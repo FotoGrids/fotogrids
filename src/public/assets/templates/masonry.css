@@ -1,0 +1,141 @@
+/**
+ * Masonry Layout Template
+ * 
+ * Pinterest-style masonry layout for FotoGrids galleries
+ */
+
+.fotogrids-layout-masonry {
+    column-count: 3;
+    column-gap: 1rem;
+    column-fill: balance;
+}
+
+.fotogrids-layout-masonry .fotogrids-item {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 1rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.fotogrids-layout-masonry .fotogrids-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Column variations */
+.fotogrids-layout-masonry[data-columns="1"] {
+    column-count: 1;
+}
+
+.fotogrids-layout-masonry[data-columns="2"] {
+    column-count: 2;
+}
+
+.fotogrids-layout-masonry[data-columns="3"] {
+    column-count: 3;
+}
+
+.fotogrids-layout-masonry[data-columns="4"] {
+    column-count: 4;
+}
+
+.fotogrids-layout-masonry[data-columns="5"] {
+    column-count: 5;
+}
+
+.fotogrids-layout-masonry[data-columns="6"] {
+    column-count: 6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .fotogrids-layout-masonry {
+        column-count: 2;
+        column-gap: 0.5rem;
+    }
+    
+    .fotogrids-layout-masonry .fotogrids-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Force fewer columns on mobile */
+    .fotogrids-layout-masonry[data-columns="3"],
+    .fotogrids-layout-masonry[data-columns="4"],
+    .fotogrids-layout-masonry[data-columns="5"],
+    .fotogrids-layout-masonry[data-columns="6"] {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 480px) {
+    .fotogrids-layout-masonry {
+        column-count: 1;
+        column-gap: 0;
+    }
+    
+    .fotogrids-layout-masonry .fotogrids-item {
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Single column on very small screens */
+    .fotogrids-layout-masonry[data-columns] {
+        column-count: 1;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .fotogrids-layout-masonry {
+        column-gap: 1.5rem;
+    }
+    
+    .fotogrids-layout-masonry .fotogrids-item {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Adjust columns for tablet */
+    .fotogrids-layout-masonry[data-columns="5"],
+    .fotogrids-layout-masonry[data-columns="6"] {
+        column-count: 3;
+    }
+}
+
+@media (min-width: 1024px) {
+    .fotogrids-layout-masonry {
+        column-gap: 2rem;
+    }
+    
+    .fotogrids-layout-masonry .fotogrids-item {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Animation for loading */
+.fotogrids-layout-masonry .fotogrids-item {
+    opacity: 0;
+    animation: fadeInMasonry 0.5s ease forwards;
+}
+
+@keyframes fadeInMasonry {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Staggered animation delay */
+.fotogrids-layout-masonry .fotogrids-item:nth-child(1) { animation-delay: 0.1s; }
+.fotogrids-layout-masonry .fotogrids-item:nth-child(2) { animation-delay: 0.2s; }
+.fotogrids-layout-masonry .fotogrids-item:nth-child(3) { animation-delay: 0.3s; }
+.fotogrids-layout-masonry .fotogrids-item:nth-child(4) { animation-delay: 0.4s; }
+.fotogrids-layout-masonry .fotogrids-item:nth-child(5) { animation-delay: 0.5s; }
+.fotogrids-layout-masonry .fotogrids-item:nth-child(6) { animation-delay: 0.6s; }
+.fotogrids-layout-masonry .fotogrids-item:nth-child(n+7) { animation-delay: 0.7s; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .fotogrids-layout-masonry .fotogrids-item {
+        opacity: 1;
+        animation: none;
+    }
+}

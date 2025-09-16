@@ -1,0 +1,516 @@
+// FotoGrids Admin Styles
+
+// Import block styles
+@import './blocks.scss';
+
+// Main page styles
+.fotogrids-main-page {
+    .fotogrids-welcome {
+        margin-bottom: 2rem;
+        
+        h2 {
+            color: #1e1e1e;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            color: #757575;
+            font-size: 1.1rem;
+        }
+    }
+    
+    .fotogrids-dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            
+            .stat-item {
+                text-align: center;
+                
+                .stat-number {
+                    font-size: 2rem;
+                    font-weight: 600;
+                    color: #0073aa;
+                    line-height: 1.2;
+                }
+                
+                .stat-label {
+                    font-size: 0.9rem;
+                    color: #757575;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+            }
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            
+            .button {
+                justify-content: center;
+            }
+        }
+        
+        .getting-started {
+            ol {
+                padding-left: 1.5rem;
+                
+                li {
+                    margin-bottom: 0.5rem;
+                    color: #1e1e1e;
+                }
+            }
+        }
+    }
+}
+
+// Templates page styles
+.fotogrids-templates-page {
+    .templates-header {
+        margin-bottom: 2rem;
+        
+        .description {
+            font-size: 1.1rem;
+            color: #757575;
+        }
+    }
+    
+    .templates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        
+        .template-card {
+            position: relative;
+            transition: transform 0.2s ease;
+            
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            
+            .template-preview {
+                position: relative;
+                
+                img {
+                    width: 100%;
+                    height: 200px;
+                    object-fit: cover;
+                    border-radius: 4px 4px 0 0;
+                }
+                
+                .template-type {
+                    position: absolute;
+                    top: 0.75rem;
+                    right: 0.75rem;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    
+                    &.template-type-free {
+                        background: #00a32a;
+                        color: white;
+                    }
+                    
+                    &.template-type-starter,
+                    &.template-type-expert,
+                    &.template-type-commerce {
+                        background: #ff6900;
+                        color: white;
+                    }
+                }
+            }
+            
+            .template-name {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            
+            .template-description {
+                color: #757575;
+                margin-bottom: 1rem;
+            }
+            
+            .template-actions {
+                display: flex;
+                gap: 0.5rem;
+                
+                .pro-template-actions {
+                    display: flex;
+                    gap: 0.5rem;
+                    width: 100%;
+                }
+            }
+        }
+    }
+    
+    .no-templates {
+        text-align: center;
+        padding: 3rem;
+        color: #757575;
+    }
+}
+
+// Stats page styles
+.fotogrids-stats-page {
+    .stats-filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        
+        .components-base-control {
+            min-width: 200px;
+        }
+    }
+    
+    .stats-content {
+        display: grid;
+        gap: 2rem;
+        
+        .stats-overview {
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 2rem;
+                
+                .stat-item {
+                    text-align: center;
+                    
+                    .stat-number {
+                        font-size: 2.5rem;
+                        font-weight: 600;
+                        color: #0073aa;
+                        line-height: 1.2;
+                    }
+                    
+                    .stat-label {
+                        font-size: 1rem;
+                        color: #757575;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+                }
+            }
+        }
+        
+        .chart-placeholder {
+            text-align: center;
+            padding: 2rem;
+            
+            .ascii-chart {
+                font-family: monospace;
+                font-size: 0.8rem;
+                color: #0073aa;
+                background: #f6f7f7;
+                padding: 1rem;
+                border-radius: 4px;
+                margin-top: 1rem;
+            }
+        }
+        
+        .top-images-list {
+            .top-image-item {
+                display: flex;
+                align-items: center;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #f0f0f1;
+                
+                &:last-child {
+                    border-bottom: none;
+                }
+                
+                .rank {
+                    font-weight: 600;
+                    margin-right: 1rem;
+                    color: #0073aa;
+                    min-width: 2rem;
+                }
+                
+                .image-title {
+                    flex: 1;
+                    font-weight: 500;
+                }
+                
+                .image-views {
+                    color: #757575;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+}
+
+// Settings page styles
+.fotogrids-settings-page {
+    .fotogrids-settings-tabs {
+        .components-tab-panel__tab {
+            font-weight: 500;
+        }
+        
+        .components-tab-panel__tab-content {
+            margin-top: 1.5rem;
+        }
+    }
+    
+    .permissions-info,
+    .integrations-info {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f6f7f7;
+        border-radius: 4px;
+        
+        p {
+            margin: 0;
+            color: #1e1e1e;
+        }
+    }
+    
+    .permission-setting {
+        margin-bottom: 2rem;
+        
+        h4 {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .role-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            
+            label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 500;
+                
+                input[type="checkbox"] {
+                    margin: 0;
+                }
+            }
+        }
+    }
+    
+    .pro-notice {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 4px;
+        text-align: center;
+        
+        .components-button {
+            background: white;
+            color: #667eea;
+            border: none;
+            font-weight: 600;
+            
+            &:hover {
+                background: #f8f9fa;
+            }
+        }
+    }
+    
+    .settings-actions {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f0f0f1;
+    }
+}
+
+// License page styles
+.fotogrids-license-page {
+    .license-content {
+        max-width: 800px;
+        
+        .license-info {
+            .license-status {
+                margin-bottom: 1rem;
+                
+                .status-badge {
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    
+                    &.status-active {
+                        background: #00a32a;
+                        color: white;
+                    }
+                    
+                    &.status-expired {
+                        background: #ffb900;
+                        color: white;
+                    }
+                    
+                    &.status-disabled {
+                        background: #d63638;
+                        color: white;
+                    }
+                }
+            }
+            
+            .license-details {
+                margin-bottom: 2rem;
+                
+                .license-detail {
+                    margin-bottom: 0.75rem;
+                    
+                    strong {
+                        display: inline-block;
+                        min-width: 100px;
+                        color: #1e1e1e;
+                    }
+                    
+                    code {
+                        background: #f6f7f7;
+                        padding: 0.25rem 0.5rem;
+                        border-radius: 3px;
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+            
+            .license-actions {
+                display: flex;
+                gap: 1rem;
+            }
+        }
+        
+        .license-activation {
+            .activation-actions {
+                margin-top: 1.5rem;
+            }
+        }
+        
+        .pro-features {
+            .feature-tier {
+                margin-bottom: 2rem;
+                
+                h4 {
+                    color: #0073aa;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    margin-bottom: 0.75rem;
+                }
+                
+                ul {
+                    list-style: none;
+                    padding: 0;
+                    
+                    li {
+                        position: relative;
+                        padding-left: 1.5rem;
+                        margin-bottom: 0.5rem;
+                        
+                        &::before {
+                            content: '✓';
+                            position: absolute;
+                            left: 0;
+                            color: #00a32a;
+                            font-weight: bold;
+                        }
+                    }
+                }
+            }
+            
+            .upgrade-cta {
+                text-align: center;
+                margin-top: 2rem;
+                padding-top: 2rem;
+                border-top: 1px solid #f0f0f1;
+            }
+        }
+    }
+}
+
+// Custom column styles for post list tables
+.fotogrids-layout-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f0f0f1;
+    color: #1e1e1e;
+    
+    &.layout-grid {
+        background: #e1f5fe;
+        color: #0277bd;
+    }
+    
+    &.layout-masonry {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+    
+    &.layout-justified {
+        background: #e8f5e8;
+        color: #2e7d32;
+    }
+    
+    &.layout-slider {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+}
+
+.fotogrids-stats {
+    font-size: 0.9rem;
+    
+    .views,
+    .shares {
+        display: block;
+        color: #757575;
+    }
+}
+
+// Loading states
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #757575;
+    font-style: italic;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .fotogrids-dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .templates-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-filters {
+        flex-direction: column;
+        
+        .components-base-control {
+            min-width: auto;
+        }
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+    
+    .license-actions {
+        flex-direction: column;
+    }
+}
