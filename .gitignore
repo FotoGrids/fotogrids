@@ -54,3 +54,6 @@ logs
 # Backup files
 *.bak
 *.backup
+
+# Documentation files
+*.md
