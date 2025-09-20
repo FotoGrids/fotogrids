@@ -40,16 +40,9 @@ class FotoGrids {
     }
     
     initializeLightbox() {
-        // Simple lightbox implementation
-        this.lightbox = new FotoGridsLightbox();
-        
-        // Attach lightbox to all gallery images
-        document.addEventListener('click', (e) => {
-            if (e.target.matches('.fotogrids-lightbox .fotogrids-item img')) {
-                e.preventDefault();
-                this.lightbox.open(e.target);
-            }
-        });
+        // Lightbox functionality is now handled by a separate lightbox.js file
+        // This method is kept for backward compatibility but does nothing
+        // The lightbox.js file will auto-initialize when loaded
     }
     
     initializeLazyLoading() {
@@ -200,162 +193,8 @@ class FotoGridsGallery {
     }
 }
 
-class FotoGridsLightbox {
-    constructor() {
-        this.isOpen = false;
-        this.currentIndex = 0;
-        this.images = [];
-        
-        this.createElement();
-        this.bindEvents();
-    }
-    
-    createElement() {
-        this.element = document.createElement('div');
-        this.element.className = 'fotogrids-lightbox-overlay';
-        this.element.innerHTML = `
-            <div class="fotogrids-lightbox-container">
-                <button class="fotogrids-lightbox-close" aria-label="Close">&times;</button>
-                <button class="fotogrids-lightbox-prev" aria-label="Previous">&#8249;</button>
-                <button class="fotogrids-lightbox-next" aria-label="Next">&#8250;</button>
-                <div class="fotogrids-lightbox-content">
-                    <img src="" alt="" />
-                    <div class="fotogrids-lightbox-caption"></div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(this.element);
-    }
-    
-    bindEvents() {
-        // Close button
-        this.element.querySelector('.fotogrids-lightbox-close').addEventListener('click', () => {
-            this.close();
-        });
-        
-        // Navigation buttons
-        this.element.querySelector('.fotogrids-lightbox-prev').addEventListener('click', () => {
-            this.prev();
-        });
-        
-        this.element.querySelector('.fotogrids-lightbox-next').addEventListener('click', () => {
-            this.next();
-        });
-        
-        // Click outside to close
-        this.element.addEventListener('click', (e) => {
-            if (e.target === this.element) {
-                this.close();
-            }
-        });
-        
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (!this.isOpen) return;
-            
-            switch (e.key) {
-                case 'Escape':
-                    this.close();
-                    break;
-                case 'ArrowLeft':
-                    this.prev();
-                    break;
-                case 'ArrowRight':
-                    this.next();
-                    break;
-            }
-        });
-    }
-    
-    open(clickedImage) {
-        // Get all images in the same gallery
-        const gallery = clickedImage.closest('.fotogrids-gallery');
-        this.images = Array.from(gallery.querySelectorAll('.fotogrids-item img'));
-        this.currentIndex = this.images.indexOf(clickedImage);
-        
-        this.showImage();
-        this.element.classList.add('active');
-        this.isOpen = true;
-        
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-        
-        // Track image view
-        this.trackImageView(clickedImage);
-    }
-    
-    close() {
-        this.element.classList.remove('active');
-        this.isOpen = false;
-        
-        // Restore body scroll
-        document.body.style.overflow = '';
-    }
-    
-    prev() {
-        this.currentIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.images.length - 1;
-        this.showImage();
-    }
-    
-    next() {
-        this.currentIndex = this.currentIndex < this.images.length - 1 ? this.currentIndex + 1 : 0;
-        this.showImage();
-    }
-    
-    showImage() {
-        const img = this.images[this.currentIndex];
-        const lightboxImg = this.element.querySelector('.fotogrids-lightbox-content img');
-        const caption = this.element.querySelector('.fotogrids-lightbox-caption');
-        
-        // Use full size image if available
-        const fullSrc = img.dataset.full || img.src;
-        lightboxImg.src = fullSrc;
-        lightboxImg.alt = img.alt;
-        
-        // Show caption if available
-        const figcaption = img.closest('.fotogrids-item').querySelector('.fotogrids-caption');
-        if (figcaption) {
-            caption.textContent = figcaption.textContent;
-            caption.style.display = 'block';
-        } else {
-            caption.style.display = 'none';
-        }
-        
-        // Update navigation button states
-        const prevBtn = this.element.querySelector('.fotogrids-lightbox-prev');
-        const nextBtn = this.element.querySelector('.fotogrids-lightbox-next');
-        
-        prevBtn.style.display = this.images.length > 1 ? 'block' : 'none';
-        nextBtn.style.display = this.images.length > 1 ? 'block' : 'none';
-    }
-    
-    trackImageView(img) {
-        const settings = window.fotogrids || {};
-        if (!settings.stats_tracking) {
-            return;
-        }
-        
-        const imageId = img.dataset.id;
-        if (!imageId) {
-            return;
-        }
-        
-        fetch(`${settings.restUrl}stats/view`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': settings.nonce,
-            },
-            body: JSON.stringify({
-                object_type: 'image',
-                object_id: parseInt(imageId),
-            }),
-        }).catch(error => {
-            console.warn('Error tracking image view:', error);
-        });
-    }
-}
+// FotoGridsLightbox class is now in a separate lightbox.js file for better performance
+// This placeholder is kept for backward compatibility
 
 // Social sharing functionality
 class FotoGridsSharing {

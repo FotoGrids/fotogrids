@@ -1,42 +1,188 @@
 // FotoGrids Admin Styles
 
 // Import block styles
+@import './colors.scss';
 @import './blocks.scss';
+@import './images.scss';
+@import './settings.scss';
+@import './ajax-save.scss';
+@import './album-assignment.scss';
+@import './album-galleries.scss';
+@import './stats.scss';
 
-// Main page styles
-.fotogrids-main-page {
-    .fotogrids-welcome {
-        margin-bottom: 2rem;
+body[class*="fotogrids_page_"] {
+    #wpcontent {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    #wpbody-content > .wrap {
+        margin: 0;
+    }
+
+    #fotogrids-admin-header {
+        padding: 1rem 2rem;
+        background-color: #fff;
         
-        h2 {
-            color: #1e1e1e;
-            margin-bottom: 0.5rem;
-        }
-        
-        p {
-            color: #757575;
-            font-size: 1.1rem;
+        h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1d2327;
         }
     }
     
-    .fotogrids-dashboard-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
+    .fotogrids-page-icon {
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
         
-        .stats-grid {
+        svg {
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+    }
+
+    .fotogrids-admin-page {
+        padding: 2rem;
+    }
+}
+
+// Welcome page styles
+.fotogrids-welcome {
+    max-width: 1200px;
+    
+    .fotogrids-welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+        
+        .fotogrids-branding {
+            h1 {
+                margin: 0;
+                color: #1e1e1e;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                
+                .dashicons {
+                    color: #0073aa;
+                }
+            }
+            
+            p {
+                margin: 0.25rem 0 0 0;
+                color: #757575;
+                font-size: 1.1rem;
+            }
+        }
+        
+        .fotogrids-version {
+            .fotogrids-version-badge {
+                background: #f0f0f1;
+                color: #1e1e1e;
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+        }
+    }
+    
+    .fotogrids-quick-actions {
+        margin-bottom: 2rem;
+        
+        h3 {
+            color: #1e1e1e;
+            margin-bottom: 1rem;
+        }
+        
+        .fotogrids-action-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
             
-            .stat-item {
+            .fotogrids-action-card {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1.5rem;
+                background: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                text-decoration: none;
+                color: #1e1e1e;
+                transition: all 0.2s ease;
+                
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    border-color: #0073aa;
+                }
+                
+                &.primary {
+                    background: linear-gradient(135deg, #0073aa 0%, #005177 100%);
+                    color: white;
+                    border-color: #0073aa;
+                }
+                
+                .action-icon {
+                    font-size: 2rem;
+                    line-height: 1;
+                }
+                
+                .action-content {
+                    flex: 1;
+                    
+                    h4 {
+                        margin: 0 0 0.25rem 0;
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                    }
+                    
+                    p {
+                        margin: 0;
+                        font-size: 0.9rem;
+                        opacity: 0.8;
+                    }
+                }
+            }
+        }
+    }
+    
+    .fotogrids-overview {
+        margin-bottom: 2rem;
+        
+        h3 {
+            color: #1e1e1e;
+            margin-bottom: 1rem;
+        }
+        
+        .fotogrids-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            
+            .fotogrids-stat-card {
                 text-align: center;
+                background: white;
+                padding: 1.5rem;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
                 
                 .stat-number {
-                    font-size: 2rem;
-                    font-weight: 600;
+                    font-size: 2.5rem;
+                    font-weight: 700;
                     color: #0073aa;
-                    line-height: 1.2;
+                    line-height: 1;
+                    margin-bottom: 0.5rem;
                 }
                 
                 .stat-label {
@@ -44,28 +190,111 @@
                     color: #757575;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
+                    font-weight: 600;
                 }
             }
         }
+    }
+    
+    .fotogrids-getting-started {
+        margin-bottom: 2rem;
         
-        .quick-actions {
+        h3 {
+            color: #1e1e1e;
+            margin-bottom: 1rem;
+        }
+        
+        .fotogrids-steps {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 1rem;
             
-            .button {
-                justify-content: center;
+            .fotogrids-step {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                padding: 1rem;
+                background: white;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                
+                .step-number {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    background: #0073aa;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    flex-shrink: 0;
+                }
+                
+                .step-content {
+                    flex: 1;
+                    
+                    h4 {
+                        margin: 0 0 0.25rem 0;
+                        color: #1e1e1e;
+                        font-weight: 600;
+                    }
+                    
+                    p {
+                        margin: 0;
+                        color: #757575;
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+        }
+    }
+    
+    .fotogrids-pro-teaser {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        
+        h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .fotogrids-pro-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            
+            .pro-feature {
+                text-align: left;
+                
+                h4 {
+                    margin: 0 0 0.5rem 0;
+                    color: white;
+                    font-weight: 600;
+                }
+                
+                p {
+                    margin: 0;
+                    font-size: 0.9rem;
+                    opacity: 0.9;
+                }
             }
         }
         
-        .getting-started {
-            ol {
-                padding-left: 1.5rem;
-                
-                li {
-                    margin-bottom: 0.5rem;
-                    color: #1e1e1e;
-                }
+        .button {
+            background: white;
+            color: #667eea;
+            border: none;
+            font-weight: 600;
+            
+            &:hover {
+                background: #f8f9fa;
+                color: #5a67d8;
             }
         }
     }
@@ -252,15 +481,45 @@
 }
 
 // Settings page styles
-.fotogrids-settings-page {
-    .fotogrids-settings-tabs {
-        .components-tab-panel__tab {
-            font-weight: 500;
-        }
+.fotogrids-settings {
+    .fotogrids-tab-nav {
+        margin-bottom: 1.5rem;
         
-        .components-tab-panel__tab-content {
-            margin-top: 1.5rem;
+        .nav-tab-wrapper {
+            border-bottom: 1px solid #c3c4c7;
+            margin: 0;
+            padding: 0;
+            
+            .nav-tab {
+                background: #f6f7f7;
+                border: 1px solid #c3c4c7;
+                color: #50575e;
+                text-decoration: none;
+                padding: 8px 12px;
+                font-size: 14px;
+                line-height: 1.4;
+                display: inline-block;
+                margin: -1px -1px -1px 0;
+                
+                &:hover {
+                    background-color: #fff;
+                    color: #135e96;
+                }
+                
+                &.nav-tab-active {
+                    background-color: #fff;
+                    border-bottom-color: #fff;
+                    color: #000;
+                }
+            }
         }
+    }
+    
+    .fotogrids-tab-content {
+        background: white;
+        padding: 1.5rem;
+        border: 1px solid #c3c4c7;
+        border-top: none;
     }
     
     .permissions-info,
@@ -327,6 +586,173 @@
         padding-top: 1.5rem;
         border-top: 1px solid #f0f0f1;
     }
+}
+
+// Galleries and Albums page styles
+.fotogrids-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    
+    h2 {
+        margin: 0;
+        color: #1e1e1e;
+    }
+    
+    .fotogrids-header-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    }
+}
+
+.fotogrids-search-section {
+    margin-bottom: 1.5rem;
+    
+    .fotogrids-search-input {
+        max-width: 300px;
+        padding: 0.5rem;
+        border: 1px solid #8c8f94;
+        border-radius: 4px;
+        font-size: 14px;
+        
+        &:focus {
+            border-color: #0073aa;
+            box-shadow: 0 0 0 1px #0073aa;
+            outline: none;
+        }
+    }
+}
+
+.fotogrids-table-container {
+    background: white;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    overflow: hidden;
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f1;
+        }
+        
+        th {
+            background: #f6f7f7;
+            font-weight: 600;
+            color: #1e1e1e;
+            border-bottom: 1px solid #c3c4c7;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .row-actions {
+            display: flex;
+            gap: 0.5rem;
+            
+            .button {
+                padding: 4px 8px;
+                font-size: 12px;
+                line-height: 1.4;
+                min-height: auto;
+            }
+        }
+    }
+}
+
+.fotogrids-form-container {
+    background: white;
+    padding: 1.5rem;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    
+    .fotogrids-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .fotogrids-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        
+        label {
+            font-weight: 600;
+            color: #1e1e1e;
+        }
+        
+        input,
+        select,
+        textarea {
+            padding: 0.5rem;
+            border: 1px solid #8c8f94;
+            border-radius: 4px;
+            font-size: 14px;
+            
+            &:focus {
+                border-color: #0073aa;
+                box-shadow: 0 0 0 1px #0073aa;
+                outline: none;
+            }
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+    }
+    
+    .fotogrids-form-actions {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+    }
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem;
+    color: #757575;
+    font-style: italic;
+    
+    &::before {
+        content: '⟳';
+        display: inline-block;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 // License page styles
@@ -512,5 +938,30 @@
     
     .license-actions {
         flex-direction: column;
+    }
+}
+
+// Copy to clipboard button styles
+.fotogrids-shortcode-container {
+    .fotogrids-copy-shortcode {
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        
+        &.copied {
+            background-color: #00a32a;
+            border-color: #00a32a;
+            color: #fff;
+        }
+        
+        &.copy-error {
+            background-color: #d63638;
+            border-color: #d63638;
+            color: #fff;
+        }
+        
+        &:hover:not(.copied):not(.copy-error) {
+            background-color: #f6f7f7;
+            border-color: #8c8f94;
+        }
     }
 }

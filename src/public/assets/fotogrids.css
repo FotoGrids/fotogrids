@@ -5,6 +5,21 @@
  */
 
 /* ==========================================================================
+   Error Messages
+   ========================================================================== */
+
+.fotogrids-error {
+    background: #ffebe8;
+    border: 1px solid #d63638;
+    border-radius: 4px;
+    color: #d63638;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
    Base Gallery Styles
    ========================================================================== */
 
@@ -58,10 +73,34 @@
     opacity: 1;
 }
 
+/* ==========================================================================
+   Click Behavior Styles
+   ========================================================================== */
+
 /* Lightbox enabled galleries */
-.fotogrids-lightbox .fotogrids-item {
+.fotogrids-lightbox .fotogrids-item,
+.fotogrids-click-lightbox .fotogrids-item {
     cursor: pointer;
 }
+
+/* Direct link galleries */
+.fotogrids-click-direct .fotogrids-item,
+.fotogrids-direct-link {
+    cursor: pointer;
+}
+
+/* External link galleries */
+.fotogrids-click-external .fotogrids-item,
+.fotogrids-external-link {
+    cursor: pointer;
+}
+
+/* Nothing click behavior */
+.fotogrids-click-nothing .fotogrids-item {
+    cursor: default;
+}
+
+/* Note: Lightbox styles are now in a separate lightbox.css file for better performance */
 
 /* Loading states */
 .fotogrids-lazy img[loading="lazy"] {
@@ -135,6 +174,8 @@
     margin-bottom: 2rem;
     font-style: italic;
 }
+
+/* Mobile lightbox styles are now in the separate lightbox.css file */
 
 /* ==========================================================================
    Responsive Design

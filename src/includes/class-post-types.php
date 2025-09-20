@@ -18,7 +18,10 @@ class Post_Types {
     public static function init() {
         add_action( 'init', array( __CLASS__, 'register_cpts' ) );
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
-        add_action( 'save_post', array( __CLASS__, 'save_meta_boxes' ) );
+        // Meta box saving is handled by class-meta-boxes.php
+        
+        // Disable Gutenberg for our post types
+        add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
     }
     
     /**
@@ -77,7 +80,7 @@ class Post_Types {
             'hierarchical'          => false,
             'menu_position'         => null,
             'menu_icon'             => 'dashicons-format-gallery',
-            'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
+            'supports'              => array( 'title', 'thumbnail' ),
             'show_in_rest'          => true,
             'rest_base'             => 'fotogrids-galleries',
             'rest_controller_class' => 'WP_REST_Posts_Controller',
@@ -131,7 +134,7 @@ class Post_Types {
             'hierarchical'          => false,
             'menu_position'         => null,
             'menu_icon'             => 'dashicons-album',
-            'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
+            'supports'              => array( 'title', 'thumbnail' ),
             'show_in_rest'          => true,
             'rest_base'             => 'fotogrids-albums',
             'rest_controller_class' => 'WP_REST_Posts_Controller',
@@ -144,15 +147,7 @@ class Post_Types {
      * Add meta boxes to post edit screens
      */
     public static function add_meta_boxes() {
-        // Gallery meta boxes
-        add_meta_box(
-            'fotogrids_gallery_settings',
-            __( 'Gallery Settings', 'fotogrids' ),
-            array( __CLASS__, 'gallery_settings_meta_box' ),
-            'fotogrids_gallery',
-            'side',
-            'high'
-        );
+        // Gallery meta boxes are handled by class-meta-boxes.php
         
         add_meta_box(
             'fotogrids_gallery_shortcode',
@@ -165,76 +160,24 @@ class Post_Types {
         
         // Album meta boxes
         add_meta_box(
+            'fotogrids_album_galleries',
+            __( 'Galleries', 'fotogrids' ),
+            array( __CLASS__, 'album_galleries_meta_box' ),
+            'fotogrids_album',
+            'normal',
+            'high'
+        );
+        
+        add_meta_box(
             'fotogrids_album_settings',
             __( 'Album Settings', 'fotogrids' ),
             array( __CLASS__, 'album_settings_meta_box' ),
             'fotogrids_album',
-            'side',
-            'high'
+            'normal',
+            'default'
         );
     }
     
-    /**
-     * Gallery settings meta box callback
-     */
-    public static function gallery_settings_meta_box( $post ) {
-        // Add nonce for security
-        wp_nonce_field( 'fotogrids_gallery_settings', 'fotogrids_gallery_settings_nonce' );
-        
-        // Get current values
-        $layout = get_post_meta( $post->ID, 'fotogrids_layout', true ) ?: 'grid';
-        $columns = get_post_meta( $post->ID, 'fotogrids_columns', true ) ?: 3;
-        $album_id = get_post_meta( $post->ID, 'fotogrids_album_id', true );
-        
-        // Get albums for dropdown
-        $albums = get_posts( array(
-            'post_type' => 'fotogrids_album',
-            'numberposts' => -1,
-            'post_status' => 'publish',
-        ) );
-        
-        ?>
-        <table class="form-table">
-            <tr>
-                <th scope="row">
-                    <label for="fotogrids_layout"><?php _e( 'Layout', 'fotogrids' ); ?></label>
-                </th>
-                <td>
-                    <select name="fotogrids_layout" id="fotogrids_layout">
-                        <option value="grid" <?php selected( $layout, 'grid' ); ?>><?php _e( 'Grid', 'fotogrids' ); ?></option>
-                        <option value="masonry" <?php selected( $layout, 'masonry' ); ?>><?php _e( 'Masonry', 'fotogrids' ); ?></option>
-                        <option value="justified" <?php selected( $layout, 'justified' ); ?>><?php _e( 'Justified', 'fotogrids' ); ?></option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="fotogrids_columns"><?php _e( 'Columns', 'fotogrids' ); ?></label>
-                </th>
-                <td>
-                    <input type="number" name="fotogrids_columns" id="fotogrids_columns" 
-                           value="<?php echo esc_attr( $columns ); ?>" min="1" max="12" />
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="fotogrids_album_id"><?php _e( 'Album', 'fotogrids' ); ?></label>
-                </th>
-                <td>
-                    <select name="fotogrids_album_id" id="fotogrids_album_id">
-                        <option value=""><?php _e( 'No Album', 'fotogrids' ); ?></option>
-                        <?php foreach ( $albums as $album ) : ?>
-                            <option value="<?php echo esc_attr( $album->ID ); ?>" 
-                                    <?php selected( $album_id, $album->ID ); ?>>
-                                <?php echo esc_html( $album->post_title ); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <?php
-    }
     
     /**
      * Gallery shortcode meta box callback
@@ -244,10 +187,17 @@ class Post_Types {
             $shortcode = '[fotogrids_gallery id="' . $post->ID . '"]';
             ?>
             <p><?php _e( 'Use this shortcode to display the gallery:', 'fotogrids' ); ?></p>
-            <input type="text" value="<?php echo esc_attr( $shortcode ); ?>" 
-                   readonly onclick="this.select();" style="width: 100%;" />
+            <div class="fotogrids-shortcode-container" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" value="<?php echo esc_attr( $shortcode ); ?>" 
+                       readonly onclick="this.select();" style="flex: 1;" />
+                <button type="button" class="button fotogrids-copy-shortcode" 
+                        data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
+                        title="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
+                    <?php _e( 'Copy', 'fotogrids' ); ?>
+                </button>
+            </div>
             <p class="description">
-                <?php _e( 'Click the shortcode to select it, then copy and paste it into your post or page.', 'fotogrids' ); ?>
+                <?php _e( 'Click "Copy" to copy the shortcode to your clipboard, or click the shortcode field to select it manually.', 'fotogrids' ); ?>
             </p>
             <?php
         } else {
@@ -255,6 +205,24 @@ class Post_Types {
             <p><?php _e( 'Publish the gallery to get the shortcode.', 'fotogrids' ); ?></p>
             <?php
         }
+    }
+    
+    /**
+     * Album galleries meta box callback
+     */
+    public static function album_galleries_meta_box( $post ) {
+        // Add nonce for security
+        wp_nonce_field( 'fotogrids_album_galleries', 'fotogrids_album_galleries_nonce' );
+        
+        ?>
+        <div id="fotogrids-album-galleries-root">
+            <!-- React Album Gallery Manager component will mount here -->
+            <div class="fotogrids-loading">
+                <span class="spinner is-active"></span>
+                <?php _e( 'Loading gallery manager...', 'fotogrids' ); ?>
+            </div>
+        </div>
+        <?php
     }
     
     /**
@@ -268,12 +236,8 @@ class Post_Types {
         $layout = get_post_meta( $post->ID, 'fotogrids_album_layout', true ) ?: 'grid';
         $featured_gallery = get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
         
-        // Get galleries for dropdown
-        $galleries = get_posts( array(
-            'post_type' => 'fotogrids_gallery',
-            'numberposts' => -1,
-            'post_status' => 'publish',
-        ) );
+        // Get assigned galleries for featured gallery dropdown
+        $assigned_galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $post->ID );
         
         ?>
         <table class="form-table">
@@ -286,6 +250,7 @@ class Post_Types {
                         <option value="grid" <?php selected( $layout, 'grid' ); ?>><?php _e( 'Grid', 'fotogrids' ); ?></option>
                         <option value="list" <?php selected( $layout, 'list' ); ?>><?php _e( 'List', 'fotogrids' ); ?></option>
                     </select>
+                    <p class="description"><?php _e( 'Choose how galleries are displayed in this album.', 'fotogrids' ); ?></p>
                 </td>
             </tr>
             <tr>
@@ -295,13 +260,14 @@ class Post_Types {
                 <td>
                     <select name="fotogrids_featured_gallery" id="fotogrids_featured_gallery">
                         <option value=""><?php _e( 'No Featured Gallery', 'fotogrids' ); ?></option>
-                        <?php foreach ( $galleries as $gallery ) : ?>
+                        <?php foreach ( $assigned_galleries as $gallery ) : ?>
                             <option value="<?php echo esc_attr( $gallery->ID ); ?>" 
                                     <?php selected( $featured_gallery, $gallery->ID ); ?>>
                                 <?php echo esc_html( $gallery->post_title ); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <p class="description"><?php _e( 'Select a gallery to be featured for this album. Only assigned galleries are available.', 'fotogrids' ); ?></p>
                 </td>
             </tr>
         </table>
@@ -309,49 +275,18 @@ class Post_Types {
     }
     
     /**
-     * Save meta box data
+     * Disable Gutenberg block editor for FotoGrids post types
+     * 
+     * @param bool $current_status Current block editor status
+     * @param string $post_type Post type being checked
+     * @return bool Whether to use block editor
      */
-    public static function save_meta_boxes( $post_id ) {
-        // Check if this is an autosave
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-            return;
+    public static function disable_gutenberg( $current_status, $post_type ) {
+        // Disable Gutenberg for our custom post types
+        if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ) ) ) {
+            return false;
         }
         
-        // Check user permissions
-        if ( ! current_user_can( 'edit_post', $post_id ) ) {
-            return;
-        }
-        
-        $post_type = get_post_type( $post_id );
-        
-        // Save gallery settings
-        if ( $post_type === 'fotogrids_gallery' ) {
-            if ( ! isset( $_POST['fotogrids_gallery_settings_nonce'] ) || 
-                 ! wp_verify_nonce( $_POST['fotogrids_gallery_settings_nonce'], 'fotogrids_gallery_settings' ) ) {
-                return;
-            }
-            
-            $fields = array( 'fotogrids_layout', 'fotogrids_columns', 'fotogrids_album_id' );
-            foreach ( $fields as $field ) {
-                if ( isset( $_POST[ $field ] ) ) {
-                    update_post_meta( $post_id, $field, sanitize_text_field( $_POST[ $field ] ) );
-                }
-            }
-        }
-        
-        // Save album settings
-        if ( $post_type === 'fotogrids_album' ) {
-            if ( ! isset( $_POST['fotogrids_album_settings_nonce'] ) || 
-                 ! wp_verify_nonce( $_POST['fotogrids_album_settings_nonce'], 'fotogrids_album_settings' ) ) {
-                return;
-            }
-            
-            $fields = array( 'fotogrids_album_layout', 'fotogrids_featured_gallery' );
-            foreach ( $fields as $field ) {
-                if ( isset( $_POST[ $field ] ) ) {
-                    update_post_meta( $post_id, $field, sanitize_text_field( $_POST[ $field ] ) );
-                }
-            }
-        }
+        return $current_status;
     }
 }

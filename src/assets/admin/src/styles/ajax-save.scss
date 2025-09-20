@@ -1,0 +1,236 @@
+/**
+ * FotoGrids AJAX Save Styles
+ * 
+ * Styles for the asynchronous saving functionality
+ */
+
+// Import colors for SCSS variables
+@import './colors.scss';
+
+// Sticky Publish Metabox
+@media screen and (min-width: 783px) {
+    .post-type-fotogrids_gallery #submitdiv {
+        position: sticky;
+        top: 52px;
+        z-index: 10;
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+
+        &.stuck {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+    }
+}
+
+// Save Status Container
+.fotogrids-save-status {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    
+    &.loading {
+        background: #f0f6fc;
+        border: 1px solid #c3dcf3;
+        color: #0073aa;
+    }
+    
+    &.success {
+        background: #f0f8f0;
+        border: 1px solid #c6e1c6;
+        color: #00a32a;
+    }
+    
+    &.error {
+        background: #fdf2f2;
+        border: 1px solid #f1c2c2;
+        color: #d63638;
+    }
+    
+    &:not(.loading) .fotogrids-save-spinner {
+        display: none;
+    }
+}
+
+// Save Message
+.fotogrids-save-message {
+    flex: 1;
+    font-weight: 500;
+}
+
+// Spinner
+.fotogrids-save-spinner {
+    display: flex;
+    align-items: center;
+    
+    .spinner {
+        float: none;
+        margin: 0;
+        width: 16px;
+        height: 16px;
+    }
+}
+
+// Last Saved Indicator
+.fotogrids-last-saved {
+    margin-top: 10px;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    color: #666;
+    
+    small {
+        font-size: 11px;
+    }
+}
+
+// Unsaved Changes Indicator
+.fotogrids-unsaved-changes {
+    margin: 10px;
+    padding: 8px 12px;
+    background: rgba($fotogrids-colors-blue, 0.1);
+    border: 1px solid rgba($fotogrids-colors-blue, 0.3);
+    border-radius: 4px;
+    color: $fotogrids-colors-blue-dark;
+    font-size: 13px;
+}
+
+.fotogrids-unsaved-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    
+    .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+    }
+}
+
+// Update Button with Changes
+#publish.fotogrids-has-changes,
+#save-post.fotogrids-has-changes {
+    background: $fotogrids-colors-blue !important;
+    border-color: $fotogrids-colors-blue-dark !important;
+    animation: pulse-changes 2s infinite;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        background: $fotogrids-colors-blue-hover !important;
+        border-color: $fotogrids-colors-blue-dark !important;
+    }
+    
+    &:active {
+        background: $fotogrids-colors-blue-dark !important;
+        border-color: $fotogrids-colors-blue-dark !important;
+    }
+}
+
+@keyframes pulse-changes {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba($fotogrids-colors-blue, 0.4);
+    }
+    50% { 
+        box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
+    }
+}
+
+// Quick Save Button in Admin Bar
+#wp-admin-bar-fotogrids-quick-save {
+    .ab-icon {
+        margin-right: 5px !important;
+        
+        &:before {
+            font-size: 16px;
+            line-height: 1;
+        }
+    }
+    
+    &:hover .ab-item {
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .ab-label {
+        @media (max-width: 782px) {
+            display: none;
+        }
+    }
+    
+    &:focus {
+        outline: 2px solid #005177;
+        outline-offset: 2px;
+    }
+}
+
+// Form Disabled State
+#post.saving {
+    input, textarea, select, button {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+}
+
+#major-publishing-actions {
+    box-shadow: 0 1px 0 0 #dcdcde;
+}
+
+// Animations
+@keyframes fadeInSuccess {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+// Apply animations to save status
+.fotogrids-save-status {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    
+    &.success {
+        animation: fadeInSuccess 0.3s ease-out;
+    }
+    
+    &.error {
+        animation: shakeError 0.5s ease-out;
+    }
+}
+
+// Mobile Responsiveness
+@media (max-width: 782px) {
+    .fotogrids-save-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .fotogrids-save-spinner {
+        align-self: center;
+    }
+}
+
+// Print Styles
+@media print {
+    .fotogrids-save-status,
+    .fotogrids-last-saved,
+    #wp-admin-bar-fotogrids-quick-save {
+        display: none !important;
+    }
+}

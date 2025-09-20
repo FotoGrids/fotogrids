@@ -37,6 +37,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-post-types.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-taxonomies.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-rest.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-statistics.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-gallery-album-relations.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/functions-helpers.php';
 
 // Register activation, deactivation, and uninstall hooks
@@ -59,10 +60,11 @@ function fotogrids_init() {
     FotoGrids\Post_Types::init();
     FotoGrids\Taxonomies::init();
     FotoGrids\REST::init();
+    FotoGrids\Gallery_Album_Relations::init();
     
     // Initialize admin interface if in admin
     if ( is_admin() ) {
-        require_once FOTOGRIDS_PLUGIN_DIR . 'admin/class-admin-init.php';
+        require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-admin-init.php';
         FotoGrids\Admin_Init::init();
     }
     

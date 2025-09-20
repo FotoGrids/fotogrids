@@ -1,0 +1,33 @@
+$settings-border-color: #ddd;
+$settings-border-light: #e0e0e0;
+$settings-bg-light: #f6f7f7;
+$settings-bg-white: #fff;
+$settings-hover-bg: #e6e7e8;
+$settings-active-border: #2271b1;
+$settings-pro-color: #f01e32;
+$settings-text-primary: #1d2327;
+$settings-text-secondary: #50575e;
+$settings-pro-notice-bg: #f0f6fc;
+$settings-pro-notice-border: #c3dcf0;
+
+// FotoGrids Brand Colors
+$fotogrids-colors-blue: #3c46f0;
+$fotogrids-colors-blue-light: #5865f2;
+$fotogrids-colors-blue-dark: #2d35c7;
+$fotogrids-colors-blue-hover: #4f5af3;
+
+// Other FotoGrids Colors
+$fotogrids-colors-red: #f01e32;
+$fotogrids-colors-yellow: #ffb914;
+$fotogrids-colors-grey: #323232;
+
+// CSS Custom Properties for FotoGrids Colors
+:root {
+    --fotogrids-blue: #{$fotogrids-colors-blue};
+    --fotogrids-blue-light: #{$fotogrids-colors-blue-light};
+    --fotogrids-blue-dark: #{$fotogrids-colors-blue-dark};
+    --fotogrids-blue-hover: #{$fotogrids-colors-blue-hover};
+    --fotogrids-red: #{$fotogrids-colors-red};
+    --fotogrids-yellow: #{$fotogrids-colors-yellow};
+    --fotogrids-grey: #{$fotogrids-colors-grey};
+}

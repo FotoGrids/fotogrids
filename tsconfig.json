@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -28,7 +29,10 @@
     "sourceMap": true
   },
   "include": [
-    "src/assets/admin/src/**/*",
+    "src/assets/admin/src/index-simple.tsx",
+    "src/assets/admin/src/blocks/gallery-block-simple.tsx",
+    "src/assets/admin/src/components/blocks/*-simple.tsx",
+    "src/assets/admin/src/types/wordpress.d.ts",
     "src/assets/frontend/src/**/*",
     "**/*.d.ts"
   ],

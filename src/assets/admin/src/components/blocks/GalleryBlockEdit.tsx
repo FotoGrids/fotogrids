@@ -154,7 +154,7 @@ export const GalleryBlockEdit: React.FC<BlockEditProps<GalleryBlockAttributes>> 
                 <Notice status="error" isDismissible={false}>
                     {error}
                     <Button 
-                        isPrimary 
+                        variant="primary" 
                         onClick={() => {
                             setError(null);
                             loadGalleries();

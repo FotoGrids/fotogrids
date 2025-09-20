@@ -1,0 +1,586 @@
+/**
+ * FotoGrids Lightbox Styles
+ * 
+ * Standalone CSS for the FotoGrids lightbox functionality
+ * Includes all themes, transitions, and responsive design
+ */
+
+/* ==========================================================================
+   Click Behavior Styles
+   ========================================================================== */
+
+/* Lightbox enabled galleries */
+.fotogrids-lightbox .fotogrids-item,
+.fotogrids-click-lightbox .fotogrids-item {
+    cursor: pointer;
+}
+
+/* Ensure captions don't interfere with lightbox clicks but remain accessible */
+.fotogrids-lightbox .fotogrids-caption,
+.fotogrids-click-lightbox .fotogrids-caption {
+    // Don't block clicks - let them bubble up to the parent
+    pointer-events: none;
+    user-select: none;
+    
+    // But allow text selection when specifically hovering over caption
+    &:hover {
+        user-select: text;
+    }
+}
+
+/* Direct link galleries */
+.fotogrids-click-direct .fotogrids-item,
+.fotogrids-direct-link {
+    cursor: pointer;
+}
+
+/* External link galleries */
+.fotogrids-click-external .fotogrids-item,
+.fotogrids-external-link {
+    cursor: pointer;
+}
+
+/* Nothing click behavior */
+.fotogrids-click-nothing .fotogrids-item {
+    cursor: default;
+}
+
+/* ==========================================================================
+   CSS Custom Properties (Variables)
+   ========================================================================== */
+
+:root {
+    --fotogrids-lightbox-z-index: 999999;
+    --fotogrids-lightbox-transition-duration: 300ms;
+    --fotogrids-lightbox-bg-dark: rgba(0, 0, 0, 0.9);
+    --fotogrids-lightbox-bg-light: rgba(255, 255, 255, 0.95);
+    --fotogrids-lightbox-control-size: 50px;
+    --fotogrids-lightbox-control-size-mobile: 40px;
+    --fotogrids-lightbox-close-size: 40px;
+    --fotogrids-lightbox-close-size-mobile: 35px;
+    --fotogrids-lightbox-padding: 20px;
+    --fotogrids-lightbox-padding-mobile: 10px;
+}
+
+/* ==========================================================================
+   Base Lightbox Overlay
+   ========================================================================== */
+
+.fotogrids-lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--fotogrids-lightbox-bg-dark);
+    z-index: var(--fotogrids-lightbox-z-index);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+        opacity var(--fotogrids-lightbox-transition-duration, var(--transition-duration, 300ms)) ease,
+        visibility var(--fotogrids-lightbox-transition-duration, var(--transition-duration, 300ms)) ease;
+    
+    // Prevent scrolling on background
+    overscroll-behavior: contain;
+    
+    // Better text rendering
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.fotogrids-lightbox-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ==========================================================================
+   Lightbox Container
+   ========================================================================== */
+
+.fotogrids-lightbox-container {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    padding: var(--fotogrids-lightbox-padding);
+    
+    // Ensure container is focusable for keyboard navigation
+    outline: none;
+}
+
+/* ==========================================================================
+   Lightbox Content
+   ========================================================================== */
+
+.fotogrids-lightbox-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    img {
+        max-width: 100%;
+        max-height: 85vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        transition: opacity var(--fotogrids-lightbox-transition-duration, var(--transition-duration, 300ms)) ease;
+        
+        // Prevent image dragging
+        user-select: none;
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+        user-drag: none;
+    }
+    
+    &.fit-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.fotogrids-lightbox-caption {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    max-width: 80vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    // Typography
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   Lightbox Controls
+   ========================================================================== */
+
+.fotogrids-lightbox-close {
+    position: absolute;
+    top: var(--fotogrids-lightbox-padding);
+    right: var(--fotogrids-lightbox-padding);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: var(--fotogrids-lightbox-close-size);
+    height: var(--fotogrids-lightbox-close-size);
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    // Typography
+    font-family: inherit;
+    font-weight: normal;
+    line-height: 1;
+    
+    &:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: scale(1.1);
+    }
+    
+    &:focus {
+        outline: 2px solid #0073aa;
+        outline-offset: 2px;
+    }
+    
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+.fotogrids-lightbox-prev,
+.fotogrids-lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: var(--fotogrids-lightbox-control-size);
+    height: var(--fotogrids-lightbox-control-size);
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    // Typography
+    font-family: inherit;
+    font-weight: normal;
+    line-height: 1;
+    
+    &:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    &:focus {
+        outline: 2px solid #0073aa;
+        outline-offset: 2px;
+    }
+    
+    &:active {
+        transform: translateY(-50%) scale(0.95);
+    }
+}
+
+.fotogrids-lightbox-prev {
+    left: var(--fotogrids-lightbox-padding);
+}
+
+.fotogrids-lightbox-next {
+    right: var(--fotogrids-lightbox-padding);
+}
+
+/* ==========================================================================
+   Navigation Dots
+   ========================================================================== */
+
+.fotogrids-lightbox-dots {
+    position: absolute;
+    bottom: var(--fotogrids-lightbox-padding);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--dot-spacing, 8px);
+    z-index: 10;
+}
+
+.fotogrids-lightbox-dot {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    background: var(--dot-color, #ffffff);
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.3s ease, background 0.3s ease, transform 0.2s ease;
+    
+    &.active {
+        opacity: 1;
+        background: var(--active-dot-color, #007cba);
+    }
+    
+    &:hover {
+        opacity: 0.8;
+        transform: scale(1.2);
+    }
+    
+    &:focus {
+        outline: 2px solid #0073aa;
+        outline-offset: 2px;
+    }
+    
+    &:active {
+        transform: scale(0.9);
+    }
+}
+
+/* Dot Style Variations */
+.fotogrids-dot-stroke {
+    background: transparent !important;
+    border: 2px solid var(--dot-color, #ffffff);
+    
+    &.active {
+        border-color: var(--active-dot-color, #007cba);
+    }
+}
+
+.fotogrids-dot-square {
+    border-radius: 2px;
+}
+
+.fotogrids-dot-square_stroke {
+    border-radius: 2px;
+    background: transparent !important;
+    border: 2px solid var(--dot-color, #ffffff);
+    
+    &.active {
+        border-color: var(--active-dot-color, #007cba);
+    }
+}
+
+/* ==========================================================================
+   Lightbox Themes
+   ========================================================================== */
+
+/* Dark Theme (default) */
+.fotogrids-theme-dark {
+    background: var(--fotogrids-lightbox-bg-dark);
+    
+    .fotogrids-lightbox-close,
+    .fotogrids-lightbox-prev,
+    .fotogrids-lightbox-next {
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        
+        &:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+    }
+    
+    .fotogrids-lightbox-caption {
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+    }
+}
+
+/* Light Theme */
+.fotogrids-theme-light {
+    background: var(--fotogrids-lightbox-bg-light);
+    
+    .fotogrids-lightbox-close,
+    .fotogrids-lightbox-prev,
+    .fotogrids-lightbox-next {
+        background: rgba(255, 255, 255, 0.8);
+        color: #333;
+        
+        &:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+    }
+    
+    .fotogrids-lightbox-caption {
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+    }
+}
+
+/* Custom Theme */
+.fotogrids-theme-custom {
+    background: var(--lightbox-custom-color, var(--fotogrids-lightbox-bg-dark));
+}
+
+/* ==========================================================================
+   Lightbox Transitions
+   ========================================================================== */
+
+/* Fade Transition (default) */
+.fotogrids-transition-fade {
+    .fotogrids-lightbox-content img {
+        transition: opacity var(--fotogrids-lightbox-transition-duration, var(--transition-duration, 300ms)) ease;
+    }
+}
+
+/* Horizontal Transition */
+.fotogrids-transition-horizontal {
+    .fotogrids-lightbox-content img {
+        transition: transform var(--fotogrids-lightbox-transition-duration, var(--transition-duration, 300ms)) ease;
+    }
+}
+
+/* Vertical Transition */
+.fotogrids-transition-vertical {
+    .fotogrids-lightbox-content img {
+        transition: transform var(--fotogrids-lightbox-transition-duration, var(--transition-duration, 300ms)) ease;
+    }
+}
+
+/* No Transition */
+.fotogrids-transition-none {
+    .fotogrids-lightbox-content img {
+        transition: none;
+    }
+}
+
+/* ==========================================================================
+   Mobile Lightbox Styles
+   ========================================================================== */
+
+/* Mobile optimized lightbox */
+.fotogrids-lightbox-overlay.mobile-optimized {
+    padding: var(--fotogrids-lightbox-padding);
+    
+    .fotogrids-lightbox-container {
+        max-width: 100vw;
+        max-height: 100vh;
+    }
+    
+    .fotogrids-lightbox-content img {
+        max-height: 70vh;
+    }
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+/* Mobile First */
+@media (max-width: 767px) {
+    :root {
+        --fotogrids-lightbox-control-size: var(--fotogrids-lightbox-control-size-mobile);
+        --fotogrids-lightbox-close-size: var(--fotogrids-lightbox-close-size-mobile);
+        --fotogrids-lightbox-padding: var(--fotogrids-lightbox-padding-mobile);
+    }
+    
+    .fotogrids-lightbox-overlay {
+        padding: var(--fotogrids-lightbox-padding-mobile);
+    }
+    
+    .fotogrids-lightbox-container {
+        max-width: 95vw;
+        max-height: 95vh;
+        padding: var(--fotogrids-lightbox-padding-mobile);
+    }
+    
+    .fotogrids-lightbox-content img {
+        max-height: 75vh;
+    }
+    
+    .fotogrids-lightbox-close {
+        top: var(--fotogrids-lightbox-padding-mobile);
+        right: var(--fotogrids-lightbox-padding-mobile);
+        width: var(--fotogrids-lightbox-close-size-mobile);
+        height: var(--fotogrids-lightbox-close-size-mobile);
+        font-size: 18px;
+    }
+    
+    .fotogrids-lightbox-prev,
+    .fotogrids-lightbox-next {
+        width: var(--fotogrids-lightbox-control-size-mobile);
+        height: var(--fotogrids-lightbox-control-size-mobile);
+        font-size: 20px;
+    }
+    
+    .fotogrids-lightbox-prev {
+        left: var(--fotogrids-lightbox-padding-mobile);
+    }
+    
+    .fotogrids-lightbox-next {
+        right: var(--fotogrids-lightbox-padding-mobile);
+    }
+    
+    .fotogrids-lightbox-dots {
+        bottom: var(--fotogrids-lightbox-padding-mobile);
+    }
+    
+    .fotogrids-lightbox-dot {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .fotogrids-lightbox-caption {
+        bottom: -40px;
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem;
+        max-width: 90vw;
+    }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .fotogrids-lightbox-container {
+        max-width: 85vw;
+        max-height: 85vh;
+    }
+    
+    .fotogrids-lightbox-content img {
+        max-height: 80vh;
+    }
+}
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+    .fotogrids-lightbox-container {
+        max-width: 80vw;
+        max-height: 80vh;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+/* Focus management */
+.fotogrids-lightbox-overlay:focus {
+    outline: none;
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .fotogrids-lightbox-close,
+    .fotogrids-lightbox-prev,
+    .fotogrids-lightbox-next {
+        border: 2px solid currentColor;
+    }
+    
+    .fotogrids-lightbox-dot {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .fotogrids-lightbox-overlay,
+    .fotogrids-lightbox-content img,
+    .fotogrids-lightbox-close,
+    .fotogrids-lightbox-prev,
+    .fotogrids-lightbox-next,
+    .fotogrids-lightbox-dot {
+        transition: none;
+    }
+    
+    .fotogrids-lightbox-close:hover,
+    .fotogrids-lightbox-prev:hover,
+    .fotogrids-lightbox-next:hover {
+        transform: none;
+    }
+    
+    .fotogrids-lightbox-dot:hover {
+        transform: none;
+    }
+}
+
+/* Print styles */
+@media print {
+    .fotogrids-lightbox-overlay {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   Loading States
+   ========================================================================== */
+
+.fotogrids-lightbox-content img {
+    &[src=""] {
+        opacity: 0;
+    }
+    
+    // Loading spinner could be added here if needed
+}
+
+/* ==========================================================================
+   Dark Mode Support (System Preference)
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    .fotogrids-theme-light {
+        // Optionally adjust light theme in dark mode
+        // This allows respecting user's system preference while maintaining theme choice
+    }
+}

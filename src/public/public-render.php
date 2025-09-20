@@ -24,6 +24,45 @@ class Public_Render {
     }
     
     /**
+     * Get gallery settings with defaults
+     * 
+     * @param int $gallery_id Gallery ID
+     * @return array Gallery settings
+     */
+    private static function get_gallery_settings( $gallery_id ) {
+        $defaults = fotogrids_get_default_gallery_settings();
+        
+        // Start with defaults
+        $settings = $defaults;
+        
+        // Load all saved settings from post meta
+        foreach ( $defaults as $key => $default_value ) {
+            $saved_value = get_post_meta( $gallery_id, 'fotogrids_' . $key, true );
+            
+            if ( $saved_value !== '' ) {
+                // Try to decode JSON for responsive/complex settings
+                if ( is_string( $saved_value ) ) {
+                    $decoded = json_decode( $saved_value, true );
+                    if ( is_array( $decoded ) ) {
+                        // For responsive settings, merge with defaults
+                        if ( is_array( $default_value ) ) {
+                            $settings[$key] = array_merge( $default_value, $decoded );
+                        } else {
+                            $settings[$key] = $decoded;
+                        }
+                    } else {
+                        $settings[$key] = $saved_value;
+                    }
+                } else {
+                    $settings[$key] = $saved_value;
+                }
+            }
+        }
+        
+        return $settings;
+    }
+    
+    /**
      * Gallery shortcode handler
      * 
      * @param array $atts Shortcode attributes
@@ -37,34 +76,53 @@ class Public_Render {
             'lazy' => 'true',
             'lightbox' => 'true',
             'captions' => 'true',
+            'test' => 'false', // Debug test mode
         ), $atts, 'fotogrids_gallery' );
+        
+        // Test mode - return a simple test gallery
+        if ( $atts['test'] === 'true' ) {
+            return self::render_test_gallery( $atts );
+        }
         
         $gallery_id = absint( $atts['id'] );
         if ( ! $gallery_id ) {
-            return '';
+            return '<div class="fotogrids-error">FotoGrids: No gallery ID specified. Usage: [fotogrids_gallery id="1"] or [fotogrids_gallery test="true"]</div>';
         }
         
         // Get gallery
         $gallery = fotogrids_get_gallery( $gallery_id );
-        if ( ! $gallery || $gallery->post_status !== 'publish' ) {
-            return '';
+        if ( ! $gallery ) {
+            return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' not found.</div>';
+        }
+        
+        if ( $gallery->post_status !== 'publish' ) {
+            return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' is not published (status: ' . $gallery->post_status . ').</div>';
         }
         
         // Get gallery settings
-        $layout = $atts['template'] ?: (get_post_meta( $gallery_id, 'fotogrids_layout', true ) ?: 'grid');
-        $columns = $atts['cols'] ? absint( $atts['cols'] ) : (get_post_meta( $gallery_id, 'fotogrids_columns', true ) ?: 3);
+        $settings = self::get_gallery_settings( $gallery_id );
         
+        // Override with shortcode attributes if provided
+        $layout = $atts['template'] ?: $settings['layout'];
+        $responsive_columns = $atts['cols'] ? 
+            array('desktop' => absint($atts['cols']), 'tablet' => absint($atts['cols']), 'mobile' => absint($atts['cols'])) : 
+            $settings['columns'];
+        $responsive_spacing = $settings['image_spacing'];
+
         // Get gallery images
         $images = fotogrids_get_gallery_images( $gallery_id );
         if ( empty( $images ) ) {
-            return '';
+            return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' exists but has no images.</div>';
         }
         
         // Enqueue specific template assets
         self::enqueue_template_assets( $layout );
         
+        // Enqueue lightbox assets if needed
+        self::enqueue_lightbox_assets( $settings );
+        
         // Render gallery
-        return self::render_gallery( $gallery_id, $images, $layout, $atts );
+        return self::render_gallery( $gallery_id, $images, $layout, $responsive_columns, $responsive_spacing, $settings, $atts );
     }
     
     /**
@@ -207,7 +265,7 @@ class Public_Render {
     /**
      * Render gallery HTML
      */
-    private static function render_gallery( $gallery_id, $images, $layout, $atts ) {
+    private static function render_gallery( $gallery_id, $images, $layout, $responsive_columns, $responsive_spacing, $settings, $atts ) {
         $classes = array(
             'fotogrids-gallery',
             'fotogrids-layout-' . esc_attr( $layout ),
@@ -217,14 +275,75 @@ class Public_Render {
             $classes[] = 'fotogrids-lazy';
         }
         
-        if ( $atts['lightbox'] === 'true' ) {
+        // Add interaction-specific classes
+        $click_behavior = $settings['image_click_behavior'] ?? 'lightbox';
+        $classes[] = 'fotogrids-click-' . esc_attr( $click_behavior );
+        
+        if ( $click_behavior === 'lightbox' || $atts['lightbox'] === 'true' ) {
             $classes[] = 'fotogrids-lightbox';
+            $classes[] = 'fotogrids-lightbox-theme-' . esc_attr( $settings['lightbox_theme'] ?? 'dark' );
+            $classes[] = 'fotogrids-lightbox-transition-' . esc_attr( $settings['lightbox_transition'] ?? 'fade' );
         }
         
-        $output = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-gallery-id="' . esc_attr( $gallery_id ) . '" data-columns="' . esc_attr( $columns ) . '">';
+        // Generate unique ID for this gallery instance
+        $gallery_instance_id = 'fotogrids-gallery-' . $gallery_id . '-' . wp_rand( 1000, 9999 );
         
-        foreach ( $images as $image ) {
-            $output .= self::render_gallery_item( $image, $atts );
+        // Generate responsive CSS
+        $responsive_css = self::generate_responsive_css( $gallery_instance_id, $responsive_columns, $responsive_spacing );
+        
+        // Prepare data attributes for JavaScript
+        $data_attrs = array(
+            'data-gallery-id' => esc_attr( $gallery_id ),
+            'data-click-behavior' => esc_attr( $click_behavior ),
+        );
+        
+        // Add lightbox-specific data attributes
+        if ( $click_behavior === 'lightbox' || $atts['lightbox'] === 'true' ) {
+            $data_attrs['data-lightbox-theme'] = esc_attr( $settings['lightbox_theme'] ?? 'dark' );
+            $data_attrs['data-lightbox-transition'] = esc_attr( $settings['lightbox_transition'] ?? 'fade' );
+            $data_attrs['data-lightbox-duration'] = esc_attr( $settings['lightbox_transition_duration'] ?? 300 );
+            $data_attrs['data-lightbox-auto-progress'] = esc_attr( $settings['lightbox_auto_progress'] ? 'true' : 'false' );
+            $data_attrs['data-lightbox-auto-delay'] = esc_attr( $settings['lightbox_auto_progress_delay'] ?? 5 );
+            $data_attrs['data-lightbox-fit-media'] = esc_attr( $settings['lightbox_fit_media'] ? 'true' : 'false' );
+            $data_attrs['data-lightbox-mobile-layout'] = esc_attr( $settings['lightbox_mobile_layout'] ?? 'mobile_optimized' );
+            $data_attrs['data-lightbox-show-arrows'] = esc_attr( $settings['lightbox_show_arrows'] ? 'true' : 'false' );
+            $data_attrs['data-lightbox-arrow-icon'] = esc_attr( $settings['lightbox_arrow_icon'] ?? 'chevron' );
+            $data_attrs['data-lightbox-arrow-size'] = esc_attr( $settings['lightbox_arrow_size'] ?? 40 );
+            $data_attrs['data-lightbox-arrow-color'] = esc_attr( $settings['lightbox_arrow_color'] ?? '#ffffff' );
+            $data_attrs['data-lightbox-show-dots'] = esc_attr( $settings['lightbox_show_dots'] ? 'true' : 'false' );
+            $data_attrs['data-lightbox-dot-style'] = esc_attr( $settings['lightbox_dot_style'] ?? 'fill' );
+            $data_attrs['data-lightbox-dot-color'] = esc_attr( $settings['lightbox_dot_color'] ?? '#ffffff' );
+            $data_attrs['data-lightbox-active-dot-color'] = esc_attr( $settings['lightbox_active_dot_color'] ?? '#007cba' );
+            
+            // Handle dots spacing (which can be an array with value and unit)
+            $dots_spacing = $settings['lightbox_dots_spacing'] ?? array( 'value' => 8, 'unit' => 'px' );
+            if ( is_array( $dots_spacing ) ) {
+                $data_attrs['data-lightbox-dots-spacing'] = esc_attr( $dots_spacing['value'] . $dots_spacing['unit'] );
+            } else {
+                $data_attrs['data-lightbox-dots-spacing'] = esc_attr( $dots_spacing . 'px' );
+            }
+            
+            // Handle custom theme color
+            if ( isset( $settings['lightbox_custom_color'] ) && $settings['lightbox_theme'] === 'custom' ) {
+                $data_attrs['data-lightbox-custom-color'] = esc_attr( $settings['lightbox_custom_color'] );
+            }
+        }
+        
+        // Build data attributes string
+        $data_attrs_string = '';
+        foreach ( $data_attrs as $attr => $value ) {
+            $data_attrs_string .= ' ' . $attr . '="' . $value . '"';
+        }
+        
+        $output = '<style>' . $responsive_css . '</style>';
+        $output .= '<div id="' . esc_attr( $gallery_instance_id ) . '" class="' . esc_attr( implode( ' ', $classes ) ) . '"' . $data_attrs_string . '>';
+        
+        if ( empty( $images ) ) {
+            $output .= '<p class="fotogrids-no-images">' . __( 'No images found in this gallery.', 'fotogrids' ) . '</p>';
+        } else {
+            foreach ( $images as $image ) {
+                $output .= self::render_gallery_item( $image, $settings, $atts );
+            }
         }
         
         $output .= '</div>';
@@ -233,10 +352,96 @@ class Public_Render {
     }
     
     /**
+     * Generate responsive CSS for gallery
+     * 
+     * @param string $gallery_id Gallery instance ID
+     * @param array $columns Responsive columns settings
+     * @param array $spacing Responsive spacing settings
+     * @return string Generated CSS
+     */
+    private static function generate_responsive_css( $gallery_id, $columns, $spacing ) {
+        $css = '';
+        
+        // Desktop styles (default)
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-grid { 
+            display: grid; 
+            grid-template-columns: repeat({$columns['desktop']}, 1fr); 
+            gap: {$spacing['desktop']}px; 
+        }";
+        
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-masonry { 
+            column-count: {$columns['desktop']}; 
+            column-gap: {$spacing['desktop']}px; 
+        }";
+        
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-justified { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: {$spacing['desktop']}px; 
+        }";
+        
+        // Tablet styles
+        $css .= "@media (max-width: 782px) {";
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-grid { 
+            grid-template-columns: repeat({$columns['tablet']}, 1fr); 
+            gap: {$spacing['tablet']}px; 
+        }";
+        
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-masonry { 
+            column-count: {$columns['tablet']}; 
+            column-gap: {$spacing['tablet']}px; 
+        }";
+        
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-justified { 
+            gap: {$spacing['tablet']}px; 
+        }";
+        $css .= "}";
+        
+        // Mobile styles
+        $css .= "@media (max-width: 480px) {";
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-grid { 
+            grid-template-columns: repeat({$columns['mobile']}, 1fr); 
+            gap: {$spacing['mobile']}px; 
+        }";
+        
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-masonry { 
+            column-count: {$columns['mobile']}; 
+            column-gap: {$spacing['mobile']}px; 
+        }";
+        
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-justified { 
+            gap: {$spacing['mobile']}px; 
+        }";
+        $css .= "}";
+        
+        // Add masonry item styles
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-masonry .fotogrids-gallery-item { 
+            break-inside: avoid; 
+            margin-bottom: {$spacing['desktop']}px; 
+        }";
+        
+        $css .= "@media (max-width: 782px) {";
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-masonry .fotogrids-gallery-item { 
+            margin-bottom: {$spacing['tablet']}px; 
+        }";
+        $css .= "}";
+        
+        $css .= "@media (max-width: 480px) {";
+        $css .= "#{$gallery_id}.fotogrids-gallery.fotogrids-layout-masonry .fotogrids-gallery-item { 
+            margin-bottom: {$spacing['mobile']}px; 
+        }";
+        $css .= "}";
+        
+        return $css;
+    }
+    
+    /**
      * Render individual gallery item
      */
-    private static function render_gallery_item( $image, $atts ) {
+    private static function render_gallery_item( $image, $settings, $atts ) {
         $classes = array( 'fotogrids-item' );
+        $click_behavior = $settings['image_click_behavior'] ?? 'lightbox';
+        $classes[] = 'fotogrids-item-' . esc_attr( $click_behavior );
         
         $output = '<figure class="' . esc_attr( implode( ' ', $classes ) ) . '">';
         
@@ -246,17 +451,57 @@ class Public_Render {
             'alt' => esc_attr( $image['alt'] ? $image['alt'] : $image['title'] ),
             'data-full' => esc_url( $image['full'] ),
             'data-id' => esc_attr( $image['id'] ),
+            'data-click-behavior' => esc_attr( $click_behavior ),
         );
         
         if ( $atts['lazy'] === 'true' ) {
             $img_attrs['loading'] = 'lazy';
         }
         
-        $output .= '<img';
-        foreach ( $img_attrs as $attr => $value ) {
-            $output .= ' ' . $attr . '="' . $value . '"';
+        // Add click behavior specific attributes
+        if ( $click_behavior === 'external' && isset( $image['external_url'] ) ) {
+            $img_attrs['data-external-url'] = esc_url( $image['external_url'] );
         }
-        $output .= ' />';
+        
+        // Wrap image with appropriate element based on click behavior
+        $img_html = '<img';
+        foreach ( $img_attrs as $attr => $value ) {
+            $img_html .= ' ' . $attr . '="' . $value . '"';
+        }
+        $img_html .= ' />';
+        
+        // Handle different click behaviors
+        switch ( $click_behavior ) {
+            case 'nothing':
+                $output .= $img_html;
+                break;
+                
+            case 'direct':
+                $output .= '<a href="' . esc_url( $image['full'] ) . '" target="_blank" rel="noopener" class="fotogrids-direct-link">';
+                $output .= $img_html;
+                $output .= '</a>';
+                break;
+                
+            case 'external':
+                if ( isset( $image['external_url'] ) && ! empty( $image['external_url'] ) ) {
+                    $output .= '<a href="' . esc_url( $image['external_url'] ) . '" target="_blank" rel="noopener" class="fotogrids-external-link">';
+                    $output .= $img_html;
+                    $output .= '</a>';
+                } else {
+                    // Fallback to direct link if no external URL is set
+                    $output .= '<a href="' . esc_url( $image['full'] ) . '" target="_blank" rel="noopener" class="fotogrids-direct-link">';
+                    $output .= $img_html;
+                    $output .= '</a>';
+                }
+                break;
+                
+            case 'lightbox':
+            default:
+                $output .= '<a href="' . esc_url( $image['full'] ) . '" class="fotogrids-lightbox-trigger" data-fotogrids-lightbox>';
+                $output .= $img_html;
+                $output .= '</a>';
+                break;
+        }
         
         // Caption
         if ( $atts['captions'] === 'true' && ! empty( $image['caption'] ) ) {
@@ -338,6 +583,35 @@ class Public_Render {
     }
     
     /**
+     * Enqueue lightbox assets if needed
+     * 
+     * @param array $settings Gallery settings
+     */
+    private static function enqueue_lightbox_assets( $settings ) {
+        $click_behavior = $settings['image_click_behavior'] ?? 'lightbox';
+        
+        // Only enqueue lightbox assets if this gallery uses lightbox
+        if ( $click_behavior === 'lightbox' ) {
+            // Enqueue lightbox CSS (compiled by webpack)
+            wp_enqueue_style(
+                'fotogrids-lightbox',
+                FOTOGRIDS_PLUGIN_URL . 'assets/css/lightbox-styles.css',
+                array( 'fotogrids-frontend' ),
+                FOTOGRIDS_VERSION
+            );
+            
+            // Enqueue lightbox JS (compiled by webpack)
+            wp_enqueue_script(
+                'fotogrids-lightbox',
+                FOTOGRIDS_PLUGIN_URL . 'assets/js/lightbox.js',
+                array(),  // No dependencies to avoid loading order issues
+                FOTOGRIDS_VERSION,
+                true
+            );
+        }
+    }
+    
+    /**
      * Check if current page has FotoGrids content
      */
     private static function has_fotogrids_content() {
@@ -361,5 +635,53 @@ class Public_Render {
         }
         
         return false;
+    }
+    
+    /**
+     * Render test gallery with placeholder images
+     */
+    private static function render_test_gallery( $atts ) {
+        $columns = $atts['cols'] ? absint( $atts['cols'] ) : 3;
+        
+        // Create test images
+        $test_images = array(
+            array(
+                'id' => 1,
+                'title' => 'Test Image 1',
+                'alt' => 'Test image 1',
+                'caption' => 'This is a test caption',
+                'medium' => 'https://picsum.photos/400/400?random=1',
+                'full' => 'https://picsum.photos/800/800?random=1',
+            ),
+            array(
+                'id' => 2,
+                'title' => 'Test Image 2',
+                'alt' => 'Test image 2',
+                'caption' => 'Another test caption',
+                'medium' => 'https://picsum.photos/400/400?random=2',
+                'full' => 'https://picsum.photos/800/800?random=2',
+            ),
+            array(
+                'id' => 3,
+                'title' => 'Test Image 3',
+                'alt' => 'Test image 3',
+                'caption' => 'Third test caption',
+                'medium' => 'https://picsum.photos/400/400?random=3',
+                'full' => 'https://picsum.photos/800/800?random=3',
+            ),
+        );
+        
+        // Enqueue assets
+        self::enqueue_template_assets( 'grid' );
+        
+        // Get default settings for test gallery
+        $test_settings = fotogrids_get_default_gallery_settings();
+        $test_responsive_columns = array( 'desktop' => $columns, 'tablet' => $columns, 'mobile' => $columns );
+        $test_responsive_spacing = $test_settings['image_spacing'];
+        
+        // Enqueue lightbox assets for test gallery
+        self::enqueue_lightbox_assets( $test_settings );
+        
+        return self::render_gallery( 0, $test_images, 'grid', $test_responsive_columns, $test_responsive_spacing, $test_settings, $atts );
     }
 }

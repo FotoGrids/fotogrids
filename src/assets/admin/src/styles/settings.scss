@@ -1,0 +1,763 @@
+#fotogrids_gallery_settings{
+    .inside {
+        padding: 0;
+        margin: 0;
+    }
+}
+
+$settings-sidebar-width: 200px;
+
+@mixin pro-badge {
+    font-size: 10px;
+    background: $fotogrids-colors-blue;
+    color: white;
+    padding: 2px 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+@mixin transition-smooth {
+    transition: all 0.2s ease;
+}
+
+.fotogrids-gallery-settings {
+    display: flex;
+    min-height: 500px;
+    background: $settings-bg-white;
+}
+
+.fotogrids-settings-sidebar {
+    width: $settings-sidebar-width;
+    background: $settings-bg-light;
+    border-right: 1px solid $settings-border-color;
+    padding: 0;
+}
+
+.fotogrids-settings-tabs {
+    display: flex;
+    flex-direction: column;
+}
+
+.fotogrids-settings-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    @include transition-smooth;
+    border-bottom: 1px solid $settings-border-light;
+    position: relative;
+
+    &:hover {
+        background: $settings-hover-bg;
+    }
+
+    &.is-active {
+        background: $settings-bg-white;
+        font-weight: 600;
+
+        &:before, &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            height: 100%;
+        }
+
+        &:before {
+            left: 0;
+            width: 3px;
+            background: $settings-active-border;
+        }
+
+
+        &:after {
+            right: -1px;
+            width: 1px;
+            background: $settings-bg-white;
+        }
+    }
+
+    &.is-pro {
+        opacity: 1;
+    }
+
+    &__icon {
+        font-size: 0;
+        width: 20px;
+        text-align: center;
+    }
+
+    &__label {
+        flex: 1;
+        font-size: 14px;
+    }
+
+    &__pro {
+        @include pro-badge;
+    }
+}
+
+.fotogrids-settings-content {
+    flex: 1;
+    padding: 24px;
+}
+
+.fotogrids-settings-group {
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+.fotogrids-setting {
+    position: relative;
+
+    &--disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+.fotogrids-pro-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 10;
+    @include pro-badge;
+}
+
+// Pro Tab Promotional Content
+.fotogrids-pro-tab-content {
+    text-align: center;
+    padding: 40px 20px;
+    
+    .fotogrids-pro-tab-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        
+        .fotogrids-pro-tab-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.7;
+        }
+        
+        h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: $settings-text-primary;
+        }
+        
+        .fotogrids-pro-badge-large {
+            @include pro-badge;
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+    }
+    
+    .fotogrids-pro-features-list {
+        margin-bottom: 30px;
+        text-align: left;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        
+        h4 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: $settings-text-primary;
+            text-align: center;
+        }
+        
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            
+            .fotogrids-pro-feature {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f0;
+                
+                &:last-child {
+                    border-bottom: none;
+                }
+                
+                .fotogrids-pro-feature-icon {
+                    font-size: 14px;
+                    width: 20px;
+                    text-align: center;
+                }
+            }
+        }
+    }
+    
+    .fotogrids-pro-cta {
+        p {
+            margin: 0 0 20px 0;
+            color: $settings-text-secondary;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .fotogrids-upgrade-button {
+            font-size: 14px;
+            padding: 12px 24px;
+            border-radius: 6px;
+        }
+    }
+}
+
+// Responsive Settings - Compact Layout
+.fotogrids-responsive-setting {
+    margin-bottom: 20px;
+    
+    // Header: Name + Device Icon
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    
+    &__label {
+        font-weight: 600;
+        color: $settings-text-primary;
+        font-size: 13px;
+        margin: 0;
+    }
+    
+    &__device-icon {
+        font-size: 0;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0073aa;
+        opacity: 0.7;
+    }
+    
+    // Controls Row: Range + Input + Device Buttons
+    &__controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    // Range slider (takes most space)
+    &__range {
+        flex: 1;
+        min-width: 120px;
+        
+        .fotogrids-responsive-range-slider {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #e1e4e8;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            
+            &::-webkit-slider-thumb {
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #0073aa;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                
+                &:hover {
+                    background: #005a87;
+                }
+            }
+            
+            &::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #0073aa;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+                
+                &:hover {
+                    background: #005a87;
+                }
+            }
+            
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                
+                &::-webkit-slider-thumb {
+                    cursor: not-allowed;
+                }
+                
+                &::-moz-range-thumb {
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+    
+    // Number input
+    &__input {
+        flex-shrink: 0;
+        
+        .fotogrids-responsive-number-input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #e1e4e8;
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: center;
+            
+            &:focus {
+                outline: none;
+                border-color: #0073aa;
+                box-shadow: 0 0 0 1px #0073aa;
+            }
+            
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                background: #f6f7f7;
+            }
+        }
+    }
+    
+    // Device button group
+    &__devices {
+        display: flex;
+        border: 1px solid #e1e4e8;
+        border-radius: 4px;
+        overflow: hidden;
+        flex-shrink: 0;
+        
+        .fotogrids-responsive-device-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: none;
+            border-right: 1px solid #e1e4e8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            &:last-child {
+                border-right: none;
+            }
+            
+            &:hover:not(:disabled) {
+                background: #f6f7f7;
+            }
+            
+            &.is-active {
+                background: #0073aa;
+                color: white;
+            }
+            
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+}
+
+// Layout Grid Settings
+.fotogrids-layout-grid-setting {
+    margin-bottom: 20px;
+    
+    &__label {
+        display: block;
+        margin-bottom: 15px;
+        font-weight: 600;
+        color: $settings-text-primary;
+        font-size: 13px;
+    }
+}
+
+.fotogrids-layout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    
+    @media (max-width: 782px) {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+    }
+}
+
+.fotogrids-layout-option {
+    border: 2px solid #e1e4e8;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    
+    &:hover:not(.is-disabled) {
+        border-color: #0073aa;
+        box-shadow: 0 2px 8px rgba(0, 115, 170, 0.1);
+        transform: translateY(-1px);
+    }
+    
+    &.is-active {
+        border-color: #0073aa;
+        box-shadow: 0 0 0 1px #0073aa;
+        
+        .fotogrids-layout-option__preview {
+            background: #f0f6fc;
+        }
+    }
+    
+    &.is-disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        
+        &:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #e1e4e8;
+        }
+    }
+    
+    &__preview {
+        position: relative;
+        padding: 20px 16px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e1e4e8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80px;
+    }
+    
+    &__icon {
+        width: 64px;
+        height: 48px;
+        color: #6b7280;
+        
+        .is-active & {
+            color: #0073aa;
+        }
+        
+        .is-disabled & {
+            color: #9ca3af;
+        }
+    }
+    
+    &__pro-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        @include pro-badge;
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    &__info {
+        padding: 12px 16px;
+    }
+    
+    &__name {
+        margin: 0 0 4px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: $settings-text-primary;
+        
+        .is-disabled & {
+            color: #9ca3af;
+        }
+    }
+    
+    &__description {
+        margin: 0;
+        font-size: 11px;
+        color: $settings-text-secondary;
+        line-height: 1.4;
+        
+        .is-disabled & {
+            color: #9ca3af;
+        }
+    }
+}
+
+// RTL Support for Responsive Settings
+body.rtl {
+    .fotogrids-responsive-setting {
+        &__controls {
+            direction: rtl;
+        }
+        
+        &__devices {
+            .fotogrids-responsive-device-btn {
+                border-right: none;
+                border-left: 1px solid #e1e4e8;
+                
+                &:last-child {
+                    border-left: none;
+                }
+                
+                &:first-child {
+                    border-left: 1px solid #e1e4e8;
+                }
+            }
+        }
+    }
+    
+    .fotogrids-layout-option {
+        &__pro-badge {
+            right: auto;
+            left: 8px;
+        }
+    }
+}
+
+// Legacy pro notice (keep for backward compatibility)
+.fotogrids-pro-notice {
+    margin-top: 30px;
+    padding: 20px;
+    background: $settings-pro-notice-bg;
+    border: 1px solid $settings-pro-notice-border;
+    border-radius: 4px;
+    text-align: center;
+
+    h4 {
+        margin: 0 0 10px 0;
+        color: $settings-text-primary;
+    }
+
+    p {
+        margin: 0 0 15px 0;
+        color: $settings-text-secondary;
+    }
+}
+
+body.rtl {
+    .fotogrids-settings-sidebar {
+        border-right: none;
+        border-left: 1px solid $settings-border-color;
+    }
+
+    .fotogrids-settings-tab {
+        &.is-active {
+            border-right: none;
+            border-left: 3px solid $settings-active-border;
+        }
+    }
+
+    .fotogrids-pro-badge {
+        right: auto;
+        left: -8px;
+    }
+}
+
+// Button Group Control
+.fotogrids-button-group {
+    margin-bottom: 20px;
+
+    .fotogrids-setting__label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1d2327;
+    }
+
+    &__buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    &__button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 12px 12px;
+        border: 1px solid #8c8f94;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 13px;
+
+        &:hover {
+            border-color: #007cba;
+            background: #f6f7f7;
+        }
+
+        &.is-active {
+            border-color: #007cba;
+            background: #007cba;
+            color: #fff;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .fotogrids-button-icon {
+            display: flex;
+            align-items: center;
+            font-size: 0;
+
+            svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        .fotogrids-button-label {
+            font-weight: 500;
+        }
+    }
+}
+
+// Color Picker Control
+.fotogrids-color-picker {
+    margin-bottom: 20px;
+
+    .fotogrids-setting__label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1d2327;
+    }
+
+    &__input {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+
+        .fotogrids-color-input {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #8c8f94;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+
+            &::-webkit-color-swatch-wrapper {
+                padding: 0;
+            }
+
+            &::-webkit-color-swatch {
+                border: none;
+                border-radius: 3px;
+            }
+        }
+
+        .fotogrids-color-text {
+            flex: 1;
+            max-width: 120px;
+            padding: 6px 8px;
+            border: 1px solid #8c8f94;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+
+            &:focus {
+                border-color: #007cba;
+                outline: none;
+                box-shadow: 0 0 0 1px #007cba;
+            }
+        }
+    }
+}
+
+// Range with Units Control
+.fotogrids-range-with-units {
+    margin-bottom: 20px;
+
+    .fotogrids-setting__label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #1d2327;
+    }
+
+    &__controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .fotogrids-range-slider {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    &__value {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .fotogrids-number-input {
+            width: 60px;
+            padding: 6px 8px;
+            border: 1px solid #8c8f94;
+            border-radius: 4px;
+            text-align: center;
+
+            &:focus {
+                border-color: #007cba;
+                outline: none;
+                box-shadow: 0 0 0 1px #007cba;
+            }
+        }
+
+        .fotogrids-units-select {
+            padding: 6px 8px;
+            border: 1px solid #8c8f94;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 13px;
+
+            &:focus {
+                border-color: #007cba;
+                outline: none;
+                box-shadow: 0 0 0 1px #007cba;
+            }
+        }
+    }
+}
+
+// Conditional Message
+.fotogrids-conditional-message {
+    margin-top: 8px;
+    margin-bottom: 12px;
+
+    .description {
+        margin: 0;
+        padding: 8px 12px;
+        background: #f0f6fc;
+        border: 1px solid #c3dcf3;
+        border-radius: 4px;
+        color: #0073aa;
+        font-size: 13px;
+    }
+}
