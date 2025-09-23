@@ -9,6 +9,7 @@ const isDevelopment = !isProduction;
 module.exports = {
     entry: {
         'admin': './src/assets/admin/src/index-working.js',
+        'metabox': './src/assets/admin/src/metabox.js',
         'frontend': './src/assets/frontend/src/index.js',
         'lightbox': './src/assets/frontend/src/lightbox.js',
         'lightbox-styles': './src/assets/frontend/src/lightbox.scss',
@@ -120,11 +121,11 @@ module.exports = {
                     from: 'src/assets/admin/js/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
-                        // Skip ajax-save.js as it's now compiled by webpack
-                        if (relativePath.includes('ajax-save.js')) {
-                            return false;
-                        }
                         return relativePath.replace('src/', '');
+                    },
+                    filter: (resourcePath) => {
+                        // Skip files that are now compiled by webpack
+                        return !resourcePath.includes('ajax-save.js') && !resourcePath.includes('meta-boxes.js');
                     },
                     transform(content, absoluteFilename) {
                         // Only transform JS files in production

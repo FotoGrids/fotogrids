@@ -1,0 +1,151 @@
+// Animated Save Button Styles
+.fotogrids-save-button {
+    position: relative;
+    overflow: hidden;
+    min-width: 120px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    .fotogrids-save-button-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s ease;
+    }
+
+    &.saving,
+    &.success {
+        min-width: 36px;
+        width: 36px;
+        padding: 0;
+        height: 36px;
+    }
+
+    &.saving {
+        .fotogrids-save-button-content {
+            opacity: 1;
+        }
+    }
+    
+    &.success {
+        background: #00a32a !important;
+        border-color: #00a32a !important;
+    }
+    
+    // Returning state - expanding back to normal width
+    &.returning {
+        min-width: 120px;
+        background: #007cba;
+        border-color: #007cba;
+        
+        .fotogrids-save-button-content {
+            opacity: 1;
+        }
+    }
+}
+
+// Spinner animation
+.fotogrids-save-spinner {
+    width: 16px;
+    height: 16px;
+    overflow: visible;
+    
+    .spinner__check,
+    .spinner__worm {
+        transform-origin: 24px 24px;
+    }
+    
+    // During saving state - loop the spinning part
+    .fotogrids-save-button.saving & {
+        .spinner__worm {
+            animation: fotogrids-worm-loop 2s linear infinite;
+        }
+        
+        .spinner__check {
+            animation: none; // No checkmark during saving
+        }
+    }
+    
+    // During success state - complete full animation
+    .fotogrids-save-button.success & {
+        .spinner__worm {
+            animation: fotogrids-worm 4s linear forwards;
+        }
+        
+        .spinner__check {
+            animation: fotogrids-check 4s linear forwards;
+        }
+    }
+}
+
+
+// Easing variables
+$ease-out-sine: cubic-bezier(0.61,1,0.88,1);
+$ease-in-cubic: cubic-bezier(0.32,0,0.67,0);
+$ease-out-cubic: cubic-bezier(0.33,1,0.68,1);
+$ease-in-out-cubic: cubic-bezier(0.65,0,0.35,1);
+
+// New spinner keyframes
+@keyframes fotogrids-check {
+    from,
+    64% {
+        stroke-dashoffset: -36.7;
+        transform: scale(1);
+    }
+    75%,
+    77% {
+        animation-timing-function: $ease-in-out-cubic;
+        stroke-dashoffset: 13.7;
+        transform: scale(1);
+    }
+    79% {
+        animation-timing-function: $ease-in-out-cubic;
+        stroke-dashoffset: 13.7;
+        transform: scale(0.4);
+    }
+    87% {
+        animation-timing-function: $ease-in-cubic;
+        stroke-dashoffset: 13.7;
+        transform: scale(1.4);
+    }
+    93%,
+    to {
+        stroke-dashoffset: 13.7;
+        transform: scale(1);
+    }
+}
+
+$startAngle: -119deg;
+
+// Looping animation for saving state
+@keyframes fotogrids-worm-loop {
+    from {
+        stroke-dashoffset: -51.84;
+        transform: rotate($startAngle);
+    }
+    to {
+        stroke-dashoffset: -51.84;
+        transform: rotate($startAngle + 1turn);
+    }
+}
+
+// Complete animation for success state
+@keyframes fotogrids-worm {
+    from {
+        stroke-dashoffset: -51.84;
+        transform: rotate($startAngle);
+    }
+    60% {
+        stroke-dashoffset: -51.84;
+        transform: rotate($startAngle + 3turn);
+    }
+    64% {
+        animation-timing-function: $ease-out-sine;
+        stroke-dashoffset: -51.84;
+        transform: rotate($startAngle + 3.2turn);
+    }
+    72.5%,
+    to {
+        stroke-dashoffset: -138.23;
+        transform: rotate($startAngle + 3.2turn);
+    }
+}

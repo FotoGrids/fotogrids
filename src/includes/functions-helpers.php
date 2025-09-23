@@ -104,6 +104,7 @@ function fotogrids_get_default_gallery_settings() {
         
         // Interactions settings
         'image_click_behavior' => 'lightbox',
+        'external_link_target' => '_self',
         
         // Lightbox General settings
         'lightbox_theme' => 'dark',
@@ -127,7 +128,11 @@ function fotogrids_get_default_gallery_settings() {
         'lightbox_dots_spacing' => array(
             'value' => 8,
             'unit' => 'px'
-        )
+        ),
+        
+        // Lightbox Thumbnails settings
+        'lightbox_thumbnail_strip_location' => 'bottom',
+        'lightbox_thumbnail_size' => 'normal'
     );
 }
 
@@ -204,6 +209,8 @@ function fotogrids_get_gallery_images( $gallery_id ) {
             'full' => wp_get_attachment_url( $attachment_id ),
             'alt' => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
             'title' => $attachment->post_title,
+            'external_url' => get_post_meta( $attachment_id, '_fotogrids_external_url', true ),
+            'link_target' => get_post_meta( $attachment_id, '_fotogrids_link_target', true ),
         );
 
         $images[] = $image_data;

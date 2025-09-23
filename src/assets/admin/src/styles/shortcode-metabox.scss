@@ -1,0 +1,92 @@
+/**
+ * Shortcode Meta Box Styles
+ * 
+ * Styles for the shortcode display meta boxes in both gallery and album edit screens.
+ * Provides a clean interface for copying shortcodes with proper spacing and visual hierarchy.
+ */
+
+.fotogrids-shortcode-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 10px 0;
+    
+    .fotogrids-shortcode-input {
+        flex: 1;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        
+        &:focus {
+            outline: none;
+            border-color: #0073aa;
+            box-shadow: 0 0 0 1px #0073aa;
+        }
+        
+        &:hover {
+            background-color: #fff;
+        }
+    }
+    
+    .fotogrids-copy-shortcode {
+        flex-shrink: 0;
+        min-width: 60px;
+        
+        &:hover {
+            background-color: #0073aa;
+            color: #fff;
+            border-color: #0073aa;
+        }
+        
+        &.copied {
+            background-color: #46b450;
+            color: #fff;
+            border-color: #46b450;
+            
+            &:after {
+                content: ' ✓';
+            }
+        }
+    }
+}
+
+// Success message styling for copy feedback
+.fotogrids-copy-success {
+    color: #46b450;
+    font-size: 11px;
+    margin-top: 5px;
+    display: none;
+    
+    &.show {
+        display: block;
+        animation: fadeInOut 2s ease-in-out;
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+// Responsive adjustments
+@media (max-width: 782px) {
+    .fotogrids-shortcode-container {
+        flex-direction: column;
+        gap: 8px;
+        
+        .fotogrids-shortcode-input {
+            width: 100%;
+        }
+        
+        .fotogrids-copy-shortcode {
+            width: 100%;
+            text-align: center;
+        }
+    }
+}

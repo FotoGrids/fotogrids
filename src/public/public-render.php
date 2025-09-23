@@ -484,14 +484,21 @@ class Public_Render {
                 
             case 'external':
                 if ( isset( $image['external_url'] ) && ! empty( $image['external_url'] ) ) {
-                    $output .= '<a href="' . esc_url( $image['external_url'] ) . '" target="_blank" rel="noopener" class="fotogrids-external-link">';
+                    // Determine target - use image-specific target, then global default, then fallback
+                    $target = '_self'; // Default fallback
+                    if ( ! empty( $image['link_target'] ) && $image['link_target'] !== 'global' ) {
+                        $target = $image['link_target'];
+                    } elseif ( isset( $settings['external_link_target'] ) ) {
+                        $target = $settings['external_link_target'];
+                    }
+                    
+                    $rel_attr = $target === '_blank' ? ' rel="noopener noreferrer"' : '';
+                    $output .= '<a href="' . esc_url( $image['external_url'] ) . '" target="' . esc_attr( $target ) . '"' . $rel_attr . ' class="fotogrids-external-link">';
                     $output .= $img_html;
                     $output .= '</a>';
                 } else {
-                    // Fallback to direct link if no external URL is set
-                    $output .= '<a href="' . esc_url( $image['full'] ) . '" target="_blank" rel="noopener" class="fotogrids-direct-link">';
+                    // Fallback - do nothing (no click action)
                     $output .= $img_html;
-                    $output .= '</a>';
                 }
                 break;
                 

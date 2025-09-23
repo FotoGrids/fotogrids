@@ -1,11 +1,13 @@
-/**
- * FotoGrids Admin Icons
- */
 
 const FotoGridsIcons = {
 	edit: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M18 10L14 6M2.49997 21.5L5.88434 21.124C6.29783 21.078 6.50457 21.055 6.69782 20.9925C6.86926 20.937 7.03242 20.8586 7.18286 20.7594C7.35242 20.6475 7.49951 20.5005 7.7937 20.2063L21 7C22.1046 5.89543 22.1046 4.10457 21 3C19.8954 1.89543 18.1046 1.89543 17 3L3.7937 16.2063C3.49952 16.5005 3.35242 16.6475 3.24061 16.8171C3.1414 16.9676 3.06298 17.1307 3.00748 17.3022C2.94493 17.4954 2.92195 17.7021 2.87601 18.1156L2.49997 21.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
+
+    preview: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.42012 12.7132C2.28394 12.4975 2.21584 12.3897 2.17772 12.2234C2.14909 12.0985 2.14909 11.9015 2.17772 11.7766C2.21584 11.6103 2.28394 11.5025 2.42012 11.2868C3.54553 9.50484 6.8954 5 12.0004 5C17.1054 5 20.4553 9.50484 21.5807 11.2868C21.7169 11.5025 21.785 11.6103 21.8231 11.7766C21.8517 11.9015 21.8517 12.0985 21.8231 12.2234C21.785 12.3897 21.7169 12.4975 21.5807 12.7132C20.4553 14.4952 17.1054 19 12.0004 19C6.8954 19 3.54553 14.4952 2.42012 12.7132Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12.0004 15C13.6573 15 15.0004 13.6569 15.0004 12C15.0004 10.3431 13.6573 9 12.0004 9C10.3435 9 9.0004 10.3431 9.0004 12C9.0004 13.6569 10.3435 15 12.0004 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
 
 	remove_image: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M16.5 2.5L21.5 7.5M21.5 2.5L16.5 7.5M12.5 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H17C17.93 21 18.395 21 18.7765 20.8978C19.8117 20.6204 20.6204 19.8117 20.8978 18.7765C21 18.395 21 17.93 21 17M10.5 8.5C10.5 9.60457 9.60457 10.5 8.5 10.5C7.39543 10.5 6.5 9.60457 6.5 8.5C6.5 7.39543 7.39543 6.5 8.5 6.5C9.60457 6.5 10.5 7.39543 10.5 8.5ZM14.99 11.9181L6.53115 19.608C6.05536 20.0406 5.81747 20.2568 5.79643 20.4442C5.77819 20.6066 5.84045 20.7676 5.96319 20.8755C6.10478 21 6.42628 21 7.06929 21H16.456C17.8951 21 18.6147 21 19.1799 20.7582C19.8894 20.4547 20.4547 19.8894 20.7582 19.1799C21 18.6147 21 17.8951 21 16.456C21 15.9717 21 15.7296 20.9471 15.5042C20.8805 15.2208 20.753 14.9554 20.5733 14.7264C20.4303 14.5442 20.2412 14.3929 19.8631 14.0905L17.0658 11.8527C16.6874 11.5499 16.4982 11.3985 16.2898 11.3451C16.1061 11.298 15.9129 11.3041 15.7325 11.3627C15.5279 11.4291 15.3486 11.5921 14.99 11.9181Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -15,16 +17,16 @@ const FotoGridsIcons = {
 		<path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
 
-	responsive_desktop: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<path d="M8 21H16M12 17V21M6.8 17H17.2C18.8802 17 19.7202 17 20.362 16.673C20.9265 16.3854 21.3854 15.9265 21.673 15.362C22 14.7202 22 13.8802 22 12.2V7.8C22 6.11984 22 5.27976 21.673 4.63803C21.3854 4.07354 20.9265 3.6146 20.362 3.32698C19.7202 3 18.8802 3 17.2 3H6.8C5.11984 3 4.27976 3 3.63803 3.32698C3.07354 3.6146 2.6146 4.07354 2.32698 4.63803C2 5.27976 2 6.11984 2 7.8V12.2C2 13.8802 2 14.7202 2.32698 15.362C2.6146 15.9265 3.07354 16.3854 3.63803 16.673C4.27976 17 5.11984 17 6.8 17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+	check_square: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M7.5 12L10.5 15L16.5 9M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
 
-	responsive_tablet: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<path d="M12 17.5H12.01M7.2 22H16.8C17.9201 22 18.4802 22 18.908 21.782C19.2843 21.5903 19.5903 21.2843 19.782 20.908C20 20.4802 20 19.9201 20 18.8V5.2C20 4.07989 20 3.51984 19.782 3.09202C19.5903 2.71569 19.2843 2.40973 18.908 2.21799C18.4802 2 17.9201 2 16.8 2H7.2C6.0799 2 5.51984 2 5.09202 2.21799C4.71569 2.40973 4.40973 2.71569 4.21799 3.09202C4 3.51984 4 4.0799 4 5.2V18.8C4 19.9201 4 20.4802 4.21799 20.908C4.40973 21.2843 4.71569 21.5903 5.09202 21.782C5.51984 22 6.07989 22 7.2 22ZM12.5 17.5C12.5 17.7761 12.2761 18 12 18C11.7239 18 11.5 17.7761 11.5 17.5C11.5 17.2239 11.7239 17 12 17C12.2761 17 12.5 17.2239 12.5 17.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-	</svg>`,
+    plus: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
 
-	responsive_mobile: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<path d="M12 17.5H12.01M8.2 22H15.8C16.9201 22 17.4802 22 17.908 21.782C18.2843 21.5903 18.5903 21.2843 18.782 20.908C19 20.4802 19 19.9201 19 18.8V5.2C19 4.07989 19 3.51984 18.782 3.09202C18.5903 2.71569 18.2843 2.40973 17.908 2.21799C17.4802 2 16.9201 2 15.8 2H8.2C7.0799 2 6.51984 2 6.09202 2.21799C5.71569 2.40973 5.40973 2.71569 5.21799 3.09202C5 3.51984 5 4.0799 5 5.2V18.8C5 19.9201 5 20.4802 5.21799 20.908C5.40973 21.2843 5.71569 21.5903 6.09202 21.782C6.51984 22 7.07989 22 8.2 22ZM12.5 17.5C12.5 17.7761 12.2761 18 12 18C11.7239 18 11.5 17.7761 11.5 17.5C11.5 17.2239 11.7239 17 12 17C12.2761 17 12.5 17.2239 12.5 17.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+	plus_square: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M12 8V16M8 12H16M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
 
 	styling: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,8 +89,6 @@ const FotoGridsIcons = {
     settings: `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <path d="M15.95 10.78c.03-.25.05-.51.05-.78s-.02-.53-.06-.78l1.69-1.32c.15-.12.19-.34.1-.51l-1.6-2.77c-.1-.18-.31-.24-.49-.18l-1.99.8c-.42-.32-.86-.58-1.35-.78L12 2.34c-.03-.2-.2-.34-.4-.34H8.4c-.2 0-.36.14-.39.34l-.3 2.12c-.49.2-.94.47-1.35.78l-1.99-.8c-.18-.07-.39 0-.49.18l-1.6 2.77c-.1.18-.06.39.1.51l1.69 1.32c-.04.25-.07.52-.07.78s.02.53.06.78L2.37 12.1c-.15.12-.19.34-.1.51l1.6 2.77c.1.18.31.24.49.18l1.99-.8c.42.32.86.58 1.35.78l.3 2.12c.04.2.2.34.4.34h3.2c.2 0 .37-.14.39-.34l.3-2.12c.49-.2.94-.47 1.35-.78l1.99.8c.18.07.39 0 .49-.18l1.6-2.77c.1-.18.06-.39-.1-.51l-1.67-1.32zM10 13c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"/>
     </svg>`,
-
-    // Device icons for responsive settings
     responsive_desktop: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
         <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
@@ -96,50 +96,48 @@ const FotoGridsIcons = {
     </svg>`,
 
     responsive_tablet: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-        <line x1="12" y1="18" x2="12.01" y2="18" stroke="currentColor" stroke-width="2"/>
+        <rect x="3" y="2" width="18" height="20" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="18" r="1" stroke="currentColor" stroke-width="2"/>
     </svg>`,
 
     responsive_mobile: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-        <line x1="12" y1="18" x2="12.01" y2="18" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="18" r="1" stroke="currentColor" stroke-width="2"/>
     </svg>`,
-
-    // Layout preview icons
     layout_grid: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="4" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="4" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="4" y="20" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="20" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="20" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="4" y="36" width="16" height="8" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="36" width="16" height="8" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="36" width="16" height="8" rx="2" fill="currentColor" opacity="0.7"/>
+        <rect x="4" y="4" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="24" y="4" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="44" y="4" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="4" y="20" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="24" y="20" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="44" y="20" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="4" y="36" width="16" height="8" rx="2" fill="currentColor"/>
+        <rect x="24" y="36" width="16" height="8" rx="2" fill="currentColor"/>
+        <rect x="44" y="36" width="16" height="8" rx="2" fill="currentColor"/>
     </svg>`,
 
     layout_masonry: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="4" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="4" width="16" height="20" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="4" y="24" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="20" width="16" height="16" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="28" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="4" y="40" width="16" height="8" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="40" width="16" height="8" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="44" width="16" height="4" rx="2" fill="currentColor" opacity="0.7"/>
+        <rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor"/>
+        <rect x="24" y="4" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="44" y="4" width="16" height="20" rx="2" fill="currentColor"/>
+        <rect x="4" y="24" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="24" y="20" width="16" height="16" rx="2" fill="currentColor"/>
+        <rect x="44" y="28" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="4" y="40" width="16" height="8" rx="2" fill="currentColor"/>
+        <rect x="24" y="40" width="16" height="8" rx="2" fill="currentColor"/>
+        <rect x="44" y="44" width="16" height="4" rx="2" fill="currentColor"/>
     </svg>`,
 
     layout_justified: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="12" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="20" y="4" width="20" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="4" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="4" y="20" width="20" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="28" y="20" width="12" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="44" y="20" width="16" height="12" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="4" y="36" width="16" height="8" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="24" y="36" width="20" height="8" rx="2" fill="currentColor" opacity="0.7"/>
-        <rect x="48" y="36" width="12" height="8" rx="2" fill="currentColor" opacity="0.7"/>
+        <rect x="4" y="4" width="12" height="12" rx="2" fill="currentColor"/>
+        <rect x="20" y="4" width="20" height="12" rx="2" fill="currentColor"/>
+        <rect x="44" y="4" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="4" y="20" width="20" height="12" rx="2" fill="currentColor"/>
+        <rect x="28" y="20" width="12" height="12" rx="2" fill="currentColor"/>
+        <rect x="44" y="20" width="16" height="12" rx="2" fill="currentColor"/>
+        <rect x="4" y="36" width="16" height="8" rx="2" fill="currentColor"/>
+        <rect x="24" y="36" width="20" height="8" rx="2" fill="currentColor"/>
+        <rect x="48" y="36" width="12" height="8" rx="2" fill="currentColor"/>
     </svg>`,
 
     layout_carousel: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -152,7 +150,7 @@ const FotoGridsIcons = {
     </svg>`,
 
     layout_slider: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="56" height="32" rx="2" fill="currentColor" opacity="0.7"/>
+        <rect x="4" y="4" width="56" height="32" rx="2" fill="currentColor"/>
         <polygon points="12,20 18,16 18,24" fill="white" opacity="0.9"/>
         <polygon points="52,20 46,16 46,24" fill="white" opacity="0.9"/>
         <circle cx="24" cy="40" r="2" fill="currentColor" opacity="0.5"/>
@@ -171,11 +169,15 @@ const FotoGridsIcons = {
         <rect x="36" y="34" width="6" height="4" rx="1" fill="currentColor" opacity="0.4"/>
     </svg>`,
     
-    // Lightbox arrow icons
+
     chevron: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`,
-    
+
+    'chevron-down': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
     'chevron-left': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`,
@@ -192,7 +194,7 @@ const FotoGridsIcons = {
         <path d="M8 12l8-6v12l-8-6z" fill="currentColor"/>
     </svg>`,
     
-    // Theme icons
+
     theme_dark: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
     </svg>`,
@@ -207,7 +209,7 @@ const FotoGridsIcons = {
         <path d="M12 1v6M12 17v6M5.64 5.64l4.24 4.24M14.12 14.12l4.24 4.24M1 12h6M17 12h6M5.64 18.36l4.24-4.24M14.12 9.88l4.24-4.24" stroke="currentColor" stroke-width="2"/>
     </svg>`,
     
-    // Transition icons
+
     transition_fade: `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
         <rect x="3" y="3" width="2.5" height="2.5"/>
         <rect x="6.1" y="3" width="2.5" height="2.5"/>
@@ -246,8 +248,7 @@ const FotoGridsIcons = {
         <rect x="3" y="6" width="18" height="12" stroke="currentColor" stroke-width="2" fill="none"/>
         <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" stroke-width="2"/>
     </svg>`,
-    
-    // Mobile layout icons
+
     mobile_optimized: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
         <path d="M9 6h6M9 10h6M9 14h4" stroke="currentColor" stroke-width="2"/>
@@ -258,8 +259,7 @@ const FotoGridsIcons = {
         <rect x="8" y="21" width="8" height="1" stroke="currentColor" stroke-width="2"/>
         <path d="M12 17v4" stroke="currentColor" stroke-width="2"/>
     </svg>`,
-    
-    // Lightbox dot styles
+
     dot_fill: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="4" fill="currentColor"/>
     </svg>`,
@@ -276,7 +276,6 @@ const FotoGridsIcons = {
         <rect x="4" y="4" width="8" height="8" stroke="currentColor" stroke-width="2" fill="none"/>
     </svg>`,
     
-    // Interaction icons
     click_nothing: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M9 9L15 15M15 9L9 15M7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
@@ -295,7 +294,23 @@ const FotoGridsIcons = {
 
 	click: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M9 3.5V2M5.06066 5.06066L4 4M5.06066 13L4 14.0607M13 5.06066L14.0607 4M3.5 9H2M8.5 8.5L12.6111 21.2778L15.5 18.3889L19.1111 22L22 19.1111L18.3889 15.5L21.2778 12.6111L8.5 8.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-	</svg>`
+	</svg>`,
+
+    'flex-align-bottom': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.5 17.6L6.5 17.6M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
+    'flex-align-left': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.5 17.5L6.5 6.5M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
+    'flex-align-right': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.5 17.5L17.5 6.5M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
+    'flex-align-top': `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.5 6.5L6.5 6.5M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
 };
 
 if (typeof module !== 'undefined' && module.exports) {

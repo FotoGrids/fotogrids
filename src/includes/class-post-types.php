@@ -18,25 +18,32 @@ class Post_Types {
     public static function init() {
         add_action( 'init', array( __CLASS__, 'register_cpts' ) );
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
-        // Meta box saving is handled by class-meta-boxes.php
         
-        // Disable Gutenberg for our post types
         add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
     }
     
     /**
      * Register custom post types
+     * 
+     * Registers both Gallery and Album custom post types with their
+     * respective labels, capabilities, and settings.
+     * 
+     * @since 1.0.0
      */
     public static function register_cpts() {
-        // Register Gallery CPT
         self::register_gallery_cpt();
         
-        // Register Album CPT
         self::register_album_cpt();
     }
     
     /**
      * Register Gallery Custom Post Type
+     * 
+     * Creates the fotogrids_gallery post type with appropriate labels,
+     * capabilities, and REST API support. Post type is private but
+     * accessible through the admin interface.
+     * 
+     * @since 1.0.0
      */
     private static function register_gallery_cpt() {
         $labels = array(
@@ -71,7 +78,7 @@ class Post_Types {
             'public'                => false,
             'publicly_queryable'    => false,
             'show_ui'               => true,
-            'show_in_menu'          => false, // We'll add our own menu
+            'show_in_menu'          => false,
             'query_var'             => true,
             'rewrite'               => array( 'slug' => 'fotogrids-gallery' ),
             'capability_type'       => array( 'fotogrids_gallery', 'fotogrids_galleries' ),
@@ -91,6 +98,12 @@ class Post_Types {
     
     /**
      * Register Album Custom Post Type
+     * 
+     * Creates the fotogrids_album post type with appropriate labels,
+     * capabilities, and REST API support. Albums serve as containers
+     * for organizing multiple galleries.
+     * 
+     * @since 1.0.0
      */
     private static function register_album_cpt() {
         $labels = array(
@@ -125,8 +138,7 @@ class Post_Types {
             'public'                => false,
             'publicly_queryable'    => false,
             'show_ui'               => true,
-            'show_in_menu'          => false, // We'll add our own menu
-            'query_var'             => true,
+            'show_in_menu'          => false,            'query_var'             => true,
             'rewrite'               => array( 'slug' => 'fotogrids-album' ),
             'capability_type'       => array( 'fotogrids_album', 'fotogrids_albums' ),
             'map_meta_cap'          => true,
@@ -145,20 +157,32 @@ class Post_Types {
     
     /**
      * Add meta boxes to post edit screens
+     * 
+     * Registers meta boxes for both gallery and album post types.
+     * Gallery meta boxes include shortcode display, while album meta boxes
+     * include gallery management, settings, and shortcode display.
+     * 
+     * @since 1.0.0
      */
     public static function add_meta_boxes() {
-        // Gallery meta boxes are handled by class-meta-boxes.php
-        
         add_meta_box(
             'fotogrids_gallery_shortcode',
             __( 'Gallery Shortcode', 'fotogrids' ),
-            array( __CLASS__, 'gallery_shortcode_meta_box' ),
+            array( __CLASS__, 'shortcode_meta_box' ),
             'fotogrids_gallery',
             'side',
             'high'
         );
         
-        // Album meta boxes
+        add_meta_box(
+            'fotogrids_album_shortcode',
+            __( 'Album Shortcode', 'fotogrids' ),
+            array( __CLASS__, 'shortcode_meta_box' ),
+            'fotogrids_album',
+            'side',
+            'high'
+        );
+        
         add_meta_box(
             'fotogrids_album_galleries',
             __( 'Galleries', 'fotogrids' ),
@@ -180,38 +204,66 @@ class Post_Types {
     
     
     /**
-     * Gallery shortcode meta box callback
+     * Shared shortcode meta box callback
+     * 
+     * Displays the appropriate shortcode for both galleries and albums.
+     * Determines the post type and generates the correct shortcode format.
+     * Includes copy functionality for easy shortcode usage.
+     * 
+     * @since 1.0.0
+     * 
+     * @param WP_Post $post The post object
      */
-    public static function gallery_shortcode_meta_box( $post ) {
+    public static function shortcode_meta_box( $post ) {
         if ( $post->post_status === 'publish' ) {
-            $shortcode = '[fotogrids_gallery id="' . $post->ID . '"]';
+            $post_type = get_post_type( $post );
+            
+            if ( $post_type === 'fotogrids_gallery' ) {
+                $shortcode = '[fotogrids_gallery id="' . $post->ID . '"]';
+                $type_label = __( 'gallery', 'fotogrids' );
+            } else {
+                $shortcode = '[fotogrids_album id="' . $post->ID . '"]';
+                $type_label = __( 'album', 'fotogrids' );
+            }
+            
             ?>
-            <p><?php _e( 'Use this shortcode to display the gallery:', 'fotogrids' ); ?></p>
-            <div class="fotogrids-shortcode-container" style="display: flex; gap: 10px; align-items: center;">
+            <p><?php printf( __( 'Use this shortcode to display the %s:', 'fotogrids' ), $type_label ); ?></p>
+            <div class="fotogrids-shortcode-container">
                 <input type="text" value="<?php echo esc_attr( $shortcode ); ?>" 
-                       readonly onclick="this.select();" style="flex: 1;" />
+                       readonly onclick="this.select();" class="fotogrids-shortcode-input" />
                 <button type="button" class="button fotogrids-copy-shortcode" 
                         data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
                         title="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
                     <?php _e( 'Copy', 'fotogrids' ); ?>
                 </button>
             </div>
+            <div class="fotogrids-copy-success">
+                <?php _e( 'Shortcode copied to clipboard!', 'fotogrids' ); ?>
+            </div>
             <p class="description">
                 <?php _e( 'Click "Copy" to copy the shortcode to your clipboard, or click the shortcode field to select it manually.', 'fotogrids' ); ?>
             </p>
             <?php
         } else {
+            $post_type = get_post_type( $post );
+            $type_label = $post_type === 'fotogrids_gallery' ? __( 'gallery', 'fotogrids' ) : __( 'album', 'fotogrids' );
             ?>
-            <p><?php _e( 'Publish the gallery to get the shortcode.', 'fotogrids' ); ?></p>
+            <p><?php printf( __( 'Publish the %s to get the shortcode.', 'fotogrids' ), $type_label ); ?></p>
             <?php
         }
     }
     
     /**
      * Album galleries meta box callback
+     * 
+     * Renders the React component container for managing gallery assignments
+     * within an album. The actual functionality is handled by the React component.
+     * 
+     * @since 1.0.0
+     * 
+     * @param WP_Post $post The album post object
      */
     public static function album_galleries_meta_box( $post ) {
-        // Add nonce for security
         wp_nonce_field( 'fotogrids_album_galleries', 'fotogrids_album_galleries_nonce' );
         
         ?>
@@ -227,16 +279,21 @@ class Post_Types {
     
     /**
      * Album settings meta box callback
+     * 
+     * Renders form fields for album-specific settings including layout type
+     * and featured gallery selection. Only galleries assigned to the album
+     * are available for featured gallery selection.
+     * 
+     * @since 1.0.0
+     * 
+     * @param WP_Post $post The album post object
      */
     public static function album_settings_meta_box( $post ) {
-        // Add nonce for security
         wp_nonce_field( 'fotogrids_album_settings', 'fotogrids_album_settings_nonce' );
         
-        // Get current values
         $layout = get_post_meta( $post->ID, 'fotogrids_album_layout', true ) ?: 'grid';
         $featured_gallery = get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
         
-        // Get assigned galleries for featured gallery dropdown
         $assigned_galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $post->ID );
         
         ?>
@@ -277,12 +334,16 @@ class Post_Types {
     /**
      * Disable Gutenberg block editor for FotoGrids post types
      * 
-     * @param bool $current_status Current block editor status
-     * @param string $post_type Post type being checked
+     * Prevents the block editor from being used on FotoGrids custom post types
+     * since they use custom meta boxes and React components for content management.
+     * 
+     * @since 1.0.0
+     * 
+     * @param bool   $current_status Current block editor status
+     * @param string $post_type      Post type being checked
      * @return bool Whether to use block editor
      */
     public static function disable_gutenberg( $current_status, $post_type ) {
-        // Disable Gutenberg for our custom post types
         if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ) ) ) {
             return false;
         }

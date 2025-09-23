@@ -340,12 +340,10 @@ class Statistics {
      * Run scheduled cleanup
      */
     public static function run_scheduled_cleanup() {
-        // Keep 1 year of data by default
         $days_to_keep = apply_filters( 'fotogrids_stats_retention_days', 365 );
         self::cleanup_old_data( $days_to_keep );
     }
 }
 
-// Schedule cleanup
 add_action( 'init', array( 'FotoGrids\Statistics', 'init_cleanup_schedule' ) );
 add_action( 'fotogrids_stats_cleanup', array( 'FotoGrids\Statistics', 'run_scheduled_cleanup' ) );

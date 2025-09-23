@@ -19,62 +19,28 @@ class Gallery_Album_Relations {
     
     /**
      * Initialize the class
+     * 
+     * Sets up the table name and registers cleanup hooks for post deletion.
+     * Table creation is handled by the Activator class during plugin activation.
+     * 
+     * @since 1.0.0
      */
     public static function init() {
         global $wpdb;
         self::$table_name = $wpdb->prefix . 'fotogrids_gallery_albums';
         
-        // Ensure table exists (for existing installations)
-        self::ensure_table_exists();
-        
-        // Create table on activation
-        add_action( 'fotogrids_activate', array( __CLASS__, 'create_table' ) );
-        
-        // Clean up relationships when posts are deleted
         add_action( 'before_delete_post', array( __CLASS__, 'delete_post_relationships' ) );
     }
     
-    /**
-     * Create the junction table
-     */
-    public static function create_table() {
-        self::ensure_table_exists();
-    }
-    
-    /**
-     * Ensure the junction table exists (can be called anytime)
-     */
-    public static function ensure_table_exists() {
-        global $wpdb;
-        
-        $table_name = self::get_table_name();
-        
-        // Check if table exists
-        $table_exists = $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name;
-        
-        if ( ! $table_exists ) {
-            $charset_collate = $wpdb->get_charset_collate();
-            
-            $sql = "CREATE TABLE $table_name (
-                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                gallery_id BIGINT UNSIGNED NOT NULL,
-                album_id BIGINT UNSIGNED NOT NULL,
-                position INT NOT NULL DEFAULT 0,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (id),
-                UNIQUE KEY unique_relationship (gallery_id, album_id),
-                INDEX (gallery_id),
-                INDEX (album_id),
-                INDEX (position)
-            ) $charset_collate;";
-            
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-            dbDelta( $sql );
-        }
-    }
     
     /**
      * Get table name
+     * 
+     * Returns the full table name for the gallery-album relationships table.
+     * 
+     * @since 1.0.0
+     * 
+     * @return string The full table name with WordPress prefix
      */
     private static function get_table_name() {
         if ( self::$table_name === null ) {
@@ -102,17 +68,14 @@ class Gallery_Album_Relations {
             return false;
         }
         
-        // Verify posts exist and are correct types
         if ( ! self::verify_post_types( $gallery_id, $album_id ) ) {
             return false;
         }
         
-        // Check if relationship already exists
         if ( self::relationship_exists( $gallery_id, $album_id ) ) {
             return false;
         }
         
-        // If no position specified, add at the end
         if ( $position === null ) {
             $position = self::get_next_position( $album_id );
         }
@@ -133,7 +96,6 @@ class Gallery_Album_Relations {
             return false;
         }
         
-        // Clear caches
         self::clear_caches( $gallery_id, $album_id );
         
         return $wpdb->insert_id;
@@ -167,7 +129,6 @@ class Gallery_Album_Relations {
             array( '%d', '%d' )
         );
         
-        // Clear caches
         self::clear_caches( $gallery_id, $album_id );
         
         return $result !== false;
@@ -221,7 +182,6 @@ class Gallery_Album_Relations {
         
         if ( $args['include_meta'] && ! empty( $galleries ) ) {
             foreach ( $galleries as $gallery ) {
-                // Add gallery meta
                 $gallery->image_count = self::get_gallery_image_count( $gallery->ID );
                 $gallery->layout = get_post_meta( $gallery->ID, 'fotogrids_layout', true ) ?: 'grid';
                 $gallery->featured_image = get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' );
@@ -278,7 +238,6 @@ class Gallery_Album_Relations {
         
         if ( $args['include_meta'] && ! empty( $albums ) ) {
             foreach ( $albums as $album ) {
-                // Add album meta
                 $album->gallery_count = self::get_album_gallery_count( $album->ID );
                 $album->featured_image = get_the_post_thumbnail_url( $album->ID, 'thumbnail' );
             }
@@ -304,7 +263,6 @@ class Gallery_Album_Relations {
         
         $table_name = self::get_table_name();
         
-        // Update positions
         $position = 0;
         foreach ( $gallery_ids as $gallery_id ) {
             $gallery_id = absint( $gallery_id );
@@ -326,7 +284,6 @@ class Gallery_Album_Relations {
             $position++;
         }
         
-        // Clear caches
         self::clear_caches( null, $album_id );
         
         return true;
@@ -489,7 +446,6 @@ class Gallery_Album_Relations {
             return array();
         }
         
-        // Get up to $limit images from the gallery
         $sample_image_ids = array_slice( $image_ids, 0, $limit );
         $image_urls = array();
         
@@ -532,8 +488,6 @@ class Gallery_Album_Relations {
      * @param int|null $album_id Album post ID
      */
     private static function clear_caches( $gallery_id = null, $album_id = null ) {
-        // Clear any caches here if implemented
-        // For now, we'll just trigger post cache clearing
         if ( $gallery_id ) {
             clean_post_cache( $gallery_id );
         }
