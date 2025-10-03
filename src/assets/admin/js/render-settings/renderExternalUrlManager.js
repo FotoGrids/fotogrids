@@ -3,14 +3,14 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, {
     settings,
     canEditPosts,
-    loadingImages,
-    imageError,
-    loadImageData,
-    galleryImages,
-    imageData,
-    savingImages,
+    loadingItems,
+    itemError,
+    loadItemData,
+    galleryItems,
+    itemData,
+    savingItems,
     openBulkModal,
-    updateImageUrl,
+    updateItemUrl,
     validateUrl,
     renderIcon,
     __
@@ -27,13 +27,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
             h('div', {
                 className: 'fotogrids-permission-notice'
             }, [
-                h('p', {}, __('You do not have permission to edit image URLs. The "edit_posts" capability is required.', 'fotogrids'))
+                h('p', {}, __('You do not have permission to edit item URLs. The "edit_posts" capability is required.', 'fotogrids'))
             ])
         ]);
     }
     
 
-    if (loadingImages) {
+    if (loadingItems) {
         return h('div', {
             className: 'fotogrids-external-url-manager fotogrids-external-url-manager--loading'
         }, [
@@ -45,23 +45,23 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                 })
             ]),
             h('div', {
-                className: 'fotogrids-image-url-grid'
-            }, galleryImages.map(imageId => 
+                className: 'fotogrids-item-url-grid'
+            }, galleryItems.map(itemId => 
                 h('div', {
-                    key: imageId,
-                    className: 'fotogrids-image-url-item fotogrids-image-url-item--skeleton'
+                    key: itemId,
+                    className: 'fotogrids-item-url-item fotogrids-item-url-item--skeleton'
                 }, [
                     h('div', {
-                        className: 'fotogrids-image-url-item__thumbnail'
+                        className: 'fotogrids-item-url-item__thumbnail'
                     }),
                     h('div', {
-                        className: 'fotogrids-image-url-item__fields'
+                        className: 'fotogrids-item-url-item__fields'
                     }, [
                         h('div', {
-                            className: 'fotogrids-image-url-item__url-field'
+                            className: 'fotogrids-item-url-item__url-field'
                         }),
                         h('div', {
-                            className: 'fotogrids-image-url-item__target-field'
+                            className: 'fotogrids-item-url-item__target-field'
                         })
                     ])
                 ])
@@ -70,17 +70,17 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
     }
     
 
-    if (imageError) {
+    if (itemError) {
         return h('div', {
             className: 'fotogrids-external-url-manager fotogrids-external-url-manager--error'
         }, [
             h('div', {
                 className: 'fotogrids-error-notice'
             }, [
-                h('p', {}, imageError),
+                h('p', {}, itemError),
                 h('button', {
                     type: 'button',
-                    onClick: loadImageData,
+                    onClick: loadItemData,
                     className: 'button'
                 }, __('Retry', 'fotogrids'))
             ])
@@ -113,27 +113,27 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
         
 
         h('div', {
-            className: 'fotogrids-image-url-grid'
-        }, galleryImages.map(imageId => {
-            const data = imageData[imageId] || {};
+            className: 'fotogrids-item-url-grid'
+        }, galleryItems.map(itemId => {
+            const data = itemData[itemId] || {};
             const currentUrl = data.url || '';
             const currentTarget = data.target || 'global';
-            const isSaving = savingImages[imageId];
+            const isSaving = savingItems[itemId];
             
             return h('div', {
-                key: imageId,
-                className: 'fotogrids-image-url-item'
+                key: itemId,
+                className: 'fotogrids-item-url-item'
             }, [
 
                 h('div', {
-                    className: 'fotogrids-image-url-item__thumbnail'
+                    className: 'fotogrids-item-url-item__thumbnail'
                 }, [
                     data.thumbnail ? h('img', {
                         src: data.thumbnail,
                         alt: data.alt || data.title || '',
                         loading: 'lazy'
                     }) : h('div', {
-                        className: 'fotogrids-image-url-item__thumbnail-placeholder'
+                        className: 'fotogrids-item-url-item__thumbnail-placeholder'
                     }, h('svg', {
                         width: '100%',
                         height: '100%',
@@ -151,14 +151,14 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                 
 
                 h('div', {
-                    className: 'fotogrids-image-url-item__fields'
+                    className: 'fotogrids-item-url-item__fields'
                 }, [
 
                     h('div', {
-                        className: 'fotogrids-image-url-item__url-field'
+                        className: 'fotogrids-item-url-item__url-field'
                     }, [
                         h('label', {
-                            className: 'fotogrids-image-url-item__label'
+                            className: 'fotogrids-item-url-item__label'
                         }, __('Link', 'fotogrids')),
                         h('input', {
                             type: 'url',
@@ -196,7 +196,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                                 
 
                                 if (validation.valid || !newUrl.trim()) {
-                                    updateImageUrl(imageId, newUrl);
+                                    updateItemUrl(itemId, newUrl);
                                 }
                             },
                             disabled: isDisabled || isSaving
@@ -212,10 +212,10 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                     
 
                     h('div', {
-                        className: 'fotogrids-image-url-item__target-field'
+                        className: 'fotogrids-item-url-item__target-field'
                     }, [
                         h('label', {
-                            className: 'fotogrids-image-url-item__label'
+                            className: 'fotogrids-item-url-item__label'
                         }, __('Target', 'fotogrids')),
                         h('div', {
                             className: 'fotogrids-target-button-group'
@@ -223,7 +223,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                             h('button', {
                                 type: 'button',
                                 className: `fotogrids-target-button ${currentTarget === 'global' ? 'is-active' : ''}`,
-                                onClick: () => updateImageUrl(imageId, currentUrl, 'global'),
+                                onClick: () => updateItemUrl(itemId, currentUrl, 'global'),
                                 disabled: isDisabled || isSaving
                             }, [
                                 h('span', {
@@ -236,7 +236,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                             h('button', {
                                 type: 'button',
                                 className: `fotogrids-target-button ${currentTarget === '_self' ? 'is-active' : ''}`,
-                                onClick: () => updateImageUrl(imageId, currentUrl, '_self'),
+                                onClick: () => updateItemUrl(itemId, currentUrl, '_self'),
                                 disabled: isDisabled || isSaving
                             }, [
                                 h('span', {
@@ -249,7 +249,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                             h('button', {
                                 type: 'button',
                                 className: `fotogrids-target-button ${currentTarget === '_blank' ? 'is-active' : ''}`,
-                                onClick: () => updateImageUrl(imageId, currentUrl, '_blank'),
+                                onClick: () => updateItemUrl(itemId, currentUrl, '_blank'),
                                 disabled: isDisabled || isSaving
                             }, [
                                 h('span', {

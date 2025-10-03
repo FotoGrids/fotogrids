@@ -15,7 +15,7 @@ class Statistics {
     /**
      * Increment a statistic counter
      * 
-     * @param string $object_type Type of object (gallery, album, image)
+     * @param string $object_type Type of object (gallery, album, item)
      * @param int $object_id ID of the object
      * @param string $field Field to increment (views, shares)
      * @param int $amount Amount to increment by
@@ -27,7 +27,7 @@ class Statistics {
         $table = $wpdb->prefix . 'fotogrids_statistics';
         
         // Validate parameters
-        if ( ! in_array( $object_type, array( 'gallery', 'album', 'image' ) ) ) {
+        if ( ! in_array( $object_type, array( 'gallery', 'album', 'item' ) ) ) {
             return false;
         }
         
@@ -312,7 +312,7 @@ class Statistics {
                 }
                 break;
                 
-            case 'image':
+            case 'item':
                 $attachment = get_post( $object_id );
                 if ( $attachment && $attachment->post_type === 'attachment' ) {
                     return array(

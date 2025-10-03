@@ -61,10 +61,10 @@ class Post_Types {
             'parent_item_colon'     => __( 'Parent Galleries:', 'fotogrids' ),
             'not_found'             => __( 'No galleries found.', 'fotogrids' ),
             'not_found_in_trash'    => __( 'No galleries found in Trash.', 'fotogrids' ),
-            'featured_image'        => _x( 'Gallery Featured Image', 'Overrides the "Featured Image" phrase', 'fotogrids' ),
-            'set_featured_image'    => _x( 'Set featured image', 'Overrides the "Set featured image" phrase', 'fotogrids' ),
-            'remove_featured_image' => _x( 'Remove featured image', 'Overrides the "Remove featured image" phrase', 'fotogrids' ),
-            'use_featured_image'    => _x( 'Use as featured image', 'Overrides the "Use as featured image" phrase', 'fotogrids' ),
+            'featured_item'        => _x( 'Gallery Featured Item', 'Overrides the "Featured Item" phrase', 'fotogrids' ),
+            'set_featured_item'    => _x( 'Set featured item', 'Overrides the "Set featured item" phrase', 'fotogrids' ),
+            'remove_featured_item' => _x( 'Remove featured item', 'Overrides the "Remove featured item" phrase', 'fotogrids' ),
+            'use_featured_item'    => _x( 'Use as featured item', 'Overrides the "Use as featured item" phrase', 'fotogrids' ),
             'archives'              => _x( 'Gallery archives', 'The post type archive label', 'fotogrids' ),
             'insert_into_item'      => _x( 'Insert into gallery', 'Overrides the "Insert into post" phrase', 'fotogrids' ),
             'uploaded_to_this_item' => _x( 'Uploaded to this gallery', 'Overrides the "Uploaded to this post" phrase', 'fotogrids' ),
@@ -121,10 +121,10 @@ class Post_Types {
             'parent_item_colon'     => __( 'Parent Albums:', 'fotogrids' ),
             'not_found'             => __( 'No albums found.', 'fotogrids' ),
             'not_found_in_trash'    => __( 'No albums found in Trash.', 'fotogrids' ),
-            'featured_image'        => _x( 'Album Featured Image', 'Overrides the "Featured Image" phrase', 'fotogrids' ),
-            'set_featured_image'    => _x( 'Set featured image', 'Overrides the "Set featured image" phrase', 'fotogrids' ),
-            'remove_featured_image' => _x( 'Remove featured image', 'Overrides the "Remove featured image" phrase', 'fotogrids' ),
-            'use_featured_image'    => _x( 'Use as featured image', 'Overrides the "Use as featured image" phrase', 'fotogrids' ),
+            'featured_item'        => _x( 'Album Featured Item', 'Overrides the "Featured Item" phrase', 'fotogrids' ),
+            'set_featured_item'    => _x( 'Set featured item', 'Overrides the "Set featured item" phrase', 'fotogrids' ),
+            'remove_featured_item' => _x( 'Remove featured item', 'Overrides the "Remove featured item" phrase', 'fotogrids' ),
+            'use_featured_item'    => _x( 'Use as featured item', 'Overrides the "Use as featured item" phrase', 'fotogrids' ),
             'archives'              => _x( 'Album archives', 'The post type archive label', 'fotogrids' ),
             'insert_into_item'      => _x( 'Insert into album', 'Overrides the "Insert into post" phrase', 'fotogrids' ),
             'uploaded_to_this_item' => _x( 'Uploaded to this album', 'Overrides the "Uploaded to this post" phrase', 'fotogrids' ),
@@ -227,17 +227,17 @@ class Post_Types {
             }
             
             ?>
-            <p><?php printf( __( 'Use this shortcode to display the %s:', 'fotogrids' ), $type_label ); ?></p>
+            <p class="fotogrids-shortcode-title"><?php printf( __( 'Use this shortcode to display the %s', 'fotogrids' ), $type_label ); ?></p>
             <div class="fotogrids-shortcode-container">
                 <input type="text" value="<?php echo esc_attr( $shortcode ); ?>" 
                        readonly onclick="this.select();" class="fotogrids-shortcode-input" />
-                <button type="button" class="button fotogrids-copy-shortcode" 
+                <button type="button" class="fotogrids-button fotogrids-button--accent fotogrids-shortcode-copy" 
                         data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
                         title="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
                     <?php _e( 'Copy', 'fotogrids' ); ?>
                 </button>
             </div>
-            <div class="fotogrids-copy-success">
+            <div class="fotogrids-shortcode-copy-success">
                 <?php _e( 'Shortcode copied to clipboard!', 'fotogrids' ); ?>
             </div>
             <p class="description">

@@ -5,23 +5,23 @@
  */
 
 // Import colors for SCSS variables
-@import './colors.scss';
+@use './colors.scss' as *;
 
 // Sticky Publish Metabox
 @media screen and (min-width: 783px) {
-    .post-type-fotogrids_gallery #submitdiv {
-        position: sticky;
-        top: 52px;
-        z-index: 10;
-        background: #fff;
-        border-radius: 4px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease;
+    // .post-type-fotogrids_gallery #submitdiv {
+    //     position: sticky;
+    //     top: 52px;
+    //     z-index: 10;
+    //     background: #fff;
+    //     border-radius: 4px;
+    //     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    //     transition: box-shadow 0.3s ease;
 
-        &.stuck {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-    }
+    //     &.stuck {
+    //         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    //     }
+    // }
 }
 
 // Save Status Container
@@ -179,7 +179,7 @@
 }
 
 #major-publishing-actions {
-    box-shadow: 0 1px 0 0 #dcdcde;
+    border-bottom: 1px solid #dcdcde;
 }
 
 // Animations

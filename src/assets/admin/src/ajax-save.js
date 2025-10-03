@@ -142,15 +142,6 @@
                 formFields[key] = value;
             }
         }
-        
-        // Debug logging
-        console.log('FotoGrids AJAX Save: Sending request', {
-            action: 'fotogrids_save_gallery',
-            nonce: $('#fotogrids_meta_box_nonce').val(),
-            post_id: $('#post_ID').val(),
-            post_title: $('#title').val(),
-            fotogrids_fields: formFields
-        });
 
         // Perform AJAX request
         $.ajax({

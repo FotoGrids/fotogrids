@@ -100,15 +100,15 @@ describe('FotoGrids Helper Functions', () => {
         });
     });
 
-    describe('Gallery Image Operations', () => {
-        test('should format image data correctly', () => {
+    describe('Gallery Item Operations', () => {
+        test('should format item data correctly', () => {
             const mockAttachment = {
                 ID: 456,
-                post_title: 'Test Image',
+                post_title: 'Test Item',
                 post_type: 'attachment'
             };
 
-            const mockImageData = {
+            const mockItemData = {
                 attachment_id: '456',
                 gallery_id: '123',
                 position: '1',
@@ -120,13 +120,13 @@ describe('FotoGrids Helper Functions', () => {
             };
 
             global.get_post.mockReturnValue(mockAttachment);
-            global.wp_get_attachment_url.mockReturnValue('https://example.com/image.jpg');
-            global.wp_get_attachment_image_url.mockReturnValue('https://example.com/image-thumb.jpg');
+            global.wp_get_attachment_url.mockReturnValue('https://example.com/item.jpg');
+            global.wp_get_attachment_image_url.mockReturnValue('https://example.com/item-thumb.jpg');
             global.get_post_meta.mockReturnValue('Alt text');
 
             // Test that our mocks are working
             expect(global.get_post(456)).toEqual(mockAttachment);
-            expect(global.wp_get_attachment_url(456)).toBe('https://example.com/image.jpg');
+            expect(global.wp_get_attachment_url(456)).toBe('https://example.com/item.jpg');
         });
     });
 
@@ -258,7 +258,7 @@ describe('FotoGrids Helper Functions', () => {
         });
 
         test('should handle WordPress hooks', () => {
-            const hookName = 'fotogrids_image_added_to_gallery';
+            const hookName = 'fotogrids_item_added_to_gallery';
             const attachmentId = 123;
             const galleryId = 456;
             const meta = { caption: 'Test' };

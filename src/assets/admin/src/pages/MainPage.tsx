@@ -104,7 +104,7 @@ const MainPage = () => {
                         <div className="getting-started">
                             <ol>
                                 <li>{__('Create your first gallery', 'fotogrids')}</li>
-                                <li>{__('Add images from your media library', 'fotogrids')}</li>
+                                <li>{__('Add items from your media library', 'fotogrids')}</li>
                                 <li>{__('Choose a layout template', 'fotogrids')}</li>
                                 <li>{__('Copy the shortcode and paste it in your post or page', 'fotogrids')}</li>
                             </ol>

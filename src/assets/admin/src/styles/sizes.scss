@@ -1,0 +1,445 @@
+@use "sass:meta";
+@use "sass:map";
+
+// FotoGrids Base Size Variables
+$base-padding: 8px;
+$base-margin: 8px;
+$base-font-size: 14px;
+$base-line-height: 1.5;
+$base-border-width: 1px;
+$base-border-radius: 4px;
+
+// Font Size Variables
+$font-size-xs: 10px;
+$font-size-sm: 12px;
+$font-size-base: 14px;
+$font-size-md: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 28px;
+$font-size-4xl: 32px;
+$font-size-5xl: 36px;
+
+// Line Height Variables
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// Spacing Variables
+$spacing-xs: 2px;
+$spacing-sm: 4px;
+$spacing-base: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+$spacing-xl: 20px;
+$spacing-2xl: 24px;
+$spacing-3xl: 32px;
+$spacing-4xl: 40px;
+$spacing-5xl: 48px;
+$spacing-6xl: 64px;
+$spacing-7xl: 80px;
+$spacing-8xl: 96px;
+
+// Border Radius Variables
+$border-radius-none: 0;
+$border-radius-xs: 2px;
+$border-radius-sm: 3px;
+$border-radius-base: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+$border-radius-2xl: 16px;
+$border-radius-3xl: 24px;
+$border-radius-full: 9999px;
+
+// Shadow Variables
+// $shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+// $shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+// $shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+// $shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+// $shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+// $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+// $shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+// $shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+// Z-Index Variables
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// FotoGrids UI Sizes Map
+$fotogrids-ui-sizes: (
+    // Spacing
+    spacing: (
+        none: 0,
+        xs: $spacing-xs,
+        sm: $spacing-sm,
+        base: $spacing-base,
+        md: $spacing-md,
+        lg: $spacing-lg,
+        xl: $spacing-xl,
+        2xl: $spacing-2xl,
+        3xl: $spacing-3xl,
+        4xl: $spacing-4xl,
+        5xl: $spacing-5xl,
+        6xl: $spacing-6xl,
+        7xl: $spacing-7xl,
+        8xl: $spacing-8xl
+    ),
+    
+    // Padding
+    padding: (
+        none: 0,
+        xs: 2px,
+        sm: 4px,
+        base: $base-padding,
+        md: 12px,
+        lg: 16px,
+        xl: 20px,
+        2xl: 24px,
+        3xl: 32px,
+        4xl: 40px,
+        5xl: 48px,
+        6xl: 64px,
+        
+        // Component specific padding
+        button-sm: 4px 8px,
+        button-base: 8px 16px,
+        button-lg: 12px 24px,
+        button-xl: 16px 32px,
+        
+        input-sm: 4px 8px,
+        input-base: 8px 12px,
+        input-lg: 12px 16px,
+        
+        card: 16px,
+        card-lg: 24px,
+        modal: 24px,
+        section: 32px
+    ),
+    
+    // Margin
+    margin: (
+        none: 0,
+        xs: 2px,
+        sm: 4px,
+        base: $base-margin,
+        md: 12px,
+        lg: 16px,
+        xl: 20px,
+        2xl: 24px,
+        3xl: 32px,
+        4xl: 40px,
+        5xl: 48px,
+        6xl: 64px,
+        
+        // Auto margins
+        auto: auto,
+        
+        // Component specific margins
+        form-field: 16px,
+        section: 32px,
+        page: 40px
+    ),
+    
+    // Font Sizes
+    font-size: (
+        xs: $font-size-xs,
+        sm: $font-size-sm,
+        base: $font-size-base,
+        md: $font-size-md,
+        lg: $font-size-lg,
+        xl: $font-size-xl,
+        2xl: $font-size-2xl,
+        3xl: $font-size-3xl,
+        4xl: $font-size-4xl,
+        5xl: $font-size-5xl,
+        
+        // Component specific font sizes
+        button-sm: 12px,
+        button-base: 14px,
+        button-lg: 16px,
+        button-xl: 18px,
+        
+        input-sm: 12px,
+        input-base: 14px,
+        input-lg: 16px,
+        
+        label: 14px,
+        help: 12px,
+        error: 12px,
+        
+        heading-sm: 16px,
+        heading-base: 18px,
+        heading-lg: 20px,
+        heading-xl: 24px,
+        heading-2xl: 28px,
+        heading-3xl: 32px
+    ),
+    
+    // Line Heights
+    line-height: (
+        none: 1,
+        tight: $line-height-tight,
+        snug: $line-height-snug,
+        normal: $line-height-normal,
+        relaxed: $line-height-relaxed,
+        loose: $line-height-loose,
+        
+        // Component specific line heights
+        button: 1.4,
+        input: 1.5,
+        text: 1.6,
+        heading: 1.2
+    ),
+    
+    // Border Radius
+    border-radius: (
+        none: $border-radius-none,
+        xs: $border-radius-xs,
+        sm: $border-radius-sm,
+        base: $border-radius-base,
+        md: $border-radius-md,
+        lg: $border-radius-lg,
+        xl: $border-radius-xl,
+        2xl: $border-radius-2xl,
+        3xl: $border-radius-3xl,
+        full: $border-radius-full,
+        
+        // Component specific border radius
+        button: 4px,
+        input: 4px,
+        card: 6px,
+        modal: 8px,
+        badge: 12px,
+        avatar: 50%
+    ),
+    
+    // Border Width
+    border-width: (
+        none: 0,
+        thin: 1px,
+        base: $base-border-width,
+        thick: 2px,
+        thicker: 3px,
+        thickest: 4px
+    ),
+    
+    // Shadows
+    // shadow: (
+    //     none: none,
+    //     xs: $shadow-xs,
+    //     sm: $shadow-sm,
+    //     base: $shadow-base,
+    //     md: $shadow-md,
+    //     lg: $shadow-lg,
+    //     xl: $shadow-xl,
+    //     2xl: $shadow-2xl,
+    //     inner: $shadow-inner,
+    //     
+    //     // Component specific shadows
+    //     button: 0 1px 3px rgba(0, 0, 0, 0.12),
+    //     button-hover: 0 2px 8px rgba(0, 0, 0, 0.15),
+    //     card: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24),
+    //     modal: 0 10px 25px rgba(0, 0, 0, 0.5),
+    //     dropdown: 0 4px 6px rgba(0, 0, 0, 0.1),
+    //     focus: 0 0 0 3px rgba(34, 113, 177, 0.25)
+    // ),
+    
+    // Width
+    width: (
+        auto: auto,
+        full: 100%,
+        screen: 100vw,
+        min: min-content,
+        max: max-content,
+        fit: fit-content,
+        
+        // Fixed widths
+        xs: 20rem,
+        sm: 24rem,
+        md: 28rem,
+        lg: 32rem,
+        xl: 36rem,
+        2xl: 42rem,
+        3xl: 48rem,
+        4xl: 56rem,
+        5xl: 64rem,
+        6xl: 72rem,
+        7xl: 80rem,
+        
+        // Component specific widths
+        sidebar: 250px,
+        sidebar-collapsed: 60px,
+        modal-sm: 300px,
+        modal-base: 500px,
+        modal-lg: 800px,
+        modal-xl: 1140px,
+        
+        // Form widths
+        input-sm: 120px,
+        input-base: 200px,
+        input-lg: 300px,
+        input-xl: 400px
+    ),
+    
+    // Height
+    height: (
+        auto: auto,
+        full: 100%,
+        screen: 100vh,
+        min: min-content,
+        max: max-content,
+        fit: fit-content,
+        
+        // Fixed heights
+        xs: 4px,
+        sm: 8px,
+        base: 16px,
+        md: 24px,
+        lg: 32px,
+        xl: 40px,
+        2xl: 48px,
+        3xl: 56px,
+        4xl: 64px,
+        5xl: 80px,
+        6xl: 96px,
+        
+        // Component specific heights
+        button-sm: 28px,
+        button-base: 36px,
+        button-lg: 44px,
+        button-xl: 52px,
+        
+        input-sm: 28px,
+        input-base: 36px,
+        input-lg: 44px,
+        
+        header: 60px,
+        navbar: 56px,
+        footer: 80px,
+        
+        // Textarea heights
+        textarea-sm: 80px,
+        textarea-base: 120px,
+        textarea-lg: 160px
+    ),
+    
+    // Z-Index
+    z-index: (
+        hide: -1,
+        auto: auto,
+        base: 0,
+        docked: 10,
+        dropdown: $z-index-dropdown,
+        sticky: $z-index-sticky,
+        banner: 1025,
+        fixed: $z-index-fixed,
+        modal-backdrop: $z-index-modal-backdrop,
+        modal: $z-index-modal,
+        popover: $z-index-popover,
+        tooltip: $z-index-tooltip,
+        toast: 1080,
+        max: 2147483647
+    ),
+    
+    // Transitions
+    transition: (
+        none: none,
+        all: all 0.15s ease-in-out,
+        colors: background-color 0.15s ease-in-out,
+        opacity: opacity 0.15s ease-in-out,
+        shadow: box-shadow 0.15s ease-in-out,
+        transform: transform 0.15s ease-in-out,
+        
+        // Duration
+        duration-75: 75ms,
+        duration-100: 100ms,
+        duration-150: 150ms,
+        duration-200: 200ms,
+        duration-300: 300ms,
+        duration-500: 500ms,
+        duration-700: 700ms,
+        duration-1000: 1000ms,
+        
+        // Timing functions
+        ease-linear: linear,
+        ease-in: cubic-bezier(0.4, 0, 1, 1),
+        ease-out: cubic-bezier(0, 0, 0.2, 1),
+        ease-in-out: cubic-bezier(0.4, 0, 0.2, 1)
+    )
+);
+
+// Helper function to get size from the map
+@function ui-size($category, $size: null) {
+    @if $size {
+        @return map.get(map.get($fotogrids-ui-sizes, $category), $size);
+    } @else {
+        @return map.get($fotogrids-ui-sizes, $category);
+    }
+}
+
+// Utility mixins for common size patterns
+@mixin padding($size) {
+    padding: ui-size(padding, $size);
+}
+
+@mixin margin($size) {
+    margin: ui-size(margin, $size);
+}
+
+@mixin font-size($size) {
+    font-size: ui-size(font-size, $size);
+}
+
+@mixin border-radius($size) {
+    border-radius: ui-size(border-radius, $size);
+}
+
+// @mixin shadow($size) {
+//     box-shadow: ui-size(shadow, $size);
+// }
+
+// Component size mixins
+@mixin button-size($size: base) {
+    padding: ui-size(padding, button-#{$size});
+    font-size: ui-size(font-size, button-#{$size});
+    height: ui-size(height, button-#{$size});
+    line-height: ui-size(line-height, button);
+}
+
+@mixin input-size($size: base) {
+    padding: ui-size(padding, input-#{$size});
+    font-size: ui-size(font-size, input-#{$size});
+    height: ui-size(height, input-#{$size});
+    line-height: ui-size(line-height, input);
+}
+
+// CSS Custom Properties for FotoGrids Sizes
+:root {
+    // Base variables
+    --fotogrids-base-padding: #{$base-padding};
+    --fotogrids-base-margin: #{$base-margin};
+    --fotogrids-base-font-size: #{$base-font-size};
+    --fotogrids-base-line-height: #{$base-line-height};
+    --fotogrids-base-border-width: #{$base-border-width};
+    --fotogrids-base-border-radius: #{$base-border-radius};
+    
+    // Generate CSS custom properties from the UI sizes map
+    @each $category, $sizes in $fotogrids-ui-sizes {
+        @if meta.type-of($sizes) == 'map' {
+            @each $size, $value in $sizes {
+                --fotogrids-#{$category}-#{$size}: #{$value};
+            }
+        } @else {
+            --fotogrids-#{$category}: #{$sizes};
+        }
+    }
+}

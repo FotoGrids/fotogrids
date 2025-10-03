@@ -13,18 +13,21 @@ const TabTags = ({
         <div className="fotogrids-tab-panel active">
             <div className="fotogrids-metadata-section">
                 <div className="fotogrids-metadata-input">
-                    <input
-                        type="text"
-                        placeholder="Add tags..."
-                        value={metadataInput.tags}
-                        onChange={(e) => setMetadataInput(prev => ({ ...prev, tags: e.target.value }))}
-                        onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addMetadataItem('tags', metadataInput.tags);
-                            }
-                        }}
-                    />
+                    <div className="fotogrids-input-with-icon">
+                        <span className="fotogrids-input-icon" dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.tag || '' }} />
+                        <input
+                            type="text"
+                            placeholder="Add tags..."
+                            value={metadataInput.tags}
+                            onChange={(e) => setMetadataInput(prev => ({ ...prev, tags: e.target.value }))}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    addMetadataItem('tags', metadataInput.tags);
+                                }
+                            }}
+                        />
+                    </div>
                     <button 
                         type="button" 
                         className="button"
@@ -37,7 +40,7 @@ const TabTags = ({
                 {/* Autocomplete suggestions */}
                 {metadataInput.tags && (
                     <div className="fotogrids-autocomplete">
-                        {(availableMetadata.tags || [])
+                        {Array.isArray(availableMetadata.tags) ? availableMetadata.tags
                             .filter(tag => 
                                 tag && tag.name && 
                                 tag.name.toLowerCase().includes(metadataInput.tags.toLowerCase()) &&
@@ -52,7 +55,7 @@ const TabTags = ({
                                 >
                                     {tag.name}
                                 </div>
-                            ))
+                            )) : []
                         }
                     </div>
                 )}
@@ -60,11 +63,11 @@ const TabTags = ({
                 {/* Current tags */}
                 <div className="fotogrids-metadata-list">
                     {metadata.tags.map(tag => (
-                        <span key={tag.id} className="fotogrids-metadata-item">
-                            {tag.name}
+                        <span key={tag.id} className="fotogrids-metadata-item fotogrids-tag">
+                            <span class="fotogrids-tag-text">{tag.name}</span>
                             <button 
                                 type="button" 
-                                className="fotogrids-remove-metadata"
+                                className="fotogrids-tag-remove-button"
                                 onClick={() => removeMetadataItem('tags', tag.id)}
                             >
                                 ×

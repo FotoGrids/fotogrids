@@ -1,21 +1,36 @@
-/**
- * Shortcode Meta Box Styles
- * 
- * Styles for the shortcode display meta boxes in both gallery and album edit screens.
- * Provides a clean interface for copying shortcodes with proper spacing and visual hierarchy.
- */
+@use './colors.scss' as *;
+@use './sizes.scss' as *;
 
+#fotogrids_gallery_shortcode,
+#fotogrids_album_shortcode {
+    .inside {
+        display: flex;
+        flex-direction: column;
+        gap: calc(ui-size(padding, base) * 1.5);
+        margin: 0;
+        padding: calc(ui-size(padding, base) * 1.5);
+    }
+
+    .fotogrids-shortcode-title {
+        font-weight: 500;
+    }
+
+    p {
+        margin: 0 !important;
+    }
+}
 .fotogrids-shortcode-container {
     display: flex;
-    gap: 10px;
-    align-items: center;
-    margin: 10px 0;
+    gap: calc(ui-size(padding, base) / 2);
+    align-items: stretch;
     
     .fotogrids-shortcode-input {
         flex: 1;
         font-family: 'Courier New', Courier, monospace;
         font-size: 12px;
-        padding: 6px 8px;
+        line-height: 38px;
+        padding: 0 8px;
+        margin: 0;
         border: 1px solid #ddd;
         border-radius: 3px;
         background-color: #f9f9f9;
@@ -32,16 +47,10 @@
         }
     }
     
-    .fotogrids-copy-shortcode {
+    .fotogrids-shortcode-copy {
         flex-shrink: 0;
         min-width: 60px;
-        
-        &:hover {
-            background-color: #0073aa;
-            color: #fff;
-            border-color: #0073aa;
-        }
-        
+
         &.copied {
             background-color: #46b450;
             color: #fff;
@@ -55,7 +64,7 @@
 }
 
 // Success message styling for copy feedback
-.fotogrids-copy-success {
+.fotogrids-shortcode-copy-success {
     color: #46b450;
     font-size: 11px;
     margin-top: 5px;
@@ -84,7 +93,7 @@
             width: 100%;
         }
         
-        .fotogrids-copy-shortcode {
+        .fotogrids-shortcode-copy {
             width: 100%;
             text-align: center;
         }

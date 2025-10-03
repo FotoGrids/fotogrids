@@ -1,3 +1,6 @@
+@use './colors.scss' as *;
+@use './sizes.scss' as *;
+
 // FotoGrids Statistics Page Styles
 
 .fotogrids-stats-dashboard {
@@ -28,7 +31,7 @@
 				background-color: var(--fotogrids-red);
 			}
 
-			&[data-fotogrids-stat="images"] {
+			&[data-fotogrids-stat="items"] {
 				background-color: var(--fotogrids-yellow);
 			}
 

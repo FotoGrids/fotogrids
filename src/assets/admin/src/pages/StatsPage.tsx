@@ -21,7 +21,7 @@ const StatsPage = () => {
                     totalViews: 1250,
                     totalShares: 89,
                     avgTime: '00:25s',
-                    topImages: [
+                    topItems: [
                         { title: 'Beach Sunset', views: 120 },
                         { title: 'City Night', views: 60 },
                         { title: 'Hike Trail', views: 50 },
@@ -123,15 +123,15 @@ const StatsPage = () => {
                     <div className="stats-top-content">
                         <Card>
                             <CardHeader>
-                                <h3>{__('Top Images (by views)', 'fotogrids')}</h3>
+                                <h3>{__('Top Items (by views)', 'fotogrids')}</h3>
                             </CardHeader>
                             <CardBody>
-                                <div className="top-images-list">
-                                    {stats?.topImages?.map((image: any, index: number) => (
-                                        <div key={index} className="top-image-item">
+                                <div className="top-items-list">
+                                    {stats?.topItems?.map((item: any, index: number) => (
+                                        <div key={index} className="top-item-item">
                                             <span className="rank">{index + 1}.</span>
-                                            <span className="image-title">{image.title}</span>
-                                            <span className="image-views">{image.views} {__('views', 'fotogrids')}</span>
+                                            <span className="item-title">{item.title}</span>
+                                            <span className="item-views">{item.views} {__('views', 'fotogrids')}</span>
                                         </div>
                                     ))}
                                 </div>

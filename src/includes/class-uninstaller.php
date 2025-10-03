@@ -61,7 +61,7 @@ class Uninstaller {
         global $wpdb;
         
         $tables = array(
-            $wpdb->prefix . 'fotogrids_image_meta',
+            $wpdb->prefix . 'fotogrids_item_meta',
             $wpdb->prefix . 'fotogrids_statistics',
             $wpdb->prefix . 'fotogrids_licenses',
         );

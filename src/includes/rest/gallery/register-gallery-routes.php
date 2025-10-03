@@ -18,7 +18,7 @@ class Register_Gallery_Routes {
      * Register all gallery-related REST API routes
      *
      * Registers endpoints for gallery data retrieval, gallery listing,
-     * and gallery image endpoints for both public and admin use.
+     * and gallery item endpoints for both public and admin use.
      *
      * @since 1.0.0
      * @return void
@@ -69,11 +69,11 @@ class Register_Gallery_Routes {
             ),
         ) );
 
-        // Gallery images endpoint (for Gutenberg block)
-        register_rest_route( 'fotogrids/v1', '/galleries/(?P<id>\d+)/images', array(
+        // Gallery items endpoint (for Gutenberg block)
+        register_rest_route( 'fotogrids/v1', '/galleries/(?P<id>\d+)/items', array(
             array(
                 'methods'  => \WP_REST_Server::READABLE,
-                'callback' => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'get_gallery_images_endpoint' ),
+                'callback' => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'get_gallery_items_endpoint' ),
                 'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_read' ),
                 'args' => array(
                     'id' => array(

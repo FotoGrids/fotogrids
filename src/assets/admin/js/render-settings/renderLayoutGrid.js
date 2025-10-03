@@ -29,6 +29,11 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (setting, currentValue, isDisa
                 onClick: () => {
                     if (!isDisabledOption) {
                         updateSetting(setting.key, option.value);
+                    } else if (!option.free && !isProActive) {
+                        // Launch upgrade modal for pro layouts
+                        if (window.FotoGridsUpgrade) {
+                            window.FotoGridsUpgrade.launchForFeature.advancedLayouts();
+                        }
                     }
                 }
             }, [
@@ -52,7 +57,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (setting, currentValue, isDisa
                 ]),
 
                 !option.free && h('span', {
-                    className: 'fotogrids-layout-option__pro-badge'
+                    className: 'fotogrids-pro-badge fotogrids-pro-badge__absolute'
                 }, __('Pro', 'fotogrids'))
             ]);
         }))

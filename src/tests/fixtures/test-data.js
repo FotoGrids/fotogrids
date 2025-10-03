@@ -8,48 +8,48 @@ export const mockGalleries = [
     {
         id: 1,
         title: 'Summer Vacation 2023',
-        image_count: 24,
-        featured_image: 'https://example.com/images/summer-vacation-featured.jpg',
+        item_count: 24,
+        featured_item: 'https://example.com/items/summer-vacation-featured.jpg',
         created: '2023-06-15T10:30:00Z',
         modified: '2023-06-20T14:45:00Z'
     },
     {
         id: 2,
         title: 'Wedding Photography',
-        image_count: 156,
-        featured_image: 'https://example.com/images/wedding-featured.jpg',
+        item_count: 156,
+        featured_item: 'https://example.com/items/wedding-featured.jpg',
         created: '2023-05-20T09:00:00Z',
         modified: '2023-05-21T16:30:00Z'
     },
     {
         id: 3,
         title: 'Nature Landscapes',
-        image_count: 8,
-        featured_image: null,
+        item_count: 8,
+        featured_item: null,
         created: '2023-04-10T11:15:00Z',
         modified: '2023-04-12T08:20:00Z'
     },
     {
         id: 4,
         title: 'Product Photography',
-        image_count: 45,
-        featured_image: 'https://example.com/images/product-featured.jpg',
+        item_count: 45,
+        featured_item: 'https://example.com/items/product-featured.jpg',
         created: '2023-03-05T13:45:00Z',
         modified: '2023-03-08T10:10:00Z'
     }
 ];
 
-export const mockImages = [
+export const mockItems = [
     {
         id: 101,
         position: 1,
         caption: 'Beautiful sunset over the ocean',
         description: 'A stunning sunset captured during our beach vacation',
-        url: 'https://example.com/images/sunset-ocean.jpg',
-        thumbnail: 'https://example.com/images/sunset-ocean-150x150.jpg',
-        medium: 'https://example.com/images/sunset-ocean-300x300.jpg',
-        large: 'https://example.com/images/sunset-ocean-1024x1024.jpg',
-        full: 'https://example.com/images/sunset-ocean-full.jpg',
+        url: 'https://example.com/items/sunset-ocean.jpg',
+        thumbnail: 'https://example.com/items/sunset-ocean-150x150.jpg',
+        medium: 'https://example.com/items/sunset-ocean-300x300.jpg',
+        large: 'https://example.com/items/sunset-ocean-1024x1024.jpg',
+        full: 'https://example.com/items/sunset-ocean-full.jpg',
         alt: 'Sunset over ocean waves',
         title: 'Ocean Sunset'
     },
@@ -58,11 +58,11 @@ export const mockImages = [
         position: 2,
         caption: 'Mountain hiking trail',
         description: 'A scenic trail through the mountains',
-        url: 'https://example.com/images/mountain-trail.jpg',
-        thumbnail: 'https://example.com/images/mountain-trail-150x150.jpg',
-        medium: 'https://example.com/images/mountain-trail-300x300.jpg',
-        large: 'https://example.com/images/mountain-trail-1024x1024.jpg',
-        full: 'https://example.com/images/mountain-trail-full.jpg',
+        url: 'https://example.com/items/mountain-trail.jpg',
+        thumbnail: 'https://example.com/items/mountain-trail-150x150.jpg',
+        medium: 'https://example.com/items/mountain-trail-300x300.jpg',
+        large: 'https://example.com/items/mountain-trail-1024x1024.jpg',
+        full: 'https://example.com/items/mountain-trail-full.jpg',
         alt: 'Winding mountain hiking trail',
         title: 'Mountain Trail'
     },
@@ -71,11 +71,11 @@ export const mockImages = [
         position: 3,
         caption: 'City skyline at night',
         description: 'Downtown city lights illuminating the skyline',
-        url: 'https://example.com/images/city-skyline.jpg',
-        thumbnail: 'https://example.com/images/city-skyline-150x150.jpg',
-        medium: 'https://example.com/images/city-skyline-300x300.jpg',
-        large: 'https://example.com/images/city-skyline-1024x1024.jpg',
-        full: 'https://example.com/images/city-skyline-full.jpg',
+        url: 'https://example.com/items/city-skyline.jpg',
+        thumbnail: 'https://example.com/items/city-skyline-150x150.jpg',
+        medium: 'https://example.com/items/city-skyline-300x300.jpg',
+        large: 'https://example.com/items/city-skyline-1024x1024.jpg',
+        full: 'https://example.com/items/city-skyline-full.jpg',
         alt: 'City skyline with illuminated buildings',
         title: 'Night Skyline'
     },
@@ -84,13 +84,13 @@ export const mockImages = [
         position: 4,
         caption: '',
         description: '',
-        url: 'https://example.com/images/no-caption.jpg',
-        thumbnail: 'https://example.com/images/no-caption-150x150.jpg',
-        medium: 'https://example.com/images/no-caption-300x300.jpg',
-        large: 'https://example.com/images/no-caption-1024x1024.jpg',
-        full: 'https://example.com/images/no-caption-full.jpg',
-        alt: 'Image without caption',
-        title: 'Untitled Image'
+        url: 'https://example.com/items/no-caption.jpg',
+        thumbnail: 'https://example.com/items/no-caption-150x150.jpg',
+        medium: 'https://example.com/items/no-caption-300x300.jpg',
+        large: 'https://example.com/items/no-caption-1024x1024.jpg',
+        full: 'https://example.com/items/no-caption-full.jpg',
+        alt: 'Item without caption',
+        title: 'Untitled Item'
     }
 ];
 
@@ -105,7 +105,7 @@ export const mockTemplates = [
     {
         id: 'masonry',
         name: 'Masonry',
-        description: 'Pinterest-style masonry layout preserving image aspect ratios',
+        description: 'Pinterest-style masonry layout preserving item aspect ratios',
         type: 'free',
         preview: 'https://example.com/previews/masonry-preview.jpg'
     },
@@ -119,7 +119,7 @@ export const mockTemplates = [
     {
         id: 'slider',
         name: 'Slider',
-        description: 'Image slider with navigation controls and autoplay',
+        description: 'Item slider with navigation controls and autoplay',
         type: 'starter',
         preview: 'https://example.com/previews/slider-preview.jpg'
     },
@@ -212,10 +212,10 @@ export const mockApiResponses = {
             data: { status: 404 }
         }
     },
-    images: {
-        success: mockImages,
+    items: {
+        success: mockItems,
         empty: [],
-        limited: mockImages.slice(0, 2),
+        limited: mockItems.slice(0, 2),
         notFound: {
             code: 'gallery_not_found',
             message: 'Gallery not found.',
@@ -279,25 +279,25 @@ export const mockWordPressGlobals = {
 export const createMockGallery = (overrides = {}) => ({
     id: 1,
     title: 'Test Gallery',
-    image_count: 5,
-    featured_image: 'https://example.com/image.jpg',
+    item_count: 5,
+    featured_item: 'https://example.com/item.jpg',
     created: '2023-01-01T00:00:00Z',
     modified: '2023-01-01T00:00:00Z',
     ...overrides
 });
 
-export const createMockImage = (overrides = {}) => ({
+export const createMockItem = (overrides = {}) => ({
     id: 1,
     position: 1,
-    caption: 'Test Image',
+    caption: 'Test Item',
     description: 'Test Description',
-    url: 'https://example.com/image.jpg',
-    thumbnail: 'https://example.com/image-150x150.jpg',
-    medium: 'https://example.com/image-300x300.jpg',
-    large: 'https://example.com/image-1024x1024.jpg',
-    full: 'https://example.com/image.jpg',
+    url: 'https://example.com/item.jpg',
+    thumbnail: 'https://example.com/item-150x150.jpg',
+    medium: 'https://example.com/item-300x300.jpg',
+    large: 'https://example.com/item-1024x1024.jpg',
+    full: 'https://example.com/item.jpg',
     alt: 'Test Alt Text',
-    title: 'Test Image Title',
+    title: 'Test Item Title',
     ...overrides
 });
 

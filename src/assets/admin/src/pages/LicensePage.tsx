@@ -217,7 +217,7 @@ const LicensePage = () => {
                                 <ul>
                                     <li>{__('Everything in Expert Pro', 'fotogrids')}</li>
                                     <li>{__('WooCommerce integration', 'fotogrids')}</li>
-                                    <li>{__('Watermarking and image protection', 'fotogrids')}</li>
+                                    <li>{__('Watermarking and item protection', 'fotogrids')}</li>
                                     <li>{__('White labeling options', 'fotogrids')}</li>
                                     <li>{__('CTA buttons and sale ribbons', 'fotogrids')}</li>
                                 </ul>

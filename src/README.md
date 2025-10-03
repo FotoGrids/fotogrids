@@ -12,8 +12,8 @@ A modern, freemium WordPress gallery plugin with Pro features for photographers,
 -   ✅ Lazy loading and responsive design
 -   ✅ Statistics tracking (views/shares)
 -   ✅ Shortcodes and Gutenberg blocks
--   ✅ Drag & drop image reordering
--   ✅ Per-image metadata (captions, tags, people, location)
+-   ✅ Drag & drop item reordering
+-   ✅ Per-item metadata (captions, tags, people, location)
 
 ### Pro Features
 
@@ -97,8 +97,8 @@ Plugin/
 1. Go to **FotoGrids > Galleries** in your WordPress admin
 2. Click **Add New Gallery**
 3. Add a title and description
-4. Click **Add from Media Library** to select images
-5. Drag and drop to reorder images
+4. Click **Add from Media Library** to select items
+5. Drag and drop to reorder items
 6. Configure gallery settings (layout, columns, etc.)
 7. Publish the gallery
 8. Copy the shortcode and paste it in your post or page
@@ -126,8 +126,8 @@ The plugin provides REST API endpoints for frontend functionality:
 
 -   `GET /wp-json/fotogrids/v1/gallery/{id}` - Get gallery data
 -   `GET /wp-json/fotogrids/v1/album/{id}` - Get album data
--   `GET /wp-json/fotogrids/v1/images` - Query images with filters
--   `POST /wp-json/fotogrids/v1/stats/view` - Track gallery/image views
+-   `GET /wp-json/fotogrids/v1/items` - Query items with filters
+-   `POST /wp-json/fotogrids/v1/stats/view` - Track gallery/item views
 -   `POST /wp-json/fotogrids/v1/stats/share` - Track social shares
 -   `GET /wp-json/fotogrids/v1/templates` - Get available templates
 
@@ -135,7 +135,7 @@ The plugin provides REST API endpoints for frontend functionality:
 
 ### Custom Tables
 
--   `wp_fotogrids_image_meta` - Per-image metadata and gallery associations
+-   `wp_fotogrids_item_meta` - Per-item metadata and gallery associations
 -   `wp_fotogrids_statistics` - View and share statistics
 -   `wp_fotogrids_licenses` - Pro license management
 
@@ -146,7 +146,7 @@ The plugin provides REST API endpoints for frontend functionality:
 
 ### Taxonomies
 
--   `fotogrids_tag` - Image tags
+-   `fotogrids_tag` - Item tags
 -   `fotogrids_person` - People tagging
 -   `fotogrids_location` - Location tagging
 
@@ -154,9 +154,9 @@ The plugin provides REST API endpoints for frontend functionality:
 
 ### Actions
 
--   `fotogrids_image_added_to_gallery` - Fired when image is added to gallery
--   `fotogrids_image_removed_from_gallery` - Fired when image is removed
--   `fotogrids_gallery_images_reordered` - Fired when images are reordered
+-   `fotogrids_item_added_to_gallery` - Fired when item is added to gallery
+-   `fotogrids_item_removed_from_gallery` - Fired when item is removed
+-   `fotogrids_gallery_items_reordered` - Fired when items are reordered
 -   `fotogrids_share_tracked` - Fired when a share is tracked
 
 ### Filters

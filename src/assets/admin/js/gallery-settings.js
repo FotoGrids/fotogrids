@@ -82,17 +82,17 @@ function GallerySettings() {
     const [activeDevice, setActiveDevice] = useState('desktop');
     const [settingsLoaded, setSettingsLoaded] = useState(false);
 
-    const [imageData, setImageData] = useState({});
-    const [loadingImages, setLoadingImages] = useState(false);
-    const [imageError, setImageError] = useState(null);
-    const [savingImages, setSavingImages] = useState({});
+    const [itemData, setItemData] = useState({});
+    const [loadingItems, setLoadingItems] = useState(false);
+    const [itemError, setItemError] = useState(null);
+    const [savingItems, setSavingItems] = useState({});
     const [showBulkModal, setShowBulkModal] = useState(false);
     const [bulkAction, setBulkAction] = useState('');
     const [bulkUrl, setBulkUrl] = useState('');
     const [bulkTarget, setBulkTarget] = useState('global');
 
     const isProActive = window.fotogridsSettings?.isProActive || false;
-    const galleryImages = window.fotogridsSettings?.galleryImages || [];
+    const galleryItems = window.fotogridsSettings?.galleryItems || [];
     const canEditPosts = window.fotogridsSettings?.canEditPosts !== false;
 
     const loadAndTranslateSettings = async () => {
@@ -125,104 +125,105 @@ function GallerySettings() {
     }, []);
 
     useEffect(() => {
-        if (settings.image_click_behavior === 'external' && canEditPosts && galleryImages.length > 0) {
-            loadImageData();
+        if (settings.item_click_behavior === 'external' && canEditPosts && galleryItems.length > 0) {
+            loadItemData();
         }
-    }, [settings.image_click_behavior, galleryImages.length, canEditPosts]);
+    }, [settings.item_click_behavior, galleryItems.length, canEditPosts]);
 
-    const loadImageData = async () => {
+    const loadItemData = async () => {
         try {
-            setLoadingImages(true);
-            setImageError(null);
+            setLoadingItems(true);
+            setItemError(null);
 
-            const params = new URLSearchParams();
-            galleryImages.forEach(id => params.append('image_ids[]', id));
+            const formData = new FormData();
+            formData.append('action', 'fotogrids_get_item_urls');
+            formData.append('nonce', window.fotogridsSettings?.nonce || '');
+            galleryItems.forEach(id => formData.append('item_ids[]', id));
 
-            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/image-urls?${params.toString()}`, {
-                headers: {
-                    'X-WP-Nonce': window.wpApiSettings.nonce
-                }
+            const response = await fetch(window.fotogridsSettings?.ajaxUrl || window.ajaxurl, {
+                method: 'POST',
+                body: formData
             });
 
-            if (!response.ok) {
-                throw new Error(__('Failed to load image data', 'fotogrids'));
-            }
+            const result = await response.json();
 
-            const data = await response.json();
-            setImageData(data);
+            if (result.success) {
+                setItemData(result.data);
+            } else {
+                throw new Error(result.data || __('Failed to load item data', 'fotogrids'));
+            }
         } catch (err) {
-            setImageError(err.message);
+            setItemError(err.message);
         } finally {
-            setLoadingImages(false);
+            setLoadingItems(false);
         }
     };
 
-    const updateImageUrl = async (imageId, url, target = null) => {
+    const updateItemUrl = async (itemId, url, target = null) => {
         try {
-            setSavingImages(prev => ({ ...prev, [imageId]: true }));
+            setSavingItems(prev => ({ ...prev, [itemId]: true }));
 
-            const updateData = { url };
+            const formData = new FormData();
+            formData.append('action', 'fotogrids_update_item_url');
+            formData.append('nonce', window.fotogridsSettings?.nonce || '');
+            formData.append('item_id', itemId);
+            formData.append('url', url);
             if (target !== null) {
-                updateData.target = target;
+                formData.append('target', target);
             }
 
-            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/image-urls`, {
+            const response = await fetch(window.fotogridsSettings?.ajaxUrl || window.ajaxurl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.wpApiSettings.nonce
-                },
-                body: JSON.stringify({
-                    urls: {
-                        [imageId]: updateData
-                    }
-                })
+                body: formData
             });
 
-            if (!response.ok) {
-                throw new Error(__('Failed to save URL', 'fotogrids'));
-            }
+            const result = await response.json();
 
-            setImageData(prev => ({
-                ...prev,
-                [imageId]: {
-                    ...prev[imageId],
-                    url: url,
-                    target: target !== null ? target : prev[imageId]?.target || 'global'
-                }
-            }));
+            if (result.success) {
+                setItemData(prev => ({
+                    ...prev,
+                    [itemId]: {
+                        ...prev[itemId],
+                        url: url,
+                        target: target !== null ? target : prev[itemId]?.target || 'global'
+                    }
+                }));
+            } else {
+                throw new Error(result.data || __('Failed to save URL', 'fotogrids'));
+            }
         } catch (err) {
-            console.error('Error updating image URL:', err);
+            console.error('Error updating item URL:', err);
         } finally {
-            setSavingImages(prev => ({ ...prev, [imageId]: false }));
+            setSavingItems(prev => ({ ...prev, [itemId]: false }));
         }
     };
 
-    const bulkImageAction = async (action, url = '', target = 'global') => {
+    const bulkItemAction = async (action, url = '', target = 'global') => {
         try {
-            setLoadingImages(true);
+            setLoadingItems(true);
 
-            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/image-urls/bulk`, {
+            const formData = new FormData();
+            formData.append('action', 'fotogrids_bulk_update_item_urls');
+            formData.append('nonce', window.fotogridsSettings?.nonce || '');
+            formData.append('bulk_action', action);
+            galleryItems.forEach(id => formData.append('item_ids[]', id));
+            formData.append('url', url);
+            formData.append('target', target);
+
+            const response = await fetch(window.fotogridsSettings?.ajaxUrl || window.ajaxurl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.wpApiSettings.nonce
-                },
-                body: JSON.stringify({
-                    action: action,
-                    image_ids: galleryImages,
-                    url: url,
-                    target: target
-                })
+                body: formData
             });
 
-            if (!response.ok) {
-                throw new Error(__('Bulk action failed', 'fotogrids'));
-            }
+            const result = await response.json();
 
-            await loadImageData();
+            if (result.success) {
+                await loadItemData();
+            } else {
+                throw new Error(result.data || __('Bulk action failed', 'fotogrids'));
+            }
         } catch (err) {
-            setImageError(err.message);
+            setItemError(err.message);
         }
     };
 
@@ -263,9 +264,9 @@ function GallerySettings() {
             if (!validation.valid) {
                 return; // Don't proceed if URL is invalid
             }
-            await bulkImageAction('apply_to_all', bulkUrl, bulkTarget);
+            await bulkItemAction('apply_to_all', bulkUrl, bulkTarget);
         } else if (bulkAction === 'clear_all') {
-            await bulkImageAction('clear_all');
+            await bulkItemAction('clear_all');
         }
 
         closeBulkModal();
@@ -458,11 +459,6 @@ function GallerySettings() {
                     }, setting.label)
                 ]);
 
-            case 'range_with_units':
-                control = window.FotoGridsRenderSettings?.renderRangeWithUnits(setting, currentValue, isDisabled, {
-                    updateSetting
-                });
-                break;
 
             case 'lightbox_subtabs':
                 control = window.FotoGridsRenderSettings?.renderLightboxSubTabs(setting, isDisabled, {
@@ -477,17 +473,23 @@ function GallerySettings() {
                 control = window.FotoGridsRenderSettings?.renderExternalUrlManager(setting, isDisabled, {
                     settings,
                     canEditPosts,
-                    loadingImages,
-                    imageError,
-                    loadImageData,
-                    galleryImages,
-                    imageData,
-                    savingImages,
+                    loadingItems,
+                    itemError,
+                    loadItemData,
+                    galleryItems,
+                    itemData,
+                    savingItems,
                     openBulkModal,
-                    updateImageUrl,
+                    updateItemUrl,
                     validateUrl,
                     renderIcon,
                     __
+                });
+                break;
+
+            case 'setting_group':
+                control = window.FotoGridsRenderSettings?.renderGroup(setting, currentValue, isDisabled, {
+                    renderSetting
                 });
                 break;
 
@@ -654,7 +656,7 @@ function GallerySettings() {
                         className: 'fotogrids-settings-tab__label'
                     }, group.label),
                     !group.free && !isProActive && h('span', {
-                        className: 'fotogrids-settings-tab__pro'
+                        className: 'fotogrids-pro-badge'
                     }, __('Pro', 'fotogrids'))
                 ])
             ))

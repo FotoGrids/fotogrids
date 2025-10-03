@@ -84,7 +84,7 @@
                 }
             }
             
-            .fotogrids-gallery-images {
+            .fotogrids-gallery-items {
                 position: relative;
                 width: 70px;
                 height: 60px;
@@ -144,7 +144,7 @@
                     z-index: 1;
                 }
                 
-                // Single image fallback
+                // Single item fallback
                 &:not([class*="fgg-stack-"]) {
                     transform: translate(-50%, -50%);
                     z-index: 1;
@@ -179,48 +179,7 @@
             
             .fotogrids-gallery-actions {
                 flex-shrink: 0;
-                margin-left: 10px;
-                
-                .fotogrids-add-button,
-                .fotogrids-remove-button {
-                    background: none;
-                    border: 1px solid;
-                    cursor: pointer;
-                    width: 28px;
-                    height: 28px;
-                    border-radius: 3px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 16px;
-                    line-height: 1;
-                    transition: all 0.2s;
-                    
-                    &:disabled {
-                        opacity: 0.5;
-                        cursor: not-allowed;
-                    }
-                }
-                
-                .fotogrids-add-button {
-                    color: #46b450;
-                    border-color: #46b450;
-                    
-                    &:hover:not(:disabled) {
-                        background-color: #46b450;
-                        color: white;
-                    }
-                }
-                
-                .fotogrids-remove-button {
-                    color: #dc3232;
-                    border-color: #dc3232;
-                    
-                    &:hover:not(:disabled) {
-                        background-color: #dc3232;
-                        color: white;
-                    }
-                }
+                margin-left: 10px;                
             }
         }
     }
@@ -308,5 +267,47 @@
     .spinner {
         float: none;
         margin-right: 8px;
+    }
+}
+
+.fotogrids-add-button,
+.fotogrids-remove-button {
+    background: none;
+    border: 1px solid;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    padding: 0 0 2px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    transition: all 0.2s;
+    
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.fotogrids-add-button {
+    color: #46b450;
+    border-color: #46b450;
+    
+    &:hover:not(:disabled) {
+        background-color: #46b450;
+        color: white;
+    }
+}
+
+.fotogrids-remove-button {
+    color: #dc3232;
+    border-color: #dc3232;
+    
+    &:hover:not(:disabled) {
+        background-color: #dc3232;
+        color: white;
     }
 }

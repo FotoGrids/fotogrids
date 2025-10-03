@@ -73,7 +73,7 @@ const TemplatesPage = () => {
                                 src={template.preview} 
                                 alt={template.name}
                                 onError={(e) => {
-                                    // Fallback image if preview doesn't exist
+                                    // Fallback item if preview doesn't exist
                                     e.currentTarget.src = window.fotogridsAdmin.pluginUrl + 'public/assets/placeholder.jpg';
                                 }}
                             />

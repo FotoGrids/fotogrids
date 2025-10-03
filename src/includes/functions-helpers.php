@@ -82,7 +82,7 @@ function fotogrids_get_default_gallery_settings() {
             'tablet' => 3,
             'mobile' => 2
         ),
-        'image_spacing' => array(
+        'item_spacing' => array(
             'desktop' => 10,
             'tablet' => 8,
             'mobile' => 5
@@ -103,7 +103,7 @@ function fotogrids_get_default_gallery_settings() {
         'filter_buttons' => false,
         
         // Interactions settings
-        'image_click_behavior' => 'lightbox',
+        'item_click_behavior' => 'lightbox',
         'external_link_target' => '_self',
         
         // Lightbox General settings
@@ -137,45 +137,45 @@ function fotogrids_get_default_gallery_settings() {
 }
 
 /**
- * Helper function to decode gallery image IDs from post meta
+ * Helper function to decode gallery item IDs from post meta
  * 
  * @param int $gallery_id Gallery ID
- * @return array Array of image IDs
+ * @return array Array of item IDs
  */
-function fotogrids_get_gallery_image_ids( $gallery_id ) {
-    $image_ids = get_post_meta( $gallery_id, 'fotogrids_gallery_images', true );
+function fotogrids_get_gallery_item_ids( $gallery_id ) {
+    $item_ids = get_post_meta( $gallery_id, 'fotogrids_gallery_items', true );
     
     // If it's a JSON string, decode it
-    if ( is_string( $image_ids ) ) {
-        $decoded = json_decode( $image_ids, true );
+    if ( is_string( $item_ids ) ) {
+        $decoded = json_decode( $item_ids, true );
         if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
             return array_map( 'intval', $decoded ); // Ensure all IDs are integers
         }
-    } elseif ( is_array( $image_ids ) ) {
-        return array_map( 'intval', $image_ids );
+    } elseif ( is_array( $item_ids ) ) {
+        return array_map( 'intval', $item_ids );
     }
     
     return array();
 }
 
 /**
- * Get gallery images with metadata
+ * Get gallery items with metadata
  * 
  * @param int $gallery_id Gallery ID
- * @return array Array of image data
+ * @return array Array of item data
  */
-function fotogrids_get_gallery_images( $gallery_id ) {
-    $image_ids = fotogrids_get_gallery_image_ids( $gallery_id );
+function fotogrids_get_gallery_items( $gallery_id ) {
+    $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
     
-    if ( empty( $image_ids ) ) {
+    if ( empty( $item_ids ) ) {
         return array();
     }
 
     global $wpdb;
-    $images = array();
+    $items = array();
     $position = 0;
 
-    foreach ( $image_ids as $attachment_id ) {
+    foreach ( $item_ids as $attachment_id ) {
         $attachment_id = (int) $attachment_id;
         $attachment = get_post( $attachment_id );
 
@@ -183,7 +183,7 @@ function fotogrids_get_gallery_images( $gallery_id ) {
             continue;
         }
 
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         $custom_meta = $wpdb->get_row( 
             $wpdb->prepare( 
                 "SELECT * FROM $table WHERE gallery_id = %d AND attachment_id = %d", 
@@ -193,7 +193,7 @@ function fotogrids_get_gallery_images( $gallery_id ) {
             ARRAY_A 
         );
 
-        $image_data = array(
+        $item_data = array(
             'id' => $attachment_id,
             'gallery_id' => (int) $gallery_id,
             'position' => $custom_meta ? (int) $custom_meta['position'] : $position,
@@ -207,39 +207,39 @@ function fotogrids_get_gallery_images( $gallery_id ) {
             'medium' => wp_get_attachment_image_url( $attachment_id, 'medium' ),
             'large' => wp_get_attachment_image_url( $attachment_id, 'large' ),
             'full' => wp_get_attachment_url( $attachment_id ),
-            'alt' => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+            'alt' => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
             'title' => $attachment->post_title,
             'external_url' => get_post_meta( $attachment_id, '_fotogrids_external_url', true ),
             'link_target' => get_post_meta( $attachment_id, '_fotogrids_link_target', true ),
         );
 
-        $images[] = $image_data;
+        $items[] = $item_data;
         $position++;
     }
 
-    usort( $images, function( $a, $b ) {
+    usort( $items, function( $a, $b ) {
         return $a['position'] - $b['position'];
     });
 
-    return $images;
+    return $items;
 }
 
 /**
- * Get gallery image count
+ * Get gallery item count
  * 
  * @param int $gallery_id Gallery ID
- * @return int Number of images in gallery
+ * @return int Number of items in gallery
  */
-function fotogrids_get_gallery_image_count( $gallery_id ) {
-    $image_ids = fotogrids_get_gallery_image_ids( $gallery_id );
+function fotogrids_get_gallery_item_count( $gallery_id ) {
+    $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
     
-    if ( empty( $image_ids ) ) {
+    if ( empty( $item_ids ) ) {
         return 0;
     }
     
     // Count only valid attachment IDs
     $count = 0;
-    foreach ( $image_ids as $attachment_id ) {
+    foreach ( $item_ids as $attachment_id ) {
         $attachment = get_post( (int) $attachment_id );
         if ( $attachment && $attachment->post_type === 'attachment' ) {
             $count++;
@@ -250,14 +250,14 @@ function fotogrids_get_gallery_image_count( $gallery_id ) {
 }
 
 /**
- * Add image to gallery
+ * Add item to gallery
  * 
  * @param int $gallery_id Gallery ID
  * @param int $attachment_id Attachment ID
- * @param array $meta Image metadata
+ * @param array $meta Item metadata
  * @return bool Success status
  */
-function fotogrids_add_image_to_gallery( $gallery_id, $attachment_id, $meta = array() ) {
+function fotogrids_add_item_to_gallery( $gallery_id, $attachment_id, $meta = array() ) {
     global $wpdb;
     
     // Validate gallery exists
@@ -270,21 +270,21 @@ function fotogrids_add_image_to_gallery( $gallery_id, $attachment_id, $meta = ar
         return false;
     }
     
-    // Get current image IDs from post meta
-    $image_ids = fotogrids_get_gallery_image_ids( $gallery_id );
+    // Get current item IDs from post meta
+    $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
     
-    // Check if image is already in gallery
-    if ( in_array( $attachment_id, $image_ids ) ) {
-        return false; // Image already in gallery
+    // Check if item is already in gallery
+    if ( in_array( $attachment_id, $item_ids ) ) {
+        return false; // Item already in gallery
     }
     
-    // Add image ID to the gallery
-    $image_ids[] = (int) $attachment_id;
-    $post_meta_result = update_post_meta( $gallery_id, 'fotogrids_gallery_images', wp_json_encode( $image_ids ) );
+    // Add item ID to the gallery
+    $item_ids[] = (int) $attachment_id;
+    $post_meta_result = update_post_meta( $gallery_id, 'fotogrids_gallery_items', wp_json_encode( $item_ids ) );
     
     // If meta is provided, also store in custom table
     if ( ! empty( $meta ) ) {
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         
         // Get next position
         $next_position = $wpdb->get_var( 
@@ -312,7 +312,7 @@ function fotogrids_add_image_to_gallery( $gallery_id, $attachment_id, $meta = ar
     }
     
     if ( $post_meta_result !== false ) {
-        do_action( 'fotogrids_image_added_to_gallery', $attachment_id, $gallery_id, $meta );
+        do_action( 'fotogrids_item_added_to_gallery', $attachment_id, $gallery_id, $meta );
         return true;
     }
     
@@ -320,32 +320,32 @@ function fotogrids_add_image_to_gallery( $gallery_id, $attachment_id, $meta = ar
 }
 
 /**
- * Remove image from gallery
+ * Remove item from gallery
  * 
  * @param int $gallery_id Gallery ID
  * @param int $attachment_id Attachment ID
  * @return bool Success status
  */
-function fotogrids_remove_image_from_gallery( $gallery_id, $attachment_id ) {
+function fotogrids_remove_item_from_gallery( $gallery_id, $attachment_id ) {
     global $wpdb;
     
     // Remove from post meta
-    $image_ids = fotogrids_get_gallery_image_ids( $gallery_id );
+    $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
     
-    if ( empty( $image_ids ) ) {
+    if ( empty( $item_ids ) ) {
         return false;
     }
     
     $attachment_id = (int) $attachment_id;
-    $key = array_search( $attachment_id, $image_ids );
+    $key = array_search( $attachment_id, $item_ids );
     if ( $key !== false ) {
-        unset( $image_ids[$key] );
+        unset( $item_ids[$key] );
         // Re-index array to prevent gaps
-        $image_ids = array_values( $image_ids );
-        $post_meta_result = update_post_meta( $gallery_id, 'fotogrids_gallery_images', wp_json_encode( $image_ids ) );
+        $item_ids = array_values( $item_ids );
+        $post_meta_result = update_post_meta( $gallery_id, 'fotogrids_gallery_items', wp_json_encode( $item_ids ) );
         
         // Also remove from custom table if it exists
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         $wpdb->delete( 
             $table, 
             array( 
@@ -356,7 +356,7 @@ function fotogrids_remove_image_from_gallery( $gallery_id, $attachment_id ) {
         );
         
         if ( $post_meta_result !== false ) {
-            do_action( 'fotogrids_image_removed_from_gallery', $attachment_id, $gallery_id );
+            do_action( 'fotogrids_item_removed_from_gallery', $attachment_id, $gallery_id );
             return true;
         }
     }
@@ -365,17 +365,17 @@ function fotogrids_remove_image_from_gallery( $gallery_id, $attachment_id ) {
 }
 
 /**
- * Update image metadata in gallery
+ * Update item metadata in gallery
  * 
  * @param int $gallery_id Gallery ID
  * @param int $attachment_id Attachment ID
  * @param array $meta New metadata
  * @return bool Success status
  */
-function fotogrids_update_image_meta( $gallery_id, $attachment_id, $meta ) {
+function fotogrids_update_item_meta( $gallery_id, $attachment_id, $meta ) {
     global $wpdb;
     
-    $table = $wpdb->prefix . 'fotogrids_image_meta';
+    $table = $wpdb->prefix . 'fotogrids_item_meta';
     
     $data = array(
         'updated_at' => current_time( 'mysql', true ),
@@ -410,7 +410,7 @@ function fotogrids_update_image_meta( $gallery_id, $attachment_id, $meta ) {
     );
     
     if ( $result !== false ) {
-        do_action( 'fotogrids_image_meta_updated', $attachment_id, $gallery_id, $meta );
+        do_action( 'fotogrids_item_meta_updated', $attachment_id, $gallery_id, $meta );
         return true;
     }
     
@@ -418,18 +418,18 @@ function fotogrids_update_image_meta( $gallery_id, $attachment_id, $meta ) {
 }
 
 /**
- * Reorder gallery images
+ * Reorder gallery items
  * 
  * @param int $gallery_id Gallery ID
- * @param array $image_order Array of attachment IDs in new order
+ * @param array $item_order Array of attachment IDs in new order
  * @return bool Success status
  */
-function fotogrids_reorder_gallery_images( $gallery_id, $image_order ) {
+function fotogrids_reorder_gallery_items( $gallery_id, $item_order ) {
     global $wpdb;
     
-    $table = $wpdb->prefix . 'fotogrids_image_meta';
+    $table = $wpdb->prefix . 'fotogrids_item_meta';
     
-    foreach ( $image_order as $position => $attachment_id ) {
+    foreach ( $item_order as $position => $attachment_id ) {
         $wpdb->update( 
             $table, 
             array( 'position' => $position + 1 ),
@@ -442,7 +442,7 @@ function fotogrids_reorder_gallery_images( $gallery_id, $image_order ) {
         );
     }
     
-    do_action( 'fotogrids_gallery_images_reordered', $gallery_id, $image_order );
+    do_action( 'fotogrids_gallery_items_reordered', $gallery_id, $item_order );
     
     return true;
 }
@@ -476,7 +476,7 @@ function fotogrids_get_available_layouts() {
     $pro_layouts = array(
         'slider' => array(
             'name' => __( 'Slider', 'fotogrids' ),
-            'description' => __( 'Image slider with navigation', 'fotogrids' ),
+            'description' => __( 'Item slider with navigation', 'fotogrids' ),
             'type' => 'starter',
         ),
         'polaroid' => array(

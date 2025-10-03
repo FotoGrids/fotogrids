@@ -31,7 +31,7 @@
             gallery.setAttribute('data-row-height', rowHeight);
         }
         
-        // Setup lazy loading for justified images
+        // Setup lazy loading for justified items
         if (gallery.classList.contains('fotogrids-lazy')) {
             setupLazyLoading(items);
         }
@@ -82,10 +82,10 @@
             return;
         }
         
-        // Wait for images to load to get aspect ratios
+        // Wait for items to load to get aspect ratios
         Promise.all(items.map(item => {
             const img = item.querySelector('img');
-            return img ? waitForImageLoad(img) : Promise.resolve();
+            return img ? waitForItemLoad(img) : Promise.resolve();
         })).then(() => {
             justifyRows(gallery, items, containerWidth, gap, targetHeight);
         });
@@ -112,9 +112,9 @@
     }
     
     /**
-     * Wait for image to load
+     * Wait for item to load
      */
-    function waitForImageLoad(img) {
+    function waitForItemLoad(img) {
         return new Promise(resolve => {
             if (img.complete) {
                 resolve();
@@ -126,7 +126,7 @@
     }
     
     /**
-     * Justify rows of images
+     * Justify rows of items
      */
     function justifyRows(gallery, items, containerWidth, gap, targetHeight) {
         const rows = [];
@@ -168,7 +168,7 @@
     }
     
     /**
-     * Justify a single row of images
+     * Justify a single row of items
      */
     function justifyRow(row, containerWidth, gap, targetHeight) {
         if (row.length === 0) return;
@@ -225,18 +225,18 @@
     }
     
     /**
-     * Setup lazy loading for justified images
+     * Setup lazy loading for justified items
      */
     function setupLazyLoading(items) {
         if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
+            const itemObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target.querySelector('img');
                         if (img && img.getAttribute('loading') === 'lazy') {
                             img.addEventListener('load', () => {
                                 img.classList.add('loaded');
-                                // Recalculate layout after image loads
+                                // Recalculate layout after item loads
                                 const gallery = entry.target.closest('.fotogrids-layout-justified');
                                 if (gallery) {
                                     requestAnimationFrame(() => {
@@ -259,7 +259,7 @@
             });
             
             items.forEach(item => {
-                imageObserver.observe(item);
+                itemObserver.observe(item);
             });
         } else {
             // Fallback for browsers without IntersectionObserver

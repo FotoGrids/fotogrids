@@ -4,25 +4,25 @@ const TabInteractions = ({ formData, handleInputChange }) => {
     return (
         <div className="fotogrids-tab-panel active">
             <div className="fotogrids-interactions-section">
-                <h4>Image Interactions</h4>
+                <h4>Item Interactions</h4>
                 <div className="fotogrids-external-url-section">
                     <div className="fotogrids-field-group">
-                        <label htmlFor="fotogrids-image-external-url">External URL</label>
+                        <label htmlFor="fotogrids-item-external-url">External URL</label>
                         <input
                             type="url"
-                            id="fotogrids-image-external-url"
+                            id="fotogrids-item-external-url"
                             placeholder="https://example.com"
                             value={formData.external_url}
                             onChange={(e) => handleInputChange('external_url', e.target.value)}
                         />
                         <p className="description">
-                            URL to redirect to when this image is clicked.
+                            URL to redirect to when this item is clicked.
                         </p>
                     </div>
                     <div className="fotogrids-field-group">
-                        <label htmlFor="fotogrids-image-link-target">Link Target</label>
+                        <label htmlFor="fotogrids-item-link-target">Link Target</label>
                         <select
-                            id="fotogrids-image-link-target"
+                            id="fotogrids-item-link-target"
                             value={formData.link_target}
                             onChange={(e) => handleInputChange('link_target', e.target.value)}
                         >

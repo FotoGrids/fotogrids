@@ -57,8 +57,8 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                             backgroundColor: '#f0f0f0',
                         }}
                         onError={(e) => {
-                            // Fallback for missing preview images
-                            const target = e.target as HTMLImageElement;
+                            // Fallback for missing preview items
+                            const target = e.target as HTMLItemElement;
                             target.style.display = 'none';
                             const parent = target.parentElement;
                             if (parent) {

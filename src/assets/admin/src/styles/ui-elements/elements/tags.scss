@@ -1,0 +1,22 @@
+@use '../../../styles/colors.scss' as *;
+@use '../../../styles/sizes.scss' as *;
+
+.fotogrids-tag {
+	background: ui-color(background, tertiary);
+	border-radius: ui-size(border-radius, base);
+	padding: ui-size(padding, base);
+	padding-inline-start: ui-size(padding, md);
+	font-size: ui-size(font-size, base);
+	color: ui-color(text, primary);
+	display: flex;
+	gap: ui-size(padding, base);
+
+	.fotogrids-tag-text {
+		font-weight: 500;
+	}
+
+	.fotogrids-tag-remove-button {
+		border: 0;
+		background: transparent;
+	}
+}

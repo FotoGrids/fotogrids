@@ -19,7 +19,7 @@ class Activator {
      * Activate the plugin
      * 
      * Performs all necessary setup tasks when the plugin is activated:
-     * - Creates database tables for image metadata, statistics, licenses, etc.
+     * - Creates database tables for item metadata, statistics, licenses, etc.
      * - Registers custom post types and flushes rewrite rules
      * - Assigns capabilities to WordPress user roles
      * - Sets plugin version and activation timestamp
@@ -44,7 +44,7 @@ class Activator {
      * Create custom database tables
      * 
      * Creates all necessary database tables for the plugin:
-     * - Image metadata and positioning
+     * - Item metadata and positioning
      * - Statistics tracking (views, shares)
      * - License management
      * - Gallery-album relationships
@@ -59,17 +59,17 @@ class Activator {
         
         $charset_collate = $wpdb->get_charset_collate();
         
-        $table_image_meta = $wpdb->prefix . 'fotogrids_image_meta';
+        $table_item_meta = $wpdb->prefix . 'fotogrids_item_meta';
         $table_stats = $wpdb->prefix . 'fotogrids_statistics';
         $table_licenses = $wpdb->prefix . 'fotogrids_licenses';
         $table_gallery_albums = $wpdb->prefix . 'fotogrids_gallery_albums';
         $table_tags = $wpdb->prefix . 'fotogrids_tags';
         $table_people = $wpdb->prefix . 'fotogrids_people';
         $table_locations = $wpdb->prefix . 'fotogrids_locations';
-        $table_image_metadata = $wpdb->prefix . 'fotogrids_image_metadata';
+        $table_item_metadata = $wpdb->prefix . 'fotogrids_item_metadata';
         
         $sql = "
-        CREATE TABLE $table_image_meta (
+        CREATE TABLE $table_item_meta (
           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
           attachment_id BIGINT UNSIGNED NOT NULL,
           gallery_id BIGINT UNSIGNED DEFAULT NULL,
@@ -91,7 +91,7 @@ class Activator {
 
         CREATE TABLE $table_stats (
           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-          object_type ENUM('gallery','album','image') NOT NULL,
+          object_type ENUM('gallery','album','item') NOT NULL,
           object_id BIGINT UNSIGNED NOT NULL,
           views BIGINT UNSIGNED NOT NULL DEFAULT 0,
           shares BIGINT UNSIGNED NOT NULL DEFAULT 0,
@@ -168,7 +168,7 @@ class Activator {
           KEY usage_count_index (usage_count)
         ) $charset_collate;
 
-        CREATE TABLE $table_image_metadata (
+        CREATE TABLE $table_item_metadata (
           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
           attachment_id BIGINT UNSIGNED NOT NULL,
           metadata_type ENUM('tag', 'person', 'location') NOT NULL,

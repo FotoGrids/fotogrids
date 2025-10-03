@@ -108,7 +108,7 @@
     transition: opacity 0.3s ease;
 }
 
-.fotogrids-lazy img[loading="lazy"].loaded {
+.fotogrids-lazy img[loading="lazy"].fotogrids-lazy-loaded {
     opacity: 1;
 }
 

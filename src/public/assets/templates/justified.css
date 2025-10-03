@@ -9,7 +9,7 @@
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 1rem;
-    line-height: 0; /* Remove space between images */
+    line-height: 0; /* Remove space between items */
 }
 
 .fotogrids-layout-justified .fotogrids-item {

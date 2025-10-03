@@ -19,7 +19,8 @@
         {
             "key": "border_radius",
             "type": "range",
-            "label": "Border Radius (px)",
+            "label": "Border Radius",
+            "unit": "px",
             "min": 0,
             "max": 50,
             "free": true
@@ -36,7 +37,7 @@
             "key": "lightbox_styling_header",
             "type": "section_header",
             "label": "Lightbox Styling",
-            "condition": { "dependsOn": "image_click_behavior", "values": ["lightbox"] },
+            "condition": { "dependsOn": "item_click_behavior", "values": ["lightbox"] },
             "free": true
         },
         {
@@ -45,7 +46,7 @@
             "label": "Custom Theme Color",
             "isReference": true,
             "condition": {
-                "dependsOn": ["image_click_behavior", "lightbox_theme"],
+                "dependsOn": ["item_click_behavior", "lightbox_theme"],
                 "values": [["lightbox"], ["custom"]]
             },
             "free": true
@@ -55,7 +56,7 @@
             "type": "color",
             "label": "Arrow Color",
             "isReference": true,
-            "condition": { "dependsOn": "image_click_behavior", "values": ["lightbox"] },
+            "condition": { "dependsOn": "item_click_behavior", "values": ["lightbox"] },
             "free": true
         },
         {
@@ -63,7 +64,7 @@
             "type": "color",
             "label": "Dot Color",
             "isReference": true,
-            "condition": { "dependsOn": "image_click_behavior", "values": ["lightbox"] },
+            "condition": { "dependsOn": "item_click_behavior", "values": ["lightbox"] },
             "free": true
         },
         {
@@ -71,7 +72,7 @@
             "type": "color",
             "label": "Active Dot Color",
             "isReference": true,
-            "condition": { "dependsOn": "image_click_behavior", "values": ["lightbox"] },
+            "condition": { "dependsOn": "item_click_behavior", "values": ["lightbox"] },
             "free": true
         }
     ]

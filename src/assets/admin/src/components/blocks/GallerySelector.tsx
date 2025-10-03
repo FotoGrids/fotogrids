@@ -19,8 +19,8 @@ import { gallery, plus } from '@wordpress/icons';
 interface Gallery {
     id: number;
     title: string;
-    image_count: number;
-    featured_image?: string;
+    item_count: number;
+    featured_item?: string;
 }
 
 interface GallerySelectorProps {
@@ -67,10 +67,10 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
                         onClick={() => onGallerySelect(galleryItem.id)}
                         style={{ cursor: 'pointer' }}
                     >
-                        {galleryItem.featured_image && (
+                        {galleryItem.featured_item && (
                             <CardMedia>
                                 <img
-                                    src={galleryItem.featured_image}
+                                    src={galleryItem.featured_item}
                                     alt={galleryItem.title}
                                     style={{
                                         width: '100%',
@@ -97,7 +97,7 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
                                 color: '#666',
                                 textAlign: 'center'
                             }}>
-                                {galleryItem.image_count} {__('images', 'fotogrids')}
+                                {galleryItem.item_count} {__('items', 'fotogrids')}
                             </p>
                         </CardBody>
                     </Card>

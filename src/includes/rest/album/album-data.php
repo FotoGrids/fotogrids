@@ -69,7 +69,7 @@ class Album_Data {
                 'title' => $gallery->post_title,
                 'description' => $gallery->post_content,
                 'thumbnail' => get_the_post_thumbnail_url( $gallery->ID, 'medium' ),
-                'image_count' => self::get_gallery_image_count( $gallery->ID ),
+                'item_count' => self::get_gallery_item_count( $gallery->ID ),
             );
         }
         
@@ -86,19 +86,19 @@ class Album_Data {
     }
 
     /**
-     * Get image count for a gallery
+     * Get item count for a gallery
      *
-     * Returns the total number of images associated with a specific gallery.
+     * Returns the total number of items associated with a specific gallery.
      * Used for display purposes and pagination calculations.
      *
      * @since 1.0.0
-     * @param int $gallery_id The ID of the gallery to count images for
-     * @return int The number of images in the gallery
+     * @param int $gallery_id The ID of the gallery to count items for
+     * @return int The number of items in the gallery
      */
-    private static function get_gallery_image_count( $gallery_id ) {
+    private static function get_gallery_item_count( $gallery_id ) {
         global $wpdb;
         
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         return (int) $wpdb->get_var( 
             $wpdb->prepare( 
                 "SELECT COUNT(*) FROM $table WHERE gallery_id = %d", 

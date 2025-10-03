@@ -17,6 +17,8 @@ module.exports = {
         'album-assignment': './src/assets/admin/src/album-assignment.js',
         'album-galleries': './src/assets/admin/src/album-galleries.js',
         'stats': './src/assets/admin/src/stats.js',
+        'global-modal-init': './src/assets/admin/src/global-modal-init.js',
+        'upgrade-modal': './src/assets/admin/src/styles/upgrade-modal.scss',
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -51,7 +53,13 @@ module.exports = {
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader',
-                    'sass-loader',
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            implementation: require('sass-embedded'),
+                            api: 'modern',
+                        },
+                    },
                 ],
             },
             {
@@ -65,7 +73,7 @@ module.exports = {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
                 generator: {
-                    filename: 'assets/images/[name][ext]',
+                    filename: 'assets/items/[name][ext]',
                 },
             },
             {
@@ -168,7 +176,7 @@ module.exports = {
                                 }
                                 
                                 if (!result.code) {
-                                    console.warn('No minified code generated for', absoluteFilename);
+                                    console.info('No minified code generated for', absoluteFilename);
                                     return content;
                                 }
                                 

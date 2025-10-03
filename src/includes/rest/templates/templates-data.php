@@ -53,7 +53,7 @@ class Templates_Data {
             array(
                 'id' => 'slider',
                 'name' => __( 'Slider', 'fotogrids' ),
-                'description' => __( 'Image slider with navigation', 'fotogrids' ),
+                'description' => __( 'Item slider with navigation', 'fotogrids' ),
                 'type' => 'starter',
                 'preview' => FOTOGRIDS_PLUGIN_URL . 'public/assets/previews/slider.jpg',
             ),

@@ -1,7 +1,7 @@
 === FotoGrids ===
 Contributors: yourname
 Donate link: https://fotogrids.com/donate
-Tags: gallery, photos, images, lightbox, albums, masonry, grid, responsive, photography
+Tags: gallery, photos, items, lightbox, albums, masonry, grid, responsive, photography
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 8.0
@@ -21,12 +21,12 @@ FotoGrids is a modern WordPress gallery plugin that makes it easy to create stun
 * **Multiple Layouts** - Grid, Masonry, and Justified layouts included
 * **Responsive Design** - Looks great on all devices
 * **Lightbox** - Beautiful lightbox with keyboard navigation
-* **Lazy Loading** - Images load as they come into view for better performance
+* **Lazy Loading** - Items load as they come into view for better performance
 * **Statistics** - Track views and shares for your galleries
 * **Shortcodes** - Easy to embed galleries anywhere with `[fotogrids_gallery id="123"]`
 * **Gutenberg Blocks** - Native WordPress block editor support
-* **Image Management** - Add captions, tags, people, and location data
-* **Drag & Drop** - Reorder images easily in the admin
+* **Item Management** - Add captions, tags, people, and location data
+* **Drag & Drop** - Reorder items easily in the admin
 
 ### Pro Features
 
@@ -46,7 +46,7 @@ FotoGrids is a modern WordPress gallery plugin that makes it easy to create stun
 **Commerce Pro:**
 * Everything in Expert Pro
 * WooCommerce integration
-* Watermarking and image protection
+* Watermarking and item protection
 * White labeling options
 * CTA buttons and sale ribbons
 
@@ -63,15 +63,15 @@ FotoGrids is a modern WordPress gallery plugin that makes it easy to create stun
 * **Photographers** - Showcase your portfolio with beautiful galleries
 * **Agencies** - Present client work professionally
 * **Bloggers** - Enhance your posts with engaging photo galleries
-* **E-commerce** - Display product images effectively (with Pro features)
-* **Anyone** - Who wants beautiful, fast-loading image galleries
+* **E-commerce** - Display product items effectively (with Pro features)
+* **Anyone** - Who wants beautiful, fast-loading item galleries
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/fotogrids` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Go to FotoGrids in your WordPress admin menu to create your first gallery
-4. Add images from your media library and configure the layout
+4. Add items from your media library and configure the layout
 5. Copy the shortcode and paste it into any post or page
 
 == Frequently Asked Questions ==
@@ -80,9 +80,9 @@ FotoGrids is a modern WordPress gallery plugin that makes it easy to create stun
 
 Yes! FotoGrids offers a comprehensive free version with unlimited galleries, multiple layouts, lightbox, and statistics. Pro features are available for advanced users who need additional functionality.
 
-= What image formats are supported? =
+= What item formats are supported? =
 
-FotoGrids supports all image formats that WordPress supports natively: JPEG, PNG, GIF, WebP, and SVG.
+FotoGrids supports all item formats that WordPress supports natively: JPEG, PNG, GIF, WebP, and SVG.
 
 = Can I customize the appearance? =
 
@@ -102,7 +102,7 @@ We provide migration tools and guides for popular gallery plugins. Contact suppo
 
 == Screenshots ==
 
-1. Gallery admin interface with drag & drop image management
+1. Gallery admin interface with drag & drop item management
 2. Beautiful grid layout with hover effects
 3. Responsive masonry layout
 4. Full-featured lightbox with keyboard navigation
@@ -118,8 +118,8 @@ We provide migration tools and guides for popular gallery plugins. Contact suppo
 * Lightbox with keyboard navigation
 * Statistics tracking (views and shares)
 * Shortcodes and Gutenberg blocks
-* Drag & drop image reordering
-* Image metadata (captions, tags, people, location)
+* Drag & drop item reordering
+* Item metadata (captions, tags, people, location)
 * Responsive design
 * Lazy loading
 * Admin interface with React components

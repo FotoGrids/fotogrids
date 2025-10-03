@@ -32,7 +32,7 @@ class Admin_Columns {
      * Add custom columns to gallery list table
      * 
      * Modifies the default WordPress columns for the gallery post type list table.
-     * Adds custom columns for shortcode, album association, layout type, image count,
+     * Adds custom columns for shortcode, album association, layout type, item count,
      * and statistics while preserving the date column at the end.
      * 
      * @since 1.0.0
@@ -47,7 +47,7 @@ class Admin_Columns {
         $columns['fotogrids_shortcode'] = __( 'Shortcode', 'fotogrids' );
         $columns['fotogrids_album'] = __( 'Album', 'fotogrids' );
         $columns['fotogrids_layout'] = __( 'Layout', 'fotogrids' );
-        $columns['fotogrids_images'] = __( 'Images', 'fotogrids' );
+        $columns['fotogrids_items'] = __( 'Items', 'fotogrids' );
         $columns['fotogrids_stats'] = __( 'Views/Shares', 'fotogrids' );
         
         $columns['date'] = $date;
@@ -59,7 +59,7 @@ class Admin_Columns {
      * Display content for custom gallery columns
      * 
      * Renders the content for each custom column in the gallery list table.
-     * Handles shortcode display, album associations, layout badges, image counts,
+     * Handles shortcode display, album associations, layout badges, item counts,
      * and statistics for each gallery.
      * 
      * @since 1.0.0
@@ -100,9 +100,9 @@ class Admin_Columns {
                 echo '<span class="fotogrids-layout-badge layout-' . esc_attr( $layout ) . '">' . esc_html( ucfirst( $layout ) ) . '</span>';
                 break;
                 
-            case 'fotogrids_images':
-                $image_count = fotogrids_get_gallery_image_count( $post_id );
-                echo '<strong>' . $image_count . '</strong>';
+            case 'fotogrids_items':
+                $item_count = fotogrids_get_gallery_item_count( $post_id );
+                echo '<strong>' . $item_count . '</strong>';
                 break;
                 
             case 'fotogrids_stats':

@@ -37,8 +37,8 @@ import { TemplateSelector } from './TemplateSelector';
 interface Gallery {
     id: number;
     title: string;
-    image_count: number;
-    featured_image?: string;
+    item_count: number;
+    featured_item?: string;
 }
 
 interface Template {
@@ -108,7 +108,7 @@ export const GalleryBlockEdit: React.FC<BlockEditProps<GalleryBlockAttributes>> 
     const galleryOptions = [
         { label: __('Select a gallery...', 'fotogrids'), value: 0 },
         ...galleries.map(gallery => ({
-            label: `${gallery.title} (${gallery.image_count} images)`,
+            label: `${gallery.title} (${gallery.item_count} items)`,
             value: gallery.id,
         })),
     ];
@@ -280,21 +280,21 @@ export const GalleryBlockEdit: React.FC<BlockEditProps<GalleryBlockAttributes>> 
                 <PanelBody title={__('Display Settings', 'fotogrids')}>
                     <ToggleControl
                         label={__('Show Captions', 'fotogrids')}
-                        help={__('Display image captions on hover.', 'fotogrids')}
+                        help={__('Display item captions on hover.', 'fotogrids')}
                         checked={attributes.showCaptions}
                         onChange={(showCaptions) => setAttributes({ showCaptions })}
                     />
 
                     <ToggleControl
                         label={__('Enable Lightbox', 'fotogrids')}
-                        help={__('Open images in lightbox when clicked.', 'fotogrids')}
+                        help={__('Open items in lightbox when clicked.', 'fotogrids')}
                         checked={attributes.lightbox}
                         onChange={(lightbox) => setAttributes({ lightbox })}
                     />
 
                     <ToggleControl
                         label={__('Lazy Loading', 'fotogrids')}
-                        help={__('Load images as they come into view for better performance.', 'fotogrids')}
+                        help={__('Load items as they come into view for better performance.', 'fotogrids')}
                         checked={attributes.lazyLoad}
                         onChange={(lazyLoad) => setAttributes({ lazyLoad })}
                     />

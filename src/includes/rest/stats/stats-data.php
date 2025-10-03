@@ -17,7 +17,7 @@ class Stats_Data {
     /**
      * Increment view count
      *
-     * Records a view event for a specific object (gallery, album, or image).
+     * Records a view event for a specific object (gallery, album, or item).
      * Used for analytics and statistics tracking.
      *
      * @since 1.0.0

@@ -15,9 +15,9 @@ if ( ! defined( 'WPINC' ) ) {
 class Gallery_Data {
     
     /**
-     * Get gallery data with images
+     * Get gallery data with items
      *
-     * Retrieves a single gallery with all its associated images and metadata.
+     * Retrieves a single gallery with all its associated items and metadata.
      * Supports preview mode for unpublished galleries. Automatically increments
      * view count unless in preview mode.
      *
@@ -52,7 +52,7 @@ class Gallery_Data {
             'album_id' => (int) get_post_meta( $gallery_id, 'fotogrids_album_id', true ) ?: null,
         );
         
-        $images = self::get_gallery_images( $gallery_id );
+        $items = self::get_gallery_items( $gallery_id );
         
         if ( ! $is_preview ) {
             \FotoGrids\Statistics::increment( 'gallery', $gallery_id, 'views' );
@@ -63,7 +63,7 @@ class Gallery_Data {
             'title' => $gallery->post_title,
             'description' => $gallery->post_content,
             'meta' => $meta,
-            'images' => $images,
+            'items' => $items,
             'shortcode' => '[fotogrids_gallery id="' . $gallery_id . '"]',
         ) );
     }
@@ -100,14 +100,14 @@ class Gallery_Data {
         $galleries = array();
 
         foreach ( $query->posts as $post ) {
-            $image_count = self::get_gallery_image_count( $post->ID );
-            $featured_image = get_the_post_thumbnail_url( $post->ID, 'medium' );
+            $item_count = self::get_gallery_item_count( $post->ID );
+            $featured_item = get_the_post_thumbnail_url( $post->ID, 'medium' );
 
             $galleries[] = array(
                 'id' => $post->ID,
                 'title' => $post->post_title,
-                'image_count' => $image_count,
-                'featured_image' => $featured_image ?: null,
+                'item_count' => $item_count,
+                'featured_item' => $featured_item ?: null,
                 'created' => $post->post_date,
                 'modified' => $post->post_modified,
             );
@@ -117,16 +117,16 @@ class Gallery_Data {
     }
 
     /**
-     * Get gallery images endpoint for Gutenberg block
+     * Get gallery items endpoint for Gutenberg block
      *
-     * Retrieves images from a specific gallery with optional pagination.
+     * Retrieves items from a specific gallery with optional pagination.
      * Designed for use in Gutenberg block preview and selection interfaces.
      *
      * @since 1.0.0
      * @param \WP_REST_Request $request The REST API request with gallery ID and pagination parameters
-     * @return \WP_REST_Response|\WP_Error Array of gallery images or error response
+     * @return \WP_REST_Response|\WP_Error Array of gallery items or error response
      */
-    public static function get_gallery_images_endpoint( $request ) {
+    public static function get_gallery_items_endpoint( $request ) {
         $gallery_id = (int) $request['id'];
         $limit = (int) $request['limit'];
         $offset = (int) $request['offset'];
@@ -137,7 +137,7 @@ class Gallery_Data {
         }
 
         global $wpdb;
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         
         $sql = "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC";
         $params = array( $gallery_id );
@@ -157,13 +157,13 @@ class Gallery_Data {
             ARRAY_A 
         );
 
-        $images = array();
+        $items = array();
         foreach ( $results as $row ) {
             $attachment_id = (int) $row['attachment_id'];
             $attachment = get_post( $attachment_id );
 
             if ( $attachment ) {
-                $images[] = array(
+                $items[] = array(
                     'id' => $attachment_id,
                     'position' => (int) $row['position'],
                     'caption' => $row['caption'],
@@ -173,29 +173,29 @@ class Gallery_Data {
                     'medium' => wp_get_attachment_image_url( $attachment_id, 'medium' ),
                     'large' => wp_get_attachment_image_url( $attachment_id, 'large' ),
                     'full' => wp_get_attachment_url( $attachment_id ),
-                    'alt' => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+                    'alt' => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                     'title' => $attachment->post_title,
                 );
             }
         }
 
-        return rest_ensure_response( $images );
+        return rest_ensure_response( $items );
     }
 
     /**
-     * Get images for a specific gallery
+     * Get items for a specific gallery
      *
-     * Retrieves all images associated with a specific gallery from the database,
-     * including their metadata, captions, and various image size URLs.
+     * Retrieves all items associated with a specific gallery from the database,
+     * including their metadata, captions, and various item size URLs.
      *
      * @since 1.0.0
-     * @param int $gallery_id The ID of the gallery to retrieve images for
-     * @return array Array of image data with attachment information
+     * @param int $gallery_id The ID of the gallery to retrieve items for
+     * @return array Array of item data with attachment information
      */
-    private static function get_gallery_images( $gallery_id ) {
+    private static function get_gallery_items( $gallery_id ) {
         global $wpdb;
         
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         $results = $wpdb->get_results( 
             $wpdb->prepare( 
                 "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC", 
@@ -204,13 +204,13 @@ class Gallery_Data {
             ARRAY_A 
         );
         
-        $images = array();
+        $items = array();
         foreach ( $results as $row ) {
             $attachment_id = (int) $row['attachment_id'];
             $attachment = get_post( $attachment_id );
             
             if ( $attachment ) {
-                $images[] = array(
+                $items[] = array(
                     'id' => $attachment_id,
                     'position' => (int) $row['position'],
                     'caption' => $row['caption'],
@@ -221,28 +221,28 @@ class Gallery_Data {
                     'medium' => wp_get_attachment_image_url( $attachment_id, 'medium' ),
                     'large' => wp_get_attachment_image_url( $attachment_id, 'large' ),
                     'full' => wp_get_attachment_url( $attachment_id ),
-                    'alt' => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+                    'alt' => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                 );
             }
         }
         
-        return $images;
+        return $items;
     }
 
     /**
-     * Get image count for a gallery
+     * Get item count for a gallery
      *
-     * Returns the total number of images associated with a specific gallery.
+     * Returns the total number of items associated with a specific gallery.
      * Used for display purposes and pagination calculations.
      *
      * @since 1.0.0
-     * @param int $gallery_id The ID of the gallery to count images for
-     * @return int The number of images in the gallery
+     * @param int $gallery_id The ID of the gallery to count items for
+     * @return int The number of items in the gallery
      */
-    private static function get_gallery_image_count( $gallery_id ) {
+    private static function get_gallery_item_count( $gallery_id ) {
         global $wpdb;
         
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         return (int) $wpdb->get_var( 
             $wpdb->prepare( 
                 "SELECT COUNT(*) FROM $table WHERE gallery_id = %d", 

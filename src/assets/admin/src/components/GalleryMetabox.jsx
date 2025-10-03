@@ -1,12 +1,28 @@
 /**
- * Gallery Images Metabox React Component
+ * Gallery Items Metabox React Component
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import ImageEditModal from './ImageEditModal.jsx';
+import ItemEditModal from './ItemEditModal.jsx';
+
+const Icon = ({ name, className = "" }) => {
+    const icons = window.FotoGridsIcons || {};
+    const iconSvg = icons[name];
+    
+    if (!iconSvg) {
+        return <span className={`fotogrids-icon fotogrids-icon--${name} ${className}`}>{name}</span>;
+    }
+    
+    return (
+        <span 
+            className={`fotogrids-icon fotogrids-icon--${name} ${className}`}
+            dangerouslySetInnerHTML={{ __html: iconSvg }}
+        />
+    );
+};
 
 const GalleryMetabox = ({ 
-    galleryImages = [], 
+    galleryItems = [], 
     canEditPosts = true, 
     ajaxUrl = '', 
     nonce = '',
@@ -20,19 +36,63 @@ const GalleryMetabox = ({
     }
 
     const [activeTab, setActiveTab] = useState('manage');
-    const [images, setImages] = useState(Array.isArray(galleryImages) ? galleryImages : []);
+    const [items, setItems] = useState(Array.isArray(galleryItems) ? galleryItems : []);
     const [showModal, setShowModal] = useState(false);
-    const [currentImageId, setCurrentImageId] = useState(null);
-    const [currentImageData, setCurrentImageData] = useState(null);
+    const [currentItemId, setCurrentItemId] = useState(null);
+    const [currentItemData, setCurrentItemData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showAddDropdown, setShowAddDropdown] = useState(false);
 
-    // Initialize images from props with safety check
+    // Initialize items from props with safety check
     useEffect(() => {
-        if (Array.isArray(galleryImages)) {
-            setImages(galleryImages);
+        if (Array.isArray(galleryItems)) {
+            setItems(galleryItems);
         }
-    }, [galleryImages]);
+    }, [galleryItems]);
+
+    // Initialize sortable functionality
+    useEffect(() => {
+        const initializeSortable = () => {
+            const gridElement = document.getElementById('fotogrids-items-grid');
+            
+            if (!gridElement || typeof jQuery === 'undefined' || typeof jQuery.ui === 'undefined') {
+                return;
+            }
+
+            // Destroy existing sortable if it exists
+            if (jQuery(gridElement).hasClass('ui-sortable')) {
+                jQuery(gridElement).sortable('destroy');
+            }
+
+            // Initialize sortable
+            jQuery(gridElement).sortable({
+                items: '.fotogrids-item-item',
+                cursor: 'move',
+                opacity: 0.7,
+                placeholder: 'fotogrids-item-placeholder',
+                tolerance: 'pointer',
+                start: function(event, ui) {
+                    // Add translatable text to placeholder
+                    jQuery('.fotogrids-item-placeholder').attr('data-drop-text', strings.dropHere || 'Drop here');
+                },
+                update: function(event, ui) {
+                    const newOrder = jQuery(this).sortable('toArray', { attribute: 'data-id' });
+                    handleReorderItems(newOrder);
+                }
+            });
+        };
+
+        // Initialize after a short delay to ensure DOM is ready
+        const timeoutId = setTimeout(initializeSortable, 100);
+        
+        return () => {
+            clearTimeout(timeoutId);
+            const gridElement = document.getElementById('fotogrids-items-grid');
+            if (gridElement && typeof jQuery !== 'undefined' && jQuery(gridElement).hasClass('ui-sortable')) {
+                jQuery(gridElement).sortable('destroy');
+            }
+        };
+    }, [items]); // Re-initialize when items change
 
     // Handle media uploader
     const openMediaUploader = useCallback(() => {
@@ -42,7 +102,7 @@ const GalleryMetabox = ({
         }
 
         const mediaUploader = wp.media({
-            title: strings.selectImages || 'Select Images for Gallery',
+            title: strings.selectItems || 'Select Items for Gallery',
             button: { text: strings.addToGallery || 'Add to Gallery' },
             multiple: true,
             library: { type: 'image' }
@@ -51,7 +111,7 @@ const GalleryMetabox = ({
         mediaUploader.on('select', () => {
             const attachments = mediaUploader.state().get('selection').toJSON();
             
-            const newImages = attachments.map(attachment => ({
+            const newItems = attachments.map(attachment => ({
                 id: attachment.id,
                 title: attachment.title || attachment.filename || 'Untitled',
                 url: attachment.url,
@@ -59,32 +119,64 @@ const GalleryMetabox = ({
                 alt: attachment.alt || attachment.title || ''
             }));
 
-            // Add new images, avoiding duplicates
-            setImages(prevImages => {
-                const existingIds = new Set(prevImages.map(img => img.id));
-                const uniqueNewImages = newImages.filter(img => !existingIds.has(img.id));
-                return [...prevImages, ...uniqueNewImages];
+            // Add new items, avoiding duplicates
+            setItems(prevItems => {
+                const existingIds = new Set(prevItems.map(img => img.id));
+                const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
+                return [...prevItems, ...uniqueNewItems];
             });
         });
 
         mediaUploader.open();
     }, [strings]);
 
-    // Remove image
-    const removeImage = useCallback((imageId) => {
-        setImages(prevImages => prevImages.filter(img => img.id !== imageId));
+    // Remove item
+    const removeItem = useCallback((itemId) => {
+        setItems(prevItems => prevItems.filter(img => img.id !== itemId));
     }, []);
 
-    // Clear all images
-    const clearAllImages = useCallback(() => {
-        if (confirm(strings.confirmClear || 'Are you sure you want to remove all images?')) {
-            setImages([]);
+    // Clear all items
+    const clearAllItems = useCallback(() => {
+        if (confirm(strings.confirmClear || 'Are you sure you want to remove all items?')) {
+            setItems([]);
         }
     }, [strings]);
 
-    // Open image edit modal
-    // Load image data function (shared by openImageModal and navigateImage)
-    const loadImageData = useCallback(async (imageId) => {
+    // Handle item reordering
+    const handleReorderItems = useCallback(async (newOrder) => {
+        try {
+            // Reorder items in state to match new order
+            const reorderedItems = newOrder.map(id => 
+                items.find(item => item.id.toString() === id.toString())
+            ).filter(Boolean);
+            
+            setItems(reorderedItems);
+
+            // Save new order to server
+            const formData = new FormData();
+            formData.append('action', 'fotogrids_reorder_gallery_items');
+            formData.append('gallery_id', window.fotogridsMetaBoxes?.postId || '');
+            formData.append('item_order', JSON.stringify(newOrder));
+            formData.append('nonce', nonce);
+
+            const response = await fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (!data.success) {
+                console.error('Failed to save item order:', data.data);
+            }
+        } catch (error) {
+            console.error('Error reordering items:', error);
+        }
+    }, [items, ajaxUrl, nonce]);
+
+    // Open item edit modal
+    // Load item data function (shared by openItemModal and navigateItem)
+    const loadItemData = useCallback(async (itemId) => {
         setLoading(true);
         
         // Add delay to see loading state (for debugging)
@@ -92,8 +184,8 @@ const GalleryMetabox = ({
         
         try {
             const formData = new FormData();
-            formData.append('action', 'fotogrids_get_image_data');
-            formData.append('image_id', imageId);
+            formData.append('action', 'fotogrids_get_item_data');
+            formData.append('item_id', itemId);
             formData.append('nonce', nonce);
 
             const response = await fetch(ajaxUrl, {
@@ -104,43 +196,43 @@ const GalleryMetabox = ({
             const data = await response.json();
 
             if (data.success) {
-                setCurrentImageData(data.data);
-                setCurrentImageId(imageId);
+                setCurrentItemData(data.data);
+                setCurrentItemId(itemId);
                 return true;
             } else {
-                alert(strings.errorLoadingImage || 'Error loading image data');
+                alert(strings.errorLoadingItem || 'Error loading item data');
                 return false;
             }
         } catch (error) {
-            console.error('Error loading image data:', error);
-            alert(strings.errorLoadingImage || 'Error loading image data');
+            console.error('Error loading item data:', error);
+            alert(strings.errorLoadingItem || 'Error loading item data');
             return false;
         } finally {
             setLoading(false);
         }
     }, [ajaxUrl, nonce, strings]);
 
-    const openImageModal = useCallback(async (imageId) => {
+    const openItemModal = useCallback(async (itemId) => {
         setShowModal(true);
-        await loadImageData(imageId);
-    }, [loadImageData]);
+        await loadItemData(itemId);
+    }, [loadItemData]);
 
-    // Navigate between images in modal
-    const navigateImage = useCallback(async (direction) => {
-        const currentIndex = images.findIndex(img => img.id === currentImageId);
+    // Navigate between items in modal
+    const navigateItem = useCallback(async (direction) => {
+        const currentIndex = items.findIndex(img => img.id === currentItemId);
         let nextIndex;
 
         if (direction === 'prev') {
-            nextIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
+            nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
         } else {
-            nextIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
+            nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
         }
 
-        const nextImageId = images[nextIndex]?.id;
-        if (nextImageId) {
-            await loadImageData(nextImageId);
+        const nextItemId = items[nextIndex]?.id;
+        if (nextItemId) {
+            await loadItemData(nextItemId);
         }
-    }, [images, currentImageId, loadImageData]);
+    }, [items, currentItemId, loadItemData]);
 
     // Handle tab switching
     const handleTabSwitch = useCallback((tabId) => {
@@ -168,51 +260,51 @@ const GalleryMetabox = ({
         }
     }, [openMediaUploader]);
 
-    // Render image grid
-    const renderImageGrid = () => {
-        if (images.length === 0) {
+    // Render item grid
+    const renderItemsGrid = () => {
+        if (items.length === 0) {
             return (
                 <p className="description">
-                    {strings.noImages || 'No images selected. Click "Add New" to get started.'}
+                    {strings.noItems || 'No items selected. Click "Add New" to get started.'}
                 </p>
             );
         }
 
         return (
-            <div id="fotogrids-images-grid" className="fotogrids-sortable">
-                {images.map((image) => (
-                    <div key={image.id} className="fotogrids-image-item" data-id={image.id}>
+            <div id="fotogrids-items-grid" className="fotogrids-sortable">
+                {items.map((item) => (
+                    <div key={item.id} className="fotogrids-item-item" data-id={item.id}>
                         <img 
-                            src={image.thumbnail} 
-                            alt={image.alt} 
-                            onClick={() => openImageModal(image.id)}
+                            src={item.thumbnail} 
+                            alt={item.alt} 
+                            onClick={() => openItemModal(item.id)}
                             style={{ cursor: 'pointer' }}
                         />
-                        <div className="fotogrids-image-controls">
+                        <div className="fotogrids-item-controls">
                             <button
                                 type="button"
-                                className="fotogrids-edit-image"
-                                onClick={() => openImageModal(image.id)}
-                                title={strings.editImage || 'Edit Image'}
+                                className="fotogrids-edit-item"
+                                onClick={() => openItemModal(item.id)}
+                                title={strings.editItem || 'Edit Item'}
                             >
-                                <span className="fotogrids-icon" data-icon="edit"></span>
+                                <Icon name="edit" />
                             </button>
                             <button
                                 type="button"
-                                className="fotogrids-remove-image"
-                                onClick={() => removeImage(image.id)}
-                                title={strings.removeImage || 'Remove Image'}
+                                className="fotogrids-remove-item"
+                                onClick={() => removeItem(item.id)}
+                                title={strings.removeItem || 'Remove Item'}
                             >
-                                <span className="fotogrids-icon" data-icon="x"></span>
+                                <Icon name="x" />
                             </button>
                         </div>
-                        <div className="fotogrids-image-title">
-                            {image.title.length > 20 ? image.title.substring(0, 20) + '...' : image.title}
+                        <div className="fotogrids-item-title">
+                            {item.title.length > 20 ? item.title.substring(0, 20) + '...' : item.title}
                         </div>
                         <input 
                             type="hidden" 
-                            name="fotogrids_gallery_images[]" 
-                            value={image.id} 
+                            name="fotogrids_gallery_items[]" 
+                            value={item.id} 
                         />
                     </div>
                 ))}
@@ -225,12 +317,12 @@ const GalleryMetabox = ({
         <div className="fotogrids-add-new-dropdown">
             <button
                 type="button"
-                className={`button button-primary fotogrids-add-new-toggle ${showAddDropdown ? 'fotogrids-dropdown-open' : ''}`}
+                className={`fotogrids-button fotogrids-button--primary fotogrids-button--smaller fotogrids-add-new-toggle ${showAddDropdown ? 'fotogrids-dropdown-open' : ''}`}
                 onClick={() => setShowAddDropdown(!showAddDropdown)}
             >
-                <span className="fotogrids-icon fotogrids-button-icon-before" data-icon="plus"></span>
+                <Icon name="plus" />
                 {strings.addNew || 'Add New'}
-                <span className="fotogrids-icon" data-icon="chevron-down"></span>
+                <Icon name="chevron-down" />
             </button>
             {showAddDropdown && (
                 <div className="fotogrids-add-new-menu fotogrids-dropdown-open">
@@ -246,11 +338,11 @@ const GalleryMetabox = ({
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('zip')}>
 						{strings.fromZip || 'From ZIP'}
                     </div>
-                    <div className="fotogrids-add-option fotogrids-add-option--pro">
+                    <div className="fotogrids-add-option fotogrids-add-option--pro" onClick={() => handleAddOption('video')}>
 						{strings.video || 'Video'}
 						<span className="fotogrids-pro-badge">Pro</span>
                     </div>
-                    <div className="fotogrids-add-option fotogrids-add-option--pro">
+                    <div className="fotogrids-add-option fotogrids-add-option--pro" onClick={() => handleAddOption('instagram')}>
 						{strings.instagram || 'Instagram'}
 						<span className="fotogrids-pro-badge">Pro</span>
                     </div>
@@ -270,7 +362,6 @@ const GalleryMetabox = ({
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, [showAddDropdown]);
-
 
     return (
         <div className="fotogrids-gallery-metabox">
@@ -300,10 +391,22 @@ const GalleryMetabox = ({
                         {renderAddDropdown()}
                         <button
                             type="button"
-                            className="button fotogrids-remove-all"
-                            onClick={clearAllImages}
+                            className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-items-remove-all"
+                            onClick={clearAllItems}
                         >
                             {strings.removeAll || 'Remove All'}
+                        </button>
+                        <button
+                            type="button"
+                            className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-items-bulk-editor"
+                            onClick={() => {
+                                if (window.FotoGridsUpgrade) {
+                                    window.FotoGridsUpgrade.launchForFeature.bulkOperations();
+                                }
+                            }}
+                        >
+                            {strings.bulkEditor || 'Bulk Editor'}
+                            <span className="fotogrids-pro-badge">Pro</span>
                         </button>
                     </div>
                 )}
@@ -312,8 +415,8 @@ const GalleryMetabox = ({
             {/* Tab content */}
             <div className="fotogrids-gallery-content">
                 <div className={`fotogrids-gallery-tab-content ${activeTab === 'manage' ? 'fotogrids-gallery-tab-content--active' : ''}`}>
-                    <div id="fotogrids-images-container">
-                        {renderImageGrid()}
+                    <div id="fotogrids-items-container">
+                        {renderItemsGrid()}
                     </div>
                 </div>
 
@@ -324,15 +427,15 @@ const GalleryMetabox = ({
                 </div>
             </div>
 
-            {/* Image Edit Modal */}
+            {/* Item Edit Modal */}
             {showModal && (
-                <ImageEditModal
-                    imageId={currentImageId}
-                    imageData={currentImageData}
+                <ItemEditModal
+                    itemId={currentItemId}
+                    itemData={currentItemData}
                     loading={loading}
-                    images={images}
+                    items={items}
                     onClose={() => setShowModal(false)}
-                    onNavigate={navigateImage}
+                    onNavigate={navigateItem}
                     ajaxUrl={ajaxUrl}
                     nonce={nonce}
                     strings={strings}
@@ -340,8 +443,8 @@ const GalleryMetabox = ({
             )}
 
             {/* Hidden compatibility buttons for existing functionality */}
-            <button type="button" id="fotogrids-add-images" style={{display: 'none'}} onClick={openMediaUploader} />
-            <button type="button" id="fotogrids-clear-images" style={{display: 'none'}} onClick={clearAllImages} />
+            <button type="button" id="fotogrids-add-items" style={{display: 'none'}} onClick={openMediaUploader} />
+            <button type="button" id="fotogrids-clear-items" style={{display: 'none'}} onClick={clearAllItems} />
         </div>
     );
 };

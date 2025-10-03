@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const FotoGridsIcons = window.FotoGridsIcons || {};
+
 const AlbumAssignment = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -53,6 +55,13 @@ const AlbumAssignment = () => {
                     },
                 });
                 setAssignedAlbums(prev => prev.filter(album => parseInt(album.ID) !== parseInt(albumId)));
+                
+                // Update the gallery count in allAlbums for the removed album
+                setAllAlbums(prev => prev.map(album => 
+                    parseInt(album.id) === parseInt(albumId) 
+                        ? { ...album, gallery_count: Math.max(0, (album.gallery_count || 0) - 1) }
+                        : album
+                ));
             } else {
                 // Add to album
                 console.log('Adding gallery to album:', { albumId, parsedId: parseInt(albumId), postId: config.postId });
@@ -69,13 +78,23 @@ const AlbumAssignment = () => {
                     // Find the album object and add it to assigned albums
                     const albumToAdd = allAlbums.find(album => parseInt(album.id) === parseInt(albumId));
                     if (albumToAdd) {
+                        const updatedGalleryCount = (albumToAdd.gallery_count || 0) + 1;
+                        
                         setAssignedAlbums(prev => [...prev, {
                             ID: albumToAdd.id,
                             post_title: albumToAdd.title,
                             post_status: albumToAdd.status,
-                            gallery_count: albumToAdd.gallery_count,
-                            featured_image: albumToAdd.featured_image
+                            status_display: albumToAdd.status_display,
+                            gallery_count: updatedGalleryCount,
+                            featured_item: albumToAdd.featured_item
                         }]);
+                        
+                        // Update the gallery count in allAlbums for the added album
+                        setAllAlbums(prev => prev.map(album => 
+                            parseInt(album.id) === parseInt(albumId) 
+                                ? { ...album, gallery_count: updatedGalleryCount }
+                                : album
+                        ));
                     }
                 } catch (apiError) {
                     console.error('API Error details:', apiError);
@@ -98,7 +117,7 @@ const AlbumAssignment = () => {
     const handleCreateNewAlbum = () => {
         // For now, just redirect to the new album page
         // In a future version, we could implement inline album creation
-        window.location.href = 'post-new.php?post_type=fotogrids_album';
+        window.open('post-new.php?post_type=fotogrids_album', '_blank');
     };
 
     const getAssignedAlbumsData = () => {
@@ -115,22 +134,22 @@ const AlbumAssignment = () => {
         // Assigned Albums Summary
         React.createElement('div', { className: 'fotogrids-assigned-summary' },
             React.createElement('p', null,
-                React.createElement('strong', null,
-                    `${config.strings.assignedTo} ${assignedAlbums.length} ${config.strings.albums}`
-                )
+                assignedAlbums.length === 0 
+                    ? `${config.strings.notAssignedTo} ${config.strings.albums}`
+                    : `${config.strings.assignedTo} ${assignedAlbums.length} ${config.strings.albums}`
             ),
             assignedAlbums.length > 0 && React.createElement('div', { className: 'fotogrids-assigned-list' },
                 getAssignedAlbumsData().map(album =>
                     React.createElement('div', { key: album.ID, className: 'fotogrids-assigned-album' },
-                        album.featured_image && React.createElement('img', {
-                            src: album.featured_image,
+                        album.featured_item && React.createElement('img', {
+                            src: album.featured_item,
                             alt: '',
                             className: 'fotogrids-assigned-album-thumb'
                         }),
                         React.createElement('div', { className: 'fotogrids-assigned-album-details' },
                             React.createElement('div', { className: 'fotogrids-assigned-album-title' }, album.post_title),
                             React.createElement('div', { className: 'fotogrids-assigned-album-meta' },
-                                `${album.gallery_count || 0} galleries • ${album.post_status || 'draft'}`
+                                `${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`
                             )
                         ),
                         React.createElement('button', {
@@ -147,13 +166,19 @@ const AlbumAssignment = () => {
 
         // Search and Selection
         React.createElement('div', { className: 'fotogrids-album-search' },
-            React.createElement('input', {
-                type: 'text',
-                placeholder: config.strings.searchPlaceholder,
-                value: searchTerm,
-                onChange: (e) => setSearchTerm(e.target.value),
-                className: 'fotogrids-search-input'
-            })
+            React.createElement('div', { className: 'fotogrids-search-input-wrapper' },
+                React.createElement('div', { 
+                    className: 'fotogrids-search-icon',
+                    dangerouslySetInnerHTML: { __html: FotoGridsIcons['search-md'] || '' }
+                }),
+                React.createElement('input', {
+                    type: 'text',
+                    placeholder: config.strings.searchPlaceholder,
+                    value: searchTerm,
+                    onChange: (e) => setSearchTerm(e.target.value),
+                    className: 'fotogrids-search-input'
+                })
+            )
         ),
 
         // Album List
@@ -166,15 +191,15 @@ const AlbumAssignment = () => {
                             key: album.id,
                             className: 'fotogrids-album-item available'
                         },
-                            album.featured_image && React.createElement('img', {
-                                src: album.featured_image,
+                            album.featured_item && React.createElement('img', {
+                                src: album.featured_item,
                                 alt: '',
                                 className: 'fotogrids-album-thumb'
                             }),
                             React.createElement('div', { className: 'fotogrids-album-details' },
                                 React.createElement('div', { className: 'fotogrids-album-title' }, album.title),
                                 React.createElement('div', { className: 'fotogrids-album-meta' },
-                                    `${album.gallery_count || 0} galleries • ${album.status || 'draft'}`
+                                    `${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`
                                 )
                             ),
                             React.createElement('button', {
@@ -193,7 +218,7 @@ const AlbumAssignment = () => {
         React.createElement('div', { className: 'fotogrids-create-album' },
             React.createElement('button', {
                 type: 'button',
-                className: 'button button-secondary',
+                className: 'fotogrids-button fotogrids-button--secondary fotogrids-button--smaller',
                 onClick: handleCreateNewAlbum
             }, `+ ${config.strings.createNewAlbum}`)
         ),

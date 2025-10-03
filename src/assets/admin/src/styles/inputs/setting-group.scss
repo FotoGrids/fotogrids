@@ -1,0 +1,79 @@
+@use '../colors.scss' as *;
+@use '../sizes.scss' as *;
+
+.fotogrids-setting-group {
+    border: ui-size(border-width, base) solid ui-color(border, primary);
+    border-radius: ui-size(border-radius, base);
+    position: relative;
+    
+    &__label {
+        position: absolute;
+        top: calc(-#{ui-size(font-size, md)} / 2);
+        left: ui-size(spacing, xl);
+        background-color: ui-color(background, primary);
+        padding: 0 ui-size(padding, sm);
+        font-size: ui-size(font-size, sm);
+        color: ui-color(text, tertiary);
+        line-height: ui-size(line-height, tight);
+        margin: 0;
+    }
+    
+    &__content {
+        padding: ui-size(padding, xl);
+        padding-top: calc( ui-size(padding, xl) + (ui-size(padding,base) / 2));
+		display: flex;
+		flex-direction: column;
+		gap: ui-size(padding, 2xl);
+    }
+    
+    &--disabled {
+        border-color: ui-color(border, light);
+        background-color: ui-color(background, secondary);
+        opacity: 0.6;
+        
+        .fotogrids-setting-group__label {
+            color: ui-color(text, tertiary);
+            background-color: ui-color(background, secondary);
+        }
+    }
+    
+    &--error {
+        border-color: ui-color(border, error);
+        background-color: ui-color(status, error-bg);
+        
+        .fotogrids-setting-group__label {
+            color: ui-color(status, error-text);
+            background-color: ui-color(status, error-bg);
+        }
+    }
+    
+    .fotogrids-setting-group {
+        margin: ui-size(margin, md) 0;
+        
+        .fotogrids-setting-group__content {
+            padding: ui-size(padding, md);
+            padding-top: ui-size(padding, lg);
+        }
+        
+        .fotogrids-setting-group__label {
+            font-size: ui-size(font-size, xs);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .fotogrids-setting-group {
+        margin: ui-size(margin, md) 0;
+        
+        &__content {
+            padding: ui-size(padding, md);
+            padding-top: ui-size(padding, lg);
+        }
+        
+        &__label {
+            font-size: ui-size(font-size, xs);
+            left: ui-size(spacing, sm);
+            padding: 0 ui-size(padding, xs);
+        }
+    }
+}

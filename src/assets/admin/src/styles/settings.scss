@@ -1,3 +1,7 @@
+@use './colors.scss' as *;
+@use './sizes.scss' as *;
+@use './pro.scss' as *;
+
 #fotogrids_gallery_settings{
     .inside {
         padding: 0;
@@ -6,15 +10,6 @@
 }
 
 $settings-sidebar-width: 200px;
-
-@mixin pro-badge {
-    font-size: 10px;
-    background: var(--fotogrids-yellow);
-    color: white;
-    padding: 2px 6px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
 
 @mixin transition-smooth {
     transition: all 0.2s ease;
@@ -101,10 +96,6 @@ $settings-sidebar-width: 200px;
         flex: 1;
         font-size: 14px;
     }
-
-    &__pro {
-        @include pro-badge;
-    }
 }
 
 .fotogrids-settings-content {
@@ -129,15 +120,6 @@ $settings-sidebar-width: 200px;
     }
 }
 
-.fotogrids-pro-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    z-index: 10;
-    @include pro-badge;
-}
-
-// Pro Tab Promotional Content
 .fotogrids-pro-tab-content {
     text-align: center;
     padding: 40px 20px;
@@ -420,15 +402,6 @@ $settings-sidebar-width: 200px;
         }
     }
     
-    &__pro-badge {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        @include pro-badge;
-        font-size: 10px;
-        padding: 3px 6px;
-    }
-    
     &__info {
         padding: 12px 16px;
     }
@@ -478,13 +451,6 @@ body.rtl {
             }
         }
     }
-    
-    .fotogrids-layout-option {
-        &__pro-badge {
-            right: auto;
-            left: 8px;
-        }
-    }
 }
 
 // Legacy pro notice (keep for backward compatibility)
@@ -518,11 +484,6 @@ body.rtl {
             border-right: none;
             border-left: 3px solid $settings-active-border;
         }
-    }
-
-    .fotogrids-pro-badge {
-        right: auto;
-        left: -8px;
     }
 }
 
@@ -611,53 +572,6 @@ body.rtl {
             border: 1px solid #8c8f94;
             border-radius: 4px;
             font-family: monospace;
-            font-size: 13px;
-
-            &:focus {
-                border-color: #007cba;
-                outline: none;
-                box-shadow: 0 0 0 1px #007cba;
-            }
-        }
-    }
-}
-
-.fotogrids-range-with-units {
-    &__controls {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .fotogrids-range-slider {
-        flex: 1;
-        min-width: 100px;
-    }
-
-    &__value {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-
-        .fotogrids-number-input {
-            width: 60px;
-            padding: 6px 8px;
-            border: 1px solid #8c8f94;
-            border-radius: 4px;
-            text-align: center;
-
-            &:focus {
-                border-color: #007cba;
-                outline: none;
-                box-shadow: 0 0 0 1px #007cba;
-            }
-        }
-
-        .fotogrids-units-select {
-            padding: 6px 8px;
-            border: 1px solid #8c8f94;
-            border-radius: 4px;
-            background: #fff;
             font-size: 13px;
 
             &:focus {
@@ -905,7 +819,7 @@ body.rtl {
     }
 }
 
-.fotogrids-image-url-grid {
+.fotogrids-item-url-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
@@ -916,7 +830,7 @@ body.rtl {
     }
 }
 
-.fotogrids-image-url-item {
+.fotogrids-item-url-item {
     border: 1px solid #e1e4e8;
     border-radius: 6px;
     background: #fff;
@@ -929,13 +843,13 @@ body.rtl {
     }
     
     &--skeleton {
-        .fotogrids-image-url-item__thumbnail {
+        .fotogrids-item-url-item__thumbnail {
             background: #e1e4e8;
             animation: fotogrids-skeleton-pulse 1.5s ease-in-out infinite alternate;
         }
         
-        .fotogrids-image-url-item__url-field,
-        .fotogrids-image-url-item__target-field {
+        .fotogrids-item-url-item__url-field,
+        .fotogrids-item-url-item__target-field {
             height: 32px;
             background: #e1e4e8;
             border-radius: 4px;
@@ -951,17 +865,13 @@ body.rtl {
         justify-content: center;
         background: #f6f7f7;
         border-bottom: 1px solid #e1e4e8;
+        color: #8c8f94;
         
         img {
             max-width: 100%;
             max-height: 100%;
             object-fit: cover;
             border-radius: 0;
-        }
-        
-        &-placeholder {
-            font-size: 24px;
-            color: #8c8f94;
         }
     }
     
@@ -1114,7 +1024,7 @@ body.rtl {
         }
     }
     
-    .fotogrids-image-url-item {
+    .fotogrids-item-url-item {
         background: #1d2327;
         border-color: #3c434a;
         
@@ -1123,9 +1033,9 @@ body.rtl {
         }
         
         &--skeleton {
-            .fotogrids-image-url-item__thumbnail,
-            .fotogrids-image-url-item__url-field,
-            .fotogrids-image-url-item__target-field {
+            .fotogrids-item-url-item__thumbnail,
+            .fotogrids-item-url-item__url-field,
+            .fotogrids-item-url-item__target-field {
                 background: #3c434a;
             }
         }
@@ -1211,17 +1121,13 @@ body.rtl {
 }
 
 // Additional styles for external URL manager improvements
-.fotogrids-image-url-item {
+.fotogrids-item-url-item {
     &__thumbnail-placeholder {
         width: 100%;
         height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f0f0f0;
-        color: #666;
-        border-radius: 4px;
-        padding: 8px;
         
         svg {
             width: 100%;
@@ -1271,24 +1177,24 @@ body.rtl {
     align-items: center;
     gap: 4px;
     justify-content: center;
-    
+
     &:hover:not(:disabled):not(.is-active) {
         background: #f6f7f7;
     }
-    
+
     &.is-active {
         background: var(--fotogrids-blue);
         border-color: var(--fotogrids-blue);
         color: #fff;
     }
-    
+
     &:disabled {
         opacity: 0.6;
         cursor: not-allowed;
         background: #f6f7f7;
         color: #a7aaad;
     }
-    
+
     &__icon {
         width: 14px;
         height: 14px;
@@ -1303,24 +1209,25 @@ body.rtl {
             height: 100%;
         }
     }
-    
+
     &__label {
         white-space: nowrap;
     }
-    
+
     &__main-label {
         font-weight: 600;
         line-height: 1.2;
     }
-    
+
     &__sub-label {
         font-size: 10px;
         font-weight: 400;
         line-height: 1.2;
         margin-top: 1px;
         opacity: 0.5;
+        white-space: nowrap;
     }
-    
+
     @media (prefers-color-scheme: dark) {
         background: #1d2327;
         color: #c3c4c7;

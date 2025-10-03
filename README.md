@@ -148,7 +148,7 @@ npm run type-check  # TypeScript validation
 ## 📈 Performance
 
 -   Conditional asset loading
--   Lazy loading for images
+-   Lazy loading for items
 -   Database query optimization
 -   Modern JavaScript (ES6+)
 

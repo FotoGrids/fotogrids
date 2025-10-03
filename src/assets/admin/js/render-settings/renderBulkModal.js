@@ -33,7 +33,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
             h('div', {
                 className: 'fotogrids-bulk-modal__header'
             }, [
-                h('h3', {}, bulkAction === 'apply_to_all' ? __('Apply URL to All Images', 'fotogrids') : __('Clear All URLs', 'fotogrids')),
+                h('h3', {}, bulkAction === 'apply_to_all' ? __('Apply URL to All Items', 'fotogrids') : __('Clear All URLs', 'fotogrids')),
                 h('button', {
                     type: 'button',
                     className: 'fotogrids-bulk-modal__close',
@@ -48,7 +48,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
                     h('div', {
                         className: 'fotogrids-bulk-modal__field'
                     }, [
-                        h('label', {}, __('URL to apply to all images:', 'fotogrids')),
+                        h('label', {}, __('URL to apply to all items:', 'fotogrids')),
                         h('input', {
                             type: 'url',
                             value: bulkUrl,

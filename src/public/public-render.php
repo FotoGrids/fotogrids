@@ -107,12 +107,12 @@ class Public_Render {
         $responsive_columns = $atts['cols'] ? 
             array('desktop' => absint($atts['cols']), 'tablet' => absint($atts['cols']), 'mobile' => absint($atts['cols'])) : 
             $settings['columns'];
-        $responsive_spacing = $settings['image_spacing'];
+        $responsive_spacing = $settings['item_spacing'];
 
-        // Get gallery images
-        $images = fotogrids_get_gallery_images( $gallery_id );
-        if ( empty( $images ) ) {
-            return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' exists but has no images.</div>';
+        // Get gallery items
+        $items = fotogrids_get_gallery_items( $gallery_id );
+        if ( empty( $items ) ) {
+            return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' exists but has no items.</div>';
         }
         
         // Enqueue specific template assets
@@ -122,7 +122,7 @@ class Public_Render {
         self::enqueue_lightbox_assets( $settings );
         
         // Render gallery
-        return self::render_gallery( $gallery_id, $images, $layout, $responsive_columns, $responsive_spacing, $settings, $atts );
+        return self::render_gallery( $gallery_id, $items, $layout, $responsive_columns, $responsive_spacing, $settings, $atts );
     }
     
     /**
@@ -265,7 +265,7 @@ class Public_Render {
     /**
      * Render gallery HTML
      */
-    private static function render_gallery( $gallery_id, $images, $layout, $responsive_columns, $responsive_spacing, $settings, $atts ) {
+    private static function render_gallery( $gallery_id, $items, $layout, $responsive_columns, $responsive_spacing, $settings, $atts ) {
         $classes = array(
             'fotogrids-gallery',
             'fotogrids-layout-' . esc_attr( $layout ),
@@ -276,7 +276,7 @@ class Public_Render {
         }
         
         // Add interaction-specific classes
-        $click_behavior = $settings['image_click_behavior'] ?? 'lightbox';
+        $click_behavior = $settings['item_click_behavior'] ?? 'lightbox';
         $classes[] = 'fotogrids-click-' . esc_attr( $click_behavior );
         
         if ( $click_behavior === 'lightbox' || $atts['lightbox'] === 'true' ) {
@@ -327,6 +327,10 @@ class Public_Render {
             if ( isset( $settings['lightbox_custom_color'] ) && $settings['lightbox_theme'] === 'custom' ) {
                 $data_attrs['data-lightbox-custom-color'] = esc_attr( $settings['lightbox_custom_color'] );
             }
+            
+            // Add thumbnail strip settings
+            $data_attrs['data-lightbox-thumbnail-strip-location'] = esc_attr( $settings['lightbox_thumbnail_strip_location'] ?? 'bottom' );
+            $data_attrs['data-lightbox-thumbnail-size'] = esc_attr( $settings['lightbox_thumbnail_size'] ?? 'normal' );
         }
         
         // Build data attributes string
@@ -338,11 +342,11 @@ class Public_Render {
         $output = '<style>' . $responsive_css . '</style>';
         $output .= '<div id="' . esc_attr( $gallery_instance_id ) . '" class="' . esc_attr( implode( ' ', $classes ) ) . '"' . $data_attrs_string . '>';
         
-        if ( empty( $images ) ) {
-            $output .= '<p class="fotogrids-no-images">' . __( 'No images found in this gallery.', 'fotogrids' ) . '</p>';
+        if ( empty( $items ) ) {
+            $output .= '<p class="fotogrids-no-items">' . __( 'No items found in this gallery.', 'fotogrids' ) . '</p>';
         } else {
-            foreach ( $images as $image ) {
-                $output .= self::render_gallery_item( $image, $settings, $atts );
+            foreach ( $items as $item ) {
+                $output .= self::render_gallery_item( $item, $settings, $atts );
             }
         }
         
@@ -438,19 +442,19 @@ class Public_Render {
     /**
      * Render individual gallery item
      */
-    private static function render_gallery_item( $image, $settings, $atts ) {
+    private static function render_gallery_item( $item, $settings, $atts ) {
         $classes = array( 'fotogrids-item' );
-        $click_behavior = $settings['image_click_behavior'] ?? 'lightbox';
+        $click_behavior = $settings['item_click_behavior'] ?? 'lightbox';
         $classes[] = 'fotogrids-item-' . esc_attr( $click_behavior );
         
         $output = '<figure class="' . esc_attr( implode( ' ', $classes ) ) . '">';
         
-        // Image tag
+        // Item tag
         $img_attrs = array(
-            'src' => esc_url( $image['medium'] ),
-            'alt' => esc_attr( $image['alt'] ? $image['alt'] : $image['title'] ),
-            'data-full' => esc_url( $image['full'] ),
-            'data-id' => esc_attr( $image['id'] ),
+            'src' => esc_url( $item['medium'] ),
+            'alt' => esc_attr( $item['alt'] ? $item['alt'] : $item['title'] ),
+            'data-full' => esc_url( $item['full'] ),
+            'data-id' => esc_attr( $item['id'] ),
             'data-click-behavior' => esc_attr( $click_behavior ),
         );
         
@@ -459,11 +463,11 @@ class Public_Render {
         }
         
         // Add click behavior specific attributes
-        if ( $click_behavior === 'external' && isset( $image['external_url'] ) ) {
-            $img_attrs['data-external-url'] = esc_url( $image['external_url'] );
+        if ( $click_behavior === 'external' && isset( $item['external_url'] ) ) {
+            $img_attrs['data-external-url'] = esc_url( $item['external_url'] );
         }
         
-        // Wrap image with appropriate element based on click behavior
+        // Wrap item with appropriate element based on click behavior
         $img_html = '<img';
         foreach ( $img_attrs as $attr => $value ) {
             $img_html .= ' ' . $attr . '="' . $value . '"';
@@ -477,23 +481,23 @@ class Public_Render {
                 break;
                 
             case 'direct':
-                $output .= '<a href="' . esc_url( $image['full'] ) . '" target="_blank" rel="noopener" class="fotogrids-direct-link">';
+                $output .= '<a href="' . esc_url( $item['full'] ) . '" target="_blank" rel="noopener" class="fotogrids-direct-link">';
                 $output .= $img_html;
                 $output .= '</a>';
                 break;
                 
             case 'external':
-                if ( isset( $image['external_url'] ) && ! empty( $image['external_url'] ) ) {
-                    // Determine target - use image-specific target, then global default, then fallback
+                if ( isset( $item['external_url'] ) && ! empty( $item['external_url'] ) ) {
+                    // Determine target - use item-specific target, then global default, then fallback
                     $target = '_self'; // Default fallback
-                    if ( ! empty( $image['link_target'] ) && $image['link_target'] !== 'global' ) {
-                        $target = $image['link_target'];
+                    if ( ! empty( $item['link_target'] ) && $item['link_target'] !== 'global' ) {
+                        $target = $item['link_target'];
                     } elseif ( isset( $settings['external_link_target'] ) ) {
                         $target = $settings['external_link_target'];
                     }
                     
                     $rel_attr = $target === '_blank' ? ' rel="noopener noreferrer"' : '';
-                    $output .= '<a href="' . esc_url( $image['external_url'] ) . '" target="' . esc_attr( $target ) . '"' . $rel_attr . ' class="fotogrids-external-link">';
+                    $output .= '<a href="' . esc_url( $item['external_url'] ) . '" target="' . esc_attr( $target ) . '"' . $rel_attr . ' class="fotogrids-external-link">';
                     $output .= $img_html;
                     $output .= '</a>';
                 } else {
@@ -504,15 +508,15 @@ class Public_Render {
                 
             case 'lightbox':
             default:
-                $output .= '<a href="' . esc_url( $image['full'] ) . '" class="fotogrids-lightbox-trigger" data-fotogrids-lightbox>';
+                $output .= '<a href="' . esc_url( $item['full'] ) . '" class="fotogrids-lightbox-trigger" data-fotogrids-lightbox>';
                 $output .= $img_html;
                 $output .= '</a>';
                 break;
         }
         
         // Caption
-        if ( $atts['captions'] === 'true' && ! empty( $image['caption'] ) ) {
-            $output .= '<figcaption class="fotogrids-caption">' . esc_html( $image['caption'] ) . '</figcaption>';
+        if ( $atts['captions'] === 'true' && ! empty( $item['caption'] ) ) {
+            $output .= '<figcaption class="fotogrids-caption">' . esc_html( $item['caption'] ) . '</figcaption>';
         }
         
         $output .= '</figure>';
@@ -528,7 +532,7 @@ class Public_Render {
         
         foreach ( $galleries as $gallery ) {
             $thumbnail = get_the_post_thumbnail_url( $gallery->ID, 'medium' );
-            $image_count = fotogrids_get_gallery_image_count( $gallery->ID );
+            $item_count = fotogrids_get_gallery_item_count( $gallery->ID );
             
             $output .= '<div class="fotogrids-album-item">';
             
@@ -546,7 +550,7 @@ class Public_Render {
             }
             
             $output .= '<div class="album-meta">';
-            $output .= sprintf( _n( '%d image', '%d images', $image_count, 'fotogrids' ), $image_count );
+            $output .= sprintf( _n( '%d item', '%d items', $item_count, 'fotogrids' ), $item_count );
             $output .= '</div>';
             
             // Embed gallery shortcode
@@ -595,7 +599,7 @@ class Public_Render {
      * @param array $settings Gallery settings
      */
     private static function enqueue_lightbox_assets( $settings ) {
-        $click_behavior = $settings['image_click_behavior'] ?? 'lightbox';
+        $click_behavior = $settings['item_click_behavior'] ?? 'lightbox';
         
         // Only enqueue lightbox assets if this gallery uses lightbox
         if ( $click_behavior === 'lightbox' ) {
@@ -645,33 +649,33 @@ class Public_Render {
     }
     
     /**
-     * Render test gallery with placeholder images
+     * Render test gallery with placeholder items
      */
     private static function render_test_gallery( $atts ) {
         $columns = $atts['cols'] ? absint( $atts['cols'] ) : 3;
         
-        // Create test images
-        $test_images = array(
+        // Create test items
+        $test_items = array(
             array(
                 'id' => 1,
-                'title' => 'Test Image 1',
-                'alt' => 'Test image 1',
+                'title' => 'Test Item 1',
+                'alt' => 'Test item 1',
                 'caption' => 'This is a test caption',
                 'medium' => 'https://picsum.photos/400/400?random=1',
                 'full' => 'https://picsum.photos/800/800?random=1',
             ),
             array(
                 'id' => 2,
-                'title' => 'Test Image 2',
-                'alt' => 'Test image 2',
+                'title' => 'Test Item 2',
+                'alt' => 'Test item 2',
                 'caption' => 'Another test caption',
                 'medium' => 'https://picsum.photos/400/400?random=2',
                 'full' => 'https://picsum.photos/800/800?random=2',
             ),
             array(
                 'id' => 3,
-                'title' => 'Test Image 3',
-                'alt' => 'Test image 3',
+                'title' => 'Test Item 3',
+                'alt' => 'Test item 3',
                 'caption' => 'Third test caption',
                 'medium' => 'https://picsum.photos/400/400?random=3',
                 'full' => 'https://picsum.photos/800/800?random=3',
@@ -684,11 +688,11 @@ class Public_Render {
         // Get default settings for test gallery
         $test_settings = fotogrids_get_default_gallery_settings();
         $test_responsive_columns = array( 'desktop' => $columns, 'tablet' => $columns, 'mobile' => $columns );
-        $test_responsive_spacing = $test_settings['image_spacing'];
+        $test_responsive_spacing = $test_settings['item_spacing'];
         
         // Enqueue lightbox assets for test gallery
         self::enqueue_lightbox_assets( $test_settings );
         
-        return self::render_gallery( 0, $test_images, 'grid', $test_responsive_columns, $test_responsive_spacing, $test_settings, $atts );
+        return self::render_gallery( 0, $test_items, 'grid', $test_responsive_columns, $test_responsive_spacing, $test_settings, $atts );
     }
 }

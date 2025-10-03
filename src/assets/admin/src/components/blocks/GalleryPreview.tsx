@@ -19,8 +19,8 @@ import { GalleryBlockAttributes } from '../blocks/gallery-block';
 interface Gallery {
     id: number;
     title: string;
-    image_count: number;
-    featured_image?: string;
+    item_count: number;
+    featured_item?: string;
 }
 
 interface Template {
@@ -31,7 +31,7 @@ interface Template {
     preview: string;
 }
 
-interface Image {
+interface Item {
     id: number;
     url: string;
     thumbnail: string;
@@ -56,30 +56,30 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
     attributes,
     isSelected,
 }) => {
-    const [images, setImages] = useState<Image[]>([]);
+    const [items, setItems] = useState<Item[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Load gallery images
+    // Load gallery items
     useEffect(() => {
         if (gallery) {
-            loadGalleryImages();
+            loadGalleryItems();
         }
     }, [gallery?.id]);
 
-    const loadGalleryImages = async () => {
+    const loadGalleryItems = async () => {
         if (!gallery) return;
 
         try {
             setIsLoading(true);
             setError(null);
             const response = await apiFetch({
-                path: `/fotogrids/v1/galleries/${gallery.id}/images`,
-            }) as Image[];
-            setImages(response.slice(0, 12)); // Limit preview to 12 images
+                path: `/fotogrids/v1/galleries/${gallery.id}/items`,
+            }) as Item[];
+            setItems(response.slice(0, 12)); // Limit preview to 12 items
         } catch (err) {
-            setError(__('Failed to load gallery images.', 'fotogrids'));
-            console.error('Failed to load gallery images:', err);
+            setError(__('Failed to load gallery items.', 'fotogrids'));
+            console.error('Failed to load gallery items:', err);
         } finally {
             setIsLoading(false);
         }
@@ -102,20 +102,20 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
         return (
             <Notice status="error" isDismissible={false}>
                 {error}
-                <Button isSecondary onClick={loadGalleryImages}>
+                <Button isSecondary onClick={loadGalleryItems}>
                     {__('Retry', 'fotogrids')}
                 </Button>
             </Notice>
         );
     }
 
-    // No images state
-    if (!gallery || images.length === 0) {
+    // No items state
+    if (!gallery || items.length === 0) {
         return (
             <Placeholder
                 icon={gallery}
                 label={gallery?.title || __('Gallery Preview', 'fotogrids')}
-                instructions={__('This gallery has no images yet.', 'fotogrids')}
+                instructions={__('This gallery has no items yet.', 'fotogrids')}
             >
                 <Button
                     isPrimary
@@ -123,7 +123,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                         window.open(`/wp-admin/admin.php?page=fotogrids&action=edit&id=${gallery?.id}`, '_blank');
                     }}
                 >
-                    {__('Add Images', 'fotogrids')}
+                    {__('Add Items', 'fotogrids')}
                 </Button>
             </Placeholder>
         );
@@ -160,7 +160,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                 gap: '8px',
             }}
         >
-            {images.map(renderImageItem)}
+            {items.map(renderItemItem)}
         </div>
     );
 
@@ -172,7 +172,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                 columnGap: '8px',
             }}
         >
-            {images.map(renderImageItem)}
+            {items.map(renderItemItem)}
         </div>
     );
 
@@ -185,24 +185,24 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                 gap: '8px',
             }}
         >
-            {images.map((image, index) => (
+            {items.map((item, index) => (
                 <div
-                    key={image.id}
+                    key={item.id}
                     style={{
                         flexGrow: 1,
                         height: '120px',
                         minWidth: '80px',
                     }}
                 >
-                    {renderImageItem(image, index)}
+                    {renderItemItem(item, index)}
                 </div>
             ))}
         </div>
     );
 
-    const renderImageItem = (image: Image, index?: number) => (
+    const renderItemItem = (item: Item, index?: number) => (
         <div
-            key={image.id}
+            key={item.id}
             className="fotogrids-preview-item"
             style={{
                 position: 'relative',
@@ -214,8 +214,8 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
             }}
         >
             <img
-                src={image.medium || image.thumbnail}
-                alt={image.alt || image.title}
+                src={item.medium || item.thumbnail}
+                alt={item.alt || item.title}
                 style={{
                     width: '100%',
                     height: attributes.template === 'grid' ? '100%' : 'auto',
@@ -224,7 +224,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                 }}
                 loading="lazy"
             />
-            {attributes.showCaptions && image.caption && (
+            {attributes.showCaptions && item.caption && (
                 <div
                     className="fotogrids-preview-caption"
                     style={{
@@ -240,7 +240,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                         opacity: 0.8,
                     }}
                 >
-                    {image.caption}
+                    {item.caption}
                 </div>
             )}
         </div>
@@ -264,9 +264,9 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                     </span>
                 )}
                 <span style={{ marginLeft: '8px' }}>
-                    • {images.length} {__('images', 'fotogrids')}
-                    {gallery.image_count > images.length && (
-                        <span> ({__('showing first', 'fotogrids')} {images.length})</span>
+                    • {items.length} {__('items', 'fotogrids')}
+                    {gallery.item_count > items.length && (
+                        <span> ({__('showing first', 'fotogrids')} {items.length})</span>
                     )}
                 </span>
             </div>

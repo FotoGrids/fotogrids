@@ -36,6 +36,13 @@ class Admin_Init {
         // Initialize meta boxes
         require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-meta-boxes.php';
         Meta_Boxes::init();
+        
+        // Initialize upgrade modal integration (for non-Pro users)
+        if ( ! defined( 'FOTOGRIDS_PRO_VERSION' ) ) {
+            require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-upgrade-modal-integration.php';
+            require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-upgrade-modal.php';
+            \FotoGrids_Upgrade_Modal_Integration::init();
+        }
     }
     
     /**
@@ -236,7 +243,7 @@ class Admin_Init {
      */
     private static function render_admin_page( $page_id ) {
         // Get the SVG icon content
-        $icon_path = FOTOGRIDS_PLUGIN_DIR . 'assets/admin/images/fotogrids-icon-color.svg';
+        $icon_path = FOTOGRIDS_PLUGIN_DIR . 'assets/admin/items/fotogrids-icon-color.svg';
         $icon_svg = '';
         if ( file_exists( $icon_path ) ) {
             $icon_svg = file_get_contents( $icon_path );
@@ -332,7 +339,7 @@ class Admin_Init {
     private static function get_menu_icon() {
         // Custom SVG icon as base64 data URI
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.53 59.53" fill="currentColor"><rect x="1.42" y="1.42" width="56.69" height="14.17"/><rect x="1.42" y="22.68" width="35.43" height="14.17"/><rect x="1.42" y="43.94" width="14.17" height="14.17"/><rect x="22.68" y="43.94" width="14.17" height="14.17"/><rect x="43.94" y="22.68" width="14.17" height="35.43"/></svg>';
-        return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+        return 'data:item/svg+xml;base64,' . base64_encode( $svg );
     }
     
     /**

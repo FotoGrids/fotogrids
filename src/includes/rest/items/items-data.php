@@ -1,30 +1,30 @@
 <?php
-namespace FotoGrids\REST\Images;
+namespace FotoGrids\REST\Items;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
 /**
- * Images Data Handler
+ * Items Data Handler
  *
- * Handles image data for REST API endpoints.
+ * Handles item data for REST API endpoints.
  *
  * @since 1.0.0
  */
-class Images_Data {
+class Items_Data {
     
     /**
-     * Query images with filters
+     * Query items with filters
      *
-     * Searches for images based on various criteria including gallery, tags,
+     * Searches for items based on various criteria including gallery, tags,
      * people, and locations. Supports pagination with limit and offset parameters.
      *
      * @since 1.0.0
      * @param \WP_REST_Request $request The REST API request object containing filter parameters
-     * @return \WP_REST_Response Array of filtered images with metadata
+     * @return \WP_REST_Response Array of filtered items with metadata
      */
-    public static function query_images( $request ) {
+    public static function query_items( $request ) {
         global $wpdb;
         
         $gallery_id = $request->get_param( 'gallery' );
@@ -34,7 +34,7 @@ class Images_Data {
         $limit = (int) $request->get_param( 'limit' );
         $offset = (int) $request->get_param( 'offset' );
         
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         $where_conditions = array();
         $query_params = array();
         
@@ -54,13 +54,13 @@ class Images_Data {
         
         $results = $wpdb->get_results( $wpdb->prepare( $sql, $query_params ), ARRAY_A );
         
-        $images = array();
+        $items = array();
         foreach ( $results as $row ) {
             $attachment_id = (int) $row['attachment_id'];
             $attachment = get_post( $attachment_id );
             
             if ( $attachment ) {
-                $images[] = array(
+                $items[] = array(
                     'id' => $attachment_id,
                     'gallery_id' => (int) $row['gallery_id'],
                     'position' => (int) $row['position'],
@@ -69,14 +69,14 @@ class Images_Data {
                     'location' => $row['location'],
                     'url' => wp_get_attachment_url( $attachment_id ),
                     'sizes' => wp_get_attachment_image_sizes( $attachment_id ),
-                    'alt' => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+                    'alt' => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                 );
             }
         }
         
         return rest_ensure_response( array(
-            'images' => $images,
-            'total' => count( $images ),
+            'items' => $items,
+            'total' => count( $items ),
             'limit' => $limit,
             'offset' => $offset,
         ) );

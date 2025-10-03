@@ -79,9 +79,9 @@ const FotoGridsAdmin = () => {
                     React.createElement('div', { key: 'number', className: 'stat-number' }, '0'),
                     React.createElement('div', { key: 'label', className: 'stat-label' }, __('Albums', 'fotogrids'))
                 ]),
-                React.createElement('div', { key: 'images', className: 'fotogrids-stat-card' }, [
+                React.createElement('div', { key: 'items', className: 'fotogrids-stat-card' }, [
                     React.createElement('div', { key: 'number', className: 'stat-number' }, '0'),
-                    React.createElement('div', { key: 'label', className: 'stat-label' }, __('Images', 'fotogrids'))
+                    React.createElement('div', { key: 'label', className: 'stat-label' }, __('Items', 'fotogrids'))
                 ]),
                 React.createElement('div', { key: 'views', className: 'fotogrids-stat-card' }, [
                     React.createElement('div', { key: 'number', className: 'stat-number' }, '0'),
@@ -104,8 +104,8 @@ const FotoGridsAdmin = () => {
                 React.createElement('div', { key: 'step2', className: 'fotogrids-step' }, [
                     React.createElement('div', { key: 'number', className: 'step-number' }, '2'),
                     React.createElement('div', { key: 'content', className: 'step-content' }, [
-                        React.createElement('h3', { key: 'title' }, __('Add Images & Configure', 'fotogrids')),
-                        React.createElement('p', { key: 'desc' }, __('Upload images, set titles and descriptions, choose templates and layout options.', 'fotogrids'))
+                        React.createElement('h3', { key: 'title' }, __('Add Items & Configure', 'fotogrids')),
+                        React.createElement('p', { key: 'desc' }, __('Upload items, set titles and descriptions, choose templates and layout options.', 'fotogrids'))
                     ])
                 ]),
                 React.createElement('div', { key: 'step3', className: 'fotogrids-step' }, [
@@ -205,7 +205,7 @@ const TemplatesPage = () => {
         React.createElement('div', { key: 'templates', className: 'fotogrids-template-grid' }, [
             React.createElement('div', { key: 'grid', className: 'template-card' }, [
                 React.createElement('h3', { key: 'title' }, __('Grid Layout', 'fotogrids')),
-                React.createElement('p', { key: 'desc' }, __('Classic grid layout with equal-sized images', 'fotogrids')),
+                React.createElement('p', { key: 'desc' }, __('Classic grid layout with equal-sized items', 'fotogrids')),
                 React.createElement('button', { key: 'btn', className: 'button button-primary' }, __('Use Template', 'fotogrids'))
             ]),
             React.createElement('div', { key: 'masonry', className: 'template-card' }, [
@@ -279,18 +279,18 @@ const SettingsPage = () => {
                                 React.createElement('p', { key: 'desc', className: 'description' }, __('Default number of columns for grid layouts', 'fotogrids'))
                             ])
                         ]),
-                        React.createElement('tr', { key: 'image-sizes' }, [
+                        React.createElement('tr', { key: 'item-sizes' }, [
                             React.createElement('th', { key: 'th' }, [
-                                React.createElement('label', { key: 'label', htmlFor: 'fotogrids-image-size' }, __('Image Size', 'fotogrids'))
+                                React.createElement('label', { key: 'label', htmlFor: 'fotogrids-item-size' }, __('Item Size', 'fotogrids'))
                             ]),
                             React.createElement('td', { key: 'td' }, [
-                                React.createElement('select', { key: 'select', id: 'fotogrids-image-size', name: 'image_size' }, [
+                                React.createElement('select', { key: 'select', id: 'fotogrids-item-size', name: 'item_size' }, [
                                     React.createElement('option', { key: 'thumbnail', value: 'thumbnail' }, __('Thumbnail (150x150)', 'fotogrids')),
                                     React.createElement('option', { key: 'medium', value: 'medium' }, __('Medium (300x300)', 'fotogrids')),
                                     React.createElement('option', { key: 'large', value: 'large' }, __('Large (1024x1024)', 'fotogrids')),
                                     React.createElement('option', { key: 'full', value: 'full' }, __('Full Size', 'fotogrids'))
                                 ]),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Default image size for gallery thumbnails', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Default item size for gallery thumbnails', 'fotogrids'))
                             ])
                         ])
                     ])
@@ -307,7 +307,7 @@ const SettingsPage = () => {
                                     React.createElement('input', { key: 'input', type: 'checkbox', name: 'enable_lightbox', defaultChecked: true }),
                                     ' ' + __('Enable lightbox by default', 'fotogrids')
                                 ]),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Show images in overlay when clicked', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Show items in overlay when clicked', 'fotogrids'))
                             ])
                         ]),
                         React.createElement('tr', { key: 'captions' }, [
@@ -317,7 +317,7 @@ const SettingsPage = () => {
                                     React.createElement('input', { key: 'input', type: 'checkbox', name: 'show_captions', defaultChecked: true }),
                                     ' ' + __('Show captions by default', 'fotogrids')
                                 ]),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Display image captions below thumbnails', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Display item captions below thumbnails', 'fotogrids'))
                             ])
                         ]),
                         React.createElement('tr', { key: 'hover-effects' }, [
@@ -329,7 +329,7 @@ const SettingsPage = () => {
                                     React.createElement('option', { key: 'fade', value: 'fade' }, __('Fade', 'fotogrids')),
                                     React.createElement('option', { key: 'slide', value: 'slide' }, __('Slide', 'fotogrids'))
                                 ]),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Effect when hovering over images', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Effect when hovering over items', 'fotogrids'))
                             ])
                         ])
                     ])
@@ -346,26 +346,26 @@ const SettingsPage = () => {
                                     React.createElement('input', { key: 'input', type: 'checkbox', name: 'enable_lazy_loading', defaultChecked: true }),
                                     ' ' + __('Enable lazy loading by default', 'fotogrids')
                                 ]),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Load images only when they come into view', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Load items only when they come into view', 'fotogrids'))
                             ])
                         ]),
                         React.createElement('tr', { key: 'preload' }, [
                             React.createElement('th', { key: 'th' }, [
-                                React.createElement('label', { key: 'label', htmlFor: 'fotogrids-preload-count' }, __('Preload Images', 'fotogrids'))
+                                React.createElement('label', { key: 'label', htmlFor: 'fotogrids-preload-count' }, __('Preload Items', 'fotogrids'))
                             ]),
                             React.createElement('td', { key: 'td' }, [
                                 React.createElement('input', { key: 'input', type: 'number', id: 'fotogrids-preload-count', name: 'preload_count', min: 0, max: 10, defaultValue: 3 }),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Number of images to preload ahead of viewport', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Number of items to preload ahead of viewport', 'fotogrids'))
                             ])
                         ]),
                         React.createElement('tr', { key: 'cache' }, [
-                            React.createElement('th', { key: 'th' }, __('Image Cache', 'fotogrids')),
+                            React.createElement('th', { key: 'th' }, __('Item Cache', 'fotogrids')),
                             React.createElement('td', { key: 'td' }, [
                                 React.createElement('label', { key: 'label' }, [
                                     React.createElement('input', { key: 'input', type: 'checkbox', name: 'enable_cache', defaultChecked: true }),
-                                    ' ' + __('Enable image caching', 'fotogrids')
+                                    ' ' + __('Enable item caching', 'fotogrids')
                                 ]),
-                                React.createElement('p', { key: 'desc', className: 'description' }, __('Cache resized images for better performance', 'fotogrids'))
+                                React.createElement('p', { key: 'desc', className: 'description' }, __('Cache resized items for better performance', 'fotogrids'))
                             ])
                         ])
                     ])
@@ -506,7 +506,7 @@ const GalleriesPage = () => {
             // Fallback to mock data for now
             setTimeout(() => {
                 setGalleries([
-                    { id: 1, title: 'Sample Gallery', images: 0, layout: 'grid', status: 'draft', created: new Date().toISOString(), views: 0 }
+                    { id: 1, title: 'Sample Gallery', items: 0, layout: 'grid', status: 'draft', created: new Date().toISOString(), views: 0 }
                 ]);
                 setLoading(false);
             }, 500);
@@ -616,7 +616,7 @@ const GalleriesPage = () => {
                         key: 'add-btn', 
                         className: 'button button-primary',
                         onClick: () => {
-                            setEditingGallery({ id: null, title: '', images: [], layout: 'grid', status: 'draft' });
+                            setEditingGallery({ id: null, title: '', items: [], layout: 'grid', status: 'draft' });
                             setCurrentView('edit');
                         }
                     }, __('Add New Gallery', 'fotogrids'))
@@ -645,7 +645,7 @@ const GalleriesPage = () => {
                             React.createElement('div', { key: 'info', className: 'gallery-info' }, [
                                 React.createElement('h3', { key: 'title', className: 'gallery-title' }, gallery.title),
                                 React.createElement('div', { key: 'meta', className: 'gallery-meta' }, [
-                                    React.createElement('span', { key: 'images' }, `${gallery.images} ${__('images', 'fotogrids')}`),
+                                    React.createElement('span', { key: 'items' }, `${gallery.items} ${__('items', 'fotogrids')}`),
                                     React.createElement('span', { key: 'layout' }, gallery.layout),
                                     React.createElement('span', { key: 'views' }, `${gallery.views} ${__('views', 'fotogrids')}`)
                                 ]),
@@ -723,11 +723,11 @@ const GalleriesPage = () => {
                         ])
                     ])
                 ]),
-                React.createElement('div', { key: 'images', className: 'fotogrids-images-section' }, [
-                    React.createElement('h3', { key: 'title' }, __('Gallery Images', 'fotogrids')),
-                    React.createElement('div', { key: 'placeholder', className: 'images-placeholder' }, [
-                        React.createElement('p', { key: 'text' }, __('Image management will be integrated here', 'fotogrids')),
-                        React.createElement('button', { key: 'btn', className: 'button button-secondary' }, __('Add Images', 'fotogrids'))
+                React.createElement('div', { key: 'items', className: 'fotogrids-items-section' }, [
+                    React.createElement('h3', { key: 'title' }, __('Gallery Items', 'fotogrids')),
+                    React.createElement('div', { key: 'placeholder', className: 'items-placeholder' }, [
+                        React.createElement('p', { key: 'text' }, __('Item management will be integrated here', 'fotogrids')),
+                        React.createElement('button', { key: 'btn', className: 'button button-secondary' }, __('Add Items', 'fotogrids'))
                     ])
                 ])
             ])

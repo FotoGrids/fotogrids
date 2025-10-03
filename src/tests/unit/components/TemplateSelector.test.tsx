@@ -73,7 +73,7 @@ describe('TemplateSelector Component', () => {
             createMockTemplate({
                 id: 'slider',
                 name: 'Slider',
-                description: 'Image slider',
+                description: 'Item slider',
                 type: 'starter',
                 preview: 'https://example.com/slider-preview.jpg'
             })
@@ -99,20 +99,20 @@ describe('TemplateSelector Component', () => {
 
             expect(screen.getByText('Simple grid layout')).toBeInTheDocument();
             expect(screen.getByText('Pinterest-style layout')).toBeInTheDocument();
-            expect(screen.getByText('Image slider')).toBeInTheDocument();
+            expect(screen.getByText('Item slider')).toBeInTheDocument();
         });
 
-        test('renders preview images', () => {
+        test('renders preview items', () => {
             render(<TemplateSelector {...defaultProps} templates={mockTemplates} />);
 
-            const images = screen.getAllByRole('img');
-            expect(images).toHaveLength(3);
+            const items = screen.getAllByRole('img');
+            expect(items).toHaveLength(3);
             
-            expect(images[0]).toHaveAttribute('src', 'https://example.com/grid-preview.jpg');
-            expect(images[0]).toHaveAttribute('alt', 'Grid');
+            expect(items[0]).toHaveAttribute('src', 'https://example.com/grid-preview.jpg');
+            expect(items[0]).toHaveAttribute('alt', 'Grid');
             
-            expect(images[1]).toHaveAttribute('src', 'https://example.com/masonry-preview.jpg');
-            expect(images[1]).toHaveAttribute('alt', 'Masonry');
+            expect(items[1]).toHaveAttribute('src', 'https://example.com/masonry-preview.jpg');
+            expect(items[1]).toHaveAttribute('alt', 'Masonry');
         });
     });
 
@@ -200,7 +200,7 @@ describe('TemplateSelector Component', () => {
         });
     });
 
-    describe('Image Error Handling', () => {
+    describe('Item Error Handling', () => {
         const mockTemplates = [
             createMockTemplate({
                 id: 'grid',
@@ -209,16 +209,16 @@ describe('TemplateSelector Component', () => {
             })
         ];
 
-        test('handles image load errors gracefully', () => {
+        test('handles item load errors gracefully', () => {
             render(<TemplateSelector {...defaultProps} templates={mockTemplates} />);
 
-            const image = screen.getByRole('img');
+            const item = screen.getByRole('img');
             
-            // Simulate image error
-            fireEvent.error(image);
+            // Simulate item error
+            fireEvent.error(item);
 
-            // The image should still be in the document
-            expect(image).toBeInTheDocument();
+            // The item should still be in the document
+            expect(item).toBeInTheDocument();
         });
     });
 
@@ -266,11 +266,11 @@ describe('TemplateSelector Component', () => {
             expect(templateCard).toHaveStyle({ cursor: 'pointer' });
         });
 
-        test('images have proper alt text', () => {
+        test('items have proper alt text', () => {
             render(<TemplateSelector {...defaultProps} templates={mockTemplates} />);
 
-            const image = screen.getByRole('img');
-            expect(image).toHaveAttribute('alt', 'Grid');
+            const item = screen.getByRole('img');
+            expect(item).toHaveAttribute('alt', 'Grid');
         });
 
         test('template cards have proper structure', () => {

@@ -1,6 +1,3 @@
-// FotoGrids Frontend JavaScript
-// Vanilla ES6+ implementation (no jQuery)
-
 class FotoGrids {
     constructor() {
         this.galleries = [];
@@ -11,7 +8,6 @@ class FotoGrids {
     }
     
     init() {
-        // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initializeGalleries());
         } else {
@@ -20,7 +16,6 @@ class FotoGrids {
     }
     
     initializeGalleries() {
-        // Find all gallery containers
         const galleryElements = document.querySelectorAll('.fotogrids-gallery');
         
         galleryElements.forEach(element => {
@@ -28,14 +23,17 @@ class FotoGrids {
             this.galleries.push(gallery);
         });
         
-        // Initialize lightbox if enabled
         if (this.settings.lightbox) {
             this.initializeLightbox();
         }
         
-        // Initialize lazy loading if enabled
         if (this.settings.lazy_load) {
             this.initializeLazyLoading();
+        } else {
+            const lazyContainers = document.querySelectorAll('.fotogrids-lazy');
+            if (lazyContainers.length > 0) {
+                this.initializeLazyLoading();
+            }
         }
     }
     
@@ -46,22 +44,49 @@ class FotoGrids {
     }
     
     initializeLazyLoading() {
-        // Use Intersection Observer for lazy loading
+        const lazyImages = document.querySelectorAll('.fotogrids-lazy img[loading="lazy"]');
+        
         if ('IntersectionObserver' in window) {
-            const lazyImages = document.querySelectorAll('.fotogrids-lazy img[data-src]');
-            
-            const imageObserver = new IntersectionObserver((entries, observer) => {
+            const itemObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
-                        img.src = img.dataset.src;
-                        img.removeAttribute('data-src');
+                        
+                        img.addEventListener('load', () => {
+                            img.classList.add('fotogrids-lazy-loaded');
+                        });
+                        
+                        if (img.complete) {
+                            img.classList.add('fotogrids-lazy-loaded');
+                        }
+                        
                         observer.unobserve(img);
                     }
                 });
             });
             
-            lazyImages.forEach(img => imageObserver.observe(img));
+            lazyImages.forEach(img => itemObserver.observe(img));
+        } else {
+            lazyImages.forEach(img => {
+                img.classList.add('fotogrids-lazy-loaded');
+            });
+        }
+        
+        const dataSrcImages = document.querySelectorAll('.fotogrids-lazy img[data-src]');
+        if (dataSrcImages.length > 0) {
+            const dataSrcObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        img.classList.add('fotogrids-lazy-loaded');
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            
+            dataSrcImages.forEach(img => dataSrcObserver.observe(img));
         }
     }
 }
@@ -71,22 +96,18 @@ class FotoGridsGallery {
         this.element = element;
         this.settings = settings;
         this.galleryId = element.dataset.galleryId;
-        this.images = [];
+        this.items = [];
         
         this.init();
     }
     
     init() {
-        // Get all images in this gallery
-        this.images = Array.from(this.element.querySelectorAll('.fotogrids-item img'));
+        this.items = Array.from(this.element.querySelectorAll('.fotogrids-item img'));
         
-        // Track gallery view
         this.trackView();
         
-        // Initialize filters if present
         this.initializeFilters();
         
-        // Initialize masonry layout if needed
         if (this.element.classList.contains('fotogrids-layout-masonry')) {
             this.initializeMasonry();
         }
@@ -97,7 +118,6 @@ class FotoGridsGallery {
             return;
         }
         
-        // Track gallery view
         fetch(`${this.settings.restUrl}stats/view`, {
             method: 'POST',
             headers: {
@@ -124,16 +144,15 @@ class FotoGridsGallery {
         filterButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.filterImages(button.dataset.filter);
+                this.filterItems(button.dataset.filter);
                 
-                // Update active state
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
             });
         });
     }
     
-    filterImages(filter) {
+    filterItems(filter) {
         const items = this.element.querySelectorAll('.fotogrids-item');
         
         items.forEach(item => {
@@ -146,17 +165,15 @@ class FotoGridsGallery {
     }
     
     initializeMasonry() {
-        // Simple masonry layout
         const items = this.element.querySelectorAll('.fotogrids-item');
         const columns = parseInt(this.element.dataset.columns) || 3;
         
-        // Wait for images to load
         const images = this.element.querySelectorAll('img');
-        let loadedImages = 0;
+        let loadedItems = 0;
         
         const checkAllLoaded = () => {
-            loadedImages++;
-            if (loadedImages === images.length) {
+            loadedItems++;
+            if (loadedItems === images.length) {
                 this.layoutMasonry(items, columns);
             }
         };
@@ -173,7 +190,7 @@ class FotoGridsGallery {
     
     layoutMasonry(items, columns) {
         const columnHeights = new Array(columns).fill(0);
-        const gap = 20; // Gap between items
+        const gap = 20;
         
         items.forEach((item, index) => {
             const shortestColumn = columnHeights.indexOf(Math.min(...columnHeights));
@@ -188,17 +205,12 @@ class FotoGridsGallery {
             columnHeights[shortestColumn] += item.offsetHeight + gap;
         });
         
-        // Set container height
         this.element.style.height = Math.max(...columnHeights) + 'px';
     }
 }
 
-// FotoGridsLightbox class is now in a separate lightbox.js file for better performance
-// This placeholder is kept for backward compatibility
-
-// Social sharing functionality
 class FotoGridsSharing {
-    static trackShare(imageId, network) {
+    static trackShare(itemId, network) {
         const settings = window.fotogrids || {};
         if (!settings.stats_tracking) {
             return;
@@ -211,8 +223,8 @@ class FotoGridsSharing {
                 'X-WP-Nonce': settings.nonce,
             },
             body: JSON.stringify({
-                object_type: 'image',
-                object_id: parseInt(imageId),
+                object_type: 'item',
+                object_id: parseInt(itemId),
                 network: network,
             }),
         }).catch(error => {
@@ -220,8 +232,8 @@ class FotoGridsSharing {
         });
     }
     
-    static shareImage(img, network) {
-        const imageUrl = img.dataset.full || img.src;
+    static shareItem(img, network) {
+        const itemUrl = img.dataset.full || img.src;
         const caption = img.alt || '';
         const pageUrl = window.location.href;
         
@@ -235,15 +247,13 @@ class FotoGridsSharing {
                 shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(caption)}`;
                 break;
             case 'pinterest':
-                shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(pageUrl)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(caption)}`;
+                shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(pageUrl)}&media=${encodeURIComponent(itemUrl)}&description=${encodeURIComponent(caption)}`;
                 break;
             case 'email':
                 shareUrl = `mailto:?subject=${encodeURIComponent(caption)}&body=${encodeURIComponent(pageUrl)}`;
                 break;
             case 'copy':
-                navigator.clipboard.writeText(imageUrl).then(() => {
-                    // Show success message
-                    console.log('Image URL copied to clipboard');
+                navigator.clipboard.writeText(itemUrl).then(() => {
                 });
                 this.trackShare(img.dataset.id, network);
                 return;
@@ -256,5 +266,4 @@ class FotoGridsSharing {
     }
 }
 
-// Initialize FotoGrids when script loads
 new FotoGrids();

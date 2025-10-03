@@ -8,7 +8,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Metadata Manager Class
  * 
- * Handles reusable metadata (tags, people, locations) for images
+ * Handles reusable metadata (tags, people, locations) for items
  */
 class Metadata_Manager {
    
@@ -258,9 +258,9 @@ class Metadata_Manager {
     }
     
     /**
-     * Add tag to image
+     * Add tag to item
      */
-    public static function add_tag_to_image( $attachment_id, $tag_name ) {
+    public static function add_tag_to_item( $attachment_id, $tag_name ) {
         $tag = self::add_or_get_tag( $tag_name );
         if ( ! $tag ) {
             return false;
@@ -275,9 +275,9 @@ class Metadata_Manager {
     }
     
     /**
-     * Add person to image
+     * Add person to item
      */
-    public static function add_person_to_image( $attachment_id, $person_name, $details = '' ) {
+    public static function add_person_to_item( $attachment_id, $person_name, $details = '' ) {
         $person = self::add_or_get_person( $person_name, $details );
         if ( ! $person ) {
             return false;
@@ -292,9 +292,9 @@ class Metadata_Manager {
     }
     
     /**
-     * Add location to image
+     * Add location to item
      */
-    public static function add_location_to_image( $attachment_id, $location_name, $latitude = null, $longitude = null ) {
+    public static function add_location_to_item( $attachment_id, $location_name, $latitude = null, $longitude = null ) {
         $location = self::add_or_get_location( $location_name, $latitude, $longitude );
         if ( ! $location ) {
             return false;
@@ -314,7 +314,7 @@ class Metadata_Manager {
     private static function add_metadata_relationship( $attachment_id, $type, $metadata_id ) {
         global $wpdb;
         
-        $table = $wpdb->prefix . 'fotogrids_image_metadata';
+        $table = $wpdb->prefix . 'fotogrids_item_metadata';
         
         $existing = $wpdb->get_var( $wpdb->prepare(
             "SELECT id FROM {$table} WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d",
@@ -340,12 +340,12 @@ class Metadata_Manager {
     }
     
     /**
-     * Remove metadata from image
+     * Remove metadata from item
      */
-    public static function remove_metadata_from_image( $attachment_id, $type, $metadata_id ) {
+    public static function remove_metadata_from_item( $attachment_id, $type, $metadata_id ) {
         global $wpdb;
         
-        $table = $wpdb->prefix . 'fotogrids_image_metadata';
+        $table = $wpdb->prefix . 'fotogrids_item_metadata';
         
         $result = $wpdb->delete(
             $table,
@@ -365,12 +365,12 @@ class Metadata_Manager {
     }
     
     /**
-     * Get all metadata for an image
+     * Get all metadata for an item
      */
-    public static function get_image_metadata( $attachment_id ) {
+    public static function get_item_metadata( $attachment_id ) {
         global $wpdb;
         
-        $metadata_table = $wpdb->prefix . 'fotogrids_image_metadata';
+        $metadata_table = $wpdb->prefix . 'fotogrids_item_metadata';
         $tags_table = $wpdb->prefix . 'fotogrids_tags';
         $people_table = $wpdb->prefix . 'fotogrids_people';
         $locations_table = $wpdb->prefix . 'fotogrids_locations';
@@ -421,12 +421,12 @@ class Metadata_Manager {
     }
     
     /**
-     * Clear all metadata for an image
+     * Clear all metadata for an item
      */
-    public static function clear_image_metadata( $attachment_id ) {
+    public static function clear_item_metadata( $attachment_id ) {
         global $wpdb;
         
-        $table = $wpdb->prefix . 'fotogrids_image_metadata';
+        $table = $wpdb->prefix . 'fotogrids_item_metadata';
         
         $metadata = $wpdb->get_results( $wpdb->prepare(
             "SELECT metadata_type, metadata_id FROM {$table} WHERE attachment_id = %d",

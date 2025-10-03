@@ -1,0 +1,335 @@
+/**
+ * FotoGrids Upgrade Modal Styles
+ */
+
+.fotogrids-upgrade-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .fotogrids-upgrade-modal {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        max-width: 900px;
+        width: 100%;
+        max-height: 90vh;
+        overflow: hidden;
+        position: relative;
+        
+        &__close {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            &:hover {
+                background: rgba(255, 255, 255, 1);
+                transform: scale(1.1);
+            }
+        }
+
+        &__content {
+            display: flex;
+            min-height: 500px;
+        }
+
+        &__image {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background-color: var(--next-bg-color, transparent);
+                transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1;
+                opacity: 0;
+            }
+            
+            &.transitioning:not(.slide-from-right)::before {
+                left: 0;
+                opacity: 1;
+            }
+            
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 100%;
+                width: 100%;
+                height: 100%;
+                background-color: var(--next-bg-color, transparent);
+                transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1;
+                opacity: 0;
+            }
+            
+            &.slide-from-right.transitioning::after {
+                left: 0;
+                opacity: 1;
+            }
+            
+            img {
+                max-width: 80%;
+                max-height: 80%;
+                width: auto;
+                height: auto;
+                max-height: 300px;
+                object-fit: contain;
+                position: relative;
+                z-index: 2;
+                transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                
+                &.transitioning {
+                    opacity: 0;
+                }
+            }
+        }
+
+        &__text {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        &__text-content {
+            transition: all 0.3s ease;
+            
+            &.transitioning {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            
+            h2 {
+                font-size: 28px;
+                font-weight: 600;
+                color: #1f2937;
+                margin: 0 0 20px 0;
+                line-height: 1.2;
+                
+                .highlight {
+                    font-size: 32px;
+                    font-weight: 700;
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    line-height: 1.1;
+                    display: block;
+                }
+            }
+            
+            p {
+                font-size: 16px;
+                line-height: 1.6;
+                color: #4b5563;
+                margin: 0;
+            }
+        }
+
+        &__bullets {
+            margin: 30px 0;
+            
+            .bullet {
+                display: flex;
+                align-items: center;
+                background: none;
+                border: none;
+                padding: 8px 0;
+                cursor: pointer;
+                width: 100%;
+                text-align: left;
+                transition: all 0.2s ease;
+                font-size: 14px;
+                color: #6b7280;
+                
+                &:hover {
+                    opacity: 0.8;
+                }
+                
+                &.active {
+                    color: #6366f1;
+                    font-weight: 600;
+                }
+                
+                &:before {
+                    content: '';
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    background: #d1d5db;
+                    margin-right: 12px;
+                    transition: all 0.2s ease;
+                }
+                
+                &.active:before {
+                    background: #6366f1;
+                    transform: scale(1.2);
+                }
+            }
+        }
+
+        &__actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        &__upgrade-btn,
+        &__comparison-btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+
+        &__upgrade-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            }
+        }
+
+        &__comparison-btn {
+            background: transparent;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            
+            &:hover {
+                background: #f9fafb;
+                border-color: #9ca3af;
+            }
+        }
+    }
+}
+
+
+// Mobile responsive
+@media (max-width: 768px) {
+    .fotogrids-upgrade-modal-overlay {
+        padding: 10px;
+        
+        .fotogrids-upgrade-modal {
+            max-height: 95vh;
+            
+            &__close {
+                top: 15px;
+                right: 15px;
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+            
+            &__content {
+                flex-direction: column;
+                min-height: auto;
+            }
+            
+            &__image {
+                min-height: 200px;
+                
+                img {
+                    max-width: 60%;
+                    max-height: 60%;
+                    max-height: 150px;
+                }
+            }
+            
+            &__text {
+                padding: 30px 20px;
+            }
+            
+            &__text-content {
+                h2 {
+                    font-size: 22px;
+                    
+                    .highlight {
+                        font-size: 26px;
+                    }
+                }
+                
+                p {
+                    font-size: 15px;
+                }
+            }
+            
+            &__bullets {
+                margin: 20px 0;
+            }
+            
+            &__actions {
+                flex-direction: column;
+                
+                .fotogrids-upgrade-modal__upgrade-btn,
+                .fotogrids-upgrade-modal__comparison-btn {
+                    width: 100%;
+                    padding: 16px 28px;
+                }
+            }
+        }
+    }
+}
+
+// Small mobile
+@media (max-width: 480px) {
+    .fotogrids-upgrade-modal {
+        &__text {
+            padding: 20px 15px;
+        }
+        
+        &__text-content {
+            h2 {
+                font-size: 20px;
+                
+                .highlight {
+                    font-size: 24px;
+                }
+            }
+            
+            p {
+                font-size: 14px;
+            }
+        }
+    }
+}

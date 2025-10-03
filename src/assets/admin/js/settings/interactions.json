@@ -5,9 +5,9 @@
     "free": true,
     "settings": [
         {
-            "key": "image_click_behavior",
+            "key": "item_click_behavior",
             "type": "button_group",
-            "label": "Image Click Behavior",
+            "label": "Item Click Behavior",
             "options": [
                 {
                     "label": "Do Nothing",
@@ -20,7 +20,7 @@
                     "icon": "click_lightbox"
                 },
                 {
-                    "label": "Direct Link to Image",
+                    "label": "Direct Link to Item",
                     "value": "direct",
                     "icon": "click_direct"
                 },
@@ -30,11 +30,7 @@
                     "icon": "click_external"
                 }
             ],
-            "free": true,
-            "conditionalMessage": {
-                "condition": { "values": ["external"] },
-                "message": "Configure external URLs for each image below."
-            }
+            "free": true
         },
         {
             "key": "external_link_target",
@@ -44,20 +40,20 @@
                 { "label": "Same Tab", "value": "_self", "icon": "check_square" },
                 { "label": "New Tab", "value": "_blank", "icon": "plus_square" }
             ],
-            "condition": { "dependsOn": "image_click_behavior", "values": ["external"] },
+            "condition": { "dependsOn": "item_click_behavior", "values": ["external"] },
             "free": true
         },
         {
             "key": "external_url_manager",
             "type": "external_url_manager",
-            "label": "Image URLs",
-            "condition": { "dependsOn": "image_click_behavior", "values": ["external"] },
+            "label": "Item URLs",
+            "condition": { "dependsOn": "item_click_behavior", "values": ["external"] },
             "free": true
         },
         {
             "key": "lightbox_settings_section",
             "type": "lightbox_subtabs",
-            "condition": { "dependsOn": "image_click_behavior", "values": ["lightbox"] },
+            "condition": { "dependsOn": "item_click_behavior", "values": ["lightbox"] },
             "free": true,
             "subTabs": {
                 "layout_styling": {
@@ -107,133 +103,167 @@
                     "icon": "transition_horizontal",
                     "settings": [
                         {
-                            "key": "lightbox_transition",
-                            "type": "button_group",
-                            "label": "Transition Between Images",
-                            "options": [
-                                { "label": "Fade", "value": "fade", "icon": "transition_fade" },
-                                { "label": "Horizontal", "value": "horizontal", "icon": "transition_horizontal" },
-                                { "label": "Vertical", "value": "vertical", "icon": "transition_vertical" },
-                                { "label": "None", "value": "none", "icon": "x" }
-                            ],
-                            "free": true
+                            "key": "lightbox_transition_group",
+                            "type": "setting_group",
+                            "label": "Transition",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "lightbox_transition",
+                                    "type": "button_group",
+                                    "label": "Transition Between Items",
+                                    "options": [
+                                        { "label": "Fade", "value": "fade", "icon": "transition_fade" },
+                                        { "label": "Horizontal", "value": "horizontal", "icon": "transition_horizontal" },
+                                        { "label": "Vertical", "value": "vertical", "icon": "transition_vertical" },
+                                        { "label": "None", "value": "none", "icon": "x" }
+                                    ],
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_transition_duration",
+                                    "type": "button_group",
+                                    "label": "Transition Duration",
+                                    "options": [
+                                        { "label": "Fast", "unit": "ms", "value": 150 },
+                                        { "label": "Normal", "unit": "ms", "value": 300 },
+                                        { "label": "Slow", "unit": "ms", "value": 450 },
+                                        { "label": "Custom", "value": "custom" }
+                                    ],
+                                    "condition": { "dependsOn": "lightbox_transition", "values": ["fade", "horizontal", "vertical"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_transition_duration_custom",
+                                    "type": "range",
+                                    "label": "Custom Duration",
+                                    "unit": "ms",
+                                    "min": 0,
+                                    "max": 1000,
+                                    "condition": { "dependsOn": "lightbox_transition_duration", "values": ["custom"] },
+                                    "free": true
+                                }
+                            ]
                         },
                         {
-                            "key": "lightbox_transition_duration",
-                            "type": "select",
-                            "label": "Transition Duration",
-                            "options": [
-                                { "label": "Fast (150ms)", "value": 150 },
-                                { "label": "Normal (300ms)", "value": 300 },
-                                { "label": "Slow (450ms)", "value": 450 },
-                                { "label": "Custom", "value": "custom" }
-                            ],
-                            "condition": { "dependsOn": "lightbox_transition", "values": ["fade", "horizontal", "vertical"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_transition_duration_custom",
-                            "type": "range",
-                            "label": "Custom Duration (ms)",
-                            "min": 0,
-                            "max": 1000,
-                            "condition": { "dependsOn": "lightbox_transition_duration", "values": ["custom"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_auto_progress",
-                            "type": "toggle",
+                            "key": "lightbox_auto_progress_group",
+                            "type": "setting_group",
                             "label": "Auto Progress",
-                            "free": true
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "lightbox_auto_progress",
+                                    "type": "toggle",
+                                    "label": "Enable Auto Progress",
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_delay",
+                                    "type": "range",
+                                    "label": "Delay",
+                                    "unit": "seconds",
+                                    "min": 1,
+                                    "max": 20,
+                                    "condition": { "dependsOn": "lightbox_auto_progress", "values": [true, "1"] },
+                                    "free": true
+                                }
+                            ]
                         },
                         {
-                            "key": "lightbox_auto_progress_delay",
-                            "type": "range",
-                            "label": "Auto Progress Delay (seconds)",
-                            "min": 1,
-                            "max": 20,
-                            "condition": { "dependsOn": "lightbox_auto_progress", "values": [true, "1"] },
-                            "free": true
+                            "key": "lightbox_navigation_arrows_group",
+                            "type": "setting_group",
+                            "label": "Navigation Arrows",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "lightbox_show_arrows",
+                                    "type": "toggle",
+                                    "label": "Show Navigation Arrows",
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_arrow_icon",
+                                    "type": "button_group",
+                                    "label": "Arrow Icon Style",
+                                    "options": [
+                                        { "value": "chevron", "icon": "chevron" },
+                                        { "value": "arrow", "icon": "arrow" },
+                                        { "value": "triangle", "icon": "triangle" }
+                                    ],
+                                    "condition": { "dependsOn": "lightbox_show_arrows", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_arrow_size",
+                                    "type": "range",
+                                    "label": "Arrow Size",
+                                    "min": 0,
+                                    "max": 120,
+                                    "default": 40,
+                                    "units": ["px", "em", "rem", "%"],
+                                    "condition": { "dependsOn": "lightbox_show_arrows", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_arrow_color",
+                                    "type": "color",
+                                    "label": "Arrow Color",
+                                    "condition": { "dependsOn": "lightbox_show_arrows", "values": [true, "1"] },
+                                    "free": true
+                                }
+                            ]
                         },
                         {
-                            "key": "lightbox_show_arrows",
-                            "type": "toggle",
-                            "label": "Show Navigation Arrows",
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_arrow_icon",
-                            "type": "button_group",
-                            "label": "Arrow Icon Style",
-                            "options": [
-                                { "value": "chevron", "icon": "chevron" },
-                                { "value": "arrow", "icon": "arrow" },
-                                { "value": "triangle", "icon": "triangle" }
-                            ],
-                            "condition": { "dependsOn": "lightbox_show_arrows", "values": [true, "1"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_arrow_size",
-                            "type": "range_with_units",
-                            "label": "Arrow Size",
-                            "min": 0,
-                            "max": 120,
-                            "default": 40,
-                            "units": ["px", "em", "rem", "%"],
-                            "condition": { "dependsOn": "lightbox_show_arrows", "values": [true, "1"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_arrow_color",
-                            "type": "color",
-                            "label": "Arrow Color",
-                            "condition": { "dependsOn": "lightbox_show_arrows", "values": [true, "1"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_show_dots",
-                            "type": "toggle",
-                            "label": "Show Navigation Dots",
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_dot_style",
-                            "type": "button_group",
-                            "label": "Dot Style",
-                            "options": [
-                                { "label": "", "value": "fill", "icon": "dot_fill" },
-                                { "label": "", "value": "stroke", "icon": "dot_stroke" },
-                                { "label": "", "value": "square", "icon": "dot_square" },
-                                { "label": "", "value": "square_stroke", "icon": "dot_square_stroke" }
-                            ],
-                            "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_dot_color",
-                            "type": "color",
-                            "label": "Dot Color",
-                            "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_active_dot_color",
-                            "type": "color",
-                            "label": "Active Dot Color",
-                            "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
-                            "free": true
-                        },
-                        {
-                            "key": "lightbox_dots_spacing",
-                            "type": "range_with_units",
-                            "label": "Space Between Dots",
-                            "min": 0,
-                            "max": 30,
-                            "default": 8,
-                            "units": ["px", "em", "rem", "%"],
-                            "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
-                            "free": true
+                            "key": "lightbox_navigation_dots_group",
+                            "type": "setting_group",
+                            "label": "Navigation Dots",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "lightbox_show_dots",
+                                    "type": "toggle",
+                                    "label": "Show Navigation Dots",
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_dot_style",
+                                    "type": "button_group",
+                                    "label": "Dot Style",
+                                    "options": [
+                                        { "label": "", "value": "fill", "icon": "dot_fill" },
+                                        { "label": "", "value": "stroke", "icon": "dot_stroke" },
+                                        { "label": "", "value": "square", "icon": "dot_square" },
+                                        { "label": "", "value": "square_stroke", "icon": "dot_square_stroke" }
+                                    ],
+                                    "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_dot_color",
+                                    "type": "color",
+                                    "label": "Dot Color",
+                                    "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_active_dot_color",
+                                    "type": "color",
+                                    "label": "Active Dot Color",
+                                    "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "lightbox_dots_spacing",
+                                    "type": "range",
+                                    "label": "Space Between Dots",
+                                    "min": 0,
+                                    "max": 30,
+                                    "default": 8,
+                                    "units": ["px", "em", "rem", "%"],
+                                    "condition": { "dependsOn": "lightbox_show_dots", "values": [true, "1"] },
+                                    "free": true
+                                }
+                            ]
                         }
                     ]
                 },

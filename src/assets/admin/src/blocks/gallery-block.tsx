@@ -45,7 +45,7 @@ registerBlockType('fotogrids/gallery', {
     keywords: [
         __('gallery', 'fotogrids'),
         __('photos', 'fotogrids'),
-        __('images', 'fotogrids'),
+        __('items', 'fotogrids'),
         __('fotogrids', 'fotogrids'),
     ],
     supports: {

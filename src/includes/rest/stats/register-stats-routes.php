@@ -33,7 +33,7 @@ class Register_Stats_Routes {
                         'required' => true,
                         'sanitize_callback' => 'sanitize_text_field',
                         'validate_callback' => function( $param ) {
-                            return in_array( $param, array( 'gallery', 'album', 'image' ) );
+                            return in_array( $param, array( 'gallery', 'album', 'item' ) );
                         },
                     ),
                     'object_id' => array(
@@ -58,7 +58,7 @@ class Register_Stats_Routes {
                         'required' => true,
                         'sanitize_callback' => 'sanitize_text_field',
                         'validate_callback' => function( $param ) {
-                            return in_array( $param, array( 'gallery', 'album', 'image' ) );
+                            return in_array( $param, array( 'gallery', 'album', 'item' ) );
                         },
                     ),
                     'object_id' => array(

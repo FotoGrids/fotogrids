@@ -28,16 +28,16 @@ describe('FotoGrids REST API Integration', () => {
                 {
                     id: 1,
                     title: 'Test Gallery 1',
-                    image_count: 5,
-                    featured_image: 'https://example.com/image1.jpg',
+                    item_count: 5,
+                    featured_item: 'https://example.com/item1.jpg',
                     created: '2023-01-01T00:00:00Z',
                     modified: '2023-01-01T00:00:00Z'
                 },
                 {
                     id: 2,
                     title: 'Test Gallery 2',
-                    image_count: 10,
-                    featured_image: null,
+                    item_count: 10,
+                    featured_item: null,
                     created: '2023-01-02T00:00:00Z',
                     modified: '2023-01-02T00:00:00Z'
                 }
@@ -85,59 +85,59 @@ describe('FotoGrids REST API Integration', () => {
         });
     });
 
-    describe('Gallery Images Endpoint', () => {
-        test('fetches gallery images', async () => {
-            const mockImages = [
+    describe('Gallery Items Endpoint', () => {
+        test('fetches gallery items', async () => {
+            const mockItems = [
                 {
                     id: 101,
                     position: 1,
-                    caption: 'First image',
+                    caption: 'First item',
                     description: 'Description',
-                    url: 'https://example.com/image1.jpg',
-                    thumbnail: 'https://example.com/image1-150x150.jpg',
-                    medium: 'https://example.com/image1-300x300.jpg',
-                    large: 'https://example.com/image1-1024x1024.jpg',
-                    full: 'https://example.com/image1.jpg',
+                    url: 'https://example.com/item1.jpg',
+                    thumbnail: 'https://example.com/item1-150x150.jpg',
+                    medium: 'https://example.com/item1-300x300.jpg',
+                    large: 'https://example.com/item1-1024x1024.jpg',
+                    full: 'https://example.com/item1.jpg',
                     alt: 'Alt text',
-                    title: 'Image Title'
+                    title: 'Item Title'
                 },
                 {
                     id: 102,
                     position: 2,
-                    caption: 'Second image',
+                    caption: 'Second item',
                     description: 'Another description',
-                    url: 'https://example.com/image2.jpg',
-                    thumbnail: 'https://example.com/image2-150x150.jpg',
-                    medium: 'https://example.com/image2-300x300.jpg',
-                    large: 'https://example.com/image2-1024x1024.jpg',
-                    full: 'https://example.com/image2.jpg',
+                    url: 'https://example.com/item2.jpg',
+                    thumbnail: 'https://example.com/item2-150x150.jpg',
+                    medium: 'https://example.com/item2-300x300.jpg',
+                    large: 'https://example.com/item2-1024x1024.jpg',
+                    full: 'https://example.com/item2.jpg',
                     alt: 'Alt text 2',
-                    title: 'Image Title 2'
+                    title: 'Item Title 2'
                 }
             ];
 
-            mockApiFetch.mockResolvedValue(mockImages);
+            mockApiFetch.mockResolvedValue(mockItems);
 
             const result = await mockApiFetch({
-                path: '/fotogrids/v1/galleries/123/images'
+                path: '/fotogrids/v1/galleries/123/items'
             });
 
-            expect(result).toEqual(mockImages);
+            expect(result).toEqual(mockItems);
         });
 
-        test('handles gallery images with limit', async () => {
-            const mockLimitedImages = [
+        test('handles gallery items with limit', async () => {
+            const mockLimitedItems = [
                 { id: 101, position: 1 },
                 { id: 102, position: 2 }
             ];
 
-            mockApiFetch.mockResolvedValue(mockLimitedImages);
+            mockApiFetch.mockResolvedValue(mockLimitedItems);
 
             const result = await mockApiFetch({
-                path: '/fotogrids/v1/galleries/123/images?limit=2'
+                path: '/fotogrids/v1/galleries/123/items?limit=2'
             });
 
-            expect(result).toEqual(mockLimitedImages);
+            expect(result).toEqual(mockLimitedItems);
         });
 
         test('handles gallery not found error', async () => {
@@ -151,7 +151,7 @@ describe('FotoGrids REST API Integration', () => {
 
             try {
                 await mockApiFetch({
-                    path: '/fotogrids/v1/galleries/999/images'
+                    path: '/fotogrids/v1/galleries/999/items'
                 });
             } catch (error) {
                 expect(error).toEqual(mockError);
@@ -179,7 +179,7 @@ describe('FotoGrids REST API Integration', () => {
                 {
                     id: 'slider',
                     name: 'Slider',
-                    description: 'Image slider with navigation',
+                    description: 'Item slider with navigation',
                     type: 'starter',
                     preview: 'https://example.com/previews/slider.jpg'
                 }
@@ -237,7 +237,7 @@ describe('FotoGrids REST API Integration', () => {
             expect(result).toEqual(mockResponse);
         });
 
-        test('tracks image click', async () => {
+        test('tracks item click', async () => {
             const mockResponse = { success: true };
 
             fetch.mockResolvedValue({
@@ -253,14 +253,14 @@ describe('FotoGrids REST API Integration', () => {
                 },
                 body: JSON.stringify({
                     gallery_id: 123,
-                    event_type: 'image_click',
-                    event_data: { image_id: 456 }
+                    event_type: 'item_click',
+                    event_data: { item_id: 456 }
                 })
             });
 
             expect(fetch).toHaveBeenCalledWith(`${baseUrl}/stats/view`, expect.objectContaining({
                 method: 'POST',
-                body: expect.stringContaining('image_click')
+                body: expect.stringContaining('item_click')
             }));
         });
     });
@@ -315,8 +315,8 @@ describe('FotoGrids REST API Integration', () => {
             const mockGallery = {
                 id: 1,
                 title: 'Test Gallery',
-                image_count: 5,
-                featured_image: 'https://example.com/image.jpg',
+                item_count: 5,
+                featured_item: 'https://example.com/item.jpg',
                 created: '2023-01-01T00:00:00Z',
                 modified: '2023-01-01T00:00:00Z'
             };
@@ -326,24 +326,24 @@ describe('FotoGrids REST API Integration', () => {
 
             expect(result[0]).toHaveProperty('id');
             expect(result[0]).toHaveProperty('title');
-            expect(result[0]).toHaveProperty('image_count');
+            expect(result[0]).toHaveProperty('item_count');
             expect(typeof result[0].id).toBe('number');
             expect(typeof result[0].title).toBe('string');
-            expect(typeof result[0].image_count).toBe('number');
+            expect(typeof result[0].item_count).toBe('number');
         });
 
-        test('validates image response structure', async () => {
-            const mockImage = {
+        test('validates item response structure', async () => {
+            const mockItem = {
                 id: 101,
                 position: 1,
                 caption: 'Test caption',
-                url: 'https://example.com/image.jpg',
+                url: 'https://example.com/item.jpg',
                 thumbnail: 'https://example.com/thumb.jpg',
                 alt: 'Alt text'
             };
 
-            mockApiFetch.mockResolvedValue([mockImage]);
-            const result = await mockApiFetch({ path: '/fotogrids/v1/galleries/1/images' });
+            mockApiFetch.mockResolvedValue([mockItem]);
+            const result = await mockApiFetch({ path: '/fotogrids/v1/galleries/1/items' });
 
             expect(result[0]).toHaveProperty('id');
             expect(result[0]).toHaveProperty('url');

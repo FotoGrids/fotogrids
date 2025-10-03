@@ -182,10 +182,10 @@ class Gallery_Album_Relations {
         
         if ( $args['include_meta'] && ! empty( $galleries ) ) {
             foreach ( $galleries as $gallery ) {
-                $gallery->image_count = self::get_gallery_image_count( $gallery->ID );
+                $gallery->item_count = self::get_gallery_item_count( $gallery->ID );
                 $gallery->layout = get_post_meta( $gallery->ID, 'fotogrids_layout', true ) ?: 'grid';
-                $gallery->featured_image = get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' );
-                $gallery->sample_images = self::get_gallery_sample_images( $gallery->ID, 4 );
+                $gallery->featured_item = get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' );
+                $gallery->sample_items = self::get_gallery_sample_items( $gallery->ID, 4 );
             }
         }
         
@@ -239,7 +239,9 @@ class Gallery_Album_Relations {
         if ( $args['include_meta'] && ! empty( $albums ) ) {
             foreach ( $albums as $album ) {
                 $album->gallery_count = self::get_album_gallery_count( $album->ID );
-                $album->featured_image = get_the_post_thumbnail_url( $album->ID, 'thumbnail' );
+                $album->featured_item = get_the_post_thumbnail_url( $album->ID, 'thumbnail' );
+                $status_obj = get_post_status_object( $album->post_status );
+                $album->status_display = $status_obj ? $status_obj->label : $album->post_status;
             }
         }
         
@@ -310,12 +312,14 @@ class Gallery_Album_Relations {
         $albums = array();
         
         foreach ( $query->posts as $album ) {
+            $status_obj = get_post_status_object( $album->post_status );
             $albums[] = array(
                 'id' => $album->ID,
                 'title' => $album->post_title,
                 'status' => $album->post_status,
+                'status_display' => $status_obj ? $status_obj->label : $album->post_status,
                 'gallery_count' => self::get_album_gallery_count( $album->ID ),
-                'featured_image' => get_the_post_thumbnail_url( $album->ID, 'thumbnail' ),
+                'featured_item' => get_the_post_thumbnail_url( $album->ID, 'thumbnail' ),
             );
         }
         
@@ -347,10 +351,10 @@ class Gallery_Album_Relations {
                 'id' => $gallery->ID,
                 'title' => $gallery->post_title,
                 'status' => $gallery->post_status,
-                'image_count' => self::get_gallery_image_count( $gallery->ID ),
+                'item_count' => self::get_gallery_item_count( $gallery->ID ),
                 'layout' => get_post_meta( $gallery->ID, 'fotogrids_layout', true ) ?: 'grid',
-                'featured_image' => get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' ),
-                'sample_images' => self::get_gallery_sample_images( $gallery->ID, 4 ),
+                'featured_item' => get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' ),
+                'sample_items' => self::get_gallery_sample_items( $gallery->ID, 4 ),
             );
         }
         
@@ -414,52 +418,52 @@ class Gallery_Album_Relations {
     }
     
     /**
-     * Get gallery image count
+     * Get gallery item count
      * 
      * @param int $gallery_id Gallery post ID
-     * @return int Image count
+     * @return int Item count
      */
-    private static function get_gallery_image_count( $gallery_id ) {
-        $gallery_images = get_post_meta( $gallery_id, 'fotogrids_gallery_images', true );
-        if ( $gallery_images ) {
-            $image_ids = json_decode( $gallery_images, true );
-            return is_array( $image_ids ) ? count( $image_ids ) : 0;
+    private static function get_gallery_item_count( $gallery_id ) {
+        $gallery_items = get_post_meta( $gallery_id, 'fotogrids_gallery_items', true );
+        if ( $gallery_items ) {
+            $item_ids = json_decode( $gallery_items, true );
+            return is_array( $item_ids ) ? count( $item_ids ) : 0;
         }
         return 0;
     }
     
     /**
-     * Get sample images from gallery for display
+     * Get sample items from gallery for display
      * 
      * @param int $gallery_id Gallery post ID
-     * @param int $limit Number of sample images to return (default 4)
-     * @return array Array of image URLs
+     * @param int $limit Number of sample items to return (default 4)
+     * @return array Array of item URLs
      */
-    private static function get_gallery_sample_images( $gallery_id, $limit = 4 ) {
-        $gallery_images = get_post_meta( $gallery_id, 'fotogrids_gallery_images', true );
-        if ( ! $gallery_images ) {
+    private static function get_gallery_sample_items( $gallery_id, $limit = 4 ) {
+        $gallery_items = get_post_meta( $gallery_id, 'fotogrids_gallery_items', true );
+        if ( ! $gallery_items ) {
             return array();
         }
         
-        $image_ids = json_decode( $gallery_images, true );
-        if ( ! is_array( $image_ids ) || empty( $image_ids ) ) {
+        $item_ids = json_decode( $gallery_items, true );
+        if ( ! is_array( $item_ids ) || empty( $item_ids ) ) {
             return array();
         }
         
-        $sample_image_ids = array_slice( $image_ids, 0, $limit );
-        $image_urls = array();
+        $sample_item_ids = array_slice( $item_ids, 0, $limit );
+        $item_urls = array();
         
-        foreach ( $sample_image_ids as $image_id ) {
-            $image_id = absint( $image_id );
-            if ( $image_id > 0 ) {
-                $image_url = wp_get_attachment_image_url( $image_id, 'thumbnail' );
-                if ( $image_url ) {
-                    $image_urls[] = $image_url;
+        foreach ( $sample_item_ids as $item_id ) {
+            $item_id = absint( $item_id );
+            if ( $item_id > 0 ) {
+                $item_url = wp_get_attachment_image_url( $item_id, 'thumbnail' );
+                if ( $item_url ) {
+                    $item_urls[] = $item_url;
                 }
             }
         }
         
-        return $image_urls;
+        return $item_urls;
     }
     
     /**

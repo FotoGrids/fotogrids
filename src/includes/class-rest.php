@@ -57,9 +57,19 @@ class REST {
         require_once $base_path . 'templates/templates-data.php';
         require_once $base_path . 'templates/register-templates-routes.php';
         
-        // Images files
-        require_once $base_path . 'images/images-data.php';
-        require_once $base_path . 'images/register-images-routes.php';
+        // Items files
+        require_once $base_path . 'items/items-data.php';
+        require_once $base_path . 'items/register-items-routes.php';
+        
+        // Metadata files
+        require_once $base_path . 'metadata/metadata-permissions.php';
+        require_once $base_path . 'metadata/metadata-data.php';
+        require_once $base_path . 'metadata/register-metadata-routes.php';
+        
+        // Admin files
+        require_once $base_path . 'admin/admin-permissions.php';
+        require_once $base_path . 'admin/admin-data.php';
+        require_once $base_path . 'admin/register-admin-routes.php';
     }
     
     /**
@@ -75,6 +85,8 @@ class REST {
         \FotoGrids\REST\Album\Register_Album_Routes::register();
         \FotoGrids\REST\Stats\Register_Stats_Routes::register();
         \FotoGrids\REST\Templates\Register_Templates_Routes::register();
-        \FotoGrids\REST\Images\Register_Images_Routes::register();
+        \FotoGrids\REST\Items\Register_Items_Routes::register();
+        \FotoGrids\REST\Metadata\Register_Metadata_Routes::register();
+        \FotoGrids\REST\Admin\Register_Admin_Routes::register();
     }
 }

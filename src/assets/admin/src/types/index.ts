@@ -9,11 +9,11 @@ export interface Gallery {
         columns: number;
         album_id?: number;
     };
-    images: GalleryImage[];
+    items: GalleryItem[];
     shortcode: string;
 }
 
-export interface GalleryImage {
+export interface GalleryItem {
     id: number;
     gallery_id: number;
     position: number;

@@ -56,10 +56,10 @@ const AlbumGalleries = () => {
                 const newAssignedGallery = {
                     ID: galleryToAdd.id,
                     post_title: galleryToAdd.title,
-                    image_count: galleryToAdd.image_count,
+                    item_count: galleryToAdd.item_count,
                     layout: galleryToAdd.layout,
-                    featured_image: galleryToAdd.featured_image,
-                    sample_images: galleryToAdd.sample_images,
+                    featured_item: galleryToAdd.featured_item,
+                    sample_items: galleryToAdd.sample_items,
                     position: assignedGalleries.length,
                 };
                 setAssignedGalleries(prev => [...prev, newAssignedGallery]);
@@ -95,9 +95,9 @@ const AlbumGalleries = () => {
                 const availableGallery = {
                     id: galleryToRemove.ID,
                     title: galleryToRemove.post_title,
-                    image_count: galleryToRemove.image_count,
+                    item_count: galleryToRemove.item_count,
                     layout: galleryToRemove.layout,
-                    featured_image: galleryToRemove.featured_image,
+                    featured_item: galleryToRemove.featured_item,
                     status: 'publish', // Assuming published
                 };
                 setAvailableGalleries(prev => [...prev, availableGallery]);
@@ -199,19 +199,19 @@ const AlbumGalleries = () => {
                             onDrop: (e) => handleDrop(e, gallery)
                         },
                             React.createElement('div', { className: 'fotogrids-gallery-drag' }, '⋮⋮'),
-                            // Image stack display
-                            React.createElement('div', { className: 'fotogrids-gallery-images' },
-                                gallery.sample_images && gallery.sample_images.length > 0 
-                                    ? gallery.sample_images.slice(0, 4).map((imageUrl, index) =>
+                            // Item stack display
+                            React.createElement('div', { className: 'fotogrids-gallery-items' },
+                                gallery.sample_items && gallery.sample_items.length > 0 
+                                    ? gallery.sample_items.slice(0, 4).map((itemUrl, index) =>
                                         React.createElement('img', {
                                             key: index,
-                                            src: imageUrl,
+                                            src: itemUrl,
                                             alt: '',
                                             className: `fotogrids-gallery-thumb fgg-stack-${index}`
                                         })
                                     )
-                                    : gallery.featured_image && React.createElement('img', {
-                                        src: gallery.featured_image,
+                                    : gallery.featured_item && React.createElement('img', {
+                                        src: gallery.featured_item,
                                         alt: '',
                                         className: 'fotogrids-gallery-thumb'
                                     })
@@ -220,7 +220,7 @@ const AlbumGalleries = () => {
                                 React.createElement('strong', { className: 'fotogrids-gallery-title' }, 
                                     gallery.post_title),
                                 React.createElement('span', { className: 'fotogrids-gallery-meta' },
-                                    `${gallery.image_count} ${config.strings.images} • ${gallery.layout}`)
+                                    `${gallery.item_count} ${config.strings.items} • ${gallery.layout}`)
                             ),
                             React.createElement('div', { className: 'fotogrids-gallery-actions' },
                                 React.createElement('button', {
@@ -259,19 +259,19 @@ const AlbumGalleries = () => {
                             key: gallery.id,
                             className: 'fotogrids-gallery-item available'
                         },
-                            // Image stack display
-                            React.createElement('div', { className: 'fotogrids-gallery-images' },
-                                gallery.sample_images && gallery.sample_images.length > 0 
-                                    ? gallery.sample_images.slice(0, 4).map((imageUrl, index) =>
+                            // Item stack display
+                            React.createElement('div', { className: 'fotogrids-gallery-items' },
+                                gallery.sample_items && gallery.sample_items.length > 0 
+                                    ? gallery.sample_items.slice(0, 4).map((itemUrl, index) =>
                                         React.createElement('img', {
                                             key: index,
-                                            src: imageUrl,
+                                            src: itemUrl,
                                             alt: '',
                                             className: `fotogrids-gallery-thumb fgg-stack-${index}`
                                         })
                                     )
-                                    : gallery.featured_image && React.createElement('img', {
-                                        src: gallery.featured_image,
+                                    : gallery.featured_item && React.createElement('img', {
+                                        src: gallery.featured_item,
                                         alt: '',
                                         className: 'fotogrids-gallery-thumb'
                                     })
@@ -280,7 +280,7 @@ const AlbumGalleries = () => {
                                 React.createElement('strong', { className: 'fotogrids-gallery-title' }, 
                                     gallery.title),
                                 React.createElement('span', { className: 'fotogrids-gallery-meta' },
-                                    `${gallery.image_count} ${config.strings.images} • ${gallery.layout}`)
+                                    `${gallery.item_count} ${config.strings.items} • ${gallery.layout}`)
                             ),
                             React.createElement('div', { className: 'fotogrids-gallery-actions' },
                                 React.createElement('button', {

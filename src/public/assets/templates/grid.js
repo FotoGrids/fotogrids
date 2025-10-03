@@ -31,7 +31,7 @@
             gallery.setAttribute('data-columns', columns);
         }
         
-        // Setup lazy loading for grid images
+        // Setup lazy loading for grid items
         if (gallery.classList.contains('fotogrids-lazy')) {
             setupLazyLoading(items);
         }
@@ -100,11 +100,11 @@
     }
     
     /**
-     * Setup lazy loading for images
+     * Setup lazy loading for items
      */
     function setupLazyLoading(items) {
         if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
+            const itemObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target.querySelector('img');
@@ -128,7 +128,7 @@
             });
             
             items.forEach(item => {
-                imageObserver.observe(item);
+                itemObserver.observe(item);
             });
         } else {
             // Fallback for browsers without IntersectionObserver
@@ -170,7 +170,7 @@
         if (window.FotoGrids && window.FotoGrids.lightbox) {
             window.FotoGrids.lightbox.open(items, startIndex, galleryId);
         } else {
-            // Fallback - open image in new tab
+            // Fallback - open item in new tab
             const img = items[startIndex].querySelector('img');
             const fullUrl = img.getAttribute('data-full') || img.src;
             window.open(fullUrl, '_blank');

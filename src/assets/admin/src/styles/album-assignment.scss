@@ -1,130 +1,144 @@
-// Album Assignment Meta Box Styles
+@use 'sizes.scss' as *;
+@use 'colors.scss' as *;
+
+#fotogrids_gallery_albums {
+    .inside {
+        margin: 0;
+        padding: 0;
+    }
+}
 
 .fotogrids-album-assignment {
     padding: 0;
     
     .fotogrids-assigned-summary {
-        margin-bottom: 15px;
-        padding: 10px;
-        background-color: #f9f9f9;
-        border-left: 3px solid #0073aa;
-        
+        margin-bottom: ui-size(margin, md);
+        padding: ui-size(padding, base) ui-size(padding, md);
+        background-color: rgba($fotogrids-colors-blue, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: ui-size(spacing, base);
+
         p {
-            margin: 0 0 8px 0;
+            margin: 0;
         }
-        
+
         .fotogrids-assigned-list {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: ui-size(spacing, sm);
+            padding-bottom: ui-size(spacing, sm);
         }
-        
+
         .fotogrids-assigned-album {
             display: flex;
             align-items: center;
-            padding: 8px;
+            padding: ui-size(padding, base) ui-size(padding, md);
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-size: 12px;
-            
+            border: ui-size(border-width, base) solid rgba($fotogrids-colors-blue, 0.5);
+            border-radius: ui-size(border-radius, sm);
+            font-size: ui-size(font-size, sm);
+
             .fotogrids-assigned-album-thumb {
-                width: 40px;
-                height: 40px;
+                width: ui-size(height, 2xl);
+                height: ui-size(height, 2xl);
                 object-fit: cover;
-                border-radius: 3px;
-                margin-right: 10px;
+                border-radius: ui-size(border-radius, sm);
+                margin-right: ui-size(margin, md);
                 flex-shrink: 0;
-                background: #f0f0f0;
+                background: ui-color(background, tertiary);
             }
-            
+
             .fotogrids-assigned-album-details {
                 flex: 1;
                 min-width: 0;
-                
+
                 .fotogrids-assigned-album-title {
                     font-weight: 500;
-                    color: #333;
-                    margin-bottom: 2px;
+                    color: ui-color(text, primary);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
-                
+
                 .fotogrids-assigned-album-meta {
-                    font-size: 11px;
-                    color: #666;
+                    font-size: ui-size(font-size, xs);
+                    color: ui-color(text, secondary);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                }
-            }
-            
-            .fotogrids-remove-button {
-                background: none;
-                border: none;
-                color: #dc3232;
-                cursor: pointer;
-                font-size: 16px;
-                line-height: 1;
-                padding: 2px 6px;
-                border-radius: 2px;
-                margin-left: 10px;
-                flex-shrink: 0;
-                
-                &:hover {
-                    background-color: #dc3232;
-                    color: white;
-                }
-                
-                &:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
                 }
             }
         }
     }
-    
+
     .fotogrids-album-search {
-        margin-bottom: 15px;
-        
+        margin: 0 ui-size(margin, md) ui-size(margin, md);
+        color: ui-color(text, primary);
+
+        .fotogrids-search-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .fotogrids-search-icon {
+            position: absolute;
+            inset-inline-start: calc(ui-size(padding, base) * 1.25);
+            top: 50%;
+            transform: translateY(-50%);
+            width: ui-size(width, base);
+            height: ui-size(height, base);
+            pointer-events: none;
+            z-index: 1;
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
         .fotogrids-search-input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-size: 13px;
-            
+            height: 40px;
+            padding: 0 ui-size(padding, base);
+            padding-inline-start: ui-size(padding, 3xl);
+            margin: 0;
+            border: ui-size(border-width, base) solid ui-color(border, primary);
+            border-radius: ui-size(border-radius, sm);
+            font-size: ui-size(font-size, base);
+            color: inherit;
+
             &:focus {
-                border-color: #0073aa;
-                box-shadow: 0 0 0 1px #0073aa;
+                border-color: ui-color(border, focus);
+                box-shadow: 0 0 0 1px ui-color(border, focus);
                 outline: none;
             }
         }
     }
-    
+
     .fotogrids-album-list {
-        max-height: 300px;
+        max-height: ui-size(height, textarea-lg);
         overflow-y: auto;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        margin-bottom: 15px;
+        border: ui-size(border-width, base) solid ui-color(border, primary);
+        border-radius: ui-size(border-radius, sm);
+        margin: 0 ui-size(margin, md) ui-size(margin, md);
         
         .fotogrids-no-albums {
-            padding: 20px;
+            padding: ui-size(padding, xl);
             text-align: center;
-            color: #666;
+            color: ui-color(text, secondary);
             margin: 0;
             font-style: italic;
         }
         
         .fotogrids-albums {
             .fotogrids-album-item {
-                border-bottom: 1px solid #eee;
+                border-bottom: ui-size(border-width, base) solid ui-color(border, light);
                 display: flex;
                 align-items: center;
-                padding: 10px;
-                transition: background-color 0.2s;
+                padding: ui-size(padding, md);
+                transition: ui-size(transition, colors);
+                gap: ui-size(spacing, md);
                 
                 &:last-child {
                     border-bottom: none;
@@ -135,13 +149,13 @@
                 }
                 
                 .fotogrids-album-thumb {
-                    width: 32px;
-                    height: 32px;
+                    width: ui-size(height, lg);
+                    height: ui-size(height, lg);
                     object-fit: cover;
-                    border-radius: 3px;
-                    margin-right: 10px;
+                    border-radius: ui-size(border-radius, sm);
+                    margin-right: ui-size(margin, md);
                     flex-shrink: 0;
-                    background: #f0f0f0;
+                    background: ui-color(background, tertiary);
                 }
                 
                 .fotogrids-album-details {
@@ -150,56 +164,30 @@
                     
                     .fotogrids-album-title {
                         font-weight: 500;
-                        color: #333;
-                        margin-bottom: 2px;
+                        color: ui-color(text, primary);
+                        margin-bottom: ui-size(margin, xs);
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
                     }
                     
                     .fotogrids-album-meta {
-                        font-size: 11px;
-                        color: #666;
+                        font-size: ui-size(font-size, xs);
+                        color: ui-color(text, secondary);
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
                     }
-                }
-                
-                .fotogrids-add-button {
-                    background: #46b450;
-                    color: white;
-                    border: none;
-                    border-radius: 50%;
-                    width: 24px;
-                    height: 24px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    line-height: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-left: 10px;
-                    flex-shrink: 0;
-                    
-                    &:hover {
-                        background: #3a9940;
-                    }
-                    
-                    &:disabled {
-                        opacity: 0.5;
-                        cursor: not-allowed;
-                    }
-                }
+                }                
             }
         }
     }
     
     .fotogrids-create-album {
         text-align: center;
-        margin-bottom: 15px;
+        margin: 0 ui-size(margin, md) ui-size(margin, md);
         
-        .button {
+        .fotogrids-button {
             width: 100%;
         }
     }
@@ -208,13 +196,13 @@
     .fotogrids-loading {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        font-size: 13px;
-        color: #666;
+        gap: ui-size(spacing, base);
+        padding: ui-size(padding, md);
+        background-color: ui-color(background, secondary);
+        border: ui-size(border-width, base) solid ui-color(border, primary);
+        border-radius: ui-size(border-radius, sm);
+        font-size: ui-size(font-size, base);
+        color: ui-color(text, secondary);
         
         .spinner {
             float: none;
@@ -223,20 +211,20 @@
     }
     
     .notice {
-        margin: 10px 0;
-        padding: 8px 12px;
+        margin: ui-size(margin, md) 0;
+        padding: ui-size(padding, base) ui-size(padding, md);
         
         &.notice-success {
-            border-left-color: #46b450;
+            border-left-color: ui-color(border, success);
         }
         
         &.notice-error {
-            border-left-color: #dc3232;
+            border-left-color: ui-color(border, error);
         }
         
         p {
             margin: 0;
-            font-size: 13px;
+            font-size: ui-size(font-size, base);
         }
     }
 }
@@ -246,22 +234,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    color: #666;
+    padding: ui-size(padding, xl);
+    color: ui-color(text, secondary);
     
     .spinner {
         float: none;
-        margin-right: 8px;
+        margin-right: ui-size(margin, base);
     }
 }
 
 // Error state
 .fotogrids-error {
-    padding: 15px;
-    background-color: #ffeaea;
-    border: 1px solid #dc3232;
-    border-radius: 3px;
-    color: #dc3232;
+    padding: ui-size(padding, lg);
+    background-color: ui-color(background, error-light);
+    border: ui-size(border-width, base) solid ui-color(border, error);
+    border-radius: ui-size(border-radius, sm);
+    color: ui-color(text, error);
     
     p {
         margin: 0;

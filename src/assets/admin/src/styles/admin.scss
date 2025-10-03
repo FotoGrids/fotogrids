@@ -1,17 +1,22 @@
 // FotoGrids Admin Styles
 
 // Import block styles
-@import './colors.scss';
-@import './inputs.scss';
-@import './blocks.scss';
-@import './images.scss';
-@import './settings.scss';
-@import './ajax-save.scss';
-@import './album-assignment.scss';
-@import './album-galleries.scss';
-@import './stats.scss';
+@use './colors.scss' as *;
+@use './sizes.scss' as *;
+@use './pro.scss' as *;
+@use './inputs.scss' as *;
+@use './blocks.scss' as *;
+@use './items.scss' as *;
+@use './settings.scss' as *;
+@use './ajax-save.scss' as *;
+@use './album-assignment.scss' as *;
+@use './album-galleries.scss' as *;
+@use './stats.scss' as *;
+@use './shortcode-metabox.scss' as *;
 
-#fotogrids_gallery_images > .inside {
+@use './ui-elements/ui-elements.scss' as *;
+
+#fotogrids_gallery_items > .inside {
     padding: 0;
     margin: 0;
 }
@@ -126,13 +131,9 @@
     display: inline-block;
 }
 
-.fotogrids-add-new-toggle.button {
-    display: flex;
-    align-items: center;
+.fotogrids-add-new-toggle {
     gap: 4px;
     padding-inline-start: 14px;
-    background-color: var(--fotogrids-blue);
-    border: 0;
 
     span {
         font-size: 0;
@@ -159,12 +160,7 @@
         }
     }
 
-    &:hover {
-        background-color: var(--fotogrids-blue-hover);
-    }
-
     &:focus {
-        background-color: var(--fotogrids-blue-dark);
         box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
     }
 }
@@ -253,6 +249,17 @@
     }
 }
 
+.fotogrids-items-bulk-editor {
+    padding-inline-end: 0;
+    align-items: stretch;
+    overflow: hidden;
+
+    .fotogrids-pro-badge {
+        display: flex;
+        align-items: center;
+    }
+}
+
 .fotogrids-gallery-content {
     border-top: 1px solid $tabbar-border-color;
     background: $tabbar-bg-white;
@@ -288,6 +295,14 @@
     }
 }
 
+.fotogrids-items-bulk-f {
+    padding-inline-end: 0;
+    overflow: hidden;
+
+    .fotogrids-pro-badge {
+        padding: 0 6px;
+    }
+}
 // Hide action buttons when not on manage tab
 .fotogrids-gallery-tab-content:not([data-tab="manage"]) ~ .fotogrids-gallery-header .fotogrids-gallery-actions {
     .fotogrids-add-new-dropdown,
@@ -734,8 +749,8 @@ body[class*="fotogrids_page_"] {
             }
         }
         
-        .top-images-list {
-            .top-image-item {
+        .top-items-list {
+            .top-item-item {
                 display: flex;
                 align-items: center;
                 padding: 0.75rem 0;
@@ -752,12 +767,12 @@ body[class*="fotogrids_page_"] {
                     min-width: 2rem;
                 }
                 
-                .image-title {
+                .item-title {
                     flex: 1;
                     font-weight: 500;
                 }
                 
-                .image-views {
+                .item-views {
                     color: #757575;
                     font-size: 0.9rem;
                 }
@@ -1153,11 +1168,10 @@ body[class*="fotogrids_page_"] {
 .fotogrids-layout-badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
-    border-radius: 12px;
+    border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     background: #f0f0f1;
     color: #1e1e1e;
     
@@ -1227,27 +1241,3 @@ body[class*="fotogrids_page_"] {
     }
 }
 
-// Copy to clipboard button styles
-.fotogrids-shortcode-container {
-    .fotogrids-copy-shortcode {
-        white-space: nowrap;
-        transition: all 0.2s ease;
-        
-        &.copied {
-            background-color: #00a32a;
-            border-color: #00a32a;
-            color: #fff;
-        }
-        
-        &.copy-error {
-            background-color: #d63638;
-            border-color: #d63638;
-            color: #fff;
-        }
-        
-        &:hover:not(.copied):not(.copy-error) {
-            background-color: #f6f7f7;
-            border-color: #8c8f94;
-        }
-    }
-}

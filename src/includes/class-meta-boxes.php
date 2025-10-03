@@ -19,8 +19,12 @@ class Meta_Boxes {
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
         add_action( 'save_post', array( __CLASS__, 'save_meta_boxes' ) );
         
-        add_action( 'wp_ajax_fotogrids_get_image_data', array( __CLASS__, 'ajax_get_image_data' ) );
-        add_action( 'wp_ajax_fotogrids_save_image_data', array( __CLASS__, 'ajax_save_image_data' ) );
+        add_action( 'wp_ajax_fotogrids_get_item_data', array( __CLASS__, 'ajax_get_item_data' ) );
+        add_action( 'wp_ajax_fotogrids_save_item_data', array( __CLASS__, 'ajax_save_item_data' ) );
+        add_action( 'wp_ajax_fotogrids_get_item_urls', array( __CLASS__, 'ajax_get_item_urls' ) );
+        add_action( 'wp_ajax_fotogrids_update_item_url', array( __CLASS__, 'ajax_update_item_url' ) );
+        add_action( 'wp_ajax_fotogrids_bulk_update_item_urls', array( __CLASS__, 'ajax_bulk_update_item_urls' ) );
+        add_action( 'wp_ajax_fotogrids_reorder_gallery_items', array( __CLASS__, 'ajax_reorder_gallery_items' ) );
         
         add_action( 'wp_ajax_fotogrids_save_gallery', array( __CLASS__, 'ajax_save_gallery' ) );
         
@@ -32,9 +36,9 @@ class Meta_Boxes {
      */
     public static function add_meta_boxes() {
         add_meta_box(
-            'fotogrids_gallery_images',
-            __( 'Gallery Images', 'fotogrids' ),
-            array( __CLASS__, 'gallery_images_meta_box' ),
+            'fotogrids_gallery_items',
+            __( 'Gallery Items', 'fotogrids' ),
+            array( __CLASS__, 'gallery_items_meta_box' ),
             'fotogrids_gallery',
             'normal',
             'high'
@@ -103,12 +107,12 @@ class Meta_Boxes {
             'renderButtonGroup',
             'renderColorPicker',
             'renderRange',
-            'renderRangeWithUnits',
             'renderToggle',
             'renderConditionalMessage',
             'renderLightboxSubTabs',
             'renderBulkModal',
-            'renderExternalUrlManager'
+            'renderExternalUrlManager',
+            'renderGroup'
         );
         
         foreach ( $render_functions as $function ) {
@@ -187,7 +191,7 @@ class Meta_Boxes {
                         'loading' => __( 'Loading...', 'fotogrids' ),
                         'saved' => __( 'Gallery assignments saved', 'fotogrids' ),
                         'error' => __( 'Error updating album', 'fotogrids' ),
-                        'images' => __( 'images', 'fotogrids' ),
+                        'items' => __( 'items', 'fotogrids' ),
                     ),
                 ) );
             }
@@ -195,18 +199,19 @@ class Meta_Boxes {
         
         wp_localize_script( 'fotogrids-metabox', 'fotogridsMetaBoxes', array(
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce' => wp_create_nonce( 'fotogrids_image_edit' ),
+            'nonce' => wp_create_nonce( 'fotogrids_item_edit' ),
+            'postId' => get_the_ID(),
             'strings' => array(
-                'selectImages' => __( 'Select Images for Gallery', 'fotogrids' ),
+                'selectItems' => __( 'Select Items for Gallery', 'fotogrids' ),
                 'addToGallery' => __( 'Add to Gallery', 'fotogrids' ),
-                'editImage' => __( 'Edit Image', 'fotogrids' ),
-                'removeImage' => __( 'Remove Image', 'fotogrids' ),
-                'noImages' => __( 'No images selected. Click "Add Images" to get started.', 'fotogrids' ),
-                'confirmClear' => __( 'Are you sure you want to remove all images?', 'fotogrids' ),
+                'editItem' => __( 'Edit Item', 'fotogrids' ),
+                'removeItem' => __( 'Remove Item', 'fotogrids' ),
+                'noItems' => __( 'No items selected. Click "Add Items" to get started.', 'fotogrids' ),
+                'confirmClear' => __( 'Are you sure you want to remove all items?', 'fotogrids' ),
                 'mediaNotAvailable' => __( 'WordPress media library is not available. Please refresh the page.', 'fotogrids' ),
                 'loading' => __( 'Loading...', 'fotogrids' ),
-                'errorLoadingImage' => __( 'Error loading image data', 'fotogrids' ),
-                'errorSaving' => __( 'Error saving image data', 'fotogrids' ),
+                'errorLoadingItem' => __( 'Error loading item data', 'fotogrids' ),
+                'errorSaving' => __( 'Error saving item data', 'fotogrids' ),
                 'title' => __( 'Title', 'fotogrids' ),
                 'altText' => __( 'Alt Text', 'fotogrids' ),
                 'caption' => __( 'Caption', 'fotogrids' ),
@@ -216,8 +221,9 @@ class Meta_Boxes {
                 'close' => __( 'Close', 'fotogrids' ),
                 'copied' => __( 'Copied!', 'fotogrids' ),
                 'copyFailed' => __( 'Copy failed', 'fotogrids' ),
-                'prevImage' => __( 'Previous image', 'fotogrids' ),
-                'nextImage' => __( 'Next image', 'fotogrids' ),
+                'prevItem' => __( 'Previous item', 'fotogrids' ),
+                'nextItem' => __( 'Next item', 'fotogrids' ),
+                'dropHere' => __( 'Drop here', 'fotogrids' ),
                 'details' => __( 'Details', 'fotogrids' ),
                 'tags' => __( 'Tags', 'fotogrids' ),
                 'people' => __( 'People', 'fotogrids' ),
@@ -229,43 +235,45 @@ class Meta_Boxes {
     }
     
     /**
-     * Gallery images meta box
+     * Gallery items meta box
      */
-    public static function gallery_images_meta_box( $post ) {
+    public static function gallery_items_meta_box( $post ) {
         wp_nonce_field( 'fotogrids_meta_box', 'fotogrids_meta_box_nonce' );
         
-        $gallery_images = get_post_meta( $post->ID, 'fotogrids_gallery_images', true );
-        $gallery_images = $gallery_images ? json_decode( $gallery_images, true ) : array();
+        $gallery_items = get_post_meta( $post->ID, 'fotogrids_gallery_items', true );
+        $gallery_items = $gallery_items ? json_decode( $gallery_items, true ) : array();
         
-        $images_data = array();
-        foreach ( $gallery_images as $image_id ) {
-            $image_url = wp_get_attachment_image_url( $image_id, 'full' );
-            $thumbnail_url = wp_get_attachment_image_url( $image_id, 'thumbnail' );
-            $image_title = get_the_title( $image_id );
-            $image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+        $items_data = array();
+        foreach ( $gallery_items as $item_id ) {
+            $item_url = wp_get_attachment_image_url( $item_id, 'full' );
+            $thumbnail_url = wp_get_attachment_image_url( $item_id, 'thumbnail' );
+            $item_title = get_the_title( $item_id );
+            $item_alt = get_post_meta( $item_id, '_wp_attachment_item_alt', true );
             
-            if ( $image_url ) {
-                $images_data[] = array(
-                    'id' => (int) $image_id,
-                    'title' => $image_title ?: 'Untitled',
-                    'url' => $image_url,
-                    'thumbnail' => $thumbnail_url ?: $image_url,
-                    'alt' => $image_alt ?: $image_title ?: ''
+            if ( $item_url ) {
+                $items_data[] = array(
+                    'id' => (int) $item_id,
+                    'title' => $item_title ?: 'Untitled',
+                    'url' => $item_url,
+                    'thumbnail' => $thumbnail_url ?: $item_url,
+                    'alt' => $item_alt ?: $item_title ?: ''
                 );
             }
         }
         
         wp_localize_script( 'fotogrids-metabox', 'fotogridsMetaBoxes', array(
-            'galleryImages' => $images_data,
+            'galleryItems' => $items_data,
             'canEditPosts' => current_user_can( 'edit_posts' ),
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce' => wp_create_nonce( 'fotogrids_image_edit' ),
+            'nonce' => wp_create_nonce( 'fotogrids_item_edit' ),
             'restNonce' => wp_create_nonce( 'wp_rest' ),
+            'postId' => $post->ID,
             'strings' => array(
                 'manageItems' => __( 'Manage Items', 'fotogrids' ),
                 'previewGallery' => __( 'Preview Gallery', 'fotogrids' ),
                 'addNew' => __( 'Add New', 'fotogrids' ),
                 'removeAll' => __( 'Remove All', 'fotogrids' ),
+                'bulkEditor' => __( 'Bulk Editor', 'fotogrids' ),
                 'upload' => __( 'Upload', 'fotogrids' ),
                 'uploadDescription' => __( 'Choose files from your computer', 'fotogrids' ),
                 'fromLibrary' => __( 'From Library', 'fotogrids' ),
@@ -278,20 +286,21 @@ class Meta_Boxes {
                 'videoDescription' => __( 'Add video files', 'fotogrids' ),
                 'instagram' => __( 'Instagram', 'fotogrids' ),
                 'instagramDescription' => __( 'Import from Instagram', 'fotogrids' ),
-                'noImages' => __( 'No images selected. Click "Add New" to get started.', 'fotogrids' ),
+                'noItems' => __( 'No items selected. Click "Add New" to get started.', 'fotogrids' ),
                 'previewPlaceholder' => __( 'Gallery preview functionality will be implemented here.', 'fotogrids' ),
-                'selectImages' => __( 'Select Images for Gallery', 'fotogrids' ),
+                'selectItems' => __( 'Select Items for Gallery', 'fotogrids' ),
                 'addToGallery' => __( 'Add to Gallery', 'fotogrids' ),
-                'editImage' => __( 'Edit Image', 'fotogrids' ),
-                'removeImage' => __( 'Remove Image', 'fotogrids' ),
-                'confirmClear' => __( 'Are you sure you want to remove all images?', 'fotogrids' ),
+                'editItem' => __( 'Edit Item', 'fotogrids' ),
+                'removeItem' => __( 'Remove Item', 'fotogrids' ),
+                'confirmClear' => __( 'Are you sure you want to remove all items?', 'fotogrids' ),
                 'mediaNotAvailable' => __( 'WordPress media library is not available. Please refresh the page.', 'fotogrids' ),
-                'errorLoadingImage' => __( 'Error loading image data', 'fotogrids' ),
-                'errorSaving' => __( 'Error saving image data', 'fotogrids' ),
+                'errorLoadingItem' => __( 'Error loading item data', 'fotogrids' ),
+                'errorSaving' => __( 'Error saving item data', 'fotogrids' ),
                 'loading' => __( 'Loading...', 'fotogrids' ),
                 'saving' => __( 'Saving...', 'fotogrids' ),
                 'saveChanges' => __( 'Save Changes', 'fotogrids' ),
                 'cancel' => __( 'Cancel', 'fotogrids' ),
+                'dropHere' => __( 'Drop here', 'fotogrids' ),
                 'details' => __( 'Details', 'fotogrids' ),
                 'tags' => __( 'Tags', 'fotogrids' ),
                 'people' => __( 'People', 'fotogrids' ),
@@ -301,8 +310,8 @@ class Meta_Boxes {
                 'altText' => __( 'Alt Text', 'fotogrids' ),
                 'caption' => __( 'Caption', 'fotogrids' ),
                 'description' => __( 'Description', 'fotogrids' ),
-                'prevImage' => __( 'Previous image', 'fotogrids' ),
-                'nextImage' => __( 'Next image', 'fotogrids' ),
+                'prevItem' => __( 'Previous item', 'fotogrids' ),
+                'nextItem' => __( 'Next item', 'fotogrids' ),
             )
         ) );
         
@@ -334,12 +343,12 @@ class Meta_Boxes {
             }
         }
         
-        $gallery_images = get_post_meta( $post->ID, 'fotogrids_gallery_images', true );
-        if ( is_string( $gallery_images ) ) {
-            $gallery_images = json_decode( $gallery_images, true );
+        $gallery_items = get_post_meta( $post->ID, 'fotogrids_gallery_items', true );
+        if ( is_string( $gallery_items ) ) {
+            $gallery_items = json_decode( $gallery_items, true );
         }
-        if ( ! is_array( $gallery_images ) ) {
-            $gallery_images = array();
+        if ( ! is_array( $gallery_items ) ) {
+            $gallery_items = array();
         }
         
         wp_localize_script( 'fotogrids-gallery-settings', 'fotogridsSettings', array(
@@ -347,8 +356,9 @@ class Meta_Boxes {
             'defaults' => $defaults,
             'postId' => $post->ID,
             'nonce' => wp_create_nonce( 'fotogrids_settings' ),
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             'isProActive' => false, // TODO: Check license status
-            'galleryImages' => $gallery_images,
+            'galleryItems' => $gallery_items,
             'canEditPosts' => current_user_can( 'edit_posts' ),
             'strings' => array(
                 'layout' => __( 'Layout', 'fotogrids' ),
@@ -387,6 +397,7 @@ class Meta_Boxes {
                 'noAlbumsFound' => __( 'No albums found', 'fotogrids' ),
                 'createNewAlbum' => __( 'Create New Album', 'fotogrids' ),
                 'assignedTo' => __( 'Assigned to', 'fotogrids' ),
+                'notAssignedTo' => __( 'Not assigned to any', 'fotogrids' ),
                 'albums' => __( 'albums', 'fotogrids' ),
                 'loading' => __( 'Loading...', 'fotogrids' ),
                 'error' => __( 'Error loading albums', 'fotogrids' ),
@@ -423,11 +434,11 @@ class Meta_Boxes {
         $post_type = get_post_type( $post_id );
         
         if ( $post_type === 'fotogrids_gallery' ) {
-            if ( isset( $_POST['fotogrids_gallery_images'] ) && is_array( $_POST['fotogrids_gallery_images'] ) ) {
-                $gallery_images = array_map( 'intval', $_POST['fotogrids_gallery_images'] );
-                update_post_meta( $post_id, 'fotogrids_gallery_images', json_encode( $gallery_images ) );
+            if ( isset( $_POST['fotogrids_gallery_items'] ) && is_array( $_POST['fotogrids_gallery_items'] ) ) {
+                $gallery_items = array_map( 'intval', $_POST['fotogrids_gallery_items'] );
+                update_post_meta( $post_id, 'fotogrids_gallery_items', json_encode( $gallery_items ) );
             } else {
-                delete_post_meta( $post_id, 'fotogrids_gallery_images' );
+                delete_post_meta( $post_id, 'fotogrids_gallery_items' );
             }
             
             $defaults = fotogrids_get_default_gallery_settings();
@@ -461,32 +472,32 @@ class Meta_Boxes {
     }
     
     /**
-     * AJAX handler to get image data for editing
+     * AJAX handler to get item data for editing
      */
-    public static function ajax_get_image_data() {
-        check_ajax_referer( 'fotogrids_image_edit', 'nonce' );
+    public static function ajax_get_item_data() {
+        check_ajax_referer( 'fotogrids_item_edit', 'nonce' );
         
         if ( ! current_user_can( 'upload_files' ) ) {
             wp_die( -1 );
         }
         
-        $image_id = intval( $_POST['image_id'] );
+        $item_id = intval( $_POST['item_id'] );
         
-        if ( ! $image_id ) {
-            wp_send_json_error( 'Invalid image ID' );
+        if ( ! $item_id ) {
+            wp_send_json_error( 'Invalid item ID' );
         }
         
-        $attachment = get_post( $image_id );
+        $attachment = get_post( $item_id );
         if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
-            wp_send_json_error( 'Image not found' );
+            wp_send_json_error( 'Item not found' );
         }
         
         global $wpdb;
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         $custom_meta = $wpdb->get_row( 
             $wpdb->prepare( 
                 "SELECT * FROM $table WHERE attachment_id = %d AND gallery_id = 0", 
-                $image_id 
+                $item_id 
             ) 
         );
         
@@ -507,34 +518,34 @@ class Meta_Boxes {
             }
         }
         
-        $image_data = array(
-            'id' => $image_id,
+        $item_data = array(
+            'id' => $item_id,
             'title' => $attachment->post_title,
-            'alt' => get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
+            'alt' => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
             'caption' => $attachment->post_excerpt,
             'description' => $attachment->post_content,
             'location' => $location,
             'external_url' => $external_url,
             'link_target' => $link_target,
             'custom_data' => $custom_data,
-            'medium_url' => wp_get_attachment_image_url( $image_id, 'medium' ),
-            'full_url' => wp_get_attachment_image_url( $image_id, 'full' ),
+            'medium_url' => wp_get_attachment_image_url( $item_id, 'medium' ),
+            'full_url' => wp_get_attachment_image_url( $item_id, 'full' ),
         );
         
-        wp_send_json_success( $image_data );
+        wp_send_json_success( $item_data );
     }
     
     /**
-     * AJAX handler to save image data
+     * AJAX handler to save item data
      */
-    public static function ajax_save_image_data() {
-        check_ajax_referer( 'fotogrids_image_edit', 'nonce' );
+    public static function ajax_save_item_data() {
+        check_ajax_referer( 'fotogrids_item_edit', 'nonce' );
         
         if ( ! current_user_can( 'upload_files' ) ) {
             wp_die( -1 );
         }
         
-        $image_id = intval( $_POST['image_id'] );
+        $item_id = intval( $_POST['item_id'] );
         $title = sanitize_text_field( $_POST['title'] );
         $alt = sanitize_text_field( $_POST['alt'] );
         $caption = sanitize_textarea_field( $_POST['caption'] );
@@ -546,8 +557,8 @@ class Meta_Boxes {
         $tags = isset( $_POST['tags'] ) ? json_decode( stripslashes( $_POST['tags'] ), true ) : array();
         $people = isset( $_POST['people'] ) ? json_decode( stripslashes( $_POST['people'] ), true ) : array();
         
-        if ( ! $image_id ) {
-            wp_send_json_error( 'Invalid image ID' );
+        if ( ! $item_id ) {
+            wp_send_json_error( 'Invalid item ID' );
         }
         
         if ( is_array( $tags ) ) {
@@ -572,7 +583,7 @@ class Meta_Boxes {
         }
         
         $attachment_data = array(
-            'ID' => $image_id,
+            'ID' => $item_id,
             'post_title' => $title,
             'post_excerpt' => $caption,
             'post_content' => $description,
@@ -581,13 +592,13 @@ class Meta_Boxes {
         $result = wp_update_post( $attachment_data );
         
         if ( is_wp_error( $result ) ) {
-            wp_send_json_error( 'Failed to update image data' );
+            wp_send_json_error( 'Failed to update item data' );
         }
         
-        update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
+        update_post_meta( $item_id, '_wp_attachment_item_alt', $alt );
         
         global $wpdb;
-        $table = $wpdb->prefix . 'fotogrids_image_meta';
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
         
         $custom_data = array(
             'tags' => $tags,
@@ -597,13 +608,13 @@ class Meta_Boxes {
         $existing = $wpdb->get_row( 
             $wpdb->prepare( 
                 "SELECT * FROM $table WHERE attachment_id = %d AND gallery_id = 0", 
-                $image_id 
+                $item_id 
             ) 
         );
         
         $data = array(
-            'attachment_id' => $image_id,
-            'gallery_id' => 0, // Global image data (not gallery-specific)
+            'attachment_id' => $item_id,
+            'gallery_id' => 0, // Global item data (not gallery-specific)
             'location' => $location,
             'external_url' => $external_url,
             'link_target' => $link_target,
@@ -628,7 +639,212 @@ class Meta_Boxes {
             );
         }
         
-        wp_send_json_success( 'Image data updated successfully' );
+        wp_send_json_success( 'Item data updated successfully' );
+    }
+
+    /**
+     * AJAX handler to get item URLs for multiple items (for External URL Manager)
+     */
+    public static function ajax_get_item_urls() {
+        check_ajax_referer( 'fotogrids_settings', 'nonce' );
+        
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_die( -1 );
+        }
+        
+        $item_ids = isset( $_POST['item_ids'] ) ? array_map( 'intval', $_POST['item_ids'] ) : array();
+        
+        if ( empty( $item_ids ) ) {
+            wp_send_json_success( array() );
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+        $placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
+        
+        $sql = "SELECT attachment_id, external_url, link_target FROM $table WHERE attachment_id IN ($placeholders)";
+        $results = $wpdb->get_results( $wpdb->prepare( $sql, $item_ids ), ARRAY_A );
+        
+        $item_data = array();
+        foreach ( $results as $row ) {
+            $item_data[ $row['attachment_id'] ] = array(
+                'url' => $row['external_url'] ?: '',
+                'target' => $row['link_target'] ?: 'global'
+            );
+        }
+        
+        // Fill in missing items with empty data
+        foreach ( $item_ids as $item_id ) {
+            if ( ! isset( $item_data[ $item_id ] ) ) {
+                $item_data[ $item_id ] = array(
+                    'url' => '',
+                    'target' => 'global'
+                );
+            }
+        }
+        
+        wp_send_json_success( $item_data );
+    }
+
+    /**
+     * AJAX handler to update a single item URL
+     */
+    public static function ajax_update_item_url() {
+        check_ajax_referer( 'fotogrids_settings', 'nonce' );
+        
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_die( -1 );
+        }
+        
+        $item_id = intval( $_POST['item_id'] ?? 0 );
+        $url = sanitize_url( $_POST['url'] ?? '' );
+        $target = sanitize_text_field( $_POST['target'] ?? 'global' );
+        
+        if ( ! $item_id ) {
+            wp_send_json_error( 'Invalid item ID' );
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+        
+        // Check if record exists
+        $exists = $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(*) FROM $table WHERE attachment_id = %d",
+            $item_id
+        ) );
+        
+        if ( $exists ) {
+            $result = $wpdb->update(
+                $table,
+                array(
+                    'external_url' => $url,
+                    'link_target' => $target
+                ),
+                array( 'attachment_id' => $item_id ),
+                array( '%s', '%s' ),
+                array( '%d' )
+            );
+        } else {
+            // Create new record
+            $attachment = get_post( $item_id );
+            if ( ! $attachment ) {
+                wp_send_json_error( 'Attachment not found' );
+            }
+            
+            $result = $wpdb->insert(
+                $table,
+                array(
+                    'attachment_id' => $item_id,
+                    'gallery_id' => 0, // Global item data
+                    'external_url' => $url,
+                    'link_target' => $target,
+                    'position' => 0
+                ),
+                array( '%d', '%d', '%s', '%s', '%d' )
+            );
+        }
+        
+        if ( $result !== false ) {
+            wp_send_json_success( 'Item URL updated successfully' );
+        } else {
+            wp_send_json_error( 'Failed to update item URL' );
+        }
+    }
+
+    /**
+     * AJAX handler for bulk item URL operations
+     */
+    public static function ajax_bulk_update_item_urls() {
+        check_ajax_referer( 'fotogrids_settings', 'nonce' );
+        
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_die( -1 );
+        }
+        
+        $action = sanitize_text_field( $_POST['bulk_action'] ?? '' );
+        $item_ids = isset( $_POST['item_ids'] ) ? array_map( 'intval', $_POST['item_ids'] ) : array();
+        $url = sanitize_url( $_POST['url'] ?? '' );
+        $target = sanitize_text_field( $_POST['target'] ?? 'global' );
+        
+        if ( empty( $item_ids ) ) {
+            wp_send_json_error( 'No item IDs provided' );
+        }
+        
+        if ( ! in_array( $action, array( 'apply_to_all', 'clear_all' ) ) ) {
+            wp_send_json_error( 'Invalid action' );
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+        $updated = 0;
+        
+        if ( $action === 'apply_to_all' ) {
+            foreach ( $item_ids as $item_id ) {
+                // Check if record exists
+                $exists = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT COUNT(*) FROM $table WHERE attachment_id = %d",
+                    $item_id
+                ) );
+                
+                if ( $exists ) {
+                    $result = $wpdb->update(
+                        $table,
+                        array(
+                            'external_url' => $url,
+                            'link_target' => $target
+                        ),
+                        array( 'attachment_id' => $item_id ),
+                        array( '%s', '%s' ),
+                        array( '%d' )
+                    );
+                } else {
+                    // Create new record
+                    $attachment = get_post( $item_id );
+                    if ( ! $attachment ) {
+                        continue;
+                    }
+                    
+                    $result = $wpdb->insert(
+                        $table,
+                        array(
+                            'attachment_id' => $item_id,
+                            'gallery_id' => 0,
+                            'external_url' => $url,
+                            'link_target' => $target,
+                            'position' => 0
+                        ),
+                        array( '%d', '%d', '%s', '%s', '%d' )
+                    );
+                }
+                
+                if ( $result !== false ) {
+                    $updated++;
+                }
+            }
+        } elseif ( $action === 'clear_all' ) {
+            foreach ( $item_ids as $item_id ) {
+                $result = $wpdb->update(
+                    $table,
+                    array(
+                        'external_url' => '',
+                        'link_target' => 'global'
+                    ),
+                    array( 'attachment_id' => $item_id ),
+                    array( '%s', '%s' ),
+                    array( '%d' )
+                );
+                
+                if ( $result !== false ) {
+                    $updated++;
+                }
+            }
+        }
+        
+        wp_send_json_success( array(
+            'updated' => $updated,
+            'action' => $action,
+            'message' => sprintf( __( 'Bulk action completed. Updated %d items.', 'fotogrids' ), $updated )
+        ) );
     }
     
     /**
@@ -682,9 +898,9 @@ class Meta_Boxes {
             }
         }
         
-        if ( isset( $_POST['fotogrids_gallery_images'] ) && is_array( $_POST['fotogrids_gallery_images'] ) ) {
-            $gallery_images = array_map( 'intval', $_POST['fotogrids_gallery_images'] );
-            update_post_meta( $post_id, 'fotogrids_gallery_images', json_encode( $gallery_images ) );
+        if ( isset( $_POST['fotogrids_gallery_items'] ) && is_array( $_POST['fotogrids_gallery_items'] ) ) {
+            $gallery_items = array_map( 'intval', $_POST['fotogrids_gallery_items'] );
+            update_post_meta( $post_id, 'fotogrids_gallery_items', json_encode( $gallery_items ) );
         }
         
         $defaults = fotogrids_get_default_gallery_settings();
@@ -723,5 +939,48 @@ class Meta_Boxes {
             'post_title' => get_the_title( $post_id ),
             'redirect_url' => get_edit_post_link( $post_id, 'raw' )
         ) );
+    }
+    
+    /**
+     * AJAX handler for reordering gallery items
+     */
+    public static function ajax_reorder_gallery_items() {
+        check_ajax_referer( 'fotogrids_item_edit', 'nonce' );
+        
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
+        }
+        
+        $gallery_id = intval( $_POST['gallery_id'] ?? 0 );
+        if ( ! $gallery_id ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid gallery ID', 'fotogrids' ) ) );
+        }
+        
+        $post = get_post( $gallery_id );
+        if ( ! $post || $post->post_type !== 'fotogrids_gallery' ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid gallery', 'fotogrids' ) ) );
+        }
+        
+        if ( ! current_user_can( 'edit_post', $gallery_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Cannot edit this gallery', 'fotogrids' ) ) );
+        }
+        
+        $item_order = isset( $_POST['item_order'] ) ? json_decode( stripslashes( $_POST['item_order'] ), true ) : array();
+        if ( ! is_array( $item_order ) ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid item order data', 'fotogrids' ) ) );
+        }
+        
+        // Use the helper function to reorder items
+        $result = fotogrids_reorder_gallery_items( $gallery_id, $item_order );
+        
+        if ( $result ) {
+            wp_send_json_success( array( 
+                'message' => __( 'Items reordered successfully', 'fotogrids' ),
+                'gallery_id' => $gallery_id,
+                'item_order' => $item_order
+            ) );
+        } else {
+            wp_send_json_error( array( 'message' => __( 'Failed to reorder items', 'fotogrids' ) ) );
+        }
     }
 }

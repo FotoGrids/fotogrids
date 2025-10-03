@@ -29,6 +29,61 @@ function initializeIcons() {
     });
 }
 
+function initializeCopyButtons() {
+    const copyButtons = document.querySelectorAll('.fotogrids-shortcode-copy');
+    
+    copyButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const shortcode = this.dataset.shortcode;
+            const successMessage = this.parentNode.nextElementSibling;
+            
+            if (!shortcode) {
+                console.warn('No shortcode found on copy button');
+                return;
+            }
+            
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(shortcode);
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = shortcode;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+                
+                this.classList.add('copied');
+                if (successMessage && successMessage.classList.contains('fotogrids-shortcode-copy-success')) {
+                    successMessage.classList.add('show');
+                    
+                    setTimeout(() => {
+                        successMessage.classList.remove('show');
+                    }, 2000);
+                }
+                
+                setTimeout(() => {
+                    this.classList.remove('copied');
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Failed to copy shortcode:', error);
+                
+                this.classList.add('copy-error');
+                
+                setTimeout(() => {
+                    this.classList.remove('copy-error');
+                }, 2000);
+            }
+        });
+    });
+}
+
 // Initialize the React app when DOM is ready
 function initializeGalleryMetabox() {
     try {
@@ -57,7 +112,7 @@ function initializeGalleryMetabox() {
         console.log('Metabox data:', metaboxData);
         
         const props = {
-            galleryImages: metaboxData.galleryImages || [],
+            galleryItems: metaboxData.galleryItems || [],
             canEditPosts: metaboxData.canEditPosts || false,
             ajaxUrl: metaboxData.ajaxUrl || '',
             nonce: metaboxData.nonce || '',
@@ -69,12 +124,13 @@ function initializeGalleryMetabox() {
         // Render React component
         ReactDOM.render(React.createElement(GalleryMetabox, props), container);
 
-        // Initialize icons after React has rendered
+        // Initialize icons and copy functionality after React has rendered
         setTimeout(() => {
             try {
                 initializeIcons();
+                initializeCopyButtons();
             } catch (error) {
-                console.warn('Failed to initialize icons:', error);
+                console.warn('Failed to initialize icons and copy buttons:', error);
             }
         }, 200);
         
@@ -95,10 +151,16 @@ function initializeGalleryMetabox() {
 function safeInitialize() {
     try {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeGalleryMetabox);
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeGalleryMetabox();
+                setTimeout(initializeCopyButtons, 300);
+            });
         } else {
             // Add a small delay to ensure all scripts are loaded
-            setTimeout(initializeGalleryMetabox, 100);
+            setTimeout(() => {
+                initializeGalleryMetabox();
+                setTimeout(initializeCopyButtons, 300);
+            }, 100);
         }
     } catch (error) {
         console.error('Failed to set up Gallery Metabox initialization:', error);
@@ -111,5 +173,6 @@ safeInitialize();
 // Export for potential external use
 window.FotoGridsMetabox = {
     init: initializeGalleryMetabox,
-    initializeIcons: initializeIcons
+    initializeIcons: initializeIcons,
+    initializeCopyButtons: initializeCopyButtons
 };

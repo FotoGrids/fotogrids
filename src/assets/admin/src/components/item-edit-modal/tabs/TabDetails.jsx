@@ -7,14 +7,14 @@ const TabDetails = ({ formData, handleInputChange, strings }) => {
                 <tbody>
                     <tr>
                         <th>
-                            <label htmlFor="fotogrids-image-title">
+                            <label htmlFor="fotogrids-item-title">
                                 {strings.title || 'Title'}
                             </label>
                         </th>
                         <td>
                             <input
                                 type="text"
-                                id="fotogrids-image-title"
+                                id="fotogrids-item-title"
                                 value={formData.title}
                                 onChange={(e) => handleInputChange('title', e.target.value)}
                             />
@@ -22,14 +22,14 @@ const TabDetails = ({ formData, handleInputChange, strings }) => {
                     </tr>
                     <tr>
                         <th>
-                            <label htmlFor="fotogrids-image-alt">
+                            <label htmlFor="fotogrids-item-alt">
                                 {strings.altText || 'Alt Text'}
                             </label>
                         </th>
                         <td>
                             <input
                                 type="text"
-                                id="fotogrids-image-alt"
+                                id="fotogrids-item-alt"
                                 value={formData.alt}
                                 onChange={(e) => handleInputChange('alt', e.target.value)}
                             />
@@ -37,13 +37,13 @@ const TabDetails = ({ formData, handleInputChange, strings }) => {
                     </tr>
                     <tr>
                         <th>
-                            <label htmlFor="fotogrids-image-caption">
+                            <label htmlFor="fotogrids-item-caption">
                                 {strings.caption || 'Caption'}
                             </label>
                         </th>
                         <td>
                             <textarea
-                                id="fotogrids-image-caption"
+                                id="fotogrids-item-caption"
                                 rows="3"
                                 value={formData.caption}
                                 onChange={(e) => handleInputChange('caption', e.target.value)}
@@ -52,13 +52,13 @@ const TabDetails = ({ formData, handleInputChange, strings }) => {
                     </tr>
                     <tr>
                         <th>
-                            <label htmlFor="fotogrids-image-description">
+                            <label htmlFor="fotogrids-item-description">
                                 {strings.description || 'Description'}
                             </label>
                         </th>
                         <td>
                             <textarea
-                                id="fotogrids-image-description"
+                                id="fotogrids-item-description"
                                 rows="4"
                                 value={formData.description}
                                 onChange={(e) => handleInputChange('description', e.target.value)}

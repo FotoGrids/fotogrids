@@ -111,14 +111,14 @@ describe('GallerySelector Component', () => {
             createMockGallery({
                 id: 1,
                 title: 'Test Gallery 1',
-                image_count: 5,
-                featured_image: 'https://example.com/image1.jpg'
+                item_count: 5,
+                featured_item: 'https://example.com/item1.jpg'
             }),
             createMockGallery({
                 id: 2,
                 title: 'Test Gallery 2',
-                image_count: 10,
-                featured_image: undefined
+                item_count: 10,
+                featured_item: undefined
             })
         ];
 
@@ -141,23 +141,23 @@ describe('GallerySelector Component', () => {
         test('displays gallery metadata', () => {
             render(<GallerySelector {...defaultProps} galleries={mockGalleries} />);
 
-            expect(screen.getByText('5 images')).toBeInTheDocument();
-            expect(screen.getByText('10 images')).toBeInTheDocument();
+            expect(screen.getByText('5 items')).toBeInTheDocument();
+            expect(screen.getByText('10 items')).toBeInTheDocument();
         });
 
-        test('renders featured images when available', () => {
+        test('renders featured items when available', () => {
             render(<GallerySelector {...defaultProps} galleries={mockGalleries} />);
 
-            const images = screen.getAllByRole('img');
-            expect(images).toHaveLength(1); // Only gallery 1 has featured image
-            expect(images[0]).toHaveAttribute('src', 'https://example.com/image1.jpg');
-            expect(images[0]).toHaveAttribute('alt', 'Test Gallery 1');
+            const items = screen.getAllByRole('img');
+            expect(items).toHaveLength(1); // Only gallery 1 has featured item
+            expect(items[0]).toHaveAttribute('src', 'https://example.com/item1.jpg');
+            expect(items[0]).toHaveAttribute('alt', 'Test Gallery 1');
         });
 
-        test('handles missing featured images gracefully', () => {
+        test('handles missing featured items gracefully', () => {
             render(<GallerySelector {...defaultProps} galleries={mockGalleries} />);
 
-            // Gallery 2 should not have an image
+            // Gallery 2 should not have an item
             const gallery2Card = screen.getByText('Test Gallery 2').closest('[data-testid="card"]');
             const mediaInGallery2 = gallery2Card?.querySelector('[data-testid="card-media"]');
             expect(mediaInGallery2).toBeFalsy();
@@ -280,7 +280,7 @@ describe('GallerySelector Component', () => {
     describe('Edge Cases', () => {
         test('handles empty gallery titles', () => {
             const galleriesWithEmptyTitle = [
-                createMockGallery({ id: 1, title: '', image_count: 0 })
+                createMockGallery({ id: 1, title: '', item_count: 0 })
             ];
 
             render(<GallerySelector {...defaultProps} galleries={galleriesWithEmptyTitle} />);
@@ -289,24 +289,24 @@ describe('GallerySelector Component', () => {
             expect(screen.getAllByTestId('card')).toHaveLength(2); // Gallery + create new
         });
 
-        test('handles zero image count', () => {
-            const galleriesWithNoImages = [
-                createMockGallery({ id: 1, title: 'Empty Gallery', image_count: 0 })
+        test('handles zero item count', () => {
+            const galleriesWithNoItems = [
+                createMockGallery({ id: 1, title: 'Empty Gallery', item_count: 0 })
             ];
 
-            render(<GallerySelector {...defaultProps} galleries={galleriesWithNoImages} />);
+            render(<GallerySelector {...defaultProps} galleries={galleriesWithNoItems} />);
 
-            expect(screen.getByText('0 images')).toBeInTheDocument();
+            expect(screen.getByText('0 items')).toBeInTheDocument();
         });
 
-        test('handles large image counts', () => {
-            const galleriesWithManyImages = [
-                createMockGallery({ id: 1, title: 'Large Gallery', image_count: 1500 })
+        test('handles large item counts', () => {
+            const galleriesWithManyItems = [
+                createMockGallery({ id: 1, title: 'Large Gallery', item_count: 1500 })
             ];
 
-            render(<GallerySelector {...defaultProps} galleries={galleriesWithManyImages} />);
+            render(<GallerySelector {...defaultProps} galleries={galleriesWithManyItems} />);
 
-            expect(screen.getByText('1500 images')).toBeInTheDocument();
+            expect(screen.getByText('1500 items')).toBeInTheDocument();
         });
     });
 });

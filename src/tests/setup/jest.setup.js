@@ -134,25 +134,25 @@ global.fetch = jest.fn(() =>
 export const createMockGallery = (overrides = {}) => ({
     id: 1,
     title: 'Test Gallery',
-    image_count: 5,
-    featured_image: 'https://example.com/image.jpg',
+    item_count: 5,
+    featured_item: 'https://example.com/item.jpg',
     created: '2023-01-01T00:00:00Z',
     modified: '2023-01-01T00:00:00Z',
     ...overrides
 });
 
-export const createMockImage = (overrides = {}) => ({
+export const createMockItem = (overrides = {}) => ({
     id: 1,
     position: 1,
-    caption: 'Test Image',
+    caption: 'Test Item',
     description: 'Test Description',
-    url: 'https://example.com/image.jpg',
-    thumbnail: 'https://example.com/image-150x150.jpg',
-    medium: 'https://example.com/image-300x300.jpg',
-    large: 'https://example.com/image-1024x1024.jpg',
-    full: 'https://example.com/image.jpg',
+    url: 'https://example.com/item.jpg',
+    thumbnail: 'https://example.com/item-150x150.jpg',
+    medium: 'https://example.com/item-300x300.jpg',
+    large: 'https://example.com/item-1024x1024.jpg',
+    full: 'https://example.com/item.jpg',
     alt: 'Test Alt Text',
-    title: 'Test Image Title',
+    title: 'Test Item Title',
     ...overrides
 });
 

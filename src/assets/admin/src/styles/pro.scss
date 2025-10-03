@@ -1,0 +1,20 @@
+@mixin pro-badge {
+    font-size: 10px;
+    line-height: 1;
+    background: var(--fotogrids-yellow);
+    color: white;
+    padding: 2px 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.fotogrids-pro-badge {
+    @include pro-badge;
+
+    &__absolute {
+        position: absolute;
+        top: 8px;
+        inset-inline-end: 8px;
+        z-index: 10;    
+    }
+}

@@ -10,7 +10,7 @@ class FotoGridsLightbox {
         this.gallery = gallery;
         this.isOpen = false;
         this.currentIndex = 0;
-        this.images = [];
+        this.items = [];
         this.autoProgressTimer = null;
         this.element = null;
         
@@ -32,7 +32,9 @@ class FotoGridsLightbox {
             dotColor: gallery.dataset.lightboxDotColor || '#ffffff',
             activeDotColor: gallery.dataset.lightboxActiveDotColor || '#007cba',
             dotsSpacing: gallery.dataset.lightboxDotsSpacing || '8px',
-            customColor: gallery.dataset.lightboxCustomColor || '#000000'
+            customColor: gallery.dataset.lightboxCustomColor || '#000000',
+            thumbnailStripLocation: gallery.dataset.lightboxThumbnailStripLocation || 'bottom',
+            thumbnailSize: gallery.dataset.lightboxThumbnailSize || 'normal'
         };
         
         this.createElement();
@@ -42,6 +44,11 @@ class FotoGridsLightbox {
     createElement() {
         this.element = document.createElement('div');
         this.element.className = `fotogrids-lightbox-overlay fotogrids-theme-${this.settings.theme} fotogrids-transition-${this.settings.transition}`;
+        
+        // Add thumbnail layout class for container styling
+        if (this.settings.thumbnailStripLocation !== 'none') {
+            this.element.classList.add(`fotogrids-thumbnails-${this.settings.thumbnailStripLocation}`);
+        }
         
         // Apply custom color if theme is custom
         if (this.settings.theme === 'custom') {
@@ -66,9 +73,15 @@ class FotoGridsLightbox {
                 ` : ''}
                 <div class="fotogrids-lightbox-content ${this.settings.fitMedia ? 'fit-media' : ''}">
                     <img src="" alt="" />
-                    <div class="fotogrids-lightbox-caption"></div>
                 </div>
                 ${this.settings.showDots ? '<div class="fotogrids-lightbox-dots"></div>' : ''}
+                ${this.settings.thumbnailStripLocation !== 'none' ? `<div class="fotogrids-lightbox-thumbnails fotogrids-thumbnails-${this.settings.thumbnailStripLocation} fotogrids-thumbnails-${this.settings.thumbnailSize}"></div>` : ''}
+            </div>
+            <div class="fotogrids-lightbox-details">
+                <div class="fotogrids-lightbox-caption"></div>
+                <div class="fotogrids-lightbox-title"></div>
+                <div class="fotogrids-lightbox-description"></div>
+                <div class="fotogrids-lightbox-meta"></div>
             </div>
         `;
         
@@ -137,22 +150,33 @@ class FotoGridsLightbox {
             this.element.addEventListener('click', (e) => {
                 if (e.target.matches('.fotogrids-lightbox-dot')) {
                     const index = parseInt(e.target.dataset.index);
-                    this.goToImage(index);
+                    this.goToItem(index);
+                }
+            });
+        }
+        
+        // Thumbnail navigation (if enabled)
+        if (this.settings.thumbnailStripLocation !== 'none') {
+            this.element.addEventListener('click', (e) => {
+                if (e.target.matches('.fotogrids-lightbox-thumbnail')) {
+                    const index = parseInt(e.target.dataset.index);
+                    this.goToItem(index);
                 }
             });
         }
     }
     
-    open(clickedImage) {
-        // Get all images in the same gallery
-        this.images = Array.from(this.gallery.querySelectorAll('.fotogrids-item img'));
-        this.currentIndex = this.images.indexOf(clickedImage);
+    open(clickedItem) {
+        // Get all items in the same gallery
+        this.items = Array.from(this.gallery.querySelectorAll('.fotogrids-item img'));
+        this.currentIndex = this.items.indexOf(clickedItem);
         
         // Set transition duration
         this.element.style.setProperty('--transition-duration', this.settings.duration + 'ms');
         
-        this.showImage();
+        this.showItem();
         this.buildDots();
+        this.buildThumbnails();
         this.element.classList.add('active');
         this.isOpen = true;
         
@@ -160,12 +184,12 @@ class FotoGridsLightbox {
         document.body.style.overflow = 'hidden';
         
         // Start auto progress if enabled
-        if (this.settings.autoProgress && this.images.length > 1) {
+        if (this.settings.autoProgress && this.items.length > 1) {
             this.startAutoProgress();
         }
         
-        // Track image view
-        this.trackImageView(clickedImage);
+        // Track item view
+        this.trackItemView(clickedItem);
         
         // Focus management for accessibility
         this.element.focus();
@@ -181,16 +205,17 @@ class FotoGridsLightbox {
         // Restore body scroll
         document.body.style.overflow = '';
         
-        // Return focus to the clicked image
-        if (this.images[this.currentIndex]) {
-            this.images[this.currentIndex].focus();
+        // Return focus to the clicked item
+        if (this.items[this.currentIndex]) {
+            this.items[this.currentIndex].focus();
         }
     }
     
     prev() {
-        this.currentIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.images.length - 1;
-        this.showImage();
+        this.currentIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.items.length - 1;
+        this.showItem();
         this.updateDots();
+        this.updateThumbnails();
         
         // Restart auto progress if enabled
         if (this.settings.autoProgress) {
@@ -199,9 +224,10 @@ class FotoGridsLightbox {
     }
     
     next() {
-        this.currentIndex = this.currentIndex < this.images.length - 1 ? this.currentIndex + 1 : 0;
-        this.showImage();
+        this.currentIndex = this.currentIndex < this.items.length - 1 ? this.currentIndex + 1 : 0;
+        this.showItem();
         this.updateDots();
+        this.updateThumbnails();
         
         // Restart auto progress if enabled
         if (this.settings.autoProgress) {
@@ -209,10 +235,11 @@ class FotoGridsLightbox {
         }
     }
     
-    goToImage(index) {
+    goToItem(index) {
         this.currentIndex = index;
-        this.showImage();
+        this.showItem();
         this.updateDots();
+        this.updateThumbnails();
         
         // Restart auto progress if enabled
         if (this.settings.autoProgress) {
@@ -245,11 +272,11 @@ class FotoGridsLightbox {
         dotsContainer.innerHTML = '';
         dotsContainer.style.setProperty('--dot-spacing', this.settings.dotsSpacing);
         
-        this.images.forEach((_, index) => {
+        this.items.forEach((_, index) => {
             const dot = document.createElement('button');
             dot.className = `fotogrids-lightbox-dot fotogrids-dot-${this.settings.dotStyle}`;
             dot.dataset.index = index;
-            dot.setAttribute('aria-label', `Go to image ${index + 1}`);
+            dot.setAttribute('aria-label', `Go to item ${index + 1}`);
             dot.style.setProperty('--dot-color', this.settings.dotColor);
             dot.style.setProperty('--active-dot-color', this.settings.activeDotColor);
             dotsContainer.appendChild(dot);
@@ -268,12 +295,47 @@ class FotoGridsLightbox {
         });
     }
     
-    showImage() {
-        const img = this.images[this.currentIndex];
+    buildThumbnails() {
+        if (this.settings.thumbnailStripLocation === 'none') return;
+        
+        const thumbnailsContainer = this.element.querySelector('.fotogrids-lightbox-thumbnails');
+        if (!thumbnailsContainer) return;
+        
+        thumbnailsContainer.innerHTML = '';
+        
+        this.items.forEach((img, index) => {
+            const thumbnail = document.createElement('button');
+            thumbnail.className = 'fotogrids-lightbox-thumbnail';
+            thumbnail.dataset.index = index;
+            thumbnail.setAttribute('aria-label', `Go to item ${index + 1}`);
+            
+            const thumbnailImg = document.createElement('img');
+            thumbnailImg.src = img.src;
+            thumbnailImg.alt = img.alt || `Thumbnail ${index + 1}`;
+            
+            thumbnail.appendChild(thumbnailImg);
+            thumbnailsContainer.appendChild(thumbnail);
+        });
+        
+        this.updateThumbnails();
+    }
+    
+    updateThumbnails() {
+        if (this.settings.thumbnailStripLocation === 'none') return;
+        
+        const thumbnails = this.element.querySelectorAll('.fotogrids-lightbox-thumbnail');
+        thumbnails.forEach((thumbnail, index) => {
+            thumbnail.classList.toggle('active', index === this.currentIndex);
+            thumbnail.setAttribute('aria-pressed', index === this.currentIndex);
+        });
+    }
+    
+    showItem() {
+        const img = this.items[this.currentIndex];
         const lightboxImg = this.element.querySelector('.fotogrids-lightbox-content img');
         const caption = this.element.querySelector('.fotogrids-lightbox-caption');
         
-        // Use full size image if available
+        // Use full size item if available
         const fullSrc = img.dataset.full || img.src;
         lightboxImg.src = fullSrc;
         lightboxImg.alt = img.alt;
@@ -292,24 +354,24 @@ class FotoGridsLightbox {
         const nextBtn = this.element.querySelector('.fotogrids-lightbox-next');
         
         if (prevBtn) {
-            prevBtn.style.display = this.images.length > 1 && this.settings.showArrows ? 'block' : 'none';
+            prevBtn.style.display = this.items.length > 1 && this.settings.showArrows ? 'block' : 'none';
         }
         if (nextBtn) {
-            nextBtn.style.display = this.images.length > 1 && this.settings.showArrows ? 'block' : 'none';
+            nextBtn.style.display = this.items.length > 1 && this.settings.showArrows ? 'block' : 'none';
         }
         
         // Update counter for screen readers
-        this.element.setAttribute('aria-label', `Image ${this.currentIndex + 1} of ${this.images.length}`);
+        this.element.setAttribute('aria-label', `Item ${this.currentIndex + 1} of ${this.items.length}`);
     }
     
-    trackImageView(img) {
+    trackItemView(img) {
         const settings = window.fotogrids || {};
         if (!settings.stats_tracking) {
             return;
         }
         
-        const imageId = img.dataset.id;
-        if (!imageId) {
+        const itemId = img.dataset.id;
+        if (!itemId) {
             return;
         }
         
@@ -320,11 +382,11 @@ class FotoGridsLightbox {
                 'X-WP-Nonce': settings.nonce,
             },
             body: JSON.stringify({
-                object_type: 'image',
-                object_id: parseInt(imageId),
+                object_type: 'item',
+                object_id: parseInt(itemId),
             }),
         }).catch(error => {
-            console.warn('FotoGrids: Error tracking image view:', error);
+            console.warn('FotoGrids: Error tracking item view:', error);
         });
     }
     
@@ -457,7 +519,7 @@ class FotoGridsLightboxManager {
                 }
             }
             
-            // Handle direct image clicks in lightbox galleries (fallback)
+            // Handle direct item clicks in lightbox galleries (fallback)
             if (e.target.matches('.fotogrids-item-lightbox img') || 
                 e.target.matches('.fotogrids-lightbox .fotogrids-item img')) {
                 e.preventDefault();

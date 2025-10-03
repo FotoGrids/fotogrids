@@ -52,11 +52,11 @@ class FotoGridsStats {
                         </div>
                     </div>
 
-					<div class="fotogrids-stat-card" data-fotogrids-stat="images">
-                        <div class="stat-icon">${window.FotoGridsIcons?.remove_image || ''}</div>
+					<div class="fotogrids-stat-card" data-fotogrids-stat="items">
+                        <div class="stat-icon">${window.FotoGridsIcons?.remove_item || ''}</div>
                         <div class="stat-content">
-                            <div class="stat-number" id="total-images">0</div>
-                            <div class="stat-label">Total Images</div>
+                            <div class="stat-number" id="total-items">0</div>
+                            <div class="stat-label">Total Items</div>
                         </div>
                     </div>
                     
@@ -239,7 +239,7 @@ class FotoGridsStats {
             if (overviewResponse) {
                 document.getElementById('total-galleries').textContent = overviewResponse.galleries || 0;
                 document.getElementById('total-albums').textContent = overviewResponse.albums || 0;
-                document.getElementById('total-images').textContent = overviewResponse.images || 0;
+                document.getElementById('total-items').textContent = overviewResponse.items || 0;
                 document.getElementById('total-views').textContent = overviewResponse.views || 0;
             }
 
@@ -343,7 +343,7 @@ class FotoGridsStats {
         // Show placeholder data with zeros
         document.getElementById('total-galleries').textContent = '0';
         document.getElementById('total-albums').textContent = '0';
-        document.getElementById('total-images').textContent = '0';
+        document.getElementById('total-items').textContent = '0';
         document.getElementById('total-views').textContent = '0';
     }
 }

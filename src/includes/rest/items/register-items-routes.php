@@ -1,33 +1,33 @@
 <?php
-namespace FotoGrids\REST\Images;
+namespace FotoGrids\REST\Items;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
 /**
- * Images REST Routes Registration
+ * Items REST Routes Registration
  *
- * Handles registration of image-related REST API endpoints.
+ * Handles registration of item-related REST API endpoints.
  *
  * @since 1.0.0
  */
-class Register_Images_Routes {
+class Register_Items_Routes {
     
     /**
-     * Register all image-related REST API routes
+     * Register all item-related REST API routes
      *
-     * Registers endpoints for image querying and filtering.
+     * Registers endpoints for item querying and filtering.
      *
      * @since 1.0.0
      * @return void
      */
     public static function register() {
-        // Images query endpoint
-        register_rest_route( 'fotogrids/v1', '/images', array(
+        // Items query endpoint
+        register_rest_route( 'fotogrids/v1', '/items', array(
             array(
                 'methods'  => \WP_REST_Server::READABLE,
-                'callback' => array( '\FotoGrids\REST\Images\Images_Data', 'query_images' ),
+                'callback' => array( '\FotoGrids\REST\Items\Items_Data', 'query_items' ),
                 'args' => array(
                     'gallery' => array(
                         'sanitize_callback' => 'absint',

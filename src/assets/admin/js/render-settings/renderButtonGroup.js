@@ -28,7 +28,12 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
                 }, renderIcon(option.icon)),
                 option.label && h('span', {
                     className: 'fotogrids-button-label'
-                }, option.label)
+                }, [
+                    option.label,
+                    option.unit && h('span', {
+                        className: 'fotogrids-button-unit'
+                    }, ` (${option.value}${option.unit})`)
+                ].filter(Boolean))
             ])
         ))
     ]);

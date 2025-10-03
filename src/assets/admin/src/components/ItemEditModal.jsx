@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import ModalStructure from './imageEditModal/ModalStructure';
+import ModalStructure from './item-edit-modal/ModalStructure';
 
-const ImageEditModal = ({ 
-    imageId, 
-    imageData, 
+const ItemEditModal = ({ 
+    itemId, 
+    itemData, 
     loading, 
-    images, 
+    items, 
     onClose, 
     onNavigate, 
     ajaxUrl, 
@@ -43,32 +43,32 @@ const ImageEditModal = ({
     const [hasChanges, setHasChanges] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
-    // Update form data when imageData changes
+    // Update form data when itemData changes
     useEffect(() => {
-        if (imageData) {
+        if (itemData) {
             const initialFormData = {
-                title: imageData.title || '',
-                alt: imageData.alt || '',
-                caption: imageData.caption || '',
-                description: imageData.description || '',
-                location: imageData.location || '',
-                external_url: imageData.external_url || '',
-                link_target: imageData.link_target || 'global'
+                title: itemData.title || '',
+                alt: itemData.alt || '',
+                caption: itemData.caption || '',
+                description: itemData.description || '',
+                location: itemData.location || '',
+                external_url: itemData.external_url || '',
+                link_target: itemData.link_target || 'global'
             };
             setFormData(initialFormData);
             setOriginalData(initialFormData);
             setHasChanges(false);
-            setSaveSuccess(false); // Reset success state when switching images
+            setSaveSuccess(false); // Reset success state when switching items
         }
-    }, [imageData]);
+    }, [itemData]);
 
     // Load metadata when modal opens
     useEffect(() => {
-        if (imageId) {
-            loadImageMetadata();
+        if (itemId) {
+            loadItemMetadata();
             loadAvailableMetadata();
         }
-    }, [imageId]);
+    }, [itemId]);
 
     // Track changes in form data and metadata
     useEffect(() => {
@@ -93,9 +93,9 @@ const ImageEditModal = ({
         setHasChanges(formDataChanged || metadataChanged);
     }, [formData, originalData, metadata, originalMetadata]);
 
-    const loadImageMetadata = async () => {
+    const loadItemMetadata = async () => {
         try {
-            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/image/${imageId}?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`);
+            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`);
             const data = await response.json();
             
             const initialMetadata = {
@@ -107,7 +107,7 @@ const ImageEditModal = ({
             setMetadata(initialMetadata);
             setOriginalMetadata(initialMetadata);
         } catch (error) {
-            console.warn('Failed to load image metadata:', error);
+            console.warn('Failed to load item metadata:', error);
         }
     };
 
@@ -209,16 +209,16 @@ const ImageEditModal = ({
         setMetadataInput(prev => ({ ...prev, [type]: '' }));
     };
 
-    const saveImageMetadata = async () => {
+    const saveItemMetadata = async () => {
         try {
-            // Save image-metadata relationships
+            // Save item-metadata relationships
             const metadataToSave = {
                 tags: metadata.tags.map(tag => tag.id),
                 people: metadata.people.map(person => person.id),
                 location: metadata.location ? metadata.location.id : null
             };
 
-            await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/image/${imageId}`, {
+            await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -227,7 +227,7 @@ const ImageEditModal = ({
                 body: JSON.stringify(metadataToSave)
             });
         } catch (error) {
-            console.warn('Failed to save image metadata:', error);
+            console.warn('Failed to save item metadata:', error);
         }
     };
 
@@ -236,8 +236,8 @@ const ImageEditModal = ({
                 
         try {
             const formDataToSend = new FormData();
-            formDataToSend.append('action', 'fotogrids_save_image_data');
-            formDataToSend.append('image_id', imageId);
+            formDataToSend.append('action', 'fotogrids_save_item_data');
+            formDataToSend.append('item_id', itemId);
             formDataToSend.append('nonce', nonce);
             
             Object.entries(formData).forEach(([key, value]) => {
@@ -252,7 +252,7 @@ const ImageEditModal = ({
             const data = await response.json();
 
             if (data.success) {
-                await saveImageMetadata();
+                await saveItemMetadata();
                 
                 setOriginalData({ ...formData });
                 setOriginalMetadata({
@@ -264,21 +264,21 @@ const ImageEditModal = ({
                 setHasChanges(false);                
                 setSaving(false);
             } else {
-                alert(strings.errorSaving || 'Error saving image data');
+                alert(strings.errorSaving || 'Error saving item data');
                 setSaving(false);
             }
         } catch (error) {
-            alert(strings.errorSaving || 'Error saving image data');
+            alert(strings.errorSaving || 'Error saving item data');
             setSaving(false);
         }
     };
 
     return (
         <ModalStructure
-            imageId={imageId}
-            imageData={imageData}
+            itemId={itemId}
+            itemData={itemData}
             loading={loading}
-            images={images}
+            items={items}
             onClose={onClose}
             onNavigate={onNavigate}
             activeTab={activeTab}
@@ -301,4 +301,4 @@ const ImageEditModal = ({
     );
 };
 
-export default ImageEditModal;
+export default ItemEditModal;

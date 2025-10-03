@@ -92,14 +92,14 @@ const SettingsPage = () => {
                             label={__('Lazy Loading', 'fotogrids')}
                             checked={settings.general.lazy_load}
                             onChange={(value) => updateGeneralSetting('lazy_load', value)}
-                            help={__('Load images as they come into view', 'fotogrids')}
+                            help={__('Load items as they come into view', 'fotogrids')}
                         />
 
                         <ToggleControl
                             label={__('Retina Support', 'fotogrids')}
                             checked={settings.general.retina_support}
                             onChange={(value) => updateGeneralSetting('retina_support', value)}
-                            help={__('Serve high-resolution images for retina displays', 'fotogrids')}
+                            help={__('Serve high-resolution items for retina displays', 'fotogrids')}
                         />
                     </CardBody>
                 </Card>

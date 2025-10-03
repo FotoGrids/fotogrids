@@ -48,7 +48,7 @@
                     "label": "Slider",
                     "value": "slider",
                     "icon": "layout_slider",
-                    "description": "Full-width image slider",
+                    "description": "Full-width item slider",
                     "free": false
                 }
             ],
@@ -66,9 +66,9 @@
             "free": true
         },
         {
-            "key": "image_spacing",
+            "key": "item_spacing",
             "type": "responsive_range",
-            "label": "Image Spacing (px)",
+            "label": "Item Spacing (px)",
             "responsive": {
                 "desktop": { "min": 0, "max": 50, "default": 10 },
                 "tablet": { "min": 0, "max": 40, "default": 8 },

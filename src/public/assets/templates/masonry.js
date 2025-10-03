@@ -31,7 +31,7 @@
             gallery.setAttribute('data-columns', columns);
         }
         
-        // Setup lazy loading for masonry images
+        // Setup lazy loading for masonry items
         if (gallery.classList.contains('fotogrids-lazy')) {
             setupLazyLoading(items, gallery);
         }
@@ -44,7 +44,7 @@
         // Handle responsive adjustments
         handleResponsiveMasonry(gallery);
         
-        // Optimize masonry layout after images load
+        // Optimize masonry layout after items load
         optimizeMasonryLayout(gallery);
         
         // Track gallery view
@@ -106,42 +106,42 @@
     }
     
     /**
-     * Optimize masonry layout after images load
+     * Optimize masonry layout after items load
      */
     function optimizeMasonryLayout(gallery) {
         const items = gallery.querySelectorAll('.fotogrids-item');
-        let loadedImages = 0;
-        const totalImages = items.length;
+        let loadedItems = 0;
+        const totalItems = items.length;
         
-        if (totalImages === 0) return;
+        if (totalItems === 0) return;
         
         items.forEach(item => {
             const img = item.querySelector('img');
             if (!img) {
-                loadedImages++;
+                loadedItems++;
                 checkLayoutComplete();
                 return;
             }
             
             if (img.complete) {
-                loadedImages++;
+                loadedItems++;
                 checkLayoutComplete();
             } else {
                 img.addEventListener('load', () => {
-                    loadedImages++;
+                    loadedItems++;
                     checkLayoutComplete();
                 });
                 
                 img.addEventListener('error', () => {
-                    loadedImages++;
+                    loadedItems++;
                     checkLayoutComplete();
                 });
             }
         });
         
         function checkLayoutComplete() {
-            if (loadedImages === totalImages) {
-                // All images loaded, optimize layout
+            if (loadedItems === totalItems) {
+                // All items loaded, optimize layout
                 requestAnimationFrame(() => {
                     rebalanceColumns(gallery);
                     gallery.classList.add('masonry-loaded');
@@ -222,18 +222,18 @@
     }
     
     /**
-     * Setup lazy loading for masonry images
+     * Setup lazy loading for masonry items
      */
     function setupLazyLoading(items, gallery) {
         if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
+            const itemObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target.querySelector('img');
                         if (img && img.getAttribute('loading') === 'lazy') {
                             img.addEventListener('load', () => {
                                 img.classList.add('loaded');
-                                // Rebalance layout after image loads
+                                // Rebalance layout after item loads
                                 requestAnimationFrame(() => {
                                     rebalanceColumns(gallery);
                                 });
@@ -253,7 +253,7 @@
             });
             
             items.forEach(item => {
-                imageObserver.observe(item);
+                itemObserver.observe(item);
             });
         } else {
             // Fallback for browsers without IntersectionObserver

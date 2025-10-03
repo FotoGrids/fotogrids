@@ -6,7 +6,7 @@ import TabLocation from './tabs/TabLocation';
 import TabInteractions from './tabs/TabInteractions';
 
 const ModalBody = ({
-    imageData,
+    itemData,
     formData,
     activeTab,
     setActiveTab,
@@ -22,10 +22,10 @@ const ModalBody = ({
 }) => {
     return (
 		<div className="fotogrids-modal-layout">
-			{/* Left side - Image preview */}
+			{/* Left side - Item preview */}
 			<div className="fotogrids-modal-left">
-				<div className="fotogrids-image-preview">
-					<img src={imageData.medium_url} alt={formData.alt} />
+				<div className="fotogrids-item-preview">
+					<img src={itemData.medium_url} alt={formData.alt} />
 				</div>
 			</div>
 
