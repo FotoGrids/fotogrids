@@ -6,11 +6,11 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
-    margin-top: 10px;
 
     .fotogrids-item-item {
         position: relative;
-        border: 1px solid #ddd;
+        aspect-ratio: 1;
+        border: 1px solid var(--fg-border-primary);
         overflow: hidden;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
 
@@ -18,17 +18,16 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
+            .fotogrids-item-favorite,
             .fotogrids-item-controls {
                 opacity: 1;
             }
         }
 
-        // Hover cursor for move
         &.fotogrids-item-hoverable {
             cursor: move;
         }
 
-        // Dragging state
         &.fotogrids-dragging {
             opacity: 0.7;
             transform: rotate(2deg);
@@ -37,22 +36,20 @@
 
         img {
             width: 100%;
-            height: 120px;
+            height: 100%;
             object-fit: cover;
             display: block;
-            cursor: pointer; // Click-to-edit cursor
-        }        
+            cursor: pointer;
+        }
     }
 
-    // Drag and drop placeholder
     .fotogrids-item-placeholder {
         border: 2px dashed #ccc !important;
         background-color: #f9f9f9 !important;
         opacity: 0.6 !important;
         position: relative;
-        
-        // Grey dotted stroke backdrop
-        background-image: 
+
+        background-image:
             repeating-linear-gradient(
                 45deg,
                 transparent,
@@ -60,13 +57,11 @@
                 rgba(0,0,0,0.1) 5px,
                 rgba(0,0,0,0.1) 10px
             );
-        
-        // Remove content during drag
+
         * {
             visibility: hidden !important;
         }
-        
-        // Add drop indicator (text will be injected via data attribute)
+
         &::after {
             content: attr(data-drop-text);
             position: absolute;
@@ -81,18 +76,39 @@
         }
     }
 
+
+    .fotogrids-item-favorite,
     .fotogrids-item-controls {
         position: absolute;
         top: 2px;
-        right: 2px;
-        display: flex;
-        gap: 2px;
         opacity: 0;
         transition: opacity 0.2s ease;
     }
-    
+
+    .fotogrids-item-favorite {
+        left: 2px;
+    }
+
+    .fotogrids-item-favorite.is-favorite {
+        opacity: 1;
+
+        .fotogrids-item-favorite-button {
+            background: rgba(0, 0, 0, 1);
+            color: var(--fg-yellow, #ffb914);
+            pointer-events: none;
+            cursor: default;
+        }
+    }
+
+    .fotogrids-item-controls {
+        right: 2px;
+        display: flex;
+        gap: 2px;
+    }
+
     .fotogrids-edit-item,
-    .fotogrids-remove-item {
+    .fotogrids-remove-item,
+    .fotogrids-item-favorite-button {
         background: rgba(0, 0, 0, 0.6);
         color: white;
         border: none;
@@ -111,7 +127,7 @@
             background: rgba(0, 0, 0, 0.9);
         }
     }
-    
+
     .fotogrids-icon {
         width: 14px;
         height: 14px;
@@ -124,7 +140,7 @@
             height: 100%;
             color: currentColor;
         }
-    }   
+    }
 
     .fotogrids-item-title {
         position: absolute;
@@ -141,957 +157,99 @@
     }
 }
 
-// Item Edit Modal Styles
-.fotogrids-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    .fotogrids-modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #fff;
+// Empty gallery state
+.fotogrids-noitems-add-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 520px) {
+        grid-template-columns: 1fr;
+    }
+
+    .fotogrids-noitems-add-block {
+        border: 1px solid var(--fg-border-primary);
         border-radius: 4px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        width: 90vw;
-        max-width: 1000px;
-        height: 90vh;
+        background: none;
+        transition: all 0.2s ease;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
-    }
-    
-    .fotogrids-modal-header {
-        flex-shrink: 0; // Prevent header from shrinking
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px;
-        padding-inline-start: 20px;
-        border-bottom: 1px solid #ddd;
-        
-        h3 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
-            color: #1d2327;
-        }
-        
-        .fotogrids-modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            padding: 0 0 2px;
-            width: 32px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            
-            &:hover {
-                background: #f0f0f0;
-                color: #000;
-            }
-        }
-    }
-    
-    .fotogrids-modal-body {
-        flex: 1;
-        overflow-x: hidden;
-        overflow-y: auto;
-        padding: 0;
-        
-        // Loading and error states
-        .fotogrids-loading,
-        .fotogrids-error {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            font-size: 16px;
-            color: #666;
-        }
-        
-        .fotogrids-error {
-            color: #d63638;
-        }
-    }
-    
-    .fotogrids-modal-layout {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        min-height: 400px;
-    }
-    
-    .fotogrids-modal-left {
-        flex: 0 0 300px;
-        padding: 24px;
-        border-inline-end: 1px solid #ddd;
-        
-        .fotogrids-item-preview {
-            position: relative;
-            
-            img {
-                width: 100%;
-                height: auto;
-                border-radius: 4px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }
-        }
-    }
-    
-    // Navigation arrows positioned outside the modal
-    .fotogrids-nav-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        border: none;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
-        z-index: 100001; // Above the modal
-        opacity: 0.8;
-        
-        &:hover {
-            background: rgba(0, 0, 0, 0.9);
-            opacity: 1;
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        .fotogrids-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            svg {
+        min-height: 120px;
+        padding: 8px;
+        text-align: center;
+        cursor: pointer;
+
+        &--upload {
+            cursor: default;
+
+            .fotogrids-upload-area-wrapper {
+                margin-bottom: 0;
                 width: 100%;
-                height: 100%;
-                fill: currentColor;
+            }
+
+            .fotogrids-upload-area {
+                border-radius: 2px;
             }
         }
-        
-        &.fotogrids-nav-prev {
-            left: 25px; // Position outside the modal to the left
+
+        &--action {
+            font-family: inherit;
+            color: var(--fg-text-primary);
+
+            &:hover {
+                border-color: var(--fg-blue);
+                background: rgba(60, 70, 240, 0.06);
+
+                .fotogrids-noitems-add-block__icon {
+                    color: var(--fg-blue);
+                    background: rgba(60, 70, 240, 0.1);
+                }
+            }
+
+            &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(60, 70, 240, 0.3);
+            }
         }
-        
-        &.fotogrids-nav-next {
-            right: 25px; // Position outside the modal to the right
-        }
-    }
-    
-    .fotogrids-modal-right {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-    }
-    
-    // Loading state for modal content during navigation
-    .fotogrids-modal-content.loading {
-        pointer-events: none;
-        opacity: 0.7;
-        
-        &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+
+        &__icon {
             width: 40px;
             height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0073aa;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 1000;
-        }
-    }
-    
-    @keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-    
-    .fotogrids-modal-tabs {
-        display: flex;
-        border-bottom: 1px solid #ddd;
-        
-        .fotogrids-tab-button {
-            background: $tabbar-bg-light;
-            border: none;
-            padding: 16px 20px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            // border-radius: 8px;
+            // background: rgba(0, 0, 0, 0.05);
+            color: var(--fg-text-secondary);
+            margin-bottom: 10px;
             transition: all 0.2s ease;
-            border-inline-end: 1px solid $tabbar-border-color;
-            
-            &:hover {
-                background: #f6f7f7;
-                color: #1d2327;
-            }
-            
-            &.active {
-                background: #fff;
-                color: #1d2327;
 
-                &:after {
-                    content: '';
-                    position: absolute;
-                    bottom: -2px;
-                    left: 0;
-                    right: 0;
-                    height: 3px;
-                    background: white;
-                }
-            }
-            
-            .fotogrids-pro-badge {
-                display: inline-block;
-                margin-left: 6px;
-                padding: 2px 6px;
-                background: #ff6900;
-                color: #fff;
-                font-size: 10px;
-                font-weight: 600;
-                border-radius: 3px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
+            svg {
+                width: 24px;
+                height: 24px;
             }
         }
-    }
-    
-    .fotogrids-tab-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 24px;
-    }
-    
-    .fotogrids-tab-panel {
-        display: none;
-        
-        &.active {
-            display: block;
-        }
-        
+
         h4 {
-            margin: 0 0 16px 0;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            color: #1d2327;
-        }
-        
-        .form-table {
             margin: 0;
-            
-            th {
-                width: 120px;
-                padding: 8px 0;
-                font-weight: 600;
-                color: #1d2327;
-                
-                label {
-                    font-weight: 600;
-                }
-            }
-            
-            td {
-                padding: 8px 0;
-                
-                input[type="text"],
-                textarea {
-                    width: 100%;
-                    max-width: 400px;
-                    padding: 8px 12px;
-                    border: 1px solid #8c8f94;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    
-                    &:focus {
-                        border-color: #007cba;
-                        outline: none;
-                        box-shadow: 0 0 0 1px #007cba;
-                    }
-                }
-                
-                textarea {
-                    resize: vertical;
-                    min-height: 80px;
-                }
-            }
+            color: var(--fg-blue);
         }
-    }
-    
-    // Metadata sections with autocomplete
-    .fotogrids-tags-section,
-    .fotogrids-people-section,
-    .fotogrids-location-section {
-        .description {
-            margin: 8px 0 0 0;
-            color: #666;
-            font-style: italic;
-            font-size: 13px;
-        }
-    }
-    
-    // Autocomplete wrapper
-    .fotogrids-autocomplete-wrapper {
-        margin-bottom: 15px;
-        
-        .fotogrids-autocomplete {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            max-width: 300px;
-            margin-right: 10px;
-            vertical-align: top;
-            
-            input {
-                width: 100%;
-                padding: 8px 12px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                font-size: 13px;
-                
-                &:focus {
-                    border-color: #007cba;
-                    outline: none;
-                    box-shadow: 0 0 0 1px #007cba;
-                }
-            }
-        }
-        
-        .button {
-            vertical-align: top;
-            margin-left: 5px;
-        }
-    }
-    
-    .fotogrids-metadata-input {
-        display: flex;
-        gap: 4px;
 
-        .fotogrids-input-with-icon {
-            flex: 1;
-            position: relative;
-
-            .fotogrids-input-icon {
-                position: absolute;
-                top: 12px;
-                left: 12px;
-                width: 18px;
-            }
-
-            input[type='text'] {
-                width: 100%;
-                height: 40px;
-                padding-inline-start: 36px;
-            }
-        }
-    }
-
-    .fotogrids-autocomplete-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: #fff;
-        border: 1px solid #ddd;
-        border-top: none;
-        border-radius: 0 0 4px 4px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        max-height: 200px;
-        overflow-y: auto;
-        display: none;
-        
-        &:empty {
-            display: none;
-        }
-    }
-    
-    // Autocomplete items
-    .fotogrids-autocomplete-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 12px;
-        cursor: pointer;
-        border-bottom: 1px solid #f0f0f0;
-        transition: background-color 0.2s ease;
-        
-        &:last-child {
-            border-bottom: none;
-        }
-        
-        &:hover {
-            background-color: #f6f7f7;
-        }
-        
-        &.fotogrids-autocomplete-new {
-            background-color: #f0f6fc;
-            border-left: 3px solid #007cba;
-            
-            &:hover {
-                background-color: #e6f2ff;
-            }
-            
-            .fotogrids-autocomplete-text {
-                font-style: italic;
-            }
-        }
-    }
-    
-    .fotogrids-metadata-list {
-        margin: 20px 0 0;
-        display: flex;
-        gap: 8px;
-    }
-
-    .fotogrids-autocomplete-text {
-        flex: 1;
-        font-size: 13px;
-        color: #333;
-    }
-    
-    .fotogrids-autocomplete-usage {
-        font-size: 11px;
-        color: #666;
-        background: #f0f0f0;
-        padding: 2px 6px;
-        border-radius: 10px;
-        margin-left: 8px;
-    }
-    
-    // Location coordinates
-    .fotogrids-location-coords {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-        
-        input {
-            flex: 1;
-            padding: 6px 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        p {
             font-size: 12px;
-            
-            &:focus {
-                border-color: #007cba;
-                outline: none;
-                box-shadow: 0 0 0 1px #007cba;
-            }
-        }
-    }
-    
-    // Metadata display lists
-    .fotogrids-tags-list,
-    .fotogrids-people-list {
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-    
-    .fotogrids-tag-item,
-    .fotogrids-person-item {
-        display: inline-flex;
-        align-items: center;
-        background: #f0f6fc;
-        border: 1px solid #c3dcf3;
-        border-radius: 12px;
-        padding: 4px 8px;
-        font-size: 12px;
-        color: #0073aa;
-        
-        .fotogrids-tag-text,
-        .fotogrids-person-name {
-            margin-right: 6px;
-            font-weight: 500;
-        }
-        
-        .fotogrids-person-details {
-            font-size: 11px;
-            color: #666;
-            margin-right: 6px;
-            font-style: italic;
-        }
-        
-        .fotogrids-remove-tag,
-        .fotogrids-remove-person {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            font-size: 14px;
-            line-height: 1;
-            padding: 0;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            
-            &:hover {
-                background: rgba(0, 0, 0, 0.1);
-                color: #d63638;
-            }
-        }
-    }
-    
-    .fotogrids-person-item {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 6px 10px;
-        position: relative;
-        
-        .fotogrids-remove-person {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-        }
-        
-        .fotogrids-person-name {
-            margin: 0 16px 0 0;
-            font-weight: 600;
-        }
-        
-        .fotogrids-person-details {
-            margin: 2px 16px 0 0;
-            font-size: 10px;
-        }
-    }
-    
-    .fotogrids-tags-input,
-    .fotogrids-people-input,
-    .fotogrids-location-input {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 16px;
-        
-        input[type="text"] {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #8c8f94;
-            border-radius: 4px;
-            font-size: 14px;
-            
-            &:focus {
-                border-color: #007cba;
-                outline: none;
-                box-shadow: 0 0 0 1px #007cba;
-            }
-        }
-        
-        .button {
-            white-space: nowrap;
-        }
-    }
-    
-    .fotogrids-location-input {
-        flex-direction: column;
-        
-        input[type="text"] {
-            margin-bottom: 8px;
-        }
-    }
-    
-    .fotogrids-people-input {
-        flex-wrap: wrap;
-        
-        input[type="text"] {
-            min-width: 200px;
-        }
-    }
-    
-    .fotogrids-tags-list,
-    .fotogrids-people-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .fotogrids-tag-item {
-        display: inline-flex;
-        align-items: center;
-        background: #f0f6fc;
-        border: 1px solid #c3dcf3;
-        border-radius: 16px;
-        padding: 4px 8px 4px 12px;
-        font-size: 13px;
-        color: #0073aa;
-        
-        .fotogrids-tag-text {
-            margin-right: 6px;
-        }
-        
-        .fotogrids-tag-remove {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            padding: 0;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            
-            &:hover {
-                background: rgba(0, 0, 0, 0.1);
-                color: #000;
-            }
-        }
-    }
-    
-    .fotogrids-person-item {
-        display: flex;
-        align-items: center;
-        background: #f6f7f7;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        width: 100%;
-        
-        .fotogrids-person-info {
-            flex: 1;
-            
-            .fotogrids-person-name {
-                display: block;
-                font-weight: 600;
-                color: #1d2327;
-                margin-bottom: 2px;
-            }
-            
-            .fotogrids-person-details {
-                display: block;
-                color: #666;
-                font-size: 13px;
-            }
-        }
-        
-        .fotogrids-person-remove {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 4px;
-            margin-left: 8px;
-            border-radius: 4px;
-            
-            &:hover {
-                background: rgba(0, 0, 0, 0.1);
-                color: #000;
-            }
-        }
-    }
-    
-    // Interactions section styling
-    .fotogrids-interactions-section {       
-        h4 {
-            margin: 0 0 20px 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .fotogrids-external-url-section {
-            .fotogrids-field-group {
-                margin-bottom: 20px;
-                
-                label {
-                    display: block;
-                    margin-bottom: 6px;
-                    font-weight: 500;
-                    color: #333;
-                }
-                
-                input[type="url"],
-                select {
-                    width: 100%;
-                    padding: 8px 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    font-size: 13px;
-                    
-                    &:focus {
-                        border-color: #007cba;
-                        outline: none;
-                        box-shadow: 0 0 0 1px #007cba;
-                    }
-                }
-                
-                .description {
-                    margin: 6px 0 0 0;
-                    font-size: 12px;
-                    color: #666;
-                    font-style: italic;
-                }
-            }
-        }
-    }
-    
-    // Pro content styling
-    .fotogrids-pro-content {
-        text-align: center;
-        padding: 40px 20px;
-        color: #666;
-        
-        h4 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        
-        .description {
+            color: var(--fg-text-secondary);
+            opacity: 0.7;
             margin: 0;
-            font-size: 14px;
-        }
-    }
-    
-    .fotogrids-modal-footer {
-        flex-shrink: 0; // Prevent footer from shrinking
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-        padding: 12px;
-        border-top: 1px solid #ddd;
-        background: #f9f9f9;
-        
-        .button {
-            padding: 4px 16px;
-            font-size: 14px;
-            line-height: 26px;
-            border-radius: 4px;
-            text-decoration: none;
-            cursor: pointer;
-            
-            &.button-primary {
-                background: #007cba;
-                border-color: #007cba;
-                color: #fff;
-                transition: all 0.2s ease;
-                
-                &:hover {
-                    background: #005a87;
-                    border-color: #005a87;
-                }
-            }
-            
-            &.fotogrids-modal-cancel {
-                background: #f6f7f7;
-                border: 1px solid #ddd;
-                color: #1d2327;
-                
-                &:hover {
-                    background: #f0f0f1;
-                    border-color: #999;
-                }
-            }
-        }
-    }
-    
-    
-    // Loading state
-    .fotogrids-loading {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 60px 20px;
-        font-size: 16px;
-        color: #666;
-    }
-    
-    // Responsive adjustments
-    @media (max-width: 768px) {
-        .fotogrids-modal-content {
-            width: 95vw;
-            height: 90vh;
-        }
-    }
-    
-    // For very small screens, use max-height instead of fixed height
-    @media (max-height: 600px) {
-        .fotogrids-modal-content {
-            height: 95vh;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .fotogrids-modal-layout {
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .fotogrids-modal-left {
-            flex: none;
-            
-            .fotogrids-item-preview img {
-                max-height: 200px;
-                width: auto;
-                margin: 0 auto;
-                display: block;
-            }
-        }
-        
-        .fotogrids-modal-tabs {
-            flex-wrap: wrap;
-            
-            .fotogrids-tab-button {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-        }
-        
-        .fotogrids-people-input {
-            flex-direction: column;
-            
-            input[type="text"] {
-                min-width: auto;
-            }
-        }
-    }
-    
-    // Dark mode support for autocomplete
-    @media (prefers-color-scheme: dark) {
-        .fotogrids-autocomplete-wrapper {
-            .fotogrids-autocomplete input {
-                background: #1d2327;
-                border-color: #3c434a;
-                color: #f0f0f1;
-                
-                &:focus {
-                    border-color: #72aee6;
-                    box-shadow: 0 0 0 1px #72aee6;
-                }
-            }
-        }
-        
-        .fotogrids-autocomplete-dropdown {
-            background: #1d2327;
-            border-color: #3c434a;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-        
-        .fotogrids-autocomplete-item {
-            border-bottom-color: #3c434a;
-            
-            &:hover {
-                background-color: #23282d;
-            }
-            
-            &.fotogrids-autocomplete-new {
-                background-color: #1e3a5f;
-                border-left-color: #72aee6;
-                
-                &:hover {
-                    background-color: #2c5282;
-                }
-            }
-        }
-        
-        .fotogrids-autocomplete-text {
-            color: #f0f0f1;
-        }
-        
-        .fotogrids-autocomplete-usage {
-            background: #3c434a;
-            color: #c3c4c7;
-        }
-        
-        .fotogrids-location-coords input {
-            background: #1d2327;
-            border-color: #3c434a;
-            color: #f0f0f1;
-            
-            &:focus {
-                border-color: #72aee6;
-                box-shadow: 0 0 0 1px #72aee6;
-            }
-        }
-        
-        .fotogrids-tag-item,
-        .fotogrids-person-item {
-            background: #1e3a5f;
-            border-color: #3c5a7a;
-            color: #72aee6;
-            
-            .fotogrids-person-details {
-                color: #c3c4c7;
-            }
-            
-            .fotogrids-remove-tag,
-            .fotogrids-remove-person {
-                color: #c3c4c7;
-                
-                &:hover {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: #f87171;
-                }
-            }
-        }
-        
-        .fotogrids-interactions-section {
-            h4 {
-                color: #f0f0f1;
-            }
-            
-            .fotogrids-external-url-section {
-                .fotogrids-field-group {
-                    label {
-                        color: #f0f0f1;
-                    }
-                    
-                    input[type="url"],
-                    select {
-                        background: #1d2327;
-                        border-color: #3c434a;
-                        color: #f0f0f1;
-                        
-                        &:focus {
-                            border-color: #72aee6;
-                            box-shadow: 0 0 0 1px #72aee6;
-                        }
-                    }
-                    
-                    .description {
-                        color: #c3c4c7;
-                    }
-                }
-            }
         }
     }
 }
+

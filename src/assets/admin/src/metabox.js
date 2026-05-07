@@ -2,114 +2,64 @@
  * Gallery Metabox React App Entry Point
  */
 
-
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import GalleryMetabox from './components/GalleryMetabox.jsx';
+import { attachCopyButtons } from './utils/copy-to-clipboard.js';
 
 // Initialize icons
 function initializeIcons() {
     if (typeof window.FotoGridsIcons === 'undefined') {
-        console.warn('FotoGridsIcons not available');
         return;
     }
-    
+
     // Find all icon placeholders and replace with SVG
     const icons = document.querySelectorAll('.fotogrids-icon[data-icon]');
     icons.forEach(function(icon) {
         const iconName = icon.dataset.icon;
         const iconSvg = window.FotoGridsIcons[iconName];
-        
+
         if (iconSvg) {
             icon.innerHTML = iconSvg;
         } else {
-            console.warn('Icon not found:', iconName);
+            console.warn('FotoGrids: Icon not found:', iconName);
             icon.textContent = iconName; // Fallback to text
         }
     });
 }
 
 function initializeCopyButtons() {
-    const copyButtons = document.querySelectorAll('.fotogrids-shortcode-copy');
-    
-    copyButtons.forEach(button => {
-        button.addEventListener('click', async function(e) {
-            e.preventDefault();
-            
-            const shortcode = this.dataset.shortcode;
-            const successMessage = this.parentNode.nextElementSibling;
-            
-            if (!shortcode) {
-                console.warn('No shortcode found on copy button');
-                return;
-            }
-            
-            try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(shortcode);
-                } else {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = shortcode;
-                    textArea.style.position = 'fixed';
-                    textArea.style.opacity = '0';
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                }
-                
-                this.classList.add('copied');
-                if (successMessage && successMessage.classList.contains('fotogrids-shortcode-copy-success')) {
-                    successMessage.classList.add('show');
-                    
-                    setTimeout(() => {
-                        successMessage.classList.remove('show');
-                    }, 2000);
-                }
-                
-                setTimeout(() => {
-                    this.classList.remove('copied');
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Failed to copy shortcode:', error);
-                
-                this.classList.add('copy-error');
-                
-                setTimeout(() => {
-                    this.classList.remove('copy-error');
-                }, 2000);
-            }
-        });
+    attachCopyButtons({
+        selector: '.fotogrids-shortcode-copy',
+        onSuccess(button) {
+            button.classList.add('copied');
+            setTimeout(() => button.classList.remove('copied'), 2000);
+        },
+        onError(button) {
+            button.classList.add('copy-error');
+            setTimeout(() => button.classList.remove('copy-error'), 2000);
+        },
     });
 }
 
 // Initialize the React app when DOM is ready
 function initializeGalleryMetabox() {
-    try {
-        console.log('Initializing Gallery Metabox...');
-        
-        // Check for React dependencies
+    try {        
         if (typeof React === 'undefined') {
-            console.error('React is not available');
             return;
         }
         
-        if (typeof ReactDOM === 'undefined') {
-            console.error('ReactDOM is not available');
+        if (typeof createRoot === 'undefined') {
             return;
         }
         
         const container = document.getElementById('fotogrids-gallery-metabox-root');
         
         if (!container) {
-            console.error('Gallery metabox container not found');
             return;
         }
 
-        // Get data from PHP
         const metaboxData = window.fotogridsMetaBoxes || {};
-        console.log('Metabox data:', metaboxData);
         
         const props = {
             galleryItems: metaboxData.galleryItems || [],
@@ -119,27 +69,11 @@ function initializeGalleryMetabox() {
             strings: metaboxData.strings || {}
         };
 
-        console.log('Rendering React component with props:', props);
+        // Render React component using createRoot (React 18+ API)
+        const root = createRoot(container);
+        root.render(React.createElement(GalleryMetabox, props));
 
-        // Render React component
-        ReactDOM.render(React.createElement(GalleryMetabox, props), container);
-
-        // Initialize icons and copy functionality after React has rendered
-        setTimeout(() => {
-            try {
-                initializeIcons();
-                initializeCopyButtons();
-            } catch (error) {
-                console.warn('Failed to initialize icons and copy buttons:', error);
-            }
-        }, 200);
-        
-        console.log('Gallery Metabox initialized successfully');
-        
     } catch (error) {
-        console.error('Failed to initialize Gallery Metabox:', error);
-        
-        // Fallback: show basic message
         const container = document.getElementById('fotogrids-gallery-metabox-root');
         if (container) {
             container.innerHTML = '<p>Gallery metabox failed to load. Please refresh the page.</p>';
@@ -147,30 +81,27 @@ function initializeGalleryMetabox() {
     }
 }
 
-// Initialize when DOM is ready
+function runIconsAndCopyButtons() {
+    initializeIcons();
+    initializeCopyButtons();
+}
+
 function safeInitialize() {
-    try {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                initializeGalleryMetabox();
-                setTimeout(initializeCopyButtons, 300);
-            });
-        } else {
-            // Add a small delay to ensure all scripts are loaded
-            setTimeout(() => {
-                initializeGalleryMetabox();
-                setTimeout(initializeCopyButtons, 300);
-            }, 100);
-        }
-    } catch (error) {
-        console.error('Failed to set up Gallery Metabox initialization:', error);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGalleryMetabox();
+            setTimeout(runIconsAndCopyButtons, 300);
+        });
+    } else {
+        setTimeout(() => {
+            initializeGalleryMetabox();
+            setTimeout(runIconsAndCopyButtons, 300);
+        }, 100);
     }
 }
 
-// Run safe initialization
 safeInitialize();
 
-// Export for potential external use
 window.FotoGridsMetabox = {
     init: initializeGalleryMetabox,
     initializeIcons: initializeIcons,

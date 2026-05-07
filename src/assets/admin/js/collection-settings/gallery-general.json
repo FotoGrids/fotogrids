@@ -1,0 +1,10 @@
+{
+    "id": "general",
+    "label": "General",
+    "icon": "settings",
+    "free": true,
+    "postTypes": ["gallery"],
+    "hideInDefaults": false,
+    "settings": [
+    ]
+}

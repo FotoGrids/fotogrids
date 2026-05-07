@@ -1,12 +1,18 @@
 import React from 'react';
-import { render } from 'react-dom';
-import AlbumGalleries from './components/AlbumGalleries.js';
+import { createRoot } from 'react-dom/client';
+import AlbumGalleries from './components/AlbumGalleries.jsx';
 
-// Initialize Album Galleries component when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+function initializeAlbumGalleries() {
     const albumGalleriesRoot = document.getElementById('fotogrids-album-galleries-root');
-    
+
     if (albumGalleriesRoot && window.fotogridsAlbumGalleries) {
-        render(React.createElement(AlbumGalleries), albumGalleriesRoot);
+        const root = createRoot(albumGalleriesRoot);
+        root.render(React.createElement(AlbumGalleries));
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAlbumGalleries);
+} else {
+    setTimeout(initializeAlbumGalleries, 0);
+}

@@ -1,0 +1,28 @@
+{
+  "id": "event-recap",
+  "name": "Event Recap",
+  "description": "Chronological masonry with date groupings and captions below each image. Built for company events, conferences, and team moments.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "events",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 11,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "sort_by": "date_asc",
+    "captions": true,
+    "captions_position": "below",
+    "lightbox": true
+  }
+}

@@ -4,17 +4,16 @@
 // FotoGrids Statistics Page Styles
 
 .fotogrids-stats-dashboard {
-    max-width: 1200px;
     margin: 0;
     padding: 0;
-    
+
     // Overview Cards
     .fotogrids-stats-cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-        
+        gap: 24px;
+        margin-bottom: 24px;
+
         .fotogrids-stat-card {
             padding: 24px;
             display: flex;
@@ -22,51 +21,57 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            
-			&[data-fotogrids-stat="albums"] {
-				background-color: var(--fotogrids-blue);
-			}
+            border-radius: 8px;
 
 			&[data-fotogrids-stat="galleries"] {
-				background-color: var(--fotogrids-red);
+                background-color: var(--fg-blue);
 			}
 
+            &[data-fotogrids-stat="albums"] {
+                background-color: var(--fg-red);
+            }
+
 			&[data-fotogrids-stat="items"] {
-				background-color: var(--fotogrids-yellow);
+				background-color: var(--fg-yellow);
 			}
 
 			&[data-fotogrids-stat="views"] {
-				background-color: var(--fotogrids-grey);
+				background-color: var(--fg-grey);
 			}
-            
+
             &:hover {
                 transform: translateY(-2px);
             }
-            
+
             .stat-icon {
                 width: 48px;
                 height: 48px;
                 margin-right: 20px;
                 color: white;
                 flex-shrink: 0;
-                
+
                 svg {
                     width: 100%;
                     height: 100%;
+
+                    path {
+                        stroke-width: 1.5;
+                    }
                 }
             }
-            
+
             .stat-content {
                 flex: 1;
-                
+
                 .stat-number {
+                    font-family: 'Poppins', sans-serif;
                     font-size: 24px;
                     font-weight: 700;
                     color: white;
                     line-height: 1;
                     margin-bottom: 4px;
                 }
-                
+
                 .stat-label {
                     font-size: 12px;
                     color: white;
@@ -77,161 +82,161 @@
             }
         }
     }
-    
+
     // Charts Section
     .fotogrids-stats-charts {
         display: grid;
         grid-template-columns: 2fr 1fr;
         gap: 20px;
         margin-bottom: 30px;
-        
+
         @media (max-width: 1024px) {
             grid-template-columns: 1fr;
         }
-        
+
         .chart-container {
-            background: $settings-bg-white;
-            border: 1px solid $settings-border-light;
+            background: $tabbar-bg-white;
+            border: 1px solid $tabbar-border-light;
             border-radius: 8px;
             padding: 24px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
-            
+
             &:hover {
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             }
-            
+
             .chart-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 20px;
-                
+
                 h3 {
                     margin: 0;
                     font-size: 18px;
                     font-weight: 600;
-                    color: $settings-text-primary;
+                    color: var(--fg-text-primary);
                 }
-                
+
                 .chart-period {
                     display: flex;
                     gap: 8px;
-                    
+
                     .period-btn {
                         padding: 6px 12px;
-                        border: 1px solid $settings-border-color;
-                        background: $settings-bg-white;
+                        border: 1px solid $tabbar-border-color;
+                        background: $tabbar-bg-white;
                         border-radius: 4px;
                         font-size: 12px;
                         cursor: pointer;
                         transition: all 0.2s ease;
-                        color: $settings-text-secondary;
+                        color: $tabbar-text-secondary;
                         font-weight: 500;
-                        
+
                         &:hover {
                             border-color: $fotogrids-colors-blue;
                             color: $fotogrids-colors-blue;
                         }
-                        
-                        &.active {
+
+                        &.fg-is-active {
                             background: $fotogrids-colors-blue;
                             border-color: $fotogrids-colors-blue;
-                            color: $settings-bg-white;
+                            color: $tabbar-bg-white;
                         }
                     }
                 }
             }
-            
+
             canvas {
                 max-height: 300px;
             }
         }
     }
-    
+
     // Tables Section
     .fotogrids-stats-tables {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
-        
+
         @media (max-width: 1024px) {
             grid-template-columns: 1fr;
         }
-        
+
         .stats-table-container {
-            background: $settings-bg-white;
-            border: 1px solid $settings-border-light;
+            background: $tabbar-bg-white;
+            border: 1px solid $tabbar-border-light;
             border-radius: 8px;
             padding: 24px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
-            
+
             &:hover {
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             }
-            
+
             h3 {
                 margin: 0 0 20px 0;
                 font-size: 18px;
                 font-weight: 600;
-                color: $settings-text-primary;
+                color: var(--fg-text-primary);
             }
-            
+
             .stats-table-wrapper {
                 overflow-x: auto;
             }
-            
+
             .fotogrids-stats-table {
                 width: 100%;
                 border-collapse: collapse;
                 font-size: 14px;
-                
+
                 thead {
                     th {
-                        background: $settings-bg-light;
+                        background: $tabbar-bg-light;
                         padding: 12px 8px;
                         text-align: left;
                         font-weight: 600;
-                        color: $settings-text-secondary;
-                        border-bottom: 2px solid $settings-border-light;
+                        color: $tabbar-text-secondary;
+                        border-bottom: 2px solid $tabbar-border-light;
                         font-size: 12px;
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                     }
                 }
-                
+
                 tbody {
                     tr {
-                        border-bottom: 1px solid $settings-border-light;
+                        border-bottom: 1px solid $tabbar-border-light;
                         transition: background-color 0.2s ease;
-                        
+
                         &:hover {
-                            background-color: $settings-bg-light;
+                            background-color: $tabbar-bg-light;
                         }
-                        
+
                         &:last-child {
                             border-bottom: none;
                         }
                     }
-                    
+
                     td {
                         padding: 12px 8px;
-                        color: $settings-text-primary;
-                        
+                        color: var(--fg-text-primary);
+
                         &.loading,
                         &.no-data {
                             text-align: center;
-                            color: $settings-text-secondary;
+                            color: $tabbar-text-secondary;
                             font-style: italic;
                             padding: 20px;
                         }
-                        
+
                         strong {
                             font-weight: 600;
-                            color: $settings-text-primary;
+                            color: var(--fg-text-primary);
                         }
-                        
+
                         .type-badge {
                             display: inline-block;
                             padding: 2px 8px;
@@ -240,12 +245,12 @@
                             font-weight: 500;
                             text-transform: uppercase;
                             letter-spacing: 0.5px;
-                            
+
                             &.type-gallery {
                                 background: rgba($fotogrids-colors-blue, 0.1);
                                 color: $fotogrids-colors-blue;
                             }
-                            
+
                             &.type-album {
                                 background: rgba($fotogrids-colors-blue-light, 0.1);
                                 color: $fotogrids-colors-blue-dark;
@@ -265,7 +270,7 @@
     justify-content: center;
     padding: 40px;
     color: #666;
-    
+
     .spinner {
         margin-right: 10px;
     }
@@ -277,26 +282,26 @@
         .fotogrids-stats-cards {
             grid-template-columns: 1fr;
             gap: 15px;
-            
+
             .fotogrids-stat-card {
                 padding: 20px;
-                
+
                 .stat-icon {
                     font-size: 36px;
                     margin-right: 15px;
                 }
-                
+
                 .stat-content .stat-number {
                     font-size: 24px;
                 }
             }
         }
-        
+
         .fotogrids-stats-charts,
         .fotogrids-stats-tables {
             grid-template-columns: 1fr;
             gap: 15px;
-            
+
             .chart-container,
             .stats-table-container {
                 padding: 20px;
@@ -305,45 +310,3 @@
     }
 }
 
-// Dark mode support (if WordPress has dark mode)
-@media (prefers-color-scheme: dark) {
-    .fotogrids-stats-dashboard {
-        .fotogrids-stat-card,
-        .chart-container,
-        .stats-table-container {
-            background: #1e1e1e;
-            border-color: #333;
-            color: #fff;
-            
-            .stat-content .stat-label,
-            .chart-header h3,
-            h3 {
-                color: #ccc;
-            }
-            
-            .fotogrids-stats-table {
-                thead th {
-                    background: #2a2a2a;
-                    color: #ccc;
-                    border-color: #444;
-                }
-                
-                tbody {
-                    tr:hover {
-                        background-color: #2a2a2a;
-                    }
-                    
-                    td {
-                        color: #fff;
-                        border-color: #333;
-                        
-                        &.loading,
-                        &.no-data {
-                            color: #999;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

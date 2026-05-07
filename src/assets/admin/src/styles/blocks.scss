@@ -1,6 +1,6 @@
 /**
  * Gutenberg Block Styles
- * 
+ *
  * Styles for FotoGrids Gutenberg blocks
  */
 
@@ -31,15 +31,15 @@
         transition: all 0.2s ease;
         border: 2px solid transparent;
         cursor: pointer;
-        
+
         &:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         &.is-selected {
-            border-color: var(--wp-admin-theme-color, #0073aa);
-            box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #0073aa);
+            border-color: var(--wp-admin-theme-color, var(--fg-blue));
+            box-shadow: 0 0 0 1px var(--wp-admin-theme-color, var(--fg-blue));
         }
 
         .components-card__media img {
@@ -64,9 +64,9 @@
 
     .fotogrids-create-new {
         border: 2px dashed #ccc;
-        
+
         &:hover {
-            border-color: var(--wp-admin-theme-color, #0073aa);
+            border-color: var(--wp-admin-theme-color, var(--fg-blue));
         }
 
         .components-card__body {
@@ -104,15 +104,15 @@
         transition: all 0.2s ease;
         border: 2px solid transparent;
         cursor: pointer;
-        
+
         &:hover {
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         &.is-selected {
-            border-color: var(--wp-admin-theme-color, #0073aa);
-            box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #0073aa);
+            border-color: var(--wp-admin-theme-color, var(--fg-blue));
+            box-shadow: 0 0 0 1px var(--wp-admin-theme-color, var(--fg-blue));
         }
 
         .components-card__media {
@@ -152,7 +152,7 @@
 .fotogrids-block-preview {
     position: relative;
     max-width: 100%;
-    border: 1px solid #ddd;
+    border: 1px solid var(--fg-border-primary);
     border-radius: 4px;
     padding: 16px;
     background: #fff;
@@ -264,7 +264,7 @@
         left: -2px;
         right: -2px;
         bottom: -2px;
-        border: 2px solid var(--wp-admin-theme-color, #0073aa);
+        border: 2px solid var(--wp-admin-theme-color, var(--fg-blue));
         border-radius: 4px;
         pointer-events: none;
     }
@@ -331,49 +331,5 @@
 
     .fotogrids-block-preview {
         padding: 12px;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .fotogrids-block-preview {
-        background: #1e1e1e;
-        border-color: #3c434a;
-        color: #e0e0e0;
-    }
-
-    .fotogrids-gallery-card .components-card__header h3,
-    .fotogrids-template-card .components-card__header h4 {
-        color: #e0e0e0;
-    }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-    .fotogrids-gallery-card,
-    .fotogrids-template-card {
-        border-width: 2px;
-        border-style: solid;
-        border-color: #000;
-
-        &.is-selected {
-            border-color: #0073aa;
-            background-color: rgba(0, 115, 170, 0.1);
-        }
-    }
-
-    .fotogrids-block-preview {
-        border-width: 2px;
-        border-color: #000;
-    }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .fotogrids-gallery-card,
-    .fotogrids-template-card,
-    .fotogrids-preview-item {
-        transition: none;
-        transform: none !important;
     }
 }

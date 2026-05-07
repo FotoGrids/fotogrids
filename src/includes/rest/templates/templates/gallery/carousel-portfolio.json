@@ -1,0 +1,28 @@
+{
+  "id": "carousel-portfolio",
+  "name": "Carousel Portfolio",
+  "description": "Auto-advancing carousel, scrub-pause on hover. Built for photographers who want motion on the homepage without video.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 26,
+  "settings": {
+    "layout": "carousel",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "autoplay": true,
+    "autoplay_speed": 4000,
+    "pause_on_hover": true,
+    "lightbox": true
+  }
+}

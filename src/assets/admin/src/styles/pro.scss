@@ -1,11 +1,12 @@
 @mixin pro-badge {
     font-size: 10px;
     line-height: 1;
-    background: var(--fotogrids-yellow);
+    background: var(--fg-yellow);
     color: white;
     padding: 2px 6px;
     font-weight: bold;
     text-transform: uppercase;
+    position: relative;
 }
 
 .fotogrids-pro-badge {
@@ -15,6 +16,11 @@
         position: absolute;
         top: 8px;
         inset-inline-end: 8px;
-        z-index: 10;    
+        z-index: 10;
+    }
+
+    &-large {
+        font-size: 12px;
+        padding: 4px 8px;
     }
 }

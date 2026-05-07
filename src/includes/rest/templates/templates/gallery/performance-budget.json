@@ -1,0 +1,28 @@
+{
+  "id": "performance-budget",
+  "name": "Performance Budget",
+  "description": "Justified grid with auto-optimization, lazy-load, and responsive images all enabled. Lighthouse-friendly defaults out of the box.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "general",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 50,
+  "settings": {
+    "layout": "justified",
+    "target_row_height": {
+      "desktop": 240,
+      "tablet": 200,
+      "mobile": 160
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "auto_image_optimization": true,
+    "lazy_loading": true,
+    "responsive_images": true,
+    "lightbox": true
+  }
+}

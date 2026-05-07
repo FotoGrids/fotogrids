@@ -67,4 +67,24 @@ class Admin_Permissions {
         
         return current_user_can( 'edit_post', $album_id );
     }
+    
+    /**
+     * Check if user can edit posts
+     *
+     * @param \WP_REST_Request $request Request object
+     * @return bool True if user has permission
+     */
+    public static function check_edit_posts( $request ) {
+        return current_user_can( 'edit_posts' );
+    }
+    
+    /**
+     * Check if user can manage license
+     *
+     * @param \WP_REST_Request $request Request object
+     * @return bool True if user has permission
+     */
+    public static function check_license_manage( $request ) {
+        return current_user_can( 'manage_fotogrids_settings' );
+    }
 }

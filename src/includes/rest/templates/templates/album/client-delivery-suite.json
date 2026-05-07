@@ -1,0 +1,30 @@
+{
+  "id": "client-delivery-suite",
+  "name": "Client Delivery Suite",
+  "description": "One album per client with proofing, expiry, and watermark pre-wired. Clients proof inside the album; selections land in wp-admin in real time.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "photography",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 12,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "password_protected": true,
+    "watermark_enabled": true,
+    "right_click_protection": true,
+    "album_expiry_days": 60,
+    "client_proofing": true,
+    "lightbox": true
+  }
+}

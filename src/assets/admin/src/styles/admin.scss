@@ -7,14 +7,35 @@
 @use './inputs.scss' as *;
 @use './blocks.scss' as *;
 @use './items.scss' as *;
+@use './item-edit-modal.scss' as *;
 @use './settings.scss' as *;
 @use './ajax-save.scss' as *;
 @use './album-assignment.scss' as *;
 @use './album-galleries.scss' as *;
 @use './stats.scss' as *;
 @use './shortcode-metabox.scss' as *;
+@use './admin-header.scss' as *;
+@use './admin-blocks-grid.scss' as *;
+@use './dashboard.scss' as *;
+@use './license-page.scss' as *;
+@use './templates.scss' as *;
+@use './plugin-settings.scss' as *;
+@use './tables.scss' as *;
 
 @use './ui-elements/ui-elements.scss' as *;
+@use './toast.scss' as *;
+
+.fotogrids-icon {
+    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
 
 #fotogrids_gallery_items > .inside {
     padding: 0;
@@ -24,32 +45,32 @@
 .fotogrids-gallery-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0;
+    align-items: flex-start;
+    margin-bottom: -1px;
 }
 
 .fotogrids-gallery-tabs {
     display: flex;
     gap: 0;
-    margin-bottom: -1px; // Overlap with content border
 }
 
 .fotogrids-gallery-tab {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 16px 20px;
+    padding: 16px 20px 17px;
     border: 0;
-    border-inline-end: 1px solid $tabbar-border-color;
-    border-bottom: 1px solid $tabbar-border-color;
+    border-inline-end: 1px solid $tabbar-border-light;
+    border-bottom: 1px solid $tabbar-border-light;
     background: $tabbar-bg-light;
     color: $tabbar-text-secondary;
     cursor: pointer;
     font-size: 14px;
+    line-height: 1;
     font-weight: 500;
     transition: all 0.2s ease;
     position: relative;
-    
+
     .fotogrids-icon {
         font-size: 0;
         width: 16px;
@@ -58,24 +79,24 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        
+
         svg {
             width: 100%;
             height: 100%;
         }
     }
-    
+
     &:hover:not(.fotogrids-gallery-tab--active) {
         background: $tabbar-hover-bg;
         color: $tabbar-text-primary;
     }
-    
+
     &--active {
         background: $tabbar-bg-white;
         color: $tabbar-text-primary;
-        border-color: $tabbar-border-color;
+        border-color: $tabbar-border-light;
         z-index: 1;
-        
+
         &::after {
             content: '';
             position: absolute;
@@ -85,45 +106,20 @@
             height: 1px;
             background: $tabbar-bg-white;
         }
-        
+
         &:hover {
             background: $tabbar-bg-white;
             color: $tabbar-text-primary;
-        }
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        background: #23282d;
-        color: #c3c4c7;
-        border-color: #3c434a;
-        
-        &:hover:not(.fotogrids-gallery-tab--active) {
-            background: #2c3338;
-            color: #f0f0f1;
-        }
-        
-        &--active {
-            background: #1d2327;
-            color: #f0f0f1;
-            border-color: #3c434a;
-            
-            &::after {
-                background: #1d2327;
-            }
-            
-            &:hover {
-                background: #1d2327;
-                color: #f0f0f1;
-            }
         }
     }
 }
 
 .fotogrids-gallery-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     align-items: center;
-    padding-inline-end: 8px;
+    padding: 10px;
 }
 
 .fotogrids-add-new-dropdown {
@@ -132,6 +128,8 @@
 }
 
 .fotogrids-add-new-toggle {
+    display: flex;
+    align-items: stretch;
     gap: 4px;
     padding-inline-start: 14px;
 
@@ -145,17 +143,16 @@
         }
     }
 
-    [data-icon='chevron-down'] {
+    .fotogrids-icon--chevron_down {
         border-inline-start: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 4px 0;
         padding-inline-start: 10px;
-        margin-inline-start: 16px;
+        margin-inline-start: 8px;
     }
 
     &.fotogrids-dropdown-open {
         box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
 
-        [data-icon='chevron-down'] svg {
+        .fotogrids-icon--chevron_down svg {
             transform: rotate(180deg);
         }
     }
@@ -171,14 +168,14 @@
     left: 0;
     margin-top: 4px;
     background: $tabbar-bg-white;
-    border: 1px solid $tabbar-border-color;
+    border: 1px solid $tabbar-border-light;
     border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     width: 100%;
     box-sizing: border-box;
     display: none;
-    
+
     &.fotogrids-dropdown-open {
         display: block;
     }
@@ -186,66 +183,35 @@
 
 .fotogrids-add-option {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
     padding: 8px 12px;
     box-sizing: border-box;
     border: none;
-    border-bottom: 1px solid $tabbar-border-color;
+    border-bottom: 1px solid $tabbar-border-light;
     background: none;
     text-align: left;
     cursor: pointer;
     transition: background-color 0.2s ease;
     position: relative;
-    
+
     &:hover:not(.fotogrids-add-option--pro) {
         background: $tabbar-hover-bg;
     }
-    
+
     &--pro {
-        opacity: 0.6;
-        cursor: not-allowed;
-        
+        color: #aaa;
+
         &:hover {
             background: $tabbar-bg-light;
         }
     }
-    
+
     .fotogrids-option-desc {
         font-size: 11px;
         color: #666;
         margin-top: 2px;
-    }
-    
-    .fotogrids-pro-badge {
-        position: absolute;
-        top: 8px;
-        right: 12px;
-        background: #ff6b35;
-        color: #fff;
-        font-size: 10px;
-        font-weight: 600;
-        padding: 2px 6px;
-        border-radius: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        color: #c3c4c7;
-        
-        &:hover:not(.fotogrids-add-option--pro) {
-            background: #23282d;
-        }
-        
-        &--pro:hover {
-            background: #2c3338;
-        }
-        
-        .fotogrids-option-desc {
-            color: #a7aaad;
-        }
     }
 }
 
@@ -261,20 +227,15 @@
 }
 
 .fotogrids-gallery-content {
-    border-top: 1px solid $tabbar-border-color;
+    border-top: 1px solid $tabbar-border-light;
     background: $tabbar-bg-white;
     padding: 20px;
     margin-top: 0;
-    
-    @media (prefers-color-scheme: dark) {
-        border-color: #3c434a;
-        background: #1d2327;
-    }
 }
 
 .fotogrids-gallery-tab-content {
     display: none;
-    
+
     &--active {
         display: block;
     }
@@ -284,15 +245,9 @@
     padding: 40px;
     text-align: center;
     background: #f9f9f9;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--fg-border-secondary);
     border-radius: 8px;
     color: #666;
-    
-    @media (prefers-color-scheme: dark) {
-        background: #23282d;
-        border-color: #3c434a;
-        color: #a7aaad;
-    }
 }
 
 .fotogrids-items-bulk-f {
@@ -311,10 +266,12 @@
     }
 }
 
-body[class*="fotogrids_page_"] {
+body[class*="fotogrids_page_"],
+body[class*="post-type-fotogrids_"] {
     #wpcontent {
         padding-left: 0;
         padding-right: 0;
+        position: relative;
     }
 
     #wpbody-content > .wrap {
@@ -324,7 +281,7 @@ body[class*="fotogrids_page_"] {
     #fotogrids-admin-header {
         padding: 1rem 2rem;
         background-color: #fff;
-        
+
         h1 {
             display: flex;
             align-items: center;
@@ -332,15 +289,15 @@ body[class*="fotogrids_page_"] {
             margin: 0;
             font-size: 1.6rem;
             font-weight: 600;
-            color: #1d2327;
+            color: var(--fg-text-primary);
         }
     }
-    
+
     .fotogrids-page-icon {
         display: inline-flex;
         align-items: center;
         flex-shrink: 0;
-        
+
         svg {
             width: 28px;
             height: 28px;
@@ -349,346 +306,7 @@ body[class*="fotogrids_page_"] {
     }
 
     .fotogrids-admin-page {
-        padding: 2rem;
-    }
-}
-
-// Welcome page styles
-.fotogrids-welcome {
-    max-width: 1200px;
-    
-    .fotogrids-welcome-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e0e0e0;
-        
-        .fotogrids-branding {
-            h1 {
-                margin: 0;
-                color: #1e1e1e;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                
-                .dashicons {
-                    color: #0073aa;
-                }
-            }
-            
-            p {
-                margin: 0.25rem 0 0 0;
-                color: #757575;
-                font-size: 1.1rem;
-            }
-        }
-        
-        .fotogrids-version {
-            .fotogrids-version-badge {
-                background: #f0f0f1;
-                color: #1e1e1e;
-                padding: 0.5rem 1rem;
-                border-radius: 20px;
-                font-size: 0.9rem;
-                font-weight: 600;
-            }
-        }
-    }
-    
-    .fotogrids-quick-actions {
-        margin-bottom: 2rem;
-        
-        h3 {
-            color: #1e1e1e;
-            margin-bottom: 1rem;
-        }
-        
-        .fotogrids-action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            
-            .fotogrids-action-card {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                padding: 1.5rem;
-                background: white;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                text-decoration: none;
-                color: #1e1e1e;
-                transition: all 0.2s ease;
-                
-                &:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                    border-color: #0073aa;
-                }
-                
-                &.primary {
-                    background: linear-gradient(135deg, #0073aa 0%, #005177 100%);
-                    color: white;
-                    border-color: #0073aa;
-                }
-                
-                .action-icon {
-                    font-size: 2rem;
-                    line-height: 1;
-                }
-                
-                .action-content {
-                    flex: 1;
-                    
-                    h4 {
-                        margin: 0 0 0.25rem 0;
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                    }
-                    
-                    p {
-                        margin: 0;
-                        font-size: 0.9rem;
-                        opacity: 0.8;
-                    }
-                }
-            }
-        }
-    }
-    
-    .fotogrids-overview {
-        margin-bottom: 2rem;
-        
-        h3 {
-            color: #1e1e1e;
-            margin-bottom: 1rem;
-        }
-        
-        .fotogrids-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            
-            .fotogrids-stat-card {
-                text-align: center;
-                background: white;
-                padding: 1.5rem;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                
-                .stat-number {
-                    font-size: 2.5rem;
-                    font-weight: 700;
-                    color: #0073aa;
-                    line-height: 1;
-                    margin-bottom: 0.5rem;
-                }
-                
-                .stat-label {
-                    font-size: 0.9rem;
-                    color: #757575;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    font-weight: 600;
-                }
-            }
-        }
-    }
-    
-    .fotogrids-getting-started {
-        margin-bottom: 2rem;
-        
-        h3 {
-            color: #1e1e1e;
-            margin-bottom: 1rem;
-        }
-        
-        .fotogrids-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            
-            .fotogrids-step {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                padding: 1rem;
-                background: white;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                
-                .step-number {
-                    width: 2.5rem;
-                    height: 2.5rem;
-                    background: #0073aa;
-                    color: white;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: 600;
-                    font-size: 1.1rem;
-                    flex-shrink: 0;
-                }
-                
-                .step-content {
-                    flex: 1;
-                    
-                    h4 {
-                        margin: 0 0 0.25rem 0;
-                        color: #1e1e1e;
-                        font-weight: 600;
-                    }
-                    
-                    p {
-                        margin: 0;
-                        color: #757575;
-                        font-size: 0.9rem;
-                    }
-                }
-            }
-        }
-    }
-    
-    .fotogrids-pro-teaser {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 8px;
-        text-align: center;
-        
-        h3 {
-            color: white;
-            margin-bottom: 1rem;
-        }
-        
-        .fotogrids-pro-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            
-            .pro-feature {
-                text-align: left;
-                
-                h4 {
-                    margin: 0 0 0.5rem 0;
-                    color: white;
-                    font-weight: 600;
-                }
-                
-                p {
-                    margin: 0;
-                    font-size: 0.9rem;
-                    opacity: 0.9;
-                }
-            }
-        }
-        
-        .button {
-            background: white;
-            color: #667eea;
-            border: none;
-            font-weight: 600;
-            
-            &:hover {
-                background: #f8f9fa;
-                color: #5a67d8;
-            }
-        }
-    }
-}
-
-// Templates page styles
-.fotogrids-templates-page {
-    .templates-header {
-        margin-bottom: 2rem;
-        
-        .description {
-            font-size: 1.1rem;
-            color: #757575;
-        }
-    }
-    
-    .templates-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        
-        .template-card {
-            position: relative;
-            transition: transform 0.2s ease;
-            
-            &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            }
-            
-            .template-preview {
-                position: relative;
-                
-                img {
-                    width: 100%;
-                    height: 200px;
-                    object-fit: cover;
-                    border-radius: 4px 4px 0 0;
-                }
-                
-                .template-type {
-                    position: absolute;
-                    top: 0.75rem;
-                    right: 0.75rem;
-                    padding: 0.25rem 0.75rem;
-                    border-radius: 12px;
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    
-                    &.template-type-free {
-                        background: #00a32a;
-                        color: white;
-                    }
-                    
-                    &.template-type-starter,
-                    &.template-type-expert,
-                    &.template-type-commerce {
-                        background: #ff6900;
-                        color: white;
-                    }
-                }
-            }
-            
-            .template-name {
-                margin: 0 0 0.5rem 0;
-                font-size: 1.2rem;
-                font-weight: 600;
-            }
-            
-            .template-description {
-                color: #757575;
-                margin-bottom: 1rem;
-            }
-            
-            .template-actions {
-                display: flex;
-                gap: 0.5rem;
-                
-                .pro-template-actions {
-                    display: flex;
-                    gap: 0.5rem;
-                    width: 100%;
-                }
-            }
-        }
-    }
-    
-    .no-templates {
-        text-align: center;
-        padding: 3rem;
-        color: #757575;
+        padding: 20px;
     }
 }
 
@@ -698,32 +316,32 @@ body[class*="fotogrids_page_"] {
         display: flex;
         gap: 1rem;
         margin-bottom: 2rem;
-        
+
         .components-base-control {
             min-width: 200px;
         }
     }
-    
+
     .stats-content {
         display: grid;
         gap: 2rem;
-        
+
         .stats-overview {
             .stats-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
                 gap: 2rem;
-                
+
                 .stat-item {
                     text-align: center;
-                    
+
                     .stat-number {
                         font-size: 2.5rem;
                         font-weight: 600;
-                        color: #0073aa;
+                        color: var(--fg-blue);
                         line-height: 1.2;
                     }
-                    
+
                     .stat-label {
                         font-size: 1rem;
                         color: #757575;
@@ -733,45 +351,45 @@ body[class*="fotogrids_page_"] {
                 }
             }
         }
-        
+
         .chart-placeholder {
             text-align: center;
             padding: 2rem;
-            
+
             .ascii-chart {
                 font-family: monospace;
                 font-size: 0.8rem;
-                color: #0073aa;
+                color: var(--fg-blue);
                 background: #f6f7f7;
                 padding: 1rem;
                 border-radius: 4px;
                 margin-top: 1rem;
             }
         }
-        
+
         .top-items-list {
             .top-item-item {
                 display: flex;
                 align-items: center;
                 padding: 0.75rem 0;
                 border-bottom: 1px solid #f0f0f1;
-                
+
                 &:last-child {
                     border-bottom: none;
                 }
-                
+
                 .rank {
                     font-weight: 600;
                     margin-right: 1rem;
-                    color: #0073aa;
+                    color: var(--fg-blue);
                     min-width: 2rem;
                 }
-                
+
                 .item-title {
                     flex: 1;
                     font-weight: 500;
                 }
-                
+
                 .item-views {
                     color: #757575;
                     font-size: 0.9rem;
@@ -781,201 +399,21 @@ body[class*="fotogrids_page_"] {
     }
 }
 
-// Settings page styles
-.fotogrids-settings {
-    .fotogrids-tab-nav {
-        margin-bottom: 1.5rem;
-        
-        .nav-tab-wrapper {
-            border-bottom: 1px solid #c3c4c7;
-            margin: 0;
-            padding: 0;
-            
-            .nav-tab {
-                background: #f6f7f7;
-                border: 1px solid #c3c4c7;
-                color: #50575e;
-                text-decoration: none;
-                padding: 8px 12px;
-                font-size: 14px;
-                line-height: 1.4;
-                display: inline-block;
-                margin: -1px -1px -1px 0;
-                
-                &:hover {
-                    background-color: #fff;
-                    color: #135e96;
-                }
-                
-                &.nav-tab-active {
-                    background-color: #fff;
-                    border-bottom-color: #fff;
-                    color: #000;
-                }
-            }
-        }
-    }
-    
-    .fotogrids-tab-content {
-        background: white;
-        padding: 1.5rem;
-        border: 1px solid #c3c4c7;
-        border-top: none;
-    }
-    
-    .permissions-info,
-    .integrations-info {
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: #f6f7f7;
-        border-radius: 4px;
-        
-        p {
-            margin: 0;
-            color: #1e1e1e;
-        }
-    }
-    
-    .permission-setting {
-        margin-bottom: 2rem;
-        
-        h4 {
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        
-        .role-checkboxes {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            
-            label {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                font-weight: 500;
-                
-                input[type="checkbox"] {
-                    margin: 0;
-                }
-            }
-        }
-    }
-    
-    .pro-notice {
-        margin-top: 1.5rem;
-        padding: 1rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 4px;
-        text-align: center;
-        
-        .components-button {
-            background: white;
-            color: #667eea;
-            border: none;
-            font-weight: 600;
-            
-            &:hover {
-                background: #f8f9fa;
-            }
-        }
-    }
-    
-    .settings-actions {
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #f0f0f1;
-    }
-}
-
-// Galleries and Albums page styles
-.fotogrids-page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e0e0e0;
-    
-    h2 {
-        margin: 0;
-        color: #1e1e1e;
-    }
-    
-    .fotogrids-header-actions {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-        
-        .button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    }
-}
 
 .fotogrids-search-section {
     margin-bottom: 1.5rem;
-    
+
     .fotogrids-search-input {
         max-width: 300px;
         padding: 0.5rem;
-        border: 1px solid #8c8f94;
+        border: 1px solid var(--fg-border-dark);
         border-radius: 4px;
         font-size: 14px;
-        
-        &:focus {
-            border-color: #0073aa;
-            box-shadow: 0 0 0 1px #0073aa;
-            outline: none;
-        }
-    }
-}
 
-.fotogrids-table-container {
-    background: white;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    overflow: hidden;
-    
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        
-        th,
-        td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f1;
-        }
-        
-        th {
-            background: #f6f7f7;
-            font-weight: 600;
-            color: #1e1e1e;
-            border-bottom: 1px solid #c3c4c7;
-        }
-        
-        tr:last-child td {
-            border-bottom: none;
-        }
-        
-        tr:hover {
-            background: #f9f9f9;
-        }
-        
-        .row-actions {
-            display: flex;
-            gap: 0.5rem;
-            
-            .button {
-                padding: 4px 8px;
-                font-size: 12px;
-                line-height: 1.4;
-                min-height: auto;
-            }
+        &:focus {
+            border-color: var(--fg-blue);
+            box-shadow: 0 0 0 1px var(--fg-blue);
+            outline: none;
         }
     }
 }
@@ -985,49 +423,49 @@ body[class*="fotogrids_page_"] {
     padding: 1.5rem;
     border: 1px solid #c3c4c7;
     border-radius: 4px;
-    
+
     .fotogrids-form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
         margin-bottom: 1.5rem;
-        
+
         @media (max-width: 768px) {
             grid-template-columns: 1fr;
         }
     }
-    
+
     .fotogrids-form-group {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        
+
         label {
             font-weight: 600;
             color: #1e1e1e;
         }
-        
+
         input,
         select,
         textarea {
             padding: 0.5rem;
-            border: 1px solid #8c8f94;
+            border: 1px solid var(--fg-border-dark);
             border-radius: 4px;
             font-size: 14px;
-            
+
             &:focus {
-                border-color: #0073aa;
-                box-shadow: 0 0 0 1px #0073aa;
+                border-color: var(--fg-blue);
+                box-shadow: 0 0 0 1px var(--fg-blue);
                 outline: none;
             }
         }
-        
+
         textarea {
             min-height: 100px;
             resize: vertical;
         }
     }
-    
+
     .fotogrids-form-actions {
         display: flex;
         gap: 0.75rem;
@@ -1041,7 +479,7 @@ body[class*="fotogrids_page_"] {
     padding: 3rem;
     color: #757575;
     font-style: italic;
-    
+
     &::before {
         content: '⟳';
         display: inline-block;
@@ -1056,149 +494,32 @@ body[class*="fotogrids_page_"] {
     to { transform: rotate(360deg); }
 }
 
-// License page styles
-.fotogrids-license-page {
-    .license-content {
-        max-width: 800px;
-        
-        .license-info {
-            .license-status {
-                margin-bottom: 1rem;
-                
-                .status-badge {
-                    padding: 0.5rem 1rem;
-                    border-radius: 20px;
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    
-                    &.status-active {
-                        background: #00a32a;
-                        color: white;
-                    }
-                    
-                    &.status-expired {
-                        background: #ffb900;
-                        color: white;
-                    }
-                    
-                    &.status-disabled {
-                        background: #d63638;
-                        color: white;
-                    }
-                }
-            }
-            
-            .license-details {
-                margin-bottom: 2rem;
-                
-                .license-detail {
-                    margin-bottom: 0.75rem;
-                    
-                    strong {
-                        display: inline-block;
-                        min-width: 100px;
-                        color: #1e1e1e;
-                    }
-                    
-                    code {
-                        background: #f6f7f7;
-                        padding: 0.25rem 0.5rem;
-                        border-radius: 3px;
-                        font-size: 0.9rem;
-                    }
-                }
-            }
-            
-            .license-actions {
-                display: flex;
-                gap: 1rem;
-            }
-        }
-        
-        .license-activation {
-            .activation-actions {
-                margin-top: 1.5rem;
-            }
-        }
-        
-        .pro-features {
-            .feature-tier {
-                margin-bottom: 2rem;
-                
-                h4 {
-                    color: #0073aa;
-                    font-size: 1.1rem;
-                    font-weight: 600;
-                    margin-bottom: 0.75rem;
-                }
-                
-                ul {
-                    list-style: none;
-                    padding: 0;
-                    
-                    li {
-                        position: relative;
-                        padding-left: 1.5rem;
-                        margin-bottom: 0.5rem;
-                        
-                        &::before {
-                            content: '✓';
-                            position: absolute;
-                            left: 0;
-                            color: #00a32a;
-                            font-weight: bold;
-                        }
-                    }
-                }
-            }
-            
-            .upgrade-cta {
-                text-align: center;
-                margin-top: 2rem;
-                padding-top: 2rem;
-                border-top: 1px solid #f0f0f1;
-            }
-        }
-    }
-}
 
 // Custom column styles for post list tables
 .fotogrids-layout-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.5px;
+    font-weight: 500;
     text-transform: uppercase;
     background: #f0f0f1;
     color: #1e1e1e;
-    
-    &.layout-grid {
-        background: #e1f5fe;
-        color: #0277bd;
-    }
-    
-    &.layout-masonry {
-        background: #f3e5f5;
-        color: #7b1fa2;
-    }
-    
-    &.layout-justified {
-        background: #e8f5e8;
-        color: #2e7d32;
-    }
-    
-    &.layout-slider {
-        background: #fff3e0;
-        color: #ef6c00;
+    white-space: nowrap;
+
+    @each $layout, $colors in map-get($fotogrids-ui-colors, layout) {
+        &.layout-#{$layout} {
+            background: map-get($colors, bg);
+            color: map-get($colors, text);
+        }
     }
 }
 
 .fotogrids-stats {
     font-size: 0.9rem;
-    
+
     .views,
     .shares {
         display: block;
@@ -1219,25 +540,28 @@ body[class*="fotogrids_page_"] {
     .fotogrids-dashboard-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .templates-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .stats-filters {
         flex-direction: column;
-        
+
         .components-base-control {
             min-width: auto;
         }
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     }
-    
+
     .license-actions {
         flex-direction: column;
     }
 }
 
+.fotogrids-text--error {
+    color: var(--fg-text-error);
+}

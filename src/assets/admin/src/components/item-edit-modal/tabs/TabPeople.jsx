@@ -1,4 +1,5 @@
 import React from 'react';
+import MetadataTab from './MetadataTab';
 
 const TabPeople = ({
     metadata,
@@ -7,73 +8,33 @@ const TabPeople = ({
     setMetadataInput,
     addMetadataItem,
     removeMetadataItem,
-    selectExistingMetadata
+    selectExistingMetadata,
+    disabled = false,
+    strings = {}
 }) => {
     return (
-        <div className="fotogrids-tab-panel active">
-            <div className="fotogrids-metadata-section">
-                <div className="fotogrids-metadata-input">
-                    <input
-                        type="text"
-                        placeholder="Add people..."
-                        value={metadataInput.people}
-                        onChange={(e) => setMetadataInput(prev => ({ ...prev, people: e.target.value }))}
-                        onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                addMetadataItem('people', metadataInput.people);
-                            }
-                        }}
-                    />
-                    <button 
-                        type="button" 
-                        className="button"
-                        onClick={() => addMetadataItem('people', metadataInput.people)}
-                    >
-                        Add
-                    </button>
-                </div>
-                
-                {/* Autocomplete suggestions */}
-                {metadataInput.people && (
-                    <div className="fotogrids-autocomplete">
-                        {(availableMetadata.people || [])
-                            .filter(person => 
-                                person && person.name &&
-                                person.name.toLowerCase().includes(metadataInput.people.toLowerCase()) &&
-                                !metadata.people.some(existing => existing.id === person.id)
-                            )
-                            .slice(0, 5)
-                            .map(person => (
-                                <div 
-                                    key={person.id} 
-                                    className="fotogrids-autocomplete-item"
-                                    onClick={() => selectExistingMetadata('people', person)}
-                                >
-                                    {person.name}
-                                </div>
-                            ))
-                        }
-                    </div>
-                )}
-                
-                {/* Current people */}
-                <div className="fotogrids-metadata-list">
-                    {metadata.people.map(person => (
-                        <span key={person.id} className="fotogrids-metadata-item">
-                            {person.name}
-                            <button 
-                                type="button" 
-                                className="fotogrids-remove-metadata"
-                                onClick={() => removeMetadataItem('people', person.id)}
-                            >
-                                ×
-                            </button>
-                        </span>
-                    ))}
-                </div>
-            </div>
-        </div>
+        <MetadataTab
+            metadata={metadata}
+            availableMetadata={availableMetadata}
+            metadataInput={metadataInput}
+            setMetadataInput={setMetadataInput}
+            addMetadataItem={addMetadataItem}
+            removeMetadataItem={removeMetadataItem}
+            selectExistingMetadata={selectExistingMetadata}
+            disabled={disabled}
+            strings={strings}
+            metadataKey="people"
+            inputKey="people"
+            placeholder={strings.addPeoplePlaceholder || ''}
+            icon={window.FotoGridsIcons?.people || ''}
+            showProNotice={true}
+            proNoticeContent={{
+                badge: strings.pro,
+                title: strings.facialRecognition,
+                description: strings.facialRecognitionDesc,
+                upgradeText: strings.upgradeToPro
+            }}
+        />
     );
 };
 

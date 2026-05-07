@@ -1,0 +1,30 @@
+{
+  "id": "listing-detail",
+  "name": "Listing Detail",
+  "description": "Full property detail layout: large hero slider, scrollable photo strip, map block, and an inline enquiry form. Everything a listing page needs in one template.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 38,
+  "settings": {
+    "layout": "slider",
+    "columns": {
+      "desktop": 1,
+      "tablet": 1,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 0,
+      "tablet": 0,
+      "mobile": 0
+    },
+    "captions": true,
+    "watermark_enabled": true,
+    "cta_overlays": true,
+    "lead_capture_form": true,
+    "map_block": true,
+    "lightbox": true
+  }
+}

@@ -1,6 +1,6 @@
 /**
  * FotoGrids AJAX Save Styles
- * 
+ *
  * Styles for the asynchronous saving functionality
  */
 
@@ -15,23 +15,15 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: box-shadow 0.3s ease;
     }
-    
+
     .post-type-fotogrids_gallery #submitdiv.stuck {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    
+
     /* Ensure the sidebar has enough space */
     .post-type-fotogrids_gallery #postbox-container-1 {
         padding-top: 10px;
     }
-}
-
-/* FotoGrids Brand Colors */
-:root {
-    --fotogrids-blue: #3c46f0;
-    --fotogrids-blue-light: #5865f2;
-    --fotogrids-blue-dark: #2d35c7;
-    --fotogrids-blue-hover: #4f5af3;
 }
 
 /* Save Status Container */
@@ -49,7 +41,7 @@
 .fotogrids-save-status.loading {
     background: #f0f6fc;
     border: 1px solid #c3dcf3;
-    color: #0073aa;
+    color: var(--fg-blue);
 }
 
 .fotogrids-save-status.success {
@@ -91,7 +83,7 @@
 .fotogrids-last-saved {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--fg-border-secondary);
     text-align: center;
     color: #666;
 }
@@ -107,7 +99,7 @@
     background: rgba(60, 70, 240, 0.1);
     border: 1px solid rgba(60, 70, 240, 0.3);
     border-radius: 4px;
-    color: var(--fotogrids-blue-dark);
+    color: var(--fg-blue-dark);
     font-size: 13px;
 }
 
@@ -128,29 +120,29 @@
 /* Update Button with Changes */
 #publish.fotogrids-has-changes,
 #save-post.fotogrids-has-changes {
-    background: var(--fotogrids-blue) !important;
-    border-color: var(--fotogrids-blue-dark) !important;
+    background: var(--fg-blue) !important;
+    border-color: var(--fg-blue-dark) !important;
     animation: pulse-changes 2s infinite;
     transition: all 0.3s ease;
 }
 
 #publish.fotogrids-has-changes:hover,
 #save-post.fotogrids-has-changes:hover {
-    background: var(--fotogrids-blue-hover) !important;
-    border-color: var(--fotogrids-blue-dark) !important;
+    background: var(--fg-blue-hover) !important;
+    border-color: var(--fg-blue-dark) !important;
 }
 
 #publish.fotogrids-has-changes:active,
 #save-post.fotogrids-has-changes:active {
-    background: var(--fotogrids-blue-dark) !important;
-    border-color: var(--fotogrids-blue-dark) !important;
+    background: var(--fg-blue-dark) !important;
+    border-color: var(--fg-blue-dark) !important;
 }
 
 @keyframes pulse-changes {
-    0%, 100% { 
+    0%, 100% {
         box-shadow: 0 0 0 0 rgba(60, 70, 240, 0.4);
     }
-    50% { 
+    50% {
         box-shadow: 0 0 0 4px rgba(60, 70, 240, 0.1);
     }
 }
@@ -212,11 +204,11 @@
         align-items: flex-start;
         gap: 5px;
     }
-    
+
     .fotogrids-save-spinner {
         align-self: center;
     }
-    
+
     #wp-admin-bar-fotogrids-quick-save .ab-label {
         display: none;
     }

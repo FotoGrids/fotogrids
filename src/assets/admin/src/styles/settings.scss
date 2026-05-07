@@ -1,8 +1,57 @@
 @use './colors.scss' as *;
 @use './sizes.scss' as *;
 @use './pro.scss' as *;
+@use './collection-settings/pro-tab.scss' as *;
+@use './collection-settings/layout-options.scss' as *;
+@use './collection-settings/hover-effects.scss' as *;
+@use './collection-settings/button-group.scss' as *;
+@use './collection-settings/alignment-grid.scss' as *;
+@use './collection-settings/color-picker.scss' as *;
+@use './collection-settings/lightbox-subtabs.scss' as *;
+@use './collection-settings/external-url-manager.scss' as *;
+@use './collection-settings/permissions-manager.scss' as *;
 
-#fotogrids_gallery_settings{
+.fotogrids-defaults-tab {
+    display: flex;
+    gap: 20px;
+}
+
+.fotogrids-defaults-subtabs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
+}
+
+.fotogrids-defaults-subtab {
+    padding: 12px 16px;
+    border: 1px solid var(--fg-border-secondary);
+    background: var(--fg-background-primary);
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    color: var(--fg-text-primary);
+
+    &:hover {
+        background: var(--fg-background-interactive);
+        border-color: var(--fg-border-primary);
+    }
+
+    &.fg-is-active {
+        background: var(--fg-blue);
+        color: white;
+        border-color: var(--fg-blue);
+        font-weight: 600;
+    }
+}
+
+.fotogrids-defaults-content {
+    flex: 1;
+}
+
+#fotogrids_collection_settings {
     .inside {
         padding: 0;
         margin: 0;
@@ -16,22 +65,24 @@ $settings-sidebar-width: 200px;
 }
 
 .fotogrids-setting__label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #1d2327;
+    color: var(--fg-text-primary);
 }
 
 .fotogrids-gallery-settings {
     display: flex;
     min-height: 500px;
-    background: $settings-bg-white;
+    background: $tabbar-bg-white;
 }
 
 .fotogrids-settings-sidebar {
     width: $settings-sidebar-width;
-    background: $settings-bg-light;
-    border-right: 1px solid $settings-border-color;
+    background: $tabbar-bg-light;
+    border-inline-end: 1px solid $tabbar-border-color;
     padding: 0;
 }
 
@@ -50,15 +101,17 @@ $settings-sidebar-width: 200px;
     text-align: left;
     cursor: pointer;
     @include transition-smooth;
-    border-bottom: 1px solid $settings-border-light;
+    border-color: $tabbar-border-light;
+    border-style: solid;
+    border-width: 0 0 1px;
     position: relative;
 
     &:hover {
-        background: $settings-hover-bg;
+        background: $tabbar-hover-bg;
     }
 
-    &.is-active {
-        background: $settings-bg-white;
+    &.fg-is-active {
+        background: $tabbar-bg-white;
         font-weight: 600;
 
         &:before, &:after {
@@ -69,16 +122,20 @@ $settings-sidebar-width: 200px;
         }
 
         &:before {
-            left: 0;
+            inset-inline-start: 0;
             width: 3px;
-            background: var(--fotogrids-blue);
+            background: var(--fg-blue);
         }
 
 
         &:after {
             right: -1px;
             width: 1px;
-            background: $settings-bg-white;
+            background: $tabbar-bg-white;
+        }
+
+        &:last-child {
+            border-bottom: none;
         }
     }
 
@@ -100,10 +157,72 @@ $settings-sidebar-width: 200px;
 
 .fotogrids-settings-content {
     flex: 1;
-    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fotogrids-settings-docs-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin: 0 24px;
+    padding: 12px 0;
+    border-bottom: 1px solid $tabbar-border-light;
+    background: transparent;
+    color: ui-color(text, tertiary);
+    font-size: 13px;
+    line-height: 28px;
+
+    &__link {
+        color: inherit;
+        text-decoration: none;
+        font-size: 13px;
+        height: 28px;
+        box-sizing: border-box;
+        flex: 0;
+        white-space: nowrap;
+        border: 1px solid $tabbar-border-light;
+        padding: 4px 10px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover, &:focus {
+            color: $fotogrids-colors-blue;
+            border-color: currentColor;
+            text-decoration: none;
+            box-shadow: none;
+        }
+    }
+
+    &__buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__autosave {
+        height: 28px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 6px 4px 10px;
+        border: 1px solid $tabbar-border-light;
+        border-radius: 14px;
+    }
+
+    &__autosave-label {
+        font-size: 13px;
+        color: ui-color(text, tertiary);
+    }
 }
 
 .fotogrids-settings-group {
+    padding: 24px;
     &__content {
         display: flex;
         flex-direction: column;
@@ -113,115 +232,32 @@ $settings-sidebar-width: 200px;
 
 .fotogrids-setting {
     position: relative;
+    line-height: 1;
 
     &--disabled {
-        opacity: 0.5;
         pointer-events: none;
     }
 }
 
-.fotogrids-pro-tab-content {
-    text-align: center;
-    padding: 40px 20px;
-    
-    .fotogrids-pro-tab-header {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 30px;
-        
-        .fotogrids-pro-tab-icon {
-            width: 24px;
-            height: 24px;
-            opacity: 0.7;
-        }
-        
-        h3 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-            color: $settings-text-primary;
-        }
-        
-        .fotogrids-pro-badge-large {
-            @include pro-badge;
-            font-size: 12px;
-            padding: 4px 8px;
-        }
-    }
-    
-    .fotogrids-pro-features-list {
-        margin-bottom: 30px;
-        text-align: left;
-        max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
-        
-        h4 {
-            margin: 0 0 15px 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: $settings-text-primary;
-            text-align: center;
-        }
-        
-        ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            
-            .fotogrids-pro-feature {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 8px 0;
-                border-bottom: 1px solid #f0f0f0;
-                
-                &:last-child {
-                    border-bottom: none;
-                }
-                
-                .fotogrids-pro-feature-icon {
-                    font-size: 14px;
-                    width: 20px;
-                    text-align: center;
-                }
-            }
-        }
-    }
-    
-    .fotogrids-pro-cta {
-        p {
-            margin: 0 0 20px 0;
-            color: $settings-text-secondary;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .fotogrids-upgrade-button {
-            font-size: 14px;
-            padding: 12px 24px;
-            border-radius: 6px;
-        }
-    }
-}
-
 .fotogrids-responsive-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
     &__header {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 8px;
     }
-    
-    &__label {
-        font-weight: 600;
-        color: $settings-text-primary;
-        font-size: 13px;
+
+    .fotogrids-setting__label {
+        margin-bottom: 0;
+    }
+
+    .fotogrids-setting__description {
         margin: 0;
     }
-    
+
     &__device-icon {
         font-size: 0;
         width: 16px;
@@ -229,56 +265,34 @@ $settings-sidebar-width: 200px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--fotogrids-blue);
+        color: var(--fg-blue);
     }
-    
-    // Controls Row: Range + Input + Device Buttons
+
     &__controls {
         display: flex;
         align-items: center;
         gap: 12px;
     }
-    
-    // Range slider (takes most space)
+
     &__range {
         flex: 1;
         min-width: 120px;
     }
-    
-    // Number input
+
     &__input {
         flex-shrink: 0;
-        
-        .fotogrids-responsive-number-input {
-            width: 60px;
-            padding: 6px 8px;
-            border: 1px solid #e1e4e8;
-            border-radius: 4px;
-            font-size: 13px;
-            text-align: center;
-            
-            &:focus {
-                outline: none;
-                border-color: #0073aa;
-                box-shadow: 0 0 0 1px #0073aa;
-            }
-            
-            &:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                background: #f6f7f7;
-            }
-        }
+        display: inline-flex;
+        align-items: flex-end;
+        gap: 4px;
     }
-    
-    // Device button group
+
     &__devices {
         display: flex;
-        border: 1px solid #e1e4e8;
+        border: 1px solid var(--fg-border-primary);
         border-radius: 4px;
         overflow: hidden;
         flex-shrink: 0;
-        
+
         .fotogrids-responsive-device-btn {
             width: 40px;
             height: 40px;
@@ -287,144 +301,33 @@ $settings-sidebar-width: 200px;
             justify-content: center;
             background: white;
             border: none;
-            border-right: 1px solid #e1e4e8;
+            border-right: 1px solid var(--fg-border-primary);
             cursor: pointer;
             transition: all 0.2s ease;
-            
+            line-height: 0;
+
             &:last-child {
                 border-right: none;
             }
-            
-            &:hover:not(:disabled):not(.is-active) {
+
+            &:hover:not(:disabled):not(.fg-is-active) {
                 background: #f6f7f7;
             }
-            
-            &.is-active {
-                background: var(--fotogrids-blue);
+
+            &.fg-is-active {
+                background: var(--fg-blue);
                 color: white;
             }
-            
+
             &:disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
             }
-            
+
             svg {
                 width: 14px;
                 height: 14px;
             }
-        }
-    }
-}
-
-.fotogrids-layout-grid-setting {
-    &__label {
-        display: block;
-        margin-bottom: 15px;
-        font-weight: 600;
-        color: $settings-text-primary;
-        font-size: 13px;
-    }
-}
-
-.fotogrids-layout-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    
-    @media (max-width: 782px) {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 8px;
-    }
-}
-
-.fotogrids-layout-option {
-    border: 1px solid #e1e4e8;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    overflow: hidden;
-    position: relative;
-    
-    &:hover:not(.is-disabled):not(.is-active) {
-        border-color: var(--fotogrids-blue);
-    }
-
-    &:hover:not(.is-disabled) {
-        box-shadow: 0 2px 8px rgba(0, 115, 170, 0.1);
-        transform: translateY(-1px);
-
-        &.is-active {
-            box-shadow: 0 0 0 1px var(--fotogrids-blue), 0 2px 8px rgba(0, 115, 170, 0.1);
-        }
-    }
-
-    &.is-active {
-        border-color: var(--fotogrids-blue);
-        box-shadow: 0 0 0 1px var(--fotogrids-blue);
-        
-        .fotogrids-layout-option__preview {
-            background: $settings-bg-light;
-        }
-    }
-    
-    &.is-disabled {
-        border-color: rgba(#e1e4e8, 0.6);
-
-        .fotogrids-layout-option__preview {
-            opacity: 0.6;
-        }
-    }
-    
-    &__preview {
-        position: relative;
-        padding: 20px 16px;
-        background: $settings-bg-light;
-        border-bottom: 1px solid #e1e4e8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 80px;
-    }
-    
-    &__icon {
-        width: 64px;
-        height: 48px;
-        color: rgba($fotogrids-colors-blue, 0.5);
-        
-        .is-active & {
-            color: var(--fotogrids-blue);
-        }
-        
-        .is-disabled & {
-            color: #9ca3af;
-        }
-    }
-    
-    &__info {
-        padding: 12px 16px;
-    }
-    
-    &__name {
-        margin: 0 0 4px 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: $settings-text-primary;
-        
-        .is-disabled & {
-            color: #9ca3af;
-        }
-    }
-    
-    &__description {
-        margin: 0;
-        font-size: 11px;
-        color: $settings-text-secondary;
-        line-height: 1.4;
-        
-        .is-disabled & {
-            color: #9ca3af;
         }
     }
 }
@@ -435,153 +338,24 @@ body.rtl {
         &__controls {
             direction: rtl;
         }
-        
+
         &__devices {
             .fotogrids-responsive-device-btn {
                 border-right: none;
-                border-left: 1px solid #e1e4e8;
-                
+                border-left: 1px solid var(--fg-border-primary);
+
                 &:last-child {
                     border-left: none;
                 }
-                
+
                 &:first-child {
-                    border-left: 1px solid #e1e4e8;
+                    border-left: 1px solid var(--fg-border-primary);
                 }
             }
         }
     }
 }
 
-// Legacy pro notice (keep for backward compatibility)
-.fotogrids-pro-notice {
-    margin-top: 30px;
-    padding: 20px;
-    background: $settings-pro-notice-bg;
-    border: 1px solid $settings-pro-notice-border;
-    border-radius: 4px;
-    text-align: center;
-
-    h4 {
-        margin: 0 0 10px 0;
-        color: $settings-text-primary;
-    }
-
-    p {
-        margin: 0 0 15px 0;
-        color: $settings-text-secondary;
-    }
-}
-
-body.rtl {
-    .fotogrids-settings-sidebar {
-        border-right: none;
-        border-left: 1px solid $settings-border-color;
-    }
-
-    .fotogrids-settings-tab {
-        &.is-active {
-            border-right: none;
-            border-left: 3px solid $settings-active-border;
-        }
-    }
-}
-
-.fotogrids-button-group {
-    &__buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-
-    &__button {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 10px 12px 12px;
-        border: 1px solid #8c8f94;
-        border-radius: 4px;
-        background: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 13px;
-
-        &:hover {
-            border-color: var(--fotogrids-blue);
-            background: #f6f7f7;
-        }
-
-        &.is-active {
-            border-color: var(--fotogrids-blue);
-            background: var(--fotogrids-blue);
-            color: #fff;
-        }
-
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .fotogrids-button-icon {
-            display: flex;
-            align-items: center;
-            font-size: 0;
-
-            svg {
-                width: 16px;
-                height: 16px;
-            }
-        }
-
-        .fotogrids-button-label {
-            font-weight: 400;
-        }
-    }
-}
-
-.fotogrids-color-picker {
-    &__input {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-
-        .fotogrids-color-input {
-            width: 38px;
-            height: 38px;
-            border: 3px solid white;
-            box-shadow: 0 0 0 1px #8c8f94;
-            border-radius: 3px;
-            cursor: pointer;
-            background: none;
-            padding: 0;
-
-            &::-webkit-color-swatch-wrapper {
-                padding: 0;
-            }
-
-            &::-webkit-color-swatch {
-                border: none;
-                border-radius: 3px;
-            }
-        }
-
-        .fotogrids-color-text {
-            flex: 1;
-            max-width: 120px;
-            padding: 6px 8px;
-            border: 1px solid #8c8f94;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
-
-            &:focus {
-                border-color: #007cba;
-                outline: none;
-                box-shadow: 0 0 0 1px #007cba;
-            }
-        }
-    }
-}
 
 .fotogrids-conditional-message {
     margin-top: 8px;
@@ -593,194 +367,7 @@ body.rtl {
         background: #f0f6fc;
         border: 1px solid #c3dcf3;
         border-radius: 4px;
-        color: #0073aa;
-        font-size: 13px;
-    }
-}
-
-.fotogrids-lightbox-subtabs {
-    border: 1px solid #e1e4e8;
-    background: #fff;
-    overflow: hidden;
-
-    &__nav {
-        display: flex;
-        background: #f6f7f7;
-        border-bottom: 1px solid #e1e4e8;
-        margin: 0;
-        padding: 0;
-    }
-}
-
-.fotogrids-lightbox-subtab {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 16px 12px;
-    border: none;
-    cursor: pointer;
-    @include transition-smooth;
-    position: relative;
-    font-size: 13px;
-    font-weight: 500;
-    border-right: 1px solid #e1e4e8;
-    background: transparent;
-
-    &:last-child {
-        border-right: none;
-    }
-
-    &:hover {
-        background: $settings-hover-bg;
-    }
-
-    &.is-active {
-        background: #fff;
-        font-weight: 600;
-        
-        &:before {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #fff;
-        }
-    }
-
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        
-        &:hover {
-            background: transparent;
-            color: #50575e;
-        }
-    }
-
-    &__icon {
-        font-size: 0;
-        width: 16px;
-        height: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        svg {
-            width: 16px;
-            height: 16px;
-        }
-    }
-
-    &__label {
-        font-size: 13px;
-        line-height: 1.2;
-        
-        @media (max-width: 782px) {
-            display: none;
-        }
-    }
-}
-
-.fotogrids-lightbox-subtab-content {
-    padding: 24px;
-    background: #fff;
-
-    &__inner {
-        display: flex;
-        flex-direction: column;
-        gap: 32px;
-    }
-}
-
-@media (max-width: 782px) {
-    .fotogrids-lightbox-subtab {
-        padding: 12px 8px;
-        
-        &__icon {
-            width: 20px;
-            height: 20px;
-            
-            svg {
-                width: 20px;
-                height: 20px;
-            }
-        }
-    }
-    
-    .fotogrids-lightbox-subtab-content {
-        padding: 16px;
-    }
-}
-
-// Dark mode support for lightbox sub-tabs
-@media (prefers-color-scheme: dark) {
-    .fotogrids-lightbox-subtabs {
-        border-color: #3c434a;
-        background: #1d2327;
-        
-        &__nav {
-            background: #23282d;
-            border-bottom-color: #3c434a;
-        }
-    }
-    
-    .fotogrids-lightbox-subtab {
-        color: #c3c4c7;
-        border-right-color: #3c434a;
-        
-        &:hover:not(:disabled) {
-            background: rgba(0, 115, 170, 0.1);
-            color: #72aee6;
-        }
-        
-        &.is-active {
-            background: #1d2327;
-            color: #72aee6;
-            
-            &:before {
-                background: #72aee6;
-            }
-        }
-    }
-    
-    .fotogrids-lightbox-subtab-content {
-        background: #1d2327;
-    }
-}
-
-.fotogrids-external-url-manager {   
-    &--no-permission,
-    &--error {
-        .fotogrids-permission-notice,
-        .fotogrids-error-notice {
-            padding: 20px;
-            background: #fff2cd;
-            border: 1px solid #dba617;
-            border-radius: 4px;
-            
-            p {
-                margin: 0;
-                color: #8a6914;
-                font-weight: 500;
-            }
-        }
-        
-        .fotogrids-error-notice {
-            background: #fcf0f1;
-            border-color: #d63638;
-            
-            p {
-                color: #8a2424;
-            }
-            
-            .button {
-                margin-top: 10px;
-            }
-        }
+        color: var(--fg-blue);
     }
 }
 
@@ -788,32 +375,36 @@ body.rtl {
     margin-bottom: 20px;
     padding: 16px;
     background: #f6f7f7;
-    border: 1px solid #e1e4e8;
+    border: 1px solid var(--fg-border-primary);
     border-radius: 6px;
-    
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    @media (max-width: 782px) {
+        flex-direction: column;
+        gap: 16px;
+    }
+
     h4 {
         margin: 0 0 12px 0;
         font-size: 14px;
         font-weight: 600;
-        color: #1d2327;
+        color: var(--fg-text-primary);
     }
-    
-    &__controls {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        
-        .button {
+
+    &__bulk-actions {
+        .fotogrids-button {
             font-size: 13px;
-            padding: 6px 12px;
-            height: auto;
-            line-height: 1.4;
+            font-weight: 400;
+            color: initial;
+            padding: 10px 12px;
         }
     }
-    
+
     &__skeleton {
         height: 60px;
-        background: #e1e4e8;
+        background: var(--fg-border-primary);
         border-radius: 4px;
         animation: fotogrids-skeleton-pulse 1.5s ease-in-out infinite alternate;
     }
@@ -823,7 +414,7 @@ body.rtl {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
-    
+
     @media (max-width: 782px) {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -831,32 +422,32 @@ body.rtl {
 }
 
 .fotogrids-item-url-item {
-    border: 1px solid #e1e4e8;
+    border: 1px solid var(--fg-border-primary);
     border-radius: 6px;
     background: #fff;
     overflow: hidden;
     @include transition-smooth;
-    
+
     &:hover {
         border-color: #c3c4c7;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
-    
+
     &--skeleton {
         .fotogrids-item-url-item__thumbnail {
-            background: #e1e4e8;
+            background: var(--fg-border-primary);
             animation: fotogrids-skeleton-pulse 1.5s ease-in-out infinite alternate;
         }
-        
+
         .fotogrids-item-url-item__url-field,
         .fotogrids-item-url-item__target-field {
             height: 32px;
-            background: #e1e4e8;
+            background: var(--fg-border-primary);
             border-radius: 4px;
             animation: fotogrids-skeleton-pulse 1.5s ease-in-out infinite alternate;
         }
     }
-    
+
     &__thumbnail {
         width: 100%;
         height: 120px;
@@ -864,112 +455,95 @@ body.rtl {
         align-items: center;
         justify-content: center;
         background: #f6f7f7;
-        border-bottom: 1px solid #e1e4e8;
-        color: #8c8f94;
-        
+        border-bottom: 1px solid var(--fg-border-primary);
+        color: var(--fg-text-tertiary);
+
         img {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-radius: 0;
         }
     }
-    
+
     &__fields {
         padding: 12px;
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
-    
+
     &__url-field {
         position: relative;
-        
-        .fotogrids-url-input {
+
+        .fotogrids-input {
             width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #8c8f94;
-            border-radius: 4px;
-            font-size: 13px;
-            @include transition-smooth;
-            
-            &:focus {
-                border-color: #007cba;
-                outline: none;
-                box-shadow: 0 0 0 1px #007cba;
-            }
-            
+
             &--valid {
                 border-color: #00a32a;
-                
+
                 &:focus {
                     border-color: #00a32a;
                     box-shadow: 0 0 0 1px #00a32a;
                 }
             }
-            
+
             &--invalid {
                 border-color: #d63638;
-                
+
                 &:focus {
                     border-color: #d63638;
                     box-shadow: 0 0 0 1px #d63638;
                 }
             }
-            
-            &:disabled {
-                background: #f6f7f7;
-                color: #8c8f94;
-                cursor: not-allowed;
-            }
         }
-        
+
         .fotogrids-url-validation {
             margin-top: 4px;
             font-size: 11px;
             line-height: 1.3;
-            
+
             &--valid {
                 color: #00a32a;
             }
-            
+
             &--invalid {
                 color: #d63638;
             }
         }
-        
+
         .fotogrids-saving-indicator {
             position: absolute;
             top: 8px;
             right: 8px;
             font-size: 11px;
-            color: #0073aa;
+            color: var(--fg-blue);
             background: rgba(255, 255, 255, 0.9);
             padding: 2px 6px;
             border-radius: 3px;
             font-weight: 500;
         }
     }
-    
+
     &__target-field {
         .fotogrids-target-select {
             width: 100%;
             padding: 6px 8px;
-            border: 1px solid #8c8f94;
+            border: 1px solid var(--fg-border-dark);
             border-radius: 4px;
             font-size: 13px;
             background: #fff;
             @include transition-smooth;
-            
+
             &:focus {
                 border-color: #007cba;
                 outline: none;
                 box-shadow: 0 0 0 1px #007cba;
             }
-            
+
             &:disabled {
                 background: #f6f7f7;
-                color: #8c8f94;
+                color: var(--fg-text-tertiary);
                 cursor: not-allowed;
             }
         }
@@ -986,140 +560,6 @@ body.rtl {
     }
 }
 
-// Dark mode support for external URL manager
-@media (prefers-color-scheme: dark) {
-    .fotogrids-external-url-manager {
-        &--no-permission,
-        &--error {
-            .fotogrids-permission-notice {
-                background: #674a00;
-                border-color: #f0b849;
-                
-                p {
-                    color: #f0b849;
-                }
-            }
-            
-            .fotogrids-error-notice {
-                background: #8a2424;
-                border-color: #f87171;
-                
-                p {
-                    color: #f87171;
-                }
-            }
-        }
-    }
-    
-    .fotogrids-bulk-actions {
-        background: #23282d;
-        border-color: #3c434a;
-        
-        h4 {
-            color: #c3c4c7;
-        }
-        
-        &__skeleton {
-            background: #3c434a;
-        }
-    }
-    
-    .fotogrids-item-url-item {
-        background: #1d2327;
-        border-color: #3c434a;
-        
-        &:hover {
-            border-color: #50575e;
-        }
-        
-        &--skeleton {
-            .fotogrids-item-url-item__thumbnail,
-            .fotogrids-item-url-item__url-field,
-            .fotogrids-item-url-item__target-field {
-                background: #3c434a;
-            }
-        }
-        
-        &__thumbnail {
-            background: #23282d;
-            border-bottom-color: #3c434a;
-            
-            &-placeholder {
-                color: #8c8f94;
-            }
-        }
-        
-        &__url-field {
-            .fotogrids-url-input {
-                background: #1d2327;
-                border-color: #50575e;
-                color: #c3c4c7;
-                
-                &:focus {
-                    border-color: #72aee6;
-                    box-shadow: 0 0 0 1px #72aee6;
-                }
-                
-                &--valid {
-                    border-color: #68de7c;
-                    
-                    &:focus {
-                        border-color: #68de7c;
-                        box-shadow: 0 0 0 1px #68de7c;
-                    }
-                }
-                
-                &--invalid {
-                    border-color: #f87171;
-                    
-                    &:focus {
-                        border-color: #f87171;
-                        box-shadow: 0 0 0 1px #f87171;
-                    }
-                }
-                
-                &:disabled {
-                    background: #23282d;
-                    color: #50575e;
-                }
-            }
-            
-            .fotogrids-url-validation {
-                &--valid {
-                    color: #68de7c;
-                }
-                
-                &--invalid {
-                    color: #f87171;
-                }
-            }
-            
-            .fotogrids-saving-indicator {
-                color: #72aee6;
-                background: rgba(29, 35, 39, 0.9);
-            }
-        }
-        
-        &__target-field {
-            .fotogrids-target-select {
-                background: #1d2327;
-                border-color: #50575e;
-                color: #c3c4c7;
-                
-                &:focus {
-                    border-color: #72aee6;
-                    box-shadow: 0 0 0 1px #72aee6;
-                }
-                
-                &:disabled {
-                    background: #23282d;
-                    color: #50575e;
-                }
-            }
-        }
-    }
-}
-
 // Additional styles for external URL manager improvements
 .fotogrids-item-url-item {
     &__thumbnail-placeholder {
@@ -1128,32 +568,23 @@ body.rtl {
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         svg {
             width: 100%;
             height: 100%;
             max-width: 32px;
             max-height: 32px;
         }
-        
-        @media (prefers-color-scheme: dark) {
-            background: #3c434a;
-            color: #a7aaad;
-        }
     }
-    
+
     &__label {
         display: block;
         font-size: 12px;
         font-weight: 600;
-        color: #1d2327;
+        color: var(--fg-text-primary);
         margin-bottom: 6px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        
-        @media (prefers-color-scheme: dark) {
-            color: #f0f0f1;
-        }
     }
 }
 
@@ -1165,10 +596,10 @@ body.rtl {
 .fotogrids-target-button {
     flex: 1;
     padding: 6px 8px;
-    border: 1px solid #8c8f94;
+    border: 1px solid var(--fg-border-dark);
     border-radius: 4px;
     background: #fff;
-    color: #1d2327;
+    color: var(--fg-text-primary);
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -1178,13 +609,13 @@ body.rtl {
     gap: 4px;
     justify-content: center;
 
-    &:hover:not(:disabled):not(.is-active) {
+    &:hover:not(:disabled):not(.fg-is-active) {
         background: #f6f7f7;
     }
 
-    &.is-active {
-        background: var(--fotogrids-blue);
-        border-color: var(--fotogrids-blue);
+    &.fg-is-active {
+        background: var(--fg-blue);
+        border-color: var(--fg-blue);
         color: #fff;
     }
 
@@ -1203,7 +634,7 @@ body.rtl {
         align-items: center;
         justify-content: center;
         font-size: 0;
-        
+
         svg {
             width: 100%;
             height: 100%;
@@ -1227,287 +658,89 @@ body.rtl {
         opacity: 0.5;
         white-space: nowrap;
     }
+}
 
-    @media (prefers-color-scheme: dark) {
-        background: #1d2327;
-        color: #c3c4c7;
-        border-color: #50575e;
-        
-        &:hover:not(:disabled) {
-            background: #23282d;
-        }
-        
-        &.is-active {
-            background: #007cba;
-            color: #fff;
-            
-            .fotogrids-target-button__sub-label {
-                color: rgba(255, 255, 255, 0.8);
-            }
-            
-            &:hover {
-                background: #005a87;
-            }
-        }
-        
-        &:disabled {
-            background: #23282d;
-            color: #50575e;
-        }
-        
-        .fotogrids-target-button__sub-label {
-            color: #a7aaad;
+#fotogrids-modal__bulk-external-url {
+    .fotogrids-modal__content {
+        width: 480px;
+        height: auto;
+    }
+}
+
+.fotogrids-setting__description {
+    margin: 8px 0 0;
+    font-size: var(--fg-font-size-small);
+    line-height: 1.4;
+    color: var(--fg-text-tertiary);
+
+    strong {
+        color: var(--fg-text-secondary);
+    }
+
+    a {
+        color: var(--fg-blue);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
         }
     }
 }
 
-// Section headers for grouping settings
-.fotogrids-section-header {
-    margin: 20px 0 15px 0;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #ddd;
-    
-    &__title {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: #1d2327;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        border-bottom-color: #3c434a;
-        
-        &__title {
-            color: #f0f0f1;
-        }
-    }
-}
-
-// Bulk action modal
-.fotogrids-bulk-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.fotogrids-settings-pro-message {
+    border: 1px solid var(--fg-yellow);
     padding: 20px;
-}
-
-.fotogrids-bulk-modal {
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    max-width: 500px;
-    width: 100%;
-    max-height: 90vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    
-    @media (prefers-color-scheme: dark) {
-        background: #1d2327;
-        color: #f0f0f1;
-    }
-}
-
-.fotogrids-bulk-modal__header {
-    padding: 20px 20px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    
-    h3 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        border-bottom-color: #3c434a;
-    }
-}
-
-.fotogrids-bulk-modal__close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 3px;
-    color: #666;
-    
-    &:hover {
-        background: #f0f0f0;
-        color: #000;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        color: #a7aaad;
-        
-        &:hover {
-            background: #3c434a;
-            color: #f0f0f1;
-        }
-    }
-}
-
-.fotogrids-bulk-modal__content {
-    padding: 0 20px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-.fotogrids-bulk-modal__field {
-    margin-bottom: 20px;
-    
-    label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #23282d;
-        
-        @media (prefers-color-scheme: dark) {
-            color: #f0f0f1;
-        }
-    }
-}
-
-.fotogrids-bulk-modal__input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
+    gap: 20px;
     border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-    
-    &:focus {
-        outline: none;
-        border-color: #007cba;
-        box-shadow: 0 0 0 1px #007cba;
-    }
-    
-    &--valid {
-        border-color: #00a32a;
-        
-        &:focus {
-            border-color: #00a32a;
-            box-shadow: 0 0 0 1px #00a32a;
-        }
-    }
-    
-    &--invalid {
-        border-color: #d63638;
-        
-        &:focus {
-            border-color: #d63638;
-            box-shadow: 0 0 0 1px #d63638;
-        }
-    }
-    
-    @media (prefers-color-scheme: dark) {
-        background: #1d2327;
-        border-color: #3c434a;
-        color: #f0f0f1;
-        
-        &:focus {
-            border-color: #007cba;
-        }
-        
-        &--valid {
-            border-color: #00a32a;
-            
-            &:focus {
-                border-color: #00a32a;
-            }
-        }
-        
-        &--invalid {
-            border-color: #d63638;
-            
-            &:focus {
-                border-color: #d63638;
-            }
-        }
-    }
-}
 
-.fotogrids-bulk-modal__select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    background: #fff;
-    
-    &:focus {
-        outline: none;
-        border-color: #007cba;
-        box-shadow: 0 0 0 1px #007cba;
+    .fotogrids-pro-badge {
+        position: absolute;
+        top: calc(-14px / 2);
+        left: 20px;
     }
-    
-    @media (prefers-color-scheme: dark) {
-        background: #1d2327;
-        border-color: #3c434a;
-        color: #f0f0f1;
-        
-        &:focus {
-            border-color: #007cba;
+
+    &__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        &:not(:first-child) {
+            border-top: 1px solid var(--fg-border-secondary);
+            padding-top: 16px;
         }
     }
-}
 
-.fotogrids-bulk-modal__validation {
-    margin-top: 6px;
-    font-size: 12px;
-    
-    &--valid {
-        color: #00a32a;
+    &__subtitle {
+        font-size: 13px;
+        line-height: 17px;
+        font-weight: 600;
+        color: var(--fg-text-primary);
     }
-    
-    &--invalid {
-        color: #d63638;
-    }
-}
 
-.fotogrids-bulk-modal__footer {
-    padding: 20px;
-    border-top: 1px solid #ddd;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    
-    @media (prefers-color-scheme: dark) {
-        border-top-color: #3c434a;
+    &__text {
+        font-size: 13px;
+        line-height: 17px;
+        color: var(--fg-text-tertiary);
     }
-}
 
-// Responsive adjustments
-@media (max-width: 600px) {
-    .fotogrids-bulk-modal {
-        margin: 10px;
-        max-width: none;
-    }
-    
-    .fotogrids-bulk-modal__header,
-    .fotogrids-bulk-modal__content,
-    .fotogrids-bulk-modal__footer {
-        padding-left: 15px;
-        padding-right: 15px;
+    &__learn-more {
+        color: var(--fg-blue-hover);
+        text-decoration: none;
+        display: inline-block;
+
+        &:hover, &:focus {
+            color: var(--fg-blue);
+            text-decoration: underline;
+        }
     }
 }

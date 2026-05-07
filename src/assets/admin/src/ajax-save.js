@@ -1,48 +1,54 @@
 /**
  * FotoGrids AJAX Save Functionality
- * 
+ *
  * Handles asynchronous saving of gallery data to prevent page reloads
  */
 
-(function($) {
+(function() {
     'use strict';
 
-    // Initialize when DOM is ready
-    $(document).ready(function() {
-        initAjaxSave();
-    });
+    const strings = window.fotogridsAjaxSave?.strings || {};
+    const State = window.FotoGridsCollectionState;
+
+    document.addEventListener('DOMContentLoaded', initAjaxSave);
 
     function initAjaxSave() {
-        // Only initialize on gallery edit pages
-        if (!$('body').hasClass('post-type-fotogrids_gallery') || !$('#post').length) {
+        const isGallery = document.body.classList.contains('post-type-fotogrids_gallery');
+        const isAlbum = document.body.classList.contains('post-type-fotogrids_album');
+        if ((!isGallery && !isAlbum) || !document.getElementById('post')) {
             return;
         }
 
-        // Add save status container
-        addSaveStatusContainer();
-        
-        // Intercept form submission
         interceptFormSubmission();
-        
-        // Add quick save functionality
         addQuickSaveButton();
+        addUnsavedChangesContainer();
+        initValidationErrorMonitoring();
+        initFormChangeTracking();
+        initBeforeUnloadWarning();
+        initAutosave();
+
+        setTimeout(() => {
+            const itemsGrid = document.getElementById('fotogrids-items-grid');
+            if (itemsGrid && State) {
+                const itemElements = itemsGrid.querySelectorAll('.fotogrids-item-item');
+                const itemIds = Array.from(itemElements).map(el => el.getAttribute('data-id')).filter(Boolean);
+                State.items.initItems(itemIds);
+            }
+        }, 500);
+
+        if (State) {
+            State.on('unsavedChanges', updateUnsavedChangesDisplay);
+        }
     }
 
-    function addSaveStatusContainer() {
-        // Add save status container after the submit box
-        const submitBox = $('#submitdiv .inside');
-        if (submitBox.length) {
-            submitBox.append(`
-                <div id="fotogrids-save-status" class="fotogrids-save-status" style="display: none;">
-                    <div class="fotogrids-save-message"></div>
-                    <div class="fotogrids-save-spinner">
-                        <span class="spinner"></span>
-                    </div>
-                </div>
+    function addUnsavedChangesContainer() {
+        const submitBox = document.querySelector('#submitdiv .inside');
+        if (submitBox) {
+            submitBox.insertAdjacentHTML('beforeend', `
                 <div id="fotogrids-unsaved-changes" class="fotogrids-unsaved-changes" style="display: none;">
-                    <div class="fotogrids-unsaved-message">
+                    <div class="fotogrids-unsaved-changes__btn">
                         <span class="dashicons dashicons-warning"></span>
-                        You have unsaved changes
+                        ${strings.youHaveUnsavedChanges}
                     </div>
                 </div>
             `);
@@ -50,92 +56,188 @@
     }
 
     function interceptFormSubmission() {
-        const $form = $('#post');
-        const $publishButton = $('#publish, #save-post');
-        
-        // Intercept publish/update button clicks
-        $publishButton.on('click', function(e) {
-            // Only intercept if this is an update (not initial publish)
-            const action = $('#original_post_status').val();
-            if (action && action !== 'auto-draft') {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                saveGalleryAjax();
-                return false;
-            }
-        });
+        const form = document.getElementById('post');
+        const saveButton = document.getElementById('save-post');
 
-        // Intercept form submission
-        $form.on('submit', function(e) {
-            // Only intercept if this is an update (not initial publish)
-            const action = $('#original_post_status').val();
-            if (action && action !== 'auto-draft') {
-                e.preventDefault();
-                saveGalleryAjax();
-                return false;
-            }
-        });
+        if (saveButton) {
+            saveButton.addEventListener('click', function(e) {
+                // Only intercept if this is an update (not initial publish)
+                const action = document.getElementById('original_post_status')?.value;
+                if (action && action !== 'auto-draft') {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
+                    if (State) {
+                        State.unsavedChanges.clear();
+                    }
+                    saveCollectionAjax();
+                    return false;
+                }
+            }, true); // Use capture phase
+        }
 
-        // Handle keyboard shortcuts (Ctrl+S / Cmd+S)
-        $(document).on('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.which === 83) { // Ctrl+S or Cmd+S
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Only intercept if this is an update (not initial publish)
+                const action = document.getElementById('original_post_status')?.value;
+                if (action && action !== 'auto-draft') {
+                    const savePostInput = document.querySelector('input[name="save"]');
+                    if (savePostInput) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        saveCollectionAjax();
+                        return false;
+                    }
+                }
+            }, true); // Use capture phase to intercept early
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.which === 83) { // Ctrl + S or ⌘ + S
                 e.preventDefault();
-                saveGalleryAjax();
+                saveCollectionAjax();
                 return false;
             }
         });
     }
 
     function addQuickSaveButton() {
-        // Add a quick save button to the admin bar if it exists
-        const $adminBar = $('#wp-admin-bar-root-default');
-        if ($adminBar.length) {
-            $adminBar.append(`
+        const adminBar = document.getElementById('wp-admin-bar-root-default');
+        if (adminBar) {
+            adminBar.insertAdjacentHTML('beforeend', `
                 <li id="wp-admin-bar-fotogrids-quick-save">
-                    <a class="ab-item" href="#" id="fotogrids-quick-save" title="Quick Save Gallery (Ctrl+S)">
+                    <a class="ab-item" href="#" id="fotogrids-quick-save" title="${strings.quickSaveGallery}">
                         <span class="ab-icon dashicons dashicons-yes-alt"></span>
-                        <span class="ab-label">Quick Save</span>
+                        <span class="ab-label">${strings.quickSave}</span>
                     </a>
                 </li>
             `);
 
-            $('#fotogrids-quick-save').on('click', function(e) {
-                e.preventDefault();
-                saveGalleryAjax();
-            });
+            const quickSaveButton = document.getElementById('fotogrids-quick-save');
+            if (quickSaveButton) {
+                quickSaveButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    saveCollectionAjax();
+                });
+            }
         }
     }
 
-    function saveGalleryAjax() {
-        const $form = $('#post');
-        const $statusContainer = $('#fotogrids-save-status');
-        const $messageContainer = $('.fotogrids-save-message');
-        const $spinner = $('.fotogrids-save-spinner');
-        
-        // Show loading state
-        showSaveStatus('loading', 'Saving gallery...');
-        
-        // Disable form elements during save
-        $form.find('input, textarea, select, button').prop('disabled', true);
-        
-        // Collect basic form data
-        const formData = new FormData($form[0]);
-        formData.append('action', 'fotogrids_save_gallery');
-        formData.append('nonce', $('#fotogrids_meta_box_nonce').val());
-        formData.append('post_id', $('#post_ID').val());
+    function initValidationErrorMonitoring() {
+        const checkValidationErrors = () => {
+            const hasErrors = hasValidationErrors();
+            updateSaveButtonState(hasErrors);
+        };
 
-        // Manually collect all gallery settings from hidden inputs
+        setInterval(checkValidationErrors, 500);
+
+        checkValidationErrors();
+    }
+
+    function hasValidationErrors() {
+        const validationErrors = window.FotoGridsValidationErrors || {};
+        return Object.values(validationErrors).some(errorInfo =>
+            errorInfo && errorInfo.hasErrors
+        );
+    }
+
+    function updateSaveButtonState(hasErrors) {
+        const publishButton = document.getElementById('publish');
+        const saveButton = document.getElementById('save-post');
+        const quickSaveButton = document.getElementById('fotogrids-quick-save');
+
+        if (hasErrors) {
+            if (publishButton) {
+                publishButton.disabled = true;
+
+                const originalText = publishButton.dataset.originalText || publishButton.value || publishButton.textContent;
+                if (!publishButton.dataset.originalText) {
+                    publishButton.dataset.originalText = originalText;
+                }
+
+                const errorText = strings.fixErrors;
+                if (publishButton.tagName === 'INPUT') {
+                    publishButton.value = errorText;
+                } else {
+                    publishButton.textContent = errorText;
+                }
+
+                publishButton.title = strings.pleaseFixValidationErrors;
+            }
+
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.title = strings.pleaseFixValidationErrors;
+            }
+
+            if (quickSaveButton) {
+                quickSaveButton.disabled = true;
+                quickSaveButton.title = strings.pleaseFixValidationErrors;
+            }
+
+        } else {
+            if (publishButton) {
+                publishButton.disabled = false;
+
+                const originalText = publishButton.dataset.originalText;
+                if (originalText) {
+                    if (publishButton.tagName === 'INPUT') {
+                        publishButton.value = originalText;
+                    } else {
+                        publishButton.textContent = originalText;
+                    }
+                }
+
+                publishButton.removeAttribute('title');
+            }
+
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.removeAttribute('title');
+            }
+
+            if (quickSaveButton) {
+                quickSaveButton.disabled = false;
+                quickSaveButton.removeAttribute('title');
+            }
+        }
+    }
+
+    function saveCollectionAjax() {
+        if (hasValidationErrors()) {
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(strings.fixValidationErrors);
+            }
+            return false;
+        }
+
+        const form = document.getElementById('post');
+
+        const formElements = form.querySelectorAll('input, textarea, select, button');
+        formElements.forEach(element => element.disabled = true);
+
+        const formData = new FormData(form);
+        formData.append('action', 'fotogrids_save_collection');
+
+        const nonceField = document.getElementById('fotogrids_meta_box_nonce');
+        const postIdField = document.getElementById('post_ID');
+        const postTypeField = document.querySelector('input[name="post_type"]');
+
+        if (nonceField) formData.append('nonce', nonceField.value);
+        if (postIdField) formData.append('post_id', postIdField.value);
+        if (postTypeField) formData.append('post_type', postTypeField.value);
+
         const gallerySettings = {};
-        $('input[name^="fotogrids_"]').each(function() {
-            const name = $(this).attr('name');
-            const value = $(this).val();
+        const galleryInputs = document.querySelectorAll('input[name^="fotogrids_"]');
+        galleryInputs.forEach(input => {
+            const name = input.getAttribute('name');
+            const value = input.value;
             if (name && value !== '') {
                 gallerySettings[name] = value;
                 formData.append(name, value);
             }
         });
 
-        // Debug: Log all form fields being sent
         const formFields = {};
         for (let [key, value] of formData.entries()) {
             if (key.startsWith('fotogrids_')) {
@@ -143,144 +245,230 @@
             }
         }
 
-        // Perform AJAX request
-        $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            timeout: 30000, // 30 second timeout
-            success: function(response) {
-                if (response.success) {
-                    handleSaveSuccess(response.data);
-                } else {
-                    handleSaveError(response.data ? response.data.message : 'Unknown error occurred');
-                }
-            },
-            error: function(xhr, status, error) {
-                let errorMessage = 'Save failed. ';
-                if (status === 'timeout') {
-                    errorMessage += 'Request timed out.';
-                } else if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                    errorMessage += xhr.responseJSON.data.message;
-                } else {
-                    errorMessage += error || 'Please try again.';
-                }
-                handleSaveError(errorMessage);
-            },
-            complete: function() {
-                // Re-enable form elements
-                $form.find('input, textarea, select, button').prop('disabled', false);
+        fetch(window.ajaxurl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                handleSaveSuccess(result.data);
+            } else {
+                const errorMessage = result.data?.message ? result.data.message : strings.saveFailed;
+                handleSaveError(errorMessage);
+            }
+        })
+        .catch(error => {
+            console.error('Save error:', error);
+            const errorMessage = error.message ? error.message : strings.saveFailed;
+            handleSaveError(errorMessage);
+        })
+        .finally(() => {
+            formElements.forEach(element => element.disabled = false);
         });
     }
 
     function handleSaveSuccess(data) {
-        // Update the page title if it changed
         if (data.post_title) {
             document.title = data.post_title + ' ‹ ' + document.title.split(' ‹ ').slice(1).join(' ‹ ');
-            $('.wrap h1').first().text('Edit Gallery: ' + data.post_title);
+            const titleElement = document.querySelector('.wrap h1');
+            if (titleElement) {
+                const isAlbum = data.post_type === 'fotogrids_album';
+                const editLabel = isAlbum ? strings.editAlbum : strings.editGallery;
+                titleElement.textContent = editLabel + ': ' + data.post_title;
+            }
         }
 
-        // Update the permalink if this was a new post
         if (data.redirect_url) {
             const currentUrl = window.location.href;
             const newUrl = data.redirect_url;
             if (currentUrl !== newUrl && !currentUrl.includes('post=' + data.post_id)) {
-                // Update URL without reload for new posts
                 window.history.replaceState({}, '', newUrl);
             }
         }
 
-        // Hide unsaved changes indicator
         hideUnsavedChanges();
 
-        // Show success message
-        showSaveStatus('success', data.message || 'Gallery saved successfully!');
-        
-        // Update last saved time
+        const successMessage = data.message ? data.message : strings.gallerySavedSuccessfully;
+        if (window.fotogridsToast) {
+            window.fotogridsToast.success(successMessage, 1000);
+        }
+
         updateLastSavedTime();
-        
-        // Trigger custom event for other scripts
-        $(document).trigger('fotogrids:gallery_saved', [data]);
+
+        document.dispatchEvent(new CustomEvent('fotogrids:collection_saved', { detail: data }));
+    }
+
+    function initAutosave() {
+        if (!State) return;
+
+        const getAutosaveSetting = () => {
+            const galleryAutosaveInput = document.querySelector('input[name="fotogrids_autosave"]');
+            if (galleryAutosaveInput) {
+                return galleryAutosaveInput.value === '1' || galleryAutosaveInput.value === 'true';
+            }
+
+            const defaultsAutosaveInput = document.querySelector('input[name="fotogrids_gallery_defaults[autosave]"]');
+            if (defaultsAutosaveInput) {
+                return defaultsAutosaveInput.value === '1' || defaultsAutosaveInput.value === 'true';
+            }
+
+            if (window.fotogridsSettings?.settings?.autosave !== undefined) {
+                return window.fotogridsSettings.settings.autosave;
+            }
+
+            return false;
+        };
+
+        State.autosave.set(getAutosaveSetting());
+
+        document.addEventListener('change', (e) => {
+            if (e.target.matches('input[name="fotogrids_autosave"], input[name="fotogrids_gallery_defaults[autosave]"]')) {
+                const enabled = e.target.value === '1' || e.target.value === 'true';
+                State.autosave.set(enabled);
+                updateUnsavedChangesDisplay();
+            }
+        });
+
+        if (State) {
+            State.on('autosave', () => {
+                updateUnsavedChangesDisplay();
+            });
+        }
     }
 
     function handleSaveError(message) {
-        showSaveStatus('error', message || 'Save failed. Please try again.');
-        
-        // Trigger custom event for other scripts
-        $(document).trigger('fotogrids:gallery_save_error', [message]);
+        const errorMessage = message ? message : strings.saveFailed;
+        if (window.fotogridsToast) {
+            window.fotogridsToast.error(errorMessage, 3000);
+        }
+
+        const form = document.getElementById('post');
+        if (form) {
+            const formElements = form.querySelectorAll('input, textarea, select, button');
+            formElements.forEach(element => element.disabled = false);
+        }
+
+        document.dispatchEvent(new CustomEvent('fotogrids:gallery_save_error', { detail: errorMessage }));
     }
 
-    function showSaveStatus(type, message) {
-        const $statusContainer = $('#fotogrids-save-status');
-        const $messageContainer = $('.fotogrids-save-message');
-        const $spinner = $('.fotogrids-save-spinner');
-        
-        // Remove previous status classes
-        $statusContainer.removeClass('loading success error');
-        
-        // Add current status class
-        $statusContainer.addClass(type);
-        
-        // Update message
-        $messageContainer.text(message);
-        
-        // Show/hide spinner
-        if (type === 'loading') {
-            $spinner.show();
-        } else {
-            $spinner.hide();
-        }
-        
-        // Show status container
-        $statusContainer.show();
-        
-        // Auto-hide success/error messages after 5 seconds
-        if (type !== 'loading') {
-            setTimeout(function() {
-                $statusContainer.fadeOut();
-            }, 5000);
-        }
-    }
 
     function updateLastSavedTime() {
         const now = new Date();
         const timeString = now.toLocaleTimeString();
-        
-        // Update or add last saved indicator
-        let $lastSaved = $('#fotogrids-last-saved');
-        if (!$lastSaved.length) {
-            $('#submitdiv .inside').append('<div id="fotogrids-last-saved" class="fotogrids-last-saved"></div>');
-            $lastSaved = $('#fotogrids-last-saved');
+
+        let lastSaved = document.querySelector('.misc-pub-fg-last-saved .timestamp');
+        if (!lastSaved) {
+            const miscActions = document.querySelector('#misc-publishing-actions');
+            if (miscActions) {
+                miscActions.insertAdjacentHTML('beforeend', `<div class="misc-pub-section misc-pub-fg-last-saved"> ${strings.lastSaved}: <span class="timestamp"></span></div>`);
+                lastSaved = document.querySelector('.misc-pub-fg-last-saved .timestamp');
+            }
         }
-        
-        $lastSaved.html(`<small><em>Last saved: ${timeString}</em></small>`);
+
+        if (lastSaved) {
+            lastSaved.innerHTML = timeString;
+        }
     }
 
-    function showUnsavedChanges() {
-        $('#fotogrids-unsaved-changes').fadeIn();
-        
-        // Add visual indicator to Update button
-        const $updateButton = $('#publish, #save-post');
-        $updateButton.addClass('fotogrids-has-changes');
+    function updateUnsavedChangesDisplay() {
+        if (!State) return;
+
+        const autosaveEnabled = State.autosave.enabled;
+        const hasChanges = State.unsavedChanges.has();
+        const shouldShow = hasChanges && !autosaveEnabled;
+
+        const unsavedChanges = document.getElementById('fotogrids-unsaved-changes');
+        if (unsavedChanges) {
+            unsavedChanges.style.display = shouldShow ? 'block' : 'none';
+        }
+
+        const updateButton = document.getElementById('publish');
+        const saveButton = document.getElementById('save-post');
+        if (updateButton) {
+            updateButton.classList.toggle('fotogrids-has-changes', shouldShow);
+        }
+        if (saveButton) {
+            saveButton.classList.toggle('fotogrids-has-changes', shouldShow);
+        }
     }
-    
+
+    function showUnsavedChanges(source) {
+        if (State) {
+            State.unsavedChanges.markChanged(source);
+        }
+    }
+
     function hideUnsavedChanges() {
-        $('#fotogrids-unsaved-changes').fadeOut();
-        
-        // Remove visual indicator from Update button
-        const $updateButton = $('#publish, #save-post');
-        $updateButton.removeClass('fotogrids-has-changes');
+        if (State) {
+            State.unsavedChanges.clear();
+            State.items.save();
+        }
     }
 
-    // Expose functions for external use
+
+    function initFormChangeTracking() {
+        const form = document.getElementById('post');
+        if (!form || !State) return;
+
+        let initialFormState = {};
+        const updateInitialState = () => {
+            const formData = new FormData(form);
+            initialFormState = {};
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('fotogrids_') || key === 'post_title' || key === 'content') {
+                    initialFormState[key] = value;
+                }
+            }
+        };
+        updateInitialState();
+
+        const handleFormChange = () => {
+            showUnsavedChanges('form');
+            if (State.autosave.enabled) {
+                State.autosave.trigger(() => saveCollectionAjax());
+            }
+        };
+
+        const handleNativeFormChange = (e) => {
+            const target = e.target;
+            const name = target.getAttribute('name') || '';
+
+            if (name.startsWith('fotogrids_') || name === 'post_title') {
+                handleFormChange();
+            }
+        };
+
+        form.addEventListener('change', handleNativeFormChange);
+        form.addEventListener('input', handleNativeFormChange);
+
+        document.addEventListener('fotogrids:setting_changed', handleFormChange);
+
+        document.addEventListener('fotogrids:collection_saved', () => {
+            updateInitialState();
+        });
+    }
+
+    function initBeforeUnloadWarning() {
+        window.addEventListener('beforeunload', (e) => {
+            if (State && State.unsavedChanges.has() && !State.autosave.enabled) {
+                e.preventDefault();
+                e.returnValue = strings.unsavedChangesConfirm;
+                return strings.unsavedChangesConfirm;
+            }
+        });
+    }
+
     window.FotoGridsAjaxSave = {
-        save: saveGalleryAjax,
-        showStatus: showSaveStatus,
+        save: saveCollectionAjax,
         showUnsavedChanges: showUnsavedChanges,
-        hideUnsavedChanges: hideUnsavedChanges
+        hideUnsavedChanges: hideUnsavedChanges,
+        updateLastSavedTime: updateLastSavedTime
     };
 
-})(jQuery);
+})();

@@ -1,0 +1,29 @@
+{
+  "id": "real-estate-agency",
+  "name": "Real-Estate Agency",
+  "description": "One album per agent, each album containing individual property listings with map block and lead form inside. The whole agency in one structure.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 18,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "map_block": true,
+    "lead_capture_form": true,
+    "watermark_enabled": true,
+    "captions": true,
+    "lightbox": true
+  }
+}

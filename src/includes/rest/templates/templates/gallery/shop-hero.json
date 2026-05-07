@@ -1,0 +1,31 @@
+{
+  "id": "shop-hero",
+  "name": "Shop Hero",
+  "description": "Hero carousel pre-wired for seasonal campaigns: per-slide CTA, image SEO enabled, mobile-first load order.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 44,
+  "settings": {
+    "layout": "carousel",
+    "columns": {
+      "desktop": 1,
+      "tablet": 1,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 0,
+      "tablet": 0,
+      "mobile": 0
+    },
+    "autoplay": true,
+    "autoplay_speed": 5000,
+    "pause_on_hover": true,
+    "captions": true,
+    "cta_overlays": true,
+    "image_seo": true,
+    "lightbox": false
+  }
+}

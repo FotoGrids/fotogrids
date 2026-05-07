@@ -1,0 +1,432 @@
+{
+    "id": "styling",
+    "label": "Styling",
+    "icon": "styling",
+    "free": true,
+    "settings": [
+        {
+            "key": "styling_settings_subtabs",
+            "type": "setting_subtabs",
+            "label": "Styling Settings",
+            "free": true,
+            "subTabs": {
+                "thumbnails": {
+                    "id": "thumbnails",
+                    "label": "Thumbnails",
+                    "icon": "layout",
+                    "settings": [
+                        {
+                            "key": "border_radius_group",
+                            "type": "setting_group",
+                            "label": "Border Radius",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "border_radius",
+                                    "type": "responsive_range",
+                                    "label": "Thumbnail Border Radius",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 50, "default": 0 },
+                                        "tablet": { "min": 0, "max": 50, "default": 0 },
+                                        "mobile": { "min": 0, "max": 50, "default": 0 }
+                                    },
+                                    "free": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "border_group",
+                            "type": "setting_group",
+                            "label": "Border",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "border_enabled",
+                                    "type": "toggle",
+                                    "label": "Enable Border",
+                                    "default": false,
+                                    "free": true
+                                },
+                                {
+                                    "key": "border_width",
+                                    "type": "responsive_range",
+                                    "label": "Border Width",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 10, "default": 1 },
+                                        "tablet": { "min": 0, "max": 10, "default": 1 },
+                                        "mobile": { "min": 0, "max": 10, "default": 1 }
+                                    },
+                                    "condition": { "dependsOn": "border_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "border_color",
+                                    "type": "color",
+                                    "label": "Border Color",
+                                    "default": "#000000",
+                                    "condition": { "dependsOn": "border_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "border_style",
+                                    "type": "button_group",
+                                    "label": "Border Style",
+                                    "options": [
+                                        { "label": "Solid", "value": "solid" },
+                                        { "label": "Dashed", "value": "dashed" },
+                                        { "label": "Dotted", "value": "dotted" },
+                                        { "label": "Double", "value": "double" }
+                                    ],
+                                    "default": "solid",
+                                    "condition": { "dependsOn": "border_enabled", "values": [true, "1"] },
+                                    "free": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "shadow_group",
+                            "type": "setting_group",
+                            "label": "Shadow",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "shadow_enabled",
+                                    "type": "toggle",
+                                    "label": "Enable Shadow",
+                                    "default": false,
+                                    "free": true
+                                },
+                                {
+                                    "key": "shadow",
+                                    "type": "responsive_range",
+                                    "label": "Shadow Intensity",
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 10, "default": 0 },
+                                        "tablet": { "min": 0, "max": 10, "default": 0 },
+                                        "mobile": { "min": 0, "max": 10, "default": 0 }
+                                    },
+                                    "condition": { "dependsOn": "shadow_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "shadow_color",
+                                    "type": "color",
+                                    "label": "Shadow Color",
+                                    "default": "#000000",
+                                    "condition": { "dependsOn": "shadow_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "shadow_blur",
+                                    "type": "responsive_range",
+                                    "label": "Shadow Blur",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 50, "default": 10 },
+                                        "tablet": { "min": 0, "max": 50, "default": 10 },
+                                        "mobile": { "min": 0, "max": 50, "default": 10 }
+                                    },
+                                    "condition": { "dependsOn": "shadow_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "shadow_spread",
+                                    "type": "responsive_range",
+                                    "label": "Shadow Spread",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": -20, "max": 20, "default": 0 },
+                                        "tablet": { "min": -20, "max": 20, "default": 0 },
+                                        "mobile": { "min": -20, "max": 20, "default": 0 }
+                                    },
+                                    "condition": { "dependsOn": "shadow_enabled", "values": [true, "1"] },
+                                    "free": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "thumbnail_image_filter_group",
+                            "type": "setting_group",
+                            "label": "Image Filter",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "thumbnail_filter_enabled",
+                                    "type": "toggle",
+                                    "label": "Enable Image Filter",
+                                    "default": false,
+                                    "free": true
+                                },
+                                {
+                                    "key": "thumbnail_filter_type",
+                                    "type": "button_group",
+                                    "label": "Filter Type",
+                                    "options": [
+                                        { "label": "Grayscale", "value": "grayscale" },
+                                        { "label": "Sepia", "value": "sepia" },
+                                        { "label": "Blur", "value": "blur" },
+                                        { "label": "Brightness", "value": "brightness" },
+                                        { "label": "Contrast", "value": "contrast" },
+                                        { "label": "Saturation", "value": "saturation" },
+                                        { "label": "Invert", "value": "invert" },
+                                        { "label": "Opacity", "value": "opacity" },
+                                        { "label": "Hue Rotate", "value": "hue-rotate" }
+                                    ],
+                                    "default": "grayscale",
+                                    "condition": { "dependsOn": "thumbnail_filter_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "thumbnail_filter_subtabs",
+                                    "type": "setting_subtabs",
+                                    "label": "Filter Settings",
+                                    "condition": { "dependsOn": ["thumbnail_filter_enabled", "thumbnail_filter_type"], "values": [[true, "1"], ["grayscale", "sepia", "blur", "brightness", "contrast", "saturation", "invert", "opacity", "hue-rotate"]] },
+                                    "free": true,
+                                    "subTabs": {
+                                        "regular": {
+                                            "id": "regular",
+                                            "label": "Regular",
+                                            "icon": "image",
+                                            "settings": [
+                                                {
+                                                    "key": "thumbnail_filter_amount",
+                                                    "type": "responsive_range",
+                                                    "label": "Filter Amount",
+                                                    "unit": "%",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
+                                                        "tablet": { "min": 0, "max": 100, "default": 50 },
+                                                        "mobile": { "min": 0, "max": 100, "default": 50 }
+                                                    },
+                                                    "condition": { "dependsOn": "thumbnail_filter_type", "values": ["grayscale", "sepia", "brightness", "contrast", "saturation", "opacity", "invert"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "thumbnail_filter_blur",
+                                                    "type": "responsive_range",
+                                                    "label": "Blur Amount",
+                                                    "unit": "px",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 20, "default": 5 },
+                                                        "tablet": { "min": 0, "max": 20, "default": 5 },
+                                                        "mobile": { "min": 0, "max": 20, "default": 5 }
+                                                    },
+                                                    "condition": { "dependsOn": "thumbnail_filter_type", "values": ["blur"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "thumbnail_filter_hue",
+                                                    "type": "responsive_range",
+                                                    "label": "Hue Rotation",
+                                                    "unit": "deg",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 360, "default": 0 },
+                                                        "tablet": { "min": 0, "max": 360, "default": 0 },
+                                                        "mobile": { "min": 0, "max": 360, "default": 0 }
+                                                    },
+                                                    "condition": { "dependsOn": "thumbnail_filter_type", "values": ["hue-rotate"] },
+                                                    "free": true
+                                                }
+                                            ]
+                                        },
+                                        "hover": {
+                                            "id": "hover",
+                                            "label": "Mouseover",
+                                            "icon": "hover",
+                                            "settings": [
+                                                {
+                                                    "key": "thumbnail_filter_hover_amount",
+                                                    "type": "responsive_range",
+                                                    "label": "Filter Amount",
+                                                    "unit": "%",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
+                                                        "tablet": { "min": 0, "max": 100, "default": 50 },
+                                                        "mobile": { "min": 0, "max": 100, "default": 50 }
+                                                    },
+                                                    "condition": { "dependsOn": "thumbnail_filter_type", "values": ["grayscale", "sepia", "brightness", "contrast", "saturation", "opacity", "invert"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "thumbnail_filter_hover_blur",
+                                                    "type": "responsive_range",
+                                                    "label": "Blur Amount",
+                                                    "unit": "px",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 20, "default": 5 },
+                                                        "tablet": { "min": 0, "max": 20, "default": 5 },
+                                                        "mobile": { "min": 0, "max": 20, "default": 5 }
+                                                    },
+                                                    "condition": { "dependsOn": "thumbnail_filter_type", "values": ["blur"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "thumbnail_filter_hover_hue",
+                                                    "type": "responsive_range",
+                                                    "label": "Hue Rotation",
+                                                    "unit": "deg",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 360, "default": 0 },
+                                                        "tablet": { "min": 0, "max": 360, "default": 0 },
+                                                        "mobile": { "min": 0, "max": 360, "default": 0 }
+                                                    },
+                                                    "condition": { "dependsOn": "thumbnail_filter_type", "values": ["hue-rotate"] },
+                                                    "free": true
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "full_images": {
+                    "id": "full_images",
+                    "label": "Full Images",
+                    "icon": "image",
+                    "postTypes": ["gallery"],
+                    "settings": [
+                        {
+                            "key": "full_image_filter_group",
+                            "type": "setting_group",
+                            "label": "Image Filter",
+                            "free": true,
+                            "settings": [
+                                {
+                                    "key": "full_image_filter_enabled",
+                                    "type": "toggle",
+                                    "label": "Enable Image Filter",
+                                    "default": false,
+                                    "free": true
+                                },
+                                {
+                                    "key": "full_image_filter_type",
+                                    "type": "button_group",
+                                    "label": "Filter Type",
+                                    "options": [
+                                        { "label": "Grayscale", "value": "grayscale" },
+                                        { "label": "Sepia", "value": "sepia" },
+                                        { "label": "Blur", "value": "blur" },
+                                        { "label": "Brightness", "value": "brightness" },
+                                        { "label": "Contrast", "value": "contrast" },
+                                        { "label": "Saturation", "value": "saturation" },
+                                        { "label": "Invert", "value": "invert" },
+                                        { "label": "Opacity", "value": "opacity" },
+                                        { "label": "Hue Rotate", "value": "hue-rotate" }
+                                    ],
+                                    "default": "grayscale",
+                                    "condition": { "dependsOn": "full_image_filter_enabled", "values": [true, "1"] },
+                                    "free": true
+                                },
+                                {
+                                    "key": "full_image_filter_subtabs",
+                                    "type": "setting_subtabs",
+                                    "label": "Filter Settings",
+                                    "condition": { "dependsOn": ["full_image_filter_enabled", "full_image_filter_type"], "values": [[true, "1"], ["grayscale", "sepia", "blur", "brightness", "contrast", "saturation", "invert", "opacity", "hue-rotate"]] },
+                                    "free": true,
+                                    "subTabs": {
+                                        "regular": {
+                                            "id": "regular",
+                                            "label": "Regular",
+                                            "icon": "image",
+                                            "settings": [
+                                                {
+                                                    "key": "full_image_filter_amount",
+                                                    "type": "responsive_range",
+                                                    "label": "Filter Amount",
+                                                    "unit": "%",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
+                                                        "tablet": { "min": 0, "max": 100, "default": 50 },
+                                                        "mobile": { "min": 0, "max": 100, "default": 50 }
+                                                    },
+                                                    "condition": { "dependsOn": "full_image_filter_type", "values": ["grayscale", "sepia", "brightness", "contrast", "saturation", "opacity", "invert"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "full_image_filter_blur",
+                                                    "type": "responsive_range",
+                                                    "label": "Blur Amount",
+                                                    "unit": "px",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 20, "default": 5 },
+                                                        "tablet": { "min": 0, "max": 20, "default": 5 },
+                                                        "mobile": { "min": 0, "max": 20, "default": 5 }
+                                                    },
+                                                    "condition": { "dependsOn": "full_image_filter_type", "values": ["blur"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "full_image_filter_hue",
+                                                    "type": "responsive_range",
+                                                    "label": "Hue Rotation",
+                                                    "unit": "deg",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 360, "default": 0 },
+                                                        "tablet": { "min": 0, "max": 360, "default": 0 },
+                                                        "mobile": { "min": 0, "max": 360, "default": 0 }
+                                                    },
+                                                    "condition": { "dependsOn": "full_image_filter_type", "values": ["hue-rotate"] },
+                                                    "free": true
+                                                }
+                                            ]
+                                        },
+                                        "hover": {
+                                            "id": "hover",
+                                            "label": "Mouseover",
+                                            "icon": "hover",
+                                            "settings": [
+                                                {
+                                                    "key": "full_image_filter_hover_amount",
+                                                    "type": "responsive_range",
+                                                    "label": "Filter Amount",
+                                                    "unit": "%",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
+                                                        "tablet": { "min": 0, "max": 100, "default": 50 },
+                                                        "mobile": { "min": 0, "max": 100, "default": 50 }
+                                                    },
+                                                    "condition": { "dependsOn": "full_image_filter_type", "values": ["grayscale", "sepia", "brightness", "contrast", "saturation", "opacity", "invert"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "full_image_filter_hover_blur",
+                                                    "type": "responsive_range",
+                                                    "label": "Blur Amount",
+                                                    "unit": "px",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 20, "default": 5 },
+                                                        "tablet": { "min": 0, "max": 20, "default": 5 },
+                                                        "mobile": { "min": 0, "max": 20, "default": 5 }
+                                                    },
+                                                    "condition": { "dependsOn": "full_image_filter_type", "values": ["blur"] },
+                                                    "free": true
+                                                },
+                                                {
+                                                    "key": "full_image_filter_hover_hue",
+                                                    "type": "responsive_range",
+                                                    "label": "Hue Rotation",
+                                                    "unit": "deg",
+                                                    "responsive": {
+                                                        "desktop": { "min": 0, "max": 360, "default": 0 },
+                                                        "tablet": { "min": 0, "max": 360, "default": 0 },
+                                                        "mobile": { "min": 0, "max": 360, "default": 0 }
+                                                    },
+                                                    "condition": { "dependsOn": "full_image_filter_type", "values": ["hue-rotate"] },
+                                                    "free": true
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

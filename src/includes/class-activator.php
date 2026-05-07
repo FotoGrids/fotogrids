@@ -7,67 +7,69 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Plugin Activator Class
- * 
+ *
  * Handles plugin activation tasks:
  * - Database table creation
  * - Capability assignment
  * - Initial setup
  */
 class Activator {
-    
+
     /**
      * Activate the plugin
-     * 
+     *
      * Performs all necessary setup tasks when the plugin is activated:
      * - Creates database tables for item metadata, statistics, licenses, etc.
      * - Registers custom post types and flushes rewrite rules
      * - Assigns capabilities to WordPress user roles
      * - Sets plugin version and activation timestamp
-     * 
+     *
      * @since 1.0.0
      */
     public static function activate() {
         self::create_tables();
-        
+
         Post_Types::register_cpts();
-        
+
         flush_rewrite_rules();
-        
+
         self::add_capabilities();
-        
+
         update_option( 'fotogrids_version', FOTOGRIDS_VERSION );
-        
         update_option( 'fotogrids_activated_time', current_time( 'timestamp' ) );
+
+        if ( ! get_option( 'fotogrids_site_id' ) ) {
+            $site_id = wp_generate_uuid4();
+            update_option( 'fotogrids_site_id', $site_id, false );
+        }
     }
-    
+
     /**
      * Create custom database tables
-     * 
+     *
      * Creates all necessary database tables for the plugin:
      * - Item metadata and positioning
      * - Statistics tracking (views, shares)
      * - License management
      * - Gallery-album relationships
      * - Tags, people, and location metadata
-     * 
+     *
      * Uses dbDelta for safe table creation and updates.
-     * 
+     *
      * @since 1.0.0
      */
     private static function create_tables() {
         global $wpdb;
-        
+
         $charset_collate = $wpdb->get_charset_collate();
-        
+
         $table_item_meta = $wpdb->prefix . 'fotogrids_item_meta';
         $table_stats = $wpdb->prefix . 'fotogrids_statistics';
         $table_licenses = $wpdb->prefix . 'fotogrids_licenses';
         $table_gallery_albums = $wpdb->prefix . 'fotogrids_gallery_albums';
         $table_tags = $wpdb->prefix . 'fotogrids_tags';
-        $table_people = $wpdb->prefix . 'fotogrids_people';
-        $table_locations = $wpdb->prefix . 'fotogrids_locations';
         $table_item_metadata = $wpdb->prefix . 'fotogrids_item_metadata';
-        
+
         $sql = "
         CREATE TABLE $table_item_meta (
           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -135,43 +137,23 @@ class Activator {
 
         CREATE TABLE $table_tags (
           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          type VARCHAR(50) NOT NULL DEFAULT 'tag',
           name VARCHAR(191) NOT NULL,
           slug VARCHAR(191) NOT NULL,
+          meta LONGTEXT DEFAULT NULL,
           usage_count INT NOT NULL DEFAULT 0,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (id),
-          UNIQUE KEY unique_slug (slug),
+          UNIQUE KEY unique_name_type (name, type),
           KEY name_index (name),
-          KEY usage_count_index (usage_count)
-        ) $charset_collate;
-
-        CREATE TABLE $table_people (
-          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-          name VARCHAR(191) NOT NULL,
-          details TEXT DEFAULT NULL,
-          usage_count INT NOT NULL DEFAULT 0,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          UNIQUE KEY unique_name (name),
-          KEY usage_count_index (usage_count)
-        ) $charset_collate;
-
-        CREATE TABLE $table_locations (
-          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-          name VARCHAR(191) NOT NULL,
-          latitude DECIMAL(10,8) DEFAULT NULL,
-          longitude DECIMAL(11,8) DEFAULT NULL,
-          usage_count INT NOT NULL DEFAULT 0,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          UNIQUE KEY unique_name (name),
+          KEY type_index (type),
           KEY usage_count_index (usage_count)
         ) $charset_collate;
 
         CREATE TABLE $table_item_metadata (
           id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
           attachment_id BIGINT UNSIGNED NOT NULL,
-          metadata_type ENUM('tag', 'person', 'location') NOT NULL,
+          metadata_type VARCHAR(50) NOT NULL,
           metadata_id BIGINT UNSIGNED NOT NULL,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           PRIMARY KEY (id),
@@ -180,25 +162,25 @@ class Activator {
           KEY metadata_lookup (metadata_type, metadata_id)
         ) $charset_collate;
         ";
-        
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
-        
-        do_action( 'fotogrids_activate' );
-        
+
+        do_action( 'fotogrids/system/activate' );
+
         update_option( 'fotogrids_db_version', '1.0' );
     }
-    
+
     /**
      * Add plugin capabilities to WordPress roles
-     * 
+     *
      * Assigns appropriate capabilities to WordPress user roles:
      * - Administrator: Full access to all plugin features
      * - Editor: Gallery/album management + statistics viewing
      * - Author: Basic gallery/album creation and editing
-     * 
+     *
      * Capabilities are based on the capability_type defined in Post_Types class.
-     * 
+     *
      * @since 1.0.0
      */
     private static function add_capabilities() {
@@ -217,7 +199,7 @@ class Activator {
             'edit_private_fotogrids_galleries',
             'edit_published_fotogrids_galleries',
         );
-        
+
         $album_capabilities = array(
             'edit_fotogrids_album',
             'read_fotogrids_album',
@@ -233,22 +215,22 @@ class Activator {
             'edit_private_fotogrids_albums',
             'edit_published_fotogrids_albums',
         );
-        
+
         $plugin_capabilities = array(
             'manage_fotogrids',
             'view_fotogrids_stats',
             'manage_fotogrids_settings',
         );
-        
+
         $all_capabilities = array_merge( $gallery_capabilities, $album_capabilities, $plugin_capabilities );
-        
+
         $admin_role = get_role( 'administrator' );
         if ( $admin_role ) {
             foreach ( $all_capabilities as $cap ) {
                 $admin_role->add_cap( $cap );
             }
         }
-        
+
         $editor_role = get_role( 'editor' );
         if ( $editor_role ) {
             $editor_caps = array_merge( $gallery_capabilities, $album_capabilities, array( 'view_fotogrids_stats' ) );
@@ -256,7 +238,7 @@ class Activator {
                 $editor_role->add_cap( $cap );
             }
         }
-        
+
         $author_role = get_role( 'author' );
         if ( $author_role ) {
             $author_caps = array(
@@ -278,29 +260,29 @@ class Activator {
             }
         }
     }
-    
+
     /**
      * Check if this is a fresh install or an update
-     * 
+     *
      * Determines whether the plugin is being installed for the first time
      * by checking if the version option exists in the database.
-     * 
+     *
      * @since 1.0.0
-     * 
+     *
      * @return bool True if this is a fresh install, false if updating
      */
     public static function is_fresh_install() {
         return ! get_option( 'fotogrids_version' );
     }
-    
+
     /**
      * Get the previous version if this is an update
-     * 
+     *
      * Retrieves the previously installed version of the plugin from the database.
      * Returns '0.0.0' if no previous version is found (fresh install).
-     * 
+     *
      * @since 1.0.0
-     * 
+     *
      * @return string The previous plugin version or '0.0.0' for fresh installs
      */
     public static function get_previous_version() {

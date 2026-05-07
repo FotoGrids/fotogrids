@@ -1,0 +1,29 @@
+{
+  "id": "campaign-landing",
+  "name": "Campaign Landing",
+  "description": "Hero slider plus a filter-enabled masonry grid below. The full campaign page layout — hero, browse, convert — ready in one click.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "leads",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 34,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "hover_effect": "slow_zoom",
+    "cta_overlays": true,
+    "filter_enabled": true,
+    "extended_analytics": true,
+    "lightbox": true
+  }
+}

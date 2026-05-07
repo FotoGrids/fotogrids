@@ -7,30 +7,29 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (setting, currentValue, isDisa
     __
 }) => {
     const { createElement: h } = wp.element;
-    
+
     return h('div', {
         className: 'fotogrids-layout-grid-setting'
     }, [
 
         h('label', {
-            className: 'fotogrids-layout-grid-setting__label'
+            className: 'fotogrids-setting__label'
         }, setting.label),
-        
+
 
         h('div', {
             className: 'fotogrids-layout-grid'
         }, setting.options.map(option => {
             const isActive = currentValue === option.value;
             const isDisabledOption = isDisabled || (!option.free && !isProActive);
-            
+
             return h('div', {
                 key: option.value,
-                className: `fotogrids-layout-option ${isActive ? 'is-active' : ''} ${isDisabledOption ? 'is-disabled' : ''}`,
+                className: `fotogrids-layout-option ${isActive ? 'fg-is-active' : ''} ${isDisabledOption ? 'fg-is-disabled' : ''}`,
                 onClick: () => {
                     if (!isDisabledOption) {
                         updateSetting(setting.key, option.value);
                     } else if (!option.free && !isProActive) {
-                        // Launch upgrade modal for pro layouts
                         if (window.FotoGridsUpgrade) {
                             window.FotoGridsUpgrade.launchForFeature.advancedLayouts();
                         }

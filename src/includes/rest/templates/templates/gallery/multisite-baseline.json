@@ -1,0 +1,28 @@
+{
+  "id": "multisite-baseline",
+  "name": "Multisite Baseline",
+  "description": "Locked brand-control defaults plus a shared template foundation. Start every new client site from the same base without rebuilding from scratch.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "general",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 51,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "brand_controls_locked": true,
+    "lazy_loading": true,
+    "responsive_images": true,
+    "lightbox": true
+  }
+}

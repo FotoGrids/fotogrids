@@ -1,0 +1,29 @@
+{
+  "id": "press-room",
+  "name": "Press Room",
+  "description": "One album for press, one for partners, one for internal. Download tokens on approved assets, right-click protection on everything else.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 21,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "password_protected": true,
+    "right_click_protection": true,
+    "download_tokens": true,
+    "captions": true,
+    "lightbox": true
+  }
+}

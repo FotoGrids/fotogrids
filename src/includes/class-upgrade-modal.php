@@ -1,7 +1,7 @@
 <?php
 /**
  * FotoGrids Upgrade Modal
- * 
+ *
  * Handles the upgrade to pro modal content and functionality
  */
 
@@ -13,89 +13,98 @@ class FotoGrids_Upgrade_Modal {
 
     /**
      * Get all upgrade benefits data
-     * 
+     *
      * @return array Array of benefit objects
      */
     public static function get_benefits() {
         return array(
             array(
-                'key' => 'unlimited_galleries',
-                'shortTitle' => __( 'Unlimited', 'fotogrids' ),
-                'title' => __( 'Level up your store with', 'fotogrids' ),
-                'subtitle' => __( 'Unlimited Galleries!', 'fotogrids' ),
-                'content' => __( 'Create as many galleries as you need without any restrictions. Perfect for photographers, agencies, and businesses showcasing extensive portfolios.', 'fotogrids' ),
-                'color' => '#6366f1',
-                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/unlimited-galleries.svg'
-            ),
-            array(
                 'key' => 'advanced_layouts',
                 'shortTitle' => __( 'Layouts', 'fotogrids' ),
-                'title' => __( 'Stunning Visual Impact with', 'fotogrids' ),
+                'title' => __( 'Turn Browsers Into Buyers with', 'fotogrids' ),
                 'subtitle' => __( 'Advanced Layout Options!', 'fotogrids' ),
-                'content' => __( 'Access premium layouts including Polaroid, Carousel, Slideshow, and more. Create unique presentations that captivate your audience.', 'fotogrids' ),
+                'content' => __( 'Make every gallery feel like a curated experience. Unlock premium layouts like Video, Polaroid, Carousel, Slideshow, and more - crafted to grab attention, spark emotion, and boost engagement.', 'fotogrids' ),
                 'color' => '#8b5cf6',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/advanced-layouts.svg'
             ),
             array(
+                'key' => 'seo_optimization',
+                'shortTitle' => __( 'SEO', 'fotogrids' ),
+                'title' => __( 'Get Discovered by Search Engines with', 'fotogrids' ),
+                'subtitle' => __( 'Built-in SEO Optimization!', 'fotogrids' ),
+                'content' => __( 'Rank higher and get found faster. FotoGrids gives you built-in SEO tools made specifically for galleries - metadata, structured data, optimized images, and clean markup - to boost visibility and organic traffic.', 'fotogrids' ),
+                'color' => '#6366f1',
+                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/seo-optimization.svg'
+            ),
+            array(
+                'key' => 'ecommerce_monetization',
+                'shortTitle' => __( 'Monetization', 'fotogrids' ),
+                'title' => __( 'Turn Views Into Revenue with', 'fotogrids' ),
+                'subtitle' => __( 'E-commerce Integrations!', 'fotogrids' ),
+                'content' => __( 'Turn your galleries into sales machines. Integrate with WooCommerce, Easy Digital Downloads, and more to sell photos, prints, and digital products - turning every gallery visitor into a potential customer.', 'fotogrids' ),
+                'color' => '#22c55e',
+                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/monetization.svg'
+            ),
+            array(
                 'key' => 'custom_css',
                 'shortTitle' => __( 'Styling', 'fotogrids' ),
-                'title' => __( 'Complete Design Freedom with', 'fotogrids' ),
+                'title' => __( 'Own Your Aesthetic with', 'fotogrids' ),
                 'subtitle' => __( 'Custom CSS & Styling!', 'fotogrids' ),
-                'content' => __( 'Take full control of your gallery appearance with custom CSS, advanced color options, and unlimited styling possibilities.', 'fotogrids' ),
+                'content' => __( 'Match your brand perfectly. From micro-details to full theme overhauls, gain complete visual freedom with custom CSS, advanced color controls, and endless styling possibilities.', 'fotogrids' ),
                 'color' => '#06b6d4',
-                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/custom-css.png'
+                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/custom-styling.svg'
             ),
             array(
                 'key' => 'priority_support',
                 'shortTitle' => __( 'Support', 'fotogrids' ),
-                'title' => __( 'Get Help When You Need It with', 'fotogrids' ),
+                'title' => __( 'Never Feel Stuck Again with', 'fotogrids' ),
                 'subtitle' => __( 'Priority Support!', 'fotogrids' ),
-                'content' => __( 'Receive fast, dedicated support from our expert team. Get priority assistance, custom solutions, and peace of mind.', 'fotogrids' ),
+                'content' => __( 'Enjoy peace of mind with lightning-fast help from our expert team. Get priority responses, personalized guidance, and solutions tailored to your setup - exactly when you need them most.', 'fotogrids' ),
                 'color' => '#10b981',
-                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/priority-support.png'
-            ),
-            array(
-                'key' => 'white_label',
-                'shortTitle' => __( 'Branding', 'fotogrids' ),
-                'title' => __( 'Professional Presentation with', 'fotogrids' ),
-                'subtitle' => __( 'White Label Options!', 'fotogrids' ),
-                'content' => __( 'Remove FotoGrids branding and add your own. Perfect for agencies and developers who want to maintain their professional image.', 'fotogrids' ),
-                'color' => '#f59e0b',
-                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/white-label.svg'
+                'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/priority-support.svg'
             ),
             array(
                 'key' => 'analytics',
                 'shortTitle' => __( 'Analytics', 'fotogrids' ),
-                'title' => __( 'Understand Your Audience with', 'fotogrids' ),
+                'title' => __( 'Make Smarter Decisions with', 'fotogrids' ),
                 'subtitle' => __( 'Advanced Analytics!', 'fotogrids' ),
-                'content' => __( 'Track views, clicks, and engagement across all your galleries. Make data-driven decisions to improve your content strategy.', 'fotogrids' ),
+                'content' => __( 'Understand exactly what your audience loves. Track views, clicks, and engagement to optimize your galleries, improve conversions, and create content that actually performs.', 'fotogrids' ),
                 'color' => '#ef4444',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/analytics.svg'
             ),
             array(
                 'key' => 'integrations',
                 'shortTitle' => __( 'Integrations', 'fotogrids' ),
-                'title' => __( 'Connect Everything with', 'fotogrids' ),
+                'title' => __( 'Connect Your Entire Workflow with', 'fotogrids' ),
                 'subtitle' => __( 'Powerful Integrations!', 'fotogrids' ),
-                'content' => __( 'Seamlessly integrate with popular services like Google Photos, Dropbox, Instagram, and more. Streamline your workflow.', 'fotogrids' ),
+                'content' => __( 'Integrate seamlessly with Google Photos, Dropbox, Instagram, and other top platforms. Import faster, organize easier, and build galleries without breaking your creative flow.', 'fotogrids' ),
                 'color' => '#8b5cf6',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/integrations.svg'
             ),
             array(
                 'key' => 'bulk_operations',
                 'shortTitle' => __( 'Bulk Tools', 'fotogrids' ),
-                'title' => __( 'Save Time and Effort with', 'fotogrids' ),
+                'title' => __( 'Save Hours of Work with', 'fotogrids' ),
                 'subtitle' => __( 'Bulk Operations!', 'fotogrids' ),
-                'content' => __( 'Edit multiple items at once, bulk import from various sources, and manage large galleries efficiently. Work smarter, not harder.', 'fotogrids' ),
+                'content' => __( 'Manage large galleries in minutes, not hours. Edit multiple items at once, bulk-import from your favorite sources, and automate repetitive tasks so you can focus on what truly matters - creating and selling.', 'fotogrids' ),
                 'color' => '#06b6d4',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/bulk-operations.svg'
-            )
+            ),
+            array(
+                'key'        => 'templates',
+                'shortTitle' => __( 'Templates', 'fotogrids' ),
+                'title'      => __( 'Launch Polished Galleries with', 'fotogrids' ),
+                'subtitle'   => __( 'Ready & Custom Templates!', 'fotogrids' ),
+                'content'    => __( 'Start from professionally crafted gallery and album presets that look great out of the box, or save your own best-performing designs as reusable templates your whole team can apply in a click.', 'fotogrids' ),
+                'color'      => '#f59e0b',
+                'image'      => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/templates.svg'
+            ),
         );
     }
 
     /**
      * Get benefit by key
-     * 
+     *
      * @param string $key Benefit key
      * @return array|null Benefit data or null if not found
      */
@@ -111,7 +120,7 @@ class FotoGrids_Upgrade_Modal {
 
     /**
      * Get benefit index by key
-     * 
+     *
      * @param string $key Benefit key
      * @return int Benefit index or 0 if not found
      */
@@ -127,7 +136,7 @@ class FotoGrids_Upgrade_Modal {
 
     /**
      * Get modal strings for translation
-     * 
+     *
      * @return array Translatable strings
      */
     public static function get_modal_strings() {
@@ -142,13 +151,13 @@ class FotoGrids_Upgrade_Modal {
 
     /**
      * Get upgrade and comparison URLs
-     * 
+     *
      * @return array URLs for upgrade and comparison
      */
     public static function get_urls() {
         return array(
-            'upgrade' => 'https://fotogrids.com/upgrade/?utm_source=plugin&utm_medium=modal&utm_campaign=upgrade',
-            'comparison' => 'https://fotogrids.com/free-vs-pro/?utm_source=plugin&utm_medium=modal&utm_campaign=comparison'
+            'upgrade' => 'https://go.fotogrids.com/upgrade/?utm_source=plugin&utm_medium=upgrade-modal&utm_campaign=upgrade',
+            'comparison' => 'https://go.fotogrids.com/free-vs-pro/?utm_source=plugin&utm_medium=upgrade-modal&utm_campaign=comparison'
         );
     }
 
@@ -163,7 +172,7 @@ class FotoGrids_Upgrade_Modal {
 
     /**
      * Get all modal data for JavaScript
-     * 
+     *
      * @return array Complete modal data
      */
     public static function get_modal_data() {

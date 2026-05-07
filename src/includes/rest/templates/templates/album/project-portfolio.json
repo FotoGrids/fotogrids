@@ -1,0 +1,26 @@
+{
+  "id": "project-portfolio",
+  "name": "Project Portfolio",
+  "description": "One album per project with a cover image and intro text. Clients click in and see one project only — no accidental cross-browsing.",
+  "type": "free",
+  "category": "album",
+  "subcategory": "portfolio",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 2,
+  "settings": {
+    "layout": "justified",
+    "target_row_height": {
+      "desktop": 260,
+      "tablet": 200,
+      "mobile": 160
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "captions": true,
+    "lightbox": true
+  }
+}

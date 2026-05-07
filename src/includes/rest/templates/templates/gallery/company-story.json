@@ -1,0 +1,28 @@
+{
+  "id": "company-story",
+  "name": "Company Story",
+  "description": "Mosaic with brand-colour accents, caption-slide-in hover, and analytics tracking on every image click. For the brands that want every page to look like the same company built it.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 31,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "hover_effect": "caption_slide_in",
+    "captions": true,
+    "extended_analytics": true,
+    "lightbox": true
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "lightroom-dump",
+  "name": "Lightroom Dump",
+  "description": "Drop a Lightroom export folder and get a date-ordered album with EXIF on hover and captions auto-populated. Nothing to configure.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "photography",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 7,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "sort_by": "date_asc",
+    "exif_display": true,
+    "captions": true,
+    "lightbox": true
+  }
+}

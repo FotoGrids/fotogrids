@@ -1,0 +1,24 @@
+{
+  "id": "spacious-justified",
+  "name": "Spacious Justified",
+  "description": "Two-column justified layout with generous row height and wide gutters. Each image gets room to breathe.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "general",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 5,
+  "settings": {
+    "layout": "justified",
+    "target_row_height": {
+      "desktop": 340,
+      "tablet": 260,
+      "mobile": 180
+    },
+    "item_spacing": {
+      "desktop": 20,
+      "tablet": 15,
+      "mobile": 10
+    }
+  }
+}

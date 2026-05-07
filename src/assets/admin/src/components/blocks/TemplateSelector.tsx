@@ -1,16 +1,15 @@
 /**
  * Template Selector Component
- * 
+ *
  * Interface for selecting gallery templates in Gutenberg block
  */
 
 import React from 'react';
-import { 
+import {
     Card,
     CardBody,
     CardMedia,
-    CardHeader,
-    Badge
+    CardHeader
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -58,17 +57,17 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                         }}
                         onError={(e) => {
                             // Fallback for missing preview items
-                            const target = e.target as HTMLItemElement;
+                            const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
                             const parent = target.parentElement;
                             if (parent) {
                                 parent.innerHTML = `
                                     <div style="
-                                        width: 100%; 
-                                        height: 100px; 
-                                        background: #f0f0f0; 
-                                        display: flex; 
-                                        align-items: center; 
+                                        width: 100%;
+                                        height: 100px;
+                                        background: #f0f0f0;
+                                        display: flex;
+                                        align-items: center;
                                         justify-content: center;
                                         font-size: 12px;
                                         color: #666;
@@ -85,16 +84,16 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                             top: '4px',
                             right: '4px',
                         }}>
-                            <Badge>
+                            <span className="fotogrids-pro-badge">
                                 {template.type === 'starter' ? __('Starter', 'fotogrids') : __('Pro', 'fotogrids')}
-                            </Badge>
+                            </span>
                         </div>
                     )}
                 </div>
             </CardMedia>
             <CardHeader>
-                <h4 style={{ 
-                    margin: 0, 
+                <h4 style={{
+                    margin: 0,
                     fontSize: '13px',
                     fontWeight: 600
                 }}>
@@ -102,9 +101,9 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                 </h4>
             </CardHeader>
             <CardBody>
-                <p style={{ 
-                    margin: 0, 
-                    fontSize: '11px', 
+                <p style={{
+                    margin: 0,
+                    fontSize: '11px',
                     color: '#666',
                     lineHeight: 1.3
                 }}>
@@ -123,9 +122,9 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
             {/* Free Templates */}
             {freeTemplates.length > 0 && (
                 <div style={{ marginBottom: '16px' }}>
-                    <div style={{ 
-                        fontSize: '12px', 
-                        color: '#666', 
+                    <div style={{
+                        fontSize: '12px',
+                        color: '#666',
                         marginBottom: '8px',
                         fontWeight: 500
                     }}>
@@ -140,9 +139,9 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
             {/* Pro Templates */}
             {proTemplates.length > 0 && (
                 <div>
-                    <div style={{ 
-                        fontSize: '12px', 
-                        color: '#666', 
+                    <div style={{
+                        fontSize: '12px',
+                        color: '#666',
                         marginBottom: '8px',
                         fontWeight: 500
                     }}>
@@ -154,28 +153,6 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                 </div>
             )}
 
-            <style jsx>{`
-                .fotogrids-template-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                    gap: 8px;
-                }
-
-                .fotogrids-template-card {
-                    transition: all 0.2s ease;
-                    border: 2px solid transparent;
-                }
-
-                .fotogrids-template-card:hover {
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                }
-
-                .fotogrids-template-card.is-selected {
-                    border-color: #0073aa;
-                    box-shadow: 0 0 0 1px #0073aa;
-                }
-            `}</style>
         </div>
     );
 };

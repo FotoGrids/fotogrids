@@ -1,0 +1,30 @@
+{
+  "id": "new-listing-launch",
+  "name": "New Listing Launch",
+  "description": "Password-protected gallery with expiry pre-set, watermark on, right-click protection on. Goes live when you're ready — remove the password and publish.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 39,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "password_protected": true,
+    "watermark_enabled": true,
+    "right_click_protection": true,
+    "album_expiry_days": 180,
+    "captions": true,
+    "lightbox": true
+  }
+}

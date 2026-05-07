@@ -1,11 +1,11 @@
 /**
  * Gallery Selector Component
- * 
+ *
  * Interface for selecting a gallery in Gutenberg block
  */
 
 import React from 'react';
-import { 
+import {
     Placeholder,
     Button,
     Card,
@@ -43,7 +43,7 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
                 label={__('FotoGrids Gallery', 'fotogrids')}
                 instructions={__('No galleries found. Create your first gallery to get started.', 'fotogrids')}
             >
-                <Button isPrimary onClick={onCreateNew}>
+                <Button variant="primary" onClick={onCreateNew}>
                     {__('Create New Gallery', 'fotogrids')}
                 </Button>
             </Placeholder>
@@ -81,8 +81,8 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
                             </CardMedia>
                         )}
                         <CardHeader>
-                            <h3 style={{ 
-                                margin: 0, 
+                            <h3 style={{
+                                margin: 0,
                                 fontSize: '14px',
                                 fontWeight: 600,
                                 textAlign: 'center'
@@ -91,9 +91,9 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
                             </h3>
                         </CardHeader>
                         <CardBody>
-                            <p style={{ 
-                                margin: 0, 
-                                fontSize: '12px', 
+                            <p style={{
+                                margin: 0,
+                                fontSize: '12px',
                                 color: '#666',
                                 textAlign: 'center'
                             }}>
@@ -109,25 +109,25 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
                     onClick={onCreateNew}
                     style={{ cursor: 'pointer' }}
                 >
-                    <CardBody style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
+                    <CardBody style={{
+                        display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
                         height: '180px',
                         border: '2px dashed #ccc',
                         borderRadius: '4px'
                     }}>
-                        <div style={{ 
-                            fontSize: '24px', 
-                            color: '#666', 
-                            marginBottom: '8px' 
+                        <div style={{
+                            fontSize: '24px',
+                            color: '#666',
+                            marginBottom: '8px'
                         }}>
                             {plus}
                         </div>
-                        <p style={{ 
-                            margin: 0, 
-                            fontSize: '14px', 
+                        <p style={{
+                            margin: 0,
+                            fontSize: '14px',
                             color: '#666',
                             textAlign: 'center'
                         }}>
@@ -138,39 +138,10 @@ export const GallerySelector: React.FC<GallerySelectorProps> = ({
             </div>
 
             <div style={{ marginTop: '16px' }}>
-                <Button isPrimary onClick={onCreateNew}>
+                <Button variant="primary" onClick={onCreateNew}>
                     {__('Create New Gallery', 'fotogrids')}
                 </Button>
             </div>
-
-            <style jsx>{`
-                .fotogrids-gallery-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                    gap: 16px;
-                    margin: 16px 0;
-                    max-width: 800px;
-                }
-
-                .fotogrids-gallery-card {
-                    transition: all 0.2s ease;
-                    border: 2px solid transparent;
-                }
-
-                .fotogrids-gallery-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                }
-
-                .fotogrids-gallery-card.is-selected {
-                    border-color: #0073aa;
-                    box-shadow: 0 0 0 1px #0073aa;
-                }
-
-                .fotogrids-create-new:hover {
-                    border-color: #0073aa;
-                }
-            `}</style>
         </Placeholder>
     );
 };

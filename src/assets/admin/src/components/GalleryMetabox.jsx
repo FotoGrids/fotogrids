@@ -2,33 +2,20 @@
  * Gallery Items Metabox React Component
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ItemEditModal from './ItemEditModal.jsx';
+import Icon from './shared/Icon.jsx';
+import GalleryPreview from './GalleryPreview.jsx';
+import UploadArea from './blocks/UploadArea.jsx';
 
-const Icon = ({ name, className = "" }) => {
-    const icons = window.FotoGridsIcons || {};
-    const iconSvg = icons[name];
-    
-    if (!iconSvg) {
-        return <span className={`fotogrids-icon fotogrids-icon--${name} ${className}`}>{name}</span>;
-    }
-    
-    return (
-        <span 
-            className={`fotogrids-icon fotogrids-icon--${name} ${className}`}
-            dangerouslySetInnerHTML={{ __html: iconSvg }}
-        />
-    );
-};
-
-const GalleryMetabox = ({ 
-    galleryItems = [], 
-    canEditPosts = true, 
-    ajaxUrl = '', 
+const GalleryMetabox = ({
+    galleryItems = [],
+    canEditPosts = true,
+    ajaxUrl = '',
     nonce = '',
-    strings = {} 
+    strings = {}
 }) => {
-    
+
     // Add safety check
     if (!React || !useState || !useEffect || !useCallback) {
         console.error('React hooks not available');
@@ -42,115 +29,418 @@ const GalleryMetabox = ({
     const [currentItemData, setCurrentItemData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showAddDropdown, setShowAddDropdown] = useState(false);
+    const handleReorderItemsRef = useRef(null);
+    const State = window.FotoGridsCollectionState;
 
     // Initialize items from props with safety check
     useEffect(() => {
         if (Array.isArray(galleryItems)) {
-            setItems(galleryItems);
+            // Ensure favorite property exists for all items
+            const itemsWithFavorite = galleryItems.map(item => ({
+                ...item,
+                favorite: item.favorite || false
+            }));
+
+            setItems(itemsWithFavorite);
+
+            // Initialize state manager with item IDs
+            if (State) {
+                const itemIds = itemsWithFavorite.map(item => String(item.id)).filter(Boolean);
+                State.items.initItems(itemIds);
+            }
         }
     }, [galleryItems]);
 
-    // Initialize sortable functionality
+    // Initialize sortable functionality using HTML5 drag and drop
     useEffect(() => {
-        const initializeSortable = () => {
-            const gridElement = document.getElementById('fotogrids-items-grid');
-            
-            if (!gridElement || typeof jQuery === 'undefined' || typeof jQuery.ui === 'undefined') {
+        const gridElement = document.getElementById('fotogrids-items-grid');
+
+        if (!gridElement || items.length === 0) {
+            return;
+        }
+
+        let draggedElement = null;
+        let placeholder = null;
+        let draggedIndex = -1;
+
+        const createPlaceholder = () => {
+            const placeholderEl = document.createElement('div');
+            placeholderEl.className = 'fotogrids-item-placeholder';
+            placeholderEl.setAttribute('data-drop-text', strings.dropHere);
+            placeholderEl.style.opacity = '0.5';
+            placeholderEl.style.border = '2px dashed var(--fg-blue)';
+            placeholderEl.style.borderRadius = '4px';
+            placeholderEl.style.minHeight = '100px';
+            return placeholderEl;
+        };
+
+        const getItemIndex = (element) => {
+            const items = Array.from(gridElement.querySelectorAll('.fotogrids-item-item'));
+            return items.indexOf(element);
+        };
+
+        const handleDragStart = (e) => {
+            draggedElement = e.currentTarget;
+            draggedIndex = getItemIndex(draggedElement);
+            draggedElement.style.opacity = '0.7';
+            draggedElement.style.cursor = 'move';
+
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedElement.getAttribute('data-id'));
+
+            // Create placeholder
+            placeholder = createPlaceholder();
+            draggedElement.parentNode.insertBefore(placeholder, draggedElement.nextSibling);
+        };
+
+        const handleDragEnd = (e) => {
+            if (draggedElement) {
+                draggedElement.style.opacity = '';
+                draggedElement.style.cursor = '';
+            }
+
+            if (placeholder && placeholder.parentNode) {
+                placeholder.parentNode.removeChild(placeholder);
+            }
+
+            draggedElement = null;
+            placeholder = null;
+            draggedIndex = -1;
+        };
+
+        const handleDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            e.dataTransfer.dropEffect = 'move';
+
+            if (!draggedElement || draggedElement === e.currentTarget) {
                 return;
             }
 
-            // Destroy existing sortable if it exists
-            if (jQuery(gridElement).hasClass('ui-sortable')) {
-                jQuery(gridElement).sortable('destroy');
+            const targetItem = e.currentTarget;
+            const targetIndex = getItemIndex(targetItem);
+
+            if (targetIndex === -1) {
+                return;
             }
 
-            // Initialize sortable
-            jQuery(gridElement).sortable({
-                items: '.fotogrids-item-item',
-                cursor: 'move',
-                opacity: 0.7,
-                placeholder: 'fotogrids-item-placeholder',
-                tolerance: 'pointer',
-                start: function(event, ui) {
-                    // Add translatable text to placeholder
-                    jQuery('.fotogrids-item-placeholder').attr('data-drop-text', strings.dropHere || 'Drop here');
-                },
-                update: function(event, ui) {
-                    const newOrder = jQuery(this).sortable('toArray', { attribute: 'data-id' });
-                    handleReorderItems(newOrder);
-                }
-            });
+            // Remove placeholder if it exists
+            if (placeholder && placeholder.parentNode) {
+                placeholder.parentNode.removeChild(placeholder);
+            }
+
+            // Insert placeholder at the correct position
+            if (draggedIndex < targetIndex) {
+                gridElement.insertBefore(placeholder, targetItem.nextSibling);
+            } else {
+                gridElement.insertBefore(placeholder, targetItem);
+            }
         };
 
-        // Initialize after a short delay to ensure DOM is ready
-        const timeoutId = setTimeout(initializeSortable, 100);
-        
+        const handleDrop = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!draggedElement) {
+                return false;
+            }
+
+            // If dropping on the same element, do nothing
+            if (draggedElement === e.currentTarget) {
+                return false;
+            }
+
+            const targetItem = e.currentTarget;
+            const targetIndex = getItemIndex(targetItem);
+
+            if (targetIndex === -1 || draggedIndex === -1) {
+                return false;
+            }
+
+            // Remove placeholder
+            if (placeholder && placeholder.parentNode) {
+                placeholder.parentNode.removeChild(placeholder);
+            }
+
+            // Move the element in the DOM
+            if (draggedIndex < targetIndex) {
+                gridElement.insertBefore(draggedElement, targetItem.nextSibling);
+            } else {
+                gridElement.insertBefore(draggedElement, targetItem);
+            }
+
+            // Get the new order from the DOM after moving
+            const itemElements = Array.from(gridElement.querySelectorAll('.fotogrids-item-item'));
+            const newOrder = itemElements.map(item => item.getAttribute('data-id'));
+
+            // Update order using ref - this will update state and trigger re-render
+            if (handleReorderItemsRef.current && newOrder.length > 0) {
+                handleReorderItemsRef.current(newOrder);
+            }
+
+            return false;
+        };
+
+        // Add drag event listeners to all items
+        const itemElements = gridElement.querySelectorAll('.fotogrids-item-item');
+        itemElements.forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragend', handleDragEnd);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+        });
+
+        // Also add dragover and drop to the container to allow dropping anywhere
+        const handleContainerDragOver = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'move';
+        };
+
+        const handleContainerDrop = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        gridElement.addEventListener('dragover', handleContainerDragOver);
+        gridElement.addEventListener('drop', handleContainerDrop);
+
+        // Cleanup function
         return () => {
-            clearTimeout(timeoutId);
-            const gridElement = document.getElementById('fotogrids-items-grid');
-            if (gridElement && typeof jQuery !== 'undefined' && jQuery(gridElement).hasClass('ui-sortable')) {
-                jQuery(gridElement).sortable('destroy');
-            }
+            itemElements.forEach(item => {
+                item.removeEventListener('dragstart', handleDragStart);
+                item.removeEventListener('dragend', handleDragEnd);
+                item.removeEventListener('dragover', handleDragOver);
+                item.removeEventListener('drop', handleDrop);
+            });
+            gridElement.removeEventListener('dragover', handleContainerDragOver);
+            gridElement.removeEventListener('drop', handleContainerDrop);
         };
-    }, [items]); // Re-initialize when items change
+    }, [items, strings]); // Re-initialize when items change
+
+    // Save favorite item to database
+    const saveFavoriteItem = useCallback(async (itemId) => {
+        try {
+            const formData = new FormData();
+            formData.append('action', 'fotogrids_set_favorite_item');
+            formData.append('gallery_id', window.fotogridsMetaBoxes?.postId || '');
+            formData.append('item_id', itemId || '');
+            formData.append('nonce', nonce);
+
+            const response = await fetch(ajaxUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                if (window.fotogridsToast) {
+                    const message = data.data?.message || (itemId ? strings.favoriteItemSet : strings.favoriteItemRemoved);
+                    window.fotogridsToast.success(message);
+                }
+            } else {
+                if (window.fotogridsToast) {
+                    const message = data.data?.message;
+                    window.fotogridsToast.error(message);
+                }
+                console.error('Failed to save favorite item:', data.data);
+            }
+        } catch (error) {
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(strings.errorSavingFavorite);
+            }
+            console.error('Error saving favorite item:', error);
+        }
+    }, [ajaxUrl, nonce]);
 
     // Handle media uploader
     const openMediaUploader = useCallback(() => {
         if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-            alert(strings.mediaNotAvailable || 'WordPress media library is not available. Please refresh the page.');
+            alert(strings.mediaNotAvailable);
             return;
         }
 
         const mediaUploader = wp.media({
-            title: strings.selectItems || 'Select Items for Gallery',
-            button: { text: strings.addToGallery || 'Add to Gallery' },
+            title: strings.selectItems,
+            button: { text: strings.addToGallery },
             multiple: true,
             library: { type: 'image' }
         });
 
         mediaUploader.on('select', () => {
             const attachments = mediaUploader.state().get('selection').toJSON();
-            
+
             const newItems = attachments.map(attachment => ({
                 id: attachment.id,
                 title: attachment.title || attachment.filename || 'Untitled',
                 url: attachment.url,
                 thumbnail: attachment.sizes?.thumbnail?.url || attachment.url,
-                alt: attachment.alt || attachment.title || ''
+                alt: attachment.alt || attachment.title || '',
+                favorite: false
             }));
 
             // Add new items, avoiding duplicates
             setItems(prevItems => {
                 const existingIds = new Set(prevItems.map(img => img.id));
                 const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
-                return [...prevItems, ...uniqueNewItems];
+                const wasEmpty = prevItems.length === 0;
+                const updatedItems = [...prevItems, ...uniqueNewItems];
+
+                if (wasEmpty && uniqueNewItems.length > 0) {
+                    updatedItems.forEach(item => {
+                        item.favorite = item.id === uniqueNewItems[0].id;
+                    });
+
+                    if (uniqueNewItems[0].id) {
+                        saveFavoriteItem(uniqueNewItems[0].id);
+                    }
+                }
+
+                // Update state manager
+                if (State) {
+                    const itemIds = updatedItems.map(item => String(item.id)).filter(Boolean);
+                    State.items.setItems(itemIds);
+                }
+
+                return updatedItems;
             });
         });
 
         mediaUploader.open();
-    }, [strings]);
+    }, [strings, saveFavoriteItem]);
+
+    const handleUploadComplete = useCallback(async (uploadedIds) => {
+        if (!uploadedIds || uploadedIds.length === 0) return;
+
+        const newItems = [];
+        for (const id of uploadedIds) {
+            try {
+                const media = await wp.apiFetch({ path: `/wp/v2/media/${id}` });
+                newItems.push({
+                    id: media.id,
+                    title: media.title?.rendered || media.slug || 'Untitled',
+                    url: media.source_url,
+                    thumbnail: media.media_details?.sizes?.thumbnail?.source_url || media.source_url,
+                    alt: media.alt_text || '',
+                    favorite: false
+                });
+            } catch (err) {
+                console.warn('Failed to fetch media', id, err);
+            }
+        }
+
+        if (newItems.length === 0) return;
+
+        setItems(prevItems => {
+            const existingIds = new Set(prevItems.map(img => img.id));
+            const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
+            const wasEmpty = prevItems.length === 0;
+            const updatedItems = [...prevItems, ...uniqueNewItems];
+
+            if (wasEmpty && uniqueNewItems.length > 0) {
+                updatedItems.forEach(item => {
+                    item.favorite = item.id === uniqueNewItems[0].id;
+                });
+                if (uniqueNewItems[0].id) {
+                    saveFavoriteItem(uniqueNewItems[0].id);
+                }
+            }
+
+            if (State) {
+                const itemIds = updatedItems.map(item => String(item.id)).filter(Boolean);
+                State.items.setItems(itemIds);
+            }
+
+            return updatedItems;
+        });
+    }, [saveFavoriteItem]);
+
+    const toggleFavorite = useCallback(async (itemId) => {
+        setItems(prevItems => {
+            const clickedItem = prevItems.find(item => item.id === itemId);
+            const wasFavorite = clickedItem?.favorite;
+
+            // If clicking on the item that's already the favorite, do nothing
+            if (wasFavorite) {
+                return prevItems; // No changes
+            }
+
+            // Set the clicked item as favorite and unset the previous favorite
+            const updatedItems = prevItems.map(item => ({
+                ...item,
+                favorite: item.id === itemId
+            }));
+
+            // Save new favorite to database
+            saveFavoriteItem(itemId);
+
+            return updatedItems;
+        });
+    }, [saveFavoriteItem]);
 
     // Remove item
     const removeItem = useCallback((itemId) => {
-        setItems(prevItems => prevItems.filter(img => img.id !== itemId));
-    }, []);
+        setItems(prevItems => {
+            const itemToRemove = prevItems.find(item => item.id === itemId);
+            const wasFavorite = itemToRemove?.favorite;
+            const remainingItems = prevItems.filter(img => img.id !== itemId);
+
+            // If favorite item was deleted, make first remaining item favorite
+            if (wasFavorite && remainingItems.length > 0) {
+                remainingItems.forEach((item, index) => {
+                    item.favorite = index === 0;
+                });
+                // Save new favorite to database
+                if (remainingItems[0].id) {
+                    saveFavoriteItem(remainingItems[0].id);
+                }
+            } else if (remainingItems.length === 0) {
+                // No items left, clear favorite
+                saveFavoriteItem(null);
+            }
+
+            // Update state manager
+            if (State) {
+                State.items.removeItem(String(itemId));
+            }
+
+            return remainingItems;
+        });
+    }, [saveFavoriteItem]);
 
     // Clear all items
     const clearAllItems = useCallback(() => {
-        if (confirm(strings.confirmClear || 'Are you sure you want to remove all items?')) {
+        if (confirm(strings.confirmClear)) {
             setItems([]);
+            // Clear favorite when all items are removed
+            saveFavoriteItem(null);
+
+            // Update state manager
+            if (State) {
+                State.items.setItems([]);
+            }
         }
-    }, [strings]);
+    }, [strings, saveFavoriteItem]);
 
     // Handle item reordering
     const handleReorderItems = useCallback(async (newOrder) => {
         try {
-            // Reorder items in state to match new order
-            const reorderedItems = newOrder.map(id => 
-                items.find(item => item.id.toString() === id.toString())
-            ).filter(Boolean);
-            
-            setItems(reorderedItems);
+            // Reorder items in state to match new order using functional update
+            setItems(prevItems => {
+                const reorderedItems = newOrder.map(id =>
+                    prevItems.find(item => item.id.toString() === id.toString())
+                ).filter(Boolean);
+
+                // Update state manager
+                if (State) {
+                    const itemIds = reorderedItems.map(item => String(item.id)).filter(Boolean);
+                    State.items.reorderItems(itemIds);
+                }
+
+                return reorderedItems;
+            });
 
             // Save new order to server
             const formData = new FormData();
@@ -165,23 +455,28 @@ const GalleryMetabox = ({
             });
 
             const data = await response.json();
-            
+
             if (!data.success) {
                 console.error('Failed to save item order:', data.data);
             }
         } catch (error) {
             console.error('Error reordering items:', error);
         }
-    }, [items, ajaxUrl, nonce]);
+    }, [ajaxUrl, nonce]);
+
+    // Update ref when handleReorderItems changes
+    useEffect(() => {
+        handleReorderItemsRef.current = handleReorderItems;
+    }, [handleReorderItems]);
 
     // Open item edit modal
     // Load item data function (shared by openItemModal and navigateItem)
     const loadItemData = useCallback(async (itemId) => {
         setLoading(true);
-        
+
         // Add delay to see loading state (for debugging)
         // await new Promise(resolve => setTimeout(resolve, 10000));
-        
+
         try {
             const formData = new FormData();
             formData.append('action', 'fotogrids_get_item_data');
@@ -200,12 +495,12 @@ const GalleryMetabox = ({
                 setCurrentItemId(itemId);
                 return true;
             } else {
-                alert(strings.errorLoadingItem || 'Error loading item data');
+                alert(strings.errorLoadingItem);
                 return false;
             }
         } catch (error) {
             console.error('Error loading item data:', error);
-            alert(strings.errorLoadingItem || 'Error loading item data');
+            alert(strings.errorLoadingItem);
             return false;
         } finally {
             setLoading(false);
@@ -243,7 +538,7 @@ const GalleryMetabox = ({
     // Handle add dropdown
     const handleAddOption = useCallback((action) => {
         setShowAddDropdown(false);
-        
+
         switch (action) {
             case 'upload':
             case 'library':
@@ -260,32 +555,75 @@ const GalleryMetabox = ({
         }
     }, [openMediaUploader]);
 
-    // Render item grid
     const renderItemsGrid = () => {
         if (items.length === 0) {
+            const handleFromLibrary = () => openMediaUploader();
+            const handleOtherSources = () => window.FotoGridsUpgrade?.launchForFeature?.integrations?.();
+
             return (
-                <p className="description">
-                    {strings.noItems || 'No items selected. Click "Add New" to get started.'}
-                </p>
+                <>
+                    <p className="description">
+                        {strings.noItems}
+                    </p>
+                    <div className="fotogrids-items-noitems-add fotogrids-noitems-add-grid">
+                        <div className="fotogrids-noitems-add-block fotogrids-noitems-add-block--upload">
+                            <UploadArea onUploadComplete={handleUploadComplete} inputId="fotogrids-metabox-upload-input" />
+                        </div>
+                        <button
+                            type="button"
+                            className="fotogrids-noitems-add-block fotogrids-noitems-add-block--action"
+                            onClick={handleFromLibrary}
+                        >
+                            <div
+                                className="fotogrids-noitems-add-block__icon"
+                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.folder }}
+                            />
+                            <h4>{strings.addFromLibrary}</h4>
+                            <p>{strings.fromLibraryDescription}</p>
+                        </button>
+                        <button
+                            type="button"
+                            className="fotogrids-noitems-add-block fotogrids-noitems-add-block--action"
+                            onClick={handleOtherSources}
+                        >
+                            <div
+                                className="fotogrids-noitems-add-block__icon"
+                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.puzzle }}
+                            />
+                            <h4>{strings.fromOtherSources}</h4>
+                            <p>{strings.fromOtherSourcesDescription}</p>
+                        </button>
+                    </div>
+                </>
             );
         }
 
         return (
             <div id="fotogrids-items-grid" className="fotogrids-sortable">
                 {items.map((item) => (
-                    <div key={item.id} className="fotogrids-item-item" data-id={item.id}>
-                        <img 
-                            src={item.thumbnail} 
-                            alt={item.alt} 
+                    <div key={item.id} className="fotogrids-item-item" data-id={item.id} draggable="true">
+                        <img
+                            src={item.thumbnail}
+                            alt={item.alt}
                             onClick={() => openItemModal(item.id)}
                             style={{ cursor: 'pointer' }}
                         />
+                        <div className={`fotogrids-item-favorite ${item.favorite ? 'is-favorite' : ''}`}>
+                            <button
+                                type="button"
+                                className="fotogrids-item-favorite-button"
+                                onClick={() => toggleFavorite(item.id)}
+                                title={item.favorite ? (strings.removeFavorite) : (strings.makeFavorite || 'Make Favorite')}
+                            >
+                                <Icon name="star" />
+                            </button>
+                        </div>
                         <div className="fotogrids-item-controls">
                             <button
                                 type="button"
                                 className="fotogrids-edit-item"
                                 onClick={() => openItemModal(item.id)}
-                                title={strings.editItem || 'Edit Item'}
+                                title={strings.editItem}
                             >
                                 <Icon name="edit" />
                             </button>
@@ -293,7 +631,7 @@ const GalleryMetabox = ({
                                 type="button"
                                 className="fotogrids-remove-item"
                                 onClick={() => removeItem(item.id)}
-                                title={strings.removeItem || 'Remove Item'}
+                                title={strings.removeItem}
                             >
                                 <Icon name="x" />
                             </button>
@@ -301,10 +639,10 @@ const GalleryMetabox = ({
                         <div className="fotogrids-item-title">
                             {item.title.length > 20 ? item.title.substring(0, 20) + '...' : item.title}
                         </div>
-                        <input 
-                            type="hidden" 
-                            name="fotogrids_gallery_items[]" 
-                            value={item.id} 
+                        <input
+                            type="hidden"
+                            name="fotogrids_gallery_items[]"
+                            value={item.id}
                         />
                     </div>
                 ))}
@@ -312,7 +650,6 @@ const GalleryMetabox = ({
         );
     };
 
-    // Render add dropdown
     const renderAddDropdown = () => (
         <div className="fotogrids-add-new-dropdown">
             <button
@@ -321,29 +658,29 @@ const GalleryMetabox = ({
                 onClick={() => setShowAddDropdown(!showAddDropdown)}
             >
                 <Icon name="plus" />
-                {strings.addNew || 'Add New'}
-                <Icon name="chevron-down" />
+                {strings.addNew}
+                <Icon name="chevron_down" />
             </button>
             {showAddDropdown && (
                 <div className="fotogrids-add-new-menu fotogrids-dropdown-open">
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('upload')}>
-						{strings.upload || 'Upload'}
+						{strings.upload}
                     </div>
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('library')}>
-						{strings.fromLibrary || 'From Library'}
+						{strings.fromLibrary}
                     </div>
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('folder')}>
-						{strings.fromFolder || 'From Folder'}
+						{strings.fromFolder}
                     </div>
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('zip')}>
-						{strings.fromZip || 'From ZIP'}
+						{strings.fromZip}
                     </div>
                     <div className="fotogrids-add-option fotogrids-add-option--pro" onClick={() => handleAddOption('video')}>
-						{strings.video || 'Video'}
+						{strings.video}
 						<span className="fotogrids-pro-badge">Pro</span>
                     </div>
                     <div className="fotogrids-add-option fotogrids-add-option--pro" onClick={() => handleAddOption('instagram')}>
-						{strings.instagram || 'Instagram'}
+						{strings.instagram}
 						<span className="fotogrids-pro-badge">Pro</span>
                     </div>
                 </div>
@@ -351,7 +688,6 @@ const GalleryMetabox = ({
         </div>
     );
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (showAddDropdown && !event.target.closest('.fotogrids-add-new-dropdown')) {
@@ -374,7 +710,7 @@ const GalleryMetabox = ({
                         onClick={() => handleTabSwitch('manage')}
                     >
                         <span className="fotogrids-icon" data-icon="edit"></span>
-                        {strings.manageItems || 'Manage Items'}
+                        {strings.manageItems}
                     </button>
                     <button
                         type="button"
@@ -382,7 +718,7 @@ const GalleryMetabox = ({
                         onClick={() => handleTabSwitch('preview')}
                     >
                         <span className="fotogrids-icon" data-icon="preview"></span>
-                        {strings.previewGallery || 'Preview Gallery'}
+                        {strings.previewGallery}
                     </button>
                 </div>
 
@@ -394,7 +730,7 @@ const GalleryMetabox = ({
                             className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-items-remove-all"
                             onClick={clearAllItems}
                         >
-                            {strings.removeAll || 'Remove All'}
+                            {strings.removeAll}
                         </button>
                         <button
                             type="button"
@@ -405,7 +741,7 @@ const GalleryMetabox = ({
                                 }
                             }}
                         >
-                            {strings.bulkEditor || 'Bulk Editor'}
+                            {strings.bulkEditor}
                             <span className="fotogrids-pro-badge">Pro</span>
                         </button>
                     </div>
@@ -421,9 +757,12 @@ const GalleryMetabox = ({
                 </div>
 
                 <div className={`fotogrids-gallery-tab-content ${activeTab === 'preview' ? 'fotogrids-gallery-tab-content--active' : ''}`}>
-                    <div className="fotogrids-preview-placeholder">
-                        <p>{strings.previewPlaceholder || 'Gallery preview functionality will be implemented here.'}</p>
-                    </div>
+                    {activeTab === 'preview' && (
+                        <GalleryPreview
+                            items={items}
+                            galleryId={window.fotogridsMetaBoxes?.postId || null}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -441,10 +780,6 @@ const GalleryMetabox = ({
                     strings={strings}
                 />
             )}
-
-            {/* Hidden compatibility buttons for existing functionality */}
-            <button type="button" id="fotogrids-add-items" style={{display: 'none'}} onClick={openMediaUploader} />
-            <button type="button" id="fotogrids-clear-items" style={{display: 'none'}} onClick={clearAllItems} />
         </div>
     );
 };

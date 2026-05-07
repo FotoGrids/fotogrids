@@ -1,15 +1,15 @@
 /**
  * Gallery Preview Component
- * 
+ *
  * Live preview of gallery in Gutenberg block editor
  */
 
 import React, { useState, useEffect } from 'react';
-import { 
+import {
     Placeholder,
     Spinner,
     Notice,
-    Button 
+    Button
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { gallery } from '@wordpress/icons';
@@ -152,7 +152,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
     };
 
     const renderGridPreview = () => (
-        <div 
+        <div
             className={previewClasses}
             style={{
                 display: 'grid',
@@ -165,7 +165,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
     );
 
     const renderMasonryPreview = () => (
-        <div 
+        <div
             className={previewClasses}
             style={{
                 columnCount: Math.min(attributes.columns, 3),
@@ -177,7 +177,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
     );
 
     const renderJustifiedPreview = () => (
-        <div 
+        <div
             className={previewClasses}
             style={{
                 display: 'flex',
@@ -290,7 +290,7 @@ export const GalleryPreview: React.FC<GalleryPreviewProps> = ({
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        border: '2px solid #0073aa',
+                        border: '2px solid var(--fg-blue)',
                         borderRadius: '4px',
                         pointerEvents: 'none',
                     }}

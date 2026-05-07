@@ -1,0 +1,101 @@
+.fotogrids-plugin-settings {
+    .fotogrids-tab-nav {
+
+        .nav-tab-wrapper {
+            border-bottom: 1px solid #c3c4c7;
+            margin: 0;
+            padding: 0;
+
+            .nav-tab {
+                background: #f6f7f7;
+                border: 1px solid #c3c4c7;
+                color: #50575e;
+                text-decoration: none;
+                padding: 12px 16px;
+                font-size: 12px;
+                line-height: 1.4;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin: -1px -1px -1px 0;
+
+                &:hover {
+                    background-color: #fff;
+                    color: var(--fg-blue);
+                }
+
+                &:focus {
+                    outline: 0;
+                    box-shadow: none;
+                }
+
+                &.nav-tab-active {
+                    background-color: #fff;
+                    border-bottom-color: #fff;
+                    color: var(--fg-text-primary);
+                }
+            }
+        }
+    }
+
+    .fotogrids-tab-content {
+        background: white;
+        padding: 1.5rem;
+        border: 1px solid #c3c4c7;
+        border-top: none;
+
+        h3 {
+            margin: 0 0 1em;
+        }
+    }
+
+    .permissions-info,
+    .integrations-info {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f6f7f7;
+        border-radius: 4px;
+
+        p {
+            margin: 0;
+            color: #1e1e1e;
+        }
+    }
+
+    .permission-setting {
+        margin-bottom: 2rem;
+
+        h4 {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .role-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 500;
+
+                input[type="checkbox"] {
+                    margin: 0;
+                }
+            }
+        }
+    }
+
+    .fotogrids-gallery-settings {
+        border: 1px solid var(--fg-border-primary);
+    }
+
+    .settings-actions {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f0f0f1;
+    }
+}

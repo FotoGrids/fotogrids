@@ -1,0 +1,248 @@
+{
+    "id": "performance",
+    "label": "Performance",
+    "icon": "speed",
+    "free": true,
+    "settings": [
+        {
+            "key": "lazy_loading_group",
+            "type": "setting_group",
+            "label": "Lazy Loading",
+            "free": true,
+            "postTypes": ["gallery"],
+            "settings": [
+                {
+                    "key": "lazy_loading",
+                    "type": "toggle",
+                    "label": "Enable Lazy Loading",
+                    "description": "Load images only when they enter the viewport. Improves initial page load time.",
+                    "default": true,
+                    "free": true
+                }
+            ]
+        },
+        {
+            "key": "pagination_group",
+            "type": "setting_group",
+            "label": "Pagination",
+            "description": "Control how gallery items are displayed and loaded",
+            "free": true,
+            "settings": [
+                {
+                    "key": "pagination_type",
+                    "type": "button_group",
+                    "label": "Display Mode",
+                    "options": [
+                        { "label": "Show All Items", "value": "show_all", "free": true },
+                        { "label": "Break into Pages", "value": "paginated", "free": true }
+                    ],
+                    "default": "show_all",
+                    "free": true
+                },
+                {
+                    "key": "items_per_page",
+                    "type": "responsive_range",
+                    "label": "Items Per Page",
+                    "responsive": {
+                        "desktop": { "min": 1, "max": 100, "default": 24 },
+                        "tablet": { "min": 1, "max": 50, "default": 18 },
+                        "mobile": { "min": 1, "max": 30, "default": 12 }
+                    },
+                    "condition": { "dependsOn": "pagination_type", "values": ["paginated"] },
+                    "free": true
+                },
+                {
+                    "key": "preload_next_page",
+                    "type": "toggle",
+                    "label": "Preload Next Page",
+                    "description": "Preload next page content in the background for even faster navigation.",
+                    "default": false,
+                    "condition": { "dependsOn": "pagination_type", "values": ["paginated"] },
+                    "free": false
+                },
+                {
+                    "key": "pagination_method",
+                    "type": "button_group",
+                    "label": "Pagination Method",
+                    "options": [
+                        { "label": "Endless Scroll", "value": "endless_scroll", "icon": "arrow_square_down", "free": true },
+                        { "label": "Load More Button", "value": "load_more", "icon": "plus_square", "free": true },
+                        { "label": "Page Buttons", "value": "pages", "icon": "code_square", "free": true }
+                    ],
+                    "default": "load_more",
+                    "condition": { "dependsOn": "pagination_type", "values": ["paginated"] },
+                    "free": true
+                },
+                {
+                    "key": "load_more_button_group",
+                    "type": "setting_group",
+                    "label": "Load More Button",
+                    "condition": { "dependsOn": ["pagination_type", "pagination_method"], "values": [["paginated"], ["load_more"]] },
+                    "free": true,
+                    "settings": [
+                        {
+                            "key": "load_more_button_text",
+                            "type": "text_input",
+                            "label": "Button Text",
+                            "default": "Load More",
+                            "free": true
+                        },
+                        {
+                            "key": "load_more_button_full_width",
+                            "type": "toggle",
+                            "label": "Full Width Button",
+                            "default": false,
+                            "free": true
+                        },
+                        {
+                            "key": "load_more_button_alignment",
+                            "type": "button_group",
+                            "label": "Button Alignment",
+                            "options": [
+                                { "label": "Left", "value": "left", "icon": "item_align_left", "free": true },
+                                { "label": "Center", "value": "center", "icon": "item_align_center", "free": true },
+                                { "label": "Right", "value": "right", "icon": "item_align_right", "free": true }
+                            ],
+                            "default": "center",
+                            "condition": { "dependsOn": "load_more_button_full_width", "values": [false, "0", 0] },
+                            "free": true
+                        }
+                    ]
+                },
+                {
+                    "key": "pagination_alignment",
+                    "type": "button_group",
+                    "label": "Pagination Alignment",
+                    "description": "Controls the alignment of all pagination controls (Previous/Next buttons and page numbers)",
+                    "options": [
+                        { "label": "Left", "value": "left", "icon": "item_align_left", "free": true },
+                        { "label": "Center", "value": "center", "icon": "item_align_center", "free": true },
+                        { "label": "Right", "value": "right", "icon": "item_align_right", "free": true }
+                    ],
+                    "default": "center",
+                    "condition": { "dependsOn": ["pagination_type", "pagination_method"], "values": [["paginated"], ["pages"]] },
+                    "free": true
+                },
+                {
+                    "key": "pages_prev_next_group",
+                    "type": "setting_group",
+                    "label": "Previous and Next Buttons",
+                    "condition": { "dependsOn": ["pagination_type", "pagination_method"], "values": [["paginated"], ["pages"]] },
+                    "free": true,
+                    "settings": [
+                        {
+                            "key": "pages_show_prev_next",
+                            "type": "toggle",
+                            "label": "Show Previous/Next Buttons",
+                            "default": true,
+                            "free": true
+                        },
+                        {
+                            "key": "pages_prev_text",
+                            "type": "text_input",
+                            "label": "Previous Button Text",
+                            "default": "Previous",
+                            "condition": { "dependsOn": "pages_show_prev_next", "values": [true, "1"] },
+                            "free": true
+                        },
+                        {
+                            "key": "pages_next_text",
+                            "type": "text_input",
+                            "label": "Next Button Text",
+                            "default": "Next",
+                            "condition": { "dependsOn": "pages_show_prev_next", "values": [true, "1"] },
+                            "free": true
+                        },
+                        {
+                            "key": "pages_button_icon",
+                            "type": "button_group",
+                            "label": "Button Icon",
+                            "options": [
+                                { "label": "None", "value": "none", "free": true },
+                                { "value": "chevron_left", "icon": "chevron_left", "free": true },
+                                { "value": "chevron_right", "icon": "chevron_right", "free": true },
+                                { "value": "arrow", "icon": "arrow", "free": true },
+                                { "value": "triangle", "icon": "triangle", "free": true }
+                            ],
+                            "default": "chevron_left",
+                            "condition": { "dependsOn": "pages_show_prev_next", "values": [true, "1"] },
+                            "free": true
+                        }
+                    ]
+                },
+                {
+                    "key": "pages_numbers_group",
+                    "type": "setting_group",
+                    "label": "Page Numbers",
+                    "condition": { "dependsOn": ["pagination_type", "pagination_method"], "values": [["paginated"], ["pages"]] },
+                    "free": true,
+                    "settings": [
+                        {
+                            "key": "pages_show_numbers",
+                            "type": "toggle",
+                            "label": "Show Page Numbers",
+                            "default": true,
+                            "free": true
+                        },
+                        {
+                            "key": "pages_max_visible",
+                            "type": "responsive_range",
+                            "label": "Max Visible Page Numbers",
+                            "description": "Maximum number of page number buttons to show at once",
+                            "responsive": {
+                                "desktop": { "min": 3, "max": 15, "default": 7 },
+                                "tablet": { "min": 3, "max": 15, "default": 5 },
+                                "mobile": { "min": 3, "max": 15, "default": 3 }
+                            },
+                            "condition": { "dependsOn": "pages_show_numbers", "values": [true, "1"] },
+                            "free": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "caching_group",
+            "type": "setting_group",
+            "label": "Caching",
+            "free": true,
+            "settings": [
+                {
+                    "key": "enable_cache",
+                    "type": "toggle",
+                    "label": "Enable {postType} Cache",
+                    "description": "Cache rendered {postType.lower} HTML to improve performance on subsequent loads.",
+                    "default": false,
+                    "free": true
+                },
+                {
+                    "key": "cache_duration",
+                    "type": "range",
+                    "label": "Cache Duration",
+                    "description": "How long to cache gallery output (in hours).",
+                    "unit": "hours",
+                    "min": 1,
+                    "max": 168,
+                    "default": 24,
+                    "condition": { "dependsOn": "enable_cache", "values": [true, "1"] },
+                    "free": true
+                }
+            ]
+        },
+        {
+            "key": "cdn_promotion",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "Accelerate your {postType.plural.lower} with lightning-fast CDN delivery.",
+                    "message": "Serve images and assets from a global network of servers for maximum performance and reduced load times worldwide."
+                },
+                {
+                    "subtitle": "Built-in Image Optimizer for peak performance.",
+                    "message": "Automatically optimize all your gallery images for faster loading, smaller file sizes, and better user experience without any manual work."
+                }
+            ],
+            "free": false
+        }
+    ]
+}

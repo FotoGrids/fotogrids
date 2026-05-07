@@ -1,0 +1,30 @@
+{
+  "id": "product-collection-hub",
+  "name": "Product Collection Hub",
+  "description": "One album per collection, each with filter and WooCommerce hand-off pre-enabled. Browsing turns into buying without leaving the gallery.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "products",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 17,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "hover_effect": "lift_shadow",
+    "filter_enabled": true,
+    "cta_overlays": true,
+    "woocommerce_handoff": true,
+    "extended_analytics": true,
+    "lightbox": false
+  }
+}

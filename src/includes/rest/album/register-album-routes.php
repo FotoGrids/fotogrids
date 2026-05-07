@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Register_Album_Routes {
-    
+
     /**
      * Register all album-related REST API routes
      *
@@ -37,6 +37,15 @@ class Register_Album_Routes {
                         },
                     ),
                 ),
+                'permission_callback' => array( '\FotoGrids\REST\Album\Album_Permissions', 'check_album_read' ),
+            ),
+        ) );
+
+        // Albums list endpoint
+        register_rest_route( 'fotogrids/v1', '/albums', array(
+            array(
+                'methods'  => \WP_REST_Server::READABLE,
+                'callback' => array( '\FotoGrids\REST\Album\Album_Data', 'get_albums_list' ),
                 'permission_callback' => array( '\FotoGrids\REST\Album\Album_Permissions', 'check_album_read' ),
             ),
         ) );

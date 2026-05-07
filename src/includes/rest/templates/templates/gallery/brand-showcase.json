@@ -1,0 +1,27 @@
+{
+  "id": "brand-showcase",
+  "name": "Brand Showcase",
+  "description": "Grid with consistent spacing and your brand colour as the hover accent. One look across every page of the site.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 10,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "hover_effect": "soft_fade",
+    "captions": true,
+    "lightbox": true
+  }
+}

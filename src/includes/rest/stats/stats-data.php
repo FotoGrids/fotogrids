@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Stats_Data {
-    
+
     /**
      * Increment view count
      *
@@ -27,20 +27,20 @@ class Stats_Data {
     public static function increment_view( $request ) {
         $object_type = $request->get_param( 'object_type' );
         $object_id = (int) $request->get_param( 'object_id' );
-        
+
         $result = \FotoGrids\Statistics::increment( $object_type, $object_id, 'views' );
-        
+
         if ( ! $result ) {
-            return new \WP_Error( 
-                'stats_update_failed', 
-                __( 'Failed to update statistics', 'fotogrids' ), 
-                array( 'status' => 500 ) 
+            return new \WP_Error(
+                'stats_update_failed',
+                __( 'Failed to update statistics', 'fotogrids' ),
+                array( 'status' => 500 )
             );
         }
-        
+
         return rest_ensure_response( array( 'success' => true ) );
     }
-    
+
     /**
      * Increment share count
      *
@@ -56,21 +56,21 @@ class Stats_Data {
         $object_type = $request->get_param( 'object_type' );
         $object_id = (int) $request->get_param( 'object_id' );
         $network = $request->get_param( 'network' );
-        
+
         $result = \FotoGrids\Statistics::increment( $object_type, $object_id, 'shares' );
-        
+
         if ( ! $result ) {
-            return new \WP_Error( 
-                'stats_update_failed', 
-                __( 'Failed to update statistics', 'fotogrids' ), 
-                array( 'status' => 500 ) 
+            return new \WP_Error(
+                'stats_update_failed',
+                __( 'Failed to update statistics', 'fotogrids' ),
+                array( 'status' => 500 )
             );
         }
-        
+
         if ( $network ) {
-            do_action( 'fotogrids_share_tracked', $object_type, $object_id, $network );
+            do_action( 'fotogrids/actions/share/tracked', $object_type, $object_id, $network );
         }
-        
+
         return rest_ensure_response( array( 'success' => true ) );
     }
 }

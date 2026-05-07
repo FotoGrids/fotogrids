@@ -8,9 +8,9 @@ const UpgradeModal = () => {
 
     const modalData = window.fotogridsUpgradeModal || {};
     const benefits = modalData.benefits || [];
-    const strings = modalData.strings || { close: 'Close', upgradeNow: 'Upgrade Now', freeVsPro: 'Free vs. Pro' };
-    const upgradeUrl = modalData.urls?.upgrade || 'https://fotogrids.com/upgrade/';
-    const comparisonUrl = modalData.urls?.comparison || 'https://fotogrids.com/free-vs-pro/';
+    const strings = modalData.strings;
+    const upgradeUrl = modalData.urls?.upgrade;
+    const comparisonUrl = modalData.urls?.comparison;
 
     useEffect(() => {
         const openModal = (benefitKey = 0) => {
@@ -21,7 +21,7 @@ const UpgradeModal = () => {
             } else if (typeof benefitKey === 'number') {
                 benefitIndex = Math.max(0, Math.min(benefitKey, benefits.length - 1));
             }
-            
+
             setCurrentBenefit(benefitIndex);
             setIsOpen(true);
         };
@@ -36,23 +36,25 @@ const UpgradeModal = () => {
                 advancedLayouts: () => openModal('advanced_layouts'),
                 customCSS: () => openModal('custom_css'),
                 prioritySupport: () => openModal('priority_support'),
-                whiteLabel: () => openModal('white_label'),
+                templates: () => openModal('templates'),
                 analytics: () => openModal('analytics'),
                 integrations: () => openModal('integrations'),
-                unlimitedGalleries: () => openModal('unlimited_galleries')
+                unlimitedGalleries: () => openModal('unlimited_galleries'),
+                templates: () => openModal('templates')
             },
             BENEFIT_KEYS: {
                 BULK_OPERATIONS: 'bulk_operations',
                 ADVANCED_LAYOUTS: 'advanced_layouts',
                 CUSTOM_CSS: 'custom_css',
                 PRIORITY_SUPPORT: 'priority_support',
-                WHITE_LABEL: 'white_label',
+                TEMPLATES: 'templates',
                 ANALYTICS: 'analytics',
                 INTEGRATIONS: 'integrations',
-                UNLIMITED_GALLERIES: 'unlimited_galleries'
+                UNLIMITED_GALLERIES: 'unlimited_galleries',
+                TEMPLATES: 'templates'
             }
         };
-        
+
         return () => {
             delete window.FotoGridsUpgrade;
         };
@@ -62,31 +64,31 @@ const UpgradeModal = () => {
         if (autoAdvanceRef.current) {
             clearInterval(autoAdvanceRef.current);
         }
-        
+
         if (isOpen && benefits.length > 1) {
             autoAdvanceRef.current = setInterval(() => {
                 setCurrentBenefit(prev => {
                     const nextIndex = (prev + 1) % benefits.length;
                     const nextBenefit = benefits[nextIndex];
-                    
+
                     const imageElement = document.querySelector('.fotogrids-upgrade-modal__image');
-                    
+
                     if (imageElement && nextBenefit) {
                         imageElement.classList.remove('slide-from-right');
                         imageElement.style.setProperty('--next-bg-color', nextBenefit.color);
-                        
+
                         setIsTransitioning(true);
-                        
+
                         setTimeout(() => {
                             setCurrentBenefit(nextIndex);
                         }, 400);
-                        
+
                         setTimeout(() => {
                             setIsTransitioning(false);
                             imageElement.style.removeProperty('--next-bg-color');
                         }, 600);
                     }
-                    
+
                     return prev;
                 });
             }, 5000);
@@ -113,34 +115,34 @@ const UpgradeModal = () => {
         if (index === currentBenefit || isTransitioning) {
             return;
         }
-        
+
         const nextBenefit = benefits[index];
         const imageElement = document.querySelector('.fotogrids-upgrade-modal__image');
-        
+
         if (!imageElement || !nextBenefit) {
             return;
         }
-        
+
         if (!imageElement.dataset.debugId) {
             imageElement.dataset.debugId = 'debug-' + Date.now();
         }
-        
+
         const isGoingBack = index < currentBenefit;
 
         setSlideFromRight(isGoingBack ? true : false);
         imageElement.style.setProperty('--next-bg-color', nextBenefit.color);
-        
+
         setIsTransitioning(true);
-        
+
         setTimeout(() => {
             setCurrentBenefit(index);
         }, 400);
-        
+
         setTimeout(() => {
             setIsTransitioning(false);
             setSlideFromRight(false);
             imageElement.style.removeProperty('--next-bg-color');
-            
+
             if (resetTimer) {
                 resetAutoAdvance();
             }
@@ -162,9 +164,9 @@ const UpgradeModal = () => {
     const currentBenefitData = benefits[currentBenefit];
 
     return (
-        <div 
-            className={`fotogrids-upgrade-modal-overlay ${isOpen ? 'open' : ''}`} 
-            style={{ 
+        <div
+            className={`fotogrids-upgrade-modal-overlay ${isOpen ? 'fotogrids-modal--open' : ''}`}
+            style={{
                 pointerEvents: isOpen ? 'auto' : 'none',
                 opacity: isOpen ? 1 : 0,
                 visibility: isOpen ? 'visible' : 'hidden'
@@ -173,21 +175,21 @@ const UpgradeModal = () => {
         >
             <div className="fotogrids-upgrade-modal" onClick={e => e.stopPropagation()}>
                 <button className="fotogrids-upgrade-modal__close" onClick={() => setIsOpen(false)}>×</button>
-                
+
                 <div className="fotogrids-upgrade-modal__content">
-                    <div 
+                    <div
                         className={`fotogrids-upgrade-modal__image ${isTransitioning ? 'transitioning' : ''} ${slideFromRight ? 'slide-from-right' : ''}`}
                         style={{ backgroundColor: currentBenefitData.color }}
                     >
                         {currentBenefitData.image && (
-                            <img 
-                                src={currentBenefitData.image} 
-                                alt="" 
+                            <img
+                                src={currentBenefitData.image}
+                                alt=""
                                 className={isTransitioning ? 'transitioning' : ''}
                             />
                         )}
                     </div>
-                    
+
                     <div className="fotogrids-upgrade-modal__text">
                         <div className={`fotogrids-upgrade-modal__text-content ${isTransitioning ? 'transitioning' : ''}`}>
                             <h2>
@@ -197,38 +199,40 @@ const UpgradeModal = () => {
                             </h2>
                             <p>{currentBenefitData.content}</p>
                         </div>
-                        
+
+                        <div className="fotogrids-upgrade-modal__actions">
+                            <button
+                                className="fotogrids-upgrade-modal__upgrade-btn"
+                                onClick={handleUpgrade}
+                            >
+                                {strings.upgradeNow}
+                            </button>
+                            <button
+                                className="fotogrids-upgrade-modal__comparison-btn"
+                                onClick={handleComparison}
+                            >
+                                {strings.freeVsPro}
+                            </button>
+                        </div>
+
                         {benefits.length > 1 && (
                             <div className="fotogrids-upgrade-modal__bullets">
                                 {benefits.map((benefit, index) => (
                                     <button
                                         key={benefit.key}
-                                        className={`bullet ${index === currentBenefit ? 'active' : ''}`}
+                                        className={`bullet ${index === currentBenefit ? 'fg-is-active' : ''}`}
                                         onClick={() => {
                                             handleBenefitChange(index, true);
                                         }}
                                         title={benefit.shortTitle}
                                     >
-                                        {benefit.shortTitle}
+                                        <span className="tooltip">
+                                            <span>{benefit.shortTitle}</span>
+                                        </span>
                                     </button>
                                 ))}
                             </div>
                         )}
-                        
-                        <div className="fotogrids-upgrade-modal__actions">
-                            <button 
-                                className="fotogrids-upgrade-modal__upgrade-btn"
-                                onClick={handleUpgrade}
-                            >
-                                {strings.upgradeNow || 'Upgrade Now'}
-                            </button>
-                            <button 
-                                className="fotogrids-upgrade-modal__comparison-btn"
-                                onClick={handleComparison}
-                            >
-                                {strings.freeVsPro || 'Free vs. Pro'}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Metadata_Data {
-    
+
     /**
      * Get metadata tags
      *
@@ -27,12 +27,12 @@ class Metadata_Data {
     public static function get_metadata_tags( $request ) {
         $search = $request->get_param( 'search' );
         $limit = $request->get_param( 'limit' );
-        
+
         $tags = \FotoGrids\Metadata_Manager::get_tags( $search, $limit );
-        
+
         return rest_ensure_response( $tags );
     }
-    
+
     /**
      * Get metadata people
      *
@@ -46,12 +46,12 @@ class Metadata_Data {
     public static function get_metadata_people( $request ) {
         $search = $request->get_param( 'search' );
         $limit = $request->get_param( 'limit' );
-        
+
         $people = \FotoGrids\Metadata_Manager::get_people( $search, $limit );
-        
+
         return rest_ensure_response( $people );
     }
-    
+
     /**
      * Get metadata locations
      *
@@ -65,12 +65,12 @@ class Metadata_Data {
     public static function get_metadata_locations( $request ) {
         $search = $request->get_param( 'search' );
         $limit = $request->get_param( 'limit' );
-        
+
         $locations = \FotoGrids\Metadata_Manager::get_locations( $search, $limit );
-        
+
         return rest_ensure_response( $locations );
     }
-    
+
     /**
      * Create metadata tag
      *
@@ -83,20 +83,20 @@ class Metadata_Data {
      */
     public static function create_metadata_tag( $request ) {
         $name = $request->get_param( 'name' );
-        
+
         if ( empty( $name ) ) {
             return new \WP_Error( 'missing_name', __( 'Tag name is required', 'fotogrids' ), array( 'status' => 400 ) );
         }
-        
+
         $tag = \FotoGrids\Metadata_Manager::add_or_get_tag( $name );
-        
+
         if ( ! $tag ) {
             return new \WP_Error( 'creation_failed', __( 'Failed to create tag', 'fotogrids' ), array( 'status' => 500 ) );
         }
-        
+
         return rest_ensure_response( $tag );
     }
-    
+
     /**
      * Create metadata person
      *
@@ -109,20 +109,20 @@ class Metadata_Data {
      */
     public static function create_metadata_person( $request ) {
         $name = $request->get_param( 'name' );
-        
+
         if ( empty( $name ) ) {
             return new \WP_Error( 'missing_name', __( 'Person name is required', 'fotogrids' ), array( 'status' => 400 ) );
         }
-        
+
         $person = \FotoGrids\Metadata_Manager::add_or_get_person( $name );
-        
+
         if ( ! $person ) {
             return new \WP_Error( 'creation_failed', __( 'Failed to create person', 'fotogrids' ), array( 'status' => 500 ) );
         }
-        
+
         return rest_ensure_response( $person );
     }
-    
+
     /**
      * Create metadata location
      *
@@ -135,20 +135,22 @@ class Metadata_Data {
      */
     public static function create_metadata_location( $request ) {
         $name = $request->get_param( 'name' );
-        
+        $latitude = $request->get_param( 'latitude' );
+        $longitude = $request->get_param( 'longitude' );
+
         if ( empty( $name ) ) {
             return new \WP_Error( 'missing_name', __( 'Location name is required', 'fotogrids' ), array( 'status' => 400 ) );
         }
-        
-        $location = \FotoGrids\Metadata_Manager::add_or_get_location( $name );
-        
+
+        $location = \FotoGrids\Metadata_Manager::add_or_get_location( $name, $latitude, $longitude );
+
         if ( ! $location ) {
             return new \WP_Error( 'creation_failed', __( 'Failed to create location', 'fotogrids' ), array( 'status' => 500 ) );
         }
-        
+
         return rest_ensure_response( $location );
     }
-    
+
     /**
      * Get item metadata
      *
@@ -161,12 +163,12 @@ class Metadata_Data {
      */
     public static function get_item_metadata( $request ) {
         $item_id = $request->get_param( 'id' );
-        
+
         $metadata = \FotoGrids\Metadata_Manager::get_item_metadata( $item_id );
-        
+
         return rest_ensure_response( $metadata );
     }
-    
+
     /**
      * Save item metadata
      *
@@ -182,32 +184,32 @@ class Metadata_Data {
         $tags = $request->get_param( 'tags' );
         $people = $request->get_param( 'people' );
         $locations = $request->get_param( 'locations' );
-        
+
         \FotoGrids\Metadata_Manager::clear_item_metadata( $item_id );
-        
+
         $results = array(
             'tags' => array(),
             'people' => array(),
             'locations' => array(),
             'errors' => array()
         );
-        
+
         if ( ! empty( $tags ) ) {
             foreach ( $tags as $tag_data ) {
                 $tag_name = is_string( $tag_data ) ? $tag_data : ( isset( $tag_data['name'] ) ? $tag_data['name'] : $tag_data );
-                
+
                 if ( is_numeric( $tag_name ) ) {
                     global $wpdb;
                     $tag_name = $wpdb->get_var( $wpdb->prepare(
-                        "SELECT name FROM {$wpdb->prefix}fotogrids_tags WHERE id = %d",
+                        "SELECT name FROM {$wpdb->prefix}fotogrids_tags WHERE id = %d AND type = 'tag'",
                         $tag_name
                     ) );
                 }
-                
+
                 if ( empty( $tag_name ) ) {
                     continue;
                 }
-                
+
                 $result = \FotoGrids\Metadata_Manager::add_tag_to_item( $item_id, $tag_name );
                 if ( $result ) {
                     $results['tags'][] = $tag_name;
@@ -216,12 +218,12 @@ class Metadata_Data {
                 }
             }
         }
-        
+
         if ( ! empty( $people ) ) {
             foreach ( $people as $person ) {
                 $name = isset( $person['name'] ) ? $person['name'] : '';
                 $details = isset( $person['details'] ) ? $person['details'] : '';
-                
+
                 if ( ! empty( $name ) ) {
                     $result = \FotoGrids\Metadata_Manager::add_person_to_item( $item_id, $name, $details );
                     if ( $result ) {
@@ -232,13 +234,13 @@ class Metadata_Data {
                 }
             }
         }
-        
+
         if ( ! empty( $locations ) ) {
             foreach ( $locations as $location ) {
                 $name = isset( $location['name'] ) ? $location['name'] : '';
                 $latitude = isset( $location['latitude'] ) ? $location['latitude'] : null;
                 $longitude = isset( $location['longitude'] ) ? $location['longitude'] : null;
-                
+
                 if ( ! empty( $name ) ) {
                     $result = \FotoGrids\Metadata_Manager::add_location_to_item( $item_id, $name, $latitude, $longitude );
                     if ( $result ) {
@@ -249,7 +251,7 @@ class Metadata_Data {
                 }
             }
         }
-        
+
         return rest_ensure_response( $results );
     }
 }

@@ -1,0 +1,29 @@
+{
+  "id": "trip-by-trip",
+  "name": "Trip by Trip",
+  "description": "One album per destination with a short intro text and EXIF on hover. Built for travel photographers and hobbyists who tell their story trip by trip.",
+  "type": "free",
+  "category": "album",
+  "subcategory": "portfolio",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 4,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "sort_by": "date_asc",
+    "exif_display": true,
+    "exif_on_hover": true,
+    "captions": true,
+    "lightbox": true
+  }
+}

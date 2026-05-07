@@ -1,11 +1,11 @@
 === FotoGrids ===
-Contributors: yourname
-Donate link: https://fotogrids.com/donate
-Tags: gallery, photos, items, lightbox, albums, masonry, grid, responsive, photography
+Contributors: FotoGrids
+Donate link: https://go.fotogrids.com/donate
+Tags: gallery, galleries, album, albums, photos, items, lightbox, masonry, grid, responsive, photography, slider, sliders
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 8.0
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,7 +111,7 @@ We provide migration tools and guides for popular gallery plugins. Contact suppo
 
 == Changelog ==
 
-= 0.1.0 =
+= 1.0.0 =
 * Initial release
 * Unlimited galleries and albums
 * Grid, Masonry, and Justified layouts
@@ -127,14 +127,14 @@ We provide migration tools and guides for popular gallery plugins. Contact suppo
 
 == Upgrade Notice ==
 
-= 0.1.0 =
+= 1.0.0 =
 Initial release of FotoGrids. Create beautiful photo galleries with modern templates and built-in statistics.
 
 == Support ==
 
-For support, please visit our [support forum](https://wordpress.org/support/plugin/fotogrids/) or check out our [documentation](https://fotogrids.com/docs/).
+For support, please visit our [support forum](https://wordpress.org/support/plugin/fotogrids/) or check out our [documentation](https://go.fotogrids.com/docs/).
 
-Pro users can access priority support at [fotogrids.com/support](https://fotogrids.com/support/).
+Pro users can access priority support at [fotogrids.com/support](https://go.fotogrids.com/support/).
 
 == Privacy Policy ==
 
@@ -144,4 +144,4 @@ FotoGrids respects your privacy. The plugin:
 * Does not send data to external servers (except for Pro license validation)
 * Complies with GDPR and other privacy regulations
 
-For more details, see our [Privacy Policy](https://fotogrids.com/privacy/).
+For more details, see our [Privacy Policy](https://go.fotogrids.com/privacy/).

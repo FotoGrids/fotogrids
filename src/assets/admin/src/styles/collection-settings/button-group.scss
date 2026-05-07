@@ -1,0 +1,85 @@
+.fotogrids-button-group {
+    &__buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    &__button {
+        color: var(--fg-text-primary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 12px 12px;
+        border: 1px solid var(--fg-border-dark);
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 13px;
+
+        &:hover:not(&__pro):not(.fg-is-active) {
+            border-color: var(--fg-blue);
+            background: #f6f7f7;
+        }
+
+        &.fg-is-active {
+            border-color: var(--fg-blue);
+            background: var(--fg-blue);
+            color: #fff;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .fotogrids-button-icon {
+            display: flex;
+            align-items: center;
+            font-size: 0;
+
+            svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        .fotogrids-button-label {
+            font-weight: 400;
+        }
+
+        &__pro {
+            padding: 0;
+            padding-inline-start: 12px;
+            gap: 12px;
+            align-items: stretch;
+            overflow: hidden;
+
+            .fotogrids-button-label {
+                display: flex;
+                align-items: center;
+                padding-bottom: 2px;
+            }
+
+            .fotogrids-pro-badge {
+                display: flex;
+                align-items: center;
+                padding-bottom: 4px;
+                min-height: 32px;
+            }
+        }
+
+        &--big-icons {
+            padding: 24px;
+            border-color: var(--fg-border-primary);
+
+            .fotogrids-button-icon {
+                svg {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        }
+    }
+}

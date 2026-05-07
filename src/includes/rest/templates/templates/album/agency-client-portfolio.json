@@ -1,0 +1,26 @@
+{
+  "id": "agency-client-portfolio",
+  "name": "Agency Client Portfolio",
+  "description": "One album per client with brand controls inherited from a shared template. Consistent finish, zero per-client setup from scratch.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 14,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "brand_controls_locked": true,
+    "lightbox": true
+  }
+}

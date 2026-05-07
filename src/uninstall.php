@@ -19,7 +19,7 @@
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
  * @link       https://fotogrids.com
- * @since      0.1.0
+ * @since      1.0.0
  *
  * @package    FotoGrids
  */

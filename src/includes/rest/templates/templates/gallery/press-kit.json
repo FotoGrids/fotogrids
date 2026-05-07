@@ -1,0 +1,30 @@
+{
+  "id": "press-kit",
+  "name": "Press Kit Gallery",
+  "description": "Grid with download tokens pre-configured. Approved press images only, with right-click protection on everything else.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 48,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "hover_effect": "soft_fade",
+    "download_tokens": true,
+    "right_click_protection": true,
+    "password_protected": true,
+    "captions": true,
+    "lightbox": true
+  }
+}

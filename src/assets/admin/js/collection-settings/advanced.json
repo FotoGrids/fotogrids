@@ -1,0 +1,65 @@
+{
+    "id": "advanced",
+    "label": "Advanced",
+    "icon": "settings",
+    "free": true,
+    "settings": [
+        {
+            "key": "maintenance_group",
+            "type": "setting_group",
+            "label": "Maintenance",
+            "free": true,
+            "settings": [
+                {
+                    "key": "auto_clear_cache",
+                    "type": "toggle",
+                    "label": "Auto Clear Cache",
+                    "description": "Automatically clear cache when settings are updated.",
+                    "default": true,
+                    "free": true
+                }
+            ]
+        },
+        {
+            "key": "data_management_group",
+            "type": "setting_group",
+            "label": "Data Management",
+            "free": true,
+            "settings": [
+                {
+                    "key": "use_ajax_from_album",
+                    "type": "toggle",
+                    "label": "Smooth Album to Gallery Transitions",
+                    "description": "When enabled, opening a gallery from an album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation.",
+                    "default": true,
+                    "postTypes": ["gallery"],
+                    "free": true
+                },
+                {
+                    "key": "enable_statistics",
+                    "type": "toggle",
+                    "label": "Enable Statistics Tracking",
+                    "description": "Track gallery views and interactions for analytics.",
+                    "default": true,
+                    "free": true
+                },
+                {
+                    "key": "retain_statistics",
+                    "type": "button_group",
+                    "label": "Retain Statistics",
+                    "description": "Choose how long to retain statistics data before cleanup.",
+                    "options": [
+                        { "label": "Forever", "value": "forever" },
+                        { "label": "30 Days", "value": "30" },
+                        { "label": "90 Days", "value": "90" },
+                        { "label": "180 Days", "value": "180" },
+                        { "label": "365 Days", "value": "365" }
+                    ],
+                    "default": "forever",
+                    "condition": { "dependsOn": "enable_statistics", "values": [true, "1"] },
+                    "free": true
+                }
+            ]
+        }
+    ]
+}

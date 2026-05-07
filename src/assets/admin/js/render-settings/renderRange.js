@@ -1,21 +1,23 @@
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled, {
-    updateSetting
+    updateSetting,
+    isProActive,
+    __
 }) => {
     const { createElement: h } = wp.element;
-    
+
     const hasUnits = setting.units && Array.isArray(setting.units) && setting.units.length > 0;
-    
+
     let value, unit;
-    
+
     if (hasUnits) {
         value = currentValue?.value || setting.default || 0;
         unit = currentValue?.unit || setting.units[0];
     } else {
         value = currentValue || setting.default || 0;
     }
-    
+
     const updateValue = (newValue) => {
         if (hasUnits) {
             updateSetting(setting.key, {
@@ -26,7 +28,7 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
             updateSetting(setting.key, newValue);
         }
     };
-    
+
     const updateUnit = (newUnit) => {
         if (hasUnits) {
             updateSetting(setting.key, {
@@ -35,7 +37,7 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
             });
         }
     };
-    
+
     return h('div', {
         className: 'fotogrids-range-control'
     }, [
@@ -45,7 +47,11 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
             setting.label,
             setting.unit && h('span', {
                 className: 'fotogrids-setting__unit'
-            }, ` (${setting.unit})`)
+            }, ` (${setting.unit})`),
+            !setting.free && !isProActive && h('span', {
+                className: 'fotogrids-pro-badge',
+                key: 'pro-badge'
+            }, __('Pro', 'fotogrids'))
         ].filter(Boolean)),
         h('div', {
             className: 'fotogrids-range-control__controls'
@@ -69,19 +75,31 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
                     value: value,
                     onChange: (e) => !isDisabled && updateValue(parseInt(e.target.value) || setting.default || 0),
                     disabled: isDisabled,
-                    className: 'fotogrids-number-input'
+                    className: 'fotogrids-range-number-input'
                 }),
-                hasUnits && h('select', {
-                    value: unit,
-                    onChange: (e) => !isDisabled && updateUnit(e.target.value),
-                    disabled: isDisabled,
-                    className: 'fotogrids-units-select'
-                }, setting.units.map(unitOption =>
-                    h('option', {
-                        key: unitOption,
-                        value: unitOption
-                    }, unitOption)
-                ))
+                hasUnits && (window.FotoGridsRenderSettings?.CustomUnitSelect && typeof React !== 'undefined'
+                    ? React.createElement(window.FotoGridsRenderSettings.CustomUnitSelect, {
+                        value: unit,
+                        onChange: (e) => !isDisabled && updateUnit(e.target.value),
+                        disabled: isDisabled,
+                        className: 'fotogrids-units-select',
+                        options: setting.units.map(unitOption => ({
+                            value: unitOption,
+                            label: unitOption
+                        }))
+                    })
+                    : h('select', {
+                        value: unit,
+                        onChange: (e) => !isDisabled && updateUnit(e.target.value),
+                        disabled: isDisabled,
+                        className: 'fotogrids-units-select'
+                    }, setting.units.map(unitOption =>
+                        h('option', {
+                            key: unitOption,
+                            value: unitOption
+                        }, unitOption)
+                    ))
+                )
             ].filter(Boolean))
         ])
     ]);

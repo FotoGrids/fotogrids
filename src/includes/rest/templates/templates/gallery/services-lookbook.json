@@ -1,0 +1,28 @@
+{
+  "id": "services-lookbook",
+  "name": "Services Lookbook",
+  "description": "Bento mosaic with CTA overlays per image. Built for service businesses that want each work sample to lead somewhere.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "leads",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 33,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "hover_effect": "lift_shadow",
+    "cta_overlays": true,
+    "extended_analytics": true,
+    "lightbox": true
+  }
+}

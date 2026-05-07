@@ -1,0 +1,28 @@
+{
+  "id": "travel-log",
+  "name": "Travel Log",
+  "description": "Masonry with EXIF on hover and a short intro text block above the grid. Built for trip-by-trip stories and personal projects.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 14,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "exif_display": true,
+    "exif_on_hover": true,
+    "captions": true,
+    "lightbox": true
+  }
+}

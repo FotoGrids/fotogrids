@@ -1,7 +1,9 @@
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 window.FotoGridsRenderSettings.renderColorPicker = (setting, currentValue, isDisabled, {
-    updateSetting
+    updateSetting,
+    isProActive,
+    __
 }) => {
     const { createElement: h } = wp.element;
     
@@ -10,7 +12,13 @@ window.FotoGridsRenderSettings.renderColorPicker = (setting, currentValue, isDis
     }, [
         h('label', {
             className: 'fotogrids-setting__label'
-        }, setting.label),
+        }, [
+            setting.label,
+            !setting.free && !isProActive && h('span', {
+                className: 'fotogrids-pro-badge',
+                key: 'pro-badge'
+            }, __('Pro', 'fotogrids'))
+        ].filter(Boolean)),
         h('div', {
             className: 'fotogrids-color-picker__input'
         }, [

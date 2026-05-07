@@ -1,0 +1,27 @@
+{
+  "id": "editorial-spread",
+  "name": "Editorial Spread",
+  "description": "Magazine-style asymmetric mosaic with caption-slide-in hover. Built for editorial and commercial photographers.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 22,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 6,
+      "tablet": 5,
+      "mobile": 3
+    },
+    "hover_effect": "caption_slide_in",
+    "captions": true,
+    "lightbox": true
+  }
+}

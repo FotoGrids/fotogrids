@@ -7,14 +7,14 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Statistics Class
- * 
+ *
  * Handles statistics tracking and management for FotoGrids
  */
 class Statistics {
-    
+
     /**
      * Increment a statistic counter
-     * 
+     *
      * @param string $object_type Type of object (gallery, album, item)
      * @param int $object_id ID of the object
      * @param string $field Field to increment (views, shares)
@@ -23,39 +23,39 @@ class Statistics {
      */
     public static function increment( $object_type, $object_id, $field = 'views', $amount = 1 ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
-        
+
         // Validate parameters
         if ( ! in_array( $object_type, array( 'gallery', 'album', 'item' ) ) ) {
             return false;
         }
-        
+
         if ( ! in_array( $field, array( 'views', 'shares' ) ) ) {
             return false;
         }
-        
+
         $object_id = (int) $object_id;
         $amount = (int) $amount;
-        
+
         if ( $object_id <= 0 || $amount <= 0 ) {
             return false;
         }
-        
+
         // Try to update existing record first
         $updated = $wpdb->query( $wpdb->prepare(
-            "UPDATE $table 
-             SET $field = $field + %d, 
-                 last_viewed = NOW(), 
-                 updated_at = NOW() 
+            "UPDATE $table
+             SET $field = $field + %d,
+                 last_viewed = NOW(),
+                 updated_at = NOW()
              WHERE object_type = %s AND object_id = %d",
             $amount, $object_type, $object_id
         ) );
-        
+
         if ( $updated === false ) {
             return false;
         }
-        
+
         // If no rows were updated, insert a new record
         if ( $updated === 0 ) {
             $data = array(
@@ -67,36 +67,36 @@ class Statistics {
                 'created_at' => current_time( 'mysql', true ),
                 'updated_at' => current_time( 'mysql', true ),
             );
-            
+
             $inserted = $wpdb->insert(
                 $table,
                 $data,
                 array( '%s', '%d', '%d', '%d', '%s', '%s', '%s' )
             );
-            
+
             return $inserted !== false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Get statistics for a specific object
-     * 
+     *
      * @param string $object_type Type of object
      * @param int $object_id ID of the object
      * @return array|null Statistics data or null if not found
      */
     public static function get( $object_type, $object_id ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
-        
+
         $result = $wpdb->get_row( $wpdb->prepare(
             "SELECT * FROM $table WHERE object_type = %s AND object_id = %d",
             $object_type, $object_id
         ), ARRAY_A );
-        
+
         if ( $result ) {
             return array(
                 'views' => (int) $result['views'],
@@ -106,13 +106,13 @@ class Statistics {
                 'updated_at' => $result['updated_at'],
             );
         }
-        
+
         return null;
     }
-    
+
     /**
      * Get top performing objects by views
-     * 
+     *
      * @param string $object_type Type of object
      * @param int $limit Number of results to return
      * @param int $days Number of days to look back (0 for all time)
@@ -120,28 +120,28 @@ class Statistics {
      */
     public static function get_top_by_views( $object_type, $limit = 10, $days = 0 ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
         $limit = (int) $limit;
-        
+
         $where_date = '';
         $params = array( $object_type );
-        
+
         if ( $days > 0 ) {
             $where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
             $params[] = $days;
         }
-        
+
         $params[] = $limit;
-        
-        $sql = "SELECT object_id, views, shares, last_viewed 
-                FROM $table 
-                WHERE object_type = %s $where_date 
-                ORDER BY views DESC 
+
+        $sql = "SELECT object_id, views, shares, last_viewed
+                FROM $table
+                WHERE object_type = %s $where_date
+                ORDER BY views DESC
                 LIMIT %d";
-        
+
         $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-        
+
         // Enrich with object data
         $enriched = array();
         foreach ( $results as $row ) {
@@ -150,13 +150,13 @@ class Statistics {
                 $enriched[] = array_merge( $row, $object_data );
             }
         }
-        
+
         return $enriched;
     }
-    
+
     /**
      * Get top performing objects by shares
-     * 
+     *
      * @param string $object_type Type of object
      * @param int $limit Number of results to return
      * @param int $days Number of days to look back (0 for all time)
@@ -164,28 +164,28 @@ class Statistics {
      */
     public static function get_top_by_shares( $object_type, $limit = 10, $days = 0 ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
         $limit = (int) $limit;
-        
+
         $where_date = '';
         $params = array( $object_type );
-        
+
         if ( $days > 0 ) {
             $where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
             $params[] = $days;
         }
-        
+
         $params[] = $limit;
-        
-        $sql = "SELECT object_id, views, shares, last_viewed 
-                FROM $table 
-                WHERE object_type = %s $where_date 
-                ORDER BY shares DESC 
+
+        $sql = "SELECT object_id, views, shares, last_viewed
+                FROM $table
+                WHERE object_type = %s $where_date
+                ORDER BY shares DESC
                 LIMIT %d";
-        
+
         $results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-        
+
         // Enrich with object data
         $enriched = array();
         foreach ( $results as $row ) {
@@ -194,39 +194,39 @@ class Statistics {
                 $enriched[] = array_merge( $row, $object_data );
             }
         }
-        
+
         return $enriched;
     }
-    
+
     /**
      * Get total statistics
-     * 
+     *
      * @return array Total views and shares across all objects
      */
     public static function get_totals() {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
-        
+
         $result = $wpdb->get_row(
-            "SELECT 
-                SUM(views) as total_views, 
+            "SELECT
+                SUM(views) as total_views,
                 SUM(shares) as total_shares,
                 COUNT(DISTINCT object_id) as total_objects
              FROM $table",
             ARRAY_A
         );
-        
+
         return array(
             'total_views' => (int) $result['total_views'],
             'total_shares' => (int) $result['total_shares'],
             'total_objects' => (int) $result['total_objects'],
         );
     }
-    
+
     /**
      * Get statistics over time
-     * 
+     *
      * @param string $object_type Type of object
      * @param int $object_id Specific object ID (optional)
      * @param int $days Number of days to look back
@@ -234,56 +234,56 @@ class Statistics {
      */
     public static function get_time_series( $object_type, $object_id = null, $days = 30 ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
-        
+
         $where_conditions = array( 'object_type = %s' );
         $params = array( $object_type );
-        
+
         if ( $object_id ) {
             $where_conditions[] = 'object_id = %d';
             $params[] = $object_id;
         }
-        
+
         $where_conditions[] = 'last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
         $params[] = $days;
-        
+
         $where_sql = implode( ' AND ', $where_conditions );
-        
-        $sql = "SELECT 
+
+        $sql = "SELECT
                     DATE(last_viewed) as date,
                     SUM(views) as daily_views,
                     SUM(shares) as daily_shares
-                FROM $table 
+                FROM $table
                 WHERE $where_sql
                 GROUP BY DATE(last_viewed)
                 ORDER BY date ASC";
-        
+
         return $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
     }
-    
+
     /**
      * Clean up old statistics data
-     * 
+     *
      * @param int $days Number of days to keep (older data will be deleted)
      * @return int Number of rows deleted
      */
     public static function cleanup_old_data( $days = 365 ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_statistics';
-        
+
         $deleted = $wpdb->query( $wpdb->prepare(
             "DELETE FROM $table WHERE last_viewed < DATE_SUB(NOW(), INTERVAL %d DAY)",
             $days
         ) );
-        
+
         return $deleted;
     }
-    
+
     /**
      * Get object data based on type and ID
-     * 
+     *
      * @param string $object_type Type of object
      * @param int $object_id ID of the object
      * @return array|null Object data or null if not found
@@ -300,7 +300,7 @@ class Statistics {
                     );
                 }
                 break;
-                
+
             case 'album':
                 $post = get_post( $object_id );
                 if ( $post && $post->post_type === 'fotogrids_album' ) {
@@ -311,7 +311,7 @@ class Statistics {
                     );
                 }
                 break;
-                
+
             case 'item':
                 $attachment = get_post( $object_id );
                 if ( $attachment && $attachment->post_type === 'attachment' ) {
@@ -323,10 +323,10 @@ class Statistics {
                 }
                 break;
         }
-        
+
         return null;
     }
-    
+
     /**
      * Initialize scheduled cleanup
      */
@@ -335,12 +335,12 @@ class Statistics {
             wp_schedule_event( time(), 'weekly', 'fotogrids_stats_cleanup' );
         }
     }
-    
+
     /**
      * Run scheduled cleanup
      */
     public static function run_scheduled_cleanup() {
-        $days_to_keep = apply_filters( 'fotogrids_stats_retention_days', 365 );
+        $days_to_keep = apply_filters( 'fotogrids/settings/stats/retention_days', 365 );
         self::cleanup_old_data( $days_to_keep );
     }
 }

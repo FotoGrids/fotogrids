@@ -1,0 +1,31 @@
+{
+  "id": "print-shop",
+  "name": "Print Shop",
+  "description": "Per-image pricing, size variants, and WooCommerce hand-off pre-configured. Built for selling prints or licensed images directly from a gallery.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 46,
+  "settings": {
+    "layout": "justified",
+    "target_row_height": {
+      "desktop": 300,
+      "tablet": 240,
+      "mobile": 180
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "hover_effect": "lift_shadow",
+    "cta_overlays": true,
+    "woocommerce_handoff": true,
+    "per_image_pricing": true,
+    "watermark_enabled": true,
+    "right_click_protection": true,
+    "lightbox": true
+  }
+}

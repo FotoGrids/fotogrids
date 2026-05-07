@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import ModalStructure from './item-edit-modal/ModalStructure';
 
-const ItemEditModal = ({ 
-    itemId, 
-    itemData, 
-    loading, 
-    items, 
-    onClose, 
-    onNavigate, 
-    ajaxUrl, 
-    nonce, 
-    strings 
+const ItemEditModal = ({
+    itemId,
+    itemData,
+    loading,
+    items,
+    onClose,
+    onNavigate,
+    ajaxUrl,
+    nonce,
+    strings
 }) => {
     const [activeTab, setActiveTab] = useState('details');
     const [formData, setFormData] = useState({
@@ -20,7 +20,8 @@ const ItemEditModal = ({
         description: '',
         location: '',
         external_url: '',
-        link_target: 'global'
+        link_target: 'global',
+        exif: {}
     });
     const [metadata, setMetadata] = useState({
         tags: [],
@@ -43,7 +44,6 @@ const ItemEditModal = ({
     const [hasChanges, setHasChanges] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
-    // Update form data when itemData changes
     useEffect(() => {
         if (itemData) {
             const initialFormData = {
@@ -53,16 +53,16 @@ const ItemEditModal = ({
                 description: itemData.description || '',
                 location: itemData.location || '',
                 external_url: itemData.external_url || '',
-                link_target: itemData.link_target || 'global'
+                link_target: itemData.link_target || 'global',
+                exif: itemData.exif || {}
             };
             setFormData(initialFormData);
             setOriginalData(initialFormData);
             setHasChanges(false);
-            setSaveSuccess(false); // Reset success state when switching items
+            setSaveSuccess(false);
         }
     }, [itemData]);
 
-    // Load metadata when modal opens
     useEffect(() => {
         if (itemId) {
             loadItemMetadata();
@@ -70,24 +70,18 @@ const ItemEditModal = ({
         }
     }, [itemId]);
 
-    // Track changes in form data and metadata
     useEffect(() => {
         if (!originalData || !originalMetadata) return;
 
-        // Compare form data
-        const formDataChanged = Object.keys(originalData).some(key => 
+        const formDataChanged = Object.keys(originalData).some(key =>
             originalData[key] !== formData[key]
         );
 
-        // Compare metadata (tags, people, location)
-        const metadataChanged = 
-            // Check tags
+        const metadataChanged =
             (originalMetadata.tags.length !== metadata.tags.length) ||
             originalMetadata.tags.some(tag => !metadata.tags.find(t => t.id === tag.id)) ||
-            // Check people
             (originalMetadata.people.length !== metadata.people.length) ||
             originalMetadata.people.some(person => !metadata.people.find(p => p.id === person.id)) ||
-            // Check location
             (originalMetadata.location?.id !== metadata.location?.id);
 
         setHasChanges(formDataChanged || metadataChanged);
@@ -97,13 +91,15 @@ const ItemEditModal = ({
         try {
             const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`);
             const data = await response.json();
-            
+
+            const location = (data.locations && data.locations.length > 0) ? data.locations[0] : null;
+
             const initialMetadata = {
                 tags: data.tags || [],
                 people: data.people || [],
-                location: data.location || null
+                location: location
             };
-            
+
             setMetadata(initialMetadata);
             setOriginalMetadata(initialMetadata);
         } catch (error) {
@@ -142,7 +138,6 @@ const ItemEditModal = ({
         }));
     };
 
-    // Metadata handling functions
     const addMetadataItem = async (type, value) => {
         if (!value.trim()) return;
 
@@ -167,17 +162,14 @@ const ItemEditModal = ({
                 }));
             }
 
-            // Add to available metadata if not already there
             setAvailableMetadata(prev => ({
                 ...prev,
-                [type]: prev[type].some(item => item.id === newItem.id) 
-                    ? prev[type] 
+                [type]: prev[type].some(item => item.id === newItem.id)
+                    ? prev[type]
                     : [...prev[type], newItem]
             }));
 
-            // Clear input
             setMetadataInput(prev => ({ ...prev, [type]: '' }));
-
         } catch (error) {
             console.warn(`Failed to add ${type}:`, error);
         }
@@ -211,11 +203,23 @@ const ItemEditModal = ({
 
     const saveItemMetadata = async () => {
         try {
-            // Save item-metadata relationships
+            const tagsToSave = metadata.tags.map(tag => tag.id);
+
+            const peopleToSave = metadata.people.map(person => ({
+                name: person.name || '',
+                details: person.details || ''
+            }));
+
+            const locationsToSave = metadata.location ? [{
+                name: metadata.location.name || '',
+                latitude: metadata.location.latitude || null,
+                longitude: metadata.location.longitude || null
+            }] : [];
+
             const metadataToSave = {
-                tags: metadata.tags.map(tag => tag.id),
-                people: metadata.people.map(person => person.id),
-                location: metadata.location ? metadata.location.id : null
+                tags: tagsToSave,
+                people: peopleToSave,
+                locations: locationsToSave
             };
 
             await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}`, {
@@ -233,15 +237,19 @@ const ItemEditModal = ({
 
     const handleSave = async () => {
         setSaving(true);
-                
+
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('action', 'fotogrids_save_item_data');
             formDataToSend.append('item_id', itemId);
             formDataToSend.append('nonce', nonce);
-            
+
             Object.entries(formData).forEach(([key, value]) => {
-                formDataToSend.append(key, value);
+                if (key === 'exif' && typeof value === 'object') {
+                    formDataToSend.append(key, JSON.stringify(value));
+                } else {
+                    formDataToSend.append(key, value);
+                }
             });
 
             const response = await fetch(ajaxUrl, {
@@ -253,24 +261,79 @@ const ItemEditModal = ({
 
             if (data.success) {
                 await saveItemMetadata();
-                
+
                 setOriginalData({ ...formData });
                 setOriginalMetadata({
                     tags: [...metadata.tags],
                     people: [...metadata.people],
                     location: metadata.location ? { ...metadata.location } : null
                 });
-                
-                setHasChanges(false);                
+
+                setHasChanges(false);
                 setSaving(false);
+                setSaveSuccess(true);
+
+                if (window.fotogridsToast) {
+                    window.fotogridsToast.success(
+                        strings.itemSavedSuccessfully || data.message || 'Item saved successfully!'
+                    );
+                }
             } else {
-                alert(strings.errorSaving || 'Error saving item data');
                 setSaving(false);
+
+                if (window.fotogridsToast) {
+                    window.fotogridsToast.error(
+                        data.message || strings.errorSaving
+                    );
+                } else {
+                    alert(data.message || strings.errorSaving);
+                }
             }
         } catch (error) {
-            alert(strings.errorSaving || 'Error saving item data');
             setSaving(false);
+
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(strings.errorSaving);
+            } else {
+                alert(strings.errorSaving);
+            }
         }
+    };
+
+    const handleClose = () => {
+        if (saving) {
+            return;
+        }
+
+        if (hasChanges) {
+            const confirmMessage = strings.unsavedChangesConfirm ||
+                'You have unsaved changes. Are you sure you want to close without saving?';
+
+            if (!window.confirm(confirmMessage)) {
+                return;
+            }
+        }
+
+        setHasChanges(false);
+        onClose();
+    };
+
+    const handleNavigate = (direction) => {
+        if (saving) {
+            return;
+        }
+
+        if (hasChanges) {
+            const confirmMessage = strings.unsavedChangesNavigate ||
+                'You have unsaved changes. Are you sure you want to navigate away without saving?';
+
+            if (!window.confirm(confirmMessage)) {
+                return;
+            }
+        }
+
+        setHasChanges(false);
+        onNavigate(direction);
     };
 
     return (
@@ -279,8 +342,8 @@ const ItemEditModal = ({
             itemData={itemData}
             loading={loading}
             items={items}
-            onClose={onClose}
-            onNavigate={onNavigate}
+            onClose={handleClose}
+            onNavigate={handleNavigate}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             formData={formData}

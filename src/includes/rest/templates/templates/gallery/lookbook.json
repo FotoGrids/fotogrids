@@ -1,0 +1,29 @@
+{
+  "id": "lookbook",
+  "name": "Lookbook",
+  "description": "Full-bleed editorial layout with slow-zoom hover, variant swatches inline, and quick-add CTA overlays on each product image.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 42,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 2,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "hover_effect": "slow_zoom",
+    "cta_overlays": true,
+    "woocommerce_handoff": true,
+    "extended_analytics": true,
+    "lightbox": true
+  }
+}

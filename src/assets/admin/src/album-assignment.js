@@ -1,12 +1,20 @@
 import React from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import AlbumAssignment from './components/AlbumAssignment.js';
 
-// Initialize Album Assignment component when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+function initializeAlbumAssignment() {
     const albumAssignmentRoot = document.getElementById('fotogrids-gallery-albums-root');
-    
-    if (albumAssignmentRoot && window.fotogridsAlbumAssignment) {
-        render(React.createElement(AlbumAssignment), albumAssignmentRoot);
+
+    if (!albumAssignmentRoot || !window.fotogridsAlbumAssignment) {
+        return;
     }
-});
+
+    const root = createRoot(albumAssignmentRoot);
+    root.render(React.createElement(AlbumAssignment));
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAlbumAssignment);
+} else {
+    setTimeout(initializeAlbumAssignment, 0);
+}

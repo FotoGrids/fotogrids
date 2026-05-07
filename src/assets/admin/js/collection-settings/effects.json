@@ -1,0 +1,323 @@
+{
+    "id": "effects",
+    "label": "Effects",
+    "icon": "effects",
+    "free": true,
+    "settings": [
+        {
+            "key": "effects_section",
+            "type": "setting_subtabs",
+            "free": true,
+            "subTabs": {
+                "loading_effects": {
+                    "id": "loading_effects",
+                    "label": "Loading Effects",
+                    "icon": "loading",
+                    "settings": [
+                        {
+                            "key": "loading_icon",
+                            "type": "button_group",
+                            "label": "Loading Icon",
+                            "options": [
+                                { "value": "fotogrids", "icon": "loading_icon_fotogrids" },
+                                { "value": "bars-rotate-fade", "icon": "loading_icon_bars-rotate-fade" },
+                                { "value": "spinner", "icon": "loading_icon_spinner" },
+                                { "value": "8-dots", "icon": "loading_icon_8-dots" },
+                                { "value": "spinning-circles", "icon": "loading_icon_spinning-circles" },
+                                { "value": "12-dots", "icon": "loading_icon_12-dots" },
+                                { "value": "6-dots-scale", "icon": "loading_icon_6-dots-scale" },
+                                { "value": "6-dots-rotate", "icon": "loading_icon_6-dots-rotate" },
+                                { "value": "ball-triangle", "icon": "loading_icon_ball-triangle" },
+                                { "value": "gooey-balls", "icon": "loading_icon_gooey-balls" },
+                                { "value": "bouncing-ball", "icon": "loading_icon_bouncing-ball" },
+                                { "value": "pulse", "icon": "loading_icon_pulse" },
+                                { "value": "puff", "icon": "loading_icon_puff" },
+                                { "value": "dot-revolve", "icon": "loading_icon_dot-revolve" },
+                                { "value": "90-ring", "icon": "loading_icon_90-ring" },
+                                { "value": "180-ring-with-bg", "icon": "loading_icon_180-ring-with-bg" },
+                                { "value": "180-ring", "icon": "loading_icon_180-ring" },
+                                { "value": "ring-resize", "icon": "loading_icon_ring-resize" },
+                                { "value": "wifi", "icon": "loading_icon_wifi" },
+                                { "value": "jump", "icon": "loading_icon_jump" },
+                                { "value": "3-dots-rotate", "icon": "loading_icon_3-dots-rotate" },
+                                { "value": "3-dots-bounce", "icon": "loading_icon_3-dots-bounce" },
+                                { "value": "3-dots-fade", "icon": "loading_icon_3-dots-fade" },
+                                { "value": "3-dots-move", "icon": "loading_icon_3-dots-move" },
+                                { "value": "3-dots-scale", "icon": "loading_icon_3-dots-scale" },
+                                { "value": "4-dots-swing", "icon": "loading_icon_4-dots-swing" },
+                                { "value": "grid", "icon": "loading_icon_grid" },
+                                { "value": "blocks-shuffle-5", "icon": "loading_icon_blocks-shuffle-5" },
+                                { "value": "blocks-shuffle-4", "icon": "loading_icon_blocks-shuffle-4" },
+                                { "value": "blocks-shuffle-3", "icon": "loading_icon_blocks-shuffle-3" },
+                                { "value": "blocks-shuffle-2", "icon": "loading_icon_blocks-shuffle-2" },
+                                { "value": "blocks-scale", "icon": "loading_icon_blocks-scale" },
+                                { "value": "blocks-wave", "icon": "loading_icon_blocks-wave" },
+                                { "value": "square", "icon": "loading_icon_square" },
+                                { "value": "square-loader", "icon": "loading_icon_square-loader" },
+                                { "value": "bars-fade", "icon": "loading_icon_bars-fade" },
+                                { "value": "bars-scale-fade", "icon": "loading_icon_bars-scale-fade" },
+                                { "value": "bars-scale", "icon": "loading_icon_bars-scale" },
+                                { "value": "bars", "icon": "loading_icon_bars" }
+                            ],
+                            "default": "12-dots",
+                            "buttonClass": "fotogrids-button-group__button--big-icons",
+                            "free": true
+                        },
+                        {
+                            "key": "loaded_effect",
+                            "type": "button_group",
+                            "label": "Loaded Effect",
+                            "free": true
+                        }
+                    ]
+                },
+                "hover_effects": {
+                    "id": "hover_effects",
+                    "label": "Hover Effects",
+                    "icon": "hover",
+                    "settings": [
+                        {
+                            "key": "hover_cursor_icon",
+                            "type": "button_group",
+                            "label": "Hover Cursor Icon",
+                            "options": [
+                                { "label": "Default", "value": "default", "icon": "cursor_default" },
+                                { "label": "Pointer", "value": "pointer", "icon": "cursor_pointer" },
+                                { "label": "Alias", "value": "alias", "icon": "cursor_alias" },
+                                { "label": "Zoom In", "value": "zoom-in", "icon": "cursor_zoom" },
+                                { "label": "Crosshair", "value": "crosshair", "icon": "cursor_crosshair" }
+                            ],
+                            "default": "pointer",
+                            "free": true
+                        },
+                        {
+                            "key": "hover_effect",
+                            "type": "hover_effects_grid",
+                            "label": "Hover Effect",
+                            "default": "none",
+                            "options": [
+                                {
+                                    "value": "slide-up",
+                                    "label": "Slide Up",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "fade-both",
+                                    "label": "Fade Both",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "slide-left",
+                                    "label": "Slide Left",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "scale",
+                                    "label": "Scale",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "rotate",
+                                    "label": "Rotate",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "slide-right",
+                                    "label": "Slide Right",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "bounce",
+                                    "label": "Bounce",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "slide-down",
+                                    "label": "Slide Down",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "opacity",
+                                    "label": "Opacity",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "blur",
+                                    "label": "Blur",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "slide-diagonal",
+                                    "label": "Slide Diagonal",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "pulse",
+                                    "label": "Pulse",
+                                    "free": true,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "zoom",
+                                    "label": "Zoom",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true, "button": true }
+                                },
+                                {
+                                    "value": "flip",
+                                    "label": "Flip",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "3d",
+                                    "label": "3D Transform",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "gradient",
+                                    "label": "Gradient",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "shine",
+                                    "label": "Shine",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "morph",
+                                    "label": "Morph",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "glitch",
+                                    "label": "Glitch",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "ripple",
+                                    "label": "Ripple",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "shadow",
+                                    "label": "Shadow Expand",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "border",
+                                    "label": "Border Animate",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "glow",
+                                    "label": "Glow",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "split",
+                                    "label": "Split Reveal",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "reveal",
+                                    "label": "Reveal",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "slide-rotate",
+                                    "label": "Slide Rotate",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "elastic",
+                                    "label": "Elastic",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "wobble",
+                                    "label": "Wobble",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "shake",
+                                    "label": "Shake",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "spin",
+                                    "label": "Spin",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "flash",
+                                    "label": "Flash",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "wave",
+                                    "label": "Wave",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "spiral",
+                                    "label": "Spiral",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true }
+                                },
+                                {
+                                    "value": "matrix",
+                                    "label": "Matrix",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                },
+                                {
+                                    "value": "neon",
+                                    "label": "Neon Glow",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "social": true }
+                                },
+                                {
+                                    "value": "hologram",
+                                    "label": "Hologram",
+                                    "free": false,
+                                    "capabilities": { "title": true, "description": true, "button": true }
+                                }
+                            ],
+                            "free": true
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

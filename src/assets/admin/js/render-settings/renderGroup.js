@@ -2,7 +2,7 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 window.FotoGridsRenderSettings.renderGroup = (setting, currentValue, isDisabled, context) => {
     const { createElement: h } = wp.element;
-    const { renderSetting } = context;
+    const { renderSetting, isProActive, __ } = context;
     
     if (!setting.settings || !Array.isArray(setting.settings)) {
         return h('div', {
@@ -15,7 +15,13 @@ window.FotoGridsRenderSettings.renderGroup = (setting, currentValue, isDisabled,
     }, [
         h('legend', {
             className: 'fotogrids-setting-group__label'
-        }, setting.label),
+        }, [
+            setting.label,
+            !setting.free && !isProActive && h('span', {
+                className: 'fotogrids-pro-badge',
+                key: 'pro-badge'
+            }, __('Pro', 'fotogrids'))
+        ].filter(Boolean)),
         
         h('div', {
             className: 'fotogrids-setting-group__content'

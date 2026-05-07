@@ -1,0 +1,31 @@
+{
+  "id": "studio-proofing-suite",
+  "name": "Studio Proofing Suite",
+  "description": "Album with proofing, expiry, password, watermark, and EXIF editing all pre-configured. The photographer's full delivery setup in one template.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 28,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 6,
+      "tablet": 5,
+      "mobile": 3
+    },
+    "password_protected": true,
+    "watermark_enabled": true,
+    "right_click_protection": true,
+    "album_expiry_days": 60,
+    "client_proofing": true,
+    "exif_display": true,
+    "lightbox": true
+  }
+}

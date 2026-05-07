@@ -1,6 +1,6 @@
 /**
  * Helper Functions Unit Tests
- * 
+ *
  * Tests for FotoGrids helper functions
  */
 
@@ -67,7 +67,7 @@ describe('FotoGrids Helper Functions', () => {
 
         test('should return null when post not found', () => {
             global.get_post.mockReturnValue(null);
-            
+
             expect(global.get_post).toBeDefined();
         });
 
@@ -79,7 +79,7 @@ describe('FotoGrids Helper Functions', () => {
             };
 
             global.get_post.mockReturnValue(mockPost);
-            
+
             expect(global.get_post).toBeDefined();
         });
     });
@@ -88,14 +88,14 @@ describe('FotoGrids Helper Functions', () => {
         test('should prepare database queries correctly', () => {
             const query = 'SELECT * FROM table WHERE id = %d AND name = %s';
             const result = mockWpdb.prepare(query, 123, 'test');
-            
+
             expect(result).toBe("SELECT * FROM table WHERE id = 123 AND name = 'test'");
         });
 
         test('should handle multiple parameters', () => {
             const query = 'INSERT INTO table (id, name, count) VALUES (%d, %s, %d)';
             const result = mockWpdb.prepare(query, 1, 'test', 5);
-            
+
             expect(result).toBe("INSERT INTO table (id, name, count) VALUES (1, 'test', 5)");
         });
     });
@@ -143,15 +143,15 @@ describe('FotoGrids Helper Functions', () => {
 
             // Mock available layouts
             const availableLayouts = ['grid', 'masonry', 'justified'];
-            
+
             // Test layout validation
             expect(availableLayouts).toContain('grid');
             expect(availableLayouts).not.toContain('invalid');
-            
+
             // Test column validation
             const columns = Math.max(1, Math.min(12, 4));
             expect(columns).toBe(4);
-            
+
             // Test boolean conversion
             expect(Boolean(mockSettings.lazy_load)).toBe(true);
             expect(Boolean(mockSettings.show_captions)).toBe(false);
@@ -168,14 +168,14 @@ describe('FotoGrids Helper Functions', () => {
             };
 
             const expectedShortcode = '[fotogrids_gallery id="123" template="grid" cols="4" captions="true"]';
-            
+
             // Build shortcode
             let shortcode = `[fotogrids_gallery id="${galleryId}"`;
             Object.entries(attributes).forEach(([key, value]) => {
                 shortcode += ` ${key}="${value}"`;
             });
             shortcode += ']';
-            
+
             expect(shortcode).toBe(expectedShortcode);
         });
 
@@ -186,13 +186,13 @@ describe('FotoGrids Helper Functions', () => {
             };
 
             const expectedShortcode = '[fotogrids_album id="456" template="masonry"]';
-            
+
             let shortcode = `[fotogrids_album id="${albumId}"`;
             Object.entries(attributes).forEach(([key, value]) => {
                 shortcode += ` ${key}="${value}"`;
             });
             shortcode += ']';
-            
+
             expect(shortcode).toBe(expectedShortcode);
         });
     });
@@ -242,7 +242,7 @@ describe('FotoGrids Helper Functions', () => {
 
         test('should handle missing attachments', () => {
             global.get_post.mockReturnValue(null);
-            
+
             const result = global.get_post(999);
             expect(result).toBeNull();
         });
@@ -258,13 +258,13 @@ describe('FotoGrids Helper Functions', () => {
         });
 
         test('should handle WordPress hooks', () => {
-            const hookName = 'fotogrids_item_added_to_gallery';
+            const hookName = 'fotogrids/actions/item/added';
             const attachmentId = 123;
             const galleryId = 456;
             const meta = { caption: 'Test' };
 
             global.do_action(hookName, attachmentId, galleryId, meta);
-            
+
             expect(global.do_action).toHaveBeenCalledWith(
                 hookName,
                 attachmentId,
@@ -274,11 +274,11 @@ describe('FotoGrids Helper Functions', () => {
         });
 
         test('should apply WordPress filters', () => {
-            const filterName = 'fotogrids_available_layouts';
+            const filterName = 'fotogrids/features/layouts/available';
             const layouts = { grid: {}, masonry: {} };
-            
+
             const result = global.apply_filters(filterName, layouts);
-            
+
             expect(global.apply_filters).toHaveBeenCalledWith(filterName, layouts);
             expect(result).toBe(layouts);
         });

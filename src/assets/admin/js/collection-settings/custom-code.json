@@ -1,0 +1,42 @@
+{
+    "id": "custom-code",
+    "label": "Custom Code",
+    "icon": "code",
+    "free": true,
+    "settings": [
+        {
+            "key": "custom_css_group",
+            "type": "setting_group",
+            "label": "Custom CSS",
+            "description": "Add custom CSS styles that will be applied to your galleries",
+            "free": true,
+            "settings": [
+                {
+                    "key": "custom_css",
+                    "type": "codearea",
+                    "label": "CSS Code",
+                    "language": "css",
+                    "default": "",
+                    "free": true
+                }
+            ]
+        },
+        {
+            "key": "custom_js_group",
+            "type": "setting_group",
+            "label": "Custom JavaScript",
+            "description": "Add custom JavaScript code that will be executed with your galleries",
+            "free": true,
+            "settings": [
+                {
+                    "key": "custom_js",
+                    "type": "codearea", 
+                    "label": "JavaScript Code",
+                    "language": "js",
+                    "default": "",
+                    "free": true
+                }
+            ]
+        }
+    ]
+}

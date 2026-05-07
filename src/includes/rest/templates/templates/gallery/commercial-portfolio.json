@@ -1,0 +1,28 @@
+{
+  "id": "commercial-portfolio",
+  "name": "Commercial Portfolio",
+  "description": "Full-bleed hero slider plus a justified gallery below. Watermark and right-click protection on. Shows the work, guards the originals.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 25,
+  "settings": {
+    "layout": "justified",
+    "target_row_height": {
+      "desktop": 300,
+      "tablet": 240,
+      "mobile": 160
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "hover_effect": "lift_shadow",
+    "watermark_enabled": true,
+    "right_click_protection": true,
+    "lightbox": true
+  }
+}

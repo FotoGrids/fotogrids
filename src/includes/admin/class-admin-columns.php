@@ -22,10 +22,49 @@ class Admin_Columns {
      */
     public static function init() {
         add_filter( 'manage_fotogrids_gallery_posts_columns', array( __CLASS__, 'gallery_columns' ) );
+        add_filter( 'manage_fotogrids_gallery_posts_columns', array( __CLASS__, 'gallery_columns_whitelist' ), 9999 );
         add_action( 'manage_fotogrids_gallery_posts_custom_column', array( __CLASS__, 'gallery_column_content' ), 10, 2 );
-        
+
         add_filter( 'manage_fotogrids_album_posts_columns', array( __CLASS__, 'album_columns' ) );
+        add_filter( 'manage_fotogrids_album_posts_columns', array( __CLASS__, 'album_columns_whitelist' ), 9999 );
         add_action( 'manage_fotogrids_album_posts_custom_column', array( __CLASS__, 'album_column_content' ), 10, 2 );
+
+        add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_shortcode_column_script' ) );
+    }
+
+    /**
+     * Enqueue shortcode column script and icons on gallery/album list table.
+     */
+    public static function enqueue_shortcode_column_script( $hook ) {
+        $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+        if ( ! $screen || ! in_array( $screen->id, array( 'edit-fotogrids_gallery', 'edit-fotogrids_album' ), true ) ) {
+            return;
+        }
+        wp_enqueue_script(
+            'fotogrids-loading-icons',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/loading-icons.js',
+            array(),
+            FOTOGRIDS_VERSION,
+            true
+        );
+        wp_enqueue_script(
+            'fotogrids-icons',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/icons.js',
+            array( 'fotogrids-loading-icons' ),
+            FOTOGRIDS_VERSION,
+            true
+        );
+        wp_enqueue_script(
+            'fotogrids-shortcode-column-init',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/shortcode-column-init.js',
+            array( 'fotogrids-icons' ),
+            FOTOGRIDS_VERSION,
+            true
+        );
+        wp_localize_script( 'fotogrids-shortcode-column-init', 'fotogridsShortcodeColumn', array(
+            'copiedMessage'     => __( 'Shortcode copied to clipboard', 'fotogrids' ),
+            'copyErrorMessage'  => __( 'Failed to copy Shortcode', 'fotogrids' ),
+        ) );
     }
     
     /**
@@ -48,13 +87,46 @@ class Admin_Columns {
         $columns['fotogrids_album'] = __( 'Album', 'fotogrids' );
         $columns['fotogrids_layout'] = __( 'Layout', 'fotogrids' );
         $columns['fotogrids_items'] = __( 'Items', 'fotogrids' );
-        $columns['fotogrids_stats'] = __( 'Views/Shares', 'fotogrids' );
+        $columns['fotogrids_stats'] = __( 'Interactions', 'fotogrids' );
         
         $columns['date'] = $date;
         
         return $columns;
     }
-    
+
+    /**
+     * Whitelist gallery columns to prevent other plugins from adding theirs
+     *
+     * Runs at priority 9999 so it executes after all other column filters.
+     *
+     * @since 1.0.0
+     * @param array $columns Columns passed by previous filters
+     * @return array Only allowed columns
+     */
+    /**
+     * Render shortcode column: input-looking div (selectable) + copy button with icon.
+     * Icon is injected by JS from window.FotoGridsIcons; copy handled by shortcode-column-init.js.
+     *
+     * @param int    $post_id       Post ID
+     * @param string $shortcode_tag Shortcode tag (e.g. fotogrids_gallery, fotogrids_album)
+     */
+    private static function render_shortcode_column( $post_id, $shortcode_tag ) {
+        $shortcode = '[' . $shortcode_tag . ' id="' . (int) $post_id . '"]';
+        ?>
+        <div class="fotogrids-shortcode-cell">
+            <div class="fotogrids-shortcode-text" tabindex="0"><?php echo esc_html( $shortcode ); ?></div>
+            <button type="button" class="fotogrids-button fotogrids-button--small fotogrids-button--secondary fotogrids-button--outline fotogrids-button--icon-only fotogrids-shortcode-copy-btn" data-shortcode="<?php echo esc_attr( $shortcode ); ?>" title="<?php esc_attr_e( 'Copy shortcode', 'fotogrids' ); ?>">
+                <span class="fotogrids-icon" data-icon="clipboard"></span>
+            </button>
+        </div>
+        <?php
+    }
+
+    public static function gallery_columns_whitelist( $columns ) {
+        $allowed = array( 'cb', 'title', 'fotogrids_shortcode', 'fotogrids_album', 'fotogrids_layout', 'fotogrids_items', 'fotogrids_stats', 'date' );
+        return array_intersect_key( $columns, array_flip( $allowed ) );
+    }
+
     /**
      * Display content for custom gallery columns
      * 
@@ -70,12 +142,7 @@ class Admin_Columns {
     public static function gallery_column_content( $column, $post_id ) {
         switch ( $column ) {
             case 'fotogrids_shortcode':
-                if ( get_post_status( $post_id ) === 'publish' ) {
-                    $shortcode = '[fotogrids_gallery id="' . $post_id . '"]';
-                    echo '<input type="text" value="' . esc_attr( $shortcode ) . '" readonly onclick="this.select();" style="width: 100%; font-size: 11px;" />';
-                } else {
-                    echo '<em>' . __( 'Publish to get shortcode', 'fotogrids' ) . '</em>';
-                }
+                self::render_shortcode_column( $post_id, 'fotogrids_gallery' );
                 break;
                 
             case 'fotogrids_album':
@@ -97,12 +164,14 @@ class Admin_Columns {
                 
             case 'fotogrids_layout':
                 $layout = get_post_meta( $post_id, 'fotogrids_layout', true ) ?: 'grid';
-                echo '<span class="fotogrids-layout-badge layout-' . esc_attr( $layout ) . '">' . esc_html( ucfirst( $layout ) ) . '</span>';
+                echo '<span class="fotogrids-layout-badge layout-' . esc_attr( $layout ) . '">' . esc_html( str_replace( '-', ' ', ucfirst( $layout ) ) ) . '</span>';
                 break;
                 
             case 'fotogrids_items':
                 $item_count = fotogrids_get_gallery_item_count( $post_id );
-                echo '<strong>' . $item_count . '</strong>';
+                echo $item_count === 0
+                    ? '<span class="fotogrids-text--error">0</span>'
+                    : esc_html( (string) $item_count );
                 break;
                 
             case 'fotogrids_stats':
@@ -137,13 +206,27 @@ class Admin_Columns {
         
         $columns['fotogrids_shortcode'] = __( 'Shortcode', 'fotogrids' );
         $columns['fotogrids_galleries'] = __( 'Galleries', 'fotogrids' );
-        $columns['fotogrids_stats'] = __( 'Views/Shares', 'fotogrids' );
+        $columns['fotogrids_stats'] = __( 'Interactions', 'fotogrids' );
         
         $columns['date'] = $date;
         
         return $columns;
     }
-    
+
+    /**
+     * Whitelist album columns to prevent other plugins from adding theirs
+     *
+     * Runs at priority 9999 so it executes after all other column filters.
+     *
+     * @since 1.0.0
+     * @param array $columns Columns passed by previous filters
+     * @return array Only allowed columns
+     */
+    public static function album_columns_whitelist( $columns ) {
+        $allowed = array( 'cb', 'title', 'fotogrids_shortcode', 'fotogrids_galleries', 'fotogrids_stats', 'date' );
+        return array_intersect_key( $columns, array_flip( $allowed ) );
+    }
+
     /**
      * Display content for custom album columns
      * 
@@ -159,12 +242,7 @@ class Admin_Columns {
     public static function album_column_content( $column, $post_id ) {
         switch ( $column ) {
             case 'fotogrids_shortcode':
-                if ( get_post_status( $post_id ) === 'publish' ) {
-                    $shortcode = '[fotogrids_album id="' . $post_id . '"]';
-                    echo '<input type="text" value="' . esc_attr( $shortcode ) . '" readonly onclick="this.select();" style="width: 100%; font-size: 11px;" />';
-                } else {
-                    echo '<em>' . __( 'Publish to get shortcode', 'fotogrids' ) . '</em>';
-                }
+                self::render_shortcode_column( $post_id, 'fotogrids_album' );
                 break;
                 
             case 'fotogrids_galleries':
@@ -173,20 +251,6 @@ class Admin_Columns {
                 
                 if ( $count > 0 ) {
                     echo '<strong>' . $count . '</strong>';
-                    
-                    $gallery_names = array_map( function( $gallery ) {
-                        return $gallery->post_title;
-                    }, $galleries );
-                    
-                    if ( count( $gallery_names ) <= 3 ) {
-                        echo '<div style="font-size: 11px; color: #666; margin-top: 2px;">' . 
-                             implode( ', ', $gallery_names ) . '</div>';
-                    } else {
-                        echo '<div style="font-size: 11px; color: #666; margin-top: 2px;" title="' . 
-                             esc_attr( implode( ', ', $gallery_names ) ) . '">' . 
-                             implode( ', ', array_slice( $gallery_names, 0, 2 ) ) . 
-                             ' and ' . ( count( $gallery_names ) - 2 ) . ' more...</div>';
-                    }
                 } else {
                     echo '<span style="color: #999;">0</span>';
                 }

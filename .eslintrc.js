@@ -29,19 +29,19 @@ module.exports = {
         // WordPress specific rules
         'no-console': 'warn',
         'no-debugger': 'error',
-        
+
         // TypeScript specific rules
         '@typescript-eslint/no-unused-vars': 'error',
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'warn',
-        
+
         // React specific rules
         'react/react-in-jsx-scope': 'off', // Not needed with React 17+
         'react/prop-types': 'off', // Using TypeScript for prop validation
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
-        
+
         // General rules
         'indent': ['error', 4],
         'quotes': ['error', 'single'],
@@ -49,6 +49,7 @@ module.exports = {
         'comma-dangle': ['error', 'always-multiline'],
         'object-curly-spacing': ['error', 'always'],
         'array-bracket-spacing': ['error', 'always'],
+        'no-trailing-spaces': 'error',
     },
     settings: {
         react: {

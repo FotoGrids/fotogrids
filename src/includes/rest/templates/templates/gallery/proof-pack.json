@@ -1,0 +1,30 @@
+{
+  "id": "proof-pack",
+  "name": "The Proof Pack",
+  "description": "Album expiry, password, watermark, and client proofing all pre-configured. Drop in the photos and send the link. Nothing else to configure.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 23,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "password_protected": true,
+    "watermark_enabled": true,
+    "right_click_protection": true,
+    "album_expiry_days": 60,
+    "client_proofing": true,
+    "lightbox": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "video-stills-tour",
+  "name": "Video & Stills Tour",
+  "description": "One album per property or project, with a video tour gallery and a stills gallery inside each. One lightbox handles both.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 22,
+  "settings": {
+    "layout": "video",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "captions": true,
+    "watermark_enabled": true,
+    "lightbox": true
+  }
+}

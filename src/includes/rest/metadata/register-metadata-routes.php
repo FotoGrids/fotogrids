@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Register_Metadata_Routes {
-    
+
     /**
      * Register all metadata-related REST API routes
      *
@@ -52,7 +52,7 @@ class Register_Metadata_Routes {
                 'permission_callback' => array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_edit_posts' ),
             ),
         ) );
-        
+
         // People endpoints
         register_rest_route( 'fotogrids/v1', '/metadata/people', array(
             array(
@@ -82,7 +82,7 @@ class Register_Metadata_Routes {
                 'permission_callback' => array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_edit_posts' ),
             ),
         ) );
-        
+
         // Locations endpoints
         register_rest_route( 'fotogrids/v1', '/metadata/locations', array(
             array(
@@ -108,11 +108,19 @@ class Register_Metadata_Routes {
                         'required' => true,
                         'sanitize_callback' => 'sanitize_text_field',
                     ),
+                    'latitude' => array(
+                        'default' => null,
+                        'sanitize_callback' => 'floatval',
+                    ),
+                    'longitude' => array(
+                        'default' => null,
+                        'sanitize_callback' => 'floatval',
+                    ),
                 ),
                 'permission_callback' => array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_edit_posts' ),
             ),
         ) );
-        
+
         // Item metadata endpoint
         register_rest_route( 'fotogrids/v1', '/metadata/item/(?P<id>\d+)', array(
             array(

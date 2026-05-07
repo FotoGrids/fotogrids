@@ -1,0 +1,29 @@
+{
+  "id": "residential-showcase",
+  "name": "Residential Showcase",
+  "description": "Large justified grid with address captions, watermarks, and a 'Book a Viewing' CTA overlay per image.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 41,
+  "settings": {
+    "layout": "justified",
+    "target_row_height": {
+      "desktop": 300,
+      "tablet": 240,
+      "mobile": 180
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "hover_effect": "soft_fade",
+    "captions": true,
+    "watermark_enabled": true,
+    "cta_overlays": true,
+    "lightbox": true
+  }
+}

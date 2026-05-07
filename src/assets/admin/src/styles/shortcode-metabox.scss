@@ -23,7 +23,7 @@
     display: flex;
     gap: calc(ui-size(padding, base) / 2);
     align-items: stretch;
-    
+
     .fotogrids-shortcode-input {
         flex: 1;
         font-family: 'Courier New', Courier, monospace;
@@ -31,56 +31,26 @@
         line-height: 38px;
         padding: 0 8px;
         margin: 0;
-        border: 1px solid #ddd;
+        border: 1px solid var(--fg-border-primary);
         border-radius: 3px;
         background-color: #f9f9f9;
         cursor: pointer;
-        
+
         &:focus {
             outline: none;
-            border-color: #0073aa;
-            box-shadow: 0 0 0 1px #0073aa;
+            border-color: var(--fg-blue);
+            box-shadow: 0 0 0 1px var(--fg-blue);
         }
-        
+
         &:hover {
             background-color: #fff;
         }
     }
-    
+
     .fotogrids-shortcode-copy {
         flex-shrink: 0;
-        min-width: 60px;
-
-        &.copied {
-            background-color: #46b450;
-            color: #fff;
-            border-color: #46b450;
-            
-            &:after {
-                content: ' ✓';
-            }
-        }
+        min-width: 40px;
     }
-}
-
-// Success message styling for copy feedback
-.fotogrids-shortcode-copy-success {
-    color: #46b450;
-    font-size: 11px;
-    margin-top: 5px;
-    display: none;
-    
-    &.show {
-        display: block;
-        animation: fadeInOut 2s ease-in-out;
-    }
-}
-
-@keyframes fadeInOut {
-    0% { opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
 }
 
 // Responsive adjustments
@@ -88,11 +58,11 @@
     .fotogrids-shortcode-container {
         flex-direction: column;
         gap: 8px;
-        
+
         .fotogrids-shortcode-input {
             width: 100%;
         }
-        
+
         .fotogrids-shortcode-copy {
             width: 100%;
             text-align: center;

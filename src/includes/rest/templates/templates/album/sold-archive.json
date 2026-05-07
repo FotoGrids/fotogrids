@@ -1,0 +1,27 @@
+{
+  "id": "sold-archive",
+  "name": "Sold Archive",
+  "description": "One album per sold property, auto-expiring after a set period. Keeps the site clean without manual cleanup.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 20,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "album_expiry_days": 365,
+    "captions": true,
+    "lightbox": true
+  }
+}

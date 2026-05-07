@@ -13,12 +13,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
     updateItemUrl,
     validateUrl,
     renderIcon,
+    updateSetting,
     __
 }) => {
     const { createElement: h } = wp.element;
-    
+
     const globalTarget = settings.external_link_target || '_self';
-    
+
 
     if (!canEditPosts) {
         return h('div', {
@@ -31,7 +32,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
             ])
         ]);
     }
-    
+
 
     if (loadingItems) {
         return h('div', {
@@ -46,7 +47,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
             ]),
             h('div', {
                 className: 'fotogrids-item-url-grid'
-            }, galleryItems.map(itemId => 
+            }, galleryItems.map(itemId =>
                 h('div', {
                     key: itemId,
                     className: 'fotogrids-item-url-item fotogrids-item-url-item--skeleton'
@@ -68,7 +69,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
             ))
         ]);
     }
-    
+
 
     if (itemError) {
         return h('div', {
@@ -86,7 +87,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
             ])
         ]);
     }
-    
+
     return h('div', {
         className: 'fotogrids-external-url-manager'
     }, [
@@ -94,23 +95,63 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
         h('div', {
             className: 'fotogrids-bulk-actions'
         }, [
-            h('h4', {}, __('Bulk Actions', 'fotogrids')),
             h('div', {
-                className: 'fotogrids-bulk-actions__controls'
+                className: 'fotogrids-bulk-actions__defaults'
             }, [
-                h('button', {
-                    type: 'button',
-                    className: 'button',
-                    onClick: () => openBulkModal('apply_to_all')
-                }, __('Apply URL to All', 'fotogrids')),
-                h('button', {
-                    type: 'button',
-                    className: 'button',
-                    onClick: () => openBulkModal('clear_all')
-                }, __('Clear All URLs', 'fotogrids'))
+                h('div', {
+                    className: 'fotogrids-button-group'
+                }, [
+                    h('label', {
+                        className: 'fotogrids-setting__label'
+                    }, __('Default Link Target', 'fotogrids')),
+                    h('div', {
+                        className: 'fotogrids-button-group__buttons'
+                    }, [
+                        { label: __('Same Tab', 'fotogrids'), value: '_self', icon: 'check_square' },
+                        { label: __('New Tab', 'fotogrids'), value: '_blank', icon: 'plus_square' }
+                    ].map(option =>
+                        h('button', {
+                            key: option.value,
+                            type: 'button',
+                            className: `fotogrids-button-group__button ${globalTarget === option.value ? 'fg-is-active' : ''}`,
+                            onClick: () => !isDisabled && updateSetting('external_link_target', option.value),
+                            disabled: isDisabled,
+                            title: option.label || ''
+                        }, [
+                            option.icon && h('span', {
+                                className: 'fotogrids-button-icon'
+                            }, renderIcon(option.icon)),
+                            option.label && h('span', {
+                                className: 'fotogrids-button-label'
+                            }, option.label)
+                        ])
+                    ))
+                ])
+            ]),
+            h('div', {
+                className: 'fotogrids-bulk-actions__bulk-actions'
+            }, [
+                h('label', {
+                    className: 'fotogrids-setting__label'
+                }, __('Bulk Actions', 'fotogrids')),
+                h('div', {
+                    className: 'fotogrids-button-group__buttons'
+                }, [
+                    h('button', {
+                        type: 'button',
+                        className: 'fotogrids-button fotogrids-button--secondary',
+                        onClick: () => openBulkModal('apply_to_all')
+                    }, __('Apply URL to All', 'fotogrids')),
+                    h('button', {
+                        type: 'button',
+                        className: 'fotogrids-button fotogrids-button--secondary',
+                        onClick: () => openBulkModal('clear_all')
+
+                    }, __('Clear All URLs', 'fotogrids'))
+                ])
             ])
         ]),
-        
+
 
         h('div', {
             className: 'fotogrids-item-url-grid'
@@ -119,7 +160,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
             const currentUrl = data.url || '';
             const currentTarget = data.target || 'global';
             const isSaving = savingItems[itemId];
-            
+
             return h('div', {
                 key: itemId,
                 className: 'fotogrids-item-url-item'
@@ -148,7 +189,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                         strokeLinejoin: 'round'
                     })))
                 ]),
-                
+
 
                 h('div', {
                     className: 'fotogrids-item-url-item__fields'
@@ -160,56 +201,56 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                         h('label', {
                             className: 'fotogrids-item-url-item__label'
                         }, __('Link', 'fotogrids')),
-                        h('input', {
-                            type: 'url',
-                            value: currentUrl,
-                            placeholder: __('External URL', 'fotogrids'),
-                            className: 'fotogrids-url-input',
-                            onChange: (e) => {
-
-                                e.target.value = e.target.value;
-                            },
-                            onBlur: (e) => {
-                                const newUrl = e.target.value;
-                                const validation = validateUrl(newUrl);
-                                
-
-                                if (validation.valid && newUrl) {
-                                    e.target.className = 'fotogrids-url-input fotogrids-url-input--valid';
-                                } else if (!validation.valid && newUrl) {
-                                    e.target.className = 'fotogrids-url-input fotogrids-url-input--invalid';
-                                } else {
-                                    e.target.className = 'fotogrids-url-input';
-                                }
-                                
-
-                                const validationEl = e.target.nextElementSibling;
-                                if (validationEl && validationEl.classList.contains('fotogrids-url-validation')) {
-                                    if (validation.message && newUrl) {
-                                        validationEl.textContent = validation.message;
-                                        validationEl.className = `fotogrids-url-validation ${validation.valid ? 'fotogrids-url-validation--valid' : 'fotogrids-url-validation--invalid'}`;
-                                        validationEl.style.display = 'block';
-                                    } else {
-                                        validationEl.style.display = 'none';
-                                    }
-                                }
-                                
-
-                                if (validation.valid || !newUrl.trim()) {
-                                    updateItemUrl(itemId, newUrl);
-                                }
-                            },
-                            disabled: isDisabled || isSaving
-                        }),
                         h('div', {
-                            className: 'fotogrids-url-validation',
-                            style: { display: 'none' }
-                        }),
-                        isSaving && h('div', {
-                            className: 'fotogrids-saving-indicator'
-                        }, __('Saving...', 'fotogrids'))
+                            className: 'fotogrids-url-input'
+                        }, [
+                            h('input', {
+                                type: 'url',
+                                value: currentUrl,
+                                placeholder: __('External URL', 'fotogrids'),
+                                className: 'fotogrids-input',
+                                onChange: (e) => {
+                                    e.target.value = e.target.value;
+                                },
+                                onBlur: (e) => {
+                                    const newUrl = e.target.value;
+                                    const validation = validateUrl(newUrl);
+
+                                    if (validation.valid && newUrl) {
+                                        e.target.className = 'fotogrids-input fotogrids-input--valid';
+                                    } else if (!validation.valid && newUrl) {
+                                        e.target.className = 'fotogrids-input fotogrids-input--invalid';
+                                    } else {
+                                        e.target.className = 'fotogrids-input';
+                                    }
+
+                                    const validationEl = e.target.nextElementSibling;
+                                    if (validationEl && validationEl.classList.contains('fotogrids-url-validation')) {
+                                        if (validation.message && newUrl) {
+                                            validationEl.textContent = validation.message;
+                                            validationEl.className = `fotogrids-url-validation ${validation.valid ? 'fotogrids-url-validation--valid' : 'fotogrids-url-validation--invalid'}`;
+                                            validationEl.style.display = 'block';
+                                        } else {
+                                            validationEl.style.display = 'none';
+                                        }
+                                    }
+
+                                    if (validation.valid || !newUrl.trim()) {
+                                        updateItemUrl(itemId, newUrl);
+                                    }
+                                },
+                                disabled: isDisabled || isSaving
+                            }),
+                            h('div', {
+                                className: 'fotogrids-url-validation',
+                                style: { display: 'none' }
+                            }),
+                            isSaving && h('div', {
+                                className: 'fotogrids-saving-indicator'
+                            }, __('Saving...', 'fotogrids'))
+                        ])
                     ]),
-                    
+
 
                     h('div', {
                         className: 'fotogrids-item-url-item__target-field'
@@ -222,7 +263,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                         }, [
                             h('button', {
                                 type: 'button',
-                                className: `fotogrids-target-button ${currentTarget === 'global' ? 'is-active' : ''}`,
+                                className: `fotogrids-target-button ${currentTarget === 'global' ? 'fg-is-active' : ''}`,
                                 onClick: () => updateItemUrl(itemId, currentUrl, 'global'),
                                 disabled: isDisabled || isSaving
                             }, [
@@ -235,7 +276,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                             ]),
                             h('button', {
                                 type: 'button',
-                                className: `fotogrids-target-button ${currentTarget === '_self' ? 'is-active' : ''}`,
+                                className: `fotogrids-target-button ${currentTarget === '_self' ? 'fg-is-active' : ''}`,
                                 onClick: () => updateItemUrl(itemId, currentUrl, '_self'),
                                 disabled: isDisabled || isSaving
                             }, [
@@ -248,7 +289,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                             ]),
                             h('button', {
                                 type: 'button',
-                                className: `fotogrids-target-button ${currentTarget === '_blank' ? 'is-active' : ''}`,
+                                className: `fotogrids-target-button ${currentTarget === '_blank' ? 'fg-is-active' : ''}`,
                                 onClick: () => updateItemUrl(itemId, currentUrl, '_blank'),
                                 disabled: isDisabled || isSaving
                             }, [

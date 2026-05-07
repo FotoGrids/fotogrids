@@ -1,11 +1,11 @@
 {
   "name": "fotogrids",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "FotoGrids WordPress gallery plugin with freemium Pro features",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack --watch",
-    "build": "cross-env NODE_ENV=production webpack",
+    "dev": "npm run icons:build && concurrently -n yaml,webpack \"node scripts/watch-loading-icons.js\" \"cross-env NODE_ENV=development webpack --watch\"",
+    "build": "npm run icons:build && cross-env NODE_ENV=production webpack",
     "build:dev": "cross-env NODE_ENV=development webpack",
     "clean": "rimraf dist",
     "lint": "eslint src/assets --ext .js,.ts,.tsx",
@@ -18,7 +18,9 @@
     "test:ci": "jest --ci --coverage --watchAll=false",
     "zip:dev": "npm run build:dev && cd dist/dev && zip -r ../../fotogrids-dev.zip . -x '*.map'",
     "zip:prod": "npm run build && cd dist/prod && zip -r ../../fotogrids-v$npm_package_version.zip . -x '*.map'",
-    "release": "npm run clean && npm run build && npm run zip:prod"
+    "release": "npm run clean && npm run build && npm run zip:prod",
+    "icons:build": "node scripts/loading-icons-build.js",
+    "icons:yaml": "node scripts/json-to-yaml.js"
   },
   "keywords": [
     "wordpress",
@@ -27,9 +29,13 @@
     "photos",
     "items"
   ],
-  "author": "Your Name",
+  "author": "FotoGrids",
   "license": "GPL-2.0-or-later",
   "dependencies": {
+    "@codemirror/lang-css": "^6.2.1",
+    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.26.3",
     "@wordpress/api-fetch": "^6.0.0",
     "@wordpress/block-editor": "^12.0.0",
     "@wordpress/blocks": "^12.0.0",
@@ -38,20 +44,23 @@
     "@wordpress/element": "^5.0.0",
     "@wordpress/i18n": "^4.0.0",
     "chart.js": "^4.5.0",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "codemirror": "^6.0.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.0",
     "@babel/preset-env": "^7.22.0",
     "@babel/preset-react": "^7.22.0",
     "@babel/preset-typescript": "^7.22.0",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
     "babel-loader": "^9.1.0",
+    "concurrently": "^8.2.2",
     "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.8.0",
+    "js-yaml": "^4.1.1",
     "mini-css-extract-plugin": "^2.7.0",
     "sass": "^1.93.2",
     "sass-embedded": "^1.93.2",

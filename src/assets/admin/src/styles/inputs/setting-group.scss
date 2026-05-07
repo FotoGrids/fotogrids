@@ -16,6 +16,9 @@
         color: ui-color(text, tertiary);
         line-height: ui-size(line-height, tight);
         margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
     
     &__content {
@@ -26,14 +29,9 @@
 		gap: ui-size(padding, 2xl);
     }
     
-    &--disabled {
-        border-color: ui-color(border, light);
-        background-color: ui-color(background, secondary);
-        opacity: 0.6;
-        
-        .fotogrids-setting-group__label {
-            color: ui-color(text, tertiary);
-            background-color: ui-color(background, secondary);
+    &--disabled {       
+        .fotogrids-setting-group__content {
+            opacity: 0.5;
         }
     }
     
@@ -48,16 +46,7 @@
     }
     
     .fotogrids-setting-group {
-        margin: ui-size(margin, md) 0;
-        
-        .fotogrids-setting-group__content {
-            padding: ui-size(padding, md);
-            padding-top: ui-size(padding, lg);
-        }
-        
-        .fotogrids-setting-group__label {
-            font-size: ui-size(font-size, xs);
-        }
+        margin: ui-size(margin, md) 0 0;        
     }
 }
 

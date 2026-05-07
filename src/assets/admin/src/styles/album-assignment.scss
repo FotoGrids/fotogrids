@@ -20,7 +20,7 @@
         gap: ui-size(spacing, base);
 
         p {
-            margin: 0;
+            margin: 0 ui-size(padding, xs);
         }
 
         .fotogrids-assigned-list {
@@ -39,13 +39,18 @@
             border-radius: ui-size(border-radius, sm);
             font-size: ui-size(font-size, sm);
 
-            .fotogrids-assigned-album-thumb {
+            .fotogrids-assigned-album-thumb-wrap {
                 width: ui-size(height, 2xl);
                 height: ui-size(height, 2xl);
-                object-fit: cover;
-                border-radius: ui-size(border-radius, sm);
                 margin-right: ui-size(margin, md);
                 flex-shrink: 0;
+            }
+
+            .fotogrids-assigned-album-thumb {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: ui-size(border-radius, sm);
                 background: ui-color(background, tertiary);
             }
 
@@ -128,7 +133,6 @@
             text-align: center;
             color: ui-color(text, secondary);
             margin: 0;
-            font-style: italic;
         }
         
         .fotogrids-albums {
@@ -148,13 +152,18 @@
                     background-color: #f0fff0;
                 }
                 
-                .fotogrids-album-thumb {
+                .fotogrids-album-thumb-wrap {
                     width: ui-size(height, lg);
                     height: ui-size(height, lg);
-                    object-fit: cover;
-                    border-radius: ui-size(border-radius, sm);
                     margin-right: ui-size(margin, md);
                     flex-shrink: 0;
+                }
+
+                .fotogrids-album-thumb {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: ui-size(border-radius, sm);
                     background: ui-color(background, tertiary);
                 }
                 

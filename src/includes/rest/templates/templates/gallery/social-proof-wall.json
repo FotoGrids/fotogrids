@@ -1,0 +1,28 @@
+{
+  "id": "social-proof-wall",
+  "name": "Social Proof Wall",
+  "description": "Mosaic of user-generated or testimonial imagery with CTA overlays linking to individual case studies or product pages.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "leads",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 37,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "hover_effect": "soft_fade",
+    "cta_overlays": true,
+    "extended_analytics": true,
+    "lightbox": true
+  }
+}
