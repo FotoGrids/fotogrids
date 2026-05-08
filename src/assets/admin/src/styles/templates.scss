@@ -463,14 +463,23 @@
 // Template Info Modal
 .fotogrids-template-info-content {
     display: flex;
-    flex-direction: column;
-    gap: 32px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
     padding: 48px !important;
 
     &__section {
-        display: flex;
+        flex: 1;
+        display: inline-flex;
         flex-direction: column;
         gap: 8px;
+        padding: 32px;
+        border-radius: 8px;
+        background: var(--fg-background-secondary);
+
+        &.fg-tm-cs__50 {
+            width: 50%;
+        }
     }
 
     h4 {
@@ -481,7 +490,6 @@
     }
 
     p {
-        padding-inline-end: 20%;
         font-size: 14px;
         line-height: 1.6;
         color: #50575e;

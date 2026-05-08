@@ -12,7 +12,7 @@ const TemplateInfoModal = ({ isOpen, onClose }) => {
             size="medium"
         >
             <div className="fotogrids-template-info-content">
-                <div className="fotogrids-template-info-content__section">
+                <div className="fotogrids-template-info-content__section fg-tm-cs__50">
                     <h4>{__("What's a Gallery Template?", 'fotogrids')}</h4>
                     <p>
                         {__('A Gallery Template is a complete, ready-to-use gallery configuration that you can apply to any of your galleries.', 'fotogrids')}
@@ -22,7 +22,7 @@ const TemplateInfoModal = ({ isOpen, onClose }) => {
                     </p>
                 </div>
 
-                <div className="fotogrids-template-info-content__section">
+                <div className="fotogrids-template-info-content__section fg-tm-cs__50">
                     <h4>{__("What's an Album Template?", 'fotogrids')}</h4>
                     <p>
                         {__('An Album is a container that groups multiple galleries together.', 'fotogrids')}

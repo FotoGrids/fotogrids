@@ -276,6 +276,9 @@ const TemplatesPage = () => {
     const currentUserTemplates = userTemplates[activeTab] || [];
     const filteredUserTemplates = showUserTemplates ? currentUserTemplates : [];
     const filteredTemplates = showFotoGridsTemplates ? currentTemplates : [];
+    const activeTemplateType = activeTab === 'gallery'
+        ? __('Gallery', 'fotogrids')
+        : __('Album', 'fotogrids');
 
     return (
         <div className="fotogrids-templates-page">
@@ -352,12 +355,11 @@ const TemplatesPage = () => {
 
                             {filteredTemplates.length > 0 && (
                                 <div className="fotogrids-templates-page__section">
-                                    <h2>
-                                        {activeTab === 'gallery'
-                                            ? __('Pre-defined Gallery Templates', 'fotogrids')
-                                            : __('Pre-defined Album Templates', 'fotogrids')
-                                        }
-                                    </h2>
+                                    {filteredUserTemplates.length > 0 && (
+                                        <h2>
+                                            {__('FotoGrids {type} Templates', 'fotogrids').replace('{type}', activeTemplateType)}
+                                        </h2>
+                                    )}
                                     <div className="fotogrids-templates-page__grid">
                                         {filteredTemplates.map(renderTemplateCard)}
                                     </div>
