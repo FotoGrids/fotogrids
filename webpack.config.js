@@ -64,7 +64,8 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            implementation: require('sass'),
+                            implementation: require('sass-embedded'),
+                            api: 'modern-compiler',
                         },
                     },
                 ],

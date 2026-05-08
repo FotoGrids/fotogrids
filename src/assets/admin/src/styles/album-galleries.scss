@@ -39,12 +39,19 @@
     .fotogrids-available-galleries {
         border: 1px solid var(--fg-border-secondary);
         border-radius: 3px;
-        max-height: 400px;
         overflow-y: auto;
     }
 
+    .fotogrids-assigned-galleries {
+        max-height: 460px;
+    }
+
+    .fotogrids-available-galleries {
+        max-height: 400px;
+    }
+
     .fotogrids-gallery-search {
-        margin-bottom: 15px;
+        margin-bottom: 16px;
 
         .fotogrids-search-input {
             width: 100%;
@@ -110,7 +117,7 @@
     &__content {
         display: flex;
         align-items: center;
-        padding: 12px;   
+        padding: 12px;
         transition: background-color 0.2s;
         border-style: solid;
         border-color: var(--fg-border-secondary);
@@ -124,7 +131,7 @@
     &--assigned &__content {
         background-color: #f0f8ff;
     }
-        
+
     &--assigned:hover &__content {
         background-color: #e6f3ff;
     }
@@ -164,7 +171,7 @@
                     rgba(0,0,0,0.05) 10px
                 );
         }
-    
+
         &.fotogrids-drag-over--before {
             &::before {
                 content: attr(data-drop-text);
@@ -174,7 +181,7 @@
                 border-top-width: 1px;
             }
         }
-    
+
         &.fotogrids-drag-over--after {
             &::after {
                 content: attr(data-drop-text);

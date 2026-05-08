@@ -1,6 +1,7 @@
 // FotoGrids Admin Styles
 
 // Import block styles
+@use "sass:map";
 @use './colors.scss' as *;
 @use './sizes.scss' as *;
 @use './pro.scss' as *;
@@ -509,10 +510,10 @@ body[class*="post-type-fotogrids_"] {
     color: #1e1e1e;
     white-space: nowrap;
 
-    @each $layout, $colors in map-get($fotogrids-ui-colors, layout) {
+    @each $layout, $colors in map.get($fotogrids-ui-colors, layout) {
         &.layout-#{$layout} {
-            background: map-get($colors, bg);
-            color: map-get($colors, text);
+            background: map.get($colors, bg);
+            color: map.get($colors, text);
         }
     }
 }
