@@ -1,0 +1,7 @@
+[data-fg-hover="fade"] .fg-item-media {
+    transition: opacity 200ms ease;
+}
+
+[data-fg-hover="fade"] .fg-item:hover .fg-item-media {
+    opacity: 0.8;
+}

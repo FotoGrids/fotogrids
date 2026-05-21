@@ -42,11 +42,28 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-freemius-license-p
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-freemius-bootstrap.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-licensing-toasts.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-license-manager.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-image-size-manager.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-collection-defaults.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-password-crypto.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-admin-helpers.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/functions-helpers.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-state-resolver.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-assembler.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-normalizer.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-plugin-settings-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-request-validator.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-endpoint.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-entries-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ModuleInterface.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ModuleLoader.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/interface-tool.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/class-abstract-tool.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/class-tools-registry.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/class-tools-rest.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';
 
 \FotoGrids\Licensing\Freemius_Bootstrap::init();
 
@@ -64,14 +81,33 @@ function fotogrids_init() {
         dirname( plugin_basename( __FILE__ ) ) . '/languages'
     );
 
+    FotoGrids\Activator::maybe_upgrade();
+
     FotoGrids\Post_Types::init();
     FotoGrids\REST::init();
     FotoGrids\Gallery_Album_Relations::init();
     FotoGrids\License_Manager::init();
     FotoGrids\Licensing\Licensing_Toasts::init();
+    FotoGrids\Image_Size_Manager::init();
 
     $module_loader = new \FotoGrids\Modules\ModuleLoader();
     $module_loader->init();
+
+    // Fire the tools registration hook. Free registers at priority 10;
+    // Pro and third-party plugins hook in at priority 10 (Pro, runs after Free
+    // because Pro loads after plugins_loaded fires for Free) or 20+ (third-party).
+    do_action( 'fotogrids/tools/init' );
+
+    // Tool init() methods call register_rest_route(), which must run on rest_api_init.
+    // Register at priority 5 so tool routes are in place before other rest_api_init
+    // callbacks that might inspect the route table.
+    add_action( 'rest_api_init', array( '\FotoGrids\Tools\Tools_Registry', 'init_all' ), 5 );
+
+    // Tool asset enqueueing is separate from REST init — enqueue_all() runs on
+    // admin_enqueue_scripts at priority 20, after Admin_Init::enqueue_admin_scripts
+    // (priority 10) has already registered 'fotogrids-admin'. This guarantees the
+    // dependency declared by each tool script resolves correctly.
+    add_action( 'admin_enqueue_scripts', array( '\FotoGrids\Tools\Tools_Registry', 'enqueue_all' ), 20 );
 
     if ( is_admin() ) {
         require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-admin-init.php';
@@ -85,6 +121,21 @@ function fotogrids_init() {
 }
 
 add_action( 'plugins_loaded', 'fotogrids_init' );
+
+/**
+ * Register built-in Free tools.
+ *
+ * Runs on 'fotogrids/tools/init' at priority 10 (fired from fotogrids_init).
+ * Pro tools hook in at the same priority (Pro loads after Free so order is
+ * guaranteed). Third-party plugins should use priority 20 or higher.
+ */
+add_action( 'fotogrids/tools/init', function () {
+    require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/regen-thumbnails/class-regen-thumbnails-tool.php';
+    require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/import-export/class-import-export-tool.php';
+
+    \FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\RegenThumbnails\Regen_Thumbnails_Tool() );
+    \FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\ImportExport\Import_Export_Tool() );
+}, 10 );
 
 /**
  * Plugin activation check

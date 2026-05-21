@@ -1,0 +1,60 @@
+{
+    "id": "video",
+    "label": "Video",
+    "icon": "video",
+    "description": "Transform your galleries with professional video integration. Seamlessly mix images and videos to create immersive, dynamic visual experiences.",
+    "postTypes": [
+        "gallery"
+    ],
+    "settings": [
+        {
+            "key": "youtube_vimeo_import",
+            "title": "YouTube & Vimeo Integration",
+            "description": "Import videos directly from YouTube and Vimeo. Import entire channels, playlists, albums, or individual videos instantly.",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "mix_media_galleries",
+            "title": "Mix Images & Videos",
+            "description": "Create rich, dynamic galleries that seamlessly combine images and videos in one beautiful showcase.",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "self_hosted_videos",
+            "title": "Self-Hosted Video Support",
+            "description": "Upload and host your own videos with full control over thumbnails, quality, and playback settings.",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "video_platforms",
+            "title": "Multi-Platform Support",
+            "description": "Connect with Facebook, Dailymotion, TED Talks, and other popular video platforms - all in one place.",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "video_lightbox",
+            "title": "Premium Video Lightbox",
+            "description": "Stunning video playback in a beautiful lightbox with responsive controls, autoplay options, and seamless navigation.",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "video_customization",
+            "title": "Advanced Video Controls",
+            "description": "Custom thumbnails, auto-generated previews, quality selection, and complete styling control for your video galleries.",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "pro_starter"
+}

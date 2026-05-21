@@ -38,10 +38,12 @@ class Admin_Helpers {
                     'toplevel_page_fotogrids',
                     'fotogrids_page_fotogrids-dashboard',
                     'fotogrids_page_fotogrids-templates',
+                    'fotogrids_page_fotogrids-library',
                     'fotogrids_page_fotogrids-stats',
                     'fotogrids_page_fotogrids-settings',
                     'fotogrids_page_fotogrids-license',
                     'fotogrids_page_fotogrids-upgrade',
+                    'fotogrids_page_fotogrids-tools',
                 );
 
                 if ( in_array( $hook_or_screen, $fotogrids_hooks, true ) ) {
@@ -67,10 +69,12 @@ class Admin_Helpers {
             'toplevel_page_fotogrids',
             'fotogrids_page_fotogrids-dashboard',
             'fotogrids_page_fotogrids-templates',
+            'fotogrids_page_fotogrids-library',
             'fotogrids_page_fotogrids-stats',
             'fotogrids_page_fotogrids-settings',
             'fotogrids_page_fotogrids-license',
             'fotogrids_page_fotogrids-upgrade',
+            'fotogrids_page_fotogrids-tools',
             'edit-fotogrids_gallery',
             'fotogrids_gallery',
             'edit-fotogrids_album',
@@ -146,9 +150,17 @@ class Admin_Helpers {
                     $saved_defaults = get_option( 'fotogrids_gallery_defaults', array() );
                     if ( isset( $saved_defaults[$key] ) ) {
                         $saved_value = $saved_defaults[$key];
-                        if ( is_string( $saved_value ) ) {
+                        if ( is_bool( $default_value ) ) {
+                            $args['settings'][$key] = $saved_value;
+                        } elseif ( is_string( $saved_value ) ) {
                             $decoded = json_decode( $saved_value, true );
-                            $args['settings'][$key] = ( is_array( $decoded ) ) ? $decoded : $saved_value;
+                            if ( is_array( $decoded ) ) {
+                                $args['settings'][$key] = $decoded;
+                            } elseif ( json_last_error() === JSON_ERROR_NONE && $decoded !== null ) {
+                                $args['settings'][$key] = $decoded;
+                            } else {
+                                $args['settings'][$key] = $saved_value;
+                            }
                         } else {
                             $args['settings'][$key] = $saved_value;
                         }
@@ -157,10 +169,33 @@ class Admin_Helpers {
                     }
                 } else {
                     $saved_value = get_post_meta( $args['post_id'], 'fotogrids_' . $key, true );
+
+                    // The `password` field is stored encrypted. Never send the
+                    // ciphertext to the browser — the eye-button reveal is done
+                    // via a dedicated permission-gated REST call instead.
+                    if ( $key === 'password' ) {
+                        $args['settings'][ $key ] = '';
+                        continue;
+                    }
+
                     if ( $saved_value !== '' ) {
-                        if ( is_string( $saved_value ) ) {
+                        if ( is_bool( $default_value ) ) {
+                            // Boolean settings: stored as '1'/'0'. Keep as string so
+                            // the JS toggle's `=== '1'` check works correctly.
+                            $args['settings'][$key] = $saved_value;
+                        } elseif ( is_string( $saved_value ) ) {
                             $decoded = json_decode( $saved_value, true );
-                            $args['settings'][$key] = ( is_array( $decoded ) ) ? $decoded : $saved_value;
+                            if ( is_array( $decoded ) ) {
+                                // Array values (e.g. token_select, responsive objects) — use decoded form.
+                                $args['settings'][$key] = $decoded;
+                            } elseif ( json_last_error() === JSON_ERROR_NONE && $decoded !== null ) {
+                                // Scalar JSON values (e.g. numeric strings "2", "16") — use the
+                                // decoded scalar so the JS side receives the correct type (integer,
+                                // not string) for strict-equality comparisons in button_group renders.
+                                $args['settings'][$key] = $decoded;
+                            } else {
+                                $args['settings'][$key] = $saved_value;
+                            }
                         } else {
                             $args['settings'][$key] = $saved_value;
                         }
@@ -169,6 +204,15 @@ class Admin_Helpers {
                     }
                 }
             }
+        }
+
+        // Hard guarantee: the encrypted password ciphertext must NEVER reach the
+        // browser, regardless of how $args['settings'] was built. This catches
+        // any code path that bypasses the loop guard above (e.g. pre-built
+        // settings passed in from a caller that called fotogrids_get_gallery_settings
+        // directly, which temporarily sets $settings['password'] before zeroing it).
+        if ( isset( $args['settings']['password'] ) && $args['settings']['password'] !== '' ) {
+            $args['settings']['password'] = '';
         }
 
         // Prepare gallery items
@@ -203,6 +247,7 @@ class Admin_Helpers {
             'documentationUrl' => $fg_post_type === 'album'
                 ? 'https://go.fotogrids.com/docs/albums'
                 : 'https://go.fotogrids.com/docs/galleries',
+            'toolsUrl' => admin_url( 'admin.php?page=fotogrids-tools' ),
             'strings' => array(
                 'layout' => __( 'Layout', 'fotogrids' ),
                 'styling' => __( 'Styling', 'fotogrids' ),
@@ -212,9 +257,26 @@ class Admin_Helpers {
             ),
         );
 
-        // Add restUrl for gallery edit pages
+        // Add restUrl and password state for gallery edit pages.
         if ( ! $args['is_defaults'] && $args['post_id'] > 0 ) {
-            $data['restUrl'] = rest_url( 'fotogrids/v1/' );
+            $data['restUrl']   = rest_url( 'fotogrids/v1/' );
+            $data['restNonce'] = wp_create_nonce( 'wp_rest' );
+
+            // Let the React password field know whether a password has been
+            // configured without exposing the encrypted value. The actual
+            // plaintext is only ever retrieved via the permission-gated
+            // GET /gallery/{id}/password REST endpoint.
+            $stored_password        = (string) get_post_meta( $args['post_id'], 'fotogrids_password', true );
+            $data['passwordIsSet']  = \FotoGrids\Password_Crypto::is_encrypted( $stored_password );
+        }
+
+        if ( current_user_can( 'manage_fotogrids_settings' ) ) {
+            $simulate_state = isset( $_GET['fotogrids_simulate_state'] )
+                ? sanitize_text_field( wp_unslash( (string) $_GET['fotogrids_simulate_state'] ) )
+                : '';
+            if ( in_array( $simulate_state, [ 'ok', 'password_required', 'expired', 'unauthorized' ], true ) ) {
+                $data['catalogSimulateState'] = $simulate_state;
+            }
         }
 
         // Add isDefaultsMode flag

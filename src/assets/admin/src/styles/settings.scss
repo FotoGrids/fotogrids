@@ -13,12 +13,13 @@
 
 .fotogrids-defaults-tab {
     display: flex;
+    flex-direction: column;
     gap: 20px;
 }
 
 .fotogrids-defaults-subtabs {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
     min-width: 180px;
 }
@@ -75,8 +76,42 @@ $settings-sidebar-width: 200px;
 
 .fotogrids-gallery-settings {
     display: flex;
-    min-height: 500px;
+    min-height: 400px;
     background: $tabbar-bg-white;
+
+    &--loading {
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.fotogrids-loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 40px;
+    color: var(--fg-text-tertiary);
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--fg-background-tertiary);
+        width: 48px;
+        height: 48px;
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__label {
+        font-size: 13px;
+        line-height: 1.4;
+    }
 }
 
 .fotogrids-settings-sidebar {
@@ -239,6 +274,23 @@ $settings-sidebar-width: 200px;
     }
 }
 
+.fotogrids-field-gate {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fotogrids-settings-locked-banner {
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid var(--fg-border-secondary);
+    border-radius: 4px;
+    background: var(--fg-background-tertiary);
+    color: var(--fg-text-tertiary);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
 .fotogrids-responsive-setting {
     display: flex;
     flex-direction: column;
@@ -272,6 +324,36 @@ $settings-sidebar-width: 200px;
         display: flex;
         align-items: center;
         gap: 12px;
+
+        &--four-sided {
+            align-items: flex-start;
+
+            .fotogrids-responsive-setting__range {
+                height: 42px;
+                display: inline-flex;
+                align-items: center;
+
+                .fotogrids-range-slider[type=range]:disabled {
+                    &::-webkit-slider-thumb {
+                        width: 0;
+                        height: 0;
+                        border: 0;
+                        background: transparent;
+                        box-shadow: none;
+                        opacity: 0;
+                    }
+
+                    &::-moz-range-thumb {
+                        width: 0;
+                        height: 0;
+                        border: 0;
+                        background: transparent;
+                        box-shadow: none;
+                        opacity: 0;
+                    }
+                }
+            }
+        }
     }
 
     &__range {
@@ -687,7 +769,7 @@ body.rtl {
     }
 }
 
-.fotogrids-settings-pro-message {
+.fotogrids-settings_pro-message {
     border: 1px solid var(--fg-yellow);
     padding: 20px;
     display: flex;
@@ -703,10 +785,11 @@ body.rtl {
     }
 
     &__content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
         gap: 16px;
+    }
+
+    &__text {
+        color: var(--fg-text-tertiary);
     }
 
     &__item {
@@ -719,6 +802,36 @@ body.rtl {
             padding-top: 16px;
         }
     }
+}
+
+.fotogrids-settings_info-block {
+    border: 1px solid var(--fg-blue);
+    border-radius: 4px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--fg-interactive-selected-bg);
+
+    &__content {
+        gap: 4px;
+        max-width: 64ch;
+    }
+
+    &__text {
+        color: var(--fg-text-secondary);
+    }
+}
+
+.fotogrids-settings_pro-message,
+.fotogrids-settings_info-block {
+    &__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
     &__subtitle {
         font-size: 13px;
@@ -730,17 +843,5 @@ body.rtl {
     &__text {
         font-size: 13px;
         line-height: 17px;
-        color: var(--fg-text-tertiary);
-    }
-
-    &__learn-more {
-        color: var(--fg-blue-hover);
-        text-decoration: none;
-        display: inline-block;
-
-        &:hover, &:focus {
-            color: var(--fg-blue);
-            text-decoration: underline;
-        }
     }
 }

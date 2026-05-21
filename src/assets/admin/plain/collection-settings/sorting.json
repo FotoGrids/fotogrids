@@ -1,0 +1,162 @@
+{
+    "id": "sorting",
+    "label": "Sorting",
+    "icon": "sort",
+    "settings": [
+        {
+            "key": "default_sort_order",
+            "type": "button_group",
+            "label": "Default Sort Order",
+            "description": "How items are sorted when the {postType.lower} is loaded.<br><strong>Note:</strong> Random sorting will automatically disable HTML caching.",
+            "options": [
+                {
+                    "label": "Manual",
+                    "value": "manual",
+                    "icon": "sort",
+                    "note": "As arranged in Manage Items",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Date",
+                    "value": "date",
+                    "icon": "calendar",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Title",
+                    "value": "title",
+                    "icon": "text",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "File Name",
+                    "value": "filename",
+                    "icon": "file_attachment",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Random",
+                    "value": "random",
+                    "icon": "shuffle",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "manual",
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "date_sort_type",
+            "type": "button_group",
+            "label": "Date Type",
+            "options": [
+                {
+                    "label": "Date Created",
+                    "value": "date_created",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Date Updated",
+                    "value": "date_updated",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "date_created",
+            "condition": {
+                "dependsOn": "default_sort_order",
+                "values": [
+                    "date"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "date_sort_direction",
+            "type": "button_group",
+            "label": "Sort Direction",
+            "options": [
+                {
+                    "label": "Newest First",
+                    "value": "desc",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Oldest First",
+                    "value": "asc",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "desc",
+            "condition": {
+                "dependsOn": "default_sort_order",
+                "values": [
+                    "date"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "title_sort_direction",
+            "type": "button_group",
+            "label": "Title Sort Direction",
+            "options": [
+                {
+                    "label": "A-Z",
+                    "value": "asc",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Z-A",
+                    "value": "desc",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "asc",
+            "condition": {
+                "dependsOn": "default_sort_order",
+                "values": [
+                    "title"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "advanced_sorting_promo",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "Allow Users to Change Sort Order",
+                    "message": "Show sort controls on the frontend so visitors can change how items are sorted."
+                },
+                {
+                    "subtitle": "Advanced Multi-Criteria Sorting",
+                    "message": "Sort by multiple fields simultaneously (e.g., date then title), or use custom fields like EXIF data, file size, and dimensions for precise control."
+                },
+                {
+                    "subtitle": "Smart AI-Powered Sorting",
+                    "message": "Let AI determine the best order for your {postType.lower.plural} based on relevance, popularity, and user engagement patterns."
+                },
+                {
+                    "subtitle": "Metadata-Based Sorting",
+                    "message": "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.lower.plural} that adapt to your content."
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

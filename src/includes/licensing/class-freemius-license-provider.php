@@ -70,12 +70,110 @@ class Freemius_License_Provider implements License_Provider {
     }
 
     public function is_on_plan( string $plan ): bool {
+        if ( $plan === 'free' ) {
+            return true;
+        }
+
         $fs = $this->fs();
         if ( ! $fs ) {
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( sprintf( '[FotoGrids License Debug] Freemius unavailable for plan check: %s', $plan ) );
+            }
             return false;
         }
 
-        return $fs->is_plan_or_trial( $plan );
+        $freemius_slugs = $this->resolve_freemius_slugs_for_tier( $plan );
+
+        $matched_slug = null;
+        foreach ( $freemius_slugs as $freemius_slug ) {
+            if ( $fs->is_plan_or_trial( $freemius_slug ) ) {
+                $matched_slug = $freemius_slug;
+                break;
+            }
+        }
+
+        $result = $matched_slug !== null;
+        $this->debug_log_plan_check( $plan, $freemius_slugs, $matched_slug, $result );
+
+        return $result;
+    }
+
+    /**
+     * Resolve the list of Freemius plan slugs that satisfy a FotoGrids tier.
+     *
+     * A FotoGrids tier (e.g. "pro_starter") can be satisfied by any of several
+     * Freemius plan slugs (e.g. "pro_starter_01", "pro_starter_02"). This lets
+     * us introduce new pricing/feature variants over time without renaming
+     * existing plans (Freemius locks slugs once they have activations).
+     *
+     * Extend via the `fotogrids/licensing/tier_to_freemius_plan` filter.
+     *
+     * @since  1.0.0
+     * @param  string $tier FotoGrids canonical tier slug.
+     * @return array<int, string>
+     */
+    private function resolve_freemius_slugs_for_tier( string $tier ): array {
+        $tier_to_freemius_plans = apply_filters(
+            'fotogrids/licensing/tier_to_freemius_plan',
+            [
+                'pro_starter' => [ 'pro_starter_01' ],
+                'pro_plus'    => [ 'pro_plus_01' ],
+                'agency'      => [ 'pro_agency_01' ],
+            ]
+        );
+
+        $slugs = $tier_to_freemius_plans[ $tier ] ?? [ $tier ];
+
+        // Defensive coercion: allow filter callers to return a single string.
+        if ( is_string( $slugs ) ) {
+            $slugs = [ $slugs ];
+        }
+
+        if ( ! is_array( $slugs ) ) {
+            return [ $tier ];
+        }
+
+        return array_values( array_unique( array_filter( $slugs, 'is_string' ) ) );
+    }
+
+    /**
+     * Emit a single, structured debug line per non-trivial plan check.
+     *
+     * Deduplicates within a single request to avoid hundreds of identical
+     * lines when one field is resolved many times during a render.
+     *
+     * @since  1.0.0
+     * @param  string             $tier FotoGrids tier slug.
+     * @param  array<int, string> $candidate_slugs Candidate Freemius slugs.
+     * @param  string|null        $matched_slug Matched slug, if any.
+     * @param  bool               $result Whether the tier was satisfied.
+     * @return void
+     */
+    private function debug_log_plan_check(
+        string $tier,
+        array $candidate_slugs,
+        ?string $matched_slug,
+        bool $result
+    ): void {
+        if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+            return;
+        }
+
+        static $already_logged = [];
+
+        $signature = $tier . '|' . implode( ',', $candidate_slugs ) . '|' . ( $result ? '1' : '0' );
+        if ( isset( $already_logged[ $signature ] ) ) {
+            return;
+        }
+        $already_logged[ $signature ] = true;
+
+        error_log( sprintf(
+            '[FotoGrids License] tier=%s candidates=[%s] matched=%s result=%s',
+            $tier,
+            implode( ',', $candidate_slugs ),
+            $matched_slug ?? '-',
+            $result ? 'yes' : 'no'
+        ) );
     }
 
     public function get_plan(): ?string {
@@ -300,4 +398,5 @@ class Freemius_License_Provider implements License_Provider {
 
         return $this->feature_plan_map;
     }
+
 }

@@ -1,0 +1,118 @@
+/* ==========================================================================
+   FotoGrids — Gate Lock Screen (shared)
+   Structural styles shared by all gate modules: ghost grid, overlay, card
+   chrome, icon, title, and description. Gate-specific interactive elements
+   (forms, inputs, links, spinners) are styled in each gate's own CSS file.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Outer wrapper
+   -------------------------------------------------------------------------- */
+
+.fotogrids-gate {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   Ghost grid
+   -------------------------------------------------------------------------- */
+
+.fotogrids-gate .fg-ghost-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--fg-cols, 3), 1fr);
+    gap: var(--fg-gap, 10px);
+    width: 100%;
+}
+
+.fotogrids-gate .fg-ghost-cell {
+    aspect-ratio: 3 / 2;
+    border-radius: var(--fg-radius, 4px);
+    overflow: hidden;
+    background: #e8e8e8;
+}
+
+/* --------------------------------------------------------------------------
+   Overlay
+   -------------------------------------------------------------------------- */
+
+.fotogrids-gate .fg-gate-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Card chrome
+   -------------------------------------------------------------------------- */
+
+.fotogrids-gate .fg-gate-card {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.14),
+        0 1px 4px rgba(0, 0, 0, 0.08);
+    padding: 32px 28px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .fotogrids-gate .fg-gate-card {
+        padding: 24px 18px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Icon
+   -------------------------------------------------------------------------- */
+
+.fotogrids-gate .fg-gate-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #f4f4f5;
+    margin: 0 auto 16px;
+}
+
+.fotogrids-gate .fg-gate-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #52525b;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* --------------------------------------------------------------------------
+   Title and description
+   -------------------------------------------------------------------------- */
+
+.fotogrids-gate .fg-gate-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 6px;
+    line-height: 1.4;
+}
+
+.fotogrids-gate .fg-gate-description {
+    font-size: 0.875rem;
+    color: #71717a;
+    margin: 0 0 20px;
+    line-height: 1.5;
+}

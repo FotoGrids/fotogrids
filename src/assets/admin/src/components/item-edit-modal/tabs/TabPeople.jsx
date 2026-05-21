@@ -24,7 +24,6 @@ const TabPeople = ({
             disabled={disabled}
             strings={strings}
             metadataKey="people"
-            inputKey="people"
             placeholder={strings.addPeoplePlaceholder || ''}
             icon={window.FotoGridsIcons?.people || ''}
             showProNotice={true}

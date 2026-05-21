@@ -54,7 +54,7 @@
             padding-inline-start: 12px;
             gap: 12px;
             align-items: stretch;
-            overflow: hidden;
+            overflow: visible; // allow tooltip bubble to escape
 
             .fotogrids-button-label {
                 display: flex;
@@ -62,11 +62,17 @@
                 padding-bottom: 2px;
             }
 
-            .fotogrids-pro-badge {
+            // New tooltip-based badge (.fg-pro-badge inside .fg-tooltip-trigger)
+            .fg-tooltip-trigger {
                 display: flex;
                 align-items: center;
-                padding-bottom: 4px;
-                min-height: 32px;
+                margin-inline-start: auto;
+                padding-inline-end: 10px;
+            }
+
+            .fg-pro-badge {
+                flex-shrink: 0;
+                margin-inline-start: 0;
             }
         }
 

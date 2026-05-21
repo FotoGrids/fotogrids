@@ -1,0 +1,8 @@
+[data-fg-hover="tilt"] .fg-item-media {
+    transition: transform 220ms ease;
+    transform-origin: center center;
+}
+
+[data-fg-hover="tilt"] .fg-item:hover .fg-item-media {
+    transform: rotate(-1.5deg) scale(1.02);
+}

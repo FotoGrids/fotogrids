@@ -34,7 +34,7 @@ const ProFeatures = () => {
                     ].map((feature) => (
                         <div key={generateProFeatureKey(feature)}>
                             <span
-                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check }}
+                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check_badge_g }}
                             />
                             {__(feature, 'fotogrids')}
                         </div>

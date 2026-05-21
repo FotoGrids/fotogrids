@@ -1,0 +1,111 @@
+{
+    "id": "advanced",
+    "label": "Advanced",
+    "icon": "settings",
+    "settings": [
+        {
+            "key": "maintenance_group",
+            "type": "setting_group",
+            "label": "Maintenance",
+            "settings": [
+                {
+                    "key": "auto_clear_cache",
+                    "type": "toggle",
+                    "label": "Auto Clear Cache",
+                    "description": "Automatically clear cache when settings are updated.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "data_management_group",
+            "type": "setting_group",
+            "label": "Data Management",
+            "settings": [
+                {
+                    "key": "use_ajax_from_album",
+                    "type": "toggle",
+                    "label": "Smooth Album to Gallery Transitions",
+                    "description": "When enabled, opening a gallery from an album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation.",
+                    "default": true,
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "enable_statistics",
+                    "type": "toggle",
+                    "label": "Enable Statistics Tracking",
+                    "description": "Track gallery views and interactions for analytics.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "retain_statistics",
+                    "type": "button_group",
+                    "label": "Retain Statistics",
+                    "description": "Choose how long to retain statistics data before cleanup.",
+                    "options": [
+                        {
+                            "label": "Forever",
+                            "value": "forever",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "30 Days",
+                            "value": "30",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "90 Days",
+                            "value": "90",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "180 Days",
+                            "value": "180",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "365 Days",
+                            "value": "365",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "forever",
+                    "condition": {
+                        "dependsOn": "enable_statistics",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

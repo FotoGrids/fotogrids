@@ -20,11 +20,16 @@
 @use './dashboard.scss' as *;
 @use './license-page.scss' as *;
 @use './templates.scss' as *;
+@use './sidebar-tabs.scss' as *;
+@use './settings-primitives.scss' as *;
 @use './plugin-settings.scss' as *;
+@use './tools.scss' as *;
 @use './tables.scss' as *;
+@use './library.scss' as *;
 
 @use './ui-elements/ui-elements.scss' as *;
 @use './toast.scss' as *;
+@use './tooltip.scss' as *;
 
 .fotogrids-icon {
     line-height: 0;
@@ -176,6 +181,7 @@
     width: 100%;
     box-sizing: border-box;
     display: none;
+    overflow: hidden;
 
     &.fotogrids-dropdown-open {
         display: block;
@@ -199,6 +205,10 @@
 
     &:hover:not(.fotogrids-add-option--pro) {
         background: $tabbar-hover-bg;
+    }
+
+    &:last-of-type {
+        border-bottom: none;
     }
 
     &--pro {

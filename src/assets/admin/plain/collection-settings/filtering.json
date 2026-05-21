@@ -1,0 +1,214 @@
+{
+    "id": "filtering",
+    "label": "Filtering",
+    "icon": "filter",
+    "settings": [
+        {
+            "key": "filtering_enabled",
+            "type": "toggle",
+            "label": "Enable Filtering",
+            "description": "Allow items to be filtered by different criteria",
+            "default": false,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "filter_by_tags",
+            "type": "toggle",
+            "label": "Filter by Tags",
+            "description": "Allow filtering items by their assigned tags",
+            "default": true,
+            "condition": {
+                "dependsOn": "filtering_enabled",
+                "values": [
+                    true,
+                    "1"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "filter_by_date",
+            "type": "toggle",
+            "label": "Filter by Date",
+            "description": "Allow filtering items by date range (date taken or uploaded)",
+            "default": false,
+            "condition": {
+                "dependsOn": "filtering_enabled",
+                "values": [
+                    true,
+                    "1"
+                ]
+            },
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "date_filter_type",
+            "type": "button_group",
+            "label": "Date Filter Type",
+            "description": "Which date to use for filtering",
+            "options": [
+                {
+                    "label": "Date Taken",
+                    "value": "date_taken",
+                    "icon": "camera",
+                    "tier_required": "pro_starter"
+                },
+                {
+                    "label": "Date Uploaded",
+                    "value": "date_uploaded",
+                    "icon": "upload",
+                    "tier_required": "pro_starter"
+                }
+            ],
+            "default": "date_taken",
+            "condition": {
+                "dependsOn": [
+                    "filtering_enabled",
+                    "filter_by_date"
+                ],
+                "values": [
+                    [
+                        true,
+                        "1"
+                    ],
+                    [
+                        true,
+                        "1"
+                    ]
+                ]
+            },
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "filter_ui_group",
+            "type": "setting_group",
+            "label": "Filter Controls",
+            "condition": {
+                "dependsOn": "filtering_enabled",
+                "values": [
+                    true,
+                    "1"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "filter_ui_position",
+                    "type": "button_group",
+                    "label": "Position",
+                    "description": "Where to display the filter controls",
+                    "options": [
+                        {
+                            "label": "Top",
+                            "value": "top",
+                            "icon": "flex_align_top",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Sidebar",
+                            "value": "sidebar",
+                            "icon": "flex_align_left",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "top",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "filter_ui_style",
+                    "type": "button_group",
+                    "label": "Style",
+                    "description": "How the filter controls are displayed",
+                    "options": [
+                        {
+                            "label": "Dropdowns",
+                            "value": "dropdowns",
+                            "icon": "arrow_square_down",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Buttons",
+                            "value": "buttons",
+                            "icon": "layout",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Checkboxes",
+                            "value": "checkboxes",
+                            "icon": "check_square",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "buttons",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "show_filter_count",
+                    "type": "toggle",
+                    "label": "Show Item Count",
+                    "description": "Display the number of items in each filter option",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "filter_all_label",
+                    "type": "text_input",
+                    "label": "\"All\" Filter Label",
+                    "description": "Text for the option that shows all items (e.g., 'All Items', 'Show All')",
+                    "default": "All",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "advanced_filtering_promo",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "Advanced EXIF & Metadata Filtering",
+                    "message": "Filter by camera settings (ISO, aperture, shutter speed), file properties (size, dimensions), and other EXIF data to find exactly what you're looking for."
+                },
+                {
+                    "subtitle": "People & Location Filtering",
+                    "message": "Filter {postType.lower.plural} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
+                },
+                {
+                    "subtitle": "Smart Filter Presets & Dynamic Filtering",
+                    "message": "Save your favorite filter combinations as presets for quick access, and enable real-time filtering that updates results as users type or select options."
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

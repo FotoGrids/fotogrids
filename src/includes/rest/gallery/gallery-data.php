@@ -69,6 +69,139 @@ class Gallery_Data {
     }
 
     /**
+     * Reveal the decrypted password for a gallery (admin eye-button).
+     *
+     * Only reachable when the permission callback
+     * (Gallery_Permissions::check_gallery_password_read) passes, which requires
+     * the fotogrids/security/can_view_gallery_password filter to return true.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request The REST API request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public static function get_gallery_password( $request ) {
+        $gallery_id = (int) $request['id'];
+
+        $gallery = get_post( $gallery_id );
+        if ( ! $gallery || $gallery->post_type !== 'fotogrids_gallery' ) {
+            return new \WP_Error(
+                'gallery_not_found',
+                __( 'Gallery not found', 'fotogrids' ),
+                array( 'status' => 404 )
+            );
+        }
+
+        $stored    = (string) get_post_meta( $gallery_id, 'fotogrids_password', true );
+        $plaintext = \FotoGrids\Password_Crypto::decrypt( $stored );
+
+        // decrypt() returns '' for empty/invalid stored values — treat both as
+        // "no password set" rather than surfacing an error.
+        return rest_ensure_response( array( 'password' => $plaintext ) );
+    }
+
+    /**
+     * Validate a visitor-submitted password and unlock the gallery.
+     *
+     * On success: sets a 7-day unlock cookie and returns the rendered gallery
+     * HTML so the frontend can swap the locked placeholder in place without a
+     * full page reload.
+     *
+     * On failure: returns a 401 with success=false. The caller should show an
+     * inline error — no redirect or reload.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request The REST API request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public static function unlock_gallery( $request ) {
+        $gallery_id = (int) $request['id'];
+        $submitted  = (string) ( $request->get_param( 'password' ) ?? '' );
+
+        $gallery = get_post( $gallery_id );
+        if ( ! $gallery || $gallery->post_type !== 'fotogrids_gallery' ) {
+            return new \WP_Error(
+                'gallery_not_found',
+                __( 'Gallery not found', 'fotogrids' ),
+                array( 'status' => 404 )
+            );
+        }
+
+        if ( $gallery->post_status !== 'publish' ) {
+            return new \WP_Error(
+                'gallery_not_published',
+                __( 'Gallery is not published', 'fotogrids' ),
+                array( 'status' => 403 )
+            );
+        }
+
+        $stored   = (string) get_post_meta( $gallery_id, 'fotogrids_password', true );
+        $settings = fotogrids_get_gallery_settings( $gallery_id );
+
+        if ( ! \FotoGrids\Password_Crypto::verify( $submitted, $stored ) ) {
+            return new \WP_Error(
+                'fotogrids_invalid_password',
+                __( 'Incorrect password.', 'fotogrids' ),
+                array( 'status' => 401 )
+            );
+        }
+
+        // Only set a persistent unlock cookie when the gallery is configured
+        // to allow it. When password_remember is false the visitor must re-enter
+        // the password on every page load.
+        $cookie_key   = 'fotogrids_unlocked_' . $gallery_id;
+        $cookie_value = self::make_unlock_cookie_value( $gallery_id, $stored );
+
+        $remember      = ! empty( $settings['password_remember'] );
+        $remember_days = max( 1, min( 365, (int) ( $settings['password_remember_days'] ?? 7 ) ) );
+
+        if ( $remember ) {
+            setcookie(
+                $cookie_key,
+                $cookie_value,
+                array(
+                    'expires'  => time() + ( $remember_days * DAY_IN_SECONDS ),
+                    'path'     => COOKIEPATH,
+                    'domain'   => COOKIE_DOMAIN,
+                    'secure'   => is_ssl(),
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                )
+            );
+        }
+
+        // Make the cookie visible within this request so the render pipeline's
+        // gate sees it as unlocked when producing the gallery HTML below.
+        $_COOKIE[ $cookie_key ] = $cookie_value;
+
+        // Render the gallery HTML server-side so the frontend can swap it in
+        // without a full page reload.
+        $html      = \FotoGrids\Public_Render::gallery_shortcode( array( 'id' => $gallery_id ) );
+        $css_urls  = \FotoGrids\Render\Internal\Asset_Resolver::instance()->get_css_asset_urls();
+
+        return rest_ensure_response( array(
+            'success'  => true,
+            'html'     => $html,
+            'css'      => $css_urls,
+            'remember' => $remember,
+        ) );
+    }
+
+    /**
+     * Produces the HMAC value stored in the unlock cookie.
+     *
+     * Ties the cookie to both the gallery ID and the current stored ciphertext,
+     * so changing the gallery password automatically invalidates old cookies.
+     *
+     * @since  1.0.0
+     * @param  int    $gallery_id Gallery ID.
+     * @param  string $stored     Encrypted password from post meta.
+     * @return string
+     */
+    public static function make_unlock_cookie_value( int $gallery_id, string $stored ): string {
+        return hash_hmac( 'sha256', $gallery_id . '|' . $stored, wp_salt( 'auth' ) );
+    }
+
+    /**
      * Get galleries list for Gutenberg block
      *
      * Retrieves a paginated list of published galleries with basic metadata.

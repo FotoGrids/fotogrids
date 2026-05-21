@@ -4,7 +4,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ItemEditModal from './ItemEditModal.jsx';
+import VideoEmbedModal from './VideoEmbedModal.jsx';
 import Icon from './shared/Icon.jsx';
+import Modal from './shared/Modal.jsx';
 import GalleryPreview from './GalleryPreview.jsx';
 import UploadArea from './blocks/UploadArea.jsx';
 
@@ -22,9 +24,21 @@ const GalleryMetabox = ({
         return React.createElement('div', {}, 'React hooks not available');
     }
 
-    const [activeTab, setActiveTab] = useState('manage');
+    const uiState = window.FotoGridsUiState?.createNamespace({
+        area: 'gallery-items',
+        postId: window.fotogridsMetaBoxes?.postId || 0,
+    });
+    const TABS = ['manage', 'preview'];
+    const [activeTab, setActiveTab] = useState(() => {
+        if (!uiState) return 'manage';
+        return uiState.getValue({ key: 'main-tab', fallback: 'manage', urlParam: 'fg-items-tab', allowed: TABS });
+    });
     const [items, setItems] = useState(Array.isArray(galleryItems) ? galleryItems : []);
     const [showModal, setShowModal] = useState(false);
+    const [showVideoEmbedModal, setShowVideoEmbedModal] = useState(false);
+    const [showClearAllModal, setShowClearAllModal] = useState(false);
+    const [clearAllConfirmValue, setClearAllConfirmValue] = useState('');
+    const [clearAllDeleteCustomData, setClearAllDeleteCustomData] = useState(false);
     const [currentItemId, setCurrentItemId] = useState(null);
     const [currentItemData, setCurrentItemData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -411,18 +425,32 @@ const GalleryMetabox = ({
     }, [saveFavoriteItem]);
 
     // Clear all items
-    const clearAllItems = useCallback(() => {
-        if (confirm(strings.confirmClear)) {
-            setItems([]);
-            // Clear favorite when all items are removed
-            saveFavoriteItem(null);
+    const closeClearAllModal = useCallback(() => {
+        setShowClearAllModal(false);
+        setClearAllConfirmValue('');
+        setClearAllDeleteCustomData(false);
+    }, []);
 
-            // Update state manager
-            if (State) {
-                State.items.setItems([]);
-            }
+    const clearAllItems = useCallback(() => {
+        setClearAllConfirmValue('');
+        setClearAllDeleteCustomData(false);
+        setShowClearAllModal(true);
+    }, []);
+
+    const confirmClearAllItems = useCallback(() => {
+        if (clearAllConfirmValue !== 'REMOVE ALL') {
+            return;
         }
-    }, [strings, saveFavoriteItem]);
+        setItems([]);
+        closeClearAllModal();
+        // Clear favorite when all items are removed
+        saveFavoriteItem(null);
+
+        // Update state manager
+        if (State) {
+            State.items.setItems([]);
+        }
+    }, [clearAllConfirmValue, closeClearAllModal, saveFavoriteItem]);
 
     // Handle item reordering
     const handleReorderItems = useCallback(async (newOrder) => {
@@ -533,7 +561,10 @@ const GalleryMetabox = ({
     const handleTabSwitch = useCallback((tabId) => {
         setActiveTab(tabId);
         setShowAddDropdown(false);
-    }, []);
+        if (uiState) {
+            uiState.setValue({ key: 'main-tab', value: tabId, urlParam: 'fg-items-tab' });
+        }
+    }, [uiState]);
 
     // Handle add dropdown
     const handleAddOption = useCallback((action) => {
@@ -550,14 +581,86 @@ const GalleryMetabox = ({
             case 'zip':
                 alert('ZIP upload functionality will be implemented soon.');
                 break;
+            case 'video_embed':
+                setShowVideoEmbedModal(true);
+                break;
             default:
                 console.log('Unknown action:', action);
         }
     }, [openMediaUploader]);
 
+    /**
+     * Called by VideoEmbedModal when the user confirms.
+     * POSTs to the REST endpoint to create a virtual item, then inserts
+     * the returned item object into the grid.
+     */
+    const handleAddVideoEmbed = useCallback(async (embedForm) => {
+        const restBase  = window.wpApiSettings?.root || '/wp-json/';
+        const restNonce = window.wpApiSettings?.nonce || '';
+        const galleryId = window.fotogridsMetaBoxes?.postId || '';
+
+        const response = await fetch(
+            `${restBase}fotogrids/v1/items/embed`,
+            {
+                method:  'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce':   restNonce,
+                },
+                body: JSON.stringify({
+                    gallery_id: galleryId,
+                    ...embedForm,
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            const msg = err.message || `HTTP ${response.status}`;
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(msg);
+            }
+            throw new Error(msg);
+        }
+
+        const data = await response.json();
+
+        const newItem = {
+            id:          data.id,
+            item_type:   data.item_type,
+            title:       data.title  || embedForm.title  || 'Video',
+            thumbnail:   data.thumbnail_url || '',
+            alt:         data.title  || '',
+            favorite:    false,
+            // carry embed meta so the grid can render the badge
+            source:      embedForm.source,
+        };
+
+        setItems(prevItems => {
+            const wasEmpty      = prevItems.length === 0;
+            const updatedItems  = [...prevItems, newItem];
+
+            if (wasEmpty) {
+                updatedItems[0].favorite = true;
+                saveFavoriteItem(updatedItems[0].id);
+            }
+
+            if (State) {
+                State.items.setItems(updatedItems.map(i => String(i.id)).filter(Boolean));
+            }
+
+            return updatedItems;
+        });
+
+        if (window.fotogridsToast) {
+            window.fotogridsToast.success(strings.videoEmbedAdded);
+        }
+    }, [saveFavoriteItem, strings]);
+
     const renderItemsGrid = () => {
         if (items.length === 0) {
             const handleFromLibrary = () => openMediaUploader();
+            const handleVideoEmbed = () => setShowVideoEmbedModal(true);
             const handleOtherSources = () => window.FotoGridsUpgrade?.launchForFeature?.integrations?.();
 
             return (
@@ -580,6 +683,18 @@ const GalleryMetabox = ({
                             />
                             <h4>{strings.addFromLibrary}</h4>
                             <p>{strings.fromLibraryDescription}</p>
+                        </button>
+                        <button
+                            type="button"
+                            className="fotogrids-noitems-add-block fotogrids-noitems-add-block--action"
+                            onClick={handleVideoEmbed}
+                        >
+                            <div
+                                className="fotogrids-noitems-add-block__icon"
+                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.video }}
+                            />
+                            <h4>{strings.addVideoEmbed}</h4>
+                            <p>{strings.addVideoEmbedDescription}</p>
                         </button>
                         <button
                             type="button"
@@ -613,7 +728,7 @@ const GalleryMetabox = ({
                                 type="button"
                                 className="fotogrids-item-favorite-button"
                                 onClick={() => toggleFavorite(item.id)}
-                                title={item.favorite ? (strings.removeFavorite) : (strings.makeFavorite || 'Make Favorite')}
+                                title={item.favorite ? strings.removeFavorite : strings.makeFavorite}
                             >
                                 <Icon name="star" />
                             </button>
@@ -675,9 +790,8 @@ const GalleryMetabox = ({
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('zip')}>
 						{strings.fromZip}
                     </div>
-                    <div className="fotogrids-add-option fotogrids-add-option--pro" onClick={() => handleAddOption('video')}>
-						{strings.video}
-						<span className="fotogrids-pro-badge">Pro</span>
+                    <div className="fotogrids-add-option" onClick={() => handleAddOption('video_embed')}>
+						{strings.videoEmbed}
                     </div>
                     <div className="fotogrids-add-option fotogrids-add-option--pro" onClick={() => handleAddOption('instagram')}>
 						{strings.instagram}
@@ -698,6 +812,26 @@ const GalleryMetabox = ({
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, [showAddDropdown]);
+
+    const clearAllFooter = (
+        <>
+            <button
+                type="button"
+                className="fotogrids-button fotogrids-button--secondary"
+                onClick={closeClearAllModal}
+            >
+                {strings.cancel}
+            </button>
+            <button
+                type="button"
+                className="fotogrids-button fotogrids-button--danger"
+                onClick={confirmClearAllItems}
+                disabled={clearAllConfirmValue !== 'REMOVE ALL'}
+            >
+                {strings.removeAllItems}
+            </button>
+        </>
+    );
 
     return (
         <div className="fotogrids-gallery-metabox">
@@ -775,11 +909,53 @@ const GalleryMetabox = ({
                     items={items}
                     onClose={() => setShowModal(false)}
                     onNavigate={navigateItem}
-                    ajaxUrl={ajaxUrl}
-                    nonce={nonce}
                     strings={strings}
                 />
             )}
+
+            {/* Video Embed Modal */}
+            <VideoEmbedModal
+                isOpen={showVideoEmbedModal}
+                onClose={() => setShowVideoEmbedModal(false)}
+                onAdd={handleAddVideoEmbed}
+                strings={strings}
+            />
+
+            <Modal
+                isOpen={showClearAllModal}
+                onClose={closeClearAllModal}
+                title={strings.removeAllModalTitle}
+                size="small"
+                footer={clearAllFooter}
+            >
+                <div className="fotogrids-notice fotogrids-notice--warning">
+                    <p><strong>{strings.removeAllModalWarning}</strong></p>
+                </div>
+                <p>{strings.removeAllModalBody}</p>
+                <label className="fotogrids-checkbox">
+                    <input
+                        type="checkbox"
+                        checked={clearAllDeleteCustomData}
+                        onChange={(e) => setClearAllDeleteCustomData(e.target.checked)}
+                    />
+                    <span className="fotogrids-checkbox__indicator"></span>
+                    <span>{strings.removeAllModalDeleteCustomDataLabel}</span>
+                </label>
+                <p className="description">{strings.removeAllModalDeleteCustomDataHelp}</p>
+                <div className="fotogrids-form-group">
+                    <label htmlFor="fotogrids-remove-all-confirm-input">
+                        {strings.removeAllModalConfirmPrompt}
+                    </label>
+                    <input
+                        id="fotogrids-remove-all-confirm-input"
+                        type="text"
+                        className="fotogrids-input"
+                        value={clearAllConfirmValue}
+                        onChange={(e) => setClearAllConfirmValue(e.target.value)}
+                        placeholder={strings.removeAllModalConfirmPlaceholder}
+                    />
+                </div>
+            </Modal>
         </div>
     );
 };

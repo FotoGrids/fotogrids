@@ -1,0 +1,17 @@
+/*
+ * FotoGrids — Loaded Effect: rise
+ *
+ * Fades in while sliding up from a few pixels below.
+ */
+
+[data-fg-loaded-effect="rise"] .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
+[data-fg-loaded-effect="rise"] .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
+    transform: translateY(10px);
+}
+
+[data-fg-loaded-effect="rise"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > img,
+[data-fg-loaded-effect="rise"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > picture img {
+    opacity:    1;
+    transform:  translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}

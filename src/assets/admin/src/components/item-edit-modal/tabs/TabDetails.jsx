@@ -52,6 +52,18 @@ const TabDetails = ({ formData, handleInputChange, strings, disabled = false }) 
                         disabled={disabled}
                     />
                 </div>
+                <div className="fotogrids-form-field">
+                    <label htmlFor="fotogrids-item-credit">
+                        {strings.credit || 'Credit'}
+                    </label>
+                    <input
+                        type="text"
+                        id="fotogrids-item-credit"
+                        value={formData?.credit || ''}
+                        onChange={(e) => handleInputChange('credit', e.target.value)}
+                        disabled={disabled}
+                    />
+                </div>
             </div>
         </div>
     );

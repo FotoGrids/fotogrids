@@ -12,6 +12,8 @@ import TemplatesPage from './components/pages/TemplatesPage';
 import StatsPage from './components/pages/StatsPage';
 import PluginSettingsPage from './components/pages/PluginSettingsPage';
 import LicensePage from './components/pages/LicensePage';
+import ToolsPage from './components/pages/ToolsPage';
+import LibraryPage from './components/pages/LibraryPage';
 
 import { registerFotoGridsBlocks } from './utils/registerBlocks';
 
@@ -56,6 +58,8 @@ function initializeAdminPages() {
     renderComponent('fotogrids-stats-page', StatsPage);
     renderComponent('fotogrids-settings-page', PluginSettingsPage);
     renderComponent('fotogrids-license-page', LicensePage);
+    renderComponent('fotogrids-tools-page', ToolsPage);
+    renderComponent('fotogrids-library-page', LibraryPage);
 }
 
 if (document.readyState === 'loading') {

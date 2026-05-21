@@ -11,8 +11,11 @@ module.exports = {
         'admin': './src/assets/admin/src/index.js',
         'metabox': './src/assets/admin/src/metabox.js',
         'frontend': './src/assets/frontend/src/index.js',
-        'lightbox': './src/assets/frontend/src/lightbox.js',
-        'lightbox-styles': './src/assets/frontend/src/lightbox.scss',
+        'fg-tooltip': './src/public/render/fg-tooltip/fg-tooltip.js',
+        'loading-icon': './src/public/render/features/loading-icon/loading-icon.js',
+        'loading-icon-styles': './src/public/render/features/loading-icon/loading-icon.scss',
+        'lightbox': './src/public/render/features/lightbox/lightbox.js',
+        'lightbox-styles': './src/public/render/features/lightbox/lightbox.scss',
         'collection-state-manager': './src/assets/admin/src/collection-state-manager.js',
         'ajax-save': './src/assets/admin/src/ajax-save.js',
         'album-assignment': './src/assets/admin/src/album-assignment.js',
@@ -26,12 +29,23 @@ module.exports = {
         'dashboard-widget-styles': './src/assets/admin/src/styles/dashboard-widget.scss',
         'toast-init': './src/assets/admin/src/toast-init.js',
         'shortcode-column-init': './src/assets/admin/src/shortcode-column-init.js',
+        'ui-state-manager': './src/assets/admin/src/utils/ui-state-manager.js',
+        'tool-regen-thumbnails': './src/includes/tools/regen-thumbnails/assets/regen-thumbnails.js',
+        'tool-import-export':    './src/includes/tools/import-export/assets/import-export.js',
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'assets/js/[name].js',
+        // Route tool-* entries to their tool folder; everything else to assets/js/.
+        filename: (pathData) => {
+            const name = pathData.chunk.name;
+            if (name && name.startsWith('tool-')) {
+                const toolId = name.slice('tool-'.length);
+                return `includes/tools/${toolId}/assets/${toolId}.js`;
+            }
+            return 'assets/js/[name].js';
+        },
         publicPath: 'auto',
-        clean: true,
+        clean: false, // managed manually; 'true' causes EPERM in sandboxed environments
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
@@ -64,8 +78,7 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            implementation: require('sass-embedded'),
-                            api: 'modern-compiler',
+                            implementation: require('sass'),
                         },
                     },
                 ],
@@ -95,7 +108,15 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: 'assets/css/[name].css',
+            // Route tool-* CSS to their tool folder; everything else to assets/css/.
+            filename: (pathData) => {
+                const name = pathData.chunk.name;
+                if (name && name.startsWith('tool-')) {
+                    const toolId = name.slice('tool-'.length);
+                    return `includes/tools/${toolId}/assets/${toolId}.css`;
+                }
+                return 'assets/css/[name].css';
+            },
         }),
         new CopyWebpackPlugin({
             patterns: [
@@ -148,7 +169,7 @@ module.exports = {
                     },
                 },
                 {
-                    from: 'src/assets/admin/js/**/*',
+                    from: 'src/assets/admin/plain/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');
@@ -223,6 +244,20 @@ module.exports = {
                     },
                 },
                 {
+                    from: 'src/public/render/**/*',
+                    to: ({ context, absoluteFilename }) => {
+                        const relativePath = path.relative(context, absoluteFilename);
+                        return relativePath.replace('src/', '');
+                    },
+                    globOptions: {
+                        // .php and .scss are excluded because webpack handles them (PHP via
+                        // the php copy patterns above; SCSS via MiniCssExtractPlugin).
+                        // fg-tooltip.js is also excluded because it's a webpack entry point
+                        // (uses ES module imports) — the built output lands in assets/js/.
+                        ignore: ['**/*.php', '**/*.scss', '**/fg-tooltip/fg-tooltip.js'],
+                    },
+                },
+                {
                     from: 'src/languages/**/*',
                     to: 'languages/[name][ext]',
                     noErrorOnMissing: true,
@@ -265,12 +300,15 @@ module.exports = {
             }),
         ],
         splitChunks: {
-            chunks: 'all',
+            // Exclude metabox and all per-tool bundles from chunk splitting.
+            // These are loaded standalone by WordPress with no awareness of
+            // sibling chunk files; splitting them causes a silent runtime failure.
+            chunks: (chunk) => chunk.name !== 'metabox' && !chunk.name?.startsWith('tool-'),
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
                     name: 'vendors',
-                    chunks: 'all',
+                    chunks: (chunk) => chunk.name !== 'metabox' && !chunk.name?.startsWith('tool-'),
                 },
             },
         },

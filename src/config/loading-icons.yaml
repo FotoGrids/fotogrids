@@ -911,7 +911,7 @@ fotogrids: |
   </svg>
 
 square: |
-  <svg viewbox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='currentColor'>
+  <svg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='currentColor'>
     <style>
       .fg-ia-square-box {
         animation: square-spin 3s 0s cubic-bezier(.09, .57, .49, .9) infinite;

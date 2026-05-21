@@ -235,35 +235,391 @@ class Admin_Data {
             return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
         }
 
+        // Hidden companion sizes — never shown in the picker UI.
+        $hidden_slugs = array( \FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE );
+
+        // Whether to include hidden sizes (e.g. for the Plugin Settings Media tab).
+        $include_hidden = (bool) ( $request->get_param( 'include_hidden' ) ?? false );
+
         $sizes = array();
         $intermediate_sizes = get_intermediate_image_sizes();
 
         foreach ( $intermediate_sizes as $size ) {
+            $is_hidden = in_array( $size, $hidden_slugs, true );
+            if ( $is_hidden && ! $include_hidden ) {
+                continue;
+            }
+
+            $is_fotogrids    = strpos( $size, 'fotogrids_' ) === 0;
+            $is_plugin_size  = in_array( $size, array(
+                \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
+                \FotoGrids\Image_Size_Manager::SLUG_FULL,
+            ), true );
+            $is_custom_size  = strpos( $size, \FotoGrids\Image_Size_Manager::CUSTOM_SLUG_PREFIX ) === 0;
+
+            // Build human-readable label; give FotoGrids plugin sizes nicer names.
+            if ( $is_plugin_size ) {
+                if ( $size === \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL ) {
+                    $label = __( 'FotoGrids Thumbnail', 'fotogrids' );
+                } elseif ( $size === \FotoGrids\Image_Size_Manager::SLUG_FULL ) {
+                    $label = __( 'FotoGrids Full', 'fotogrids' );
+                } else {
+                    $label = ucfirst( str_replace( array( '-', '_' ), ' ', $size ) );
+                }
+            } else {
+                $label = ucfirst( str_replace( array( '-', '_' ), ' ', $size ) );
+            }
+
             $size_data = array(
-                'value' => $size,
-                'label' => ucfirst( str_replace( array( '-', '_' ), ' ', $size ) ),
+                'value'          => $size,
+                'label'          => $label,
+                'is_fotogrids'   => $is_fotogrids,
+                'is_plugin_size' => $is_plugin_size,
+                'is_custom_size' => $is_custom_size,
+                'is_hidden'      => $is_hidden,
             );
 
             $size_info = wp_get_additional_image_sizes();
             if ( isset( $size_info[ $size ] ) ) {
-                $size_data['width'] = $size_info[ $size ]['width'];
+                $size_data['width']  = $size_info[ $size ]['width'];
                 $size_data['height'] = $size_info[ $size ]['height'];
-                $size_data['crop'] = isset( $size_info[ $size ]['crop'] ) ? $size_info[ $size ]['crop'] : false;
+                $size_data['crop']   = isset( $size_info[ $size ]['crop'] ) ? $size_info[ $size ]['crop'] : false;
             } else {
-                $size_data['width'] = get_option( "{$size}_size_w" );
+                $size_data['width']  = get_option( "{$size}_size_w" );
                 $size_data['height'] = get_option( "{$size}_size_h" );
-                $size_data['crop'] = get_option( "{$size}_crop" );
+                $size_data['crop']   = get_option( "{$size}_crop" );
             }
 
             $sizes[] = $size_data;
         }
 
         $sizes[] = array(
-            'value' => 'full',
-            'label' => __( 'Full Size', 'fotogrids' ),
+            'value'          => 'full',
+            'label'          => __( 'Full Size', 'fotogrids' ),
+            'is_fotogrids'   => false,
+            'is_plugin_size' => false,
+            'is_custom_size' => false,
+            'is_hidden'      => false,
         );
 
         return rest_ensure_response( array( 'sizes' => $sizes ) );
+    }
+
+    /**
+     * Get plugin-wide media settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/media-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_media_settings( $request ): \WP_REST_Response {
+        $settings     = \FotoGrids\Image_Size_Manager::get_plugin_size_settings();
+        $custom_sizes = \FotoGrids\Image_Size_Manager::get_custom_sizes();
+
+        return rest_ensure_response( array(
+            'settings'     => $settings,
+            'custom_sizes' => array_values( array_map( function( $slug, $config ) {
+                return array_merge( [ 'slug' => $slug ], $config );
+            }, array_keys( $custom_sizes ), $custom_sizes ) ),
+        ) );
+    }
+
+    /**
+     * Save plugin-wide media settings.
+     *
+     * POST /wp-json/fotogrids/v1/admin/media-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_media_settings( $request ): \WP_REST_Response {
+        $raw = array(
+            'thumbnail_width'     => $request->get_param( 'thumbnail_width' ),
+            'thumbnail_height'    => $request->get_param( 'thumbnail_height' ),
+            'thumbnail_crop'      => $request->get_param( 'thumbnail_crop' ),
+            'thumbnail_alignment' => $request->get_param( 'thumbnail_alignment' ),
+            'full_width'          => $request->get_param( 'full_width' ),
+            'full_height'         => $request->get_param( 'full_height' ),
+        );
+
+        $saved = \FotoGrids\Image_Size_Manager::save_plugin_size_settings( $raw );
+
+        return rest_ensure_response( array( 'settings' => $saved ) );
+    }
+
+    /**
+     * Get general (responsiveness) settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/general-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_general_settings( $request ): \WP_REST_Response {
+        return rest_ensure_response( array(
+            'settings' => \FotoGrids\Settings\Plugin_Settings_Store::get_general(),
+        ) );
+    }
+
+    /**
+     * Save general (responsiveness) settings.
+     *
+     * Delegates to the same sanitizer the Settings API uses, so REST and
+     * options.php persist identically (breakpoint clamping included).
+     *
+     * POST /wp-json/fotogrids/v1/admin/general-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_general_settings( $request ): \WP_REST_Response {
+        $settings = \FotoGrids\Settings\Plugin_Settings_Store::save_general( array(
+            'mobile_breakpoint'            => $request->get_param( 'mobile_breakpoint' ),
+            'tablet_breakpoint'            => $request->get_param( 'tablet_breakpoint' ),
+            'detect_responsive_by_browser' => $request->get_param( 'detect_responsive_by_browser' ),
+        ) );
+
+        return rest_ensure_response( array( 'settings' => $settings ) );
+    }
+
+    /**
+     * Get advanced (boolean) settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/advanced-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_advanced_settings( $request ): \WP_REST_Response {
+        return rest_ensure_response( array(
+            'settings' => \FotoGrids\Settings\Plugin_Settings_Store::get_advanced(),
+        ) );
+    }
+
+    /**
+     * Save advanced (boolean) settings.
+     *
+     * Each flag is its own top-level option. The uninstall flag is persisted
+     * as its inverse (fotogrids_preserve_data_on_uninstall), which is what the
+     * uninstaller reads.
+     *
+     * POST /wp-json/fotogrids/v1/admin/advanced-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_advanced_settings( $request ): \WP_REST_Response {
+        $settings = \FotoGrids\Settings\Plugin_Settings_Store::save_advanced( array(
+            'autosave'                          => $request->get_param( 'autosave' ),
+            'share_statistics'                  => $request->get_param( 'share_statistics' ),
+            'custom_js_allow_dynamic_execution' => $request->get_param( 'custom_js_allow_dynamic_execution' ),
+            'delete_data_on_uninstall'          => $request->get_param( 'delete_data_on_uninstall' ),
+        ) );
+
+        return rest_ensure_response( array( 'settings' => $settings ) );
+    }
+
+    /**
+     * Get regeneration status for all gallery attachments.
+     *
+     * Returns per-attachment derivative status for fotogrids_thumbnail, fotogrids_full,
+     * and any registered custom FotoGrids sizes.
+     *
+     * GET /wp-json/fotogrids/v1/admin/regen-thumbnails/status
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_regen_thumbnails_status( $request ): \WP_REST_Response {
+        global $wpdb;
+
+        // Collect all unique attachment IDs used across FotoGrids galleries.
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $attachment_ids = $wpdb->get_col( "SELECT DISTINCT attachment_id FROM {$table} WHERE attachment_id > 0" );
+
+        $plugin_sizes   = array(
+            \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
+            \FotoGrids\Image_Size_Manager::SLUG_FULL,
+        );
+        $custom_sizes   = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
+
+        $items = array();
+        foreach ( $attachment_ids as $attachment_id ) {
+            $attachment_id   = (int) $attachment_id;
+            $attachment_post = get_post( $attachment_id );
+            if ( ! $attachment_post ) {
+                continue;
+            }
+
+            $size_statuses = array();
+            foreach ( array_merge( $plugin_sizes, $custom_sizes ) as $slug ) {
+                $data = image_get_intermediate_size( $attachment_id, $slug );
+                $size_statuses[ $slug ] = array(
+                    'exists' => ( $data !== false && ! empty( $data['file'] ) ),
+                    'width'  => $data['width']  ?? null,
+                    'height' => $data['height'] ?? null,
+                );
+            }
+
+            $items[] = array(
+                'attachment_id' => $attachment_id,
+                'filename'      => basename( get_attached_file( $attachment_id ) ?: '' ),
+                'thumb_url'     => wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) ?: '',
+                'sizes'         => $size_statuses,
+            );
+        }
+
+        return rest_ensure_response( array(
+            'items'        => $items,
+            'plugin_sizes' => $plugin_sizes,
+            'custom_sizes' => $custom_sizes,
+        ) );
+    }
+
+    /**
+     * Regenerate image derivatives for a single attachment.
+     *
+     * POST /wp-json/fotogrids/v1/admin/regen-thumbnails/regenerate
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public static function regenerate_attachment( $request ) {
+        $attachment_id = (int) $request->get_param( 'attachment_id' );
+
+        $attachment_post = get_post( $attachment_id );
+        if ( ! $attachment_post || $attachment_post->post_type !== 'attachment' ) {
+            return new \WP_Error(
+                'invalid_attachment',
+                __( 'Attachment not found.', 'fotogrids' ),
+                array( 'status' => 404 )
+            );
+        }
+
+        $file = get_attached_file( $attachment_id );
+        if ( ! $file || ! file_exists( $file ) ) {
+            return new \WP_Error(
+                'file_missing',
+                __( 'Attachment file not found on disk.', 'fotogrids' ),
+                array( 'status' => 422 )
+            );
+        }
+
+        // Regenerate all derivatives for this attachment.
+        $metadata = wp_generate_attachment_metadata( $attachment_id, $file );
+        if ( is_wp_error( $metadata ) ) {
+            return $metadata;
+        }
+        wp_update_attachment_metadata( $attachment_id, $metadata );
+
+        // Return updated size statuses.
+        $plugin_sizes = array(
+            \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
+            \FotoGrids\Image_Size_Manager::SLUG_FULL,
+        );
+        $custom_sizes = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
+        $size_statuses = array();
+        foreach ( array_merge( $plugin_sizes, $custom_sizes ) as $slug ) {
+            $data = image_get_intermediate_size( $attachment_id, $slug );
+            $size_statuses[ $slug ] = array(
+                'exists' => ( $data !== false && ! empty( $data['file'] ) ),
+                'width'  => $data['width']  ?? null,
+                'height' => $data['height'] ?? null,
+            );
+        }
+
+        return rest_ensure_response( array(
+            'attachment_id' => $attachment_id,
+            'sizes'         => $size_statuses,
+        ) );
+    }
+
+    /**
+     * Get Google Fonts family names via a server-side request.
+     *
+     * @param \WP_REST_Request $request Request object.
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public static function get_google_fonts_families( $request ) {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
+        }
+
+        $cache_key = 'fotogrids_google_fonts_families_v1';
+        $cached_families = get_transient( $cache_key );
+
+        if ( is_array( $cached_families ) && ! empty( $cached_families ) ) {
+            return rest_ensure_response( array( 'families' => array_values( $cached_families ) ) );
+        }
+
+        $response = wp_remote_get(
+            'https://fonts.google.com/metadata/fonts',
+            array(
+                'timeout' => 8,
+                'redirection' => 3,
+            )
+        );
+
+        if ( is_wp_error( $response ) ) {
+            return new \WP_Error(
+                'google_fonts_request_failed',
+                __( 'Unable to fetch Google Fonts metadata.', 'fotogrids' ),
+                array( 'status' => 502 )
+            );
+        }
+
+        $status_code = (int) wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $status_code ) {
+            return new \WP_Error(
+                'google_fonts_bad_response',
+                __( 'Google Fonts metadata endpoint returned an unexpected response.', 'fotogrids' ),
+                array( 'status' => 502 )
+            );
+        }
+
+        $body = (string) wp_remote_retrieve_body( $response );
+        $body = preg_replace( "/^\)\]\}'\n?/", '', $body );
+        $parsed = json_decode( $body, true );
+        $family_metadata = is_array( $parsed ) && isset( $parsed['familyMetadataList'] ) && is_array( $parsed['familyMetadataList'] )
+            ? $parsed['familyMetadataList']
+            : array();
+
+        $families = array();
+        foreach ( $family_metadata as $font_entry ) {
+            if ( ! is_array( $font_entry ) || ! isset( $font_entry['family'] ) ) {
+                continue;
+            }
+
+            $family = trim( (string) $font_entry['family'] );
+            if ( '' !== $family ) {
+                $families[] = $family;
+            }
+        }
+
+        $families = array_values( array_unique( $families ) );
+        sort( $families, SORT_NATURAL | SORT_FLAG_CASE );
+
+        if ( empty( $families ) ) {
+            return new \WP_Error(
+                'google_fonts_empty',
+                __( 'Google Fonts metadata response was empty.', 'fotogrids' ),
+                array( 'status' => 502 )
+            );
+        }
+
+        set_transient( $cache_key, $families, 12 * HOUR_IN_SECONDS );
+
+        return rest_ensure_response( array( 'families' => $families ) );
     }
 
     /**

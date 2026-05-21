@@ -1,6 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import ModalStructure from './item-edit-modal/ModalStructure';
 
+/**
+ * Metadata type registry.
+ *
+ * Pro (or any extension) can register additional metadata types that will be
+ * included in the item save payload automatically. Call this before the modal
+ * mounts — typically from the Pro plugin's admin JS entry point.
+ *
+ * Example (Pro plugin):
+ *   window.FotoGridsAdmin.registerMetadataType({
+ *     key: 'subjects',
+ *     serialize:   (metadata) => metadata.subjects?.map(s => s.id) ?? [],
+ *     deserialize: (data)     => data.subjects ?? [],
+ *   });
+ *
+ * Each registration object must provide:
+ *   key         {string}   — The state key used in `metadata` and the payload field name.
+ *   serialize   {Function} — Converts the current metadata state slice to a saveable value.
+ *   deserialize {Function} — Converts the API load response into the initial state slice.
+ */
+const _metadataTypeRegistry = [];
+
+window.FotoGridsAdmin = window.FotoGridsAdmin || {};
+window.FotoGridsAdmin.registerMetadataType = ( registration ) => {
+    if ( ! registration?.key || typeof registration.serialize !== 'function' || typeof registration.deserialize !== 'function' ) {
+        console.warn( '[FotoGrids] registerMetadataType: invalid registration — key, serialize, and deserialize are required.', registration );
+        return;
+    }
+    if ( _metadataTypeRegistry.some( r => r.key === registration.key ) ) {
+        console.warn( `[FotoGrids] registerMetadataType: type "${ registration.key }" is already registered.` );
+        return;
+    }
+    _metadataTypeRegistry.push( registration );
+};
+
 const ItemEditModal = ({
     itemId,
     itemData,
@@ -8,8 +42,6 @@ const ItemEditModal = ({
     items,
     onClose,
     onNavigate,
-    ajaxUrl,
-    nonce,
     strings
 }) => {
     const [activeTab, setActiveTab] = useState('details');
@@ -18,7 +50,7 @@ const ItemEditModal = ({
         alt: '',
         caption: '',
         description: '',
-        location: '',
+        credit: '',
         external_url: '',
         link_target: 'global',
         exif: {}
@@ -26,7 +58,7 @@ const ItemEditModal = ({
     const [metadata, setMetadata] = useState({
         tags: [],
         people: [],
-        location: null
+        locations: []
     });
     const [availableMetadata, setAvailableMetadata] = useState({
         tags: [],
@@ -36,7 +68,7 @@ const ItemEditModal = ({
     const [metadataInput, setMetadataInput] = useState({
         tags: '',
         people: '',
-        location: ''
+        locations: ''
     });
     const [saving, setSaving] = useState(false);
     const [originalData, setOriginalData] = useState(null);
@@ -51,7 +83,7 @@ const ItemEditModal = ({
                 alt: itemData.alt || '',
                 caption: itemData.caption || '',
                 description: itemData.description || '',
-                location: itemData.location || '',
+                credit: itemData.credit || '',
                 external_url: itemData.external_url || '',
                 link_target: itemData.link_target || 'global',
                 exif: itemData.exif || {}
@@ -82,7 +114,7 @@ const ItemEditModal = ({
             originalMetadata.tags.some(tag => !metadata.tags.find(t => t.id === tag.id)) ||
             (originalMetadata.people.length !== metadata.people.length) ||
             originalMetadata.people.some(person => !metadata.people.find(p => p.id === person.id)) ||
-            (originalMetadata.location?.id !== metadata.location?.id);
+            (originalMetadata.locations[0]?.id !== metadata.locations[0]?.id);
 
         setHasChanges(formDataChanged || metadataChanged);
     }, [formData, originalData, metadata, originalMetadata]);
@@ -92,13 +124,16 @@ const ItemEditModal = ({
             const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`);
             const data = await response.json();
 
-            const location = (data.locations && data.locations.length > 0) ? data.locations[0] : null;
-
             const initialMetadata = {
                 tags: data.tags || [],
                 people: data.people || [],
-                location: location
+                locations: data.locations || []
             };
+
+            // Allow registered extension types to hydrate their own state slices.
+            _metadataTypeRegistry.forEach(({ key, deserialize }) => {
+                initialMetadata[key] = deserialize(data);
+            });
 
             setMetadata(initialMetadata);
             setOriginalMetadata(initialMetadata);
@@ -153,14 +188,13 @@ const ItemEditModal = ({
 
             const newItem = await response.json();
 
-            if (type === 'locations') {
-                setMetadata(prev => ({ ...prev, location: newItem }));
-            } else {
-                setMetadata(prev => ({
-                    ...prev,
-                    [type]: [...prev[type], newItem]
-                }));
-            }
+            // For replace-type keys (maxItems === 1, e.g. locations), replace
+            // the existing entry rather than appending.
+            const REPLACE_TYPES = ['locations'];
+            setMetadata(prev => ({
+                ...prev,
+                [type]: REPLACE_TYPES.includes(type) ? [newItem] : [...prev[type], newItem]
+            }));
 
             setAvailableMetadata(prev => ({
                 ...prev,
@@ -176,97 +210,72 @@ const ItemEditModal = ({
     };
 
     const removeMetadataItem = (type, itemId) => {
-        if (type === 'location') {
-            setMetadata(prev => ({ ...prev, location: null }));
-        } else {
-            setMetadata(prev => ({
-                ...prev,
-                [type]: prev[type].filter(item => item.id !== itemId)
-            }));
-        }
+        setMetadata(prev => ({
+            ...prev,
+            [type]: prev[type].filter(item => item.id !== itemId)
+        }));
     };
 
     const selectExistingMetadata = (type, item) => {
-        if (type === 'locations') {
-            setMetadata(prev => ({ ...prev, location: item }));
-        } else {
-            const exists = metadata[type].some(existing => existing.id === item.id);
-            if (!exists) {
-                setMetadata(prev => ({
-                    ...prev,
-                    [type]: [...prev[type], item]
-                }));
-            }
-        }
-        setMetadataInput(prev => ({ ...prev, [type]: '' }));
-    };
+        // For single-item types (locations), replace rather than append.
+        const isSingleType = type === 'locations';
+        const alreadySelected = metadata[type].some(existing => existing.id === item.id);
 
-    const saveItemMetadata = async () => {
-        try {
-            const tagsToSave = metadata.tags.map(tag => tag.id);
-
-            const peopleToSave = metadata.people.map(person => ({
-                name: person.name || '',
-                details: person.details || ''
+        if (!alreadySelected) {
+            setMetadata(prev => ({
+                ...prev,
+                [type]: isSingleType ? [item] : [...prev[type], item]
             }));
-
-            const locationsToSave = metadata.location ? [{
-                name: metadata.location.name || '',
-                latitude: metadata.location.latitude || null,
-                longitude: metadata.location.longitude || null
-            }] : [];
-
-            const metadataToSave = {
-                tags: tagsToSave,
-                people: peopleToSave,
-                locations: locationsToSave
-            };
-
-            await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.wpApiSettings.nonce
-                },
-                body: JSON.stringify(metadataToSave)
-            });
-        } catch (error) {
-            console.warn('Failed to save item metadata:', error);
         }
+
+        setMetadataInput(prev => ({ ...prev, [type]: '' }));
     };
 
     const handleSave = async () => {
         setSaving(true);
 
         try {
-            const formDataToSend = new FormData();
-            formDataToSend.append('action', 'fotogrids_save_item_data');
-            formDataToSend.append('item_id', itemId);
-            formDataToSend.append('nonce', nonce);
+            const payload = {
+                ...formData,
+                tags: metadata.tags.map(tag => tag.id),
+                people: metadata.people.map(person => ({
+                    id: person.id,
+                    name: person.name || '',
+                    details: person.details || ''
+                })),
+                locations: metadata.locations.map(loc => ({
+                    id: loc.id,
+                    name: loc.name || '',
+                    latitude: loc.latitude || null,
+                    longitude: loc.longitude || null
+                }))
+            };
 
-            Object.entries(formData).forEach(([key, value]) => {
-                if (key === 'exif' && typeof value === 'object') {
-                    formDataToSend.append(key, JSON.stringify(value));
-                } else {
-                    formDataToSend.append(key, value);
+            // Allow registered extension types to append their own payload fields.
+            _metadataTypeRegistry.forEach(({ key, serialize }) => {
+                payload[key] = serialize(metadata);
+            });
+
+            const response = await fetch(
+                `${window.wpApiSettings.root}fotogrids/v1/items/${itemId}/save`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': window.wpApiSettings.nonce
+                    },
+                    body: JSON.stringify(payload)
                 }
-            });
-
-            const response = await fetch(ajaxUrl, {
-                method: 'POST',
-                body: formDataToSend
-            });
+            );
 
             const data = await response.json();
 
-            if (data.success) {
-                await saveItemMetadata();
-
+            if (response.ok && data.success) {
                 setOriginalData({ ...formData });
                 setOriginalMetadata({
                     tags: [...metadata.tags],
                     people: [...metadata.people],
-                    location: metadata.location ? { ...metadata.location } : null
+                    locations: [...metadata.locations]
                 });
 
                 setHasChanges(false);
@@ -281,12 +290,11 @@ const ItemEditModal = ({
             } else {
                 setSaving(false);
 
+                const errorMessage = data.message || strings.errorSaving;
                 if (window.fotogridsToast) {
-                    window.fotogridsToast.error(
-                        data.message || strings.errorSaving
-                    );
+                    window.fotogridsToast.error(errorMessage);
                 } else {
-                    alert(data.message || strings.errorSaving);
+                    alert(errorMessage);
                 }
             }
         } catch (error) {

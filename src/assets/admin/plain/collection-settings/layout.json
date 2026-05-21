@@ -1,0 +1,265 @@
+{
+    "id": "layout",
+    "label": "Layout",
+    "icon": "layout",
+    "settings": [
+        {
+            "key": "layout",
+            "type": "layout_grid",
+            "label": "Layout Type",
+            "options": [
+                {
+                    "label": "Grid",
+                    "value": "grid",
+                    "icon": "layout_grid",
+                    "description": "Evenly spaced grid layout",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Masonry",
+                    "value": "masonry",
+                    "icon": "layout_masonry",
+                    "description": "Pinterest-style masonry layout",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Justified",
+                    "value": "justified",
+                    "icon": "layout_justified",
+                    "description": "Justified rows with equal heights",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Slider",
+                    "value": "slider",
+                    "icon": "layout_slider",
+                    "description": "Full-width item slider",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Image Viewer",
+                    "value": "image-viewer",
+                    "icon": "layout_image_viewer",
+                    "description": "Large image viewer with navigation",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Single Item",
+                    "value": "single-item",
+                    "icon": "layout_single_item",
+                    "description": "Display one item at a time",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Video Playlist",
+                    "value": "video",
+                    "icon": "layout_video",
+                    "description": "Large video with thumbnail gallery",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "pro_starter"
+                },
+                {
+                    "label": "Carousel",
+                    "value": "carousel",
+                    "icon": "layout_carousel",
+                    "description": "Horizontal scrolling carousel",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "pro_starter"
+                },
+                {
+                    "label": "Product Gallery",
+                    "value": "products",
+                    "icon": "layout_product_gallery",
+                    "description": "E-commerce style product gallery with main image and thumbnails",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "pro_plus"
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "item_spacing",
+            "type": "responsive_range",
+            "label": "Item Spacing",
+            "responsive": {
+                "desktop": {
+                    "min": 0,
+                    "max": 50,
+                    "default": 10
+                },
+                "tablet": {
+                    "min": 0,
+                    "max": 40,
+                    "default": 8
+                },
+                "mobile": {
+                    "min": 0,
+                    "max": 30,
+                    "default": 5
+                }
+            },
+            "unit": "px",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "grid",
+                    "masonry",
+                    "justified"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "columns_group",
+            "type": "setting_group",
+            "label": "Columns",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "grid"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "columns_mode",
+                    "type": "button_group",
+                    "label": "Columns Mode",
+                    "description": "Choose between fixed number of columns or auto-responsive columns",
+                    "options": [
+                        {
+                            "label": "Fixed",
+                            "value": "fixed",
+                            "icon": "columns_01",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Auto",
+                            "value": "auto",
+                            "icon": "columns_02",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "fixed",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "columns",
+                    "type": "responsive_range",
+                    "label": "Number of Columns",
+                    "description": "Fixed number of columns for each device",
+                    "responsive": {
+                        "desktop": {
+                            "min": 1,
+                            "max": 12,
+                            "default": 4
+                        },
+                        "tablet": {
+                            "min": 1,
+                            "max": 6,
+                            "default": 3
+                        },
+                        "mobile": {
+                            "min": 1,
+                            "max": 4,
+                            "default": 1
+                        }
+                    },
+                    "condition": {
+                        "dependsOn": "columns_mode",
+                        "values": [
+                            "fixed"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "columns_auto_range",
+                    "type": "responsive_range",
+                    "minMax": true,
+                    "label": "Column Width Range",
+                    "description": "Set the minimum and maximum width for each column. Columns will automatically adjust based on available space.",
+                    "units": [
+                        "px",
+                        "em",
+                        "rem",
+                        "%"
+                    ],
+                    "responsive": {
+                        "desktop": {
+                            "min": 100,
+                            "max": 800,
+                            "minMin": 100,
+                            "minMax": 500,
+                            "maxMin": 200,
+                            "maxMax": 800,
+                            "defaultMin": 200,
+                            "defaultMax": 400
+                        },
+                        "tablet": {
+                            "min": 100,
+                            "max": 600,
+                            "minMin": 100,
+                            "minMax": 400,
+                            "maxMin": 150,
+                            "maxMax": 600,
+                            "defaultMin": 180,
+                            "defaultMax": 350
+                        },
+                        "mobile": {
+                            "min": 100,
+                            "max": 400,
+                            "minMin": 100,
+                            "minMax": 300,
+                            "maxMin": 100,
+                            "maxMax": 400,
+                            "defaultMin": 100,
+                            "defaultMax": 300
+                        }
+                    },
+                    "condition": {
+                        "dependsOn": "columns_mode",
+                        "values": [
+                            "auto"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

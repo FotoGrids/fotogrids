@@ -11,14 +11,13 @@ const MetadataTab = ({
     disabled = false,
     strings = {},
     metadataKey,
-    inputKey,
     placeholder,
     icon,
     itemClassName = 'fotogrids-metadata-item',
     showProNotice = false,
     proNoticeContent,
     renderItemContent,
-    isSingleItem = false,
+    maxItems = Infinity,
 }) => {
     const handleUpgrade = () => {
         if (window.FotoGridsUpgrade) {
@@ -28,33 +27,33 @@ const MetadataTab = ({
         }
     };
 
-    const currentInput = metadataInput?.[inputKey] || '';
-    // For single items, use inputKey to get the item (e.g., metadata.location)
-    // For arrays, use metadataKey (e.g., metadata.tags)
-    const currentItems = isSingleItem
-        ? (metadata[inputKey] ? [metadata[inputKey]] : [])
-        : (metadata[metadataKey] || []);
+    const currentInput = metadataInput?.[metadataKey] || '';
+    const currentItems = metadata[metadataKey] || [];
     const availableItems = availableMetadata[metadataKey] || [];
+
+    // "Replace" semantics: when maxItems === 1, the input stays visible so the
+    // user can search and replace the existing value. Adding a second item via
+    // the Add button or Enter is still blocked — only autocomplete selection
+    // (which replaces) is allowed when one item is already present.
+    const isReplaceType = maxItems === 1;
+    const isHardFull    = !isReplaceType && currentItems.length >= maxItems;
 
     const filteredSuggestions = availableItems
         .filter(item => {
             if (!item || !item.name) return false;
             if (!currentInput) return false;
-
             const matchesInput = item.name.toLowerCase().includes(currentInput.toLowerCase());
-
-            if (isSingleItem) {
-                return matchesInput && (!metadata[inputKey] || metadata[inputKey].id !== item.id);
-            } else {
-                return matchesInput && !currentItems.some(existing => existing.id === item.id);
-            }
+            return matchesInput && !currentItems.some(existing => existing.id === item.id);
         })
         .slice(0, 5);
 
     const hasSuggestions = filteredSuggestions.length > 0;
 
+    // For replace-type (location): when one item is set, Enter / Add button
+    // create a new entry and replace — handled by selectExistingMetadata /
+    // addMetadataItem in ItemEditModal. Block only when truly hard-full.
     const handleKeyEvent = (e) => {
-        if (!disabled && e.key === 'Enter') {
+        if (!disabled && !isHardFull && e.key === 'Enter') {
             e.preventDefault();
             addMetadataItem(metadataKey, currentInput);
         }
@@ -65,7 +64,7 @@ const MetadataTab = ({
             type="text"
             placeholder={placeholder}
             value={currentInput}
-            onChange={(e) => setMetadataInput(prev => ({ ...prev, [inputKey]: e.target.value }))}
+            onChange={(e) => setMetadataInput(prev => ({ ...prev, [metadataKey]: e.target.value }))}
             onKeyDown={handleKeyEvent}
             disabled={disabled}
             className="fotogrids-input"
@@ -75,27 +74,34 @@ const MetadataTab = ({
     return (
         <div className="fotogrids-tab-panel fg-is-active">
             <div className="fotogrids-metadata-section">
-                <div className="fotogrids-metadata-input">
-                    {icon ? (
-                        <div className="fotogrids-input-with-icon">
-                            <span className="fotogrids-input-icon" dangerouslySetInnerHTML={{ __html: icon }} />
-                            {inputElement}
-                        </div>
-                    ) : (
-                        inputElement
-                    )}
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--primary fotogrids-button--outline"
-                        onClick={() => !disabled && addMetadataItem(metadataKey, currentInput)}
-                        disabled={disabled}
-                    >
-                        {strings.add}
-                    </button>
-                </div>
+                {!isHardFull && (
+                    <div className="fotogrids-metadata-input">
+                        {icon ? (
+                            <div className="fotogrids-input-with-icon">
+                                <span className="fotogrids-input-icon" dangerouslySetInnerHTML={{ __html: icon }} />
+                                {inputElement}
+                            </div>
+                        ) : (
+                            inputElement
+                        )}
+                        {/* For replace-type, hide the Add button when an item is
+                            already set — the user should select from autocomplete
+                            to replace, not add a second entry. */}
+                        {(!isReplaceType || currentItems.length === 0) && (
+                            <button
+                                type="button"
+                                className="fotogrids-button fotogrids-button--primary fotogrids-button--outline"
+                                onClick={() => !disabled && addMetadataItem(metadataKey, currentInput)}
+                                disabled={disabled}
+                            >
+                                {strings.add}
+                            </button>
+                        )}
+                    </div>
+                )}
 
                 {/* Autocomplete suggestions */}
-                {currentInput && hasSuggestions && (
+                {!isHardFull && currentInput && hasSuggestions && (
                     <div className="fotogrids-autocomplete">
                         {filteredSuggestions.map(item => (
                             <div
@@ -148,7 +154,7 @@ const MetadataTab = ({
                                 <button
                                     type="button"
                                     className="fotogrids-tag-remove-button"
-                                    onClick={() => !disabled && removeMetadataItem(isSingleItem ? inputKey : metadataKey, item.id)}
+                                    onClick={() => !disabled && removeMetadataItem(metadataKey, item.id)}
                                     disabled={disabled}
                                     aria-label="Remove"
                                     dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.x || 'x' }}

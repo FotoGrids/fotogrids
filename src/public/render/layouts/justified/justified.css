@@ -1,0 +1,10 @@
+[data-fg-layout="justified"] .fg-justified-track {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fg-gap, 10px);
+}
+
+[data-fg-layout="justified"] .fg-justified-track .fg-item {
+    flex: 1 1 220px;
+    min-width: 180px;
+}

@@ -42,6 +42,11 @@ class Activator {
             $site_id = wp_generate_uuid4();
             update_option( 'fotogrids_site_id', $site_id, false );
         }
+
+        // Seed plugin-wide media settings with defaults (only on first activation)
+        if ( ! get_option( 'fotogrids_media_settings' ) ) {
+            update_option( 'fotogrids_media_settings', Image_Size_Manager::get_plugin_size_defaults(), false );
+        }
     }
 
     /**
@@ -76,8 +81,10 @@ class Activator {
           attachment_id BIGINT UNSIGNED NOT NULL,
           gallery_id BIGINT UNSIGNED DEFAULT NULL,
           position INT NOT NULL DEFAULT 0,
+          item_type VARCHAR(20) NOT NULL DEFAULT 'image',
           caption TEXT DEFAULT NULL,
           description LONGTEXT DEFAULT NULL,
+          credit TEXT DEFAULT NULL,
           location VARCHAR(191) DEFAULT NULL,
           external_url TEXT DEFAULT NULL,
           link_target VARCHAR(20) DEFAULT 'global',
@@ -88,7 +95,8 @@ class Activator {
           PRIMARY KEY (id),
           KEY attachment_id (attachment_id),
           KEY gallery_id (gallery_id),
-          KEY position (position)
+          KEY position (position),
+          KEY item_type (item_type)
         ) $charset_collate;
 
         CREATE TABLE $table_stats (
@@ -168,7 +176,26 @@ class Activator {
 
         do_action( 'fotogrids/system/activate' );
 
-        update_option( 'fotogrids_db_version', '1.0' );
+        update_option( 'fotogrids_db_version', '1.1' );
+    }
+
+    /**
+     * Run database upgrades if needed
+     *
+     * Compares the stored db version against the current schema version.
+     * The version check uses the options cache (no DB hit on the fast path),
+     * so this is safe to call on every plugins_loaded without measurable overhead.
+     * upgrade.php and dbDelta are only loaded when an upgrade is actually needed.
+     *
+     * @since 1.0.0
+     */
+    public static function maybe_upgrade() {
+        $current = get_option( 'fotogrids_db_version', '0' );
+        if ( version_compare( $current, '1.1', '>=' ) ) {
+            return; // Already up to date — nothing to do.
+        }
+
+        self::create_tables();
     }
 
     /**
@@ -220,6 +247,7 @@ class Activator {
             'manage_fotogrids',
             'view_fotogrids_stats',
             'manage_fotogrids_settings',
+            'manage_fotogrids_library',
         );
 
         $all_capabilities = array_merge( $gallery_capabilities, $album_capabilities, $plugin_capabilities );
@@ -233,7 +261,11 @@ class Activator {
 
         $editor_role = get_role( 'editor' );
         if ( $editor_role ) {
-            $editor_caps = array_merge( $gallery_capabilities, $album_capabilities, array( 'view_fotogrids_stats' ) );
+            $editor_caps = array_merge(
+                $gallery_capabilities,
+                $album_capabilities,
+                array( 'view_fotogrids_stats', 'manage_fotogrids_library' )
+            );
             foreach ( $editor_caps as $cap ) {
                 $editor_role->add_cap( $cap );
             }

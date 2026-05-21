@@ -19,14 +19,17 @@ const AlbumAssignment = () => {
 
     // Derive available albums during render - avoids useEffect sync and two-phase updates
     // that were causing removeChild errors when item moved from available to assigned
-    const filteredAlbums = useMemo(() => {
+    const availableAlbums = useMemo(() => {
         const assignedAlbumIds = assignedAlbums.map(album => parseInt(album.ID));
-        const available = allAlbums.filter(album => !assignedAlbumIds.includes(parseInt(album.id)));
-        if (!searchTerm) return available;
-        return available.filter(album =>
+        return allAlbums.filter(album => !assignedAlbumIds.includes(parseInt(album.id)));
+    }, [allAlbums, assignedAlbums]);
+
+    const filteredAlbums = useMemo(() => {
+        if (!searchTerm) return availableAlbums;
+        return availableAlbums.filter(album =>
             album.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [searchTerm, allAlbums, assignedAlbums]);
+    }, [searchTerm, availableAlbums]);
 
     const handleAlbumToggle = async (albumId) => {
         const isCurrentlyAssigned = assignedAlbums.some(album => parseInt(album.ID) === parseInt(albumId));
@@ -155,7 +158,7 @@ const AlbumAssignment = () => {
         ),
 
         // Search and Selection
-        React.createElement('div', { className: 'fotogrids-album-search' },
+        availableAlbums.length > 0 && React.createElement('div', { className: 'fotogrids-album-search' },
             React.createElement('div', { className: 'fotogrids-search-input-wrapper' },
                 React.createElement('div', {
                     className: 'fotogrids-search-icon',
@@ -174,7 +177,13 @@ const AlbumAssignment = () => {
         // Album List
         React.createElement('div', { className: 'fotogrids-album-list' },
             filteredAlbums.length === 0
-                ? React.createElement('p', { className: 'fotogrids-no-albums' }, config.strings.noAvailableAlbumsFound)
+                ? React.createElement(
+                    'p',
+                    { className: 'fotogrids-no-albums' },
+                    assignedAlbums.length > 0 && availableAlbums.length === 0
+                        ? config.strings.noMoreAlbumsFound
+                        : config.strings.noAvailableAlbumsFound
+                )
                 : React.createElement('div', { className: 'fotogrids-albums' },
                     filteredAlbums.map(album =>
                         React.createElement('div', {

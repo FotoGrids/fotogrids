@@ -6,6 +6,35 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
+const ensurePreviewCssAssets = (cssAssets) => {
+    if (!cssAssets || typeof cssAssets !== 'object') {
+        return;
+    }
+
+    Object.entries(cssAssets).forEach(([handle, href]) => {
+        if (!handle || !href || typeof href !== 'string') {
+            return;
+        }
+
+        const existingByHandle = document.querySelector(`link[data-fotogrids-preview-css="${handle}"]`);
+        if (existingByHandle) {
+            return;
+        }
+
+        const existingByHref = document.querySelector(`link[rel="stylesheet"][href="${href}"]`);
+        if (existingByHref) {
+            existingByHref.setAttribute('data-fotogrids-preview-css', handle);
+            return;
+        }
+
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.setAttribute('data-fotogrids-preview-css', handle);
+        document.head.appendChild(link);
+    });
+};
+
 const GalleryPreview = ({ items = [], galleryId = null }) => {
     const previewRef = useRef(null);
     const [previewHtml, setPreviewHtml] = useState('');
@@ -53,9 +82,14 @@ const GalleryPreview = ({ items = [], galleryId = null }) => {
                 const response = await fetch(
                     `${restUrl}admin/galleries/${currentGalleryId}/preview`,
                     {
+                        method: 'POST',
                         headers: {
+                            'Content-Type': 'application/json',
                             'X-WP-Nonce': restNonce,
                         },
+                        body: JSON.stringify({
+                            version: 2,
+                        }),
                     }
                 );
                 
@@ -66,6 +100,7 @@ const GalleryPreview = ({ items = [], galleryId = null }) => {
                 
                 const data = await response.json();
                 setPreviewHtml(data.html || '');
+                ensurePreviewCssAssets(data.assets?.css);
             } catch (err) {
                 console.error('Error fetching gallery preview:', err);
                 setError(err.message || 'Failed to load gallery preview.');

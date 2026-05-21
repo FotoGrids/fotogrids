@@ -282,6 +282,54 @@
     }
 }
 
+.cm-fg-selector-token {
+    background-color: var(--fg-background-warning);
+    color: var(--fg-blue);
+    border-radius: 3px;
+    padding: 0 2px;
+    outline: 1px solid var(--fg-yellow);
+    outline-offset: -1px;
+
+    span {
+        color: inherit !important;
+    }
+}
+
+.fotogrids-codearea-hint {
+    margin: ui-size(margin, base) 0 0;
+    color: ui-color(text, secondary);
+    font-size: ui-size(font-size, sm);
+    line-height: ui-size(line-height, text);
+
+    code {
+        display: inline;
+        background-color: var(--fg-background-warning);
+        color: var(--fg-blue);
+        border: 1px solid var(--fg-yellow);
+        border-radius: 3px;
+        padding: 0 3px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+        font-size: ui-size(font-size, xs);
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    &-link {
+        font-size: ui-size(font-size, sm);
+        margin: ui-size(margin, base) 0 0;
+
+        a {
+            color: var(--fg-blue);
+            text-decoration: none;
+
+            &:hover,
+            &:focus {
+                color: var(--fg-blue-dark);
+            }
+        }
+    }
+}
+
 @media (max-width: 768px) {
     .fotogrids-codearea-container {
         .cm-editor {

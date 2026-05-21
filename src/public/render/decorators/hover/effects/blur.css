@@ -1,0 +1,7 @@
+[data-fg-hover="blur"] .fg-item-media {
+    transition: filter 220ms ease;
+}
+
+[data-fg-hover="blur"] .fg-item:hover .fg-item-media {
+    filter: blur(2px);
+}

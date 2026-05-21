@@ -69,6 +69,11 @@
         .fg-is-disabled & {
             color: #9ca3af;
         }
+
+        .fotogrids-icon svg {
+            width: 100%;
+            height: 100%;
+        }
     }
 
     &__info {

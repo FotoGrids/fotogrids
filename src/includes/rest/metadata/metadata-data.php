@@ -180,74 +180,97 @@ class Metadata_Data {
      * @return \WP_REST_Response Results of metadata save operation including any errors
      */
     public static function save_item_metadata( $request ) {
-        $item_id = $request->get_param( 'id' );
-        $tags = $request->get_param( 'tags' );
-        $people = $request->get_param( 'people' );
-        $locations = $request->get_param( 'locations' );
+        $item_id   = $request->get_param( 'id' );
+        $tags      = $request->get_param( 'tags' )      ?: array();
+        $people    = $request->get_param( 'people' )    ?: array();
+        $locations = $request->get_param( 'locations' ) ?: array();
 
         \FotoGrids\Metadata_Manager::clear_item_metadata( $item_id );
 
         $results = array(
-            'tags' => array(),
-            'people' => array(),
+            'tags'      => array(),
+            'people'    => array(),
             'locations' => array(),
-            'errors' => array()
+            'errors'    => array(),
         );
 
-        if ( ! empty( $tags ) ) {
-            foreach ( $tags as $tag_data ) {
-                $tag_name = is_string( $tag_data ) ? $tag_data : ( isset( $tag_data['name'] ) ? $tag_data['name'] : $tag_data );
-
-                if ( is_numeric( $tag_name ) ) {
-                    global $wpdb;
-                    $tag_name = $wpdb->get_var( $wpdb->prepare(
-                        "SELECT name FROM {$wpdb->prefix}fotogrids_tags WHERE id = %d AND type = 'tag'",
-                        $tag_name
-                    ) );
+        // ── Tags ─────────────────────────────────────────────────────────────
+        // The FE sends an array of integer IDs. Link each directly without a
+        // name lookup. Fall back to name-based lookup only for non-integer values
+        // (e.g. external API callers that still send names).
+        foreach ( $tags as $tag_data ) {
+            if ( is_int( $tag_data ) || ( is_numeric( $tag_data ) && intval( $tag_data ) == $tag_data ) ) {
+                $tag_id = (int) $tag_data;
+                $result = \FotoGrids\Metadata_Manager::link_tag_to_item( $item_id, $tag_id );
+                if ( $result ) {
+                    $results['tags'][] = array( 'id' => $tag_id );
+                } else {
+                    $results['errors'][] = sprintf( __( 'Failed to link tag ID %d to item %d', 'fotogrids' ), $tag_id, $item_id );
                 }
-
+            } else {
+                // Fallback: name string (backwards compat for external callers).
+                $tag_name = is_string( $tag_data ) ? trim( $tag_data ) : ( isset( $tag_data['name'] ) ? trim( $tag_data['name'] ) : '' );
                 if ( empty( $tag_name ) ) {
                     continue;
                 }
-
                 $result = \FotoGrids\Metadata_Manager::add_tag_to_item( $item_id, $tag_name );
                 if ( $result ) {
-                    $results['tags'][] = $tag_name;
+                    $results['tags'][] = array( 'name' => $tag_name );
                 } else {
                     $results['errors'][] = sprintf( __( 'Failed to add tag: %s to item %d', 'fotogrids' ), $tag_name, $item_id );
                 }
             }
         }
 
-        if ( ! empty( $people ) ) {
-            foreach ( $people as $person ) {
-                $name = isset( $person['name'] ) ? $person['name'] : '';
-                $details = isset( $person['details'] ) ? $person['details'] : '';
+        // ── People ───────────────────────────────────────────────────────────
+        // The FE sends { id, name, details }. When an ID is present, link
+        // directly. Fall back to name-based lookup when ID is absent.
+        foreach ( $people as $person ) {
+            $person_id = isset( $person['id'] ) ? (int) $person['id'] : 0;
+            $name      = isset( $person['name'] )    ? trim( $person['name'] )    : '';
+            $details   = isset( $person['details'] ) ? trim( $person['details'] ) : '';
 
-                if ( ! empty( $name ) ) {
-                    $result = \FotoGrids\Metadata_Manager::add_person_to_item( $item_id, $name, $details );
-                    if ( $result ) {
-                        $results['people'][] = $person;
-                    } else {
-                        $results['errors'][] = sprintf( __( 'Failed to add person: %s', 'fotogrids' ), $name );
-                    }
+            if ( $person_id > 0 ) {
+                $result = \FotoGrids\Metadata_Manager::link_person_to_item( $item_id, $person_id );
+                if ( $result ) {
+                    $results['people'][] = array( 'id' => $person_id, 'name' => $name );
+                } else {
+                    $results['errors'][] = sprintf( __( 'Failed to link person ID %d to item %d', 'fotogrids' ), $person_id, $item_id );
+                }
+            } elseif ( ! empty( $name ) ) {
+                // Fallback: no ID supplied — find or create by name.
+                $result = \FotoGrids\Metadata_Manager::add_person_to_item( $item_id, $name, $details );
+                if ( $result ) {
+                    $results['people'][] = array( 'name' => $name );
+                } else {
+                    $results['errors'][] = sprintf( __( 'Failed to add person: %s', 'fotogrids' ), $name );
                 }
             }
         }
 
-        if ( ! empty( $locations ) ) {
-            foreach ( $locations as $location ) {
-                $name = isset( $location['name'] ) ? $location['name'] : '';
-                $latitude = isset( $location['latitude'] ) ? $location['latitude'] : null;
-                $longitude = isset( $location['longitude'] ) ? $location['longitude'] : null;
+        // ── Locations ────────────────────────────────────────────────────────
+        // The FE sends { id, name, latitude, longitude }. When an ID is present,
+        // link directly. Fall back to name-based lookup when ID is absent.
+        foreach ( $locations as $location ) {
+            $location_id = isset( $location['id'] ) ? (int) $location['id'] : 0;
+            $name        = isset( $location['name'] )      ? trim( $location['name'] )    : '';
+            $latitude    = isset( $location['latitude'] )  ? $location['latitude']        : null;
+            $longitude   = isset( $location['longitude'] ) ? $location['longitude']       : null;
 
-                if ( ! empty( $name ) ) {
-                    $result = \FotoGrids\Metadata_Manager::add_location_to_item( $item_id, $name, $latitude, $longitude );
-                    if ( $result ) {
-                        $results['locations'][] = $location;
-                    } else {
-                        $results['errors'][] = sprintf( __( 'Failed to add location: %s', 'fotogrids' ), $name );
-                    }
+            if ( $location_id > 0 ) {
+                $result = \FotoGrids\Metadata_Manager::link_location_to_item( $item_id, $location_id );
+                if ( $result ) {
+                    $results['locations'][] = array( 'id' => $location_id, 'name' => $name );
+                } else {
+                    $results['errors'][] = sprintf( __( 'Failed to link location ID %d to item %d', 'fotogrids' ), $location_id, $item_id );
+                }
+            } elseif ( ! empty( $name ) ) {
+                // Fallback: no ID supplied — find or create by name.
+                $result = \FotoGrids\Metadata_Manager::add_location_to_item( $item_id, $name, $latitude, $longitude );
+                if ( $result ) {
+                    $results['locations'][] = array( 'name' => $name );
+                } else {
+                    $results['errors'][] = sprintf( __( 'Failed to add location: %s', 'fotogrids' ), $name );
                 }
             }
         }

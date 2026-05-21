@@ -87,4 +87,30 @@ class Admin_Permissions {
     public static function check_license_manage( $request ) {
         return current_user_can( 'manage_fotogrids_settings' );
     }
+
+    /**
+     * Check if user has the manage_fotogrids capability (required for plugin-level settings
+     * like media configuration and maintenance tools).
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request Request object
+     * @return bool
+     */
+    public static function check_manage_fotogrids( $request ) {
+        return current_user_can( 'manage_fotogrids' );
+    }
+
+    /**
+     * Check if the user can manage plugin settings (general / advanced).
+     *
+     * Mirrors the capability gating the Settings page menu and the legacy
+     * options.php save path used.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request Request object
+     * @return bool
+     */
+    public static function check_manage_settings( $request ) {
+        return current_user_can( 'manage_fotogrids_settings' );
+    }
 }

@@ -213,7 +213,12 @@
 
         const form = document.getElementById('post');
 
-        const formElements = form.querySelectorAll('input, textarea, select, button');
+        // Only disable native WP form controls — exclude the React-managed settings
+        // panel so focused inputs don't lose focus and React's disabled props aren't clobbered.
+        const settingsPanel = document.getElementById('fotogrids-collection-settings-root');
+        const formElements = Array.from(
+            form.querySelectorAll('input, textarea, select, button')
+        ).filter(el => !settingsPanel || !settingsPanel.contains(el));
         formElements.forEach(element => element.disabled = true);
 
         const formData = new FormData(form);
@@ -232,7 +237,13 @@
         galleryInputs.forEach(input => {
             const name = input.getAttribute('name');
             const value = input.value;
-            if (name && value !== '') {
+            // Always include fotogrids_ inputs — even empty ones. Empty string is a
+            // valid save-intent (e.g. the user cleared a codearea field). The
+            // `value !== ''` guard used to be here but it silently swallowed clears:
+            // FormData skips disabled inputs (they are disabled above to prevent
+            // native WP submission), so this loop is the only path for these
+            // dynamically-created hidden inputs to reach the server.
+            if (name) {
                 gallerySettings[name] = value;
                 formData.append(name, value);
             }
@@ -350,7 +361,10 @@
 
         const form = document.getElementById('post');
         if (form) {
-            const formElements = form.querySelectorAll('input, textarea, select, button');
+            const settingsPanel = document.getElementById('fotogrids-collection-settings-root');
+            const formElements = Array.from(
+                form.querySelectorAll('input, textarea, select, button')
+            ).filter(el => !settingsPanel || !settingsPanel.contains(el));
             formElements.forEach(element => element.disabled = false);
         }
 

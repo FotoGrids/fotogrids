@@ -42,14 +42,14 @@ class Admin_Columns {
         }
         wp_enqueue_script(
             'fotogrids-loading-icons',
-            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/loading-icons.js',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/loading-icons.js',
             array(),
             FOTOGRIDS_VERSION,
             true
         );
         wp_enqueue_script(
             'fotogrids-icons',
-            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/icons.js',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/icons.js',
             array( 'fotogrids-loading-icons' ),
             FOTOGRIDS_VERSION,
             true

@@ -122,6 +122,12 @@ npm run test:coverage
 
 # Run tests for CI
 npm run test:ci
+
+# Run render architecture guards only
+npm run test:ci:render-guards
+
+# Run lightweight PHP integration tests
+npm run test:ci:php-integration
 ```
 
 ### Test Patterns
@@ -416,7 +422,7 @@ jobs:
               with:
                   node-version: '18'
             - run: npm ci
-            - run: npm run test:ci
+            - run: FOTOGRIDS_REQUIRE_PHP_TESTS=1 npm run test:ci
             - run: npm run lint
             - run: npm run type-check
 ```

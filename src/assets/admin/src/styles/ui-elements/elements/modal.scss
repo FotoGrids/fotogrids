@@ -149,7 +149,7 @@ body:has(.fotogrids-modal--open) {
         height: 30px;
 		padding: 1px 0 0;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         border-radius: 3px;
         color: #666;
@@ -163,6 +163,11 @@ body:has(.fotogrids-modal--open) {
         &:hover {
             background: #f0f0f0;
             color: #000;
+        }
+
+        svg {
+            width: 22px;
+            height: 22px;
         }
     }
 

@@ -104,6 +104,7 @@ class Meta_Boxes {
             'altText' => __( 'Alt Text', 'fotogrids' ),
             'caption' => __( 'Caption', 'fotogrids' ),
             'description' => __( 'Description', 'fotogrids' ),
+            'credit' => __( 'Credit', 'fotogrids' ),
             'saveChanges' => __( 'Save Changes', 'fotogrids' ),
             'cancel' => __( 'Cancel', 'fotogrids' ),
             'close' => __( 'Close', 'fotogrids' ),
@@ -118,6 +119,14 @@ class Meta_Boxes {
             'previewGallery' => __( 'Preview Gallery', 'fotogrids' ),
             'addNew' => __( 'Add New', 'fotogrids' ),
             'removeAll' => __( 'Remove All', 'fotogrids' ),
+            'removeAllItems' => __( 'Remove all items', 'fotogrids' ),
+            'removeAllModalTitle' => __( 'Remove all gallery items?', 'fotogrids' ),
+            'removeAllModalWarning' => __( 'This action cannot be undone.', 'fotogrids' ),
+            'removeAllModalBody' => __( 'You are about to remove every item from this gallery. The gallery will become empty, and the removed items will no longer appear here.', 'fotogrids' ),
+            'removeAllModalDeleteCustomDataLabel' => __( 'Also delete custom data saved for these items', 'fotogrids' ),
+            'removeAllModalDeleteCustomDataHelp' => __( 'This includes item-specific FotoGrids data such as custom titles, descriptions, links, captions, alt text overrides, sorting data, tags, filters, and other custom fields. This data will be deleted for these items everywhere they are used in FotoGrids, including other galleries where the same items appear.', 'fotogrids' ),
+            'removeAllModalConfirmPrompt' => __( 'To confirm, type REMOVE ALL below.', 'fotogrids' ),
+            'removeAllModalConfirmPlaceholder' => __( 'Type REMOVE ALL', 'fotogrids' ),
             'bulkEditor' => __( 'Bulk Editor', 'fotogrids' ),
             'upload' => __( 'Upload', 'fotogrids' ),
             'uploadDescription' => __( 'Choose files from your computer', 'fotogrids' ),
@@ -130,8 +139,42 @@ class Meta_Boxes {
             'fromZipDescription' => __( 'Upload and extract ZIP file', 'fotogrids' ),
             'video' => __( 'Video', 'fotogrids' ),
             'videoDescription' => __( 'Add video files', 'fotogrids' ),
+            'videoEmbed' => __( 'Video Embed', 'fotogrids' ),
+            'addVideoEmbed' => __( 'Add a video embed', 'fotogrids' ),
+            'addVideoEmbedDescription' => __( 'YouTube / Vimeo', 'fotogrids' ),
+            'videoEmbedAdded' => __( 'Video added to gallery.', 'fotogrids' ),
+            'link' => __( 'Link', 'fotogrids' ),
+            'loadVideo' => __( 'Load video', 'fotogrids' ),
+            'videoLoaded' => __( 'Video loaded successfully.', 'fotogrids' ),
+            'invalidYouTubeUrl' => __( 'Please enter a valid YouTube URL.', 'fotogrids' ),
+            'invalidVimeoUrl' => __( 'Please enter a valid Vimeo URL.', 'fotogrids' ),
+            'resolveError' => __( 'Could not resolve video URL.', 'fotogrids' ),
+            'resolveMetadataFailed' => __( 'Video found but metadata could not be fetched.', 'fotogrids' ),
+            'noThumbnail' => __( 'No thumbnail available', 'fotogrids' ),
+            'previewWillAppear' => __( 'Preview will appear here', 'fotogrids' ),
+            'startTime' => __( 'Start Time', 'fotogrids' ),
+            'startTimeDesc' => __( 'Specify a start time (in seconds)', 'fotogrids' ),
+            'endTime' => __( 'End Time', 'fotogrids' ),
+            'endTimeDesc' => __( 'Specify an end time (in seconds)', 'fotogrids' ),
+            'videoOptions' => __( 'Video Options', 'fotogrids' ),
+            'autoplay' => __( 'Autoplay', 'fotogrids' ),
+            'autoplayNote' => __( 'Autoplay is subject to browser autoplay policies.', 'fotogrids' ),
+            'mute' => __( 'Mute', 'fotogrids' ),
+            'loop' => __( 'Loop', 'fotogrids' ),
+            'playerControls' => __( 'Player Controls', 'fotogrids' ),
+            'captions' => __( 'Captions', 'fotogrids' ),
+            'privacyMode' => __( 'Privacy Mode', 'fotogrids' ),
+            'privacyModeNote' => __( "When on, the platform won't store information about visitors unless they play the video.", 'fotogrids' ),
+            'suggestedVideos' => __( 'Suggested Videos', 'fotogrids' ),
+            'introTitle' => __( 'Intro Title', 'fotogrids' ),
+            'introPortrait' => __( 'Intro Portrait', 'fotogrids' ),
+            'introByline' => __( 'Intro Byline', 'fotogrids' ),
+            'controlsColor' => __( 'Controls Color', 'fotogrids' ),
+            'resetColor' => __( 'Reset to default', 'fotogrids' ),
+            'optional' => __( '(optional)', 'fotogrids' ),
+            'adding' => __( 'Adding…', 'fotogrids' ),
             'fromOtherSources' => __( 'Add from other sources', 'fotogrids' ),
-            'fromOtherSourcesDescription' => __( "YouTube, Dropbox, Instagram, etc...", 'fotogrids' ),
+            'fromOtherSourcesDescription' => __( "Google Photos, Dropbox, Instagram, etc...", 'fotogrids' ),
             'instagram' => __( 'Instagram', 'fotogrids' ),
             'instagramDescription' => __( 'Import from Instagram', 'fotogrids' ),
             'noItems' => __( 'No items yet added.', 'fotogrids' ),
@@ -217,7 +260,7 @@ class Meta_Boxes {
         wp_enqueue_script(
             'fotogrids-metabox',
             FOTOGRIDS_PLUGIN_URL . 'assets/js/metabox.js',
-            array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'media-upload', 'jquery-ui-sortable', 'fotogrids-icons' ),
+            array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'jquery-ui-sortable', 'fotogrids-icons' ),
             FOTOGRIDS_VERSION,
             true
         );
@@ -371,7 +414,6 @@ class Meta_Boxes {
         ) );
 
         ?>
-        <!-- React container for Gallery Metabox -->
         <div id="fotogrids-gallery-metabox-root"></div>
         <?php
     }
@@ -413,6 +455,7 @@ class Meta_Boxes {
             'strings' => array(
                 'searchPlaceholder' => __( 'Search albums...', 'fotogrids' ),
                 'noAvailableAlbumsFound' => __( 'No available albums found', 'fotogrids' ),
+                'noMoreAlbumsFound' => __( 'No more albums found', 'fotogrids' ),
                 'createNewAlbum' => __( 'Create New Album', 'fotogrids' ),
                 'assignedTo' => __( 'Assigned to', 'fotogrids' ),
                 'notAssignedTo' => __( 'Not assigned to any', 'fotogrids' ),
@@ -514,33 +557,7 @@ class Meta_Boxes {
                 delete_post_meta( $post_id, 'fotogrids_gallery_items' );
             }
 
-            $defaults = fotogrids_get_default_gallery_settings();
-
-            foreach ( $defaults as $setting_key => $default_value ) {
-                $post_key = 'fotogrids_' . $setting_key;
-
-                if ( isset( $_POST[$post_key] ) ) {
-                    $value = $_POST[$post_key];
-
-                    if ( is_array( $default_value ) ) {
-                        if ( is_string( $value ) ) {
-                            $decoded = json_decode( $value, true );
-                            if ( json_last_error() === JSON_ERROR_NONE ) {
-                                update_post_meta( $post_id, $post_key, $value );
-                            }
-                        } else if ( is_array( $value ) ) {
-                            update_post_meta( $post_id, $post_key, json_encode( $value ) );
-                        }
-                    } else if ( is_bool( $default_value ) ) {
-                        $bool_value = ( $value === '1' || $value === 'true' || $value === true ) ? '1' : '0';
-                        update_post_meta( $post_id, $post_key, $bool_value );
-                    } else if ( is_numeric( $default_value ) ) {
-                        update_post_meta( $post_id, $post_key, sanitize_text_field( $value ) );
-                    } else {
-                        update_post_meta( $post_id, $post_key, sanitize_text_field( $value ) );
-                    }
-                }
-            }
+            self::save_collection_settings_with_gate( $post_id, $_POST );
         }
     }
 
@@ -574,16 +591,14 @@ class Meta_Boxes {
             )
         );
 
-        $custom_data = array();
-        $location = '';
+        $custom_data  = array();
         $external_url = '';
-        $link_target = 'global';
-        $exif_data = null;
+        $link_target  = 'global';
+        $exif_data    = null;
 
         if ( $custom_meta ) {
-            $location = $custom_meta->location;
             $external_url = $custom_meta->external_url ?? '';
-            $link_target = $custom_meta->link_target ?? 'global';
+            $link_target  = $custom_meta->link_target ?? 'global';
             if ( ! empty( $custom_meta->custom_data ) ) {
                 $decoded_data = json_decode( $custom_meta->custom_data, true );
                 if ( is_array( $decoded_data ) ) {
@@ -616,16 +631,16 @@ class Meta_Boxes {
         }
 
         $item_data = array(
-            'id' => $item_id,
-            'title' => $attachment->post_title,
-            'alt' => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
-            'caption' => $attachment->post_excerpt,
+            'id'          => $item_id,
+            'title'       => $attachment->post_title,
+            'alt'         => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
+            'caption'     => $attachment->post_excerpt,
             'description' => $attachment->post_content,
-            'location' => $location,
+            'credit'      => $custom_meta ? ( $custom_meta->credit ?? '' ) : '',
             'external_url' => $external_url,
-            'link_target' => $link_target,
-            'custom_data' => $custom_data,
-            'exif' => $exif_data,
+            'link_target'  => $link_target,
+            'custom_data'  => $custom_data,
+            'exif'         => $exif_data,
             'medium_url' => wp_get_attachment_image_url( $item_id, 'medium' ),
             'full_url' => wp_get_attachment_image_url( $item_id, 'full' ),
             'filename' => $filename,
@@ -648,14 +663,14 @@ class Meta_Boxes {
             wp_die( -1 );
         }
 
-        $item_id = intval( $_POST['item_id'] );
-        $title = sanitize_text_field( $_POST['title'] );
-        $alt = sanitize_text_field( $_POST['alt'] );
-        $caption = sanitize_textarea_field( $_POST['caption'] );
-        $description = sanitize_textarea_field( $_POST['description'] );
-        $location = sanitize_text_field( $_POST['location'] ?? '' );
+        $item_id      = intval( $_POST['item_id'] );
+        $title        = sanitize_text_field( $_POST['title'] );
+        $alt          = sanitize_text_field( $_POST['alt'] );
+        $caption      = sanitize_textarea_field( $_POST['caption'] );
+        $description  = sanitize_textarea_field( $_POST['description'] );
+        $credit       = sanitize_text_field( $_POST['credit'] ?? '' );
         $external_url = sanitize_url( $_POST['external_url'] ?? '' );
-        $link_target = sanitize_text_field( $_POST['link_target'] ?? 'global' );
+        $link_target  = sanitize_text_field( $_POST['link_target'] ?? 'global' );
 
         $exif_data = array();
         if ( isset( $_POST['exif'] ) ) {
@@ -696,12 +711,15 @@ class Meta_Boxes {
 
         $data = array(
             'attachment_id' => $item_id,
-            'gallery_id' => 0, // Global item data (not gallery-specific)
-            'location' => $location,
-            'external_url' => $external_url,
-            'link_target' => $link_target,
-            'exif_data' => ! empty( $exif_data ) ? wp_json_encode( $exif_data ) : null,
-            'updated_at' => current_time( 'mysql', true ),
+            'gallery_id'    => 0, // Global item data (not gallery-specific)
+            'credit'        => $credit,
+            // Note: the `location` VARCHAR column is deprecated — structured
+            // location data is stored in fotogrids_item_metadata via the
+            // metadata REST endpoint. Do not write to it here.
+            'external_url'  => $external_url,
+            'link_target'   => $link_target,
+            'exif_data'     => ! empty( $exif_data ) ? wp_json_encode( $exif_data ) : null,
+            'updated_at'    => current_time( 'mysql', true ),
         );
 
         if ( $existing ) {
@@ -996,35 +1014,7 @@ class Meta_Boxes {
             update_post_meta( $post_id, 'fotogrids_gallery_items', json_encode( $gallery_items ) );
         }
 
-        $defaults = fotogrids_get_default_gallery_settings();
-
-        $settings_saved = 0;
-        foreach ( $defaults as $setting_key => $default_value ) {
-            $post_key = 'fotogrids_' . $setting_key;
-
-            if ( isset( $_POST[$post_key] ) ) {
-                $value = $_POST[$post_key];
-                $settings_saved++;
-
-                if ( is_array( $default_value ) ) {
-                    if ( is_string( $value ) ) {
-                        $decoded = json_decode( $value, true );
-                        if ( json_last_error() === JSON_ERROR_NONE ) {
-                            update_post_meta( $post_id, $post_key, $value );
-                        }
-                    } else if ( is_array( $value ) ) {
-                        update_post_meta( $post_id, $post_key, json_encode( $value ) );
-                    }
-                } else if ( is_bool( $default_value ) ) {
-                    $bool_value = ( $value === '1' || $value === 'true' || $value === true ) ? '1' : '0';
-                    update_post_meta( $post_id, $post_key, $bool_value );
-                } else if ( is_numeric( $default_value ) ) {
-                    update_post_meta( $post_id, $post_key, sanitize_text_field( $value ) );
-                } else {
-                    update_post_meta( $post_id, $post_key, sanitize_text_field( $value ) );
-                }
-            }
-        }
+        $gated_result = self::save_collection_settings_with_gate( $post_id, $_POST );
 
         $collection_type = $post->post_type === 'fotogrids_album' ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' );
         wp_send_json_success( array(
@@ -1032,8 +1022,219 @@ class Meta_Boxes {
             'post_id' => $post_id,
             'post_title' => get_the_title( $post_id ),
             'post_type' => $post->post_type,
-            'redirect_url' => get_edit_post_link( $post_id, 'raw' )
+            'redirect_url' => get_edit_post_link( $post_id, 'raw' ),
+            'gated' => $gated_result['gated'],
         ) );
+    }
+
+    /**
+     * Save collection settings through Edit_Gate filtering.
+     *
+     * @param int   $post_id Post ID.
+     * @param array $request_data Raw request payload.
+     * @return array{settings: array<string,mixed>, gated: array<int,array<string,mixed>>}
+     */
+    private static function save_collection_settings_with_gate( $post_id, $request_data ) {
+        $defaults = fotogrids_get_default_gallery_settings();
+        $incoming = array();
+        $existing = array();
+
+        foreach ( $defaults as $setting_key => $default_value ) {
+            $post_meta_key = 'fotogrids_' . $setting_key;
+            $existing[ $setting_key ] = self::decode_stored_setting_value( get_post_meta( $post_id, $post_meta_key, true ), $default_value );
+
+            if ( ! isset( $request_data[ $post_meta_key ] ) ) {
+                continue;
+            }
+
+            $field_type = self::catalog_field_type( $setting_key );
+            $incoming[ $setting_key ] = self::normalize_incoming_setting_value( $request_data[ $post_meta_key ], $default_value, $field_type );
+        }
+
+        $gated_result = \FotoGrids\Settings\Edit_Gate::filter( $incoming, $existing );
+
+        foreach ( $gated_result['settings'] as $setting_key => $setting_value ) {
+            if ( ! array_key_exists( $setting_key, $defaults ) ) {
+                continue;
+            }
+
+            $field_type    = self::catalog_field_type( $setting_key );
+            $post_meta_key = 'fotogrids_' . $setting_key;
+            self::persist_setting_value( $post_id, $post_meta_key, $setting_value, $defaults[ $setting_key ], $field_type );
+        }
+
+        return $gated_result;
+    }
+
+    /**
+     * Normalize incoming setting value from request payload.
+     *
+     * @param mixed  $raw_value     Raw incoming value.
+     * @param mixed  $default_value Default value shape.
+     * @param string $field_type    Catalog field control type (e.g. 'codearea').
+     * @return mixed
+     */
+    private static function normalize_incoming_setting_value( $raw_value, $default_value, string $field_type = '' ) {
+        if ( is_array( $default_value ) ) {
+            if ( is_array( $raw_value ) ) {
+                return $raw_value;
+            }
+
+            if ( is_string( $raw_value ) ) {
+                $decoded_value = json_decode( wp_unslash( $raw_value ), true );
+                if ( json_last_error() === JSON_ERROR_NONE ) {
+                    return $decoded_value;
+                }
+            }
+
+            return $default_value;
+        }
+
+        if ( is_bool( $default_value ) ) {
+            return $raw_value === '1' || $raw_value === 'true' || $raw_value === true;
+        }
+
+        // button_group fields may mix numeric option values with string sentinels
+        // (e.g. a "Custom" option alongside numeric presets). Always treat them as
+        // strings so a sentinel like "custom" is never discarded by the numeric branch.
+        if ( $field_type === 'button_group' ) {
+            return sanitize_text_field( (string) $raw_value );
+        }
+
+        if ( is_numeric( $default_value ) ) {
+            return is_numeric( $raw_value ) ? $raw_value + 0 : $default_value;
+        }
+
+        // codearea fields contain raw CSS/JS — use fotogrids_sanitize_code_field
+        // which strips only null bytes and control characters, preserving < > and
+        // all other characters valid in source code.
+        // sanitize_textarea_field must NOT be used here: it strips HTML tags and
+        // encodes entities, corrupting JS comparisons, arrow functions, etc.
+        if ( $field_type === 'codearea' ) {
+            return fotogrids_sanitize_code_field( (string) $raw_value );
+        }
+
+        // password_input fields are passed through as-is (sanitize_text_field would
+        // strip special characters that are valid in passwords). The value will be
+        // encrypted — not stored in plain text — by persist_setting_value.
+        if ( $field_type === 'password_input' ) {
+            return (string) $raw_value;
+        }
+
+        return sanitize_text_field( (string) $raw_value );
+    }
+
+    /**
+     * Resolves the catalog control type for a setting key.
+     *
+     * Returns '' when the key is not found in the catalog or no type is set,
+     * so callers can treat the empty string as "unknown / use default behaviour".
+     *
+     * @since  1.0.0
+     * @param  string $setting_key Setting key (without the fotogrids_ prefix).
+     * @return string              Catalog control type, e.g. 'codearea', 'toggle'.
+     */
+    private static function catalog_field_type( string $setting_key ): string {
+        $entry = \FotoGrids\Catalog\Catalog::get( $setting_key );
+        return is_array( $entry ) ? (string) ( $entry['control'] ?? '' ) : '';
+    }
+
+    /**
+     * Decode stored post meta setting value.
+     *
+     * @param mixed $stored_value Stored post meta value.
+     * @param mixed $default_value Default value shape.
+     * @return mixed
+     */
+    private static function decode_stored_setting_value( $stored_value, $default_value ) {
+        if ( $stored_value === '' || $stored_value === null ) {
+            return $default_value;
+        }
+
+        if ( is_array( $default_value ) ) {
+            if ( is_array( $stored_value ) ) {
+                return $stored_value;
+            }
+
+            if ( is_string( $stored_value ) ) {
+                $decoded_value = json_decode( $stored_value, true );
+                if ( json_last_error() === JSON_ERROR_NONE ) {
+                    return $decoded_value;
+                }
+            }
+
+            return $default_value;
+        }
+
+        if ( is_bool( $default_value ) ) {
+            return $stored_value === '1' || $stored_value === 'true' || $stored_value === true;
+        }
+
+        if ( is_numeric( $default_value ) ) {
+            return is_numeric( $stored_value ) ? $stored_value + 0 : $default_value;
+        }
+
+        return (string) $stored_value;
+    }
+
+    /**
+     * Persist a normalized setting value to post meta.
+     *
+     * @param int    $post_id       Post ID.
+     * @param string $post_meta_key Meta key.
+     * @param mixed  $setting_value Setting value.
+     * @param mixed  $default_value Default value shape.
+     * @param string $field_type    Catalog field control type (e.g. 'codearea').
+     * @return void
+     */
+    private static function persist_setting_value( $post_id, $post_meta_key, $setting_value, $default_value, string $field_type = '' ) {
+        if ( is_array( $default_value ) ) {
+            update_post_meta( $post_id, $post_meta_key, wp_json_encode( $setting_value ) );
+            return;
+        }
+
+        if ( is_bool( $default_value ) ) {
+            update_post_meta( $post_id, $post_meta_key, $setting_value ? '1' : '0' );
+            return;
+        }
+
+        if ( is_numeric( $default_value ) ) {
+            update_post_meta( $post_id, $post_meta_key, sanitize_text_field( (string) $setting_value ) );
+            return;
+        }
+
+        // codearea fields contain raw CSS/JS — use fotogrids_sanitize_code_field.
+        // See normalize_incoming_setting_value for the rationale.
+        if ( $field_type === 'codearea' ) {
+            update_post_meta( $post_id, $post_meta_key, fotogrids_sanitize_code_field( (string) $setting_value ) );
+            return;
+        }
+
+        // password_input fields are encrypted before storage so the raw password is
+        // never written to the DB in plain text. An empty value means "clear the
+        // password" — we delete the meta key so password_is_set returns false.
+        //
+        // Guard: if the incoming value is already an encrypted blob (i.e. the
+        // browser echoed back the ciphertext that was loaded into the field on
+        // page load), skip re-encryption — just leave the stored value as-is.
+        // Re-encrypting on every save causes the blob to grow exponentially and
+        // eventually exhausts PHP's memory limit.
+        if ( $field_type === 'password_input' ) {
+            $plaintext = (string) $setting_value;
+            if ( $plaintext === '' ) {
+                delete_post_meta( $post_id, $post_meta_key );
+            } elseif ( \FotoGrids\Password_Crypto::is_encrypted( $plaintext ) ) {
+                // Already encrypted — the stored value hasn't changed; do nothing.
+            } else {
+                $encrypted = \FotoGrids\Password_Crypto::encrypt( $plaintext );
+                if ( $encrypted !== '' ) {
+                    update_post_meta( $post_id, $post_meta_key, $encrypted );
+                }
+            }
+            return;
+        }
+
+        update_post_meta( $post_id, $post_meta_key, sanitize_text_field( (string) $setting_value ) );
     }
 
     /**

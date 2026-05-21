@@ -1,0 +1,59 @@
+/**
+ * FotoGrids Tooltip Styles
+ *
+ * Source:  src/public/render/fg-tooltip/fg-tooltip.scss
+ * Webpack: entry key 'fg-tooltip'  →  assets/css/fg-tooltip.css
+ *
+ * Intentionally theme-neutral — uses CSS custom properties so any surface
+ * (lightbox, gallery overlay, etc.) can restyle without overrides.
+ */
+
+.fg-tooltip {
+    // Tokens — override at :root or on a parent to retheme.
+    --fg-tt-bg:          rgba(20, 20, 20, 0.92);
+    --fg-tt-color:       #ffffff;
+    --fg-tt-font-size:   12px;
+    --fg-tt-font-family: inherit;
+    --fg-tt-padding:     5px 9px;
+    --fg-tt-radius:      5px;
+    --fg-tt-shadow:      0 2px 8px rgba(0, 0, 0, 0.25);
+    --fg-tt-z:           1000010;   // above lightbox (999999)
+    --fg-tt-duration:    140ms;
+    --fg-tt-offset:      4px;       // entrance slide distance
+
+    position:         fixed;
+    z-index:          var(--fg-tt-z);
+    padding:          var(--fg-tt-padding);
+    background:       var(--fg-tt-bg);
+    color:            var(--fg-tt-color);
+    font-family:      var(--fg-tt-font-family);
+    font-size:        var(--fg-tt-font-size);
+    font-weight:      400;
+    line-height:      1.4;
+    white-space:      nowrap;
+    border-radius:    var(--fg-tt-radius);
+    box-shadow:       var(--fg-tt-shadow);
+    pointer-events:   none;
+    user-select:      none;
+
+    // Hidden state (default).
+    opacity:          0;
+    visibility:       hidden;
+    transform:        translateY(calc(-1 * var(--fg-tt-offset)));
+    transition:
+        opacity    var(--fg-tt-duration) ease,
+        visibility var(--fg-tt-duration) ease,
+        transform  var(--fg-tt-duration) ease;
+
+    // Entrance slide direction — set via data-dir by JS.
+    &[data-dir="below"] { transform: translateY(var(--fg-tt-offset)); }
+    &[data-dir="left"]  { transform: translateX(var(--fg-tt-offset)); }
+    &[data-dir="right"] { transform: translateX(calc(-1 * var(--fg-tt-offset))); }
+    // "above" uses the default translateY(-offset) set above.
+
+    &.fg-tooltip--visible {
+        opacity:    1;
+        visibility: visible;
+        transform:  none;
+    }
+}

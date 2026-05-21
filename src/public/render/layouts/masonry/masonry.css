@@ -1,0 +1,9 @@
+[data-fg-layout="masonry"] .fg-masonry-track {
+    column-count: var(--fg-cols, 4);
+    column-gap: var(--fg-gap, 10px);
+}
+
+[data-fg-layout="masonry"] .fg-masonry-track .fg-item {
+    break-inside: avoid;
+    margin-bottom: var(--fg-gap, 10px);
+}

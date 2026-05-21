@@ -1,0 +1,7 @@
+[data-fg-hover="slide-down"] .fg-item-media {
+    transition: transform 220ms ease;
+}
+
+[data-fg-hover="slide-down"] .fg-item:hover .fg-item-media {
+    transform: translateY(6px);
+}

@@ -1,0 +1,8 @@
+[data-fg-hover="fade-caption"] .fg-caption {
+    opacity: 0;
+    transition: opacity 220ms ease;
+}
+
+[data-fg-hover="fade-caption"] .fg-item:hover .fg-caption {
+    opacity: 1;
+}

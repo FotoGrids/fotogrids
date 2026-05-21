@@ -1,0 +1,32 @@
+.fotogrids-gallery .fg-item,
+.fotogrids-album .fg-item {
+    gap: var(--fg-caption-gap, 0);
+}
+
+.fotogrids-gallery .fg-item-media,
+.fotogrids-album .fg-item-media {
+    align-self: var(--fg-caption-media-align, stretch);
+}
+
+.fotogrids-gallery .fg-caption,
+.fotogrids-album .fg-caption {
+    margin: 0;
+    text-align: var(--fg-caption-align, start);
+}
+
+.fotogrids-gallery[data-fg-caption="top"] .fg-caption,
+.fotogrids-album[data-fg-caption="top"] .fg-caption {
+    order: -1;
+}
+
+.fotogrids-gallery[data-fg-caption="overlay"] .fg-caption,
+.fotogrids-album[data-fg-caption="overlay"] .fg-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.5rem 0.75rem;
+    color: #fff;
+    background: linear-gradient(to top, rgb(0 0 0 / 70%), rgb(0 0 0 / 0%));
+    pointer-events: none;
+}

@@ -144,29 +144,31 @@ class Register_Metadata_Routes {
                     ),
                     'tags' => array(
                         'default' => array(),
-                        'type' => 'array',
-                        'items' => array( 'type' => 'string' ),
+                        'type'    => 'array',
+                        'items'   => array( 'type' => 'integer' ),
                     ),
                     'people' => array(
                         'default' => array(),
-                        'type' => 'array',
-                        'items' => array(
-                            'type' => 'object',
+                        'type'    => 'array',
+                        'items'   => array(
+                            'type'       => 'object',
                             'properties' => array(
-                                'name' => array( 'type' => 'string' ),
+                                'id'      => array( 'type' => 'integer' ),
+                                'name'    => array( 'type' => 'string' ),
                                 'details' => array( 'type' => 'string' ),
                             ),
                         ),
                     ),
                     'locations' => array(
                         'default' => array(),
-                        'type' => 'array',
-                        'items' => array(
-                            'type' => 'object',
+                        'type'    => 'array',
+                        'items'   => array(
+                            'type'       => 'object',
                             'properties' => array(
-                                'name' => array( 'type' => 'string' ),
-                                'latitude' => array( 'type' => 'number' ),
-                                'longitude' => array( 'type' => 'number' ),
+                                'id'        => array( 'type' => 'integer' ),
+                                'name'      => array( 'type' => 'string' ),
+                                'latitude'  => array( 'type' => array( 'number', 'null' ) ),
+                                'longitude' => array( 'type' => array( 'number', 'null' ) ),
                             ),
                         ),
                     ),

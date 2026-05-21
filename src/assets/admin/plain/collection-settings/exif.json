@@ -1,0 +1,174 @@
+{
+    "id": "exif",
+    "label": "Exif",
+    "icon": "lens",
+    "postTypes": [
+        "gallery"
+    ],
+    "settings": [
+        {
+            "key": "display_exif",
+            "type": "toggle",
+            "label": "Display EXIF Data",
+            "default": false,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "exif_fields_group",
+            "type": "setting_group",
+            "label": "Fields to Display",
+            "condition": {
+                "dependsOn": "display_exif",
+                "values": [
+                    true,
+                    "1"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "exif_camera",
+                    "type": "toggle",
+                    "label": "Camera",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_aperture",
+                    "type": "toggle",
+                    "label": "Aperture",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_shutter_speed",
+                    "type": "toggle",
+                    "label": "Shutter Speed",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_iso",
+                    "type": "toggle",
+                    "label": "ISO",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_lens",
+                    "type": "toggle",
+                    "label": "Lens",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_focal_length",
+                    "type": "toggle",
+                    "label": "Focal Length",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_date_taken",
+                    "type": "toggle",
+                    "label": "Date Taken",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_copyright",
+                    "type": "toggle",
+                    "label": "Copyright",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_orientation",
+                    "type": "toggle",
+                    "label": "Orientation",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_flash",
+                    "type": "toggle",
+                    "label": "Flash",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_white_balance",
+                    "type": "toggle",
+                    "label": "White Balance",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "exif_exposure_mode",
+                    "type": "toggle",
+                    "label": "Exposure Mode",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "exif_per_image_notice",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "Per-image EXIF overrides.",
+                    "message": "Override EXIF display settings for individual images. Customize which fields to show or hide on a per-image basis for complete control.",
+                    "learn_more": "feature-exif"
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

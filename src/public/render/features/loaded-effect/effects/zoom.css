@@ -1,0 +1,17 @@
+/*
+ * FotoGrids — Loaded Effect: zoom
+ *
+ * Fades in while scaling up from 95 %.
+ */
+
+[data-fg-loaded-effect="zoom"] .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
+[data-fg-loaded-effect="zoom"] .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
+    transform: scale(0.95);
+}
+
+[data-fg-loaded-effect="zoom"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > img,
+[data-fg-loaded-effect="zoom"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > picture img {
+    opacity:    1;
+    transform:  scale(1);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}

@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Global frontend tokens
+   ========================================================================== */
+
+:root {
+    /* Brand blue — active/selected states across all frontend surfaces
+       (lightbox active dots, thumbnail borders, focus rings, etc.) */
+    --fg-colors-blue: rgba(60, 70, 240, 1);
+}
+
+.fotogrids-gallery .fg-item,
+.fotogrids-album .fg-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    min-width: 0;
+    cursor: var(--fg-hover-cursor, default);
+}
+
+.fotogrids-gallery .fg-item:focus,
+.fotogrids-album .fg-item:focus {
+    outline: none;
+}
+
+.fotogrids-gallery .fg-item:focus-visible,
+.fotogrids-album .fg-item:focus-visible {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+/* When a decorator wraps the entire item contents (media + caption) in an
+   anchor, the <a> becomes the flex child of fg-item. These rules ensure it
+   inherits the same flex layout so gap and direction still apply correctly. */
+.fotogrids-gallery .fg-item > a,
+.fotogrids-album .fg-item > a {
+    display: inherit;
+    flex-direction: inherit;
+    gap: inherit;
+    flex: inherit;
+    cursor: var(--fg-hover-cursor-link, pointer);
+    min-width: 0;
+}
+
+.fotogrids-gallery .fg-item a:focus,
+.fotogrids-album .fg-item a:focus {
+    outline: none;
+}
+
+.fotogrids-gallery .fg-item-media,
+.fotogrids-album .fg-item-media {
+    display: block;
+    width: 100%;
+    border-radius: var(--fg-radius, 0);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.fotogrids-gallery .fg-item-media picture,
+.fotogrids-gallery .fg-item-media img,
+.fotogrids-album .fg-item-media picture,
+.fotogrids-album .fg-item-media img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Border — only painted when the decorator is active. */
+.fotogrids-gallery[data-fg-border] .fg-item-media,
+.fotogrids-album[data-fg-border] .fg-item-media {
+    border-width: var(--fg-border-w, 1px);
+    border-color: var(--fg-border-color, #000);
+    border-style: var(--fg-border-style, solid);
+}
+
+/* Thumbnail image filters — only applied when the decorator is active. */
+.fotogrids-gallery[data-fg-filter] .fg-item-media img,
+.fotogrids-album[data-fg-filter] .fg-item-media img {
+    filter: var(--fg-thumb-filter-regular);
+    transition: filter 0.25s ease;
+}
+
+.fotogrids-gallery[data-fg-filter] .fg-item:hover .fg-item-media img,
+.fotogrids-album[data-fg-filter] .fg-item:hover .fg-item-media img {
+    filter: var(--fg-thumb-filter-hover);
+}

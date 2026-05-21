@@ -24,7 +24,6 @@ const TabTags = ({
             disabled={disabled}
             strings={strings}
             metadataKey="tags"
-            inputKey="tags"
             placeholder={strings.addTagsPlaceholder || ''}
             icon={window.FotoGridsIcons?.tag || ''}
             itemClassName="fotogrids-metadata-item fotogrids-tag"

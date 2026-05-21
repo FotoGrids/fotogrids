@@ -1,0 +1,7 @@
+[data-fg-hover="zoom-in"] .fg-item-media {
+    transition: transform 220ms ease;
+}
+
+[data-fg-hover="zoom-in"] .fg-item:hover .fg-item-media {
+    transform: scale(1.06);
+}

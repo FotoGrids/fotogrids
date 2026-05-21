@@ -1,0 +1,1143 @@
+/**
+ * FotoGrids Lightbox Styles
+ *
+ * Source:  src/public/render/features/lightbox/lightbox.scss
+ * Webpack: entry key 'lightbox-styles'  →  assets/css/lightbox-styles.css
+ *
+ * Served as the lightbox overlay CSS via the fotogrids-lightbox handle registered
+ * by the PHP Lightbox feature module (Asset_Decl path ../../assets/css/lightbox-styles.css).
+ *
+ * Class naming convention: all lightbox overlay elements use fg-lb-* prefixes.
+ * Gallery wrapper state is expressed via data-fg-click / data-fg-lb-* attributes.
+ *
+ * Theme model
+ * -----------
+ * There are NO theme classes in this file (no .fg-lb-theme-dark, -light, -custom).
+ * Per-gallery JS writes a single <style id="fg-lb-vars"> block into the dialog
+ * that sets ALL colour tokens for the chosen theme. SCSS uses only var(--fg-lb-*).
+ * The .fg-lightbox token block below provides baseline defaults so the lightbox renders
+ * even if the per-gallery style block is absent (e.g. during FOUC).
+ *
+ * Token naming conventions
+ * ------------------------
+ * --fg-lb-color-*   All colour values. No colour literal appears outside this block.
+ * --fg-lb-*         Structural / layout tokens (sizes, spacing, radii, etc.).
+ * --fg-colors-*     Global brand tokens (defined in collection-base.css on :root).
+ */
+
+/* ==========================================================================
+   CSS Custom Properties (scoped to the dialog, not :root)
+   Baseline dark-theme values — colour tokens overridden per-gallery by JS.
+   ========================================================================== */
+
+.fg-lightbox {
+    // ── Z-index ───────────────────────────────────────────────────────────
+    --fg-lb-z:                      999999;
+
+    // ── Transitions ───────────────────────────────────────────────────────
+    --fg-lb-transition-duration:    300ms;   // image transition; overridden per-gallery
+
+    // ── Stage / layout spacing ────────────────────────────────────────────
+    --fg-lb-stage-padding:          20px;    // dots bottom offset, thumbs padding
+    --fg-lb-nav-btn-offset:         20px;    // prev/next distance from stage edge
+
+    // ── Toolbar ───────────────────────────────────────────────────────────
+    --fg-lb-toolbar-height:         56px;
+    --fg-lb-toolbar-padding:        4px;
+    --fg-lb-toolbar-gap:            2px;
+    --fg-lb-toolbar-btn-size:       40px;
+    --fg-lb-toolbar-btn-radius:     6px;
+    --fg-lb-toolbar-icon-size:      20px;
+    --fg-lb-counter-font-size:      13px;
+    --fg-lb-counter-font-weight:    500;
+    --fg-lb-counter-letter-spacing: 0.02em;
+    --fg-lb-counter-padding-x:      6px;
+
+    // ── Navigation arrows (prev/next buttons) ─────────────────────────────
+    --fg-lb-nav-btn-size:           50px;
+    --fg-lb-nav-btn-size-mobile:    40px;
+    --fg-lb-nav-btn-radius:         50%;
+    --fg-lb-nav-icon-size:          24px;
+
+    // ── Navigation dots ───────────────────────────────────────────────────
+    --fg-lb-dot-size:               12px;    // overridden per-gallery via setting
+    --fg-lb-dot-radius:             50%;
+    --fg-lb-dot-opacity:            0.45;
+    --fg-lb-dot-opacity-hover:      0.75;
+    --fg-lb-dot-border-width:       2px;
+    --fg-lb-dots-spacing:           8px;     // overridden per-gallery
+
+    // ── Spinner ───────────────────────────────────────────────────────────
+    --fg-lb-spinner-size:           32px;
+
+    // ── Thumbnail strip ───────────────────────────────────────────────────
+    --fg-lb-thumbs-padding:         20px;
+    --fg-lb-thumb-radius:           4px;
+    --fg-lb-thumb-spacing:          5px;     // overridden per-gallery
+
+    // ── Info panel ────────────────────────────────────────────────────────
+    --fg-lb-info-padding:           12px 20px;
+    --fg-lb-info-gap:               4px;
+    --fg-lb-info-width:             280px;
+    --fg-lb-info-max-width:         28%;
+    --fg-lb-info-block-radius:      4px;
+    --fg-lb-info-block-padding:     10px 0;
+    --fg-lb-info-block-padding-boxed: 10px 12px;
+    --fg-lb-info-block-margin:      4px;
+
+    // ── Info panel typography ─────────────────────────────────────────────
+    --fg-lb-info-font-family:       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --fg-lb-info-line-height:       1;
+    --fg-lb-info-font-size-base:    0.85rem;  // body text: description
+    --fg-lb-info-font-size-s:       0.78rem;  // small text: credit, dl, chips
+    --fg-lb-info-font-size-xs:      0.7rem;   // extra-small: block header labels
+
+    // ── Info panel layout details ─────────────────────────────────────────
+    --fg-lb-info-block-header-gap:  5px;
+    --fg-lb-info-block-header-margin: 0 0 6px;
+    --fg-lb-info-chips-gap:         4px;
+    --fg-lb-info-chip-padding:      2px 8px;
+    --fg-lb-info-chip-radius:       20px;
+    --fg-lb-info-chip-bg:           rgba(128, 128, 128, 0.15);
+    --fg-lb-info-dl-col-gap:        10px;
+    --fg-lb-info-dl-row-gap:        3px;
+
+    // ── Progress indicator ────────────────────────────────────────────────
+    --fg-lb-progress-duration:       5000ms;  // overridden per-gallery from autoDelay
+    --fg-lb-progress-bar-thickness:  4px;
+    --fg-lb-progress-spinner-size:   40px;
+    --fg-lb-progress-spinner-border: 3px;
+
+    // ── Overlay blur ──────────────────────────────────────────────────────
+    --fg-lb-overlay-blur:           2px;     // overridden per-gallery
+
+    // ── Colours — overridden per-gallery by JS <style> block ──────────────
+    --fg-lb-color-backdrop:         rgba(0, 0, 0, 0.92);
+    --fg-lb-color-toolbar-bg:       rgba(0, 0, 0, 0.35);
+    --fg-lb-color-toolbar-icon:     rgba(255, 255, 255, 0.7);
+    --fg-lb-color-toolbar-icon-hover: rgba(255, 255, 255, 1);
+    --fg-lb-color-toolbar-btn-active: rgba(255, 255, 255, 0.15);
+    --fg-lb-color-nav-bg:           rgba(0, 0, 0, 0.45);
+    --fg-lb-color-nav-bg-hover:     rgba(0, 0, 0, 0.75);
+    --fg-lb-color-nav-icon:         rgba(255, 255, 255, 1);
+    --fg-lb-color-nav-icon-hover:   rgba(255, 255, 255, 1);
+    --fg-lb-color-dot:              rgba(255, 255, 255, 1);
+    --fg-lb-color-dot-hover:        rgba(255, 255, 255, 1);
+    --fg-lb-color-dot-active:       var(--fg-colors-blue);
+    --fg-lb-color-thumbs-bg:        rgba(0, 0, 0, 0.7);
+    --fg-lb-color-thumb-border:     rgba(255, 255, 255, 0.45);
+    --fg-lb-color-thumb-active:     var(--fg-colors-blue);
+    --fg-lb-color-info-bg:          rgba(0, 0, 0, 0.25);
+    --fg-lb-color-info-block-bg:      rgba(255, 255, 255, 0.06);
+    --fg-lb-color-info-block-divider: rgba(255, 255, 255, 0.12);
+    --fg-lb-color-info-text:          rgba(255, 255, 255, 0.85);
+    --fg-lb-color-info-title:       rgba(255, 255, 255, 1);
+    --fg-lb-color-spinner:          rgba(255, 255, 255, 0.8);
+    --fg-lb-color-img-shadow:       rgba(0, 0, 0, 0.3);
+    --fg-lb-color-progress:         var(--fg-colors-blue);
+}
+
+/* ==========================================================================
+   <dialog> reset + base overlay
+   ========================================================================== */
+
+.fg-lightbox {
+    // Reset <dialog> UA styles
+    padding:    0;
+    margin:     0;
+    border:     none;
+    background: transparent;
+    max-width:  none;
+    max-height: none;
+    width:      100%;
+    height:     100%;
+    overflow:   hidden;
+
+    // Overlay positioning
+    position:   fixed;
+    inset:      0;
+    z-index:    var(--fg-lb-z);
+
+    // Hidden by default; shown via dialog[open]
+    display:    none;
+
+    -webkit-font-smoothing:  antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &[open] {
+        display:        flex;
+        flex-direction: column;   // backdrop (z-index:-1) + shell fill the dialog
+        align-items:    stretch;
+    }
+
+    // Native backdrop not used — we have our own .fg-lb-backdrop
+    &::backdrop {
+        background: transparent;
+    }
+}
+
+/* ==========================================================================
+   Backdrop (our own, behind the shell)
+   ========================================================================== */
+
+.fg-lb-backdrop {
+    position:        fixed;
+    inset:           0;
+    z-index:         -1;
+    background:      var(--fg-lb-color-backdrop);
+    backdrop-filter: blur(var(--fg-lb-overlay-blur));
+    transition:      opacity var(--fg-lb-transition-duration) ease;
+}
+
+/* ==========================================================================
+   Shell — flex column: toolbar on top, content fills the rest
+   ========================================================================== */
+
+.fg-lb-shell {
+    flex:           1;
+    display:        flex;
+    flex-direction: column;
+    align-items:    stretch;
+    min-width:      0;
+    min-height:     0;
+    overflow:       hidden;
+}
+
+/* ==========================================================================
+   Content — flex container holding stage + info panel.
+   Default: column (info below stage). Location variants switch to row.
+   ========================================================================== */
+
+.fg-lb-content {
+    flex:           1;
+    display:        flex;
+    flex-direction: column;   // default: info below stage
+    align-items:    stretch;
+    min-width:      0;
+    min-height:     0;
+    overflow:       hidden;
+}
+
+// Info panel on the right (default sidebar): stage | info
+.fg-lb-content.fg-lb-info-loc-right {
+    flex-direction: row;
+}
+
+// Info panel on the left: info | stage
+.fg-lb-content.fg-lb-info-loc-left {
+    flex-direction: row-reverse;
+}
+
+// Info panel on the bottom: stage above, info below (same as default column)
+.fg-lb-content.fg-lb-info-loc-bottom {
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   Stage — flex container for image area + thumbnail strip.
+   prev/next/dots are absolutely positioned inside it.
+   Thumbnail strip location classes switch flex-direction.
+   ========================================================================== */
+
+.fg-lb-stage {
+    flex:           1;
+    display:        flex;
+    flex-direction: column;   // default: thumbs below img-wrap
+    align-items:    stretch;
+    min-width:      0;
+    min-height:     0;
+    position:       relative;
+    overflow:       hidden;
+}
+
+// Thumbnail strip position variants (applied to .fg-lb-stage)
+.fg-lb-stage.fg-lb-thumbs-top    { flex-direction: column-reverse; }
+.fg-lb-stage.fg-lb-thumbs-bottom { flex-direction: column; }
+.fg-lb-stage.fg-lb-thumbs-left   { flex-direction: row-reverse; }
+.fg-lb-stage.fg-lb-thumbs-right  { flex-direction: row; }
+
+.fg-lb-media-wrap {
+    flex:            1;        // fills remaining stage space after thumb strip
+    position:        relative;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    min-width:       0;
+    min-height:      0;
+    overflow:        hidden;
+
+    &.fg-lb-fit-media {
+        .fg-lb-img {
+            width:      100%;
+            height:     100%;
+            object-fit: contain;
+        }
+    }
+}
+
+.fg-lb-img {
+    display:    block;
+    max-width:  100%;
+    max-height: 100%;
+    width:      auto;
+    height:     auto;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow:    0 8px 32px var(--fg-lb-color-img-shadow);
+
+    user-select:       none;
+    -webkit-user-drag: none;
+
+    // Zoom transform — driven by CSS vars written by _applyZoom().
+    // translate() is inside scale() so panning is in screen-space, not image-space.
+    transform-origin: center center;
+    transform: scale(var(--fg-lb-zoom-scale, 1))
+               translate(
+                   calc(var(--fg-lb-zoom-tx, 0px) / var(--fg-lb-zoom-scale, 1)),
+                   calc(var(--fg-lb-zoom-ty, 0px) / var(--fg-lb-zoom-scale, 1))
+               );
+
+    // Full-image filter — --fg-lb-full-filter is set by buildVarsCSS() when a
+    // filter is configured; falls back to 'none' (no-op) when not set.
+    filter: var(--fg-lb-full-filter, none);
+
+    // Transition states managed by JS class toggling.
+    // Opacity transitions during slide changes; filter transitions on open/update.
+    // Transform is always instant (zoom-driven, not transitioned here).
+    transition:  opacity calc(var(--fg-lb-transition-duration) / 2) ease,
+                 filter  0.25s ease;
+
+    &.fg-lb-img--out {
+        opacity: 0;
+    }
+
+    &.fg-lb-img--loading {
+        opacity: 0;
+    }
+
+    &.fg-lb-img--in {
+        opacity: 1;
+    }
+}
+
+// Full-image filter hover — --fg-lb-full-filter-hover is only set when a hover
+// filter is configured; when absent falls back to --fg-lb-full-filter (no change).
+// Hover is detected on the media-wrap so the entire image area acts as the target.
+.fg-lb-media-wrap:hover .fg-lb-img {
+    filter: var(--fg-lb-full-filter-hover, var(--fg-lb-full-filter, none));
+}
+
+// Transition variants — driven by data-fg-lb-transition on the dialog.
+// Directional variants add a slide offset on top of the zoom transform.
+// The zoom vars default to scale(1) translate(0,0) when zoom is inactive,
+// so these compose cleanly with or without zoom.
+.fg-lightbox[data-fg-lb-transition="none"] .fg-lb-img {
+    transition: none;
+}
+
+.fg-lightbox[data-fg-lb-transition="horizontal"] .fg-lb-img {
+    &.fg-lb-img--out { transform: scale(var(--fg-lb-zoom-scale, 1)) translate(calc(var(--fg-lb-zoom-tx, 0px) / var(--fg-lb-zoom-scale, 1) - 4%), calc(var(--fg-lb-zoom-ty, 0px) / var(--fg-lb-zoom-scale, 1))); }
+    &.fg-lb-img--in  { transform: scale(var(--fg-lb-zoom-scale, 1)) translate(calc(var(--fg-lb-zoom-tx, 0px) / var(--fg-lb-zoom-scale, 1)),      calc(var(--fg-lb-zoom-ty, 0px) / var(--fg-lb-zoom-scale, 1))); }
+}
+
+.fg-lightbox[data-fg-lb-transition="vertical"] .fg-lb-img {
+    &.fg-lb-img--out { transform: scale(var(--fg-lb-zoom-scale, 1)) translate(calc(var(--fg-lb-zoom-tx, 0px) / var(--fg-lb-zoom-scale, 1)), calc(var(--fg-lb-zoom-ty, 0px) / var(--fg-lb-zoom-scale, 1) - 4%)); }
+    &.fg-lb-img--in  { transform: scale(var(--fg-lb-zoom-scale, 1)) translate(calc(var(--fg-lb-zoom-tx, 0px) / var(--fg-lb-zoom-scale, 1)), calc(var(--fg-lb-zoom-ty, 0px) / var(--fg-lb-zoom-scale, 1)));      }
+}
+
+/* ==========================================================================
+   Loading spinner
+   ========================================================================== */
+
+.fg-lb-spinner {
+    // Centred over .fg-lb-media-wrap (position: relative parent).
+    position:        absolute;
+    top:             50%;
+    left:            50%;
+    transform:       translate(-50%, -50%);
+    width:           var(--fg-lb-spinner-size);
+    height:          var(--fg-lb-spinner-size);
+    color:           var(--fg-lb-color-spinner);
+    pointer-events:  none;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+
+    // The inline SVG injected from window.fotogridsLoadingIcon fills the
+    // container so it respects --fg-lb-spinner-size exactly.
+    svg {
+        width:    100%;
+        height:   100%;
+        display:  block;
+        overflow: visible;
+    }
+
+    &[hidden] { display: none; }
+}
+
+@keyframes fg-lb-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Auto-progress indicator
+   Two modes, mutually exclusive, controlled by classes on .fg-lightbox:
+     .fg-lb-progress-bar      — a thin stripe fixed to one edge of .fg-lb-shell
+     .fg-lb-progress-spinner  — a small circular arc inside the toolbar (left side)
+   Both animate via CSS animation restarted by JS on each slide.
+   ========================================================================== */
+
+// Keyframes
+
+@keyframes fg-lb-progress-bar-anim {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+
+@keyframes fg-lb-progress-bar-anim-vertical {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+}
+
+// SVG ring: circle has r=13, circumference = 2π×13 ≈ 81.68.
+// Animates stroke-dashoffset from 81.68 (empty) → 0 (full).
+@keyframes fg-lb-progress-ring-anim {
+    from { stroke-dashoffset: 81.68; }
+    to   { stroke-dashoffset: 0; }
+}
+
+// ── Progress bar ────────────────────────────────────────────────────────────
+// Absolute stripe inside .fg-lb-shell.
+//
+// Class model (on the element itself — mutually exclusive, never combined):
+//   (no class)              → no animation-name, not started
+//   .fg-lb-progress--running → animation-name set, play-state: running
+//   .fg-lb-progress--paused  → animation-name set, play-state: paused (frozen mid-run)
+//
+// Restart (JS): remove whichever class is present → el.offsetWidth → add --running.
+// The reflow between removal and re-add is what makes the browser treat it as a
+// new animation rather than a continuation.
+
+.fg-lb-progress-bar {
+    display:                    none;
+    position:                   absolute;
+    z-index:                    20;
+    background:                 var(--fg-lb-color-progress);
+    animation-timing-function:  linear;
+    animation-fill-mode:        both;
+    pointer-events:             none;
+}
+
+// Show it only in bar mode — driven by data-fg-lb-progress-style on the dialog
+.fg-lightbox[data-fg-lb-progress-style="bar"] .fg-lb-progress-bar {
+    display: block;
+}
+
+// Top / Bottom: full width, grows left→right
+.fg-lightbox[data-fg-lb-progress-bar-loc="top"]    .fg-lb-progress-bar,
+.fg-lightbox[data-fg-lb-progress-bar-loc="bottom"] .fg-lb-progress-bar {
+    left:               0;
+    right:              0;
+    height:             var(--fg-lb-progress-bar-thickness);
+    transform-origin:   left center;
+    transform:          scaleX(0);  // default: empty; animation overrides this
+}
+
+.fg-lightbox[data-fg-lb-progress-bar-loc="top"]    .fg-lb-progress-bar { top: 0; }
+.fg-lightbox[data-fg-lb-progress-bar-loc="bottom"] .fg-lb-progress-bar { bottom: 0; }
+
+// Left / Right: full height, grows top→bottom
+.fg-lightbox[data-fg-lb-progress-bar-loc="left"]  .fg-lb-progress-bar,
+.fg-lightbox[data-fg-lb-progress-bar-loc="right"] .fg-lb-progress-bar {
+    top:                0;
+    bottom:             0;
+    width:              var(--fg-lb-progress-bar-thickness);
+    transform-origin:   center top;
+    transform:          scaleY(0);  // default: empty; animation overrides this
+}
+
+.fg-lightbox[data-fg-lb-progress-bar-loc="left"]  .fg-lb-progress-bar { left: 0; }
+.fg-lightbox[data-fg-lb-progress-bar-loc="right"] .fg-lb-progress-bar { right: 0; }
+
+// --running: animation-name present + playing
+.fg-lightbox[data-fg-lb-progress-bar-loc="top"]    .fg-lb-progress-bar.fg-lb-progress--running,
+.fg-lightbox[data-fg-lb-progress-bar-loc="bottom"] .fg-lb-progress-bar.fg-lb-progress--running {
+    animation-name:       fg-lb-progress-bar-anim;
+    animation-duration:   var(--fg-lb-progress-duration);
+    animation-play-state: running;
+}
+
+.fg-lightbox[data-fg-lb-progress-bar-loc="left"]  .fg-lb-progress-bar.fg-lb-progress--running,
+.fg-lightbox[data-fg-lb-progress-bar-loc="right"] .fg-lb-progress-bar.fg-lb-progress--running {
+    animation-name:       fg-lb-progress-bar-anim-vertical;
+    animation-duration:   var(--fg-lb-progress-duration);
+    animation-play-state: running;
+}
+
+// --paused: same animation-name so position is preserved, but play-state: paused
+.fg-lightbox[data-fg-lb-progress-bar-loc="top"]    .fg-lb-progress-bar.fg-lb-progress--paused,
+.fg-lightbox[data-fg-lb-progress-bar-loc="bottom"] .fg-lb-progress-bar.fg-lb-progress--paused {
+    animation-name:       fg-lb-progress-bar-anim;
+    animation-duration:   var(--fg-lb-progress-duration);
+    animation-play-state: paused;
+}
+
+.fg-lightbox[data-fg-lb-progress-bar-loc="left"]  .fg-lb-progress-bar.fg-lb-progress--paused,
+.fg-lightbox[data-fg-lb-progress-bar-loc="right"] .fg-lb-progress-bar.fg-lb-progress--paused {
+    animation-name:       fg-lb-progress-bar-anim-vertical;
+    animation-duration:   var(--fg-lb-progress-duration);
+    animation-play-state: paused;
+}
+
+// ── Progress spinner ─────────────────────────────────────────────────────────
+// SVG progress ring at the left end of the toolbar.
+// Same class/attribute model as the bar — applied to .fg-lb-progress-ring-fill.
+
+.fg-lb-progress-spinner {
+    display:     none;
+    flex-shrink: 0;
+    width:       var(--fg-lb-progress-spinner-size);
+    height:      var(--fg-lb-progress-spinner-size);
+}
+
+.fg-lightbox[data-fg-lb-progress-style="spinner"] .fg-lb-progress-spinner {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+}
+
+.fg-lb-progress-ring {
+    width:     calc(var(--fg-lb-toolbar-icon-size) * 1.2);
+    height:    calc(var(--fg-lb-toolbar-icon-size) * 1.2);
+    overflow:  visible;
+    // Start at 12 o'clock — rotate the whole SVG -90°
+    transform: rotate(-90deg);
+}
+
+// Track ring — faint background circle
+.fg-lb-progress-ring-track {
+    fill:         none;
+    stroke:       var(--fg-lb-color-progress);
+    stroke-width: var(--fg-lb-progress-spinner-border);
+    opacity:      0.2;
+}
+
+// Fill arc — stroke-dashoffset from full circumference (81.68) → 0.
+// Same mutually-exclusive class model as the bar.
+.fg-lb-progress-ring-fill {
+    fill:                  none;
+    stroke:                var(--fg-lb-color-progress);
+    stroke-width:          var(--fg-lb-progress-spinner-border);
+    stroke-linecap:        round;
+    stroke-dasharray:      81.68;
+    stroke-dashoffset:     81.68;  // default: empty arc, no animation-name
+    animation-timing-function: linear;
+    animation-fill-mode:   both;
+}
+
+.fg-lb-progress-ring-fill.fg-lb-progress--running {
+    animation-name:        fg-lb-progress-ring-anim;
+    animation-duration:    var(--fg-lb-progress-duration);
+    animation-play-state:  running;
+}
+
+.fg-lb-progress-ring-fill.fg-lb-progress--paused {
+    animation-name:        fg-lb-progress-ring-anim;
+    animation-duration:    var(--fg-lb-progress-duration);
+    animation-play-state:  paused;
+}
+
+/* ==========================================================================
+   Toolbar — first child of shell, always at the top.
+   shell is a flex column so toolbar naturally spans full width.
+   ========================================================================== */
+
+.fg-lb-toolbar {
+    flex-shrink:     0;
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    padding:         var(--fg-lb-toolbar-padding);
+    height:          var(--fg-lb-toolbar-height);
+    box-sizing:      border-box;
+    background:      var(--fg-lb-color-toolbar-bg);
+    z-index:         10;
+}
+
+.fg-lb-toolbar-start,
+.fg-lb-toolbar-end {
+    display:     flex;
+    align-items: center;
+    gap:         var(--fg-lb-toolbar-gap);
+}
+
+.fg-lb-counter {
+    padding:        0 var(--fg-lb-counter-padding-x);
+    font-size:      var(--fg-lb-counter-font-size);
+    font-weight:    var(--fg-lb-counter-font-weight);
+    line-height:    1;
+    letter-spacing: var(--fg-lb-counter-letter-spacing);
+    color:          var(--fg-lb-color-toolbar-icon-hover);
+    white-space:    nowrap;
+    user-select:    none;
+}
+
+/* ==========================================================================
+   Toolbar buttons — close, info-toggle, fullscreen, play-pause
+   All share the same appearance: no background, no border, icon color driven
+   by --fg-lb-color-toolbar-icon / --fg-lb-color-toolbar-icon-hover.
+   ========================================================================== */
+
+.fg-lb-toolbar button {
+    background:      none;
+    border:          none;
+    border-radius:   var(--fg-lb-toolbar-btn-radius);
+    padding:         0;
+    width:           var(--fg-lb-toolbar-btn-size);
+    height:          var(--fg-lb-toolbar-btn-size);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    cursor:          pointer;
+    color:           var(--fg-lb-color-toolbar-icon);
+    transition:      color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    flex-shrink:     0;
+
+    svg {
+        width:   var(--fg-lb-toolbar-icon-size);
+        height:  var(--fg-lb-toolbar-icon-size);
+        display: block;
+    }
+
+    &:hover         { color: var(--fg-lb-color-toolbar-icon-hover); }
+    &:active        { transform: scale(0.93); }
+    &:focus         { outline: none; }
+    &:focus-visible { outline: 2px solid var(--fg-colors-blue); outline-offset: 2px; }
+
+    // Active state — used for toggle buttons (fullscreen, info panel) when on.
+    &.fg-lb-btn--active {
+        background: var(--fg-lb-color-toolbar-btn-active);
+        color:      var(--fg-lb-color-toolbar-icon-hover);
+    }
+}
+
+/* ==========================================================================
+   Zoom buttons
+   Zoom-in / zoom-out are hidden by default; shown when data-fg-lb-zoom-icons
+   is present on the dialog. Active (zoomed-in) state uses .fg-lb-btn--active.
+   ========================================================================== */
+
+.fg-lb-zoom-in,
+.fg-lb-zoom-out {
+    display: none;
+}
+
+.fg-lightbox[data-fg-lb-zoom-icons] .fg-lb-zoom-in,
+.fg-lightbox[data-fg-lb-zoom-icons] .fg-lb-zoom-out {
+    display: flex;
+}
+
+// Highlight zoom-in when currently zoomed in.
+.fg-lightbox[data-fg-lb-zoom-active] .fg-lb-zoom-in {
+    background: var(--fg-lb-color-toolbar-btn-active);
+    color:      var(--fg-lb-color-toolbar-icon-hover);
+}
+
+/* ==========================================================================
+   Zoom — cursor and image transform
+   ========================================================================== */
+
+// Zoom-enabled: zoom-in cursor on the image area.
+.fg-lightbox[data-fg-lb-zoom] .fg-lb-media-wrap {
+    cursor: zoom-in;
+}
+
+// When zoomed in and trigger is click/double-click: zoom-out cursor signals
+// that clicking again will reset. wheel_pinch keeps zoom-in (no click toggle).
+.fg-lightbox[data-fg-lb-zoom-active][data-fg-lb-zoom-trigger="double_click"] .fg-lb-media-wrap,
+.fg-lightbox[data-fg-lb-zoom-active][data-fg-lb-zoom-trigger="click"]        .fg-lb-media-wrap {
+    cursor: zoom-out;
+}
+
+// When zoomed in with wheel_pinch trigger: grab (panning only, no click reset).
+.fg-lightbox[data-fg-lb-zoom-active][data-fg-lb-zoom-trigger="wheel_pinch"] .fg-lb-media-wrap {
+    cursor: grab;
+}
+
+// While actively dragging: grabbing cursor overrides all above.
+.fg-lightbox[data-fg-lb-zoom-dragging] .fg-lb-media-wrap {
+    cursor: grabbing;
+}
+
+/* ==========================================================================
+   Nav controls — prev, next
+   Absolutely positioned over the image area; keep their own distinct style.
+   ========================================================================== */
+
+// Shared base for prev / next
+.fg-lb-prev,
+.fg-lb-next {
+    background:      var(--fg-lb-color-nav-bg);
+    color:           var(--fg-lb-color-nav-icon);
+    border:          none;
+    border-radius:   var(--fg-lb-nav-btn-radius);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    cursor:          pointer;
+    line-height:     1;
+    font-family:     inherit;
+    font-weight:     normal;
+    transition:      background 0.2s ease, transform 0.15s ease;
+
+    &:hover  { background: var(--fg-lb-color-nav-bg-hover); color: var(--fg-lb-color-nav-icon-hover); }
+    &:focus         { outline: none; }
+    &:focus-visible { outline: 2px solid var(--fg-colors-blue); outline-offset: 2px; }
+}
+
+// Prev / next: absolutely positioned over .fg-lb-media-wrap.
+.fg-lb-prev,
+.fg-lb-next {
+    position:  absolute;
+    z-index:   10;
+    top:       50%;
+    transform: translateY(-50%);
+    width:     var(--fg-lb-nav-btn-size);
+    height:    var(--fg-lb-nav-btn-size);
+    font-size: var(--fg-lb-nav-icon-size);
+
+    &:hover  { transform: translateY(-50%) scale(1.1); }
+    &:active { transform: translateY(-50%) scale(0.93); }
+    &[hidden] { display: none; }
+}
+
+.fg-lb-prev { left:  var(--fg-lb-nav-btn-offset); }
+.fg-lb-next { right: var(--fg-lb-nav-btn-offset); }
+
+/* ==========================================================================
+   Navigation dots
+   ========================================================================== */
+
+.fg-lb-dots {
+    position:  absolute;
+    bottom:    var(--fg-lb-stage-padding);
+    left:      50%;
+    transform: translateX(-50%);
+    display:   flex;
+    gap:       var(--fg-lb-dots-spacing);
+    z-index:   10;
+
+    &[hidden] { display: none; }
+}
+
+.fg-lb-dot {
+    width:         var(--fg-lb-dot-size);
+    height:        var(--fg-lb-dot-size);
+    border:        none;
+    border-radius: var(--fg-lb-dot-radius);
+    background:    var(--fg-lb-color-dot);
+    opacity:       var(--fg-lb-dot-opacity);
+    cursor:        pointer;
+    padding:       0;
+    transition:    opacity 0.2s ease, transform 0.15s ease;
+
+    &:hover  { opacity: var(--fg-lb-dot-opacity-hover); background: var(--fg-lb-color-dot-hover); transform: scale(1.2); }
+    &:focus         { outline: none; }
+    &:focus-visible { outline: 2px solid var(--fg-colors-blue); outline-offset: 2px; }
+    &:active { transform: scale(0.9); }
+
+    &.fg-lb-dot--active {
+        opacity:    1;
+        background: var(--fg-lb-color-dot-active);
+    }
+}
+
+// Dot style variants
+.fg-lb-dot-stroke {
+    background: transparent !important;
+    border:     var(--fg-lb-dot-border-width) solid var(--fg-lb-color-dot);
+
+    &.fg-lb-dot--active {
+        background:   transparent !important;
+        border-color: var(--fg-lb-color-dot-active);
+    }
+}
+
+.fg-lb-dot-square { border-radius: 2px; }
+
+.fg-lb-dot-square_stroke {
+    border-radius: 2px;
+    background:    transparent !important;
+    border:        var(--fg-lb-dot-border-width) solid var(--fg-lb-color-dot);
+
+    &.fg-lb-dot--active {
+        background:   transparent !important;
+        border-color: var(--fg-lb-color-dot-active);
+    }
+}
+
+/* ==========================================================================
+   Info panel (caption + title)
+   ========================================================================== */
+
+.fg-lb-info {
+    flex-shrink:    0;   // don't compress in column layout; sidebar width set explicitly
+    padding:        var(--fg-lb-info-padding);
+    display:        flex;
+    flex-direction: column;
+    gap:            var(--fg-lb-info-gap);
+    box-sizing:     border-box;
+    background:    var(--fg-lb-color-info-bg);
+
+    &[hidden] { display: none; }
+}
+
+// ── Info block — base card ─────────────────────────────────────────────────
+// Appearance is driven by data-fg-lb-info-blocks-style on .fg-lb-info.
+// Three modes:
+//   boxed   — each block is a rounded card with a background fill.
+//   divided — blocks are separated by a thin horizontal rule (no card bg).
+//   plain   — no visual separation; blocks run flush.
+.fg-lb-info-block {
+    padding:    var(--fg-lb-info-block-padding);
+    margin:     0;
+    box-sizing: border-box;
+    overflow:   hidden;
+
+    &[hidden] { display: none; }
+
+    // Boxed mode — card background + radius.
+    .fg-lb-info[data-fg-lb-info-blocks-style="boxed"] & {
+        padding:       var(--fg-lb-info-block-padding-boxed);
+        border-radius: var(--fg-lb-info-block-radius);
+        background:    var(--fg-lb-color-info-block-bg);
+        margin:        var(--fg-lb-info-block-margin) 0;
+    }
+
+    // Divided mode — top border rule on every block except the first.
+    .fg-lb-info[data-fg-lb-info-blocks-style="divided"] &:not(:first-child) {
+        border-top: 1px solid var(--fg-lb-color-info-block-divider, rgba(255,255,255,0.12));
+    }
+
+    // Loading state — skeleton placeholder.
+    &.fg-lb-info-block--loading {
+        padding: var(--fg-lb-info-block-padding);
+    }
+}
+
+// Info sidebar dimensions when location is left or right.
+.fg-lb-content.fg-lb-info-loc-left  .fg-lb-info,
+.fg-lb-content.fg-lb-info-loc-right .fg-lb-info {
+    flex-shrink: 0;
+    width:       var(--fg-lb-info-width);
+    max-width:   var(--fg-lb-info-max-width);
+    overflow-y:  auto;
+}
+
+// ── Caption + description ──────────────────────────────────────────────────
+.fg-lb-info-caption {
+    margin:      0 0 4px;
+    padding:     0;
+    font-family: var(--fg-lb-info-font-family);
+    font-size:   var(--fg-lb-info-font-size-base);
+    line-height: var(--fg-lb-info-line-height);
+    color:       var(--fg-lb-color-info-text);
+
+    &[hidden] { display: none; }
+}
+
+.fg-lb-info-description {
+    margin:      0;
+    padding:     0;
+    font-family: var(--fg-lb-info-font-family);
+    font-size:   var(--fg-lb-info-font-size-base);
+    line-height: var(--fg-lb-info-line-height);
+    color:       var(--fg-lb-color-info-text);
+    opacity:     0.8;
+
+    &[hidden] { display: none; }
+}
+
+// ── Credit ─────────────────────────────────────────────────────────────────
+.fg-lb-info-credit {
+    margin:      0;
+    padding:     0;
+    font-family: var(--fg-lb-info-font-family);
+    font-size:   var(--fg-lb-info-font-size-s);
+    line-height: var(--fg-lb-info-line-height);
+    color:       var(--fg-lb-color-info-text);
+    opacity:     0.65;
+    font-style:  italic;
+}
+
+// ── Definition list — file_info + exif ─────────────────────────────────────
+.fg-lb-info-dl {
+    display:               grid;
+    grid-template-columns: auto 1fr;
+    column-gap:            var(--fg-lb-info-dl-col-gap);
+    row-gap:               var(--fg-lb-info-dl-row-gap);
+    margin:                0;
+    padding:               0;
+    list-style:            none;
+    font-family:           var(--fg-lb-info-font-family);
+    font-size:             var(--fg-lb-info-font-size-s);
+    line-height:           var(--fg-lb-info-line-height);
+
+    dt {
+        color:       var(--fg-lb-color-info-text);
+        opacity:     0.55;
+        white-space: nowrap;
+        font-weight: 500;
+    }
+
+    dd {
+        margin:        0;
+        color:         var(--fg-lb-color-info-text);
+        overflow:      hidden;
+        text-overflow: ellipsis;
+        white-space:   nowrap;
+    }
+}
+
+// ── Block header (icon + label) — tags, people, location ────────────────────
+.fg-lb-info-block-header {
+    display:     flex;
+    align-items: center;
+    gap:         var(--fg-lb-info-block-header-gap);
+    margin:      var(--fg-lb-info-block-header-margin);
+
+    span {
+        font-family:    var(--fg-lb-info-font-family);
+        font-size:      var(--fg-lb-info-font-size-xs);
+        font-weight:    600;
+        line-height:    var(--fg-lb-info-line-height);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color:          var(--fg-lb-color-info-text);
+        opacity:        0.55;
+    }
+}
+
+.fg-lb-info-block-header-icon {
+    flex-shrink: 0;
+    width:       var(--fg-lb-info-font-size-xs);
+    height:      var(--fg-lb-info-font-size-xs);
+    color:       var(--fg-lb-color-info-text);
+    opacity:     0.55;
+}
+
+// ── Tags / People chips ─────────────────────────────────────────────────────
+.fg-lb-info-chips {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       var(--fg-lb-info-chips-gap);
+}
+
+.fg-lb-info-chip {
+    display:       inline-block;
+    padding:       var(--fg-lb-info-chip-padding);
+    border-radius: var(--fg-lb-info-chip-radius);
+    font-family:   var(--fg-lb-info-font-family);
+    font-size:     var(--fg-lb-info-font-size-s);
+    line-height:   var(--fg-lb-info-line-height);
+    color:         var(--fg-lb-color-info-text);
+    background:    var(--fg-lb-info-chip-bg);
+    white-space:   nowrap;
+}
+
+// ── Location ────────────────────────────────────────────────────────────────
+.fg-lb-info-location {
+    margin:      0;
+    padding:     0;
+    font-family: var(--fg-lb-info-font-family);
+    font-size:   var(--fg-lb-info-font-size-s);
+    line-height: var(--fg-lb-info-line-height);
+    color:       var(--fg-lb-color-info-text);
+}
+
+// ── Skeleton loader ─────────────────────────────────────────────────────────
+// Used while the REST fetch is in progress (block has .fg-lb-info-block--loading).
+@keyframes fg-lb-skeleton-pulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 0.7; }
+}
+
+.fg-lb-info-skeleton-line {
+    height:        10px;
+    border-radius: 4px;
+    background:    var(--fg-lb-color-info-text);
+    margin-bottom: 6px;
+    animation:     fg-lb-skeleton-pulse 1.5s ease-in-out infinite;
+
+    &:nth-child(1) { width: 80%; }
+    &:nth-child(2) { width: 55%; animation-delay: 0.2s; }
+    &:nth-child(3) { width: 65%; animation-delay: 0.4s; }
+    &:last-child   { margin-bottom: 0; }
+}
+
+// Inline description skeleton (inside caption block).
+.fg-lb-info-description.fg-lb-info-skeleton {
+    height:        10px;
+    border-radius: 4px;
+    background:    var(--fg-lb-color-info-text);
+    opacity:       0.4;
+    width:         70%;
+    animation:     fg-lb-skeleton-pulse 1.5s ease-in-out infinite;
+    margin-top:    4px;
+    color:         transparent; // Hide any accidental text.
+
+    &[hidden] { display: none; }
+}
+
+/* ==========================================================================
+   Thumbnail strip
+   ========================================================================== */
+
+.fg-lb-thumbs {
+    flex-shrink: 0;
+    display:     flex;
+    gap:         var(--fg-lb-thumb-spacing);
+    padding:     var(--fg-lb-thumbs-padding);
+    background:  var(--fg-lb-color-thumbs-bg);
+    overflow:    auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--fg-lb-color-thumb-border) transparent;
+
+    &[hidden] { display: none; }
+
+    &::-webkit-scrollbar        { width: 4px; height: 4px; }
+    &::-webkit-scrollbar-track  { background: transparent; }
+    &::-webkit-scrollbar-thumb  { background: var(--fg-lb-color-thumb-border); border-radius: 2px; }
+}
+
+.fg-lb-thumbs--bottom,
+.fg-lb-thumbs--top {
+    flex-direction: row;
+    justify-content: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.fg-lb-thumbs--left,
+.fg-lb-thumbs--right {
+    flex-direction: column;
+    align-items:    center;
+    overflow-x:     hidden;
+    overflow-y:     auto;
+    max-height:     100%;
+}
+
+.fg-lb-thumb {
+    flex-shrink:   0;
+    padding:       0;
+    border:        2px solid transparent;
+    border-radius: var(--fg-lb-thumb-radius);
+    overflow:      hidden;
+    background:    none;
+    cursor:        pointer;
+    transition:    border-color 0.2s ease, transform 0.15s ease;
+
+    &:hover  { border-color: var(--fg-lb-color-thumb-border); transform: scale(1.06); }
+    &:focus         { outline: none; }
+    &:focus-visible { outline: 2px solid var(--fg-colors-blue); outline-offset: 2px; }
+    &:active { transform: scale(0.96); }
+
+    &.fg-lb-thumb--active {
+        border-color: var(--fg-lb-color-thumb-active);
+        transform:    scale(1.1);
+    }
+
+    img {
+        display:    block;
+        object-fit: cover;
+    }
+}
+
+// Thumbnail size variants
+.fg-lb-thumbs--small  .fg-lb-thumb img { width: 50px; height: 50px; }
+.fg-lb-thumbs--normal .fg-lb-thumb img { width: 70px; height: 70px; }
+.fg-lb-thumbs--large  .fg-lb-thumb img { width: 90px; height: 90px; }
+
+// Thumbnail strip image filter — --fg-lb-thumb-filter is set by buildVarsCSS()
+// when the thumbnail filter is configured; falls back to 'none' when not set.
+// --fg-lb-thumb-filter-hover is only set when a hover filter is configured;
+// when absent the hover state falls back to --fg-lb-thumb-filter (i.e. no change).
+.fg-lb-thumb img {
+    filter:     var(--fg-lb-thumb-filter, none);
+    transition: filter 0.25s ease;
+}
+.fg-lb-thumb:hover img {
+    filter: var(--fg-lb-thumb-filter-hover, var(--fg-lb-thumb-filter, none));
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+// Mobile layout — driven by data-fg-lb-mobile presence on the dialog
+.fg-lightbox[data-fg-lb-mobile] {
+    --fg-lb-nav-btn-size:        var(--fg-lb-nav-btn-size-mobile);
+    --fg-lb-toolbar-btn-size:    36px;
+    --fg-lb-toolbar-height:      48px;
+    --fg-lb-stage-padding:       12px;
+    --fg-lb-nav-btn-offset:      12px;
+}
+
+@media (max-width: 767px) {
+    .fg-lightbox {
+        --fg-lb-nav-btn-size:        var(--fg-lb-nav-btn-size-mobile);
+        --fg-lb-toolbar-btn-size:    36px;
+        --fg-lb-toolbar-height:      48px;
+        --fg-lb-stage-padding:       12px;
+        --fg-lb-nav-btn-offset:      12px;
+    }
+
+    .fg-lb-thumbs--small  .fg-lb-thumb img { width: 40px; height: 40px; }
+    .fg-lb-thumbs--normal .fg-lb-thumb img { width: 55px; height: 55px; }
+    .fg-lb-thumbs--large  .fg-lb-thumb img { width: 70px; height: 70px; }
+
+    .fg-lb-dot { --fg-lb-dot-size: 10px; }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+.fg-lightbox:focus       { outline: none; }
+.fg-lb-shell:focus { outline: none; }
+
+// Focus sentinel — absorbs initial focus on open so no real button gets
+// an accidental tooltip or Space/Enter press before user interaction.
+.fg-lb-focus-sentinel {
+    position: absolute;
+    width:    0;
+    height:   0;
+    overflow: hidden;
+    outline:  none;
+    pointer-events: none;
+}
+
+@media (prefers-contrast: high) {
+    .fg-lb-toolbar button,
+    .fg-lb-prev,
+    .fg-lb-next { border: 2px solid currentColor; }
+
+    .fg-lb-dot  { border: 2px solid currentColor; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fg-lb-img,
+    .fg-lb-toolbar button,
+    .fg-lb-prev,
+    .fg-lb-next,
+    .fg-lb-dot,
+    .fg-lb-thumb,
+    .fg-lb-spinner {
+        transition: none !important;
+        animation:  none !important;
+    }
+}
+
+@media print {
+    .fg-lightbox { display: none !important; }
+}

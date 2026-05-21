@@ -46,6 +46,49 @@ class Register_Gallery_Routes {
             ),
         ) );
 
+        // Gallery password reveal endpoint (admin eye-button — permission-gated).
+        register_rest_route( 'fotogrids/v1', '/gallery/(?P<id>\d+)/password', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'get_gallery_password' ),
+                'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_password_read' ),
+                'args'                => array(
+                    'id' => array(
+                        'required'          => true,
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function ( $param ) {
+                            return is_numeric( $param ) && $param > 0;
+                        },
+                    ),
+                ),
+            ),
+        ) );
+
+        // Gallery unlock endpoint (public — visitor submits password to unlock).
+        register_rest_route( 'fotogrids/v1', '/gallery/(?P<id>\d+)/unlock', array(
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'unlock_gallery' ),
+                'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_unlock' ),
+                'args'                => array(
+                    'id' => array(
+                        'required'          => true,
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function ( $param ) {
+                            return is_numeric( $param ) && $param > 0;
+                        },
+                    ),
+                    'password' => array(
+                        'required'          => true,
+                        'sanitize_callback' => function ( $value ) {
+                            // Preserve special characters — strip_tags only.
+                            return wp_strip_all_tags( (string) $value );
+                        },
+                    ),
+                ),
+            ),
+        ) );
+
         // Galleries list endpoint (for Gutenberg block)
         register_rest_route( 'fotogrids/v1', '/galleries', array(
             array(

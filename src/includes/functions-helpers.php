@@ -222,6 +222,15 @@ function fotogrids_get_gallery_settings( $gallery_id ) {
         }
     }
 
+    // The `password` setting is stored encrypted. Expose it to the render
+    // pipeline via the internal `_password_encrypted` key so gates can call
+    // Password_Crypto::verify() without the raw ciphertext leaking into REST
+    // responses or the public JS bundle. The public `password` key is always
+    // kept as '' in the returned settings array.
+    $encrypted = (string) get_post_meta( $gallery_id, 'fotogrids_password', true );
+    $settings['_password_encrypted'] = $encrypted;
+    $settings['password']            = '';
+
     return $settings;
 }
 
@@ -282,6 +291,7 @@ function fotogrids_get_gallery_items( $gallery_id ) {
             'position' => $custom_meta ? (int) $custom_meta['position'] : $position,
             'caption' => $custom_meta ? $custom_meta['caption'] : $attachment->post_excerpt,
             'description' => $custom_meta ? $custom_meta['description'] : $attachment->post_content,
+            'credit' => $custom_meta ? ( $custom_meta['credit'] ?? '' ) : '',
             'location' => $custom_meta ? $custom_meta['location'] : '',
             'exif_data' => $custom_meta && $custom_meta['exif_data'] ? json_decode( $custom_meta['exif_data'], true ) : null,
             'custom_data' => $custom_meta && $custom_meta['custom_data'] ? json_decode( $custom_meta['custom_data'], true ) : null,
@@ -930,7 +940,7 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
     if ( $enqueue_settings_loader ) {
         wp_enqueue_script(
             'fotogrids-settings-loader',
-            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/collection-settings/index.js',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/collection-settings/index.js',
             array(),
             FOTOGRIDS_VERSION,
             true
@@ -947,8 +957,30 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         );
     }
 
+    // Standalone helper scripts that render functions may depend on.
+
+    // Standalone helper scripts that render functions may depend on.
+    // These live in render-settings/utils/ — not render functions themselves.
+
+    // Tooltip utilities — must load before any render helper that shows Pro badges.
+    wp_enqueue_script(
+        'fotogrids-tooltip-utils',
+        FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/tooltip-utils.js',
+        array( 'wp-element' ),
+        FOTOGRIDS_VERSION,
+        true
+    );
+
+    wp_enqueue_script(
+        'fotogrids-fg-color-picker',
+        FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/fg-color-picker.js',
+        array(),
+        FOTOGRIDS_VERSION,
+        true
+    );
+
     $render_functions = array(
-        'CustomUnitSelect',
+        'renderCustomUnitSelect',
         'renderResponsiveRange',
         'renderLayoutGrid',
         'renderHoverEffectsGrid',
@@ -960,6 +992,8 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         'renderPasswordInput',
         'renderRange',
         'renderTextInput',
+        'renderSelect',
+        'renderFontFamily',
         'renderToggle',
         'renderConditionalMessage',
         'renderSettingSubTabs',
@@ -967,19 +1001,39 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         'renderExternalUrlManager',
         'renderGroup',
         'renderCodeArea',
-        'renderPromo'
+        'renderPromo',
+        'renderInfoBlock',
+        'renderTokenSelect'
     );
 
     foreach ( $render_functions as $function ) {
         $dependencies = array( 'wp-element', 'wp-components', 'wp-i18n', 'fotogrids-icons' );
 
+        // Render helpers that display Pro badges depend on the tooltip utilities.
+        $uses_pro_badges = array( 'renderButtonGroup', 'renderButtonGroupDynamic', 'renderLayoutGrid', 'renderHoverEffectsGrid', 'renderTokenSelect' );
+        if ( in_array( $function, $uses_pro_badges, true ) ) {
+            $dependencies[] = 'fotogrids-tooltip-utils';
+        }
+
         if ( $function === 'renderCodeArea' ) {
             $dependencies[] = 'fotogrids-codemirror-init';
         }
 
+        if ( $function === 'renderColorPicker' ) {
+            $dependencies[] = 'fotogrids-fg-color-picker';
+        }
+
+        if ( in_array( $function, array( 'renderRange', 'renderResponsiveRange' ), true ) ) {
+            $dependencies[] = 'fotogrids-render-custom-unit-select';
+        }
+
+        if ( $function === 'renderFontFamily' ) {
+            $dependencies[] = 'fotogrids-render-select';
+        }
+
         wp_enqueue_script(
             'fotogrids-' . strtolower( preg_replace( '/([a-z])([A-Z])/', '$1-$2', $function ) ),
-            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/render-settings/' . $function . '.js',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/' . $function . '.js',
             $dependencies,
             FOTOGRIDS_VERSION,
             true
@@ -988,8 +1042,8 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
 
     wp_enqueue_script(
         'fotogrids-collection-settings',
-        FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/collection-settings.js',
-        array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'fotogrids-icons', 'fotogrids-settings-loader' ),
+        FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/collection-settings.js',
+        array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'fotogrids-icons', 'fotogrids-settings-loader', 'fotogrids-ui-state-manager' ),
         FOTOGRIDS_VERSION,
         true
     );
@@ -1037,4 +1091,80 @@ function fotogrids_get_loading_icon_svg( $icon_name = 'spinner', $instance_id = 
     }
 
     return $svg;
+}
+
+/**
+ * Get the WAAPI animate function source for a loading icon by name.
+ *
+ * Returns a raw JS function string:
+ *   function animate(svg) { ... }
+ *
+ * This is emitted verbatim by Loading_Icon into the inline script global so the
+ * browser receives a fully pre-built function — no eval, no new Function, no
+ * runtime code generation. The helpers (fgCubicBezier, fgAnimAttr, etc.) are
+ * inlined inside the function by the build-time converter.
+ *
+ * @param string $icon_name The icon name (e.g. 'spinner', '12-dots').
+ * @return string Raw JS function source, or empty string if not found.
+ */
+function fotogrids_get_loading_icon_animate_fn( $icon_name = 'spinner' ) {
+    static $waapi_cache = null;
+
+    if ( $waapi_cache === null ) {
+        $waapi_file = FOTOGRIDS_PLUGIN_DIR . 'config/loading-icons-waapi.json';
+
+        if ( file_exists( $waapi_file ) ) {
+            $waapi_json  = file_get_contents( $waapi_file );
+            $waapi_cache = json_decode( $waapi_json, true );
+
+            if ( ! is_array( $waapi_cache ) ) {
+                $waapi_cache = array();
+            }
+        } else {
+            $waapi_cache = array();
+        }
+    }
+
+    if ( isset( $waapi_cache[ $icon_name ] ) ) {
+        return $waapi_cache[ $icon_name ];
+    }
+
+    if ( isset( $waapi_cache['spinner'] ) ) {
+        return $waapi_cache['spinner'];
+    }
+
+    return '';
+}
+
+/**
+ * Sanitizes a raw code string (CSS, JS, or similar) for safe storage.
+ *
+ * This is the correct sanitizer for `codearea` fields. It is intentionally
+ * narrower than `sanitize_textarea_field`:
+ *
+ *  - Removes null bytes and ASCII control characters (except tab, newline, CR)
+ *    which have no legitimate use in source code and are common in obfuscation
+ *    payloads.
+ *  - Preserves ALL printable characters, including `<`, `>`, `&`, quotes, and
+ *    every character valid in CSS or JavaScript.
+ *
+ * `sanitize_textarea_field` strips HTML tags and encodes entities, which
+ * corrupts legitimate code — e.g. JS comparisons (`a < b`), arrow functions
+ * (`=>`), template literal expressions, or any CSS selector containing `>`.
+ * This function avoids that corruption.
+ *
+ * NOTE: this function sanitizes for *storage* only. Render-time sanitization
+ * (preventing breakout from `<style>` / `<script>` tags) is handled separately
+ * by the Custom_Css and Custom_Js feature classes.
+ *
+ * @since  1.0.0
+ * @param  string $raw Raw code input.
+ * @return string Sanitized code, safe for storage in post meta.
+ */
+function fotogrids_sanitize_code_field( string $raw ): string {
+    // Strip null bytes and ASCII control characters, preserving tab (\x09),
+    // newline (\x0A), and carriage return (\x0D) which are valid in code.
+    $sanitized = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $raw );
+
+    return is_string( $sanitized ) ? $sanitized : '';
 }

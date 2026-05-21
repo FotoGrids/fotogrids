@@ -303,8 +303,6 @@ const PermissionsManagerTab = () => {
 
     return (
         <div className="fotogrids-permissions-manager">
-            <h3>{__('Permissions Manager', 'fotogrids')}</h3>
-
             <div className="fg-rpm__pro-box">
                 <span className="fotogrids-pro-badge">{__('PRO', 'fotogrids')}</span>
                 <div className="fg-rpm__pro-box-text">

@@ -1,0 +1,254 @@
+{
+    "id": "sharing",
+    "label": "Social & Sharing",
+    "icon": "share",
+    "settings": [
+        {
+            "key": "enable_social_sharing",
+            "type": "toggle",
+            "label": "Enable social sharing",
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "sharing_settings_subtabs",
+            "type": "setting_subtabs",
+            "label": "Sharing Settings",
+            "condition": {
+                "dependsOn": "enable_social_sharing",
+                "values": [
+                    true,
+                    "1"
+                ]
+            },
+            "subTabs": {
+                "social_networks": {
+                    "id": "social_networks",
+                    "label": "Social Networks",
+                    "icon": "share",
+                    "settings": [
+                        {
+                            "key": "share_facebook",
+                            "type": "toggle",
+                            "label": "Facebook",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_x",
+                            "type": "toggle",
+                            "label": "X (Twitter)",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_pinterest",
+                            "type": "toggle",
+                            "label": "Pinterest",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_linkedin",
+                            "type": "toggle",
+                            "label": "LinkedIn",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_whatsapp",
+                            "type": "toggle",
+                            "label": "WhatsApp",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_telegram",
+                            "type": "toggle",
+                            "label": "Telegram",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_reddit",
+                            "type": "toggle",
+                            "label": "Reddit",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_email",
+                            "type": "toggle",
+                            "label": "Email",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "share_copy_link",
+                            "type": "toggle",
+                            "label": "Copy Link",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "styling": {
+                    "id": "styling",
+                    "label": "Styling",
+                    "icon": "styling",
+                    "settings": [
+                        {
+                            "key": "sharing_button_style",
+                            "type": "button_group",
+                            "label": "Button Style",
+                            "options": [
+                                {
+                                    "label": "Icons Only",
+                                    "value": "icons_only",
+                                    "icon": "star",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Icons with Labels",
+                                    "value": "icons_labels",
+                                    "icon": "text",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Labels Only",
+                                    "value": "labels_only",
+                                    "icon": "text",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "icons_only",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "sharing_button_size",
+                            "type": "button_group",
+                            "label": "Button Size",
+                            "options": [
+                                {
+                                    "label": "Small",
+                                    "value": "small",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Medium",
+                                    "value": "medium",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Large",
+                                    "value": "large",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "medium",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "advanced": {
+                    "id": "advanced",
+                    "label": "Advanced",
+                    "icon": "settings",
+                    "settings": [
+                        {
+                            "key": "sharing_location",
+                            "type": "button_group",
+                            "label": "Display At",
+                            "description": "Choose where social sharing buttons should appear.",
+                            "options": [
+                                {
+                                    "label": "Full Images Only",
+                                    "value": "full_only",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Thumbnails Only",
+                                    "value": "thumbnails_only",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Both",
+                                    "value": "both",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "full_only",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "sharing_custom_text",
+                            "type": "text_input",
+                            "label": "Custom Share Text",
+                            "description": "Custom text to include when sharing. Use {title} and {url} as placeholders.",
+                            "placeholder": "Check out {title} - {url}",
+                            "default": "",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "sharing_track_clicks",
+                            "type": "toggle",
+                            "label": "Track Share Clicks",
+                            "description": "Track when users click share buttons for analytics.",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

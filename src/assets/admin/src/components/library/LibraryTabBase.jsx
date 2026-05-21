@@ -1,0 +1,682 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    Button,
+    CheckboxControl,
+    Notice,
+    Spinner,
+    TextControl,
+    Popover,
+    Modal,
+} from '@wordpress/components';
+import MergeDialog from './MergeDialog';
+
+const { __, sprintf, _n } = wp.i18n;
+const apiFetch = wp.apiFetch;
+
+const DEFAULT_PER_PAGE = 50;
+const SEARCH_DEBOUNCE_MS = 300;
+
+/**
+ * Shared table + actions for every library entity type.
+ *
+ * Behaviour is identical across Tags / People / Locations; entity-specific
+ * differences (extra columns, create-form fields, inline-edit fields) come in
+ * via the `config` prop. Keeping it shared means a bug-fix in one place
+ * applies to every tab.
+ */
+const LibraryTabBase = ({ entityType, config }) => {
+    const library = window.fotogridsLibrary || {};
+    const restBase = library.restBase || 'fotogrids/v1/library';
+    const canManage = Boolean(library.canManage);
+
+    // ─── List state ──────────────────────────────────────────────────────────
+    const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [perPage] = useState(library.perPage || DEFAULT_PER_PAGE);
+    const [orderby, setOrderby] = useState('name');
+    const [order, setOrder] = useState('asc');
+    const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [unusedOnly, setUnusedOnly] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [notice, setNotice] = useState(null);
+
+    // ─── Selection / inline state ────────────────────────────────────────────
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [editingId, setEditingId] = useState(null);
+    const [editingDraft, setEditingDraft] = useState({});
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+    const [createOpen, setCreateOpen] = useState(false);
+    const [createDraft, setCreateDraft] = useState({});
+    const [mergeOpen, setMergeOpen] = useState(false);
+    const [recalcing, setRecalcing] = useState(false);
+
+    // ─── Debounced search ────────────────────────────────────────────────────
+    useEffect(() => {
+        const t = setTimeout(() => setDebouncedSearch(search.trim()), SEARCH_DEBOUNCE_MS);
+        return () => clearTimeout(t);
+    }, [search]);
+
+    // ─── Data load ───────────────────────────────────────────────────────────
+    const reqIdRef = useRef(0);
+    const loadList = useCallback(() => {
+        const reqId = ++reqIdRef.current;
+        setLoading(true);
+        setError(null);
+
+        const params = new URLSearchParams({
+            search: debouncedSearch,
+            page: String(page),
+            per_page: String(perPage),
+            orderby,
+            order,
+            unused_only: unusedOnly ? '1' : '0',
+        });
+
+        apiFetch({ path: `/${restBase}/${entityType.slug}?${params.toString()}` })
+            .then((response) => {
+                if (reqId !== reqIdRef.current) return; // stale
+                setItems(Array.isArray(response.items) ? response.items : []);
+                setTotal(Number(response.total) || 0);
+                setLoading(false);
+                setSelectedIds(new Set());
+            })
+            .catch((err) => {
+                if (reqId !== reqIdRef.current) return;
+                setError(err?.message || __('Failed to load entries.', 'fotogrids'));
+                setLoading(false);
+            });
+    }, [restBase, entityType.slug, debouncedSearch, page, perPage, orderby, order, unusedOnly]);
+
+    useEffect(() => { loadList(); }, [loadList]);
+
+    // Reset to page 1 when the filter/search/sort changes.
+    useEffect(() => { setPage(1); }, [debouncedSearch, orderby, order, unusedOnly]);
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+    const toggleSelected = (id) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) { next.delete(id); } else { next.add(id); }
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        setSelectedIds((prev) => {
+            if (prev.size === items.length) return new Set();
+            return new Set(items.map((i) => i.id));
+        });
+    };
+
+    const toggleSort = (column) => {
+        if (orderby === column) {
+            setOrder((o) => (o === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setOrderby(column);
+            setOrder('asc');
+        }
+    };
+
+    const flashNotice = (status, message) => {
+        setNotice({ status, message });
+        setTimeout(() => setNotice(null), 4000);
+    };
+
+    // ─── Inline rename ───────────────────────────────────────────────────────
+    const startEdit = (item) => {
+        setEditingId(item.id);
+        const draft = { name: item.name };
+        if (entityType.type === 'location') {
+            draft.latitude = item.latitude ?? '';
+            draft.longitude = item.longitude ?? '';
+        }
+        if (entityType.type === 'person') {
+            draft.details = item.meta?.details || '';
+        }
+        setEditingDraft(draft);
+    };
+
+    const cancelEdit = () => {
+        setEditingId(null);
+        setEditingDraft({});
+    };
+
+    const saveEdit = () => {
+        if (!editingId) return;
+
+        const body = { name: editingDraft.name };
+        if (entityType.type === 'location') {
+            body.latitude = editingDraft.latitude === '' ? null : Number(editingDraft.latitude);
+            body.longitude = editingDraft.longitude === '' ? null : Number(editingDraft.longitude);
+        }
+        if (entityType.type === 'person') {
+            body.details = editingDraft.details || '';
+        }
+
+        apiFetch({
+            path: `/${restBase}/${entityType.slug}/${editingId}`,
+            method: 'PATCH',
+            data: body,
+        })
+            .then((updated) => {
+                setItems((prev) => prev.map((it) => (it.id === editingId ? updated : it)));
+                cancelEdit();
+                flashNotice('success', __('Saved.', 'fotogrids'));
+            })
+            .catch((err) => {
+                flashNotice('error', err?.message || __('Save failed.', 'fotogrids'));
+            });
+    };
+
+    // ─── Delete ──────────────────────────────────────────────────────────────
+    const requestDelete = (item) => {
+        setDeleteTarget(item);
+    };
+
+    const cancelDelete = () => {
+        setDeleteTarget(null);
+    };
+
+    const confirmDelete = () => {
+        if (!deleteTarget) return;
+        const id = deleteTarget.id;
+        apiFetch({
+            path: `/${restBase}/${entityType.slug}/${id}`,
+            method: 'DELETE',
+        })
+            .then(() => {
+                setItems((prev) => prev.filter((it) => it.id !== id));
+                setTotal((t) => Math.max(0, t - 1));
+                cancelDelete();
+                flashNotice('success', __('Deleted.', 'fotogrids'));
+            })
+            .catch((err) => {
+                flashNotice('error', err?.message || __('Delete failed.', 'fotogrids'));
+                cancelDelete();
+            });
+    };
+
+    // ─── Bulk delete ─────────────────────────────────────────────────────────
+    const confirmBulkDelete = () => {
+        const ids = Array.from(selectedIds);
+        if (ids.length === 0) return;
+
+        apiFetch({
+            path: `/${restBase}/${entityType.slug}`,
+            method: 'DELETE',
+            data: { ids },
+        })
+            .then((response) => {
+                loadList();
+                setBulkConfirmOpen(false);
+                flashNotice(
+                    'success',
+                    sprintf(
+                        _n('%d entry deleted.', '%d entries deleted.', response.deleted || 0, 'fotogrids'),
+                        response.deleted || 0
+                    )
+                );
+            })
+            .catch((err) => {
+                flashNotice('error', err?.message || __('Bulk delete failed.', 'fotogrids'));
+                setBulkConfirmOpen(false);
+            });
+    };
+
+    // ─── Create ──────────────────────────────────────────────────────────────
+    const openCreate = () => {
+        const draft = { name: '' };
+        if (entityType.type === 'location') { draft.latitude = ''; draft.longitude = ''; }
+        if (entityType.type === 'person')   { draft.details = ''; }
+        setCreateDraft(draft);
+        setCreateOpen(true);
+    };
+
+    const submitCreate = () => {
+        const body = { name: createDraft.name };
+        if (entityType.type === 'location') {
+            if (createDraft.latitude !== '')  body.latitude  = Number(createDraft.latitude);
+            if (createDraft.longitude !== '') body.longitude = Number(createDraft.longitude);
+        }
+        if (entityType.type === 'person' && createDraft.details) {
+            body.details = createDraft.details;
+        }
+
+        apiFetch({
+            path: `/${restBase}/${entityType.slug}`,
+            method: 'POST',
+            data: body,
+        })
+            .then(() => {
+                setCreateOpen(false);
+                loadList();
+                flashNotice('success', __('Created.', 'fotogrids'));
+            })
+            .catch((err) => {
+                flashNotice('error', err?.message || __('Create failed.', 'fotogrids'));
+            });
+    };
+
+    // ─── Merge ───────────────────────────────────────────────────────────────
+    const openMerge = () => setMergeOpen(true);
+    const closeMerge = () => setMergeOpen(false);
+
+    const handleMerge = ({ targetId, sourceIds }) => {
+        return apiFetch({
+            path: `/${restBase}/${entityType.slug}/merge`,
+            method: 'POST',
+            data: { target_id: targetId, source_ids: sourceIds },
+        }).then((response) => {
+            loadList();
+            setMergeOpen(false);
+            flashNotice(
+                'success',
+                sprintf(
+                    _n('Merged %d entry.', 'Merged %d entries.', response.merged || 0, 'fotogrids'),
+                    response.merged || 0
+                )
+            );
+            return response;
+        });
+    };
+
+    // ─── Recalculate ─────────────────────────────────────────────────────────
+    const handleRecalc = () => {
+        setRecalcing(true);
+        apiFetch({
+            path: `/${restBase}/${entityType.slug}/recalculate`,
+            method: 'POST',
+            data: {},
+        })
+            .then((response) => {
+                loadList();
+                flashNotice(
+                    'success',
+                    sprintf(
+                        _n('Recalculated %d entry.', 'Recalculated %d entries.', response.touched || 0, 'fotogrids'),
+                        response.touched || 0
+                    )
+                );
+            })
+            .catch((err) => {
+                flashNotice('error', err?.message || __('Recalculate failed.', 'fotogrids'));
+            })
+            .finally(() => setRecalcing(false));
+    };
+
+    // ─── Render ──────────────────────────────────────────────────────────────
+    const allSelectedOnPage = items.length > 0 && selectedIds.size === items.length;
+
+    const sortIndicator = (column) => {
+        if (orderby !== column) return '';
+        return order === 'asc' ? ' ▲' : ' ▼';
+    };
+
+    return (
+        <div className={`fotogrids-library-tab fotogrids-library-tab-${entityType.slug}`}>
+            <div className="fotogrids-library-toolbar">
+                <div className="fotogrids-library-toolbar-search">
+                    <TextControl
+                        value={search}
+                        onChange={setSearch}
+                        placeholder={
+                            entityType.label_plural
+                                ? sprintf(__('Search %s…', 'fotogrids'), entityType.label_plural.toLowerCase())
+                                : __('Search…', 'fotogrids')
+                        }
+                        __nextHasNoMarginBottom
+                    />
+                </div>
+
+                <label className="fotogrids-library-toolbar-filter">
+                    <CheckboxControl
+                        label={__('Unused only', 'fotogrids')}
+                        checked={unusedOnly}
+                        onChange={setUnusedOnly}
+                        __nextHasNoMarginBottom
+                    />
+                </label>
+
+                <div className="fotogrids-library-toolbar-actions">
+                    {canManage && entityType.supports_create && (
+                        <Button variant="secondary" onClick={openCreate}>
+                            {sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
+                        </Button>
+                    )}
+                    {canManage && (
+                        <Button variant="tertiary" onClick={handleRecalc} isBusy={recalcing} disabled={recalcing}>
+                            {__('Recalculate counts', 'fotogrids')}
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            {notice && (
+                <Notice status={notice.status} isDismissible={true} onRemove={() => setNotice(null)}>
+                    {notice.message}
+                </Notice>
+            )}
+            {error && (
+                <Notice status="error" isDismissible={false}>{error}</Notice>
+            )}
+
+            {selectedIds.size > 0 && (
+                <div className="fotogrids-library-bulkbar">
+                    <span>{sprintf(_n('%d selected', '%d selected', selectedIds.size, 'fotogrids'), selectedIds.size)}</span>
+                    <Button variant="secondary" isDestructive onClick={() => setBulkConfirmOpen(true)} disabled={!canManage}>
+                        {__('Delete selected', 'fotogrids')}
+                    </Button>
+                    {selectedIds.size >= 2 && (
+                        <Button variant="secondary" onClick={openMerge} disabled={!canManage}>
+                            {__('Merge…', 'fotogrids')}
+                        </Button>
+                    )}
+                </div>
+            )}
+
+            {loading ? (
+                <div className="fotogrids-library-loading"><Spinner /></div>
+            ) : items.length === 0 ? (
+                <div className="fotogrids-library-empty">
+                    <p>
+                        {unusedOnly
+                            ? __('No unused entries.', 'fotogrids')
+                            : debouncedSearch
+                                ? __('No entries match your search.', 'fotogrids')
+                                : __('No entries yet.', 'fotogrids')}
+                    </p>
+                    {!debouncedSearch && !unusedOnly && (
+                        <p className="fotogrids-library-empty-help">
+                            {__('Entries are usually created from the Item Edit modal inside a gallery. You can also add one directly using the button above.', 'fotogrids')}
+                        </p>
+                    )}
+                </div>
+            ) : (
+                <table className="wp-list-table widefat fixed striped fotogrids-library-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" className="check-column">
+                                <CheckboxControl
+                                    label={''}
+                                    checked={allSelectedOnPage}
+                                    onChange={toggleSelectAll}
+                                    aria-label={__('Select all on this page', 'fotogrids')}
+                                    __nextHasNoMarginBottom
+                                />
+                            </th>
+                            <th scope="col">
+                                <button type="button" className="fotogrids-library-sort" onClick={() => toggleSort('name')}>
+                                    {__('Name', 'fotogrids')}{sortIndicator('name')}
+                                </button>
+                            </th>
+                            <th scope="col">
+                                <button type="button" className="fotogrids-library-sort" onClick={() => toggleSort('slug')}>
+                                    {__('Slug', 'fotogrids')}{sortIndicator('slug')}
+                                </button>
+                            </th>
+                            <th scope="col">
+                                <button type="button" className="fotogrids-library-sort" onClick={() => toggleSort('usage_count')}>
+                                    {__('Items', 'fotogrids')}{sortIndicator('usage_count')}
+                                </button>
+                            </th>
+                            {entityType.supports_extra_fields && (
+                                <th scope="col">{__('Latitude / Longitude', 'fotogrids')}</th>
+                            )}
+                            <th scope="col" className="fotogrids-library-actions-col">{__('Actions', 'fotogrids')}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items.map((item) => {
+                            const isEditing = editingId === item.id;
+                            const isSelected = selectedIds.has(item.id);
+
+                            return (
+                                <React.Fragment key={item.id}>
+                                    <tr className={isSelected ? 'fotogrids-library-row-selected' : ''}>
+                                        <th scope="row" className="check-column">
+                                            <CheckboxControl
+                                                label={''}
+                                                checked={isSelected}
+                                                onChange={() => toggleSelected(item.id)}
+                                                aria-label={sprintf(__('Select %s', 'fotogrids'), item.name)}
+                                                __nextHasNoMarginBottom
+                                            />
+                                        </th>
+                                        <td>
+                                            {isEditing ? (
+                                                <TextControl
+                                                    value={editingDraft.name || ''}
+                                                    onChange={(v) => setEditingDraft({ ...editingDraft, name: v })}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') saveEdit();
+                                                        if (e.key === 'Escape') cancelEdit();
+                                                    }}
+                                                    autoFocus
+                                                    __nextHasNoMarginBottom
+                                                />
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="fotogrids-library-name-button"
+                                                    onClick={() => canManage && startEdit(item)}
+                                                    disabled={!canManage}
+                                                    title={canManage ? __('Click to rename', 'fotogrids') : ''}
+                                                >
+                                                    {item.name}
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td><code className="fotogrids-library-slug">{item.slug}</code></td>
+                                        <td>{item.usage_count}</td>
+                                        {entityType.supports_extra_fields && (
+                                            <td>
+                                                {isEditing ? (
+                                                    <div className="fotogrids-library-latlng-edit">
+                                                        <TextControl
+                                                            label={__('Lat', 'fotogrids')}
+                                                            value={editingDraft.latitude ?? ''}
+                                                            onChange={(v) => setEditingDraft({ ...editingDraft, latitude: v })}
+                                                            type="number"
+                                                            __nextHasNoMarginBottom
+                                                        />
+                                                        <TextControl
+                                                            label={__('Lng', 'fotogrids')}
+                                                            value={editingDraft.longitude ?? ''}
+                                                            onChange={(v) => setEditingDraft({ ...editingDraft, longitude: v })}
+                                                            type="number"
+                                                            __nextHasNoMarginBottom
+                                                        />
+                                                    </div>
+                                                ) : item.latitude !== null && item.longitude !== null ? (
+                                                    <span className="fotogrids-library-latlng">
+                                                        {item.latitude}, {item.longitude}
+                                                    </span>
+                                                ) : (
+                                                    <span className="fotogrids-library-muted">—</span>
+                                                )}
+                                            </td>
+                                        )}
+                                        <td className="fotogrids-library-actions-col">
+                                            {isEditing ? (
+                                                <>
+                                                    <Button size="small" variant="primary" onClick={saveEdit}>{__('Save', 'fotogrids')}</Button>
+                                                    <Button size="small" variant="tertiary" onClick={cancelEdit}>{__('Cancel', 'fotogrids')}</Button>
+                                                </>
+                                            ) : (
+                                                <Button
+                                                    size="small"
+                                                    variant="tertiary"
+                                                    isDestructive
+                                                    disabled={!canManage}
+                                                    onClick={() => requestDelete(item)}
+                                                    aria-label={sprintf(__('Delete %s', 'fotogrids'), item.name)}
+                                                >
+                                                    {__('Delete', 'fotogrids')}
+                                                </Button>
+                                            )}
+
+                                            {deleteTarget && deleteTarget.id === item.id && (
+                                                <Popover
+                                                    onClose={cancelDelete}
+                                                    placement="bottom-end"
+                                                >
+                                                    <div className="fotogrids-library-delete-popover">
+                                                        <p>
+                                                            {item.usage_count > 0
+                                                                ? sprintf(
+                                                                    _n(
+                                                                        'Delete "%1$s"? This will remove it from %2$d item.',
+                                                                        'Delete "%1$s"? This will remove it from %2$d items.',
+                                                                        item.usage_count,
+                                                                        'fotogrids'
+                                                                    ),
+                                                                    item.name,
+                                                                    item.usage_count
+                                                                )
+                                                                : sprintf(__('Delete "%s"? It is not used by any items.', 'fotogrids'), item.name)
+                                                            }
+                                                        </p>
+                                                        <div className="fotogrids-library-delete-popover-actions">
+                                                            <Button size="small" variant="primary" isDestructive onClick={confirmDelete}>
+                                                                {__('Delete', 'fotogrids')}
+                                                            </Button>
+                                                            <Button size="small" variant="tertiary" onClick={cancelDelete}>
+                                                                {__('Cancel', 'fotogrids')}
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </Popover>
+                                            )}
+                                        </td>
+                                    </tr>
+                                </React.Fragment>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            )}
+
+            {!loading && totalPages > 1 && (
+                <div className="fotogrids-library-pagination tablenav-pages">
+                    <span className="displaying-num">
+                        {sprintf(_n('%d entry', '%d entries', total, 'fotogrids'), total)}
+                    </span>
+                    <span className="pagination-links">
+                        <Button
+                            variant="secondary"
+                            disabled={page <= 1}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        >
+                            {'‹'}
+                        </Button>
+                        <span className="paging-input">
+                            {sprintf(__('%1$d of %2$d', 'fotogrids'), page, totalPages)}
+                        </span>
+                        <Button
+                            variant="secondary"
+                            disabled={page >= totalPages}
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        >
+                            {'›'}
+                        </Button>
+                    </span>
+                </div>
+            )}
+
+            {bulkConfirmOpen && (
+                <Modal
+                    title={__('Delete selected entries?', 'fotogrids')}
+                    onRequestClose={() => setBulkConfirmOpen(false)}
+                >
+                    <p>
+                        {sprintf(
+                            _n(
+                                'You are about to delete %d entry. Linked items will lose this %s.',
+                                'You are about to delete %d entries. Linked items will lose these %s.',
+                                selectedIds.size,
+                                'fotogrids'
+                            ),
+                            selectedIds.size,
+                            (entityType.label_plural || '').toLowerCase()
+                        )}
+                    </p>
+                    <div className="fotogrids-library-modal-actions">
+                        <Button variant="primary" isDestructive onClick={confirmBulkDelete}>
+                            {__('Delete', 'fotogrids')}
+                        </Button>
+                        <Button variant="tertiary" onClick={() => setBulkConfirmOpen(false)}>
+                            {__('Cancel', 'fotogrids')}
+                        </Button>
+                    </div>
+                </Modal>
+            )}
+
+            {createOpen && (
+                <Modal
+                    title={sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
+                    onRequestClose={() => setCreateOpen(false)}
+                >
+                    <TextControl
+                        label={__('Name', 'fotogrids')}
+                        value={createDraft.name || ''}
+                        onChange={(v) => setCreateDraft({ ...createDraft, name: v })}
+                        __nextHasNoMarginBottom
+                    />
+                    {entityType.type === 'location' && (
+                        <>
+                            <TextControl
+                                label={__('Latitude', 'fotogrids')}
+                                value={createDraft.latitude ?? ''}
+                                onChange={(v) => setCreateDraft({ ...createDraft, latitude: v })}
+                                type="number"
+                                __nextHasNoMarginBottom
+                            />
+                            <TextControl
+                                label={__('Longitude', 'fotogrids')}
+                                value={createDraft.longitude ?? ''}
+                                onChange={(v) => setCreateDraft({ ...createDraft, longitude: v })}
+                                type="number"
+                                __nextHasNoMarginBottom
+                            />
+                        </>
+                    )}
+                    {entityType.type === 'person' && (
+                        <TextControl
+                            label={__('Details (optional)', 'fotogrids')}
+                            value={createDraft.details ?? ''}
+                            onChange={(v) => setCreateDraft({ ...createDraft, details: v })}
+                            __nextHasNoMarginBottom
+                        />
+                    )}
+                    <div className="fotogrids-library-modal-actions">
+                        <Button variant="primary" onClick={submitCreate} disabled={!createDraft.name?.trim()}>
+                            {__('Create', 'fotogrids')}
+                        </Button>
+                        <Button variant="tertiary" onClick={() => setCreateOpen(false)}>
+                            {__('Cancel', 'fotogrids')}
+                        </Button>
+                    </div>
+                </Modal>
+            )}
+
+            {mergeOpen && (
+                <MergeDialog
+                    entityType={entityType}
+                    selectedIds={Array.from(selectedIds)}
+                    items={items}
+                    onCancel={closeMerge}
+                    onMerge={handleMerge}
+                    restBase={restBase}
+                />
+            )}
+        </div>
+    );
+};
+
+export default LibraryTabBase;

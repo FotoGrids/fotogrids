@@ -27,4 +27,64 @@ class Gallery_Permissions {
     public static function check_gallery_read( $request ) {
         return true;
     }
+
+    /**
+     * Permission check for unlocking a password-protected gallery.
+     *
+     * The unlock endpoint is intentionally public — any visitor can attempt
+     * to unlock a gallery by submitting the password. Rate-limiting (if ever
+     * needed) should be applied at the server/WAF level, not here.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request The REST API request object
+     * @return bool Always true.
+     */
+    public static function check_gallery_unlock( $request ) {
+        return true;
+    }
+
+    /**
+     * Permission check for reading a gallery's saved (decrypted) password.
+     *
+     * Controlled by the fotogrids/security/can_view_gallery_password filter.
+     * Default is false — nobody can view stored passwords unless the site
+     * owner explicitly grants permission via the filter.
+     *
+     * Example — allow administrators:
+     *   add_filter(
+     *       'fotogrids/security/can_view_gallery_password',
+     *       fn( $can, $gallery_id, $user_id ) => current_user_can( 'manage_options' ),
+     *       10,
+     *       3
+     *   );
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request The REST API request object
+     * @return bool|\WP_Error True if allowed, WP_Error if not.
+     */
+    public static function check_gallery_password_read( $request ) {
+        $gallery_id = absint( $request['id'] );
+        $user_id    = get_current_user_id();
+
+        // Administrators can view saved passwords by default.
+        // All other roles require an explicit opt-in via the filter.
+        $default_allowed = current_user_can( 'administrator' );
+
+        $allowed = apply_filters(
+            'fotogrids/security/can_view_gallery_password',
+            $default_allowed,
+            $gallery_id,
+            $user_id
+        );
+
+        if ( ! $allowed ) {
+            return new \WP_Error(
+                'fotogrids_forbidden',
+                __( 'You do not have permission to view saved gallery passwords.', 'fotogrids' ),
+                array( 'status' => 403 )
+            );
+        }
+
+        return true;
+    }
 }

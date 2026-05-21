@@ -165,6 +165,84 @@ class Register_Admin_Routes {
                 'methods'  => \WP_REST_Server::READABLE,
                 'callback' => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_image_sizes' ),
                 'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
+                'args'     => array(
+                    'include_hidden' => array(
+                        'type'    => 'boolean',
+                        'default' => false,
+                    ),
+                ),
+            ),
+        ) );
+
+        // Plugin-wide media settings: GET /admin/media-settings, POST /admin/media-settings
+        register_rest_route( 'fotogrids/v1', '/admin/media-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_media_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_fotogrids' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_media_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_fotogrids' ),
+                'args'                => array(
+                    'thumbnail_width'     => array( 'type' => 'integer', 'minimum' => 1,   'default' => 400 ),
+                    'thumbnail_height'    => array( 'type' => 'integer', 'minimum' => 0,   'default' => 300 ),
+                    'thumbnail_crop'      => array( 'type' => 'boolean',                   'default' => true ),
+                    'thumbnail_alignment' => array( 'type' => 'string',  'default' => 'center',
+                        'enum' => array( 'center', 'top', 'bottom', 'left', 'right', 'top-left', 'top-right', 'bottom-left', 'bottom-right' ),
+                    ),
+                    'full_width'          => array( 'type' => 'integer', 'minimum' => 1,   'default' => 1920 ),
+                    'full_height'         => array( 'type' => 'integer', 'minimum' => 0,   'default' => 0 ),
+                ),
+            ),
+        ) );
+
+        // General (responsiveness) settings: GET / POST /admin/general-settings
+        register_rest_route( 'fotogrids/v1', '/admin/general-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_general_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_general_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+                'args'                => array(
+                    'mobile_breakpoint'            => array( 'type' => 'integer', 'minimum' => 0, 'default' => 767 ),
+                    'tablet_breakpoint'            => array( 'type' => 'integer', 'minimum' => 0, 'default' => 1024 ),
+                    'detect_responsive_by_browser' => array( 'type' => 'boolean', 'default' => false ),
+                ),
+            ),
+        ) );
+
+        // Advanced (boolean) settings: GET / POST /admin/advanced-settings
+        register_rest_route( 'fotogrids/v1', '/admin/advanced-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_advanced_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_advanced_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+                'args'                => array(
+                    'autosave'                          => array( 'type' => 'boolean', 'default' => false ),
+                    'share_statistics'                  => array( 'type' => 'boolean', 'default' => false ),
+                    'custom_js_allow_dynamic_execution' => array( 'type' => 'boolean', 'default' => false ),
+                    'delete_data_on_uninstall'          => array( 'type' => 'boolean', 'default' => false ),
+                ),
+            ),
+        ) );
+
+        // Get Google Fonts families: GET /admin/google-fonts/families
+        register_rest_route( 'fotogrids/v1', '/admin/google-fonts/families', array(
+            array(
+                'methods'  => \WP_REST_Server::READABLE,
+                'callback' => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_google_fonts_families' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
             ),
         ) );
 
@@ -284,6 +362,67 @@ class Register_Admin_Routes {
                     ),
                 ),
                 'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_edit' ),
+            ),
+            array(
+                'methods'  => \WP_REST_Server::CREATABLE,
+                'callback' => array( '\FotoGrids\REST\Admin\Preview_Endpoint', 'preview' ),
+                'args' => array(
+                    'id' => array(
+                        'required' => true,
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function( $param ) {
+                            return is_numeric( $param ) && $param > 0;
+                        },
+                    ),
+                    'version' => array(
+                        'default' => 2,
+                        'sanitize_callback' => 'absint',
+                    ),
+                    'settings' => array(
+                        'default' => array(),
+                    ),
+                    'item_order' => array(
+                        'default' => array(),
+                    ),
+                    'item_overrides' => array(
+                        'default' => array(),
+                    ),
+                    'simulate_state' => array(
+                        'default' => null,
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ),
+                ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_edit' ),
+            ),
+        ) );
+
+        // Get catalog field states: GET /admin/catalog/field-states
+        register_rest_route( 'fotogrids/v1', '/admin/catalog/field-states', array(
+            array(
+                'methods'  => \WP_REST_Server::READABLE,
+                'callback' => array( '\FotoGrids\REST\Admin\Catalog_Field_States_Endpoint', 'get_field_states' ),
+                'args' => array(
+                    'simulate_state' => array(
+                        'default' => null,
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ),
+                ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
+            ),
+        ) );
+
+        // Get assembled catalog tree: GET /admin/catalog/entries
+        register_rest_route( 'fotogrids/v1', '/admin/catalog/entries', array(
+            array(
+                'methods'  => \WP_REST_Server::READABLE,
+                'callback' => array( '\FotoGrids\REST\Admin\Catalog_Entries_Endpoint', 'get_entries' ),
+                'args' => array(
+                    'post_type' => array(
+                        'default' => 'gallery',
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ),
+                ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
             ),
         ) );
 

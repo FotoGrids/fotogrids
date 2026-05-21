@@ -1,0 +1,1676 @@
+{
+    "id": "interactions",
+    "label": "Interactions",
+    "icon": "click",
+    "postTypes": [
+        "gallery"
+    ],
+    "settings": [
+        {
+            "key": "item_click_behavior",
+            "type": "button_group",
+            "label": "Item Click Behavior",
+            "options": [
+                {
+                    "label": "Do Nothing",
+                    "value": "nothing",
+                    "icon": "click_nothing",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Open in Lightbox",
+                    "value": "lightbox",
+                    "icon": "click_lightbox",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Direct Link to Item",
+                    "value": "direct",
+                    "icon": "click_direct",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "External URL",
+                    "value": "external",
+                    "icon": "click_external",
+                    "tier_required": "free"
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "external_link_target",
+            "type": "hidden",
+            "label": "Default Link Target",
+            "options": [
+                {
+                    "label": "Same Tab",
+                    "value": "_self",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "New Tab",
+                    "value": "_blank",
+                    "tier_required": "free"
+                }
+            ],
+            "condition": {
+                "dependsOn": "item_click_behavior",
+                "values": [
+                    "external"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "external_url_manager",
+            "type": "external_url_manager",
+            "label": "Item URLs",
+            "condition": {
+                "dependsOn": "item_click_behavior",
+                "values": [
+                    "external"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "lightbox_settings_section",
+            "type": "setting_subtabs",
+            "condition": {
+                "dependsOn": "item_click_behavior",
+                "values": [
+                    "lightbox"
+                ]
+            },
+            "subTabs": {
+                "layout_styling": {
+                    "id": "layout_styling",
+                    "label": "Lightbox Layout & Styling",
+                    "icon": "layout",
+                    "settings": [
+                        {
+                            "key": "lightbox_img_shadow_group",
+                            "type": "setting_group",
+                            "label": "Shadow",
+                            "settings": [
+                                {
+                                    "key": "lightbox_img_shadow_enabled",
+                                    "type": "toggle",
+                                    "label": "Enable Shadow on Full Image",
+                                    "default": false,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_img_shadow_offset_x",
+                                    "type": "responsive_range",
+                                    "label": "Horizontal Offset",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": -50, "max": 50, "default": 0 },
+                                        "tablet":  { "min": -50, "max": 50, "default": 0 },
+                                        "mobile":  { "min": -50, "max": 50, "default": 0 }
+                                    },
+                                    "condition": {
+                                        "dependsOn": "lightbox_img_shadow_enabled",
+                                        "values": [ true, "1" ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_img_shadow_offset_y",
+                                    "type": "responsive_range",
+                                    "label": "Vertical Offset",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": -50, "max": 50, "default": 4 },
+                                        "tablet":  { "min": -50, "max": 50, "default": 4 },
+                                        "mobile":  { "min": -50, "max": 50, "default": 4 }
+                                    },
+                                    "condition": {
+                                        "dependsOn": "lightbox_img_shadow_enabled",
+                                        "values": [ true, "1" ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_img_shadow_blur",
+                                    "type": "responsive_range",
+                                    "label": "Blur",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 50, "default": 10 },
+                                        "tablet":  { "min": 0, "max": 50, "default": 10 },
+                                        "mobile":  { "min": 0, "max": 50, "default": 10 }
+                                    },
+                                    "condition": {
+                                        "dependsOn": "lightbox_img_shadow_enabled",
+                                        "values": [ true, "1" ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_img_shadow_spread",
+                                    "type": "responsive_range",
+                                    "label": "Spread",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": { "min": -20, "max": 20, "default": 0 },
+                                        "tablet":  { "min": -20, "max": 20, "default": 0 },
+                                        "mobile":  { "min": -20, "max": 20, "default": 0 }
+                                    },
+                                    "condition": {
+                                        "dependsOn": "lightbox_img_shadow_enabled",
+                                        "values": [ true, "1" ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_theme",
+                            "type": "button_group",
+                            "label": "Lightbox Theme",
+                            "options": [
+                                {
+                                    "label": "Dark",
+                                    "value": "dark",
+                                    "icon": "theme_dark",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Light",
+                                    "value": "light",
+                                    "icon": "theme_light",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Custom",
+                                    "value": "custom",
+                                    "icon": "theme_custom",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_custom_theme",
+                            "type": "setting_group",
+                            "label": "Custom Theme",
+                            "condition": {
+                                "dependsOn": "lightbox_theme",
+                                "values": [
+                                    "custom"
+                                ]
+                            },
+                            "settings": [
+                                {
+                                    "key": "lightbox_custom_theme_subtabs",
+                                    "type": "setting_subtabs",
+                                    "subTabs": {
+                                        "general": {
+                                            "id": "general",
+                                            "label": "General",
+                                            "icon": "settings",
+                                            "settings": [
+                                                {
+                                                    "key": "lightbox_background_color",
+                                                    "type": "color",
+                                                    "label": "Background Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_img_shadow_color",
+                                                    "type": "color",
+                                                    "label": "Image Shadow Color",
+                                                    "condition": {
+                                                        "dependsOn": "lightbox_img_shadow_enabled",
+                                                        "values": [ true, "1" ]
+                                                    },
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_spinner_color",
+                                                    "type": "color",
+                                                    "label": "Spinner Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_progress_color",
+                                                    "type": "color",
+                                                    "label": "Progress Indicator Color",
+                                                    "condition": {
+                                                        "dependsOn": "lightbox_auto_progress_style",
+                                                        "values": [ "bar", "spinner" ]
+                                                    },
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        },
+                                        "toolbar": {
+                                            "id": "toolbar",
+                                            "label": "Toolbar",
+                                            "icon": "flex_align_top",
+                                            "settings": [
+                                                {
+                                                    "key": "lightbox_top_toolbar_background",
+                                                    "type": "color",
+                                                    "label": "Toolbar Background",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_toolbar_button_color",
+                                                    "type": "color",
+                                                    "label": "Button Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_toolbar_button_hover_color",
+                                                    "type": "color",
+                                                    "label": "Button Hover Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_toolbar_btn_active_bg",
+                                                    "type": "color",
+                                                    "label": "Active Button Background",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        },
+                                        "thumbnails": {
+                                            "id": "thumbnails",
+                                            "label": "Thumbnails",
+                                            "icon": "flex_align_bottom",
+                                            "settings": [
+                                                {
+                                                    "key": "lightbox_thumbnails_background",
+                                                    "type": "color",
+                                                    "label": "Strip Background",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_thumbnail_border_color",
+                                                    "type": "color",
+                                                    "label": "Thumbnail Border Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_thumbnail_active_color",
+                                                    "type": "color",
+                                                    "label": "Active Thumbnail Border Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ],
+                                            "condition": {
+                                                "dependsOn": "lightbox_thumbnail_strip_location",
+                                                "values": [
+                                                    "top",
+                                                    "bottom",
+                                                    "left",
+                                                    "right"
+                                                ]
+                                            }
+                                        },
+                                        "info_panel": {
+                                            "id": "info_panel",
+                                            "label": "Info Panel",
+                                            "icon": "layout_right",
+                                            "settings": [
+                                                {
+                                                    "key": "lightbox_info_panel_background",
+                                                    "type": "color",
+                                                    "label": "Panel Background",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_info_block_bg",
+                                                    "type": "color",
+                                                    "label": "Info Block Background",
+                                                    "condition": {
+                                                        "dependsOn": "lightbox_info_blocks_style",
+                                                        "values": ["boxed"]
+                                                    },
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_info_block_divider",
+                                                    "type": "color",
+                                                    "label": "Info Block Divider",
+                                                    "condition": {
+                                                        "dependsOn": "lightbox_info_blocks_style",
+                                                        "values": ["divided"]
+                                                    },
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_info_panel_text",
+                                                    "type": "color",
+                                                    "label": "Text Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_info_panel_title",
+                                                    "type": "color",
+                                                    "label": "Title Color",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ],
+                                            "condition": {
+                                                "dependsOn": "lightbox_info_panel",
+                                                "values": [
+                                                    "always",
+                                                    "on_click"
+                                                ]
+                                            }
+                                        },
+                                        "navigation": {
+                                            "id": "navigation",
+                                            "label": "Navigation",
+                                            "icon": "transition_horizontal",
+                                            "settings": [
+                                                {
+                                                    "key": "lightbox_bullets_group",
+                                                    "type": "setting_group",
+                                                    "label": "Bullets",
+                                                    "settings": [
+                                                        {
+                                                            "key": "lightbox_bullet_color",
+                                                            "type": "color",
+                                                            "label": "Bullet Color",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "lightbox_bullet_mouseover_color",
+                                                            "type": "color",
+                                                            "label": "Bullet Hover Color",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "lightbox_bullet_active_color",
+                                                            "type": "color",
+                                                            "label": "Active Bullet Color",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        }
+                                                    ],
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "lightbox_arrows_group",
+                                                    "type": "setting_group",
+                                                    "label": "Navigation Arrows",
+                                                    "settings": [
+                                                        {
+                                                            "key": "lightbox_navigation_arrow_color",
+                                                            "type": "color",
+                                                            "label": "Arrow Color",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "lightbox_navigation_arrow_mouseover_color",
+                                                            "type": "color",
+                                                            "label": "Arrow Hover Color",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "lightbox_navigation_arrow_background",
+                                                            "type": "color",
+                                                            "label": "Arrow Background",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "lightbox_navigation_arrow_background_hover",
+                                                            "type": "color",
+                                                            "label": "Arrow Background Hover",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        }
+                                                    ],
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ],
+                                            "condition": {
+                                                "dependsOn": "lightbox_show_arrows",
+                                                "values": [
+                                                    "1",
+                                                    true
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_overlay_blur",
+                            "type": "button_group",
+                            "label": "Overlay Blur Intensity",
+                            "options": [
+                                {
+                                    "label": "Light",
+                                    "value": 8,
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Strong",
+                                    "value": 24,
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "None",
+                                    "value": 0,
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_fit_media",
+                            "type": "toggle",
+                            "label": "Fit Media to Screen",
+                            "description": "Scales images to fit the screen. Turn off to show images at their natural size.",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_fullscreen",
+                            "type": "toggle",
+                            "label": "Show Fullscreen Button",
+                            "description": "Adds a fullscreen button to the lightbox toolbar.",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_show_tooltips",
+                            "type": "toggle",
+                            "label": "Show Button Tooltips",
+                            "description": "Show labels when hovering over lightbox toolbar buttons.",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_mobile_layout",
+                            "type": "button_group",
+                            "label": "Mobile Layout",
+                            "options": [
+                                {
+                                    "label": "Mobile Optimized",
+                                    "value": "mobile_optimized",
+                                    "icon": "responsive_mobile",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Same as Desktop",
+                                    "value": "same_as_desktop",
+                                    "icon": "responsive_desktop",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "navigation": {
+                    "id": "navigation",
+                    "label": "Lightbox Navigation",
+                    "icon": "transition_horizontal",
+                    "settings": [
+                        {
+                            "key": "lightbox_loop",
+                            "type": "toggle",
+                            "label": "Loop Gallery",
+                            "description": "After the last item, loop back to the first. When off, navigation stops at each end.",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_transition_group",
+                            "type": "setting_group",
+                            "label": "Transition",
+                            "settings": [
+                                {
+                                    "key": "lightbox_transition",
+                                    "type": "button_group",
+                                    "label": "Transition Between Items",
+                                    "options": [
+                                        {
+                                            "label": "Fade",
+                                            "value": "fade",
+                                            "icon": "transition_fade",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Horizontal",
+                                            "value": "horizontal",
+                                            "icon": "transition_horizontal",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Vertical",
+                                            "value": "vertical",
+                                            "icon": "transition_vertical",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "None",
+                                            "value": "none",
+                                            "icon": "x",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_transition_duration",
+                                    "type": "button_group",
+                                    "label": "Transition Duration",
+                                    "options": [
+                                        {
+                                            "label": "Fast",
+                                            "unit": "ms",
+                                            "value": "150",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Normal",
+                                            "unit": "ms",
+                                            "value": "300",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Slow",
+                                            "unit": "ms",
+                                            "value": "450",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Custom",
+                                            "value": "custom",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "300",
+                                    "condition": {
+                                        "dependsOn": "lightbox_transition",
+                                        "values": [
+                                            "fade",
+                                            "horizontal",
+                                            "vertical"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_transition_duration_custom",
+                                    "type": "range",
+                                    "label": "Custom Duration",
+                                    "unit": "ms",
+                                    "min": 0,
+                                    "max": 1000,
+                                    "default": 400,
+                                    "condition": {
+                                        "dependsOn": "lightbox_transition_duration",
+                                        "values": [
+                                            "custom"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_auto_progress_group",
+                            "type": "setting_group",
+                            "label": "Auto Progress",
+                            "settings": [
+                                {
+                                    "key": "lightbox_auto_progress",
+                                    "type": "toggle",
+                                    "label": "Enable Auto Progress",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_delay",
+                                    "type": "range",
+                                    "label": "Delay",
+                                    "unit": "seconds",
+                                    "min": 1,
+                                    "max": 20,
+                                    "condition": {
+                                        "dependsOn": "lightbox_auto_progress",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_style",
+                                    "type": "button_group",
+                                    "label": "Progress Indicator",
+                                    "options": [
+                                        {
+                                            "label": "Progress Bar",
+                                            "value": "bar",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Spinner",
+                                            "value": "spinner",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "None",
+                                            "value": "none",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_auto_progress",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_bar_location",
+                                    "type": "button_group",
+                                    "label": "Bar Location",
+                                    "options": [
+                                        {
+                                            "label": "Top",
+                                            "value": "top",
+                                            "icon": "flex_align_top",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Right",
+                                            "value": "right",
+                                            "icon": "flex_align_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Bottom",
+                                            "value": "bottom",
+                                            "icon": "flex_align_bottom",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Left",
+                                            "value": "left",
+                                            "icon": "flex_align_left",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_auto_progress_style",
+                                        "values": [
+                                            "bar"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_pause_on",
+                                    "type": "token_select",
+                                    "label": "Pause On",
+                                    "options": [
+                                        {
+                                            "label": "Full Image Mouseover",
+                                            "value": "image_hover",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Thumbnail Mouseover",
+                                            "value": "thumbnail_hover",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": ["image_hover"],
+                                    "condition": {
+                                        "dependsOn": "lightbox_auto_progress",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_stop_on_interaction",
+                                    "type": "toggle",
+                                    "label": "Stop on User Interaction",
+                                    "description": "Stops auto progress permanently once the visitor manually navigates, rather than resuming after each slide.",
+                                    "default": true,
+                                    "condition": {
+                                        "dependsOn": "lightbox_auto_progress",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_auto_progress_show_controls",
+                                    "type": "toggle",
+                                    "label": "Show Play / Pause Button",
+                                    "description": "Adds a play/pause toggle button in the lightbox toolbar so visitors can control auto progress themselves.",
+                                    "default": false,
+                                    "condition": {
+                                        "dependsOn": "lightbox_auto_progress",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_navigation_arrows_group",
+                            "type": "setting_group",
+                            "label": "Navigation Arrows",
+                            "settings": [
+                                {
+                                    "key": "lightbox_show_arrows",
+                                    "type": "toggle",
+                                    "label": "Show Navigation Arrows",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_arrow_icon",
+                                    "type": "button_group",
+                                    "label": "Arrow Icon Style",
+                                    "options": [
+                                        {
+                                            "value": "chevron",
+                                            "icon": "chevron_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "chevron_double",
+                                            "icon": "chevron_right_double",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "arrow",
+                                            "icon": "arrow_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "arrow_narrow",
+                                            "icon": "arrow_right_narrow",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "arrow_square",
+                                            "icon": "arrow_square_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "arrow_circle",
+                                            "icon": "arrow_circle_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "arrow_circle_broken",
+                                            "icon": "arrow_circle_broken_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "value": "arrow_block",
+                                            "icon": "arrow_block_right",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_arrow_size",
+                                    "type": "range",
+                                    "label": "Arrow Size",
+                                    "min": 0,
+                                    "max": 120,
+                                    "default": 40,
+                                    "units": [
+                                        "px",
+                                        "em",
+                                        "rem",
+                                        "%"
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_hide_arrows_at_ends",
+                                    "type": "toggle",
+                                    "label": "Hide Arrows at First and Last Item",
+                                    "description": "Hides the previous arrow on the first item and the next arrow on the last when loop is off.",
+                                    "default": false,
+                                    "condition": {
+                                        "dependsOn": [
+                                            "lightbox_show_arrows",
+                                            "lightbox_loop"
+                                        ],
+                                        "values": [
+                                            [
+                                                true,
+                                                "1"
+                                            ],
+                                            [
+                                                false,
+                                                "0"
+                                            ]
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_navigation_dots_group",
+                            "type": "setting_group",
+                            "label": "Navigation Dots",
+                            "settings": [
+                                {
+                                    "key": "lightbox_show_dots",
+                                    "type": "toggle",
+                                    "label": "Show Navigation Dots",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_dot_style",
+                                    "type": "button_group",
+                                    "label": "Dot Style",
+                                    "options": [
+                                        {
+                                            "label": "",
+                                            "value": "fill",
+                                            "icon": "dot_fill",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "",
+                                            "value": "stroke",
+                                            "icon": "dot_stroke",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "",
+                                            "value": "square",
+                                            "icon": "dot_square",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "",
+                                            "value": "square_stroke",
+                                            "icon": "dot_square_stroke",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_show_dots",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_dots_spacing",
+                                    "type": "range",
+                                    "label": "Space Between Dots",
+                                    "min": 0,
+                                    "max": 30,
+                                    "default": 8,
+                                    "units": [
+                                        "px",
+                                        "em",
+                                        "rem",
+                                        "%"
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_show_dots",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_dot_size",
+                                    "type": "range",
+                                    "label": "Dot Size",
+                                    "min": 4,
+                                    "max": 24,
+                                    "default": 12,
+                                    "units": [
+                                        "px"
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_show_dots",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_counter_group",
+                            "type": "setting_group",
+                            "label": "Item Counter",
+                            "settings": [
+                                {
+                                    "key": "lightbox_show_counter",
+                                    "type": "toggle",
+                                    "label": "Show Item Counter",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "thumbnails": {
+                    "id": "thumbnails",
+                    "label": "Lightbox Thumbnail Strip",
+                    "icon": "flex_align_bottom",
+                    "settings": [
+                        {
+                            "key": "lightbox_thumbnail_strip_location",
+                            "type": "button_group",
+                            "label": "Thumbnail Strip Location",
+                            "options": [
+                                {
+                                    "label": "Bottom",
+                                    "value": "bottom",
+                                    "icon": "flex_align_bottom",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Top",
+                                    "value": "top",
+                                    "icon": "flex_align_top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Left",
+                                    "value": "left",
+                                    "icon": "flex_align_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Right",
+                                    "value": "right",
+                                    "icon": "flex_align_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "None",
+                                    "value": "none",
+                                    "icon": "x",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_thumbnail_size",
+                            "type": "button_group",
+                            "label": "Thumbnail Size",
+                            "options": [
+                                {
+                                    "label": "Small",
+                                    "value": "small",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Normal",
+                                    "value": "normal",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Large",
+                                    "value": "large",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "condition": {
+                                "dependsOn": "lightbox_thumbnail_strip_location",
+                                "values": [
+                                    "bottom",
+                                    "top",
+                                    "left",
+                                    "right"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_thumbnail_spacing",
+                            "type": "range",
+                            "label": "Space Between Thumbnails",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 20,
+                            "default": 5,
+                            "condition": {
+                                "dependsOn": "lightbox_thumbnail_strip_location",
+                                "values": [
+                                    "bottom",
+                                    "top",
+                                    "left",
+                                    "right"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_thumbnail_drag",
+                            "type": "toggle",
+                            "label": "Drag Thumbnails",
+                            "description": "Allow visitors to drag the thumbnail strip with a mouse on desktop.",
+                            "default": true,
+                            "condition": {
+                                "dependsOn": "lightbox_thumbnail_strip_location",
+                                "values": [
+                                    "bottom",
+                                    "top",
+                                    "left",
+                                    "right"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_thumbnail_swipe",
+                            "type": "toggle",
+                            "label": "Swipe Thumbnails",
+                            "description": "Allow visitors to swipe the thumbnail strip on touch devices.",
+                            "default": true,
+                            "condition": {
+                                "dependsOn": "lightbox_thumbnail_strip_location",
+                                "values": [
+                                    "bottom",
+                                    "top",
+                                    "left",
+                                    "right"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "advanced": {
+                    "id": "advanced",
+                    "label": "Advanced",
+                    "icon": "settings",
+                    "settings": [
+                        {
+                            "key": "lightbox_backdrop_close",
+                            "type": "toggle",
+                            "label": "Close Lightbox on Background Click",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_info_panel_group",
+                            "type": "setting_group",
+                            "label": "Info Panel",
+                            "settings": [
+                                {
+                                    "key": "lightbox_info_panel",
+                                    "type": "button_group",
+                                    "label": "Show Info Panel",
+                                    "options": [
+                                        {
+                                            "label": "Always",
+                                            "value": "always",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "On Click",
+                                            "value": "on_click",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Never",
+                                            "value": "never",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_info_panel_location",
+                                    "type": "button_group",
+                                    "label": "Info Panel Location",
+                                    "options": [
+                                        {
+                                            "label": "Left",
+                                            "value": "left",
+                                            "icon": "flex_align_left",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Right",
+                                            "value": "right",
+                                            "icon": "flex_align_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Bottom",
+                                            "value": "bottom",
+                                            "icon": "flex_align_bottom",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_info_panel",
+                                        "values": [
+                                            "always",
+                                            "on_click"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_info_blocks",
+                                    "type": "token_select",
+                                    "label": "Info Panel Blocks",
+                                    "description": "Choose which blocks appear in the info panel. Drag to reorder.",
+                                    "sortable": true,
+                                    "keep_open": true,
+                                    "condition": {
+                                        "dependsOn": "lightbox_info_panel",
+                                        "values": [
+                                            "always",
+                                            "on_click"
+                                        ]
+                                    },
+                                    "options": [
+                                        {
+                                            "label": "Caption",
+                                            "value": "caption",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Description",
+                                            "value": "description",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "File Info",
+                                            "value": "file_info",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "EXIF Data",
+                                            "value": "exif",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Share Buttons",
+                                            "value": "share",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Copyright / Credit",
+                                            "value": "credit",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Tags",
+                                            "value": "tags",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "People",
+                                            "value": "people",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Location",
+                                            "value": "location",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Rating",
+                                            "value": "rating",
+                                            "tier_required": "pro_plus"
+                                        },
+                                        {
+                                            "label": "Download Button",
+                                            "value": "download",
+                                            "tier_required": "pro_plus"
+                                        },
+                                        {
+                                            "label": "Custom Fields",
+                                            "value": "custom_fields",
+                                            "tier_required": "pro_plus"
+                                        }
+                                    ],
+                                    "default": ["caption", "description"],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_credit_source",
+                                    "type": "button_group",
+                                    "label": "Credit Source",
+                                    "description": "Where to pull the credit text from.",
+                                    "options": [
+                                        {
+                                            "label": "Item Credit",
+                                            "value": "item_meta",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "EXIF Copyright",
+                                            "value": "exif",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_info_blocks",
+                                        "values": ["credit"],
+                                        "condition_operator": "array_includes"
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_info_blocks_style",
+                                    "type": "button_group",
+                                    "label": "Info Blocks Style",
+                                    "options": [
+                                        {
+                                            "label": "Boxed",
+                                            "value": "boxed",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Divided",
+                                            "value": "divided",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Plain",
+                                            "value": "plain",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_info_panel",
+                                        "values": ["always", "on_click"]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_zoom_group",
+                            "type": "setting_group",
+                            "label": "Zoom",
+                            "settings": [
+                                {
+                                    "key": "lightbox_zoom",
+                                    "type": "toggle",
+                                    "label": "Enable Image Zoom",
+                                    "description": "Allow visitors to zoom into images in the lightbox.",
+                                    "default": true,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_zoom_trigger",
+                                    "type": "token_select",
+                                    "label": "Zoom Trigger",
+                                    "description": "How visitors activate zoom. Scroll and pinch always work regardless of this setting.",
+                                    "default": "double_click",
+                                    "options": [
+                                        {
+                                            "label": "Double-Click",
+                                            "value": "double_click",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Click",
+                                            "value": "click",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Scroll & Pinch Only",
+                                            "value": "wheel_pinch",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "lightbox_zoom",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_zoom_icons",
+                                    "type": "toggle",
+                                    "label": "Show Zoom Buttons",
+                                    "description": "Adds zoom in and zoom out buttons to the lightbox toolbar.",
+                                    "default": false,
+                                    "condition": {
+                                        "dependsOn": "lightbox_zoom",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "lightbox_zoom_beyond_original",
+                                    "type": "toggle",
+                                    "label": "Allow Zooming Beyond Original Size",
+                                    "description": "Let visitors zoom in further than the image's actual resolution.",
+                                    "default": true,
+                                    "condition": {
+                                        "dependsOn": "lightbox_zoom",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

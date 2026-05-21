@@ -501,16 +501,23 @@ class Templates_Data {
             require_once FOTOGRIDS_PLUGIN_DIR . 'public/public-render.php';
         }
 
-        // Use shortcode rendering with template preview mode
-        $gallery_html = \FotoGrids\Public_Render::gallery_shortcode( array(
-            'template_preview' => 'true',
-            'template' => $layout,
-            'template_settings' => wp_json_encode( $final_settings ),
-            'template_items' => wp_json_encode( $preview_items ),
-            'lazy' => 'false',
-            'lightbox' => 'false',
-            'captions' => 'true',
-        ) );
+        $spacing = isset( $final_settings['item_spacing'] ) && is_array( $final_settings['item_spacing'] )
+            ? $final_settings['item_spacing']
+            : array( 'desktop' => 10, 'tablet' => 8, 'mobile' => 5 );
+
+        // Render template preview through pipeline entrypoint directly.
+        $gallery_html = \FotoGrids\Public_Render::render_template_preview(
+            $preview_items,
+            $layout,
+            $columns,
+            $spacing,
+            $final_settings,
+            array(
+                'lazy' => 'false',
+                'lightbox' => 'false',
+                'captions' => 'true',
+            )
+        );
 
         // Check if gallery HTML was generated
         if ( empty( $gallery_html ) ) {

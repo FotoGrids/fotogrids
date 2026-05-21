@@ -1,0 +1,197 @@
+// FotoGrids → Library admin page.
+// Minimal styling — relies on @wordpress/components defaults where possible.
+
+.fotogrids-library-page {
+    .fotogrids-library-tab-content {
+        padding-top: 16px;
+    }
+}
+
+.fotogrids-library-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+
+    .fotogrids-library-toolbar-search {
+        flex: 1 1 240px;
+        max-width: 360px;
+    }
+
+    .fotogrids-library-toolbar-filter {
+        // CheckboxControl owns its own spacing; we just want vertical alignment.
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
+
+    .fotogrids-library-toolbar-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+    }
+}
+
+.fotogrids-library-bulkbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #f6f7f7;
+    border: 1px solid var(--fg-border-secondary, #dcdcde);
+    border-radius: 4px;
+
+    > span {
+        font-weight: 500;
+    }
+}
+
+.fotogrids-library-loading {
+    padding: 32px;
+    display: flex;
+    justify-content: center;
+}
+
+.fotogrids-library-empty {
+    padding: 32px;
+    text-align: center;
+    color: #50575e;
+
+    .fotogrids-library-empty-help {
+        font-size: 12px;
+        color: #757575;
+        max-width: 420px;
+        margin: 8px auto 0;
+    }
+}
+
+.fotogrids-library-table {
+    .fotogrids-library-sort {
+        background: none;
+        border: 0;
+        padding: 0;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        font-weight: 600;
+
+        &:hover {
+            color: var(--fg-blue, #3c46f0);
+        }
+    }
+
+    .fotogrids-library-name-button {
+        background: none;
+        border: 0;
+        padding: 2px 4px;
+        margin: -2px -4px;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        text-align: left;
+        border-radius: 3px;
+        max-width: 100%;
+        word-break: break-word;
+
+        &:hover:not(:disabled) {
+            background: rgba(60, 70, 240, 0.08);
+        }
+
+        &:disabled {
+            cursor: default;
+        }
+    }
+
+    .fotogrids-library-slug {
+        font-size: 12px;
+        color: #50575e;
+    }
+
+    .fotogrids-library-latlng {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .fotogrids-library-latlng-edit {
+        display: flex;
+        gap: 8px;
+
+        .components-base-control {
+            margin: 0;
+        }
+    }
+
+    .fotogrids-library-muted {
+        color: #999;
+    }
+
+    .fotogrids-library-row-selected {
+        background: rgba(60, 70, 240, 0.04);
+    }
+
+    .fotogrids-library-actions-col {
+        white-space: nowrap;
+        text-align: end;
+        width: 1%;
+    }
+}
+
+.fotogrids-library-delete-popover {
+    padding: 12px;
+    max-width: 260px;
+
+    p {
+        margin-top: 0;
+    }
+
+    .fotogrids-library-delete-popover-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+}
+
+.fotogrids-library-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 12px 0;
+
+    .paging-input {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.fotogrids-library-modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.fotogrids-library-merge-sources,
+.fotogrids-library-merge-targets {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--fg-border-secondary, #dcdcde);
+    border-radius: 4px;
+
+    li {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f0f0f1;
+
+        &:last-child { border-bottom: 0; }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+    }
+}

@@ -1,0 +1,555 @@
+// ─── VideoEmbedModal styles ───────────────────────────────────────────────────
+// Uses FotoGrids CSS custom properties where possible so it inherits
+// light/dark wp-admin theme colours automatically.
+
+@use './colors.scss' as *;
+
+// ── Source selector ────────────────────────────────────────────────────────────
+
+.fg-embed-source-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.fg-embed-source-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    background: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .fotogrids-icon {
+        flex-shrink: 0;
+    }
+
+    &:hover {
+        border-color: var(--fg-blue);
+        color: var(--fg-blue);
+        background: rgba(60, 70, 240, 0.04);
+    }
+
+    &--active {
+        border-color: var(--fg-blue);
+        color: var(--fg-blue);
+        background: rgba(60, 70, 240, 0.08);
+        font-weight: 600;
+    }
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+
+.fg-embed-body {
+    padding: 20px;
+}
+
+.fg-embed-section {
+    border-top: 1px solid var(--fg-border-primary);
+    padding-top: 16px;
+    margin-top: 4px;
+
+    &:first-child {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    &__title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--fg-text-secondary);
+        margin: 0 0 12px;
+    }
+
+    &__divider {
+        height: 1px;
+        background: var(--fg-border-primary);
+        margin: 12px 0;
+    }
+
+    &--timing {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 20px;
+        align-items: start;
+    }
+}
+
+// ── Fields ────────────────────────────────────────────────────────────────────
+
+.fg-embed-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg-text-primary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    &__optional {
+        font-weight: 400;
+        color: var(--fg-text-secondary);
+        font-size: 12px;
+    }
+
+    &__description {
+        font-size: 12px;
+        color: var(--fg-text-secondary);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    &__error {
+        font-size: 12px;
+        color: var(--fg-text-error, #d32f2f);
+        margin: 2px 0 0;
+    }
+
+    &__success {
+        font-size: 12px;
+        color: #2e7d32;
+        margin: 2px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .fotogrids-icon svg {
+            width: 13px;
+            height: 13px;
+        }
+    }
+
+    // toggle: row layout
+    &--toggle {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--fg-border-primary);
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    &__label-group {
+        flex: 1;
+        min-width: 0;
+
+        label {
+            display: block;
+            margin-bottom: 2px;
+        }
+    }
+
+    // select: compact row
+    &--select {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--fg-border-primary);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        label {
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+    }
+
+    // number: compact row
+    &--number {
+        flex-direction: column;
+    }
+
+    // color: row
+    &--color {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--fg-border-primary);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        label {
+            margin-bottom: 0;
+        }
+    }
+
+    &__input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &--color {
+            gap: 4px;
+        }
+    }
+}
+
+// ── URL input row ─────────────────────────────────────────────────────────────
+
+.fg-embed-url-row {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+}
+
+.fg-embed-input {
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--fg-text-primary);
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: var(--fg-blue);
+        box-shadow: 0 0 0 2px rgba(60, 70, 240, 0.15);
+    }
+
+    &--url {
+        flex: 1;
+        font-family: monospace;
+        font-size: 12px;
+    }
+
+    &--number {
+        width: 80px;
+        text-align: center;
+    }
+
+    &--error {
+        border-color: var(--fg-text-error, #d32f2f);
+        box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.12);
+    }
+
+    &--resolved {
+        border-color: #388e3c;
+        background: #f9fff9;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.fg-embed-resolve-btn {
+    flex-shrink: 0;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    background: #f6f7f7;
+    color: var(--fg-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .fotogrids-icon svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    &:hover:not(:disabled) {
+        border-color: var(--fg-blue);
+        color: var(--fg-blue);
+        background: rgba(60, 70, 240, 0.06);
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    &--loading {
+        cursor: wait;
+    }
+}
+
+// ── Spinner ───────────────────────────────────────────────────────────────────
+
+.fg-embed-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-top-color: var(--fg-blue);
+    border-radius: 50%;
+    animation: fg-embed-spin 0.7s linear infinite;
+}
+
+@keyframes fg-embed-spin {
+    to { transform: rotate(360deg); }
+}
+
+// ── Toggle ────────────────────────────────────────────────────────────────────
+
+.fg-embed-toggle {
+    flex-shrink: 0;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+
+    &__track {
+        display: flex;
+        align-items: center;
+        width: 58px;
+        height: 26px;
+        border-radius: 13px;
+        background: #c8c8c8;
+        position: relative;
+        transition: background 0.2s ease;
+        padding: 0 5px;
+        box-sizing: border-box;
+    }
+
+    &__thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        position: absolute;
+        left: 4px;
+        transition: left 0.2s ease;
+    }
+
+    &__label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        margin-left: auto;
+        line-height: 1;
+        transition: margin 0.2s ease;
+        user-select: none;
+    }
+
+    &--on {
+        .fg-embed-toggle__track {
+            background: #9b59b6; // matches existing Elementor-style toggle colour in the screenshots
+        }
+
+        .fg-embed-toggle__thumb {
+            left: calc(100% - 22px);
+        }
+
+        .fg-embed-toggle__label {
+            margin-left: 0;
+            margin-right: auto;
+        }
+    }
+}
+
+// ── Select ────────────────────────────────────────────────────────────────────
+
+.fg-embed-select {
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 13px;
+    color: var(--fg-text-primary);
+    background: #fff;
+    max-width: 200px;
+    min-width: 130px;
+
+    &:focus {
+        outline: none;
+        border-color: var(--fg-blue);
+        box-shadow: 0 0 0 2px rgba(60, 70, 240, 0.15);
+    }
+}
+
+// ── Textarea ──────────────────────────────────────────────────────────────────
+
+.fg-embed-textarea {
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--fg-text-primary);
+    background: #fff;
+    resize: vertical;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: var(--fg-blue);
+        box-shadow: 0 0 0 2px rgba(60, 70, 240, 0.15);
+    }
+}
+
+// ── Color picker ─────────────────────────────────────────────────────────────
+
+.fg-embed-color-input {
+    width: 32px;
+    height: 26px;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    padding: 2px;
+    cursor: pointer;
+    background: #fff;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(60, 70, 240, 0.15);
+    }
+}
+
+.fg-embed-color-reset {
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    background: #f6f7f7;
+    color: var(--fg-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+
+    .fotogrids-icon svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    &:hover {
+        background: #e0e0e0;
+    }
+}
+
+// ── Sidebar / Preview ─────────────────────────────────────────────────────────
+
+.fg-embed-sidebar {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fg-embed-preview {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #111;
+    aspect-ratio: 16 / 9;
+
+    &__thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    &__placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #888;
+        font-size: 12px;
+        text-align: center;
+        padding: 16px;
+        box-sizing: border-box;
+
+        .fotogrids-icon {
+            opacity: 0.4;
+
+            svg {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    }
+
+    &__badge {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+
+        .fotogrids-icon svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        &--youtube {
+            background: #ff0000;
+        }
+
+        &--vimeo {
+            background: #1ab7ea;
+        }
+    }
+}
+
+.fg-embed-sidebar__meta {
+    .fg-embed-sidebar__title {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--fg-text-primary);
+        margin: 0;
+        line-height: 1.4;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+
+.fg-embed-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+}

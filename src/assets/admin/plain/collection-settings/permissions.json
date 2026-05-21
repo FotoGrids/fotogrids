@@ -1,0 +1,249 @@
+{
+    "id": "permissions",
+    "label": "Permissions",
+    "icon": "lock",
+    "settings": [
+        {
+            "key": "edit_permission_group",
+            "type": "setting_group",
+            "label": "Edit Permissions",
+            "description": "Control who can edit gallery and album posts",
+            "settings": [
+                {
+                    "key": "who_can_edit",
+                    "type": "button_group",
+                    "label": "Who can edit this Gallery?",
+                    "options": [
+                        {
+                            "label": "All",
+                            "value": "all",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Specific roles",
+                            "value": "specific_roles",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Specific users",
+                            "value": "specific_users",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "all",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "edit_role_permission_type",
+                    "type": "button_group",
+                    "label": "Permission type",
+                    "options": [
+                        {
+                            "label": "Include",
+                            "value": "include",
+                            "icon": "check",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Exclude",
+                            "value": "exclude",
+                            "icon": "close",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "include",
+                    "condition": {
+                        "dependsOn": "who_can_edit",
+                        "values": [
+                            "specific_roles",
+                            "specific_users"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "edit_allowed_roles",
+                    "type": "multi_select",
+                    "label": "Select roles",
+                    "options": [
+                        {
+                            "label": "Administrator",
+                            "value": "administrator",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Editor",
+                            "value": "editor",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Author",
+                            "value": "author",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Contributor",
+                            "value": "contributor",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Subscriber",
+                            "value": "subscriber",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": [],
+                    "condition": {
+                        "dependsOn": "who_can_edit",
+                        "values": [
+                            "specific_roles"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "edit_allowed_users",
+                    "type": "user_select",
+                    "label": "Select users",
+                    "default": [],
+                    "condition": {
+                        "dependsOn": "who_can_edit",
+                        "values": [
+                            "specific_users"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "view_permission_group",
+            "type": "setting_group",
+            "label": "View Permissions",
+            "description": "Control who can view gallery and album posts",
+            "settings": [
+                {
+                    "key": "who_can_view",
+                    "type": "button_group",
+                    "label": "Who can view this Gallery?",
+                    "options": [
+                        {
+                            "label": "All",
+                            "value": "all",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Only registered users",
+                            "value": "registered_users",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Specific roles",
+                            "value": "specific_roles",
+                            "tier_required": "pro_starter"
+                        }
+                    ],
+                    "default": "all",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "view_role_permission_type",
+                    "type": "button_group",
+                    "label": "Permission type",
+                    "options": [
+                        {
+                            "label": "Include",
+                            "value": "include",
+                            "icon": "check",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Exclude",
+                            "value": "exclude",
+                            "icon": "close",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "include",
+                    "condition": {
+                        "dependsOn": "who_can_view",
+                        "values": [
+                            "specific_roles"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "view_allowed_roles",
+                    "type": "multi_select",
+                    "label": "Select roles",
+                    "options": [
+                        {
+                            "label": "Administrator",
+                            "value": "administrator",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Editor",
+                            "value": "editor",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Author",
+                            "value": "author",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Contributor",
+                            "value": "contributor",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Subscriber",
+                            "value": "subscriber",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": [],
+                    "condition": {
+                        "dependsOn": "who_can_view",
+                        "values": [
+                            "specific_roles"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

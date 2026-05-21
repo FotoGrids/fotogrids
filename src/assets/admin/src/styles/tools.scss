@@ -1,0 +1,183 @@
+// FotoGrids Tools Page
+//
+// Shared styles for both the card-grid overview (Mode A) and the
+// sidebar-detail view (Mode B). Per-tool styles belong in the tool's
+// own stylesheet (returned by get_style_url()), not here.
+
+// -------------------------------------------------------------------------
+// Page shell
+// -------------------------------------------------------------------------
+
+.fg-tools-page {
+    &--loading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 32px 0;
+        color: var(--fg-text-secondary, #757575);
+        font-size: 14px;
+    }
+}
+
+// -------------------------------------------------------------------------
+// Mode A — card grid
+// -------------------------------------------------------------------------
+
+.fg-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 4px 2px; // keep box-shadows visible
+}
+
+.fg-tool-card {
+    background: #fff;
+    border: 1px solid var(--fg-border-light, #dcdcde);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-color: var(--fg-border-dark, #a7aaad);
+    }
+
+    &--locked {
+        opacity: 0.85;
+    }
+
+    &--unavailable {
+        .fg-tool-card__body {
+            opacity: 0.7;
+        }
+    }
+}
+
+.fg-tool-card__image {
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+    background: var(--fg-bg-subtle, #f6f7f7);
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+}
+
+.fg-tool-card__body {
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.fg-tool-card__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.fg-tool-card__icon {
+    font-size: 18px;
+    color: var(--fg-text-secondary, #757575);
+    flex-shrink: 0;
+}
+
+.fg-tool-card__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg-text-primary, #1e1e1e);
+    line-height: 1.3;
+    flex: 1;
+}
+
+.fg-tool-card__tier-badge,
+.fg-tool-card__soon-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.fg-tool-card__tier-badge {
+    background: var(--fg-pro-badge-bg, #f0ebff);
+    color: var(--fg-pro-badge-text, #6941c6);
+}
+
+.fg-tool-card__soon-badge {
+    background: var(--fg-bg-subtle, #f6f7f7);
+    color: var(--fg-text-secondary, #757575);
+}
+
+.fg-tool-card__description {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--fg-text-secondary, #757575);
+    flex: 1;
+}
+
+// -------------------------------------------------------------------------
+// Mode B — tool detail / unavailable / missing states
+// -------------------------------------------------------------------------
+
+.fg-tool-unavailable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 32px;
+    gap: 12px;
+    color: var(--fg-text-secondary, #757575);
+
+    &__icon {
+        font-size: 40px;
+        opacity: 0.4;
+        line-height: 1;
+    }
+
+    h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--fg-text-primary, #1e1e1e);
+    }
+
+    p {
+        margin: 0;
+        max-width: 480px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    &__notice {
+        margin-top: 8px;
+        display: inline-block;
+        padding: 6px 16px;
+        background: var(--fg-bg-subtle, #f6f7f7);
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+}
+
+.fg-tool-missing {
+    padding: 32px;
+    color: var(--fg-text-secondary, #757575);
+    font-size: 14px;
+    text-align: center;
+}

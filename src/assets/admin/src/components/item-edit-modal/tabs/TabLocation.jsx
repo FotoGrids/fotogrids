@@ -24,10 +24,9 @@ const TabLocation = ({
             disabled={disabled}
             strings={strings}
             metadataKey="locations"
-            inputKey="location"
             placeholder={strings.addLocationPlaceholder || ''}
             icon={window.FotoGridsIcons?.location || ''}
-            isSingleItem={true}
+            maxItems={1}
             showProNotice={true}
             proNoticeContent={{
                 badge: strings.pro,

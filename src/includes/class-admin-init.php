@@ -116,6 +116,15 @@ class Admin_Init {
 
         add_submenu_page(
             'fotogrids',
+            __( 'Library', 'fotogrids' ),
+            __( 'Library', 'fotogrids' ),
+            'manage_fotogrids_library',
+            'fotogrids-library',
+            array( __CLASS__, 'library_page' )
+        );
+
+        add_submenu_page(
+            'fotogrids',
             __( 'Statistics', 'fotogrids' ),
             __( 'Statistics', 'fotogrids' ),
             'view_fotogrids_stats',
@@ -130,6 +139,15 @@ class Admin_Init {
             'manage_fotogrids_settings',
             'fotogrids-settings',
             array( __CLASS__, 'settings_page' )
+        );
+
+        add_submenu_page(
+            'fotogrids',
+            __( 'Tools', 'fotogrids' ),
+            __( 'Tools', 'fotogrids' ),
+            'manage_fotogrids',
+            'fotogrids-tools',
+            array( __CLASS__, 'tools_page' )
         );
 
         add_submenu_page(
@@ -173,17 +191,38 @@ class Admin_Init {
         wp_enqueue_script( 'wp-i18n' );
         wp_enqueue_script( 'wp-url' );
 
+        // UI state manager — must load before admin bundle and collection-settings.
+        wp_enqueue_script(
+            'fotogrids-ui-state-manager',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/ui-state-manager.js',
+            array(),
+            FOTOGRIDS_VERSION,
+            true
+        );
+
+        // vendors.js is the webpack shared-chunk for node_modules code split out
+        // of admin.js. admin.js's entry module is deferred behind this chunk via
+        // __webpack_require__.O — if vendors.js hasn't run first, admin.js never
+        // executes its own entry point and window.FotoGridsToolsComponents is never set.
+        wp_enqueue_script(
+            'fotogrids-vendors',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/vendors.js',
+            array(),
+            FOTOGRIDS_VERSION,
+            true
+        );
+
         wp_enqueue_script(
             'fotogrids-admin',
             FOTOGRIDS_PLUGIN_URL . 'assets/js/admin.js',
-            array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'media-upload', 'fotogrids-icons' ),
+            array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'fotogrids-icons', 'fotogrids-ui-state-manager', 'fotogrids-vendors' ),
             FOTOGRIDS_VERSION,
             true
         );
 
         wp_enqueue_script(
             'fotogrids-loading-icons',
-            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/loading-icons.js',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/loading-icons.js',
             array(),
             FOTOGRIDS_VERSION,
             true
@@ -191,7 +230,7 @@ class Admin_Init {
 
         wp_enqueue_script(
             'fotogrids-icons',
-            FOTOGRIDS_PLUGIN_URL . 'assets/admin/js/icons.js',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/icons.js',
             array( 'fotogrids-loading-icons' ),
             FOTOGRIDS_VERSION,
             true
@@ -243,9 +282,12 @@ class Admin_Init {
             'restNonce' => wp_create_nonce( 'wp_rest' ),
             'pluginUrl' => FOTOGRIDS_PLUGIN_URL,
             'apiUrl' => home_url( '/wp-json/' ),
+            'generalSettings' => self::get_general_settings(),
             'currentUser' => wp_get_current_user(),
             'shareStatistics' => (bool) get_option( 'fotogrids_share_statistics', false ),
             'autosave' => (bool) get_option( 'fotogrids_autosave', '0' ),
+            'customJsAllowDynamicExecution' => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
+            'settingsBaseUrl' => admin_url( 'admin.php?page=fotogrids-settings' ),
             'isFotoGridsPage' => Admin_Helpers::is_fotogrids_page( $hook ),
             'capabilities' => array(
                 'manage_fotogrids' => current_user_can( 'manage_fotogrids' ),
@@ -278,6 +320,26 @@ class Admin_Init {
             );
         }
 
+        // Localize Library page data only on the Library admin screen.
+        // Exposes the entity-type registry and the initial active tab so the
+        // React side does not have to make a separate roundtrip on mount.
+        if ( $hook === 'fotogrids_page_fotogrids-library' || strpos( $hook, 'fotogrids-library' ) !== false ) {
+            $entity_types = \FotoGrids\REST\Metadata\Library_Data::get_entity_types();
+            $tab_slugs    = array_keys( $entity_types );
+            $requested    = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : '';
+            $initial_tab  = in_array( $requested, $tab_slugs, true ) ? $requested : ( $tab_slugs[0] ?? 'tags' );
+
+            wp_localize_script( 'fotogrids-admin', 'fotogridsLibrary', array(
+                'restBase'    => 'fotogrids/v1/library',
+                'restNonce'   => wp_create_nonce( 'wp_rest' ),
+                'initialTab'  => $initial_tab,
+                'entityTypes' => array_values( $entity_types ),
+                'perPage'     => 50,
+                'canManage'   => current_user_can( 'manage_fotogrids_library' )
+                    || current_user_can( 'manage_fotogrids' ),
+            ) );
+        }
+
         // Enqueue settings-specific scripts only on settings page
         if ( $hook === 'fotogrids_page_fotogrids-settings' || strpos( $hook, 'fotogrids-settings' ) !== false ) {
             fotogrids_enqueue_collection_settings_scripts( true, false );
@@ -300,7 +362,15 @@ class Admin_Init {
      * Admin initialization
      */
     public static function admin_init() {
-        register_setting( 'fotogrids_settings', 'fotogrids_general_settings' );
+        register_setting(
+            'fotogrids_settings',
+            'fotogrids_general_settings',
+            array(
+                'type' => 'array',
+                'default' => self::get_general_settings_defaults(),
+                'sanitize_callback' => array( __CLASS__, 'sanitize_general_settings' ),
+            )
+        );
         register_setting( 'fotogrids_settings', 'fotogrids_permission_settings' );
         register_setting( 'fotogrids_settings', 'fotogrids_integration_settings' );
         register_setting( 'fotogrids_settings', 'fotogrids_share_statistics', array(
@@ -312,6 +382,11 @@ class Admin_Init {
             'type' => 'boolean',
             'default' => false,
             'sanitize_callback' => array( __CLASS__, 'sanitize_autosave' ),
+        ) );
+        register_setting( 'fotogrids_settings', 'fotogrids_custom_js_allow_dynamic_execution', array(
+            'type' => 'boolean',
+            'default' => false,
+            'sanitize_callback' => array( __CLASS__, 'sanitize_custom_js_allow_dynamic_execution' ),
         ) );
         register_setting(
             'fotogrids_settings',
@@ -369,33 +444,92 @@ class Admin_Init {
     }
 
     /**
-     * Sanitize share statistics setting
+     * Return default values for general settings.
      *
-     * Handles checkbox value - if not present in POST, it's false
-     *
-     * @param mixed $value Input value
-     * @return bool Sanitized boolean value
+     * @return array<string, mixed>
      */
-    public static function sanitize_share_statistics( $value ) {
-        if ( ! isset( $_POST['fotogrids_share_statistics'] ) ) {
-            return false;
-        }
-        return (bool) $value;
+    private static function get_general_settings_defaults() {
+        return \FotoGrids\Settings\Plugin_Settings_Store::general_defaults();
     }
 
     /**
-     * Sanitize autosave setting
+     * Return general settings merged with defaults.
      *
-     * Handles checkbox value - if not present in POST, it's false
+     * Public so the REST settings endpoints can read the same canonical
+     * shape the Settings API and the frontend renderer use.
      *
-     * @param mixed $value Input value
-     * @return bool Sanitized boolean value
+     * @return array<string, mixed>
      */
-    public static function sanitize_autosave( $value ) {
-        if ( ! isset( $_POST['fotogrids_autosave'] ) ) {
-            return false;
-        }
-        return (bool) $value;
+    public static function get_general_settings() {
+        return \FotoGrids\Settings\Plugin_Settings_Store::get_general();
+    }
+
+    /**
+     * Return the advanced (boolean) settings as a single map.
+     *
+     * These live as separate top-level options but are read/written together
+     * by the Advanced settings tab via REST.
+     *
+     * @return array<string, bool>
+     */
+    public static function get_advanced_settings() {
+        return \FotoGrids\Settings\Plugin_Settings_Store::get_advanced();
+    }
+
+    /**
+     * Sanitize general settings option.
+     *
+     * @param mixed $value Raw option value.
+     * @return array<string, mixed>
+     */
+    public static function sanitize_general_settings( $value ) {
+        return \FotoGrids\Settings\Plugin_Settings_Store::sanitize_general( $value );
+    }
+
+    /**
+     * Sanitize a boolean setting submitted via a Toggle component.
+     *
+     * Toggle uses a hidden input that is always present in POST with value
+     * '1' (on) or '0' (off), so absence-from-POST is not a valid signal.
+     * We cast the raw value directly.
+     *
+     * @since  1.0.0
+     * @param  mixed $value Raw option value from options.php.
+     * @return bool
+     */
+    private static function sanitize_boolean_setting( $value ): bool {
+        return $value === '1' || $value === 1 || $value === true;
+    }
+
+    /**
+     * Sanitize share statistics setting.
+     *
+     * @param mixed $value Input value.
+     * @return bool
+     */
+    public static function sanitize_share_statistics( $value ): bool {
+        return self::sanitize_boolean_setting( $value );
+    }
+
+    /**
+     * Sanitize autosave setting.
+     *
+     * @param mixed $value Input value.
+     * @return bool
+     */
+    public static function sanitize_autosave( $value ): bool {
+        return self::sanitize_boolean_setting( $value );
+    }
+
+    /**
+     * Sanitize the custom JS allow dynamic execution setting.
+     *
+     * @since  1.0.0
+     * @param  mixed $value Input value.
+     * @return bool
+     */
+    public static function sanitize_custom_js_allow_dynamic_execution( $value ): bool {
+        return self::sanitize_boolean_setting( $value );
     }
 
     /**
@@ -504,6 +638,17 @@ class Admin_Init {
     }
 
     /**
+     * Library admin page
+     *
+     * Mounts the React Library Manager into #fotogrids-library-page.
+     * The active tab is read from the `tab` query parameter and exposed
+     * to React via the `fotogridsLibrary` localised global.
+     */
+    public static function library_page() {
+        self::render_admin_page( 'library' );
+    }
+
+    /**
      * Statistics admin page
      */
     public static function statistics_page() {
@@ -522,6 +667,13 @@ class Admin_Init {
      */
     public static function license_page() {
         self::render_admin_page( 'license' );
+    }
+
+    /**
+     * Tools admin page
+     */
+    public static function tools_page() {
+        self::render_admin_page( 'tools' );
     }
 
     /**
