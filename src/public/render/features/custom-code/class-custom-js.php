@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * that variables declared inside it do not leak into the global scope. Two
  * identifiers are injected as IIFE parameters for convenience:
  *
- *   collection  — the live DOM element for this gallery/album instance,
+ *   collection  - the live DOM element for this gallery/album instance,
  *                 equivalent to document.getElementById('COLLECTION_ID').
  *                 Will be `null` if the element is not found at execution time
  *                 (defensive coding: always check `if (collection) { … }`).
@@ -33,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   el.addEventListener('click', handler);
  *
  * `COLLECTION_ID` is replaced with the real instance ID (single-quoted string,
- * no surrounding quotes needed — the substitution includes them) before the
+ * no surrounding quotes needed - the substitution includes them) before the
  * IIFE is emitted. Example output after substitution:
  *
  *   (function(collection) {
@@ -45,7 +45,7 @@ if ( ! defined( 'WPINC' ) ) {
  * ---------
  * The `<script>` block is emitted via html_after(), placing it immediately
  * after the collection wrapper in the DOM. This guarantees the `collection`
- * element already exists when the script runs — no DOMContentLoaded wrapper
+ * element already exists when the script runs - no DOMContentLoaded wrapper
  * is needed for simple DOM queries.
  *
  * Sanitization (defence-in-depth on top of capability-gating)
@@ -57,8 +57,8 @@ if ( ! defined( 'WPINC' ) ) {
  *  - JS block comments (/* … *\/) and line comments (// …) stripped before
  *    further analysis, preventing payloads hidden across comment boundaries.
  *  - `</script` closing sequences (case-insensitive, with whitespace variants)
- *    rejected — a legitimate script block never needs to close an HTML tag.
- *  - Bare `<` and `>` rejected — prevents smuggling a second `<script>` tag
+ *    rejected - a legitimate script block never needs to close an HTML tag.
+ *  - Bare `<` and `>` rejected - prevents smuggling a second `<script>` tag
  *    or other HTML inside the block.
  *
  * Dynamic execution gate
@@ -68,14 +68,14 @@ if ( ! defined( 'WPINC' ) ) {
  *  - eval(…)
  *  - new Function(…) / Function(…)
  *  - setTimeout / setInterval called with a string argument (the string-eval
- *    form). The callback form — setTimeout(fn, ms) — is not affected.
+ *    form). The callback form - setTimeout(fn, ms) - is not affected.
  *
  * These restrictions are deliberately narrow. `fetch`, `XMLHttpRequest`,
- * `document`, `window`, `cookie`, and all other browser APIs remain allowed —
+ * `document`, `window`, `cookie`, and all other browser APIs remain allowed -
  * they are legitimate gallery JS patterns and blocking them would be
  * security theatre.
  *
- * Administrators are never subject to the dynamic execution restriction —
+ * Administrators are never subject to the dynamic execution restriction -
  * it exists to protect against lower-privilege roles that have gallery
  * editing access. For non-administrators, the restriction can be lifted by
  * enabling the `custom_js_allow_dynamic_execution` setting on the collection
@@ -141,6 +141,10 @@ final class Custom_Js implements Feature {
 
     public function supports( Render_Context $render_context ): bool {
         return $this->resolve_custom_js( $render_context ) !== '';
+    }
+
+    public function html_before( Render_Context $render_context ): string {
+        return '';
     }
 
     public function html_appendix( Render_Context $render_context ): string {
@@ -221,7 +225,7 @@ final class Custom_Js implements Feature {
          * Filters the sanitized JS string after the built-in sanitizer runs.
          *
          * Return '' to suppress output. Return the original $raw to bypass all
-         * built-in checks (use with care — only for fully trusted contexts).
+         * built-in checks (use with care - only for fully trusted contexts).
          *
          * @since 1.0.0
          * @param string         $sanitized      Output of the built-in sanitizer, or '' if rejected.
@@ -236,7 +240,7 @@ final class Custom_Js implements Feature {
     /**
      * Resolves whether dynamic code execution is permitted for this render.
      *
-     * Administrators are always allowed — the restriction only applies to
+     * Administrators are always allowed - the restriction only applies to
      * lower-privilege roles that have gallery editing access. For everyone
      * else, the per-collection setting (which defaults to the global plugin
      * option) is the baseline, and the filter is the override point for the
@@ -278,7 +282,7 @@ final class Custom_Js implements Feature {
      *
      * Removes dangerous constructs while preserving valid JavaScript. The method
      * is intentionally focused on HTML-breakout prevention rather than attempting
-     * a full JS sandbox — that would be security theatre for a capability-gated
+     * a full JS sandbox - that would be security theatre for a capability-gated
      * field. When in doubt, the input is rejected entirely.
      *
      * @since  1.0.0
@@ -320,11 +324,11 @@ final class Custom_Js implements Feature {
             return '';
         }
 
-        // 6. Dynamic execution gate — blocked unless explicitly enabled.
-        //    eval()           — direct JS evaluation.
-        //    Function(…)      — Function constructor (equivalent to eval).
-        //    new Function(…)  — same, with new keyword.
-        //    setTimeout / setInterval with a string first argument — the string
+        // 6. Dynamic execution gate - blocked unless explicitly enabled.
+        //    eval()           - direct JS evaluation.
+        //    Function(…)      - Function constructor (equivalent to eval).
+        //    new Function(…)  - same, with new keyword.
+        //    setTimeout / setInterval with a string first argument - the string
         //    is evaluated as code. The callback form (fn, ms) is legitimate and
         //    is NOT blocked (we check for a quote character after the opening
         //    parenthesis to distinguish the two forms).

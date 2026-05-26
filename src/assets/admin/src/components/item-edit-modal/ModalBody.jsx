@@ -207,6 +207,7 @@ const ModalBody = ({
 							selectExistingMetadata={selectExistingMetadata}
 							disabled={isDisabled}
 							strings={strings}
+							exifData={formData.exif}
 						/>
 					)}
 

@@ -17,10 +17,10 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
     let value, unit;
 
     if (hasUnits) {
-        value = currentValue?.value || setting.default || 0;
+        value = (currentValue?.value !== undefined && currentValue?.value !== null) ? currentValue.value : (setting.default ?? 0);
         unit = currentValue?.unit || setting.units[0];
     } else {
-        value = currentValue || setting.default || 0;
+        value = (currentValue !== undefined && currentValue !== null) ? currentValue : (setting.default ?? 0);
     }
 
     const updateValue = (newValue) => {
@@ -78,7 +78,7 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
                     min: setting.min,
                     max: setting.max,
                     value: value,
-                    onChange: (e) => !isDisabled && updateValue(parseInt(e.target.value) || setting.default || 0),
+                    onChange: (e) => { const v = parseInt(e.target.value); !isDisabled && updateValue(Number.isFinite(v) ? v : (setting.default ?? 0)); },
                     disabled: isDisabled,
                     className: 'fotogrids-range-number-input'
                 }),

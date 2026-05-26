@@ -256,7 +256,7 @@ const LicensePage = () => {
                                     <span className="fotogrids-license-detail-value">
                                         {licenseStatus && licenseStatus.expires_formatted
                                             ? licenseStatus.expires_formatted
-                                            : '—'}
+                                            : '-'}
                                     </span>
                                 </div>
                                 {licenseStatus && licenseStatus.activations !== null && licenseStatus.quota !== null && (
@@ -279,7 +279,7 @@ const LicensePage = () => {
                                     <div className="fotogrids-license-detail-row fotogrids-license-detail-row--warning">
                                         <span className="fotogrids-license-detail-label">{__('Subscription', 'fotogrids')}</span>
                                         <span className="fotogrids-license-detail-value">
-                                            {__('Cancelled — license remains active until expiry.', 'fotogrids')}
+                                            {__('Cancelled - license remains active until expiry.', 'fotogrids')}
                                         </span>
                                     </div>
                                 )}

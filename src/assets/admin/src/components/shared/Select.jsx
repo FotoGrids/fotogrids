@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import Icon from './Icon';
 
 const { __ } = wp.i18n;
@@ -14,8 +15,7 @@ const Select = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
-    const [dropdownPosition, setDropdownPosition] = useState('bottom');
-    const [isPositioned, setIsPositioned] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState(null);
     const selectRef = useRef(null);
     const dropdownRef = useRef(null);
 
@@ -34,71 +34,73 @@ const Select = ({
         }
     }, [value, options, groups]);
 
+    const updateDropdownPosition = useCallback(() => {
+        if (!selectRef.current) return;
+
+        const triggerRect = selectRef.current.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+        const scrollX = window.pageXOffset || document.documentElement.scrollLeft || 0;
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        const sidePadding = 8;
+        const desiredMargin = 4;
+        const minPanelHeight = 160;
+        const availableBelow = viewportHeight - triggerRect.bottom - desiredMargin - sidePadding;
+        const availableAbove = triggerRect.top - desiredMargin - sidePadding;
+        const placement = availableBelow >= minPanelHeight || availableBelow >= availableAbove ? 'bottom' : 'top';
+        const maxHeight = Math.max(120, placement === 'bottom' ? availableBelow : availableAbove);
+        const width = Math.min(Math.max(triggerRect.width, 120), viewportWidth - sidePadding * 2);
+        const left = Math.min(
+            Math.max(sidePadding, triggerRect.left),
+            Math.max(sidePadding, viewportWidth - width - sidePadding)
+        );
+        setDropdownPosition({
+            top: placement === 'bottom'
+                ? triggerRect.bottom + desiredMargin + scrollY
+                : triggerRect.top - desiredMargin + scrollY,
+            left: left + scrollX,
+            width,
+            maxHeight,
+            placement
+        });
+    }, []);
+
     useEffect(() => {
-        if (isOpen && selectRef.current) {
-            setIsPositioned(false);
-
-            let positioned = false;
-
-            const calculatePosition = () => {
-                if (!selectRef.current) return;
-
-                const triggerRect = selectRef.current.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - triggerRect.bottom;
-                const spaceAbove = triggerRect.top;
-
-                const dropdownHeight = dropdownRef.current?.offsetHeight || 300;
-                const minSpaceNeeded = Math.min(dropdownHeight, 300) + 8;
-
-                if (spaceBelow < minSpaceNeeded && spaceAbove > spaceBelow) {
-                    setDropdownPosition('top');
-                } else {
-                    setDropdownPosition('bottom');
-                }
-
-                positioned = true;
-                setIsPositioned(true);
-            };
-
-            const timeoutId = setTimeout(calculatePosition, 0);
-
-            const handleScroll = () => {
-                if (positioned) {
-                    calculatePosition();
-                }
-            };
-            const handleResize = () => {
-                if (positioned) {
-                    calculatePosition();
-                }
-            };
-
-            window.addEventListener('scroll', handleScroll, true);
-            window.addEventListener('resize', handleResize);
-
-            return () => {
-                clearTimeout(timeoutId);
-                window.removeEventListener('scroll', handleScroll, true);
-                window.removeEventListener('resize', handleResize);
-            };
-        } else {
-            setIsPositioned(false);
+        if (!isOpen) {
+            setDropdownPosition(null);
+            return;
         }
-    }, [isOpen]);
+
+        updateDropdownPosition();
+        window.addEventListener('resize', updateDropdownPosition);
+        window.addEventListener('scroll', updateDropdownPosition, true);
+
+        return () => {
+            window.removeEventListener('resize', updateDropdownPosition);
+            window.removeEventListener('scroll', updateDropdownPosition, true);
+        };
+    }, [isOpen, updateDropdownPosition]);
 
     useEffect(() => {
+        if (!isOpen) return;
+
         const handleClickOutside = (event) => {
-            if (selectRef.current && !selectRef.current.contains(event.target)) {
+            const inTrigger = selectRef.current && selectRef.current.contains(event.target);
+            const inDropdown = dropdownRef.current && dropdownRef.current.contains(event.target);
+            if (!inTrigger && !inDropdown) {
                 setIsOpen(false);
             }
         };
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') setIsOpen(false);
+        };
 
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscape);
         };
     }, [isOpen]);
 
@@ -132,10 +134,18 @@ const Select = ({
                 <Icon name="chevron_down" className="fotogrids-select__icon" />
             </button>
 
-            {isOpen && (
+            {isOpen && dropdownPosition && createPortal(
                 <div
                     ref={dropdownRef}
-                    className={`fotogrids-select__dropdown fotogrids-select__dropdown--${dropdownPosition} ${!isPositioned ? 'fotogrids-select__dropdown--positioning' : ''}`}
+                    className={`fotogrids-select__dropdown fotogrids-select__dropdown--${dropdownPosition.placement}`}
+                    style={{
+                        position: 'absolute',
+                        top: `${dropdownPosition.top}px`,
+                        left: `${dropdownPosition.left}px`,
+                        width: `${dropdownPosition.width}px`,
+                        maxHeight: `${dropdownPosition.maxHeight}px`,
+                        transform: dropdownPosition.placement === 'top' ? 'translateY(-100%)' : undefined,
+                    }}
                 >
                     {groups ? (
                         groups.map((group, groupIndex) => (
@@ -169,7 +179,8 @@ const Select = ({
                             </button>
                         ))
                     )}
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

@@ -53,10 +53,8 @@ class REST {
         require_once $base_path . 'stats/stats-data.php';
         require_once $base_path . 'stats/register-stats-routes.php';
 
-        // Templates files
-        require_once $base_path . 'templates/templates-permissions.php';
-        require_once $base_path . 'templates/templates-data.php';
-        require_once $base_path . 'templates/register-templates-routes.php';
+        // Templates files are required and registered by the Templates module
+        // (includes/modules/Templates/Module.php), not here.
 
         // Items files
         require_once $base_path . 'items/items-permissions.php';
@@ -83,6 +81,11 @@ class REST {
         require_once $base_path . 'admin/register-admin-routes.php';
         require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-rest-endpoint.php';
 
+        // Maintenance files (Plugin Settings > Maintenance tab)
+        require_once $base_path . 'maintenance/maintenance-permissions.php';
+        require_once $base_path . 'maintenance/maintenance-data.php';
+        require_once $base_path . 'maintenance/register-maintenance-routes.php';
+
         // Tools infrastructure files are loaded in fotogrids.php (required before REST::init).
         // Tools_Rest only registers the manifest route; individual tool routes are
         // registered by each tool's init() method via Tools_Registry::init_all().
@@ -100,12 +103,13 @@ class REST {
         \FotoGrids\REST\Gallery\Register_Gallery_Routes::register();
         \FotoGrids\REST\Album\Register_Album_Routes::register();
         \FotoGrids\REST\Stats\Register_Stats_Routes::register();
-        \FotoGrids\REST\Templates\Register_Templates_Routes::register();
+        // Templates routes are registered by the Templates module on rest_api_init.
         \FotoGrids\REST\Items\Register_Items_Routes::register();
         \FotoGrids\REST\Metadata\Register_Metadata_Routes::register();
         \FotoGrids\REST\Metadata\Register_Library_Routes::register();
         \FotoGrids\REST\Lightbox\Register_Lightbox_Routes::register();
         \FotoGrids\REST\Admin\Register_Admin_Routes::register();
+        \FotoGrids\REST\Maintenance\Register_Maintenance_Routes::register();
         \FotoGrids\Tools\Tools_Rest::register_routes();
     }
 }

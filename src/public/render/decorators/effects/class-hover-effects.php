@@ -93,7 +93,7 @@ class Hover_Effects implements Decorator {
         $vars   = [ '--fg-hover-cursor' => $cursor ];
 
         // When the cursor is 'default', the <a> inside .fg-item should fall back
-        // to the browser's natural pointer — so we omit --fg-hover-cursor-link and
+        // to the browser's natural pointer - so we omit --fg-hover-cursor-link and
         // let the CSS fallback (pointer) take over. For any other value the link
         // should match the chosen cursor, so we set the var explicitly.
         if ( 'default' !== $cursor ) {

@@ -1,0 +1,555 @@
+// =============================================================================
+// FotoGrids - Filter UI
+//
+// CSS variables (set via style_vars() in Filter_Ui PHP class, or defaulted
+// here). All colours, sizes, and spacing are driven by CSS variables - the
+// SCSS has no hardcoded design values.
+//
+// Wrapper-level data attributes written by Filter_Ui::wrapper_data_attrs():
+//   data-fg-filter-ui           always "true" when filtering is active
+//   data-fg-filter-style        "buttons" | "dropdowns" | "checkboxes"
+//   data-fg-filter-position     "top" | "sidebar"
+//   data-fg-filter-sidebar-side "left" | "right"
+//
+// Item visibility:
+//   .fg-is-filtered-out         JS-applied class on hidden items
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Default CSS variable values
+//
+// Per-gallery overrides are written into the fg-style <style> block by
+// Filter_Ui::style_vars() on the gallery wrapper, which takes priority.
+// -----------------------------------------------------------------------------
+
+.fotogrids-gallery,
+.fotogrids-album {
+    --fg-filter-gap:              8px;
+    --fg-filter-bar-gap:          8px;
+    --fg-filter-wrapper-gap:      16px;
+    // Count badge extras (no-op defaults so var() fallback chains work)
+    --fg-filter-count-bg:         transparent;
+    --fg-filter-count-radius:     0px;
+    --fg-filter-count-padding:    0;
+    --fg-filter-count-font-size:  0.8em;
+    // Dropdown popover overrides (fall back to trigger vars)
+    --fg-filter-dropdown-list-bg:                var(--fg-filter-select-bg);
+    --fg-filter-dropdown-list-border:            var(--fg-filter-select-border);
+    --fg-filter-dropdown-list-radius:            var(--fg-filter-select-radius);
+    --fg-filter-dropdown-option-hover-bg:        color-mix(in srgb, currentColor 8%, transparent);
+    --fg-filter-dropdown-option-active-color:    currentColor;
+    // Checkbox unchecked box (fall back to select/dropdown vars)
+    --fg-filter-cb-border: var(--fg-filter-select-border);
+    --fg-filter-cb-bg:     var(--fg-filter-select-bg);
+    // Checkbox checked state (fall back to currentColor / Canvas)
+    --fg-filter-cb-checked-bg:           currentColor;
+    --fg-filter-cb-checked-border-color: currentColor;
+    --fg-filter-cb-checkmark-color:      Canvas;
+    --fg-filter-sidebar-width:    200px;
+    --fg-filter-btn-padding:      6px 14px;
+    --fg-filter-btn-radius:       4px;
+    --fg-filter-btn-font-size:    0.875rem;
+    --fg-filter-btn-bg:           transparent;
+    --fg-filter-btn-color:        inherit;
+    --fg-filter-btn-border:       1px solid currentColor;
+    --fg-filter-btn-active-bg:    currentColor;
+    --fg-filter-btn-active-color: Canvas;
+    --fg-filter-btn-hover-bg:     color-mix(in srgb, currentColor 10%, transparent);
+    --fg-filter-btn-hover-color:  inherit;
+    --fg-filter-count-color:      color-mix(in srgb, currentColor 55%, transparent);
+    // Custom dropdown vars
+    --fg-filter-select-padding:   6px 32px 6px 12px;
+    --fg-filter-select-radius:    4px;
+    --fg-filter-select-bg:        Canvas;
+    --fg-filter-select-color:     CanvasText;
+    --fg-filter-select-border:    1px solid color-mix(in srgb, CanvasText 30%, transparent);
+    --fg-filter-cb-size:          16px;
+    --fg-filter-cb-gap:           8px;
+    --fg-filter-cb-radius:        3px;
+    --fg-filter-transition:       150ms ease;
+    --fg-filter-item-transition:  200ms ease;
+}
+
+// -----------------------------------------------------------------------------
+// Gallery wrapper layout when filtering is active
+//
+// Top position (default): wrapper becomes a flex column so the filter bar
+// sits above the layout grid with a gap between them - no margin on the bar.
+//
+// Sidebar position: wrapper becomes a flex row so the filter bar sits
+// alongside the layout grid. data-fg-filter-sidebar-side controls order.
+// -----------------------------------------------------------------------------
+
+// Top position
+[data-fg-filter-ui="true"][data-fg-filter-position="top"] {
+    display:        flex;
+    flex-direction: column;
+    gap:            var(--fg-filter-wrapper-gap);
+
+    // Let the layout track grow to fill the available width.
+    > .fg-grid-track,
+    > .fg-masonry-track,
+    > .fg-justified-track {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+// Sidebar position - row layout
+[data-fg-filter-ui="true"][data-fg-filter-position="sidebar"] {
+    display:        flex;
+    flex-direction: row;
+    align-items:    flex-start;
+    gap:            var(--fg-filter-wrapper-gap);
+
+    // Filter bar: fixed width column
+    > .fotogrids-filters {
+        flex:      0 0 var(--fg-filter-sidebar-width);
+        min-width: 0;
+        width:     var(--fg-filter-sidebar-width);
+    }
+
+    // Layout track: grows to fill remaining space
+    > .fg-grid-track,
+    > .fg-masonry-track,
+    > .fg-justified-track {
+        flex:      1 1 auto;
+        min-width: 0;
+    }
+}
+
+// Sidebar on the right: reverse the flex order
+[data-fg-filter-ui="true"][data-fg-filter-position="sidebar"][data-fg-filter-sidebar-side="right"] {
+    > .fotogrids-filters {
+        order: 2;
+    }
+
+    > .fg-grid-track,
+    > .fg-masonry-track,
+    > .fg-justified-track {
+        order: 1;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Filter bar wrapper
+// -----------------------------------------------------------------------------
+
+.fotogrids-filters {
+    display:    flex;
+    flex-wrap:  wrap;
+    align-items: center;
+    gap:        var(--fg-filter-bar-gap);
+}
+
+// Sidebar: column layout, no wrap
+.fg-filters--sidebar {
+    flex-direction: column;
+    align-items:    flex-start;
+    flex-wrap:      nowrap;
+}
+
+// -----------------------------------------------------------------------------
+// "All" reset button  (present in all styles)
+// -----------------------------------------------------------------------------
+
+.fg-filter-all {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             4px;
+    padding:         var(--fg-filter-btn-padding);
+    border-radius:   var(--fg-filter-btn-radius);
+    font-size:       var(--fg-filter-btn-font-size);
+    background:      var(--fg-filter-btn-bg);
+    color:           var(--fg-filter-btn-color);
+    border:          var(--fg-filter-btn-border);
+    cursor:          pointer;
+    transition:      background var(--fg-filter-transition),
+                     color      var(--fg-filter-transition),
+                     border-color var(--fg-filter-transition);
+    white-space:     nowrap;
+    -webkit-appearance: none;
+    appearance:      none;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--fg-filter-btn-hover-bg);
+        color:      var(--fg-filter-btn-hover-color);
+        outline:    2px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    &.fg-is-active,
+    &[aria-pressed="true"] {
+        background: var(--fg-filter-btn-active-bg);
+        color:      var(--fg-filter-btn-active-color);
+        border-color: transparent;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// "Filters" toggle button  (rendered when filter_display_mode === "toggle")
+//
+// The toggle button is the first child of .fotogrids-filters. When the bar
+// carries data-fg-filter-collapsed="true", every sibling is hidden but the
+// toggle button remains visible. Clicking the toggle removes the collapsed
+// attribute; the chevron rotates to indicate the current state.
+// -----------------------------------------------------------------------------
+
+.fg-filter-toggle {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             6px;
+    padding:         var(--fg-filter-btn-padding);
+    border-radius:   var(--fg-filter-btn-radius);
+    font-size:       var(--fg-filter-btn-font-size);
+    background:      var(--fg-filter-btn-bg);
+    color:           var(--fg-filter-btn-color);
+    border:          var(--fg-filter-btn-border);
+    cursor:          pointer;
+    transition:      background var(--fg-filter-transition),
+                     color      var(--fg-filter-transition),
+                     border-color var(--fg-filter-transition);
+    white-space:     nowrap;
+    -webkit-appearance: none;
+    appearance:      none;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--fg-filter-btn-hover-bg);
+        color:      var(--fg-filter-btn-hover-color);
+        outline:    2px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    .fg-filter-toggle-icon {
+        transition: transform var(--fg-filter-transition);
+    }
+
+    &[aria-expanded="true"] .fg-filter-toggle-icon {
+        transform: rotate(180deg);
+    }
+}
+
+// Collapsed state: hide every child of .fotogrids-filters except the toggle.
+.fotogrids-filters[data-fg-filter-collapsed="true"] {
+    > *:not(.fg-filter-toggle) {
+        display: none;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Filter group
+// -----------------------------------------------------------------------------
+
+.fg-filter-group {
+    display:    flex;
+    flex-wrap:  wrap;
+    align-items: center;
+    gap:        var(--fg-filter-gap);
+}
+
+// -----------------------------------------------------------------------------
+// Button style  (.fotogrids-filters.fg-filters--buttons)
+// -----------------------------------------------------------------------------
+
+.fg-filters--buttons .fg-filter-btn {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             5px;
+    padding:         var(--fg-filter-btn-padding);
+    border-radius:   var(--fg-filter-btn-radius);
+    font-size:       var(--fg-filter-btn-font-size);
+    background:      var(--fg-filter-btn-bg);
+    color:           var(--fg-filter-btn-color);
+    border:          var(--fg-filter-btn-border);
+    cursor:          pointer;
+    transition:      background var(--fg-filter-transition),
+                     color      var(--fg-filter-transition),
+                     border-color var(--fg-filter-transition);
+    white-space:     nowrap;
+    -webkit-appearance: none;
+    appearance:      none;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--fg-filter-btn-hover-bg);
+        color:      var(--fg-filter-btn-hover-color);
+        outline:    2px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    &.fg-is-active,
+    &[aria-pressed="true"] {
+        background:   var(--fg-filter-btn-active-bg);
+        color:        var(--fg-filter-btn-active-color);
+        border-color: transparent;
+    }
+}
+
+.fg-filters--buttons .fg-filter-count {
+    font-size:           var(--fg-filter-count-font-size);
+    color:               var(--fg-filter-count-color);
+    background:          var(--fg-filter-count-bg);
+    border-radius:       var(--fg-filter-count-radius);
+    padding:             var(--fg-filter-count-padding);
+    margin-inline-start: 2px;
+}
+
+.fg-filters--buttons .fg-filter-buttons {
+    display:    flex;
+    flex-wrap:  wrap;
+    gap:        var(--fg-filter-gap);
+}
+
+// -----------------------------------------------------------------------------
+// Dropdown style  (.fotogrids-filters.fg-filters--dropdowns)
+//
+// Custom-built dropdowns: a button trigger + a popover list.
+// No native <select> - fully styled and accessible.
+// -----------------------------------------------------------------------------
+
+.fg-filters--dropdowns .fg-filter-group {
+    flex-direction: row;
+    align-items:    center;
+    gap:            8px;
+    position:       relative;
+}
+
+.fg-filters--dropdowns .fg-filter-label {
+    font-size:      var(--fg-filter-btn-font-size);
+    font-weight:    500;
+    white-space:    nowrap;
+}
+
+// The trigger button that opens/closes the dropdown
+.fg-filters--dropdowns .fg-filter-dropdown-trigger {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             6px;
+    padding:         var(--fg-filter-select-padding);
+    border-radius:   var(--fg-filter-select-radius);
+    background:      var(--fg-filter-select-bg);
+    color:           var(--fg-filter-select-color);
+    border:          var(--fg-filter-select-border);
+    font-size:       var(--fg-filter-btn-font-size);
+    cursor:          pointer;
+    white-space:     nowrap;
+    -webkit-appearance: none;
+    appearance:      none;
+    min-width:       120px;
+    justify-content: space-between;
+
+    &:focus-visible {
+        outline:        2px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    // Chevron icon
+    &::after {
+        content:     '';
+        display:     inline-block;
+        width:       0;
+        height:      0;
+        border-left:   4px solid transparent;
+        border-right:  4px solid transparent;
+        border-top:    5px solid currentColor;
+        flex-shrink:   0;
+        transition:    transform var(--fg-filter-transition);
+    }
+
+    &[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+}
+
+// Selected value label inside the trigger
+.fg-filters--dropdowns .fg-filter-dropdown-value {
+    overflow:       hidden;
+    text-overflow:  ellipsis;
+    white-space:    nowrap;
+}
+
+// Popover list
+.fg-filters--dropdowns .fg-filter-dropdown-list {
+    position:       absolute;
+    top:            calc(100% + 4px);
+    left:           0;
+    z-index:        100;
+    min-width:      100%;
+    background:     var(--fg-filter-dropdown-list-bg, var(--fg-filter-select-bg));
+    border:         var(--fg-filter-dropdown-list-border, var(--fg-filter-select-border));
+    border-radius:  var(--fg-filter-dropdown-list-radius, var(--fg-filter-select-radius));
+    box-shadow:     0 4px 12px color-mix(in srgb, CanvasText 15%, transparent);
+    padding:        4px 0;
+    list-style:     none;
+    margin:         0;
+    display:        none;
+
+    &.fg-is-open {
+        display: block;
+    }
+}
+
+// Individual options
+.fg-filters--dropdowns .fg-filter-dropdown-option {
+    display:        flex;
+    align-items:    center;
+    justify-content: space-between;
+    gap:            8px;
+    padding:        6px 14px;
+    font-size:      var(--fg-filter-btn-font-size);
+    cursor:         pointer;
+    white-space:    nowrap;
+    transition:     background var(--fg-filter-transition);
+
+    &:hover,
+    &:focus {
+        background: var(--fg-filter-dropdown-option-hover-bg, color-mix(in srgb, currentColor 8%, transparent));
+        outline:    none;
+    }
+
+    &.fg-is-active,
+    &[aria-selected="true"] {
+        font-weight:  600;
+        color:        var(--fg-filter-dropdown-option-active-color, currentColor);
+    }
+}
+
+.fg-filters--dropdowns .fg-filter-count {
+    font-size:    var(--fg-filter-count-font-size);
+    color:        var(--fg-filter-count-color);
+    background:   var(--fg-filter-count-bg);
+    border-radius: var(--fg-filter-count-radius);
+    padding:      var(--fg-filter-count-padding);
+    flex-shrink:  0;
+}
+
+// -----------------------------------------------------------------------------
+// Checkbox style  (.fotogrids-filters.fg-filters--checkboxes)
+//
+// Fully custom checkboxes: native <input type="checkbox"> is visually hidden,
+// a CSS-drawn box is shown via the ::before pseudo-element on the label.
+// -----------------------------------------------------------------------------
+
+.fg-filters--checkboxes .fg-filter-fieldset {
+    border:     none;
+    margin:     0;
+    padding:    0;
+    min-width:  0;
+}
+
+.fg-filters--checkboxes .fg-filter-legend {
+    font-size:       var(--fg-filter-btn-font-size);
+    font-weight:     500;
+    margin-block-end: 6px;
+    white-space:     nowrap;
+}
+
+// Hide native checkbox but keep it keyboard/AT accessible
+.fg-filters--checkboxes .fg-filter-checkbox {
+    position:    absolute;
+    width:       1px;
+    height:      1px;
+    overflow:    hidden;
+    clip:        rect(0 0 0 0);
+    clip-path:   inset(50%);
+    white-space: nowrap;
+    margin:      0;
+    padding:     0;
+    border:      0;
+    opacity:     0;
+}
+
+.fg-filters--checkboxes .fg-filter-checkbox-label {
+    display:        flex;
+    align-items:    center;
+    gap:            var(--fg-filter-cb-gap);
+    font-size:      var(--fg-filter-btn-font-size);
+    cursor:         pointer;
+    user-select:    none;
+    padding:        3px 0;
+    line-height:    1.4;
+
+    // Custom checkbox box, drawn via ::before
+    &::before {
+        content:      '';
+        display:      inline-flex;
+        align-items:  center;
+        justify-content: center;
+        flex-shrink:  0;
+        width:        var(--fg-filter-cb-size);
+        height:       var(--fg-filter-cb-size);
+        border:       var(--fg-filter-cb-border);
+        border-radius: var(--fg-filter-cb-radius);
+        background:   var(--fg-filter-cb-bg);
+        transition:   background var(--fg-filter-transition),
+                      border-color var(--fg-filter-transition);
+    }
+
+    // Checked state: filled box with a checkmark
+    &:has(.fg-filter-checkbox:checked)::before {
+        background:    var(--fg-filter-cb-checked-bg, currentColor);
+        border-color:  var(--fg-filter-cb-checked-border-color, currentColor);
+        // SVG checkmark - stroke color driven by --fg-filter-cb-checkmark-color
+        // We encode the color into the SVG via a CSS custom property trick:
+        // since SVG data URIs can't reference CSS vars, we default to white
+        // and let the variable override via a separate mask layer when supported.
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 75%;
+        box-shadow: none;
+    }
+
+    &:hover::before {
+        border-color:  currentColor;
+    }
+}
+
+// Focus ring on label when native checkbox is focused
+.fg-filters--checkboxes .fg-filter-checkbox:focus-visible + .fg-filter-checkbox-label::before,
+.fg-filters--checkboxes .fg-filter-checkbox-label:has(.fg-filter-checkbox:focus-visible)::before {
+    outline:       2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.fg-filters--checkboxes .fg-filter-count {
+    font-size:           var(--fg-filter-count-font-size);
+    color:               var(--fg-filter-count-color);
+    background:          var(--fg-filter-count-bg);
+    border-radius:       var(--fg-filter-count-radius);
+    padding:             var(--fg-filter-count-padding);
+    margin-inline-start: 2px;
+}
+
+// -----------------------------------------------------------------------------
+// Hidden items
+//
+// Class-based hide (not style.display) so CSS transitions work and the layout
+// engine can be notified. Transitions use opacity + scale for a smooth effect.
+// pointer-events:none prevents hover/click while the item is fading out.
+// -----------------------------------------------------------------------------
+
+.fotogrids-gallery .fg-item.fg-is-filtered-out,
+.fotogrids-album   .fg-item.fg-is-filtered-out {
+    display:         none; // remove from flow; keeps layout clean without JS reflow
+}
+
+// If a layout wants animated filter transitions it can override display:none
+// with opacity/pointer-events instead. Opt-in per layout via a BEM modifier.
+.fotogrids-gallery.fg-layout-animated-filter .fg-item.fg-is-filtered-out,
+.fotogrids-album.fg-layout-animated-filter   .fg-item.fg-is-filtered-out {
+    display:         block;
+    opacity:         0;
+    pointer-events:  none;
+    transition:      opacity var(--fg-filter-item-transition);
+    position:        absolute; // collapse without display:none
+    width:           1px;
+    height:          1px;
+    overflow:        hidden;
+    clip:            rect(0 0 0 0);
+    clip-path:       inset(50%);
+    white-space:     nowrap;
+}

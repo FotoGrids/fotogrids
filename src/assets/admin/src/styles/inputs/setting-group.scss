@@ -50,6 +50,12 @@
     }
 }
 
+.fotogrids-settings-sbs {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+}
+
 @media (max-width: 768px) {
     .fotogrids-setting-group {
         margin: ui-size(margin, md) 0;

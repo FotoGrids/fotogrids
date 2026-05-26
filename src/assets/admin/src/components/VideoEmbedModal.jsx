@@ -312,13 +312,13 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                         min="0"
                         value={ form.startTime }
                         onChange={ e => set( 'startTime', e.target.value ) }
-                        placeholder="—"
+                        placeholder="-"
                         className="fotogrids-embed-time-input"
                     />
                     <p className="description">{ strings.startTimeDesc || 'Specify a start time (in seconds)' }</p>
                 </div>
 
-                {/* End time — YouTube only */}
+                {/* End time - YouTube only */}
                 { form.source === 'youtube' && (
                     <div className="fotogrids-form-field">
                         <label htmlFor="fg-embed-end">
@@ -330,7 +330,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                             min="0"
                             value={ form.endTime }
                             onChange={ e => set( 'endTime', e.target.value ) }
-                            placeholder="—"
+                            placeholder="-"
                             className="fotogrids-embed-time-input"
                         />
                         <p className="description">{ strings.endTimeDesc || 'Specify an end time (in seconds)' }</p>

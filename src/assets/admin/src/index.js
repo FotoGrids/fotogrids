@@ -8,7 +8,6 @@ import { createRoot } from 'react-dom/client';
 import './styles/admin.scss';
 
 import Dashboard from './components/pages/Dashboard';
-import TemplatesPage from './components/pages/TemplatesPage';
 import StatsPage from './components/pages/StatsPage';
 import PluginSettingsPage from './components/pages/PluginSettingsPage';
 import LicensePage from './components/pages/LicensePage';
@@ -54,7 +53,8 @@ function renderComponent(containerId, Component) {
 
 function initializeAdminPages() {
     renderComponent('fotogrids-main-page', Dashboard);
-    renderComponent('fotogrids-templates-page', TemplatesPage);
+    // Templates page is mounted by the Templates module's own bundle
+    // (includes/modules/Templates/assets/templates-page.js).
     renderComponent('fotogrids-stats-page', StatsPage);
     renderComponent('fotogrids-settings-page', PluginSettingsPage);
     renderComponent('fotogrids-license-page', LicensePage);

@@ -4,7 +4,7 @@ import './fg-tooltip.scss';
  * FotoGrids Tooltip
  *
  * Lightweight, accessible tooltip for any public-facing FotoGrids surface.
- * Not lightbox-scoped — any frontend module can import and use it.
+ * Not lightbox-scoped - any frontend module can import and use it.
  *
  * Usage
  * -----
@@ -12,7 +12,7 @@ import './fg-tooltip.scss';
  *   FgTooltip.bind( buttonEl, 'Label text' );       // attach to an element
  *   FgTooltip.bind( buttonEl );                     // reads aria-label automatically
  *
- * Or declaratively — any element with [data-fg-tooltip] is picked up automatically
+ * Or declaratively - any element with [data-fg-tooltip] is picked up automatically
  * when FgTooltip.init() is called (called once by the module on DOMContentLoaded).
  *
  * Positioning
@@ -25,7 +25,7 @@ import './fg-tooltip.scss';
  * -------------
  * The tooltip element carries role="tooltip". Each bound host element gets a
  * generated aria-describedby pointing at the tooltip id so screen readers
- * announce it on focus. (aria-label on the host is kept untouched — it is the
+ * announce it on focus. (aria-label on the host is kept untouched - it is the
  * primary label; the tooltip is the visual complement.)
  *
  * Source:  src/public/render/fg-tooltip/fg-tooltip.js
@@ -53,7 +53,7 @@ let activeHost  = null;
  * Returns the singleton tooltip element, creating it on first call.
  *
  * If the host lives inside a <dialog> element, the tooltip is re-parented
- * into that dialog so it inherits the browser's top-layer rendering — a
+ * into that dialog so it inherits the browser's top-layer rendering - a
  * tooltip appended to <body> is invisible behind an open <dialog> regardless
  * of z-index, because <dialog> establishes its own top-layer stacking context.
  *
@@ -250,7 +250,7 @@ function refresh( host ) {
 }
 
 /**
- * Declarative init — bind all [data-fg-tooltip] elements in the given root.
+ * Declarative init - bind all [data-fg-tooltip] elements in the given root.
  * Safe to call multiple times; already-bound elements are skipped.
  *
  * @param {Element|Document} [root=document]

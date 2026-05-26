@@ -21,8 +21,8 @@
 
 @mixin fotogrids-button-secondary() {
     background-color: ui-color(button, secondary-bg);
-    color: ui-color(button, secondary-text);
-    border-color: ui-color(button, secondary-border);
+    color: var(--fg-text-secondary);
+    border-color: var(--fg-border-dark);
 }
 
 // FotoGrids Button Styles
@@ -115,7 +115,7 @@
     &:hover:not(:disabled):not(.fotogrids-button--disabled) {
         background-color: ui-color(button, secondary-hover-bg);
         color: ui-color(button, secondary-hover-text);
-        border-color: ui-color(button, primary-border);
+        border-color: var(--fg-border-focus);
     }
 
     &:active:not(:disabled):not(.fotogrids-button--disabled) {

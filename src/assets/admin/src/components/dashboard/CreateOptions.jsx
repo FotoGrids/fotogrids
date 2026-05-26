@@ -20,14 +20,14 @@ const CreateOptions = () => {
                 <a href="post-new.php?post_type=fotogrids_gallery" className="create-option">
                     <div
                         className="fotogrids-admin-block-card-icon"
-                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.layout_grid }}
+                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.layout_3x3 }}
                     />
                     <span>{__('New Gallery', 'fotogrids')}</span>
                 </a>
                 <a href="post-new.php?post_type=fotogrids_album" className="create-option">
                     <div
                         className="fotogrids-admin-block-card-icon"
-                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.layout }}
+                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.layout_2x2 }}
                     />
                     <span>{__('New Album', 'fotogrids')}</span>
                 </a>

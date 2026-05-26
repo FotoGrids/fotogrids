@@ -1,11 +1,18 @@
 import React from 'react';
 import LibraryTabBase from './LibraryTabBase';
+import LibraryLocationsHeader from './LibraryLocationsHeader';
 
 /**
- * Library → Locations tab. LibraryTabBase reads
- * `entityType.supports_extra_fields` to show the Lat/Lng column and inline
- * editor, so this tab is just a wrapper.
+ * Library → Locations tab.
+ * Renders a rich stats header (stat cards + bar chart + geo SVG scatter) above
+ * the shared table. LibraryTabBase reads `entityType.supports_extra_fields` to
+ * show the Lat/Lng column and inline editor.
  */
-const LibraryLocationsTab = ({ entityType }) => <LibraryTabBase entityType={entityType} />;
+const LibraryLocationsTab = ({ entityType }) => (
+    <>
+        <LibraryLocationsHeader entityType={entityType} />
+        <LibraryTabBase entityType={entityType} />
+    </>
+);
 
 export default LibraryLocationsTab;

@@ -30,3 +30,41 @@
     background: linear-gradient(to top, rgb(0 0 0 / 70%), rgb(0 0 0 / 0%));
     pointer-events: none;
 }
+
+.fotogrids-gallery .fg-caption-title,
+.fotogrids-album .fg-caption-title {
+    display: block;
+    font-family: var(--fg-caption-title-font-family);
+    font-weight: var(--fg-caption-title-font-weight);
+    font-size: var(--fg-caption-title-font-size);
+    color: var(--fg-caption-title-color);
+}
+
+.fotogrids-gallery .fg-caption-description,
+.fotogrids-album .fg-caption-description {
+    display: block;
+    font-size: var(--fg-caption-desc-font-size);
+    color: var(--fg-caption-desc-color);
+}
+
+/* Line-clamp - active when the decorator emits an integer for
+   --fg-caption-*-lines; falls back to 'none' (no clamp) otherwise.
+   @supports gates the -webkit-box display so browsers without line-clamp
+   keep plain block display and show all text rather than breaking layout. */
+@supports (-webkit-line-clamp: 1) {
+    .fotogrids-gallery .fg-caption-title,
+    .fotogrids-album .fg-caption-title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--fg-caption-title-lines, none);
+        overflow: hidden;
+    }
+
+    .fotogrids-gallery .fg-caption-description,
+    .fotogrids-album .fg-caption-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--fg-caption-desc-lines, none);
+        overflow: hidden;
+    }
+}

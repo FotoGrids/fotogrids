@@ -8,7 +8,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Lightbox REST Permissions
  *
- * All lightbox endpoints are publicly readable — the frontend renders
+ * All lightbox endpoints are publicly readable - the frontend renders
  * galleries without authentication and must be able to fetch item data.
  *
  * @since 1.0.0
@@ -16,7 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Lightbox_Permissions {
 
     /**
-     * Public read — no authentication required.
+     * Public read - no authentication required.
      *
      * @return true
      */

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import {
     SettingsPanel,
-    SettingRow,
+    PanelRow,
     NumberField,
     Segmented,
     BreakpointPreview,
@@ -22,7 +22,7 @@ const DEFAULTS = {
  *
  * Reads/writes the canonical fotogrids_general_settings keys
  * (mobile_breakpoint / tablet_breakpoint / detect_responsive_by_browser) via
- * /fotogrids/v1/admin/general-settings — the same option the public frontend
+ * /fotogrids/v1/admin/general-settings - the same option the public frontend
  * renderer consumes.
  */
 const ResponsivenessTab = () => {
@@ -100,12 +100,12 @@ const ResponsivenessTab = () => {
     };
 
     return (
-        <div key="responsiveness-content">
+        <div className="fotogrids-sidebar-tabs__content__inner" key="responsiveness-content">
             <SettingsPanel
                 title={__('Breakpoints', 'fotogrids')}
                 description={__('Pixel widths where FotoGrids switches between mobile, tablet and desktop layouts.', 'fotogrids')}
             >
-                <SettingRow
+                <PanelRow
                     title={__('Mobile', 'fotogrids')}
                     description={__('Below this width, mobile layout rules apply.', 'fotogrids')}
                     htmlFor="fg-bp-mobile"
@@ -117,9 +117,9 @@ const ResponsivenessTab = () => {
                         unit="px"
                         min={0}
                     />
-                </SettingRow>
+                </PanelRow>
 
-                <SettingRow
+                <PanelRow
                     title={__('Tablet', 'fotogrids')}
                     description={__('Below this width and above the mobile breakpoint, tablet rules apply.', 'fotogrids')}
                     htmlFor="fg-bp-tablet"
@@ -131,9 +131,9 @@ const ResponsivenessTab = () => {
                         unit="px"
                         min={0}
                     />
-                </SettingRow>
+                </PanelRow>
 
-                <SettingRow
+                <PanelRow
                     title={__('Preview', 'fotogrids')}
                     description={__('Three device sizes mapped to your current breakpoints.', 'fotogrids')}
                 >
@@ -141,14 +141,15 @@ const ResponsivenessTab = () => {
                         mobile={settings.mobile_breakpoint}
                         tablet={settings.tablet_breakpoint}
                     />
-                </SettingRow>
+                </PanelRow>
             </SettingsPanel>
 
             <SettingsPanel
                 title={__('Detection mode', 'fotogrids')}
+                titleTag="h3"
                 description={__('How FotoGrids decides which layout to serve.', 'fotogrids')}
             >
-                <SettingRow
+                <PanelRow
                     title={__('Detect by', 'fotogrids')}
                     description={__('Viewport width is the most predictable. Device capabilities is heuristic-based and can differ across browsers.', 'fotogrids')}
                 >
@@ -161,7 +162,7 @@ const ResponsivenessTab = () => {
                             { value: 'device', label: __('Device & browser', 'fotogrids'), icon: 'responsive_mobile' },
                         ]}
                     />
-                </SettingRow>
+                </PanelRow>
             </SettingsPanel>
 
             <SaveBar

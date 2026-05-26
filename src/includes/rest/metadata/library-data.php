@@ -13,14 +13,14 @@ if ( ! defined( 'WPINC' ) ) {
  * Metadata_Permissions::check_manage_library() via the route registration.
  *
  * Endpoints (all under fotogrids/v1):
- *   GET    /library/types                        — registered entity types
- *   GET    /library/{type}                       — paginated list + total count header
- *   POST   /library/{type}                       — create an entry
- *   PATCH  /library/{type}/{id}                  — rename / update meta
- *   DELETE /library/{type}/{id}                  — delete one
- *   DELETE /library/{type}                       — bulk delete (ids in body)
- *   POST   /library/{type}/merge                 — merge sources into target
- *   POST   /library/{type}/recalculate           — recompute usage counts
+ *   GET    /library/types                        - registered entity types
+ *   GET    /library/{type}                       - paginated list + total count header
+ *   POST   /library/{type}                       - create an entry
+ *   PATCH  /library/{type}/{id}                  - rename / update meta
+ *   DELETE /library/{type}/{id}                  - delete one
+ *   DELETE /library/{type}                       - bulk delete (ids in body)
+ *   POST   /library/{type}/merge                 - merge sources into target
+ *   POST   /library/{type}/recalculate           - recompute usage counts
  *
  * The {type} segment is the *plural* slug exposed in the filter
  * (`tags|people|locations`), which is mapped back to the internal singular
@@ -142,14 +142,14 @@ class Library_Data {
     // ─── Endpoint callbacks ─────────────────────────────────────────────────
 
     /**
-     * GET /library/types — returns the registered entity-type config.
+     * GET /library/types - returns the registered entity-type config.
      */
     public static function get_types( $request ) {
         return rest_ensure_response( array_values( self::get_entity_types() ) );
     }
 
     /**
-     * GET /library/{type} — paginated list.
+     * GET /library/{type} - paginated list.
      */
     public static function get_library( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );
@@ -184,7 +184,7 @@ class Library_Data {
     }
 
     /**
-     * POST /library/{type} — create a new entry.
+     * POST /library/{type} - create a new entry.
      */
     public static function create_entity( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );
@@ -224,7 +224,7 @@ class Library_Data {
     }
 
     /**
-     * PATCH /library/{type}/{id} — rename / update meta.
+     * PATCH /library/{type}/{id} - rename / update meta.
      */
     public static function update_entity( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );
@@ -290,7 +290,7 @@ class Library_Data {
     }
 
     /**
-     * DELETE /library/{type}/{id} — delete a single entry.
+     * DELETE /library/{type}/{id} - delete a single entry.
      */
     public static function delete_entity( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );
@@ -313,7 +313,7 @@ class Library_Data {
     }
 
     /**
-     * DELETE /library/{type} — bulk delete.
+     * DELETE /library/{type} - bulk delete.
      */
     public static function bulk_delete( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );
@@ -332,7 +332,7 @@ class Library_Data {
     }
 
     /**
-     * POST /library/{type}/merge — merge sources into target.
+     * POST /library/{type}/merge - merge sources into target.
      */
     public static function merge( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );
@@ -360,7 +360,7 @@ class Library_Data {
     }
 
     /**
-     * POST /library/{type}/recalculate — recompute usage counts.
+     * POST /library/{type}/recalculate - recompute usage counts.
      */
     public static function recalculate( $request ) {
         $type = self::resolve_type( $request->get_param( 'type' ) );

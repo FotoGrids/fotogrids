@@ -65,7 +65,7 @@ interface Layout {
     /**
      * CSS classes added to the wrapper element for layout-specific structural
      * rules (e.g. 'fg-layout-grid'). Layouts are the only module type that
-     * still contribute classes — everything else uses data attributes.
+     * still contribute classes - everything else uses data attributes.
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.

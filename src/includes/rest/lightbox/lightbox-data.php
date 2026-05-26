@@ -11,7 +11,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Lightbox Item Data Handler
  *
  * Returns all per-item data needed by the lightbox info panel in a single
- * request. Intentionally separate from the admin item-edit endpoint — this
+ * request. Intentionally separate from the admin item-edit endpoint - this
  * response is shaped for the frontend, not the editor.
  *
  * Response shape:
@@ -45,6 +45,7 @@ class Lightbox_Data {
     public static function get_item_data( \WP_REST_Request $request ) {
         $item_id       = (int) $request->get_param( 'id' );
         $credit_source = sanitize_key( $request->get_param( 'credit_source' ) ?: 'item_meta' );
+        $gallery_id    = (int) $request->get_param( 'gallery_id' );
 
         $attachment = get_post( $item_id );
         if ( ! $attachment || $attachment->post_type !== 'attachment' ) {
@@ -77,11 +78,25 @@ class Lightbox_Data {
             }
         }
 
+        // If no stored EXIF, fall back to reading live from the file - but
+        // only when the gallery has EXIF display enabled and has enabled fields.
+        // This handles items that were added before EXIF extraction ran, or
+        // whose exif_data column was never populated.
+        if ( null === $exif && $gallery_id > 0 ) {
+            $enabled_fields = fotogrids_get_enabled_exif_fields( $gallery_id );
+            if ( ! empty( $enabled_fields ) ) {
+                $live_exif = fotogrids_extract_exif_data( $item_id, $enabled_fields );
+                if ( ! empty( $live_exif ) ) {
+                    $exif = $live_exif;
+                }
+            }
+        }
+
         // ── Credit ───────────────────────────────────────────────────────────
         $credit = '';
         if ( $credit_source === 'exif' ) {
-            // EXIF Copyright field — stored under the key 'copyright' by TabEXIF.
-            // If exif is missing or the copyright key is absent, return empty — no fallback.
+            // EXIF Copyright field - stored under the key 'copyright' by TabEXIF.
+            // If exif is missing or the copyright key is absent, return empty - no fallback.
             $credit = ( is_array( $exif ) && isset( $exif['copyright'] ) ) ? (string) $exif['copyright'] : '';
         } else {
             $credit = $custom_meta ? ( $custom_meta->credit ?? '' ) : '';

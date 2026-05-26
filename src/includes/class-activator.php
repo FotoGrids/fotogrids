@@ -47,6 +47,46 @@ class Activator {
         if ( ! get_option( 'fotogrids_media_settings' ) ) {
             update_option( 'fotogrids_media_settings', Image_Size_Manager::get_plugin_size_defaults(), false );
         }
+
+        // Let modules that own persistent state (tables, options, cron) create
+        // it as part of activation. Free's six core tables stay above - those
+        // are platform, not modules. This is how a (Pro) module ships its own
+        // table creation with the feature instead of editing this activator.
+        self::run_module_lifecycle( 'on_activate' );
+    }
+
+    /**
+     * Run a lifecycle hook across every registered Lifecycle_Module_Interface.
+     *
+     * Activation / deactivation / uninstall run in isolated requests where the
+     * 'init' hook has not fired, so modules are not yet registered. We fire the
+     * registration action here explicitly (its listeners are attached at
+     * plugin-file load time) before iterating. No-op until a lifecycle module
+     * exists.
+     *
+     * @since 1.0.0
+     * @param string $method One of 'on_activate' | 'on_deactivate' | 'on_uninstall'.
+     * @return void
+     */
+    public static function run_module_lifecycle( string $method ): void {
+        if ( ! class_exists( '\FotoGrids\Modules\Module_Registry' ) ) {
+            return;
+        }
+
+        // Ensure modules are registered for this isolated request.
+        do_action( 'fotogrids/modules/register' );
+
+        foreach ( \FotoGrids\Modules\Module_Registry::get_all() as $entry ) {
+            $module = $entry['module'];
+
+            if ( ! $module instanceof \FotoGrids\Modules\Lifecycle_Module_Interface ) {
+                continue;
+            }
+
+            if ( is_callable( [ $module, $method ] ) ) {
+                $module->{$method}();
+            }
+        }
     }
 
     /**
@@ -70,10 +110,12 @@ class Activator {
 
         $table_item_meta = $wpdb->prefix . 'fotogrids_item_meta';
         $table_stats = $wpdb->prefix . 'fotogrids_statistics';
+        $table_stats_daily = $wpdb->prefix . 'fotogrids_statistics_daily';
         $table_licenses = $wpdb->prefix . 'fotogrids_licenses';
         $table_gallery_albums = $wpdb->prefix . 'fotogrids_gallery_albums';
         $table_tags = $wpdb->prefix . 'fotogrids_tags';
         $table_item_metadata = $wpdb->prefix . 'fotogrids_item_metadata';
+        $table_render_cache = $wpdb->prefix . 'fotogrids_render_cache';
 
         $sql = "
         CREATE TABLE $table_item_meta (
@@ -169,6 +211,33 @@ class Activator {
           KEY attachment_id (attachment_id),
           KEY metadata_lookup (metadata_type, metadata_id)
         ) $charset_collate;
+
+        CREATE TABLE $table_stats_daily (
+          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          object_type ENUM('gallery','album','item') NOT NULL,
+          object_id BIGINT UNSIGNED NOT NULL,
+          viewed_date DATE NOT NULL,
+          views BIGINT UNSIGNED NOT NULL DEFAULT 0,
+          shares BIGINT UNSIGNED NOT NULL DEFAULT 0,
+          PRIMARY KEY (id),
+          UNIQUE KEY daily_idx (object_type, object_id, viewed_date),
+          KEY viewed_date (viewed_date),
+          KEY object_lookup (object_type, object_id)
+        ) $charset_collate;
+
+        CREATE TABLE $table_render_cache (
+          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          object_type ENUM('gallery','album') NOT NULL,
+          object_id BIGINT UNSIGNED NOT NULL,
+          cache_key VARCHAR(64) NOT NULL,
+          html LONGTEXT NOT NULL,
+          cached_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          expires_at DATETIME NOT NULL,
+          PRIMARY KEY (id),
+          UNIQUE KEY cache_key (cache_key),
+          KEY object_lookup (object_type, object_id),
+          KEY expires_at (expires_at)
+        ) $charset_collate;
         ";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -176,7 +245,7 @@ class Activator {
 
         do_action( 'fotogrids/system/activate' );
 
-        update_option( 'fotogrids_db_version', '1.1' );
+        update_option( 'fotogrids_db_version', '1.3' );
     }
 
     /**
@@ -191,8 +260,8 @@ class Activator {
      */
     public static function maybe_upgrade() {
         $current = get_option( 'fotogrids_db_version', '0' );
-        if ( version_compare( $current, '1.1', '>=' ) ) {
-            return; // Already up to date — nothing to do.
+        if ( version_compare( $current, '1.3', '>=' ) ) {
+            return; // Already up to date - nothing to do.
         }
 
         self::create_tables();

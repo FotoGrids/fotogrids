@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import TabNavigation from '../plugin-settings/TabNavigation';
+import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
 import LibraryTagsTab from '../library/LibraryTagsTab';
 import LibraryPeopleTab from '../library/LibraryPeopleTab';
 import LibraryLocationsTab from '../library/LibraryLocationsTab';
@@ -15,6 +15,8 @@ const { __ } = wp.i18n;
  * type does not require touching this component. Default render-mapping for
  * the three built-in types is below; any additional types fall through to
  * LibraryGenericTab which uses the same shared LibraryTabBase under the hood.
+ *
+ * Uses SidebarTabs for the left-rail layout consistent with Settings and Tools.
  */
 const LibraryPage = () => {
     const library = window.fotogridsLibrary || {};
@@ -48,6 +50,7 @@ const LibraryPage = () => {
     const tabs = entityTypes.map((t) => ({
         id: t.slug,
         label: t.label_plural || t.slug,
+        icon: t.icon || undefined,
     }));
 
     const activeType = entityTypes.find((t) => t.slug === activeTab) || entityTypes[0];
@@ -74,12 +77,14 @@ const LibraryPage = () => {
     };
 
     return (
-        <div className="fotogrids-library-page">
-            <TabNavigation tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
-            <div className="fotogrids-library-tab-content">
-                {renderTabContent()}
-            </div>
-        </div>
+        <SidebarTabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            className="fotogrids-sidebar-tabs--bare-content fotogrids-library-sidebar-tabs"
+        >
+            {renderTabContent()}
+        </SidebarTabs>
     );
 };
 

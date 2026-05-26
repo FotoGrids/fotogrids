@@ -1,10 +1,10 @@
 import React from 'react';
-import NumberField from './NumberField';
+import NumberField from '../NumberField';
 
 const { __ } = wp.i18n;
 
 /**
- * DimensionsField — a Width × Height pair built from two NumberFields.
+ * DimensionsField - a Width × Height pair built from two NumberFields.
  *
  * @param {Object}   props
  * @param {number}   props.width

@@ -39,6 +39,46 @@ class Public_Render {
     }
 
     /**
+     * Re-enqueue the CSS and JS assets that were collected during the original render.
+     *
+     * On a cache hit the render pipeline never runs, so Asset_Resolver never
+     * collects module assets. This method replays both stored maps directly,
+     * mirroring Asset_Resolver::flush() for both sides.
+     *
+     * @since  1.0.0
+     * @param  array<string, string>                             $css Handle → URL map.
+     * @param  array<string, array{src: string, in_footer: bool}> $js  Handle → metadata map.
+     * @return void
+     */
+    private static function replay_cached_assets( array $css, array $js ): void {
+        $resolver        = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+        $already_css     = $resolver->get_css_asset_urls();
+        $already_js      = $resolver->get_js_asset_data();
+        $new_css_handles = [];
+
+        foreach ( $css as $handle => $src ) {
+            if ( isset( $already_css[ $handle ] ) ) {
+                continue;
+            }
+            wp_register_style( $handle, $src, [], false );
+            wp_enqueue_style( $handle );
+            $new_css_handles[] = $handle;
+        }
+
+        if ( ! empty( $new_css_handles ) && ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) ) {
+            wp_print_styles( $new_css_handles );
+        }
+
+        foreach ( $js as $handle => $meta ) {
+            if ( isset( $already_js[ $handle ] ) ) {
+                continue;
+            }
+            wp_register_script( $handle, $meta['src'], [], false, $meta['in_footer'] );
+            wp_enqueue_script( $handle );
+        }
+    }
+
+    /**
      * Render one gallery through the render controller pipeline.
      *
      * @param int   $gallery_id Gallery ID.
@@ -185,7 +225,30 @@ class Public_Render {
         if ( absint( $atts['album_id'] ) > 0 ) {
             $source = Request_Source::ALBUM_AJAX;
         }
-        return self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+
+        $cache_key = null;
+        if ( \FotoGrids\FotoGrids_Cache::should_cache( $settings, $gallery_id ) ) {
+            $cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts );
+            $cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
+            if ( $cached !== false ) {
+                self::replay_cached_assets( $cached['css'], $cached['js'] );
+                do_action( 'fotogrids/cache/hit', $gallery_id, $cache_key );
+                return $cached['html'];
+            }
+        }
+
+        $html = self::render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source, false );
+
+        if ( $cache_key !== null ) {
+            $duration = max( 1, absint( $settings['cache_duration'] ?? 24 ) );
+            $resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+            $css      = $resolver->get_css_asset_urls();
+            $js       = $resolver->get_js_asset_data();
+            \FotoGrids\FotoGrids_Cache::put( $gallery_id, $cache_key, $html, $css, $js, $duration );
+            do_action( 'fotogrids/cache/written', $gallery_id, $cache_key );
+        }
+
+        return $html;
     }
 
     /**
@@ -240,6 +303,29 @@ class Public_Render {
             true
         );
 
+        wp_enqueue_script(
+            'fotogrids-deep-linking',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
+            array( 'fotogrids-frontend' ),
+            FOTOGRIDS_VERSION,
+            true
+        );
+
+        wp_enqueue_style(
+            'fotogrids-fg-tooltip',
+            FOTOGRIDS_PLUGIN_URL . 'assets/css/fg-tooltip.css',
+            array(),
+            FOTOGRIDS_VERSION
+        );
+
+        wp_enqueue_script(
+            'fotogrids-fg-tooltip',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/fg-tooltip.js',
+            array(),
+            FOTOGRIDS_VERSION,
+            true
+        );
+
         wp_enqueue_style(
             'fotogrids-frontend',
             FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids.css',
@@ -247,13 +333,20 @@ class Public_Render {
             FOTOGRIDS_VERSION
         );
 
+        $sharing          = \FotoGrids\Settings\Sharing_Settings_Store::get();
+        $default_settings = fotogrids_get_default_gallery_settings();
+
         // Flat structure so both index.js and lightbox.js can read top-level keys
         // directly (e.g. window.fotogrids.stats_tracking, not .settings.stats_tracking).
+        // lazy_load reflects the site-wide default so the global IntersectionObserver
+        // activation path in initializeLazyLoading() matches the rendered output.
         wp_localize_script( 'fotogrids-frontend', 'fotogrids', array(
-            'restUrl'       => rest_url( 'fotogrids/v1/' ),
-            'nonce'         => wp_create_nonce( 'wp_rest' ),
-            'stats_tracking' => true,
-            'lazy_load'     => true,
+            'restUrl'               => rest_url( 'fotogrids/v1/' ),
+            'nonce'                 => wp_create_nonce( 'wp_rest' ),
+            'stats_tracking'        => true,
+            'lazy_load'             => (bool) ( $default_settings['lazy_load'] ?? true ),
+            'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
+            'embedded_share_target' => $sharing['embedded_share_target'],
         ) );
     }
 
@@ -450,8 +543,7 @@ class Public_Render {
                 alt: (string) ( $item['alt'] ?? '' ),
                 title: (string) ( $item['title'] ?? '' ),
                 caption: (string) ( $item['caption'] ?? '' ),
-                width: isset( $item['width'] ) ? absint( $item['width'] ) : null,
-                height: isset( $item['height'] ) ? absint( $item['height'] ) : null,
+                description: (string) ( $item['description'] ?? '' ),
                 meta: array()
             );
         }

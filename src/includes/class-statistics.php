@@ -74,10 +74,49 @@ class Statistics {
                 array( '%s', '%d', '%d', '%d', '%s', '%s', '%s' )
             );
 
-            return $inserted !== false;
+            if ( $inserted === false ) {
+                return false;
+            }
         }
 
+        // Also record in the per-day table so time-series charts are accurate.
+        self::increment_daily( $object_type, $object_id, $field, $amount );
+
         return true;
+    }
+
+    /**
+     * Increment the per-day statistics counter.
+     *
+     * Uses INSERT … ON DUPLICATE KEY UPDATE so a single row per
+     * (object_type, object_id, viewed_date) is maintained automatically.
+     *
+     * @param string $object_type gallery|album|item
+     * @param int    $object_id
+     * @param string $field       views|shares
+     * @param int    $amount
+     */
+    private static function increment_daily( $object_type, $object_id, $field, $amount ) {
+        global $wpdb;
+
+        $daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+        $today = current_time( 'Y-m-d' );
+
+        if ( $field === 'views' ) {
+            $wpdb->query( $wpdb->prepare(
+                "INSERT INTO $daily_table (object_type, object_id, viewed_date, views, shares)
+                 VALUES (%s, %d, %s, %d, 0)
+                 ON DUPLICATE KEY UPDATE views = views + %d",
+                $object_type, $object_id, $today, $amount, $amount
+            ) );
+        } else {
+            $wpdb->query( $wpdb->prepare(
+                "INSERT INTO $daily_table (object_type, object_id, viewed_date, views, shares)
+                 VALUES (%s, %d, %s, 0, %d)
+                 ON DUPLICATE KEY UPDATE shares = shares + %d",
+                $object_type, $object_id, $today, $amount, $amount
+            ) );
+        }
     }
 
     /**

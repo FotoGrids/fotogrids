@@ -98,7 +98,7 @@ final class Image_Size_Manager {
             false  // full size is never cropped
         );
 
-        // fotogrids_full_mobile — hidden companion, always half fotogrids_full width
+        // fotogrids_full_mobile - hidden companion, always half fotogrids_full width
         $mobile_width = max( 1, (int) floor( $settings['full_width'] / 2 ) );
         add_image_size(
             self::SLUG_FULL_MOBILE,
@@ -142,7 +142,7 @@ final class Image_Size_Manager {
      * @param  int         $attachment_id  WP attachment post ID.
      * @param  string      $setting_value  The stored setting value ('fotogrids_thumbnail',
      *                                     'thumbnail', 'large', 'custom', etc.).
-     * @param  string      $role           'thumbnail' or 'full' — determines the fallback chain.
+     * @param  string      $role           'thumbnail' or 'full' - determines the fallback chain.
      * @param  string|null $custom_slug    Resolved slug when $setting_value === 'custom'.
      * @return string      A WP size slug guaranteed to resolve (falls back to 'full').
      */
@@ -250,7 +250,7 @@ final class Image_Size_Manager {
     /**
      * Register a gallery-custom size with WP and persist it to the custom size registry.
      *
-     * Safe to call multiple times with the same parameters — add_image_size() is
+     * Safe to call multiple times with the same parameters - add_image_size() is
      * idempotent and save_custom_size_registry() deduplicates.
      *
      * @since  1.0.0

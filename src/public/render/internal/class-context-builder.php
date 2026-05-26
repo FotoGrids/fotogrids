@@ -7,11 +7,13 @@ use FotoGrids\Image_Size_Manager;
 use FotoGrids\Render\Api\Columns_Mode;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Render_Behavior;
+use FotoGrids\Render\Internal\Caption_Content_Builder;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Render_Layout;
 use FotoGrids\Render\Api\Render_Meta;
 use FotoGrids\Render\Api\Render_Mode;
 use FotoGrids\Render\Api\Request_Source;
+use FotoGrids\Render\Api\Sorter;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -63,12 +65,30 @@ final class Context_Builder {
 
         [ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
 
-        return new Render_Context(
+        // Build a context shell (no items yet) so Module_Registry::active_modules()
+        // can call supports() on each registered sorter. The sorter receives this
+        // same context so it can read settings, gallery_id, is_preview, etc.
+        $sort_context = new Render_Context(
             meta: $render_meta,
             layout: $this->build_layout( $render_settings ),
             behavior: $this->build_behavior( $render_settings ),
             settings: $render_settings,
-            items: $this->load_items( $collection_item_ids, $thumb_size, $full_size ),
+            items: [],
+            warnings: []
+        );
+
+        $raw_ids       = array_map( 'absint', $collection_item_ids );
+        $sorted_ids    = $this->apply_sorter( $raw_ids, $sort_context );
+
+        $loaded_items = $this->load_items( $sorted_ids, $thumb_size, $full_size );
+        $loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
+
+        return new Render_Context(
+            meta: $render_meta,
+            layout: $sort_context->layout,
+            behavior: $sort_context->behavior,
+            settings: $render_settings,
+            items: $loaded_items,
             warnings: []
         );
     }
@@ -101,6 +121,7 @@ final class Context_Builder {
         if ( ! empty( $item_overrides ) ) {
             $collection_items = $this->apply_item_overrides( $collection_items, $item_overrides );
         }
+        $collection_items = $this->resolve_captions( $collection_items, $render_settings );
 
         if ( $simulate_state !== null && ! in_array( $simulate_state, [ 'ok', 'password_required', 'expired', 'unauthorized' ], true ) ) {
             $warnings[] = sprintf( 'Unsupported simulate_state: %s', $simulate_state );
@@ -151,6 +172,38 @@ final class Context_Builder {
     }
 
     /**
+     * Finds the highest-precedence active sorter and sorts the item IDs.
+     *
+     * Asks Module_Registry for all active 'sorters' modules for the given
+     * context (which already has settings and meta set). The registry returns
+     * them in origin-precedence order (fotogrids < fotogrids-pro < third-party)
+     * with replaces() already resolved, so we always call the first one.
+     *
+     * Falls back to the original order when no sorter is active (should not
+     * happen in practice because Manual_Sorter covers the default case, but
+     * this guards against a mis-configured registry).
+     *
+     * @since   1.0.0
+     * @param   array<int, int>  $item_ids     Attachment IDs in manual order.
+     * @param   Render_Context   $sort_context Context shell (no items yet).
+     * @return  array<int, int>                Sorted attachment IDs.
+     */
+    private function apply_sorter( array $item_ids, Render_Context $sort_context ): array {
+        $active = Module_Registry::active_modules( 'sorters', $sort_context );
+
+        /** @var Sorter|null $sorter */
+        $sorter = $active[0] ?? null;
+
+        if ( $sorter === null ) {
+            return $item_ids;
+        }
+
+        $sorted = $sorter->sort( $item_ids, $sort_context );
+
+        return is_array( $sorted ) ? array_values( $sorted ) : $item_ids;
+    }
+
+    /**
      * Builds normalized layout data from settings.
      *
      * @since   1.0.0
@@ -188,7 +241,6 @@ final class Context_Builder {
             click_behavior: is_string( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ?? null ) ? ( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ) : 'lightbox',
             pagination_type: is_string( $render_settings['pagination_type'] ?? null ) ? $render_settings['pagination_type'] : 'show_all',
             pagination_method: is_string( $render_settings['pagination_method'] ?? null ) ? $render_settings['pagination_method'] : 'load_more',
-            captions_enabled: (bool) ( $render_settings['captions'] ?? true ),
             hover_effect: is_string( $render_settings['hover_effect'] ?? null ) ? $render_settings['hover_effect'] : null
         );
     }
@@ -236,7 +288,7 @@ final class Context_Builder {
 
                 $link_meta = $item_link_meta[ $attachment_id ] ?? [];
 
-                // Resolve sizes per attachment — falls back gracefully if a derivative
+                // Resolve sizes per attachment - falls back gracefully if a derivative
                 // does not exist on disk for this specific image.
                 $resolved_thumb = Image_Size_Manager::resolve_size( $attachment_id, $thumb_size, 'thumbnail' );
                 $resolved_full  = Image_Size_Manager::resolve_size( $attachment_id, $full_size,  'full' );
@@ -245,11 +297,10 @@ final class Context_Builder {
                     id: $attachment_id,
                     thumb_url: (string) ( wp_get_attachment_image_url( $attachment_id, $resolved_thumb ) ?: '' ),
                     full_url: (string) ( wp_get_attachment_image_url( $attachment_id, $resolved_full ) ?: '' ),
-                    alt: (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+                    alt: (string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                     title: (string) $attachment_post->post_title,
                     caption: (string) $attachment_post->post_excerpt,
-                    width: null,
-                    height: null,
+                    description: (string) $attachment_post->post_content,
                     meta: $link_meta,
                     thumb_size: $resolved_thumb,
                 );
@@ -261,6 +312,35 @@ final class Context_Builder {
         $loaded_items = call_user_func( $this->items_loader, $collection_item_ids );
 
         return is_array( $loaded_items ) ? $loaded_items : [];
+    }
+
+    /**
+     * Resolves caption_title and caption_description on every loaded item.
+     *
+     * Runs each Item_View through Caption_Content_Builder using the gallery
+     * settings, and returns a new array of Item_View instances with
+     * caption_title and caption_description populated.  Items coming from a
+     * custom items_loader will also go through this step so third-party loaders
+     * benefit automatically.
+     *
+     * @since  1.0.0
+     * @param  array<int, Item_View>  $items           Loaded items.
+     * @param  array<string, mixed>   $render_settings Gallery render settings.
+     * @return array<int, Item_View>
+     */
+    private function resolve_captions( array $items, array $render_settings ): array {
+        $builder = new Caption_Content_Builder();
+        $resolved = [];
+
+        foreach ( $items as $item_view ) {
+            $content    = $builder->resolve( $item_view, $render_settings );
+            $resolved[] = $item_view->with( [
+                'caption_title'       => $content->title,
+                'caption_description' => $content->description,
+            ] );
+        }
+
+        return $resolved;
     }
 
     /**

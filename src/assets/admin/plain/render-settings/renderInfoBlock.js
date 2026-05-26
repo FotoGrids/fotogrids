@@ -10,10 +10,11 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
  * JSON schema for the `setting` object:
  * {
  *   "type": "info_block",
- *   "key": "...",          // optional — block is not saved
+ *   "key": "...",          // optional - block is not saved
  *   "subtitle": "...",     // optional; bold label rendered above the message
  *   "message": "...",      // required; supports <strong> and <a> tags
- *   "icon": "info",        // optional; reserved for future icon rendering
+ *   "icon": "info_square", // optional; renders a fotogrids-icon before the inner block; defaults to "info_square"
+ *   "full_width": false,   // optional; when true, removes content max-width limit
  *   "button_label": "...", // optional; shows a secondary action button
  *   "button_url": "..."    // required when button_label is set
  * }
@@ -41,32 +42,54 @@ window.FotoGridsRenderSettings.renderInfoBlock = (setting, currentValue, isDisab
         }
     };
 
+    const icon = setting.icon !== undefined ? setting.icon : 'info_square';
+    const iconSvg = icon ? ( window.FotoGridsIcons?.[icon] || null ) : null;
+
+    const baseClass = 'fotogrids-settings_info-block';
+    const isFullWidth = Boolean(setting.full_width);
+    const rootClassName = [
+        baseClass,
+        isFullWidth ? `${baseClass}--full-width` : null,
+    ].filter(Boolean).join(' ');
+
     return h('div', {
-        className: 'fotogrids-settings_info-block'
+        className: rootClassName,
     }, [
+        icon
+            ? h('span', {
+                key: 'icon',
+                className: `${baseClass}__icon fotogrids-icon fotogrids-icon--${icon}`,
+                ...(iconSvg ? { dangerouslySetInnerHTML: { __html: iconSvg } } : {})
+            }, iconSvg ? undefined : icon)
+            : null,
         h('div', {
-            key: 'content',
-            className: 'fotogrids-settings_info-block__content'
+            key: 'inner',
+            className: `${baseClass}__inner`
         }, [
-            subtitle
-                ? h('strong', {
-                    key: 'subtitle',
-                    className: 'fotogrids-settings_info-block__subtitle'
-                }, subtitle)
-                : null,
-            h('span', {
-                key: 'message',
-                className: 'fotogrids-settings_info-block__text',
-                dangerouslySetInnerHTML: { __html: message }
-            })
-        ].filter(Boolean)),
-        buttonLabel && buttonUrl
-            ? h('button', {
-                key: 'action',
-                type: 'button',
-                className: 'fotogrids-button fotogrids-button--primary fotogrids-button--small',
-                onClick: handleButtonClick
-            }, buttonLabel)
-            : null
+            h('div', {
+                key: 'content',
+                className: `${baseClass}__content`
+            }, [
+                subtitle
+                    ? h('strong', {
+                        key: 'subtitle',
+                        className: `${baseClass}__subtitle`
+                    }, subtitle)
+                    : null,
+                h('span', {
+                    key: 'message',
+                    className: `${baseClass}__text`,
+                    dangerouslySetInnerHTML: { __html: message }
+                })
+            ].filter(Boolean)),
+            buttonLabel && buttonUrl
+                ? h('button', {
+                    key: 'action',
+                    type: 'button',
+                    className: 'fotogrids-button fotogrids-button--primary fotogrids-button--small',
+                    onClick: handleButtonClick
+                }, buttonLabel)
+                : null
+        ].filter(Boolean))
     ].filter(Boolean));
 };

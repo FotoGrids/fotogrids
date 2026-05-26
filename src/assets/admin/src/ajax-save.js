@@ -213,7 +213,7 @@
 
         const form = document.getElementById('post');
 
-        // Only disable native WP form controls — exclude the React-managed settings
+        // Only disable native WP form controls - exclude the React-managed settings
         // panel so focused inputs don't lose focus and React's disabled props aren't clobbered.
         const settingsPanel = document.getElementById('fotogrids-collection-settings-root');
         const formElements = Array.from(
@@ -237,7 +237,7 @@
         galleryInputs.forEach(input => {
             const name = input.getAttribute('name');
             const value = input.value;
-            // Always include fotogrids_ inputs — even empty ones. Empty string is a
+            // Always include fotogrids_ inputs - even empty ones. Empty string is a
             // valid save-intent (e.g. the user cleared a codearea field). The
             // `value !== ''` guard used to be here but it silently swallowed clears:
             // FormData skips disabled inputs (they are disabled above to prevent

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
-import ToolsComponents from '../../tools/registry.js';
-
+import ToolsComponents from '../../tools-registry.js';
+import Icon from '../shared/Icon.jsx';
 
 /**
  * FotoGrids Tools Page
@@ -11,12 +11,12 @@ import ToolsComponents from '../../tools/registry.js';
  * A manifest-driven shell. The page fetches the list of registered tools
  * from the PHP registry via REST and renders one of two layouts:
  *
- * Mode A — no ?tool= param → card grid overview of all tools.
- * Mode B — ?tool=<id>      → SidebarTabs shell with the matched tool's
+ * Mode A - no ?tool= param → card grid overview of all tools.
+ * Mode B - ?tool=<id>      → SidebarTabs shell with the matched tool's
  *                            React component in the content pane.
  *
  * The card grid and the sidebar tab list are both built from the manifest,
- * so adding a new tool requires no changes here — just registering it in
+ * so adding a new tool requires no changes here - just registering it in
  * PHP (Tools_Registry) and JS (FotoGridsToolsComponents).
  *
  * URL sync mirrors PluginSettingsPage: reads ?tool= on init, writes it
@@ -29,7 +29,7 @@ const ToolsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Derive active tool from the URL param only — not from sessionStorage.
+    // Derive active tool from the URL param only - not from sessionStorage.
     // The tool param is deep-link state: if it's not in the URL, we're on
     // the grid view regardless of what was visited previously.
     const [activeTool, setActiveTool] = useState(() => {
@@ -40,10 +40,6 @@ const ToolsPage = () => {
     // a re-render so ToolsPage picks up the newly available component.
     const [, setComponentRevision] = useState(0);
 
-    // -------------------------------------------------------------------------
-    // Load manifest
-    // -------------------------------------------------------------------------
-
     useEffect(() => {
         const load = async () => {
             setLoading(true);
@@ -52,8 +48,6 @@ const ToolsPage = () => {
                 const data = await apiFetch({ path: '/fotogrids/v1/admin/tools' });
                 setManifest(data || []);
 
-                // Validate the URL param against the actual tool list.
-                // If the param names a tool that doesn't exist, clear it.
                 const urlParam = new URLSearchParams( window.location.search ).get( 'tool' );
                 if (urlParam) {
                     const exists = (data || []).some(t => t.id === urlParam);
@@ -73,10 +67,6 @@ const ToolsPage = () => {
         load();
     }, []);
 
-    // -------------------------------------------------------------------------
-    // Browser back/forward
-    // -------------------------------------------------------------------------
-
     useEffect(() => {
         const handlePopState = () => {
             const raw = new URLSearchParams( window.location.search ).get( 'tool' );
@@ -86,14 +76,10 @@ const ToolsPage = () => {
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    // -------------------------------------------------------------------------
-    // Per-tool script registration listener
-    // -------------------------------------------------------------------------
-
     // Per-tool bundles load synchronously in the footer *before* React mounts
     // (index.js defers initializeAdminPages via setTimeout). That means the tool
-    // script calls FotoGridsToolsComponents.register() — and fires the
-    // 'fotogrids:tool-component-registered' event — before ToolsPage's useEffect
+    // script calls FotoGridsToolsComponents.register() - and fires the
+    // 'fotogrids:tool-component-registered' event - before ToolsPage's useEffect
     // listener is attached. The event is therefore lost.
     //
     // Fix: on mount (and whenever activeTool changes), check immediately whether
@@ -114,18 +100,10 @@ const ToolsPage = () => {
         return () => window.removeEventListener('fotogrids:tool-component-registered', handler);
     }, [activeTool]);
 
-    // -------------------------------------------------------------------------
-    // Tab change
-    // -------------------------------------------------------------------------
-
     const handleToolChange = (toolId) => {
         setActiveTool(toolId);
         if (uiState) uiState.setValue({ key: 'tool', value: toolId, urlParam: 'tool' });
     };
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     const getTabHref = (toolId) => {
         const url = new URL(window.location.href);
@@ -138,10 +116,6 @@ const ToolsPage = () => {
         if (tool.access_state === 'locked') return tool.tier_required;
         return null;
     };
-
-    // -------------------------------------------------------------------------
-    // Loading / error states
-    // -------------------------------------------------------------------------
 
     if (loading) {
         return (
@@ -162,14 +136,10 @@ const ToolsPage = () => {
 
     const tools = manifest || [];
 
-    // -------------------------------------------------------------------------
-    // Mode B — tool detail view (SidebarTabs)
-    // -------------------------------------------------------------------------
-
     if (activeTool) {
         const currentTool = tools.find(t => t.id === activeTool);
 
-        // Unknown tool id — silently fall back to grid.
+        // Unknown tool id - silently fall back to grid.
         if (!currentTool) {
             setActiveTool(null);
             if (uiState) uiState.setValue({ key: 'tool', value: null, urlParam: 'tool' });
@@ -186,6 +156,7 @@ const ToolsPage = () => {
         return (
             <div className="fg-tools-page fg-tools-page--detail">
                 <SidebarTabs
+                    className="fotogrids-sidebar-tabs--bare-content"
                     tabs={tabs}
                     activeTab={activeTool}
                     onTabChange={handleToolChange}
@@ -215,10 +186,6 @@ const ToolsPage = () => {
         );
     }
 
-    // -------------------------------------------------------------------------
-    // Mode A — card grid
-    // -------------------------------------------------------------------------
-
     return (
         <div className="fg-tools-page fg-tools-page--grid">
             <div className="fg-tools-grid">
@@ -227,23 +194,14 @@ const ToolsPage = () => {
                     const isUnavailable = !tool.available;
                     const tierLabel = accessStateLabel(tool);
 
-                    return (
-                        <div
-                            key={tool.id}
-                            className={[
-                                'fg-tool-card',
-                                isLocked ? 'fg-tool-card--locked' : '',
-                                isUnavailable ? 'fg-tool-card--unavailable' : '',
-                            ].filter(Boolean).join(' ')}
-                        >
-                            {tool.image && (
-                                <div className="fg-tool-card__image">
-                                    <img src={tool.image} alt="" />
-                                </div>
-                            )}
+                    const cardInner = (
+                        <>
+                            <div className="fg-tool-card__image">
+                                {tool.image && <img src={tool.image} alt="" />}
+                            </div>
                             <div className="fg-tool-card__body">
                                 <div className="fg-tool-card__header">
-                                    <span className={`dashicons dashicons-${tool.icon} fg-tool-card__icon`} />
+                                    <Icon name={tool.icon} className="fg-tool-card__icon" />
                                     <h2 className="fg-tool-card__title">{tool.label}</h2>
                                     {tierLabel && (
                                         <span className="fg-tool-card__tier-badge">
@@ -257,20 +215,39 @@ const ToolsPage = () => {
                                     )}
                                 </div>
                                 <p className="fg-tool-card__description">{tool.description}</p>
-                                {!isLocked && (
-                                    <button
-                                        type="button"
-                                        className="fotogrids-button fotogrids-button--primary fotogrids-button--small"
-                                        onClick={() => handleToolChange(tool.id)}
-                                        disabled={isUnavailable}
-                                    >
-                                        {isUnavailable
-                                            ? __('Coming soon', 'fotogrids')
-                                            : __('Open', 'fotogrids')
-                                        }
-                                    </button>
-                                )}
                             </div>
+                        </>
+                    );
+
+                    const cardClasses = [
+                        'fg-tool-card',
+                        isLocked ? 'fg-tool-card--locked' : '',
+                        isUnavailable ? 'fg-tool-card--unavailable' : '',
+                    ].filter(Boolean).join(' ');
+
+                    const cardStyle = tool.image_bg_color ? { '--fg-tool-card-color': tool.image_bg_color } : undefined;
+
+                    return !isLocked ? (
+                        <a
+                            key={tool.id}
+                            href={isUnavailable ? undefined : getTabHref(tool.id)}
+                            className={cardClasses}
+                            style={cardStyle}
+                            onClick={isUnavailable ? undefined : (e) => {
+                                e.preventDefault();
+                                handleToolChange(tool.id);
+                            }}
+                            aria-disabled={isUnavailable || undefined}
+                        >
+                            {cardInner}
+                        </a>
+                    ) : (
+                        <div
+                            key={tool.id}
+                            className={cardClasses}
+                            style={cardStyle}
+                        >
+                            {cardInner}
                         </div>
                     );
                 })}

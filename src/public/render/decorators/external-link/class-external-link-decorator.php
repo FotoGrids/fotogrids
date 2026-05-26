@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * encloses both the fg-item-media block and the figcaption, making the entire
  * item surface clickable.
  *
- * Items with no external_url set are left unwrapped — no dead anchor is emitted.
+ * Items with no external_url set are left unwrapped - no dead anchor is emitted.
  *
  * Link target resolution (per-item link_target → resolved HTML target):
  *   'global'  → gallery setting external_link_target ('_self' | '_blank'), default '_blank'
@@ -62,7 +62,7 @@ final class External_Link_Decorator implements Decorator {
      * Adds an <a> figure_wrapper around each item's full contents (media + caption)
      * linking to its per-item external URL.
      *
-     * Items whose external_url is empty are left unchanged — no wrapper is added,
+     * Items whose external_url is empty are left unchanged - no wrapper is added,
      * so no dead or misleading anchor appears on those items.
      *
      * @since   1.0.0
@@ -77,7 +77,7 @@ final class External_Link_Decorator implements Decorator {
         foreach ( $collection_items as $item_view ) {
             $external_url = (string) ( $item_view->meta['external_url'] ?? '' );
 
-            // Skip items with no external URL — leave the item unwrapped.
+            // Skip items with no external URL - leave the item unwrapped.
             if ( $external_url === '' ) {
                 $decorated[] = $item_view;
                 continue;

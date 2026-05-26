@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * 'fotogrids/tools/init' action.
  *
  * Source (fotogrids / fotogrids-pro / third-party) is derived
- * automatically from the tool's PHP namespace — the tool itself
+ * automatically from the tool's PHP namespace - the tool itself
  * never declares it. This prevents third-party tools from spoofing
  * a first-party source.
  *
@@ -65,7 +65,7 @@ class Tools_Registry {
 	/**
 	 * Register a tool.
 	 *
-	 * The tool's source is derived from its PHP namespace — it cannot
+	 * The tool's source is derived from its PHP namespace - it cannot
 	 * be declared by the tool itself. If a tool with the same id is
 	 * already registered, it is replaced (allows Pro to override Free).
 	 *
@@ -76,7 +76,7 @@ class Tools_Registry {
 		$source = self::detect_source( $tool );
 
 		if ( isset( self::$tools[ $id ] ) ) {
-			// Intentional replacement — log in debug mode only.
+			// Intentional replacement - log in debug mode only.
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				error_log( sprintf(
@@ -153,7 +153,7 @@ class Tools_Registry {
 	 * Initialise all registered tools (call init() on each).
 	 *
 	 * Hooked to rest_api_init so tools can safely call register_rest_route().
-	 * Does NOT handle asset enqueueing — see enqueue_all().
+	 * Does NOT handle asset enqueueing - see enqueue_all().
 	 */
 	public static function init_all(): void {
 		foreach ( self::$tools as $entry ) {

@@ -40,21 +40,27 @@ final class Asset_Resolver {
     private static ?self $instance = null;
 
     /**
-     * Handles enqueued in any flush this request, mapped to their resolved URL.
+     * CSS handles enqueued in any flush this request, mapped to their resolved URL.
      *
      * Because the Asset_Resolver is a request-scoped singleton, multiple galleries
      * on the same page each call flush() after their own render. This map prevents
      * re-registering and re-printing a handle that a previous gallery already sent
-     * to WordPress — without blocking later galleries from flushing their own assets.
+     * to WordPress - without blocking later galleries from flushing their own assets.
      * It also serves as the source of truth for get_css_asset_urls(), which the
-     * preview endpoint reads after flush() has cleared the per-render queue.
+     * preview endpoint and cache replay both read after flush() has cleared the
+     * per-render queue.
      *
      * @var array<string, string>  handle => resolved URL
      */
     private array $enqueued_css_handles = [];
 
     /**
-     * @var array<string, true>
+     * JS handles enqueued in any flush this request.
+     *
+     * Stored as handle => ['src' => string, 'in_footer' => bool] so the cache
+     * replay path can re-register and re-enqueue them with correct metadata.
+     *
+     * @var array<string, array{src: string, in_footer: bool}>
      */
     private array $enqueued_js_handles = [];
 
@@ -151,7 +157,7 @@ final class Asset_Resolver {
             $new_css_handles[] = $handle;
         }
 
-        // wp_head has already fired (shortcode / block rendered in content) —
+        // wp_head has already fired (shortcode / block rendered in content) -
         // print new styles inline so they arrive before their HTML.
         if ( ! empty( $new_css_handles ) && ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) ) {
             wp_print_styles( $new_css_handles );
@@ -172,7 +178,10 @@ final class Asset_Resolver {
                 $js_asset['in_footer']
             );
             wp_enqueue_script( $handle );
-            $this->enqueued_js_handles[ $handle ] = true;
+            $this->enqueued_js_handles[ $handle ] = [
+                'src'       => $js_asset['src'],
+                'in_footer' => $js_asset['in_footer'],
+            ];
         }
 
         // Clear the per-render queues so the next gallery render starts fresh.
@@ -185,13 +194,28 @@ final class Asset_Resolver {
      *
      * Reads from $enqueued_css_handles rather than $css_queue, because the queue
      * is cleared after each flush(). This ensures callers (e.g. the preview REST
-     * endpoint) receive the correct URLs even when called after flush().
+     * endpoint and cache replay) receive the correct URLs even when called after
+     * flush().
      *
      * @since   1.0.0
      * @return  array<string, string>
      */
     public function get_css_asset_urls(): array {
         return $this->enqueued_css_handles;
+    }
+
+    /**
+     * Returns JS asset metadata keyed by handle for all assets enqueued this request.
+     *
+     * Each entry is an array with 'src' (string) and 'in_footer' (bool). Reads
+     * from $enqueued_js_handles so the data is available after flush() has cleared
+     * the per-render queue - the same pattern as get_css_asset_urls().
+     *
+     * @since   1.0.0
+     * @return  array<string, array{src: string, in_footer: bool}>
+     */
+    public function get_js_asset_data(): array {
+        return $this->enqueued_js_handles;
     }
 
     /**

@@ -236,7 +236,7 @@ final class Catalog {
             }
 
             $setting_type = $setting['type'] ?? '';
-            if ( $setting_type === 'setting_group' && ! empty( $setting['settings'] ) && is_array( $setting['settings'] ) ) {
+            if ( in_array( $setting_type, [ 'setting_group', 'side_by_side' ], true ) && ! empty( $setting['settings'] ) && is_array( $setting['settings'] ) ) {
                 self::flatten_settings( $setting['settings'], $group );
                 continue;
             }
@@ -394,13 +394,16 @@ final class Catalog {
     /**
      * Logs catalog warnings in debug mode.
      *
+     * Routed through Debug_Log so the 'catalog' channel can be toggled from
+     * Plugin Settings -> Maintenance -> Debug Log, or forced on/off via the
+     * FOTOGRIDS_DEBUG_CATALOG constant. Default state on a fresh WP_DEBUG dev
+     * box is off.
+     *
      * @since   1.0.0
      * @param   string $message Warning message.
      * @return  void
      */
     private static function dev_log( string $message ): void {
-        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( '[FotoGrids Catalog] ' . $message );
-        }
+        \FotoGrids\Debug_Log::write( 'catalog', $message );
     }
 }

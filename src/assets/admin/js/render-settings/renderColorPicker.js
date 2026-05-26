@@ -155,7 +155,7 @@ function AlphaColorPicker({
         pickerRef.current = null;
     }, []);
 
-    // Sync picker value when the upstream value changes — but NOT when the
+    // Sync picker value when the upstream value changes - but NOT when the
     // change originated from the picker itself (that would cause a feedback
     // loop: drag → onChange → setValue → parseCssColor → rgbToHsv → hue lost).
     useEffect(() => {

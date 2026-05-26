@@ -20,8 +20,8 @@ if ( ! defined( 'WPINC' ) ) {
  * 1. Emitting window.fotogridsLoadingIcon = { name, svg, animate } as a
  *    plain inline <script> in the page body, immediately after the first
  *    gallery wrapper (via html_after). This runs synchronously as the
- *    browser parses the page — before any images finish loading from cache
- *    and before DOMContentLoaded — so the global is always available when
+ *    browser parses the page - before any images finish loading from cache
+ *    and before DOMContentLoaded - so the global is always available when
  *    the per-gallery animate calls immediately follow in the same script.
  *
  *    `animate` is a raw WAAPI function (pre-built from loading-icons-waapi.json
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
  *    Animation / rAF-cancel handles.
  *
  *    The same global is also registered via wp_add_inline_script (footer)
- *    for JS-built surfaces that need it after the page load — lightbox
+ *    for JS-built surfaces that need it after the page load - lightbox
  *    spinner, AJAX-loaded album items.
  *
  * 2. Writing data-fg-loading-icon="{icon_name}" on the gallery wrapper so
@@ -102,7 +102,7 @@ final class Loading_Icon implements Feature {
     }
 
     /**
-     * Always active — every gallery shows a loader while images are fetched.
+     * Always active - every gallery shows a loader while images are fetched.
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.
@@ -110,6 +110,17 @@ final class Loading_Icon implements Feature {
      */
     public function supports( Render_Context $render_context ): bool {
         return true;
+    }
+
+    /**
+     * No markup before the layout content.
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  string
+     */
+    public function html_before( Render_Context $render_context ): string {
+        return '';
     }
 
     /**
@@ -126,14 +137,14 @@ final class Loading_Icon implements Feature {
     /**
      * Emits a tiny inline <script> immediately after each gallery wrapper.
      *
-     * This script pushes the gallery instance ID onto window.fgAnimQueue —
+     * This script pushes the gallery instance ID onto window.fgAnimQueue -
      * a plain array that the footer global script drains immediately when it
      * is defined. This bridges the timing gap: the queue is populated
      * synchronously as the browser parses the page body (before images load
      * from cache), and the footer script processes it as soon as it runs.
      *
      * The script contains no JS operators that wptexturize could mangle
-     * (no &&, <, >, & outside of strings) — just an array push with a
+     * (no &&, <, >, & outside of strings) - just an array push with a
      * JSON-encoded string argument.
      *
      * @since   1.0.0
@@ -144,7 +155,7 @@ final class Loading_Icon implements Feature {
         $instance_id = $render_context->meta->instance_id;
         $id_json     = wp_json_encode( $instance_id );
 
-        // Intentionally minimal — no operators, no symbols wptexturize touches.
+        // Intentionally minimal - no operators, no symbols wptexturize touches.
         return '<script>'
             . 'window.fgAnimQueue=window.fgAnimQueue||[];'
             . 'window.fgAnimQueue.push(' . $id_json . ');'
@@ -232,7 +243,7 @@ final class Loading_Icon implements Feature {
     }
 
     /**
-     * Builds JS that defines window.fotogridsLoadingIcons — a map of all icon
+     * Builds JS that defines window.fotogridsLoadingIcons - a map of all icon
      * names used on this page, each with its svg template and WAAPI animate fn.
      *
      * Also sets window.fotogridsLoadingIcon to the first / default icon for
@@ -291,7 +302,7 @@ final class Loading_Icon implements Feature {
      * Schedules the footer global + queue drainer via wp_add_inline_script.
      *
      * wp_add_inline_script bypasses the_content filters (wptexturize etc.) so
-     * the full animate function — which contains &&, <, > — is emitted safely.
+     * the full animate function - which contains &&, <, > - is emitted safely.
      *
      * The script:
      *  1. Defines window.fotogridsLoadingIcon = { name, svg, animate }.

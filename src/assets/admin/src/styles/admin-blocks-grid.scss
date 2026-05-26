@@ -31,7 +31,8 @@
                 height: 100%;
                 color: currentColor;
 
-                path {
+                path,
+                rect {
                     stroke-width: 1.6;
                 }
             }

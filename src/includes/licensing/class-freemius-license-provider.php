@@ -76,9 +76,7 @@ class Freemius_License_Provider implements License_Provider {
 
         $fs = $this->fs();
         if ( ! $fs ) {
-            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-                error_log( sprintf( '[FotoGrids License Debug] Freemius unavailable for plan check: %s', $plan ) );
-            }
+            \FotoGrids\Debug_Log::write( 'license', sprintf( 'Freemius unavailable for plan check: %s', $plan ) );
             return false;
         }
 
@@ -155,7 +153,8 @@ class Freemius_License_Provider implements License_Provider {
         ?string $matched_slug,
         bool $result
     ): void {
-        if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+        // Cheap gate first so non-debug requests never touch the dedup table.
+        if ( ! \FotoGrids\Debug_Log::should_log( 'license' ) ) {
             return;
         }
 
@@ -167,8 +166,8 @@ class Freemius_License_Provider implements License_Provider {
         }
         $already_logged[ $signature ] = true;
 
-        error_log( sprintf(
-            '[FotoGrids License] tier=%s candidates=[%s] matched=%s result=%s',
+        \FotoGrids\Debug_Log::write( 'license', sprintf(
+            'tier=%s candidates=[%s] matched=%s result=%s',
             $tier,
             implode( ',', $candidate_slugs ),
             $matched_slug ?? '-',

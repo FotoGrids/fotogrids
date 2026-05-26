@@ -2,45 +2,112 @@
  * Statistics Page Component
  */
 import React, { useState, useEffect, useRef } from 'react';
+import StatCard from '../shared/StatCard';
+import StatsTable from '../shared/StatsTable';
 
 const { __ } = wp.i18n;
 
+const getIcon = ( name ) => window.FotoGridsIcons?.[ name ] || '';
+
+const fmt = ( n ) => ( typeof n === 'number' ? n.toLocaleString() : n );
+
+const TypeBadge = ( { type } ) => (
+    <span className={ `fg-type-badge fg-type-badge--${ type }` }>
+        { type }
+    </span>
+);
+
+const TitleCell = ( { title, editUrl } ) =>
+    editUrl ? (
+        <a className="fg-stats-title-link" href={ editUrl }>{ title }</a>
+    ) : (
+        <strong>{ title }</strong>
+    );
+
+const PERIODS = [
+    { days: 7,  label: __( '7 Days',  'fotogrids' ) },
+    { days: 30, label: __( '30 Days', 'fotogrids' ) },
+    { days: 90, label: __( '90 Days', 'fotogrids' ) },
+];
+
+const recentActivityColumns = [
+    {
+        key: 'title',
+        label: __( 'Gallery / Album', 'fotogrids' ),
+        render: ( val, row ) => <TitleCell title={ val } editUrl={ row.edit_url } />,
+    },
+    {
+        key: 'type',
+        label: __( 'Type', 'fotogrids' ),
+        render: ( val ) => <TypeBadge type={ val } />,
+    },
+    { key: 'views',       label: __( 'Views',       'fotogrids' ), render: fmt },
+    { key: 'last_viewed', label: __( 'Last Viewed', 'fotogrids' ) },
+];
+
+const topContentColumns = [
+    {
+        key: 'title',
+        label: __( 'Name', 'fotogrids' ),
+        render: ( val, row ) => <TitleCell title={ val } editUrl={ row.edit_url } />,
+    },
+    {
+        key: 'type',
+        label: __( 'Type', 'fotogrids' ),
+        render: ( val ) => <TypeBadge type={ val } />,
+    },
+    { key: 'views',  label: __( 'Views',  'fotogrids' ), render: fmt },
+    { key: 'shares', label: __( 'Shares', 'fotogrids' ), render: fmt },
+];
+
+const defaultOverview = { galleries: 0, albums: 0, items: 0, views: 0 };
+
 const StatsPage = () => {
-    const [overview, setOverview] = useState({
-        galleries: 0,
-        albums: 0,
-        items: 0,
-        views: 0
-    });
-    const [viewsData, setViewsData] = useState({ labels: [], data: [] });
-    const [popularGalleries, setPopularGalleries] = useState({ labels: [], data: [] });
-    const [recentActivity, setRecentActivity] = useState([]);
-    const [topContent, setTopContent] = useState([]);
-    const [selectedPeriod, setSelectedPeriod] = useState(7);
-    const [loading, setLoading] = useState(true);
+    const [ overview,         setOverview         ] = useState( defaultOverview );
+    const [ viewsData,        setViewsData        ] = useState( { labels: [], data: [] } );
+    const [ popularGalleries, setPopularGalleries ] = useState( { labels: [], data: [] } );
+    const [ recentActivity,   setRecentActivity   ] = useState( [] );
+    const [ topContent,       setTopContent       ] = useState( [] );
+    const [ selectedPeriod,   setSelectedPeriod   ] = useState( 7 );
+    const [ loading,          setLoading          ] = useState( true );
+    const [ error,            setError            ] = useState( null );
+    const [ refreshToken,     setRefreshToken     ] = useState( 0 );
 
-    const viewsChartRef = useRef(null);
-    const popularChartRef = useRef(null);
-    const viewsChartInstance = useRef(null);
-    const popularChartInstance = useRef(null);
+    // Canvas nodes are always in the DOM - we use a CSS overlay for the loading
+    // skeleton so refs are valid from first mount and never need to be re-created.
+    const viewsChartRef    = useRef( null );
+    const popularChartRef  = useRef( null );
+    const viewsChartInst   = useRef( null );
+    const popularChartInst = useRef( null );
 
-    // Initialize charts
-    useEffect(() => {
-        if (typeof Chart === 'undefined') {
-            console.error('FotoGrids Stats: Chart.js is not available');
+    // ── destroy charts on unmount only ───────────────────────────────────────
+    useEffect( () => {
+        return () => {
+            viewsChartInst.current?.destroy();
+            popularChartInst.current?.destroy();
+            viewsChartInst.current   = null;
+            popularChartInst.current = null;
+        };
+    }, [] );
+
+    // ── views chart: create on first data arrival, update on subsequent ──────
+    // Depends on `loading` so it fires as soon as the load cycle completes.
+    useEffect( () => {
+        if ( loading ) return;
+        if ( typeof Chart === 'undefined' ) {
+            console.error( 'FotoGrids Stats: Chart.js is not available' );
             return;
         }
+        if ( ! viewsChartRef.current ) return;
 
-        // Views chart
-        const viewsCtx = document.getElementById('views-chart');
-        if (viewsCtx && !viewsChartInstance.current) {
-            viewsChartInstance.current = new Chart(viewsCtx, {
+        if ( ! viewsChartInst.current ) {
+            viewsChartInst.current = new Chart( viewsChartRef.current, {
                 type: 'line',
                 data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Views',
-                        data: [],
+                    labels: viewsData.labels,
+                    datasets: [ {
+                        label: __( 'Views', 'fotogrids' ),
+                        data: viewsData.data,
                         borderColor: '#3c46f0',
                         backgroundColor: 'rgba(60, 70, 240, 0.1)',
                         tension: 0.4,
@@ -48,340 +115,254 @@ const StatsPage = () => {
                         pointBackgroundColor: '#3c46f0',
                         pointBorderColor: '#ffffff',
                         pointBorderWidth: 2,
-                        pointRadius: 4
-                    }]
+                        pointRadius: 4,
+                    } ],
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
-                        }
-                    }
-                }
-            });
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                },
+            } );
+        } else {
+            viewsChartInst.current.data.labels             = viewsData.labels;
+            viewsChartInst.current.data.datasets[ 0 ].data = viewsData.data;
+            viewsChartInst.current.update();
         }
+    }, [ loading, viewsData ] );
 
-        // Popular galleries chart
-        const popularCtx = document.getElementById('popular-galleries-chart');
-        if (popularCtx && !popularChartInstance.current) {
-            popularChartInstance.current = new Chart(popularCtx, {
+    // ── popular galleries chart: same pattern ────────────────────────────────
+    useEffect( () => {
+        if ( loading ) return;
+        if ( typeof Chart === 'undefined' ) return;
+        if ( ! popularChartRef.current ) return;
+        // No data → canvas is hidden, nothing to draw.
+        if ( popularGalleries.data.length === 0 ) return;
+
+        if ( ! popularChartInst.current ) {
+            popularChartInst.current = new Chart( popularChartRef.current, {
                 type: 'doughnut',
                 data: {
-                    labels: [],
-                    datasets: [{
-                        data: [],
-                        backgroundColor: [
-                            '#3c46f0',
-                            '#5865f2',
-                            '#4f5af3',
-                            '#2d35c7',
-                            '#f01e32'
-                        ],
+                    labels: popularGalleries.labels,
+                    datasets: [ {
+                        data: popularGalleries.data,
+                        backgroundColor: [ '#3c46f0', '#5865f2', '#4f5af3', '#2d35c7', '#f01e32' ],
                         borderWidth: 0,
                         hoverBorderWidth: 2,
-                        hoverBorderColor: '#ffffff'
-                    }]
+                        hoverBorderColor: '#ffffff',
+                    } ],
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
+                    plugins: { legend: { position: 'bottom' } },
+                },
+            } );
+        } else {
+            popularChartInst.current.data.labels             = popularGalleries.labels;
+            popularChartInst.current.data.datasets[ 0 ].data = popularGalleries.data;
+            popularChartInst.current.update();
         }
+    }, [ loading, popularGalleries ] );
 
-        // Cleanup on unmount
-        return () => {
-            if (viewsChartInstance.current) {
-                viewsChartInstance.current.destroy();
-            }
-            if (popularChartInstance.current) {
-                popularChartInstance.current.destroy();
-            }
-        };
-    }, []);
+    // ── load all stats in one coordinated batch ───────────────────────────────
+    useEffect( () => {
+        let cancelled = false;
 
-    // Load overview stats
-    useEffect(() => {
-        const loadOverview = async () => {
+        const load = async () => {
+            setLoading( true );
+            setError( null );
+
+            // Destroy existing chart instances before re-creating with new data.
+            viewsChartInst.current?.destroy();
+            popularChartInst.current?.destroy();
+            viewsChartInst.current   = null;
+            popularChartInst.current = null;
+
             try {
-                const response = await wp.apiFetch({
-                    path: 'fotogrids/v1/admin/stats/overview'
-                });
+                const [
+                    overviewRes,
+                    viewsRes,
+                    popularRes,
+                    activityRes,
+                    topRes,
+                ] = await Promise.all( [
+                    wp.apiFetch( { path: 'fotogrids/v1/admin/stats/overview' } ),
+                    wp.apiFetch( { path: `fotogrids/v1/admin/stats/views?days=${ selectedPeriod }` } ),
+                    wp.apiFetch( { path: `fotogrids/v1/admin/stats/popular-galleries?days=${ selectedPeriod }` } ),
+                    wp.apiFetch( { path: `fotogrids/v1/admin/stats/recent-activity?days=${ selectedPeriod }` } ),
+                    wp.apiFetch( { path: `fotogrids/v1/admin/stats/top-content?days=${ selectedPeriod }` } ),
+                ] );
 
-                if (response) {
-                    setOverview({
-                        galleries: response.galleries || 0,
-                        albums: response.albums || 0,
-                        items: response.items || 0,
-                        views: response.views || 0
-                    });
+                if ( cancelled ) return;
+
+                setOverview( {
+                    galleries: overviewRes?.galleries ?? 0,
+                    albums:    overviewRes?.albums    ?? 0,
+                    items:     overviewRes?.items     ?? 0,
+                    views:     overviewRes?.views     ?? 0,
+                } );
+                setViewsData( { labels: viewsRes?.labels ?? [], data: viewsRes?.data ?? [] } );
+                setPopularGalleries( { labels: popularRes?.labels ?? [], data: popularRes?.data ?? [] } );
+                setRecentActivity( Array.isArray( activityRes ) ? activityRes : [] );
+                setTopContent( Array.isArray( topRes ) ? topRes : [] );
+
+            } catch ( err ) {
+                if ( ! cancelled ) {
+                    console.error( 'FotoGrids Stats: failed to load stats', err );
+                    setError( __( 'Could not load statistics. Please refresh the page.', 'fotogrids' ) );
                 }
-            } catch (error) {
-                console.error('Error loading overview stats:', error);
+            } finally {
+                if ( ! cancelled ) setLoading( false );
             }
         };
 
-        loadOverview();
-    }, []);
+        load();
+        return () => { cancelled = true; };
+    }, [ selectedPeriod, refreshToken ] );
 
-    // Load views data when period changes
-    useEffect(() => {
-        const loadViewsData = async () => {
-            try {
-                const response = await wp.apiFetch({
-                    path: `fotogrids/v1/admin/stats/views?days=${selectedPeriod}`
-                });
-
-                if (response && viewsChartInstance.current) {
-                    viewsChartInstance.current.data.labels = response.labels || [];
-                    viewsChartInstance.current.data.datasets[0].data = response.data || [];
-                    viewsChartInstance.current.update();
-                    setViewsData({
-                        labels: response.labels || [],
-                        data: response.data || []
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading views data:', error);
-            }
-        };
-
-        loadViewsData();
-    }, [selectedPeriod]);
-
-    // Load popular galleries
-    useEffect(() => {
-        const loadPopularGalleries = async () => {
-            try {
-                const response = await wp.apiFetch({
-                    path: 'fotogrids/v1/admin/stats/popular-galleries'
-                });
-
-                if (response && popularChartInstance.current) {
-                    popularChartInstance.current.data.labels = response.labels || [];
-                    popularChartInstance.current.data.datasets[0].data = response.data || [];
-                    popularChartInstance.current.update();
-                    setPopularGalleries({
-                        labels: response.labels || [],
-                        data: response.data || []
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading popular galleries:', error);
-            }
-        };
-
-        loadPopularGalleries();
-    }, []);
-
-    // Load recent activity
-    useEffect(() => {
-        const loadRecentActivity = async () => {
-            try {
-                const response = await wp.apiFetch({
-                    path: 'fotogrids/v1/admin/stats/recent-activity'
-                });
-
-                if (response) {
-                    setRecentActivity(Array.isArray(response) ? response : []);
-                }
-                setLoading(false);
-            } catch (error) {
-                console.error('Error loading recent activity:', error);
-                setRecentActivity([]);
-                setLoading(false);
-            }
-        };
-
-        loadRecentActivity();
-    }, []);
-
-    // Load top content
-    useEffect(() => {
-        const loadTopContent = async () => {
-            try {
-                const response = await wp.apiFetch({
-                    path: 'fotogrids/v1/admin/stats/top-content'
-                });
-
-                if (response) {
-                    setTopContent(Array.isArray(response) ? response : []);
-                }
-            } catch (error) {
-                console.error('Error loading top content:', error);
-                setTopContent([]);
-            }
-        };
-
-        loadTopContent();
-    }, []);
-
-    const handlePeriodChange = (days) => {
-        setSelectedPeriod(days);
-    };
-
-    const getIcon = (iconName) => {
-        return window.FotoGridsIcons?.[iconName] || '';
-    };
+    const isEmpty = ! loading && ! error
+        && overview.views     === 0
+        && overview.galleries === 0;
 
     return (
-        <div className="fotogrids-stats-dashboard">
-            {/* Overview Cards */}
-            <div className="fotogrids-stats-cards">
-                <div className="fotogrids-stat-card" data-fotogrids-stat="galleries">
-                    <div className="stat-icon" dangerouslySetInnerHTML={{ __html: getIcon('layout_grid') }} />
-                    <div className="stat-content">
-                        <div className="stat-number">{overview.galleries}</div>
-                        <div className="stat-label">{__('Total Galleries', 'fotogrids')}</div>
+        <div className="fg-stats-dashboard">
+
+            {/* Toolbar */}
+            <div className="fg-stats-toolbar">
+                <div className="fg-stats-period" role="group" aria-label={ __( 'Time period', 'fotogrids' ) }>
+                    { PERIODS.map( ( p ) => (
+                        <button
+                            key={ p.days }
+                            className={ `fg-period-btn${ selectedPeriod === p.days ? ' fg-is-active' : '' }` }
+                            onClick={ () => setSelectedPeriod( p.days ) }
+                            aria-pressed={ selectedPeriod === p.days }
+                        >
+                            { p.label }
+                        </button>
+                    ) ) }
+                </div>
+
+                <button
+                    className={ `fg-stats-refresh${ loading ? ' fg-is-loading' : '' }` }
+                    onClick={ () => setRefreshToken( ( t ) => t + 1 ) }
+                    disabled={ loading }
+                    aria-label={ __( 'Refresh stats', 'fotogrids' ) }
+                >
+                    <span
+                        className="fg-stats-refresh__icon"
+                        dangerouslySetInnerHTML={ { __html: getIcon( 'refresh' ) } }
+                        aria-hidden="true"
+                    />
+                    { __( 'Refresh', 'fotogrids' ) }
+                </button>
+            </div>
+
+            { error && (
+                <div className="fg-stats-error" role="alert">{ error }</div>
+            ) }
+
+            { isEmpty && (
+                <div className="fg-stats-empty">
+                    <div
+                        className="fg-stats-empty__icon"
+                        dangerouslySetInnerHTML={ { __html: getIcon( 'chart_bar' ) } }
+                        aria-hidden="true"
+                    />
+                    <h3 className="fg-stats-empty__heading">
+                        { __( 'No statistics yet', 'fotogrids' ) }
+                    </h3>
+                    <p className="fg-stats-empty__body">
+                        { __( 'Your gallery stats will appear here once visitors start viewing your galleries.', 'fotogrids' ) }
+                    </p>
+                </div>
+            ) }
+
+            {/* Overview cards */}
+            <div className="fg-stats-cards">
+                <StatCard
+                    icon={ getIcon( 'layout_3x3' ) }
+                    value={ fmt( overview.galleries ) }
+                    label={ __( 'Total Galleries', 'fotogrids' ) }
+                    accent="blue"
+                    loading={ loading }
+                />
+                <StatCard
+                    icon={ getIcon( 'layout_2x2' ) }
+                    value={ fmt( overview.albums ) }
+                    label={ __( 'Total Albums', 'fotogrids' ) }
+                    accent="red"
+                    loading={ loading }
+                />
+                <StatCard
+                    icon={ getIcon( 'image' ) }
+                    value={ fmt( overview.items ) }
+                    label={ __( 'Total Items', 'fotogrids' ) }
+                    accent="yellow"
+                    loading={ loading }
+                />
+                <StatCard
+                    icon={ getIcon( 'click' ) }
+                    value={ fmt( overview.views ) }
+                    label={ __( 'Total Views', 'fotogrids' ) }
+                    accent="grey"
+                    loading={ loading }
+                />
+            </div>
+
+            {/* Charts - canvases are always in the DOM; skeleton is a CSS overlay */}
+            <div className="fg-stats-charts">
+                <div className={ `fg-chart-container${ loading ? ' fg-is-loading' : '' }` }>
+                    <div className="fg-chart-header">
+                        <h3 className="fg-chart-header__title">
+                            { __( 'Views Over Time', 'fotogrids' ) }
+                        </h3>
+                    </div>
+                    <div className="fg-chart-body">
+                        { loading && <div className="fg-chart-skeleton" aria-hidden="true" /> }
+                        <canvas ref={ viewsChartRef } className="fg-chart-canvas" />
                     </div>
                 </div>
 
-                <div className="fotogrids-stat-card" data-fotogrids-stat="albums">
-                    <div className="stat-icon" dangerouslySetInnerHTML={{ __html: getIcon('layout') }} />
-                    <div className="stat-content">
-                        <div className="stat-number">{overview.albums}</div>
-                        <div className="stat-label">{__('Total Albums', 'fotogrids')}</div>
+                <div className={ `fg-chart-container${ loading ? ' fg-is-loading' : '' }` }>
+                    <div className="fg-chart-header">
+                        <h3 className="fg-chart-header__title">
+                            { __( 'Most Popular Galleries', 'fotogrids' ) }
+                        </h3>
                     </div>
-                </div>
-
-                <div className="fotogrids-stat-card" data-fotogrids-stat="items">
-                    <div className="stat-icon" dangerouslySetInnerHTML={{ __html: getIcon('image') }} />
-                    <div className="stat-content">
-                        <div className="stat-number">{overview.items}</div>
-                        <div className="stat-label">{__('Total Items', 'fotogrids')}</div>
-                    </div>
-                </div>
-
-                <div className="fotogrids-stat-card" data-fotogrids-stat="views">
-                    <div className="stat-icon" dangerouslySetInnerHTML={{ __html: getIcon('click') }} />
-                    <div className="stat-content">
-                        <div className="stat-number">{overview.views}</div>
-                        <div className="stat-label">{__('Total Interactions', 'fotogrids')}</div>
+                    <div className="fg-chart-body">
+                        { loading && <div className="fg-chart-skeleton" aria-hidden="true" /> }
+                        { ! loading && popularGalleries.data.length === 0 && (
+                            <p className="fg-chart-empty">
+                                { __( 'No gallery views in this period.', 'fotogrids' ) }
+                            </p>
+                        ) }
+                        <canvas
+                            ref={ popularChartRef }
+                            className="fg-chart-canvas"
+                            style={ { display: ! loading && popularGalleries.data.length === 0 ? 'none' : '' } }
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Charts Section */}
-            <div className="fotogrids-stats-charts">
-                <div className="chart-container">
-                    <div className="chart-header">
-                        <h3>{__('Views Over Time', 'fotogrids')}</h3>
-                        <div className="chart-period">
-                            <button
-                                className={`period-btn ${selectedPeriod === 7 ? 'fg-is-active' : ''}`}
-                                onClick={() => handlePeriodChange(7)}
-                            >
-                                {__('7 Days', 'fotogrids')}
-                            </button>
-                            <button
-                                className={`period-btn ${selectedPeriod === 30 ? 'fg-is-active' : ''}`}
-                                onClick={() => handlePeriodChange(30)}
-                            >
-                                {__('30 Days', 'fotogrids')}
-                            </button>
-                            <button
-                                className={`period-btn ${selectedPeriod === 90 ? 'fg-is-active' : ''}`}
-                                onClick={() => handlePeriodChange(90)}
-                            >
-                                {__('90 Days', 'fotogrids')}
-                            </button>
-                        </div>
-                    </div>
-                    <canvas id="views-chart"></canvas>
-                </div>
-
-                <div className="chart-container">
-                    <div className="chart-header">
-                        <h3>{__('Most Popular Galleries', 'fotogrids')}</h3>
-                    </div>
-                    <canvas id="popular-galleries-chart"></canvas>
-                </div>
-            </div>
-
-            {/* Detailed Stats Tables */}
-            <div className="fotogrids-stats-tables">
-                <div className="stats-table-container">
-                    <h3>{__('Recent Activity', 'fotogrids')}</h3>
-                    <div className="stats-table-wrapper">
-                        <table className="fotogrids-stats-table">
-                            <thead>
-                                <tr>
-                                    <th>{__('Gallery/Album', 'fotogrids')}</th>
-                                    <th>{__('Type', 'fotogrids')}</th>
-                                    <th>{__('Views', 'fotogrids')}</th>
-                                    <th>{__('Last Viewed', 'fotogrids')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="4" className="loading">{__('Loading...', 'fotogrids')}</td>
-                                    </tr>
-                                ) : recentActivity.length > 0 ? (
-                                    recentActivity.map((item, index) => (
-                                        <tr key={index}>
-                                            <td><strong>{item.title}</strong></td>
-                                            <td><span className={`type-badge type-${item.type}`}>{item.type}</span></td>
-                                            <td>{item.views}</td>
-                                            <td>{item.last_viewed}</td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="no-data">{__('No recent activity', 'fotogrids')}</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div className="stats-table-container">
-                    <h3>{__('Top Performing Content', 'fotogrids')}</h3>
-                    <div className="stats-table-wrapper">
-                        <table className="fotogrids-stats-table">
-                            <thead>
-                                <tr>
-                                    <th>{__('Name', 'fotogrids')}</th>
-                                    <th>{__('Type', 'fotogrids')}</th>
-                                    <th>{__('Views', 'fotogrids')}</th>
-                                    <th>{__('Shares', 'fotogrids')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {topContent.length > 0 ? (
-                                    topContent.map((item, index) => (
-                                        <tr key={index}>
-                                            <td><strong>{item.title}</strong></td>
-                                            <td><span className={`type-badge type-${item.type}`}>{item.type}</span></td>
-                                            <td>{item.views}</td>
-                                            <td>{item.shares}</td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="no-data">{__('No data available', 'fotogrids')}</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            {/* Tables */}
+            <div className="fg-stats-tables">
+                <StatsTable
+                    title={ __( 'Recent Activity', 'fotogrids' ) }
+                    columns={ recentActivityColumns }
+                    rows={ recentActivity }
+                    loading={ loading }
+                    emptyMsg={ __( 'No recent activity in this period.', 'fotogrids' ) }
+                />
+                <StatsTable
+                    title={ __( 'Top Performing Content', 'fotogrids' ) }
+                    columns={ topContentColumns }
+                    rows={ topContent }
+                    loading={ loading }
+                    emptyMsg={ __( 'No data available for this period.', 'fotogrids' ) }
+                />
             </div>
         </div>
     );

@@ -111,7 +111,7 @@ class Admin_Init {
             __( 'Templates', 'fotogrids' ),
             'manage_fotogrids',
             'fotogrids-templates',
-            array( __CLASS__, 'templates_page' )
+            array( __CLASS__, 'templates_page' ) // Render delegated to Templates module - see templates_page().
         );
 
         add_submenu_page(
@@ -191,7 +191,7 @@ class Admin_Init {
         wp_enqueue_script( 'wp-i18n' );
         wp_enqueue_script( 'wp-url' );
 
-        // UI state manager — must load before admin bundle and collection-settings.
+        // UI state manager - must load before admin bundle and collection-settings.
         wp_enqueue_script(
             'fotogrids-ui-state-manager',
             FOTOGRIDS_PLUGIN_URL . 'assets/js/ui-state-manager.js',
@@ -202,7 +202,7 @@ class Admin_Init {
 
         // vendors.js is the webpack shared-chunk for node_modules code split out
         // of admin.js. admin.js's entry module is deferred behind this chunk via
-        // __webpack_require__.O — if vendors.js hasn't run first, admin.js never
+        // __webpack_require__.O - if vendors.js hasn't run first, admin.js never
         // executes its own entry point and window.FotoGridsToolsComponents is never set.
         wp_enqueue_script(
             'fotogrids-vendors',
@@ -283,10 +283,15 @@ class Admin_Init {
             'pluginUrl' => FOTOGRIDS_PLUGIN_URL,
             'apiUrl' => home_url( '/wp-json/' ),
             'generalSettings' => self::get_general_settings(),
+            'sharingSettings' => \FotoGrids\Settings\Sharing_Settings_Store::get(),
+            'viewSettings' => \FotoGrids\Settings\View_Settings_Store::get(),
             'currentUser' => wp_get_current_user(),
             'shareStatistics' => (bool) get_option( 'fotogrids_share_statistics', false ),
             'autosave' => (bool) get_option( 'fotogrids_autosave', '0' ),
             'customJsAllowDynamicExecution' => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
+            // Surfaced to the Plugin Settings > Maintenance tab so the Debug
+            // Log panel only renders when WP_DEBUG is actually on.
+            'wpDebug' => defined( 'WP_DEBUG' ) && WP_DEBUG,
             'settingsBaseUrl' => admin_url( 'admin.php?page=fotogrids-settings' ),
             'isFotoGridsPage' => Admin_Helpers::is_fotogrids_page( $hook ),
             'capabilities' => array(
@@ -309,8 +314,11 @@ class Admin_Init {
         // Set up translations
         wp_set_script_translations( 'fotogrids-admin', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
-        // Enqueue stats-specific scripts only on stats page
-        if ( $hook === 'fotogrids_page_fotogrids-stats' || strpos( $hook, 'fotogrids-stats' ) !== false ) {
+        // Enqueue Chart.js on stats page and library page (both use Chart.js charts).
+        if (
+            $hook === 'fotogrids_page_fotogrids-stats'  || strpos( $hook, 'fotogrids-stats' ) !== false ||
+            $hook === 'fotogrids_page_fotogrids-library' || strpos( $hook, 'fotogrids-library' ) !== false
+        ) {
             wp_enqueue_script(
                 'chartjs',
                 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
@@ -631,9 +639,19 @@ class Admin_Init {
     }
 
     /**
-     * Templates admin page
+     * Templates admin page.
+     *
+     * Render is owned by the Templates module. The menu item stays here so
+     * submenu ordering is centralized, but the page body is delegated to the
+     * module's render_page(). Falls back to the shared renderer if the module
+     * is unavailable (defensive - should not happen in normal operation).
      */
     public static function templates_page() {
+        $entry = \FotoGrids\Modules\Module_Registry::get_by_id( 'templates' );
+        if ( $entry && $entry['module'] instanceof \FotoGrids\Modules\Templates\Module ) {
+            $entry['module']->render_page();
+            return;
+        }
         self::render_admin_page( 'templates' );
     }
 

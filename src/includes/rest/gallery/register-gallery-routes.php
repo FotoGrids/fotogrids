@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Register_Gallery_Routes {
-    
+
     /**
      * Register all gallery-related REST API routes
      *
@@ -46,7 +46,7 @@ class Register_Gallery_Routes {
             ),
         ) );
 
-        // Gallery password reveal endpoint (admin eye-button — permission-gated).
+        // Gallery password reveal endpoint (admin eye-button - permission-gated).
         register_rest_route( 'fotogrids/v1', '/gallery/(?P<id>\d+)/password', array(
             array(
                 'methods'             => \WP_REST_Server::READABLE,
@@ -64,7 +64,7 @@ class Register_Gallery_Routes {
             ),
         ) );
 
-        // Gallery unlock endpoint (public — visitor submits password to unlock).
+        // Gallery unlock endpoint (public - visitor submits password to unlock).
         register_rest_route( 'fotogrids/v1', '/gallery/(?P<id>\d+)/unlock', array(
             array(
                 'methods'             => \WP_REST_Server::CREATABLE,
@@ -81,8 +81,44 @@ class Register_Gallery_Routes {
                     'password' => array(
                         'required'          => true,
                         'sanitize_callback' => function ( $value ) {
-                            // Preserve special characters — strip_tags only.
+                            // Preserve special characters - strip_tags only.
                             return wp_strip_all_tags( (string) $value );
+                        },
+                    ),
+                ),
+            ),
+        ) );
+
+        // Gallery cache status endpoint (admin UI).
+        register_rest_route( 'fotogrids/v1', '/gallery/(?P<id>\d+)/cache-status', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'get_cache_status' ),
+                'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_cache_status_read' ),
+                'args'                => array(
+                    'id' => array(
+                        'required'          => true,
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function ( $param ) {
+                            return is_numeric( $param ) && $param > 0;
+                        },
+                    ),
+                ),
+            ),
+        ) );
+
+        // Gallery cache flush endpoint (admin UI).
+        register_rest_route( 'fotogrids/v1', '/gallery/(?P<id>\d+)/cache', array(
+            array(
+                'methods'             => \WP_REST_Server::DELETABLE,
+                'callback'            => array( '\FotoGrids\REST\Gallery\Gallery_Data', 'flush_cache' ),
+                'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_cache_flush' ),
+                'args'                => array(
+                    'id' => array(
+                        'required'          => true,
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function ( $param ) {
+                            return is_numeric( $param ) && $param > 0;
                         },
                     ),
                 ),

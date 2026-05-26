@@ -6,7 +6,7 @@ window.FotoGridsSettings = window.FotoGridsSettings || {};
  * The PHP endpoint at /wp-json/fotogrids/v1/admin/catalog/entries returns the
  * final tab/subtab/section tree, with placements (insert_tab / insert_subtab /
  * insert_section / extend_options / replace / hide) already applied. This is
- * the single source of truth — Free, Pro, and any third-party plugin contribute
+ * the single source of truth - Free, Pro, and any third-party plugin contribute
  * their catalog files through the `fotogrids/catalog/json_files` filter, and
  * the assembler merges them.
  *
@@ -63,7 +63,7 @@ const loadSettingsGroups = async (postType = 'gallery', isDefaultsMode = false) 
 /**
  * Remove tabs / subtabs / settings marked as `hidden: true` by a `hide`
  * placement. We can't remove them server-side because hidden settings still
- * need their saved values respected at render time — the assembler just tags
+ * need their saved values respected at render time - the assembler just tags
  * them, and the UI layer drops them here.
  */
 const filterHidden = (groups) => {

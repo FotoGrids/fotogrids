@@ -28,12 +28,12 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Supported effects
  * -----------------
- *   none  — image appears instantly with no transition.
- *   fade  — image fades in (opacity 0 → 1). This is the default.
- *   rise  — image fades in while sliding up from a few pixels below.
- *   drop  — image fades in while sliding down from a few pixels above.
- *   zoom  — image fades in while scaling up from 95 %.
- *   blur  — image fades in while deblurring (blur 4px → 0).
+ *   none  - image appears instantly with no transition.
+ *   fade  - image fades in (opacity 0 → 1). This is the default.
+ *   rise  - image fades in while sliding up from a few pixels below.
+ *   drop  - image fades in while sliding down from a few pixels above.
+ *   zoom  - image fades in while scaling up from 95 %.
+ *   blur  - image fades in while deblurring (blur 4px → 0).
  *
  * @package FotoGrids\Render\Features\Loaded_Effect
  * @since   1.0.0
@@ -80,7 +80,7 @@ final class Loaded_Effect implements Feature {
     }
 
     /**
-     * Always active — every gallery has a loaded effect (even if "none").
+     * Always active - every gallery has a loaded effect (even if "none").
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.
@@ -88,6 +88,17 @@ final class Loaded_Effect implements Feature {
      */
     public function supports( Render_Context $render_context ): bool {
         return true;
+    }
+
+    /**
+     * No markup before the layout content.
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  string
+     */
+    public function html_before( Render_Context $render_context ): string {
+        return '';
     }
 
     /**
@@ -126,7 +137,7 @@ final class Loaded_Effect implements Feature {
     }
 
     /**
-     * No CSS custom properties needed — effects are CSS-only.
+     * No CSS custom properties needed - effects are CSS-only.
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.

@@ -216,6 +216,36 @@
                     "visible_when_uninstalled": true
                 },
                 {
+                    "type": "side_by_side",
+                    "condition": {
+                        "dependsOn": "caption_hide_title",
+                        "values": [
+                            false,
+                            "0"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "caption_title_font_family",
+                            "type": "font_family",
+                            "label": "Title Font Family",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_title_font_weight",
+                            "type": "font_weight",
+                            "label": "Title Font Weight",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                {
                     "key": "caption_title_font_size",
                     "type": "responsive_range",
                     "label": "Title Font Size",
@@ -453,6 +483,36 @@
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",
                     "visible_when_uninstalled": true
+                },
+                {
+                    "type": "side_by_side",
+                    "condition": {
+                        "dependsOn": "caption_hide_description",
+                        "values": [
+                            false,
+                            "0"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "caption_description_font_family",
+                            "type": "font_family",
+                            "label": "Description Font Family",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_description_font_weight",
+                            "type": "font_weight",
+                            "label": "Description Font Weight",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
                 },
                 {
                     "key": "caption_description_font_size",

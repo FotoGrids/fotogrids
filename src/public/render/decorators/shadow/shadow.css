@@ -1,4 +1,4 @@
-/* Shadow — only applied when the decorator is active. */
+/* Shadow - only applied when the decorator is active. */
 .fotogrids-gallery[data-fg-shadow] .fg-item-media,
 .fotogrids-album[data-fg-shadow] .fg-item-media {
     box-shadow: var(--fg-shadow, none);

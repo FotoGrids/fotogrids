@@ -58,7 +58,7 @@ interface Decorator {
      * Data attributes to merge onto the collection wrapper element.
      *
      * Keys must be prefixed with 'data-fg-'. Values are meaningful tokens
-     * (e.g. 'data-fg-border' => 'solid') — never bare booleans. An attribute
+     * (e.g. 'data-fg-border' => 'solid') - never bare booleans. An attribute
      * should only be returned when the feature is active; omitting it entirely
      * is the canonical "off" state.
      *

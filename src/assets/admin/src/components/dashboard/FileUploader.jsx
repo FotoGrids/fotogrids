@@ -4,7 +4,7 @@
  * Creates a new gallery when upload completes.
  */
 import React from 'react';
-import UploadArea from '../blocks/UploadArea';
+import MediaUpload from '../blocks/MediaUpload';
 
 const { __ } = wp.i18n;
 
@@ -52,7 +52,7 @@ const FileUploader = ({ onUploadComplete }) => {
                 <p>{__('Click or drag files here to create a gallery automatically.', 'fotogrids')}</p>
             </div>
             <div className="fotogrids-admin-block-card-content">
-                <UploadArea onUploadComplete={onUploadComplete} inputId="fotogrids-dashboard-upload-input" />
+                <MediaUpload onUploadComplete={onUploadComplete} inputId="fotogrids-dashboard-upload-input" />
                 <p className="fotogrids-upload-or">
                     {__('or ', 'fotogrids')}
                     <a

@@ -137,7 +137,8 @@ final class State_Resolver {
         Field_State $state,
         string $reason
     ): void {
-        if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+        // Cheap gate first so non-debug requests never touch the dedup table.
+        if ( ! \FotoGrids\Debug_Log::should_log( 'catalog' ) ) {
             return;
         }
 
@@ -149,8 +150,8 @@ final class State_Resolver {
         }
         $already_logged[ $signature ] = true;
 
-        error_log( sprintf(
-            '[FotoGrids Catalog] field=%s%s tier=%s -> %s (%s)',
+        \FotoGrids\Debug_Log::write( 'catalog', sprintf(
+            'field=%s%s tier=%s -> %s (%s)',
             $field_id,
             $option_value !== null ? '.' . $option_value : '',
             $required_tier,

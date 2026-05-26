@@ -63,7 +63,7 @@ function mergeLoadingIcons() {
             const data = await response.json();
 
             // Merge icon data into the existing object so that getLoadingIconSvg /
-            // randomId — already attached to it synchronously below — are preserved.
+            // randomId - already attached to it synchronously below - are preserved.
             Object.assign(FotoGridsLoadingIcons, data);
 
             if (typeof window !== 'undefined') {

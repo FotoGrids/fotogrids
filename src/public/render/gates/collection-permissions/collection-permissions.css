@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FotoGrids — Collection Permissions Gate (gate-specific styles)
+   FotoGrids - Collection Permissions Gate (gate-specific styles)
    Login CTA button and its wrapper paragraph.
    Shared chrome (ghost grid, overlay, card, title, description) is
    handled by gate-lock.css via Gate_Renderer::shared_asset_decl().

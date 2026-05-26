@@ -19,7 +19,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Active when click_behavior === 'direct'. Each item gets a plain <a> whose href
  * points to the full-size attachment URL, wrapping both the media block and the
  * caption so the entire item surface is clickable. No lightbox trigger attributes
- * are added — the link navigates the browser to the image file directly.
+ * are added - the link navigates the browser to the image file directly.
  *
  * The gallery wrapper also receives data-fg-click="direct" (via wrapper_data_attrs)
  * so CSS cursor rules and any future JS hooks can target this mode.

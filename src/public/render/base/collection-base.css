@@ -3,7 +3,7 @@
    ========================================================================== */
 
 :root {
-    /* Brand blue — active/selected states across all frontend surfaces
+    /* Brand blue - active/selected states across all frontend surfaces
        (lightbox active dots, thumbnail borders, focus rings, etc.) */
     --fg-colors-blue: rgba(60, 70, 240, 1);
 }
@@ -65,7 +65,7 @@
     max-width: 100%;
 }
 
-/* Border — only painted when the decorator is active. */
+/* Border - only painted when the decorator is active. */
 .fotogrids-gallery[data-fg-border] .fg-item-media,
 .fotogrids-album[data-fg-border] .fg-item-media {
     border-width: var(--fg-border-w, 1px);
@@ -73,7 +73,7 @@
     border-style: var(--fg-border-style, solid);
 }
 
-/* Thumbnail image filters — only applied when the decorator is active. */
+/* Thumbnail image filters - only applied when the decorator is active. */
 .fotogrids-gallery[data-fg-filter] .fg-item-media img,
 .fotogrids-album[data-fg-filter] .fg-item-media img {
     filter: var(--fg-thumb-filter-regular);

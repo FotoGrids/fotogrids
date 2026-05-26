@@ -27,7 +27,7 @@
 
 /* ==========================================================================
    CSS Custom Properties (scoped to the dialog, not :root)
-   Baseline dark-theme values — colour tokens overridden per-gallery by JS.
+   Baseline dark-theme values - colour tokens overridden per-gallery by JS.
    ========================================================================== */
 
 .fg-lightbox {
@@ -76,14 +76,14 @@
     --fg-lb-thumb-spacing:          5px;     // overridden per-gallery
 
     // ── Info panel ────────────────────────────────────────────────────────
-    --fg-lb-info-padding:           12px 20px;
-    --fg-lb-info-gap:               4px;
-    --fg-lb-info-width:             280px;
-    --fg-lb-info-max-width:         28%;
-    --fg-lb-info-block-radius:      4px;
-    --fg-lb-info-block-padding:     10px 0;
-    --fg-lb-info-block-padding-boxed: 10px 12px;
-    --fg-lb-info-block-margin:      4px;
+    --fg-lb-info-padding:             20px;
+    --fg-lb-info-gap:                 12px;
+    --fg-lb-info-width:               280px;
+    --fg-lb-info-max-width:           28%;
+    --fg-lb-info-block-radius:        4px;
+    --fg-lb-info-block-padding:       12px 0;
+    --fg-lb-info-block-padding-boxed: 12px;
+    --fg-lb-info-block-margin:        4px;
 
     // ── Info panel typography ─────────────────────────────────────────────
     --fg-lb-info-font-family:       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -93,14 +93,14 @@
     --fg-lb-info-font-size-xs:      0.7rem;   // extra-small: block header labels
 
     // ── Info panel layout details ─────────────────────────────────────────
-    --fg-lb-info-block-header-gap:  5px;
+    --fg-lb-info-block-header-gap:    5px;
     --fg-lb-info-block-header-margin: 0 0 6px;
-    --fg-lb-info-chips-gap:         4px;
-    --fg-lb-info-chip-padding:      2px 8px;
-    --fg-lb-info-chip-radius:       20px;
-    --fg-lb-info-chip-bg:           rgba(128, 128, 128, 0.15);
-    --fg-lb-info-dl-col-gap:        10px;
-    --fg-lb-info-dl-row-gap:        3px;
+    --fg-lb-info-chips-gap:           4px;
+    --fg-lb-info-chip-padding:        2px 8px;
+    --fg-lb-info-chip-radius:         20px;
+    --fg-lb-info-chip-bg:             rgba(128, 128, 128, 0.15);
+    --fg-lb-info-dl-col-gap:          12px;
+    --fg-lb-info-dl-row-gap:          8px;
 
     // ── Progress indicator ────────────────────────────────────────────────
     --fg-lb-progress-duration:       5000ms;  // overridden per-gallery from autoDelay
@@ -111,7 +111,7 @@
     // ── Overlay blur ──────────────────────────────────────────────────────
     --fg-lb-overlay-blur:           2px;     // overridden per-gallery
 
-    // ── Colours — overridden per-gallery by JS <style> block ──────────────
+    // ── Colours - overridden per-gallery by JS <style> block ──────────────
     --fg-lb-color-backdrop:         rgba(0, 0, 0, 0.92);
     --fg-lb-color-toolbar-bg:       rgba(0, 0, 0, 0.35);
     --fg-lb-color-toolbar-icon:     rgba(255, 255, 255, 0.7);
@@ -170,7 +170,7 @@
         align-items:    stretch;
     }
 
-    // Native backdrop not used — we have our own .fg-lb-backdrop
+    // Native backdrop not used - we have our own .fg-lb-backdrop
     &::backdrop {
         background: transparent;
     }
@@ -190,7 +190,7 @@
 }
 
 /* ==========================================================================
-   Shell — flex column: toolbar on top, content fills the rest
+   Shell - flex column: toolbar on top, content fills the rest
    ========================================================================== */
 
 .fg-lb-shell {
@@ -204,7 +204,7 @@
 }
 
 /* ==========================================================================
-   Content — flex container holding stage + info panel.
+   Content - flex container holding stage + info panel.
    Default: column (info below stage). Location variants switch to row.
    ========================================================================== */
 
@@ -234,7 +234,7 @@
 }
 
 /* ==========================================================================
-   Stage — flex container for image area + thumbnail strip.
+   Stage - flex container for image area + thumbnail strip.
    prev/next/dots are absolutely positioned inside it.
    Thumbnail strip location classes switch flex-direction.
    ========================================================================== */
@@ -288,7 +288,7 @@
     user-select:       none;
     -webkit-user-drag: none;
 
-    // Zoom transform — driven by CSS vars written by _applyZoom().
+    // Zoom transform - driven by CSS vars written by _applyZoom().
     // translate() is inside scale() so panning is in screen-space, not image-space.
     transform-origin: center center;
     transform: scale(var(--fg-lb-zoom-scale, 1))
@@ -297,7 +297,7 @@
                    calc(var(--fg-lb-zoom-ty, 0px) / var(--fg-lb-zoom-scale, 1))
                );
 
-    // Full-image filter — --fg-lb-full-filter is set by buildVarsCSS() when a
+    // Full-image filter - --fg-lb-full-filter is set by buildVarsCSS() when a
     // filter is configured; falls back to 'none' (no-op) when not set.
     filter: var(--fg-lb-full-filter, none);
 
@@ -320,14 +320,14 @@
     }
 }
 
-// Full-image filter hover — --fg-lb-full-filter-hover is only set when a hover
+// Full-image filter hover - --fg-lb-full-filter-hover is only set when a hover
 // filter is configured; when absent falls back to --fg-lb-full-filter (no change).
 // Hover is detected on the media-wrap so the entire image area acts as the target.
 .fg-lb-media-wrap:hover .fg-lb-img {
     filter: var(--fg-lb-full-filter-hover, var(--fg-lb-full-filter, none));
 }
 
-// Transition variants — driven by data-fg-lb-transition on the dialog.
+// Transition variants - driven by data-fg-lb-transition on the dialog.
 // Directional variants add a slide offset on top of the zoom transform.
 // The zoom vars default to scale(1) translate(0,0) when zoom is inactive,
 // so these compose cleanly with or without zoom.
@@ -382,8 +382,8 @@
 /* ==========================================================================
    Auto-progress indicator
    Two modes, mutually exclusive, controlled by classes on .fg-lightbox:
-     .fg-lb-progress-bar      — a thin stripe fixed to one edge of .fg-lb-shell
-     .fg-lb-progress-spinner  — a small circular arc inside the toolbar (left side)
+     .fg-lb-progress-bar      - a thin stripe fixed to one edge of .fg-lb-shell
+     .fg-lb-progress-spinner  - a small circular arc inside the toolbar (left side)
    Both animate via CSS animation restarted by JS on each slide.
    ========================================================================== */
 
@@ -409,7 +409,7 @@
 // ── Progress bar ────────────────────────────────────────────────────────────
 // Absolute stripe inside .fg-lb-shell.
 //
-// Class model (on the element itself — mutually exclusive, never combined):
+// Class model (on the element itself - mutually exclusive, never combined):
 //   (no class)              → no animation-name, not started
 //   .fg-lb-progress--running → animation-name set, play-state: running
 //   .fg-lb-progress--paused  → animation-name set, play-state: paused (frozen mid-run)
@@ -428,7 +428,7 @@
     pointer-events:             none;
 }
 
-// Show it only in bar mode — driven by data-fg-lb-progress-style on the dialog
+// Show it only in bar mode - driven by data-fg-lb-progress-style on the dialog
 .fg-lightbox[data-fg-lb-progress-style="bar"] .fg-lb-progress-bar {
     display: block;
 }
@@ -491,7 +491,7 @@
 
 // ── Progress spinner ─────────────────────────────────────────────────────────
 // SVG progress ring at the left end of the toolbar.
-// Same class/attribute model as the bar — applied to .fg-lb-progress-ring-fill.
+// Same class/attribute model as the bar - applied to .fg-lb-progress-ring-fill.
 
 .fg-lb-progress-spinner {
     display:     none;
@@ -510,11 +510,11 @@
     width:     calc(var(--fg-lb-toolbar-icon-size) * 1.2);
     height:    calc(var(--fg-lb-toolbar-icon-size) * 1.2);
     overflow:  visible;
-    // Start at 12 o'clock — rotate the whole SVG -90°
+    // Start at 12 o'clock - rotate the whole SVG -90°
     transform: rotate(-90deg);
 }
 
-// Track ring — faint background circle
+// Track ring - faint background circle
 .fg-lb-progress-ring-track {
     fill:         none;
     stroke:       var(--fg-lb-color-progress);
@@ -522,7 +522,7 @@
     opacity:      0.2;
 }
 
-// Fill arc — stroke-dashoffset from full circumference (81.68) → 0.
+// Fill arc - stroke-dashoffset from full circumference (81.68) → 0.
 // Same mutually-exclusive class model as the bar.
 .fg-lb-progress-ring-fill {
     fill:                  none;
@@ -548,7 +548,7 @@
 }
 
 /* ==========================================================================
-   Toolbar — first child of shell, always at the top.
+   Toolbar - first child of shell, always at the top.
    shell is a flex column so toolbar naturally spans full width.
    ========================================================================== */
 
@@ -583,7 +583,7 @@
 }
 
 /* ==========================================================================
-   Toolbar buttons — close, info-toggle, fullscreen, play-pause
+   Toolbar buttons - close, info-toggle, fullscreen, play-pause
    All share the same appearance: no background, no border, icon color driven
    by --fg-lb-color-toolbar-icon / --fg-lb-color-toolbar-icon-hover.
    ========================================================================== */
@@ -614,7 +614,7 @@
     &:focus         { outline: none; }
     &:focus-visible { outline: 2px solid var(--fg-colors-blue); outline-offset: 2px; }
 
-    // Active state — used for toggle buttons (fullscreen, info panel) when on.
+    // Active state - used for toggle buttons (fullscreen, info panel) when on.
     &.fg-lb-btn--active {
         background: var(--fg-lb-color-toolbar-btn-active);
         color:      var(--fg-lb-color-toolbar-icon-hover);
@@ -644,7 +644,7 @@
 }
 
 /* ==========================================================================
-   Zoom — cursor and image transform
+   Zoom - cursor and image transform
    ========================================================================== */
 
 // Zoom-enabled: zoom-in cursor on the image area.
@@ -670,7 +670,7 @@
 }
 
 /* ==========================================================================
-   Nav controls — prev, next
+   Nav controls - prev, next
    Absolutely positioned over the image area; keep their own distinct style.
    ========================================================================== */
 
@@ -792,12 +792,12 @@
     &[hidden] { display: none; }
 }
 
-// ── Info block — base card ─────────────────────────────────────────────────
+// ── Info block - base card ─────────────────────────────────────────────────
 // Appearance is driven by data-fg-lb-info-blocks-style on .fg-lb-info.
 // Three modes:
-//   boxed   — each block is a rounded card with a background fill.
-//   divided — blocks are separated by a thin horizontal rule (no card bg).
-//   plain   — no visual separation; blocks run flush.
+//   boxed   - each block is a rounded card with a background fill.
+//   divided - blocks are separated by a thin horizontal rule (no card bg).
+//   plain   - no visual separation; blocks run flush.
 .fg-lb-info-block {
     padding:    var(--fg-lb-info-block-padding);
     margin:     0;
@@ -806,7 +806,7 @@
 
     &[hidden] { display: none; }
 
-    // Boxed mode — card background + radius.
+    // Boxed mode - card background + radius.
     .fg-lb-info[data-fg-lb-info-blocks-style="boxed"] & {
         padding:       var(--fg-lb-info-block-padding-boxed);
         border-radius: var(--fg-lb-info-block-radius);
@@ -814,12 +814,12 @@
         margin:        var(--fg-lb-info-block-margin) 0;
     }
 
-    // Divided mode — top border rule on every block except the first.
+    // Divided mode - top border rule on every block except the first.
     .fg-lb-info[data-fg-lb-info-blocks-style="divided"] &:not(:first-child) {
         border-top: 1px solid var(--fg-lb-color-info-block-divider, rgba(255,255,255,0.12));
     }
 
-    // Loading state — skeleton placeholder.
+    // Loading state - skeleton placeholder.
     &.fg-lb-info-block--loading {
         padding: var(--fg-lb-info-block-padding);
     }
@@ -870,7 +870,7 @@
     font-style:  italic;
 }
 
-// ── Definition list — file_info + exif ─────────────────────────────────────
+// ── Definition list - file_info + exif ─────────────────────────────────────
 .fg-lb-info-dl {
     display:               grid;
     grid-template-columns: auto 1fr;
@@ -899,7 +899,7 @@
     }
 }
 
-// ── Block header (icon + label) — tags, people, location ────────────────────
+// ── Block header (icon + label) - tags, people, location ────────────────────
 .fg-lb-info-block-header {
     display:     flex;
     align-items: center;
@@ -1058,7 +1058,7 @@
 .fg-lb-thumbs--normal .fg-lb-thumb img { width: 70px; height: 70px; }
 .fg-lb-thumbs--large  .fg-lb-thumb img { width: 90px; height: 90px; }
 
-// Thumbnail strip image filter — --fg-lb-thumb-filter is set by buildVarsCSS()
+// Thumbnail strip image filter - --fg-lb-thumb-filter is set by buildVarsCSS()
 // when the thumbnail filter is configured; falls back to 'none' when not set.
 // --fg-lb-thumb-filter-hover is only set when a hover filter is configured;
 // when absent the hover state falls back to --fg-lb-thumb-filter (i.e. no change).
@@ -1074,7 +1074,7 @@
    Mobile
    ========================================================================== */
 
-// Mobile layout — driven by data-fg-lb-mobile presence on the dialog
+// Mobile layout - driven by data-fg-lb-mobile presence on the dialog
 .fg-lightbox[data-fg-lb-mobile] {
     --fg-lb-nav-btn-size:        var(--fg-lb-nav-btn-size-mobile);
     --fg-lb-toolbar-btn-size:    36px;
@@ -1106,7 +1106,7 @@
 .fg-lightbox:focus       { outline: none; }
 .fg-lb-shell:focus { outline: none; }
 
-// Focus sentinel — absorbs initial focus on open so no real button gets
+// Focus sentinel - absorbs initial focus on open so no real button gets
 // an accidental tooltip or Space/Enter press before user interaction.
 .fg-lb-focus-sentinel {
     position: absolute;

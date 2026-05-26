@@ -1,12 +1,12 @@
-// Barrel export for the shared settings UI primitives. Lets pages import the
-// whole kit from one place:
-//   import { SettingsPanel, SettingRow, NumberField } from '../../shared/settings';
+// Barrel export for settings UI primitives.
+export { default as SettingsPanel } from '../SidebarTabs/elements/Panel';      // renamed → Panel; alias kept
+export { default as Panel }         from '../SidebarTabs/elements/Panel';
+export { default as PanelRow }      from '../SidebarTabs/elements/PanelRow';
+export { default as SaveBar }       from '../SidebarTabs/elements/SaveBar';
+export { default as Segmented }     from '../Segmented';
+export { default as NumberField }   from '../NumberField';
+export { default as DangerZone }    from '../DangerZone';
 
-export { default as SettingsPanel } from './SettingsPanel';
-export { default as SettingRow } from './SettingRow';
-export { default as NumberField } from './NumberField';
-export { default as DimensionsField } from './DimensionsField';
-export { default as Segmented } from './Segmented';
+// Settings-specific components that stay in this folder:
+export { default as DimensionsField }   from './DimensionsField';
 export { default as BreakpointPreview } from './BreakpointPreview';
-export { default as DangerZone } from './DangerZone';
-export { default as SaveBar } from './SaveBar';

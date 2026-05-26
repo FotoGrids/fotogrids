@@ -76,6 +76,8 @@ class Post_Types {
         $args = array(
             'labels'                => $labels,
             'public'                => false,
+            // The View Collections module may override publicly_queryable and
+            // rewrite via the register_post_type_args filter.
             'publicly_queryable'    => false,
             'show_ui'               => true,
             'show_in_menu'          => false,
@@ -136,9 +138,12 @@ class Post_Types {
         $args = array(
             'labels'                => $labels,
             'public'                => false,
+            // The View Collections module may override publicly_queryable and
+            // rewrite via the register_post_type_args filter.
             'publicly_queryable'    => false,
             'show_ui'               => true,
-            'show_in_menu'          => false,            'query_var'             => true,
+            'show_in_menu'          => false,
+            'query_var'             => true,
             'rewrite'               => array( 'slug' => 'fotogrids-album' ),
             'capability_type'       => array( 'fotogrids_album', 'fotogrids_albums' ),
             'map_meta_cap'          => true,

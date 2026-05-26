@@ -47,6 +47,20 @@ interface Feature {
     public function supports( Render_Context $render_context ): bool;
 
     /**
+     * HTML injected inside the gallery wrapper, before the layout content.
+     *
+     * Use for UI controls that must live inside the wrapper but precede items
+     * (e.g. filter bar, sort bar, search box). Returned strings from all active
+     * features are concatenated and placed immediately after the <style> block
+     * and before the layout output.
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  string
+     */
+    public function html_before( Render_Context $render_context ): string;
+
+    /**
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.
      * @return  string

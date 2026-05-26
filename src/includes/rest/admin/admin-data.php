@@ -235,7 +235,7 @@ class Admin_Data {
             return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
         }
 
-        // Hidden companion sizes — never shown in the picker UI.
+        // Hidden companion sizes - never shown in the picker UI.
         $hidden_slugs = array( \FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE );
 
         // Whether to include hidden sizes (e.g. for the Plugin Settings Media tab).
@@ -383,6 +383,66 @@ class Admin_Data {
             'tablet_breakpoint'            => $request->get_param( 'tablet_breakpoint' ),
             'detect_responsive_by_browser' => $request->get_param( 'detect_responsive_by_browser' ),
         ) );
+
+        return rest_ensure_response( array( 'settings' => $settings ) );
+    }
+
+    /**
+     * Get the global sharing settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/sharing-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_sharing_settings( $request ): \WP_REST_Response {
+        return rest_ensure_response( array(
+            'settings' => \FotoGrids\Settings\Sharing_Settings_Store::get(),
+        ) );
+    }
+
+    /**
+     * Save the global sharing settings.
+     *
+     * POST /wp-json/fotogrids/v1/admin/sharing-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_sharing_settings( $request ): \WP_REST_Response {
+        $settings = \FotoGrids\Settings\Sharing_Settings_Store::save( $request->get_json_params() ?: $request->get_params() );
+
+        return rest_ensure_response( array( 'settings' => $settings ) );
+    }
+
+    /**
+     * Get the global view page appearance settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/view-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_view_settings( $request ): \WP_REST_Response {
+        return rest_ensure_response( array(
+            'settings' => \FotoGrids\Settings\View_Settings_Store::get(),
+        ) );
+    }
+
+    /**
+     * Save the global view page appearance settings.
+     *
+     * POST /wp-json/fotogrids/v1/admin/view-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_view_settings( $request ): \WP_REST_Response {
+        $settings = \FotoGrids\Settings\View_Settings_Store::save( $request->get_json_params() ?: $request->get_params() );
 
         return rest_ensure_response( array( 'settings' => $settings ) );
     }
@@ -638,7 +698,7 @@ class Admin_Data {
         $galleries_count = wp_count_posts( 'fotogrids_gallery' )->publish;
         $albums_count = wp_count_posts( 'fotogrids_album' )->publish;
 
-        $items_table = $wpdb->prefix . 'fotogrids_items';
+        $items_table = $wpdb->prefix . 'fotogrids_item_meta';
         $items_count = $wpdb->get_var( "SELECT COUNT(*) FROM $items_table" );
 
         $stats_table = $wpdb->prefix . 'fotogrids_statistics';
@@ -672,20 +732,32 @@ class Admin_Data {
         }
 
         global $wpdb;
-        $stats_table = $wpdb->prefix . 'fotogrids_statistics';
+        $daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+
+        // Fetch all daily rows within the window in one query, then map to a
+        // dense date-keyed array so days with zero views are still represented.
+        $rows = $wpdb->get_results( $wpdb->prepare(
+            "SELECT viewed_date, SUM(views) AS daily_views
+             FROM $daily_table
+             WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+               AND viewed_date <= CURDATE()
+             GROUP BY viewed_date
+             ORDER BY viewed_date ASC",
+            $days - 1
+        ), ARRAY_A );
+
+        $views_by_date = array();
+        foreach ( $rows as $row ) {
+            $views_by_date[ $row['viewed_date'] ] = (int) $row['daily_views'];
+        }
 
         $labels = array();
         $data = array();
 
         for ( $i = $days - 1; $i >= 0; $i-- ) {
             $date = date( 'Y-m-d', strtotime( "-$i days" ) );
-            $views = $wpdb->get_var( $wpdb->prepare(
-                "SELECT SUM(views) FROM $stats_table WHERE DATE(last_viewed) = %s",
-                $date
-            ) );
-
             $labels[] = date( 'M j', strtotime( "-$i days" ) );
-            $data[] = (int) ( $views ? $views : 0 );
+            $data[] = $views_by_date[ $date ] ?? 0;
         }
 
         return rest_ensure_response( array(
@@ -705,18 +777,35 @@ class Admin_Data {
             return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
         }
 
-        global $wpdb;
-        $stats_table = $wpdb->prefix . 'fotogrids_statistics';
+        $days = (int) $request->get_param( 'days' );
 
-        $results = $wpdb->get_results(
-            "SELECT object_id, SUM(views) as total_views
-             FROM $stats_table
-             WHERE object_type = 'gallery'
-             GROUP BY object_id
-             ORDER BY total_views DESC
-             LIMIT 10",
-            ARRAY_A
-        );
+        global $wpdb;
+
+        if ( $days > 0 ) {
+            // Scope to the daily table for the selected period.
+            $daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+            $results = $wpdb->get_results( $wpdb->prepare(
+                "SELECT object_id, SUM(views) AS total_views
+                 FROM $daily_table
+                 WHERE object_type = 'gallery'
+                   AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                 GROUP BY object_id
+                 ORDER BY total_views DESC
+                 LIMIT 10",
+                $days - 1
+            ), ARRAY_A );
+        } else {
+            $stats_table = $wpdb->prefix . 'fotogrids_statistics';
+            $results = $wpdb->get_results(
+                "SELECT object_id, SUM(views) AS total_views
+                 FROM $stats_table
+                 WHERE object_type = 'gallery'
+                 GROUP BY object_id
+                 ORDER BY total_views DESC
+                 LIMIT 10",
+                ARRAY_A
+            );
+        }
 
         $labels = array();
         $data = array();
@@ -746,16 +835,29 @@ class Admin_Data {
             return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
         }
 
+        $days = (int) $request->get_param( 'days' );
+
         global $wpdb;
         $stats_table = $wpdb->prefix . 'fotogrids_statistics';
 
-        $results = $wpdb->get_results(
-            "SELECT object_type, object_id, views, last_viewed
-             FROM $stats_table
-             ORDER BY last_viewed DESC
-             LIMIT 20",
-            ARRAY_A
-        );
+        if ( $days > 0 ) {
+            $results = $wpdb->get_results( $wpdb->prepare(
+                "SELECT object_type, object_id, views, last_viewed
+                 FROM $stats_table
+                 WHERE last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)
+                 ORDER BY last_viewed DESC
+                 LIMIT 20",
+                $days
+            ), ARRAY_A );
+        } else {
+            $results = $wpdb->get_results(
+                "SELECT object_type, object_id, views, last_viewed
+                 FROM $stats_table
+                 ORDER BY last_viewed DESC
+                 LIMIT 20",
+                ARRAY_A
+            );
+        }
 
         $activity = array();
 
@@ -763,10 +865,12 @@ class Admin_Data {
             $post = get_post( $result['object_id'] );
             if ( $post ) {
                 $activity[] = array(
-                    'title' => $post->post_title,
-                    'type' => $result['object_type'],
-                    'views' => (int) $result['views'],
+                    'id'          => (int) $result['object_id'],
+                    'title'       => $post->post_title,
+                    'type'        => $result['object_type'],
+                    'views'       => (int) $result['views'],
                     'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] ), current_time( 'timestamp' ) ) . ' ago',
+                    'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
                 );
             }
         }
@@ -785,16 +889,32 @@ class Admin_Data {
             return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
         }
 
-        global $wpdb;
-        $stats_table = $wpdb->prefix . 'fotogrids_statistics';
+        $days = (int) $request->get_param( 'days' );
 
-        $results = $wpdb->get_results(
-            "SELECT object_type, object_id, views, shares
-             FROM $stats_table
-             ORDER BY views DESC
-             LIMIT 20",
-            ARRAY_A
-        );
+        global $wpdb;
+
+        if ( $days > 0 ) {
+            $daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+            $results = $wpdb->get_results( $wpdb->prepare(
+                "SELECT object_type, object_id,
+                        SUM(views) AS views, SUM(shares) AS shares
+                 FROM $daily_table
+                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                 GROUP BY object_type, object_id
+                 ORDER BY views DESC
+                 LIMIT 20",
+                $days - 1
+            ), ARRAY_A );
+        } else {
+            $stats_table = $wpdb->prefix . 'fotogrids_statistics';
+            $results = $wpdb->get_results(
+                "SELECT object_type, object_id, views, shares
+                 FROM $stats_table
+                 ORDER BY views DESC
+                 LIMIT 20",
+                ARRAY_A
+            );
+        }
 
         $content = array();
 
@@ -802,10 +922,12 @@ class Admin_Data {
             $post = get_post( $result['object_id'] );
             if ( $post ) {
                 $content[] = array(
-                    'title' => $post->post_title,
-                    'type' => $result['object_type'],
-                    'views' => (int) $result['views'],
-                    'shares' => (int) ( $result['shares'] ? $result['shares'] : 0 ),
+                    'id'       => (int) $result['object_id'],
+                    'title'    => $post->post_title,
+                    'type'     => $result['object_type'],
+                    'views'    => (int) $result['views'],
+                    'shares'   => (int) ( $result['shares'] ?: 0 ),
+                    'edit_url' => get_edit_post_link( $post->ID, 'raw' ),
                 );
             }
         }
@@ -979,7 +1101,7 @@ class Admin_Data {
     }
 
     /**
-     * GET /admin/license/status — returns the current license status snapshot.
+     * GET /admin/license/status - returns the current license status snapshot.
      *
      * @since  1.0.0
      * @param  \WP_REST_Request $request
@@ -990,7 +1112,7 @@ class Admin_Data {
     }
 
     /**
-     * POST /admin/license/activate — activates the supplied license key.
+     * POST /admin/license/activate - activates the supplied license key.
      *
      * @since  1.0.0
      * @param  \WP_REST_Request $request
@@ -1018,7 +1140,7 @@ class Admin_Data {
     }
 
     /**
-     * POST /admin/license/deactivate — deactivates the current site's license.
+     * POST /admin/license/deactivate - deactivates the current site's license.
      *
      * @since  1.0.0
      * @param  \WP_REST_Request $request

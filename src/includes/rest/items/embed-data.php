@@ -9,8 +9,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Embed Data Handler
  *
  * Handles REST API endpoints for video embed (virtual) items:
- *  - resolve-embed  — fetches oEmbed metadata from YouTube / Vimeo
- *  - embed          — creates a virtual item row in fotogrids_item_meta
+ *  - resolve-embed  - fetches oEmbed metadata from YouTube / Vimeo
+ *  - embed          - creates a virtual item row in fotogrids_item_meta
  *
  * Virtual items have attachment_id = 0 and store all embed data in
  * the custom_data JSON column. item_type is 'video_youtube' or 'video_vimeo'.
@@ -93,7 +93,7 @@ class Embed_Data {
             }
         }
 
-        // YouTube fallback thumbnail — constructible without any API call.
+        // YouTube fallback thumbnail - constructible without any API call.
         if ( empty( $thumbnail_url ) && 'video_youtube' === $source ) {
             $thumbnail_url = 'https://img.youtube.com/vi/' . $video_id . '/hqdefault.jpg';
         }
@@ -319,7 +319,7 @@ class Embed_Data {
 
         foreach ( $string_keys as $key ) {
             if ( isset( $raw[ $key ] ) && is_string( $raw[ $key ] ) ) {
-                // Controls color — validate it's a hex colour.
+                // Controls color - validate it's a hex colour.
                 $value = sanitize_text_field( $raw[ $key ] );
                 if ( preg_match( '/^#[0-9a-fA-F]{3,6}$/', $value ) ) {
                     $out[ $key ] = $value;

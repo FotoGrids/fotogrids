@@ -125,12 +125,14 @@ final class Render_Controller {
             $active_modules['layouts'][] = $layout_module->id();
 
             $layout_inner_html     = $layout_module->render( $render, $this->item_renderer );
+            $feature_before_html   = '';
             $feature_appendix_html = '';
             $feature_after_html    = '';
 
             foreach ( Module_Registry::active_modules( 'features', $render ) as $feature_module ) {
                 $wrapper_data_attrs    = array_merge( $wrapper_data_attrs, $feature_module->wrapper_data_attrs( $render ) );
                 $css_variables         = array_merge( $css_variables, $feature_module->style_vars( $render ) );
+                $feature_before_html   .= $feature_module->html_before( $render );
                 $feature_appendix_html .= $feature_module->html_appendix( $render );
                 $feature_after_html    .= $feature_module->html_after( $render );
                 $this->asset_resolver->collect( $feature_module->assets( $render ), $feature_module->origin() );
@@ -154,7 +156,7 @@ final class Render_Controller {
                 layout_css_classes: $layout_css_classes,
                 wrapper_data_attrs: $wrapper_data_attrs,
                 css_variables:      $css_variables,
-                inner_html:         $layout_inner_html . $feature_appendix_html,
+                inner_html:         $feature_before_html . $layout_inner_html . $feature_appendix_html,
             );
 
             $render_result = new Render_Result(

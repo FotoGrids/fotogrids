@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Gallery_Data {
-    
+
     /**
      * Get gallery data with items
      *
@@ -28,36 +28,36 @@ class Gallery_Data {
     public static function get_gallery( $request ) {
         $gallery_id = (int) $request['id'];
         $is_preview = (bool) $request['preview'];
-        
+
         $gallery = get_post( $gallery_id );
         if ( ! $gallery || $gallery->post_type !== 'fotogrids_gallery' ) {
-            return new \WP_Error( 
-                'gallery_not_found', 
-                __( 'Gallery not found', 'fotogrids' ), 
-                array( 'status' => 404 ) 
+            return new \WP_Error(
+                'gallery_not_found',
+                __( 'Gallery not found', 'fotogrids' ),
+                array( 'status' => 404 )
             );
         }
-        
+
         if ( ! $is_preview && $gallery->post_status !== 'publish' ) {
-            return new \WP_Error( 
-                'gallery_not_published', 
-                __( 'Gallery is not published', 'fotogrids' ), 
-                array( 'status' => 403 ) 
+            return new \WP_Error(
+                'gallery_not_published',
+                __( 'Gallery is not published', 'fotogrids' ),
+                array( 'status' => 403 )
             );
         }
-        
+
         $meta = array(
             'layout' => get_post_meta( $gallery_id, 'fotogrids_layout', true ) ?: 'grid',
             'columns' => (int) get_post_meta( $gallery_id, 'fotogrids_columns', true ) ?: 3,
             'album_id' => (int) get_post_meta( $gallery_id, 'fotogrids_album_id', true ) ?: null,
         );
-        
+
         $items = self::get_gallery_items( $gallery_id );
-        
+
         if ( ! $is_preview ) {
             \FotoGrids\Statistics::increment( 'gallery', $gallery_id, 'views' );
         }
-        
+
         return rest_ensure_response( array(
             'id' => $gallery->ID,
             'title' => $gallery->post_title,
@@ -94,7 +94,7 @@ class Gallery_Data {
         $stored    = (string) get_post_meta( $gallery_id, 'fotogrids_password', true );
         $plaintext = \FotoGrids\Password_Crypto::decrypt( $stored );
 
-        // decrypt() returns '' for empty/invalid stored values — treat both as
+        // decrypt() returns '' for empty/invalid stored values - treat both as
         // "no password set" rather than surfacing an error.
         return rest_ensure_response( array( 'password' => $plaintext ) );
     }
@@ -107,7 +107,7 @@ class Gallery_Data {
      * full page reload.
      *
      * On failure: returns a 401 with success=false. The caller should show an
-     * inline error — no redirect or reload.
+     * inline error - no redirect or reload.
      *
      * @since 1.0.0
      * @param \WP_REST_Request $request The REST API request object.
@@ -263,7 +263,7 @@ class Gallery_Data {
         $gallery_id = (int) $request['id'];
         $limit = (int) $request['limit'];
         $offset = (int) $request['offset'];
-        
+
         $gallery = get_post( $gallery_id );
         if ( ! $gallery || $gallery->post_type !== 'fotogrids_gallery' ) {
             return new \WP_Error( 'gallery_not_found', __( 'Gallery not found.', 'fotogrids' ), array( 'status' => 404 ) );
@@ -271,7 +271,7 @@ class Gallery_Data {
 
         global $wpdb;
         $table = $wpdb->prefix . 'fotogrids_item_meta';
-        
+
         $sql = "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC";
         $params = array( $gallery_id );
 
@@ -285,9 +285,9 @@ class Gallery_Data {
             }
         }
 
-        $results = $wpdb->get_results( 
-            $wpdb->prepare( $sql, $params ), 
-            ARRAY_A 
+        $results = $wpdb->get_results(
+            $wpdb->prepare( $sql, $params ),
+            ARRAY_A
         );
 
         $items = array();
@@ -327,21 +327,21 @@ class Gallery_Data {
      */
     private static function get_gallery_items( $gallery_id ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_item_meta';
-        $results = $wpdb->get_results( 
-            $wpdb->prepare( 
-                "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC", 
-                $gallery_id 
-            ), 
-            ARRAY_A 
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC",
+                $gallery_id
+            ),
+            ARRAY_A
         );
-        
+
         $items = array();
         foreach ( $results as $row ) {
             $attachment_id = (int) $row['attachment_id'];
             $attachment = get_post( $attachment_id );
-            
+
             if ( $attachment ) {
                 $items[] = array(
                     'id' => $attachment_id,
@@ -358,8 +358,43 @@ class Gallery_Data {
                 );
             }
         }
-        
+
         return $items;
+    }
+
+    /**
+     * Return cache status metadata for a gallery.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_cache_status( $request ) {
+        $gallery_id = (int) $request['id'];
+        $meta       = \FotoGrids\FotoGrids_Cache::get_meta( $gallery_id );
+
+        return rest_ensure_response( array(
+            'gallery_id' => $gallery_id,
+            'cached'     => $meta !== null,
+            'meta'       => $meta,
+        ) );
+    }
+
+    /**
+     * Flush the render cache for a specific gallery.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function flush_cache( $request ) {
+        $gallery_id = (int) $request['id'];
+        \FotoGrids\FotoGrids_Cache::flush_for_gallery( $gallery_id );
+
+        return rest_ensure_response( array(
+            'gallery_id' => $gallery_id,
+            'flushed'    => true,
+        ) );
     }
 
     /**
@@ -374,13 +409,13 @@ class Gallery_Data {
      */
     private static function get_gallery_item_count( $gallery_id ) {
         global $wpdb;
-        
+
         $table = $wpdb->prefix . 'fotogrids_item_meta';
-        return (int) $wpdb->get_var( 
-            $wpdb->prepare( 
-                "SELECT COUNT(*) FROM $table WHERE gallery_id = %d", 
-                $gallery_id 
-            ) 
+        return (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM $table WHERE gallery_id = %d",
+                $gallery_id
+            )
         );
     }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import {
     SettingsPanel,
-    SettingRow,
+    PanelRow,
     DimensionsField,
     NumberField,
     Segmented,
@@ -24,7 +24,7 @@ const { __ } = wp.i18n;
  * primitives.
  */
 const MediaTab = () => {
-    const regenUrl = 'admin.php?page=fotogrids-tools&tool=regen-thumbnails';
+    const regenUrl = 'admin.php?page=fotogrids-tools&tool=regenerate-thumbnails';
 
     const [settings, setSettings] = useState(null);
     const [saved, setSaved] = useState(null); // last-persisted snapshot for dirty tracking
@@ -120,8 +120,7 @@ const MediaTab = () => {
     ];
 
     return (
-        <div className="fg-media-tab" key="media-content">
-            {/* Gallery thumbnails */}
+        <div className="fotogrids-sidebar-tabs__content__inner fg-media-tab" key="media-content">
             <SettingsPanel
                 title={__('Gallery thumbnails', 'fotogrids')}
                 description={__('The size used in the gallery grid. Changing these requires regenerating thumbnails for existing images.', 'fotogrids')}
@@ -131,7 +130,7 @@ const MediaTab = () => {
                     </a>
                 }
             >
-                <SettingRow
+                <PanelRow
                     title={__('Dimensions', 'fotogrids')}
                     description={__('Width and height in pixels. Used for every grid thumbnail.', 'fotogrids')}
                 >
@@ -144,9 +143,9 @@ const MediaTab = () => {
                         min={0}
                         max={2000}
                     />
-                </SettingRow>
+                </PanelRow>
 
-                <SettingRow
+                <PanelRow
                     title={__('Crop mode', 'fotogrids')}
                     description={__('Hard crop forces every thumbnail to the exact dimensions. Soft crop keeps the original aspect ratio.', 'fotogrids')}
                 >
@@ -174,16 +173,15 @@ const MediaTab = () => {
                             />
                         </div>
                     )}
-                </SettingRow>
+                </PanelRow>
 
             </SettingsPanel>
 
-            {/* Lightbox image */}
             <SettingsPanel
                 title={__('Lightbox image', 'fotogrids')}
-                description={__('The full-size image shown in the Lightbox. Always proportional — never hard-cropped.', 'fotogrids')}
+                description={__('The full-size image shown in the Lightbox. Always proportional - never hard-cropped.', 'fotogrids')}
             >
-                <SettingRow
+                <PanelRow
                     title={__('Max width', 'fotogrids')}
                     description={__('A companion mobile size at half this width is generated automatically.', 'fotogrids')}
                     htmlFor="fg-full-width"
@@ -199,13 +197,13 @@ const MediaTab = () => {
                             <>
                                 {__('Mobile companion:', 'fotogrids')}{' '}
                                 <strong>{mobileCompanion} px</strong>
-                                {' — '}{__('generated automatically.', 'fotogrids')}
+                                {' - '}{__('generated automatically.', 'fotogrids')}
                             </>
                         }
                     />
-                </SettingRow>
+                </PanelRow>
 
-                <SettingRow
+                <PanelRow
                     title={__('Max height', 'fotogrids')}
                     description={__('Optional. Leave at 0 to keep images proportional.', 'fotogrids')}
                     htmlFor="fg-full-height"
@@ -219,10 +217,9 @@ const MediaTab = () => {
                         max={8000}
                         help={__('0 = proportional (recommended)', 'fotogrids')}
                     />
-                </SettingRow>
+                </PanelRow>
             </SettingsPanel>
 
-            {/* Gallery-custom sizes (read-only) */}
             {customSizes.length > 0 && (
                 <SettingsPanel
                     title={__('Gallery-custom sizes', 'fotogrids')}
@@ -257,10 +254,9 @@ const MediaTab = () => {
                 status={status}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
-                saveLabel={__('Save size settings', 'fotogrids')}
                 extraAction={
-                    <a href={regenUrl} className="fotogrids-button fotogrids-button--ghost fotogrids-button--small">
-                        {__('Regenerate thumbnails →', 'fotogrids')}
+                    <a href={regenUrl} className="fotogrids-button fotogrids-button--secondary fotogrids-button--small">
+                        {__('Regenerate thumbnails', 'fotogrids')}
                     </a>
                 }
             />

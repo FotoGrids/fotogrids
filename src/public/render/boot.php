@@ -81,6 +81,15 @@ add_action(
         }
         \FotoGrids\Render\Internal\Module_Registry::register( 'gates', \FotoGrids\Render\Gates\Collection_Permissions\Collection_Permissions::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'gates', \FotoGrids\Render\Gates\Password\Password_Gate::class );
+        // Sorters run at the ID level, before item hydration. Only one sorter is
+        // active per render (the highest-precedence module whose supports() returns
+        // true). Pro registers additional sorters via the same hook at priority 10
+        // with origin 'fotogrids-pro', which gives them automatic precedence.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'sorters', \FotoGrids\Render\Sorters\Manual\Manual_Sorter::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'sorters', \FotoGrids\Render\Sorters\Date\Date_Sorter::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'sorters', \FotoGrids\Render\Sorters\Title\Title_Sorter::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'sorters', \FotoGrids\Render\Sorters\Filename\Filename_Sorter::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'sorters', \FotoGrids\Render\Sorters\Random\Random_Sorter::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Grid::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Masonry::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Justified::class );
@@ -96,15 +105,43 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Lightbox\Lightbox_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Direct_Link\Direct_Link_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\External_Link\External_Link_Decorator::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::class );
         // Loading Icon must be registered before Lightbox so its <symbol> block
         // is emitted inside html_appendix() before the lightbox reads the global.
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Loading_Icon\Loading_Icon::class );
         // Loaded Effect drives the image reveal animation once state="loaded".
         // Registered immediately after Loading Icon so the CSS loads in order.
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Loaded_Effect\Loaded_Effect::class );
+        // Lazy Load writes data-fg-lazy="1" on the wrapper when the setting is on,
+        // and conditionally suppresses loading="lazy" on items when it is off.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Lazy_Load\Lazy_Load::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Css::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Js::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Lightbox\Lightbox::class );
+        // Filter sources must be registered before Filter_UI so the feature can
+        // call Module_Registry::active_modules('filter_sources', ...) during
+        // supports() and html_before(). Tags decorator runs with decorators so
+        // data-fg-tags is stamped before layout and feature rendering starts.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\Tags\Tags_Filter_Source::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\People\People_Filter_Source::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\Location\Location_Filter_Source::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\Tags\Tags_Filter_Decorator::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\People\People_Filter_Decorator::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\Location\Location_Filter_Decorator::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Filters\Features\Ui\Filter_Ui::class );
+    },
+    10
+);
+
+add_action(
+    'wp_loaded',
+    static function (): void {
+        // Register the Google Fonts enqueue hook once per request.
+        // Decorators call Font_Resolver::instance()->resolve_font_family() during
+        // style_vars(), which runs inside shortcode/block rendering (the_content).
+        // By the time wp_enqueue_scripts fires at priority 20, all galleries on
+        // the page have registered their fonts and a single combined URL is built.
+        \FotoGrids\Render\Api\Font_Resolver::instance()->register_enqueue_hook();
     },
     10
 );

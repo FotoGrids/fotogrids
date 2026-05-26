@@ -784,7 +784,7 @@ class Metadata_Manager {
      * Bulk delete by ID, scoped to a single type for safety.
      *
      * @since 1.0.0
-     * @param string $type Metadata type — all IDs must belong to this type.
+     * @param string $type Metadata type - all IDs must belong to this type.
      * @param int[]  $ids  IDs to delete.
      * @return array { deleted: int, skipped: int[] }
      */
@@ -827,7 +827,7 @@ class Metadata_Manager {
      * then deletes the sources and recomputes the target's usage_count.
      *
      * @since 1.0.0
-     * @param string $type       Metadata type — all rows must share this type.
+     * @param string $type       Metadata type - all rows must share this type.
      * @param int    $target_id  Row to keep.
      * @param int[]  $source_ids Rows to merge into target.
      * @return array|\WP_Error { merged: int, target: object } on success.
@@ -875,7 +875,7 @@ class Metadata_Manager {
                 ) );
 
                 if ( $already_linked ) {
-                    // Target already linked — drop the source link without re-pointing.
+                    // Target already linked - drop the source link without re-pointing.
                     $wpdb->delete(
                         $links_table,
                         array(
@@ -901,7 +901,7 @@ class Metadata_Manager {
                 }
             }
 
-            // Source is now empty — delete it.
+            // Source is now empty - delete it.
             $wpdb->delete( $wpdb->prefix . 'fotogrids_tags', array( 'id' => $source_id ), array( '%d' ) );
             $merged++;
 
@@ -956,7 +956,7 @@ class Metadata_Manager {
     /**
      * Recompute usage_count for every row, optionally scoped to a type.
      *
-     * Cheap on real-world libraries — one UPDATE per row that needs fixing.
+     * Cheap on real-world libraries - one UPDATE per row that needs fixing.
      *
      * @since 1.0.0
      * @param string|null $type If provided, only rows of this type are recomputed.

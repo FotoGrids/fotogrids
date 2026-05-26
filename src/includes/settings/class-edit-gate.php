@@ -100,8 +100,6 @@ final class Edit_Gate {
      * @return  void
      */
     private static function dev_log( string $message ): void {
-        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( '[FotoGrids Edit_Gate] ' . $message );
-        }
+        \FotoGrids\Debug_Log::write( 'edit_gate', $message );
     }
 }

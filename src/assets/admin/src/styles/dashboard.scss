@@ -74,40 +74,9 @@ body[class*="fotogrids_page_fotogrids-dashboard"] {
     .fotogrids-overview {
         margin-bottom: 2rem;
 
-        h3 {
+        h2 {
             color: #1e1e1e;
             margin-bottom: 1rem;
-        }
-
-        .fotogrids-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-
-            .fotogrids-stat-card {
-                font-family: 'Poppins', sans-serif;
-                text-align: center;
-                background: white;
-                padding: 1.5rem;
-                border-radius: 8px;
-                border: 1px solid var(--fg-border-primary);
-
-                .stat-number {
-                    font-size: 2.5rem;
-                    font-weight: 700;
-                    color: var(--fg-blue);
-                    line-height: 1;
-                    margin-bottom: 0.5rem;
-                }
-
-                .stat-label {
-                    font-size: 0.9rem;
-                    color: #757575;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    font-weight: 600;
-                }
-            }
         }
     }
 }

@@ -3,7 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import Toggle from '../../shared/Toggle';
 import {
     SettingsPanel,
-    SettingRow,
+    PanelRow,
     DangerZone,
     SaveBar,
 } from '../../shared/settings';
@@ -100,12 +100,12 @@ const AdvancedTab = () => {
     };
 
     return (
-        <div key="advanced-content">
+        <div className="fotogrids-sidebar-tabs__content__inner" key="advanced-content">
             <SettingsPanel
                 title={__('Editor behaviour', 'fotogrids')}
                 description={__('How FotoGrids saves your work in the gallery and album editors.', 'fotogrids')}
             >
-                <SettingRow
+                <PanelRow
                     title={__('Autosave', 'fotogrids')}
                     description={__('Saves gallery and album settings changes automatically as you work.', 'fotogrids')}
                 >
@@ -115,14 +115,14 @@ const AdvancedTab = () => {
                         onChange={(v) => update('autosave', v)}
                         label={__('Save automatically', 'fotogrids')}
                     />
-                </SettingRow>
+                </PanelRow>
             </SettingsPanel>
 
             <SettingsPanel
                 title={__('Privacy & analytics', 'fotogrids')}
                 description={__('Decide what FotoGrids shares about plugin usage.', 'fotogrids')}
             >
-                <SettingRow
+                <PanelRow
                     title={__('Anonymous usage stats', 'fotogrids')}
                     description={__('Helps us spot bugs and decide which features to invest in. No personal data is collected.', 'fotogrids')}
                 >
@@ -132,16 +132,16 @@ const AdvancedTab = () => {
                         onChange={(v) => update('share_statistics', v)}
                         label={__('Share anonymous usage data', 'fotogrids')}
                     />
-                </SettingRow>
+                </PanelRow>
             </SettingsPanel>
 
             <SettingsPanel
                 title={__('Custom code', 'fotogrids')}
                 description={__('Controls for sites that use custom JavaScript in gallery fields.', 'fotogrids')}
             >
-                <SettingRow
+                <PanelRow
                     title={__('Dynamic JavaScript', 'fotogrids')}
-                    description={__('Enables eval, the Function constructor and string-based setTimeout / setInterval in custom JS fields. Applies to every role that can edit galleries — administrators are never restricted. Only turn this on if you trust everyone with editor access.', 'fotogrids')}
+                    description={__('Enables `eval`, the `Function` constructor and string-based `setTimeout` / `setInterval` in custom JS fields.', 'fotogrids')}
                 >
                     <Toggle
                         id="fotogrids_custom_js_allow_dynamic"
@@ -149,7 +149,11 @@ const AdvancedTab = () => {
                         onChange={(v) => update('custom_js_allow_dynamic_execution', v)}
                         label={__('Allow dynamic code execution', 'fotogrids')}
                     />
-                </SettingRow>
+                </PanelRow>
+                <DangerZone
+                    title={__('Applies to every role that can edit collections - administrators are never restricted.', 'fotogrids')}
+                    description={__('Only turn this on if you trust everyone with editor access.', 'fotogrids')}
+                />
             </SettingsPanel>
 
             <SettingsPanel
@@ -159,6 +163,7 @@ const AdvancedTab = () => {
                 <DangerZone
                     title={__('Delete all data on uninstall', 'fotogrids')}
                     description={__('Removes every gallery, album, template, statistic and setting. This cannot be undone.', 'fotogrids')}
+                    icon="remove_item"
                 >
                     <Toggle
                         id="fotogrids_delete_on_uninstall"

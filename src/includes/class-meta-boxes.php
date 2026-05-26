@@ -69,16 +69,8 @@ class Meta_Boxes {
             'default'
         );
 
-        foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
-            add_meta_box(
-                $post_type . '_templates',
-                __( 'Templates', 'fotogrids' ),
-                array( __CLASS__, 'templates_meta_box' ),
-                $post_type,
-                'side',
-                'default'
-            );
-        }
+        // The Templates metabox is registered by the Templates module
+        // (includes/modules/Templates/Module.php), not here.
     }
 
     /**
@@ -350,21 +342,8 @@ class Meta_Boxes {
             }
         }
 
-        wp_enqueue_script(
-            'fotogrids-templates-metabox',
-            FOTOGRIDS_PLUGIN_URL . 'assets/js/templates-metabox.js',
-            array( 'wp-element', 'wp-api-fetch' ),
-            FOTOGRIDS_VERSION,
-            true
-        );
-
-        // Enqueue frontend CSS for preview
-        wp_enqueue_style(
-            'fotogrids-frontend',
-            FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids.css',
-            array(),
-            FOTOGRIDS_VERSION
-        );
+        // The Templates metabox script + its preview CSS are enqueued by the
+        // Templates module (includes/modules/Templates/Module.php), not here.
     }
 
     /**
@@ -476,60 +455,8 @@ class Meta_Boxes {
         <?php
     }
 
-    /**
-     * Templates meta box for both galleries and albums
-     */
-    public static function templates_meta_box( $post ) {
-        $post_type = $post->post_type === 'fotogrids_gallery' ? 'gallery' : 'album';
-
-        $save_as_template_button = apply_filters(
-            'fotogrids/templates/save_as_template_button',
-            null,
-            $post
-        );
-
-        wp_localize_script( 'fotogrids-templates-metabox', 'fotogridsTemplatesMetabox', array(
-            'postId' => $post->ID,
-            'postType' => $post_type,
-            'isPro' => fotogrids_has_pro(),
-            'nonce' => wp_create_nonce( 'wp_rest' ),
-            'restUrl' => 'fotogrids/v1/',
-            'templatesUrl' => admin_url( 'admin.php?page=fotogrids-templates' ),
-            'saveAsTemplateButton' => $save_as_template_button,
-            'strings' => array(
-                'selectTemplate' => __( 'Select Template', 'fotogrids' ),
-                'saveAsTemplate' => __( 'Save current settings as Template', 'fotogrids' ),
-                'applyTemplate' => __( 'Apply Template', 'fotogrids' ),
-                'templatesNoticeDescription' => __( 'Apply beautiful, ready-to-use designs to your galleries and albums instantly. Browse the Templates Library to explore what\'s available.', 'fotogrids' ),
-                'proSaveDescriptionGallery' => __( 'With a {pro_badge} license, you will be able to save the current gallery settings as a reusable template and apply it across multiple galleries.', 'fotogrids' ),
-                'proSaveDescriptionAlbum' => __( 'With a {pro_badge} license, you will be able to save the current album settings as a reusable template and apply it across multiple albums.', 'fotogrids' ),
-                'dismiss' => __( 'Dismiss', 'fotogrids' ),
-                'upgradeToPro' => __( 'Upgrade to Pro', 'fotogrids' ),
-                'loading' => __( 'Loading templates...', 'fotogrids' ),
-                'noTemplates' => __( 'No templates available', 'fotogrids' ),
-                'templateApplied' => __( 'Template applied successfully', 'fotogrids' ),
-                'templateSaved' => __( 'Template saved successfully', 'fotogrids' ),
-                'confirmApply' => __( 'This will override your current settings. Are you sure?', 'fotogrids' ),
-                'templateName' => __( 'Template Name', 'fotogrids' ),
-                'templateDescription' => __( 'Description (optional)', 'fotogrids' ),
-                'save' => __( 'Save', 'fotogrids' ),
-                'saving' => __( 'Saving...', 'fotogrids' ),
-                'cancel' => __( 'Cancel', 'fotogrids' ),
-                'applying' => __( 'Applying...', 'fotogrids' ),
-                'myTemplate' => __( 'My Template', 'fotogrids' ),
-                'userTemplates' => __( 'User Templates', 'fotogrids' ),
-                'fotogridsTemplates' => __( 'FotoGrids Templates', 'fotogrids' ),
-                'templatesLibrary' => __( 'Templates Library', 'fotogrids' ),
-                'templateNameRequired' => __( 'Template name is required.', 'fotogrids' ),
-                'failedToLoadTemplates' => __( 'Failed to load templates.', 'fotogrids' ),
-                'failedToApplyTemplate' => __( 'Failed to apply template.', 'fotogrids' ),
-                'failedToSaveTemplate' => __( 'Failed to save template.', 'fotogrids' ),
-            ),
-        ) );
-        ?>
-        <div id="fotogrids-templates-metabox"></div>
-        <?php
-    }
+    // The Templates metabox (register + render + localize) is owned by the
+    // Templates module (includes/modules/Templates/Module.php).
 
     /**
      * Save meta box data
@@ -610,6 +537,18 @@ class Meta_Boxes {
                 if ( is_array( $decoded_exif ) ) {
                     $exif_data = $decoded_exif;
                 }
+            }
+        }
+
+        // If no stored EXIF, read it live from the file so the EXIF tab is
+        // always populated in the modal regardless of gallery settings.
+        if ( null === $exif_data ) {
+            $raw_exif = fotogrids_extract_exif_data(
+                $item_id,
+                array( 'camera', 'aperture', 'shutter_speed', 'iso', 'lens', 'focal_length', 'date_taken', 'copyright', 'orientation', 'flash', 'white_balance', 'exposure_mode' )
+            );
+            if ( ! empty( $raw_exif ) ) {
+                $exif_data = $raw_exif;
             }
         }
 
@@ -713,7 +652,7 @@ class Meta_Boxes {
             'attachment_id' => $item_id,
             'gallery_id'    => 0, // Global item data (not gallery-specific)
             'credit'        => $credit,
-            // Note: the `location` VARCHAR column is deprecated — structured
+            // Note: the `location` VARCHAR column is deprecated - structured
             // location data is stored in fotogrids_item_metadata via the
             // metadata REST endpoint. Do not write to it here.
             'external_url'  => $external_url,
@@ -774,7 +713,7 @@ class Meta_Boxes {
                 'url' => $row['external_url'] ?: '',
                 'target' => $row['link_target'] ?: 'global',
                 'thumbnail' => wp_get_attachment_image_url( $attachment_id, 'medium' ),
-                'alt' => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+                'alt' => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                 'title' => $attachment ? $attachment->post_title : ''
             );
         }
@@ -787,7 +726,7 @@ class Meta_Boxes {
                     'url' => '',
                     'target' => 'global',
                     'thumbnail' => wp_get_attachment_image_url( $item_id, 'medium' ),
-                    'alt' => get_post_meta( $item_id, '_wp_attachment_image_alt', true ),
+                    'alt' => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
                     'title' => $attachment ? $attachment->post_title : ''
                 );
             }
@@ -1016,6 +955,10 @@ class Meta_Boxes {
 
         $gated_result = self::save_collection_settings_with_gate( $post_id, $_POST );
 
+        if ( $post->post_type === 'fotogrids_gallery' ) {
+            do_action( 'fotogrids/actions/gallery/settings/saved', $post_id );
+        }
+
         $collection_type = $post->post_type === 'fotogrids_album' ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' );
         wp_send_json_success( array(
             'message' => sprintf( __( '%s saved successfully', 'fotogrids' ), $collection_type ),
@@ -1063,6 +1006,14 @@ class Meta_Boxes {
             self::persist_setting_value( $post_id, $post_meta_key, $setting_value, $defaults[ $setting_key ], $field_type );
         }
 
+        // When password_protect is being turned off, remove the stored encrypted
+        // password so the gallery can never be accidentally locked by a stale
+        // ciphertext if the toggle is re-enabled without a new password being set.
+        $protect_value = $gated_result['settings']['password_protect'] ?? null;
+        if ( $protect_value !== null && ! $protect_value ) {
+            delete_post_meta( $post_id, 'fotogrids_password' );
+        }
+
         return $gated_result;
     }
 
@@ -1105,7 +1056,7 @@ class Meta_Boxes {
             return is_numeric( $raw_value ) ? $raw_value + 0 : $default_value;
         }
 
-        // codearea fields contain raw CSS/JS — use fotogrids_sanitize_code_field
+        // codearea fields contain raw CSS/JS - use fotogrids_sanitize_code_field
         // which strips only null bytes and control characters, preserving < > and
         // all other characters valid in source code.
         // sanitize_textarea_field must NOT be used here: it strips HTML tags and
@@ -1116,7 +1067,7 @@ class Meta_Boxes {
 
         // password_input fields are passed through as-is (sanitize_text_field would
         // strip special characters that are valid in passwords). The value will be
-        // encrypted — not stored in plain text — by persist_setting_value.
+        // encrypted - not stored in plain text - by persist_setting_value.
         if ( $field_type === 'password_input' ) {
             return (string) $raw_value;
         }
@@ -1203,7 +1154,7 @@ class Meta_Boxes {
             return;
         }
 
-        // codearea fields contain raw CSS/JS — use fotogrids_sanitize_code_field.
+        // codearea fields contain raw CSS/JS - use fotogrids_sanitize_code_field.
         // See normalize_incoming_setting_value for the rationale.
         if ( $field_type === 'codearea' ) {
             update_post_meta( $post_id, $post_meta_key, fotogrids_sanitize_code_field( (string) $setting_value ) );
@@ -1212,11 +1163,11 @@ class Meta_Boxes {
 
         // password_input fields are encrypted before storage so the raw password is
         // never written to the DB in plain text. An empty value means "clear the
-        // password" — we delete the meta key so password_is_set returns false.
+        // password" - we delete the meta key so password_is_set returns false.
         //
         // Guard: if the incoming value is already an encrypted blob (i.e. the
         // browser echoed back the ciphertext that was loaded into the field on
-        // page load), skip re-encryption — just leave the stored value as-is.
+        // page load), skip re-encryption - just leave the stored value as-is.
         // Re-encrypting on every save causes the blob to grow exponentially and
         // eventually exhausts PHP's memory limit.
         if ( $field_type === 'password_input' ) {
@@ -1224,7 +1175,7 @@ class Meta_Boxes {
             if ( $plaintext === '' ) {
                 delete_post_meta( $post_id, $post_meta_key );
             } elseif ( \FotoGrids\Password_Crypto::is_encrypted( $plaintext ) ) {
-                // Already encrypted — the stored value hasn't changed; do nothing.
+                // Already encrypted - the stored value hasn't changed; do nothing.
             } else {
                 $encrypted = \FotoGrids\Password_Crypto::encrypt( $plaintext );
                 if ( $encrypted !== '' ) {

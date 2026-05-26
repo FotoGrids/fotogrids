@@ -30,9 +30,24 @@ final class Item_View {
         public readonly string $full_url,
         public readonly string $alt,
         public readonly string $title,
+        /** Raw attachment post_excerpt - source of truth for caption_title/caption_description resolution. */
         public readonly string $caption,
-        public readonly ?int $width,
-        public readonly ?int $height,
+        /** Raw attachment post_content. Available as a caption source (item_description). */
+        public readonly string $description,
+        /**
+         * Resolved caption title text after applying caption_hide_title and
+         * caption_title_source settings.  Empty string when the title is hidden
+         * or the resolved source field is blank.  Set by Context_Builder.
+         */
+        public readonly string $caption_title = '',
+        /**
+         * Resolved caption description text after applying caption_hide_description
+         * and caption_description_source settings.  Empty string when hidden or blank.
+         * Set by Context_Builder.
+         */
+        public readonly string $caption_description = '',
+        public readonly ?int $width = null,
+        public readonly ?int $height = null,
         public readonly array $meta = [],
         public readonly array $classes = [],
         public readonly array $data_attrs = [],
@@ -63,6 +78,9 @@ final class Item_View {
             alt: $changes['alt'] ?? $this->alt,
             title: $changes['title'] ?? $this->title,
             caption: $changes['caption'] ?? $this->caption,
+            description: $changes['description'] ?? $this->description,
+            caption_title: $changes['caption_title'] ?? $this->caption_title,
+            caption_description: $changes['caption_description'] ?? $this->caption_description,
             width: $changes['width'] ?? $this->width,
             height: $changes['height'] ?? $this->height,
             meta: $changes['meta'] ?? $this->meta,

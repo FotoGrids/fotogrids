@@ -1,7 +1,7 @@
 {
   "id": "project-portfolio",
   "name": "Project Portfolio",
-  "description": "One album per project with a cover image and intro text. Clients click in and see one project only — no accidental cross-browsing.",
+  "description": "One album per project with a cover image and intro text. Clients click in and see one project only - no accidental cross-browsing.",
   "type": "free",
   "category": "album",
   "subcategory": "portfolio",

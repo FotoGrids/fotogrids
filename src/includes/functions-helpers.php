@@ -318,6 +318,19 @@ function fotogrids_get_gallery_items( $gallery_id ) {
 }
 
 /**
+ * Get the resolved sharing configuration for a collection.
+ *
+ * Merges global sharing settings with the collection's per-collection override.
+ *
+ * @since 1.0.0
+ * @param int $collection_id Gallery or album ID.
+ * @return array<string, mixed>
+ */
+function fotogrids_get_resolved_sharing( $collection_id ) {
+    return \FotoGrids\Settings\Sharing_Settings_Store::resolve( (int) $collection_id );
+}
+
+/**
  * Get gallery item count
  *
  * @param int $gallery_id Gallery ID
@@ -361,6 +374,17 @@ function fotogrids_add_item_to_gallery( $gallery_id, $attachment_id, $meta = arr
     // Validate attachment exists
     if ( ! get_post( $attachment_id ) ) {
         return false;
+    }
+
+    // Seed FotoGrids alt from the WP Media Library alt if not already set.
+    // This means items added before the user has touched the FotoGrids item
+    // editor still render with the alt the user already typed in the Media
+    // Library, rather than silently falling back to the title.
+    if ( '' === get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ) ) {
+        $wp_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+        if ( '' !== (string) $wp_alt ) {
+            update_post_meta( $attachment_id, '_wp_attachment_item_alt', $wp_alt );
+        }
     }
 
     // Get current item IDs from post meta
@@ -960,9 +984,9 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
     // Standalone helper scripts that render functions may depend on.
 
     // Standalone helper scripts that render functions may depend on.
-    // These live in render-settings/utils/ — not render functions themselves.
+    // These live in render-settings/utils/ - not render functions themselves.
 
-    // Tooltip utilities — must load before any render helper that shows Pro badges.
+    // Tooltip utilities - must load before any render helper that shows Pro badges.
     wp_enqueue_script(
         'fotogrids-tooltip-utils',
         FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/tooltip-utils.js',
@@ -994,6 +1018,8 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         'renderTextInput',
         'renderSelect',
         'renderFontFamily',
+        'renderFontWeight',
+        'renderSideBySide',
         'renderToggle',
         'renderConditionalMessage',
         'renderSettingSubTabs',
@@ -1003,7 +1029,8 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         'renderCodeArea',
         'renderPromo',
         'renderInfoBlock',
-        'renderTokenSelect'
+        'renderTokenSelect',
+        'renderCacheStatus'
     );
 
     foreach ( $render_functions as $function ) {
@@ -1027,7 +1054,7 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
             $dependencies[] = 'fotogrids-render-custom-unit-select';
         }
 
-        if ( $function === 'renderFontFamily' ) {
+        if ( in_array( $function, array( 'renderFontFamily', 'renderFontWeight' ), true ) ) {
             $dependencies[] = 'fotogrids-render-select';
         }
 
@@ -1100,7 +1127,7 @@ function fotogrids_get_loading_icon_svg( $icon_name = 'spinner', $instance_id = 
  *   function animate(svg) { ... }
  *
  * This is emitted verbatim by Loading_Icon into the inline script global so the
- * browser receives a fully pre-built function — no eval, no new Function, no
+ * browser receives a fully pre-built function - no eval, no new Function, no
  * runtime code generation. The helpers (fgCubicBezier, fgAnimAttr, etc.) are
  * inlined inside the function by the build-time converter.
  *
@@ -1149,7 +1176,7 @@ function fotogrids_get_loading_icon_animate_fn( $icon_name = 'spinner' ) {
  *    every character valid in CSS or JavaScript.
  *
  * `sanitize_textarea_field` strips HTML tags and encodes entities, which
- * corrupts legitimate code — e.g. JS comparisons (`a < b`), arrow functions
+ * corrupts legitimate code - e.g. JS comparisons (`a < b`), arrow functions
  * (`=>`), template literal expressions, or any CSS selector containing `>`.
  * This function avoids that corruption.
  *

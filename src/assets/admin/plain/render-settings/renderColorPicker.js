@@ -155,7 +155,7 @@ function AlphaColorPicker({
         pickerRef.current = null;
     }, []);
 
-    // Sync picker value when the upstream value changes — but NOT when the
+    // Sync picker value when the upstream value changes - but NOT when the
     // change originated from the picker itself (that would cause a feedback
     // loop: drag → onChange → setValue → parseCssColor → rgbToHsv → hue lost).
     useEffect(() => {
@@ -220,7 +220,7 @@ function AlphaColorPicker({
             }, settingBadgeText)
         ].filter(Boolean)),
         h('div', { className: inputClassName, ref: triggerRef }, [
-            // Swatch button — opens/closes the picker popover.
+            // Swatch button - opens/closes the picker popover.
             h('button', {
                 type: 'button',
                 className: 'fotogrids-color-swatch' + (isDisabled ? ' fotogrids-color-swatch--disabled' : ''),

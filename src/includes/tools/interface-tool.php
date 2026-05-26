@@ -8,12 +8,12 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Tool Interface
  *
- * Every FotoGrids tool — built-in, Pro, or third-party — must implement
+ * Every FotoGrids tool - built-in, Pro, or third-party - must implement
  * this interface. Tools are user-visible admin features with their own UI,
  * REST endpoints, and capability gates.
  *
  * Source (fotogrids / fotogrids-pro / third-party) is determined by the
- * registry from the tool's PHP namespace — the tool itself does not declare it.
+ * registry from the tool's PHP namespace - the tool itself does not declare it.
  *
  * @since 1.0.0
  */
@@ -23,7 +23,7 @@ interface Tool_Interface {
 	 * Unique tool identifier. Used as the URL slug (?tool=<id>)
 	 * and as the REST route segment (/admin/tools/<id>/*).
 	 *
-	 * @return string e.g. 'regen-thumbnails'
+	 * @return string e.g. 'regenerate-thumbnails'
 	 */
 	public function get_id(): string;
 
@@ -42,7 +42,7 @@ interface Tool_Interface {
 	public function get_description(): string;
 
 	/**
-	 * Icon identifier — dashicon slug (without 'dashicons-' prefix)
+	 * Icon identifier - dashicon slug (without 'dashicons-' prefix)
 	 * or a FotoGrids icon id.
 	 *
 	 * @return string e.g. 'update'
@@ -56,6 +56,15 @@ interface Tool_Interface {
 	 * @return string|null
 	 */
 	public function get_image(): ?string;
+
+	/**
+	 * Optional background color for the card image area.
+	 * Used as the value of the --fg-tool-card-color CSS variable.
+	 * Return null to use the default color defined in CSS.
+	 *
+	 * @return string|null e.g. '#ff0000' or 'rgb(255, 0, 0)'
+	 */
+	public function get_image_bg_color(): ?string;
 
 	/**
 	 * Logical grouping for future sidebar section headers.
@@ -80,7 +89,7 @@ interface Tool_Interface {
 	 * WordPress capability required to access this tool.
 	 *
 	 * Default is 'manage_fotogrids'. Override to declare a custom
-	 * capability (e.g. 'fotogrids_regen_thumbnails') so the
+	 * capability (e.g. 'fotogrids_regenerate_thumbnails') so the
 	 * Permissions Manager can expose per-tool access control.
 	 *
 	 * @return string
@@ -89,7 +98,7 @@ interface Tool_Interface {
 
 	/**
 	 * React component id the JS side should render for this tool.
-	 * Defaults to get_id() — only override when the component name
+	 * Defaults to get_id() - only override when the component name
 	 * must differ from the tool id.
 	 *
 	 * @return string
@@ -109,7 +118,7 @@ interface Tool_Interface {
 	/**
 	 * Absolute URL to the tool's compiled JavaScript file.
 	 *
-	 * Return null (the default) if the tool ships no script — for example,
+	 * Return null (the default) if the tool ships no script - for example,
 	 * a coming-soon stub that has no interactive UI yet.
 	 *
 	 * The infrastructure enqueues this URL on admin_enqueue_scripts,

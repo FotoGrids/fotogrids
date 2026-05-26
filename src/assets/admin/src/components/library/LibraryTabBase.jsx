@@ -1,20 +1,316 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, memo, useRef, useState } from 'react';
 import {
     Button,
-    CheckboxControl,
     Notice,
     Spinner,
+    CheckboxControl,
     TextControl,
     Popover,
     Modal,
 } from '@wordpress/components';
 import MergeDialog from './MergeDialog';
+import Panel from '../shared/SidebarTabs/elements/Panel';
+import Toggle from '../shared/Toggle';
+import Icon from '../shared/Icon';
 
 const { __, sprintf, _n } = wp.i18n;
 const apiFetch = wp.apiFetch;
 
 const DEFAULT_PER_PAGE = 50;
 const SEARCH_DEBOUNCE_MS = 300;
+
+// ─── Row component ────────────────────────────────────────────────────────────
+// Memoised so that only the row(s) whose props actually changed re-render when
+// the parent updates (e.g. a different row enters edit mode, selectedIds changes
+// for one item, or a new page of data arrives).
+const LibraryTableRow = memo(({
+    item,
+    isEditing,
+    isSelected,
+    editingDraft,
+    canManage,
+    entityType,
+    deleteTarget,
+    onToggleSelected,
+    onStartEdit,
+    onCancelEdit,
+    onSaveEdit,
+    onEditingDraftChange,
+    onRequestDelete,
+    onCancelDelete,
+    onConfirmDelete,
+}) => {
+    const { __, sprintf, _n } = wp.i18n;
+
+    return (
+        <React.Fragment key={item.id}>
+            <tr className={isSelected ? 'fotogrids-library-row-selected' : ''}>
+                <td scope="row" className="check-column">
+                    <CheckboxControl
+                        label={''}
+                        checked={isSelected}
+                        onChange={() => onToggleSelected(item.id)}
+                        aria-label={sprintf(__('Select %s', 'fotogrids'), item.name)}
+                        __nextHasNoMarginBottom
+                    />
+                </td>
+                <td className="fotogrids-library-table__column-name">
+                    {isEditing ? (
+                        <TextControl
+                            value={editingDraft.name || ''}
+                            onChange={(v) => onEditingDraftChange({ ...editingDraft, name: v })}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') onSaveEdit();
+                                if (e.key === 'Escape') onCancelEdit();
+                            }}
+                            autoFocus
+                            __nextHasNoMarginBottom
+                        />
+                    ) : (
+                        <button
+                            type="button"
+                            className="fotogrids-library-name-button"
+                            onClick={() => canManage && onStartEdit(item)}
+                            disabled={!canManage}
+                            title={canManage ? __('Click to rename', 'fotogrids') : ''}
+                        >
+                            {item.name}
+                        </button>
+                    )}
+                </td>
+                <td className="fotogrids-library-table__column-slug"><code className="fotogrids-library-slug">{item.slug}</code></td>
+                <td className="fotogrids-library-table__column--small fotogrids-library-table__column-usage">{item.usage_count}</td>
+                {entityType.supports_extra_fields && (
+                    <td className="fotogrids-library-table__column--small fotogrids-library-table__column-extra">
+                        {isEditing ? (
+                            <div className="fotogrids-library-latlng-edit">
+                                <TextControl
+                                    label={__('Lat', 'fotogrids')}
+                                    value={editingDraft.latitude ?? ''}
+                                    onChange={(v) => onEditingDraftChange({ ...editingDraft, latitude: v })}
+                                    type="number"
+                                    __nextHasNoMarginBottom
+                                />
+                                <TextControl
+                                    label={__('Lng', 'fotogrids')}
+                                    value={editingDraft.longitude ?? ''}
+                                    onChange={(v) => onEditingDraftChange({ ...editingDraft, longitude: v })}
+                                    type="number"
+                                    __nextHasNoMarginBottom
+                                />
+                            </div>
+                        ) : item.latitude !== null && item.longitude !== null ? (
+                            <span className="fotogrids-library-latlng">
+                                {item.latitude}, {item.longitude}
+                            </span>
+                        ) : (
+                            <span className="fotogrids-library-muted">-</span>
+                        )}
+                    </td>
+                )}
+                <td className="fotogrids-library-table__column--small fotogrids-library-table__column-actions">
+                    {isEditing ? (
+                        <div className="fotogrids-library-actions">
+                            <button className="fotogrids-button fotogrids-button--primary fotogrids-button--small" onClick={onSaveEdit}>{__('Save', 'fotogrids')}</button>
+                            <button className="fotogrids-button fotogrids-button--secondary fotogrids-button--small" onClick={onCancelEdit}>{__('Cancel', 'fotogrids')}</button>
+                        </div>
+                    ) : (
+                        <Button
+                            size="small"
+                            variant="tertiary"
+                            isDestructive
+                            disabled={!canManage}
+                            onClick={() => onRequestDelete(item)}
+                            aria-label={sprintf(__('Delete %s', 'fotogrids'), item.name)}
+                        >
+                            {__('Delete', 'fotogrids')}
+                        </Button>
+                    )}
+
+                    {deleteTarget && deleteTarget.id === item.id && (
+                        <Popover
+                            onClose={onCancelDelete}
+                            placement="bottom-end"
+                        >
+                            <div className="fotogrids-library-delete-popover">
+                                <p>
+                                    {item.usage_count > 0
+                                        ? sprintf(
+                                            _n(
+                                                'Delete "%1$s"? This will remove it from %2$d item.',
+                                                'Delete "%1$s"? This will remove it from %2$d items.',
+                                                item.usage_count,
+                                                'fotogrids'
+                                            ),
+                                            item.name,
+                                            item.usage_count
+                                        )
+                                        : sprintf(__('Delete "%s"? It is not used by any items.', 'fotogrids'), item.name)
+                                    }
+                                </p>
+                                <div className="fotogrids-library-delete-popover-actions">
+                                    <Button size="small" variant="primary" isDestructive onClick={onConfirmDelete}>
+                                        {__('Delete', 'fotogrids')}
+                                    </Button>
+                                    <Button size="small" variant="tertiary" onClick={onCancelDelete}>
+                                        {__('Cancel', 'fotogrids')}
+                                    </Button>
+                                </div>
+                            </div>
+                        </Popover>
+                    )}
+                </td>
+            </tr>
+        </React.Fragment>
+    );
+});
+
+LibraryTableRow.displayName = 'LibraryTableRow';
+
+// ─── Toolbar component ────────────────────────────────────────────────────────
+// Owns the search input and unused-only toggle. Debounces internally so
+// LibraryTabBase never re-renders on a raw keystroke - it only hears the
+// stabilised value via onSearchChange.
+const LibraryTableToolbar = memo(({
+    entityType,
+    canManage,
+    recalcing,
+    onSearchChange,
+    onUnusedOnlyChange,
+    onOpenCreate,
+    onRecalc,
+}) => {
+    const { __, sprintf } = wp.i18n;
+    const [search, setSearch] = useState('');
+    const [unusedOnly, setUnusedOnly] = useState(false);
+
+    // Debounce: notify parent only after the user stops typing.
+    useEffect(() => {
+        const t = setTimeout(() => onSearchChange(search.trim()), SEARCH_DEBOUNCE_MS);
+        return () => clearTimeout(t);
+    }, [search, onSearchChange]);
+
+    const handleUnusedOnly = useCallback((value) => {
+        setUnusedOnly(value);
+        onUnusedOnlyChange(value);
+    }, [onUnusedOnlyChange]);
+
+    return (
+        <div className="fotogrids-library-toolbar">
+            <div className="fotogrids-library-toolbar-search">
+                <TextControl
+                    value={search}
+                    onChange={setSearch}
+                    placeholder={
+                        entityType.label_plural
+                            ? sprintf(__('Search %s…', 'fotogrids'), entityType.label_plural.toLowerCase())
+                            : __('Search…', 'fotogrids')
+                    }
+                    __nextHasNoMarginBottom
+                />
+            </div>
+
+            <div className="fotogrids-library-toolbar-filter">
+                <Toggle
+                    checked={unusedOnly}
+                    onChange={handleUnusedOnly}
+                    label={__('Unused only', 'fotogrids')}
+                    labelLight
+                    size="small"
+                    id={`fg-lib-unused-only-${entityType.slug}`}
+                />
+            </div>
+
+            <div className="fotogrids-library-toolbar-actions">
+                {canManage && entityType.supports_create && (
+                    <button className="fotogrids-button fotogrids-button--primary fotogrids-button--small" onClick={onOpenCreate}>
+                        {sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
+                    </button>
+                )}
+                {canManage && (
+                    <button className="fotogrids-button fotogrids-button--secondary fotogrids-button--small" onClick={onRecalc} disabled={recalcing}>
+                        {__('Recalculate counts', 'fotogrids')}
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+});
+
+LibraryTableToolbar.displayName = 'LibraryTableToolbar';
+
+const LibraryTableBulkBar = memo(({ selectedCount, canManage, onDeleteSelected, onMerge }) => {
+    const { __, sprintf, _n } = wp.i18n;
+    return (
+        <div className="fotogrids-library-bulkbar">
+            <span>{sprintf(_n('%d selected', '%d selected', selectedCount, 'fotogrids'), selectedCount)}</span>
+            <Button variant="secondary" isDestructive onClick={onDeleteSelected} disabled={!canManage}>
+                {__('Delete selected', 'fotogrids')}
+            </Button>
+            {selectedCount >= 2 && (
+                <Button variant="secondary" onClick={onMerge} disabled={!canManage}>
+                    {__('Merge…', 'fotogrids')}
+                </Button>
+            )}
+        </div>
+    );
+});
+
+LibraryTableBulkBar.displayName = 'LibraryTableBulkBar';
+
+const LibraryTableHead = memo(({ entityType, orderby, order, allSelectedOnPage, onSort, onToggleSelectAll }) => {
+    const { __ } = wp.i18n;
+
+    const sortIndicator = (column) => {
+        if (orderby !== column) return null;
+        return (
+            <span
+                className="fotogrids-library-sort__indicator"
+                data-fg-order={order === 'asc' ? 'asc' : 'desc'}
+                aria-hidden="true"
+            >
+                <Icon name="arrow_down" />
+            </span>
+        );
+    };
+
+    return (
+        <thead>
+            <tr>
+                <th scope="col" className="check-column">
+                    <CheckboxControl
+                        label={''}
+                        checked={allSelectedOnPage}
+                        onChange={onToggleSelectAll}
+                        aria-label={__('Select all on this page', 'fotogrids')}
+                        __nextHasNoMarginBottom
+                    />
+                </th>
+                <th className="fotogrids-library-table__column-name" scope="col">
+                    <button type="button" className="fotogrids-library-sort" onClick={() => onSort('name')}>
+                        {__('Name', 'fotogrids')}{sortIndicator('name')}
+                    </button>
+                </th>
+                <th className="fotogrids-library-table__column-slug" scope="col">
+                    <button type="button" className="fotogrids-library-sort" onClick={() => onSort('slug')}>
+                        {__('Slug', 'fotogrids')}{sortIndicator('slug')}
+                    </button>
+                </th>
+                <th className="fotogrids-library-table__column--small fotogrids-library-table__column-usage" scope="col">
+                    <button type="button" className="fotogrids-library-sort" onClick={() => onSort('usage_count')}>
+                        {__('Items', 'fotogrids')}{sortIndicator('usage_count')}
+                    </button>
+                </th>
+                {entityType.supports_extra_fields && (
+                    <th className="fotogrids-library-table__column--small fotogrids-library-table__column-extra" scope="col">{__('Latitude / Longitude', 'fotogrids')}</th>
+                )}
+                <th className="fotogrids-library-table__column--small fotogrids-library-table__column-actions" scope="col">{__('Actions', 'fotogrids')}</th>
+            </tr>
+        </thead>
+    );
+});
+
+LibraryTableHead.displayName = 'LibraryTableHead';
 
 /**
  * Shared table + actions for every library entity type.
@@ -36,7 +332,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     const [perPage] = useState(library.perPage || DEFAULT_PER_PAGE);
     const [orderby, setOrderby] = useState('name');
     const [order, setOrder] = useState('asc');
-    const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [unusedOnly, setUnusedOnly] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -54,11 +349,7 @@ const LibraryTabBase = ({ entityType, config }) => {
     const [mergeOpen, setMergeOpen] = useState(false);
     const [recalcing, setRecalcing] = useState(false);
 
-    // ─── Debounced search ────────────────────────────────────────────────────
-    useEffect(() => {
-        const t = setTimeout(() => setDebouncedSearch(search.trim()), SEARCH_DEBOUNCE_MS);
-        return () => clearTimeout(t);
-    }, [search]);
+
 
     // ─── Data load ───────────────────────────────────────────────────────────
     const reqIdRef = useRef(0);
@@ -96,40 +387,49 @@ const LibraryTabBase = ({ entityType, config }) => {
     // Reset to page 1 when the filter/search/sort changes.
     useEffect(() => { setPage(1); }, [debouncedSearch, orderby, order, unusedOnly]);
 
+    // ─── Toolbar / filter callbacks ───────────────────────────────────────────
+    const handleSearchChange = useCallback((value) => {
+        setDebouncedSearch(value);
+    }, []);
+
+    const handleUnusedOnlyChange = useCallback((value) => {
+        setUnusedOnly(value);
+    }, []);
+
     // ─── Helpers ─────────────────────────────────────────────────────────────
     const totalPages = Math.max(1, Math.ceil(total / perPage));
 
-    const toggleSelected = (id) => {
+    const toggleSelected = useCallback((id) => {
         setSelectedIds((prev) => {
             const next = new Set(prev);
             if (next.has(id)) { next.delete(id); } else { next.add(id); }
             return next;
         });
-    };
+    }, []);
 
-    const toggleSelectAll = () => {
+    const toggleSelectAll = useCallback(() => {
         setSelectedIds((prev) => {
             if (prev.size === items.length) return new Set();
             return new Set(items.map((i) => i.id));
         });
-    };
+    }, [items]);
 
-    const toggleSort = (column) => {
+    const toggleSort = useCallback((column) => {
         if (orderby === column) {
             setOrder((o) => (o === 'asc' ? 'desc' : 'asc'));
         } else {
             setOrderby(column);
             setOrder('asc');
         }
-    };
+    }, [orderby]);
 
-    const flashNotice = (status, message) => {
+    const flashNotice = useCallback((status, message) => {
         setNotice({ status, message });
         setTimeout(() => setNotice(null), 4000);
-    };
+    }, []);
 
     // ─── Inline rename ───────────────────────────────────────────────────────
-    const startEdit = (item) => {
+    const startEdit = useCallback((item) => {
         setEditingId(item.id);
         const draft = { name: item.name };
         if (entityType.type === 'location') {
@@ -140,14 +440,14 @@ const LibraryTabBase = ({ entityType, config }) => {
             draft.details = item.meta?.details || '';
         }
         setEditingDraft(draft);
-    };
+    }, [entityType.type]);
 
-    const cancelEdit = () => {
+    const cancelEdit = useCallback(() => {
         setEditingId(null);
         setEditingDraft({});
-    };
+    }, []);
 
-    const saveEdit = () => {
+    const saveEdit = useCallback(() => {
         if (!editingId) return;
 
         const body = { name: editingDraft.name };
@@ -172,18 +472,18 @@ const LibraryTabBase = ({ entityType, config }) => {
             .catch((err) => {
                 flashNotice('error', err?.message || __('Save failed.', 'fotogrids'));
             });
-    };
+    }, [editingId, editingDraft, entityType.type, entityType.slug, restBase, cancelEdit, flashNotice]);
 
     // ─── Delete ──────────────────────────────────────────────────────────────
-    const requestDelete = (item) => {
+    const requestDelete = useCallback((item) => {
         setDeleteTarget(item);
-    };
+    }, []);
 
-    const cancelDelete = () => {
+    const cancelDelete = useCallback(() => {
         setDeleteTarget(null);
-    };
+    }, []);
 
-    const confirmDelete = () => {
+    const confirmDelete = useCallback(() => {
         if (!deleteTarget) return;
         const id = deleteTarget.id;
         apiFetch({
@@ -200,7 +500,7 @@ const LibraryTabBase = ({ entityType, config }) => {
                 flashNotice('error', err?.message || __('Delete failed.', 'fotogrids'));
                 cancelDelete();
             });
-    };
+    }, [deleteTarget, entityType.slug, restBase, cancelDelete, flashNotice]);
 
     // ─── Bulk delete ─────────────────────────────────────────────────────────
     const confirmBulkDelete = () => {
@@ -313,49 +613,20 @@ const LibraryTabBase = ({ entityType, config }) => {
     // ─── Render ──────────────────────────────────────────────────────────────
     const allSelectedOnPage = items.length > 0 && selectedIds.size === items.length;
 
-    const sortIndicator = (column) => {
-        if (orderby !== column) return '';
-        return order === 'asc' ? ' ▲' : ' ▼';
-    };
-
     return (
-        <div className={`fotogrids-library-tab fotogrids-library-tab-${entityType.slug}`}>
-            <div className="fotogrids-library-toolbar">
-                <div className="fotogrids-library-toolbar-search">
-                    <TextControl
-                        value={search}
-                        onChange={setSearch}
-                        placeholder={
-                            entityType.label_plural
-                                ? sprintf(__('Search %s…', 'fotogrids'), entityType.label_plural.toLowerCase())
-                                : __('Search…', 'fotogrids')
-                        }
-                        __nextHasNoMarginBottom
-                    />
-                </div>
-
-                <label className="fotogrids-library-toolbar-filter">
-                    <CheckboxControl
-                        label={__('Unused only', 'fotogrids')}
-                        checked={unusedOnly}
-                        onChange={setUnusedOnly}
-                        __nextHasNoMarginBottom
-                    />
-                </label>
-
-                <div className="fotogrids-library-toolbar-actions">
-                    {canManage && entityType.supports_create && (
-                        <Button variant="secondary" onClick={openCreate}>
-                            {sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
-                        </Button>
-                    )}
-                    {canManage && (
-                        <Button variant="tertiary" onClick={handleRecalc} isBusy={recalcing} disabled={recalcing}>
-                            {__('Recalculate counts', 'fotogrids')}
-                        </Button>
-                    )}
-                </div>
-            </div>
+        <Panel
+            // className={`fotogrids-library-tab fotogrids-library-tab-${entityType.slug}`}
+            equalBodyPadding
+        >
+            <LibraryTableToolbar
+                entityType={entityType}
+                canManage={canManage}
+                recalcing={recalcing}
+                onSearchChange={handleSearchChange}
+                onUnusedOnlyChange={handleUnusedOnlyChange}
+                onOpenCreate={openCreate}
+                onRecalc={handleRecalc}
+            />
 
             {notice && (
                 <Notice status={notice.status} isDismissible={true} onRemove={() => setNotice(null)}>
@@ -367,200 +638,69 @@ const LibraryTabBase = ({ entityType, config }) => {
             )}
 
             {selectedIds.size > 0 && (
-                <div className="fotogrids-library-bulkbar">
-                    <span>{sprintf(_n('%d selected', '%d selected', selectedIds.size, 'fotogrids'), selectedIds.size)}</span>
-                    <Button variant="secondary" isDestructive onClick={() => setBulkConfirmOpen(true)} disabled={!canManage}>
-                        {__('Delete selected', 'fotogrids')}
-                    </Button>
-                    {selectedIds.size >= 2 && (
-                        <Button variant="secondary" onClick={openMerge} disabled={!canManage}>
-                            {__('Merge…', 'fotogrids')}
-                        </Button>
-                    )}
-                </div>
+                <LibraryTableBulkBar
+                    selectedCount={selectedIds.size}
+                    canManage={canManage}
+                    onDeleteSelected={() => setBulkConfirmOpen(true)}
+                    onMerge={openMerge}
+                />
             )}
 
-            {loading ? (
-                <div className="fotogrids-library-loading"><Spinner /></div>
-            ) : items.length === 0 ? (
-                <div className="fotogrids-library-empty">
-                    <p>
-                        {unusedOnly
-                            ? __('No unused entries.', 'fotogrids')
-                            : debouncedSearch
-                                ? __('No entries match your search.', 'fotogrids')
-                                : __('No entries yet.', 'fotogrids')}
-                    </p>
-                    {!debouncedSearch && !unusedOnly && (
-                        <p className="fotogrids-library-empty-help">
-                            {__('Entries are usually created from the Item Edit modal inside a gallery. You can also add one directly using the button above.', 'fotogrids')}
-                        </p>
-                    )}
-                </div>
-            ) : (
-                <table className="wp-list-table widefat fixed striped fotogrids-library-table">
-                    <thead>
+            <table className="wp-list-table widefat striped fotogrids-library-table">
+                <LibraryTableHead
+                    entityType={entityType}
+                    orderby={orderby}
+                    order={order}
+                    allSelectedOnPage={allSelectedOnPage}
+                    onSort={toggleSort}
+                    onToggleSelectAll={toggleSelectAll}
+                />
+                <tbody>
+                    {loading ? (
                         <tr>
-                            <th scope="col" className="check-column">
-                                <CheckboxControl
-                                    label={''}
-                                    checked={allSelectedOnPage}
-                                    onChange={toggleSelectAll}
-                                    aria-label={__('Select all on this page', 'fotogrids')}
-                                    __nextHasNoMarginBottom
-                                />
-                            </th>
-                            <th scope="col">
-                                <button type="button" className="fotogrids-library-sort" onClick={() => toggleSort('name')}>
-                                    {__('Name', 'fotogrids')}{sortIndicator('name')}
-                                </button>
-                            </th>
-                            <th scope="col">
-                                <button type="button" className="fotogrids-library-sort" onClick={() => toggleSort('slug')}>
-                                    {__('Slug', 'fotogrids')}{sortIndicator('slug')}
-                                </button>
-                            </th>
-                            <th scope="col">
-                                <button type="button" className="fotogrids-library-sort" onClick={() => toggleSort('usage_count')}>
-                                    {__('Items', 'fotogrids')}{sortIndicator('usage_count')}
-                                </button>
-                            </th>
-                            {entityType.supports_extra_fields && (
-                                <th scope="col">{__('Latitude / Longitude', 'fotogrids')}</th>
-                            )}
-                            <th scope="col" className="fotogrids-library-actions-col">{__('Actions', 'fotogrids')}</th>
+                            <td colSpan={entityType.supports_extra_fields ? 6 : 5} className="fotogrids-library-loading">
+                                <Spinner />
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item) => {
-                            const isEditing = editingId === item.id;
-                            const isSelected = selectedIds.has(item.id);
-
-                            return (
-                                <React.Fragment key={item.id}>
-                                    <tr className={isSelected ? 'fotogrids-library-row-selected' : ''}>
-                                        <th scope="row" className="check-column">
-                                            <CheckboxControl
-                                                label={''}
-                                                checked={isSelected}
-                                                onChange={() => toggleSelected(item.id)}
-                                                aria-label={sprintf(__('Select %s', 'fotogrids'), item.name)}
-                                                __nextHasNoMarginBottom
-                                            />
-                                        </th>
-                                        <td>
-                                            {isEditing ? (
-                                                <TextControl
-                                                    value={editingDraft.name || ''}
-                                                    onChange={(v) => setEditingDraft({ ...editingDraft, name: v })}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') saveEdit();
-                                                        if (e.key === 'Escape') cancelEdit();
-                                                    }}
-                                                    autoFocus
-                                                    __nextHasNoMarginBottom
-                                                />
-                                            ) : (
-                                                <button
-                                                    type="button"
-                                                    className="fotogrids-library-name-button"
-                                                    onClick={() => canManage && startEdit(item)}
-                                                    disabled={!canManage}
-                                                    title={canManage ? __('Click to rename', 'fotogrids') : ''}
-                                                >
-                                                    {item.name}
-                                                </button>
-                                            )}
-                                        </td>
-                                        <td><code className="fotogrids-library-slug">{item.slug}</code></td>
-                                        <td>{item.usage_count}</td>
-                                        {entityType.supports_extra_fields && (
-                                            <td>
-                                                {isEditing ? (
-                                                    <div className="fotogrids-library-latlng-edit">
-                                                        <TextControl
-                                                            label={__('Lat', 'fotogrids')}
-                                                            value={editingDraft.latitude ?? ''}
-                                                            onChange={(v) => setEditingDraft({ ...editingDraft, latitude: v })}
-                                                            type="number"
-                                                            __nextHasNoMarginBottom
-                                                        />
-                                                        <TextControl
-                                                            label={__('Lng', 'fotogrids')}
-                                                            value={editingDraft.longitude ?? ''}
-                                                            onChange={(v) => setEditingDraft({ ...editingDraft, longitude: v })}
-                                                            type="number"
-                                                            __nextHasNoMarginBottom
-                                                        />
-                                                    </div>
-                                                ) : item.latitude !== null && item.longitude !== null ? (
-                                                    <span className="fotogrids-library-latlng">
-                                                        {item.latitude}, {item.longitude}
-                                                    </span>
-                                                ) : (
-                                                    <span className="fotogrids-library-muted">—</span>
-                                                )}
-                                            </td>
-                                        )}
-                                        <td className="fotogrids-library-actions-col">
-                                            {isEditing ? (
-                                                <>
-                                                    <Button size="small" variant="primary" onClick={saveEdit}>{__('Save', 'fotogrids')}</Button>
-                                                    <Button size="small" variant="tertiary" onClick={cancelEdit}>{__('Cancel', 'fotogrids')}</Button>
-                                                </>
-                                            ) : (
-                                                <Button
-                                                    size="small"
-                                                    variant="tertiary"
-                                                    isDestructive
-                                                    disabled={!canManage}
-                                                    onClick={() => requestDelete(item)}
-                                                    aria-label={sprintf(__('Delete %s', 'fotogrids'), item.name)}
-                                                >
-                                                    {__('Delete', 'fotogrids')}
-                                                </Button>
-                                            )}
-
-                                            {deleteTarget && deleteTarget.id === item.id && (
-                                                <Popover
-                                                    onClose={cancelDelete}
-                                                    placement="bottom-end"
-                                                >
-                                                    <div className="fotogrids-library-delete-popover">
-                                                        <p>
-                                                            {item.usage_count > 0
-                                                                ? sprintf(
-                                                                    _n(
-                                                                        'Delete "%1$s"? This will remove it from %2$d item.',
-                                                                        'Delete "%1$s"? This will remove it from %2$d items.',
-                                                                        item.usage_count,
-                                                                        'fotogrids'
-                                                                    ),
-                                                                    item.name,
-                                                                    item.usage_count
-                                                                )
-                                                                : sprintf(__('Delete "%s"? It is not used by any items.', 'fotogrids'), item.name)
-                                                            }
-                                                        </p>
-                                                        <div className="fotogrids-library-delete-popover-actions">
-                                                            <Button size="small" variant="primary" isDestructive onClick={confirmDelete}>
-                                                                {__('Delete', 'fotogrids')}
-                                                            </Button>
-                                                            <Button size="small" variant="tertiary" onClick={cancelDelete}>
-                                                                {__('Cancel', 'fotogrids')}
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </Popover>
-                                            )}
-                                        </td>
-                                    </tr>
-                                </React.Fragment>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            )}
+                    ) : items.length === 0 ? (
+                        <tr>
+                            <td colSpan={entityType.supports_extra_fields ? 6 : 5} className="fotogrids-library-empty">
+                                <p>
+                                    {unusedOnly
+                                        ? __('No unused entries.', 'fotogrids')
+                                        : debouncedSearch
+                                            ? __('No entries match your search.', 'fotogrids')
+                                            : __('No entries yet.', 'fotogrids')}
+                                </p>
+                                {!debouncedSearch && !unusedOnly && (
+                                    <p className="fotogrids-library-empty-help">
+                                        {__('Entries are usually created from the Item Edit modal inside a gallery. You can also add one directly using the button above.', 'fotogrids')}
+                                    </p>
+                                )}
+                            </td>
+                        </tr>
+                    ) : items.map((item) => (
+                        <LibraryTableRow
+                            key={item.id}
+                            item={item}
+                            isEditing={editingId === item.id}
+                            isSelected={selectedIds.has(item.id)}
+                            editingDraft={editingDraft}
+                            canManage={canManage}
+                            entityType={entityType}
+                            deleteTarget={deleteTarget}
+                            onToggleSelected={toggleSelected}
+                            onStartEdit={startEdit}
+                            onCancelEdit={cancelEdit}
+                            onSaveEdit={saveEdit}
+                            onEditingDraftChange={setEditingDraft}
+                            onRequestDelete={requestDelete}
+                            onCancelDelete={cancelDelete}
+                            onConfirmDelete={confirmDelete}
+                        />
+                    ))}
+                </tbody>
+            </table>
 
             {!loading && totalPages > 1 && (
                 <div className="fotogrids-library-pagination tablenav-pages">
@@ -675,7 +815,7 @@ const LibraryTabBase = ({ entityType, config }) => {
                     restBase={restBase}
                 />
             )}
-        </div>
+        </Panel>
     );
 };
 

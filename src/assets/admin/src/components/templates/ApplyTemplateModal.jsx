@@ -159,7 +159,7 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
                         onChange={(e) => setTargetId(e.target.value)}
                         disabled={applying}
                     >
-                        <option value="">{__('— Select —', 'fotogrids')}</option>
+                        <option value="">{__('- Select -', 'fotogrids')}</option>
                         {targets.map(target => (
                             <option key={target.id} value={target.id}>
                                 {target.title}

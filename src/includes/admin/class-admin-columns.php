@@ -7,17 +7,17 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Admin Columns Class
- * 
+ *
  * Handles custom columns for FotoGrids post types in admin list tables
  */
 class Admin_Columns {
-    
+
     /**
      * Initialize the admin columns
-     * 
+     *
      * Sets up WordPress hooks for custom columns in gallery and album list tables.
      * Registers column headers and content handlers for both post types.
-     * 
+     *
      * @since 1.0.0
      */
     public static function init() {
@@ -66,31 +66,31 @@ class Admin_Columns {
             'copyErrorMessage'  => __( 'Failed to copy Shortcode', 'fotogrids' ),
         ) );
     }
-    
+
     /**
      * Add custom columns to gallery list table
-     * 
+     *
      * Modifies the default WordPress columns for the gallery post type list table.
      * Adds custom columns for shortcode, album association, layout type, item count,
      * and statistics while preserving the date column at the end.
-     * 
+     *
      * @since 1.0.0
-     * 
+     *
      * @param array $columns Associative array of column IDs and labels
      * @return array Modified columns array with custom FotoGrids columns
      */
     public static function gallery_columns( $columns ) {
         $date = $columns['date'];
         unset( $columns['date'] );
-        
+
         $columns['fotogrids_shortcode'] = __( 'Shortcode', 'fotogrids' );
         $columns['fotogrids_album'] = __( 'Album', 'fotogrids' );
         $columns['fotogrids_layout'] = __( 'Layout', 'fotogrids' );
         $columns['fotogrids_items'] = __( 'Items', 'fotogrids' );
         $columns['fotogrids_stats'] = __( 'Interactions', 'fotogrids' );
-        
+
         $columns['date'] = $date;
-        
+
         return $columns;
     }
 
@@ -129,13 +129,13 @@ class Admin_Columns {
 
     /**
      * Display content for custom gallery columns
-     * 
+     *
      * Renders the content for each custom column in the gallery list table.
      * Handles shortcode display, album associations, layout badges, item counts,
      * and statistics for each gallery.
-     * 
+     *
      * @since 1.0.0
-     * 
+     *
      * @param string $column  The column ID being rendered
      * @param int    $post_id The ID of the post (gallery) being processed
      */
@@ -144,7 +144,7 @@ class Admin_Columns {
             case 'fotogrids_shortcode':
                 self::render_shortcode_column( $post_id, 'fotogrids_gallery' );
                 break;
-                
+
             case 'fotogrids_album':
                 $albums = \FotoGrids\Gallery_Album_Relations::get_albums_for_gallery( $post_id );
                 if ( ! empty( $albums ) ) {
@@ -153,27 +153,27 @@ class Admin_Columns {
                         $album_links[] = '<a href="' . get_edit_post_link( $album->ID ) . '">' . esc_html( $album->post_title ) . '</a>';
                     }
                     echo implode( ', ', $album_links );
-                    
+
                     if ( count( $albums ) > 1 ) {
                         echo '<br><small style="color: #666;">(' . sprintf( __( '%d albums', 'fotogrids' ), count( $albums ) ) . ')</small>';
                     }
                 } else {
-                    echo '—';
+                    echo '-';
                 }
                 break;
-                
+
             case 'fotogrids_layout':
                 $layout = get_post_meta( $post_id, 'fotogrids_layout', true ) ?: 'grid';
                 echo '<span class="fotogrids-layout-badge layout-' . esc_attr( $layout ) . '">' . esc_html( str_replace( '-', ' ', ucfirst( $layout ) ) ) . '</span>';
                 break;
-                
+
             case 'fotogrids_items':
                 $item_count = fotogrids_get_gallery_item_count( $post_id );
                 echo $item_count === 0
                     ? '<span class="fotogrids-text--error">0</span>'
                     : esc_html( (string) $item_count );
                 break;
-                
+
             case 'fotogrids_stats':
                 $stats = \FotoGrids\Statistics::get( 'gallery', $post_id );
                 if ( $stats ) {
@@ -187,29 +187,29 @@ class Admin_Columns {
                 break;
         }
     }
-    
+
     /**
      * Add custom columns to album list table
-     * 
+     *
      * Modifies the default WordPress columns for the album post type list table.
      * Adds custom columns for shortcode, associated galleries count, and statistics
      * while preserving the date column at the end.
-     * 
+     *
      * @since 1.0.0
-     * 
+     *
      * @param array $columns Associative array of column IDs and labels
      * @return array Modified columns array with custom FotoGrids columns
      */
     public static function album_columns( $columns ) {
         $date = $columns['date'];
         unset( $columns['date'] );
-        
+
         $columns['fotogrids_shortcode'] = __( 'Shortcode', 'fotogrids' );
         $columns['fotogrids_galleries'] = __( 'Galleries', 'fotogrids' );
         $columns['fotogrids_stats'] = __( 'Interactions', 'fotogrids' );
-        
+
         $columns['date'] = $date;
-        
+
         return $columns;
     }
 
@@ -229,13 +229,13 @@ class Admin_Columns {
 
     /**
      * Display content for custom album columns
-     * 
+     *
      * Renders the content for each custom column in the album list table.
      * Handles shortcode display, gallery associations with counts and names,
      * and statistics for each album.
-     * 
+     *
      * @since 1.0.0
-     * 
+     *
      * @param string $column  The column ID being rendered
      * @param int    $post_id The ID of the post (album) being processed
      */
@@ -244,18 +244,18 @@ class Admin_Columns {
             case 'fotogrids_shortcode':
                 self::render_shortcode_column( $post_id, 'fotogrids_album' );
                 break;
-                
+
             case 'fotogrids_galleries':
                 $galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $post_id );
                 $count = count( $galleries );
-                
+
                 if ( $count > 0 ) {
                     echo '<strong>' . $count . '</strong>';
                 } else {
                     echo '<span style="color: #999;">0</span>';
                 }
                 break;
-                
+
             case 'fotogrids_stats':
                 $stats = \FotoGrids\Statistics::get( 'album', $post_id );
                 if ( $stats ) {

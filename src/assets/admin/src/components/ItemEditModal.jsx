@@ -6,7 +6,7 @@ import ModalStructure from './item-edit-modal/ModalStructure';
  *
  * Pro (or any extension) can register additional metadata types that will be
  * included in the item save payload automatically. Call this before the modal
- * mounts — typically from the Pro plugin's admin JS entry point.
+ * mounts - typically from the Pro plugin's admin JS entry point.
  *
  * Example (Pro plugin):
  *   window.FotoGridsAdmin.registerMetadataType({
@@ -16,16 +16,16 @@ import ModalStructure from './item-edit-modal/ModalStructure';
  *   });
  *
  * Each registration object must provide:
- *   key         {string}   — The state key used in `metadata` and the payload field name.
- *   serialize   {Function} — Converts the current metadata state slice to a saveable value.
- *   deserialize {Function} — Converts the API load response into the initial state slice.
+ *   key         {string}   - The state key used in `metadata` and the payload field name.
+ *   serialize   {Function} - Converts the current metadata state slice to a saveable value.
+ *   deserialize {Function} - Converts the API load response into the initial state slice.
  */
 const _metadataTypeRegistry = [];
 
 window.FotoGridsAdmin = window.FotoGridsAdmin || {};
 window.FotoGridsAdmin.registerMetadataType = ( registration ) => {
     if ( ! registration?.key || typeof registration.serialize !== 'function' || typeof registration.deserialize !== 'function' ) {
-        console.warn( '[FotoGrids] registerMetadataType: invalid registration — key, serialize, and deserialize are required.', registration );
+        console.warn( '[FotoGrids] registerMetadataType: invalid registration - key, serialize, and deserialize are required.', registration );
         return;
     }
     if ( _metadataTypeRegistry.some( r => r.key === registration.key ) ) {

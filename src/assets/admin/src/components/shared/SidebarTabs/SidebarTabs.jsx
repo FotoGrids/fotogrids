@@ -2,12 +2,12 @@ import React from 'react';
 import SidebarTabsNav from './SidebarTabsNav';
 
 /**
- * SidebarTabs — a reusable vertical-tabs page shell.
+ * SidebarTabs - a reusable vertical-tabs page shell.
  *
  * A sticky left navigation rail plus a content pane on the right. Used to
  * give Settings, Tools, and Library a consistent layout. The component is
  * deliberately "dumb": it owns no active-tab state and does no data
- * fetching or URL syncing — the parent page keeps that responsibility (e.g.
+ * fetching or URL syncing - the parent page keeps that responsibility (e.g.
  * via window.FotoGridsUiState) and passes `activeTab` / `onTabChange` down.
  *
  * Children are rendered as-is inside the content pane, so each page is free

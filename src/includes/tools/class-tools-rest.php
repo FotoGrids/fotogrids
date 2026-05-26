@@ -6,7 +6,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Tools REST — Manifest Endpoint
+ * Tools REST - Manifest Endpoint
  *
  * Registers GET /fotogrids/v1/admin/tools which returns the manifest
  * of all tools the current user can access.
@@ -15,9 +15,9 @@ if ( ! defined( 'WPINC' ) ) {
  * the tool's tier_required and the current user's license, following
  * the same pattern as the collection-settings catalog:
  *
- *   'editable' — user is on the required tier (or tier is 'free')
- *   'teaser'   — feature exists on a higher tier the user doesn't have
- *   'locked'   — user was on the right tier but license has expired
+ *   'editable' - user is on the required tier (or tier is 'free')
+ *   'teaser'   - feature exists on a higher tier the user doesn't have
+ *   'locked'   - user was on the right tier but license has expired
  *
  * @since 1.0.0
  */
@@ -66,6 +66,7 @@ class Tools_Rest {
 				'description'  => $tool->get_description(),
 				'icon'         => $tool->get_icon(),
 				'image'        => $tool->get_image(),
+				'image_bg_color' => $tool->get_image_bg_color(),
 				'group'        => $tool->get_group(),
 				'source'       => $source,
 				'tier_required' => $tool->get_tier_required(),
@@ -81,30 +82,19 @@ class Tools_Rest {
 	/**
 	 * Resolve tier_required → access_state for the current user.
 	 *
-	 * Mirrors the logic in catalog/class-state-resolver.php so the
-	 * Tools manifest uses the same vocabulary as collection settings.
+	 * Delegates to the shared Access_State resolver so the Tools manifest,
+	 * the Modules manifest, and the collection-settings catalog all use the
+	 * same vocabulary and the same logic.
+	 *
+	 * NOTE: this previously called the non-existent License_Manager::instance()
+	 * (License_Manager is all-static), which would have fatalled the manifest
+	 * the moment a non-free tier tool was registered. Fixed by routing through
+	 * Access_State, which uses the correct static License_Manager API.
 	 *
 	 * @param string $tier_required
 	 * @return string 'editable' | 'teaser' | 'locked'
 	 */
 	private static function resolve_access_state( string $tier_required ): string {
-		if ( 'free' === $tier_required ) {
-			return 'editable';
-		}
-
-		$license = \FotoGrids\License_Manager::instance();
-
-		// User is on the required plan or higher.
-		if ( $license->on_plan( $tier_required ) ) {
-			return 'editable';
-		}
-
-		// User was previously on this plan but license has since expired.
-		if ( $license->pro_is_active() ) {
-			return 'locked';
-		}
-
-		// User has never had this tier.
-		return 'teaser';
+		return \FotoGrids\Licensing\Access_State::resolve( $tier_required );
 	}
 }

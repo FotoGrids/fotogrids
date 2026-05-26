@@ -1,15 +1,15 @@
 // =============================================================================
-// FotoGrids — Loading Icon
+// FotoGrids - Loading Icon
 //
-// State model — driven by data-fg-media-state on .fg-item (<figure>):
+// State model - driven by data-fg-media-state on .fg-item (<figure>):
 //
-//   [data-fg-media-state="loading"]  — server-rendered default; loader visible,
+//   [data-fg-media-state="loading"]  - server-rendered default; loader visible,
 //                                      image invisible, pointer-events blocked.
-//   [data-fg-media-state="loaded"]   — JS-applied after img load/error; loader
+//   [data-fg-media-state="loaded"]   - JS-applied after img load/error; loader
 //                                      hidden, image fades in, clicks enabled.
 //
 // The loader is <div class="fg-item-loader"> containing a full inline SVG
-// (one per item — <symbol>/<use> breaks SMIL animation ID cross-references).
+// (one per item - <symbol>/<use> breaks SMIL animation ID cross-references).
 // It is absolutely positioned so it sits centred over the image bounding box
 // without affecting layout.
 //
@@ -25,7 +25,7 @@
 }
 
 // -----------------------------------------------------------------------------
-// Loader container — centred absolutely inside .fg-item-media
+// Loader container - centred absolutely inside .fg-item-media
 // -----------------------------------------------------------------------------
 
 .fotogrids-gallery .fg-item-loader,

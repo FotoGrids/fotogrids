@@ -4,12 +4,12 @@
  * Source:  src/public/render/fg-tooltip/fg-tooltip.scss
  * Webpack: entry key 'fg-tooltip'  →  assets/css/fg-tooltip.css
  *
- * Intentionally theme-neutral — uses CSS custom properties so any surface
+ * Intentionally theme-neutral - uses CSS custom properties so any surface
  * (lightbox, gallery overlay, etc.) can restyle without overrides.
  */
 
 .fg-tooltip {
-    // Tokens — override at :root or on a parent to retheme.
+    // Tokens - override at :root or on a parent to retheme.
     --fg-tt-bg:          rgba(20, 20, 20, 0.92);
     --fg-tt-color:       #ffffff;
     --fg-tt-font-size:   12px;
@@ -45,7 +45,7 @@
         visibility var(--fg-tt-duration) ease,
         transform  var(--fg-tt-duration) ease;
 
-    // Entrance slide direction — set via data-dir by JS.
+    // Entrance slide direction - set via data-dir by JS.
     &[data-dir="below"] { transform: translateY(var(--fg-tt-offset)); }
     &[data-dir="left"]  { transform: translateX(var(--fg-tt-offset)); }
     &[data-dir="right"] { transform: translateX(calc(-1 * var(--fg-tt-offset))); }

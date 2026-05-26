@@ -26,7 +26,7 @@ class Register_Library_Routes {
         $manage_cb = array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_manage_library' );
         $read_cb   = array( '\FotoGrids\REST\Metadata\Metadata_Permissions', 'check_read_library' );
 
-        // GET /library/types — list registered entity types.
+        // GET /library/types - list registered entity types.
         register_rest_route( 'fotogrids/v1', '/library/types', array(
             array(
                 'methods'             => \WP_REST_Server::READABLE,

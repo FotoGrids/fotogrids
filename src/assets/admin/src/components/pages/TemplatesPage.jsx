@@ -293,7 +293,7 @@ const TemplatesPage = () => {
                             onClick={() => setActiveTab('gallery')}
                         >
                             <span className="fotogrids-templates-page__tab__icon">
-                                {renderIcon('layout_grid')}
+                                {renderIcon('layout_3x3')}
                             </span>
                             <span className="fotogrids-templates-page__tab__label">
                                 {__('Gallery Templates', 'fotogrids')}
@@ -305,7 +305,7 @@ const TemplatesPage = () => {
                             onClick={() => setActiveTab('album')}
                         >
                             <span className="fotogrids-templates-page__tab__icon">
-                                {renderIcon('layout')}
+                                {renderIcon('layout_2x2')}
                             </span>
                             <span className="fotogrids-templates-page__tab__label">
                                 {__('Album Templates', 'fotogrids')}

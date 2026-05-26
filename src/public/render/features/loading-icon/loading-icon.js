@@ -1,11 +1,11 @@
 /**
- * FotoGrids — Loading Icon
+ * FotoGrids - Loading Icon
  *
  * Manages the data-fg-media-state attribute on .fg-item elements.
  *
  * WAAPI animations are started by an inline <script> emitted immediately after
  * each gallery wrapper (Loading_Icon::html_after). That script runs as the
- * browser parses the page — before images load from cache — and stores
+ * browser parses the page - before images load from cache - and stores
  * animation handles in window.fgLoaderHandles (a WeakMap keyed by .fg-item).
  *
  * This footer script's job is purely state management:
@@ -18,7 +18,7 @@
  * arrives. Pointer-events on the clickable wrapper (<a>) are blocked via CSS
  * while state="loading" so the lightbox can't be triggered prematurely.
  *
- * No imports — standalone vanilla-JS compiled by webpack.
+ * No imports - standalone vanilla-JS compiled by webpack.
  */
 
 ( function () {
@@ -28,7 +28,7 @@
     const STATE_LOADED = 'loaded';
 
     // -------------------------------------------------------------------------
-    // Handle map — shared with the inline per-gallery script
+    // Handle map - shared with the inline per-gallery script
     // -------------------------------------------------------------------------
 
     /**
@@ -94,7 +94,7 @@
      *
      * If the image is already complete (cached hit or footer-script timing),
      * marks it loaded immediately. The inline per-gallery script has already
-     * started the animation, so cancelling here is safe — the animation ran
+     * started the animation, so cancelling here is safe - the animation ran
      * for 0ms and the user sees a clean instant reveal.
      *
      * @param {HTMLImageElement} img
@@ -105,7 +105,7 @@
             return;
         }
 
-        // Already resolved — naturalWidth > 0 means decoded image.
+        // Already resolved - naturalWidth > 0 means decoded image.
         if ( img.complete && img.naturalWidth > 0 ) {
             markLoaded( item );
             return;
@@ -142,14 +142,14 @@
     // -------------------------------------------------------------------------
 
     /**
-     * Initial pass — wire every gallery already in the DOM.
+     * Initial pass - wire every gallery already in the DOM.
      */
     function init() {
         document.querySelectorAll( '.fotogrids-gallery' ).forEach( wireGallery );
     }
 
     /**
-     * MutationObserver — handles galleries inserted after page load
+     * MutationObserver - handles galleries inserted after page load
      * (album AJAX loads, password-unlock swaps, dynamic insertions).
      *
      * Dynamically inserted items don't have a prior inline script, so
@@ -188,7 +188,7 @@
                         return;
                     }
 
-                    // Newly inserted gallery wrapper — wire images inside it.
+                    // Newly inserted gallery wrapper - wire images inside it.
                     if ( node.matches( '.fotogrids-gallery' ) ) {
                         node.querySelectorAll( '.fg-item' ).forEach( startDynamicAnimation );
                         wireGallery( node );

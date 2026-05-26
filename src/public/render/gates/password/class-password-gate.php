@@ -115,7 +115,7 @@ final class Password_Gate implements Gate {
         $settings   = $render_context->settings;
         $simulate   = (string) ( $settings['_simulate_state'] ?? '' );
 
-        // Simulated lock — always show the lock screen, skip cookie check.
+        // Simulated lock - always show the lock screen, skip cookie check.
         if ( $simulate !== 'password_required' ) {
             $stored     = (string) ( $settings['_password_encrypted'] ?? '' );
             $cookie_key = 'fotogrids_unlocked_' . $gallery_id;
@@ -218,7 +218,7 @@ final class Password_Gate implements Gate {
     /**
      * Returns a self-contained SVG lock icon (no external dependency).
      *
-     * Uses the Heroicons "lock-closed" outline path — MIT licensed, inline so
+     * Uses the Heroicons "lock-closed" outline path - MIT licensed, inline so
      * no extra HTTP request is needed.
      *
      * @since  1.0.0

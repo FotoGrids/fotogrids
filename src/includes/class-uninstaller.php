@@ -23,7 +23,16 @@ class Uninstaller {
         if ( ! self::should_delete_data() ) {
             return;
         }
-        
+
+        // Let lifecycle modules drop the tables/options they own before the
+        // core cleanup runs. Guarded: if the registry is not loaded in this
+        // uninstall request, the blanket option/postmeta cleanup below still
+        // removes module options, and a module's own uninstall hook (if it
+        // registered one against WordPress) handles its tables.
+        if ( class_exists( '\FotoGrids\Activator' ) ) {
+            Activator::run_module_lifecycle( 'on_uninstall' );
+        }
+
         // Remove database tables
         self::drop_tables();
         
@@ -64,6 +73,7 @@ class Uninstaller {
             $wpdb->prefix . 'fotogrids_item_meta',
             $wpdb->prefix . 'fotogrids_statistics',
             $wpdb->prefix . 'fotogrids_licenses',
+            $wpdb->prefix . 'fotogrids_render_cache',
         );
         
         foreach ( $tables as $table ) {

@@ -217,6 +217,34 @@ class Register_Admin_Routes {
             ),
         ) );
 
+        // Sharing settings: GET / POST /admin/sharing-settings
+        register_rest_route( 'fotogrids/v1', '/admin/sharing-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_sharing_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_sharing_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+        ) );
+
+        // View page appearance settings: GET / POST /admin/view-settings
+        register_rest_route( 'fotogrids/v1', '/admin/view-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_view_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_view_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+        ) );
+
         // Advanced (boolean) settings: GET / POST /admin/advanced-settings
         register_rest_route( 'fotogrids/v1', '/admin/advanced-settings', array(
             array(
@@ -278,6 +306,12 @@ class Register_Admin_Routes {
             array(
                 'methods'  => \WP_REST_Server::READABLE,
                 'callback' => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_popular_galleries' ),
+                'args' => array(
+                    'days' => array(
+                        'default' => 0,
+                        'sanitize_callback' => 'absint',
+                    ),
+                ),
                 'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
             ),
         ) );
@@ -287,6 +321,12 @@ class Register_Admin_Routes {
             array(
                 'methods'  => \WP_REST_Server::READABLE,
                 'callback' => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_recent_activity' ),
+                'args' => array(
+                    'days' => array(
+                        'default' => 0,
+                        'sanitize_callback' => 'absint',
+                    ),
+                ),
                 'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
             ),
         ) );
@@ -296,6 +336,12 @@ class Register_Admin_Routes {
             array(
                 'methods'  => \WP_REST_Server::READABLE,
                 'callback' => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_top_content' ),
+                'args' => array(
+                    'days' => array(
+                        'default' => 0,
+                        'sanitize_callback' => 'absint',
+                    ),
+                ),
                 'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
             ),
         ) );

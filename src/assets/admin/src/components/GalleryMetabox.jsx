@@ -8,7 +8,7 @@ import VideoEmbedModal from './VideoEmbedModal.jsx';
 import Icon from './shared/Icon.jsx';
 import Modal from './shared/Modal.jsx';
 import GalleryPreview from './GalleryPreview.jsx';
-import UploadArea from './blocks/UploadArea.jsx';
+import MediaUpload from './blocks/MediaUpload.jsx';
 
 const GalleryMetabox = ({
     galleryItems = [],
@@ -670,7 +670,7 @@ const GalleryMetabox = ({
                     </p>
                     <div className="fotogrids-items-noitems-add fotogrids-noitems-add-grid">
                         <div className="fotogrids-noitems-add-block fotogrids-noitems-add-block--upload">
-                            <UploadArea onUploadComplete={handleUploadComplete} inputId="fotogrids-metabox-upload-input" />
+                            <MediaUpload onUploadComplete={handleUploadComplete} inputId="fotogrids-metabox-upload-input" />
                         </div>
                         <button
                             type="button"

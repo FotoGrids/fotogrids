@@ -238,7 +238,7 @@ class Metadata_Data {
                     $results['errors'][] = sprintf( __( 'Failed to link person ID %d to item %d', 'fotogrids' ), $person_id, $item_id );
                 }
             } elseif ( ! empty( $name ) ) {
-                // Fallback: no ID supplied — find or create by name.
+                // Fallback: no ID supplied - find or create by name.
                 $result = \FotoGrids\Metadata_Manager::add_person_to_item( $item_id, $name, $details );
                 if ( $result ) {
                     $results['people'][] = array( 'name' => $name );
@@ -265,7 +265,7 @@ class Metadata_Data {
                     $results['errors'][] = sprintf( __( 'Failed to link location ID %d to item %d', 'fotogrids' ), $location_id, $item_id );
                 }
             } elseif ( ! empty( $name ) ) {
-                // Fallback: no ID supplied — find or create by name.
+                // Fallback: no ID supplied - find or create by name.
                 $result = \FotoGrids\Metadata_Manager::add_location_to_item( $item_id, $name, $latitude, $longitude );
                 if ( $result ) {
                     $results['locations'][] = array( 'name' => $name );

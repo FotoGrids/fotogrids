@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Metadata_Permissions {
-    
+
     /**
      * Permission check for edit_posts capability
      *
@@ -46,7 +46,7 @@ class Metadata_Permissions {
     }
 
     /**
-     * Read permission for library endpoints — same gate as manage.
+     * Read permission for library endpoints - same gate as manage.
      *
      * Library listings expose usage counts and stored metadata, which we want
      * to keep behind the management capability.

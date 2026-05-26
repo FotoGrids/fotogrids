@@ -1,10 +1,17 @@
 import React from 'react';
 import LibraryTabBase from './LibraryTabBase';
+import LibraryTagsHeader from './LibraryTagsHeader';
 
 /**
- * Library → Tags tab. Thin wrapper over LibraryTabBase so the shared logic
- * (search, pagination, bulk actions, merge, recalc) stays in one place.
+ * Library → Tags tab.
+ * Renders a rich stats header (stat cards + charts) followed by the shared
+ * table/search/bulk-actions via LibraryTabBase.
  */
-const LibraryTagsTab = ({ entityType }) => <LibraryTabBase entityType={entityType} />;
+const LibraryTagsTab = ({ entityType }) => (
+    <>
+        <LibraryTagsHeader entityType={entityType} />
+        <LibraryTabBase entityType={entityType} />
+    </>
+);
 
 export default LibraryTagsTab;

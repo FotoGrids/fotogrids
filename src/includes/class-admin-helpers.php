@@ -171,7 +171,7 @@ class Admin_Helpers {
                     $saved_value = get_post_meta( $args['post_id'], 'fotogrids_' . $key, true );
 
                     // The `password` field is stored encrypted. Never send the
-                    // ciphertext to the browser — the eye-button reveal is done
+                    // ciphertext to the browser - the eye-button reveal is done
                     // via a dedicated permission-gated REST call instead.
                     if ( $key === 'password' ) {
                         $args['settings'][ $key ] = '';
@@ -186,10 +186,10 @@ class Admin_Helpers {
                         } elseif ( is_string( $saved_value ) ) {
                             $decoded = json_decode( $saved_value, true );
                             if ( is_array( $decoded ) ) {
-                                // Array values (e.g. token_select, responsive objects) — use decoded form.
+                                // Array values (e.g. token_select, responsive objects) - use decoded form.
                                 $args['settings'][$key] = $decoded;
                             } elseif ( json_last_error() === JSON_ERROR_NONE && $decoded !== null ) {
-                                // Scalar JSON values (e.g. numeric strings "2", "16") — use the
+                                // Scalar JSON values (e.g. numeric strings "2", "16") - use the
                                 // decoded scalar so the JS side receives the correct type (integer,
                                 // not string) for strict-equality comparisons in button_group renders.
                                 $args['settings'][$key] = $decoded;
@@ -235,6 +235,7 @@ class Admin_Helpers {
         $data = array(
             'settings' => $args['settings'],
             'defaults' => $args['defaults'],
+            'globalSharing' => \FotoGrids\Settings\Sharing_Settings_Store::get(),
             'postId' => $args['post_id'],
             'postType' => $args['post_type'],
             'nonce' => wp_create_nonce( 'fotogrids_settings' ),

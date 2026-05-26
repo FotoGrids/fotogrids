@@ -12,7 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Modules return this from style_vars() for any property whose value differs
  * across breakpoints. Style_Var_Builder accumulates all Responsive_Var
- * instances and emits exactly one @media block per breakpoint — the number
+ * instances and emits exactly one @media block per breakpoint - the number
  * of blocks is bounded by the number of breakpoints, not by the number of
  * properties or decorators.
  *

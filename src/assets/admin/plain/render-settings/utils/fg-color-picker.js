@@ -2,7 +2,7 @@
  * FotoGrids Custom Color Picker
  *
  * A self-contained, framework-free color picker widget.
- * Renders inline (no external positioning needed — the caller decides where).
+ * Renders inline (no external positioning needed - the caller decides where).
  *
  * Features:
  *  - HSV gradient canvas with draggable handle
@@ -344,7 +344,7 @@ window.FGColorPicker.create = function(options) {
     textInput.addEventListener('change', () => {
         const parsed = parseCssColor(textInput.value);
         if (parsed) {
-            // Preserve the current hue when saturation is near zero — rgbToHsv
+            // Preserve the current hue when saturation is near zero - rgbToHsv
             // loses hue information for greys/whites (all channels equal).
             if (parsed.s < 0.01) parsed.h = state.h;
             state = parsed;

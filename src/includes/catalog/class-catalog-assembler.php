@@ -41,7 +41,7 @@ if ( ! defined( 'WPINC' ) ) {
  *                        without owning the whole field.
  *
  *  - `replace`           Replaces an existing tab, subtab, or setting wholesale.
- *                        Required: `target_id`. Destructive — prefer `extend_options`
+ *                        Required: `target_id`. Destructive - prefer `extend_options`
  *                        or `insert_*` where possible. Multiple `replace` operations
  *                        on the same target resolve last-wins with a dev-mode warning.
  *
@@ -56,7 +56,7 @@ if ( ! defined( 'WPINC' ) ) {
  *     `fotogrids-pro` → third-party in their JSON-file registration order.
  *
  *  2. When two placements target the same insertion point (same `after`/`before`
- *     anchor inside the same parent), they are inserted in precedence order —
+ *     anchor inside the same parent), they are inserted in precedence order -
  *     the higher-precedence one wins the anchor position, the lower one follows
  *     immediately. A dev-mode warning is logged so contributors can resolve it.
  *
@@ -69,7 +69,7 @@ if ( ! defined( 'WPINC' ) ) {
  *     nearest valid parent. A dev-mode warning is logged.
  *
  *  5. Files without any `placement` block default to `placement.mode = insert_tab`
- *     with `at_end` position. This is the legacy behavior — every Free catalog
+ *     with `at_end` position. This is the legacy behavior - every Free catalog
  *     file is one top-level tab.
  *
  * Group-level conditional visibility:
@@ -206,7 +206,7 @@ final class Catalog_Assembler {
      * Apply one Catalog file's placement to the working tree.
      *
      * Dispatches on `placement.mode`. Files without an explicit placement
-     * default to `insert_tab` with `at_end` position — the legacy behavior.
+     * default to `insert_tab` with `at_end` position - the legacy behavior.
      *
      * @since   1.0.0
      * @param   array<string, mixed> $catalog_file Decoded Catalog file contents.
@@ -468,7 +468,7 @@ final class Catalog_Assembler {
     /**
      * Apply a `replace` placement.
      *
-     * Replaces an existing tab, subtab, or setting by id. Destructive operation —
+     * Replaces an existing tab, subtab, or setting by id. Destructive operation -
      * the warning log captures multiple replacements on the same target.
      *
      * @since   1.0.0
@@ -584,7 +584,7 @@ final class Catalog_Assembler {
     private function build_tab_node( array $catalog_file, array $placement ): array {
         $tab_node = $catalog_file;
 
-        // Drop the placement block from the rendered tree — it's metadata.
+        // Drop the placement block from the rendered tree - it's metadata.
         unset( $tab_node['placement'] );
 
         $visible_when = $placement['visible_when'] ?? null;
@@ -727,9 +727,7 @@ final class Catalog_Assembler {
     private function warn( string $message ): void {
         $this->warnings[] = $message;
 
-        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-            error_log( '[FotoGrids Catalog Assembler] ' . $message );
-        }
+        \FotoGrids\Debug_Log::write( 'catalog_assembler', $message );
     }
 }
 

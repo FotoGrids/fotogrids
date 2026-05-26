@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Register_Items_Routes {
-    
+
     /**
      * Register all item-related REST API routes
      *
@@ -23,7 +23,7 @@ class Register_Items_Routes {
      * @return void
      */
     public static function register() {
-        // Unified item save endpoint — core fields + metadata in one call.
+        // Unified item save endpoint - core fields + metadata in one call.
         register_rest_route( 'fotogrids/v1', '/items/(?P<id>\d+)/save', array(
             array(
                 'methods'             => \WP_REST_Server::CREATABLE,

@@ -46,7 +46,7 @@ const TokenSelectComponent = ({
 
     const serializeValue = (arr) => JSON.stringify(arr);
 
-    // Options — filter isGlobalDefault in defaults mode (same as button_group)
+    // Options - filter isGlobalDefault in defaults mode (same as button_group)
     const allOptions = isDefaultsMode
         ? (setting.options || []).filter((o) => !o.isGlobalDefault)
         : (setting.options || []);
@@ -228,7 +228,7 @@ const TokenSelectComponent = ({
 
     const handleDrop = (e, index) => {
         e.preventDefault();
-        // Read both refs immediately — handleDragEnd may fire synchronously
+        // Read both refs immediately - handleDragEnd may fire synchronously
         // in some browsers and would clear dragSrcIndex before we use it.
         const srcIndex = dragSrcIndex.current;
         // Use the last recorded slot from dragOver; fall back to computing
@@ -422,7 +422,7 @@ const TokenSelectComponent = ({
             })
         ].filter(Boolean)),
 
-        // Input area — tokens + open-dropdown trigger
+        // Input area - tokens + open-dropdown trigger
         h('div', {
             key: 'input',
             ref: triggerRef,

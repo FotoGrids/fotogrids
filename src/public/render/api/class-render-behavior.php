@@ -20,7 +20,6 @@ final class Render_Behavior {
      * @param   string      $click_behavior Click interaction mode.
      * @param   string      $pagination_type Pagination type.
      * @param   string      $pagination_method Pagination method.
-     * @param   bool        $captions_enabled Whether captions are enabled.
      * @param   string|null $hover_effect Hover effect ID.
      * @return  void
      */
@@ -28,7 +27,6 @@ final class Render_Behavior {
         public readonly string $click_behavior,
         public readonly string $pagination_type,
         public readonly string $pagination_method,
-        public readonly bool $captions_enabled,
         public readonly ?string $hover_effect,
     ) {}
 }

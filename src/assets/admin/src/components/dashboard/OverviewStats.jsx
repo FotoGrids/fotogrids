@@ -1,43 +1,45 @@
 /**
- * Overview Statistics Component
+ * Overview Statistics Component - Dashboard
  */
 import React from 'react';
+import StatCard from '../shared/StatCard';
 
 const { __ } = wp.i18n;
 
-const OverviewStats = ({ stats, loading }) => {
+const fmt = ( n ) => ( typeof n === 'number' ? n.toLocaleString() : n );
+
+const OverviewStats = ( { stats, loading } ) => {
     return (
         <div className="fotogrids-overview">
-            <h2>{__('Overview', 'fotogrids')}</h2>
-            <div className="fotogrids-stats-grid">
-                <div className="fotogrids-stat-card">
-                    <div className="stat-number">
-                        {loading ? '...' : stats.galleries.toLocaleString()}
-                    </div>
-                    <div className="stat-label">{__('Galleries', 'fotogrids')}</div>
-                </div>
-                <div className="fotogrids-stat-card">
-                    <div className="stat-number">
-                        {loading ? '...' : stats.albums.toLocaleString()}
-                    </div>
-                    <div className="stat-label">{__('Albums', 'fotogrids')}</div>
-                </div>
-                <div className="fotogrids-stat-card">
-                    <div className="stat-number">
-                        {loading ? '...' : stats.items.toLocaleString()}
-                    </div>
-                    <div className="stat-label">{__('Items', 'fotogrids')}</div>
-                </div>
-                <div className="fotogrids-stat-card">
-                    <div className="stat-number">
-                        {loading ? '...' : stats.views.toLocaleString()}
-                    </div>
-                    <div className="stat-label">{__('Total Views', 'fotogrids')}</div>
-                </div>
+            <h2>{ __( 'Overview', 'fotogrids' ) }</h2>
+            <div className="fg-stats-cards">
+                <StatCard
+                    value={ fmt( stats.galleries ) }
+                    label={ __( 'Galleries', 'fotogrids' ) }
+                    accent="blue"
+                    loading={ loading }
+                />
+                <StatCard
+                    value={ fmt( stats.albums ) }
+                    label={ __( 'Albums', 'fotogrids' ) }
+                    accent="red"
+                    loading={ loading }
+                />
+                <StatCard
+                    value={ fmt( stats.items ) }
+                    label={ __( 'Items', 'fotogrids' ) }
+                    accent="yellow"
+                    loading={ loading }
+                />
+                <StatCard
+                    value={ fmt( stats.views ) }
+                    label={ __( 'Total Views', 'fotogrids' ) }
+                    accent="grey"
+                    loading={ loading }
+                />
             </div>
         </div>
     );
 };
 
 export default OverviewStats;
-

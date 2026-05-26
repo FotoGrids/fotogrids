@@ -1,11 +1,11 @@
 /*
- * FotoGrids — Loaded Effect: base
+ * FotoGrids - Loaded Effect: base
  *
  * Shared reset applied regardless of which effect is active. Ensures images
  * start invisible while loading so the effect has something to reveal.
  * Individual effect files add their own transitions / transforms on top.
  *
- * "none" maps to this file only — no transition, instant reveal.
+ * "none" maps to this file only - no transition, instant reveal.
  */
 
 .fotogrids-gallery .fg-item[data-fg-media-state="loading"] .fg-item-media > img,

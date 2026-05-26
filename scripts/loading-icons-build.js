@@ -87,7 +87,7 @@ function main() {
 
   // Run the SMIL→WAAPI converter to produce loading-icons-waapi.json.
   // The converter also regenerates loading-icons-waapi.js (dev artifact) and
-  // waapi-compare.html — both are dev-only outputs, never shipped to dist.
+  // waapi-compare.html - both are dev-only outputs, never shipped to dist.
   try {
     execSync(`node "${CONVERTER}"`, { stdio: 'inherit', cwd: ROOT });
   } catch (e) {

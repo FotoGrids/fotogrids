@@ -761,7 +761,7 @@ function CollectionSettings() {
         saveSetting(key, value);
     };
 
-    // Updates React state only — does not persist to the form or trigger autosave.
+    // Updates React state only - does not persist to the form or trigger autosave.
     // Use for UI-only state that lives inside a value object (e.g. _linked flag).
     const updateSettingStateOnly = (key, value) => {
         setSettings(prev => ({
@@ -846,12 +846,12 @@ function CollectionSettings() {
      *
      * Supports three visibility mechanisms:
      *
-     *  1. `setting.postTypes` — array of post types this setting is valid for.
-     *  2. `setting.depends_on` (+ optional `setting.depends_on_value`) —
+     *  1. `setting.postTypes` - array of post types this setting is valid for.
+     *  2. `setting.depends_on` (+ optional `setting.depends_on_value`) -
      *     snake_case predicate used by Pro and the new placement schema. When
      *     `depends_on_value` is omitted, the parent value is checked for
      *     truthiness. When given, equality is required.
-     *  3. `setting.condition.dependsOn` + `values` — legacy camelCase predicate
+     *  3. `setting.condition.dependsOn` + `values` - legacy camelCase predicate
      *     used by Free's existing JSON files. `values` is either a single value
      *     or an array of accepted values; `dependsOn` may be a single key or an
      *     array of keys (all must match).
@@ -864,6 +864,35 @@ function CollectionSettings() {
         if (setting.postTypes && Array.isArray(setting.postTypes)) {
             if (!setting.postTypes.includes(normalizedPostType)) {
                 return false;
+            }
+        }
+
+        // condition_global: predicate resolved against the global sharing
+        // settings rather than sibling fields. Same shape as condition
+        // (dependsOn + values); dependsOn may be a dotted key (e.g.
+        // "networks.facebook"). Absent condition_global always passes.
+        if (setting.condition_global) {
+            const globalState = window.fotogridsSettings?.globalSharing || {};
+            const { dependsOn, values } = setting.condition_global;
+
+            const readGlobal = (path) =>
+                String(path).split('.').reduce(
+                    (acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined),
+                    globalState
+                );
+
+            const matches = (actual, expected) => {
+                const list = Array.isArray(expected) ? expected : [expected];
+                return list.some((v) => v === actual
+                    || (v === true && (actual === true || actual === '1' || actual === 1))
+                    || (v === false && (actual === false || actual === '0' || actual === 0 || actual === undefined)));
+            };
+
+            if (Array.isArray(dependsOn)) {
+                const ok = dependsOn.every((dep, i) => matches(readGlobal(dep), values[i]));
+                if (!ok) return false;
+            } else if (dependsOn) {
+                if (!matches(readGlobal(dependsOn), values)) return false;
             }
         }
 
@@ -1066,10 +1095,41 @@ function CollectionSettings() {
             return null;
         }
 
-        const currentValue = settings[setting.key];
+        let currentValue = settings[setting.key];
         const fieldState = resolveFieldStateValue(setting, currentValue, fieldStates, fieldStatesByOption);
         const isDisabledByGate = fieldState !== FIELD_STATE.EDITABLE;
-        const isDisabled = isDisabledByGate || (!isFreeTier(setting) && !isProActive && setting.type !== 'promo');
+
+        // disabled_unless: a sibling toggle key that must be truthy for this
+        // field to be editable. Used by the per-collection override pattern -
+        // override fields stay visible but disabled until the override toggle
+        // is turned on.
+        let isDisabledByUnless = false;
+        if (typeof setting.disabled_unless === 'string' && setting.disabled_unless !== '') {
+            const gateValue = settings[setting.disabled_unless];
+            isDisabledByUnless = !(gateValue === true || gateValue === '1' || gateValue === 1 || gateValue === 'true');
+        }
+
+        // inherit_from: while a field is disabled by disabled_unless (inheriting,
+        // not overriding), display the global value it inherits instead of the
+        // collection's own stored value, so the preview reflects what visitors
+        // will actually see. dependsOn may be a dotted key (e.g. networks).
+        if (isDisabledByUnless && typeof setting.inherit_from === 'string' && setting.inherit_from !== '') {
+            const globalState = window.fotogridsSettings?.globalSharing || {};
+            let inherited = String(setting.inherit_from).split('.').reduce(
+                (acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined),
+                globalState
+            );
+            // token_select expects an array of active values; the global networks
+            // map is an object keyed by network. Convert truthy keys to an array.
+            if (setting.type === 'token_select' && inherited && ! Array.isArray(inherited) && typeof inherited === 'object') {
+                inherited = Object.keys(inherited).filter((k) => inherited[k] === true || inherited[k] === '1' || inherited[k] === 1);
+            }
+            if (inherited !== undefined) {
+                currentValue = inherited;
+            }
+        }
+
+        const isDisabled = isDisabledByGate || isDisabledByUnless || (!isFreeTier(setting) && !isProActive && setting.type !== 'promo');
         const getFieldState = (fieldKey, fieldValue = currentValue) => {
             const pseudoSetting = { key: fieldKey };
             return resolveFieldStateValue(pseudoSetting, fieldValue, fieldStates, fieldStatesByOption);
@@ -1130,6 +1190,15 @@ function CollectionSettings() {
 
             case 'font_family':
                 control = window.FotoGridsRenderSettings?.renderFontFamily(setting, currentValue, isDisabled, {
+                    updateSetting,
+                    getFieldState,
+                    renderIcon,
+                    __
+                });
+                break;
+
+            case 'font_weight':
+                control = window.FotoGridsRenderSettings?.renderFontWeight(setting, currentValue, isDisabled, {
                     updateSetting,
                     getFieldState,
                     renderIcon,
@@ -1295,6 +1364,13 @@ function CollectionSettings() {
                 });
                 break;
 
+            case 'side_by_side':
+                control = window.FotoGridsRenderSettings?.renderSideBySide(setting, currentValue, isDisabled, {
+                    renderSetting,
+                    __
+                });
+                break;
+
             case 'codearea':
                 control = window.FotoGridsRenderSettings?.renderCodeArea(setting, currentValue, (value, errorInfo) => {
                     updateSetting(setting.key, value);
@@ -1333,6 +1409,15 @@ function CollectionSettings() {
                     restUrl: window.fotogridsSettings?.restUrl || window.wpApiSettings?.root || '',
                     restNonce: window.fotogridsSettings?.restNonce || window.wpApiSettings?.nonce || '',
                     passwordIsSet: !!(window.fotogridsSettings?.passwordIsSet),
+                });
+                break;
+
+            case 'cache_status':
+                control = window.FotoGridsRenderSettings?.renderCacheStatus(setting, currentValue, isDisabled, {
+                    __,
+                    postId: window.fotogridsSettings?.postId || 0,
+                    restUrl: window.fotogridsSettings?.restUrl || window.wpApiSettings?.root || '',
+                    restNonce: window.fotogridsSettings?.restNonce || window.wpApiSettings?.nonce || '',
                 });
                 break;
 
@@ -1648,7 +1733,7 @@ function CollectionSettings() {
             ]);
         }
 
-        // Plain tab — flat settings list with section-level visible_when filtering.
+        // Plain tab - flat settings list with section-level visible_when filtering.
         const visibleSettings = (group.settings || [])
             .filter(s => !s?.hidden)
             .filter(s => evaluateVisibleWhen(s?.visible_when));
@@ -1745,8 +1830,8 @@ function initializeCollectionSettings() {
     const container = document.getElementById('fotogrids-collection-settings-root');
 
     if (container && window.wp && window.wp.element) {
-        const { render } = wp.element;
-        render(h(CollectionSettings), container);
+        const { createRoot } = wp.element;
+        createRoot(container).render(h(CollectionSettings));
     } else {
         setTimeout(initializeCollectionSettings, 100);
     }

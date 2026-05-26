@@ -30,27 +30,27 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-click                    = "lightbox"
  *   data-fg-lb-theme                 = "dark" | "light" | "custom"
  *
- * Colour attributes (all themes — JS reads these to build the per-gallery <style> block):
- *   data-fg-lb-bg                        rgba — backdrop background
- *   data-fg-lb-toolbar-bg                rgba — toolbar background
- *   data-fg-lb-toolbar-btn-color         rgba — toolbar icon colour
- *   data-fg-lb-toolbar-btn-hover         rgba — toolbar icon hover colour
- *   data-fg-lb-toolbar-btn-active-bg     rgba — active toggle button background
- *   data-fg-lb-arrow-bg                  rgba — nav arrow button background
- *   data-fg-lb-arrow-bg-hover            rgba — nav arrow button hover background
- *   data-fg-lb-arrow-hover-color         rgba — nav arrow icon hover colour
- *   data-fg-lb-bullet-color              rgba — dot fill colour
- *   data-fg-lb-bullet-hover-color        rgba — dot hover colour
- *   data-fg-lb-bullet-active-color       rgba — active dot colour
- *   data-fg-lb-thumbs-bg                 rgba — thumbnail strip background
- *   data-fg-lb-thumb-border-color        rgba — thumbnail hover border
- *   data-fg-lb-thumb-active-color        rgba — active thumbnail border
- *   data-fg-lb-info-bg                   rgba — info panel (sidebar/overlay) background
- *   data-fg-lb-info-block-bg             rgba — individual info block card background
- *   data-fg-lb-info-text                 rgba — info panel caption text
- *   data-fg-lb-info-title                rgba — info panel title text
- *   data-fg-lb-spinner-color             rgba — loading spinner colour
- *   data-fg-lb-img-shadow                rgba — image drop-shadow colour (only when shadow enabled)
+ * Colour attributes (all themes - JS reads these to build the per-gallery <style> block):
+ *   data-fg-lb-bg                        rgba - backdrop background
+ *   data-fg-lb-toolbar-bg                rgba - toolbar background
+ *   data-fg-lb-toolbar-btn-color         rgba - toolbar icon colour
+ *   data-fg-lb-toolbar-btn-hover         rgba - toolbar icon hover colour
+ *   data-fg-lb-toolbar-btn-active-bg     rgba - active toggle button background
+ *   data-fg-lb-arrow-bg                  rgba - nav arrow button background
+ *   data-fg-lb-arrow-bg-hover            rgba - nav arrow button hover background
+ *   data-fg-lb-arrow-hover-color         rgba - nav arrow icon hover colour
+ *   data-fg-lb-bullet-color              rgba - dot fill colour
+ *   data-fg-lb-bullet-hover-color        rgba - dot hover colour
+ *   data-fg-lb-bullet-active-color       rgba - active dot colour
+ *   data-fg-lb-thumbs-bg                 rgba - thumbnail strip background
+ *   data-fg-lb-thumb-border-color        rgba - thumbnail hover border
+ *   data-fg-lb-thumb-active-color        rgba - active thumbnail border
+ *   data-fg-lb-info-bg                   rgba - info panel (sidebar/overlay) background
+ *   data-fg-lb-info-block-bg             rgba - individual info block card background
+ *   data-fg-lb-info-text                 rgba - info panel caption text
+ *   data-fg-lb-info-title                rgba - info panel title text
+ *   data-fg-lb-spinner-color             rgba - loading spinner colour
+ *   data-fg-lb-img-shadow                rgba - image drop-shadow colour (only when shadow enabled)
  *
  * Behaviour / layout attributes:
  *   data-fg-lb-transition            = "fade" | "horizontal" | "vertical" | "none"
@@ -70,6 +70,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-thumbnail-location    = "none" | "bottom" | "top" | "left" | "right"
  *   data-fg-lb-thumbnail-size        = "small" | "normal" | "large"
  *   data-fg-lb-overlay-blur          = "2"                    (px integer; 0 = none)
+ *   data-fg-lb-preload-slides        = "2"                    (integer; slides to preload ahead and behind; absent = 2)
  *   data-fg-lb-info-panel            = "on_click" | "never"   (absent = "always" default)
  *   data-fg-lb-info-location         = "left" | "bottom"      (absent = "right" default; omitted when info-panel=never)
  *   data-fg-lb-no-backdrop-close                              (present = disabled; absent = enabled)
@@ -91,21 +92,21 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-zoom-beyond                                     (present = allow zoom beyond original size)
  *   data-fg-lb-info-blocks           = "caption description ..." (space-sep ordered list of enabled blocks)
  *   data-fg-lb-info-blocks-style     = "boxed" | "divided" | "plain"
- *   data-fg-lb-info-block-divider    rgba — divider colour (only when style=divided)
+ *   data-fg-lb-info-block-divider    rgba - divider colour (only when style=divided)
  *   data-fg-lb-credit-source         = "exif"  (absent = "item_meta" default)
  *   data-fg-lb-exif-fields           = "camera aperture ..." (space-sep list of enabled EXIF field keys; absent = exif block disabled or display_exif off)
  *
- * Image filter attributes (desktop breakpoint values only — lightbox is fullscreen):
+ * Image filter attributes (desktop breakpoint values only - lightbox is fullscreen):
  *   data-fg-lb-thumb-filter          = combined CSS filter string for lightbox thumbnail strip images
- *                                      (e.g. "grayscale(50%) blur(3px)") — emitted only when thumbnail
+ *                                      (e.g. "grayscale(50%) blur(3px)") - emitted only when thumbnail
  *                                      filter is enabled and at least one filter type is selected.
  *   data-fg-lb-thumb-filter-hover    = combined CSS filter string applied on thumbnail :hover
- *                                      — emitted only when thumbnail filter is enabled.
+ *                                      - emitted only when thumbnail filter is enabled.
  *   data-fg-lb-full-filter           = combined CSS filter string for the main lightbox stage image
- *                                      (e.g. "sepia(80%)") — emitted only when full-image filter is
+ *                                      (e.g. "sepia(80%)") - emitted only when full-image filter is
  *                                      enabled and at least one filter type is selected.
  *   data-fg-lb-full-filter-hover     = combined CSS filter string applied on main image :hover
- *                                      — emitted only when full-image filter is enabled.
+ *                                      - emitted only when full-image filter is enabled.
  *
  * Attributes with a boolean nature follow the "presence = true, absence = false"
  * convention: they are only emitted when the setting is truthy. The JS reads them
@@ -187,9 +188,9 @@ final class Lightbox implements Feature {
         $attrs['data-fg-lb-theme'] = $theme;
 
         // ── Per-theme colour defaults ─────────────────────────────────────────
-        // JS uses these to build the full CSS variable block — no theme classes
+        // JS uses these to build the full CSS variable block - no theme classes
         // in SCSS. Defaults differ per theme; custom theme reads saved settings.
-        // All values are rgba() — no hex literals.
+        // All values are rgba() - no hex literals.
         $dark_defaults = [
             'bg'                 => 'rgba(0, 0, 0, 0.92)',
             'toolbar_bg'         => 'rgba(0, 0, 0, 0.35)',
@@ -295,7 +296,7 @@ final class Lightbox implements Feature {
             ? $this->safe_color( $s['lightbox_info_panel_background'] ?? null, $td['info_bg'] )
             : $td['info_bg'];
 
-        // Info blocks style — drives visual separation between blocks.
+        // Info blocks style - drives visual separation between blocks.
         $info_blocks_style = is_string( $s['lightbox_info_blocks_style'] ?? null ) ? (string) $s['lightbox_info_blocks_style'] : 'boxed';
         $allowed_styles    = [ 'boxed', 'divided', 'plain' ];
         if ( ! in_array( $info_blocks_style, $allowed_styles, true ) ) {
@@ -303,14 +304,14 @@ final class Lightbox implements Feature {
         }
         $attrs['data-fg-lb-info-blocks-style'] = $info_blocks_style;
 
-        // Info block background — only when style = boxed.
+        // Info block background - only when style = boxed.
         if ( $info_blocks_style === 'boxed' ) {
             $attrs['data-fg-lb-info-block-bg'] = $theme === 'custom'
                 ? $this->safe_color( $s['lightbox_info_block_bg'] ?? null, $td['info_block_bg'] )
                 : $td['info_block_bg'];
         }
 
-        // Info block divider colour — only when style = divided.
+        // Info block divider colour - only when style = divided.
         if ( $info_blocks_style === 'divided' ) {
             $attrs['data-fg-lb-info-block-divider'] = $theme === 'custom'
                 ? $this->safe_color( $s['lightbox_info_block_divider'] ?? null, $td['info_block_divider'] )
@@ -327,7 +328,7 @@ final class Lightbox implements Feature {
             ? $this->safe_color( $s['lightbox_spinner_color'] ?? null, $td['spinner_color'] )
             : $td['spinner_color'];
 
-        // Image shadow — emitted only when the shadow is enabled.
+        // Image shadow - emitted only when the shadow is enabled.
         if ( $this->setting_to_bool( $s['lightbox_img_shadow_enabled'] ?? false ) ) {
             $shadow_color = $theme === 'custom'
                 ? $this->safe_color( $s['lightbox_img_shadow_color'] ?? null, 'rgba(0, 0, 0, 0.3)' )
@@ -338,7 +339,7 @@ final class Lightbox implements Feature {
         // Transition
         $attrs['data-fg-lb-transition'] = is_string( $s['lightbox_transition'] ?? null ) ? (string) $s['lightbox_transition'] : 'fade';
 
-        // Duration (ms) — when the button_group value is "custom", use the custom field.
+        // Duration (ms) - when the button_group value is "custom", use the custom field.
         $duration_raw = $s['lightbox_transition_duration'] ?? 300;
         if ( $duration_raw === 'custom' ) {
             $duration = absint( $s['lightbox_transition_duration_custom'] ?? 400 );
@@ -349,7 +350,7 @@ final class Lightbox implements Feature {
             $attrs['data-fg-lb-duration'] = (string) $duration;
         }
 
-        // Auto-progress (boolean — present = true)
+        // Auto-progress (boolean - present = true)
         if ( $this->setting_to_bool( $s['lightbox_auto_progress'] ?? true ) ) {
             $attrs['data-fg-lb-auto-progress'] = '1';
             $delay = absint( $s['lightbox_auto_progress_delay'] ?? 5 );
@@ -357,14 +358,14 @@ final class Lightbox implements Feature {
                 $attrs['data-fg-lb-auto-delay'] = (string) $delay;
             }
 
-            // Progress indicator style (bar by default — omit attribute when bar).
+            // Progress indicator style (bar by default - omit attribute when bar).
             // Accepted values: "bar" (default, omitted) | "spinner" | "none".
             $progress_style = is_string( $s['lightbox_auto_progress_style'] ?? null ) ? (string) $s['lightbox_auto_progress_style'] : 'bar';
             if ( $progress_style !== 'bar' ) {
                 $attrs['data-fg-lb-progress-style'] = $progress_style;
             }
 
-            // Progress bar location (bottom by default — omit attribute when bottom)
+            // Progress bar location (bottom by default - omit attribute when bottom)
             if ( $progress_style === 'bar' ) {
                 $bar_loc = is_string( $s['lightbox_auto_progress_bar_location'] ?? null ) ? (string) $s['lightbox_auto_progress_bar_location'] : 'bottom';
                 if ( $bar_loc !== 'bottom' ) {
@@ -372,7 +373,7 @@ final class Lightbox implements Feature {
                 }
             }
 
-            // Progress indicator colour — emitted for all themes when style ≠ none.
+            // Progress indicator colour - emitted for all themes when style ≠ none.
             if ( $progress_style !== 'none' ) {
                 $progress_color_default = 'rgba(60, 70, 240, 1)'; // --fg-colors-blue
                 $attrs['data-fg-lb-progress-color'] = $theme === 'custom'
@@ -389,18 +390,18 @@ final class Lightbox implements Feature {
                 }
             }
 
-            // Stop on interaction (false by default — only emit when true)
+            // Stop on interaction (false by default - only emit when true)
             if ( $this->setting_to_bool( $s['lightbox_auto_progress_stop_on_interaction'] ?? true ) ) {
                 $attrs['data-fg-lb-progress-stop'] = '';
             }
 
-            // Show play/pause controls (false by default — only emit when true)
+            // Show play/pause controls (false by default - only emit when true)
             if ( $this->setting_to_bool( $s['lightbox_auto_progress_show_controls'] ?? false ) ) {
                 $attrs['data-fg-lb-progress-controls'] = '';
             }
         }
 
-        // Fit media (boolean — present = true)
+        // Fit media (boolean - present = true)
         if ( $this->setting_to_bool( $s['lightbox_fit_media'] ?? true ) ) {
             $attrs['data-fg-lb-fit-media'] = '1';
         }
@@ -411,7 +412,7 @@ final class Lightbox implements Feature {
             $attrs['data-fg-lb-mobile-layout'] = $mob;
         }
 
-        // Arrows (boolean — present = true; arrows are ON by default so only write when ON)
+        // Arrows (boolean - present = true; arrows are ON by default so only write when ON)
         if ( $this->setting_to_bool( $s['lightbox_show_arrows'] ?? true ) ) {
             $attrs['data-fg-lb-show-arrows'] = '1';
 
@@ -430,7 +431,7 @@ final class Lightbox implements Feature {
 
         }
 
-        // Dots (boolean — present = true; dots are OFF by default so only write when ON)
+        // Dots (boolean - present = true; dots are OFF by default so only write when ON)
         if ( $this->setting_to_bool( $s['lightbox_show_dots'] ?? false ) ) {
             $attrs['data-fg-lb-show-dots'] = '1';
 
@@ -454,7 +455,7 @@ final class Lightbox implements Feature {
                 $attrs['data-fg-lb-dot-active-color'] = $dot_active_color;
             }
 
-            // dots spacing — stored as { value, unit } object or plain string
+            // dots spacing - stored as { value, unit } object or plain string
             $spacing_raw = $s['lightbox_dots_spacing'] ?? null;
             $spacing     = $this->normalize_unit_value( $spacing_raw, 'px' );
             if ( $spacing !== '' && $spacing !== '8px' ) {
@@ -462,15 +463,19 @@ final class Lightbox implements Feature {
             }
         }
 
-        // Counter (false by default — only emit when enabled)
+        // Counter (false by default - only emit when enabled)
         if ( $this->setting_to_bool( $s['lightbox_show_counter'] ?? false ) ) {
             $attrs['data-fg-lb-show-counter'] = '';
         }
 
-        // Overlay blur intensity (2px by default — omit attribute when default to save bytes)
         $blur = absint( $s['lightbox_overlay_blur'] ?? 8 );
         if ( $blur !== 8 ) {
             $attrs['data-fg-lb-overlay-blur'] = (string) $blur;
+        }
+
+        $preload_slides = absint( $s['lightbox_preload_slides'] ?? 2 );
+        if ( $preload_slides !== 2 ) {
+            $attrs['data-fg-lb-preload-slides'] = (string) $preload_slides;
         }
 
         // Info panel visibility
@@ -487,27 +492,27 @@ final class Lightbox implements Feature {
             }
         }
 
-        // Backdrop close (true by default — only emit attribute when disabled)
+        // Backdrop close (true by default - only emit attribute when disabled)
         if ( ! $this->setting_to_bool( $s['lightbox_backdrop_close'] ?? true ) ) {
             $attrs['data-fg-lb-no-backdrop-close'] = '';
         }
 
-        // Loop (true by default — only emit attribute when disabled)
+        // Loop (true by default - only emit attribute when disabled)
         if ( ! $this->setting_to_bool( $s['lightbox_loop'] ?? true ) ) {
             $attrs['data-fg-lb-no-loop'] = '';
         }
 
-        // Hide arrows at ends (false by default — only emit when enabled)
+        // Hide arrows at ends (false by default - only emit when enabled)
         if ( $this->setting_to_bool( $s['lightbox_hide_arrows_at_ends'] ?? false ) ) {
             $attrs['data-fg-lb-hide-arrows-at-ends'] = '';
         }
 
-        // Fullscreen button (false by default — only emit when enabled)
+        // Fullscreen button (false by default - only emit when enabled)
         if ( $this->setting_to_bool( $s['lightbox_fullscreen'] ?? true ) ) {
             $attrs['data-fg-lb-fullscreen'] = '';
         }
 
-        // Tooltips — enabled by default; emit absence-marker only when disabled
+        // Tooltips - enabled by default; emit absence-marker only when disabled
         if ( ! $this->setting_to_bool( $s['lightbox_show_tooltips'] ?? true ) ) {
             $attrs['data-fg-lb-no-tooltips'] = '';
         }
@@ -540,24 +545,24 @@ final class Lightbox implements Feature {
                 $attrs['data-fg-lb-thumbnail-size'] = $thumb_size;
             }
 
-            // Thumbnail spacing (5 by default — omit when default)
+            // Thumbnail spacing (5 by default - omit when default)
             $thumb_spacing = absint( $s['lightbox_thumbnail_spacing'] ?? 5 );
             if ( $thumb_spacing !== 5 ) {
                 $attrs['data-fg-lb-thumb-spacing'] = (string) $thumb_spacing;
             }
 
-            // Thumbnail drag (true by default — emit attribute when disabled)
+            // Thumbnail drag (true by default - emit attribute when disabled)
             if ( ! $this->setting_to_bool( $s['lightbox_thumbnail_drag'] ?? true ) ) {
                 $attrs['data-fg-lb-no-thumb-drag'] = '';
             }
 
-            // Thumbnail swipe (true by default — emit attribute when disabled)
+            // Thumbnail swipe (true by default - emit attribute when disabled)
             if ( ! $this->setting_to_bool( $s['lightbox_thumbnail_swipe'] ?? true ) ) {
                 $attrs['data-fg-lb-no-thumb-swipe'] = '';
             }
         }
 
-        // Info panel blocks — token_select stored as array.
+        // Info panel blocks - token_select stored as array.
         // Always emit so JS always has an explicit ordered list to render.
         if ( $info_panel !== 'never' ) {
             $info_blocks_raw   = $s['lightbox_info_blocks'] ?? self::DEFAULT_INFO_BLOCKS;
@@ -567,7 +572,7 @@ final class Lightbox implements Feature {
                 $attrs['data-fg-lb-info-blocks'] = implode( ' ', $info_blocks_clean );
             }
 
-            // Credit source — only relevant when credit block is enabled.
+            // Credit source - only relevant when credit block is enabled.
             if ( in_array( 'credit', $info_blocks_clean, true ) ) {
                 $credit_source = is_string( $s['lightbox_credit_source'] ?? null ) ? (string) $s['lightbox_credit_source'] : 'item_meta';
                 if ( $credit_source === 'exif' ) {
@@ -575,7 +580,7 @@ final class Lightbox implements Feature {
                 }
             }
 
-            // EXIF fields — which fields are enabled for display in the EXIF block.
+            // EXIF fields - which fields are enabled for display in the EXIF block.
             // Only emitted when the exif block is enabled and display_exif is on.
             if ( in_array( 'exif', $info_blocks_clean, true ) && $this->setting_to_bool( $s['display_exif'] ?? false ) ) {
                 $exif_key_map = [
@@ -643,6 +648,10 @@ final class Lightbox implements Feature {
      * @param   Render_Context $render_context Render context.
      * @return  string
      */
+    public function html_before( Render_Context $render_context ): string {
+        return '';
+    }
+
     public function html_appendix( Render_Context $render_context ): string {
         return '';
     }
@@ -670,7 +679,7 @@ final class Lightbox implements Feature {
     public function assets( Render_Context $render_context ): Module_Assets {
         return new Module_Assets(
             css: [
-                // Tooltip styles — shared across all frontend surfaces.
+                // Tooltip styles - shared across all frontend surfaces.
                 'fotogrids-tooltip' => new Asset_Decl(
                     path:      '../../assets/css/fg-tooltip.css',
                     in_footer: false,
@@ -682,7 +691,7 @@ final class Lightbox implements Feature {
                 ),
             ],
             js: [
-                // Tooltip module — loaded before lightbox so FgTooltip is available.
+                // Tooltip module - loaded before lightbox so FgTooltip is available.
                 'fotogrids-tooltip' => new Asset_Decl(
                     path:      '../../assets/js/fg-tooltip.js',
                     deps:      [],

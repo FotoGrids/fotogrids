@@ -21,7 +21,7 @@
       "mobile": 4
     },
     "auto_image_optimization": true,
-    "lazy_loading": true,
+    "lazy_load": true,
     "responsive_images": true,
     "lightbox": true
   }

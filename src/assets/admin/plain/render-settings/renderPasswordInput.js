@@ -7,10 +7,10 @@
  * ---------
  * - When no password has been saved (passwordIsSet=false): renders a standard
  *   password input. The eye button toggles visibility of what the user is
- *   currently typing — nothing is fetched from the server.
+ *   currently typing - nothing is fetched from the server.
  *
  * - When a password IS already saved (passwordIsSet=true): the input starts
- *   empty with a "Password saved — type to change" placeholder. The eye button
+ *   empty with a "Password saved - type to change" placeholder. The eye button
  *   fires a one-time GET /gallery/{id}/password REST call to retrieve the
  *   decrypted value (permission-gated on the server). On success the decrypted
  *   password is shown in the input and the eye button works on that local value
@@ -23,17 +23,17 @@
  *
  * Props received via the render-settings framework
  * ------------------------------------------------
- * setting        — the JSON setting definition (key, label, placeholder, …)
- * value          — current field value from React state (always '' for saved passwords)
- * onChange       — callback to update parent state
- * isDisabled     — whether the field is locked/grayed out
- * getFieldState  — returns 'editable' | 'locked' | 'pro'
- * renderIcon     — renders an icon by name string
- * __             — i18n function
- * postId         — gallery post ID (needed for the REST call)
- * restUrl        — base REST URL, e.g. https://example.com/wp-json/fotogrids/v1/
- * restNonce      — wp_rest nonce for authenticating REST requests
- * passwordIsSet  — boolean; true when an encrypted password already exists in DB
+ * setting        - the JSON setting definition (key, label, placeholder, …)
+ * value          - current field value from React state (always '' for saved passwords)
+ * onChange       - callback to update parent state
+ * isDisabled     - whether the field is locked/grayed out
+ * getFieldState  - returns 'editable' | 'locked' | 'pro'
+ * renderIcon     - renders an icon by name string
+ * __             - i18n function
+ * postId         - gallery post ID (needed for the REST call)
+ * restUrl        - base REST URL, e.g. https://example.com/wp-json/fotogrids/v1/
+ * restNonce      - wp_rest nonce for authenticating REST requests
+ * passwordIsSet  - boolean; true when an encrypted password already exists in DB
  */
 const PasswordInputComponent = ({
     setting,
@@ -52,11 +52,11 @@ const PasswordInputComponent = ({
     const [showPassword, setShowPassword] = React.useState(false);
 
     // Tracks the fetch lifecycle for the server-side reveal:
-    //   'idle'     — not yet attempted
-    //   'loading'  — request in flight
-    //   'done'     — successfully fetched; revealePassword holds the value
-    //   'denied'   — server returned 403 (permission denied)
-    //   'error'    — other network/server error
+    //   'idle'     - not yet attempted
+    //   'loading'  - request in flight
+    //   'done'     - successfully fetched; revealePassword holds the value
+    //   'denied'   - server returned 403 (permission denied)
+    //   'error'    - other network/server error
     const [revealState, setRevealState] = React.useState('idle');
     const [revealedPassword, setRevealedPassword] = React.useState('');
 
@@ -64,7 +64,7 @@ const PasswordInputComponent = ({
     // session using a ref that is only set by handleChange, never by prop updates.
     // This is more reliable than `value !== ''` because a stale encrypted blob
     // could leak into `value` through the PHP→JS localization path if the
-    // server-side guard were ever bypassed — we never want to show that blob.
+    // server-side guard were ever bypassed - we never want to show that blob.
     const userHasTypedRef = React.useRef(false);
 
     const settingState = typeof getFieldState === 'function'
@@ -88,7 +88,7 @@ const PasswordInputComponent = ({
 
     // Placeholder text depends on whether a password is already saved.
     const placeholder = isSavedAndUnchanged
-        ? __('Password saved — type to change', 'fotogrids')
+        ? __('Password already set - type to change', 'fotogrids')
         : ( setting.placeholder || '' );
 
     // Eye-button handler.
@@ -96,7 +96,7 @@ const PasswordInputComponent = ({
         if (isDisabled) return;
 
         // If the user has already typed something, or no saved password exists,
-        // just toggle visibility locally — nothing to fetch.
+        // just toggle visibility locally - nothing to fetch.
         if (hasUserTyped || !passwordIsSet) {
             setShowPassword(prev => !prev);
             return;
@@ -149,15 +149,13 @@ const PasswordInputComponent = ({
             userHasTypedRef.current = true;
             onChange(newValue);
             if (newValue === '' && revealState === 'done') {
-                // User cleared the revealed password — reset reveal state so
-                // the "Password saved — type to change" placeholder comes back
-                // on the next save/reload, and so the eye button can re-fetch.
+                // User cleared the revealed password. Reset the reveal UI state
+                // so the eye button and placeholder behave correctly, but keep
+                // userHasTypedRef = true so the empty value is sent on the next
+                // save and actually deletes the stored password.
                 setRevealedPassword('');
                 setRevealState('idle');
                 setShowPassword(false);
-                // Also reset the ref: they cleared their new password, so the
-                // saved (server-side) password is still the active one.
-                userHasTypedRef.current = false;
             }
         }
     };

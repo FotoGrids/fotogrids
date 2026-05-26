@@ -19,7 +19,7 @@ if ( ! defined( 'WPINC' ) ) {
  * the JS settings panel renders.
  *
  * Replaces the legacy approach of fetching individual JSON files from the
- * browser — Pro/third-party files were never reachable that way because they
+ * browser - Pro/third-party files were never reachable that way because they
  * live in different plugin directories.
  *
  * @package FotoGrids\REST\Admin

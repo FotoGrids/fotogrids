@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FotoGrids — Gate Lock Screen (shared)
+   FotoGrids - Gate Lock Screen (shared)
    Structural styles shared by all gate modules: ghost grid, overlay, card
    chrome, icon, title, and description. Gate-specific interactive elements
    (forms, inputs, links, spinners) are styled in each gate's own CSS file.

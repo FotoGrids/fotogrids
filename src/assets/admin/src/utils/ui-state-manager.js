@@ -18,6 +18,8 @@
  *
  *   const subtabs = uiState.getValue({ key: 'subtabs', fallback: {} });
  *   uiState.setValue({ key: 'subtabs', value: { styling: 'thumbnails' } });
+ *
+ *   uiState.clearValue({ key: 'defaults-subtab', urlParam: 'subtab' });
  */
 
 ( function () {
@@ -52,7 +54,20 @@
         try {
             window.sessionStorage.setItem( storageKey, rawValue );
         } catch ( _e ) {
-            // Storage unavailable — fail silently.
+            // Storage unavailable - fail silently.
+        }
+    }
+
+    /**
+     * Safely remove a key from sessionStorage. Silently no-ops on error.
+     *
+     * @param {string} storageKey
+     */
+    function sessionRemove( storageKey ) {
+        try {
+            window.sessionStorage.removeItem( storageKey );
+        } catch ( _e ) {
+            // Storage unavailable - fail silently.
         }
     }
 
@@ -82,7 +97,25 @@
             url.searchParams.set( param, value );
             window.history.pushState( {}, '', url.toString() );
         } catch ( _e ) {
-            // History API unavailable — fail silently.
+            // History API unavailable - fail silently.
+        }
+    }
+
+    /**
+     * Remove a URL search param via replaceState. No-ops on error.
+     *
+     * Uses replaceState (not pushState) so clearing a param does not add a
+     * spurious history entry - clearing is a cleanup, not a navigation.
+     *
+     * @param {string} param
+     */
+    function urlDelete( param ) {
+        try {
+            const url = new URL( window.location.href );
+            url.searchParams.delete( param );
+            window.history.replaceState( {}, '', url.toString() );
+        } catch ( _e ) {
+            // History API unavailable - fail silently.
         }
     }
 
@@ -221,7 +254,36 @@
             }
         }
 
-        return { getValue, setValue };
+        // -----------------------------------------------------------------
+        // clearValue
+        // -----------------------------------------------------------------
+
+        /**
+         * Remove a persisted UI state value entirely.
+         *
+         * Always removes from sessionStorage.
+         * Also removes the param from the URL if urlParam is provided.
+         *
+         * Use this (rather than setValue with a default) when a value should
+         * be absent - e.g. a subtab that only applies to one tab and must not
+         * linger in the URL or session when that tab is not active.
+         *
+         * @param {Object}  opts
+         * @param {string}  opts.key        Storage control key.
+         * @param {string}  [opts.urlParam]  URL search param name to remove.
+         */
+        function clearValue( opts ) {
+            const { key, urlParam } = opts;
+            const storageKey = buildStorageKey( ns, key );
+
+            sessionRemove( storageKey );
+
+            if ( urlParam ) {
+                urlDelete( urlParam );
+            }
+        }
+
+        return { getValue, setValue, clearValue };
     }
 
     // -------------------------------------------------------------------------

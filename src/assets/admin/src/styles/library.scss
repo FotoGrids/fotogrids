@@ -1,5 +1,195 @@
 // FotoGrids → Library admin page.
-// Minimal styling — relies on @wordpress/components defaults where possible.
+
+.fg-lib-header__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: 20px;
+}
+
+.fg-lib-stat-card {
+    background: var(--fg-background-primary);
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        width: 4px;
+        background: var(--fg-blue);
+    }
+
+    &--warning::before { background: var(--fg-red); }
+    &--positive::before { background: var(--fg-green); }
+
+    &__content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    &__label {
+        font-weight: 600;
+        color: var(--fg-text-primary);
+        text-transform: uppercase;
+    }
+
+    &__value {
+        font-family: 'Poppins', sans-serif;
+        font-size: 40px;
+        font-weight: 600;
+        color: var(--fg-text-primary);
+        line-height: 1.5;
+    }
+
+    &__sub {
+        color: var(--fg-text-tertiary);
+    }
+
+    &__value--big {
+        position: absolute;
+        z-index: 0;
+        right: 16px;
+        top: 12px;
+        font-size: 240px;
+        line-height: 0.8;
+        letter-spacing: -0.06em;
+        color: var(--fg-background-secondary);
+    }
+}
+
+.fg-lib-chart-panel {
+    background: var(--fg-background-primary);
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+
+    &--span2 {
+        grid-column: span 2;
+    }
+
+    &__title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fg-text-primary);
+        flex-shrink: 0;
+    }
+
+    &__body {
+        flex: 1;
+        min-height: 0;
+        height: 160px;
+        position: relative;
+
+        canvas {
+            max-height: 100%;
+        }
+
+        &--map {
+            background: var(--fg-interactive-selected-bg);
+            width: 100%;
+            aspect-ratio: 2 / 1;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+        }
+
+        &--donut {
+            flex: none;
+            height: 200px;
+        }
+    }
+}
+
+.fg-lib-chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--fg-text-secondary);
+    font-size: 12px;
+}
+
+.fg-lib-geo-svg {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    color: var(--fg-blue);
+
+    line {
+        opacity: 0.1;
+    }
+}
+
+.fg-lib-geo-loading,
+.fg-lib-geo-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 6px;
+    color: var(--fg-text-tertiary);
+    font-size: 12px;
+    text-align: center;
+    background-image: url("data:image/svg+xml,%3Csvg width='388' height='193' viewBox='0 0 388 193' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='squares' width='15' height='15' patternUnits='userSpaceOnUse'%3E%3Crect x='13' y='13' width='2' height='2' fill='rgba(60,70,240,0.1)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='388' height='193' fill='url(%23squares)'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    .fotogrids-icon svg {
+        width: 32px;
+        height: 32px;
+        color: var(--fg-blue);
+
+        path {
+            stroke-width: 1.2;
+        }
+    }
+}
+
+.fg-lib-pro-nudge {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--fg-yellow);
+    border-radius: 4px;
+
+    &__text {
+        flex: 1;
+        font-size: 12px;
+        line-height: 1.2;
+        color: var(--fg-text-secondary);
+        min-width: 0;
+
+        strong {
+            display: block;
+            color: var(--fg-text-primary);
+        }
+    }
+}
 
 .fotogrids-library-page {
     .fotogrids-library-tab-content {
@@ -10,9 +200,8 @@
 .fotogrids-library-toolbar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
     flex-wrap: wrap;
-    margin-bottom: 12px;
 
     .fotogrids-library-toolbar-search {
         flex: 1 1 240px;
@@ -20,7 +209,6 @@
     }
 
     .fotogrids-library-toolbar-filter {
-        // CheckboxControl owns its own spacing; we just want vertical alignment.
         display: flex;
         align-items: center;
         margin: 0;
@@ -39,8 +227,8 @@
     gap: 12px;
     padding: 10px 12px;
     margin-bottom: 8px;
-    background: #f6f7f7;
-    border: 1px solid var(--fg-border-secondary, #dcdcde);
+    background: var(--fg-background-secondary);
+    border: 1px solid var(--fg-border-primary);
     border-radius: 4px;
 
     > span {
@@ -57,17 +245,39 @@
 .fotogrids-library-empty {
     padding: 32px;
     text-align: center;
-    color: #50575e;
+    color: var(--fg-text-secondary);
 
     .fotogrids-library-empty-help {
         font-size: 12px;
-        color: #757575;
+        color: var(--fg-text-secondary);
         max-width: 420px;
         margin: 8px auto 0;
     }
 }
 
 .fotogrids-library-table {
+    table-layout: auto;
+
+    &.widefat .check-column {
+        padding: 8px;
+        white-space: nowrap;
+        width: 1px;
+        vertical-align: middle;
+
+        .components-checkbox-control__input-container,
+        .components-checkbox-control__input[type='checkbox'] {
+            margin: 0;
+        }
+    }
+
+    th {
+        font-size: 12px;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+
     .fotogrids-library-sort {
         background: none;
         border: 0;
@@ -75,10 +285,34 @@
         font: inherit;
         color: inherit;
         cursor: pointer;
-        font-weight: 600;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
 
         &:hover {
-            color: var(--fg-blue, #3c46f0);
+            color: var(--fg-blue);
+        }
+
+        .fotogrids-library-sort__indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--fg-text-secondary);
+            transition: transform 0.15s ease;
+
+            &[data-fg-order='asc'] {
+                transform: rotate(180deg);
+            }
+
+            .fotogrids-icon svg {
+                width: 12px;
+                height: 12px;
+
+                path {
+                    stroke-width: 3;
+                }
+            }
         }
     }
 
@@ -106,7 +340,7 @@
 
     .fotogrids-library-slug {
         font-size: 12px;
-        color: #50575e;
+        color: var(--fg-text-secondary);
     }
 
     .fotogrids-library-latlng {
@@ -123,17 +357,24 @@
     }
 
     .fotogrids-library-muted {
-        color: #999;
+        color: var(--fg-text-secondary);
     }
 
     .fotogrids-library-row-selected {
         background: rgba(60, 70, 240, 0.04);
     }
 
-    .fotogrids-library-actions-col {
+    .widefat &__column--small {
         white-space: nowrap;
-        text-align: end;
+        text-align: center;
         width: 1%;
+    }
+
+    &__column-actions {
+        .fotogrids-library-actions {
+            display: flex;
+            gap: 4px;
+        }
     }
 }
 
@@ -178,12 +419,12 @@
     margin: 8px 0 12px;
     max-height: 220px;
     overflow-y: auto;
-    border: 1px solid var(--fg-border-secondary, #dcdcde);
+    border: 1px solid var(--fg-border-primary);
     border-radius: 4px;
 
     li {
         padding: 6px 10px;
-        border-bottom: 1px solid #f0f0f1;
+        border-bottom: 1px solid var(--fg-border-primary);
 
         &:last-child { border-bottom: 0; }
 

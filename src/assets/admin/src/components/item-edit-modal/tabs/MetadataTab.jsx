@@ -33,7 +33,7 @@ const MetadataTab = ({
 
     // "Replace" semantics: when maxItems === 1, the input stays visible so the
     // user can search and replace the existing value. Adding a second item via
-    // the Add button or Enter is still blocked — only autocomplete selection
+    // the Add button or Enter is still blocked - only autocomplete selection
     // (which replaces) is allowed when one item is already present.
     const isReplaceType = maxItems === 1;
     const isHardFull    = !isReplaceType && currentItems.length >= maxItems;
@@ -50,7 +50,7 @@ const MetadataTab = ({
     const hasSuggestions = filteredSuggestions.length > 0;
 
     // For replace-type (location): when one item is set, Enter / Add button
-    // create a new entry and replace — handled by selectExistingMetadata /
+    // create a new entry and replace - handled by selectExistingMetadata /
     // addMetadataItem in ItemEditModal. Block only when truly hard-full.
     const handleKeyEvent = (e) => {
         if (!disabled && !isHardFull && e.key === 'Enter') {
@@ -85,7 +85,7 @@ const MetadataTab = ({
                             inputElement
                         )}
                         {/* For replace-type, hide the Add button when an item is
-                            already set — the user should select from autocomplete
+                            already set - the user should select from autocomplete
                             to replace, not add a second entry. */}
                         {(!isReplaceType || currentItems.length === 0) && (
                             <button

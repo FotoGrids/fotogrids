@@ -17,7 +17,7 @@ class Items_Permissions {
     /**
      * Permission check for reading items
      *
-     * Public — the frontend lightbox needs item data without auth.
+     * Public - the frontend lightbox needs item data without auth.
      *
      * @since 1.0.0
      * @param \WP_REST_Request $request

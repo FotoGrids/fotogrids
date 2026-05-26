@@ -20,7 +20,7 @@ final class Module_Registry {
     /**
      * @var array<int, string>
      */
-    public const CATEGORIES = [ 'gates', 'decorators', 'layouts', 'features', 'sidecars' ];
+    public const CATEGORIES = [ 'gates', 'sorters', 'decorators', 'layouts', 'features', 'filter_sources', 'sidecars' ];
 
     /**
      * @var array<string, array<int, class-string>>

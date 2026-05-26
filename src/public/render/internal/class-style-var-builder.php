@@ -16,7 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Accepts a mixed map of plain strings and Responsive_Var instances.
  * Plain strings are emitted in the base rule.  Responsive_Var instances
  * are bucketed by breakpoint and emitted as at most two @media blocks
- * (tablet, mobile) — the count is bounded by breakpoints, never by the
+ * (tablet, mobile) - the count is bounded by breakpoints, never by the
  * number of properties or decorators.
  *
  * Output shape for instance #fotogrids-gallery-123:

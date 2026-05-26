@@ -15,7 +15,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Security model
  * --------------
  * - The encryption key is derived from two WordPress secret keys (AUTH_KEY and
- *   SECURE_AUTH_KEY) that live in wp-config.php — never in the database.
+ *   SECURE_AUTH_KEY) that live in wp-config.php - never in the database.
  * - Compromising the database alone is not enough to decrypt stored passwords;
  *   an attacker also needs read access to wp-config.php.
  * - A fresh random IV is generated per encryption so identical passwords
@@ -164,7 +164,7 @@ final class Password_Crypto {
 	/**
 	 * Returns whether a stored value looks like an encrypted password.
 	 *
-	 * A lightweight check — does not attempt decryption. Used by the admin
+	 * A lightweight check - does not attempt decryption. Used by the admin
 	 * read path to populate the password_is_set flag without decrypting.
 	 *
 	 * @since  1.0.0
@@ -199,7 +199,7 @@ final class Password_Crypto {
 			return '';
 		}
 
-		// HMAC-SHA256 always produces 32 bytes — exactly the AES-256 key size.
+		// HMAC-SHA256 always produces 32 bytes - exactly the AES-256 key size.
 		return hash_hmac(
 			'sha256',
 			self::KEY_CONTEXT,

@@ -1,11 +1,11 @@
 /**
  * Splits a hint string on <code>…</code> tags and returns an array of
- * React nodes — plain text segments as strings, tagged segments as <code>
+ * React nodes - plain text segments as strings, tagged segments as <code>
  * elements styled with the .fotogrids-codearea-hint code rule.
  *
  * This lets hint authors write arbitrary inline examples, not just specific
  * token words:
- *   "Use <code>SELECTOR</code> to target — e.g. <code>SELECTOR .item { … }</code>"
+ *   "Use <code>SELECTOR</code> to target - e.g. <code>SELECTOR .item { … }</code>"
  *
  * No dangerouslySetInnerHTML is used; the output is safe React elements.
  */

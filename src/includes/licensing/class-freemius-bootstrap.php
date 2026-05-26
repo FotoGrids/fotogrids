@@ -77,9 +77,7 @@ class Freemius_Bootstrap {
         try {
             self::$instance = fs_dynamic_init( self::config() );
         } catch ( \Throwable $e ) {
-            if ( function_exists( 'error_log' ) ) {
-                error_log( 'FotoGrids Freemius init failed: ' . $e->getMessage() );
-            }
+            \FotoGrids\Debug_Log::write( 'license', 'Freemius init failed: ' . $e->getMessage() );
             return null;
         }
 

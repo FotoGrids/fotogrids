@@ -18,7 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
  * License provider backed by the in-house License_Manager class.
  *
  * Used as a transitional provider when no other licensing backend is loaded.
- * Read-only — write methods return WP_Error.
+ * Read-only - write methods return WP_Error.
  *
  * @since 1.0.0
  */

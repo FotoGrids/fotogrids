@@ -523,6 +523,7 @@ class Gallery_Album_Relations {
 
         if ( $post->post_type === 'fotogrids_gallery' ) {
             $wpdb->delete( $table_name, array( 'gallery_id' => $post_id ), array( '%d' ) );
+            do_action( 'fotogrids/actions/gallery/deleted', $post_id );
         } elseif ( $post->post_type === 'fotogrids_album' ) {
             $wpdb->delete( $table_name, array( 'album_id' => $post_id ), array( '%d' ) );
         }

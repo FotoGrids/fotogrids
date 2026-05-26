@@ -77,7 +77,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
             return (typeof dv === 'object' && dv !== null ? dv.unit : null) || setting.units[0];
         };
 
-        // _linked is UI-only — never included in updateSetting payloads, only in updateSettingStateOnly.
+        // _linked is UI-only - never included in updateSetting payloads, only in updateSettingStateOnly.
         const withLinked = (val, linked) => ({ ...val, _linked: linked });
         const withoutLinked = (val) => { const { _linked, ...rest } = val; return rest; };
         const stateOnly = typeof updateSettingStateOnly === 'function' ? updateSettingStateOnly : updateSetting;
@@ -121,10 +121,10 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
 
         const handleLinkToggle = () => {
             if (isLinked) {
-                // Unlinking — UI only, no save
+                // Unlinking - UI only, no save
                 stateOnly(setting.key, withLinked({ ...responsiveValue }, false));
             } else {
-                // Linking — collapse all sides to top value (data save), flip flag (state only)
+                // Linking - collapse all sides to top value (data save), flip flag (state only)
                 const topVal = getSideValue(activeDevice, 'top');
                 const unit = getDeviceUnit(activeDevice);
                 let newDeviceValue;
@@ -169,7 +169,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
 
             h('div', { className: 'fotogrids-responsive-setting__controls fotogrids-responsive-setting__controls--four-sided' }, [
 
-                // Range slider — always visible, disabled when unlinked
+                // Range slider - always visible, disabled when unlinked
                 h('div', { className: 'fotogrids-responsive-setting__range' }, [
                     h('input', {
                         type: 'range',
@@ -194,7 +194,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                                     value: getSideValue(activeDevice, side),
                                     onChange: (e) => {
                                         if (isDisabled) return;
-                                        const val = parseInt(e.target.value) || setting.responsive[activeDevice].default;
+                                        const _v = parseInt(e.target.value); const val = Number.isFinite(_v) ? _v : setting.responsive[activeDevice].default;
                                         isLinked
                                             ? updateAllSides(activeDevice, val)
                                             : updateSide(activeDevice, side, val);
@@ -362,11 +362,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                     ...responsiveValue,
                     [device]: {
                         min: {
-                            value: responsiveValue[device].min.value || setting.responsive[device].defaultMin,
+                            value: (responsiveValue[device].min.value !== undefined && responsiveValue[device].min.value !== null) ? responsiveValue[device].min.value : setting.responsive[device].defaultMin,
                             unit: unit
                         },
                         max: {
-                            value: responsiveValue[device].max.value || setting.responsive[device].defaultMax,
+                            value: (responsiveValue[device].max.value !== undefined && responsiveValue[device].max.value !== null) ? responsiveValue[device].max.value : setting.responsive[device].defaultMax,
                             unit: unit
                         }
                     }
@@ -376,7 +376,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                 const newValue = {
                     ...responsiveValue,
                     [device]: {
-                        value: responsiveValue[device].value || setting.responsive[device].default,
+                        value: (responsiveValue[device].value !== undefined && responsiveValue[device].value !== null) ? responsiveValue[device].value : setting.responsive[device].default,
                         unit: unit
                     }
                 };
@@ -506,7 +506,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                                 max: currentMaxValue,
                                 value: currentMinValue,
                                 onChange: (e) => {
-                                    const newMin = parseInt(e.target.value) || minMin;
+                                    const _vm = parseInt(e.target.value); const newMin = Number.isFinite(_vm) ? _vm : minMin;
                                     if (newMin <= currentMaxValue) {
                                         !isDisabled && updateResponsiveValue(activeDevice, newMin, 'min');
                                     }
@@ -531,7 +531,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                                 max: maxMax,
                                 value: currentMaxValue,
                                 onChange: (e) => {
-                                    const newMax = parseInt(e.target.value) || maxMax;
+                                    const _vx = parseInt(e.target.value); const newMax = Number.isFinite(_vx) ? _vx : maxMax;
                                     if (newMax >= currentMinValue) {
                                         !isDisabled && updateResponsiveValue(activeDevice, newMax, 'max');
                                     }
@@ -643,7 +643,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                     min: setting.responsive[activeDevice].min,
                     max: setting.responsive[activeDevice].max,
                     value: currentDeviceValue,
-                    onChange: (e) => !isDisabled && updateResponsiveValue(activeDevice, parseInt(e.target.value) || setting.responsive[activeDevice].default),
+                    onChange: (e) => { const v = parseInt(e.target.value); !isDisabled && updateResponsiveValue(activeDevice, Number.isFinite(v) ? v : setting.responsive[activeDevice].default); },
                     disabled: isDisabled,
                     className: 'fotogrids-range-number-input'
                 }),

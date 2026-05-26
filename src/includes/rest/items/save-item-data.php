@@ -33,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Save_Item_Data {
 
     /**
-     * Save all item data — core fields plus structured metadata.
+     * Save all item data - core fields plus structured metadata.
      *
      * @since 1.0.0
      * @param \WP_REST_Request $request
@@ -136,7 +136,7 @@ class Save_Item_Data {
             'errors'    => array(),
         );
 
-        // Tags — FE sends integer IDs.
+        // Tags - FE sends integer IDs.
         foreach ( $tags as $tag_data ) {
             if ( is_int( $tag_data ) || ( is_numeric( $tag_data ) && intval( $tag_data ) == $tag_data ) ) {
                 $tag_id = (int) $tag_data;
@@ -169,7 +169,7 @@ class Save_Item_Data {
             }
         }
 
-        // People — FE sends { id, name, details }.
+        // People - FE sends { id, name, details }.
         foreach ( $people as $person ) {
             $person_id = isset( $person['id'] ) ? (int) $person['id'] : 0;
             $name      = isset( $person['name'] )    ? trim( $person['name'] )    : '';
@@ -196,7 +196,7 @@ class Save_Item_Data {
             }
         }
 
-        // Locations — FE sends { id, name, latitude, longitude }.
+        // Locations - FE sends { id, name, latitude, longitude }.
         foreach ( $locations as $location ) {
             $location_id = isset( $location['id'] ) ? (int) $location['id'] : 0;
             $name        = isset( $location['name'] )      ? trim( $location['name'] )  : '';

@@ -12,7 +12,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Created once per request from fotogrids_general_settings and passed into
  * Style_Var_Builder so that the breakpoint pixel values used in emitted
- * @media blocks match whatever the user has configured — they are never
+ * @media blocks match whatever the user has configured - they are never
  * hardcoded in PHP or CSS.
  *
  * Filterable via 'fotogrids/render/breakpoint_config' before the render

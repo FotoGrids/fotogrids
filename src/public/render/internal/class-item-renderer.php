@@ -50,13 +50,20 @@ final class Item_Renderer {
         $state_attr      = ' data-fg-media-state="loading"';
         $data_attributes = $this->serialize_data_attrs( $item_view->data_attrs );
 
-        $image_html          = $this->render_img( $item_view );
+        $image_html          = $this->render_img( $item_view, $render_context );
         $image_with_overlays = $this->wrap_with_overlays( $image_html, $item_view->thumb_overlays, $item_view, $render_context );
         $image_with_wrappers = $this->apply_wrappers( $image_with_overlays, $item_view->wrappers );
 
         $caption_html = '';
-        if ( $render_context->behavior->captions_enabled && $item_view->caption !== '' ) {
-            $caption_html = '<figcaption class="fg-caption">' . esc_html( $item_view->caption ) . '</figcaption>';
+        if ( $item_view->caption_title !== '' || $item_view->caption_description !== '' ) {
+            $inner = '';
+            if ( $item_view->caption_title !== '' ) {
+                $inner .= '<span class="fg-caption-title">' . esc_html( $item_view->caption_title ) . '</span>';
+            }
+            if ( $item_view->caption_description !== '' ) {
+                $inner .= '<span class="fg-caption-description">' . esc_html( $item_view->caption_description ) . '</span>';
+            }
+            $caption_html = '<figcaption class="fg-caption">' . $inner . '</figcaption>';
         }
 
         // figure_wrappers enclose both the media block and the caption, so the
@@ -76,10 +83,11 @@ final class Item_Renderer {
      * Renders image markup for an item.
      *
      * @since   1.0.0
-     * @param   Item_View $item_view Item data.
+     * @param   Item_View      $item_view      Item data.
+     * @param   Render_Context $render_context Render context (used for lazy_load setting).
      * @return  string
      */
-    private function render_img( Item_View $item_view ): string {
+    private function render_img( Item_View $item_view, Render_Context $render_context ): string {
         $srcset = '';
         $sizes = '';
         if ( $item_view->id > 0 ) {
@@ -98,14 +106,19 @@ final class Item_Renderer {
             }
         }
 
+        $lazy_load = (bool) ( $render_context->settings['lazy_load'] ?? true );
+
         $image_attributes = [
             'src' => esc_url( $item_view->thumb_url ),
             'alt' => esc_attr( $item_view->alt !== '' ? $item_view->alt : $item_view->title ),
             'data-full' => esc_url( $item_view->full_url ),
             'data-id' => (string) $item_view->id,
-            'loading' => 'lazy',
-            'decoding' => 'async',
         ];
+
+        if ( $lazy_load ) {
+            $image_attributes['loading']  = 'lazy';
+            $image_attributes['decoding'] = 'async';
+        }
 
         if ( $srcset !== '' ) {
             $image_attributes['srcset'] = esc_attr( $srcset );
@@ -147,7 +160,7 @@ final class Item_Renderer {
      *
      * The loading icon is a full inline SVG (not a <symbol>/<use> reference)
      * so CSS transitions can target individual SVG child elements directly.
-     * Inlining one SVG per item costs ~900 bytes of markup per item — a
+     * Inlining one SVG per item costs ~900 bytes of markup per item - a
      * negligible tradeoff for a gallery page.
      *
      * __FG_ID__ in the SVG is replaced with a per-item unique suffix so any
@@ -189,7 +202,7 @@ final class Item_Renderer {
      * Uses the icon name from settings (falling back to '12-dots') and replaces
      * __FG_ID__ in the SVG with a per-item unique suffix so gradient and clipPath
      * IDs don't collide across multiple items on the same page. The inlined SVG
-     * contains no SMIL tags — animations are started by WAAPI in loading-icon.js.
+     * contains no SMIL tags - animations are started by WAAPI in loading-icon.js.
      *
      * @since   1.0.0
      * @param   Item_View      $item_view Item data.

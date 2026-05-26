@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
  * "advanced" (boolean) settings: their defaults, sanitisation, read, and
  * write. Lives in includes/settings/ which is required unconditionally at
  * bootstrap, so it is available on BOTH admin requests (Settings API via
- * Admin_Init) and frontend/REST requests (Admin_Data) — unlike Admin_Init,
+ * Admin_Init) and frontend/REST requests (Admin_Data) - unlike Admin_Init,
  * which only loads when is_admin() is true.
  *
  * The "general" settings keys (mobile_breakpoint / tablet_breakpoint /
@@ -118,7 +118,7 @@ final class Plugin_Settings_Store {
             'autosave'                          => (bool) get_option( 'fotogrids_autosave', false ),
             'share_statistics'                  => (bool) get_option( 'fotogrids_share_statistics', false ),
             'custom_js_allow_dynamic_execution' => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
-            // UI: "delete on uninstall" — persisted as the inverse "preserve" flag.
+            // UI: "delete on uninstall" - persisted as the inverse "preserve" flag.
             'delete_data_on_uninstall'          => ! (bool) get_option( 'fotogrids_preserve_data_on_uninstall', false ),
         );
     }

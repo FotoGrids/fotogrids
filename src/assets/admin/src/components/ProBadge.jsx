@@ -16,7 +16,7 @@ const tierLabel = ( tier ) => {
 };
 
 /**
- * Lock icon SVG — inline so there is no extra HTTP request.
+ * Lock icon SVG - inline so there is no extra HTTP request.
  */
 const LockIcon = () => (
     <svg
@@ -38,8 +38,8 @@ const LockIcon = () => (
 /**
  * A small lock badge that shows a "Available from <Plan>" tooltip on hover.
  *
- * For React admin pages — import and use directly.
- * For vanilla render helpers — use window.FotoGridsTooltip.ProBadge() instead.
+ * For React admin pages - import and use directly.
+ * For vanilla render helpers - use window.FotoGridsTooltip.ProBadge() instead.
  *
  * @param {object}  props
  * @param {string}  props.tier   tier_required value from settings JSON

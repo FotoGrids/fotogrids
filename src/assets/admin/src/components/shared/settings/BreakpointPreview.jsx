@@ -3,7 +3,7 @@ import React from 'react';
 const { __ } = wp.i18n;
 
 /**
- * BreakpointPreview — three device frames (mobile / tablet / desktop) labelled
+ * BreakpointPreview - three device frames (mobile / tablet / desktop) labelled
  * with the ranges implied by the two breakpoint values.
  *
  * @param {Object} props

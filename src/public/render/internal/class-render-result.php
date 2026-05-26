@@ -60,12 +60,12 @@ final class Render_Result {
         int $http_status = 500
     ): self {
         $error_context = sprintf(
-            'FotoGrids render error. gallery_id=%d instance_id=%s message=%s',
+            'gallery_id=%d instance_id=%s message=%s',
             $gallery_id,
             $instance_id !== '' ? $instance_id : 'n/a',
             $message
         );
-        error_log( $error_context );
+        \FotoGrids\Debug_Log::write( 'render', $error_context );
 
         $html = '<div class="fotogrids-error" hidden></div>';
         if ( $show_inline_error ) {

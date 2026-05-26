@@ -15,37 +15,23 @@
             "visible_when_uninstalled": true
         },
         {
-            "key": "filter_by_tags",
-            "type": "toggle",
-            "label": "Filter by Tags",
-            "description": "Allow filtering items by their assigned tags",
-            "default": true,
+            "key": "filter_by",
+            "type": "token_select",
+            "label": "Filter By",
+            "description": "Which criteria visitors can filter items by",
+            "options": [
+                { "label": "Tags", "value": "tags", "tier_required": "free" },
+                { "label": "People", "value": "people", "tier_required": "pro_starter" },
+                { "label": "Location", "value": "location", "tier_required": "pro_starter" },
+                { "label": "Date", "value": "date", "tier_required": "pro_starter" },
+                { "label": "EXIF", "value": "exif", "tier_required": "pro_starter" }
+            ],
+            "default": ["tags"],
             "condition": {
                 "dependsOn": "filtering_enabled",
-                "values": [
-                    true,
-                    "1"
-                ]
+                "values": [true, "1"]
             },
             "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "filter_by_date",
-            "type": "toggle",
-            "label": "Filter by Date",
-            "description": "Allow filtering items by date range (date taken or uploaded)",
-            "default": false,
-            "condition": {
-                "dependsOn": "filtering_enabled",
-                "values": [
-                    true,
-                    "1"
-                ]
-            },
-            "tier_required": "pro_starter",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
             "visible_when_uninstalled": true
@@ -71,20 +57,9 @@
             ],
             "default": "date_taken",
             "condition": {
-                "dependsOn": [
-                    "filtering_enabled",
-                    "filter_by_date"
-                ],
-                "values": [
-                    [
-                        true,
-                        "1"
-                    ],
-                    [
-                        true,
-                        "1"
-                    ]
-                ]
+                "dependsOn": "filter_by",
+                "values": ["date"],
+                "condition_operator": "array_includes"
             },
             "tier_required": "pro_starter",
             "render_when_unlicensed": true,
@@ -92,96 +67,742 @@
             "visible_when_uninstalled": true
         },
         {
-            "key": "filter_ui_group",
-            "type": "setting_group",
+            "key": "filter_controls_subtabs",
+            "type": "setting_subtabs",
             "label": "Filter Controls",
             "condition": {
                 "dependsOn": "filtering_enabled",
-                "values": [
-                    true,
-                    "1"
-                ]
+                "values": [true, "1"]
             },
-            "settings": [
-                {
-                    "key": "filter_ui_position",
-                    "type": "button_group",
-                    "label": "Position",
-                    "description": "Where to display the filter controls",
-                    "options": [
+            "subTabs": {
+                "appearance": {
+                    "id": "appearance",
+                    "label": "Appearance",
+                    "icon": "eye",
+                    "settings": [
                         {
-                            "label": "Top",
-                            "value": "top",
-                            "icon": "flex_align_top",
-                            "tier_required": "free"
+                            "key": "filter_display_mode",
+                            "type": "button_group",
+                            "label": "Display",
+                            "description": "Whether the filter bar is always visible or revealed by a toggle button",
+                            "options": [
+                                {
+                                    "label": "Toggle Button",
+                                    "value": "toggle",
+                                    "icon": "click",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Always Visible",
+                                    "value": "always",
+                                    "icon": "eye",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "toggle",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
                         },
                         {
-                            "label": "Sidebar",
-                            "value": "sidebar",
-                            "icon": "flex_align_left",
-                            "tier_required": "free"
+                            "key": "filter_ui_position",
+                            "type": "button_group",
+                            "label": "Position",
+                            "description": "Where to display the filter controls",
+                            "options": [
+                                {
+                                    "label": "Top",
+                                    "value": "top",
+                                    "icon": "flex_align_top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Sidebar",
+                                    "value": "sidebar",
+                                    "icon": "flex_align_left",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "top",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_sidebar_side",
+                            "type": "button_group",
+                            "label": "Sidebar Side",
+                            "description": "Which side the filter sidebar appears on",
+                            "options": [
+                                {
+                                    "label": "Left",
+                                    "value": "left",
+                                    "icon": "align_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Right",
+                                    "value": "right",
+                                    "icon": "align_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "left",
+                            "condition": {
+                                "dependsOn": "filter_ui_position",
+                                "values": ["sidebar"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_ui_style",
+                            "type": "button_group",
+                            "label": "Style",
+                            "description": "How the filter controls are displayed",
+                            "options": [
+                                {
+                                    "label": "Dropdowns",
+                                    "value": "dropdowns",
+                                    "icon": "arrow_square_down",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Buttons",
+                                    "value": "buttons",
+                                    "icon": "layout",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Checkboxes",
+                                    "value": "checkboxes",
+                                    "icon": "check_square",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "buttons",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_all_label",
+                            "type": "text_input",
+                            "label": "\"All\" Label",
+                            "description": "Text for the reset control that shows all items",
+                            "default": "All",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
                         }
-                    ],
-                    "default": "top",
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                    ]
                 },
-                {
-                    "key": "filter_ui_style",
-                    "type": "button_group",
-                    "label": "Style",
-                    "description": "How the filter controls are displayed",
-                    "options": [
+                "spacing": {
+                    "id": "spacing",
+                    "label": "Spacing",
+                    "icon": "spacing_width",
+                    "settings": [
                         {
-                            "label": "Dropdowns",
-                            "value": "dropdowns",
-                            "icon": "arrow_square_down",
-                            "tier_required": "free"
+                            "key": "filter_wrapper_gap",
+                            "type": "range",
+                            "label": "Gap Between Bar and Gallery",
+                            "description": "Space between the filter bar and the gallery grid",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 64,
+                            "default": 16,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
                         },
                         {
-                            "label": "Buttons",
-                            "value": "buttons",
-                            "icon": "layout",
-                            "tier_required": "free"
+                            "key": "filter_bar_gap",
+                            "type": "range",
+                            "label": "Gap Between Groups",
+                            "description": "Space between filter groups (e.g. Tags row and People row)",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 48,
+                            "default": 8,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
                         },
                         {
-                            "label": "Checkboxes",
-                            "value": "checkboxes",
-                            "icon": "check_square",
-                            "tier_required": "free"
+                            "key": "filter_gap",
+                            "type": "range",
+                            "label": "Gap Between Controls",
+                            "description": "Space between individual buttons, options, or checkboxes within a group",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 32,
+                            "default": 8,
+                            "condition": {
+                                "dependsOn": "filter_ui_style",
+                                "values": ["buttons", "checkboxes"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_sidebar_width",
+                            "type": "range",
+                            "label": "Sidebar Width",
+                            "description": "Width of the filter column when position is set to Sidebar",
+                            "unit": "px",
+                            "min": 100,
+                            "max": 400,
+                            "default": 200,
+                            "condition": {
+                                "dependsOn": "filter_ui_position",
+                                "values": ["sidebar"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
                         }
-                    ],
-                    "default": "buttons",
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                    ]
                 },
-                {
-                    "key": "show_filter_count",
-                    "type": "toggle",
-                    "label": "Show Item Count",
-                    "description": "Display the number of items in each filter option",
-                    "default": true,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                "buttons": {
+                    "id": "buttons",
+                    "label": "Buttons",
+                    "icon": "layout",
+                    "condition": {
+                        "dependsOn": "filter_ui_style",
+                        "values": ["buttons"]
+                    },
+                    "settings": [
+                        {
+                            "key": "filter_btn_shape_group",
+                            "type": "setting_group",
+                            "label": "Shape",
+                            "settings": [
+                                {
+                                    "key": "filter_btn_padding",
+                                    "type": "text_input",
+                                    "label": "Padding",
+                                    "description": "CSS padding shorthand (e.g. 6px 14px)",
+                                    "default": "6px 14px",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_btn_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 50,
+                                    "default": 4,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_btn_font_size",
+                                    "type": "range",
+                                    "label": "Font Size",
+                                    "unit": "rem",
+                                    "min": 0.6,
+                                    "max": 1.4,
+                                    "step": 0.05,
+                                    "default": 0.875,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_btn_default_group",
+                            "type": "setting_group",
+                            "label": "Default State",
+                            "settings": [
+                                {
+                                    "key": "filter_btn_bg",
+                                    "type": "color_picker",
+                                    "label": "Background",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_btn_color",
+                                    "type": "color_picker",
+                                    "label": "Text Color",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_btn_border",
+                                    "type": "text_input",
+                                    "label": "Border",
+                                    "description": "CSS border shorthand (e.g. 1px solid #ccc)",
+                                    "default": "1px solid currentColor",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_btn_active_group",
+                            "type": "setting_group",
+                            "label": "Active State",
+                            "settings": [
+                                {
+                                    "key": "filter_btn_active_bg",
+                                    "type": "color_picker",
+                                    "label": "Background",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_btn_active_color",
+                                    "type": "color_picker",
+                                    "label": "Text Color",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_btn_hover_group",
+                            "type": "setting_group",
+                            "label": "Hover State",
+                            "settings": [
+                                {
+                                    "key": "filter_btn_hover_bg",
+                                    "type": "color_picker",
+                                    "label": "Background",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_btn_hover_color",
+                                    "type": "color_picker",
+                                    "label": "Text Color",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
                 },
-                {
-                    "key": "filter_all_label",
-                    "type": "text_input",
-                    "label": "\"All\" Filter Label",
-                    "description": "Text for the option that shows all items (e.g., 'All Items', 'Show All')",
-                    "default": "All",
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                "dropdowns": {
+                    "id": "dropdowns",
+                    "label": "Dropdowns",
+                    "icon": "arrow_square_down",
+                    "condition": {
+                        "dependsOn": "filter_ui_style",
+                        "values": ["dropdowns"]
+                    },
+                    "settings": [
+                        {
+                            "key": "filter_dropdown_trigger_group",
+                            "type": "setting_group",
+                            "label": "Trigger Button",
+                            "settings": [
+                                {
+                                    "key": "filter_select_padding",
+                                    "type": "text_input",
+                                    "label": "Padding",
+                                    "description": "CSS padding shorthand (e.g. 6px 32px 6px 12px)",
+                                    "default": "6px 32px 6px 12px",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_select_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 50,
+                                    "default": 4,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_select_bg",
+                                    "type": "color_picker",
+                                    "label": "Background",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_select_color",
+                                    "type": "color_picker",
+                                    "label": "Text Color",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_select_border",
+                                    "type": "text_input",
+                                    "label": "Border",
+                                    "description": "CSS border shorthand (e.g. 1px solid #ccc)",
+                                    "default": "1px solid currentColor",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_dropdown_list_group",
+                            "type": "setting_group",
+                            "label": "Popover List",
+                            "settings": [
+                                {
+                                    "key": "filter_dropdown_list_bg",
+                                    "type": "color_picker",
+                                    "label": "Background",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_dropdown_list_border",
+                                    "type": "text_input",
+                                    "label": "Border",
+                                    "description": "CSS border shorthand (e.g. 1px solid #ccc)",
+                                    "default": "1px solid currentColor",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_dropdown_list_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 20,
+                                    "default": 4,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_dropdown_option_hover_bg",
+                                    "type": "color_picker",
+                                    "label": "Option Hover Background",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_dropdown_option_active_color",
+                                    "type": "color_picker",
+                                    "label": "Selected Option Color",
+                                    "description": "Text color of the currently selected option",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "checkboxes": {
+                    "id": "checkboxes",
+                    "label": "Checkboxes",
+                    "icon": "check_square",
+                    "condition": {
+                        "dependsOn": "filter_ui_style",
+                        "values": ["checkboxes"]
+                    },
+                    "settings": [
+                        {
+                            "key": "filter_cb_shape_group",
+                            "type": "setting_group",
+                            "label": "Box",
+                            "settings": [
+                                {
+                                    "key": "filter_cb_size",
+                                    "type": "range",
+                                    "label": "Size",
+                                    "description": "Width and height of the checkbox box",
+                                    "unit": "px",
+                                    "min": 10,
+                                    "max": 28,
+                                    "default": 16,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "description": "0 = square, 50% equivalent = circle",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 14,
+                                    "default": 3,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_gap",
+                                    "type": "range",
+                                    "label": "Gap to Label",
+                                    "description": "Space between the checkbox box and its label text",
+                                    "unit": "px",
+                                    "min": 2,
+                                    "max": 24,
+                                    "default": 8,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_cb_colors_group",
+                            "type": "setting_group",
+                            "label": "Colors",
+                            "settings": [
+                                {
+                                    "key": "filter_cb_border",
+                                    "type": "text_input",
+                                    "label": "Border (unchecked)",
+                                    "description": "CSS border shorthand (e.g. 1px solid #ccc)",
+                                    "default": "1px solid currentColor",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_bg",
+                                    "type": "color_picker",
+                                    "label": "Background (unchecked)",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_checked_bg",
+                                    "type": "color_picker",
+                                    "label": "Background (checked)",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_checked_border_color",
+                                    "type": "color_picker",
+                                    "label": "Border Color (checked)",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_checkmark_color",
+                                    "type": "color_picker",
+                                    "label": "Checkmark Color",
+                                    "description": "Color of the tick mark inside a checked box",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "count_badge": {
+                    "id": "count_badge",
+                    "label": "Count Badge",
+                    "icon": "notification_message",
+                    "settings": [
+                        {
+                            "key": "show_filter_count",
+                            "type": "toggle",
+                            "label": "Show Item Count",
+                            "description": "Display the number of matching items next to each filter option",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_count_group",
+                            "type": "setting_group",
+                            "label": "Badge",
+                            "condition": {
+                                "dependsOn": "show_filter_count",
+                                "values": [true, "1"]
+                            },
+                            "settings": [
+                                {
+                                    "key": "filter_count_color",
+                                    "type": "color_picker",
+                                    "label": "Text Color",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_font_size",
+                                    "type": "range",
+                                    "label": "Font Size",
+                                    "description": "Relative to the button/option font size",
+                                    "unit": "em",
+                                    "min": 0.5,
+                                    "max": 1,
+                                    "step": 0.05,
+                                    "default": 0.8,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_bg",
+                                    "type": "color_picker",
+                                    "label": "Background",
+                                    "description": "Leave empty for transparent (default)",
+                                    "default": "",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "description": "Useful for a pill-shaped badge",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 20,
+                                    "default": 0,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_padding",
+                                    "type": "text_input",
+                                    "label": "Padding",
+                                    "description": "CSS padding shorthand (e.g. 2px 5px). Only matters when background is set.",
+                                    "default": "0",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
                 }
-            ],
+            },
             "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",

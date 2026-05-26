@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import SidebarTabs from '../shared/SidebarTabs/SidebarTabs';
-import SettingsPanel from '../shared/settings/SettingsPanel';
+import Panel from '../shared/SidebarTabs/elements/Panel';
 import ResponsivenessTab from '../plugin-settings/tabs/ResponsivenessTab';
 import DefaultsTab from '../plugin-settings/tabs/DefaultsTab';
 import AdvancedTab from '../plugin-settings/tabs/AdvancedTab';
+import MaintenanceTab from '../plugin-settings/tabs/MaintenanceTab';
 import PermissionsManagerTab from '../plugin-settings/tabs/PermissionsManagerTab';
 import MediaTab from '../plugin-settings/tabs/MediaTab';
+import SharingTab from '../plugin-settings/tabs/SharingTab';
+import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
+import TabBar from '../shared/TabBar.jsx';
 
 const { __ } = wp.i18n;
 
-const TAB_IDS = ['media', 'responsiveness', 'defaults', 'permissions_manager', 'advanced'];
-const SUBTAB_IDS = ['gallery', 'album'];
+const TAB_IDS = ['media', 'responsiveness', 'defaults', 'view_pages', 'sharing', 'permissions_manager', 'advanced', 'maintenance'];
+const DEFAULTS_TABS = [
+    { id: 'gallery', label: __('Gallery Defaults', 'fotogrids'), icon: 'layout_3x3' },
+    { id: 'album', label: __('Album Defaults', 'fotogrids'), icon: 'layout_2x2' }
+];
 
 const PluginSettingsPage = () => {
     const uiState = window.FotoGridsUiState?.createNamespace({ area: 'plugin-settings' });
@@ -19,8 +26,11 @@ const PluginSettingsPage = () => {
         { id: 'media', label: __('Media', 'fotogrids'), icon: 'image', group: 'setup' },
         { id: 'responsiveness', label: __('Responsiveness', 'fotogrids'), icon: 'responsive_desktop', group: 'setup' },
         { id: 'defaults', label: __('Defaults', 'fotogrids'), icon: 'layout', group: 'setup' },
+        { id: 'view_pages', label: __('View Pages', 'fotogrids'), icon: 'image', group: 'setup' },
+        { id: 'sharing', label: __('Sharing', 'fotogrids'), icon: 'share', group: 'setup' },
         { id: 'permissions_manager', label: __('Permissions Manager', 'fotogrids'), icon: 'security', group: 'setup' },
-        { id: 'advanced', label: __('Advanced', 'fotogrids'), icon: 'advanced', group: 'system' }
+        { id: 'advanced', label: __('Advanced', 'fotogrids'), icon: 'settings', group: 'system' },
+        { id: 'maintenance', label: __('Maintenance', 'fotogrids'), icon: 'tools', group: 'system' }
     ];
 
     const tabGroups = [
@@ -32,27 +42,35 @@ const PluginSettingsPage = () => {
         const url = new URL(window.location.href);
         url.searchParams.set('tab', tabId);
         url.searchParams.delete('field');
+        url.searchParams.delete('subtab');
         return url.toString();
     };
 
-    const [activeTab, setActiveTab] = useState(() => {
+    // Resolve the active main tab from persisted state, normalising the legacy
+    // 'general' alias to 'responsiveness'.
+    const resolveActiveTab = () => {
         if (!uiState) return 'media';
-        // Normalise legacy 'general' alias.
         const raw = uiState.getValue({ key: 'main-tab', fallback: 'media', urlParam: 'tab', allowed: TAB_IDS });
         return raw === 'general' ? 'responsiveness' : raw;
-    });
+    };
 
-    const [activeSubTab, setActiveSubTab] = useState(() => {
-        if (!uiState) return 'gallery';
-        return uiState.getValue({ key: 'subtab', fallback: 'gallery', urlParam: 'subtab', allowed: SUBTAB_IDS });
-    });
+    // The subtab only applies to the Defaults tab. For any other tab it is
+    // always 'gallery' (the default) regardless of what the URL or session may
+    // still carry, so a stale subtab can never leak into a non-defaults tab.
+    const resolveDefaultsSubTab = (tabId) => {
+        if (!uiState || tabId !== 'defaults') return 'gallery';
+        return uiState.getValue({ key: 'defaults-subtab', fallback: 'gallery', urlParam: 'subtab', allowed: DEFAULTS_TABS.map((tab) => tab.id) });
+    };
+
+    const [activeTab, setActiveTab] = useState(resolveActiveTab);
+    const [activeDefaultsSubTab, setActiveDefaultsSubTab] = useState(() => resolveDefaultsSubTab(resolveActiveTab()));
 
     useEffect(() => {
         const handlePopState = () => {
             if (!uiState) return;
-            const raw = uiState.getValue({ key: 'main-tab', fallback: 'media', urlParam: 'tab', allowed: TAB_IDS });
-            setActiveTab(raw === 'general' ? 'responsiveness' : raw);
-            setActiveSubTab(uiState.getValue({ key: 'subtab', fallback: 'gallery', urlParam: 'subtab', allowed: SUBTAB_IDS }));
+            const tabId = resolveActiveTab();
+            setActiveTab(tabId);
+            setActiveDefaultsSubTab(resolveDefaultsSubTab(tabId));
         };
 
         window.addEventListener('popstate', handlePopState);
@@ -120,16 +138,17 @@ const PluginSettingsPage = () => {
     const handleTabChange = (tabId) => {
         setActiveTab(tabId);
 
-        // Reset sub-tab when switching away from defaults.
-        if (tabId !== 'defaults') {
-            setActiveSubTab('gallery');
-            if (uiState) {
-                uiState.setValue({ key: 'subtab', value: 'gallery', urlParam: 'subtab' });
-            }
-        }
-
         if (uiState) {
             uiState.setValue({ key: 'main-tab', value: tabId, urlParam: 'tab' });
+
+            // The subtab only applies to the Defaults tab. On any other tab it
+            // must be absent from both the URL and the session - clear it so it
+            // never lingers. Reset the local state too so Defaults opens on the
+            // first subtab next time.
+            if (tabId !== 'defaults') {
+                uiState.clearValue({ key: 'defaults-subtab', urlParam: 'subtab' });
+                setActiveDefaultsSubTab('gallery');
+            }
         }
 
         // Remove the field deep-link param when switching tabs.
@@ -138,16 +157,16 @@ const PluginSettingsPage = () => {
             url.searchParams.delete('field');
             window.history.replaceState({}, '', url.toString());
         } catch ( _e ) {
-            // History API unavailable — fail silently.
+            // History API unavailable - fail silently.
         }
     };
 
     const handleSubTabChange = (subTabId) => {
-        setActiveSubTab(subTabId);
+        setActiveDefaultsSubTab(subTabId);
 
         if (uiState) {
             uiState.setValue({ key: 'main-tab', value: 'defaults', urlParam: 'tab' });
-            uiState.setValue({ key: 'subtab', value: subTabId, urlParam: 'subtab' });
+            uiState.setValue({ key: 'defaults-subtab', value: subTabId, urlParam: 'subtab' });
         }
 
         // Remove the field deep-link param when switching subtabs.
@@ -156,7 +175,7 @@ const PluginSettingsPage = () => {
             url.searchParams.delete('field');
             window.history.replaceState({}, '', url.toString());
         } catch ( _e ) {
-            // History API unavailable — fail silently.
+            // History API unavailable - fail silently.
         }
     };
 
@@ -168,61 +187,55 @@ const PluginSettingsPage = () => {
                 return <ResponsivenessTab />;
             case 'defaults':
                 return (
-                    <SettingsPanel
-                        title={__('Defaults', 'fotogrids')}
-                        description={__('Default settings applied to new galleries and albums.', 'fotogrids')}
-                    >
-                        {/*
-                          * Defaults uses the shared CollectionSettings app, which in
-                          * defaults mode persists by writing hidden inputs into this
-                          * options.php form and submitting via the WordPress Settings
-                          * API. This form is scoped to the Defaults tab only — the
-                          * other tabs save via REST.
-                          */}
-                        <form method="post" action="options.php" className="fotogrids-defaults-form">
-                            <input type="hidden" name="option_page" value="fotogrids_settings" />
-                            <input type="hidden" name="action" value="update" />
-                            <input type="hidden" name="_wpnonce" value={window.fotogridsAdmin?.settingsNonce || ''} />
-                            <div className="fotogrids-defaults-tab">
-                                <div className="fotogrids-defaults-subtabs">
-                                    <button
-                                        type="button"
-                                        className={`fotogrids-defaults-subtab ${activeSubTab === 'gallery' ? 'fg-is-active' : ''}`}
-                                        onClick={() => handleSubTabChange('gallery')}
-                                    >
-                                        {__('Gallery Defaults', 'fotogrids')}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={`fotogrids-defaults-subtab ${activeSubTab === 'album' ? 'fg-is-active' : ''}`}
-                                        onClick={() => handleSubTabChange('album')}
-                                    >
-                                        {__('Album Defaults', 'fotogrids')}
-                                    </button>
-                                </div>
-                                <div className="fotogrids-defaults-content">
-                                    <DefaultsTab key={activeSubTab} type={activeSubTab} />
-                                </div>
-                                <p className="submit">
-                                    <button type="submit" className="fotogrids-button fotogrids-button--primary fotogrids-button--small">
-                                        {__('Save Defaults', 'fotogrids')}
-                                    </button>
-                                </p>
-                            </div>
-                        </form>
-                    </SettingsPanel>
+                    <>
+                        <Panel
+                            title={__('Defaults', 'fotogrids')}
+                            description={__('Default settings applied to new Galleries and Albums.', 'fotogrids')}
+                            noBodyPadding
+                        >
+                            <TabBar
+                                tabs={ DEFAULTS_TABS }
+                                activeTab={ activeDefaultsSubTab }
+                                onTabChange={ handleSubTabChange }
+                            />
+                        </Panel>
+                        <Panel equalBodyPadding>
+                            {/*
+                            * Defaults uses the shared CollectionSettings app, which in
+                            * defaults mode persists by writing hidden inputs into this
+                            * options.php form and submitting via the WordPress Settings
+                            * API. This form is scoped to the Defaults tab only - the
+                            * other tabs save via REST.
+                            */}
+                            <form method="post" action="options.php" className="fotogrids-defaults-form">
+                                <input type="hidden" name="option_page" value="fotogrids_settings" />
+                                <input type="hidden" name="action" value="update" />
+                                <input type="hidden" name="_wpnonce" value={window.fotogridsAdmin?.settingsNonce || ''} />
+                                <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />
+                                <button type="submit" className="fotogrids-button fotogrids-button--primary fotogrids-button--small">
+                                    {__('Save Defaults', 'fotogrids')}
+                                </button>
+                            </form>
+                        </Panel>
+                    </>
                 );
+            case 'view_pages':
+                return <ViewPagesTab />;
+            case 'sharing':
+                return <SharingTab />;
             case 'permissions_manager':
                 return (
-                    <SettingsPanel
+                    <Panel
                         title={__('Permissions Manager', 'fotogrids')}
                         description={__('Control which roles can create and manage galleries and albums.', 'fotogrids')}
                     >
                         <PermissionsManagerTab />
-                    </SettingsPanel>
+                    </Panel>
                 );
             case 'advanced':
                 return <AdvancedTab />;
+            case 'maintenance':
+                return <MaintenanceTab />;
             default:
                 return <div key="default">{__('Select a tab to configure settings', 'fotogrids')}</div>;
         }

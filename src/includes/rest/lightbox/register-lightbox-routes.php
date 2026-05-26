@@ -40,6 +40,13 @@ class Register_Lightbox_Routes {
                         'sanitize_callback' => 'sanitize_key',
                         'description'       => __( 'Where to resolve the credit field from.', 'fotogrids' ),
                     ),
+                    'gallery_id'    => array(
+                        'required'          => false,
+                        'type'              => 'integer',
+                        'default'           => 0,
+                        'sanitize_callback' => 'absint',
+                        'description'       => __( 'Gallery ID, used to determine which EXIF fields are enabled for display.', 'fotogrids' ),
+                    ),
                 ),
             ),
         ) );

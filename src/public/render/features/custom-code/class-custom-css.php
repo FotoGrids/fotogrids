@@ -84,6 +84,10 @@ final class Custom_Css implements Feature {
         return $this->resolve_custom_css( $render_context ) !== '';
     }
 
+    public function html_before( Render_Context $render_context ): string {
+        return '';
+    }
+
     public function html_appendix( Render_Context $render_context ): string {
         return '';
     }
@@ -183,7 +187,7 @@ final class Custom_Css implements Feature {
             return '';
         }
 
-        // 5. Reject @import — prevents external stylesheet loading and exfiltration.
+        // 5. Reject @import - prevents external stylesheet loading and exfiltration.
         if ( preg_match( '/@import\b/i', $css ) ) {
             return '';
         }
@@ -193,7 +197,7 @@ final class Custom_Css implements Feature {
             return '';
         }
 
-        // 7. Reject expression() — legacy IE CSS evaluation.
+        // 7. Reject expression() - legacy IE CSS evaluation.
         if ( preg_match( '/\bexpression\s*\(/i', $css ) ) {
             return '';
         }
@@ -208,7 +212,7 @@ final class Custom_Css implements Feature {
      * double-prefixed. At-rules (`@media`, `@keyframes`, etc.) are kept as-is
      * and their inner rules are scoped recursively.
      *
-     * The algorithm is a lightweight brace-counting parser — it handles nested
+     * The algorithm is a lightweight brace-counting parser - it handles nested
      * at-rules (e.g. `@media { @supports { … } }`) correctly without requiring
      * a full CSS parser.
      *
@@ -262,7 +266,7 @@ final class Custom_Css implements Feature {
             }
 
             if ( $block_start === false ) {
-                // No `{` found — trailing garbage; skip.
+                // No `{` found - trailing garbage; skip.
                 continue;
             }
 
@@ -301,7 +305,7 @@ final class Custom_Css implements Feature {
                     continue;
                 }
 
-                // Already contains the real selector — don't double-prefix.
+                // Already contains the real selector - don't double-prefix.
                 if ( strpos( $sel, $selector ) !== false ) {
                     $scoped_selectors[] = $sel;
                 } else {
