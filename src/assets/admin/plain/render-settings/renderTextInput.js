@@ -24,14 +24,23 @@ window.FotoGridsRenderSettings.renderTextInput = (setting, currentValue, isDisab
                 key: 'pro-badge'
             }, settingBadgeText)
         ].filter(Boolean)),
-        h('input', {
-            type: 'text',
-            className: 'fotogrids-input',
-            value: currentValue || setting.default || '',
-            placeholder: setting.placeholder || '',
-            onChange: (e) => !isDisabled && updateSetting(setting.key, e.target.value),
-            disabled: isDisabled
-        }),
+        setting.multiline
+            ? h('textarea', {
+                className: 'fotogrids-input fotogrids-input--multiline',
+                value: currentValue || setting.default || '',
+                placeholder: setting.placeholder || '',
+                rows: setting.rows || 3,
+                onChange: (e) => !isDisabled && updateSetting(setting.key, e.target.value),
+                disabled: isDisabled
+            })
+            : h('input', {
+                type: 'text',
+                className: 'fotogrids-input',
+                value: currentValue || setting.default || '',
+                placeholder: setting.placeholder || '',
+                onChange: (e) => !isDisabled && updateSetting(setting.key, e.target.value),
+                disabled: isDisabled
+            }),
         setting.description && h('div', {
             className: 'fotogrids-setting__description'
         }, setting.description)

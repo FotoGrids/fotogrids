@@ -108,7 +108,7 @@ module.exports = {
     entry: {
         'admin': './src/assets/admin/src/index.js',
         'metabox': './src/assets/admin/src/metabox.js',
-        'frontend': './src/assets/frontend/src/index.js',
+        'fotogrids-runtime': './src/public/render/internal/runtime/runtime.js',
         'deep-linking': './src/assets/frontend/src/deep-linking.js',
         'fg-tooltip': './src/public/render/fg-tooltip/fg-tooltip.js',
         'loading-icon': './src/public/render/features/loading-icon/loading-icon.js',
@@ -117,6 +117,16 @@ module.exports = {
         'lightbox-styles': './src/public/render/features/lightbox/lightbox.scss',
         'filter-ui': './src/public/render/filters/features/ui/filter-ui.js',
         'filter-ui-styles': './src/public/render/filters/features/ui/filter-ui.scss',
+        'sharing': './src/public/render/decorators/sharing/sharing.js',
+        'password-gate': './src/public/render/gates/password/password-gate.js',
+        'lazy-load': './src/public/render/features/lazy-load/lazy-load.js',
+        'stats': './src/public/render/features/stats/stats.js',
+        'album-to-gallery-ajax': './src/public/render/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
+        'collection-header': './src/public/render/features/collection-header/collection-header.js',
+        'pagination-core': './src/public/render/features/pagination/pagination-core.js',
+        'endless-scroll': './src/public/render/features/pagination/endless-scroll/endless-scroll.js',
+        'load-more': './src/public/render/features/pagination/load-more/load-more.js',
+        'page-buttons': './src/public/render/features/pagination/page-buttons/page-buttons.js',
         'collection-state-manager': './src/assets/admin/src/collection-state-manager.js',
         'ajax-save': './src/assets/admin/src/ajax-save.js',
         'album-assignment': './src/assets/admin/src/album-assignment.js',
@@ -372,9 +382,25 @@ module.exports = {
                     globOptions: {
                         // .php and .scss are excluded because webpack handles them (PHP via
                         // the php copy patterns above; SCSS via MiniCssExtractPlugin).
-                        // fg-tooltip.js is also excluded because it's a webpack entry point
-                        // (uses ES module imports) - the built output lands in assets/js/.
-                        ignore: ['**/*.php', '**/*.scss', '**/fg-tooltip/fg-tooltip.js'],
+                        // fg-tooltip.js and runtime.js are also excluded because they're
+                        // webpack entry points — the built output lands in assets/js/.
+                        ignore: [
+                            '**/*.php',
+                            '**/*.scss',
+                            '**/*.md',
+                            '**/fg-tooltip/fg-tooltip.js',
+                            '**/internal/runtime/runtime.js',
+                            '**/decorators/sharing/sharing.js',
+                            '**/gates/password/password-gate.js',
+                            '**/features/lazy-load/lazy-load.js',
+                            '**/features/stats/stats.js',
+                            '**/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
+                            '**/features/collection-header/collection-header.js',
+                            '**/features/pagination/pagination-core.js',
+                            '**/features/pagination/endless-scroll/endless-scroll.js',
+                            '**/features/pagination/load-more/load-more.js',
+                            '**/features/pagination/page-buttons/page-buttons.js',
+                        ],
                     },
                 },
                 {

@@ -35,11 +35,6 @@ const PLACEMENTS = [
         description: __('Inside Lightboxes.', 'fotogrids'),
     },
     {
-        key: 'full_image',
-        label: __('Full Image', 'fotogrids'),
-        description: __('On the full-size image when items open directly.', 'fotogrids'),
-    },
-    {
         key: 'thumbnail',
         label: __('Thumbnails', 'fotogrids'),
         description: __('On each grid thumbnail, shown on hover, if enabled.', 'fotogrids'),

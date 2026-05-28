@@ -254,18 +254,23 @@ class Admin_Data {
             $is_plugin_size  = in_array( $size, array(
                 \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
                 \FotoGrids\Image_Size_Manager::SLUG_FULL,
+                \FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE,
+                \FotoGrids\Image_Size_Manager::SLUG_MASONRY,
+                \FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED,
             ), true );
             $is_custom_size  = strpos( $size, \FotoGrids\Image_Size_Manager::CUSTOM_SLUG_PREFIX ) === 0;
 
             // Build human-readable label; give FotoGrids plugin sizes nicer names.
-            if ( $is_plugin_size ) {
-                if ( $size === \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL ) {
-                    $label = __( 'FotoGrids Thumbnail', 'fotogrids' );
-                } elseif ( $size === \FotoGrids\Image_Size_Manager::SLUG_FULL ) {
-                    $label = __( 'FotoGrids Full', 'fotogrids' );
-                } else {
-                    $label = ucfirst( str_replace( array( '-', '_' ), ' ', $size ) );
-                }
+            if ( $size === \FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL ) {
+                $label = __( 'FotoGrids Thumbnails', 'fotogrids' );
+            } elseif ( $size === \FotoGrids\Image_Size_Manager::SLUG_FULL ) {
+                $label = __( 'FotoGrids Full Size', 'fotogrids' );
+            } elseif ( $size === \FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE ) {
+                $label = __( 'FotoGrids Full Size (Mobile)', 'fotogrids' );
+            } elseif ( $size === \FotoGrids\Image_Size_Manager::SLUG_MASONRY ) {
+                $label = __( 'FotoGrids Masonry (variable height)', 'fotogrids' );
+            } elseif ( $size === \FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED ) {
+                $label = __( 'FotoGrids Justified (variable width)', 'fotogrids' );
             } else {
                 $label = ucfirst( str_replace( array( '-', '_' ), ' ', $size ) );
             }
@@ -343,6 +348,8 @@ class Admin_Data {
             'thumbnail_alignment' => $request->get_param( 'thumbnail_alignment' ),
             'full_width'          => $request->get_param( 'full_width' ),
             'full_height'         => $request->get_param( 'full_height' ),
+            'masonry_width'       => $request->get_param( 'masonry_width' ),
+            'justified_height'    => $request->get_param( 'justified_height' ),
         );
 
         $saved = \FotoGrids\Image_Size_Manager::save_plugin_size_settings( $raw );
@@ -383,6 +390,36 @@ class Admin_Data {
             'tablet_breakpoint'            => $request->get_param( 'tablet_breakpoint' ),
             'detect_responsive_by_browser' => $request->get_param( 'detect_responsive_by_browser' ),
         ) );
+
+        return rest_ensure_response( array( 'settings' => $settings ) );
+    }
+
+    /**
+     * Get the global SEO settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/seo-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_seo_settings( $request ): \WP_REST_Response {
+        return rest_ensure_response( array(
+            'settings' => \FotoGrids\Settings\SEO_Settings_Store::get(),
+        ) );
+    }
+
+    /**
+     * Save the global SEO settings.
+     *
+     * POST /wp-json/fotogrids/v1/admin/seo-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_seo_settings( $request ): \WP_REST_Response {
+        $settings = \FotoGrids\Settings\SEO_Settings_Store::save( $request->get_json_params() ?: $request->get_params() );
 
         return rest_ensure_response( array( 'settings' => $settings ) );
     }
@@ -702,16 +739,19 @@ class Admin_Data {
         $items_count = $wpdb->get_var( "SELECT COUNT(*) FROM $items_table" );
 
         $stats_table = $wpdb->prefix . 'fotogrids_statistics';
-        $views_count = $wpdb->get_var( "SELECT SUM(views) FROM $stats_table" );
-        if ( ! $views_count ) {
-            $views_count = 0;
-        }
+        $totals = $wpdb->get_row(
+            "SELECT SUM(views) AS views, SUM(shares) AS shares FROM $stats_table",
+            ARRAY_A
+        );
+        $views_count = isset( $totals['views'] ) ? (int) $totals['views'] : 0;
+        $shares_count = isset( $totals['shares'] ) ? (int) $totals['shares'] : 0;
 
         return rest_ensure_response( array(
             'galleries' => (int) $galleries_count,
             'albums' => (int) $albums_count,
             'items' => (int) $items_count,
             'views' => (int) $views_count,
+            'shares' => (int) $shares_count,
         ) );
     }
 

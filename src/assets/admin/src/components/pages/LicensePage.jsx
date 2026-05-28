@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -162,10 +163,10 @@ const LicensePage = () => {
             <div className="fotogrids-admin-blocks-grid">
                 <div className="fotogrids-admin-block-card fg-abc-license">
                     <div className="fotogrids-admin-block-card-header">
-                        <div
-                            className={`fotogrids-admin-block-card-header-icon${isPro ? ' fg-abc-header-icon-pro' : ''}`}
-                            dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check_verified }}
-                        />
+                            <Icon
+                                name="check_verified"
+                                className={`fotogrids-admin-block-card-header-icon${isPro ? ' fg-abc-header-icon-pro' : ''}`}
+                            />
                         <h3>{__('Your License', 'fotogrids')}</h3>
                     </div>
                     <div className="fotogrids-license-card-content">
@@ -223,14 +224,9 @@ const LicensePage = () => {
                                                     onClick={() => setKeyRevealed(!keyRevealed)}
                                                     aria-label={keyRevealed ? __('Hide license key', 'fotogrids') : __('Reveal license key', 'fotogrids')}
                                                 >
-                                                    <span
+                                                    <Icon
+                                                        name={ keyRevealed ? 'eye_off' : 'eye' }
                                                         className="fotogrids-button__icon"
-                                                        aria-hidden="true"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: keyRevealed
-                                                                ? window.FotoGridsIcons?.eye_off
-                                                                : window.FotoGridsIcons?.eye,
-                                                        }}
                                                     />
                                                 </button>
                                             )}
@@ -320,10 +316,7 @@ const LicensePage = () => {
                 {licenseStatus && licenseStatus.needs_pro_install && (
                     <div className="fotogrids-admin-block-card fg-abc-download-pro">
                         <div className="fotogrids-admin-block-card-header">
-                            <div
-                                className="fotogrids-admin-block-card-header-icon fg-abc-header-icon-pro"
-                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.download }}
-                            />
+                            <Icon name="download" className="fotogrids-admin-block-card-header-icon fg-abc-header-icon-pro" />
                             <h3>{__('Download the Pro plugin', 'fotogrids')}</h3>
                         </div>
                         <div className="fotogrids-admin-block-card-content">
@@ -377,9 +370,7 @@ const LicensePage = () => {
                                     'Bulk Operations',
                                 ].map((feature) => (
                                     <div key={generateProFeatureKey(feature)}>
-                                        <span
-                                            dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check_badge_g }}
-                                        />
+                                        <Icon name="check_badge_g" />
                                         {__(feature, 'fotogrids')}
                                     </div>
                                 ))}

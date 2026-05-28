@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Decorators\Direct_Link;
 
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Item_Wrapper;
@@ -46,6 +47,11 @@ final class Direct_Link_Decorator implements Decorator {
     }
 
     public function supports( Render_Context $render_context ): bool {
+        // Direct-to-image is an attachment-only click behaviour; albums
+        // use Album_To_View_Page / Album_To_Gallery_Ajax instead.
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
         return $render_context->behavior->click_behavior === 'direct';
     }
 

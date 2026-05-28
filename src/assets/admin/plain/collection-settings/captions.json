@@ -47,20 +47,100 @@
                 {
                     "label": "Overlay",
                     "value": "overlay",
-                    "icon": "grid_dots_vertical_center",
+                    "icon": "caption_overlay",
                     "tier_required": "free"
                 },
                 {
                     "label": "Top",
                     "value": "top",
-                    "icon": "grid_dots_top",
+                    "icon": "caption_top",
                     "tier_required": "free"
                 },
                 {
                     "label": "Bottom",
                     "value": "bottom",
-                    "icon": "grid_dots_bottom",
+                    "icon": "caption_bottom",
                     "tier_required": "free"
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "caption_overlay_color_group",
+            "type": "setting_group",
+            "label": "Overlay Color",
+            "condition": {
+                "dependsOn": "caption_placement",
+                "values": [
+                    "overlay"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "caption_overlay_color",
+                    "type": "color",
+                    "label": "Choose a color",
+                    "default": "rgba(0, 0, 0, 0.3)",
+                    "isReference": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "caption_overlay_opacity_subtabs",
+                    "type": "setting_subtabs",
+                    "subTabs": {
+                        "regular": {
+                            "id": "regular",
+                            "label": "Regular",
+                            "icon": "image",
+                            "settings": [
+                                {
+                                    "key": "caption_overlay_opacity",
+                                    "type": "range",
+                                    "label": "Opacity",
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 1,
+                                    "default": 100,
+                                    "unit": "%",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ]
+                        },
+                        "hover": {
+                            "id": "hover",
+                            "label": "Mouseover",
+                            "icon": "hover",
+                            "settings": [
+                                {
+                                    "key": "caption_overlay_hover_opacity",
+                                    "type": "range",
+                                    "label": "Opacity",
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 1,
+                                    "default": 50,
+                                    "unit": "%",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ]
+                        }
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
                 }
             ],
             "tier_required": "free",
@@ -107,34 +187,81 @@
             "visible_when_uninstalled": true
         },
         {
-            "key": "caption_alignment",
-            "type": "button_group",
+            "key": "caption_alignment_group",
+            "type": "setting_group",
             "label": "Caption Alignment",
-            "description": "Change the horizontal alignment of the thumbnail captions.",
-            "options": [
+            "settings": [
                 {
-                    "label": "Left",
-                    "value": "left",
-                    "icon": "align_left",
-                    "tier_required": "free"
+                    "key": "caption_alignment",
+                    "type": "button_group",
+                    "label": "Horizontal",
+                    "description": "Change the horizontal alignment of the thumbnail captions.",
+                    "options": [
+                        {
+                            "label": "Left",
+                            "value": "left",
+                            "icon": "align_left",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Center",
+                            "value": "center",
+                            "icon": "align_center",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Right",
+                            "value": "right",
+                            "icon": "align_right",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Justify",
+                            "value": "justify",
+                            "icon": "align_justify",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
                 },
                 {
-                    "label": "Center",
-                    "value": "center",
-                    "icon": "align_center",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Right",
-                    "value": "right",
-                    "icon": "align_right",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Justify",
-                    "value": "justify",
-                    "icon": "align_justify",
-                    "tier_required": "free"
+                    "key": "caption_vertical_alignment",
+                    "type": "button_group",
+                    "label": "Vertical",
+                    "description": "Change the vertical alignment of the caption inside the overlay.",
+                    "options": [
+                        {
+                            "label": "Top",
+                            "value": "top",
+                            "icon": "grid_dots_top",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Middle",
+                            "value": "middle",
+                            "icon": "grid_dots_vertical_center",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Bottom",
+                            "value": "bottom",
+                            "icon": "grid_dots_bottom",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "condition": {
+                        "dependsOn": "caption_placement",
+                        "values": [
+                            "overlay"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
                 }
             ],
             "tier_required": "free",

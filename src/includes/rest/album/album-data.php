@@ -15,6 +15,77 @@ if ( ! defined( 'WPINC' ) ) {
 class Album_Data {
 
     /**
+     * Set or clear the album's featured gallery.
+     *
+     * Body: { gallery_id: int | null }. When null, the explicit choice is
+     * cleared (the runtime cover resolver falls back to the first child
+     * gallery with a resolvable cover). When set, the gallery must still
+     * be a child of this album.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
+     */
+    public static function set_featured_gallery( $request ) {
+        $album_id = (int) $request['id'];
+
+        $album = get_post( $album_id );
+        if ( ! $album || $album->post_type !== 'fotogrids_album' ) {
+            return new \WP_Error(
+                'fotogrids_album_not_found',
+                __( 'Album not found.', 'fotogrids' ),
+                array( 'status' => 404 )
+            );
+        }
+
+        $gallery_param = $request->get_param( 'gallery_id' );
+        $clearing      = ( $gallery_param === null || $gallery_param === '' || (int) $gallery_param === 0 );
+
+        if ( $clearing ) {
+            delete_post_meta( $album_id, 'fotogrids_featured_gallery' );
+            return rest_ensure_response( array(
+                'album_id'   => $album_id,
+                'gallery_id' => null,
+                'cleared'    => true,
+            ) );
+        }
+
+        $gallery_id = (int) $gallery_param;
+        $gallery    = get_post( $gallery_id );
+        if ( ! $gallery || $gallery->post_type !== 'fotogrids_gallery' ) {
+            return new \WP_Error(
+                'fotogrids_invalid_gallery',
+                __( 'Featured gallery must be a gallery.', 'fotogrids' ),
+                array( 'status' => 400 )
+            );
+        }
+
+        $children = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $album_id );
+        $child_ids = array();
+        foreach ( (array) $children as $child ) {
+            $gid = is_object( $child ) ? (int) ( $child->ID ?? $child->id ?? 0 ) : (int) $child;
+            if ( $gid > 0 ) {
+                $child_ids[] = $gid;
+            }
+        }
+        if ( ! in_array( $gallery_id, $child_ids, true ) ) {
+            return new \WP_Error(
+                'fotogrids_gallery_not_in_album',
+                __( 'Gallery is not part of this album.', 'fotogrids' ),
+                array( 'status' => 400 )
+            );
+        }
+
+        update_post_meta( $album_id, 'fotogrids_featured_gallery', $gallery_id );
+
+        return rest_ensure_response( array(
+            'album_id'   => $album_id,
+            'gallery_id' => $gallery_id,
+            'cleared'    => false,
+        ) );
+    }
+
+    /**
      * Get album data with galleries
      *
      * Retrieves a single album with all its associated galleries and metadata.
@@ -64,11 +135,12 @@ class Album_Data {
 
         $gallery_data = array();
         foreach ( $galleries as $gallery ) {
+            $thumb = fotogrids_get_collection_cover_url( $gallery->ID, 'medium' );
             $gallery_data[] = array(
                 'id' => $gallery->ID,
                 'title' => $gallery->post_title,
                 'description' => $gallery->post_content,
-                'thumbnail' => get_the_post_thumbnail_url( $gallery->ID, 'medium' ),
+                'thumbnail' => $thumb !== '' ? $thumb : null,
                 'item_count' => self::get_gallery_item_count( $gallery->ID ),
             );
         }

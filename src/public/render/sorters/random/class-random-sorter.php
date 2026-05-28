@@ -52,13 +52,51 @@ final class Random_Sorter implements Sorter {
     }
 
     /**
-     * Returns a shuffled copy of $item_ids.
+     * Returns a shuffled copy of $item_ids using a deterministic shuffle
+     * seeded by Render_Meta::random_seed.
+     *
+     * Why deterministic? Because pagination + filtering rebuild the
+     * Render_Context per request. With a non-seeded shuffle, page 2
+     * would draw from a different random permutation than page 1 — items
+     * that appeared on page 1 could reappear on page 2, and others would
+     * never show up. The seed travels with every paginated request (set
+     * once on the initial render, sent back by the client thereafter)
+     * so all pages of one visitor's session draw from the same shuffle.
+     *
+     * Implementation: Fisher-Yates with mt_srand. We don't use the older
+     * srand()/array_rand() path; mt_srand gives reproducible output
+     * cross-platform.
      *
      * @since  1.0.0
      */
     public function sort( array $item_ids, Render_Context $render_context ): array {
-        $shuffled = $item_ids;
-        shuffle( $shuffled );
+        $shuffled = array_values( $item_ids );
+        $count    = count( $shuffled );
+        if ( $count < 2 ) {
+            return $shuffled;
+        }
+
+        $seed = $render_context->meta->random_seed;
+        if ( $seed === null ) {
+            // No seed inherited — fall back to a non-deterministic shuffle.
+            shuffle( $shuffled );
+            return $shuffled;
+        }
+
+        // Seed once and consume mt_rand() values. mt_srand resets the
+        // global PHP Mersenne Twister state — fine here because the
+        // renderer runs synchronously per request.
+        mt_srand( (int) $seed );
+        for ( $i = $count - 1; $i > 0; $i-- ) {
+            $j = mt_rand( 0, $i );
+            $tmp           = $shuffled[ $i ];
+            $shuffled[ $i ] = $shuffled[ $j ];
+            $shuffled[ $j ] = $tmp;
+        }
+        // Re-seed from time so any later mt_rand() callers aren't
+        // pinned to our seed.
+        mt_srand();
+
         return $shuffled;
     }
 

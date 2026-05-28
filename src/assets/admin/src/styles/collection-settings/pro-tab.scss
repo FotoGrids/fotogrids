@@ -95,6 +95,11 @@
             box-shadow: 0 1px 0 0 var(--fg-border-primary);
             background: var(--fg-background-card);
             color: var(--fg-green);
+
+            .fotogrids-icon svg {
+                width: 24px;
+                height: 24px;
+            }
         }
 
         &--content {

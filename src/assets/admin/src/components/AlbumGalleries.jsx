@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Tooltip from './Tooltip';
+import Icon from './shared/Icon';
 
 const AlbumGalleries = () => {
     const [loading, setLoading] = useState(false);
@@ -7,17 +9,11 @@ const AlbumGalleries = () => {
     const [allGalleries, setAllGalleries] = useState([]);
     const [availableGalleries, setAvailableGalleries] = useState([]);
     const [saving, setSaving] = useState(false);
+    const [featuredGalleryId, setFeaturedGalleryId] = useState(null);
     const [draggedItem, setDraggedItem] = useState(null);
     const [dragOverState, setDragOverState] = useState(null); // { index, position: 'before'|'after' }
 
     const config = window.fotogridsAlbumGalleries;
-
-    const renderIcon = (iconName) => {
-        const icons = window.FotoGridsIcons || {};
-        const iconSvg = icons[iconName];
-        if (!iconSvg) return null;
-        return <span className="fotogrids-icon" dangerouslySetInnerHTML={{ __html: iconSvg }} />;
-    };
 
     // Normalize gallery for unified rendering (assigned uses ID/post_title, available uses id/title)
     const normalizeGallery = (gallery) => ({
@@ -34,6 +30,11 @@ const AlbumGalleries = () => {
     const renderGalleryItem = (gallery, variant, actionButton, index) => {
         const g = normalizeGallery(gallery);
         const isAssigned = variant === 'assigned';
+        const isFeatured = isAssigned && featuredGalleryId === g.id;
+        const featuredTooltip = isFeatured ? config.strings.clearFeatured : config.strings.setAsFeatured;
+        const actionButtonTooltip = React.isValidElement(actionButton)
+            ? actionButton.props?.title || actionButton.props?.['aria-label']
+            : '';
 
         const thumbContent = g.sample_items && g.sample_items.length > 0
             ? g.sample_items.slice(0, 4).map((itemUrl, i) => (
@@ -50,7 +51,7 @@ const AlbumGalleries = () => {
                 />
             ) : (
                 <div className="fotogrids-gallery-thumb">
-                    {renderIcon('image_x')}
+                    <Icon name="image_x" />
                 </div>
             );
 
@@ -58,7 +59,7 @@ const AlbumGalleries = () => {
         const isDragging = isAssigned && draggedItem && draggedItem.ID === gallery.ID;
         const dragOverPosition = isDragOver ? dragOverState.position : null;
         const itemProps = {
-            className: `fotogrids-gallery-item fotogrids-gallery-item--${variant}${isDragOver ? ` fotogrids-drag-over fotogrids-drag-over--${dragOverPosition}` : ''}${isDragging ? ' fotogrids-gallery-item--dragging' : ''}`,
+            className: `fotogrids-gallery-item fotogrids-gallery-item--${variant}${isFeatured ? ' fotogrids-gallery-item--featured' : ''}${isDragOver ? ` fotogrids-drag-over fotogrids-drag-over--${dragOverPosition}` : ''}${isDragging ? ' fotogrids-gallery-item--dragging' : ''}`,
             ...(isDragOver && { 'data-drop-text': config.strings.dropItemHere }),
         };
         if (isAssigned) {
@@ -83,25 +84,48 @@ const AlbumGalleries = () => {
                         </span>
                     </div>
                     <div className="fotogrids-gallery-actions">
-                        <a
-                            href={g.permalink}
-                            className="fotogrids-action-button fotogrids-view-button"
-                            title={config.strings.viewGallery}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {renderIcon('preview')}
-                        </a>
-                        <a
-                            href={`${window.location.origin}/wp-admin/post.php?post=${g.id}&action=edit`}
-                            className="fotogrids-action-button fotogrids-edit-button"
-                            title={config.strings.editGallery}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {renderIcon('edit')}
-                        </a>
-                        {actionButton}
+                        {isAssigned && (
+                            <Tooltip content={featuredTooltip} position="top">
+                                <button
+                                    type="button"
+                                    className={`fotogrids-action-button fotogrids-featured-button${isFeatured ? ' is-featured' : ''}`}
+                                    onClick={() => handleSetFeaturedGallery(g.id)}
+                                    disabled={saving}
+                                    title={featuredTooltip}
+                                    aria-pressed={!!isFeatured}
+                                    aria-label={featuredTooltip}
+                                >
+                                    <Icon name="star" />
+                                </button>
+                            </Tooltip>
+                        )}
+                        <Tooltip content={config.strings.viewGallery} position="top">
+                            <a
+                                href={g.permalink}
+                                className="fotogrids-action-button fotogrids-view-button"
+                                title={config.strings.viewGallery}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Icon name="preview" />
+                            </a>
+                        </Tooltip>
+                        <Tooltip content={config.strings.editGallery} position="top">
+                            <a
+                                href={`${window.location.origin}/wp-admin/post.php?post=${g.id}&action=edit`}
+                                className="fotogrids-action-button fotogrids-edit-button"
+                                title={config.strings.editGallery}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Icon name="edit" />
+                            </a>
+                        </Tooltip>
+                        {actionButtonTooltip ? (
+                            <Tooltip content={actionButtonTooltip} position="top">
+                                {actionButton}
+                            </Tooltip>
+                        ) : actionButton}
                     </div>
                 </div>
             </div>
@@ -112,6 +136,7 @@ const AlbumGalleries = () => {
         if (config) {
             setAssignedGalleries(config.assignedGalleries || []);
             setAllGalleries(config.allGalleries || []);
+            setFeaturedGalleryId(config.featuredGalleryId ?? null);
         }
     }, []);
 
@@ -174,6 +199,41 @@ const AlbumGalleries = () => {
         }
     };
 
+    // Set or clear the album's featured gallery. Passing null clears the
+    // explicit choice — the runtime resolver then falls back to the first
+    // child gallery with a resolvable cover.
+    const handleSetFeaturedGallery = async (galleryId) => {
+        const wasFeatured = featuredGalleryId === galleryId;
+        const nextId = wasFeatured ? null : galleryId;
+        setSaving(true);
+
+        try {
+            await window.wp.apiFetch({
+                path: `${config.restUrl}album/${config.postId}/featured-gallery`,
+                method: 'POST',
+                headers: {
+                    'X-WP-Nonce': config.nonce,
+                },
+                data: { gallery_id: nextId },
+            });
+
+            setFeaturedGalleryId(nextId);
+
+            if (window.fotogridsToast) {
+                window.fotogridsToast.success(
+                    nextId ? config.strings.featuredGallerySet : config.strings.featuredGalleryCleared,
+                    1500
+                );
+            }
+        } catch (err) {
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(err?.message || config.strings.errorSavingFeatured, 3000);
+            }
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleRemoveGallery = async (galleryId) => {
         setSaving(true);
 
@@ -198,6 +258,15 @@ const AlbumGalleries = () => {
                 };
                 setAvailableGalleries(prev => [...prev, availableGallery]);
                 setAssignedGalleries(prev => prev.filter(g => g.ID !== galleryId));
+            }
+
+            // If the removed gallery was the explicit featured choice, drop
+            // it locally — server-side the cover resolver will fall back to
+            // the next valid child the next time it's read. We don't fire
+            // the REST clear endpoint because the post meta still pointing
+            // at a now-unassigned gallery is harmless (resolver ignores it).
+            if (featuredGalleryId === galleryId) {
+                setFeaturedGalleryId(null);
             }
 
             if (window.fotogridsToast) {
@@ -313,7 +382,7 @@ const AlbumGalleries = () => {
                                         disabled={saving}
                                         title={config.strings.removeFromAlbum}
                                     >
-                                        {renderIcon('x')}
+                                        <Icon name="x" />
                                     </button>,
                                     index
                             )
@@ -349,7 +418,7 @@ const AlbumGalleries = () => {
                                     disabled={saving}
                                     title={config.strings.addToAlbum}
                                 >
-                                    {renderIcon('plus')}
+                                    <Icon name="plus" />
                                 </button>
                             )
                         )

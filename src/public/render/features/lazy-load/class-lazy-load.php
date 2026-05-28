@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Features\Lazy_Load;
 
+use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
@@ -83,14 +84,22 @@ final class Lazy_Load implements Feature {
     }
 
     /**
-     * No additional assets - the IntersectionObserver logic lives in the
-     * always-loaded frontend bundle (frontend.js).
+     * IntersectionObserver enhancement layer for native-lazy and data-src
+     * lazy images. Ships from public/render/features/lazy-load/.
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.
      * @return  Module_Assets
      */
     public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
+        return new Module_Assets(
+            js: [
+                'fotogrids-lazy-load' => new Asset_Decl(
+                    path:      '../../assets/js/lazy-load.js',
+                    deps:      [ 'fotogrids-runtime' ],
+                    in_footer: true,
+                ),
+            ]
+        );
     }
 }

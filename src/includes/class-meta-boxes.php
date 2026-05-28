@@ -25,7 +25,6 @@ class Meta_Boxes {
         add_action( 'wp_ajax_fotogrids_update_item_url', array( __CLASS__, 'ajax_update_item_url' ) );
         add_action( 'wp_ajax_fotogrids_bulk_update_item_urls', array( __CLASS__, 'ajax_bulk_update_item_urls' ) );
         add_action( 'wp_ajax_fotogrids_reorder_gallery_items', array( __CLASS__, 'ajax_reorder_gallery_items' ) );
-        add_action( 'wp_ajax_fotogrids_set_favorite_item', array( __CLASS__, 'ajax_set_favorite_item' ) );
 
         add_action( 'wp_ajax_fotogrids_save_collection', array( __CLASS__, 'ajax_save_collection' ) );
 
@@ -173,12 +172,11 @@ class Meta_Boxes {
             'previewPlaceholder' => __( 'Gallery preview functionality will be implemented here.', 'fotogrids' ),
             'saving' => __( 'Saving...', 'fotogrids' ),
             'interactions' => __( 'Interactions', 'fotogrids' ),
-            'toggleFavorite' => __( 'Make Favorite', 'fotogrids' ),
-            'makeFavorite' => __( 'Make Favorite', 'fotogrids' ),
-            'removeFavorite' => __( 'Remove Favorite', 'fotogrids' ),
-            'favoriteItemSet' => __( 'Favorite item set successfully', 'fotogrids' ),
-            'favoriteItemRemoved' => __( 'Favorite item removed successfully', 'fotogrids' ),
-            'errorSavingFavorite' => __( 'Error saving favorite item', 'fotogrids' ),
+            'setAsFeatured' => __( 'Set as featured item', 'fotogrids' ),
+            'clearFeatured' => __( 'Clear featured item', 'fotogrids' ),
+            'featuredItemSet' => __( 'Featured item set', 'fotogrids' ),
+            'featuredItemCleared' => __( 'Featured item cleared', 'fotogrids' ),
+            'errorSavingFeatured' => __( 'Error saving featured item', 'fotogrids' ),
             'copied' => __( 'Copied!', 'fotogrids' ),
             'copyFailed' => __( 'Copy failed', 'fotogrids' ),
             'seo' => __( 'SEO', 'fotogrids' ),
@@ -314,25 +312,34 @@ class Meta_Boxes {
             if ( $post && $post->post_type === 'fotogrids_album' ) {
                 $assigned_galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $post->ID );
                 $all_galleries = \FotoGrids\Gallery_Album_Relations::get_all_galleries();
+                $featured_gallery_id = (int) get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
 
                 wp_localize_script( 'fotogrids-album-galleries', 'fotogridsAlbumGalleries', array(
                     'postId' => $post->ID,
                     'assignedGalleries' => $assigned_galleries,
                     'allGalleries' => $all_galleries,
+                    'featuredGalleryId' => $featured_gallery_id > 0 ? $featured_gallery_id : null,
                     'nonce' => wp_create_nonce( 'wp_rest' ),
                     'restUrl' => 'fotogrids/v1/',
                     'strings' => array(
                         'assignedGalleries' => __( 'Assigned Galleries', 'fotogrids' ),
                         'availableGalleries' => __( 'Available Galleries', 'fotogrids' ),
-                        'searchPlaceholder' => __( 'Search galleries...', 'fotogrids' ),
-                        'noGalleriesAssigned' => __( 'No galleries assigned to this album', 'fotogrids' ),
-                        'noGalleriesAvailable' => __( 'No available galleries found', 'fotogrids' ),
-                        'dragToReorder' => __( 'Drag to reorder galleries', 'fotogrids' ),
-                        'removeFromAlbum' => __( 'Remove from album', 'fotogrids' ),
-                        'addToAlbum' => __( 'Add to album', 'fotogrids' ),
+                        'searchPlaceholder' => __( 'Search Galleries...', 'fotogrids' ),
+                        'noGalleriesAssigned' => __( 'No Galleries assigned to this Album', 'fotogrids' ),
+                        'noGalleriesAvailable' => __( 'No available Galleries found', 'fotogrids' ),
+                        'dragToReorder' => __( 'Drag to reorder Galleries', 'fotogrids' ),
+                        'removeFromAlbum' => __( 'Remove from Album', 'fotogrids' ),
+                        'addToAlbum' => __( 'Add to Album', 'fotogrids' ),
+                        'setAsFeatured' => __( 'Set as featured Gallery', 'fotogrids' ),
+                        'clearFeatured' => __( 'Clear featured Gallery', 'fotogrids' ),
+                        'featuredGallerySet' => __( 'Featured Gallery set', 'fotogrids' ),
+                        'featuredGalleryCleared' => __( 'Featured Gallery cleared', 'fotogrids' ),
+                        'errorSavingFeatured' => __( 'Error saving featured Gallery', 'fotogrids' ),
+                        'viewGallery' => __( 'View Gallery', 'fotogrids' ),
+                        'editGallery' => __( 'Edit Gallery', 'fotogrids' ),
                         'loading' => __( 'Loading...', 'fotogrids' ),
                         'saved' => __( 'Gallery assignments saved', 'fotogrids' ),
-                        'error' => __( 'Error updating album', 'fotogrids' ),
+                        'error' => __( 'Error updating Album', 'fotogrids' ),
                         'items' => __( 'items', 'fotogrids' ),
                         'noItems' => __( 'No items', 'fotogrids' ),
                         'galleryTitleMissing' => __( 'Gallery Title Missing', 'fotogrids' ),
@@ -355,20 +362,19 @@ class Meta_Boxes {
         $gallery_items = get_post_meta( $post->ID, 'fotogrids_gallery_items', true );
         $gallery_items = $gallery_items ? json_decode( $gallery_items, true ) : array();
 
-        $favorite_item_id = get_post_meta( $post->ID, 'fotogrids_gallery_favorite_item', true );
-        $favorite_item_id = $favorite_item_id ? intval( $favorite_item_id ) : null;
-
-        if ( $favorite_item_id === null && ! empty( $gallery_items ) ) {
-            $favorite_item_id = intval( $gallery_items[0] );
-            update_post_meta( $post->ID, 'fotogrids_gallery_favorite_item', $favorite_item_id );
-        }
+        // Source of truth for the cover image is WP's native post thumbnail.
+        // The runtime resolver (`fotogrids_get_gallery_cover_attachment_id`)
+        // falls back to the first valid item when nothing is explicitly set,
+        // so we don't seed `_thumbnail_id` here — the UI shows a "no item is
+        // explicitly featured" state until the user clicks a star.
+        $featured_item_id = (int) get_post_thumbnail_id( $post->ID );
 
         $items_data = array();
         foreach ( $gallery_items as $item_id ) {
             $item_url = wp_get_attachment_image_url( $item_id, 'full' );
             $thumbnail_url = wp_get_attachment_image_url( $item_id, 'thumbnail' );
             $item_title = get_the_title( $item_id );
-            $item_alt = get_post_meta( $item_id, '_wp_attachment_item_alt', true );
+            $item_alt = get_post_meta( $item_id, '_wp_attachment_image_alt', true );
 
             if ( $item_url ) {
                 $items_data[] = array(
@@ -377,7 +383,7 @@ class Meta_Boxes {
                     'url' => $item_url,
                     'thumbnail' => $thumbnail_url ?: $item_url,
                     'alt' => $item_alt ?: $item_title ?: '',
-                    'favorite' => ( $favorite_item_id !== null && (int) $item_id === $favorite_item_id )
+                    'featured' => ( $featured_item_id > 0 && (int) $item_id === $featured_item_id ),
                 );
             }
         }
@@ -1231,50 +1237,4 @@ class Meta_Boxes {
         }
     }
 
-    /**
-     * AJAX handler to set favorite item for gallery
-     */
-    public static function ajax_set_favorite_item() {
-        check_ajax_referer( 'fotogrids_item_edit', 'nonce' );
-
-        if ( ! current_user_can( 'edit_posts' ) ) {
-            wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
-        }
-
-        $gallery_id = intval( $_POST['gallery_id'] ?? 0 );
-        if ( ! $gallery_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid gallery ID', 'fotogrids' ) ) );
-        }
-
-        $post = get_post( $gallery_id );
-        if ( ! $post || $post->post_type !== 'fotogrids_gallery' ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid gallery', 'fotogrids' ) ) );
-        }
-
-        if ( ! current_user_can( 'edit_post', $gallery_id ) ) {
-            wp_send_json_error( array( 'message' => __( 'Cannot edit this gallery', 'fotogrids' ) ) );
-        }
-
-        $item_id = isset( $_POST['item_id'] ) && $_POST['item_id'] !== '' ? intval( $_POST['item_id'] ) : null;
-
-        if ( $item_id !== null ) {
-            $gallery_items = get_post_meta( $gallery_id, 'fotogrids_gallery_items', true );
-            $gallery_items = $gallery_items ? json_decode( $gallery_items, true ) : array();
-
-            if ( ! in_array( $item_id, $gallery_items ) ) {
-                wp_send_json_error( array( 'message' => __( 'Item not found in gallery', 'fotogrids' ) ) );
-            }
-        }
-
-        if ( $item_id !== null ) {
-            update_post_meta( $gallery_id, 'fotogrids_gallery_favorite_item', $item_id );
-        } else {
-            delete_post_meta( $gallery_id, 'fotogrids_gallery_favorite_item' );
-        }
-
-        wp_send_json_success( array(
-            'message' => __( 'Favorite item updated successfully', 'fotogrids' ),
-            'favorite_item_id' => $item_id
-        ) );
-    }
 }

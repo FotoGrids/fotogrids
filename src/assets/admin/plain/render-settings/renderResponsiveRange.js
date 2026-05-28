@@ -26,11 +26,31 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
     // ─── Four-sided mode ──────────────────────────────────────────────────────
 
     if (isFourSided) {
-        // _linked is stored inside the value object itself so it travels with currentValue
-        const linkedRaw = currentValue?._linked;
-        const isLinked = linkedRaw === undefined ? true : linkedRaw !== false && linkedRaw !== '0' && linkedRaw !== 0;
-
         const sides = ['top', 'right', 'bottom', 'left'];
+
+        // _linked is a UI-only flag held in React state; it's never persisted.
+        // On first render after a reload, currentValue._linked is undefined, so we
+        // derive linked-state from the data: if any device has unequal sides,
+        // the user must have unlinked at some point — show as unlinked.
+        const sideValueFor = (deviceValue, side) => {
+            if (!deviceValue || typeof deviceValue !== 'object') return undefined;
+            const sv = deviceValue[side];
+            return (sv && typeof sv === 'object') ? sv.value : sv;
+        };
+        const deviceHasEqualSides = (deviceValue) => {
+            if (!deviceValue || typeof deviceValue !== 'object') return true;
+            const first = sideValueFor(deviceValue, 'top');
+            return sides.every(s => sideValueFor(deviceValue, s) === first);
+        };
+        const allDevicesEqual = () => {
+            if (!currentValue || typeof currentValue !== 'object') return true;
+            return ['desktop', 'tablet', 'mobile'].every(d => deviceHasEqualSides(currentValue[d]));
+        };
+
+        const linkedRaw = currentValue?._linked;
+        const isLinked = linkedRaw === undefined
+            ? allDevicesEqual()
+            : linkedRaw !== false && linkedRaw !== '0' && linkedRaw !== 0;
 
         // Build normalized four-sided responsive value
         const buildDefaultSideValue = (device, singleVal) => {

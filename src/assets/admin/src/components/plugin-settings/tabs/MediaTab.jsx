@@ -220,6 +220,48 @@ const MediaTab = () => {
                 </PanelRow>
             </SettingsPanel>
 
+            <SettingsPanel
+                title={__('Layout-specific sizes', 'fotogrids')}
+                description={__('Used by layouts where only one dimension is fixed - Masonry uses the width, Justified uses the height. The other dimension stays proportional, so these are never cropped. Changing these requires regenerating thumbnails for existing images.', 'fotogrids')}
+                action={
+                    <a href={regenUrl} className="fotogrids-button fotogrids-button--secondary fotogrids-button--small">
+                        {__('Regenerate', 'fotogrids')}
+                    </a>
+                }
+            >
+                <PanelRow
+                    title={__('Masonry thumbnail width', 'fotogrids')}
+                    description={__('Width in pixels for Masonry layouts. Height stays proportional to the original image.', 'fotogrids')}
+                    htmlFor="fg-masonry-width"
+                >
+                    <NumberField
+                        id="fg-masonry-width"
+                        value={settings?.masonry_width ?? 600}
+                        onChange={(v) => update('masonry_width', Math.max(1, v))}
+                        unit="px"
+                        min={1}
+                        max={2000}
+                        help={__('Height is automatic.', 'fotogrids')}
+                    />
+                </PanelRow>
+
+                <PanelRow
+                    title={__('Justified thumbnail height', 'fotogrids')}
+                    description={__('Height in pixels for Justified Rows layouts. Width stays proportional to the original image.', 'fotogrids')}
+                    htmlFor="fg-justified-height"
+                >
+                    <NumberField
+                        id="fg-justified-height"
+                        value={settings?.justified_height ?? 400}
+                        onChange={(v) => update('justified_height', Math.max(1, v))}
+                        unit="px"
+                        min={1}
+                        max={2000}
+                        help={__('Width is automatic.', 'fotogrids')}
+                    />
+                </PanelRow>
+            </SettingsPanel>
+
             {customSizes.length > 0 && (
                 <SettingsPanel
                     title={__('Gallery-custom sizes', 'fotogrids')}

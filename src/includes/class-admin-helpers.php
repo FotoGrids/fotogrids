@@ -236,6 +236,7 @@ class Admin_Helpers {
             'settings' => $args['settings'],
             'defaults' => $args['defaults'],
             'globalSharing' => \FotoGrids\Settings\Sharing_Settings_Store::get(),
+            'globalSeo' => \FotoGrids\Settings\SEO_Settings_Store::get(),
             'postId' => $args['post_id'],
             'postType' => $args['post_type'],
             'nonce' => wp_create_nonce( 'fotogrids_settings' ),

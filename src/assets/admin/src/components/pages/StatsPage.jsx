@@ -4,18 +4,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import StatCard from '../shared/StatCard';
 import StatsTable from '../shared/StatsTable';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
-const getIcon = ( name ) => window.FotoGridsIcons?.[ name ] || '';
-
 const fmt = ( n ) => ( typeof n === 'number' ? n.toLocaleString() : n );
 
-const TypeBadge = ( { type } ) => (
-    <span className={ `fg-type-badge fg-type-badge--${ type }` }>
-        { type }
-    </span>
-);
+const TypeBadge = ( { type } ) => {
+    const baseClass = 'fg-type-badge';
+
+    return (
+        <span className={ `${baseClass} ${baseClass}--${ type }` }>
+            <span>{ type }</span>
+        </span>
+    );
+};
 
 const TitleCell = ( { title, editUrl } ) =>
     editUrl ? (
@@ -33,34 +36,45 @@ const PERIODS = [
 const recentActivityColumns = [
     {
         key: 'title',
-        label: __( 'Gallery / Album', 'fotogrids' ),
+        label: __( 'Name', 'fotogrids' ),
+        ellipsis: true,
         render: ( val, row ) => <TitleCell title={ val } editUrl={ row.edit_url } />,
     },
     {
         key: 'type',
         label: __( 'Type', 'fotogrids' ),
+        align: 'center',
         render: ( val ) => <TypeBadge type={ val } />,
     },
-    { key: 'views',       label: __( 'Views',       'fotogrids' ), render: fmt },
-    { key: 'last_viewed', label: __( 'Last Viewed', 'fotogrids' ) },
+    { key: 'views',       label: __( 'Views',       'fotogrids' ), align: 'center', render: fmt },
+    { key: 'last_viewed', label: __( 'Last Viewed', 'fotogrids' ), align: 'center' },
 ];
 
 const topContentColumns = [
     {
         key: 'title',
         label: __( 'Name', 'fotogrids' ),
+        ellipsis: true,
         render: ( val, row ) => <TitleCell title={ val } editUrl={ row.edit_url } />,
     },
     {
         key: 'type',
         label: __( 'Type', 'fotogrids' ),
+        align: 'center',
         render: ( val ) => <TypeBadge type={ val } />,
     },
-    { key: 'views',  label: __( 'Views',  'fotogrids' ), render: fmt },
-    { key: 'shares', label: __( 'Shares', 'fotogrids' ), render: fmt },
+    { key: 'views',  label: __( 'Views',  'fotogrids' ), align: 'center', render: fmt },
+    { key: 'shares', label: __( 'Shares', 'fotogrids' ), align: 'center', render: fmt },
 ];
 
-const defaultOverview = { galleries: 0, albums: 0, items: 0, views: 0 };
+const defaultOverview = { galleries: 0, albums: 0, items: 0, views: 0, shares: 0 };
+const OVERVIEW_CARDS = [
+    { key: 'galleries', iconName: 'layout_3x3', label: __( 'Total Galleries', 'fotogrids' ), accent: 'blue' },
+    { key: 'albums', iconName: 'layout_2x2', label: __( 'Total Albums', 'fotogrids' ), accent: 'red' },
+    { key: 'items', iconName: 'image', label: __( 'Total Items', 'fotogrids' ), accent: 'yellow' },
+    { key: 'views', iconName: 'eye', label: __( 'Total Views', 'fotogrids' ), accent: 'grey' },
+    { key: 'shares', iconName: 'click', label: __( 'Total Interactions', 'fotogrids' ), accent: 'green' },
+];
 
 const StatsPage = () => {
     const [ overview,         setOverview         ] = useState( defaultOverview );
@@ -202,6 +216,7 @@ const StatsPage = () => {
                     albums:    overviewRes?.albums    ?? 0,
                     items:     overviewRes?.items     ?? 0,
                     views:     overviewRes?.views     ?? 0,
+                    shares:    overviewRes?.shares    ?? 0,
                 } );
                 setViewsData( { labels: viewsRes?.labels ?? [], data: viewsRes?.data ?? [] } );
                 setPopularGalleries( { labels: popularRes?.labels ?? [], data: popularRes?.data ?? [] } );
@@ -235,7 +250,7 @@ const StatsPage = () => {
                     { PERIODS.map( ( p ) => (
                         <button
                             key={ p.days }
-                            className={ `fg-period-btn${ selectedPeriod === p.days ? ' fg-is-active' : '' }` }
+                            className={ `fotogrids-button fotogrids-button--${ selectedPeriod === p.days ? 'primary' : 'secondary' }` }
                             onClick={ () => setSelectedPeriod( p.days ) }
                             aria-pressed={ selectedPeriod === p.days }
                         >
@@ -245,16 +260,12 @@ const StatsPage = () => {
                 </div>
 
                 <button
-                    className={ `fg-stats-refresh${ loading ? ' fg-is-loading' : '' }` }
+                    className={ `fotogrids-button fotogrids-button--secondary ${ loading ? 'fg-is-loading' : '' }` }
                     onClick={ () => setRefreshToken( ( t ) => t + 1 ) }
                     disabled={ loading }
                     aria-label={ __( 'Refresh stats', 'fotogrids' ) }
                 >
-                    <span
-                        className="fg-stats-refresh__icon"
-                        dangerouslySetInnerHTML={ { __html: getIcon( 'refresh' ) } }
-                        aria-hidden="true"
-                    />
+                    <Icon name="refresh_cv" />
                     { __( 'Refresh', 'fotogrids' ) }
                 </button>
             </div>
@@ -265,11 +276,7 @@ const StatsPage = () => {
 
             { isEmpty && (
                 <div className="fg-stats-empty">
-                    <div
-                        className="fg-stats-empty__icon"
-                        dangerouslySetInnerHTML={ { __html: getIcon( 'chart_bar' ) } }
-                        aria-hidden="true"
-                    />
+                    <Icon name="chart_bar" className="fg-stats-empty__icon" />
                     <h3 className="fg-stats-empty__heading">
                         { __( 'No statistics yet', 'fotogrids' ) }
                     </h3>
@@ -279,41 +286,21 @@ const StatsPage = () => {
                 </div>
             ) }
 
-            {/* Overview cards */}
             <div className="fg-stats-cards">
-                <StatCard
-                    icon={ getIcon( 'layout_3x3' ) }
-                    value={ fmt( overview.galleries ) }
-                    label={ __( 'Total Galleries', 'fotogrids' ) }
-                    accent="blue"
-                    loading={ loading }
-                />
-                <StatCard
-                    icon={ getIcon( 'layout_2x2' ) }
-                    value={ fmt( overview.albums ) }
-                    label={ __( 'Total Albums', 'fotogrids' ) }
-                    accent="red"
-                    loading={ loading }
-                />
-                <StatCard
-                    icon={ getIcon( 'image' ) }
-                    value={ fmt( overview.items ) }
-                    label={ __( 'Total Items', 'fotogrids' ) }
-                    accent="yellow"
-                    loading={ loading }
-                />
-                <StatCard
-                    icon={ getIcon( 'click' ) }
-                    value={ fmt( overview.views ) }
-                    label={ __( 'Total Views', 'fotogrids' ) }
-                    accent="grey"
-                    loading={ loading }
-                />
+                { OVERVIEW_CARDS.map( ( card ) => (
+                    <StatCard
+                        key={ card.key }
+                        iconName={ card.iconName }
+                        value={ fmt( overview[ card.key ] ) }
+                        label={ card.label }
+                        accent={ card.accent }
+                        loading={ loading }
+                    />
+                ) ) }
             </div>
 
-            {/* Charts - canvases are always in the DOM; skeleton is a CSS overlay */}
             <div className="fg-stats-charts">
-                <div className={ `fg-chart-container${ loading ? ' fg-is-loading' : '' }` }>
+                <div className={ `fg-stats-card fg-chart-container${ loading ? ' fg-is-loading' : '' }` }>
                     <div className="fg-chart-header">
                         <h3 className="fg-chart-header__title">
                             { __( 'Views Over Time', 'fotogrids' ) }
@@ -325,7 +312,7 @@ const StatsPage = () => {
                     </div>
                 </div>
 
-                <div className={ `fg-chart-container${ loading ? ' fg-is-loading' : '' }` }>
+                <div className={ `fg-stats-card fg-chart-container${ loading ? ' fg-is-loading' : '' }` }>
                     <div className="fg-chart-header">
                         <h3 className="fg-chart-header__title">
                             { __( 'Most Popular Galleries', 'fotogrids' ) }
@@ -347,7 +334,6 @@ const StatsPage = () => {
                 </div>
             </div>
 
-            {/* Tables */}
             <div className="fg-stats-tables">
                 <StatsTable
                     title={ __( 'Recent Activity', 'fotogrids' ) }

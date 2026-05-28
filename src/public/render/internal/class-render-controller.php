@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Internal;
 
 use FotoGrids\Render\Api\Breakpoint_Config;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Render_Context;
 
@@ -125,6 +126,27 @@ final class Render_Controller {
             $active_modules['layouts'][] = $layout_module->id();
 
             $layout_inner_html     = $layout_module->render( $render, $this->item_renderer );
+
+            // Partial 'items_only' short-circuit. Used by the REST
+            // /gallery/render endpoint for pagination requests where the
+            // client only needs the new items to append/replace into an
+            // existing gallery wrapper — no wrapper, no chrome, no
+            // sidecars, no <style> block. The collected CSS asset URLs are
+            // still returned via Asset_Resolver so the client can inject
+            // any missing stylesheets, mirroring the album-AJAX flow.
+            if ( $render->meta->partial === 'items_only' ) {
+                $render_result = new Render_Result(
+                    html:           $layout_inner_html,
+                    instance_id:    $render->meta->instance_id,
+                    active_modules: $active_modules,
+                    http_status:    200,
+                );
+                Hooks::fire_action( 'after_render', $render, $render_result );
+                $this->asset_resolver->flush();
+
+                return $render_result;
+            }
+
             $feature_before_html   = '';
             $feature_appendix_html = '';
             $feature_after_html    = '';
@@ -226,14 +248,35 @@ final class Render_Controller {
         array $css_variables,
         string $inner_html
     ): string {
-        // Base class is always 'fotogrids-gallery'; layout classes follow.
-        $all_classes     = array_values( array_unique( array_merge( [ 'fotogrids-gallery' ], $layout_css_classes ) ) );
+        // Base class is 'fotogrids-gallery' for galleries and 'fotogrids-album'
+        // for albums-as-collections (collection_kind discriminator on Render_Meta).
+        // Layout classes follow.
+        $base_class = $render->meta->collection_kind === Collection_Kind::ALBUM
+            ? 'fotogrids-album'
+            : 'fotogrids-gallery';
+        // We keep .fotogrids-gallery on album wrappers too — the runtime's
+        // .fotogrids-gallery selector, the MutationObserver and every
+        // per-gallery feature module's onGallery() callback all key off it,
+        // and an album-as-collection IS a gallery-shaped render. The
+        // 'fotogrids-album' class is the additional discriminator decorators
+        // and CSS can use to differentiate.
+        $base_classes = $render->meta->collection_kind === Collection_Kind::ALBUM
+            ? [ 'fotogrids-gallery', 'fotogrids-album' ]
+            : [ 'fotogrids-gallery' ];
+        $all_classes     = array_values( array_unique( array_merge( $base_classes, $layout_css_classes ) ) );
         $class_attribute = esc_attr( implode( ' ', $all_classes ) );
+        unset( $base_class );
 
-        // data-fg-gallery-id is always the first attribute.
+        // data-fg-gallery-id is always the first attribute. For album
+        // renders gallery_id is 0; data-fg-album-id is added too so
+        // anything that needs the primary identifier for an album can
+        // read it directly.
         $ordered_attrs = [ 'data-fg-gallery-id' => (string) $render->meta->gallery_id ];
+        if ( $render->meta->collection_kind === Collection_Kind::ALBUM && $render->meta->album_id !== null ) {
+            $ordered_attrs['data-fg-album-id'] = (string) $render->meta->album_id;
+        }
         foreach ( $wrapper_data_attrs as $attr_name => $attr_value ) {
-            if ( $attr_name !== 'data-fg-gallery-id' ) {
+            if ( $attr_name !== 'data-fg-gallery-id' && $attr_name !== 'data-fg-album-id' ) {
                 $ordered_attrs[ $attr_name ] = $attr_value;
             }
         }

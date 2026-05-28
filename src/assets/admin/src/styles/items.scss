@@ -18,7 +18,7 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-            .fotogrids-item-favorite,
+            .fotogrids-item-featured,
             .fotogrids-item-controls {
                 opacity: 1;
             }
@@ -28,10 +28,15 @@
             cursor: move;
         }
 
+        &[draggable="true"] {
+            cursor: grab;
+        }
+
         &.fotogrids-dragging {
             opacity: 0.7;
             transform: rotate(2deg);
             z-index: 1000;
+            cursor: grabbing;
         }
 
         img {
@@ -43,10 +48,19 @@
         }
     }
 
+    // While any item is being dragged, the cursor stays in "grabbing" mode
+    // across the whole grid so it looks consistent even when the pointer
+    // moves over gaps or the placeholder.
+    &.fotogrids-sortable--dragging {
+        cursor: grabbing;
+    }
+
     .fotogrids-item-placeholder {
-        border: 2px dashed #ccc !important;
-        background-color: #f9f9f9 !important;
-        opacity: 0.6 !important;
+        border: 2px dashed var(--fg-blue, #2271b1);
+        background-color: #f9f9f9;
+        opacity: 0.6;
+        border-radius: 4px;
+        min-height: 100px;
         position: relative;
 
         background-image:
@@ -59,7 +73,7 @@
             );
 
         * {
-            visibility: hidden !important;
+            visibility: hidden;
         }
 
         &::after {
@@ -71,13 +85,13 @@
             color: #666;
             font-size: 12px;
             font-weight: 500;
-            visibility: visible !important;
+            visibility: visible;
             z-index: 1;
         }
     }
 
 
-    .fotogrids-item-favorite,
+    .fotogrids-item-featured,
     .fotogrids-item-controls {
         position: absolute;
         top: 2px;
@@ -85,18 +99,20 @@
         transition: opacity 0.2s ease;
     }
 
-    .fotogrids-item-favorite {
+    .fotogrids-item-featured {
         left: 2px;
     }
 
-    .fotogrids-item-favorite.is-favorite {
+    // When this item is the gallery's featured item, surface the star at
+    // rest (no hover needed). The button stays clickable so the user can
+    // clear the featured choice — clicking sends `item_id: null` which
+    // hands the cover-resolver back the responsibility of picking one.
+    .fotogrids-item-featured.is-featured {
         opacity: 1;
 
-        .fotogrids-item-favorite-button {
+        .fotogrids-item-featured-button {
             background: rgba(0, 0, 0, 1);
             color: var(--fg-yellow, #ffb914);
-            pointer-events: none;
-            cursor: default;
         }
     }
 
@@ -108,7 +124,7 @@
 
     .fotogrids-edit-item,
     .fotogrids-remove-item,
-    .fotogrids-item-favorite-button {
+    .fotogrids-item-featured-button {
         background: rgba(0, 0, 0, 0.6);
         color: white;
         border: none;
@@ -225,8 +241,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            // border-radius: 8px;
-            // background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
             color: var(--fg-text-secondary);
             margin-bottom: 10px;
             transition: all 0.2s ease;

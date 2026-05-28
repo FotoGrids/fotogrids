@@ -5,18 +5,18 @@
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
-    background: #fff8e1;
-    border: 1px solid #ffe082;
+    background: var(--fg-background-warning);
+    border: 1px solid var(--fg-yellow);
     border-radius: 4px;
     font-size: 13px;
-    color: #5d4037;
+    color: var(--fg-text-primary);
 
     &__spinner {
         display: inline-block;
         width: 14px;
         height: 14px;
-        border: 2px solid #ffca28;
-        border-top-color: #f57f17;
+        border: 2px solid var(--fg-yellow);
+        border-top-color: var(--fg-text-primary);
         border-radius: 50%;
         animation: fg-ie-spin 0.7s linear infinite;
         flex-shrink: 0;
@@ -48,7 +48,7 @@
 .fg-ie-hint {
     margin: 8px 0 0;
     font-size: 12px;
-    color: var(--fg-text-secondary, #757575);
+    color: var(--fg-text-secondary);
     line-height: 1.5;
 
     &--loading {
@@ -63,13 +63,13 @@
     border: none;
     padding: 0;
     font-size: 12px;
-    color: var(--fg-primary, #2271b1);
+    color: var(--fg-blue);
     cursor: pointer;
     text-decoration: underline;
     text-underline-offset: 2px;
 
     &:hover {
-        color: var(--fg-primary-dark, #135e96);
+        color: var(--fg-blue-dark);
     }
 }
 
@@ -82,17 +82,17 @@
 
 .fg-ie-warning {
     font-size: 12px;
-    color: var(--fg-warning, #d63638);
+    color: var(--fg-red);
 }
 
 .fg-ie-error-notice {
     margin-top: 12px;
     padding: 8px 12px;
-    background: #fef0f0;
-    border: 1px solid #f5c6cb;
+    background: rgba(240, 30, 50, 0.1);
+    border: 1px solid rgba(240, 30, 50, 0.3);
     border-radius: 4px;
     font-size: 13px;
-    color: #721c24;
+    color: var(--fg-red);
 }
 
 .fg-ie-summary {
@@ -109,12 +109,12 @@
     &__file-name {
         font-size: 13px;
         font-weight: 600;
-        color: var(--fg-text-primary, #1e1e1e);
+        color: var(--fg-text-primary);
     }
 
     &__file-size {
         font-size: 12px;
-        color: var(--fg-text-secondary, #757575);
+        color: var(--fg-text-secondary);
     }
 
     &__chips {
@@ -161,12 +161,12 @@
 .fg-ie-conflict-section {
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid var(--fg-border-light, #dcdcde);
+    border-top: 1px solid var(--fg-border-light);
 
     &__label {
         margin: 0 0 12px;
         font-size: 12px;
-        color: var(--fg-text-secondary, #757575);
+        color: var(--fg-text-secondary);
     }
 }
 
@@ -177,13 +177,13 @@
     padding: 8px 0;
 
     & + & {
-        border-top: 1px solid var(--fg-border-light, #dcdcde);
+        border-top: 1px solid var(--fg-border-light);
     }
 
     &__label {
         font-size: 13px;
         font-weight: 500;
-        color: var(--fg-text-primary, #1e1e1e);
+        color: var(--fg-text-primary);
         min-width: 80px;
     }
 
@@ -216,13 +216,13 @@
         margin: 0;
         font-size: 16px;
         font-weight: 600;
-        color: var(--fg-text-primary, #1e1e1e);
+        color: var(--fg-text-primary);
     }
 
     p {
         margin: 0;
         font-size: 13px;
-        color: var(--fg-text-secondary, #757575);
+        color: var(--fg-text-secondary);
     }
 }
 
@@ -230,7 +230,7 @@
     padding: 24px 0;
     text-align: center;
     font-size: 13px;
-    color: var(--fg-text-secondary, #757575);
+    color: var(--fg-text-secondary);
 }
 
 .fg-ie-log-table {
@@ -254,7 +254,7 @@
 
 .fg-ie-log-date {
     white-space: nowrap;
-    color: var(--fg-text-secondary, #757575);
+    color: var(--fg-text-secondary);
 }
 
 .fg-ie-log-detail {
@@ -272,17 +272,17 @@
     text-transform: uppercase;
 
     &--success {
-        background: #e8f5e9;
-        color: #2e7d32;
+        background: rgba(70, 180, 80, 0.1);
+        color: var(--fg-green);
     }
 
     &--error, &--failed {
-        background: #fef0f0;
-        color: #721c24;
+        background: rgba(240, 30, 50, 0.1);
+        color: var(--fg-red);
     }
 
     &--partial {
-        background: #fff8e1;
-        color: #5d4037;
+        background: rgba(50, 50, 50, 0.1);
+        color: var(--fg-grey);
     }
 }

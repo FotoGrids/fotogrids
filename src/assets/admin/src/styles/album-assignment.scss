@@ -33,7 +33,8 @@
         .fotogrids-assigned-album {
             display: flex;
             align-items: center;
-            padding: ui-size(padding, base) ui-size(padding, md);
+            gap: 8px;
+            padding: ui-size(padding, base);
             background: white;
             border: ui-size(border-width, base) solid rgba($fotogrids-colors-blue, 0.5);
             border-radius: ui-size(border-radius, sm);
@@ -42,7 +43,6 @@
             .fotogrids-assigned-album-thumb-wrap {
                 width: ui-size(height, 2xl);
                 height: ui-size(height, 2xl);
-                margin-right: ui-size(margin, md);
                 flex-shrink: 0;
             }
 
@@ -155,7 +155,6 @@
                 .fotogrids-album-thumb-wrap {
                     width: ui-size(height, lg);
                     height: ui-size(height, lg);
-                    margin-right: ui-size(margin, md);
                     flex-shrink: 0;
                 }
 

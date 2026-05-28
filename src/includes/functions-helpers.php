@@ -356,6 +356,151 @@ function fotogrids_get_gallery_item_count( $gallery_id ) {
 }
 
 /**
+ * Resolve the cover-image attachment ID for a gallery.
+ *
+ * Reads the gallery's `_thumbnail_id`. If it still points to an attachment
+ * that exists AND is still in the gallery's `fotogrids_gallery_items`,
+ * that ID wins. Otherwise the first valid item is returned. Returns 0
+ * when the gallery has no resolvable cover.
+ *
+ * @since 1.0.0
+ * @param int $gallery_id Gallery post ID.
+ * @return int Attachment ID or 0.
+ */
+function fotogrids_get_gallery_cover_attachment_id( $gallery_id ) {
+    $gallery_id = (int) $gallery_id;
+    if ( $gallery_id <= 0 ) {
+        return 0;
+    }
+
+    $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
+    if ( empty( $item_ids ) ) {
+        return 0;
+    }
+
+    $item_ids   = array_map( 'intval', $item_ids );
+    $picked     = (int) get_post_thumbnail_id( $gallery_id );
+    $candidates = $picked > 0 ? array_merge( array( $picked ), $item_ids ) : $item_ids;
+
+    foreach ( $candidates as $attachment_id ) {
+        $attachment_id = (int) $attachment_id;
+        if ( $attachment_id <= 0 ) {
+            continue;
+        }
+        if ( ! in_array( $attachment_id, $item_ids, true ) ) {
+            continue;
+        }
+        $attachment = get_post( $attachment_id );
+        if ( $attachment && $attachment->post_type === 'attachment' ) {
+            return $attachment_id;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Resolve the cover-image attachment ID for an album.
+ *
+ * Reads `fotogrids_featured_gallery`. If it still names a gallery that
+ * exists AND is still a child of this album AND that gallery has a
+ * resolvable cover, that wins. Otherwise the first child gallery with
+ * a resolvable cover is returned. Returns 0 when nothing resolves.
+ *
+ * @since 1.0.0
+ * @param int $album_id Album post ID.
+ * @return int Attachment ID or 0.
+ */
+function fotogrids_get_album_cover_attachment_id( $album_id ) {
+    $album_id = (int) $album_id;
+    if ( $album_id <= 0 ) {
+        return 0;
+    }
+
+    $galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $album_id );
+    if ( empty( $galleries ) ) {
+        return 0;
+    }
+
+    $child_ids = array();
+    foreach ( $galleries as $gallery ) {
+        $gid = is_object( $gallery ) ? (int) ( $gallery->ID ?? $gallery->id ?? 0 ) : (int) $gallery;
+        if ( $gid > 0 ) {
+            $child_ids[] = $gid;
+        }
+    }
+    if ( empty( $child_ids ) ) {
+        return 0;
+    }
+
+    $picked = (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true );
+    if ( $picked > 0 && in_array( $picked, $child_ids, true ) ) {
+        $cover = fotogrids_get_gallery_cover_attachment_id( $picked );
+        if ( $cover > 0 ) {
+            return $cover;
+        }
+    }
+
+    foreach ( $child_ids as $gid ) {
+        $cover = fotogrids_get_gallery_cover_attachment_id( $gid );
+        if ( $cover > 0 ) {
+            return $cover;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Resolve the cover-image attachment ID for a gallery or album.
+ *
+ * Dispatcher used by every cover-image consumer (REST list endpoints,
+ * statistics cards, relations widgets, view-page OG, etc.) so that the
+ * resolution rules live in one place. Returns 0 when the post is not
+ * a FotoGrids collection or has no resolvable cover.
+ *
+ * @since 1.0.0
+ * @param int $post_id Gallery or album post ID.
+ * @return int Attachment ID or 0.
+ */
+function fotogrids_get_collection_cover_attachment_id( $post_id ) {
+    $post_id = (int) $post_id;
+    if ( $post_id <= 0 ) {
+        return 0;
+    }
+
+    $post_type = get_post_type( $post_id );
+    if ( $post_type === 'fotogrids_gallery' ) {
+        return fotogrids_get_gallery_cover_attachment_id( $post_id );
+    }
+    if ( $post_type === 'fotogrids_album' ) {
+        return fotogrids_get_album_cover_attachment_id( $post_id );
+    }
+
+    return 0;
+}
+
+/**
+ * Resolve the cover-image URL for a gallery or album.
+ *
+ * Thin convenience wrapper around `fotogrids_get_collection_cover_attachment_id`
+ * + `wp_get_attachment_image_url`. Returns an empty string when nothing resolves.
+ *
+ * @since 1.0.0
+ * @param int    $post_id Gallery or album post ID.
+ * @param string $size    Image size keyword. Default 'thumbnail'.
+ * @return string Cover image URL or empty string.
+ */
+function fotogrids_get_collection_cover_url( $post_id, $size = 'thumbnail' ) {
+    $attachment_id = fotogrids_get_collection_cover_attachment_id( $post_id );
+    if ( $attachment_id <= 0 ) {
+        return '';
+    }
+    $url = wp_get_attachment_image_url( $attachment_id, $size );
+    return $url ? $url : '';
+}
+
+/**
  * Add item to gallery
  *
  * @param int $gallery_id Gallery ID
@@ -971,6 +1116,24 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         );
     }
 
+    // fg-tooltip — the shared lightweight tooltip used on the frontend.
+    // We reuse it inside wp-admin (shortcode metabox copy button, docs strip
+    // links) so the tooltip styling matches the public surface. Picks up any
+    // element with [data-fg-tooltip] on DOMContentLoaded.
+    wp_enqueue_style(
+        'fotogrids-fg-tooltip',
+        FOTOGRIDS_PLUGIN_URL . 'assets/css/fg-tooltip.css',
+        array(),
+        FOTOGRIDS_VERSION
+    );
+    wp_enqueue_script(
+        'fotogrids-fg-tooltip',
+        FOTOGRIDS_PLUGIN_URL . 'assets/js/fg-tooltip.js',
+        array(),
+        FOTOGRIDS_VERSION,
+        true
+    );
+
     if ( $enqueue_codemirror ) {
         wp_enqueue_script(
             'fotogrids-codemirror-init',
@@ -1030,11 +1193,19 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         'renderPromo',
         'renderInfoBlock',
         'renderTokenSelect',
-        'renderCacheStatus'
+        'renderCacheStatus',
+        'renderImagePicker'
     );
 
     foreach ( $render_functions as $function ) {
         $dependencies = array( 'wp-element', 'wp-components', 'wp-i18n', 'fotogrids-icons' );
+
+        // The image picker calls wp.apiFetch to resolve thumbnail URLs and
+        // wp.media to open the upload modal.
+        if ( $function === 'renderImagePicker' ) {
+            $dependencies[] = 'wp-api-fetch';
+            wp_enqueue_media();
+        }
 
         // Render helpers that display Pro badges depend on the tooltip utilities.
         $uses_pro_badges = array( 'renderButtonGroup', 'renderButtonGroupDynamic', 'renderLayoutGrid', 'renderHoverEffectsGrid', 'renderTokenSelect' );

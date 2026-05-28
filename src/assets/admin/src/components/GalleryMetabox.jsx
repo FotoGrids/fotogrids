@@ -7,6 +7,7 @@ import ItemEditModal from './ItemEditModal.jsx';
 import VideoEmbedModal from './VideoEmbedModal.jsx';
 import Icon from './shared/Icon.jsx';
 import Modal from './shared/Modal.jsx';
+import Tooltip from './Tooltip.jsx';
 import GalleryPreview from './GalleryPreview.jsx';
 import MediaUpload from './blocks/MediaUpload.jsx';
 
@@ -49,17 +50,20 @@ const GalleryMetabox = ({
     // Initialize items from props with safety check
     useEffect(() => {
         if (Array.isArray(galleryItems)) {
-            // Ensure favorite property exists for all items
-            const itemsWithFavorite = galleryItems.map(item => ({
+            // Ensure `featured` property exists for all items. The bootstrap
+            // payload carries `featured: bool` reflecting the gallery's
+            // native `_thumbnail_id`; default to false for any item missing
+            // the field.
+            const itemsWithFeatured = galleryItems.map(item => ({
                 ...item,
-                favorite: item.favorite || false
+                featured: item.featured || false
             }));
 
-            setItems(itemsWithFavorite);
+            setItems(itemsWithFeatured);
 
             // Initialize state manager with item IDs
             if (State) {
-                const itemIds = itemsWithFavorite.map(item => String(item.id)).filter(Boolean);
+                const itemIds = itemsWithFeatured.map(item => String(item.id)).filter(Boolean);
                 State.items.initItems(itemIds);
             }
         }
@@ -77,14 +81,16 @@ const GalleryMetabox = ({
         let placeholder = null;
         let draggedIndex = -1;
 
+        // All visual state for the dragging item and the placeholder lives in
+        // CSS — see `.fotogrids-dragging` and `.fotogrids-item-placeholder`
+        // in items.scss. Do NOT set inline styles here: when React re-renders
+        // after a successful drop, it reuses DOM nodes by key and any
+        // JS-applied inline `style.*` will outlive the drag (e.g. opacity
+        // stuck at 0.7) because React doesn't manage those properties.
         const createPlaceholder = () => {
             const placeholderEl = document.createElement('div');
             placeholderEl.className = 'fotogrids-item-placeholder';
             placeholderEl.setAttribute('data-drop-text', strings.dropHere);
-            placeholderEl.style.opacity = '0.5';
-            placeholderEl.style.border = '2px dashed var(--fg-blue)';
-            placeholderEl.style.borderRadius = '4px';
-            placeholderEl.style.minHeight = '100px';
             return placeholderEl;
         };
 
@@ -93,11 +99,21 @@ const GalleryMetabox = ({
             return items.indexOf(element);
         };
 
+        // Defensive cleanup: removes the dragging class from every item.
+        // Called from handleDragEnd AND directly after a drop, because some
+        // browsers don't fire dragend when the source node is reparented
+        // mid-drag (which our drop handler does).
+        const clearDraggingState = () => {
+            gridElement.querySelectorAll('.fotogrids-item-item.fotogrids-dragging')
+                .forEach(el => el.classList.remove('fotogrids-dragging'));
+            gridElement.classList.remove('fotogrids-sortable--dragging');
+        };
+
         const handleDragStart = (e) => {
             draggedElement = e.currentTarget;
             draggedIndex = getItemIndex(draggedElement);
-            draggedElement.style.opacity = '0.7';
-            draggedElement.style.cursor = 'move';
+            draggedElement.classList.add('fotogrids-dragging');
+            gridElement.classList.add('fotogrids-sortable--dragging');
 
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', draggedElement.getAttribute('data-id'));
@@ -108,10 +124,7 @@ const GalleryMetabox = ({
         };
 
         const handleDragEnd = (e) => {
-            if (draggedElement) {
-                draggedElement.style.opacity = '';
-                draggedElement.style.cursor = '';
-            }
+            clearDraggingState();
 
             if (placeholder && placeholder.parentNode) {
                 placeholder.parentNode.removeChild(placeholder);
@@ -160,33 +173,40 @@ const GalleryMetabox = ({
                 return false;
             }
 
-            // If dropping on the same element, do nothing
-            if (draggedElement === e.currentTarget) {
-                return false;
-            }
-
-            const targetItem = e.currentTarget;
-            const targetIndex = getItemIndex(targetItem);
-
-            if (targetIndex === -1 || draggedIndex === -1) {
-                return false;
-            }
-
-            // Remove placeholder
-            if (placeholder && placeholder.parentNode) {
+            // Move the dragged element to wherever the placeholder currently
+            // sits. The placeholder is kept in sync with the cursor by
+            // handleDragOver, so this is the authoritative drop position —
+            // we deliberately do NOT recompute from draggedIndex / targetIndex
+            // because those snapshots get out of sync as the DOM mutates.
+            if (placeholder && placeholder.parentNode === gridElement) {
+                gridElement.insertBefore(draggedElement, placeholder);
                 placeholder.parentNode.removeChild(placeholder);
-            }
-
-            // Move the element in the DOM
-            if (draggedIndex < targetIndex) {
-                gridElement.insertBefore(draggedElement, targetItem.nextSibling);
             } else {
-                gridElement.insertBefore(draggedElement, targetItem);
+                // Fallback: no placeholder present (shouldn't normally happen).
+                // Drop next to the hovered target based on the captured index.
+                if (draggedElement === e.currentTarget) {
+                    return false;
+                }
+                const targetItem = e.currentTarget;
+                const targetIndex = getItemIndex(targetItem);
+                if (targetIndex === -1 || draggedIndex === -1) {
+                    return false;
+                }
+                if (draggedIndex < targetIndex) {
+                    gridElement.insertBefore(draggedElement, targetItem.nextSibling);
+                } else {
+                    gridElement.insertBefore(draggedElement, targetItem);
+                }
             }
 
             // Get the new order from the DOM after moving
             const itemElements = Array.from(gridElement.querySelectorAll('.fotogrids-item-item'));
             const newOrder = itemElements.map(item => item.getAttribute('data-id'));
+
+            // Belt-and-braces: clear dragging classes here too. dragend
+            // normally handles it, but reparenting the source node during
+            // drop can suppress dragend on some browsers.
+            clearDraggingState();
 
             // Update order using ref - this will update state and trigger re-render
             if (handleReorderItemsRef.current && newOrder.length > 0) {
@@ -215,6 +235,31 @@ const GalleryMetabox = ({
         const handleContainerDrop = (e) => {
             e.preventDefault();
             e.stopPropagation();
+
+            if (!draggedElement) {
+                return;
+            }
+
+            // If the placeholder is in the DOM, drop the dragged element where
+            // the placeholder is. This is the path that fires when the user
+            // releases the mouse with the cursor over the placeholder itself
+            // (rather than over another .fotogrids-item-item) — without this,
+            // the item-level `drop` handler never runs and the reorder is lost.
+            if (placeholder && placeholder.parentNode === gridElement) {
+                gridElement.insertBefore(draggedElement, placeholder);
+                placeholder.parentNode.removeChild(placeholder);
+
+                const itemElementsAfter = Array.from(
+                    gridElement.querySelectorAll('.fotogrids-item-item')
+                );
+                const newOrder = itemElementsAfter.map(item => item.getAttribute('data-id'));
+
+                clearDraggingState();
+
+                if (handleReorderItemsRef.current && newOrder.length > 0) {
+                    handleReorderItemsRef.current(newOrder);
+                }
+            }
         };
 
         gridElement.addEventListener('dragover', handleContainerDragOver);
@@ -233,41 +278,28 @@ const GalleryMetabox = ({
         };
     }, [items, strings]); // Re-initialize when items change
 
-    // Save favorite item to database
-    const saveFavoriteItem = useCallback(async (itemId) => {
+    // Save the gallery's featured item via REST. Pass null to clear.
+    const saveFeaturedItem = useCallback(async (itemId) => {
+        const galleryId = window.fotogridsMetaBoxes?.postId;
+        if (!galleryId) {
+            return;
+        }
         try {
-            const formData = new FormData();
-            formData.append('action', 'fotogrids_set_favorite_item');
-            formData.append('gallery_id', window.fotogridsMetaBoxes?.postId || '');
-            formData.append('item_id', itemId || '');
-            formData.append('nonce', nonce);
-
-            const response = await fetch(ajaxUrl, {
+            await window.wp.apiFetch({
+                path: `/fotogrids/v1/gallery/${galleryId}/featured-item`,
                 method: 'POST',
-                body: formData
+                data: { item_id: itemId == null ? null : itemId },
             });
-
-            const data = await response.json();
-
-            if (data.success) {
-                if (window.fotogridsToast) {
-                    const message = data.data?.message || (itemId ? strings.favoriteItemSet : strings.favoriteItemRemoved);
-                    window.fotogridsToast.success(message);
-                }
-            } else {
-                if (window.fotogridsToast) {
-                    const message = data.data?.message;
-                    window.fotogridsToast.error(message);
-                }
-                console.error('Failed to save favorite item:', data.data);
+            if (window.fotogridsToast) {
+                window.fotogridsToast.success(itemId ? strings.featuredItemSet : strings.featuredItemCleared);
             }
         } catch (error) {
             if (window.fotogridsToast) {
-                window.fotogridsToast.error(strings.errorSavingFavorite);
+                window.fotogridsToast.error(error?.message || strings.errorSavingFeatured);
             }
-            console.error('Error saving favorite item:', error);
+            console.error('Error saving featured item:', error);
         }
-    }, [ajaxUrl, nonce]);
+    }, [strings]);
 
     // Handle media uploader
     const openMediaUploader = useCallback(() => {
@@ -286,33 +318,25 @@ const GalleryMetabox = ({
         mediaUploader.on('select', () => {
             const attachments = mediaUploader.state().get('selection').toJSON();
 
+            // New items are never auto-featured. The server-side resolver
+            // (`fotogrids_get_gallery_cover_attachment_id`) falls back to
+            // the first valid item when nothing is explicitly chosen, so
+            // the UI accurately reflects "the user hasn't picked one yet".
             const newItems = attachments.map(attachment => ({
                 id: attachment.id,
                 title: attachment.title || attachment.filename || 'Untitled',
                 url: attachment.url,
                 thumbnail: attachment.sizes?.thumbnail?.url || attachment.url,
                 alt: attachment.alt || attachment.title || '',
-                favorite: false
+                featured: false,
             }));
 
             // Add new items, avoiding duplicates
             setItems(prevItems => {
                 const existingIds = new Set(prevItems.map(img => img.id));
                 const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
-                const wasEmpty = prevItems.length === 0;
                 const updatedItems = [...prevItems, ...uniqueNewItems];
 
-                if (wasEmpty && uniqueNewItems.length > 0) {
-                    updatedItems.forEach(item => {
-                        item.favorite = item.id === uniqueNewItems[0].id;
-                    });
-
-                    if (uniqueNewItems[0].id) {
-                        saveFavoriteItem(uniqueNewItems[0].id);
-                    }
-                }
-
-                // Update state manager
                 if (State) {
                     const itemIds = updatedItems.map(item => String(item.id)).filter(Boolean);
                     State.items.setItems(itemIds);
@@ -323,7 +347,7 @@ const GalleryMetabox = ({
         });
 
         mediaUploader.open();
-    }, [strings, saveFavoriteItem]);
+    }, [strings]);
 
     const handleUploadComplete = useCallback(async (uploadedIds) => {
         if (!uploadedIds || uploadedIds.length === 0) return;
@@ -338,7 +362,7 @@ const GalleryMetabox = ({
                     url: media.source_url,
                     thumbnail: media.media_details?.sizes?.thumbnail?.source_url || media.source_url,
                     alt: media.alt_text || '',
-                    favorite: false
+                    featured: false,
                 });
             } catch (err) {
                 console.warn('Failed to fetch media', id, err);
@@ -350,17 +374,7 @@ const GalleryMetabox = ({
         setItems(prevItems => {
             const existingIds = new Set(prevItems.map(img => img.id));
             const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
-            const wasEmpty = prevItems.length === 0;
             const updatedItems = [...prevItems, ...uniqueNewItems];
-
-            if (wasEmpty && uniqueNewItems.length > 0) {
-                updatedItems.forEach(item => {
-                    item.favorite = item.id === uniqueNewItems[0].id;
-                });
-                if (uniqueNewItems[0].id) {
-                    saveFavoriteItem(uniqueNewItems[0].id);
-                }
-            }
 
             if (State) {
                 const itemIds = updatedItems.map(item => String(item.id)).filter(Boolean);
@@ -369,60 +383,46 @@ const GalleryMetabox = ({
 
             return updatedItems;
         });
-    }, [saveFavoriteItem]);
+    }, []);
 
-    const toggleFavorite = useCallback(async (itemId) => {
+    // Click the star: if not featured, make this item the featured one.
+    // If already featured, clear (so there's a real "remove" affordance —
+    // the runtime resolver then falls back to first-valid-item).
+    const setFeatured = useCallback(async (itemId) => {
+        let nextItemId = null;
         setItems(prevItems => {
             const clickedItem = prevItems.find(item => item.id === itemId);
-            const wasFavorite = clickedItem?.favorite;
+            const wasFeatured = !!clickedItem?.featured;
+            nextItemId = wasFeatured ? null : itemId;
 
-            // If clicking on the item that's already the favorite, do nothing
-            if (wasFavorite) {
-                return prevItems; // No changes
-            }
-
-            // Set the clicked item as favorite and unset the previous favorite
-            const updatedItems = prevItems.map(item => ({
+            return prevItems.map(item => ({
                 ...item,
-                favorite: item.id === itemId
+                featured: nextItemId !== null && item.id === nextItemId,
             }));
-
-            // Save new favorite to database
-            saveFavoriteItem(itemId);
-
-            return updatedItems;
         });
-    }, [saveFavoriteItem]);
+        await saveFeaturedItem(nextItemId);
+    }, [saveFeaturedItem]);
 
-    // Remove item
+    // Remove item. We never auto-promote a different item to featured —
+    // the runtime resolver handles that fallback. We just clear the
+    // explicit featured choice when the user removes the featured item.
     const removeItem = useCallback((itemId) => {
+        let needsClear = false;
         setItems(prevItems => {
             const itemToRemove = prevItems.find(item => item.id === itemId);
-            const wasFavorite = itemToRemove?.favorite;
+            needsClear = !!itemToRemove?.featured;
             const remainingItems = prevItems.filter(img => img.id !== itemId);
 
-            // If favorite item was deleted, make first remaining item favorite
-            if (wasFavorite && remainingItems.length > 0) {
-                remainingItems.forEach((item, index) => {
-                    item.favorite = index === 0;
-                });
-                // Save new favorite to database
-                if (remainingItems[0].id) {
-                    saveFavoriteItem(remainingItems[0].id);
-                }
-            } else if (remainingItems.length === 0) {
-                // No items left, clear favorite
-                saveFavoriteItem(null);
-            }
-
-            // Update state manager
             if (State) {
                 State.items.removeItem(String(itemId));
             }
 
             return remainingItems;
         });
-    }, [saveFavoriteItem]);
+        if (needsClear) {
+            saveFeaturedItem(null);
+        }
+    }, [saveFeaturedItem]);
 
     // Clear all items
     const closeClearAllModal = useCallback(() => {
@@ -443,54 +443,53 @@ const GalleryMetabox = ({
         }
         setItems([]);
         closeClearAllModal();
-        // Clear favorite when all items are removed
-        saveFavoriteItem(null);
+        // Clear the explicit featured choice when the gallery is emptied.
+        saveFeaturedItem(null);
 
         // Update state manager
         if (State) {
             State.items.setItems([]);
         }
-    }, [clearAllConfirmValue, closeClearAllModal, saveFavoriteItem]);
+    }, [clearAllConfirmValue, closeClearAllModal, saveFeaturedItem]);
 
-    // Handle item reordering
-    const handleReorderItems = useCallback(async (newOrder) => {
-        try {
-            // Reorder items in state to match new order using functional update
-            setItems(prevItems => {
-                const reorderedItems = newOrder.map(id =>
-                    prevItems.find(item => item.id.toString() === id.toString())
-                ).filter(Boolean);
+    // Handle item reordering.
+    //
+    // The reorder is treated as a regular gallery change: it updates the
+    // shared state manager (which marks `items` as unsaved) and dispatches
+    // the `fotogrids:setting_changed` event so ajax-save.js's autosave
+    // pipeline handles persistence the same way it handles any other
+    // change. If autosave is off, the user will see the "unsaved changes"
+    // badge and can click Update; if it's on, the standard debounced
+    // saveCollectionAjax() fires and produces the usual save toast.
+    //
+    // We deliberately don't hit the legacy `fotogrids_reorder_gallery_items`
+    // endpoint anymore — order is persisted by `fotogrids_save_collection`
+    // via the hidden `fotogrids_gallery_items[]` inputs rendered for each
+    // item below.
+    const handleReorderItems = useCallback((newOrder) => {
+        // Reorder items in state to match new order using functional update
+        setItems(prevItems => {
+            const reorderedItems = newOrder.map(id =>
+                prevItems.find(item => item.id.toString() === id.toString())
+            ).filter(Boolean);
 
-                // Update state manager
-                if (State) {
-                    const itemIds = reorderedItems.map(item => String(item.id)).filter(Boolean);
-                    State.items.reorderItems(itemIds);
-                }
-
-                return reorderedItems;
-            });
-
-            // Save new order to server
-            const formData = new FormData();
-            formData.append('action', 'fotogrids_reorder_gallery_items');
-            formData.append('gallery_id', window.fotogridsMetaBoxes?.postId || '');
-            formData.append('item_order', JSON.stringify(newOrder));
-            formData.append('nonce', nonce);
-
-            const response = await fetch(ajaxUrl, {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (!data.success) {
-                console.error('Failed to save item order:', data.data);
+            // Update state manager — this fires the 'items' listener which
+            // in turn sets `unsavedChanges.sources.items = true`.
+            if (State) {
+                const itemIds = reorderedItems.map(item => String(item.id)).filter(Boolean);
+                State.items.reorderItems(itemIds);
             }
-        } catch (error) {
-            console.error('Error reordering items:', error);
-        }
-    }, [ajaxUrl, nonce]);
+
+            return reorderedItems;
+        });
+
+        // Tell ajax-save.js a setting changed. This is the same channel
+        // settings panels use, so it triggers the unsaved-changes badge
+        // and the autosave debounce.
+        document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
+            detail: { source: 'items-reorder' },
+        }));
+    }, []);
 
     // Update ref when handleReorderItems changes
     useEffect(() => {
@@ -631,19 +630,13 @@ const GalleryMetabox = ({
             title:       data.title  || embedForm.title  || 'Video',
             thumbnail:   data.thumbnail_url || '',
             alt:         data.title  || '',
-            favorite:    false,
+            featured:    false,
             // carry embed meta so the grid can render the badge
             source:      embedForm.source,
         };
 
         setItems(prevItems => {
-            const wasEmpty      = prevItems.length === 0;
-            const updatedItems  = [...prevItems, newItem];
-
-            if (wasEmpty) {
-                updatedItems[0].favorite = true;
-                saveFavoriteItem(updatedItems[0].id);
-            }
+            const updatedItems = [...prevItems, newItem];
 
             if (State) {
                 State.items.setItems(updatedItems.map(i => String(i.id)).filter(Boolean));
@@ -655,7 +648,7 @@ const GalleryMetabox = ({
         if (window.fotogridsToast) {
             window.fotogridsToast.success(strings.videoEmbedAdded);
         }
-    }, [saveFavoriteItem, strings]);
+    }, [strings]);
 
     const renderItemsGrid = () => {
         if (items.length === 0) {
@@ -677,10 +670,7 @@ const GalleryMetabox = ({
                             className="fotogrids-noitems-add-block fotogrids-noitems-add-block--action"
                             onClick={handleFromLibrary}
                         >
-                            <div
-                                className="fotogrids-noitems-add-block__icon"
-                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.folder }}
-                            />
+                            <Icon name="folder" className="fotogrids-noitems-add-block__icon" />
                             <h4>{strings.addFromLibrary}</h4>
                             <p>{strings.fromLibraryDescription}</p>
                         </button>
@@ -723,33 +713,40 @@ const GalleryMetabox = ({
                             onClick={() => openItemModal(item.id)}
                             style={{ cursor: 'pointer' }}
                         />
-                        <div className={`fotogrids-item-favorite ${item.favorite ? 'is-favorite' : ''}`}>
-                            <button
-                                type="button"
-                                className="fotogrids-item-favorite-button"
-                                onClick={() => toggleFavorite(item.id)}
-                                title={item.favorite ? strings.removeFavorite : strings.makeFavorite}
-                            >
-                                <Icon name="star" />
-                            </button>
+                        <div className={`fotogrids-item-featured ${item.featured ? 'is-featured' : ''}`}>
+                            <Tooltip content={item.featured ? strings.clearFeatured : strings.setAsFeatured} position="top">
+                                <button
+                                    type="button"
+                                    className="fotogrids-item-featured-button"
+                                    onClick={() => setFeatured(item.id)}
+                                    aria-pressed={!!item.featured}
+                                    aria-label={item.featured ? strings.clearFeatured : strings.setAsFeatured}
+                                >
+                                    <Icon name="star" />
+                                </button>
+                            </Tooltip>
                         </div>
                         <div className="fotogrids-item-controls">
-                            <button
-                                type="button"
-                                className="fotogrids-edit-item"
-                                onClick={() => openItemModal(item.id)}
-                                title={strings.editItem}
-                            >
-                                <Icon name="edit" />
-                            </button>
-                            <button
-                                type="button"
-                                className="fotogrids-remove-item"
-                                onClick={() => removeItem(item.id)}
-                                title={strings.removeItem}
-                            >
-                                <Icon name="x" />
-                            </button>
+                            <Tooltip content={strings.editItem} position="top">
+                                <button
+                                    type="button"
+                                    className="fotogrids-edit-item"
+                                    onClick={() => openItemModal(item.id)}
+                                    aria-label={strings.editItem}
+                                >
+                                    <Icon name="edit" />
+                                </button>
+                            </Tooltip>
+                            <Tooltip content={strings.removeItem} position="top">
+                                <button
+                                    type="button"
+                                    className="fotogrids-remove-item"
+                                    onClick={() => removeItem(item.id)}
+                                    aria-label={strings.removeItem}
+                                >
+                                    <Icon name="x" />
+                                </button>
+                            </Tooltip>
                         </div>
                         <div className="fotogrids-item-title">
                             {item.title.length > 20 ? item.title.substring(0, 20) + '...' : item.title}

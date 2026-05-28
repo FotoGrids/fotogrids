@@ -1,0 +1,13 @@
+/*
+ * FotoGrids — Album → Gallery (AJAX swap) loading state.
+ *
+ * While the AJAX fetch is in flight, the album wrapper carries
+ * .fotogrids-album--is-loading. We fade and disable pointer events so
+ * the user can't double-click into a stuck request.
+ */
+
+.fotogrids-album--is-loading {
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}

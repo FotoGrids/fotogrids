@@ -31,20 +31,6 @@
             "label": "Data Management",
             "settings": [
                 {
-                    "key": "use_ajax_from_album",
-                    "type": "toggle",
-                    "label": "Smooth Album to Gallery Transitions",
-                    "description": "When enabled, opening a gallery from an album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation.",
-                    "default": true,
-                    "postTypes": [
-                        "gallery"
-                    ],
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
                     "key": "enable_statistics",
                     "type": "toggle",
                     "label": "Enable Statistics Tracking",

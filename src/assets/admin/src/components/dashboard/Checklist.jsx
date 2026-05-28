@@ -2,6 +2,7 @@
  * Setup Checklist Component
  */
 import React from 'react';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -12,24 +13,21 @@ const Checklist = ({ galleriesCount, shortcodesUsed }) => {
     return (
         <div className="fotogrids-admin-block-card fg-abc-checklist">
             <div className="fotogrids-admin-block-card-header">
-                <div
-                    className="fotogrids-admin-block-card-header-icon fg-header-icon-light"
-                    dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.list }}
-                />
+                <Icon name="list" className="fotogrids-admin-block-card-header-icon fg-header-icon-light" />
                 <h3>{__('Complete Your Setup', 'fotogrids')}</h3>
             </div>
             <ul className="fg-abc-checklist-items">
                 <li className="completed">
-                    <span dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check }} />
+                    <Icon name="check" />
                     {__('Plugin installed and activated', 'fotogrids')}
                 </li>
                 <li className="completed">
-                    <span dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check }} />
+                    <Icon name="check" />
                     {__('Dashboard page visited', 'fotogrids')}
                 </li>
                 <li className={galleriesCount > 0 ? 'completed' : ''}>
                     {galleriesCount > 0 ? (
-                        <span dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check }} />
+                        <Icon name="check" />
                     ) : (
                         <span />
                     )}
@@ -41,7 +39,7 @@ const Checklist = ({ galleriesCount, shortcodesUsed }) => {
                 </li>
                 <li className={shortcodesUsed ? 'completed' : ''}>
                     {shortcodesUsed ? (
-                        <span dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check }} />
+                        <Icon name="check" />
                     ) : (
                         <span />
                     )}

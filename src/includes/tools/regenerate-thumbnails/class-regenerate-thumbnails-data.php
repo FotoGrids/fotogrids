@@ -46,6 +46,9 @@ class Regenerate_Thumbnails_Data {
 		$plugin_sizes = [
 			\FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL,
+			\FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE,
+			\FotoGrids\Image_Size_Manager::SLUG_MASONRY,
+			\FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED,
 		];
 		$custom_sizes = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
 		$other_sizes  = self::get_other_registered_sizes( $plugin_sizes, $custom_sizes );
@@ -57,6 +60,11 @@ class Regenerate_Thumbnails_Data {
 		// Look up which attachment IDs are used in galleries so we can mark
 		// unused rows in the table when include_unused is on.
 		$used_ids = $include_unused ? self::get_used_attachment_ids() : [];
+
+		// Per-attachment set of layout IDs used by the galleries containing it.
+		// Lets the client grey out layout-specific size rows (Masonry/Justified)
+		// for attachments whose galleries don't use that layout.
+		$layouts_by_attachment = self::get_layouts_by_attachment();
 
 		$items = [];
 		foreach ( $attachment_ids as $attachment_id ) {
@@ -76,6 +84,11 @@ class Regenerate_Thumbnails_Data {
 				];
 			}
 
+			// Orphan-safe: an attachment in no FotoGrids gallery is treated as
+			// "uses every layout" so its rows aren't greyed out misleadingly.
+			$layouts_used = $layouts_by_attachment[ $attachment_id ]
+				?? [ 'grid', 'masonry', 'justified' ];
+
 			$items[] = [
 				'attachment_id' => $attachment_id,
 				'title'         => get_the_title( $attachment_id ),
@@ -83,6 +96,7 @@ class Regenerate_Thumbnails_Data {
 				'thumb_url'     => wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) ?: '',
 				'sizes'         => $size_statuses,
 				'in_gallery'    => $include_unused ? in_array( $attachment_id, $used_ids, true ) : true,
+				'layouts_used'  => array_values( $layouts_used ),
 			];
 		}
 
@@ -143,6 +157,9 @@ class Regenerate_Thumbnails_Data {
 		$plugin_sizes      = [
 			\FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL,
+			\FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE,
+			\FotoGrids\Image_Size_Manager::SLUG_MASONRY,
+			\FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED,
 		];
 		$custom_sizes      = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
 		$other_sizes       = self::get_other_registered_sizes( $plugin_sizes, $custom_sizes );
@@ -325,6 +342,84 @@ class Regenerate_Thumbnails_Data {
 		}
 
 		return array_keys( $used );
+	}
+
+	/**
+	 * Returns a map of attachment_id => list of distinct layout IDs used by
+	 * every FotoGrids gallery that contains that attachment.
+	 *
+	 * Used by the regen tool to grey out layout-specific size rows (Masonry,
+	 * Justified) for attachments whose galleries don't actually use that layout
+	 * - those derivatives are not needed in practice and showing them as
+	 * "missing" would be misleading.
+	 *
+	 * Two batch queries:
+	 *   1. All `fotogrids_gallery_items` rows (gallery_id, JSON of attachment IDs).
+	 *   2. All `fotogrids_layout` rows (gallery_id, layout ID string).
+	 *
+	 * Galleries with no saved layout fall back to the default ('grid') so
+	 * brand-new galleries don't incorrectly grey out Masonry/Justified rows
+	 * for everyone.
+	 *
+	 * @return array<int, string[]>  attachment_id => [ 'grid', 'masonry', ... ]
+	 */
+	private static function get_layouts_by_attachment(): array {
+		global $wpdb;
+
+		// One row per gallery: gallery_id => layout_id. Default to 'grid' when
+		// the post meta is absent.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$layout_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				'fotogrids_layout'
+			),
+			ARRAY_A
+		);
+
+		$layout_by_gallery = [];
+		foreach ( $layout_rows as $row ) {
+			$gallery_id = (int) $row['post_id'];
+			$layout     = is_string( $row['meta_value'] ) && $row['meta_value'] !== ''
+				? $row['meta_value']
+				: 'grid';
+			$layout_by_gallery[ $gallery_id ] = $layout;
+		}
+
+		// One row per gallery: gallery_id => JSON-encoded list of attachment IDs.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$item_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				'fotogrids_gallery_items'
+			),
+			ARRAY_A
+		);
+
+		$layouts_by_attachment = [];
+		foreach ( $item_rows as $row ) {
+			$gallery_id = (int) $row['post_id'];
+			$layout     = $layout_by_gallery[ $gallery_id ] ?? 'grid';
+
+			$decoded = is_string( $row['meta_value'] ) ? json_decode( $row['meta_value'], true ) : null;
+			if ( ! is_array( $decoded ) ) {
+				$decoded = maybe_unserialize( $row['meta_value'] );
+			}
+			if ( ! is_array( $decoded ) ) {
+				continue;
+			}
+
+			foreach ( $decoded as $attachment_id ) {
+				$attachment_id = (int) $attachment_id;
+				if ( $attachment_id <= 0 ) {
+					continue;
+				}
+				$layouts_by_attachment[ $attachment_id ][ $layout ] = true;
+			}
+		}
+
+		// Flatten the per-attachment associative set back to a list of layout IDs.
+		return array_map( 'array_keys', $layouts_by_attachment );
 	}
 
 	/**

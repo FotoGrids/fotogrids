@@ -18,8 +18,31 @@ class Post_Types {
     public static function init() {
         add_action( 'init', array( __CLASS__, 'register_cpts' ) );
         add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
+        add_action( 'add_meta_boxes', array( __CLASS__, 'hide_featured_image_metabox' ), 99 );
 
         add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
+    }
+
+    /**
+     * Hide the native WordPress Featured Image metabox for FotoGrids CPTs.
+     *
+     * The gallery CPT declares 'thumbnail' support so that `_thumbnail_id`
+     * is a first-class field (read by `get_post_thumbnail_id()` from REST
+     * handlers, statistics, OG, etc.), but the user-facing way to choose
+     * the cover is the in-metabox "Featured Item" star picker on each
+     * gallery item — not the generic media-library Featured Image picker.
+     * Showing both pickers would confuse users.
+     *
+     * Albums don't declare 'thumbnail' support (their cover is resolved
+     * at runtime from the chosen child gallery), so this is a no-op for
+     * them — included for safety in case that ever changes.
+     *
+     * @since 1.0.0
+     * @return void
+     */
+    public static function hide_featured_image_metabox() {
+        remove_meta_box( 'postimagediv', 'fotogrids_gallery', 'side' );
+        remove_meta_box( 'postimagediv', 'fotogrids_album', 'side' );
     }
 
     /**
@@ -89,7 +112,14 @@ class Post_Types {
             'hierarchical'          => false,
             'menu_position'         => null,
             'menu_icon'             => 'dashicons-format-gallery',
-            'supports'              => array( 'title' ),
+            // 'title'    — gallery name shown in lists and as the page <title>.
+            // 'thumbnail' — backs the Featured Item picker via WP-native
+            //               `_thumbnail_id`. The native Featured Image
+            //               metabox is hidden in `hide_featured_image_metabox()`.
+            // 'excerpt'  — backs the `og:description` fallback chain. The
+            //               native Excerpt metabox renders below the title
+            //               unless the user has hidden it via Screen Options.
+            'supports'              => array( 'title', 'thumbnail', 'excerpt' ),
             'show_in_rest'          => true,
             'rest_base'             => 'fotogrids-galleries',
             'rest_controller_class' => 'WP_REST_Posts_Controller',
@@ -151,7 +181,13 @@ class Post_Types {
             'hierarchical'          => false,
             'menu_position'         => null,
             'menu_icon'             => 'dashicons-album',
-            'supports'              => array( 'title' ),
+            // 'title'   — album name shown in lists and as the page <title>.
+            // 'excerpt' — backs the `og:description` fallback chain for albums.
+            // Albums intentionally do NOT declare 'thumbnail' support — the
+            // album cover is resolved at runtime from the Featured Gallery
+            // (see `fotogrids_get_album_cover_attachment_id()`), not stored
+            // as a native `_thumbnail_id` on the album post.
+            'supports'              => array( 'title', 'excerpt' ),
             'show_in_rest'          => true,
             'rest_base'             => 'fotogrids-albums',
             'rest_controller_class' => 'WP_REST_Posts_Controller',
@@ -237,7 +273,9 @@ class Post_Types {
                 readonly onclick="this.select();" class="fotogrids-shortcode-input" />
             <button type="button" class="fotogrids-button fotogrids-button--outline fotogrids-button--primary fotogrids-button--icon-only fotogrids-shortcode-copy"
                 data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
-                title="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
+                data-fg-tooltip="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>"
+                data-fg-tooltip-dir="below"
+                aria-label="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
                 <span class="fotogrids-icon" data-icon="clipboard"></span>
             </button>
         </div>
@@ -267,60 +305,6 @@ class Post_Types {
                 <?php _e( 'Loading gallery manager...', 'fotogrids' ); ?>
             </div>
         </div>
-        <?php
-    }
-
-    /**
-     * Album settings meta box callback
-     *
-     * Renders form fields for album-specific settings including layout type
-     * and featured gallery selection. Only galleries assigned to the album
-     * are available for featured gallery selection.
-     *
-     * @since 1.0.0
-     *
-     * @param WP_Post $post The album post object
-     */
-    public static function album_settings_meta_box( $post ) {
-        wp_nonce_field( 'fotogrids_album_settings', 'fotogrids_album_settings_nonce' );
-
-        $layout = get_post_meta( $post->ID, 'fotogrids_album_layout', true ) ?: 'grid';
-        $featured_gallery = get_post_meta( $post->ID, 'fotogrids_featured_gallery', true );
-
-        $assigned_galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $post->ID );
-
-        ?>
-        <table class="form-table">
-            <tr>
-                <th scope="row">
-                    <label for="fotogrids_album_layout"><?php _e( 'Layout', 'fotogrids' ); ?></label>
-                </th>
-                <td>
-                    <select name="fotogrids_album_layout" id="fotogrids_album_layout">
-                        <option value="grid" <?php selected( $layout, 'grid' ); ?>><?php _e( 'Grid', 'fotogrids' ); ?></option>
-                        <option value="list" <?php selected( $layout, 'list' ); ?>><?php _e( 'List', 'fotogrids' ); ?></option>
-                    </select>
-                    <p class="description"><?php _e( 'Choose how galleries are displayed in this album.', 'fotogrids' ); ?></p>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="fotogrids_featured_gallery"><?php _e( 'Featured Gallery', 'fotogrids' ); ?></label>
-                </th>
-                <td>
-                    <select name="fotogrids_featured_gallery" id="fotogrids_featured_gallery">
-                        <option value=""><?php _e( 'No Featured Gallery', 'fotogrids' ); ?></option>
-                        <?php foreach ( $assigned_galleries as $gallery ) : ?>
-                            <option value="<?php echo esc_attr( $gallery->ID ); ?>"
-                                    <?php selected( $featured_gallery, $gallery->ID ); ?>>
-                                <?php echo esc_html( $gallery->post_title ); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <p class="description"><?php _e( 'Select a gallery to be featured for this album. Only assigned galleries are available.', 'fotogrids' ); ?></p>
-                </td>
-            </tr>
-        </table>
         <?php
     }
 

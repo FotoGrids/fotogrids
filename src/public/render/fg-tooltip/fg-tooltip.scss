@@ -20,6 +20,7 @@
     --fg-tt-z:           1000010;   // above lightbox (999999)
     --fg-tt-duration:    140ms;
     --fg-tt-offset:      4px;       // entrance slide distance
+    --fg-tt-arrow-size:  6px;       // arrow leg length
 
     position:         fixed;
     z-index:          var(--fg-tt-z);
@@ -45,6 +46,57 @@
         visibility var(--fg-tt-duration) ease,
         transform  var(--fg-tt-duration) ease;
 
+    // ---------- Arrow ----------
+    // CSS-triangle-via-borders: a zero-size box with three transparent
+    // borders and one coloured border. No rotated square, so the arrow has
+    // no overlap with the tooltip body — which means transparent --fg-tt-bg
+    // values render cleanly instead of doubling up where the square meets
+    // the tooltip.
+    //
+    // Direction is set by JS via data-dir on the tooltip element (see
+    // fg-tooltip.js position()). Default direction is "above" — the
+    // tooltip sits above the host, arrow drops down from the bottom.
+    &::before {
+        content:    "";
+        position:   absolute;
+        width:      0;
+        height:     0;
+        border:     var(--fg-tt-arrow-size) solid transparent;
+        // Default placement = above (arrow points down from bottom of tooltip).
+        top:              100%;
+        left:             50%;
+        transform:        translateX(-50%);
+        border-top-color: var(--fg-tt-bg);
+    }
+
+    &[data-dir="below"]::before {
+        top:                 auto;
+        bottom:              100%;
+        left:                50%;
+        transform:           translateX(-50%);
+        border-top-color:    transparent;
+        border-bottom-color: var(--fg-tt-bg);
+    }
+
+    &[data-dir="left"]::before {
+        top:               50%;
+        bottom:            auto;
+        left:              100%;
+        transform:         translateY(-50%);
+        border-top-color:  transparent;
+        border-left-color: var(--fg-tt-bg);
+    }
+
+    &[data-dir="right"]::before {
+        top:                50%;
+        bottom:             auto;
+        left:               auto;
+        right:              100%;
+        transform:          translateY(-50%);
+        border-top-color:   transparent;
+        border-right-color: var(--fg-tt-bg);
+    }
+
     // Entrance slide direction - set via data-dir by JS.
     &[data-dir="below"] { transform: translateY(var(--fg-tt-offset)); }
     &[data-dir="left"]  { transform: translateX(var(--fg-tt-offset)); }
@@ -56,4 +108,68 @@
         visibility: visible;
         transform:  none;
     }
+
+    // ---------- Interactive mode ----------
+    // When the tooltip carries arbitrary content (a share grid, a quick
+    // menu, …) it stops behaving like a passive hover hint and becomes
+    // a popover-style surface:
+    //   • pointer-events enabled so child controls receive clicks
+    //   • text can select inside the popover (overrides .fg-tooltip's user-select:none)
+    //   • white-space relaxes so multi-row content lays out naturally
+    //   • slightly more inner padding to give the content room
+    // The trigger flow (open / dismiss / Escape) lives in fg-tooltip.js.
+    &.fg-tooltip--interactive {
+        pointer-events: auto;
+        user-select:    auto;
+        white-space:    normal;
+        padding:        8px;
+        // Don't animate via translate — interactive popovers feel
+        // jittery if they slide in. Just opacity-fade.
+        transform:      none !important;
+    }
+
+    // ---------- Content morph (text → interactive) ----------
+    // When showInteractive() takes over an already-visible text tooltip
+    // we want a "morph" feel: the outer chrome (background, arrow,
+    // shadow) stays on screen while the inner content cross-fades and
+    // the outer container animates its size from the small text width
+    // to whatever the new interactive content needs.
+    //
+    // The outer container transitions width/height so the resize is
+    // smooth. The inner element has its own opacity transition.
+    // The fg-tooltip--swapping class triggers the fade-out leg
+    // (controlled from JS so timing is reliable across surfaces).
+    width:  auto;
+    height: auto;
+    transition:
+        opacity    var(--fg-tt-duration) ease,
+        visibility var(--fg-tt-duration) ease,
+        transform  var(--fg-tt-duration) ease,
+        width      var(--fg-tt-duration) ease,
+        height     var(--fg-tt-duration) ease;
+}
+
+// Inner content wrapper added by showInteractive(). Lets us crossfade
+// the content while the outer container resizes/animates separately.
+.fg-tooltip__inner {
+    opacity:    0;
+    transition: opacity var(--fg-tt-duration, 140ms) ease;
+}
+
+.fg-tooltip__inner.fg-tooltip__inner--visible {
+    opacity: 1;
+}
+
+// While JS is mid-swap (text → interactive), force the inner-content
+// opacity to 0 even though the tooltip itself stays visible. Outer
+// chrome (bg, arrow, shadow) keeps showing through.
+.fg-tooltip.fg-tooltip--swapping {
+    // textContent is what's currently inside (the "Sharing" label).
+    // Plain text doesn't have a wrapper, so we fade it via the parent's
+    // color transition — visually equivalent.
+    color: transparent;
+    transition:
+        color      var(--fg-tt-duration) ease,
+        width      var(--fg-tt-duration) ease,
+        height     var(--fg-tt-duration) ease;
 }

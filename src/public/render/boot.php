@@ -98,6 +98,7 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Border_Radius\Border_Radius::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Border\Border::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Shadow\Shadow::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Spacing\Spacing::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Effects\Hover_Effects::class );
         // Click-behavior decorators must run after all visual decorators so the
         // <a> wraps the fully-decorated item media. Only one of these will be
@@ -106,6 +107,16 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Direct_Link\Direct_Link_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\External_Link\External_Link_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::class );
+        // Album click-behaviour decorators. Mutually exclusive via
+        // supports(): one runs per album based on use_ajax_from_album.
+        // Both opt OUT of normal gallery renders via collection_kind.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Album_To_View_Page\Album_To_View_Page::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Album_To_Gallery_Ajax\Album_To_Gallery_Ajax::class );
+        // Runtime Bootstrap is registered first so window.FotoGrids is defined
+        // before any other module's JS runs. Every other module's JS declares
+        // the 'fotogrids-runtime' handle as a dep, but registering this module
+        // first means the asset is queued first too.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Internal\Runtime\Runtime_Bootstrap::class );
         // Loading Icon must be registered before Lightbox so its <symbol> block
         // is emitted inside html_appendix() before the lightbox reads the global.
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Loading_Icon\Loading_Icon::class );
@@ -115,6 +126,9 @@ add_action(
         // Lazy Load writes data-fg-lazy="1" on the wrapper when the setting is on,
         // and conditionally suppresses loading="lazy" on items when it is off.
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Lazy_Load\Lazy_Load::class );
+        // Stats fires view + share pings to the REST API. Gated by the
+        // enable_statistics setting (default true) and never active in previews.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Stats\Stats::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Css::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Js::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Lightbox\Lightbox::class );
@@ -125,10 +139,29 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\Tags\Tags_Filter_Source::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\People\People_Filter_Source::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\Location\Location_Filter_Source::class );
+        // Sequence index decorator stamps data-fg-sequence-index on
+        // every item using Gallery_Item_Sequence::resolve(). Lightbox
+        // reads it to know each item's position in the full
+        // filtered+sorted set. Always runs (gallery-only via supports).
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Sequence_Index\Sequence_Index_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\Tags\Tags_Filter_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\People\People_Filter_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\Location\Location_Filter_Decorator::class );
+        // Collection Header (back-to-album button + breadcrumbs) MUST be
+        // registered before Filter_Ui so its html_before output renders
+        // above .fotogrids-filters inside the gallery wrapper. The feature
+        // gates itself via Breadcrumb_Resolver — never active on album
+        // renders or galleries with zero / multiple parent albums.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Collection_Header\Collection_Header::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Filters\Features\Ui\Filter_Ui::class );
+        // Pagination — three mutually exclusive sibling modules, all gated
+        // on pagination_type === 'paginated' and the appropriate
+        // pagination_method. Order between them doesn't matter
+        // (supports() is mutually exclusive); registered after Filter_Ui
+        // so the filter bar renders above the pagination chrome.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Endless_Scroll\Endless_Scroll::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Load_More\Load_More::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Page_Buttons\Page_Buttons::class );
     },
     10
 );

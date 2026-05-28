@@ -55,6 +55,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-assembler.ph
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-normalizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-plugin-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-sharing-settings-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-request-validator.php';

@@ -31,6 +31,63 @@ const SizeStatus = ({ status }) => {
 };
 
 /**
+ * A single labelled row inside MultiRowSizeCell.
+ * Renders ✓/✗ + a short label, optional dims trailing. When `unused` is true
+ * the row is dimmed and wrapped in a Tooltip explaining why.
+ */
+const SizeRow = ({ status, label, unused, unusedReason }) => {
+    const exists = !!status?.exists;
+    const dims   = exists && status.width && status.height
+        ? `${status.width}×${status.height}`
+        : null;
+
+    const inner = (
+        <span
+            className={[
+                `${baseClass}__row-status`,
+                exists ? `${baseClass}__row-status--ok` : `${baseClass}__row-status--missing`,
+                unused ? `${baseClass}__row-status--unused` : '',
+            ].filter(Boolean).join(' ')}
+        >
+            <span className={`${baseClass}__row-status-icon`} aria-hidden="true">
+                <Icon name={exists ? 'check_circle' : 'alert_circle'} />
+            </span>
+            <span className={`${baseClass}__row-status-label`}>{label}</span>
+            {dims && <span className={`${baseClass}__row-status-dims`}>{dims}</span>}
+        </span>
+    );
+
+    if (unused && unusedReason) {
+        return (
+            <Tooltip content={unusedReason} position="right">
+                {inner}
+            </Tooltip>
+        );
+    }
+
+    return inner;
+};
+
+/**
+ * Flex-column cell that stacks multiple labelled size rows. Used for the two
+ * FotoGrids columns ("Thumbnail group" and "Full group") so partial-generation
+ * state and layout-conditional sizes are visible at a glance.
+ */
+const MultiRowSizeCell = ({ rows, sizes }) => (
+    <div className={`${baseClass}__multi-rows`}>
+        {rows.map(({ slug, label, unused, unusedReason }) => (
+            <SizeRow
+                key={slug}
+                status={sizes?.[slug]}
+                label={label}
+                unused={unused}
+                unusedReason={unusedReason}
+            />
+        ))}
+    </div>
+);
+
+/**
  * Compact "X exist / Y missing" cell with hover tooltip showing the detailed
  * per-slug list.
  */
@@ -127,9 +184,6 @@ const RegenerateThumbnailsTool = () => {
     const [activeTab, setActiveTab] = useState('regenerate');
     const [logEntries, setLogEntries] = useState([]); // [{ id, attachment_id, title, filename, sizes, source }]
     const logScrollRef = useRef(null);
-
-    // Slugs that get their own table column (FotoGrids plugin + custom sizes).
-    const allSizeSlugs = [...pluginSizes, ...customSizes];
 
     // --------------------------------------------------------------
     // Loading + regeneration
@@ -269,8 +323,11 @@ const RegenerateThumbnailsTool = () => {
     }, []);
 
     const niceSlug = (slug) => {
-        if (slug === 'fotogrids_thumbnail') return __('FotoGrids Thumbnail', 'fotogrids');
-        if (slug === 'fotogrids_full') return __('FotoGrids Full Image', 'fotogrids');
+        if (slug === 'fotogrids_thumbnail')   return __('FotoGrids Thumbnails', 'fotogrids');
+        if (slug === 'fotogrids_full')        return __('FotoGrids Full Image', 'fotogrids');
+        if (slug === 'fotogrids_full_mobile') return __('FotoGrids Full Image (Mobile)', 'fotogrids');
+        if (slug === 'fotogrids_masonry')     return __('FotoGrids Masonry (variable height)', 'fotogrids');
+        if (slug === 'fotogrids_justified')   return __('FotoGrids Justified (variable width)', 'fotogrids');
         return slug.replace(/^fotogrids_custom_/, '').replace(/_/g, ' ');
     };
 
@@ -375,14 +432,20 @@ const RegenerateThumbnailsTool = () => {
                                     <thead>
                                         <tr>
                                             <th className={`${baseClass}__col-file`}>{__('File', 'fotogrids')}</th>
-                                            {allSizeSlugs.map(slug => (
+                                            <th className={`${baseClass}__col-size ${baseClass}__col-size--multi`}>
+                                                {__('FotoGrids Thumbnails', 'fotogrids')}
+                                            </th>
+                                            <th className={`${baseClass}__col-size ${baseClass}__col-size--multi`}>
+                                                {__('FotoGrids Full Image', 'fotogrids')}
+                                            </th>
+                                            {customSizes.map(slug => (
                                                 <th key={slug} className={`${baseClass}__col-size`}>
                                                     {niceSlug(slug)}
                                                 </th>
                                             ))}
                                             {otherSizes.length > 0 && (
                                                 <th className={`${baseClass}__col-other-sizes`}>
-                                                    {__('Other registered sizes', 'fotogrids')}
+                                                    {__('Other sizes', 'fotogrids')}
                                                 </th>
                                             )}
                                             <th className={`${baseClass}__col-action`}>{__('Action', 'fotogrids')}</th>
@@ -432,7 +495,45 @@ const RegenerateThumbnailsTool = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    {allSizeSlugs.map(slug => (
+                                                    <td className={`${baseClass}__col-size ${baseClass}__col-size--multi`}>
+                                                        <MultiRowSizeCell
+                                                            sizes={item.sizes}
+                                                            rows={[
+                                                                {
+                                                                    slug:  'fotogrids_thumbnail',
+                                                                    label: __('Thumbnail', 'fotogrids'),
+                                                                },
+                                                                {
+                                                                    slug:  'fotogrids_masonry',
+                                                                    label: __('Masonry', 'fotogrids'),
+                                                                    unused: !(item.layouts_used || []).includes('masonry'),
+                                                                    unusedReason: __('Not used by this gallery’s layout.', 'fotogrids'),
+                                                                },
+                                                                {
+                                                                    slug:  'fotogrids_justified',
+                                                                    label: __('Justified', 'fotogrids'),
+                                                                    unused: !(item.layouts_used || []).includes('justified'),
+                                                                    unusedReason: __('Not used by this gallery’s layout.', 'fotogrids'),
+                                                                },
+                                                            ]}
+                                                        />
+                                                    </td>
+                                                    <td className={`${baseClass}__col-size ${baseClass}__col-size--multi`}>
+                                                        <MultiRowSizeCell
+                                                            sizes={item.sizes}
+                                                            rows={[
+                                                                {
+                                                                    slug:  'fotogrids_full',
+                                                                    label: __('Full', 'fotogrids'),
+                                                                },
+                                                                {
+                                                                    slug:  'fotogrids_full_mobile',
+                                                                    label: __('Full (Mobile)', 'fotogrids'),
+                                                                },
+                                                            ]}
+                                                        />
+                                                    </td>
+                                                    {customSizes.map(slug => (
                                                         <td key={slug} className={`${baseClass}__col-size`}>
                                                             <SizeStatus status={item.sizes?.[slug]} />
                                                         </td>

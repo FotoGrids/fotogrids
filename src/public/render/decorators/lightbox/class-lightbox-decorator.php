@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Decorators\Lightbox;
 
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Item_Wrapper;
@@ -43,6 +44,13 @@ final class Lightbox_Decorator implements Decorator {
     }
 
     public function supports( Render_Context $render_context ): bool {
+        // The lightbox is for opening individual attachments — it never
+        // applies to album-as-collection renders, whose items ARE
+        // galleries (and therefore have their own click-behaviour
+        // decorator, e.g. Album_To_View_Page or Album_To_Gallery_Ajax).
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
         return $render_context->behavior->click_behavior === 'lightbox';
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Internal;
 
 use FotoGrids\Image_Size_Manager;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Columns_Mode;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Render_Behavior;
@@ -14,6 +15,7 @@ use FotoGrids\Render\Api\Render_Meta;
 use FotoGrids\Render\Api\Render_Mode;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Sorter;
+use FotoGrids\Render\Features\Pagination\Page_Size_Resolver;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -44,6 +46,15 @@ final class Context_Builder {
      * @param   array<int, mixed>    $collection_item_ids Item IDs.
      * @param   Request_Source       $source Request source.
      * @param   int|null             $album_id Album identifier.
+     * @param   array<string, mixed> $meta_overrides Optional Render_Meta field overrides.
+     *                                               Accepted keys: requested_page,
+     *                                               requested_per_page, breakpoint,
+     *                                               partial, view_page,
+     *                                               via_album_id. Used by the REST
+     *                                               /gallery/render endpoint to drive
+     *                                               pagination + partial rendering,
+     *                                               and by ViewCollections / album-ajax
+     *                                               flows to thread visit context.
      * @return  Render_Context
      */
     public function build_for_public(
@@ -51,17 +62,69 @@ final class Context_Builder {
         array $render_settings = [],
         array $collection_item_ids = [],
         Request_Source $source = Request_Source::SHORTCODE,
-        ?int $album_id = null
+        ?int $album_id = null,
+        array $meta_overrides = []
     ): Render_Context {
+        // Random sort seed.
+        //   - If the caller (typically the paginated REST handler) supplied
+        //     one, honour it so paginated requests draw from the same
+        //     permutation that the initial render used.
+        //   - Otherwise generate a fresh seed for this render. Even non-
+        //     random-sort galleries get a seed (cheap), so toggling sort
+        //     to random later wouldn't change the wire shape.
+        // Capped at 2^31-1 (mt_rand's native range) so JavaScript's
+        // 53-bit-float Number type can round-trip the value losslessly.
+        // PHP_INT_MAX is 64-bit on most servers; seeds beyond ~9e15 lose
+        // precision when sent as JSON and arrive at the server with the
+        // last digits zeroed, producing a different shuffle and duplicate
+        // items across paginated pages.
+        $random_seed = isset( $meta_overrides['random_seed'] ) && $meta_overrides['random_seed'] !== null
+            ? (int) $meta_overrides['random_seed']
+            : random_int( 1, 2147483647 );
+
+        // is_ajax_swap must be set explicitly by the caller. The /gallery/
+        // render REST handler stamps it true on every payload it returns;
+        // every other code path (shortcode, block, ViewCollections,
+        // preview) leaves it false. We don't infer from Request_Source
+        // here because legitimate non-AJAX renders can also legitimately
+        // arrive with ALBUM_AJAX as their source (e.g. an embedded
+        // gallery whose shortcode carries album_id="N").
+        $is_ajax_swap = ! empty( $meta_overrides['is_ajax_swap'] );
+
+        $view_page = ! empty( $meta_overrides['view_page'] );
+
         $render_meta = new Render_Meta(
-            gallery_id: $gallery_id,
-            album_id: $album_id,
-            instance_id: $this->instance_id_factory->generate( $gallery_id ),
-            source: $source,
-            is_preview: false,
-            mode: Render_Mode::INITIAL,
-            schema_version: 2
+            gallery_id:         $gallery_id,
+            album_id:           $album_id,
+            instance_id:        $this->instance_id_factory->generate( $gallery_id ),
+            source:             $source,
+            is_preview:         false,
+            mode:               Render_Mode::INITIAL,
+            schema_version:     2,
+            requested_page:     isset( $meta_overrides['requested_page'] )     ? (int) $meta_overrides['requested_page']     : null,
+            requested_per_page: isset( $meta_overrides['requested_per_page'] ) ? (int) $meta_overrides['requested_per_page'] : null,
+            breakpoint:         isset( $meta_overrides['breakpoint'] )         ? (string) $meta_overrides['breakpoint']      : null,
+            partial:            isset( $meta_overrides['partial'] )            ? (string) $meta_overrides['partial']         : null,
+            active_filters:     isset( $meta_overrides['active_filters'] ) && is_array( $meta_overrides['active_filters'] )
+                                    ? $meta_overrides['active_filters']
+                                    : [],
+            random_seed:        $random_seed,
+            view_page:          $view_page,
+            is_ajax_swap:       $is_ajax_swap,
         );
+
+        // Visit-context album. Honour an explicit meta override (REST /
+        // gallery/render path); otherwise read the `fg_via` query var
+        // for normal page loads. Validation (does this album really
+        // contain this gallery?) is deferred to Breadcrumb_Resolver.
+        $via_album_id = null;
+        if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
+            $candidate    = (int) $meta_overrides['via_album_id'];
+            $via_album_id = $candidate > 0 ? $candidate : null;
+        } elseif ( isset( $_GET['fg_via'] ) ) {
+            $candidate    = (int) wp_unslash( $_GET['fg_via'] );
+            $via_album_id = $candidate > 0 ? $candidate : null;
+        }
 
         [ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
 
@@ -74,7 +137,8 @@ final class Context_Builder {
             behavior: $this->build_behavior( $render_settings ),
             settings: $render_settings,
             items: [],
-            warnings: []
+            warnings: [],
+            via_album_id: $via_album_id,
         );
 
         $raw_ids       = array_map( 'absint', $collection_item_ids );
@@ -83,13 +147,64 @@ final class Context_Builder {
         $loaded_items = $this->load_items( $sorted_ids, $thumb_size, $full_size );
         $loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
 
+        // Server-side filtering. Runs BEFORE pagination so the page index
+        // is computed against the filtered set, not the raw item list.
+        //
+        // Filter sources implement matches() per item; we apply AND across
+        // sources and rely on each source's own OR-within semantics. An
+        // item must pass every source that has active values.
+        //
+        // Only applies when active_filters is non-empty (REST pagination
+        // requests with filter state) — initial shortcode renders never
+        // pass active_filters, so the client-side filter UI keeps full
+        // control of which items are visually shown on page 1.
+        if ( ! empty( $render_meta->active_filters ) && $render_meta->collection_kind === Collection_Kind::GALLERY ) {
+            // Rebuild context so filter sources see the sorted + loaded
+            // items (needed by their supports() checks).
+            $filter_context = new Render_Context(
+                meta:     $render_meta,
+                layout:   $sort_context->layout,
+                behavior: $sort_context->behavior,
+                settings: $render_settings,
+                items:    $loaded_items,
+                warnings: [],
+                via_album_id: $via_album_id,
+            );
+
+            $loaded_items = $this->apply_server_filters( $loaded_items, $render_meta->active_filters, $filter_context );
+        }
+
+        // Record the total BEFORE pagination slicing (but AFTER filtering)
+        // so chrome modules emit data-fg-page-total against the filtered set.
+        $total_item_count = count( $loaded_items );
+        $render_meta      = $render_meta->with( [ 'total_item_count' => $total_item_count ] );
+
+        // Pagination slicing. Runs after sorter selection (canonical order
+        // already established) and after caption resolution + filtering (so
+        // the slice contains fully-prepared Item_Views from the filtered set).
+        if ( ( $render_settings['pagination_type'] ?? 'show_all' ) === 'paginated'
+            && $render_meta->collection_kind === Collection_Kind::GALLERY
+        ) {
+            $per_page_override = $render_meta->requested_per_page;
+            $page_size         = $per_page_override !== null && $per_page_override > 0
+                ? $per_page_override
+                : Page_Size_Resolver::resolve_page_size( $render_settings, $sort_context );
+
+            if ( Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
+                $page         = max( 1, (int) ( $render_meta->requested_page ?? 1 ) );
+                $offset       = ( $page - 1 ) * $page_size;
+                $loaded_items = array_slice( $loaded_items, $offset, $page_size );
+            }
+        }
+
         return new Render_Context(
             meta: $render_meta,
             layout: $sort_context->layout,
             behavior: $sort_context->behavior,
             settings: $render_settings,
             items: $loaded_items,
-            warnings: []
+            warnings: [],
+            via_album_id: $via_album_id,
         );
     }
 
@@ -146,6 +261,68 @@ final class Context_Builder {
     }
 
     /**
+     * Creates a context for rendering an album as a collection.
+     *
+     * An album-as-collection renders one item per child gallery. Each
+     * Item_View is a gallery summary (featured-image-or-first-attachment
+     * thumbnail + gallery title as caption) supplied by Album_Item_Loader.
+     * The same Grid / Justified / Masonry layouts apply. Click-behaviour
+     * decorators specific to attachments (Lightbox, Direct_Link,
+     * External_Link) opt out via supports(); the album-specific click
+     * decorators (Album_To_View_Page, Album_To_Gallery_Ajax) opt in.
+     *
+     * No sorting: child galleries arrive in album-stored order. None of
+     * the existing sorters operate on gallery summaries; running them
+     * would be a no-op at best and misbehave at worst.
+     *
+     * @since   1.0.0
+     * @param   int                  $album_id            Album post identifier.
+     * @param   array<string, mixed> $render_settings     Resolved album settings.
+     * @param   array<int, mixed>    $child_gallery_ids   Child gallery post IDs in album-stored order.
+     * @param   Request_Source       $source              Request source.
+     * @return  Render_Context
+     */
+    public function build_for_album(
+        int $album_id,
+        array $render_settings = [],
+        array $child_gallery_ids = [],
+        Request_Source $source = Request_Source::SHORTCODE
+    ): Render_Context {
+        $render_meta = new Render_Meta(
+            // gallery_id is intentionally 0 — the render's primary identity
+            // is the album. instance_id_factory needs SOMETHING unique to
+            // build an instance ID off; we feed it the album_id so the IDs
+            // are stable per-album.
+            gallery_id:      0,
+            album_id:        $album_id,
+            instance_id:     $this->instance_id_factory->generate( $album_id ),
+            source:          $source,
+            is_preview:      false,
+            mode:            Render_Mode::INITIAL,
+            schema_version:  2,
+            collection_kind: Collection_Kind::ALBUM,
+        );
+
+        // Load gallery-summary items directly via Album_Item_Loader, bypassing
+        // the attachment-flavoured items_loader path entirely.
+        $loaded_items = Album_Item_Loader::load( $child_gallery_ids );
+        // Captions decorator picks up caption_title / caption_description
+        // from the Item_View. For albums we always pass the gallery title
+        // through as caption_title — call resolve_captions to handle the
+        // normal caption_hide_title / source resolution logic too.
+        $loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
+
+        return new Render_Context(
+            meta:     $render_meta,
+            layout:   $this->build_layout( $render_settings ),
+            behavior: $this->build_behavior( $render_settings ),
+            settings: $render_settings,
+            items:    $loaded_items,
+            warnings: []
+        );
+    }
+
+    /**
      * Returns a request-scoped builder instance for public renders.
      *
      * @since   1.0.0
@@ -169,6 +346,64 @@ final class Context_Builder {
      */
     public static function for_preview(): self {
         return self::for_public();
+    }
+
+    /**
+     * Applies server-side filters to the loaded items.
+     *
+     * For each filter source registered AND active for the context, if
+     * the source's REST arg key is present in $active_filters with a
+     * non-empty value list, every item is run through $source->matches().
+     * AND across sources (item must pass every source with active values).
+     *
+     * @since 1.0.0
+     * @param array<int, Item_View>           $items
+     * @param array<string, array<int,string>> $active_filters
+     * @param Render_Context                  $filter_context
+     * @return array<int, Item_View>
+     */
+    private function apply_server_filters( array $items, array $active_filters, Render_Context $filter_context ): array {
+        if ( empty( $items ) || empty( $active_filters ) ) {
+            return $items;
+        }
+
+        $sources = Module_Registry::active_modules( 'filter_sources', $filter_context );
+        if ( empty( $sources ) ) {
+            return $items;
+        }
+
+        // Resolve sources that have active values supplied.
+        $source_predicates = [];
+        foreach ( $sources as $source ) {
+            $arg_key = $source->filter_arg_key();
+            $values  = $active_filters[ $arg_key ] ?? null;
+            if ( ! is_array( $values ) || empty( $values ) ) {
+                continue;
+            }
+            $source_predicates[] = [ 'source' => $source, 'values' => array_values( array_map( 'strval', $values ) ) ];
+        }
+
+        if ( empty( $source_predicates ) ) {
+            return $items;
+        }
+
+        $filtered = [];
+        foreach ( $items as $item ) {
+            $passes = true;
+            foreach ( $source_predicates as $entry ) {
+                /** @var \FotoGrids\Render\Api\Filter_Source $source */
+                $source = $entry['source'];
+                if ( ! $source->matches( (int) $item->id, $entry['values'], $filter_context ) ) {
+                    $passes = false;
+                    break;
+                }
+            }
+            if ( $passes ) {
+                $filtered[] = $item;
+            }
+        }
+
+        return $filtered;
     }
 
     /**

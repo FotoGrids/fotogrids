@@ -42,7 +42,7 @@ const EXPORT_TYPES = [
     {
         key:         'settings',
         label:       __( 'Settings',   'fotogrids' ),
-        description: __( 'Plugin settings - overwrites the settings on this site.', 'fotogrids' ),
+        description: __( 'Plugin settings — overwrites the settings on this site.', 'fotogrids' ),
     },
     {
         key:         'statistics',
@@ -223,7 +223,7 @@ const ExportPanel = ( { onOperationStart, onOperationEnd } ) => {
 const FileSummary = ( { file, summary } ) => {
     const counts = summary?.contents ?? {};
     // Drive chips from EXPORT_TYPES order so hidden/unknown keys from the API
-    // are either labelled correctly or suppressed - never shown as raw key names.
+    // are either labelled correctly or suppressed — never shown as raw key names.
     const chips = EXPORT_TYPES
         .filter( ( { key } ) => counts[ key ] > 0 );
 
@@ -451,7 +451,6 @@ const ImportPanel = ( { onOperationStart, onOperationEnd } ) => {
                     ) }
 
                     <DangerZone
-                        // icon="restore"
                         title={ __( 'Ready to import', 'fotogrids' ) }
                         description={ __(
                             'We recommend taking a database backup before importing. This action cannot be undone.',

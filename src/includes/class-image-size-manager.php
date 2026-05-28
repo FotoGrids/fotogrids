@@ -32,6 +32,8 @@ final class Image_Size_Manager {
     public const SLUG_THUMBNAIL       = 'fotogrids_thumbnail';
     public const SLUG_FULL            = 'fotogrids_full';
     public const SLUG_FULL_MOBILE     = 'fotogrids_full_mobile';  // hidden companion
+    public const SLUG_MASONRY         = 'fotogrids_masonry';      // fixed width, variable height
+    public const SLUG_JUSTIFIED       = 'fotogrids_justified';    // fixed height, variable width
     public const CUSTOM_SLUG_PREFIX   = 'fotogrids_custom_';
 
     // Option keys
@@ -50,6 +52,8 @@ final class Image_Size_Manager {
     private const DEFAULT_FULL_WIDTH          = 1920;
     private const DEFAULT_FULL_HEIGHT         = 0;   // 0 = proportional
     private const DEFAULT_FULL_CROP           = false;
+    private const DEFAULT_MASONRY_WIDTH       = 600; // height auto (variable)
+    private const DEFAULT_JUSTIFIED_HEIGHT    = 400; // width  auto (variable)
 
     /**
      * Wire up the WordPress hooks.
@@ -105,6 +109,22 @@ final class Image_Size_Manager {
             $mobile_width,
             0,     // proportional height
             false
+        );
+
+        // fotogrids_masonry - fixed width, variable height (used by the Masonry layout)
+        add_image_size(
+            self::SLUG_MASONRY,
+            max( 1, (int) $settings['masonry_width'] ),
+            0,     // 0 = proportional height (variable)
+            false  // never cropped - the layout decides
+        );
+
+        // fotogrids_justified - fixed height, variable width (used by the Justified layout)
+        add_image_size(
+            self::SLUG_JUSTIFIED,
+            0,     // 0 = proportional width (variable)
+            max( 1, (int) $settings['justified_height'] ),
+            false  // never cropped - the layout decides
         );
 
         // Re-register any gallery-custom sizes from the persistent registry
@@ -363,6 +383,8 @@ final class Image_Size_Manager {
      *     full_width: int,
      *     full_height: int,
      *     full_crop: bool,
+     *     masonry_width: int,
+     *     justified_height: int,
      * }
      */
     public static function get_plugin_size_settings(): array {
@@ -394,6 +416,8 @@ final class Image_Size_Manager {
             'full_width'          => max( 1, (int) ( $raw['full_width']          ?? self::DEFAULT_FULL_WIDTH ) ),
             'full_height'         => max( 0, (int) ( $raw['full_height']         ?? self::DEFAULT_FULL_HEIGHT ) ),
             'full_crop'           => false,  // full size is never cropped; ignore input
+            'masonry_width'       => max( 1, (int) ( $raw['masonry_width']       ?? self::DEFAULT_MASONRY_WIDTH ) ),
+            'justified_height'    => max( 1, (int) ( $raw['justified_height']    ?? self::DEFAULT_JUSTIFIED_HEIGHT ) ),
         ];
 
         update_option( self::OPT_PLUGIN_SIZES, $settings, false );
@@ -420,6 +444,8 @@ final class Image_Size_Manager {
             'full_width'          => self::DEFAULT_FULL_WIDTH,
             'full_height'         => self::DEFAULT_FULL_HEIGHT,
             'full_crop'           => self::DEFAULT_FULL_CROP,
+            'masonry_width'       => self::DEFAULT_MASONRY_WIDTH,
+            'justified_height'    => self::DEFAULT_JUSTIFIED_HEIGHT,
         ];
     }
 

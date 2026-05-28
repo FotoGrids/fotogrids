@@ -155,6 +155,7 @@ export const fetchDashboardStats = () => {
             albums: 0,
             items: 0,
             views: 0,
+            shares: 0,
             shortcodes_used: false
         });
     }
@@ -170,6 +171,7 @@ export const fetchDashboardStats = () => {
             albums: 0,
             items: 0,
             views: 0,
+            shares: 0,
             shortcodes_used: false
         };
     });

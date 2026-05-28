@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Filters\Decorators\Tags;
 
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Module_Assets;
@@ -53,6 +54,11 @@ final class Tags_Filter_Decorator implements Decorator {
      * @since  1.0.0
      */
     public function supports( Render_Context $render_context ): bool {
+        // Albums filter galleries, not attachments — tag metadata
+        // doesn't apply.
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
         if ( ! ( $render_context->settings['filtering_enabled'] ?? false ) ) {
             return false;
         }

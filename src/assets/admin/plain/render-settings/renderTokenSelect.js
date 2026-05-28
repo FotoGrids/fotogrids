@@ -9,6 +9,7 @@ const TokenSelectComponent = ({
     getOptionState,
     renderIcon,
     isDefaultsMode,
+    isOptionVisible,
     __
 }) => {
     const {
@@ -46,10 +47,19 @@ const TokenSelectComponent = ({
 
     const serializeValue = (arr) => JSON.stringify(arr);
 
-    // Options - filter isGlobalDefault in defaults mode (same as button_group)
-    const allOptions = isDefaultsMode
+    // Options - filter isGlobalDefault in defaults mode (same as button_group),
+    // then drop any option whose per-option `condition` evaluates false against
+    // the current settings. Per-option conditions let us hide dropdown choices
+    // that only make sense when another setting is on (e.g. an "Embedded"
+    // placement that requires AJAX navigation to be on).
+    const baseOptions = isDefaultsMode
         ? (setting.options || []).filter((o) => !o.isGlobalDefault)
         : (setting.options || []);
+    const allOptions = baseOptions.filter((option) => {
+        if (!option || !option.condition) return true;
+        if (typeof isOptionVisible !== 'function') return true;
+        return isOptionVisible(option);
+    });
 
     const sortable = setting.sortable === true;
     const keepOpen = setting.keep_open === true;
@@ -72,6 +82,19 @@ const TokenSelectComponent = ({
     useEffect(() => {
         setSelectedValues(parseValue(currentValue));
     }, [currentValue]);
+
+    // When a per-option condition turns an option off, drop any stale selected
+    // value referencing it. Without this, the user would still see (and could
+    // not remove without re-enabling the gating setting) a chip whose option
+    // is no longer in the dropdown.
+    useEffect(() => {
+        const visibleValues = new Set(allOptions.map((o) => o.value));
+        const pruned = selectedValues.filter((v) => visibleValues.has(v));
+        if (pruned.length !== selectedValues.length) {
+            setSelectedValues(pruned);
+            updateSetting(setting.key, serializeValue(pruned));
+        }
+    }, [allOptions.map((o) => o.value).join('|')]);
 
     // ---------------------------------------------------------------------------
     // Field / option state (Pro gating)

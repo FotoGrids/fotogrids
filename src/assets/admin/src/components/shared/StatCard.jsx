@@ -8,36 +8,48 @@
  *   value    - The primary numeric/text value to display
  *   label    - Card label text
  *   accent   - 'blue' | 'red' | 'yellow' | 'grey' (default 'blue')
+ *   invert   - bool; adds inverted visual style when true
  *   loading  - bool; shows skeleton when true
- *   href     - optional link URL (wraps value in an anchor)
+ *   href     - optional link URL (wraps the whole card in an anchor)
  */
 import React from 'react';
+import Icon from './Icon';
 
-const StatCard = ( { icon, value, label, accent = 'blue', loading = false, href } ) => {
-    const cls = `fg-stat-card fg-stat-card--${accent}`;
+const StatCard = ( { icon, iconName, value, label, accent = 'blue', invert = false, loading = false, href } ) => {
+    const baseClass = 'fg-stat-card';
+    const wrapperClass = [
+        baseClass,
+        `${baseClass}--${accent}`,
+        invert && `${baseClass}--invert`,
+    ].filter( Boolean ).join( ' ' );
+
+    const isLink = !! href && ! loading;
+    const Tag = isLink ? 'a' : 'div';
+    const wrapperProps = isLink ? { href } : {};
 
     const valueNode = loading ? (
-        <span className="fg-stat-card__skeleton" aria-hidden="true" />
-    ) : href ? (
-        <a className="fg-stat-card__value" href={ href }>{ value }</a>
+        <span className={`${baseClass}__skeleton`} aria-hidden="true" />
     ) : (
-        <span className="fg-stat-card__value">{ value }</span>
+        <span className={`${baseClass}__value`}>{ value }</span>
     );
 
     return (
-        <div className={ cls }>
-            { icon && (
+        <Tag className={ wrapperClass } { ...wrapperProps }>
+            { iconName && (
+                <Icon name={ iconName } className={`${baseClass}__icon`} />
+            ) }
+            { ! iconName && icon && (
                 <div
-                    className="fg-stat-card__icon"
+                    className={`${baseClass}__icon`}
                     dangerouslySetInnerHTML={ { __html: icon } }
                     aria-hidden="true"
                 />
             ) }
-            <div className="fg-stat-card__body">
+            <div className={`${baseClass}__body`}>
                 { valueNode }
-                <div className="fg-stat-card__label">{ label }</div>
+                <div className={`${baseClass}__label`}>{ label }</div>
             </div>
-        </div>
+        </Tag>
     );
 };
 

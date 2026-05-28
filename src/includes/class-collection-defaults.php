@@ -51,6 +51,16 @@ class Collection_Defaults {
                 'tablet' => 8,
                 'mobile' => 5
             ),
+            'margin' => array(
+                'desktop' => 0,
+                'tablet' => 0,
+                'mobile' => 0
+            ),
+            'padding' => array(
+                'desktop' => 0,
+                'tablet' => 0,
+                'mobile' => 0
+            ),
             'hover_effects' => false,
             'hover_effect' => 'none',
             'loading_icon' => '12-dots',
@@ -141,7 +151,7 @@ class Collection_Defaults {
             'full_image_filter_hover_amount_hue_rotate'=> array( 'desktop' => 0,   'tablet' => 0,   'mobile' => 0   ),
             'animation_speed' => 300,
             'filter_buttons' => false,
-            'pagination_type' => 'show_all',
+            'pagination_type' => 'paginated',
             'pagination_method' => 'load_more',
             'default_sort_order' => 'manual',
             'date_sort_type' => 'date_created',
@@ -213,17 +223,13 @@ class Collection_Defaults {
             'load_more_button_text' => 'Load More',
             'load_more_button_alignment' => 'center',
             'load_more_button_full_width' => false,
-            'pagination_alignment' => 'center',
+            'pagination_alignment' => 'stretch',
             'pages_show_prev_next' => true,
             'pages_prev_text' => 'Previous',
             'pages_next_text' => 'Next',
-            'pages_button_icon' => 'chevron_left',
+            'pages_button_icon' => 'chevron',
             'pages_show_numbers' => true,
-            'pages_max_visible' => array(
-                'desktop' => 7,
-                'tablet' => 5,
-                'mobile' => 3
-            ),
+            'pages_truncate' => true,
             'item_click_behavior' => 'lightbox',
             'external_link_target' => '_self',
             'lightbox_img_shadow_enabled'             => false,
@@ -310,25 +316,26 @@ class Collection_Defaults {
                 'mobile' => 8
             ),
             'caption_alignment' => array( 'left' ),
+            'caption_vertical_alignment' => 'bottom',
             'caption_hide_title' => false,
             'caption_title_source' => array( 'item_title' ),
             'caption_title_font_family' => 'default',
             'caption_title_font_weight' => 'default',
             'caption_title_font_size' => array(
-                'desktop' => 18,
-                'tablet' => 16,
+                'desktop' => 16,
+                'tablet' => 15,
                 'mobile' => 14
             ),
-            'caption_title_color' => '#000000',
+            'caption_title_color' => 'rgba(255, 255, 255, 1)',
             'caption_hide_description' => false,
             'caption_description_source' => array( 'item_caption' ),
             'caption_description_font_size' => array(
-                'desktop' => 14,
-                'tablet' => 12,
-                'mobile' => 12
+                'desktop' => 12,
+                'tablet' => 11,
+                'mobile' => 10
             ),
-            'caption_description_color' => '#aaaaaa',
-            'caption_limit_title_length' => 'no',
+            'caption_description_color' => 'rgba(255, 255, 255, 0.7)',
+            'caption_limit_title_length' => 'lines',
             'caption_max_title_characters' => array(
                 'desktop' => 200,
                 'tablet' => 200,
@@ -339,7 +346,7 @@ class Collection_Defaults {
                 'tablet' => 1,
                 'mobile' => 1
             ),
-            'caption_limit_description_length' => 'no',
+            'caption_limit_description_length' => 'lines',
             'caption_max_desc_characters' => array(
                 'desktop' => 200,
                 'tablet' => 200,
@@ -350,6 +357,11 @@ class Collection_Defaults {
                 'tablet' => 2,
                 'mobile' => 2
             ),
+            'caption_overlay_color' => 'rgba(0, 0, 0, 0.3)',
+            // Stored on a 0-100 scale (matches the % range control). Frontend
+            // divides by 100 before applying as a CSS opacity value.
+            'caption_overlay_opacity' => 100,
+            'caption_overlay_hover_opacity' => 50,
             'who_can_edit' => 'all',
             'who_can_view' => 'all',
             'thumbnail_size' => 'fotogrids_thumbnail',
@@ -396,6 +408,18 @@ class Collection_Defaults {
             'sharing_networks_override' => array( 'facebook', 'x', 'pinterest', 'email', 'copy_link' ),
             'sharing_placements_override' => array( 'view_page', 'lightbox' ),
             'sharing_custom_text_override' => '',
+            // SEO per-collection overrides (paired with the plugin-wide SEO
+            // store in `SEO_Settings_Store`). All optional - empty / falsy
+            // values fall through to the resolver's layered fallback chain
+            // (post excerpt → post content → count summary for the
+            // description; Featured Item/Gallery → custom → site-wide
+            // default for the image; permalink for the canonical).
+            'fotogrids_og_title'           => '',
+            'fotogrids_og_description'     => '',
+            'fotogrids_og_image_source'    => 'featured',
+            'fotogrids_og_image_custom_id' => 0,
+            'fotogrids_noindex'            => false,
+            'fotogrids_canonical_override' => '',
             'enable_cache' => true,
             'cache_duration' => 24,
             'hover_cursor_icon' => 'pointer',
@@ -403,6 +427,13 @@ class Collection_Defaults {
             'enable_statistics' => true,
             'retain_statistics' => 'forever',
             'use_ajax_from_album' => true,
+            'navigation_show_breadcrumbs' => false,
+            'navigation_breadcrumbs_placements' => array( 'view_pages', 'embedded' ),
+            'navigation_show_breadcrumbs_on_direct_visit' => false,
+            'navigation_emit_breadcrumb_schema' => true,
+            'navigation_breadcrumb_source' => 'fotogrids',
+            'navigation_show_back_button' => true,
+            'navigation_back_button_show_album_name' => true,
             'display_exif' => false,
             'exif_camera' => true,
             'exif_aperture' => true,

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Decorators\Sharing;
 
+use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Module_Assets;
@@ -44,11 +46,20 @@ final class Sharing_Decorator implements Decorator {
     /**
      * Active when sharing resolves to enabled for this collection.
      *
+     * Opts out of album-as-collection renders. The item-level share
+     * placements (thumbnail, lightbox) don't apply to album thumbnails
+     * (which navigate into a gallery, not into a lightbox), and the
+     * view_footer placement is rendered by the View Page shell — not by
+     * the gallery wrapper inside it.
+     *
      * @since 1.0.0
      * @param Render_Context $render_context Render context.
      * @return bool
      */
     public function supports( Render_Context $render_context ): bool {
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
         $resolved = fotogrids_get_resolved_sharing( $render_context->meta->gallery_id );
         return ! empty( $resolved['enabled'] );
     }
@@ -90,7 +101,52 @@ final class Sharing_Decorator implements Decorator {
         return array();
     }
 
+    /**
+     * Sharing's own JS and CSS. Both ship from the module folder via the
+     * webpack entries `sharing` (JS, copied to assets/js) and the inline
+     * CSS file (copied verbatim by CopyWebpackPlugin's public/render/**
+     * rule).
+     *
+     * @since 1.0.0
+     * @param Render_Context $render_context Render context.
+     * @return Module_Assets
+     */
     public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
+        return new Module_Assets(
+            css: [
+                // fg-tooltip first so its handle is registered before any
+                // module that depends on it (sharing's share-bar buttons
+                // bind tooltips via window.FgTooltip).
+                'fotogrids-fg-tooltip' => new Asset_Decl(
+                    path:      '../../assets/css/fg-tooltip.css',
+                    in_footer: false,
+                ),
+                'fotogrids-sharing' => new Asset_Decl(
+                    path:      'decorators/sharing/sharing.css',
+                    in_footer: false,
+                ),
+            ],
+            js: [
+                'fotogrids-fg-tooltip' => new Asset_Decl(
+                    path:      '../../assets/js/fg-tooltip.js',
+                    deps:      [],
+                    in_footer: true,
+                ),
+                // deep-linking only makes sense when sharing is active —
+                // it interprets ?fg-item / #fg-<g>-<i> URLs that come
+                // from shared links. The View Page enqueues it directly
+                // because those URLs arrive there even with sharing off.
+                'fotogrids-deep-linking' => new Asset_Decl(
+                    path:      '../../assets/js/deep-linking.js',
+                    deps:      [ 'fotogrids-runtime' ],
+                    in_footer: true,
+                ),
+                'fotogrids-sharing' => new Asset_Decl(
+                    path:      '../../assets/js/sharing.js',
+                    deps:      [ 'fotogrids-runtime', 'fotogrids-fg-tooltip' ],
+                    in_footer: true,
+                ),
+            ],
+        );
     }
 }

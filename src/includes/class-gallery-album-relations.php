@@ -184,7 +184,7 @@ class Gallery_Album_Relations {
             foreach ( $galleries as $gallery ) {
                 $gallery->item_count = self::get_gallery_item_count( $gallery->ID );
                 $gallery->layout = get_post_meta( $gallery->ID, 'fotogrids_layout', true ) ?: 'grid';
-                $gallery->featured_item = get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' );
+                $gallery->featured_item = fotogrids_get_collection_cover_url( $gallery->ID, 'thumbnail' );
                 $gallery->sample_items = self::get_gallery_sample_items( $gallery->ID, 4 );
                 $gallery->permalink = get_permalink( $gallery->ID );
                 $status_obj = get_post_status_object( $gallery->post_status );
@@ -242,7 +242,7 @@ class Gallery_Album_Relations {
         if ( $args['include_meta'] && ! empty( $albums ) ) {
             foreach ( $albums as $album ) {
                 $album->gallery_count = self::get_album_gallery_count( $album->ID );
-                $album->featured_item = get_the_post_thumbnail_url( $album->ID, 'thumbnail' );
+                $album->featured_item = fotogrids_get_collection_cover_url( $album->ID, 'thumbnail' );
                 $status_obj = get_post_status_object( $album->post_status );
                 $album->status_display = $status_obj ? $status_obj->label : $album->post_status;
             }
@@ -322,7 +322,7 @@ class Gallery_Album_Relations {
                 'status' => $album->post_status,
                 'status_display' => $status_obj ? $status_obj->label : $album->post_status,
                 'gallery_count' => self::get_album_gallery_count( $album->ID ),
-                'featured_item' => get_the_post_thumbnail_url( $album->ID, 'thumbnail' ),
+                'featured_item' => fotogrids_get_collection_cover_url( $album->ID, 'thumbnail' ),
             );
         }
 
@@ -358,7 +358,7 @@ class Gallery_Album_Relations {
                 'status_display' => $status_obj ? $status_obj->label : $gallery->post_status,
                 'item_count' => self::get_gallery_item_count( $gallery->ID ),
                 'layout' => get_post_meta( $gallery->ID, 'fotogrids_layout', true ) ?: 'grid',
-                'featured_item' => get_the_post_thumbnail_url( $gallery->ID, 'thumbnail' ),
+                'featured_item' => fotogrids_get_collection_cover_url( $gallery->ID, 'thumbnail' ),
                 'sample_items' => self::get_gallery_sample_items( $gallery->ID, 4 ),
                 'permalink' => get_permalink( $gallery->ID ),
             );

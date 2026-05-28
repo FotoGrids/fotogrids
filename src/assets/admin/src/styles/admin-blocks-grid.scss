@@ -241,6 +241,9 @@
         &.fg-abc-uploader {
             .fotogrids-admin-block-card-content {
                 padding: 6px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
             }
         }
 

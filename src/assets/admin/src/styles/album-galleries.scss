@@ -51,7 +51,7 @@
     }
 
     .fotogrids-gallery-search {
-        margin-bottom: 16px;
+        margin-bottom: 20px;
 
         .fotogrids-search-input {
             width: 100%;
@@ -138,6 +138,14 @@
 
     &--available:hover &__content {
         background-color: #f0fff0;
+    }
+
+    &--featured &__content {
+        background-color: var(--fg-background-warning);
+    }
+
+    &--featured:hover &__content {
+        background-color: var(--fg-background-warning-hover);
     }
 
     .fotogrids-gallery-drag {
@@ -324,20 +332,32 @@
         gap: 4px;
 
         .fotogrids-view-button,
-        .fotogrids-edit-button {
+        .fotogrids-edit-button,
+        .fotogrids-featured-button {
             opacity: 0;
+        }
+
+        .fotogrids-featured-button.is-featured {
+            background: var(--fg-yellow);
+            border-color: var(--fg-yellow);
+            color: var(--fg-text-inverse);
+
+            svg path {
+                stroke: 0;
+                fill: currentColor;
+            }
         }
     }
 
     &:hover .fotogrids-gallery-actions {
         .fotogrids-view-button,
-        .fotogrids-edit-button {
+        .fotogrids-edit-button,
+        .fotogrids-featured-button {
             opacity: 1;
         }
     }
 }
 
-// Drag and drop states
 .fotogrids-gallery-item {
     &[draggable="true"] {
         cursor: move;

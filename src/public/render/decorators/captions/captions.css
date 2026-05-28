@@ -1,17 +1,22 @@
+.fotogrids-gallery,
+.fotogrids-album {
+    --fg-caption-overlay-padding: 1rem;
+}
+
 .fotogrids-gallery .fg-item,
 .fotogrids-album .fg-item {
-    gap: var(--fg-caption-gap, 0);
+    gap: var(--fg-caption-gap);
 }
 
 .fotogrids-gallery .fg-item-media,
 .fotogrids-album .fg-item-media {
-    align-self: var(--fg-caption-media-align, stretch);
+    align-self: var(--fg-caption-media-align);
 }
 
 .fotogrids-gallery .fg-caption,
 .fotogrids-album .fg-caption {
     margin: 0;
-    text-align: var(--fg-caption-align, start);
+    text-align: var(--fg-caption-align);
 }
 
 .fotogrids-gallery[data-fg-caption="top"] .fg-caption,
@@ -19,16 +24,29 @@
     order: -1;
 }
 
+/* Overlay placement: the caption box fills the whole item so the tinted
+   background acts as a hover-darkening layer across the entire thumbnail.
+   Vertical anchoring of the text inside that box is controlled by
+   --fg-caption-overlay-align (top / middle / bottom). Horizontal alignment
+   continues to come from --fg-caption-align via text-align. */
 .fotogrids-gallery[data-fg-caption="overlay"] .fg-caption,
 .fotogrids-album[data-fg-caption="overlay"] .fg-caption {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 0.5rem 0.75rem;
-    color: #fff;
-    background: linear-gradient(to top, rgb(0 0 0 / 70%), rgb(0 0 0 / 0%));
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: var(--fg-caption-overlay-align);
+    box-sizing: border-box;
+    padding: var(--fg-caption-overlay-padding);
+    color: var(--fg-caption-title-color);
+    background: var(--fg-caption-overlay-bg);
+    transition: background-color 220ms ease;
     pointer-events: none;
+}
+
+.fotogrids-gallery[data-fg-caption="overlay"] .fg-item:hover .fg-caption,
+.fotogrids-album[data-fg-caption="overlay"] .fg-item:hover .fg-caption {
+    background: var(--fg-caption-overlay-bg-hover, var(--fg-caption-overlay-bg, rgba(0, 0, 0, 0.5)));
 }
 
 .fotogrids-gallery .fg-caption-title,
@@ -56,7 +74,7 @@
     .fotogrids-album .fg-caption-title {
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: var(--fg-caption-title-lines, none);
+        -webkit-line-clamp: var(--fg-caption-title-lines);
         overflow: hidden;
     }
 
@@ -64,7 +82,7 @@
     .fotogrids-album .fg-caption-description {
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: var(--fg-caption-desc-lines, none);
+        -webkit-line-clamp: var(--fg-caption-desc-lines);
         overflow: hidden;
     }
 }

@@ -276,6 +276,10 @@
         padding-bottom: 0;
     }
 
+    &--larger-labels {
+        grid-template-columns: 240px minmax(0, 1fr);
+    }
+
     &--full {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -302,6 +306,8 @@
 
         code {
             font-size: inherit;
+            margin: 0;
+            padding: 1px 3px;
         }
     }
 

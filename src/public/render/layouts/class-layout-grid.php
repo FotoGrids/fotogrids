@@ -52,7 +52,9 @@ final class Layout_Grid implements Layout {
             $items_html .= $item_renderer->render( $item_view, $render_context );
         }
 
-        return '<div class="fg-grid-track">' . $items_html . '</div>';
+        // data-fg-items-root marks this element as the container that
+        // pagination-core.js can append/replace items inside.
+        return '<div class="fg-grid-track" data-fg-items-root="true">' . $items_html . '</div>';
     }
 
     public function structural_classes( Render_Context $render_context ): array {

@@ -25,7 +25,7 @@ const TabTags = ({
             strings={strings}
             metadataKey="tags"
             placeholder={strings.addTagsPlaceholder || ''}
-            icon={window.FotoGridsIcons?.tag || ''}
+            iconName="tag"
             itemClassName="fotogrids-metadata-item fotogrids-tag"
         />
     );

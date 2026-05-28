@@ -3,9 +3,8 @@
    ========================================================================== */
 
 :root {
-    /* Brand blue - active/selected states across all frontend surfaces
-       (lightbox active dots, thumbnail borders, focus rings, etc.) */
-    --fg-colors-blue: rgba(60, 70, 240, 1);
+    --fg-colors-blue:  rgba(60, 70, 240, 1);
+    --fg-colors-white: rgba(255, 255, 255, 1);
 }
 
 .fotogrids-gallery .fg-item,
@@ -25,7 +24,7 @@
 
 .fotogrids-gallery .fg-item:focus-visible,
 .fotogrids-album .fg-item:focus-visible {
-    outline: 2px solid #007cba;
+    outline: 2px solid var(--fg-colors-blue);
     outline-offset: 2px;
 }
 
@@ -68,9 +67,19 @@
 /* Border - only painted when the decorator is active. */
 .fotogrids-gallery[data-fg-border] .fg-item-media,
 .fotogrids-album[data-fg-border] .fg-item-media {
-    border-width: var(--fg-border-w, 1px);
-    border-color: var(--fg-border-color, #000);
-    border-style: var(--fg-border-style, solid);
+    border-width: var(--fg-border-w);
+    border-color: var(--fg-border-color);
+    border-style: var(--fg-border-style);
+}
+
+/* Wrapper margin/padding - only applied when the Spacing decorator is active,
+   so a gallery with no configured spacing doesn't override a theme's defaults.
+   Each variable is set independently, so unconfigured sides fall back to 0. */
+.fotogrids-gallery[data-fg-spacing],
+.fotogrids-album[data-fg-spacing] {
+    margin: var(--fg-margin, 0);
+    padding: var(--fg-padding, 0);
+    box-sizing: border-box;
 }
 
 /* Thumbnail image filters - only applied when the decorator is active. */

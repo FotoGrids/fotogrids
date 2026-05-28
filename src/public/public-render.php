@@ -18,6 +18,41 @@ if ( ! defined( 'WPINC' ) ) {
 class Public_Render {
 
     /**
+     * Thread-local flag: when true, every gallery/album shortcode call made
+     * during this request lands in Render_Meta with `view_page=true`.
+     * Set by ViewCollections\Renderer::gallery_html() around its call to
+     * gallery_shortcode() / album_shortcode() so the Collection_Header
+     * feature can gate its "view_pages" placement.
+     *
+     * @var bool
+     * @since 1.0.0
+     */
+    private static bool $view_page_context = false;
+
+    /**
+     * Toggle the view-page context flag. ViewCollections wraps its
+     * shortcode call in `set_view_page_context(true)` … `set_view_page_context(false)`
+     * so a single page render can have view-page chrome on the gallery and
+     * still rely on plain `gallery_shortcode()` for normal embeds (which
+     * stay context-free).
+     *
+     * @since 1.0.0
+     * @param bool $is_view_page
+     * @return void
+     */
+    public static function set_view_page_context( bool $is_view_page ): void {
+        self::$view_page_context = $is_view_page;
+    }
+
+    /**
+     * @since 1.0.0
+     * @return bool
+     */
+    public static function is_view_page_context(): bool {
+        return self::$view_page_context;
+    }
+
+    /**
      * Initialize the public rendering
      */
     public static function init() {
@@ -87,7 +122,7 @@ class Public_Render {
      * @param array $atts Shortcode attributes.
      * @return string
      */
-    private static function render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source = Request_Source::SHORTCODE, $is_preview = false ) {
+    private static function render_gallery_with_pipeline( $gallery_id, $settings, $item_ids, $atts, $source = Request_Source::SHORTCODE, $is_preview = false, $meta_overrides = array() ) {
         if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
             return '';
         }
@@ -131,17 +166,81 @@ class Public_Render {
             );
         } else {
             $render_settings = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
+            $effective_meta_overrides = is_array( $meta_overrides ) ? $meta_overrides : array();
+            // Promote the request-scoped view-page flag into the per-render
+            // meta overrides so downstream features (Collection_Header) can
+            // gate behaviour on it. Caller-supplied overrides win.
+            if ( self::is_view_page_context() && ! array_key_exists( 'view_page', $effective_meta_overrides ) ) {
+                $effective_meta_overrides['view_page'] = true;
+            }
             $render_context = $context_builder->build_for_public(
                 gallery_id: (int) $gallery_id,
                 render_settings: $render_settings,
                 collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
                 source: $source instanceof Request_Source ? $source : Request_Source::SHORTCODE,
-                album_id: absint( $atts['album_id'] ?? 0 ) ?: null
+                album_id: absint( $atts['album_id'] ?? 0 ) ?: null,
+                meta_overrides: $effective_meta_overrides
             );
         }
 
         $render_result = Render_Controller::factory()->render( $render_context );
         return (string) $render_result->html;
+    }
+
+    /**
+     * REST entry point for rendering a gallery with pagination + partial
+     * options.
+     *
+     * Used by the /fotogrids/v1/gallery/render REST endpoint. Unlike the
+     * shortcode path, this bypasses caching (per-(gallery, page, breakpoint)
+     * cache keys are a v2 concern — see PLAN.md §8.5) and never re-enters
+     * the shortcode atts parser. Returns the raw rendered HTML — the REST
+     * handler still owns the CSS-handle map and the pagination metadata
+     * envelope.
+     *
+     * @since 1.0.0
+     * @param int                  $gallery_id     Gallery ID.
+     * @param array<string, mixed> $meta_overrides Optional Render_Meta overrides:
+     *                                             requested_page, requested_per_page,
+     *                                             breakpoint, partial.
+     * @param Request_Source       $source         Request source (defaults to ALBUM_AJAX
+     *                                             because the existing /gallery/render
+     *                                             callers use it that way; the REST handler
+     *                                             can override).
+     * @return string Rendered HTML (or empty string when the gallery cannot be rendered).
+     */
+    public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), Request_Source $source = Request_Source::ALBUM_AJAX ): string {
+        $gallery = fotogrids_get_gallery( $gallery_id );
+        if ( ! $gallery || $gallery->post_status !== 'publish' ) {
+            return '';
+        }
+
+        $settings = self::get_gallery_settings( $gallery_id );
+        $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
+        if ( empty( $item_ids ) ) {
+            return '';
+        }
+
+        // Synthetic atts mirroring what the shortcode produces — the
+        // pipeline reads a small subset and the rest are inert.
+        $atts = array(
+            'id'       => $gallery_id,
+            'album_id' => 0,
+            'template' => '',
+            'cols'     => 0,
+            'captions' => 'true',
+            'lightbox' => 'true',
+        );
+
+        return (string) self::render_gallery_with_pipeline(
+            $gallery_id,
+            $settings,
+            $item_ids,
+            $atts,
+            $source,
+            false,
+            $meta_overrides
+        );
     }
 
     /**
@@ -252,14 +351,22 @@ class Public_Render {
     }
 
     /**
-     * Album shortcode handler
+     * Album shortcode handler.
      *
-     * @param array $atts Shortcode attributes
-     * @return string Rendered album HTML
+     * Albums render through the same Render_Controller pipeline as
+     * galleries, with collection_kind = ALBUM. Each "item" in the render
+     * context is a child gallery summary (Album_Item_Loader). The same
+     * Grid / Justified / Masonry layouts and the visual decorators
+     * (Captions, Border, Shadow, Hover_Effects, Image_Filters) apply
+     * uniformly. Click behaviour is supplied by Album_To_View_Page or
+     * Album_To_Gallery_Ajax depending on the use_ajax_from_album setting.
+     *
+     * @param array $atts Shortcode attributes.
+     * @return string Rendered album HTML.
      */
     public static function album_shortcode( $atts ) {
         $atts = shortcode_atts( array(
-            'id' => 0,
+            'id'       => 0,
             'template' => 'grid',
         ), $atts, 'fotogrids_album' );
 
@@ -273,78 +380,112 @@ class Public_Render {
             return '';
         }
 
-        $galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id, array(
+        $child_galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id, array(
             'orderby' => 'position',
-            'order' => 'ASC',
-            'include_meta' => true,
+            'order'   => 'ASC',
         ) );
 
-        if ( empty( $galleries ) ) {
+        if ( empty( $child_galleries ) ) {
             return '';
         }
 
-        return self::render_album( $album_id, $galleries, $atts );
+        // Reduce to bare IDs in album-stored order.
+        $child_gallery_ids = array_values( array_filter( array_map(
+            static fn ( $gallery_post ) => (int) ( is_object( $gallery_post ) ? $gallery_post->ID : 0 ),
+            $child_galleries
+        ) ) );
+
+        if ( empty( $child_gallery_ids ) ) {
+            return '';
+        }
+
+        if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
+            return '';
+        }
+
+        $album_settings = fotogrids_get_album_settings( $album_id );
+
+        // Allow the shortcode's `template` attribute to override the
+        // layout (e.g. [fotogrids_album id=42 template=masonry]).
+        if ( ! empty( $atts['template'] ) && is_string( $atts['template'] ) ) {
+            $album_settings['layout'] = $atts['template'];
+        }
+
+        $context = Context_Builder::for_public()->build_for_album(
+            album_id:          $album_id,
+            render_settings:   $album_settings,
+            child_gallery_ids: $child_gallery_ids,
+        );
+
+        $result = Render_Controller::factory()->render( $context );
+
+        return $result->html;
     }
 
     /**
-     * Enqueue frontend scripts and styles
+     * Enqueue frontend scripts and styles.
+     *
+     * After the frontend refactor, almost everything reaches the page via
+     * the render pipeline (Asset_Resolver). The only assets enqueued here
+     * are:
+     *
+     *   • fg-tooltip JS/CSS — still globally enqueued because multiple
+     *     modules (sharing, filter UI, lightbox) bind tooltips and
+     *     fg-tooltip is not yet wrapped as a render module dependency.
+     *     Task 15 of the refactor will move this.
+     *   • fotogrids-errors.css — tiny always-on stylesheet for the
+     *     `.fotogrids-error` block. Lives outside the render pipeline
+     *     because error markup can be emitted before any layout module
+     *     runs (e.g. "gallery not found"), so collection-base.css is
+     *     never enqueued for those paths.
+     *
+     * The window.fotogrids localize payload is pre-registered against the
+     * `fotogrids-runtime` handle here, even though the runtime asset
+     * itself is enqueued by Asset_Resolver from Runtime_Bootstrap during
+     * the render. wp_register_script() at this stage means the localize
+     * data is associated with the handle so it prints when the script is
+     * enqueued later in wp_footer.
      */
     public static function enqueue_frontend_scripts() {
-        // Only enqueue if we have FotoGrids content on the page
         if ( ! self::has_fotogrids_content() ) {
             return;
         }
 
-        wp_enqueue_script(
-            'fotogrids-frontend',
-            FOTOGRIDS_PLUGIN_URL . 'assets/js/frontend.js',
+        // Pre-register the runtime handle so wp_localize_script can attach
+        // its payload. Asset_Resolver will later call wp_register_script
+        // for the same handle; WordPress treats a duplicate registration
+        // as a no-op, so this is safe.
+        wp_register_script(
+            'fotogrids-runtime',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/fotogrids-runtime.js',
             array(),
             FOTOGRIDS_VERSION,
             true
         );
 
-        wp_enqueue_script(
-            'fotogrids-deep-linking',
-            FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
-            array( 'fotogrids-frontend' ),
-            FOTOGRIDS_VERSION,
-            true
-        );
+        // fg-tooltip and deep-linking are NOT enqueued here anymore.
+        // • fg-tooltip is declared as a dep by Sharing_Decorator and
+        //   Lightbox features; Asset_Resolver pulls it in when either is
+        //   active on the page.
+        // • deep-linking is declared by Sharing_Decorator (task 16). On
+        //   the View Page it's pulled in directly by Renderer::enqueue_assets
+        //   because a ?fg-item URL can arrive even when sharing is off.
 
         wp_enqueue_style(
-            'fotogrids-fg-tooltip',
-            FOTOGRIDS_PLUGIN_URL . 'assets/css/fg-tooltip.css',
+            'fotogrids-errors',
+            FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids-errors.css',
             array(),
             FOTOGRIDS_VERSION
         );
 
-        wp_enqueue_script(
-            'fotogrids-fg-tooltip',
-            FOTOGRIDS_PLUGIN_URL . 'assets/js/fg-tooltip.js',
-            array(),
-            FOTOGRIDS_VERSION,
-            true
-        );
+        $sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
 
-        wp_enqueue_style(
-            'fotogrids-frontend',
-            FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids.css',
-            array(),
-            FOTOGRIDS_VERSION
-        );
-
-        $sharing          = \FotoGrids\Settings\Sharing_Settings_Store::get();
-        $default_settings = fotogrids_get_default_gallery_settings();
-
-        // Flat structure so both index.js and lightbox.js can read top-level keys
-        // directly (e.g. window.fotogrids.stats_tracking, not .settings.stats_tracking).
-        // lazy_load reflects the site-wide default so the global IntersectionObserver
-        // activation path in initializeLazyLoading() matches the rendered output.
-        wp_localize_script( 'fotogrids-frontend', 'fotogrids', array(
-            'restUrl'               => rest_url( 'fotogrids/v1/' ),
-            'nonce'                 => wp_create_nonce( 'wp_rest' ),
-            'stats_tracking'        => true,
-            'lazy_load'             => (bool) ( $default_settings['lazy_load'] ?? true ),
+        // window.fotogrids carries only the sharing-related deep-link
+        // settings now. REST URLs and nonces are per-render: Stats and
+        // Album_To_Gallery_Ajax write their own URL/nonce into per-element
+        // data attributes. Lazy-load is gated by the per-gallery
+        // data-fg-lazy attribute, not a global.
+        wp_localize_script( 'fotogrids-runtime', 'fotogrids', array(
             'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
             'embedded_share_target' => $sharing['embedded_share_target'],
         ) );
@@ -552,57 +693,8 @@ class Public_Render {
     }
 
 
-    /**
-     * Render album HTML
-     */
-    private static function render_album( $album_id, $galleries, $atts ) {
-        $output = '<div class="fotogrids-album" data-album-id="' . esc_attr( $album_id ) . '">';
-
-        foreach ( $galleries as $gallery ) {
-            $thumbnail = get_the_post_thumbnail_url( $gallery->ID, 'medium' );
-            $item_count = fotogrids_get_gallery_item_count( $gallery->ID );
-
-            $output .= '<div class="fotogrids-album-item">';
-
-            if ( $thumbnail ) {
-                $output .= '<div class="album-thumbnail">';
-                $output .= '<img src="' . esc_url( $thumbnail ) . '" alt="' . esc_attr( $gallery->post_title ) . '" />';
-                $output .= '</div>';
-            }
-
-            $output .= '<div class="album-content">';
-            $output .= '<h3 class="album-title">' . esc_html( $gallery->post_title ) . '</h3>';
-
-            if ( $gallery->post_content ) {
-                $output .= '<div class="album-description">' . wp_kses_post( $gallery->post_content ) . '</div>';
-            }
-
-            $output .= '<div class="album-meta">';
-            $output .= sprintf( _n( '%d item', '%d items', $item_count, 'fotogrids' ), $item_count );
-            $output .= '</div>';
-
-            // Get album settings to check use_ajax_from_album
-            $album_settings = fotogrids_get_album_settings( $album_id );
-            $use_ajax = ! empty( $album_settings['use_ajax_from_album'] );
-
-            // Pass album context to gallery shortcode
-            $gallery_source = $use_ajax ? Request_Source::ALBUM_AJAX->value : Request_Source::SHORTCODE->value;
-            $gallery_shortcode = '[fotogrids_gallery id="' . $gallery->ID . '" album_id="' . $album_id . '" _source="' . esc_attr( $gallery_source ) . '"]';
-
-            if ( $use_ajax ) {
-                $output .= '<div class="fotogrids-gallery-placeholder" data-gallery-id="' . esc_attr( $gallery->ID ) . '" data-album-id="' . esc_attr( $album_id ) . '" data-source="' . esc_attr( Request_Source::ALBUM_AJAX->value ) . '"></div>';
-            } else {
-                $output .= do_shortcode( $gallery_shortcode );
-            }
-
-            $output .= '</div>';
-            $output .= '</div>';
-        }
-
-        $output .= '</div>';
-
-        return $output;
-    }
+    // render_album() removed — album rendering now goes through the
+    // standard Render_Controller pipeline. See album_shortcode() above.
 
     /**
      * Check if current page has FotoGrids content

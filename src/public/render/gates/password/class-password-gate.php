@@ -154,7 +154,14 @@ final class Password_Gate implements Gate {
                         path: 'gates/password/password-lock.css'
                     ),
                 ]
-            )
+            ),
+            js: [
+                'fotogrids-password-gate' => new Asset_Decl(
+                    path:      '../../assets/js/password-gate.js',
+                    deps:      [ 'fotogrids-runtime' ],
+                    in_footer: true,
+                ),
+            ]
         );
     }
 

@@ -1,0 +1,41 @@
+/*
+ * FotoGrids — Pagination: load-more (per-method overrides).
+ *
+ * Base button styling and the sr-only status region live in the shared
+ * pagination.css. This file only adds:
+ *   - the flex wrapper + alignment classes,
+ *   - the .fg-pagination--full-width modifier,
+ *   - the load-more-specific padding default (roomier than the page-buttons
+ *     default — load-more is a single hero CTA, page-buttons are small chips),
+ *   - the .fg-pagination--exhausted hidden state.
+ *
+ * The button itself carries `.fg-pagination__btn .fg-pagination__load-more`
+ * — base look from `.fg-pagination__btn` in pagination.css, the second
+ * class is purely a structural hook used by full-width and any future
+ * load-more-only theming.
+ */
+
+.fotogrids-gallery .fg-pagination--load-more {
+    display: flex;
+}
+
+.fotogrids-gallery .fg-pagination--load-more.fg-pagination--align-left   { justify-content: flex-start; }
+.fotogrids-gallery .fg-pagination--load-more.fg-pagination--align-center { justify-content: center; }
+.fotogrids-gallery .fg-pagination--load-more.fg-pagination--align-right  { justify-content: flex-end; }
+
+/*
+ * Load-more uses a roomier default padding than page-buttons — it's a
+ * single hero CTA, not a numbered-page chip. The shared --fg-pagination-btn-padding
+ * variable picks this up via the `.fg-pagination__load-more` scope override.
+ */
+.fotogrids-gallery .fg-pagination__load-more {
+    --fg-pagination-btn-padding: calc(var(--fg-pagination-base-size) * 2) calc(var(--fg-pagination-base-size) * 3)
+}
+
+.fotogrids-gallery .fg-pagination--full-width .fg-pagination__load-more {
+    width: 100%;
+}
+
+.fotogrids-gallery .fg-pagination--exhausted {
+    display: none;
+}

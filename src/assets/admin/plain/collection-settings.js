@@ -452,6 +452,15 @@ function CollectionSettings() {
         loadAndTranslateSettings();
     }, []);
 
+    // Bind fg-tooltip to any [data-fg-tooltip] element rendered by this
+    // component (docs strip "Defaults" link, etc). fg-tooltip auto-inits on
+    // DOMContentLoaded but the React tree mounts later, so we re-run init
+    // after render. init() skips already-bound nodes so it's safe to spam.
+    useEffect(() => {
+        if (window.FgTooltip?.init) {
+            window.FgTooltip.init();
+        }
+    });
 
     useEffect(() => {
         const fetchFieldStates = async () => {
@@ -867,12 +876,15 @@ function CollectionSettings() {
             }
         }
 
-        // condition_global: predicate resolved against the global sharing
-        // settings rather than sibling fields. Same shape as condition
-        // (dependsOn + values); dependsOn may be a dotted key (e.g.
-        // "networks.facebook"). Absent condition_global always passes.
+        // condition_global: predicate resolved against a global settings
+        // store (sharing or seo) rather than sibling fields. Same shape as
+        // condition (dependsOn + values); dependsOn may be a dotted key
+        // (e.g. "networks.facebook"). The optional `source` field selects
+        // which global store to read - defaults to 'sharing' for back-compat.
+        // Absent condition_global always passes.
         if (setting.condition_global) {
-            const globalState = window.fotogridsSettings?.globalSharing || {};
+            const source = setting.condition_global.source === 'seo' ? 'globalSeo' : 'globalSharing';
+            const globalState = window.fotogridsSettings?.[source] || {};
             const { dependsOn, values } = setting.condition_global;
 
             const readGlobal = (path) =>
@@ -1041,6 +1053,31 @@ function CollectionSettings() {
 
         if (group?.visible_when && !evaluateVisibleWhen(group.visible_when)) {
             return false;
+        }
+
+        // condition_global on a tab: hide the whole tab when a global
+        // settings predicate matches. Used by the SEO tab to disappear when
+        // the site owner has chosen to defer to a third-party SEO plugin.
+        // Same shape as the setting-level predicate (source, dependsOn,
+        // values). source defaults to 'sharing' for back-compat.
+        if (group?.condition_global) {
+            const source = group.condition_global.source === 'seo' ? 'globalSeo' : 'globalSharing';
+            const globalState = window.fotogridsSettings?.[source] || {};
+            const { dependsOn, values } = group.condition_global;
+            const readGlobal = (path) =>
+                String(path).split('.').reduce(
+                    (acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined),
+                    globalState
+                );
+            const matches = (actual, expected) => {
+                const list = Array.isArray(expected) ? expected : [expected];
+                return list.some((v) => v === actual
+                    || (v === true && (actual === true || actual === '1' || actual === 1))
+                    || (v === false && (actual === false || actual === '0' || actual === 0 || actual === undefined)));
+            };
+            if (typeof dependsOn === 'string' && dependsOn !== '') {
+                if (!matches(readGlobal(dependsOn), values)) return false;
+            }
         }
 
         if (!group.condition) return true;
@@ -1273,6 +1310,10 @@ function CollectionSettings() {
                     getFieldState,
                     getOptionState: getFieldState,
                     isDefaultsMode,
+                    // Per-option `condition` evaluation. The token_select renderer
+                    // uses this to hide dropdown options whose own `condition`
+                    // (relative to the current settings map) does not pass.
+                    isOptionVisible: (option) => shouldDisplaySetting(option),
                     __
                 });
                 break;
@@ -1312,6 +1353,14 @@ function CollectionSettings() {
 
             case 'color':
                 control = window.FotoGridsRenderSettings?.renderColorPicker(setting, currentValue, isDisabled, {
+                    updateSetting,
+                    getFieldState,
+                    __
+                });
+                break;
+
+            case 'image_picker':
+                control = window.FotoGridsRenderSettings?.renderImagePicker(setting, currentValue, isDisabled, {
                     updateSetting,
                     getFieldState,
                     __
@@ -1540,7 +1589,13 @@ function CollectionSettings() {
                     href: defaultsUrl,
                     className: 'fotogrids-settings-docs-strip__link',
                     target: '_blank',
-                    alt: __('Configure defaults', 'fotogrids')
+                    'aria-label': normalizedPostType === 'album'
+                        ? __('Configure Album defaults', 'fotogrids')
+                        : __('Configure Gallery defaults', 'fotogrids'),
+                    'data-fg-tooltip': normalizedPostType === 'album'
+                        ? __('Configure Album defaults', 'fotogrids')
+                        : __('Configure Gallery defaults', 'fotogrids'),
+                    'data-fg-tooltip-dir': 'below'
                 }, __('Defaults', 'fotogrids')),
                 h('div', {
                     className: 'fotogrids-settings-docs-strip__autosave'

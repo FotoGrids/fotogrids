@@ -6,45 +6,54 @@
 // Uses the UI color system from colors.scss
 
 // Base Input Styles
-.fotogrids-input {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
-    background-color: ui-color(input, bg);
-    color: ui-color(input, text);
-    border: 1px solid ui-color(input, border);
-    border-radius: 4px;
-    transition: all 0.2s ease;
+input[type='text'],
+input[type='url'],
+textarea {
+    &.fotogrids-input {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        margin: 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        background-color: ui-color(input, bg);
+        color: ui-color(input, text);
+        border: 1px solid ui-color(input, border);
+        border-radius: 4px;
+        transition: all 0.2s ease;
 
-    &::placeholder {
-        color: ui-color(input, placeholder);
-        opacity: 1;
-    }
-
-    &:hover:not(:disabled):not(:focus) {
-        border-color: ui-color(input, border-hover);
-    }
-
-    &:focus {
-        outline: none;
-        border-color: ui-color(input, border-focus);
-        box-shadow: 0 0 0 3px ui-color(input, shadow-focus);
-    }
-
-    &:disabled {
-        background-color: ui-color(input, disabled-bg);
-        color: ui-color(input, disabled-text);
-        border-color: ui-color(input, disabled-border);
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    &:read-only {
-        background-color: ui-color(background, secondary);
-        cursor: default;
+        &--inline {
+            width: auto;
+        }
+    
+        &::placeholder {
+            color: ui-color(input, placeholder);
+            opacity: 1;
+        }
+    
+        &:hover:not(:disabled):not(:focus) {
+            border-color: ui-color(input, border-hover);
+        }
+    
+        &:focus {
+            outline: none;
+            border-color: ui-color(input, border-focus);
+            box-shadow: 0 0 0 3px ui-color(input, shadow-focus);
+        }
+    
+        &:disabled {
+            background-color: ui-color(input, disabled-bg);
+            color: ui-color(input, disabled-text);
+            border-color: ui-color(input, disabled-border);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    
+        &:read-only {
+            background-color: ui-color(background, secondary);
+            cursor: default;
+        }
     }
 }
 
@@ -418,7 +427,7 @@
     }
 }
 
-.fotogrids-text-input,
+// .fotogrids-text-input,
 .fotogrids-url-input,
 .fotogrids-password-input__wrapper {
     .fotogrids-input[type="text"],

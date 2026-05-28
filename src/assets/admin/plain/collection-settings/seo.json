@@ -1,0 +1,152 @@
+{
+    "id": "seo",
+    "label": "SEO",
+    "icon": "search_md",
+    "condition_global": {
+        "source": "seo",
+        "dependsOn": "defer_to_seo_plugins",
+        "values": false
+    },
+    "settings": [
+        {
+            "key": "open_graph_group",
+            "type": "setting_group",
+            "label": "Open Graph & Social Sharing",
+            "description": "Controls the title, description and image that appear when someone shares this view page on Facebook, X, LinkedIn, WhatsApp, iMessage or any other platform that reads Open Graph tags. Empty fields inherit the site-wide default.",
+            "settings": [
+                {
+                    "key": "fotogrids_og_title",
+                    "type": "text_input",
+                    "label": "Custom OG Title",
+                    "description": "Optional. Leave empty to use the collection title.",
+                    "default": "",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "fotogrids_og_description",
+                    "type": "text_input",
+                    "multiline": true,
+                    "rows": 3,
+                    "label": "Custom OG Description",
+                    "description": "Optional. Leave empty to use the post excerpt, then the post content, then a count summary.",
+                    "default": "",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "fotogrids_og_image_source",
+                    "type": "button_group",
+                    "label": "OG Image Source",
+                    "description": "Choose which image appears in social previews for this gallery.",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "options": [
+                        {
+                            "label": "Featured Item",
+                            "value": "featured",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Custom Image",
+                            "value": "custom",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "featured",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "fotogrids_og_image_source",
+                    "type": "button_group",
+                    "label": "OG Image Source",
+                    "description": "Choose which image appears in social previews for this album.",
+                    "postTypes": [
+                        "album"
+                    ],
+                    "options": [
+                        {
+                            "label": "Featured Gallery",
+                            "value": "featured",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Custom Image",
+                            "value": "custom",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "featured",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "fotogrids_og_image_custom_id",
+                    "type": "image_picker",
+                    "label": "Custom OG Image",
+                    "description": "Recommended size: 1200×630px.",
+                    "default": 0,
+                    "condition": {
+                        "dependsOn": "fotogrids_og_image_source",
+                        "values": [
+                            "custom"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "search_engines_group",
+            "type": "setting_group",
+            "label": "Search Engines",
+            "description": "Controls how this view page appears in Google, Bing and other search engines.",
+            "settings": [
+                {
+                    "key": "fotogrids_noindex",
+                    "type": "toggle",
+                    "label": "Hide from search engines",
+                    "description": "When on, emits <meta name=\"robots\" content=\"noindex, nofollow\"> so search engines skip this page. Use for drafts, private clients, or one-off galleries you don't want indexed.",
+                    "default": false,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "fotogrids_canonical_override",
+                    "type": "text",
+                    "label": "Canonical URL Override",
+                    "description": "Optional. Leave empty to use this view page's permalink. Useful when the same gallery is published under multiple URLs.",
+                    "default": "",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

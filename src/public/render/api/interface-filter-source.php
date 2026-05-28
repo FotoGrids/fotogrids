@@ -117,4 +117,39 @@ interface Filter_Source {
      * @return  Module_Assets
      */
     public function assets( Render_Context $render_context ): Module_Assets;
+
+    /**
+     * REST arg key under which the client sends selected values for this
+     * source. E.g. 'tags' → POST body `{ filters: { tags: ['nature'] } }`.
+     *
+     * Must be a short, stable identifier (sanitize_key safe).
+     *
+     * @since 1.0.0
+     * @return string
+     */
+    public function filter_arg_key(): string;
+
+    /**
+     * Returns true when the given item matches at least one of the values
+     * selected for this source (OR within source).
+     *
+     * Used for server-side filtering when pagination interleaves with active
+     * filters — the server has to know which items belong on each filtered
+     * page so the client can request "page N of the filtered set" without
+     * ever pulling non-matching items over the wire.
+     *
+     * Implementations should mirror the client-side predicate exactly so
+     * the initial paint and subsequent paginated renders agree on which
+     * items are visible. For Tags, that means: "tokens stamped on
+     * data-fg-tags intersect $values".
+     *
+     * @since 1.0.0
+     * @param int                $item_id        Attachment ID.
+     * @param array<int, string> $values         Selected filter values
+     *                                           (typically slugs).
+     * @param Render_Context     $render_context Render context (carrying
+     *                                           the gallery being filtered).
+     * @return bool
+     */
+    public function matches( int $item_id, array $values, Render_Context $render_context ): bool;
 }

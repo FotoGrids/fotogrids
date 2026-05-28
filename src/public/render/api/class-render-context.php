@@ -19,6 +19,12 @@ final class Render_Context {
      * @param array<string, mixed> $settings Render settings map.
      * @param array<int, Item_View> $items Collection items.
      * @param array<int, string> $warnings Preview warnings.
+     * @param int|null $via_album_id Resolved album the visitor reached this gallery from
+     *                               (visit-context). Sourced from the ?fg_via query var on
+     *                               normal page loads or from the via_album_id meta override
+     *                               on REST renders. Validated downstream by Breadcrumb_Resolver
+     *                               (a non-null value here doesn't guarantee the album really
+     *                               contains this gallery).
      */
     public function __construct(
         public readonly Render_Meta $meta,
@@ -27,6 +33,7 @@ final class Render_Context {
         public readonly array $settings,
         public readonly array $items,
         public readonly array $warnings = [],
+        public readonly ?int $via_album_id = null,
     ) {}
 
     /**
@@ -37,7 +44,7 @@ final class Render_Context {
      * @return  self
      */
     public function with( array $changes ): self {
-        $allowed_keys = [ 'items', 'settings', 'warnings' ];
+        $allowed_keys = [ 'items', 'settings', 'warnings', 'via_album_id' ];
 
         foreach ( array_keys( $changes ) as $change_key ) {
             if ( ! in_array( $change_key, $allowed_keys, true ) ) {
@@ -52,6 +59,7 @@ final class Render_Context {
             settings: $changes['settings'] ?? $this->settings,
             items: $changes['items'] ?? $this->items,
             warnings: $changes['warnings'] ?? $this->warnings,
+            via_album_id: array_key_exists( 'via_album_id', $changes ) ? $changes['via_album_id'] : $this->via_album_id,
         );
     }
 }

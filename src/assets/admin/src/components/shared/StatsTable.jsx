@@ -18,12 +18,27 @@ const { __ } = wp.i18n;
 const SKELETON_ROWS = 5;
 
 const StatsTable = ( { title, columns, rows, loading, emptyMsg } ) => {
+    const baseClass = 'fg-stats-table';
+    const getColClassName = ( col, type ) => {
+        const classes = [ `${baseClass}__${ type }` ];
+
+        if ( col.align === 'center' ) {
+            classes.push( `${baseClass}__${ type }--center` );
+        }
+
+        if ( col.ellipsis ) {
+            classes.push( `${baseClass}__${ type }--ellipsis` );
+        }
+
+        return classes.join( ' ' );
+    };
+
     const renderBody = () => {
         if ( loading ) {
             return Array.from( { length: SKELETON_ROWS } ).map( ( _, i ) => (
-                <tr key={ i } className="fg-stats-table__row fg-stats-table__row--skeleton">
+                <tr key={ i } className={`${baseClass}__row ${baseClass}__row--skeleton`}>
                     { columns.map( ( col ) => (
-                        <td key={ col.key } className="fg-stats-table__cell">
+                        <td key={ col.key } className={ getColClassName( col, 'cell' ) }>
                             <span className="fg-skeleton-line" aria-hidden="true" />
                         </td>
                     ) ) }
@@ -36,7 +51,7 @@ const StatsTable = ( { title, columns, rows, loading, emptyMsg } ) => {
                 <tr>
                     <td
                         colSpan={ columns.length }
-                        className="fg-stats-table__cell fg-stats-table__cell--empty"
+                        className={`${baseClass}__cell ${baseClass}__cell--empty`}
                     >
                         { emptyMsg || __( 'No data available', 'fotogrids' ) }
                     </td>
@@ -47,10 +62,10 @@ const StatsTable = ( { title, columns, rows, loading, emptyMsg } ) => {
         return rows.map( ( row, i ) => (
             <tr
                 key={ row.id != null ? `${ row.type }-${ row.id }` : i }
-                className="fg-stats-table__row"
+                className={`${baseClass}__row`}
             >
                 { columns.map( ( col ) => (
-                    <td key={ col.key } className="fg-stats-table__cell">
+                    <td key={ col.key } className={ getColClassName( col, 'cell' ) }>
                         { col.render ? col.render( row[ col.key ], row ) : row[ col.key ] }
                     </td>
                 ) ) }
@@ -59,14 +74,14 @@ const StatsTable = ( { title, columns, rows, loading, emptyMsg } ) => {
     };
 
     return (
-        <div className="fg-stats-table-container">
-            { title && <h3 className="fg-stats-table__title">{ title }</h3> }
-            <div className="fg-stats-table__wrapper">
-                <table className="fg-stats-table">
+        <div className={`${baseClass}__container fg-stats-card`}>
+            { title && <h3 className={`${baseClass}__title`}>{ title }</h3> }
+            <div className={`${baseClass}__wrapper`}>
+                <table className={`${baseClass} widefat striped`}>
                     <thead>
                         <tr>
                             { columns.map( ( col ) => (
-                                <th key={ col.key } className="fg-stats-table__th">
+                                <th key={ col.key } className={ getColClassName( col, 'th' ) } scope="col">
                                     { col.label }
                                 </th>
                             ) ) }

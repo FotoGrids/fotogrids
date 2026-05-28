@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Decorators\External_Link;
 
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Item_Wrapper;
@@ -55,6 +56,11 @@ final class External_Link_Decorator implements Decorator {
     }
 
     public function supports( Render_Context $render_context ): bool {
+        // External-link click behaviour is per-attachment; albums use
+        // their own click-behaviour decorators.
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
         return $render_context->behavior->click_behavior === 'external';
     }
 

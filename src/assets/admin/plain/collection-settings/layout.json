@@ -259,6 +259,62 @@
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
             "visible_when_uninstalled": true
+        },
+        {
+            "key": "margin",
+            "type": "responsive_range",
+            "label": "Margin",
+            "unit": "px",
+            "fourSided": true,
+            "responsive": {
+                "desktop": {
+                    "min": 0,
+                    "max": 100,
+                    "default": 0
+                },
+                "tablet": {
+                    "min": 0,
+                    "max": 100,
+                    "default": 0
+                },
+                "mobile": {
+                    "min": 0,
+                    "max": 100,
+                    "default": 0
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "padding",
+            "type": "responsive_range",
+            "label": "Padding",
+            "unit": "px",
+            "fourSided": true,
+            "responsive": {
+                "desktop": {
+                    "min": 0,
+                    "max": 100,
+                    "default": 0
+                },
+                "tablet": {
+                    "min": 0,
+                    "max": 100,
+                    "default": 0
+                },
+                "mobile": {
+                    "min": 0,
+                    "max": 100,
+                    "default": 0
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
         }
     ],
     "tier_required": "free"

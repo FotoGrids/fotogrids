@@ -21,6 +21,7 @@ const Dashboard = () => {
         albums: 0,
         items: 0,
         views: 0,
+        shares: 0,
         shortcodes_used: false
     });
     const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ const Dashboard = () => {
                     albums: data.albums || 0,
                     items: data.items || 0,
                     views: data.views || 0,
+                    shares: data.shares || 0,
                     shortcodes_used: data.shortcodes_used || false
                 });
                 setLoading(false);

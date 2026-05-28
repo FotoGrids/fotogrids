@@ -17,7 +17,12 @@
     const settings = window.fotogrids || {};
     const hasHistory = typeof window.history !== 'undefined' && typeof window.history.replaceState === 'function';
 
-    const isViewPage = () => document.documentElement.classList.contains('fotogrids-view');
+    // The View Page sets the `fotogrids-view` class on <body> (see
+    // ViewCollections\Renderer::body_attrs), not on <html>. Check both
+    // to be defensive against future moves.
+    const isViewPage = () =>
+        (document.body && document.body.classList.contains('fotogrids-view')) ||
+        document.documentElement.classList.contains('fotogrids-view');
 
     /**
      * Parse the deep link from the current URL.
@@ -53,7 +58,8 @@
             return url.toString();
         }
 
-        const galleryId = galleryEl ? galleryEl.dataset.galleryId : '';
+        // Pipeline writes data-fg-gallery-id on the wrapper.
+        const galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
         const base = window.location.href.split('#')[0];
         return galleryId ? `${base}#fg-${galleryId}-${itemId}` : base;
     }
@@ -84,7 +90,7 @@
     function resolveTarget(link) {
         let galleries;
         if (link.galleryId) {
-            galleries = document.querySelectorAll(`.fotogrids-gallery[data-gallery-id="${link.galleryId}"]`);
+            galleries = document.querySelectorAll(`.fotogrids-gallery[data-fg-gallery-id="${link.galleryId}"]`);
         } else {
             galleries = document.querySelectorAll('.fotogrids-gallery');
         }

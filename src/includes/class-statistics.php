@@ -335,7 +335,7 @@ class Statistics {
                     return array(
                         'title' => $post->post_title,
                         'url' => get_permalink( $post->ID ),
-                        'thumbnail' => get_the_post_thumbnail_url( $post->ID, 'thumbnail' ),
+                        'thumbnail' => fotogrids_get_collection_cover_url( $post->ID, 'thumbnail' ),
                     );
                 }
                 break;
@@ -346,7 +346,7 @@ class Statistics {
                     return array(
                         'title' => $post->post_title,
                         'url' => get_permalink( $post->ID ),
-                        'thumbnail' => get_the_post_thumbnail_url( $post->ID, 'thumbnail' ),
+                        'thumbnail' => fotogrids_get_collection_cover_url( $post->ID, 'thumbnail' ),
                     );
                 }
                 break;

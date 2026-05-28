@@ -1,0 +1,129 @@
+/*
+ * FotoGrids — Pagination shared base.
+ *
+ * Loaded by every pagination method module (load-more, page-buttons,
+ * endless-scroll) via Pagination_Common::common_assets(). Holds:
+ *
+ *  - .fg-pagination                    declares the shared CSS variables
+ *                                      (button look + font) so per-method
+ *                                      files can override by re-declaring
+ *                                      the same custom property on a
+ *                                      descendant scope (e.g. load-more's
+ *                                      roomier padding)
+ *  - .fg-pagination__btn               base button look — load-more's button
+ *                                      and page-buttons' prev/next/number
+ *                                      buttons both carry this class
+ *  - .fg-pagination__btn:hover         hover state — shared
+ *  - .fg-pagination__btn:disabled      disabled state — shared
+ *  - .fg-pagination__btn.fg-is-loading "loading" state — shared (load-more
+ *                                      adds this during async fetch)
+ *  - .fg-pagination__status            sr-only live region — used by all
+ *                                      three methods
+ *
+ * Per-method specifics (wrapper layout, alignment classes, the active-page
+ * state, the .fg-pagination__icon SVG wrapper, full-width modifier,
+ * endless-scroll loader, etc.) live in the sibling per-method CSS files.
+ *
+ * Theming hooks (CSS variables, declared on .fg-pagination):
+ *   --fg-pagination-btn-border-width   1px
+ *   --fg-pagination-btn-border-style   solid
+ *   --fg-pagination-btn-border-color   currentColor
+ *   --fg-pagination-btn-bg             transparent
+ *   --fg-pagination-btn-color          inherit
+ *   --fg-pagination-btn-padding        0.4em 0.8em   (load-more overrides on its own scope)
+ *   --fg-pagination-btn-radius         4px
+ *   --fg-pagination-btn-hover-bg       currentColor
+ *   --fg-pagination-btn-hover-color    transparent
+ *   --fg-pagination-btn-gap            0.4em
+ *   --fg-pagination-btn-min-width      2.4em
+ *   --fg-pagination-btn-transition     background-color 0.15s ease, color 0.15s ease
+ *   --fg-pagination-btn-disabled-opacity   0.4
+ *   --fg-pagination-btn-loading-opacity    0.6
+ *   --fg-pagination-font-family        inherit
+ *   --fg-pagination-font-size          inherit
+ *   --fg-pagination-font-style         inherit
+ *   --fg-pagination-font-variant       inherit
+ *   --fg-pagination-font-weight        inherit
+ *   --fg-pagination-line-height        inherit
+ */
+
+.fotogrids-gallery .fg-pagination {
+    --fg-pagination-base-size: 8px;
+    --fg-pagination-btn-border-width: 1px;
+    --fg-pagination-btn-border-style: solid;
+    --fg-pagination-btn-border-color: currentColor;
+    --fg-pagination-btn-bg: transparent;
+    --fg-pagination-btn-color: inherit;
+    --fg-pagination-btn-padding: calc(var(--fg-pagination-base-size) * 1.5) calc(var(--fg-pagination-base-size) * 2);
+    --fg-pagination-btn-radius: calc(var(--fg-pagination-base-size) / 2);
+    --fg-pagination-btn-hover-bg: rgba(60, 70, 240, 0.05);
+    --fg-pagination-btn-hover-color: var(--fg-colors-blue);
+    --fg-pagination-btn-gap: var(--fg-pagination-base-size);
+    --fg-pagination-btn-min-width: calc(var(--fg-pagination-base-size) * 3);
+    --fg-pagination-btn-transition: background-color 0.15s ease, color 0.15s ease;
+    --fg-pagination-btn-disabled-opacity: 0.4;
+    --fg-pagination-btn-loading-opacity: 0.6;
+    --fg-pagination-btn-font-family: inherit;
+    --fg-pagination-btn-font-size: calc(var(--fg-pagination-base-size) * 1.75);
+    --fg-pagination-btn-font-style: normal;
+    --fg-pagination-btn-font-variant: normal;
+    --fg-pagination-btn-font-weight: 500;
+    --fg-pagination-btn-line-height: 1;
+    --fg-pagination-btn-text-transform: none;
+
+    margin-top: calc(var(--fg-pagination-base-size) * 2);
+}
+
+.fotogrids-gallery .fg-pagination__btn {
+    appearance: none;
+    border-width: var( --fg-pagination-btn-border-width );
+    border-style: var( --fg-pagination-btn-border-style );
+    border-color: var( --fg-pagination-btn-border-color );
+    background: var( --fg-pagination-btn-bg );
+    color: var( --fg-pagination-btn-color );
+    padding: var( --fg-pagination-btn-padding );
+    border-radius: var( --fg-pagination-btn-radius );
+    font-family: var( --fg-pagination-btn-font-family );
+    font-size: var( --fg-pagination-btn-font-size );
+    font-style: var( --fg-pagination-btn-font-style );
+    font-variant: var( --fg-pagination-btn-font-variant );
+    font-weight: var( --fg-pagination-btn-font-weight );
+    line-height: var( --fg-pagination-btn-line-height );
+    text-transform: var( --fg-pagination-btn-text-transform );
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var( --fg-pagination-btn-gap );
+    min-width: var( --fg-pagination-btn-min-width );
+    transition: var( --fg-pagination-btn-transition );
+}
+
+.fotogrids-gallery .fg-pagination__btn:hover:not( :disabled ):not( .fg-is-loading ):not( .fg-is-active ) {
+    background: var( --fg-pagination-btn-hover-bg );
+    color: var( --fg-pagination-btn-hover-color );
+}
+
+.fotogrids-gallery .fg-pagination__btn:disabled {
+    opacity: var( --fg-pagination-btn-disabled-opacity );
+    cursor: not-allowed;
+}
+
+.fotogrids-gallery .fg-pagination__btn.fg-is-loading {
+    opacity: var( --fg-pagination-btn-loading-opacity );
+    cursor: progress;
+}
+
+/*
+ * Visually-hidden status region used by all three pagination methods for
+ * screen-reader announcements (aria-live=polite). One ruleset, one source
+ * of truth.
+ */
+.fotogrids-gallery .fg-pagination__status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect( 0, 0, 0, 0 );
+    white-space: nowrap;
+}

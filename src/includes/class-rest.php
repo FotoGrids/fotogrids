@@ -41,6 +41,7 @@ class REST {
         // Gallery files
         require_once $base_path . 'gallery/gallery-permissions.php';
         require_once $base_path . 'gallery/gallery-data.php';
+        require_once $base_path . 'gallery/lightbox-slides-data.php';
         require_once $base_path . 'gallery/register-gallery-routes.php';
 
         // Album files

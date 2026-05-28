@@ -1,10 +1,10 @@
 /**
- * File Uploader Component (Dashboard)
- * Wraps UploadArea in a card and adds media library selection.
- * Creates a new gallery when upload completes.
+ * File Uploader Component
+ * Handles file uploads, drag and drop, and media library selection
  */
 import React from 'react';
-import MediaUpload from '../blocks/MediaUpload';
+import UploadArea from '../blocks/UploadArea';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -44,15 +44,17 @@ const FileUploader = ({ onUploadComplete }) => {
     return (
         <div className="fotogrids-admin-block-card fg-abc-uploader">
             <div className="fotogrids-admin-block-card-header">
-                <div
-                    className="fotogrids-admin-block-card-header-icon"
-                    dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.upload }}
-                />
+                <Icon name="upload" className="fotogrids-admin-block-card-header-icon" />
                 <h3>{__('Quick Upload', 'fotogrids')}</h3>
                 <p>{__('Click or drag files here to create a gallery automatically.', 'fotogrids')}</p>
             </div>
             <div className="fotogrids-admin-block-card-content">
-                <MediaUpload onUploadComplete={onUploadComplete} inputId="fotogrids-dashboard-upload-input" />
+                <UploadArea
+                    onUploadComplete={onUploadComplete}
+                    inputId="fotogrids-dashboard-upload-input"
+                    title={__('Select files to upload', 'fotogrids')}
+                    subtitle={__('or drag and drop files here', 'fotogrids')}        
+                />
                 <p className="fotogrids-upload-or">
                     {__('or ', 'fotogrids')}
                     <a

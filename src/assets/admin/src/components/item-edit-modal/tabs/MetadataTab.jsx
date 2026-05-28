@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from '../../shared/Icon';
 
 const MetadataTab = ({
     metadata,
@@ -12,7 +13,7 @@ const MetadataTab = ({
     strings = {},
     metadataKey,
     placeholder,
-    icon,
+    iconName,
     itemClassName = 'fotogrids-metadata-item',
     showProNotice = false,
     proNoticeContent,
@@ -76,9 +77,9 @@ const MetadataTab = ({
             <div className="fotogrids-metadata-section">
                 {!isHardFull && (
                     <div className="fotogrids-metadata-input">
-                        {icon ? (
+                        {iconName ? (
                             <div className="fotogrids-input-with-icon">
-                                <span className="fotogrids-input-icon" dangerouslySetInnerHTML={{ __html: icon }} />
+                                <Icon name={ iconName } className="fotogrids-input-icon" />
                                 {inputElement}
                             </div>
                         ) : (
@@ -157,8 +158,9 @@ const MetadataTab = ({
                                     onClick={() => !disabled && removeMetadataItem(metadataKey, item.id)}
                                     disabled={disabled}
                                     aria-label="Remove"
-                                    dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.x || 'x' }}
-                                />
+                                >
+                                    <Icon name="x" />
+                                </button>
                             </span>
                         ))}
                     </div>

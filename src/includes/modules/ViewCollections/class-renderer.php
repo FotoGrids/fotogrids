@@ -103,7 +103,19 @@ class Renderer {
      * @return string
      */
     public function head_meta(): string {
-        $noindex = ! empty( $this->settings['noindex'] ) || empty( $this->settings['index'] ) || $this->is_draft_preview();
+        $seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
+
+        // Noindex chain (lowest to highest precedence):
+        //   1. legacy view settings (`noindex` / `index`) for backwards-
+        //      compatible behaviour with collections that pre-date the SEO tab
+        //   2. the SEO tab's per-collection `fotogrids_noindex` toggle (true
+        //      forces noindex; false alone does NOT override a draft preview)
+        //   3. draft preview always wins — never index unsaved work
+        //   4. the `fotogrids/view/robots` filter for code-level overrides
+        $noindex = ! empty( $this->settings['noindex'] )
+            || empty( $this->settings['index'] )
+            || ! empty( $seo['noindex'] )
+            || $this->is_draft_preview();
 
         /**
          * Filter whether the view page is excluded from search engines.
@@ -114,15 +126,39 @@ class Renderer {
          */
         $noindex = (bool) apply_filters( 'fotogrids/view/robots', $noindex, $this->post );
 
+        // Canonical: per-collection override wins; otherwise the permalink.
+        $canonical = $seo['canonical_override'] !== '' ? $seo['canonical_override'] : get_permalink( $this->post );
+
+        /**
+         * Filter the canonical URL emitted on the view page.
+         *
+         * Use this to inject a custom canonical (for example, on sites that
+         * present the same gallery under multiple URLs and want a single
+         * canonical pointer).
+         *
+         * @since 1.0.0
+         * @param string   $canonical Default: permalink of the view page.
+         * @param \WP_Post $post
+         */
+        $canonical = (string) apply_filters( 'fotogrids/view/canonical', $canonical, $this->post );
+
         $meta = '';
         if ( $noindex ) {
             $meta .= '<meta name="robots" content="noindex, nofollow">' . "\n";
         }
-        $meta .= '<link rel="canonical" href="' . esc_url( get_permalink( $this->post ) ) . '">' . "\n";
-        $meta .= $this->open_graph_meta();
+        if ( $canonical !== '' ) {
+            $meta .= '<link rel="canonical" href="' . esc_url( $canonical ) . '">' . "\n";
+        }
+        $meta .= $this->open_graph_meta( $seo );
 
         /**
-         * Filter the raw head meta markup (Pro injects OG and Twitter tags).
+         * Filter the complete head-meta markup the view page emits.
+         *
+         * This is the catch-all string filter that runs after every granular
+         * filter (og/title, og/description, og/image, og/url, og/type,
+         * og/enabled, view/robots, view/canonical). Prefer the granular
+         * filters for targeted changes — this one is for sites that need to
+         * rewrite or completely replace the markup.
          *
          * @since 1.0.0
          * @param string   $meta
@@ -138,43 +174,338 @@ class Renderer {
      * present in the request (?fg-item) and belongs to a gallery, emits per-item
      * tags so a shared image renders a rich preview.
      *
+     * Every field passes through a granular filter (fotogrids/view/og/title,
+     * /og/description, /og/image, /og/url, /og/type, /og/enabled) so themes
+     * and other plugins can adjust individual values without rewriting the
+     * whole markup. The `fotogrids/view/og/enabled` filter is the conflict-
+     * guard escape hatch for sites whose SEO plugin already emits OG tags.
+     *
      * @since 1.0.0
      * @return string
      */
-    private function open_graph_meta(): string {
-        $title       = get_the_title( $this->post );
-        $description = '';
-        $image       = '';
-        $url         = get_permalink( $this->post );
+    private function open_graph_meta( ?array $seo = null ): string {
+        if ( $seo === null ) {
+            $seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
+        }
 
         $item = $this->deep_linked_item();
+
+        // Master switch: site-wide "OG off" or per-collection "defer to other
+        // SEO plugins" both kill OG emission before any filter runs.
+        if ( empty( $seo['enable_open_graph'] ) || ! empty( $seo['defer_to_seo_plugins'] ) ) {
+            return (string) apply_filters( 'fotogrids/view/og/enabled', '', $this->post, $item );
+        }
+
+        /**
+         * Filter whether OG/Twitter tags are emitted on this view page.
+         *
+         * Default true. Return false to suppress every OG and Twitter tag
+         * (e.g. when another SEO plugin owns the head and FotoGrids should
+         * stay out of the way for this specific page).
+         *
+         * @since 1.0.0
+         * @param bool       $enabled  Default true.
+         * @param \WP_Post   $post
+         * @param array|null $item     Deep-linked item context (or null).
+         */
+        $enabled = (bool) apply_filters( 'fotogrids/view/og/enabled', true, $this->post, $item );
+        if ( ! $enabled ) {
+            return '';
+        }
+
+        $title = (string) get_the_title( $this->post );
+        $url   = (string) get_permalink( $this->post );
+        $image = array(
+            'id'     => 0,
+            'url'    => '',
+            'width'  => 0,
+            'height' => 0,
+            'alt'    => '',
+        );
+        $description = '';
+
         if ( $item ) {
             $title       = $item['title'] !== '' ? $item['title'] : $title;
-            $description = $item['caption'];
-            $image       = $item['image'];
-            $url         = add_query_arg( 'fg-item', $item['id'], $url );
-        } elseif ( ! $this->is_album() ) {
-            $thumb_id = get_post_thumbnail_id( $this->post->ID );
-            if ( $thumb_id ) {
-                $src = wp_get_attachment_image_src( $thumb_id, 'large' );
-                $image = $src ? $src[0] : '';
+            $description = (string) $item['caption'];
+            $image = array(
+                'id'     => (int) $item['id'],
+                'url'    => (string) $item['image'],
+                'width'  => (int) ( $item['image_width']  ?? 0 ),
+                'height' => (int) ( $item['image_height'] ?? 0 ),
+                'alt'    => (string) ( $item['image_alt'] ?? '' ),
+            );
+            $url = add_query_arg( 'fg-item', $item['id'], $url );
+        } else {
+            // Per-collection title override wins; else post title (already set).
+            if ( $seo['og_title_override'] !== '' ) {
+                $title = $seo['og_title_override'];
+            }
+
+            // Per-collection description override wins; else the layered chain.
+            $description = $seo['og_description_override'] !== ''
+                ? $seo['og_description_override']
+                : $this->collection_description();
+
+            // Image: custom > featured > plugin-wide fallback.
+            $image_id = 0;
+            if ( $seo['og_image_source'] === 'custom' && $seo['og_image_custom_id'] > 0 ) {
+                $image_id = (int) $seo['og_image_custom_id'];
+            }
+            if ( $image_id <= 0 ) {
+                $image_id = fotogrids_get_collection_cover_attachment_id( (int) $this->post->ID );
+            }
+            if ( $image_id <= 0 && $seo['og_image_fallback_id'] > 0 ) {
+                $image_id = (int) $seo['og_image_fallback_id'];
+            }
+
+            if ( $image_id ) {
+                $src = wp_get_attachment_image_src( $image_id, 'large' );
+                $image = array(
+                    'id'     => $image_id,
+                    'url'    => $src ? (string) $src[0] : '',
+                    'width'  => $src ? (int) ( $src[1] ?? 0 ) : 0,
+                    'height' => $src ? (int) ( $src[2] ?? 0 ) : 0,
+                    'alt'    => (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
+                );
             }
         }
 
-        $tags  = '<meta property="og:type" content="website">' . "\n";
+        $type = $this->og_type( $seo );
+
+        /**
+         * Filter the og:title emitted for a view page.
+         *
+         * @since 1.0.0
+         * @param string     $title
+         * @param \WP_Post   $post
+         * @param array|null $item Deep-linked item context (or null).
+         */
+        $title = (string) apply_filters( 'fotogrids/view/og/title', $title, $this->post, $item );
+
+        /**
+         * Filter the og:description emitted for a view page.
+         *
+         * @since 1.0.0
+         * @param string     $description
+         * @param \WP_Post   $post
+         * @param array|null $item Deep-linked item context (or null).
+         */
+        $description = (string) apply_filters( 'fotogrids/view/og/description', $description, $this->post, $item );
+
+        /**
+         * Filter the og:url emitted for a view page.
+         *
+         * @since 1.0.0
+         * @param string     $url
+         * @param \WP_Post   $post
+         * @param array|null $item Deep-linked item context (or null).
+         */
+        $url = (string) apply_filters( 'fotogrids/view/og/url', $url, $this->post, $item );
+
+        /**
+         * Filter the og:image data structure emitted for a view page.
+         *
+         * Shape: array{id:int,url:string,width:int,height:int,alt:string}.
+         * Return an array with an empty `url` to suppress the image (and the
+         * Twitter card, which depends on the image).
+         *
+         * @since 1.0.0
+         * @param array      $image
+         * @param \WP_Post   $post
+         * @param array|null $item Deep-linked item context (or null).
+         */
+        $image = (array) apply_filters( 'fotogrids/view/og/image', $image, $this->post, $item );
+
+        $image_url    = isset( $image['url'] )    ? (string) $image['url']    : '';
+        $image_width  = isset( $image['width'] )  ? (int)    $image['width']  : 0;
+        $image_height = isset( $image['height'] ) ? (int)    $image['height'] : 0;
+        $image_alt    = isset( $image['alt'] )    ? (string) $image['alt']    : '';
+
+        $emit_twitter = ! empty( $seo['enable_twitter_card'] );
+
+        $tags  = '<meta property="og:type" content="' . esc_attr( $type ) . '">' . "\n";
+        $tags .= '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '">' . "\n";
+        $tags .= '<meta property="og:locale" content="' . esc_attr( str_replace( '-', '_', get_locale() ) ) . '">' . "\n";
         $tags .= '<meta property="og:title" content="' . esc_attr( $title ) . '">' . "\n";
         $tags .= '<meta property="og:url" content="' . esc_url( $url ) . '">' . "\n";
         if ( $description !== '' ) {
             $tags .= '<meta property="og:description" content="' . esc_attr( $description ) . '">' . "\n";
         }
-        if ( $image !== '' ) {
-            $tags .= '<meta property="og:image" content="' . esc_url( $image ) . '">' . "\n";
-            $tags .= '<meta name="twitter:card" content="summary_large_image">' . "\n";
-            $tags .= '<meta name="twitter:image" content="' . esc_url( $image ) . '">' . "\n";
+        if ( ! empty( $seo['facebook_app_id'] ) ) {
+            $tags .= '<meta property="fb:app_id" content="' . esc_attr( (string) $seo['facebook_app_id'] ) . '">' . "\n";
         }
-        $tags .= '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+        if ( $image_url !== '' ) {
+            $tags .= '<meta property="og:image" content="' . esc_url( $image_url ) . '">' . "\n";
+            if ( $image_width > 0 && $image_height > 0 ) {
+                $tags .= '<meta property="og:image:width" content="' . esc_attr( (string) $image_width ) . '">' . "\n";
+                $tags .= '<meta property="og:image:height" content="' . esc_attr( (string) $image_height ) . '">' . "\n";
+            }
+            if ( $image_alt !== '' ) {
+                $tags .= '<meta property="og:image:alt" content="' . esc_attr( $image_alt ) . '">' . "\n";
+            }
+            if ( $emit_twitter ) {
+                $tags .= '<meta name="twitter:card" content="summary_large_image">' . "\n";
+                $tags .= '<meta name="twitter:image" content="' . esc_url( $image_url ) . '">' . "\n";
+                if ( $image_alt !== '' ) {
+                    $tags .= '<meta name="twitter:image:alt" content="' . esc_attr( $image_alt ) . '">' . "\n";
+                }
+            }
+        }
+        if ( $emit_twitter ) {
+            $tags .= '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+            if ( ! empty( $seo['twitter_handle'] ) ) {
+                $tags .= '<meta name="twitter:site" content="' . esc_attr( (string) $seo['twitter_handle'] ) . '">' . "\n";
+            }
+        }
+
+        // article:* tags pair with og:type=article (the default). Skip them
+        // when a filter has rewritten og:type to something else (e.g.
+        // 'website', 'profile') because article:published_time on a
+        // non-article would be malformed.
+        if ( $type === 'article' && ! $item ) {
+            $tags .= $this->article_meta();
+        }
 
         return $tags;
+    }
+
+    /**
+     * Build the description used for og:description on a collection page.
+     *
+     * Layered fallback: post excerpt → trimmed post content → auto-built
+     * count summary (e.g. "24 photos in 'Tuscany 2024'"). The site tagline
+     * is intentionally NOT in the chain — it would put the same generic
+     * string on every gallery and actively hurt link previews.
+     *
+     * @since 1.0.0
+     * @return string
+     */
+    private function collection_description(): string {
+        $excerpt = trim( wp_strip_all_tags( (string) $this->post->post_excerpt ) );
+        if ( $excerpt !== '' ) {
+            return $this->trim_description( $excerpt );
+        }
+
+        $content = trim( wp_strip_all_tags( (string) $this->post->post_content ) );
+        if ( $content !== '' ) {
+            return $this->trim_description( $content );
+        }
+
+        return $this->auto_description();
+    }
+
+    /**
+     * Build the count-based fallback description for a collection.
+     *
+     * Examples:
+     *   "24 photos in 'Tuscany 2024'."
+     *   "3 galleries in 'Weddings 2024'."
+     *
+     * @since 1.0.0
+     * @return string
+     */
+    private function auto_description(): string {
+        $title = (string) get_the_title( $this->post );
+
+        if ( $this->is_album() ) {
+            $count = count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) );
+            if ( $count <= 0 ) {
+                return '';
+            }
+            return sprintf(
+                /* translators: 1: gallery count, 2: album title */
+                _n( '%1$d gallery in %2$s.', '%1$d galleries in %2$s.', $count, 'fotogrids' ),
+                $count,
+                '"' . $title . '"'
+            );
+        }
+
+        $count = fotogrids_get_gallery_item_count( (int) $this->post->ID );
+        if ( $count <= 0 ) {
+            return '';
+        }
+        return sprintf(
+            /* translators: 1: item count, 2: gallery title */
+            _n( '%1$d photo in %2$s.', '%1$d photos in %2$s.', $count, 'fotogrids' ),
+            $count,
+            '"' . $title . '"'
+        );
+    }
+
+    /**
+     * Cap a description string at a safe length for OG/social previews.
+     *
+     * Most platforms truncate around 200 characters in card previews. We
+     * cap at 300 to give a generous buffer while keeping the tag small.
+     *
+     * @since 1.0.0
+     * @param string $text
+     * @return string
+     */
+    private function trim_description( string $text ): string {
+        if ( function_exists( 'mb_strlen' ) ) {
+            if ( mb_strlen( $text ) <= 300 ) {
+                return $text;
+            }
+            return rtrim( mb_substr( $text, 0, 297 ) ) . '...';
+        }
+        if ( strlen( $text ) <= 300 ) {
+            return $text;
+        }
+        return rtrim( substr( $text, 0, 297 ) ) . '...';
+    }
+
+    /**
+     * Build the article:* meta tags that pair with og:type=article.
+     *
+     * @since 1.0.0
+     * @return string
+     */
+    private function article_meta(): string {
+        $tags = '';
+
+        $published = mysql2date( 'c', $this->post->post_date_gmt ?: $this->post->post_date, false );
+        if ( $published ) {
+            $tags .= '<meta property="article:published_time" content="' . esc_attr( $published ) . '">' . "\n";
+        }
+
+        $modified = mysql2date( 'c', $this->post->post_modified_gmt ?: $this->post->post_modified, false );
+        if ( $modified ) {
+            $tags .= '<meta property="article:modified_time" content="' . esc_attr( $modified ) . '">' . "\n";
+        }
+
+        $author = get_userdata( (int) $this->post->post_author );
+        if ( $author && $author->display_name !== '' ) {
+            $tags .= '<meta property="article:author" content="' . esc_attr( $author->display_name ) . '">' . "\n";
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Resolve the og:type for the current collection.
+     *
+     * @since 1.0.0
+     * @param array|null $seo Resolved SEO settings (avoids a second store
+     *                        lookup when the caller has them).
+     * @return string
+     */
+    private function og_type( ?array $seo = null ): string {
+        if ( $seo === null ) {
+            $seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
+        }
+        $type = isset( $seo['og_type'] ) && in_array( $seo['og_type'], \FotoGrids\Settings\SEO_Settings_Store::OG_TYPES, true )
+            ? $seo['og_type']
+            : 'article';
+
+        /**
+         * Filter the og:type emitted for a view page.
+         *
+         * @since 1.0.0
+         * @param string   $type Default from `fotogrids/seo/settings`.
+         * @param \WP_Post $post
+         */
+        return (string) apply_filters( 'fotogrids/view/og/type', $type, $this->post );
     }
 
     /**
@@ -204,12 +535,16 @@ class Renderer {
         }
 
         $src = wp_get_attachment_image_src( $item_id, 'large' );
+        $alt = (string) get_post_meta( $item_id, '_wp_attachment_image_alt', true );
 
         return array(
-            'id'      => $item_id,
-            'title'   => get_the_title( $item_id ),
-            'caption' => $caption,
-            'image'   => $src ? $src[0] : '',
+            'id'           => $item_id,
+            'title'        => get_the_title( $item_id ),
+            'caption'      => $caption,
+            'image'        => $src ? $src[0] : '',
+            'image_width'  => $src ? (int) ( $src[1] ?? 0 ) : 0,
+            'image_height' => $src ? (int) ( $src[2] ?? 0 ) : 0,
+            'image_alt'    => $alt,
         );
     }
 
@@ -303,12 +638,21 @@ class Renderer {
             require_once FOTOGRIDS_PLUGIN_DIR . 'public/public-render.php';
         }
 
-        if ( $this->is_album() ) {
-            $html = \FotoGrids\Public_Render::album_shortcode( array( 'id' => (int) $this->post->ID ) );
-        } elseif ( $this->is_draft_preview() ) {
-            $html = \FotoGrids\Public_Render::render_gallery_preview( (int) $this->post->ID );
-        } else {
-            $html = \FotoGrids\Public_Render::gallery_shortcode( array( 'id' => (int) $this->post->ID ) );
+        // Flag this request as a View Page render so Render_Meta::view_page
+        // turns true. Collection_Header reads that flag to decide whether
+        // the parent album's "View Pages" breadcrumb placement applies.
+        \FotoGrids\Public_Render::set_view_page_context( true );
+
+        try {
+            if ( $this->is_album() ) {
+                $html = \FotoGrids\Public_Render::album_shortcode( array( 'id' => (int) $this->post->ID ) );
+            } elseif ( $this->is_draft_preview() ) {
+                $html = \FotoGrids\Public_Render::render_gallery_preview( (int) $this->post->ID );
+            } else {
+                $html = \FotoGrids\Public_Render::gallery_shortcode( array( 'id' => (int) $this->post->ID ) );
+            }
+        } finally {
+            \FotoGrids\Public_Render::set_view_page_context( false );
         }
 
         /**
@@ -324,39 +668,48 @@ class Renderer {
     /**
      * Share controls for the view page footer.
      *
-     * Renders the resolved share network set when sharing is enabled for the
-     * collection and the view_page placement applies; the frontend draws the
-     * buttons from the config in the data attribute. Otherwise falls back to a
-     * copy-link button so a shareable page always offers at least that.
+     * Both code paths emit a [data-fg-share-footer] container with a JSON
+     * sharing config. The Sharing module's attachFooterBars() handler
+     * (public/render/decorators/sharing/sharing.js) picks the container
+     * up and renders the buttons from the config — no view-specific JS.
+     *
+     * When sharing is enabled for the collection and the view_page
+     * placement applies, the full resolved network set is used. Otherwise
+     * we fall back to a copy-link-only config so every shareable page
+     * still offers at least the copy button.
      *
      * @since 1.0.0
      * @return string
      */
     public function share_html(): string {
-        $url      = get_permalink( $this->post );
         $resolved = fotogrids_get_resolved_sharing( (int) $this->post->ID );
 
         $shows_footer_bar = ! empty( $resolved['enabled'] )
             && in_array( 'view_page', (array) $resolved['placements'], true );
 
         if ( $shows_footer_bar ) {
-            $config = wp_json_encode(
-                array(
-                    'enabled'      => true,
-                    'networks'     => $resolved['networks'],
-                    'placements'   => $resolved['placements'],
-                    'button_style' => $resolved['button_style'],
-                    'button_size'  => $resolved['button_size'],
-                )
+            $config = array(
+                'enabled'      => true,
+                'networks'     => $resolved['networks'],
+                'placements'   => $resolved['placements'],
+                'button_style' => $resolved['button_style'],
+                'button_size'  => $resolved['button_size'],
             );
-            $html = '<div class="fotogrids-view__share" data-fg-share-footer="' . esc_attr( $config ) . '"></div>';
         } else {
-            $html = '<button type="button" class="fotogrids-view__share-copy"'
-                . ' data-url="' . esc_url( $url ) . '"'
-                . ' data-copied-label="' . esc_attr__( 'Copied!', 'fotogrids' ) . '">'
-                . esc_html__( 'Copy link', 'fotogrids' )
-                . '</button>';
+            // Copy-link-only fallback. Same payload shape so the Sharing
+            // module renders this just like any other share bar — just
+            // with a single network active.
+            $config = array(
+                'enabled'      => true,
+                'networks'     => array( 'copy_link' => true ),
+                'placements'   => array( 'view_footer' ),
+                'button_style' => 'icons_and_labels',
+                'button_size'  => 'medium',
+            );
         }
+
+        $html = '<div class="fotogrids-view__share" data-fg-share-footer="'
+            . esc_attr( wp_json_encode( $config ) ) . '"></div>';
 
         /**
          * Filter the share controls markup.
@@ -397,10 +750,44 @@ class Renderer {
      * @return void
      */
     public function enqueue_assets(): void {
-        wp_enqueue_script(
-            'fotogrids-frontend',
-            FOTOGRIDS_PLUGIN_URL . 'assets/js/frontend.js',
+        // Pre-register fotogrids-runtime so wp_localize_script can attach the
+        // shared settings payload. The runtime asset itself is enqueued by
+        // Asset_Resolver during the gallery/album render that happens inside
+        // this view page; this registration just makes the handle known.
+        wp_register_script(
+            'fotogrids-runtime',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/fotogrids-runtime.js',
             array(),
+            FOTOGRIDS_VERSION,
+            true
+        );
+
+        // Deep-linking is essential on the view page — the URL might
+        // carry ?fg-item={id} which we resolve into a lightbox open.
+        wp_enqueue_script(
+            'fotogrids-deep-linking',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
+            array( 'fotogrids-runtime' ),
+            FOTOGRIDS_VERSION,
+            true
+        );
+
+        // Sharing module — needed unconditionally because the View Page
+        // footer always shows at least a copy-link button via the
+        // Sharing module's attachFooterBars() (see share_html()). The
+        // Sharing_Decorator's render-pipeline assets() only enqueues
+        // this when sharing is enabled for the gallery being rendered;
+        // here we need it regardless of the gallery's sharing setting.
+        wp_enqueue_style(
+            'fotogrids-sharing',
+            FOTOGRIDS_PLUGIN_URL . 'public/render/decorators/sharing/sharing.css',
+            array(),
+            FOTOGRIDS_VERSION
+        );
+        wp_enqueue_script(
+            'fotogrids-sharing',
+            FOTOGRIDS_PLUGIN_URL . 'assets/js/sharing.js',
+            array( 'fotogrids-runtime' ),
             FOTOGRIDS_VERSION,
             true
         );
@@ -417,22 +804,6 @@ class Renderer {
             FOTOGRIDS_PLUGIN_URL . 'includes/modules/ViewCollections/assets/view-collection.css',
             array(),
             FOTOGRIDS_VERSION
-        );
-
-        wp_enqueue_script(
-            'fotogrids-view-collection-share',
-            FOTOGRIDS_PLUGIN_URL . 'includes/modules/ViewCollections/assets/view-collection-share.js',
-            array(),
-            FOTOGRIDS_VERSION,
-            true
-        );
-
-        wp_enqueue_script(
-            'fotogrids-deep-linking',
-            FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
-            array( 'fotogrids-frontend' ),
-            FOTOGRIDS_VERSION,
-            true
         );
 
         wp_enqueue_style(
@@ -452,14 +823,12 @@ class Renderer {
 
         $sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
 
+        // window.fotogrids carries only the sharing-related deep-link
+        // settings — same shape as the public render path.
         wp_localize_script(
-            'fotogrids-frontend',
+            'fotogrids-runtime',
             'fotogrids',
             array(
-                'restUrl'               => rest_url( 'fotogrids/v1/' ),
-                'nonce'                 => wp_create_nonce( 'wp_rest' ),
-                'stats_tracking'        => true,
-                'lazy_load'             => true,
                 'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
                 'embedded_share_target' => $sharing['embedded_share_target'],
             )

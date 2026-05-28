@@ -151,7 +151,7 @@ const TabPeople = ({
                 strings={strings}
                 metadataKey="people"
                 placeholder={strings.addPeoplePlaceholder || ''}
-                icon={window.FotoGridsIcons?.people || ''}
+                iconName="people"
                 showProNotice={!isProActive}
                 proNoticeContent={proNoticeContent}
             />

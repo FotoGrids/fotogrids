@@ -41,6 +41,34 @@ class Register_Album_Routes {
             ),
         ) );
 
+        // Featured gallery endpoint — sets or clears the album's featured gallery.
+        register_rest_route( 'fotogrids/v1', '/album/(?P<id>\d+)/featured-gallery', array(
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Album\Album_Data', 'set_featured_gallery' ),
+                'permission_callback' => array( '\FotoGrids\REST\Album\Album_Permissions', 'check_featured_gallery_write' ),
+                'args'                => array(
+                    'id' => array(
+                        'required'          => true,
+                        'sanitize_callback' => 'absint',
+                        'validate_callback' => function ( $param ) {
+                            return is_numeric( $param ) && $param > 0;
+                        },
+                    ),
+                    'gallery_id' => array(
+                        'required'          => false,
+                        'default'           => null,
+                        'sanitize_callback' => function ( $value ) {
+                            if ( $value === null || $value === '' ) {
+                                return null;
+                            }
+                            return absint( $value );
+                        },
+                    ),
+                ),
+            ),
+        ) );
+
         // Albums list endpoint
         register_rest_route( 'fotogrids/v1', '/albums', array(
             array(

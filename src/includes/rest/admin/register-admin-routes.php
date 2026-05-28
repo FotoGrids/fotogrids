@@ -194,6 +194,8 @@ class Register_Admin_Routes {
                     ),
                     'full_width'          => array( 'type' => 'integer', 'minimum' => 1,   'default' => 1920 ),
                     'full_height'         => array( 'type' => 'integer', 'minimum' => 0,   'default' => 0 ),
+                    'masonry_width'       => array( 'type' => 'integer', 'minimum' => 1,   'default' => 600 ),
+                    'justified_height'    => array( 'type' => 'integer', 'minimum' => 1,   'default' => 400 ),
                 ),
             ),
         ) );
@@ -227,6 +229,20 @@ class Register_Admin_Routes {
             array(
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_sharing_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+        ) );
+
+        // SEO settings: GET / POST /admin/seo-settings
+        register_rest_route( 'fotogrids/v1', '/admin/seo-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_seo_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_seo_settings' ),
                 'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
             ),
         ) );

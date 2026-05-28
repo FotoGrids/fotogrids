@@ -284,6 +284,7 @@ class Admin_Init {
             'apiUrl' => home_url( '/wp-json/' ),
             'generalSettings' => self::get_general_settings(),
             'sharingSettings' => \FotoGrids\Settings\Sharing_Settings_Store::get(),
+            'seoSettings' => \FotoGrids\Settings\SEO_Settings_Store::get(),
             'viewSettings' => \FotoGrids\Settings\View_Settings_Store::get(),
             'currentUser' => wp_get_current_user(),
             'shareStatistics' => (bool) get_option( 'fotogrids_share_statistics', false ),

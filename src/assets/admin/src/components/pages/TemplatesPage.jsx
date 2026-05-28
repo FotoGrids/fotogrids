@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import PreviewTemplateModal from '../templates/PreviewTemplateModal';
 import ApplyTemplateModal from '../templates/ApplyTemplateModal';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -100,13 +101,6 @@ const TemplatesPage = () => {
         }
     };
 
-    const renderIcon = (iconName) => {
-        const icons = window.FotoGridsIcons || {};
-        const iconSvg = icons[iconName];
-        if (!iconSvg) return null;
-        return <span className="fotogrids-icon" dangerouslySetInnerHTML={{ __html: iconSvg }} />;
-    };
-
     const renderTemplateCard = (template) => {
         const isProTemplate = template.type !== 'free' && !isProActive;
 
@@ -125,13 +119,13 @@ const TemplatesPage = () => {
                 >
                     {template.preview_icon ? (
                         <div className="fotogrids-template-card__preview-icon">
-                            {renderIcon(template.preview_icon)}
+                            <Icon name={template.preview_icon} />
                         </div>
                     ) : template.preview ? (
                         <img src={template.preview} alt={template.name} />
                     ) : (
                         <div className="fotogrids-template-card__preview-placeholder">
-                            {renderIcon('image')}
+                            <Icon name="image" />
                         </div>
                     )}
                 </div>
@@ -238,7 +232,7 @@ const TemplatesPage = () => {
                             }}
                         >
                             <div className="fotogrids-templates-page__info-item__heading">
-                                {renderIcon('check_circle')}
+                                <Icon name="check_circle" />
                                 <h5>
                                     {item.title}
                                     {item.pro && (
@@ -293,7 +287,7 @@ const TemplatesPage = () => {
                             onClick={() => setActiveTab('gallery')}
                         >
                             <span className="fotogrids-templates-page__tab__icon">
-                                {renderIcon('layout_3x3')}
+                                <Icon name="layout_3x3" />
                             </span>
                             <span className="fotogrids-templates-page__tab__label">
                                 {__('Gallery Templates', 'fotogrids')}
@@ -305,7 +299,7 @@ const TemplatesPage = () => {
                             onClick={() => setActiveTab('album')}
                         >
                             <span className="fotogrids-templates-page__tab__icon">
-                                {renderIcon('layout_2x2')}
+                                <Icon name="layout_2x2" />
                             </span>
                             <span className="fotogrids-templates-page__tab__label">
                                 {__('Album Templates', 'fotogrids')}

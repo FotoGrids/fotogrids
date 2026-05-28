@@ -66,8 +66,10 @@ class Module extends Abstract_Module implements Lifecycle_Module_Interface {
         require_once __DIR__ . '/class-settings.php';
         require_once __DIR__ . '/class-router.php';
         require_once __DIR__ . '/class-renderer.php';
+        require_once __DIR__ . '/class-seo-conflict-guard.php';
 
         Router::init();
+        SEO_Conflict_Guard::init();
 
         add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
     }

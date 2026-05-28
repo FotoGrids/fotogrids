@@ -24,6 +24,7 @@ const PanelRow = ({
     htmlFor,
     fullWidth = false,
     splitColumns = false,
+    largerLabels = false,
     className = '',
     children,
 }) => {
@@ -45,6 +46,7 @@ const PanelRow = ({
 
     const modifierClass = fullWidth    ? ` ${baseClass}--full`
                         : splitColumns ? ` ${baseClass}--split`
+                        : largerLabels ? ` ${baseClass}--larger-labels`
                         : '';
 
     return (

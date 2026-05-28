@@ -87,8 +87,10 @@
         background-color: var(--fg-interactive-selected-bg) !important;
     }
 
-    &__col-file {
-        width: 280px;
+    @media (min-width: 1601px) {
+        &__col-file {
+            width: 400px;
+        }
     }
 
     &__file {
@@ -168,8 +170,73 @@
         color: var(--fg-text-secondary);
     }
 
+    @at-root {
+        th#{&}__col-size--multi,
+        td#{&}__col-size--multi {
+            text-align: left;
+            white-space: nowrap;
+            width: 140px;
+            vertical-align: middle;
+        }
+    }
+
+    &__multi-rows {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    &__row-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        line-height: 1.3;
+        transition: opacity 0.15s ease;
+
+        &--unused {
+            opacity: 0.5;
+        }
+
+        &--unused:hover {
+            opacity: 0.75;
+        }
+    }
+
+    &__row-status-icon {
+        display: inline-flex;
+        align-items: center;
+        width: 14px;
+        font-weight: 700;
+    }
+
+    &__row-status--ok &__row-status-icon {
+        color: var(--fg-green);
+    }
+
+    &__row-status--missing &__row-status-icon {
+        color: var(--fg-red);
+    }
+
+    &__row-status-label {
+        font-weight: 500;
+        color: var(--fg-text-primary);
+    }
+
+    &__row-status--missing &__row-status-label {
+        color: var(--fg-text-secondary);
+    }
+
+    &__row-status-dims {
+        margin-left: 4px;
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--fg-text-secondary);
+    }
+
     &__col-other-sizes {
-        min-width: 180px;
+        width: 100px;
     }
 
     &__other-sizes-list {
@@ -209,7 +276,7 @@
     }
 
     &__col-action {
-        width: 140px;
+        width: 100px;
     }
 
     &__row-spinner {

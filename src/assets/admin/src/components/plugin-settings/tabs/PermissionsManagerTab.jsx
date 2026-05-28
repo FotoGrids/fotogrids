@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -358,16 +359,10 @@ const PermissionsManagerTab = () => {
                             {roles.map((role) => {
                                 const isChecked = hasCapability(role, permission.key);
                                 const iconName = isChecked ? 'check_circle' : 'circle';
-                                const iconSvg = window.FotoGridsIcons?.[iconName] || '';
 
                                 return (
                                     <div key={role.key} className={`fg-rpm__cell fg-rpm__cell--checkbox ${isChecked ? 'fg-rpm__cell--checkbox-checked' : ''} ${isEven ? 'fg-rpm__cell--even' : 'fg-rpm__cell--odd'}`}>
-                                        {iconSvg && (
-                                            <span
-                                                className="fotogrids-icon"
-                                                dangerouslySetInnerHTML={{ __html: iconSvg }}
-                                            />
-                                        )}
+                                        <Icon name={iconName} />
                                     </div>
                                 );
                             })}

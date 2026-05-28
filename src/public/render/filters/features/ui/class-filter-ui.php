@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Filters\Features\Ui;
 
 use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Filter_Option;
 use FotoGrids\Render\Api\Module_Assets;
@@ -72,6 +73,14 @@ final class Filter_Ui implements Feature {
      * @since  1.0.0
      */
     public function supports( Render_Context $render_context ): bool {
+        // Filters operate on attachment-level metadata (tags, people,
+        // locations on the items inside a gallery). Album items are
+        // galleries, not attachments — none of the filter sources have
+        // anything to filter by.
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
+
         if ( ! ( $render_context->settings['filtering_enabled'] ?? false ) ) {
             return false;
         }
@@ -290,7 +299,7 @@ final class Filter_Ui implements Feature {
             js: [
                 'fotogrids-filter-ui' => new Asset_Decl(
                     path:      '../../assets/js/filter-ui.js',
-                    deps:      [],
+                    deps:      [ 'fotogrids-runtime' ],
                     in_footer: true,
                 ),
             ]

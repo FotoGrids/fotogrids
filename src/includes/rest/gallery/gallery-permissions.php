@@ -84,6 +84,34 @@ class Gallery_Permissions {
         return current_user_can( 'manage_fotogrids' );
     }
 
+    /**
+     * Permission check for writing a gallery's featured item.
+     *
+     * Mirrors WP's `edit_post` cap for the specific gallery ID.
+     *
+     * @since 1.0.0
+     * @param \WP_REST_Request $request
+     * @return bool|\WP_Error
+     */
+    public static function check_featured_item_write( $request ) {
+        $gallery_id = absint( $request['id'] );
+        if ( $gallery_id <= 0 ) {
+            return new \WP_Error(
+                'fotogrids_invalid_gallery',
+                __( 'Invalid gallery ID.', 'fotogrids' ),
+                array( 'status' => 400 )
+            );
+        }
+        if ( ! current_user_can( 'edit_post', $gallery_id ) ) {
+            return new \WP_Error(
+                'fotogrids_forbidden',
+                __( 'You do not have permission to edit this gallery.', 'fotogrids' ),
+                array( 'status' => 403 )
+            );
+        }
+        return true;
+    }
+
     public static function check_gallery_password_read( $request ) {
         $gallery_id = absint( $request['id'] );
         $user_id    = get_current_user_id();

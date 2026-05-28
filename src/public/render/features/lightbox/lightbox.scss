@@ -80,10 +80,10 @@
     --fg-lb-info-gap:                 12px;
     --fg-lb-info-width:               280px;
     --fg-lb-info-max-width:           28%;
-    --fg-lb-info-block-radius:        4px;
+    --fg-lb-info-block-radius:        8px;
     --fg-lb-info-block-padding:       12px 0;
     --fg-lb-info-block-padding-boxed: 12px;
-    --fg-lb-info-block-margin:        4px;
+    --fg-lb-info-block-margin:        0px;
 
     // ── Info panel typography ─────────────────────────────────────────────
     --fg-lb-info-font-family:       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -803,8 +803,16 @@
     margin:     0;
     box-sizing: border-box;
     overflow:   hidden;
+    flex:       0 0 auto;
 
     &[hidden] { display: none; }
+
+    // Empty blocks (data not yet arrived from REST, or no data
+    // available) are hidden completely. Previously these showed
+    // skeleton placeholders that flashed for the duration of a fast
+    // fetch — visually a layout glitch. Now: nothing renders until
+    // the data is populated.
+    &:empty { display: none; }
 
     // Boxed mode - card background + radius.
     .fg-lb-info[data-fg-lb-info-blocks-style="boxed"] & {
@@ -817,11 +825,6 @@
     // Divided mode - top border rule on every block except the first.
     .fg-lb-info[data-fg-lb-info-blocks-style="divided"] &:not(:first-child) {
         border-top: 1px solid var(--fg-lb-color-info-block-divider, rgba(255,255,255,0.12));
-    }
-
-    // Loading state - skeleton placeholder.
-    &.fg-lb-info-block--loading {
-        padding: var(--fg-lb-info-block-padding);
     }
 }
 
@@ -955,51 +958,38 @@
     color:       var(--fg-lb-color-info-text);
 }
 
-// ── Skeleton loader ─────────────────────────────────────────────────────────
-// Used while the REST fetch is in progress (block has .fg-lb-info-block--loading).
-@keyframes fg-lb-skeleton-pulse {
-    0%, 100% { opacity: 0.4; }
-    50%       { opacity: 0.7; }
-}
-
-.fg-lb-info-skeleton-line {
-    height:        10px;
-    border-radius: 4px;
-    background:    var(--fg-lb-color-info-text);
-    margin-bottom: 6px;
-    animation:     fg-lb-skeleton-pulse 1.5s ease-in-out infinite;
-
-    &:nth-child(1) { width: 80%; }
-    &:nth-child(2) { width: 55%; animation-delay: 0.2s; }
-    &:nth-child(3) { width: 65%; animation-delay: 0.4s; }
-    &:last-child   { margin-bottom: 0; }
-}
-
-// Inline description skeleton (inside caption block).
-.fg-lb-info-description.fg-lb-info-skeleton {
-    height:        10px;
-    border-radius: 4px;
-    background:    var(--fg-lb-color-info-text);
-    opacity:       0.4;
-    width:         70%;
-    animation:     fg-lb-skeleton-pulse 1.5s ease-in-out infinite;
-    margin-top:    4px;
-    color:         transparent; // Hide any accidental text.
-
-    &[hidden] { display: none; }
-}
+// (Skeleton-loader styles previously lived here. They've been removed
+// along with the JS that produced skeleton markup: on fast networks the
+// skeleton flash read as a glitch. Info blocks now render only when
+// their data is present; empty blocks are hidden via `&:empty`.)
 
 /* ==========================================================================
    Thumbnail strip
    ========================================================================== */
 
+// The thumb strip is a two-element structure:
+//   .fg-lb-thumbs        — the scrollable viewport (also a flex container)
+//   .fg-lb-thumbs__track — the flex track that holds the thumb buttons
+//
+// Both are flex containers. The outer one's `justify-content: center`
+// (the natural flex behaviour) does NOT play well with overflow — when
+// content overflows, the leftmost items spill out of reach. The fix
+// is `margin: auto` on the inner track:
+//
+//  - When track width <= viewport width: `margin: auto` absorbs the free
+//    space symmetrically → track is centred.
+//  - When track width >  viewport width: there's no free space for
+//    `margin: auto` to absorb → margins collapse to 0 → track starts at
+//    the viewport edge and scrolls freely in BOTH directions.
+//
+// This is the canonical flexbox idiom for "center if it fits, scroll if
+// it doesn't" — works the same on every modern browser.
+
 .fg-lb-thumbs {
     flex-shrink: 0;
     display:     flex;
-    gap:         var(--fg-lb-thumb-spacing);
-    padding:     var(--fg-lb-thumbs-padding);
     background:  var(--fg-lb-color-thumbs-bg);
-    overflow:    auto;
+    padding:     var(--fg-lb-thumbs-padding);
     scrollbar-width: thin;
     scrollbar-color: var(--fg-lb-color-thumb-border) transparent;
 
@@ -1010,21 +1000,36 @@
     &::-webkit-scrollbar-thumb  { background: var(--fg-lb-color-thumb-border); border-radius: 2px; }
 }
 
+.fg-lb-thumbs__track {
+    display:     flex;
+    gap:         var(--fg-lb-thumb-spacing);
+    flex-shrink: 0;        // never let the track shrink — content drives its size
+}
+
 .fg-lb-thumbs--bottom,
 .fg-lb-thumbs--top {
     flex-direction: row;
-    justify-content: center;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-x:     auto;
+    overflow-y:     hidden;
+
+    .fg-lb-thumbs__track {
+        flex-direction: row;
+        margin-inline:  auto;  // centres when fitting; collapses to 0 when overflowing
+    }
 }
 
 .fg-lb-thumbs--left,
 .fg-lb-thumbs--right {
     flex-direction: column;
-    align-items:    center;
     overflow-x:     hidden;
     overflow-y:     auto;
     max-height:     100%;
+
+    .fg-lb-thumbs__track {
+        flex-direction: column;
+        align-items:    center;
+        margin-block:   auto;  // centres vertically when fitting; collapses when overflowing
+    }
 }
 
 .fg-lb-thumb {

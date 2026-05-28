@@ -336,7 +336,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     const [unusedOnly, setUnusedOnly] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [notice, setNotice] = useState(null);
 
     // ─── Selection / inline state ────────────────────────────────────────────
     const [selectedIds, setSelectedIds] = useState(new Set());
@@ -348,8 +347,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     const [createDraft, setCreateDraft] = useState({});
     const [mergeOpen, setMergeOpen] = useState(false);
     const [recalcing, setRecalcing] = useState(false);
-
-
 
     // ─── Data load ───────────────────────────────────────────────────────────
     const reqIdRef = useRef(0);
@@ -424,8 +421,16 @@ const LibraryTabBase = ({ entityType, config }) => {
     }, [orderby]);
 
     const flashNotice = useCallback((status, message) => {
-        setNotice({ status, message });
-        setTimeout(() => setNotice(null), 4000);
+        if (!window.fotogridsToast) return;
+        if (status === 'success') {
+            window.fotogridsToast.success(message);
+        } else if (status === 'error') {
+            window.fotogridsToast.error(message);
+        } else if (status === 'warning') {
+            window.fotogridsToast.warning(message);
+        } else {
+            window.fotogridsToast.info(message);
+        }
     }, []);
 
     // ─── Inline rename ───────────────────────────────────────────────────────
@@ -467,10 +472,25 @@ const LibraryTabBase = ({ entityType, config }) => {
             .then((updated) => {
                 setItems((prev) => prev.map((it) => (it.id === editingId ? updated : it)));
                 cancelEdit();
-                flashNotice('success', __('Saved.', 'fotogrids'));
+                flashNotice(
+                    'success',
+                    sprintf(
+                        /* translators: 1: entity type singular (e.g. "tag"), 2: entry name */
+                        __('Saved the %1$s "%2$s".', 'fotogrids'),
+                        (entityType.label_singular || __('entry', 'fotogrids')).toLowerCase(),
+                        updated.name
+                    )
+                );
             })
             .catch((err) => {
-                flashNotice('error', err?.message || __('Save failed.', 'fotogrids'));
+                flashNotice(
+                    'error',
+                    err?.message || sprintf(
+                        /* translators: %s: entity type singular (e.g. "tag") */
+                        __('Could not save %s.', 'fotogrids'),
+                        (entityType.label_singular || __('entry', 'fotogrids')).toLowerCase()
+                    )
+                );
             });
     }, [editingId, editingDraft, entityType.type, entityType.slug, restBase, cancelEdit, flashNotice]);
 
@@ -486,6 +506,8 @@ const LibraryTabBase = ({ entityType, config }) => {
     const confirmDelete = useCallback(() => {
         if (!deleteTarget) return;
         const id = deleteTarget.id;
+        const name = deleteTarget.name;
+        const typeLabel = (entityType.label_singular || __('entry', 'fotogrids')).toLowerCase();
         apiFetch({
             path: `/${restBase}/${entityType.slug}/${id}`,
             method: 'DELETE',
@@ -494,13 +516,29 @@ const LibraryTabBase = ({ entityType, config }) => {
                 setItems((prev) => prev.filter((it) => it.id !== id));
                 setTotal((t) => Math.max(0, t - 1));
                 cancelDelete();
-                flashNotice('success', __('Deleted.', 'fotogrids'));
+                flashNotice(
+                    'success',
+                    sprintf(
+                        /* translators: 1: entity type singular (e.g. "tag"), 2: entry name */
+                        __('Deleted the %1$s "%2$s".', 'fotogrids'),
+                        typeLabel,
+                        name
+                    )
+                );
             })
             .catch((err) => {
-                flashNotice('error', err?.message || __('Delete failed.', 'fotogrids'));
+                flashNotice(
+                    'error',
+                    err?.message || sprintf(
+                        /* translators: 1: entity type singular (e.g. "tag"), 2: entry name */
+                        __('Could not delete the %1$s "%2$s".', 'fotogrids'),
+                        typeLabel,
+                        name
+                    )
+                );
                 cancelDelete();
             });
-    }, [deleteTarget, entityType.slug, restBase, cancelDelete, flashNotice]);
+    }, [deleteTarget, entityType.slug, entityType.label_singular, restBase, cancelDelete, flashNotice]);
 
     // ─── Bulk delete ─────────────────────────────────────────────────────────
     const confirmBulkDelete = () => {
@@ -515,16 +553,29 @@ const LibraryTabBase = ({ entityType, config }) => {
             .then((response) => {
                 loadList();
                 setBulkConfirmOpen(false);
+                const deleted = response.deleted || 0;
                 flashNotice(
                     'success',
                     sprintf(
-                        _n('%d entry deleted.', '%d entries deleted.', response.deleted || 0, 'fotogrids'),
-                        response.deleted || 0
+                        /* translators: 1: number of entries, 2: entity type (singular or plural, e.g. "tag" / "tags") */
+                        _n('Deleted %1$d %2$s.', 'Deleted %1$d %2$s.', deleted, 'fotogrids'),
+                        deleted,
+                        (deleted === 1
+                            ? (entityType.label_singular || __('entry', 'fotogrids'))
+                            : (entityType.label_plural || __('entries', 'fotogrids'))
+                        ).toLowerCase()
                     )
                 );
             })
             .catch((err) => {
-                flashNotice('error', err?.message || __('Bulk delete failed.', 'fotogrids'));
+                flashNotice(
+                    'error',
+                    err?.message || sprintf(
+                        /* translators: %s: entity type plural (e.g. "tags") */
+                        __('Could not delete the selected %s.', 'fotogrids'),
+                        (entityType.label_plural || __('entries', 'fotogrids')).toLowerCase()
+                    )
+                );
                 setBulkConfirmOpen(false);
             });
     };
@@ -548,18 +599,35 @@ const LibraryTabBase = ({ entityType, config }) => {
             body.details = createDraft.details;
         }
 
+        const createdName = body.name;
+        const typeLabel = (entityType.label_singular || __('entry', 'fotogrids')).toLowerCase();
         apiFetch({
             path: `/${restBase}/${entityType.slug}`,
             method: 'POST',
             data: body,
         })
-            .then(() => {
+            .then((created) => {
                 setCreateOpen(false);
                 loadList();
-                flashNotice('success', __('Created.', 'fotogrids'));
+                flashNotice(
+                    'success',
+                    sprintf(
+                        /* translators: 1: entity type singular (e.g. "tag"), 2: entry name */
+                        __('Created the %1$s "%2$s".', 'fotogrids'),
+                        typeLabel,
+                        (created && created.name) || createdName
+                    )
+                );
             })
             .catch((err) => {
-                flashNotice('error', err?.message || __('Create failed.', 'fotogrids'));
+                flashNotice(
+                    'error',
+                    err?.message || sprintf(
+                        /* translators: %s: entity type singular (e.g. "tag") */
+                        __('Could not create %s.', 'fotogrids'),
+                        typeLabel
+                    )
+                );
             });
     };
 
@@ -568,6 +636,7 @@ const LibraryTabBase = ({ entityType, config }) => {
     const closeMerge = () => setMergeOpen(false);
 
     const handleMerge = ({ targetId, sourceIds }) => {
+        const target = items.find((it) => it.id === targetId);
         return apiFetch({
             path: `/${restBase}/${entityType.slug}/merge`,
             method: 'POST',
@@ -575,12 +644,27 @@ const LibraryTabBase = ({ entityType, config }) => {
         }).then((response) => {
             loadList();
             setMergeOpen(false);
+            const merged = response.merged || 0;
+            const typeLabel = (merged === 1
+                ? (entityType.label_singular || __('entry', 'fotogrids'))
+                : (entityType.label_plural || __('entries', 'fotogrids'))
+            ).toLowerCase();
             flashNotice(
                 'success',
-                sprintf(
-                    _n('Merged %d entry.', 'Merged %d entries.', response.merged || 0, 'fotogrids'),
-                    response.merged || 0
-                )
+                target && target.name
+                    ? sprintf(
+                        /* translators: 1: number of merged entries, 2: entity type (singular or plural), 3: target entry name */
+                        _n('Merged %1$d %2$s into "%3$s".', 'Merged %1$d %2$s into "%3$s".', merged, 'fotogrids'),
+                        merged,
+                        typeLabel,
+                        target.name
+                    )
+                    : sprintf(
+                        /* translators: 1: number of merged entries, 2: entity type (singular or plural) */
+                        _n('Merged %1$d %2$s.', 'Merged %1$d %2$s.', merged, 'fotogrids'),
+                        merged,
+                        typeLabel
+                    )
             );
             return response;
         });
@@ -596,16 +680,29 @@ const LibraryTabBase = ({ entityType, config }) => {
         })
             .then((response) => {
                 loadList();
+                const touched = response.touched || 0;
                 flashNotice(
                     'success',
                     sprintf(
-                        _n('Recalculated %d entry.', 'Recalculated %d entries.', response.touched || 0, 'fotogrids'),
-                        response.touched || 0
+                        /* translators: 1: number of entries, 2: entity type (singular or plural, e.g. "tag" / "tags") */
+                        _n('Recalculated counts for %1$d %2$s.', 'Recalculated counts for %1$d %2$s.', touched, 'fotogrids'),
+                        touched,
+                        (touched === 1
+                            ? (entityType.label_singular || __('entry', 'fotogrids'))
+                            : (entityType.label_plural || __('entries', 'fotogrids'))
+                        ).toLowerCase()
                     )
                 );
             })
             .catch((err) => {
-                flashNotice('error', err?.message || __('Recalculate failed.', 'fotogrids'));
+                flashNotice(
+                    'error',
+                    err?.message || sprintf(
+                        /* translators: %s: entity type plural (e.g. "tags") */
+                        __('Could not recalculate counts for %s.', 'fotogrids'),
+                        (entityType.label_plural || __('entries', 'fotogrids')).toLowerCase()
+                    )
+                );
             })
             .finally(() => setRecalcing(false));
     };
@@ -628,11 +725,6 @@ const LibraryTabBase = ({ entityType, config }) => {
                 onRecalc={handleRecalc}
             />
 
-            {notice && (
-                <Notice status={notice.status} isDismissible={true} onRemove={() => setNotice(null)}>
-                    {notice.message}
-                </Notice>
-            )}
             {error && (
                 <Notice status="error" isDismissible={false}>{error}</Notice>
             )}

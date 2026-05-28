@@ -2,6 +2,7 @@
  * Pro Features Component
  */
 import React from 'react';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -33,9 +34,7 @@ const ProFeatures = () => {
                         'Bulk Operations',
                     ].map((feature) => (
                         <div key={generateProFeatureKey(feature)}>
-                            <span
-                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.check_badge_g }}
-                            />
+                            <Icon name="check_badge_g" />
                             {__(feature, 'fotogrids')}
                         </div>
                     ))}

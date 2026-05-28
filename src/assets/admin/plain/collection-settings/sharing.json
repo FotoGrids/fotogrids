@@ -92,8 +92,7 @@
             "options": [
                 { "label": "View page", "value": "view_page", "tier_required": "free" },
                 { "label": "Lightbox", "value": "lightbox", "tier_required": "free" },
-                { "label": "Thumbnails", "value": "thumbnail", "tier_required": "free" },
-                { "label": "Full image", "value": "full_image", "tier_required": "free" }
+                { "label": "Thumbnails", "value": "thumbnail", "tier_required": "free" }
             ],
             "default": ["view_page", "lightbox"],
             "disabled_unless": "sharing_override",

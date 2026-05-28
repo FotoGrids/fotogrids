@@ -1,0 +1,228 @@
+/*
+ * FotoGrids — Sharing
+ *
+ * Styles for the share bar in every placement it can appear:
+ *   • thumbnail overlay  (inside .fg-item, hover-revealed)
+ *   • footer             (view page footer container)
+ *   • lightbox           (toolbar, inside the lightbox overlay)
+ *
+ * Sizes follow the button_size setting (small / medium / large).
+ * Styles follow the button_style setting (icons_only / labels_only / icons_and_labels).
+ *
+ * Replaces the inline FotoGridsSharing.injectStyles() block from the
+ * legacy frontend monolith — no JS-injected CSS anywhere.
+ *
+ * Theming
+ * -------
+ * Every numeric value is a CSS custom property declared on
+ * .fotogrids-share-bar so a parent surface (the lightbox, the view-page
+ * footer, a site-level theme) can override individual tokens without
+ * needing selectors with high specificity.
+ *
+ *   Layout
+ *     --fg-sb-gap                 Spacing between buttons in the bar
+ *     --fg-sb-btn-radius          Button corner radius
+ *     --fg-sb-btn-padding         Button padding (medium size — default)
+ *     --fg-sb-btn-font-size       Button label font size (medium size)
+ *     --fg-sb-icon-size           Icon dimensions (medium size)
+ *     --fg-sb-labels-only-padding-x  Extra horizontal padding for labels-only
+ *
+ *   Size variants
+ *     --fg-sb-btn-padding-small / --fg-sb-btn-font-size-small / --fg-sb-icon-size-small
+ *     --fg-sb-btn-padding-large / --fg-sb-btn-font-size-large / --fg-sb-icon-size-large
+ *
+ *   Colours
+ *     --fg-sb-btn-bg              Idle button background
+ *     --fg-sb-btn-bg-hover        Button background on hover
+ *     --fg-sb-btn-color           Button text/icon colour
+ *     --fg-sb-active-scale        Scale factor on :active
+ *     --fg-sb-transition          Background + transform transition
+ *     --fg-sb-fade-transition     Opacity transition (thumbnail context)
+ *
+ *   Thumbnail overlay context
+ *     --fg-sb-thumbnail-bg        Backdrop behind the bar
+ *     --fg-sb-thumbnail-color     Button colour over the backdrop
+ *     --fg-sb-thumbnail-hover-bg  Button hover bg over the backdrop
+ *     --fg-sb-thumbnail-radius    Backdrop corner radius
+ *     --fg-sb-thumbnail-padding   Backdrop inner padding
+ *     --fg-sb-thumbnail-offset    Distance from item edge (right + bottom)
+ *     --fg-sb-thumbnail-blur      Backdrop-filter blur amount
+ */
+
+.fotogrids-share-bar {
+    /* Tokens — override at any parent to retheme. */
+    --fg-sb-gap:                    6px;
+    --fg-sb-btn-gap:                8px;
+    --fg-sb-btn-radius:             6px;
+    --fg-sb-btn-padding:            12px;
+    --fg-sb-btn-font-size:          12px;
+    --fg-sb-icon-size:              16px;
+    --fg-sb-labels-only-padding-x:  12px;
+
+    --fg-sb-btn-padding-small:      6px;
+    --fg-sb-btn-font-size-small:    11px;
+    --fg-sb-icon-size-small:        14px;
+
+    --fg-sb-btn-padding-large:      10px;
+    --fg-sb-btn-font-size-large:    14px;
+    --fg-sb-icon-size-large:        20px;
+
+    --fg-sb-btn-bg:                 rgba(0, 0, 0, 0.06);
+    --fg-sb-btn-bg-hover:           rgba(0, 0, 0, 0.12);
+    --fg-sb-btn-color:              inherit;
+    --fg-sb-active-scale:           0.94;
+    --fg-sb-transition:             background 0.15s ease, transform 0.1s ease;
+    --fg-sb-fade-transition:        opacity 0.15s ease;
+
+    --fg-sb-thumbnail-bg:           rgba(0, 0, 0, 0.45);
+    --fg-sb-thumbnail-color:        #fff;
+    --fg-sb-thumbnail-hover-bg:     rgba(255, 255, 255, 0.2);
+    --fg-sb-thumbnail-radius:       8px;
+    --fg-sb-thumbnail-padding:      4px;
+    --fg-sb-thumbnail-offset:       8px;
+    --fg-sb-thumbnail-blur:         2px;
+
+    display:     flex;
+    flex-wrap:   wrap;
+    gap:         var(--fg-sb-gap);
+    align-items: center;
+}
+
+.fotogrids-share-bar__btn {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            var(--fg-sb-btn-gap);
+    border:         0;
+    cursor:         pointer;
+    border-radius:  var(--fg-sb-btn-radius);
+    padding:        var(--fg-sb-btn-padding);
+    line-height:    1;
+    background:     var(--fg-sb-btn-bg);
+    color:          var(--fg-sb-btn-color);
+    font-size:      var(--fg-sb-btn-font-size);
+    transition:     var(--fg-sb-transition);
+}
+
+.fotogrids-share-bar__btn:hover {
+    background: var(--fg-sb-btn-bg-hover);
+}
+
+.fotogrids-share-bar__btn:active {
+    transform: scale(var(--fg-sb-active-scale));
+}
+
+.fotogrids-share-bar__icon {
+    display: inline-flex;
+    width:   var(--fg-sb-icon-size);
+    height:  var(--fg-sb-icon-size);
+}
+
+/* ----- Sizes ------------------------------------------------------------ */
+
+.fotogrids-share-bar--small .fotogrids-share-bar__icon {
+    width:  var(--fg-sb-icon-size-small);
+    height: var(--fg-sb-icon-size-small);
+}
+.fotogrids-share-bar--small .fotogrids-share-bar__btn {
+    padding:   var(--fg-sb-btn-padding-small);
+    font-size: var(--fg-sb-btn-font-size-small);
+}
+
+.fotogrids-share-bar--large .fotogrids-share-bar__icon {
+    width:  var(--fg-sb-icon-size-large);
+    height: var(--fg-sb-icon-size-large);
+}
+.fotogrids-share-bar--large .fotogrids-share-bar__btn {
+    padding:   var(--fg-sb-btn-padding-large);
+    font-size: var(--fg-sb-btn-font-size-large);
+}
+
+/* ----- Button styles --------------------------------------------------- */
+
+.fotogrids-share-bar--labels_only .fotogrids-share-bar__btn {
+    padding-left:  var(--fg-sb-labels-only-padding-x);
+    padding-right: var(--fg-sb-labels-only-padding-x);
+}
+
+/* ----- Thumbnail overlay context --------------------------------------- */
+
+.fg-item {
+    position: relative;
+}
+
+.fotogrids-share-bar--thumbnail {
+    position:        absolute;
+    right:           var(--fg-sb-thumbnail-offset);
+    bottom:          var(--fg-sb-thumbnail-offset);
+    opacity:         0;
+    transition:      var(--fg-sb-fade-transition);
+    background:      var(--fg-sb-thumbnail-bg);
+    padding:         var(--fg-sb-thumbnail-padding);
+    border-radius:   var(--fg-sb-thumbnail-radius);
+    backdrop-filter: blur(var(--fg-sb-thumbnail-blur));
+}
+
+.fotogrids-share-bar--thumbnail .fotogrids-share-bar__btn {
+    background: transparent;
+    color:      var(--fg-sb-thumbnail-color);
+}
+
+.fotogrids-share-bar--thumbnail .fotogrids-share-bar__btn:hover {
+    background: var(--fg-sb-thumbnail-hover-bg);
+}
+
+.fg-item:hover .fotogrids-share-bar--thumbnail,
+.fg-item:focus-within .fotogrids-share-bar--thumbnail {
+    opacity: 1;
+}
+
+/* ----- Footer + lightbox contexts -------------------------------------- */
+
+.fotogrids-share-bar--footer,
+.fotogrids-share-bar--lightbox {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+/* ----- Lightbox-popover (inside the interactive tooltip) ---------------- */
+/*
+ * The share grid lives inside fg-tooltip in interactive mode. Compact
+ * layout: 3 icons per row, no gap between buttons (each button has its
+ * own padding), and the buttons get their own colour treatment to read
+ * well on the tooltip's dark background.
+ */
+.fotogrids-share-bar--lightbox-popover {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 2px;
+}
+
+.fotogrids-share-bar--lightbox-popover .fotogrids-share-bar__btn {
+    background:    rgba(255, 255, 255, 0.06);
+    color:         #fff;
+    border-radius: 3px;
+}
+
+.fotogrids-share-bar--lightbox-popover .fotogrids-share-bar__btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+/* ----- Copy-link click feedback ---------------------------------------- */
+/*
+ * Short-lived visual confirmation after a copy-link click. The tooltip
+ * label change handles screen readers / hover-feedback in non-popover
+ * contexts; this provides a visual signal for users inside the
+ * interactive lightbox popover, where the tooltip itself is hosting the
+ * share grid and won't show a text refresh.
+ */
+.fotogrids-share-bar__btn--just-copied {
+    background: rgba(46, 160, 67, 0.45) !important;  /* green-ish */
+    color:      #fff;
+    transition: background 0.2s ease;
+}
+
+.fotogrids-share-bar__btn--copy-failed {
+    background: rgba(207, 34, 46, 0.45) !important;  /* red-ish */
+    color:      #fff;
+    transition: background 0.2s ease;
+}

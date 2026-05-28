@@ -26,6 +26,7 @@
  * @param {string}       [props.inputId]          HTML id for the hidden input.
  */
 import React from 'react';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -78,14 +79,15 @@ const UploadArea = ({
         }
     };
 
+    const baseClass = 'fotogrids-upload-area';
     const zoneClass = [
-        'fotogrids-upload-area',
-        isDragging  ? 'fotogrids-upload-area--dragging'  : '',
-        isUploading ? 'fotogrids-upload-area--uploading' : '',
+        baseClass,
+        isDragging  ? `${baseClass}--dragging`  : '',
+        isUploading ? `${baseClass}--uploading` : '',
     ].filter(Boolean).join(' ');
 
     return (
-        <div className="fotogrids-upload-area-wrapper">
+        <div className={`${baseClass}-wrapper`}>
             <div
                 className={zoneClass}
                 onDragOver={handleDragOver}
@@ -106,10 +108,10 @@ const UploadArea = ({
                 />
 
                 {isUploading ? (
-                    <div className="fotogrids-upload-area__progress">
-                        <div className="fotogrids-upload-area__progress-bar">
+                    <div className={`${baseClass}__progress`}>
+                        <div className={`${baseClass}__progress-bar`}>
                             <div
-                                className="fotogrids-upload-area__progress-fill"
+                                className={`${baseClass}__progress-fill`}
                                 style={{ width: `${uploadProgress}%` }}
                             />
                         </div>
@@ -117,25 +119,19 @@ const UploadArea = ({
                     </div>
                 ) : (
                     <>
-                        <div className="fotogrids-upload-area__icon">
-                            <div
-                                className="fotogrids-upload-area__icon-folder"
-                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.folder }}
-                            />
-                            <div
-                                className="fotogrids-upload-area__icon-plus"
-                                dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.plus }}
-                            />
+                        <div className={`${baseClass}__icon`}>
+                            <Icon name="folder" className={`${baseClass}__icon-folder`} />
+                            <Icon name="plus" className={`${baseClass}__icon-plus`} />
                         </div>
                         {title    && <h4>{title}</h4>}
                         {subtitle && <p>{subtitle}</p>}
-                        {hint     && <p className="fotogrids-upload-area__hint">{hint}</p>}
+                        {hint     && <p className={`${baseClass}__hint`}>{hint}</p>}
                     </>
                 )}
             </div>
 
             {error && (
-                <div className="fotogrids-upload-area__error notice notice-error">
+                <div className={`${baseClass}__error notice notice-error`}>
                     <p>{error}</p>
                 </div>
             )}

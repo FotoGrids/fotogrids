@@ -2,6 +2,7 @@
  * Learn & Get Inspired Section Component
  */
 import React from 'react';
+import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -9,39 +10,24 @@ const LearnSection = () => {
     return (
         <div className="fotogrids-admin-block-card fg-abc-learn">
             <div className="fotogrids-admin-block-card-header">
-                <div
-                    className="fotogrids-admin-block-card-header-icon"
-                    dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.book }}
-                />
+                <Icon name="book" className="fotogrids-admin-block-card-header-icon" />
                 <h3>{__('Learn & Get Inspired', 'fotogrids')}</h3>
             </div>
             <div className="fg-abc-learn-options">
                 <a href="#" className="fg-abc-learn-option" data-icon-color="blue">
-                    <span
-                        className="fotogrids-admin-block-card-icon"
-                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.rocket }}
-                    />
+                    <Icon name="rocket" className="fotogrids-admin-block-card-icon" />
                     {__('Getting Started', 'fotogrids')}
                 </a>
                 <a href="#" className="fg-abc-learn-option" data-icon-color="yellow">
-                    <span
-                        className="fotogrids-admin-block-card-icon"
-                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.puzzle }}
-                    />
+                    <Icon name="puzzle" className="fotogrids-admin-block-card-icon" />
                     {__('Explore Integrations', 'fotogrids')}
                 </a>
                 <a href="#" className="fg-abc-learn-option" data-icon-color="green">
-                    <span
-                        className="fotogrids-admin-block-card-icon"
-                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.bulb }}
-                    />
+                    <Icon name="bulb" className="fotogrids-admin-block-card-icon" />
                     {__('Productivity Hacks', 'fotogrids')}
                 </a>
                 <a href="#" className="fg-abc-learn-option" data-icon-color="red">
-                    <span
-                        className="fotogrids-admin-block-card-icon"
-                        dangerouslySetInnerHTML={{ __html: window.FotoGridsIcons?.help }}
-                    />
+                    <Icon name="help" className="fotogrids-admin-block-card-icon" />
                     {__('Help Center', 'fotogrids')}
                 </a>
             </div>

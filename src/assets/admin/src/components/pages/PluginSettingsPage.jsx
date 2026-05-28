@@ -8,12 +8,13 @@ import MaintenanceTab from '../plugin-settings/tabs/MaintenanceTab';
 import PermissionsManagerTab from '../plugin-settings/tabs/PermissionsManagerTab';
 import MediaTab from '../plugin-settings/tabs/MediaTab';
 import SharingTab from '../plugin-settings/tabs/SharingTab';
+import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
 import TabBar from '../shared/TabBar.jsx';
 
 const { __ } = wp.i18n;
 
-const TAB_IDS = ['media', 'responsiveness', 'defaults', 'view_pages', 'sharing', 'permissions_manager', 'advanced', 'maintenance'];
+const TAB_IDS = ['media', 'responsiveness', 'defaults', 'view_pages', 'sharing', 'seo', 'permissions_manager', 'advanced', 'maintenance'];
 const DEFAULTS_TABS = [
     { id: 'gallery', label: __('Gallery Defaults', 'fotogrids'), icon: 'layout_3x3' },
     { id: 'album', label: __('Album Defaults', 'fotogrids'), icon: 'layout_2x2' }
@@ -28,6 +29,7 @@ const PluginSettingsPage = () => {
         { id: 'defaults', label: __('Defaults', 'fotogrids'), icon: 'layout', group: 'setup' },
         { id: 'view_pages', label: __('View Pages', 'fotogrids'), icon: 'image', group: 'setup' },
         { id: 'sharing', label: __('Sharing', 'fotogrids'), icon: 'share', group: 'setup' },
+        { id: 'seo', label: __('SEO', 'fotogrids'), icon: 'search_md', group: 'setup' },
         { id: 'permissions_manager', label: __('Permissions Manager', 'fotogrids'), icon: 'security', group: 'setup' },
         { id: 'advanced', label: __('Advanced', 'fotogrids'), icon: 'settings', group: 'system' },
         { id: 'maintenance', label: __('Maintenance', 'fotogrids'), icon: 'tools', group: 'system' }
@@ -223,6 +225,8 @@ const PluginSettingsPage = () => {
                 return <ViewPagesTab />;
             case 'sharing':
                 return <SharingTab />;
+            case 'seo':
+                return <SEOTab />;
             case 'permissions_manager':
                 return (
                     <Panel
