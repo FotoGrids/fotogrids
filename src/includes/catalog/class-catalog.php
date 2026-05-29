@@ -112,8 +112,10 @@ final class Catalog {
         $free_catalog_dir = trailingslashit( FOTOGRIDS_PLUGIN_DIR . 'assets/admin/plain/collection-settings' );
         $json_file_paths  = [
             $free_catalog_dir . 'layout.json',
-            $free_catalog_dir . 'interactions.json',
+            $free_catalog_dir . 'layout-navigation.json',
             $free_catalog_dir . 'styling.json',
+            $free_catalog_dir . 'interactions.json',
+            $free_catalog_dir . 'lightbox.json',
             $free_catalog_dir . 'captions.json',
             $free_catalog_dir . 'pagination.json',
             $free_catalog_dir . 'sorting.json',
@@ -239,6 +241,14 @@ final class Catalog {
 
             $setting_type = $setting['type'] ?? '';
             if ( in_array( $setting_type, [ 'setting_group', 'side_by_side' ], true ) && ! empty( $setting['settings'] ) && is_array( $setting['settings'] ) ) {
+                // Register the container's own key (if any) so its tier_required
+                // is reflected in field_states. Without this, the Pro badge on
+                // a Pro-tier setting_group/side_by_side never renders even
+                // though the group is correctly greyed out by the disabled path.
+                $container_key = $setting['key'] ?? null;
+                if ( is_string( $container_key ) && $container_key !== '' ) {
+                    self::$entries[ $container_key ] = self::normalize( $setting, $group );
+                }
                 self::flatten_settings( $setting['settings'], $group );
                 continue;
             }

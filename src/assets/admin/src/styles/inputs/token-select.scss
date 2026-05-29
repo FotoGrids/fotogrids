@@ -78,7 +78,7 @@
     &__token {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 4px;
         padding: 2px 6px 2px 4px;
         background: var(--fg-background-tertiary, #f0f0f1);
         border: 1px solid var(--fg-border-secondary, #e0e0e0);
@@ -133,6 +133,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        padding-inline-start: 4px;
     }
 
     &__token-remove {

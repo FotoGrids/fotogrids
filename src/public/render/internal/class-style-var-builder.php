@@ -19,22 +19,23 @@ if ( ! defined( 'WPINC' ) ) {
  * (tablet, mobile) - the count is bounded by breakpoints, never by the
  * number of properties or decorators.
  *
- * Output shape for instance #fotogrids-gallery-123:
+ * Output shape for instance #fg-123-1 (instance_id pattern is
+ * "fg-{collection_id}-{seq}", written into the wrapper's id attribute):
  *
  *   <style class="fg-vars">
- *   #fotogrids-gallery-123 {
+ *   #fg-123-1 {
  *       --fg-radius: 8px 4px;
  *       --fg-gap: 12px;
  *       --fg-border-color: #f00;
  *   }
  *   \@media (max-width: 1024px) {
- *       #fotogrids-gallery-123 {
+ *       #fg-123-1 {
  *           --fg-radius: 6px;
  *           --fg-gap: 8px;
  *       }
  *   }
  *   \@media (max-width: 767px) {
- *       #fotogrids-gallery-123 {
+ *       #fg-123-1 {
  *           --fg-radius: 4px;
  *           --fg-gap: 6px;
  *       }

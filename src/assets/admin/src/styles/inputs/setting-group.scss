@@ -29,7 +29,8 @@
 		gap: ui-size(padding, 2xl);
     }
     
-    &--disabled {       
+    &--disabled {
+        .fotogrids-setting-group__label .fotogrids-pro-badge,
         .fotogrids-setting-group__content {
             opacity: 0.5;
         }

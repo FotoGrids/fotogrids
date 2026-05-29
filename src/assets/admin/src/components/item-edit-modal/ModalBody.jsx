@@ -57,8 +57,8 @@ const ModalBody = ({
 						<div className="fotogrids-item-preview__error">
 							<Icon name="x_circle" className="fotogrids-item-preview__error-icon" />
 						</div>
-					) : itemData?.medium_url ? (
-						<img src={itemData.medium_url} alt={formData?.alt || ''} />
+					) : itemData?.thumbnail_url ? (
+						<img src={itemData.thumbnail_url} alt={formData?.alt || ''} />
 					) : null}
 				</div>
 				{loading ? null : hasError ? (

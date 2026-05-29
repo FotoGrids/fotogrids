@@ -56,6 +56,17 @@
     // Direction is set by JS via data-dir on the tooltip element (see
     // fg-tooltip.js position()). Default direction is "above" — the
     // tooltip sits above the host, arrow drops down from the bottom.
+    // Arrow position along the cross-axis. JS sets --fg-tt-arrow-x (for
+    // above/below) or --fg-tt-arrow-y (for left/right) in pixels measured
+    // from the tooltip's top-left corner. This lets the arrow stay
+    // pointed at the host even when the tooltip body has been clamped
+    // away from the host centre near a viewport edge. When unset (first
+    // paint, or unusual layouts) we fall back to 50% so the arrow is
+    // centred on the tooltip body — same behaviour as before this var
+    // existed.
+    --fg-tt-arrow-x: 50%;
+    --fg-tt-arrow-y: 50%;
+
     &::before {
         content:    "";
         position:   absolute;
@@ -64,7 +75,7 @@
         border:     var(--fg-tt-arrow-size) solid transparent;
         // Default placement = above (arrow points down from bottom of tooltip).
         top:              100%;
-        left:             50%;
+        left:             var(--fg-tt-arrow-x);
         transform:        translateX(-50%);
         border-top-color: var(--fg-tt-bg);
     }
@@ -72,14 +83,14 @@
     &[data-dir="below"]::before {
         top:                 auto;
         bottom:              100%;
-        left:                50%;
+        left:                var(--fg-tt-arrow-x);
         transform:           translateX(-50%);
         border-top-color:    transparent;
         border-bottom-color: var(--fg-tt-bg);
     }
 
     &[data-dir="left"]::before {
-        top:               50%;
+        top:               var(--fg-tt-arrow-y);
         bottom:            auto;
         left:              100%;
         transform:         translateY(-50%);
@@ -88,7 +99,7 @@
     }
 
     &[data-dir="right"]::before {
-        top:                50%;
+        top:                var(--fg-tt-arrow-y);
         bottom:             auto;
         left:               auto;
         right:              100%;

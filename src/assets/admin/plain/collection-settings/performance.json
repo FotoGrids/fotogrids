@@ -67,7 +67,7 @@
                     "key": "cache_duration",
                     "type": "range",
                     "label": "Cache Duration",
-                    "description": "How long to cache gallery output (in hours).",
+                    "description": "How long to cache {postType.lower} output (in hours).",
                     "unit": "hours",
                     "min": 1,
                     "max": 168,

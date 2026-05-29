@@ -42,7 +42,7 @@
                     "key": "fotogrids_og_image_source",
                     "type": "button_group",
                     "label": "OG Image Source",
-                    "description": "Choose which image appears in social previews for this gallery.",
+                    "description": "Choose which image appears in social previews for this {postType}.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -123,7 +123,7 @@
                     "key": "fotogrids_noindex",
                     "type": "toggle",
                     "label": "Hide from search engines",
-                    "description": "When on, emits <meta name=\"robots\" content=\"noindex, nofollow\"> so search engines skip this page. Use for drafts, private clients, or one-off galleries you don't want indexed.",
+                    "description": "When on, emits <meta name=\"robots\" content=\"noindex, nofollow\"> so search engines skip this page. Use for drafts, private clients, or one-off {postType.plural.lower} you don't want indexed.",
                     "default": false,
                     "tier_required": "free",
                     "render_when_unlicensed": true,
@@ -132,9 +132,9 @@
                 },
                 {
                     "key": "fotogrids_canonical_override",
-                    "type": "text",
+                    "type": "text_input",
                     "label": "Canonical URL Override",
-                    "description": "Optional. Leave empty to use this view page's permalink. Useful when the same gallery is published under multiple URLs.",
+                    "description": "Optional. Leave empty to use this view page's permalink. Useful when the same {postType} is published under multiple URLs.",
                     "default": "",
                     "tier_required": "free",
                     "render_when_unlicensed": true,

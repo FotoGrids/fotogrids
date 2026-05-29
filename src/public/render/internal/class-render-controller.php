@@ -120,8 +120,18 @@ final class Render_Controller {
             }
 
             $layout_css_classes = array_merge( $layout_css_classes, $layout_module->structural_classes( $render ) );
+            // Layout-supplied contributions go in first; the composer's
+            // capability-driven contributions go on top so that
+            // shared / cross-cutting logic (item-box vars, columns vars,
+            // gap, lightbox-extended attrs, the universal data-fg-layout
+            // attr) always wins over any stale per-layout duplicates.
             $wrapper_data_attrs = array_merge( $wrapper_data_attrs, $layout_module->wrapper_data_attrs( $render ) );
             $css_variables      = array_merge( $css_variables, $layout_module->style_vars( $render ) );
+
+            $composed           = Layout_Wrapper_Composer::compose( $layout_module, $render );
+            $wrapper_data_attrs = array_merge( $wrapper_data_attrs, $composed['wrapper_data_attrs'] );
+            $css_variables      = array_merge( $css_variables, $composed['style_vars'] );
+
             $this->asset_resolver->collect( $layout_module->assets( $render ), $layout_module->origin() );
             $active_modules['layouts'][] = $layout_module->id();
 
@@ -228,8 +238,9 @@ final class Render_Controller {
     /**
      * Builds wrapper HTML from assembled rendering state.
      *
-     * The wrapper element always carries exactly one class ('fotogrids-gallery'
-     * or 'fotogrids-album') plus any layout structural classes (e.g.
+     * Every wrapper carries the umbrella class 'fotogrids-collection' plus
+     * exactly one discriminator class ('fotogrids-gallery' or
+     * 'fotogrids-album') plus any layout structural classes (e.g.
      * 'fg-layout-grid'). All decorator and feature state is expressed as
      * 'data-fg-*' attributes. 'data-fg-gallery-id' is always written first.
      *
@@ -248,24 +259,16 @@ final class Render_Controller {
         array $css_variables,
         string $inner_html
     ): string {
-        // Base class is 'fotogrids-gallery' for galleries and 'fotogrids-album'
-        // for albums-as-collections (collection_kind discriminator on Render_Meta).
-        // Layout classes follow.
-        $base_class = $render->meta->collection_kind === Collection_Kind::ALBUM
-            ? 'fotogrids-album'
-            : 'fotogrids-gallery';
-        // We keep .fotogrids-gallery on album wrappers too — the runtime's
-        // .fotogrids-gallery selector, the MutationObserver and every
-        // per-gallery feature module's onGallery() callback all key off it,
-        // and an album-as-collection IS a gallery-shaped render. The
-        // 'fotogrids-album' class is the additional discriminator decorators
-        // and CSS can use to differentiate.
+        // Every wrapper carries the umbrella class 'fotogrids-collection'
+        // (the runtime's discovery selector + the only selector that means
+        // "any FotoGrids wrapper"). The kind-discriminator is a second class:
+        // 'fotogrids-gallery' for galleries, 'fotogrids-album' for albums.
+        // Layout structural classes follow.
         $base_classes = $render->meta->collection_kind === Collection_Kind::ALBUM
-            ? [ 'fotogrids-gallery', 'fotogrids-album' ]
-            : [ 'fotogrids-gallery' ];
+            ? [ 'fotogrids-collection', 'fotogrids-album' ]
+            : [ 'fotogrids-collection', 'fotogrids-gallery' ];
         $all_classes     = array_values( array_unique( array_merge( $base_classes, $layout_css_classes ) ) );
         $class_attribute = esc_attr( implode( ' ', $all_classes ) );
-        unset( $base_class );
 
         // data-fg-gallery-id is always the first attribute. For album
         // renders gallery_id is 0; data-fg-album-id is added too so

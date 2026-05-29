@@ -9,6 +9,7 @@ use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Filter_Option;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Internal\Layout_Capabilities;
 use FotoGrids\Render\Internal\Module_Registry;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -78,6 +79,17 @@ final class Filter_Ui implements Feature {
         // galleries, not attachments — none of the filter sources have
         // anything to filter by.
         if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
+
+        // Ask the active layout whether it wants a filter bar around it.
+        // Single Item / Image Viewer / Slider / Carousel return
+        // capabilities()['filters'] = false because they render a single
+        // item (or handle navigation themselves) - filtering chrome on top
+        // would make no sense. Belt-and-braces: this also catches the case
+        // where a user toggled filtering on in a multi-item layout and
+        // then switched to one of these layouts.
+        if ( ! Layout_Capabilities::supports( $render_context, 'filters' ) ) {
             return false;
         }
 

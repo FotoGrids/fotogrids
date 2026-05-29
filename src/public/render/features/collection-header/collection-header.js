@@ -54,9 +54,9 @@
         if ( event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ) return;
 
         // Walk up to the album wrapper that owns this gallery (if any).
-        // .fotogrids-album currently lives BOTH as a discriminator class on
-        // the wrapper AND historically as a standalone class — same lookup
-        // as Album_To_Gallery_Ajax.
+        // .fotogrids-album is unambiguous — it only appears on album
+        // wrappers — so a short selector is fine here (same lookup as
+        // Album_To_Gallery_Ajax).
         var albumEl = backLink.closest( '.fotogrids-album' );
         if ( ! albumEl ) {
             return; // Embedded outside an album or no album in scope — natural nav.

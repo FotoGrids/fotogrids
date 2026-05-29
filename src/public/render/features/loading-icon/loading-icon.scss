@@ -19,8 +19,7 @@
 
 // .fg-item-media must be position:relative so the absolute loader is contained.
 // collection-base.css already sets it, but we reinforce here in case of overrides.
-.fotogrids-gallery .fg-item-media,
-.fotogrids-album .fg-item-media {
+.fotogrids-collection .fg-item-media {
     position: relative;
 }
 
@@ -28,8 +27,7 @@
 // Loader container - centred absolutely inside .fg-item-media
 // -----------------------------------------------------------------------------
 
-.fotogrids-gallery .fg-item-loader,
-.fotogrids-album .fg-item-loader {
+.fotogrids-collection .fg-item-loader {
     position:        absolute;
     inset:           0;
     display:         flex;
@@ -55,17 +53,14 @@
 
 // Hide the image while it's loading so the loader reads clearly on the
 // background colour rather than competing with a half-decoded image.
-.fotogrids-gallery .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
-.fotogrids-gallery .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img,
-.fotogrids-album   .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
-.fotogrids-album   .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
     opacity: 0;
 }
 
 // Block clicks on the item's anchor while the image hasn't loaded yet.
 // Prevents the lightbox from opening on a blank/placeholder slot.
-.fotogrids-gallery .fg-item[data-fg-media-state="loading"] > a,
-.fotogrids-album   .fg-item[data-fg-media-state="loading"] > a {
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] > a {
     pointer-events: none;
 }
 
@@ -74,8 +69,7 @@
 // Loader fades out, image fades in.
 // -----------------------------------------------------------------------------
 
-.fotogrids-gallery .fg-item[data-fg-media-state="loaded"] .fg-item-loader,
-.fotogrids-album   .fg-item[data-fg-media-state="loaded"] .fg-item-loader {
+.fotogrids-collection .fg-item[data-fg-media-state="loaded"] .fg-item-loader {
     opacity: 0;
 }
 

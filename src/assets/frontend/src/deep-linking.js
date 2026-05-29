@@ -90,9 +90,9 @@
     function resolveTarget(link) {
         let galleries;
         if (link.galleryId) {
-            galleries = document.querySelectorAll(`.fotogrids-gallery[data-fg-gallery-id="${link.galleryId}"]`);
+            galleries = document.querySelectorAll(`.fotogrids-collection.fotogrids-gallery[data-fg-gallery-id="${link.galleryId}"]`);
         } else {
-            galleries = document.querySelectorAll('.fotogrids-gallery');
+            galleries = document.querySelectorAll('.fotogrids-collection.fotogrids-gallery');
         }
 
         for (const galleryEl of galleries) {
@@ -176,7 +176,7 @@
         if (!hasHistory) return;
         const detail = event.detail || {};
         const item = detail.item;
-        const galleryEl = detail.galleryEl || (item && item.triggerEl ? item.triggerEl.closest('.fotogrids-gallery') : null);
+        const galleryEl = detail.galleryEl || (item && item.triggerEl ? item.triggerEl.closest('.fotogrids-collection.fotogrids-gallery') : null);
         const itemId = item && item.id ? item.id : null;
         if (!itemId) return;
 

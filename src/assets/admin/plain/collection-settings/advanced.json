@@ -34,7 +34,7 @@
                     "key": "enable_statistics",
                     "type": "toggle",
                     "label": "Enable Statistics Tracking",
-                    "description": "Track gallery views and interactions for analytics.",
+                    "description": "Track {postType.lower} views and interactions for analytics.",
                     "default": true,
                     "tier_required": "free",
                     "render_when_unlicensed": true,

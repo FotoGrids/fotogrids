@@ -575,7 +575,7 @@ class Templates_Data {
             $html .= '            max-width: ' . esc_attr( $max_width ) . ';' . "\n";
         }
         $html .= '        }' . "\n";
-        $html .= '        .fotogrids-gallery {' . "\n";
+        $html .= '        .fotogrids-collection {' . "\n";
         $html .= '            max-width: 100%;' . "\n";
         $html .= '        }' . "\n";
         $html .= '        .fotogrids-item img {' . "\n";

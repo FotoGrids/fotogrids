@@ -12,7 +12,7 @@
                 {
                     "key": "who_can_edit",
                     "type": "button_group",
-                    "label": "Who can edit this Gallery?",
+                    "label": "Who can edit this {postType}?",
                     "options": [
                         {
                             "label": "All",
@@ -141,7 +141,7 @@
                 {
                     "key": "who_can_view",
                     "type": "button_group",
-                    "label": "Who can view this Gallery?",
+                    "label": "Who can view this {postType}?",
                     "options": [
                         {
                             "label": "All",

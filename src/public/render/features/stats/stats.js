@@ -111,7 +111,7 @@
 
         // Find any gallery on the page that has stats enabled so we can
         // reuse its restUrl + nonce.
-        var anyGallery = document.querySelector( '.fotogrids-gallery[data-fg-stats]' );
+        var anyGallery = document.querySelector( '.fotogrids-collection.fotogrids-gallery[data-fg-stats]' );
         if ( ! anyGallery ) return;
         var cfg = readConfig( anyGallery );
         if ( ! cfg ) return;

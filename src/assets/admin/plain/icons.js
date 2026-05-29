@@ -222,7 +222,7 @@ const FotoGridsIcons = {
     </svg>`,
 
     layout_slider: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="56" height="32" rx="2" ry="2" fill="currentColor" opacity="0.8"/>
+        <rect x="4" y="4" width="56" height="32" rx="2" ry="2" fill="currentColor"/>
         <polygon points="10 20 16 16 16 24 10 20" fill="white" opacity="0.9"/>
         <polygon points="54 20 48 16 48 24 54 20" fill="white" opacity="0.9"/>
         <rect x="8" y="38" width="8" height="6" rx="1" ry="1" fill="currentColor" opacity="0.6"/>
@@ -247,11 +247,11 @@ const FotoGridsIcons = {
         <rect x="4" y="34" width="56" height="10" rx="2" ry="2" fill="currentColor" opacity="0.5"/>
         <polygon points="8 39 11 37 11 41 8 39" fill="white" opacity="0.9"/>
         <polygon points="53 41 53 37 56 39 53 41" fill="white" opacity="0.9"/>
-        <path d="M58,4H6c-1.1,0-2,.9-2,2v24c0,1.1.9,2,2,2h52c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2Z" fill="currentColor" opacity="0.8"/>
+        <path d="M58,4H6c-1.1,0-2,.9-2,2v24c0,1.1.9,2,2,2h52c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2Z" fill="currentColor"/>
     </svg>`,
 
     layout_single_item: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M56.14,6H7.86c-1.03,0-1.86,1.07-1.86,2.4v31.2c0,1.33.83,2.4,1.86,2.4h48.29c1.03,0,1.86-1.07,1.86-2.4V8.4c0-1.33-.83-2.4-1.86-2.4Z" fill="currentColor" opacity="0.8"/>
+        <path d="M56.14,6H7.86c-1.03,0-1.86,1.07-1.86,2.4v31.2c0,1.33.83,2.4,1.86,2.4h48.29c1.03,0,1.86-1.07,1.86-2.4V8.4c0-1.33-.83-2.4-1.86-2.4Z" fill="currentColor"/>
         <polygon points="34.5 18.75 44.5 33.75 24.5 33.75 34.5 18.75" fill="white" opacity="0.9"/>
         <circle cx="23.5" cy="17" r="4" fill="white" opacity="0.9"/>
     </svg>`,
@@ -337,7 +337,7 @@ const FotoGridsIcons = {
     </svg>`,
 
     theme_dark: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`,
 
     theme_light: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -435,6 +435,10 @@ const FotoGridsIcons = {
 	click: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path d="M9 3.5V2M5.06066 5.06066L4 4M5.06066 13L4 14.0607M13 5.06066L14.0607 4M3.5 9H2M8.5 8.5L12.6111 21.2778L15.5 18.3889L19.1111 22L22 19.1111L18.3889 15.5L21.2778 12.6111L8.5 8.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
+
+    // hover: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    //     <path d="M8.5 8.5L12.6111 21.2778L15.5 18.3889L19.1111 22L22 19.1111L18.3889 15.5L21.2778 12.6111L8.5 8.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+    // </svg>`,
 
     flex_align_bottom: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M17.5 17.6L6.5 17.6M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -865,6 +869,69 @@ const FotoGridsIcons = {
     caption_overlay: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         <line x1="6" y1="12" x2="18" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>`,
+
+    aspect_ratio_1_1: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    aspect_ratio_4_3: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2" y="4.5" width="20" height="15" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    aspect_ratio_3_2: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2" y="5.33" width="20" height="13.33" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    aspect_ratio_16_9: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2" y="6.375" width="20" height="11.25" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    aspect_ratio_3_4: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="4.5" y="2" width="15" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    aspect_ratio_2_3: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="5.33" y="2" width="13.33" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    aspect_ratio_custom: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9 6L6 6L6 9M15 18L18 18L18 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    object_fit_contain: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+            <pattern id="fg-fit-contain-pattern" width="2" height="2" patternUnits="userSpaceOnUse">
+                <rect width="2" height="2" fill="currentColor" fill-opacity="0.1" />
+                <rect width="1" height="1" fill="currentColor" fill-opacity="0.4" />
+                <rect x="1" y="1" width="1" height="1" fill="currentColor" fill-opacity="0.4" />
+            </pattern>
+        </defs>
+        <rect x="6" y="5" width="12" height="14" rx="1" fill="url(#fg-fit-contain-pattern)" />
+        <rect x="6" y="5" width="12" height="14" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3" />
+        <rect x="2" y="5" width="20" height="14" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    object_fit_cover: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+            <pattern id="fg-fit-cover-pattern" width="2" height="2" patternUnits="userSpaceOnUse">
+                <rect width="2" height="2" fill="currentColor" fill-opacity="0.05" />
+                <rect width="1" height="1" fill="currentColor" fill-opacity="0.3" />
+                <rect x="1" y="1" width="1" height="1" fill="currentColor" fill-opacity="0.3" />
+            </pattern>
+        </defs>
+        <rect x="2" y="2" width="20" height="20" rx="1" fill="url(#fg-fit-cover-pattern)" />
+        <rect x="2" y="2" width="20" height="20" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3" />
+        <rect x="2" y="5" width="20" height="14" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`,
+
+    scale_up: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V8M11.5 12.5L17 7M17 7H12M17 7V12M6.2 21H8.8C9.9201 21 10.4802 21 10.908 20.782C11.2843 20.5903 11.5903 20.2843 11.782 19.908C12 19.4802 12 18.9201 12 17.8V15.2C12 14.0799 12 13.5198 11.782 13.092C11.5903 12.7157 11.2843 12.4097 10.908 12.218C10.4802 12 9.92011 12 8.8 12H6.2C5.0799 12 4.51984 12 4.09202 12.218C3.71569 12.4097 3.40973 12.7157 3.21799 13.092C3 13.5198 3 14.0799 3 15.2V17.8C3 18.9201 3 19.4802 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.07989 21 6.2 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+
+    scale_down: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8M16.2 3C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8M16.2 3H15.2C14.0799 3 13.5198 3 13.092 3.21799C12.7157 3.40973 12.4097 3.71569 12.218 4.09202C12 4.51984 12 5.07989 12 6.2V8.8C12 9.9201 12 10.4802 12.218 10.908C12.4097 11.2843 12.7157 11.5903 13.092 11.782C13.5198 12 14.0799 12 15.2 12H17.8C18.9201 12 19.4802 12 19.908 11.782C20.2843 11.5903 20.5903 11.2843 20.782 10.908C21 10.4802 21 9.92011 21 8.8V7.8M12.5 11.5L7 17M7 17H12M7 17L7 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`,
 };
 

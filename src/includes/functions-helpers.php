@@ -1158,6 +1158,18 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
         true
     );
 
+    // Post-type placeholder helpers — single source of truth for {postType}
+    // replacement, used by both collection-settings.js (translation pass) and
+    // any render helper that reads raw placeholder strings (e.g. renderCodeArea
+    // hints). Must load before any render-* script and before collection-settings.
+    wp_enqueue_script(
+        'fotogrids-post-type-placeholders',
+        FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/post-type-placeholders.js',
+        array(),
+        FOTOGRIDS_VERSION,
+        true
+    );
+
     wp_enqueue_script(
         'fotogrids-fg-color-picker',
         FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/fg-color-picker.js',
@@ -1198,7 +1210,7 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
     );
 
     foreach ( $render_functions as $function ) {
-        $dependencies = array( 'wp-element', 'wp-components', 'wp-i18n', 'fotogrids-icons' );
+        $dependencies = array( 'wp-element', 'wp-components', 'wp-i18n', 'fotogrids-icons', 'fotogrids-post-type-placeholders' );
 
         // The image picker calls wp.apiFetch to resolve thumbnail URLs and
         // wp.media to open the upload modal.
@@ -1241,7 +1253,7 @@ function fotogrids_enqueue_collection_settings_scripts( $enqueue_settings_loader
     wp_enqueue_script(
         'fotogrids-collection-settings',
         FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/collection-settings.js',
-        array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'fotogrids-icons', 'fotogrids-settings-loader', 'fotogrids-ui-state-manager' ),
+        array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'fotogrids-icons', 'fotogrids-settings-loader', 'fotogrids-ui-state-manager', 'fotogrids-post-type-placeholders' ),
         FOTOGRIDS_VERSION,
         true
     );

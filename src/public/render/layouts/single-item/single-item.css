@@ -1,0 +1,15 @@
+/* Single Item layout. The container holds exactly one item that fills the
+   available width. The fixed-box behavior (aspect-ratio + object-fit) and
+   the natural-ratio escape hatch are defined in base/collection-base.css
+   so they can be shared with Grid and Image Viewer; this file only
+   contributes the track shape. */
+
+[data-fg-layout="single-item"] .fg-single-item-track {
+    display: block;
+    width: 100%;
+}
+
+[data-fg-layout="single-item"] .fg-item {
+    min-width: 0;
+    width: 100%;
+}

@@ -21,7 +21,7 @@
  * Integration
  * -----------
  * The PHP Lightbox feature module writes:
- *   data-fg-click="lightbox"        on the .fotogrids-gallery wrapper
+ *   data-fg-click="lightbox"        on the .fotogrids-collection.fotogrids-gallery wrapper
  *   data-fg-lb-*                    per-gallery settings (see below)
  *   data-fg-lightbox-trigger  on the <a> that wraps each item's media
  *   data-fg-caption / data-fg-title on the same <a>
@@ -282,14 +282,25 @@ function buildSlideFromApi( apiSlide ) {
 }
 
 /**
- * Whether a gallery wrapper is in paginated mode and we need to consult
- * the lightbox-slides REST endpoint for items beyond what's in the DOM.
+ * Whether the lightbox needs to consult the lightbox-slides REST
+ * endpoint for items beyond what's in the DOM. True in two cases:
+ *
+ *  1. The gallery is paginated (data-fg-paginated) — the visible page
+ *     is a subset of the gallery and the lightbox must lazy-fetch the
+ *     rest as the user navigates.
+ *  2. The gallery uses Single Item layout with lightbox scope "gallery"
+ *     (data-fg-lightbox-extended) — only one item is in the DOM but
+ *     the user can still navigate the full gallery in the lightbox.
+ *
+ * Both attributes use the same downstream sparse-cache + REST flow,
+ * so a single helper covers both.
  *
  * @param {Element} galleryEl
  * @returns {boolean}
  */
 function isGalleryPaginated( galleryEl ) {
-    return galleryEl.dataset.fgPaginated === 'true';
+    return galleryEl.dataset.fgPaginated === 'true'
+        || galleryEl.dataset.fgLightboxExtended === 'true';
 }
 
 /**
@@ -3121,7 +3132,7 @@ class FotoGridsLightboxInit {
     }
 
     _init() {
-        document.querySelectorAll( '.fotogrids-gallery[data-fg-click="lightbox"]' )
+        document.querySelectorAll( '.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]' )
             .forEach( ( el ) => this._activateGallery( el ) );
 
         if ( 'MutationObserver' in window ) {
@@ -3131,10 +3142,10 @@ class FotoGridsLightboxInit {
                         if ( ! ( node instanceof Element ) ) continue;
 
                         const candidates = [];
-                        if ( node.matches( '.fotogrids-gallery[data-fg-click="lightbox"]' ) ) {
+                        if ( node.matches( '.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]' ) ) {
                             candidates.push( node );
                         }
-                        node.querySelectorAll( '.fotogrids-gallery[data-fg-click="lightbox"]' )
+                        node.querySelectorAll( '.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]' )
                             .forEach( ( el ) => candidates.push( el ) );
 
                         candidates.forEach( ( el ) => this._activateGallery( el ) );

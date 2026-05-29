@@ -1,14 +1,6 @@
-const { createElement: h, useState, useEffect, useLayoutEffect, useMemo } = wp.element;
+const { createElement: h, useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } = wp.element;
 const {
-    Panel,
-    PanelBody,
     SelectControl,
-    TextControl,
-    RangeControl,
-    Button,
-    ButtonGroup,
-    Card,
-    CardBody,
     __experimentalNavigatorProvider: NavigatorProvider,
     __experimentalNavigatorScreen: NavigatorScreen,
     __experimentalNavigatorButton: NavigatorButton,
@@ -117,165 +109,12 @@ window.FotoGridsRenderSettings.TeaserBadge = TeaserBadge;
 window.FotoGridsRenderSettings.LockedBanner = LockedBanner;
 window.FotoGridsRenderSettings.FieldGate = FieldGate;
 
-/**
- * Get post type value based on property path
- *
- * Supports nested properties like:
- * - postType → "Gallery" or "Album"
- * - postType.lower → "gallery" or "album"
- * - postType.plural → "Galleries" or "Albums"
- * - postType.plural.lower → "galleries" or "albums"
- *
- * @param {string} normalizedPostType - Normalized post type ('gallery' or 'album')
- * @param {string} propertyPath - Property path (e.g., 'lower', 'plural', 'lower.plural')
- * @returns {string} The resolved value
- */
-const getPostTypeValue = (normalizedPostType, propertyPath = '') => {
-    const isAlbum = normalizedPostType === 'album';
-
-    // Base values
-    const base = {
-        '': isAlbum ? 'Album' : 'Gallery',
-        'lower': isAlbum ? 'album' : 'gallery',
-        'plural': isAlbum ? 'Albums' : 'Galleries',
-        'plural.lower': isAlbum ? 'albums' : 'galleries'
-    };
-
-    // If no property path, return base value
-    if (!propertyPath) {
-        return base[''];
-    }
-
-    // Return the value for the property path, or fallback to base
-    return base[propertyPath] !== undefined ? base[propertyPath] : base[''];
-};
-
-/**
- * Replace post type placeholders in text
- *
- * Replaces placeholders like:
- * - {postType} → "Gallery" or "Album"
- * - {postType.lower} → "gallery" or "album"
- * - {postType.plural} → "Galleries" or "Albums"
- * - {postType.plural.lower} → "galleries" or "albums"
- *
- * @param {string} text - Text that may contain placeholders
- * @param {string} normalizedPostType - Normalized post type ('gallery' or 'album')
- * @returns {string} Text with placeholders replaced
- */
-const replacePostTypePlaceholders = (text, normalizedPostType) => {
-    if (!text || typeof text !== 'string') {
-        return text;
-    }
-
-    // Match {postType} or {postType.property} or {postType.property.nested}
-    return text.replace(/\{postType(?:\.([^}]+))?\}/g, (match, propertyPath) => {
-        return getPostTypeValue(normalizedPostType, propertyPath || '');
-    });
-};
-
-/**
- * Process a setting object to replace post type placeholders
- *
- * @param {Object} setting - Setting object
- * @param {string} normalizedPostType - Normalized post type ('gallery' or 'album')
- * @returns {Object} Setting object with placeholders replaced
- */
-const processSettingPlaceholders = (setting, normalizedPostType) => {
-    if (!setting || typeof setting !== 'object') {
-        return setting;
-    }
-
-    const processed = { ...setting };
-
-    // Process label
-    if (processed.label) {
-        processed.label = replacePostTypePlaceholders(processed.label, normalizedPostType);
-    }
-
-    // Process description
-    if (processed.description) {
-        processed.description = replacePostTypePlaceholders(processed.description, normalizedPostType);
-    }
-
-    // Process options (filter by postTypes and process placeholders)
-    if (processed.options && Array.isArray(processed.options)) {
-        processed.options = processed.options
-            .filter(option => {
-                if (option.postTypes && Array.isArray(option.postTypes)) {
-                    return option.postTypes.includes(normalizedPostType);
-                }
-                return true;
-            })
-            .map(option => {
-                const processedOption = { ...option };
-                if (processedOption.label) {
-                    processedOption.label = replacePostTypePlaceholders(processedOption.label, normalizedPostType);
-                }
-                if (processedOption.description) {
-                    processedOption.description = replacePostTypePlaceholders(processedOption.description, normalizedPostType);
-                }
-                return processedOption;
-            });
-    }
-
-    // Process conditional message
-    if (processed.conditionalMessage?.message) {
-        processed.conditionalMessage = {
-            ...processed.conditionalMessage,
-            message: replacePostTypePlaceholders(processed.conditionalMessage.message, normalizedPostType)
-        };
-    }
-
-    // Process promo messages (for promo type settings)
-    if (processed.messages && Array.isArray(processed.messages)) {
-        processed.messages = processed.messages.map(msg => {
-            const processedMsg = { ...msg };
-            if (processedMsg.subtitle) {
-                processedMsg.subtitle = replacePostTypePlaceholders(processedMsg.subtitle, normalizedPostType);
-            }
-            if (processedMsg.message) {
-                processedMsg.message = replacePostTypePlaceholders(processedMsg.message, normalizedPostType);
-            }
-            return processedMsg;
-        });
-    }
-
-    // Process nested settings (for setting_group)
-    if (processed.settings && Array.isArray(processed.settings)) {
-        processed.settings = processed.settings.map(subSetting =>
-            processSettingPlaceholders(subSetting, normalizedPostType)
-        );
-    }
-
-    // Process subTabs (filter by postTypes and process placeholders)
-    if (processed.subTabs) {
-        const processedSubTabs = {};
-        Object.keys(processed.subTabs).forEach(subTabKey => {
-            const subTab = { ...processed.subTabs[subTabKey] };
-
-            // Filter by postTypes if specified
-            if (subTab.postTypes && Array.isArray(subTab.postTypes)) {
-                if (!subTab.postTypes.includes(normalizedPostType)) {
-                    return; // Skip this sub-tab
-                }
-            }
-
-            if (subTab.label) {
-                subTab.label = replacePostTypePlaceholders(subTab.label, normalizedPostType);
-            }
-            if (subTab.settings && Array.isArray(subTab.settings)) {
-                subTab.settings = subTab.settings.map(subSetting =>
-                    processSettingPlaceholders(subSetting, normalizedPostType)
-                );
-            }
-            processedSubTabs[subTabKey] = subTab;
-        });
-        processed.subTabs = processedSubTabs;
-    }
-
-    return processed;
-};
+// Post-type placeholder helpers live in render-settings/utils/post-type-placeholders.js
+// (wrapped in an IIFE) and are enqueued before this script. Pull them off the
+// shared global so the renderers (e.g. renderCodeArea for hint strings) and
+// the settings translator share a single implementation.
+const replacePostTypePlaceholders = window.FotoGridsRenderSettings.replacePostTypePlaceholders;
+const processSettingPlaceholders = window.FotoGridsRenderSettings.processSettingPlaceholders;
 
 const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
     const translated = withLegacyFreeFlag({ ...group });
@@ -432,6 +271,53 @@ function CollectionSettings() {
             return updated;
         });
     };
+
+    // ---------------------------------------------------------------------
+    // Scroll-on-tab-change and programmatic tab switching
+    //
+    // rootRef:        attached to the top-level <div> below; used as the
+    //                 scroll target so we land at the metabox top, not above
+    //                 the WP title bar.
+    // isFirstRender:  skip the initial scroll on mount/deep-link, otherwise
+    //                 every page load would yank the user to the metabox.
+    // switchTab:      stable imperative API. Updates activeTab + persists
+    //                 via uiState (mirroring the sidebar button's onClick).
+    //                 Exposed on window.FotoGridsCollectionSettings.switchTab
+    //                 so non-React code can call it; also driven by the
+    //                 declarative option.on_change.switch_tab JSON hook in
+    //                 updateSetting (see below).
+    // ---------------------------------------------------------------------
+    const rootRef = useRef(null);
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        if (rootRef.current && typeof rootRef.current.scrollIntoView === 'function') {
+            rootRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }
+    }, [activeTab]);
+
+    const switchTab = useCallback((tabId) => {
+        if (typeof tabId !== 'string' || tabId === '') return;
+        if (!SETTINGS_GROUPS[tabId]) return;
+        setActiveTab(tabId);
+        if (uiState) {
+            uiState.setValue({ key: 'main-tab', value: tabId, urlParam: 'fg-settings-tab' });
+        }
+    }, [uiState]);
+
+    useEffect(() => {
+        window.FotoGridsCollectionSettings = window.FotoGridsCollectionSettings || {};
+        window.FotoGridsCollectionSettings.switchTab = switchTab;
+        return () => {
+            if (window.FotoGridsCollectionSettings && window.FotoGridsCollectionSettings.switchTab === switchTab) {
+                delete window.FotoGridsCollectionSettings.switchTab;
+            }
+        };
+    }, [switchTab]);
 
     const loadAndTranslateSettings = async () => {
         if (window.FotoGridsSettings?.loadSettingsGroups) {
@@ -768,6 +654,24 @@ function CollectionSettings() {
         }));
 
         saveSetting(key, value);
+
+        // Declarative tab switch: when the selected option declares
+        //   "on_change": { "switch_tab": "<tab-id>" }
+        // jump to that tab. Lets JSON wire flows like "picking Open in
+        // Lightbox should jump to the Lightbox tab" without renderer changes.
+        // The scroll-on-tab-change effect above handles the scroll for free.
+        try {
+            const settingDef = findSettingByKey(key);
+            const selectedOption = Array.isArray(settingDef?.options)
+                ? settingDef.options.find(o => o && o.value === value)
+                : null;
+            const targetTab = selectedOption?.on_change?.switch_tab;
+            if (typeof targetTab === 'string' && targetTab !== '') {
+                switchTab(targetTab);
+            }
+        } catch (_e) {
+            // findSettingByKey is best-effort; never block a save on this.
+        }
     };
 
     // Updates React state only - does not persist to the form or trigger autosave.
@@ -928,6 +832,25 @@ function CollectionSettings() {
         // condition.dependsOn / values (legacy camelCase predicate)
         if (!setting.condition) return true;
 
+        // any / all composite predicates. Allow nesting so we can express OR/AND
+        // trees on top of the leaf dependsOn predicate. Each child is itself a
+        // condition node (any | all | dependsOn+values).
+        const evaluateCondition = (condition) => {
+            if (!condition || typeof condition !== 'object') return true;
+            if (Array.isArray(condition.any)) {
+                return condition.any.some((child) => evaluateCondition(child));
+            }
+            if (Array.isArray(condition.all)) {
+                return condition.all.every((child) => evaluateCondition(child));
+            }
+            // Leaf predicate: reuse shouldDisplaySetting via a synthetic setting.
+            return shouldDisplaySetting({ condition });
+        };
+
+        if (Array.isArray(setting.condition.any) || Array.isArray(setting.condition.all)) {
+            return evaluateCondition(setting.condition);
+        }
+
         const { dependsOn, values } = setting.condition;
 
         if (Array.isArray(dependsOn)) {
@@ -1081,6 +1004,11 @@ function CollectionSettings() {
         }
 
         if (!group.condition) return true;
+
+        // any / all composite predicates (mirrors shouldDisplaySetting).
+        if (Array.isArray(group.condition.any) || Array.isArray(group.condition.all)) {
+            return shouldDisplaySetting({ condition: group.condition });
+        }
 
         const { dependsOn, values } = group.condition;
         const dependentValue = settings[dependsOn];
@@ -1299,6 +1227,7 @@ function CollectionSettings() {
                     getFieldState,
                     isDefaultsMode,
                     getOptionState: getFieldState,
+                    isOptionVisible: (option) => shouldDisplaySetting(option),
                     __
                 });
                 break;
@@ -1822,7 +1751,8 @@ function CollectionSettings() {
     }
 
     return h('div', {
-        className: 'fotogrids-gallery-settings'
+        className: 'fotogrids-gallery-settings',
+        ref: rootRef
     }, [
 
         h('div', {
@@ -1853,7 +1783,20 @@ function CollectionSettings() {
                     }, group.label),
                     !isFreeTier(group) && !isProActive && h('span', {
                         className: 'fotogrids-pro-badge'
-                    }, __('Pro', 'fotogrids'))
+                    }, h( 'svg', {
+                        className:   'fg-pro-badge__lock-icon',
+                        xmlns:       'http://www.w3.org/2000/svg',
+                        viewBox:     '0 0 16 16',
+                        width:       '10',
+                        height:      '10',
+                        'aria-hidden': 'true',
+                        focusable:   'false',
+                    },
+                        h( 'path', {
+                            fill: 'currentColor',
+                            d: 'M11 7V5a3 3 0 0 0-6 0v2H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1ZM6 5a2 2 0 1 1 4 0v2H6V5Z',
+                        } )
+                    ))
                 ])
             ))
         ]),

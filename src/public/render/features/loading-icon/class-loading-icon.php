@@ -172,62 +172,54 @@ final class Loading_Icon implements Feature {
         $instance_id = $render_context->meta->instance_id;
         $id_json     = wp_json_encode( $instance_id );
 
-        // Build the icon-map global with THIS gallery's icon. The pipeline
-        // calls html_after BEFORE assets, so self::$icon_names_seen is
-        // empty here — we cannot use it. Instead, build a single-icon
-        // global based on this gallery's resolved icon. Subsequent
-        // galleries' inline scripts merge their own icons into the
-        // existing global via the runtime guard (see JS below).
+        // Record this icon so the footer drainer's build_global_js() picks it
+        // up. assets() also records it (belt-and-braces), but assets() runs
+        // after html_after() and only when the pipeline reaches it.
         $this_icon = $this->resolve_icon_name( $render_context );
-        $icon_set  = [ $this_icon => true ];
-        // Ensure assets() still records this icon for the footer drain
-        // fallback (which uses self::$icon_names_seen). assets() will run
-        // later in this same render, so this is belt-and-braces.
         self::$icon_names_seen[ $this_icon ] = true;
-        $global_js = self::build_global_js( $icon_set );
 
-        // Per-gallery icon entry, used to merge this gallery's icon into
-        // an existing global painted by an earlier gallery.
-        $svg            = fotogrids_get_loading_icon_svg( $this_icon, '' );
-        $animate_fn_src = fotogrids_get_loading_icon_animate_fn( $this_icon );
-        if ( $animate_fn_src === '' ) {
-            $animate_fn_src = 'function animate(){return [];}';
-        }
-        $icon_entry_js = sprintf(
-            'window.fotogridsLoadingIcons[%s]={svg:%s,animate:%s};',
-            wp_json_encode( $this_icon ),
-            wp_json_encode( $svg ),
-            $animate_fn_src
-        );
-
-        // Per-gallery inline runner. Runs synchronously as the parser
-        // passes the gallery wrapper — well before the footer arrives —
-        // which is essential on slow networks where the user sees the
-        // gallery DOM long before any footer script would parse.
+        // Per-collection inline runner. Runs synchronously as the parser
+        // passes the wrapper. Two important constraints govern the script
+        // body below:
         //
-        //  1. Define or extend window.fotogridsLoadingIcons.
-        //  2. Push the gallery ID onto fgAnimQueue (defensive fallback
-        //     for the footer drain).
-        //  3. Start WAAPI animations on this gallery's loader SVGs
-        //     immediately.
+        //  1. It is emitted into the_content output, which means WordPress
+        //     filters (convert_chars, wpautop, block normalizers, kses on
+        //     re-saved posts) may HTML-encode any &, &&, <, or > literals
+        //     inside it. We MUST therefore avoid those characters and we
+        //     MUST NOT interpolate JS source that contains them (the icon
+        //     animate functions DO contain `&&` and `<`, so they cannot
+        //     appear here — they live in the footer global instead, which
+        //     ships via wp_add_inline_script and bypasses the_content).
+        //
+        //  2. Even with the global not yet defined, the script still does
+        //     useful work: it queues the collection ID onto fgAnimQueue,
+        //     which the footer drainer reads to start animations for every
+        //     collection on the page. On a healthy page the global may
+        //     already be present (footer-printed-in-head extension, second
+        //     collection on the page after the global painted) and the
+        //     inline runner starts the animation immediately.
+        //
+        // Banned characters below: & (and any operator built from it: &&,
+        // &amp;), < and > (other than the script tag bracket itself).
+        // `||` and `|` are safe — pipes are not HTML-special.
         return '<script>'
             . '(function(id){'
-            .   'if(!window.fotogridsLoadingIcons){' . $global_js . '}'
-            .   'else if(!window.fotogridsLoadingIcons[' . wp_json_encode( $this_icon ) . ']){' . $icon_entry_js . '}'
-            .   'window.fgAnimQueue=window.fgAnimQueue||[];'
+            .   'if(!window.fgLoaderHandles){window.fgLoaderHandles=new WeakMap();}'
+            .   'if(!window.fgAnimQueue){window.fgAnimQueue=[];}'
             .   'window.fgAnimQueue.push(id);'
-            .   'if(!window.fgLoaderHandles)window.fgLoaderHandles=new WeakMap();'
             .   'var icons=window.fotogridsLoadingIcons;'
-            .   'if(!icons)return;'
+            .   'if(!icons){return;}'
             .   'var g=document.getElementById(id);'
-            .   'if(!g)return;'
+            .   'if(!g){return;}'
             .   'var iconName=g.getAttribute("data-fg-loading-icon")||"";'
-            .   'var icon=icons[iconName]||icons[Object.keys(icons)[0]];'
-            .   'if(!icon||typeof icon.animate!=="function")return;'
+            .   'var icon=icons[iconName];'
+            .   'if(!icon){icon=icons[Object.keys(icons)[0]];}'
+            .   'if(!icon){return;}'
+            .   'if(typeof icon.animate!=="function"){return;}'
             .   'g.querySelectorAll(".fg-item").forEach(function(item){'
-            .     'if(window.fgLoaderHandles.has(item))return;'
+            .     'if(window.fgLoaderHandles.has(item)){return;}'
             .     'var svg=item.querySelector(".fg-item-loader svg");'
-            .     'if(!svg)return;'
+            .     'if(!svg){return;}'
             .     'try{'
             .       'var h=icon.animate(svg);'
             .       'window.fgLoaderHandles.set(item,Array.isArray(h)?h:[]);'

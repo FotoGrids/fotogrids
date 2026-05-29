@@ -1,26 +1,25 @@
-.fotogrids-gallery,
-.fotogrids-album {
+.fotogrids-collection {
     --fg-caption-overlay-padding: 1rem;
 }
 
-.fotogrids-gallery .fg-item,
-.fotogrids-album .fg-item {
+.fotogrids-collection .fg-item {
     gap: var(--fg-caption-gap);
 }
 
-.fotogrids-gallery .fg-item-media,
-.fotogrids-album .fg-item-media {
+.fotogrids-collection .fg-item-media {
     align-self: var(--fg-caption-media-align);
 }
 
-.fotogrids-gallery .fg-caption,
-.fotogrids-album .fg-caption {
+.fotogrids-collection .fg-caption {
     margin: 0;
     text-align: var(--fg-caption-align);
 }
 
-.fotogrids-gallery[data-fg-caption="top"] .fg-caption,
-.fotogrids-album[data-fg-caption="top"] .fg-caption {
+.fotogrids-collection[data-fg-caption="top"] .fg-item {
+    align-self: flex-end;
+}
+
+.fotogrids-collection[data-fg-caption="top"] .fg-caption {
     order: -1;
 }
 
@@ -29,14 +28,14 @@
    Vertical anchoring of the text inside that box is controlled by
    --fg-caption-overlay-align (top / middle / bottom). Horizontal alignment
    continues to come from --fg-caption-align via text-align. */
-.fotogrids-gallery[data-fg-caption="overlay"] .fg-caption,
-.fotogrids-album[data-fg-caption="overlay"] .fg-caption {
+.fotogrids-collection[data-fg-caption="overlay"] .fg-caption {
     position: absolute;
     inset: 0;
     display: flex;
     flex-direction: column;
     justify-content: var(--fg-caption-overlay-align);
     box-sizing: border-box;
+    border-radius: var(--fg-radius);
     padding: var(--fg-caption-overlay-padding);
     color: var(--fg-caption-title-color);
     background: var(--fg-caption-overlay-bg);
@@ -44,13 +43,11 @@
     pointer-events: none;
 }
 
-.fotogrids-gallery[data-fg-caption="overlay"] .fg-item:hover .fg-caption,
-.fotogrids-album[data-fg-caption="overlay"] .fg-item:hover .fg-caption {
+.fotogrids-collection[data-fg-caption="overlay"] .fg-item:hover .fg-caption {
     background: var(--fg-caption-overlay-bg-hover, var(--fg-caption-overlay-bg, rgba(0, 0, 0, 0.5)));
 }
 
-.fotogrids-gallery .fg-caption-title,
-.fotogrids-album .fg-caption-title {
+.fotogrids-collection .fg-caption-title {
     display: block;
     font-family: var(--fg-caption-title-font-family);
     font-weight: var(--fg-caption-title-font-weight);
@@ -58,8 +55,7 @@
     color: var(--fg-caption-title-color);
 }
 
-.fotogrids-gallery .fg-caption-description,
-.fotogrids-album .fg-caption-description {
+.fotogrids-collection .fg-caption-description {
     display: block;
     font-size: var(--fg-caption-desc-font-size);
     color: var(--fg-caption-desc-color);
@@ -70,16 +66,14 @@
    @supports gates the -webkit-box display so browsers without line-clamp
    keep plain block display and show all text rather than breaking layout. */
 @supports (-webkit-line-clamp: 1) {
-    .fotogrids-gallery .fg-caption-title,
-    .fotogrids-album .fg-caption-title {
+    .fotogrids-collection .fg-caption-title {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: var(--fg-caption-title-lines);
         overflow: hidden;
     }
 
-    .fotogrids-gallery .fg-caption-description,
-    .fotogrids-album .fg-caption-description {
+    .fotogrids-collection .fg-caption-description {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: var(--fg-caption-desc-lines);

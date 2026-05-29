@@ -159,6 +159,21 @@ function position( host ) {
         : Object.keys( space ).reduce( ( best, d ) => space[ d ] > space[ best ] ? d : best, 'above' );
 
     let top, left;
+    // Arrow offset along the cross-axis, measured from the tooltip's
+    // top-left corner. When the tooltip is clamped away from the host
+    // centre (e.g. near a viewport edge), the arrow stays pointed at the
+    // host instead of sliding along with the body. Computed below per
+    // direction and exposed as --fg-tt-arrow-x / --fg-tt-arrow-y so the
+    // CSS can position the ::before pseudo-element off it.
+    let arrowX = null;
+    let arrowY = null;
+
+    // How far the arrow tip must stay from the tooltip's own rounded
+    // corners so it never visually detaches from the body. We use the
+    // arrow's half-width as the minimum inset; combined with the border
+    // radius this keeps the triangle inside the rounded chrome.
+    const ARROW_HALF = 6;            // matches --fg-tt-arrow-size default
+    const ARROW_INSET = ARROW_HALF + 4;
 
     if ( dir === 'above' || dir === 'below' ) {
         // Horizontally centred on host; clamped to viewport.
@@ -167,6 +182,12 @@ function position( host ) {
         top  = dir === 'above'
             ? rect.top    - th - MARGIN_PX
             : rect.bottom      + MARGIN_PX;
+
+        // Arrow x in tooltip-local coordinates = host centre - tooltip left.
+        const hostCentreX = rect.left + rect.width / 2;
+        arrowX = hostCentreX - left;
+        // Keep the arrow inside the tooltip's rounded chrome.
+        arrowX = Math.max( ARROW_INSET, Math.min( arrowX, tw - ARROW_INSET ) );
     } else {
         // Vertically centred on host; clamped to viewport.
         top  = rect.top + rect.height / 2 - th / 2;
@@ -174,12 +195,29 @@ function position( host ) {
         left = dir === 'left'
             ? rect.left  - tw - MARGIN_PX
             : rect.right      + MARGIN_PX;
+
+        // Arrow y in tooltip-local coordinates = host centre - tooltip top.
+        const hostCentreY = rect.top + rect.height / 2;
+        arrowY = hostCentreY - top;
+        arrowY = Math.max( ARROW_INSET, Math.min( arrowY, th - ARROW_INSET ) );
     }
 
     // Use fixed positioning (relative to viewport).
     el.style.position = 'fixed';
     el.style.top      = `${Math.round( top )}px`;
     el.style.left     = `${Math.round( left )}px`;
+
+    // Publish arrow position as CSS custom properties so the arrow stays
+    // pointed at the host even when the tooltip body is clamped to the
+    // viewport edge. The CSS reads --fg-tt-arrow-x / --fg-tt-arrow-y and
+    // falls back to 50% when unset (e.g. before the first position()).
+    if ( arrowX !== null ) {
+        el.style.setProperty( '--fg-tt-arrow-x', `${Math.round( arrowX )}px` );
+        el.style.removeProperty( '--fg-tt-arrow-y' );
+    } else if ( arrowY !== null ) {
+        el.style.setProperty( '--fg-tt-arrow-y', `${Math.round( arrowY )}px` );
+        el.style.removeProperty( '--fg-tt-arrow-x' );
+    }
 
     // Data attribute for the entrance animation direction.
     el.dataset.dir = dir;

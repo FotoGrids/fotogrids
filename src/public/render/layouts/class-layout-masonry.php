@@ -7,7 +7,6 @@ use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
-use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Internal\Item_Renderer;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -16,6 +15,10 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Masonry layout module.
+ *
+ * Opt-in capabilities:
+ *   - uses_columns      : --fg-cols + data-fg-columns-mode
+ *   - uses_item_spacing : --fg-gap
  *
  * @package FotoGrids\Render\Layouts
  * @since   1.0.0
@@ -60,25 +63,11 @@ final class Layout_Masonry implements Layout {
     }
 
     public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [ 'data-fg-layout' => 'masonry' ];
+        return [];
     }
 
     public function style_vars( Render_Context $render_context ): array {
-        $responsive_columns = $render_context->layout->responsive_columns;
-        $responsive_spacing = $render_context->layout->responsive_spacing;
-
-        return [
-            '--fg-cols' => new Responsive_Var(
-                desktop: (string) ( $responsive_columns['desktop'] ?? 4 ),
-                tablet:  (string) ( $responsive_columns['tablet']  ?? 3 ),
-                mobile:  (string) ( $responsive_columns['mobile']  ?? 1 ),
-            ),
-            '--fg-gap'  => new Responsive_Var(
-                desktop: $this->to_unit_value( $responsive_spacing['desktop'] ?? [ 'value' => 10, 'unit' => 'px' ], 'px' ),
-                tablet:  $this->to_unit_value( $responsive_spacing['tablet']  ?? [ 'value' => 8,  'unit' => 'px' ], 'px' ),
-                mobile:  $this->to_unit_value( $responsive_spacing['mobile']  ?? [ 'value' => 5,  'unit' => 'px' ], 'px' ),
-            ),
-        ];
+        return [];
     }
 
     public function assets( Render_Context $render_context ): Module_Assets {
@@ -90,13 +79,10 @@ final class Layout_Masonry implements Layout {
         );
     }
 
-    private function to_unit_value( mixed $raw_value, string $default_unit ): string {
-        if ( is_array( $raw_value ) ) {
-            $value = $raw_value['value'] ?? 0;
-            $unit  = $raw_value['unit']  ?? $default_unit;
-            return (string) $value . $unit;
-        }
-
-        return (string) $raw_value . $default_unit;
+    public function capabilities(): array {
+        return [
+            'uses_columns'      => true,
+            'uses_item_spacing' => true,
+        ];
     }
 }

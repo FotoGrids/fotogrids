@@ -53,6 +53,33 @@
     var activeFingerprint = new WeakMap();
 
     /**
+     * Per-gallery monotonic request token. Bumped every time we kick off
+     * a fetch via goToPage/swapToFilterState; the token captured at fetch
+     * time is checked when the response lands. If a newer fetch has
+     * superseded this one, its DOM/cache write is dropped.
+     *
+     * Without this, rapid filter toggles produce overlapping in-flight
+     * fetches whose responses can interleave — the later-arriving response
+     * for an earlier filter wins, painting stale items AND poisoning the
+     * cache slot of whichever filter is "active" at apply time. That's
+     * the source of the "sometimes correct, sometimes wrong" totalPages
+     * symptom on the bar.
+     *
+     * @type {WeakMap<Element, number>}
+     */
+    var inflightToken = new WeakMap();
+
+    function nextToken( galleryEl ) {
+        var t = ( inflightToken.get( galleryEl ) || 0 ) + 1;
+        inflightToken.set( galleryEl, t );
+        return t;
+    }
+
+    function isCurrentToken( galleryEl, token ) {
+        return ( inflightToken.get( galleryEl ) || 0 ) === token;
+    }
+
+    /**
      * Reads pagination state off the gallery wrapper's data-fg-* attributes.
      * Always returns a fresh object — never the stored one, callers should
      * not mutate it.
@@ -238,8 +265,12 @@
      * @param {Element} galleryEl
      * @param {{html:string,css:object,page:number,total_pages:number,page_size:number,has_more:boolean}} payload
      * @param {'replace'|'append'} mode
+     * @param {string} [capturedFingerprint] Fingerprint captured at fetch
+     *        time. When provided, the snapshot taken after this paint is
+     *        keyed against THIS value (not `activeFingerprint.get(...)`
+     *        which can move under us during overlapping requests).
      */
-    function applyPage( galleryEl, payload, mode ) {
+    function applyPage( galleryEl, payload, mode, capturedFingerprint ) {
         injectMissingStyles( payload.css || {} );
 
         var root = resolveItemsRoot( galleryEl );
@@ -290,8 +321,15 @@
 
         // Snapshot the current view into the filter-view cache so a
         // future filter toggle that returns to this state can paint
-        // instantly from cache.
-        snapshotCurrentView( galleryEl );
+        // instantly from cache. Use the fingerprint captured at FETCH
+        // time — not whatever activeFingerprint holds now — so an
+        // earlier-arriving response can't be filed under a later
+        // filter's slot.
+        if ( typeof capturedFingerprint === 'string' ) {
+            snapshotCurrentViewAs( galleryEl, capturedFingerprint );
+        } else {
+            snapshotCurrentView( galleryEl );
+        }
 
         writeState( galleryEl, {
             page:       payload.page,
@@ -377,6 +415,28 @@
         var fp = activeFingerprint.get( galleryEl );
         var s  = readState( galleryEl );
 
+        ensureCacheBucket( galleryEl ).set( fp, {
+            html:       root.innerHTML,
+            page:       s.page,
+            totalPages: s.totalPages,
+            hasMore:    s.hasMore,
+        } );
+    }
+
+    /**
+     * Same as snapshotCurrentView but writes under a caller-supplied
+     * fingerprint instead of the currently-active one. Used by applyPage
+     * so the snapshot key is the fingerprint that was active when the
+     * fetch was kicked off — guaranteeing the cache slot reflects what
+     * the server actually returned.
+     *
+     * @param {Element} galleryEl
+     * @param {string}  fp
+     */
+    function snapshotCurrentViewAs( galleryEl, fp ) {
+        var root = resolveItemsRoot( galleryEl );
+        if ( ! root ) return;
+        var s = readState( galleryEl );
         ensureCacheBucket( galleryEl ).set( fp, {
             html:       root.innerHTML,
             page:       s.page,
@@ -476,10 +536,14 @@
 
         // Cache miss — set the active fingerprint to the new value so
         // the post-fetch snapshot (taken by applyPage) lands in the
-        // right cache slot.
+        // right cache slot. We also pass the captured fingerprint
+        // into goToPage so its snapshot is keyed against the exact
+        // filter state that was active when the fetch was issued —
+        // robust against another swapToFilterState firing while this
+        // fetch is in flight.
         activeFingerprint.set( galleryEl, newFp );
 
-        return goToPage( galleryEl, 1, { mode: 'replace' } ).then( function ( result ) {
+        return goToPage( galleryEl, 1, { mode: 'replace', fingerprint: newFp } ).then( function ( result ) {
             return { page: result.page, hasMore: result.hasMore, fromCache: false };
         } );
     }
@@ -508,11 +572,27 @@
     function goToPage( galleryEl, page, opts ) {
         var mode = ( opts && opts.mode ) || 'replace';
 
+        // Capture the filter fingerprint and a fresh request token at the
+        // moment we kick the fetch off. If a later goToPage/swapToFilterState
+        // bumps the token before this response lands, we drop the result —
+        // both the DOM write and the cache snapshot — so the late response
+        // can't poison a newer filter's view.
+        var capturedFp    = ( opts && typeof opts.fingerprint === 'string' )
+            ? opts.fingerprint
+            : currentFingerprint( galleryEl );
+        var capturedToken = nextToken( galleryEl );
+
         galleryEl.classList.add( 'fotogrids-gallery--is-paginating' );
 
         return fetchPage( galleryEl, page )
             .then( function ( payload ) {
-                applyPage( galleryEl, payload, mode );
+                if ( ! isCurrentToken( galleryEl, capturedToken ) ) {
+                    // Superseded by a newer request. Surface the payload
+                    // so awaiting callers still resolve, but don't touch
+                    // the DOM or cache — the newer request owns those.
+                    return { page: payload.page, hasMore: payload.has_more, stale: true };
+                }
+                applyPage( galleryEl, payload, mode, capturedFp );
                 return { page: payload.page, hasMore: payload.has_more };
             } )
             .catch( function ( err ) {

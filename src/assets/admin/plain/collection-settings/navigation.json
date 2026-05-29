@@ -12,7 +12,7 @@
             "label": "AJAX Navigation",
             "settings": [
                 {
-                    "key": "use_ajax_from_Album",
+                    "key": "use_ajax_from_album",
                     "type": "toggle",
                     "label": "Smooth Album to Gallery Transitions",
                     "description": "When enabled, opening a Gallery from an Album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation.",
@@ -60,7 +60,7 @@
                             "value": "embedded",
                             "tier_required": "free",
                             "condition": {
-                                "dependsOn": "use_ajax_from_Album",
+                                "dependsOn": "use_ajax_from_album",
                                 "values": [true, "1"]
                             }
                         }

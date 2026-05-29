@@ -1,0 +1,123 @@
+{
+    "id": "layout-navigation",
+    "label": "Navigation",
+    "icon": "transition_horizontal",
+    "postTypes": [
+        "gallery"
+    ],
+    "condition": {
+        "dependsOn": "layout",
+        "values": [
+            "image-viewer",
+            "slider"
+        ]
+    },
+    "settings": [
+        {
+            "key": "layout_show_arrows",
+            "type": "toggle",
+            "label": "Show Arrows",
+            "description": "Show previous and next arrows on the sides.",
+            "default": true,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "layout_show_bullets",
+            "type": "toggle",
+            "label": "Show Bullets",
+            "description": "Show pagination dots below the image.",
+            "default": true,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "layout_show_counter",
+            "type": "toggle",
+            "label": "Show Counter",
+            "description": "Show the current position indicator (e.g. 3 of 12).",
+            "default": false,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "layout_loop",
+            "type": "toggle",
+            "label": "Loop",
+            "description": "After the last item, return to the first.",
+            "default": true,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "layout_autoplay_group",
+            "type": "setting_group",
+            "label": "Autoplay",
+            "settings": [
+                {
+                    "key": "layout_autoplay",
+                    "type": "toggle",
+                    "label": "Enable Autoplay",
+                    "description": "Automatically advance between items.",
+                    "default": false,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "layout_autoplay_delay",
+                    "type": "range",
+                    "label": "Delay",
+                    "description": "Time spent on each item before advancing.",
+                    "min": 1000,
+                    "max": 10000,
+                    "step": 250,
+                    "default": 4000,
+                    "unit": "ms",
+                    "condition": {
+                        "dependsOn": "layout_autoplay",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "layout_autoplay_pause_on_hover",
+                    "type": "toggle",
+                    "label": "Pause on Hover",
+                    "default": true,
+                    "condition": {
+                        "dependsOn": "layout_autoplay",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

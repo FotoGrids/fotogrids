@@ -98,4 +98,30 @@ interface Layout {
      * @return  Module_Assets
      */
     public function assets( Render_Context $render_context ): Module_Assets;
+
+    /**
+     * Capability flags this layout advertises to the rest of the render
+     * pipeline. Lets cross-cutting features (pagination, filtering, etc.)
+     * ask the active layout "do you support this?" without hardcoding a
+     * list of layout IDs.
+     *
+     * Contract:
+     *  - Missing keys default to TRUE (permissive). A layout that returns
+     *    `[]` opts into every capability — the historical default for
+     *    Grid, Masonry, Justified.
+     *  - Returning `[ 'paginates' => false ]` opts out of pagination chrome
+     *    being rendered around this layout (used by Single Item, which
+     *    only ever shows one image).
+     *  - Returning `[ 'filters' => false ]` opts out of the filter bar
+     *    being rendered above this layout.
+     *
+     * Known capability keys (extend this list as new cross-cutting
+     * features need to ask):
+     *  - paginates : bool — Pagination modules should render chrome.
+     *  - filters   : bool — Filter_Ui should render the filter bar.
+     *
+     * @since   1.0.0
+     * @return  array<string, bool>
+     */
+    public function capabilities(): array;
 }

@@ -80,6 +80,45 @@
     }
 
     /**
+     * Inject <script> tags for any JS handles the render pipeline declared
+     * that aren't already in the document. Necessary because the host
+     * album page only enqueues the modules its OWN render needed — but a
+     * swapped-in gallery may need extra modules (lightbox.js, direct-link,
+     * external-link, sharing, lazy-load, stats, loading-icon, filter-ui,
+     * deep-linking, pagination layouts, etc.) that weren't enqueued
+     * upstream. Late-loaded modules self-scan the DOM on init so they
+     * still wire the swapped-in gallery even though they start after the
+     * MutationObserver fired.
+     *
+     * @param {Record<string, {src: string, in_footer: boolean}>} jsData
+     *     handle → {src, in_footer} map. The in_footer flag is informative
+     *     only — script tags are appended async to <head> either way; the
+     *     browser fetches them in parallel and executes them in load order
+     *     (good enough for our modules since their init is idempotent).
+     */
+    function injectMissingScripts( jsData ) {
+        if ( ! jsData || typeof jsData !== 'object' ) return;
+
+        Object.keys( jsData ).forEach( function ( handle ) {
+            var entry = jsData[ handle ];
+            var url   = entry && entry.src ? entry.src : '';
+            if ( ! handle || ! url ) return;
+            var scriptId = 'fotogrids-js-' + handle;
+            if ( document.getElementById( scriptId ) ) return;
+            // Also skip if WordPress already enqueued this handle the
+            // normal way (id="<handle>-js"), to avoid loading the same
+            // module twice.
+            if ( document.getElementById( handle + '-js' ) ) return;
+
+            var script   = document.createElement( 'script' );
+            script.id    = scriptId;
+            script.src   = url;
+            script.async = false; // preserve load order between siblings
+            document.head.appendChild( script );
+        } );
+    }
+
+    /**
      * Resolve the album wrapper that owns a trigger. Used as the target
      * container for the swap.
      *
@@ -87,10 +126,6 @@
      * @returns {Element|null}
      */
     function albumWrapperFor( trigger ) {
-        // .fotogrids-album lives BOTH as a discriminator class on the
-        // wrapper AND historically as a standalone class. The render
-        // pipeline emits the .fotogrids-gallery.fotogrids-album wrapper;
-        // we walk up to whichever element carries .fotogrids-album.
         return trigger.closest( '.fotogrids-album' );
     }
 
@@ -152,6 +187,7 @@
                 }
 
                 injectMissingStyles( data.css || {} );
+                injectMissingScripts( data.js || {} );
 
                 // Stash the album's original HTML before the swap so the
                 // in-place Back button (rendered inside the swapped-in
@@ -166,7 +202,8 @@
 
                 // Replace the album's contents with the rendered gallery
                 // HTML. The runtime's MutationObserver picks up the new
-                // .fotogrids-gallery and fires its onGallery callbacks.
+                // .fotogrids-collection wrapper and fires its onGallery
+                // callbacks (the swapped-in HTML is a gallery).
                 albumEl.innerHTML = data.html;
 
                 document.dispatchEvent( new CustomEvent( 'fotogrids:album_swapped', {
@@ -206,15 +243,12 @@
 
     /**
      * Attach the AJAX behaviour to an album wrapper. Called by the runtime's
-     * onGallery for every album wrapper (album wrappers carry .fotogrids-gallery
-     * so they go through the same onGallery path as galleries).
+     * onAlbum callback for every album wrapper.
      *
-     * @param {Element} galleryOrAlbumEl
+     * @param {Element} albumEl
      */
-    function attach( galleryOrAlbumEl ) {
-        if ( ! galleryOrAlbumEl.classList.contains( 'fotogrids-album' ) ) return;
-
-        galleryOrAlbumEl.querySelectorAll( '[data-fg-album-ajax-trigger]' ).forEach( bindTrigger );
+    function attach( albumEl ) {
+        albumEl.querySelectorAll( '[data-fg-album-ajax-trigger]' ).forEach( bindTrigger );
     }
 
     /**
@@ -239,9 +273,9 @@
 
         albumEl.innerHTML = original;
 
-        // The runtime's MutationObserver fires on .fotogrids-gallery
+        // The runtime's MutationObserver fires on .fotogrids-collection
         // *insertions*, but here the album wrapper itself wasn't replaced —
-        // only its descendants. The runtime never re-runs onGallery for
+        // only its descendants. The runtime never re-runs onAlbum for
         // this wrapper, so the restored trigger <a>s never get a listener
         // through the normal path. Re-bind them explicitly so the user can
         // drill into the same (or another) child gallery again.
@@ -267,8 +301,8 @@
     }
 
     function init() {
-        if ( window.FotoGrids && typeof window.FotoGrids.onGallery === 'function' ) {
-            window.FotoGrids.onGallery( attach, 15 );
+        if ( window.FotoGrids && typeof window.FotoGrids.onAlbum === 'function' ) {
+            window.FotoGrids.onAlbum( attach, 15 );
         }
 
         // Expose the restore API on the cross-module namespace. Collection_Header

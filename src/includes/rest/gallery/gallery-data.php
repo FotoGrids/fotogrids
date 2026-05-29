@@ -240,12 +240,15 @@ class Gallery_Data {
         // Render the gallery HTML server-side so the frontend can swap it in
         // without a full page reload.
         $html      = \FotoGrids\Public_Render::gallery_shortcode( array( 'id' => $gallery_id ) );
-        $css_urls  = \FotoGrids\Render\Internal\Asset_Resolver::instance()->get_css_asset_urls();
+        $resolver  = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+        $css_urls  = $resolver->get_css_asset_urls();
+        $js_data   = $resolver->get_js_asset_data();
 
         return rest_ensure_response( array(
             'success'  => true,
             'html'     => $html,
             'css'      => $css_urls,
+            'js'       => $js_data,
             'remember' => $remember,
         ) );
     }
@@ -325,12 +328,15 @@ class Gallery_Data {
                 $gallery_id,
                 $shared_meta_overrides
             );
-            $css_urls = \FotoGrids\Render\Internal\Asset_Resolver::instance()->get_css_asset_urls();
+            $resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+            $css_urls = $resolver->get_css_asset_urls();
+            $js_data  = $resolver->get_js_asset_data();
 
             return rest_ensure_response( array(
                 'success' => true,
                 'html'    => $html,
                 'css'     => $css_urls,
+                'js'      => $js_data,
             ) );
         }
 
@@ -353,7 +359,9 @@ class Gallery_Data {
         $meta_overrides = array_merge( $meta_overrides, $shared_meta_overrides );
 
         $html     = \FotoGrids\Public_Render::render_gallery_for_rest( $gallery_id, $meta_overrides );
-        $css_urls = \FotoGrids\Render\Internal\Asset_Resolver::instance()->get_css_asset_urls();
+        $resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+        $css_urls = $resolver->get_css_asset_urls();
+        $js_data  = $resolver->get_js_asset_data();
 
         // Pagination metadata for the client. When filters are active,
         // total reflects the filtered set so chrome (load-more hasMore,
@@ -392,6 +400,7 @@ class Gallery_Data {
             'success'     => true,
             'html'        => $html,
             'css'         => $css_urls,
+            'js'          => $js_data,
             'page'        => $page,
             'page_size'   => $page_size,
             'total_pages' => $total_pages,

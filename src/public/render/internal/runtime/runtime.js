@@ -2,10 +2,11 @@
  * FotoGrids Frontend Runtime
  *
  * The minimum amount of JavaScript that must be present on any page
- * rendering a FotoGrids gallery. It does NOT implement any feature — no
- * filters, no lightbox, no sharing, no masonry, no stats, no password
- * gate. Its sole job is to discover gallery elements and announce them
- * so the per-feature modules can attach to each one.
+ * rendering a FotoGrids gallery or album. It does NOT implement any
+ * feature — no filters, no lightbox, no sharing, no masonry, no stats,
+ * no password gate. Its sole job is to discover collection elements
+ * (galleries and albums) and announce them so the per-feature modules
+ * can attach to each one.
  *
  * See README.md in this directory for the full contract.
  *
@@ -15,18 +16,24 @@
 ( function () {
     'use strict';
 
-    var VERSION = '1.0.0';
+    var VERSION = '1.1.0';
 
     // -------------------------------------------------------------------------
     // Internal state
     // -------------------------------------------------------------------------
 
     /**
-     * Registered onGallery callbacks, kept sorted by priority ascending.
+     * Three independent callback queues, one per public subscription API.
+     * Each queue is kept sorted by (priority asc, seq asc) so registration
+     * order is preserved within a priority bucket.
      *
-     * @type {Array<{ cb: Function, priority: number, seq: number }>}
+     * @type {Object<string, Array<{ cb: Function, priority: number, seq: number }>>}
      */
-    var callbacks = [];
+    var queues = {
+        gallery:    [],
+        album:      [],
+        collection: [],
+    };
 
     /**
      * Monotonic counter used as a tiebreaker when two callbacks share
@@ -37,16 +44,18 @@
     var callbackSeq = 0;
 
     /**
-     * Initialized gallery elements (WeakSet so detached elements GC).
+     * Initialized collection elements (WeakSet so detached elements GC).
      *
      * @type {WeakSet<Element>}
      */
     var initialized = new WeakSet();
 
     /**
-     * List of initialized gallery records, exposed via getInstances().
+     * List of initialized collection records, exposed via getInstances().
+     * Each record carries the collection kind so late-subscribed callbacks
+     * can be replayed only against matching elements.
      *
-     * @type {Array<{ element: Element, galleryId: string|null }>}
+     * @type {Array<{ element: Element, galleryId: string|null, kind: string }>}
      */
     var instances = [];
 
@@ -55,21 +64,40 @@
      *
      * @type {MutationObserver|null}
      */
-    var galleryObserver = null;
+    var collectionObserver = null;
+
+    // -------------------------------------------------------------------------
+    // Collection-kind discriminator
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the kind of collection wrapper this element represents.
+     * Album wrappers carry the `fotogrids-album` discriminator class;
+     * gallery wrappers carry `fotogrids-gallery`. Both also carry the
+     * umbrella class `fotogrids-collection`.
+     *
+     * @param {Element} el
+     * @return {string} 'album' or 'gallery'
+     */
+    function collectionKind( el ) {
+        return el && el.classList && el.classList.contains( 'fotogrids-album' ) ? 'album' : 'gallery';
+    }
 
     // -------------------------------------------------------------------------
     // Callback management
     // -------------------------------------------------------------------------
 
     /**
-     * Inserts a callback into the queue, kept sorted by (priority, seq).
+     * Inserts a callback into the named queue, kept sorted by (priority, seq).
      *
+     * @param {string}   queueName One of 'gallery', 'album', 'collection'.
      * @param {Function} cb
-     * @param {number} priority
+     * @param {number}   priority
      */
-    function insertCallback( cb, priority ) {
-        callbacks.push( { cb: cb, priority: priority, seq: callbackSeq++ } );
-        callbacks.sort( function ( a, b ) {
+    function insertCallback( queueName, cb, priority ) {
+        var q = queues[ queueName ];
+        q.push( { cb: cb, priority: priority, seq: callbackSeq++ } );
+        q.sort( function ( a, b ) {
             if ( a.priority !== b.priority ) {
                 return a.priority - b.priority;
             }
@@ -78,94 +106,103 @@
     }
 
     /**
-     * Runs every registered callback against a single gallery element.
-     * Catches and logs any callback error so one broken module can't
-     * stop the others.
+     * Runs every callback in a queue against a single collection element.
+     * Catches and logs any callback error so one broken module can't stop
+     * the others.
      *
-     * @param {Element} galleryElement
+     * @param {string}  queueName
+     * @param {Element} collectionElement
      */
-    function runCallbacks( galleryElement ) {
-        for ( var i = 0; i < callbacks.length; i++ ) {
+    function runQueue( queueName, collectionElement ) {
+        var q = queues[ queueName ];
+        for ( var i = 0; i < q.length; i++ ) {
             try {
-                callbacks[ i ].cb( galleryElement );
+                q[ i ].cb( collectionElement );
             } catch ( err ) {
                 if ( window.console && console.warn ) {
-                    console.warn( 'FotoGrids: onGallery callback threw', err );
+                    console.warn( 'FotoGrids: ' + queueName + ' callback threw', err );
                 }
             }
         }
     }
 
     // -------------------------------------------------------------------------
-    // Gallery initialization
+    // Collection initialization
     // -------------------------------------------------------------------------
 
     /**
-     * Initializes a single gallery element: marks it initialized, records it,
-     * runs every registered callback against it, then dispatches
+     * Initializes a single collection element: marks it initialized, records
+     * it, runs the matching callback queues against it, then dispatches
      * fotogrids:gallery_initialized.
      *
      * Safe to call multiple times on the same element — second and later
      * calls are no-ops.
      *
-     * @param {Element} galleryElement
+     * @param {Element} collectionElement
      */
-    function initializeGallery( galleryElement ) {
-        if ( ! galleryElement || initialized.has( galleryElement ) ) {
+    function initializeCollection( collectionElement ) {
+        if ( ! collectionElement || initialized.has( collectionElement ) ) {
             return;
         }
-        initialized.add( galleryElement );
+        initialized.add( collectionElement );
+
+        var kind = collectionKind( collectionElement );
 
         // The render pipeline writes data-fg-gallery-id on every wrapper
         // (Render_Controller::build_wrapper). Read that, not the legacy
         // data-gallery-id which the pipeline doesn't emit.
         var record = {
-            element:   galleryElement,
-            galleryId: galleryElement.dataset.fgGalleryId || null,
+            element:   collectionElement,
+            galleryId: collectionElement.dataset.fgGalleryId || null,
+            kind:      kind,
         };
         instances.push( record );
 
         // Mark the element so existing CSS / external code can detect it.
-        galleryElement.dataset.fotogridsInitialized = '1';
+        collectionElement.dataset.fotogridsInitialized = '1';
 
-        runCallbacks( galleryElement );
+        // Kind-specific queue first, then the always-fires collection queue.
+        runQueue( kind, collectionElement );
+        runQueue( 'collection', collectionElement );
 
         document.dispatchEvent( new CustomEvent( 'fotogrids:gallery_initialized', {
             bubbles: true,
             detail:  {
-                galleryElement: galleryElement,
+                galleryElement: collectionElement,
                 galleryId:      record.galleryId,
+                kind:           kind,
                 instance:       record,
             },
         } ) );
     }
 
     /**
-     * Finds every .fotogrids-gallery element in the document and initializes
-     * each one. Idempotent — initializeGallery() guards against double init.
+     * Finds every collection element in the document and initializes each
+     * one. Idempotent — initializeCollection() guards against double init.
      */
-    function initializeAllGalleries() {
-        var elements = document.querySelectorAll( '.fotogrids-gallery' );
+    function initializeAllCollections() {
+        var elements = document.querySelectorAll( '.fotogrids-collection' );
         for ( var i = 0; i < elements.length; i++ ) {
-            initializeGallery( elements[ i ] );
+            initializeCollection( elements[ i ] );
         }
     }
 
     // -------------------------------------------------------------------------
-    // MutationObserver — picks up dynamically inserted galleries
+    // MutationObserver — picks up dynamically inserted collections
     // -------------------------------------------------------------------------
 
     /**
      * Installs the runtime's single MutationObserver. Feature modules MUST
-     * NOT install their own — they subscribe via FotoGrids.onGallery() and
-     * the same callback fires for static and dynamic galleries.
+     * NOT install their own — they subscribe via FotoGrids.onGallery(),
+     * onAlbum() or onCollection() and the same callback fires for static
+     * and dynamic collections.
      */
     function installObserver() {
-        if ( galleryObserver !== null || ! ( 'MutationObserver' in window ) ) {
+        if ( collectionObserver !== null || ! ( 'MutationObserver' in window ) ) {
             return;
         }
 
-        galleryObserver = new MutationObserver( function ( mutations ) {
+        collectionObserver = new MutationObserver( function ( mutations ) {
             for ( var i = 0; i < mutations.length; i++ ) {
                 var added = mutations[ i ].addedNodes;
                 if ( ! added || added.length === 0 ) {
@@ -179,13 +216,13 @@
                     }
 
                     // The inserted node itself.
-                    if ( node.matches && node.matches( '.fotogrids-gallery' ) ) {
+                    if ( node.matches && node.matches( '.fotogrids-collection' ) ) {
                         announceInserted( node );
                     }
 
-                    // Galleries nested inside the inserted subtree.
+                    // Collections nested inside the inserted subtree.
                     if ( node.querySelectorAll ) {
-                        var nested = node.querySelectorAll( '.fotogrids-gallery' );
+                        var nested = node.querySelectorAll( '.fotogrids-collection' );
                         for ( var k = 0; k < nested.length; k++ ) {
                             announceInserted( nested[ k ] );
                         }
@@ -194,29 +231,72 @@
             }
         } );
 
-        galleryObserver.observe( document.body, { childList: true, subtree: true } );
+        collectionObserver.observe( document.body, { childList: true, subtree: true } );
     }
 
     /**
      * Fires fotogrids:gallery_inserted (preserved legacy event) and then
-     * initializes the gallery. Skips already-initialized elements.
+     * initializes the collection. Skips already-initialized elements.
      *
-     * @param {Element} galleryElement
+     * @param {Element} collectionElement
      */
-    function announceInserted( galleryElement ) {
-        if ( initialized.has( galleryElement ) ) {
+    function announceInserted( collectionElement ) {
+        if ( initialized.has( collectionElement ) ) {
             return;
         }
 
         document.dispatchEvent( new CustomEvent( 'fotogrids:gallery_inserted', {
             bubbles: true,
             detail:  {
-                galleryElement: galleryElement,
-                galleryId:      galleryElement.dataset.fgGalleryId || null,
+                galleryElement: collectionElement,
+                galleryId:      collectionElement.dataset.fgGalleryId || null,
+                kind:           collectionKind( collectionElement ),
             },
         } ) );
 
-        initializeGallery( galleryElement );
+        initializeCollection( collectionElement );
+    }
+
+    // -------------------------------------------------------------------------
+    // Subscription factory
+    // -------------------------------------------------------------------------
+
+    /**
+     * Builds a subscription function (onGallery/onAlbum/onCollection).
+     * Each returned function inserts into its own queue, validates input,
+     * and replays against already-initialized matching instances so late
+     * subscribers never miss a collection.
+     *
+     * @param {string} queueName 'gallery' | 'album' | 'collection'
+     * @return {Function}
+     */
+    function makeSubscriber( queueName ) {
+        return function ( cb, priority ) {
+            if ( typeof cb !== 'function' ) {
+                return;
+            }
+            var pri = ( typeof priority === 'number' && isFinite( priority ) ) ? priority : 10;
+            insertCallback( queueName, cb, pri );
+
+            // Late subscriber — replay against already-initialized instances
+            // whose kind matches this queue.
+            if ( instances.length === 0 ) {
+                return;
+            }
+            for ( var i = 0; i < instances.length; i++ ) {
+                var rec = instances[ i ];
+                if ( queueName !== 'collection' && rec.kind !== queueName ) {
+                    continue;
+                }
+                try {
+                    cb( rec.element );
+                } catch ( err ) {
+                    if ( window.console && console.warn ) {
+                        console.warn( 'FotoGrids: ' + queueName + ' replay callback threw', err );
+                    }
+                }
+            }
+        };
     }
 
     // -------------------------------------------------------------------------
@@ -227,7 +307,8 @@
         version: VERSION,
 
         /**
-         * Subscribe to per-gallery initialization.
+         * Subscribe to per-gallery initialization. Fires ONLY for gallery
+         * wrappers (`.fotogrids-collection.fotogrids-gallery`).
          *
          * Fires once per gallery — for every gallery present at
          * DOMContentLoaded AND for every gallery the MutationObserver
@@ -241,33 +322,35 @@
          * @param {Function} cb       Receives (galleryElement).
          * @param {number} [priority] Default 10.
          */
-        onGallery: function ( cb, priority ) {
-            if ( typeof cb !== 'function' ) {
-                return;
-            }
-            var pri = ( typeof priority === 'number' && isFinite( priority ) ) ? priority : 10;
-            insertCallback( cb, pri );
-
-            // Late subscriber — replay against galleries already initialized,
-            // so the callback never misses a gallery just because a module
-            // loaded after DOMContentLoaded.
-            if ( instances.length > 0 ) {
-                for ( var i = 0; i < instances.length; i++ ) {
-                    try {
-                        cb( instances[ i ].element );
-                    } catch ( err ) {
-                        if ( window.console && console.warn ) {
-                            console.warn( 'FotoGrids: onGallery replay callback threw', err );
-                        }
-                    }
-                }
-            }
-        },
+        onGallery: makeSubscriber( 'gallery' ),
 
         /**
-         * Returns the current list of initialized gallery records.
+         * Subscribe to per-album initialization. Fires ONLY for album
+         * wrappers (`.fotogrids-collection.fotogrids-album`).
          *
-         * @return {Array<{ element: Element, galleryId: string|null }>}
+         * Same replay-on-late-subscribe semantics as onGallery.
+         *
+         * @param {Function} cb       Receives (albumElement).
+         * @param {number} [priority] Default 10.
+         */
+        onAlbum: makeSubscriber( 'album' ),
+
+        /**
+         * Subscribe to per-collection initialization. Fires for BOTH
+         * galleries and albums — any element matching
+         * `.fotogrids-collection`. Use this only when a module genuinely
+         * needs to run against both kinds; most modules want onGallery or
+         * onAlbum instead.
+         *
+         * @param {Function} cb       Receives (collectionElement).
+         * @param {number} [priority] Default 10.
+         */
+        onCollection: makeSubscriber( 'collection' ),
+
+        /**
+         * Returns the current list of initialized collection records.
+         *
+         * @return {Array<{ element: Element, galleryId: string|null, kind: string }>}
          */
         getInstances: function () {
             return instances.slice();
@@ -289,12 +372,13 @@
 
     function boot() {
         installObserver();
-        initializeAllGalleries();
+        initializeAllCollections();
         document.dispatchEvent( new CustomEvent( 'fotogrids:ready', { bubbles: true } ) );
     }
 
     // Expose the API BEFORE booting so module scripts that load earlier in
-    // the page (defer) can already call onGallery() during their own init.
+    // the page (defer) can already call onGallery()/onAlbum()/onCollection()
+    // during their own init.
     window.FotoGrids = publicApi;
 
     if ( document.readyState === 'loading' ) {

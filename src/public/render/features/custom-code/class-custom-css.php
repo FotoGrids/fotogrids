@@ -16,16 +16,15 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Scoping
  * -------
- * Every top-level rule is automatically prefixed with the gallery's unique
- * instance ID selector (e.g. `#fotogrids-gallery-abc123`), so custom CSS
- * written for one gallery cannot affect another gallery or the rest of the
- * page.
+ * Every top-level rule is automatically prefixed with the wrapper's unique
+ * instance ID selector (e.g. `#fg-123-1`), so custom CSS written for one
+ * gallery cannot affect another gallery or the rest of the page.
  *
  * Users may also write the bare token `SELECTOR` (all-caps) anywhere in
- * their CSS to reference the current gallery wrapper explicitly:
+ * their CSS to reference the current wrapper explicitly:
  *
  *   SELECTOR .fg-item { border: 2px solid red; }
- *   SELECTOR.fotogrids-gallery { background: #fafafa; }
+ *   SELECTOR.fotogrids-collection { background: #fafafa; }
  *
  * `SELECTOR` is replaced with the real `#instance_id` selector before
  * output. Rules that already contain the expanded selector are NOT
@@ -218,7 +217,7 @@ final class Custom_Css implements Feature {
      *
      * @since  1.0.0
      * @param  string $css      Sanitized CSS input.
-     * @param  string $selector Real instance selector, e.g. `#fotogrids-gallery-abc123`.
+     * @param  string $selector Real instance selector, e.g. `#fg-123-1`.
      * @return string
      */
     private function scope_css( string $css, string $selector ): string {

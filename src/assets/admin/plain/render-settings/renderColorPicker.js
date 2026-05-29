@@ -79,6 +79,10 @@ function AlphaColorPicker({
         const measuredWidth = popoverRef.current
             ? popoverRef.current.getBoundingClientRect().width
             : fallbackWidth;
+        // Only used to decide above-vs-below placement. The actual vertical
+        // anchor below does NOT depend on this — we anchor at the trigger top
+        // and use transform: translateY(-100%) so the gap is always exactly
+        // desiredMargin regardless of the popover's rendered height.
         const measuredHeight = popoverRef.current
             ? popoverRef.current.getBoundingClientRect().height
             : fallbackHeight;
@@ -95,26 +99,23 @@ function AlphaColorPicker({
         const spaceBelow = viewportHeight - triggerRect.bottom - desiredMargin - sidePadding;
         const spaceAbove = triggerRect.top - desiredMargin - sidePadding;
         const showBelow = spaceBelow >= measuredHeight || spaceBelow >= spaceAbove;
+        const placement = showBelow ? 'bottom' : 'top';
         const top = showBelow
-            ? Math.min(
-                triggerRect.bottom + desiredMargin,
-                Math.max(sidePadding, viewportHeight - measuredHeight - sidePadding)
-            )
-            : Math.max(
-                sidePadding,
-                triggerRect.top - desiredMargin - measuredHeight
-            );
+            ? triggerRect.bottom + desiredMargin
+            : triggerRect.top - desiredMargin;
 
         const nextPosition = {
             top: top + scrollY,
-            left: left + scrollX
+            left: left + scrollX,
+            placement
         };
 
         setPopoverPosition((previousPosition) => {
             if (
                 previousPosition &&
                 previousPosition.top === nextPosition.top &&
-                previousPosition.left === nextPosition.left
+                previousPosition.left === nextPosition.left &&
+                previousPosition.placement === nextPosition.placement
             ) {
                 return previousPosition;
             }
@@ -259,6 +260,7 @@ function AlphaColorPicker({
                     position: 'absolute',
                     top: `${popoverPosition.top}px`,
                     left: `${popoverPosition.left}px`,
+                    transform: popoverPosition.placement === 'top' ? 'translateY(-100%)' : undefined,
                 },
             }), document.body)
             : h('div', {
@@ -268,6 +270,7 @@ function AlphaColorPicker({
                     position: 'absolute',
                     top: `${popoverPosition.top}px`,
                     left: `${popoverPosition.left}px`,
+                    transform: popoverPosition.placement === 'top' ? 'translateY(-100%)' : undefined,
                 },
             })),
     ]);

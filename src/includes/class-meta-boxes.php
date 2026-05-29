@@ -587,6 +587,7 @@ class Meta_Boxes {
             'custom_data'  => $custom_data,
             'exif'         => $exif_data,
             'medium_url' => wp_get_attachment_image_url( $item_id, 'medium' ),
+            'thumbnail_url' => wp_get_attachment_image_url( $item_id, 'fotogrids_masonry' ),
             'full_url' => wp_get_attachment_image_url( $item_id, 'full' ),
             'filename' => $filename,
             'filesize' => $filesize,
@@ -718,7 +719,7 @@ class Meta_Boxes {
             $item_data[ $attachment_id ] = array(
                 'url' => $row['external_url'] ?: '',
                 'target' => $row['link_target'] ?: 'global',
-                'thumbnail' => wp_get_attachment_image_url( $attachment_id, 'medium' ),
+                'thumbnail' => wp_get_attachment_image_url( $attachment_id, 'fotogrids_masonry' ),
                 'alt' => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                 'title' => $attachment ? $attachment->post_title : ''
             );
@@ -731,7 +732,7 @@ class Meta_Boxes {
                 $item_data[ $item_id ] = array(
                     'url' => '',
                     'target' => 'global',
-                    'thumbnail' => wp_get_attachment_image_url( $item_id, 'medium' ),
+                    'thumbnail' => wp_get_attachment_image_url( $item_id, 'fotogrids_masonry' ),
                     'alt' => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
                     'title' => $attachment ? $attachment->post_title : ''
                 );

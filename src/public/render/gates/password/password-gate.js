@@ -52,6 +52,32 @@
     }
 
     /**
+     * Inject any JS handles the render pipeline declared for the unlocked
+     * gallery that aren't already in the document. Mirrors the
+     * Album_To_Gallery_Ajax injectMissingScripts helper.
+     *
+     * @param {Record<string, {src: string, in_footer: boolean}>} jsData
+     */
+    function injectMissingScripts( jsData ) {
+        if ( ! jsData || typeof jsData !== 'object' ) return;
+
+        Object.keys( jsData ).forEach( function ( handle ) {
+            var entry = jsData[ handle ];
+            var url   = entry && entry.src ? entry.src : '';
+            if ( ! handle || ! url ) return;
+            var scriptId = 'fotogrids-js-' + handle;
+            if ( document.getElementById( scriptId ) ) return;
+            if ( document.getElementById( handle + '-js' ) ) return;
+
+            var script   = document.createElement( 'script' );
+            script.id    = scriptId;
+            script.src   = url;
+            script.async = false;
+            document.head.appendChild( script );
+        } );
+    }
+
+    /**
      * Wire up a single lock form. Idempotent — repeat calls on the
      * same form are no-ops.
      *
@@ -124,6 +150,7 @@
                 }
 
                 injectMissingStyles( data.css || {} );
+                injectMissingScripts( data.js || {} );
 
                 var html = data.html || '';
                 if ( ! html || ! wrapper ) {
@@ -153,7 +180,7 @@
 
                 // Notify other modules. The runtime's MutationObserver
                 // will already have fired fotogrids:gallery_inserted for
-                // any .fotogrids-gallery in the inserted nodes; this
+                // any .fotogrids-collection in the inserted nodes; this
                 // event is a higher-level "the gate was passed" signal
                 // for anything that cares (e.g. analytics).
                 document.dispatchEvent( new CustomEvent( 'fotogrids:gallery_unlocked', {

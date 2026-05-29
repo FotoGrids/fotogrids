@@ -128,9 +128,11 @@
     }
 
     /**
-     * Wires all images inside a gallery container.
+     * Wires all images inside a collection container (gallery or album —
+     * both render <figure data-fg-media-state="loading"> items whose
+     * state needs flipping to "loaded" once the image arrives).
      *
-     * @param {Element} container A .fotogrids-gallery element.
+     * @param {Element} container A .fotogrids-collection element.
      */
     function wireGallery( container ) {
         const imgs = container.querySelectorAll( '.fg-item-media img' );
@@ -145,7 +147,7 @@
      * Initial pass - wire every gallery already in the DOM.
      */
     function init() {
-        document.querySelectorAll( '.fotogrids-gallery' ).forEach( wireGallery );
+        document.querySelectorAll( '.fotogrids-collection' ).forEach( wireGallery );
     }
 
     /**
@@ -189,13 +191,13 @@
                     }
 
                     // Newly inserted gallery wrapper - wire images inside it.
-                    if ( node.matches( '.fotogrids-gallery' ) ) {
+                    if ( node.matches( '.fotogrids-collection' ) ) {
                         node.querySelectorAll( '.fg-item' ).forEach( startDynamicAnimation );
                         wireGallery( node );
                     }
 
                     // Galleries nested inside an inserted subtree.
-                    node.querySelectorAll( '.fotogrids-gallery' ).forEach( function ( gallery ) {
+                    node.querySelectorAll( '.fotogrids-collection' ).forEach( function ( gallery ) {
                         gallery.querySelectorAll( '.fg-item' ).forEach( startDynamicAnimation );
                         wireGallery( gallery );
                     } );

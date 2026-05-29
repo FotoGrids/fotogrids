@@ -1,13 +1,13 @@
 {
     "id": "sharing",
-    "label": "Social & Sharing",
+    "label": "Sharing",
     "icon": "share",
     "settings": [
         {
             "key": "sharing_global_off_notice",
             "type": "info_block",
             "subtitle": "Sharing is turned off site-wide",
-            "message": "Social sharing is disabled in FotoGrids settings. Turn it on under FotoGrids → Settings → Sharing to configure sharing for this collection.",
+            "message": "Social sharing is disabled in FotoGrids settings. Turn it on under FotoGrids → Settings → Sharing to configure sharing for this {postType}.",
             "icon": "share",
             "button_label": "Open Sharing settings",
             "button_url": "admin.php?page=fotogrids-settings&tab=sharing",
@@ -24,8 +24,8 @@
         {
             "key": "sharing_override",
             "type": "toggle",
-            "label": "Override sharing for this collection",
-            "description": "By default this collection inherits the site-wide sharing settings. Turn this on to customise sharing just for this gallery or album.",
+            "label": "Override sharing for this {postType}",
+            "description": "By default this {postType.lower} inherits the site-wide sharing settings. Turn this on to customise sharing just for this {postType.lower}.",
             "default": false,
             "tier_required": "free",
             "render_when_unlicensed": true,
@@ -39,8 +39,8 @@
         {
             "key": "sharing_disabled_for_collection",
             "type": "toggle",
-            "label": "Disable sharing for this collection",
-            "description": "Hide all share controls on this gallery or album, even though sharing is enabled site-wide.",
+            "label": "Disable sharing for this {postType}",
+            "description": "Hide all share controls on this {postType}, even though sharing is enabled site-wide.",
             "default": false,
             "disabled_unless": "sharing_override",
             "tier_required": "free",
@@ -56,7 +56,7 @@
             "key": "sharing_networks_override",
             "type": "token_select",
             "label": "Networks",
-            "description": "Which share buttons to show for this collection.",
+            "description": "Which share buttons to show for this {postType}.",
             "options": [
                 { "label": "Facebook", "value": "facebook", "tier_required": "free" },
                 { "label": "X (Twitter)", "value": "x", "tier_required": "free" },
@@ -88,7 +88,7 @@
             "key": "sharing_placements_override",
             "type": "token_select",
             "label": "Display at",
-            "description": "Where share controls appear for this collection.",
+            "description": "Where share controls appear for this {postType}.",
             "options": [
                 { "label": "View page", "value": "view_page", "tier_required": "free" },
                 { "label": "Lightbox", "value": "lightbox", "tier_required": "free" },
@@ -114,7 +114,7 @@
             "key": "sharing_custom_text_override",
             "type": "text_input",
             "label": "Custom share text",
-            "description": "Text included when sharing this collection. Use {title} and {url} as placeholders.",
+            "description": "Text included when sharing this {postType}. Use {title} and {url} as placeholders.",
             "placeholder": "Check out {title} - {url}",
             "default": "",
             "disabled_unless": "sharing_override",

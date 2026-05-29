@@ -214,7 +214,7 @@
                                 }
                             ],
                             "default": "12-dots",
-                            "buttonClass": "fotogrids-button-group__button--big-icons",
+                            "bigIcons": true,
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",

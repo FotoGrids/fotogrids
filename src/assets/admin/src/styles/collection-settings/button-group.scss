@@ -76,14 +76,54 @@
             }
         }
 
-        &--big-icons {
+    }
+
+    &--big-icons {
+        .fotogrids-button-group__button {
             padding: 24px;
+            flex-direction: column;
             border-color: var(--fg-border-primary);
 
-            .fotogrids-button-icon {
-                svg {
-                    width: 24px;
-                    height: 24px;
+            .fotogrids-button-icon svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    }
+
+    &--big-icons.fotogrids-button-group--same-width {
+        .fotogrids-button-group__buttons {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 1fr;
+            width: max-content;
+            align-items: center;
+
+            .fotogrids-button-group__button {
+                padding: 20px;
+                gap: 8px;
+
+                .fotogrids-button-icon svg {
+                    path, rect {
+                        stroke-width: 1.4;
+                    }
+                }
+            }
+        }
+    }
+
+    &--big-icons.fotogrids-button-group--extra-big-icons {
+        .fotogrids-button-group__buttons {
+            .fotogrids-button-group__button {
+                padding: 16px 24px;
+    
+                .fotogrids-button-icon svg {
+                    width: 40px;
+                    height: 40px;
+    
+                    path, rect {
+                        stroke-width: 0.8;
+                    }
                 }
             }
         }

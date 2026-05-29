@@ -7,6 +7,7 @@ use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Internal\Layout_Capabilities;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -42,6 +43,16 @@ trait Pagination_Common {
      */
     protected function pagination_supports( Render_Context $render_context ): bool {
         if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
+
+        // Ask the active layout whether it wants pagination chrome around
+        // it. Layouts like Single Item, Image Viewer, Slider, and Carousel
+        // return capabilities()['paginates'] = false because they render
+        // a single item (or handle navigation inside themselves). Layouts
+        // that don't care (Grid, Masonry, Justified) return [], which the
+        // helper treats as permissive default true.
+        if ( ! Layout_Capabilities::supports( $render_context, 'paginates' ) ) {
             return false;
         }
 

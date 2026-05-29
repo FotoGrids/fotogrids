@@ -37,9 +37,9 @@ if ( ! defined( 'WPINC' ) ) {
  * IIFE is emitted. Example output after substitution:
  *
  *   (function(collection) {
- *       const el = document.getElementById('fotogrids-gallery-abc123');
+ *       const el = document.getElementById('fg-123-1');
  *       // …
- *   })(document.getElementById('fotogrids-gallery-abc123'));
+ *   })(document.getElementById('fg-123-1'));
  *
  * Placement
  * ---------

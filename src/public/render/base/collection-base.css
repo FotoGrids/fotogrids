@@ -7,8 +7,12 @@
     --fg-colors-white: rgba(255, 255, 255, 1);
 }
 
-.fotogrids-gallery .fg-item,
-.fotogrids-album .fg-item {
+.fotogrids-collection {
+    list-style: none;
+    font-size: 12px;
+}
+
+.fotogrids-collection .fg-item {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -17,13 +21,11 @@
     cursor: var(--fg-hover-cursor, default);
 }
 
-.fotogrids-gallery .fg-item:focus,
-.fotogrids-album .fg-item:focus {
+.fotogrids-collection .fg-item:focus {
     outline: none;
 }
 
-.fotogrids-gallery .fg-item:focus-visible,
-.fotogrids-album .fg-item:focus-visible {
+.fotogrids-collection .fg-item:focus-visible {
     outline: 2px solid var(--fg-colors-blue);
     outline-offset: 2px;
 }
@@ -31,23 +33,21 @@
 /* When a decorator wraps the entire item contents (media + caption) in an
    anchor, the <a> becomes the flex child of fg-item. These rules ensure it
    inherits the same flex layout so gap and direction still apply correctly. */
-.fotogrids-gallery .fg-item > a,
-.fotogrids-album .fg-item > a {
+.fotogrids-collection .fg-item > a {
     display: inherit;
     flex-direction: inherit;
     gap: inherit;
     flex: inherit;
     cursor: var(--fg-hover-cursor-link, pointer);
     min-width: 0;
+    text-decoration: none;
 }
 
-.fotogrids-gallery .fg-item a:focus,
-.fotogrids-album .fg-item a:focus {
+.fotogrids-collection .fg-item a:focus {
     outline: none;
 }
 
-.fotogrids-gallery .fg-item-media,
-.fotogrids-album .fg-item-media {
+.fotogrids-collection .fg-item-media {
     display: block;
     width: 100%;
     border-radius: var(--fg-radius, 0);
@@ -55,41 +55,76 @@
     box-sizing: border-box;
 }
 
-.fotogrids-gallery .fg-item-media picture,
-.fotogrids-gallery .fg-item-media img,
-.fotogrids-album .fg-item-media picture,
-.fotogrids-album .fg-item-media img {
+.fotogrids-collection .fg-item-media picture,
+.fotogrids-collection .fg-item-media img {
     display: block;
     width: 100%;
     max-width: 100%;
 }
 
+/* Box-and-fit layouts. Grid, Single Item, and Image Viewer give the media
+   container a fixed aspect-ratio and use object-fit to control how the
+   image fills that ratio. Layouts that flow with the image's natural
+   dimensions (Masonry, Justified) don't opt in here. */
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"]
+) .fg-item-media {
+    aspect-ratio: var(--fg-item-aspect-ratio, 4 / 3);
+}
+
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"]
+) .fg-item-media picture,
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"]
+) .fg-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--fg-item-fit, cover);
+}
+
+/* Single Item with "None" aspect ratio: the layout adds
+   data-fg-natural-ratio="1" to the wrapper, opting out of the fixed-box
+   behavior so the image keeps its intrinsic dimensions. */
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media {
+    aspect-ratio: auto;
+}
+
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media picture,
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media img {
+    height: auto;
+    object-fit: initial;
+}
+
 /* Border - only painted when the decorator is active. */
-.fotogrids-gallery[data-fg-border] .fg-item-media,
-.fotogrids-album[data-fg-border] .fg-item-media {
+.fotogrids-collection[data-fg-border] .fg-item-media {
     border-width: var(--fg-border-w);
     border-color: var(--fg-border-color);
     border-style: var(--fg-border-style);
 }
 
 /* Wrapper margin/padding - only applied when the Spacing decorator is active,
-   so a gallery with no configured spacing doesn't override a theme's defaults.
-   Each variable is set independently, so unconfigured sides fall back to 0. */
-.fotogrids-gallery[data-fg-spacing],
-.fotogrids-album[data-fg-spacing] {
+   so a collection with no configured spacing doesn't override a theme's
+   defaults. Each variable is set independently, so unconfigured sides fall
+   back to 0. */
+.fotogrids-collection[data-fg-spacing] {
     margin: var(--fg-margin, 0);
     padding: var(--fg-padding, 0);
     box-sizing: border-box;
 }
 
 /* Thumbnail image filters - only applied when the decorator is active. */
-.fotogrids-gallery[data-fg-filter] .fg-item-media img,
-.fotogrids-album[data-fg-filter] .fg-item-media img {
+.fotogrids-collection[data-fg-filter] .fg-item-media img {
     filter: var(--fg-thumb-filter-regular);
     transition: filter 0.25s ease;
 }
 
-.fotogrids-gallery[data-fg-filter] .fg-item:hover .fg-item-media img,
-.fotogrids-album[data-fg-filter] .fg-item:hover .fg-item-media img {
+.fotogrids-collection[data-fg-filter] .fg-item:hover .fg-item-media img {
     filter: var(--fg-thumb-filter-hover);
 }

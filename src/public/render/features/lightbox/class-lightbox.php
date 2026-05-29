@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Features\Lightbox;
 
 use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
@@ -168,6 +169,15 @@ final class Lightbox implements Feature {
     }
 
     public function supports( Render_Context $render_context ): bool {
+        // Lightbox shows full-size attachment media for the items inside a
+        // collection. Album items are themselves galleries (their click goes
+        // to a view-page or AJAX-swaps to the child gallery), so there is
+        // no "open this item in a lightbox" semantic. Opt out cleanly to
+        // avoid polluting album wrappers with data-fg-click + data-fg-lb-*.
+        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
+            return false;
+        }
+
         return $render_context->behavior->click_behavior === 'lightbox';
     }
 

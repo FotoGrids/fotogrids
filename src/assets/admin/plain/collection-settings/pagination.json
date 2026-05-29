@@ -2,6 +2,19 @@
     "id": "pagination",
     "label": "Pagination",
     "icon": "arrow_square_down",
+    "condition": {
+        "dependsOn": "layout",
+        "values": [
+            "grid",
+            "masonry",
+            "justified",
+            "slider",
+            "image-viewer",
+            "video",
+            "carousel",
+            "products"
+        ]
+    },
     "settings": [
         {
             "key": "pagination_type",
@@ -273,10 +286,7 @@
                     "visible_when_uninstalled": true
                 },
                 {
-                    "key": "pages_prev_text",
-                    "type": "text_input",
-                    "label": "Previous Button Text",
-                    "default": "Previous",
+                    "type": "side_by_side",
                     "condition": {
                         "dependsOn": "pages_show_prev_next",
                         "values": [
@@ -284,27 +294,28 @@
                             "1"
                         ]
                     },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "pages_next_text",
-                    "type": "text_input",
-                    "label": "Next Button Text",
-                    "default": "Next",
-                    "condition": {
-                        "dependsOn": "pages_show_prev_next",
-                        "values": [
-                            true,
-                            "1"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                    "settings": [
+                        {
+                            "key": "pages_prev_text",
+                            "type": "text_input",
+                            "label": "Previous Button Text",
+                            "default": "Previous",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "pages_next_text",
+                            "type": "text_input",
+                            "label": "Next Button Text",
+                            "default": "Next",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
                 },
                 {
                     "key": "pages_button_icon",

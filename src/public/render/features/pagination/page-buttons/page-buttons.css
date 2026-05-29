@@ -20,7 +20,7 @@
  * picks up whichever @media block CSS resolved.
  */
 
-.fotogrids-gallery .fg-pagination--pages {
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages {
     --fg-pagination-gap: calc(var( --fg-pagination-base-size ) / 2);
 
     display: flex;
@@ -35,27 +35,27 @@
  * the same width even when the page numbers differ in digit count, so a
  * bar like [1] [...] [4] [5] [6] [...] [12] reads as a uniform row.
  */
-.fotogrids-gallery .fg-pagination__number-item {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__number-item {
     display: flex;
     align-items: stretch;
     justify-content: stretch;
     width: 100%;
 }
 
-.fotogrids-gallery .fg-pagination__number-item > .fg-pagination__btn {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__number-item > .fg-pagination__btn {
     width: 100%;
 }
 
-.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-left    { justify-content: flex-start; }
-.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-center  { justify-content: center; }
-.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-right   { justify-content: flex-end; }
-.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-stretch { justify-content: space-between; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-left    { justify-content: flex-start; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-center  { justify-content: center; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-right   { justify-content: flex-end; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-stretch { justify-content: space-between; }
 
 /*
  * Active (current) page chip. Only numbered buttons use this state —
  * load-more never has an active state because there's only one button.
  */
-.fotogrids-gallery .fg-pagination--pages .fg-pagination__btn.fg-is-active {
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages .fg-pagination__btn.fg-is-active {
     background: var( --fg-colors-blue );
     border-color: var( --fg-colors-blue );
     color: var( --fg-colors-white );
@@ -83,7 +83,7 @@
  * lets the grid keep its max-content sizing while still living inside
  * the .fg-pagination flex parent next to Prev / Next.
  */
-.fotogrids-gallery .fg-pagination__numbers {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__numbers {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
@@ -102,7 +102,7 @@
  * with it) instead of just hiding the button while leaving an empty <li>
  * taking up gap space.
  */
-.fotogrids-gallery .fg-pagination__number-item.fg-is-trimmed {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__number-item.fg-is-trimmed {
     display: none;
 }
 
@@ -114,14 +114,14 @@
  * affordances (hover/focus rings, pointer events) so it reads as a gap
  * indicator, not a clickable target.
  */
-.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis {
     cursor: default;
     pointer-events: none;
     user-select: none;
 }
-.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:hover,
-.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:focus,
-.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:focus-visible {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:hover,
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:focus,
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:focus-visible {
     background: inherit;
     border-color: inherit;
     color: inherit;
@@ -129,7 +129,7 @@
     outline: none;
 }
 
-.fotogrids-gallery .fg-pagination--pages.fg-is-loading {
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-is-loading {
     pointer-events: none;
     opacity: 0.7;
 }
@@ -139,7 +139,7 @@
  * and embedded inline by Page_Buttons::render_icon(). Size is driven from the
  * button's font-size so the icon scales with the button label.
  */
-.fotogrids-gallery .fg-pagination__icon {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -149,7 +149,7 @@
     flex-shrink: 0;
 }
 
-.fotogrids-gallery .fg-pagination__icon > svg {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__icon > svg {
     width: 100%;
     height: 100%;
     display: block;

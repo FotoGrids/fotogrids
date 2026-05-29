@@ -8,9 +8,7 @@
  * "none" maps to this file only - no transition, instant reveal.
  */
 
-.fotogrids-gallery .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
-.fotogrids-gallery .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img,
-.fotogrids-album   .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
-.fotogrids-album   .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
     opacity: 0;
 }

@@ -166,7 +166,7 @@
 
         var target = settings.embedded_share_target || 'image';
         if ( target === 'image' && deepLink && itemId ) {
-            var galleryEl = img.closest ? img.closest( '.fotogrids-gallery' ) : null;
+            var galleryEl = img.closest ? img.closest( '.fotogrids-collection.fotogrids-gallery' ) : null;
             // Pipeline writes data-fg-gallery-id on the wrapper.
             var galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
             if ( galleryId ) {
@@ -387,7 +387,15 @@
                 || ( context.galleryEl.dataset ? context.galleryEl.dataset.fgGalleryId : '' );
         }
         proxy.closest = function ( sel ) {
-            return ( sel === '.fotogrids-gallery' && context.galleryEl ) ? context.galleryEl : null;
+            if ( ! context.galleryEl ) return null;
+            if (
+                sel === '.fotogrids-gallery'
+                || sel === '.fotogrids-collection'
+                || sel === '.fotogrids-collection.fotogrids-gallery'
+            ) {
+                return context.galleryEl;
+            }
+            return null;
         };
 
         function labelFor( network ) {

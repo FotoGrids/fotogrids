@@ -20,7 +20,7 @@
                 {
                     "key": "password_protect",
                     "type": "toggle",
-                    "label": "Password Protect Gallery",
+                    "label": "Password Protect {postType}",
                     "tier_required": "free",
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",
@@ -29,7 +29,7 @@
                 {
                     "key": "password",
                     "type": "password_input",
-                    "label": "Gallery Password",
+                    "label": "{postType} Password",
                     "default": "",
                     "condition": {
                         "dependsOn": "password_protect",
@@ -454,7 +454,10 @@
             "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
-            "visible_when_uninstalled": true
+            "visible_when_uninstalled": true,
+            "postTypes": [
+                "gallery"
+            ]
         }
     ],
     "tier_required": "free"

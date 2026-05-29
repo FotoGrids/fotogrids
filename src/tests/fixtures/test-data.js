@@ -197,7 +197,7 @@ export const mockBlockAttributes = {
         showCaptions: true,
         lightbox: true,
         lazyLoad: true,
-        customCSS: '.fotogrids-gallery { border: 2px solid red; }',
+        customCSS: '.fotogrids-collection { border: 2px solid red; }',
         align: 'none'
     }
 };

@@ -6,14 +6,23 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
     getFieldState,
     isDefaultsMode,
     getOptionState,
+    isOptionVisible,
     __,
     buttonsClassName = ''
 }) => {
     const { createElement: h } = wp.element;
 
-    const filteredOptions = isDefaultsMode
+    const baseOptions = isDefaultsMode
         ? (setting.options || []).filter(option => !option.isGlobalDefault)
         : (setting.options || []);
+
+    // Per-option `condition` evaluation. Lets an option opt out of the
+    // current settings state (e.g. an aspect-ratio option that only makes
+    // sense for a specific layout). Caller passes `isOptionVisible` which
+    // wraps the same shouldDisplaySetting() the field-level conditions use.
+    const filteredOptions = typeof isOptionVisible === 'function'
+        ? baseOptions.filter(option => !option || isOptionVisible(option))
+        : baseOptions;
     const settingState = typeof getFieldState === 'function'
         ? getFieldState(setting.key, currentValue)
         : 'editable';
@@ -22,8 +31,15 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
 
     const buttonsContainerClass = 'fotogrids-button-group__buttons' + (buttonsClassName ? ' ' + buttonsClassName : '');
 
+    const wrapperClassName = [
+        'fotogrids-button-group',
+        setting.bigIcons ? 'fotogrids-button-group--big-icons' : '',
+        setting.sameWidth ? 'fotogrids-button-group--same-width' : '',
+        setting.extraBigIcons ? 'fotogrids-button-group--extra-big-icons' : ''
+    ].filter(Boolean).join(' ');
+
     return h('div', {
-        className: 'fotogrids-button-group'
+        className: wrapperClassName
     }, [
         setting.label && h('label', {
             className: 'fotogrids-setting__label'
@@ -48,10 +64,8 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
                 ? getOptionState(setting.key, option.value)
                 : 'editable';
             const isPro = optionState !== 'editable';
-            const buttonClass = (setting.buttonClass || '').trim();
             const buttonClassName = [
                 'fotogrids-button-group__button',
-                buttonClass,
                 isPro ? 'fotogrids-button-group__button__pro' : '',
                 currentValue === option.value ? 'fg-is-active' : ''
             ].filter(Boolean).join(' ');

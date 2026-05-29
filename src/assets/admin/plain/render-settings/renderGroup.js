@@ -8,7 +8,7 @@ window.FotoGridsRenderSettings.renderGroup = (setting, currentValue, isDisabled,
         : 'editable';
     const showSettingBadge = settingState !== 'editable';
     const settingBadgeText = settingState === 'locked' ? __('Locked', 'fotogrids') : __('Pro', 'fotogrids');
-    
+ 
     if (!setting.settings || !Array.isArray(setting.settings)) {
         return h('div', {
             className: 'fotogrids-setting-group fotogrids-setting-group--error'

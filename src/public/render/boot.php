@@ -93,6 +93,7 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Grid::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Masonry::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Justified::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Single_Item::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Captions\Captions::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Image_Filters\Image_Filters::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Border_Radius\Border_Radius::class );

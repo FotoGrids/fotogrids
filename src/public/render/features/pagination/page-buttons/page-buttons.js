@@ -28,6 +28,14 @@
         var pagination = window.FotoGrids.modules.pagination;
         var s = pagination.state( gEl );
 
+        // Reconcile the rendered chip list with the current totalPages.
+        // PHP renders 1..N chips for the unfiltered count; once a filter
+        // is applied the server returns a new totalPages reflecting the
+        // filtered set, and the chip list must match — otherwise we
+        // either leave stale chips for pages that no longer exist or
+        // are missing chips for newly-reachable pages.
+        rebuildChips( nav, s.totalPages );
+
         // Prev / Next disabled state.
         var prev = nav.querySelector( '[data-fg-pagination-trigger="prev"]' );
         var next = nav.querySelector( '[data-fg-pagination-trigger="next"]' );
@@ -54,6 +62,61 @@
             gEl.dataset.fgPagesInitialScroll = '1';
         } else {
             gEl.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+        }
+    }
+
+    /**
+     * Reconcile the rendered numbered-chip list with `totalPages`.
+     *
+     * PHP renders chips 1..N for the unfiltered gallery total. When
+     * filters mutate the active set the server returns a different
+     * totalPages, so we add or remove chips to match before any
+     * active-state / truncation pass runs.
+     *
+     * Mirrors the PHP markup in Page_Buttons::render_number_buttons() —
+     * same element + class structure, same data attrs — so styling and
+     * the click delegation in attach() keep working unchanged. Ellipsis
+     * chips (.fg-pagination__ellipsis-item) are excluded so they get
+     * cleared and rebuilt by applyTruncation() on the same pass.
+     *
+     * @param {Element} nav
+     * @param {number}  totalPages
+     */
+    function rebuildChips( nav, totalPages ) {
+        var list = nav.querySelector( '.fg-pagination__numbers' );
+        if ( ! list ) return;
+        if ( ! totalPages || totalPages < 1 ) totalPages = 1;
+
+        // Drop any ellipsis chips first — applyTruncation() will rebuild
+        // them after rebuildChips() finishes. Leaving them in would
+        // confuse the index walk below.
+        list.querySelectorAll( '.fg-pagination__ellipsis-item' ).forEach( function ( el ) {
+            el.remove();
+        } );
+
+        var existing = Array.prototype.slice.call(
+            list.querySelectorAll( '.fg-pagination__number-item' )
+        );
+
+        // Trim chips beyond the new total.
+        for ( var i = existing.length - 1; i >= totalPages; i-- ) {
+            existing[ i ].remove();
+        }
+
+        // Append chips for pages that don't have one yet.
+        for ( var p = existing.length + 1; p <= totalPages; p++ ) {
+            var li  = document.createElement( 'li' );
+            li.className = 'fg-pagination__number-item';
+
+            var btn = document.createElement( 'button' );
+            btn.type = 'button';
+            btn.className = 'fg-pagination__btn fg-pagination__number';
+            btn.setAttribute( 'data-fg-pagination-trigger', 'page' );
+            btn.setAttribute( 'data-fg-pagination-page', String( p ) );
+            btn.textContent = String( p );
+
+            li.appendChild( btn );
+            list.appendChild( li );
         }
     }
 

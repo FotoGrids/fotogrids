@@ -144,6 +144,24 @@ final class Context_Builder {
         $raw_ids       = array_map( 'absint', $collection_item_ids );
         $sorted_ids    = $this->apply_sorter( $raw_ids, $sort_context );
 
+        // Single Item layout: only one item ever renders, picked by the
+        // active sorter (so random sorter naturally gives a different image
+        // per request, manual gives the first, etc). The slice happens
+        // upstream of load_items so we only do attachment hydration for the
+        // one item we're going to render. The full sorted-ID count is
+        // captured separately below and stamped into Render_Meta so the
+        // lightbox-extended path knows the real gallery size.
+        $is_single_item        = ( $render_settings['layout'] ?? '' ) === 'single-item';
+        $single_item_full_count = $is_single_item ? count( $sorted_ids ) : null;
+        if ( $is_single_item ) {
+            $sorted_ids = array_slice( $sorted_ids, 0, 1 );
+            // The "thumbnail" we render IS the full image - a Single Item is
+            // a hero, not a derivative. Forcing SLUG_FULL also gives the
+            // correct srcset candidates so the browser picks an appropriate
+            // resolution for the viewport.
+            $thumb_size = Image_Size_Manager::SLUG_FULL;
+        }
+
         $loaded_items = $this->load_items( $sorted_ids, $thumb_size, $full_size );
         $loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
 
@@ -176,7 +194,12 @@ final class Context_Builder {
 
         // Record the total BEFORE pagination slicing (but AFTER filtering)
         // so chrome modules emit data-fg-page-total against the filtered set.
-        $total_item_count = count( $loaded_items );
+        //
+        // For Single Item layout, $loaded_items has length 1 because we
+        // sliced the sorted-ID list upstream. The lightbox-extended path
+        // still needs to know the real gallery size, so we substitute the
+        // pre-slice count captured before load_items().
+        $total_item_count = $single_item_full_count ?? count( $loaded_items );
         $render_meta      = $render_meta->with( [ 'total_item_count' => $total_item_count ] );
 
         // Pagination slicing. Runs after sorter selection (canonical order
@@ -459,8 +482,70 @@ final class Context_Builder {
                 'tablet' => [ 'value' => 8, 'unit' => 'px' ],
                 'mobile' => [ 'value' => 5, 'unit' => 'px' ],
             ],
-            columns_auto_range: is_array( $render_settings['columns_auto_range'] ?? null ) ? $render_settings['columns_auto_range'] : []
+            columns_auto_range: is_array( $render_settings['columns_auto_range'] ?? null ) ? $render_settings['columns_auto_range'] : [],
+            item_aspect_ratio: $this->resolve_item_aspect_ratio( $render_settings ),
+            item_object_fit: $this->resolve_item_object_fit( $render_settings ),
         );
+    }
+
+    /**
+     * Normalizes the object-fit setting into a CSS-ready string.
+     *
+     * Returns "cover" | "contain" or an empty string. Empty means "do not
+     * emit the var" - the CSS fallback in the layout stylesheet takes over.
+     *
+     * @since   1.0.0
+     * @param   array<string, mixed> $render_settings Render settings.
+     * @return  string
+     */
+    private function resolve_item_object_fit( array $render_settings ): string {
+        $raw = $render_settings['layout_item_object_fit'] ?? null;
+        if ( $raw === 'cover' || $raw === 'contain' ) {
+            return $raw;
+        }
+        return '';
+    }
+
+    /**
+     * Normalizes the aspect-ratio setting into a CSS-ready string.
+     *
+     * Returns either a "W / H" string (e.g. "4 / 3") or an empty string.
+     * Empty means "do not emit the var" - the CSS fallback in the layout
+     * stylesheet takes over.
+     *
+     * @since   1.0.0
+     * @param   array<string, mixed> $render_settings Render settings.
+     * @return  string
+     */
+    private function resolve_item_aspect_ratio( array $render_settings ): string {
+        $raw = $render_settings['layout_item_aspect_ratio'] ?? null;
+
+        if ( ! is_string( $raw ) || $raw === '' ) {
+            return '';
+        }
+
+        // 'none' means "use the image's natural aspect ratio". Return the
+        // empty string so style_vars() skips emitting --fg-item-aspect-ratio
+        // and the .fg-item-media container has no enforced ratio.
+        if ( $raw === 'none' ) {
+            return '';
+        }
+
+        if ( $raw === 'custom' ) {
+            $w = absint( $render_settings['layout_item_aspect_ratio_w'] ?? 0 );
+            $h = absint( $render_settings['layout_item_aspect_ratio_h'] ?? 0 );
+            if ( $w < 1 || $h < 1 ) {
+                return '';
+            }
+            return $w . ' / ' . $h;
+        }
+
+        // Preset values arrive as "W/H" (e.g. "4/3"). Normalize to "W / H".
+        if ( preg_match( '#^\s*(\d+)\s*/\s*(\d+)\s*$#', $raw, $m ) === 1 ) {
+            return ( (int) $m[1] ) . ' / ' . ( (int) $m[2] );
+        }
+
+        return '';
     }
 
     /**

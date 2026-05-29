@@ -7,7 +7,6 @@ use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
-use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Internal\Item_Renderer;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -16,6 +15,16 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Justified layout module.
+ *
+ * Opt-in capabilities:
+ *   - uses_item_spacing : --fg-gap
+ *
+ * Justified flows with each image's natural aspect ratio - no columns,
+ * no fixed item box. The justified-rows specific settings
+ * (layout_justified_row_height, ..._tolerance, ..._last_row,
+ * ..._max_rows) are consumed by the layout's own renderer when its
+ * frontend logic is built; the wrapper composer doesn't need to know
+ * about them.
  *
  * @package FotoGrids\Render\Layouts
  * @since   1.0.0
@@ -60,19 +69,11 @@ final class Layout_Justified implements Layout {
     }
 
     public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [ 'data-fg-layout' => 'justified' ];
+        return [];
     }
 
     public function style_vars( Render_Context $render_context ): array {
-        $responsive_spacing = $render_context->layout->responsive_spacing;
-
-        return [
-            '--fg-gap' => new Responsive_Var(
-                desktop: $this->to_unit_value( $responsive_spacing['desktop'] ?? [ 'value' => 10, 'unit' => 'px' ], 'px' ),
-                tablet:  $this->to_unit_value( $responsive_spacing['tablet']  ?? [ 'value' => 8,  'unit' => 'px' ], 'px' ),
-                mobile:  $this->to_unit_value( $responsive_spacing['mobile']  ?? [ 'value' => 5,  'unit' => 'px' ], 'px' ),
-            ),
-        ];
+        return [];
     }
 
     public function assets( Render_Context $render_context ): Module_Assets {
@@ -84,13 +85,9 @@ final class Layout_Justified implements Layout {
         );
     }
 
-    private function to_unit_value( mixed $raw_value, string $default_unit ): string {
-        if ( is_array( $raw_value ) ) {
-            $value = $raw_value['value'] ?? 0;
-            $unit  = $raw_value['unit']  ?? $default_unit;
-            return (string) $value . $unit;
-        }
-
-        return (string) $raw_value . $default_unit;
+    public function capabilities(): array {
+        return [
+            'uses_item_spacing' => true,
+        ];
     }
 }

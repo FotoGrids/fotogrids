@@ -22,8 +22,7 @@
 // Filter_Ui::style_vars() on the gallery wrapper, which takes priority.
 // -----------------------------------------------------------------------------
 
-.fotogrids-gallery,
-.fotogrids-album {
+.fotogrids-collection.fotogrids-gallery {
     --fg-filter-gap:              8px;
     --fg-filter-bar-gap:          8px;
     --fg-filter-wrapper-gap:      16px;
@@ -532,15 +531,13 @@
 // pointer-events:none prevents hover/click while the item is fading out.
 // -----------------------------------------------------------------------------
 
-.fotogrids-gallery .fg-item.fg-is-filtered-out,
-.fotogrids-album   .fg-item.fg-is-filtered-out {
+.fotogrids-collection.fotogrids-gallery .fg-item.fg-is-filtered-out {
     display:         none; // remove from flow; keeps layout clean without JS reflow
 }
 
 // If a layout wants animated filter transitions it can override display:none
 // with opacity/pointer-events instead. Opt-in per layout via a BEM modifier.
-.fotogrids-gallery.fg-layout-animated-filter .fg-item.fg-is-filtered-out,
-.fotogrids-album.fg-layout-animated-filter   .fg-item.fg-is-filtered-out {
+.fotogrids-collection.fotogrids-gallery.fg-layout-animated-filter .fg-item.fg-is-filtered-out {
     display:         block;
     opacity:         0;
     pointer-events:  none;

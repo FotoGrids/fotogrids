@@ -51,6 +51,42 @@ class Collection_Defaults {
                 'tablet' => 8,
                 'mobile' => 5
             ),
+            'layout_item_aspect_ratio' => '4/3',
+            'layout_item_aspect_ratio_w' => 4,
+            'layout_item_aspect_ratio_h' => 3,
+            'layout_item_object_fit' => 'cover',
+            // Masonry-only.
+            'layout_masonry_column_balancing' => 'balanced',
+            'layout_masonry_order' => 'row',
+            // Justified-only.
+            'layout_justified_row_height' => array(
+                'desktop' => 220,
+                'tablet'  => 180,
+                'mobile'  => 140,
+            ),
+            'layout_justified_row_height_tolerance' => 25,
+            'layout_justified_last_row' => 'nojustify',
+            'layout_justified_max_rows' => 0,
+            // Navigation (Image Viewer / Slider).
+            'layout_show_arrows' => true,
+            'layout_show_bullets' => true,
+            'layout_show_counter' => false,
+            'layout_loop' => true,
+            'layout_autoplay' => false,
+            'layout_autoplay_delay' => 4000,
+            'layout_autoplay_pause_on_hover' => true,
+            // Lightbox scope (only consulted for single-item layout).
+            'lightbox_scope' => 'gallery',
+            // Interactions: zoom.
+            'interactions_zoom' => false,
+            'interactions_zoom_mode' => 'hover',
+            'interactions_zoom_style' => 'inline',
+            'interactions_zoom_hover_delay' => 300,
+            'interactions_zoom_popover_bg' => 'rgba(0,0,0,0.2)',
+            'interactions_zoom_popover_bg_blur' => 8,
+            'interactions_zoom_popover_padding' => 24,
+            'interactions_zoom_popover_close_button' => true,
+            'interactions_zoom_popover_click_outside_to_close' => true,
             'margin' => array(
                 'desktop' => 0,
                 'tablet' => 0,
@@ -64,7 +100,7 @@ class Collection_Defaults {
             'hover_effects' => false,
             'hover_effect' => 'none',
             'loading_icon' => '12-dots',
-            'loading_icon_color' => 'rgba(60, 70, 240, 1)',
+            'loading_icon_color' => 'rgba(0, 0, 0, 0.2)',
             'loaded_effect' => 'fade',
             'lightbox' => true,
             'captions' => true,

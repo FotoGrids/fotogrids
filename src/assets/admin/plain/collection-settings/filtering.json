@@ -2,6 +2,19 @@
     "id": "filtering",
     "label": "Filtering",
     "icon": "filter",
+    "condition": {
+        "dependsOn": "layout",
+        "values": [
+            "grid",
+            "masonry",
+            "justified",
+            "slider",
+            "image-viewer",
+            "video",
+            "carousel",
+            "products"
+        ]
+    },
     "settings": [
         {
             "key": "filtering_enabled",
@@ -211,8 +224,8 @@
                         {
                             "key": "filter_wrapper_gap",
                             "type": "range",
-                            "label": "Gap Between Bar and Gallery",
-                            "description": "Space between the filter bar and the gallery grid",
+                            "label": "Gap Between Bar and {postType}",
+                            "description": "Space between the filter bar and the {postType.lower} grid",
                             "unit": "px",
                             "min": 0,
                             "max": 64,

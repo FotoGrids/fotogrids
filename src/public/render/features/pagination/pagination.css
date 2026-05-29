@@ -47,7 +47,7 @@
  *   --fg-pagination-line-height        inherit
  */
 
-.fotogrids-gallery .fg-pagination {
+.fotogrids-collection.fotogrids-gallery .fg-pagination {
     --fg-pagination-base-size: 8px;
     --fg-pagination-btn-border-width: 1px;
     --fg-pagination-btn-border-style: solid;
@@ -74,7 +74,7 @@
     margin-top: calc(var(--fg-pagination-base-size) * 2);
 }
 
-.fotogrids-gallery .fg-pagination__btn {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn {
     appearance: none;
     border-width: var( --fg-pagination-btn-border-width );
     border-style: var( --fg-pagination-btn-border-style );
@@ -99,17 +99,17 @@
     transition: var( --fg-pagination-btn-transition );
 }
 
-.fotogrids-gallery .fg-pagination__btn:hover:not( :disabled ):not( .fg-is-loading ):not( .fg-is-active ) {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn:hover:not( :disabled ):not( .fg-is-loading ):not( .fg-is-active ) {
     background: var( --fg-pagination-btn-hover-bg );
     color: var( --fg-pagination-btn-hover-color );
 }
 
-.fotogrids-gallery .fg-pagination__btn:disabled {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn:disabled {
     opacity: var( --fg-pagination-btn-disabled-opacity );
     cursor: not-allowed;
 }
 
-.fotogrids-gallery .fg-pagination__btn.fg-is-loading {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-is-loading {
     opacity: var( --fg-pagination-btn-loading-opacity );
     cursor: progress;
 }
@@ -119,7 +119,7 @@
  * screen-reader announcements (aria-live=polite). One ruleset, one source
  * of truth.
  */
-.fotogrids-gallery .fg-pagination__status {
+.fotogrids-collection.fotogrids-gallery .fg-pagination__status {
     position: absolute;
     width: 1px;
     height: 1px;
