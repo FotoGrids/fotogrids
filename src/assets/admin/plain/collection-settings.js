@@ -1669,7 +1669,7 @@ function CollectionSettings() {
                 }, [
                     h('div', {
                         className: 'fotogrids-settings-group__content'
-                    }, (singleSubTab.settings || []).filter(s => !s?.hidden).map(renderSetting))
+                    }, (singleSubTab.settings || []).filter(s => !s?.hidden).map(s => renderSetting({ ...s, __chromeWhenContext: 'single_subtab' })))
                 ]);
             }
 
@@ -1712,7 +1712,7 @@ function CollectionSettings() {
                 }, [
                     h('div', {
                         className: 'fotogrids-settings-group__content'
-                    }, (group.subTabs[currentActiveSubTab]?.settings || []).filter(s => !s?.hidden).map(renderSetting) || [])
+                    }, (group.subTabs[currentActiveSubTab]?.settings || []).filter(s => !s?.hidden).map(s => renderSetting({ ...s, __chromeWhenContext: 'multi_subtab' })) || [])
                 ])
             ]);
         }

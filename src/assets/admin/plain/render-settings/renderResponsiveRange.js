@@ -13,7 +13,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
 
     const hasUnits = setting.units && Array.isArray(setting.units) && setting.units.length > 0;
     const isMinMaxMode = setting.minMax === true;
-    const isFourSided = setting.fourSided === true;
+    const isFourSided = setting.four_sided === true;
     const settingState = typeof getFieldState === 'function'
         ? getFieldState(setting.key, currentValue)
         : 'editable';
@@ -186,6 +186,10 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                 ].filter(Boolean)),
                 h('span', { className: 'fotogrids-responsive-setting__device-icon' }, renderIcon(activeDeviceData.icon))
             ]),
+
+            setting.description && h('p', {
+                className: 'fotogrids-setting__description'
+            }, setting.description),
 
             h('div', { className: 'fotogrids-responsive-setting__controls fotogrids-responsive-setting__controls--four-sided' }, [
 
@@ -637,6 +641,10 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                 className: 'fotogrids-responsive-setting__device-icon'
             }, renderIcon(activeDeviceData.icon))
         ]),
+
+        setting.description && h('p', {
+            className: 'fotogrids-setting__description'
+        }, setting.description),
 
         h('div', {
             className: 'fotogrids-responsive-setting__controls'

@@ -56,7 +56,6 @@ class Collection_Defaults {
             'layout_item_aspect_ratio_h' => 3,
             'layout_item_object_fit' => 'cover',
             // Masonry-only.
-            'layout_masonry_column_balancing' => 'balanced',
             'layout_masonry_order' => 'row',
             // Justified-only.
             'layout_justified_row_height' => array(
@@ -67,14 +66,77 @@ class Collection_Defaults {
             'layout_justified_row_height_tolerance' => 25,
             'layout_justified_last_row' => 'nojustify',
             'layout_justified_max_rows' => 0,
+            'layout_justified_page_trailing_row' => 'fill',
+            'layout_justified_snap_window' => 20,
+            'layout_justified_snap_fill_threshold' => 85,
+            'layout_justified_snap_direction' => 'auto',
+            // Slider-only items-per-view.
+            'layout_items_per_view' => array(
+                'desktop' => 3,
+                'tablet'  => 2,
+                'mobile'  => 1,
+            ),
+            // Height (Slider / Image Viewer).
+            'layout_height_mode'  => 'auto',
+            'layout_height_fixed' => array(
+                'desktop' => 500,
+                'tablet'  => 400,
+                'mobile'  => 300,
+            ),
+            'layout_height_max'   => array(
+                'desktop' => 0,
+                'tablet'  => 0,
+                'mobile'  => 0,
+            ),
             // Navigation (Image Viewer / Slider).
-            'layout_show_arrows' => true,
-            'layout_show_bullets' => true,
-            'layout_show_counter' => false,
             'layout_loop' => true,
+            'layout_show_counter' => false,
             'layout_autoplay' => false,
             'layout_autoplay_delay' => 4000,
             'layout_autoplay_pause_on_hover' => true,
+            // Transition.
+            'layout_transition' => 'horizontal',
+            'layout_transition_duration' => 'normal',
+            'layout_transition_duration_custom' => 300,
+            // Arrows.
+            'layout_show_arrows' => true,
+            'layout_arrow_icon' => 'chevron',
+            'layout_arrow_size' => array(
+                'value' => 40,
+                'unit'  => 'px',
+            ),
+            'layout_arrows_location' => 'inset',
+            'layout_arrow_distance' => array(
+                'value' => 8,
+                'unit'  => 'px',
+            ),
+            'layout_arrows_reserve_space' => false,
+            'layout_arrows_visibility' => 'always',
+            'layout_hide_arrows_at_ends' => false,
+            // Bullets.
+            'layout_show_bullets' => true,
+            'layout_bullet_style' => 'fill',
+            'layout_bullet_size' => array(
+                'value' => 10,
+                'unit'  => 'px',
+            ),
+            'layout_bullets_spacing' => array(
+                'value' => 8,
+                'unit'  => 'px',
+            ),
+            'layout_bullets_location' => 'bottom',
+            'layout_bullet_distance' => array(
+                'value' => 8,
+                'unit'  => 'px',
+            ),
+            'layout_bullets_visibility' => 'always',
+            // Thumbnails (slider).
+            'layout_thumbnails_show' => false,
+            'layout_thumbnails_location' => 'bottom',
+            'layout_thumbnails_size' => 'normal',
+            'layout_thumbnails_spacing' => 5,
+            'layout_thumbnails_drag' => true,
+            'layout_thumbnails_swipe' => true,
             // Lightbox scope (only consulted for single-item layout).
             'lightbox_scope' => 'gallery',
             // Interactions: zoom.
@@ -106,12 +168,18 @@ class Collection_Defaults {
             'captions' => true,
             'lazy_load' => true,
             'lightbox_preload_slides' => 2,
+            // Thumbnail background (regular / hover / loading).
+            'background_enabled' => false,
+            'background_color' => 'rgba(0,0,0,0)',
+            'background_hover_color' => 'rgba(0,0,0,0)',
+            'background_loading_color' => 'rgba(0,0,0,0)',
             'border_radius' => array(
                 'desktop' => 0,
                 'tablet' => 0,
                 'mobile' => 0
             ),
             'border_enabled' => false,
+            // Border - regular state.
             'border_width' => array(
                 'desktop' => 1,
                 'tablet' => 1,
@@ -119,7 +187,24 @@ class Collection_Defaults {
             ),
             'border_color' => '#000000',
             'border_style' => 'solid',
+            // Border - hover (mouseover) state.
+            'border_hover_width' => array(
+                'desktop' => 1,
+                'tablet' => 1,
+                'mobile' => 1
+            ),
+            'border_hover_color' => '#000000',
+            'border_hover_style' => 'solid',
+            // Border - loading state.
+            'border_loading_width' => array(
+                'desktop' => 1,
+                'tablet' => 1,
+                'mobile' => 1
+            ),
+            'border_loading_color' => '#000000',
+            'border_loading_style' => 'solid',
             'shadow_enabled' => false,
+            // Shadow - regular state.
             'shadow_color' => 'rgba(0,0,0,0.5)',
             'shadow_offset_x' => array(
                 'desktop' => 0,
@@ -137,6 +222,50 @@ class Collection_Defaults {
                 'mobile' => 10
             ),
             'shadow_spread' => array(
+                'desktop' => 0,
+                'tablet' => 0,
+                'mobile' => 0
+            ),
+            // Shadow - hover (mouseover) state.
+            'shadow_hover_color' => 'rgba(0,0,0,0.5)',
+            'shadow_hover_offset_x' => array(
+                'desktop' => 0,
+                'tablet' => 0,
+                'mobile' => 0
+            ),
+            'shadow_hover_offset_y' => array(
+                'desktop' => 4,
+                'tablet' => 4,
+                'mobile' => 4
+            ),
+            'shadow_hover_blur' => array(
+                'desktop' => 10,
+                'tablet' => 10,
+                'mobile' => 10
+            ),
+            'shadow_hover_spread' => array(
+                'desktop' => 0,
+                'tablet' => 0,
+                'mobile' => 0
+            ),
+            // Shadow - loading state.
+            'shadow_loading_color' => 'rgba(0,0,0,0.5)',
+            'shadow_loading_offset_x' => array(
+                'desktop' => 0,
+                'tablet' => 0,
+                'mobile' => 0
+            ),
+            'shadow_loading_offset_y' => array(
+                'desktop' => 4,
+                'tablet' => 4,
+                'mobile' => 4
+            ),
+            'shadow_loading_blur' => array(
+                'desktop' => 10,
+                'tablet' => 10,
+                'mobile' => 10
+            ),
+            'shadow_loading_spread' => array(
                 'desktop' => 0,
                 'tablet' => 0,
                 'mobile' => 0
@@ -163,6 +292,34 @@ class Collection_Defaults {
             'thumbnail_filter_hover_amount_invert'    => array( 'desktop' => 100, 'tablet' => 100, 'mobile' => 100 ),
             'thumbnail_filter_hover_amount_opacity'   => array( 'desktop' => 100, 'tablet' => 100, 'mobile' => 100 ),
             'thumbnail_filter_hover_amount_hue_rotate'=> array( 'desktop' => 0,   'tablet' => 0,   'mobile' => 0   ),
+            // Full image background (regular / hover / loading).
+            'full_image_background_enabled' => false,
+            'full_image_background_color' => 'rgba(0,0,0,0)',
+            'full_image_background_hover_color' => 'rgba(0,0,0,0)',
+            'full_image_background_loading_color' => 'rgba(0,0,0,0)',
+            // Full image border (regular / hover / loading).
+            'full_image_border_enabled' => false,
+            'full_image_border_width' => array(
+                'desktop' => 1,
+                'tablet' => 1,
+                'mobile' => 1
+            ),
+            'full_image_border_color' => '#000000',
+            'full_image_border_style' => 'solid',
+            'full_image_border_hover_width' => array(
+                'desktop' => 1,
+                'tablet' => 1,
+                'mobile' => 1
+            ),
+            'full_image_border_hover_color' => '#000000',
+            'full_image_border_hover_style' => 'solid',
+            'full_image_border_loading_width' => array(
+                'desktop' => 1,
+                'tablet' => 1,
+                'mobile' => 1
+            ),
+            'full_image_border_loading_color' => '#000000',
+            'full_image_border_loading_style' => 'solid',
             'full_image_filter_enabled' => false,
             'full_image_filter_type' => array(),
             // Per-filter amount controls (regular state).
@@ -198,6 +355,7 @@ class Collection_Defaults {
             'sort_ui_style' => 'dropdown',
             'sort_ui_label' => 'Sort by:',
             'filtering_enabled' => false,
+            'filtering_multiple_enabled' => true,
             'filter_by' => array( 'tags' ),
             'date_filter_type' => 'date_taken',
             'filter_display_mode' => 'toggle',
@@ -205,52 +363,128 @@ class Collection_Defaults {
             'filter_sidebar_side' => 'left',
             'filter_ui_style' => 'buttons',
             'show_filter_count' => true,
-            'filter_all_label' => 'All',
-            // Filter UI spacing
-            'filter_wrapper_gap'   => 16,
-            'filter_bar_gap'       => 8,
-            'filter_gap'           => 8,
-            'filter_sidebar_width' => 200,
+            'filter_reset_btn_enabled'  => true,
+            'filter_reset_btn_position' => 'start',
+            'filter_reset_btn_label'    => 'All',
+            // Filter UI spacing - all responsive with px/em/rem units.
+            'filter_wrapper_gap'   => array(
+                'desktop' => 16,
+                'tablet'  => 16,
+                'mobile'  => 12,
+            ),
+            'filter_bar_gap'       => array(
+                'desktop' => 8,
+                'tablet'  => 8,
+                'mobile'  => 6,
+            ),
+            'filter_gap'           => array(
+                'desktop' => 8,
+                'tablet'  => 8,
+                'mobile'  => 6,
+            ),
+            'filter_sidebar_width' => array(
+                'desktop' => 200,
+                'tablet'  => 180,
+                'mobile'  => 160,
+            ),
+            'filter_panel_padding' => array(
+                'desktop' => 0,
+                'tablet'  => 0,
+                'mobile'  => 0,
+            ),
+            'filter_panel_bg'      => 'rgba(0, 0, 0, 0)',
+            'filter_panel_radius'  => 12,
             // Button shape
-            'filter_btn_padding'   => '6px 14px',
+            'filter_btn_padding'   => array(
+                'desktop' => 8,
+                'tablet'  => 8,
+                'mobile'  => 8,
+            ),
             'filter_btn_radius'    => 4,
-            'filter_btn_font_size' => 0.875,
-            // Button colors (empty = use SCSS defaults / inherit)
-            'filter_btn_bg'           => '',
-            'filter_btn_color'        => '',
-            'filter_btn_border'       => '1px solid currentColor',
-            'filter_btn_active_bg'    => '',
-            'filter_btn_active_color' => '',
-            'filter_btn_hover_bg'     => '',
-            'filter_btn_hover_color'  => '',
-            // Dropdown trigger
-            'filter_select_padding' => '6px 32px 6px 12px',
-            'filter_select_radius'  => 4,
-            'filter_select_bg'      => '',
-            'filter_select_color'   => '',
-            'filter_select_border'  => '1px solid currentColor',
-            // Dropdown popover
-            'filter_dropdown_list_bg'             => '',
-            'filter_dropdown_list_border'          => '',
-            'filter_dropdown_list_radius'          => 4,
-            'filter_dropdown_option_hover_bg'      => '',
-            'filter_dropdown_option_active_color'  => '',
+            'filter_btn_font_size' => array(
+                'desktop' => 14,
+                'tablet'  => 14,
+                'mobile'  => 13,
+            ),
+            // Button colors per state.
+            'filter_btn_bg'                   => 'rgba(0, 0, 0, 0)',
+            'filter_btn_color'                => 'rgba(0, 0, 0, 1)',
+            'filter_btn_border_color'         => 'rgba(0, 0, 0, 1)',
+            'filter_btn_border_width'         => 1,
+            'filter_btn_hover_bg'             => 'rgba(60, 70, 240, 0.05)',
+            'filter_btn_hover_color'          => 'rgba(60, 70, 240, 1)',
+            'filter_btn_hover_border_color'   => 'rgba(60, 70, 240, 1)',
+            'filter_btn_hover_border_width'   => 1,
+            'filter_btn_active_bg'            => 'rgba(60, 70, 240, 1)',
+            'filter_btn_active_color'         => 'rgba(255, 255, 255, 1)',
+            'filter_btn_active_border_color'  => 'rgba(60, 70, 240, 1)',
+            'filter_btn_active_border_width'  => 1,
+            // Dropdown trigger - same shape as filter_btn_*.
+            'filter_select_padding'             => array(
+                'desktop' => 10,
+                'tablet'  => 10,
+                'mobile'  => 10,
+            ),
+            'filter_select_radius'              => 4,
+            'filter_select_border_width'        => 1,
+            // Per-state colours (Regular / Mouseover / Open).
+            'filter_select_bg'                  => 'rgba(0, 0, 0, 0)',
+            'filter_select_color'               => 'rgba(0, 0, 0, 1)',
+            'filter_select_border_color'        => 'rgba(0, 0, 0, 0.3)',
+            'filter_select_hover_bg'            => 'rgba(60, 70, 240, 0.05)',
+            'filter_select_hover_color'         => 'rgba(0, 0, 0, 1)',
+            'filter_select_hover_border_color'  => 'rgba(60, 70, 240, 1)',
+            'filter_select_open_bg'             => 'rgba(60, 70, 240, 1)',
+            'filter_select_open_color'          => 'rgba(255, 255, 255, 1)',
+            'filter_select_open_border_color'   => 'rgba(60, 70, 240, 1)',
+            // Dropdown popover - shared chrome (radius + border + separator)
+            // plus per-option-state bg/text colours.
+            'filter_dropdown_list_radius'              => 4,
+            'filter_dropdown_list_border_color'        => 'rgba(0, 0, 0, 0.3)',
+            'filter_dropdown_list_border_width'        => 1,
+            'filter_dropdown_option_separator_color'   => 'rgba(0, 0, 0, 0.08)',
+            'filter_dropdown_option_bg'                => 'rgba(255, 255, 255, 1)',
+            'filter_dropdown_option_color'             => 'rgba(0, 0, 0, 1)',
+            'filter_dropdown_option_hover_bg'          => 'rgba(60, 70, 240, 0.05)',
+            'filter_dropdown_option_hover_color'       => 'rgba(60, 70, 240, 1)',
+            'filter_dropdown_option_selected_bg'       => 'rgba(60, 70, 240, 1)',
+            'filter_dropdown_option_selected_color'    => 'rgba(255, 255, 255, 1)',
             // Checkbox shape
             'filter_cb_size'   => 16,
             'filter_cb_radius' => 3,
             'filter_cb_gap'    => 8,
-            // Checkbox colors
-            'filter_cb_border'               => '1px solid currentColor',
-            'filter_cb_bg'                   => '',
-            'filter_cb_checked_bg'           => '',
-            'filter_cb_checked_border_color' => '',
-            'filter_cb_checkmark_color'      => '',
+            // Checkbox border width (shared across states).
+            'filter_cb_border_width'             => 1,
+            // Checkbox colors - per state (unchecked / hover / checked).
+            // Unchecked has no visible checkmark, so no checkmark key.
+            'filter_cb_bg'                       => 'rgba(255, 255, 255, 1)',
+            'filter_cb_border_color'             => 'rgba(0, 0, 0, 1)',
+            'filter_cb_hover_bg'                 => 'rgba(255, 255, 255, 1)',
+            'filter_cb_hover_border_color'       => 'rgba(60, 70, 240, 1)',
+            'filter_cb_hover_checkmark_color'    => 'rgba(60, 70, 240, 0.3)',
+            'filter_cb_checked_bg'               => 'rgba(60, 70, 240, 1)',
+            'filter_cb_checked_border_color'     => 'rgba(60, 70, 240, 1)',
+            'filter_cb_checked_checkmark_color'  => 'rgba(255, 255, 255, 1)',
             // Count badge
-            'filter_count_color'     => '',
-            'filter_count_font_size' => 0.8,
-            'filter_count_bg'        => '',
-            'filter_count_radius'    => 0,
-            'filter_count_padding'   => '0',
+            // Count badge - per-state colours mirror filter_btn_* states so
+            // the badge tracks its containing button's hover / active states.
+            'filter_count_bg'           => 'rgba(0, 0, 0, 0.1)',
+            'filter_count_color'        => 'rgba(0, 0, 0, 0.7)',
+            'filter_count_hover_bg'     => 'rgba(60, 70, 240, 0.2)',
+            'filter_count_hover_color'  => 'rgba(60, 70, 240, 1)',
+            'filter_count_active_bg'    => 'rgba(255, 255, 255, 0.3)',
+            'filter_count_active_color' => 'rgba(255, 255, 255, 1)',
+            'filter_count_font_size'    => array(
+                'desktop' => 12,
+                'tablet'  => 12,
+                'mobile'  => 11,
+            ),
+            'filter_count_radius'       => 3,
+            'filter_count_padding'      => array(
+                'desktop' => array( 'top' => 2, 'right' => 6, 'bottom' => 2, 'left' => 6 ),
+                'tablet'  => array( 'top' => 2, 'right' => 6, 'bottom' => 2, 'left' => 6 ),
+                'mobile'  => array( 'top' => 2, 'right' => 6, 'bottom' => 2, 'left' => 6 ),
+            ),
             'items_per_page' => array(
                 'desktop' => 12,
                 'tablet' => 8,

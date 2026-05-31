@@ -37,13 +37,13 @@
         if ( ! cssUrls || typeof cssUrls !== 'object' ) return;
 
         Object.keys( cssUrls ).forEach( function ( handle ) {
-            var url = cssUrls[ handle ];
+            let url = cssUrls[ handle ];
             if ( ! handle || ! url ) return;
 
-            var linkId = 'fotogrids-css-' + handle;
+            const linkId = 'fotogrids-css-' + handle;
             if ( document.getElementById( linkId ) ) return;
 
-            var link = document.createElement( 'link' );
+            const link = document.createElement( 'link' );
             link.rel  = 'stylesheet';
             link.id   = linkId;
             link.href = url;
@@ -62,14 +62,14 @@
         if ( ! jsData || typeof jsData !== 'object' ) return;
 
         Object.keys( jsData ).forEach( function ( handle ) {
-            var entry = jsData[ handle ];
-            var url   = entry && entry.src ? entry.src : '';
+            const entry = jsData[ handle ];
+            let url   = entry && entry.src ? entry.src : '';
             if ( ! handle || ! url ) return;
-            var scriptId = 'fotogrids-js-' + handle;
+            const scriptId = 'fotogrids-js-' + handle;
             if ( document.getElementById( scriptId ) ) return;
             if ( document.getElementById( handle + '-js' ) ) return;
 
-            var script   = document.createElement( 'script' );
+            const script   = document.createElement( 'script' );
             script.id    = scriptId;
             script.src   = url;
             script.async = false;
@@ -102,18 +102,18 @@
      * @param {HTMLFormElement} form
      */
     function unlockGallery( form ) {
-        var card      = form.closest( '.fg-gate-card' );
-        var errorEl   = form.querySelector( '.fg-lock-error' );
-        var submitBtn = form.querySelector( '.fg-lock-submit' );
-        var input     = form.querySelector( '.fg-lock-input' );
-        var wrapper   = form.closest( '.fotogrids-gate' );
+        const card      = form.closest( '.fg-gate-card' );
+        const errorEl   = form.querySelector( '.fg-lock-error' );
+        const submitBtn = form.querySelector( '.fg-lock-submit' );
+        const input     = form.querySelector( '.fg-lock-input' );
+        const wrapper   = form.closest( '.fotogrids-gate' );
 
-        var galleryId = parseInt( form.dataset.galleryId || '0', 10 );
-        var unlockUrl = form.dataset.unlockUrl || '';
+        const galleryId = parseInt( form.dataset.galleryId || '0', 10 );
+        const unlockUrl = form.dataset.unlockUrl || '';
         // The lock form carries its own nonce in data-nonce — we don't
         // rely on a global settings object here.
-        var nonce    = form.dataset.nonce || '';
-        var password = input ? input.value : '';
+        const nonce    = form.dataset.nonce || '';
+        const password = input ? input.value : '';
 
         if ( ! galleryId || ! unlockUrl ) {
             return;
@@ -138,7 +138,7 @@
                 } );
             } )
             .then( function ( result ) {
-                var data = result.data;
+                const data = result.data;
 
                 if ( ! result.ok || ! data || ! data.success ) {
                     if ( errorEl ) errorEl.classList.add( 'is-visible' );
@@ -152,22 +152,22 @@
                 injectMissingStyles( data.css || {} );
                 injectMissingScripts( data.js || {} );
 
-                var html = data.html || '';
+                const html = data.html || '';
                 if ( ! html || ! wrapper ) {
                     window.location.reload();
                     return;
                 }
 
-                var tempDiv = document.createElement( 'div' );
+                const tempDiv = document.createElement( 'div' );
                 tempDiv.innerHTML = html;
 
-                var newNodes = Array.prototype.slice.call( tempDiv.childNodes );
+                const newNodes = Array.prototype.slice.call( tempDiv.childNodes );
                 if ( newNodes.length === 0 ) {
                     window.location.reload();
                     return;
                 }
 
-                var parent = wrapper.parentNode;
+                const parent = wrapper.parentNode;
                 if ( ! parent ) {
                     window.location.reload();
                     return;
@@ -216,7 +216,7 @@
         // run our own MutationObserver (per the runtime contract); a
         // delegated submit listener achieves the same with no observer.
         document.addEventListener( 'submit', function ( e ) {
-            var form = e.target;
+            const form = e.target;
             if ( ! form || ! form.classList || ! form.classList.contains( 'fg-lock-form' ) ) return;
             if ( form.dataset.fotogridsLockBound === '1' ) return;
             // Bind on the fly, then re-dispatch the submit event so the

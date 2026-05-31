@@ -12,6 +12,10 @@
     font-size: 12px;
 }
 
+.fg-item-hidden {
+    visibility: hidden;
+}
+
 .fotogrids-collection .fg-item {
     position: relative;
     display: flex;
@@ -59,6 +63,7 @@
 .fotogrids-collection .fg-item-media img {
     display: block;
     width: 100%;
+    height: auto;
     max-width: 100%;
 }
 

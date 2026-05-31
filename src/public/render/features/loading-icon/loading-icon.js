@@ -97,23 +97,41 @@
      * started the animation, so cancelling here is safe - the animation ran
      * for 0ms and the user sees a clean instant reveal.
      *
+     * Callers that want already-complete images to be revealed progressively
+     * (initial-load pass) pass `deferImmediate: true`, which schedules the
+     * markLoaded call onto its own animation frame. Per-item callers (the
+     * MutationObserver path for paginated arrivals) pass nothing — images
+     * inserted dynamically aren't complete yet, and even when they cache-hit
+     * they're spaced out across separate insertions, so deferring would just
+     * add latency.
+     *
      * @param {HTMLImageElement} img
+     * @param {{ deferImmediate?: boolean }} [opts]
      */
-    function wireImage( img ) {
+    function wireImage( img, opts ) {
         const item = img.closest( '.fg-item' );
         if ( ! item ) {
             return;
         }
 
-        // Already resolved - naturalWidth > 0 means decoded image.
-        if ( img.complete && img.naturalWidth > 0 ) {
-            markLoaded( item );
-            return;
-        }
+        const deferImmediate = !! ( opts && opts.deferImmediate );
 
-        // Error state (complete but no natural size).
+        // Already resolved (naturalWidth > 0 means decoded image) OR errored
+        // (complete but no natural size). Both go through markLoaded.
         if ( img.complete ) {
-            markLoaded( item );
+            if ( deferImmediate ) {
+                // Don't synchronously cancel the loader animation that the
+                // inline html_after script just started. We need at least
+                // one paint between animation start and animation cancel
+                // for the user to see the loader. Without this, the entire
+                // initial-load wireGallery loop runs to completion before
+                // the browser paints anything, batching all images into a
+                // single reveal AND cancelling every animation before it
+                // ever ran a visible frame.
+                requestAnimationFrame( function () { markLoaded( item ); } );
+            } else {
+                markLoaded( item );
+            }
             return;
         }
 
@@ -132,11 +150,56 @@
      * both render <figure data-fg-media-state="loading"> items whose
      * state needs flipping to "loaded" once the image arrives).
      *
+     * Two modes:
+     *
+     *   - INITIAL pass (init() → wireGallery): every image is wired with
+     *     deferImmediate=true AND staggered across animation frames so
+     *     already-complete images reveal one per frame instead of all at
+     *     once. This is the only path that runs against the parser-painted
+     *     initial slice, where many images may already be cached/complete
+     *     by footer-script time. Without staggering, the synchronous loop
+     *     locks the main thread and the browser flushes every
+     *     data-fg-media-state="loaded" mutation in a single paint, which
+     *     looks (and is) batched.
+     *
+     *   - DYNAMIC pass (MutationObserver → wireGallery for late-inserted
+     *     wrappers, or wireImage for a single .fg-item arrival): no
+     *     staggering. Inserted items aren't complete yet, so the load
+     *     listener path handles streaming naturally.
+     *
      * @param {Element} container A .fotogrids-collection element.
+     * @param {{ initial?: boolean }} [opts]
      */
-    function wireGallery( container ) {
+    function wireGallery( container, opts ) {
+        const initial = !! ( opts && opts.initial );
         const imgs = container.querySelectorAll( '.fg-item-media img' );
-        imgs.forEach( wireImage );
+
+        if ( ! initial ) {
+            imgs.forEach( function ( img ) { wireImage( img ); } );
+            return;
+        }
+
+        // Initial pass — stagger across animation frames so the browser
+        // paints the loader animation at least once per item and reveals
+        // images progressively as their markLoaded mutation lands.
+        let i = 0;
+        function step() {
+            // Process a small batch per frame so very large galleries don't
+            // take forever to finish initial wiring on slow devices. One
+            // image per frame would push a 60-image gallery to ~1s of frames
+            // even if every image is already loaded.
+            const BATCH = 4;
+            const end = Math.min( i + BATCH, imgs.length );
+            for ( ; i < end; i++ ) {
+                wireImage( imgs[ i ], { deferImmediate: true } );
+            }
+            if ( i < imgs.length ) {
+                requestAnimationFrame( step );
+            }
+        }
+        if ( imgs.length > 0 ) {
+            requestAnimationFrame( step );
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -145,9 +208,15 @@
 
     /**
      * Initial pass - wire every gallery already in the DOM.
+     *
+     * Uses the initial=true wireGallery mode so already-complete images
+     * get progressively revealed across animation frames instead of all
+     * in one main-thread-blocking batch.
      */
     function init() {
-        document.querySelectorAll( '.fotogrids-collection' ).forEach( wireGallery );
+        document.querySelectorAll( '.fotogrids-collection' ).forEach( function ( container ) {
+            wireGallery( container, { initial: true } );
+        } );
     }
 
     /**
@@ -218,13 +287,23 @@
         observer.observe( document.body, { childList: true, subtree: true } );
     }
 
+    // The script is enqueued in_footer:true, so by the time it evaluates
+    // the gallery markup has already been parsed and is queryable in the
+    // DOM. We must NOT wait for DOMContentLoaded — that event doesn't fire
+    // until every in-flight <img> on the page settles, which can be
+    // multiple seconds on a cold cache. During that window, every cached
+    // image silently completes in the background and arrives at init()
+    // simultaneously — which is what produced the "everything appears
+    // together after a long pause" symptom we were chasing.
+    //
+    // observeDynamic() still uses DOMContentLoaded because the
+    // MutationObserver only needs to be installed before any LATE
+    // insertion can happen (pagination, album AJAX), and those flows
+    // can't run until the page is interactive anyway.
+    init();
     if ( document.readyState === 'loading' ) {
-        document.addEventListener( 'DOMContentLoaded', function () {
-            init();
-            observeDynamic();
-        } );
+        document.addEventListener( 'DOMContentLoaded', observeDynamic );
     } else {
-        init();
         observeDynamic();
     }
 

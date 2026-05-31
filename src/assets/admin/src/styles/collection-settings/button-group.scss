@@ -94,17 +94,16 @@
     &--big-icons.fotogrids-button-group--same-width {
         .fotogrids-button-group__buttons {
             display: grid;
-            grid-auto-flow: column;
-            grid-auto-columns: 1fr;
-            width: max-content;
             align-items: center;
+            justify-content: start;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 100px));
 
             .fotogrids-button-group__button {
                 padding: 20px;
                 gap: 8px;
 
                 .fotogrids-button-icon svg {
-                    path, rect {
+                    path, rect, line {
                         stroke-width: 1.4;
                     }
                 }
@@ -121,7 +120,7 @@
                     width: 40px;
                     height: 40px;
     
-                    path, rect {
+                    path, rect, line {
                         stroke-width: 0.8;
                     }
                 }

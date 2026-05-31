@@ -109,11 +109,25 @@ final class Item_Renderer {
         $lazy_load = (bool) ( $render_context->settings['lazy_load'] ?? true );
 
         $image_attributes = [
-            'src' => esc_url( $item_view->thumb_url ),
-            'alt' => esc_attr( $item_view->alt !== '' ? $item_view->alt : $item_view->title ),
-            'data-full' => esc_url( $item_view->full_url ),
-            'data-id' => (string) $item_view->id,
+            'src'                => esc_url( $item_view->thumb_url ),
+            'alt'                => esc_attr( $item_view->alt !== '' ? $item_view->alt : $item_view->title ),
+            'data-fg-thumb-src'  => esc_url( $item_view->thumb_url ),
+            'data-fg-full-src'   => esc_url( $item_view->full_url ),
+            'data-id'            => (string) $item_view->id,
         ];
+
+        if ( $item_view->width !== null ) {
+            $image_attributes['data-fg-thumb-w'] = (string) $item_view->width;
+        }
+        if ( $item_view->height !== null ) {
+            $image_attributes['data-fg-thumb-h'] = (string) $item_view->height;
+        }
+        if ( $item_view->full_width !== null ) {
+            $image_attributes['data-fg-full-w'] = (string) $item_view->full_width;
+        }
+        if ( $item_view->full_height !== null ) {
+            $image_attributes['data-fg-full-h'] = (string) $item_view->full_height;
+        }
 
         if ( $lazy_load ) {
             $image_attributes['loading']  = 'lazy';

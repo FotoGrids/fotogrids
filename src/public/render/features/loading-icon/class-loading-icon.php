@@ -398,45 +398,86 @@ final class Loading_Icon implements Feature {
         // has handles set via the inline runner. Skips already-cached
         // images so we don't start an animation only to cancel it in
         // the same frame.
+        //
+        // The drain runs as a chunked rAF loop instead of one big
+        // synchronous pass. Two reasons:
+        //   1. icon.animate(svg) attaches a WAAPI animation AND an rAF
+        //      attribute interpolator (fgAnimAttr). Starting N of those
+        //      in one synchronous loop pins the main thread on the very
+        //      first frame, which queues image load events behind the
+        //      backlog and visibly batches every gallery's reveals.
+        //   2. The same blocking loop is why initial loader animations
+        //      don't visibly run — the browser never gets a paint
+        //      between animate() and the loading-icon.js wireGallery
+        //      cancel pass for already-cached images.
+        // We process up to FG_DRAIN_BATCH items per animation frame so
+        // the browser can paint between batches.
         $drain_js = '(function(){'
             . 'var icons=window.fotogridsLoadingIcons||{};'
             . 'var q=window.fgAnimQueue||[];'
             . 'if(!window.fgLoaderHandles)window.fgLoaderHandles=new WeakMap();'
+            . 'var pending=[];'
+            // Collect every (gallery, item, icon) tuple to process — cheap
+            // pass, no animate() calls yet.
             . 'for(var i=0;i<q.length;i++){'
             .   'var g=document.getElementById(q[i]);'
             .   'if(!g)continue;'
             .   'var iconName=g.getAttribute("data-fg-loading-icon")||"";'
             .   'var icon=icons[iconName]||icons[Object.keys(icons)[0]];'
             .   'if(!icon||typeof icon.animate!=="function")continue;'
-            .   'g.querySelectorAll(".fg-item").forEach(function(item){'
-            .     'if(window.fgLoaderHandles.has(item))return;'
+            .   'var items=g.querySelectorAll(".fg-item");'
+            .   'for(var j=0;j<items.length;j++){'
+            .     'pending.push({item:items[j],icon:icon});'
+            .   '}'
+            . '}'
+            // Drain pending in small rAF batches so each animate() call has
+            // breathing room to paint. BATCH of 4 keeps a 60-item gallery
+            // wired up in ~15 frames (~250ms) while still streaming.
+            . 'var BATCH=4;var pos=0;'
+            . 'function step(){'
+            .   'var end=Math.min(pos+BATCH,pending.length);'
+            .   'for(;pos<end;pos++){'
+            .     'var item=pending[pos].item;'
+            .     'var icon=pending[pos].icon;'
+            .     'if(window.fgLoaderHandles.has(item))continue;'
             .     'var img=item.querySelector(".fg-item-media img");'
             .     'if(img && img.complete && img.naturalWidth > 0){'
             .       'window.fgLoaderHandles.set(item,[]);'
-            .       'return;'
+            .       'continue;'
             .     '}'
             .     'var svg=item.querySelector(".fg-item-loader svg");'
-            .     'if(!svg)return;'
+            .     'if(!svg)continue;'
             .     'try{'
             .       'var h=icon.animate(svg);'
             .       'window.fgLoaderHandles.set(item,Array.isArray(h)?h:[]);'
             .     '}catch(e){}'
-            .   '});'
+            .   '}'
+            .   'if(pos<pending.length){'
+            .     '(window.requestAnimationFrame||function(f){setTimeout(f,16);})(step);'
+            .   '}'
+            . '}'
+            . 'if(pending.length){'
+            .   '(window.requestAnimationFrame||function(f){setTimeout(f,16);})(step);'
             . '}'
             . '})();';
 
         // Defensive footer drain — catches any galleries whose per-gallery
         // inline script bailed (e.g. unexpected DOM/JS state). On a healthy
         // page this is a no-op because all items already have handles set.
-        add_action(
-            'wp_footer',
-            static function () use ( $drain_js ): void {
-                $global_js = self::build_global_js( self::$icon_names_seen );
-                $inline    = $global_js . $drain_js;
-                wp_add_inline_script( 'fotogrids-loading-icon', $inline, 'before' );
-            },
-            10
-        );
+        //
+        // Also hooks `fotogrids/render/late_assets`, fired by the admin
+        // preview endpoint after the render completes. wp_footer never fires
+        // inside a REST request, so without this second hook the loading
+        // icons map (window.fotogridsLoadingIcons) is never published to the
+        // preview document and every item stays stuck on its spinner.
+        $publish_inline = static function () use ( $drain_js ): void {
+            $global_js = self::build_global_js( self::$icon_names_seen );
+            $inline    = $global_js . $drain_js;
+            wp_add_inline_script( 'fotogrids-loading-icon', $inline, 'before' );
+        };
+
+        add_action( 'wp_footer', $publish_inline, 10 );
+        add_action( 'fotogrids/render/late_assets', $publish_inline, 10 );
     }
 
     /**

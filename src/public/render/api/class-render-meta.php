@@ -34,6 +34,9 @@ final class Render_Meta {
      * @param   int|null        $random_seed Seed for deterministic random sorting. Set on initial render and sent back by the client on paginated requests so each page draws from the same shuffle. Null = unseeded (initial paint with no inherited seed).
      * @param   bool            $view_page True when rendered on a standalone Gallery/Album View Page (ViewCollections renderer); false on embedded shortcode/block renders. Read by Collection_Header to gate the 'view_pages' breadcrumb placement.
      * @param   bool            $is_ajax_swap True when the render is being produced specifically for an Album → Gallery AJAX swap. Used to suppress BreadcrumbList JSON-LD on swaps (the page URL has not changed, so emitting fresh schema would describe content that does not match the canonical URL).
+     * @param   int|null        $container_width Measured gallery container width in CSS pixels, sent by the client on later renders. Used by the justified snap-pagination resolver. Null = no measurement; the resolver falls back to a per-breakpoint assumed width.
+     * @param   int|null        $pagination_page_size Authoritative page size for THIS page, set after Context_Builder runs pagination (including snap). Null = no pagination ran.
+     * @param   int|null        $pagination_total_pages Authoritative total page count, set after Context_Builder runs pagination. Null = no pagination ran.
      * @return  void
      */
     public function __construct(
@@ -54,6 +57,9 @@ final class Render_Meta {
         public readonly ?int $random_seed = null,
         public readonly bool $view_page = false,
         public readonly bool $is_ajax_swap = false,
+        public readonly ?int $container_width = null,
+        public readonly ?int $pagination_page_size = null,
+        public readonly ?int $pagination_total_pages = null,
     ) {}
 
     /**
@@ -85,7 +91,10 @@ final class Render_Meta {
             active_filters:     array_key_exists( 'active_filters',     $changes ) ? $changes['active_filters']     : $this->active_filters,
             random_seed:        array_key_exists( 'random_seed',        $changes ) ? $changes['random_seed']        : $this->random_seed,
             view_page:          array_key_exists( 'view_page',          $changes ) ? $changes['view_page']          : $this->view_page,
-            is_ajax_swap:       array_key_exists( 'is_ajax_swap',       $changes ) ? $changes['is_ajax_swap']       : $this->is_ajax_swap,
+            is_ajax_swap:           array_key_exists( 'is_ajax_swap',           $changes ) ? $changes['is_ajax_swap']           : $this->is_ajax_swap,
+            container_width:        array_key_exists( 'container_width',        $changes ) ? $changes['container_width']        : $this->container_width,
+            pagination_page_size:   array_key_exists( 'pagination_page_size',   $changes ) ? $changes['pagination_page_size']   : $this->pagination_page_size,
+            pagination_total_pages: array_key_exists( 'pagination_total_pages', $changes ) ? $changes['pagination_total_pages'] : $this->pagination_total_pages,
         );
     }
 }

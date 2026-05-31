@@ -958,6 +958,23 @@
     color:       var(--fg-lb-color-info-text);
 }
 
+// ── Share bar inside the info panel ────────────────────────────────────────
+// The share bar (a fotogrids-share-bar element) lives inside the 'share'
+// info block. Its colour treatment must inherit from the info panel's
+// theme tokens — NOT from sharing.css's neutral defaults — so the bar
+// reads correctly against whatever info-block background the user has
+// configured (boxed/divided/plain × dark/light theme overrides).
+//
+// We override the share-bar's own custom properties so the cascade keeps
+// sharing.css authoritative on layout and this file authoritative on
+// per-context colour. This lives here (not in sharing.css) so the
+// lightbox theme tokens stay the single source of truth.
+.fg-lb-info .fotogrids-share-bar--lightbox {
+    --fg-sb-btn-color:    var(--fg-lb-color-info-text);
+    --fg-sb-btn-bg:       var(--fg-lb-color-info-block-bg);
+    --fg-sb-btn-bg-hover: var(--fg-lb-color-info-block-divider);
+}
+
 // (Skeleton-loader styles previously lived here. They've been removed
 // along with the JS that produced skeleton markup: on fast networks the
 // skeleton flash read as a glitch. Info blocks now render only when

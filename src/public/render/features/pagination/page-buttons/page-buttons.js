@@ -25,8 +25,8 @@
      * @param {Element} nav
      */
     function syncBar( gEl, nav ) {
-        var pagination = window.FotoGrids.modules.pagination;
-        var s = pagination.state( gEl );
+        let pagination = window.FotoGrids.modules.pagination;
+        let s = pagination.state( gEl );
 
         // Reconcile the rendered chip list with the current totalPages.
         // PHP renders 1..N chips for the unfiltered count; once a filter
@@ -37,14 +37,14 @@
         rebuildChips( nav, s.totalPages );
 
         // Prev / Next disabled state.
-        var prev = nav.querySelector( '[data-fg-pagination-trigger="prev"]' );
-        var next = nav.querySelector( '[data-fg-pagination-trigger="next"]' );
+        const prev = nav.querySelector( '[data-fg-pagination-trigger="prev"]' );
+        const next = nav.querySelector( '[data-fg-pagination-trigger="next"]' );
         if ( prev ) prev.disabled = s.page <= 1;
         if ( next ) next.disabled = s.page >= s.totalPages;
 
         // Active number.
         nav.querySelectorAll( '[data-fg-pagination-trigger="page"]' ).forEach( function ( btn ) {
-            var n = parseInt( btn.dataset.fgPaginationPage || '0', 10 );
+            let n = parseInt( btn.dataset.fgPaginationPage || '0', 10 );
             if ( n === s.page ) {
                 btn.classList.add( 'fg-is-active' );
                 btn.setAttribute( 'aria-current', 'page' );
@@ -83,7 +83,7 @@
      * @param {number}  totalPages
      */
     function rebuildChips( nav, totalPages ) {
-        var list = nav.querySelector( '.fg-pagination__numbers' );
+        let list = nav.querySelector( '.fg-pagination__numbers' );
         if ( ! list ) return;
         if ( ! totalPages || totalPages < 1 ) totalPages = 1;
 
@@ -94,21 +94,21 @@
             el.remove();
         } );
 
-        var existing = Array.prototype.slice.call(
+        const existing = Array.prototype.slice.call(
             list.querySelectorAll( '.fg-pagination__number-item' )
         );
 
         // Trim chips beyond the new total.
-        for ( var i = existing.length - 1; i >= totalPages; i-- ) {
+        for ( let i = existing.length - 1; i >= totalPages; i-- ) {
             existing[ i ].remove();
         }
 
         // Append chips for pages that don't have one yet.
-        for ( var p = existing.length + 1; p <= totalPages; p++ ) {
-            var li  = document.createElement( 'li' );
+        for ( let p = existing.length + 1; p <= totalPages; p++ ) {
+            const li  = document.createElement( 'li' );
             li.className = 'fg-pagination__number-item';
 
-            var btn = document.createElement( 'button' );
+            let btn = document.createElement( 'button' );
             btn.type = 'button';
             btn.className = 'fg-pagination__btn fg-pagination__number';
             btn.setAttribute( 'data-fg-pagination-trigger', 'page' );
@@ -147,7 +147,7 @@
      * @param {number}  total
      */
     function applyTruncation( gEl, nav, current, total ) {
-        var list = nav.querySelector( '.fg-pagination__numbers' );
+        let list = nav.querySelector( '.fg-pagination__numbers' );
         if ( ! list ) return;
 
         // Clear any ellipsis chips inserted on a previous sync so we can
@@ -162,7 +162,7 @@
         // items would have been removed in the cleanup above, but the
         // :not() guards against future markup changes where the cleanup
         // doesn't reach (e.g. server-side prerendered ellipses).
-        var numberItems = Array.prototype.slice.call(
+        const numberItems = Array.prototype.slice.call(
             list.querySelectorAll( '.fg-pagination__number-item:not(.fg-pagination__ellipsis-item)' )
         );
         if ( numberItems.length === 0 ) return;
@@ -181,9 +181,9 @@
         }
 
         // Sibling count from the wrapper's computed style. Defaults to 1 if
-        // the CSS var hasn't been emitted for any reason (e.g. tests).
-        var rawSiblings = getComputedStyle( gEl ).getPropertyValue( '--fg-pagination-siblings' );
-        var siblings    = parseInt( rawSiblings, 10 );
+        // the CSS const hasn't been emitted for any reason (e.g. tests).
+        const rawSiblings = getComputedStyle( gEl ).getPropertyValue( '--fg-pagination-siblings' );
+        let siblings    = parseInt( rawSiblings, 10 );
         if ( isNaN( siblings ) || siblings < 0 ) siblings = 1;
 
         // Worst-case visible count (current in the middle):
@@ -191,19 +191,19 @@
         // = 5 + 2*siblings chips, plus the two ellipsis slots.
         // If the gallery has fewer pages than that, truncation can't
         // actually save space — show everything.
-        var minTotalForTruncation = 5 + 2 * siblings;
+        const minTotalForTruncation = 5 + 2 * siblings;
         if ( total <= minTotalForTruncation ) {
             showAll();
             return;
         }
 
         // Build the visible set: boundaries + sibling window around current.
-        var visible      = Object.create( null );
+        const visible      = Object.create( null );
         visible[ 1 ]     = true;
         visible[ total ] = true;
-        var winStart = Math.max( 2, current - siblings );
-        var winEnd   = Math.min( total - 1, current + siblings );
-        for ( var p = winStart; p <= winEnd; p++ ) {
+        const winStart = Math.max( 2, current - siblings );
+        const winEnd   = Math.min( total - 1, current + siblings );
+        for ( let p = winStart; p <= winEnd; p++ ) {
             visible[ p ] = true;
         }
 
@@ -212,9 +212,9 @@
         // list-item drops out of the flex flow, including its gap, rather
         // than leaving an empty zero-width <li> behind.
         numberItems.forEach( function ( item ) {
-            var btn = item.querySelector( '.fg-pagination__number' );
+            let btn = item.querySelector( '.fg-pagination__number' );
             if ( ! btn ) return;
-            var n = parseInt( btn.dataset.fgPaginationPage || '0', 10 );
+            let n = parseInt( btn.dataset.fgPaginationPage || '0', 10 );
             if ( visible[ n ] ) {
                 item.classList.remove( 'fg-is-trimmed' );
             } else {
@@ -229,20 +229,20 @@
         // its height/padding/font/baseline line up exactly with the
         // surrounding buttons. CSS strips the interactive states so it
         // reads as a gap indicator rather than a clickable target.
-        var visibleItems = numberItems.filter( function ( item ) {
+        const visibleItems = numberItems.filter( function ( item ) {
             return ! item.classList.contains( 'fg-is-trimmed' );
         } );
 
-        for ( var i = 0; i < visibleItems.length - 1; i++ ) {
-            var aBtn = visibleItems[ i ].querySelector( '.fg-pagination__number' );
-            var bBtn = visibleItems[ i + 1 ].querySelector( '.fg-pagination__number' );
-            var aN   = parseInt( aBtn.dataset.fgPaginationPage || '0', 10 );
-            var bN   = parseInt( bBtn.dataset.fgPaginationPage || '0', 10 );
+        for ( let i = 0; i < visibleItems.length - 1; i++ ) {
+            const aBtn = visibleItems[ i ].querySelector( '.fg-pagination__number' );
+            const bBtn = visibleItems[ i + 1 ].querySelector( '.fg-pagination__number' );
+            const aN   = parseInt( aBtn.dataset.fgPaginationPage || '0', 10 );
+            const bN   = parseInt( bBtn.dataset.fgPaginationPage || '0', 10 );
             if ( bN - aN > 1 ) {
-                var dotsLi  = document.createElement( 'li' );
+                const dotsLi  = document.createElement( 'li' );
                 dotsLi.className = 'fg-pagination__number-item fg-pagination__ellipsis-item';
 
-                var dotsBtn = document.createElement( 'button' );
+                const dotsBtn = document.createElement( 'button' );
                 dotsBtn.type = 'button';
                 dotsBtn.className = 'fg-pagination__btn fg-pagination__ellipsis';
                 dotsBtn.disabled = true;
@@ -264,11 +264,11 @@
      * @returns {number|null}
      */
     function resolveTargetPage( target, s ) {
-        var trigger = target.dataset.fgPaginationTrigger;
+        const trigger = target.dataset.fgPaginationTrigger;
         if ( trigger === 'prev' ) return Math.max( 1, s.page - 1 );
         if ( trigger === 'next' ) return Math.min( s.totalPages, s.page + 1 );
         if ( trigger === 'page' ) {
-            var n = parseInt( target.dataset.fgPaginationPage || '0', 10 );
+            let n = parseInt( target.dataset.fgPaginationPage || '0', 10 );
             return n > 0 ? n : null;
         }
         return null;
@@ -284,10 +284,10 @@
         if ( gEl.dataset.fgPageButtonsBound === '1' ) return;
         gEl.dataset.fgPageButtonsBound = '1';
 
-        var nav = gEl.querySelector( '[data-fg-pagination-role="pages"]' );
+        const nav = gEl.querySelector( '[data-fg-pagination-role="pages"]' );
         if ( ! nav ) return;
 
-        var pagination = window.FotoGrids
+        let pagination = window.FotoGrids
             && window.FotoGrids.modules
             && window.FotoGrids.modules.pagination;
         if ( ! pagination ) return;
@@ -296,12 +296,12 @@
         syncBar( gEl, nav );
 
         nav.addEventListener( 'click', function ( event ) {
-            var btn = event.target.closest( '[data-fg-pagination-trigger]' );
+            let btn = event.target.closest( '[data-fg-pagination-trigger]' );
             if ( ! btn || btn.disabled ) return;
             event.preventDefault();
 
-            var s    = pagination.state( gEl );
-            var page = resolveTargetPage( btn, s );
+            let s    = pagination.state( gEl );
+            const page = resolveTargetPage( btn, s );
             if ( page === null || page === s.page ) return;
 
             nav.classList.add( 'fg-is-loading' );

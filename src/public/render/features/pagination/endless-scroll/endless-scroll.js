@@ -30,15 +30,15 @@
      */
     function startLoaderAnimation( loaderEl ) {
         if ( loaderEl.dataset.fgLoaderAnimRunning === '1' ) return;
-        var icons = window.fotogridsLoadingIcons;
+        const icons = window.fotogridsLoadingIcons;
         if ( ! icons ) return;
-        var iconName = loaderEl.dataset.fgLoadingIcon || 'spinner';
-        var icon = icons[ iconName ] || icons[ Object.keys( icons )[ 0 ] ];
+        const iconName = loaderEl.dataset.fgLoadingIcon || 'spinner';
+        const icon = icons[ iconName ] || icons[ Object.keys( icons )[ 0 ] ];
         if ( ! icon || typeof icon.animate !== 'function' ) return;
-        var svg = loaderEl.querySelector( 'svg' );
+        const svg = loaderEl.querySelector( 'svg' );
         if ( ! svg ) return;
         try {
-            var handles = icon.animate( svg );
+            let handles = icon.animate( svg );
             loaderEl.__fgLoaderHandles = handles;
             loaderEl.dataset.fgLoaderAnimRunning = '1';
         } catch ( e ) { /* swallow */ }
@@ -52,7 +52,7 @@
      * @param {Element} loaderEl
      */
     function stopLoaderAnimation( loaderEl ) {
-        var handles = loaderEl.__fgLoaderHandles;
+        let handles = loaderEl.__fgLoaderHandles;
         if ( handles && handles.forEach ) {
             handles.forEach( function ( h ) {
                 if ( h && typeof h.cancel === 'function' ) h.cancel();
@@ -68,12 +68,12 @@
         if ( gEl.dataset.fgEndlessScrollBound === '1' ) return;
         gEl.dataset.fgEndlessScrollBound = '1';
 
-        var sentinel = gEl.querySelector( '[data-fg-pagination-sentinel="true"]' );
+        let sentinel = gEl.querySelector( '[data-fg-pagination-sentinel="true"]' );
         if ( ! sentinel ) return;
 
-        var loaderEl = gEl.querySelector( '.fg-pagination__loader' );
+        const loaderEl = gEl.querySelector( '.fg-pagination__loader' );
 
-        var pagination = window.FotoGrids
+        const pagination = window.FotoGrids
             && window.FotoGrids.modules
             && window.FotoGrids.modules.pagination;
         if ( ! pagination ) return;
@@ -83,7 +83,7 @@
         // We observe the wrapper's class attribute so we don't have to
         // bake start/stop calls into pagination-core.
         if ( loaderEl && 'MutationObserver' in window ) {
-            var classObserver = new MutationObserver( function () {
+            const classObserver = new MutationObserver( function () {
                 if ( gEl.classList.contains( 'fotogrids-gallery--is-paginating' ) ) {
                     startLoaderAnimation( loaderEl );
                 } else {
@@ -108,9 +108,9 @@
         // round-trip (the unobserve happens synchronously before the
         // fetch resolves, but defence-in-depth never hurts).
 
-        var inFlight = false;
-        var observerActive = false;
-        var exhausted = false;
+        let inFlight = false;
+        let observerActive = false;
+        let exhausted = false;
 
         function activateObserver() {
             if ( observerActive || exhausted ) return;
@@ -124,11 +124,11 @@
             observer.unobserve( sentinel );
         }
 
-        var observer = new IntersectionObserver( function ( entries ) {
+        const observer = new IntersectionObserver( function ( entries ) {
             entries.forEach( function ( entry ) {
                 if ( ! entry.isIntersecting || inFlight ) return;
 
-                var s = pagination.state( gEl );
+                const s = pagination.state( gEl );
                 if ( ! s.hasMore ) {
                     exhausted = true;
                     deactivateObserver();

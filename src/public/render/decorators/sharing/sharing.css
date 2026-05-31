@@ -176,10 +176,20 @@
     opacity: 1;
 }
 
-/* ----- Footer + lightbox contexts -------------------------------------- */
-
-.fotogrids-share-bar--footer,
-.fotogrids-share-bar--lightbox {
+/* ----- Layout modifiers (caller-driven) -------------------------------- */
+/*
+ * Layout is selected by the caller via the renderShareBar(config, ctx,
+ * { layout: 'grid' | 'row' }) option, which adds one of these modifiers.
+ *
+ *   --row     Flex row (the base layout already does this; no extra rules).
+ *   --grid    Two-column grid — used inside the lightbox info panel and
+ *             anywhere a balanced 2-up cluster reads better than a row.
+ *
+ * Context modifiers (--footer, --lightbox, --thumbnail, --lightbox-popover)
+ * stay responsible for *theming and positioning* in their host surface,
+ * never for the bar's own column arrangement.
+ */
+.fotogrids-share-bar--grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
@@ -190,6 +200,9 @@
  * layout: 3 icons per row, no gap between buttons (each button has its
  * own padding), and the buttons get their own colour treatment to read
  * well on the tooltip's dark background.
+ *
+ * Overrides any caller-supplied --grid / --row layout: the popover always
+ * uses its own 3-column compact grid regardless of the layout option.
  */
 .fotogrids-share-bar--lightbox-popover {
     display: grid;

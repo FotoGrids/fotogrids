@@ -61,6 +61,12 @@ final class Item_View {
          * matches the actual displayed size rather than hardcoding 'large'.
          */
         public readonly string $thumb_size = 'large',
+        /**
+         * Intrinsic dimensions of full_url. Distinct from width/height which
+         * describe thumb_url's intrinsic dimensions.
+         */
+        public readonly ?int $full_width = null,
+        public readonly ?int $full_height = null,
     ) {}
 
     /**
@@ -91,6 +97,8 @@ final class Item_View {
             wrappers: $changes['wrappers'] ?? $this->wrappers,
             figure_wrappers: $changes['figure_wrappers'] ?? $this->figure_wrappers,
             thumb_size: $changes['thumb_size'] ?? $this->thumb_size,
+            full_width: $changes['full_width'] ?? $this->full_width,
+            full_height: $changes['full_height'] ?? $this->full_height,
         );
     }
 }

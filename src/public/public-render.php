@@ -184,7 +184,29 @@ class Public_Render {
         }
 
         $render_result = Render_Controller::factory()->render( $render_context );
+        self::$last_render_meta = $render_context->meta;
         return (string) $render_result->html;
+    }
+
+    /**
+     * Holds the Render_Meta of the most recent render_gallery_with_pipeline()
+     * call within this request. REST handlers read it to surface
+     * pagination metadata (snap-aware page size and total page count)
+     * that Context_Builder resolved during the render.
+     *
+     * @since 1.0.0
+     * @var \FotoGrids\Render\Api\Render_Meta|null
+     */
+    private static ?\FotoGrids\Render\Api\Render_Meta $last_render_meta = null;
+
+    /**
+     * Returns the Render_Meta from the most recent gallery render in this
+     * request, or null when no render has run yet.
+     *
+     * @since  1.0.0
+     */
+    public static function last_render_meta(): ?\FotoGrids\Render\Api\Render_Meta {
+        return self::$last_render_meta;
     }
 
     /**

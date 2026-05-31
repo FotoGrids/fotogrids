@@ -16,7 +16,7 @@
 ( function () {
     'use strict';
 
-    var VERSION = '1.1.0';
+    const VERSION = '1.1.0';
 
     // -------------------------------------------------------------------------
     // Internal state
@@ -29,7 +29,7 @@
      *
      * @type {Object<string, Array<{ cb: Function, priority: number, seq: number }>>}
      */
-    var queues = {
+    const queues = {
         gallery:    [],
         album:      [],
         collection: [],
@@ -41,14 +41,14 @@
      *
      * @type {number}
      */
-    var callbackSeq = 0;
+    let callbackSeq = 0;
 
     /**
      * Initialized collection elements (WeakSet so detached elements GC).
      *
      * @type {WeakSet<Element>}
      */
-    var initialized = new WeakSet();
+    const initialized = new WeakSet();
 
     /**
      * List of initialized collection records, exposed via getInstances().
@@ -57,14 +57,14 @@
      *
      * @type {Array<{ element: Element, galleryId: string|null, kind: string }>}
      */
-    var instances = [];
+    const instances = [];
 
     /**
      * The MutationObserver, installed exactly once.
      *
      * @type {MutationObserver|null}
      */
-    var collectionObserver = null;
+    let collectionObserver = null;
 
     // -------------------------------------------------------------------------
     // Collection-kind discriminator
@@ -95,7 +95,7 @@
      * @param {number}   priority
      */
     function insertCallback( queueName, cb, priority ) {
-        var q = queues[ queueName ];
+        let q = queues[ queueName ];
         q.push( { cb: cb, priority: priority, seq: callbackSeq++ } );
         q.sort( function ( a, b ) {
             if ( a.priority !== b.priority ) {
@@ -114,8 +114,8 @@
      * @param {Element} collectionElement
      */
     function runQueue( queueName, collectionElement ) {
-        var q = queues[ queueName ];
-        for ( var i = 0; i < q.length; i++ ) {
+        let q = queues[ queueName ];
+        for ( let i = 0; i < q.length; i++ ) {
             try {
                 q[ i ].cb( collectionElement );
             } catch ( err ) {
@@ -146,12 +146,12 @@
         }
         initialized.add( collectionElement );
 
-        var kind = collectionKind( collectionElement );
+        const kind = collectionKind( collectionElement );
 
         // The render pipeline writes data-fg-gallery-id on every wrapper
         // (Render_Controller::build_wrapper). Read that, not the legacy
         // data-gallery-id which the pipeline doesn't emit.
-        var record = {
+        const record = {
             element:   collectionElement,
             galleryId: collectionElement.dataset.fgGalleryId || null,
             kind:      kind,
@@ -181,8 +181,8 @@
      * one. Idempotent — initializeCollection() guards against double init.
      */
     function initializeAllCollections() {
-        var elements = document.querySelectorAll( '.fotogrids-collection' );
-        for ( var i = 0; i < elements.length; i++ ) {
+        const elements = document.querySelectorAll( '.fotogrids-collection' );
+        for ( let i = 0; i < elements.length; i++ ) {
             initializeCollection( elements[ i ] );
         }
     }
@@ -203,14 +203,14 @@
         }
 
         collectionObserver = new MutationObserver( function ( mutations ) {
-            for ( var i = 0; i < mutations.length; i++ ) {
-                var added = mutations[ i ].addedNodes;
+            for ( let i = 0; i < mutations.length; i++ ) {
+                const added = mutations[ i ].addedNodes;
                 if ( ! added || added.length === 0 ) {
                     continue;
                 }
 
-                for ( var j = 0; j < added.length; j++ ) {
-                    var node = added[ j ];
+                for ( let j = 0; j < added.length; j++ ) {
+                    const node = added[ j ];
                     if ( ! ( node instanceof Element ) ) {
                         continue;
                     }
@@ -222,8 +222,8 @@
 
                     // Collections nested inside the inserted subtree.
                     if ( node.querySelectorAll ) {
-                        var nested = node.querySelectorAll( '.fotogrids-collection' );
-                        for ( var k = 0; k < nested.length; k++ ) {
+                        const nested = node.querySelectorAll( '.fotogrids-collection' );
+                        for ( let k = 0; k < nested.length; k++ ) {
                             announceInserted( nested[ k ] );
                         }
                     }
@@ -275,7 +275,7 @@
             if ( typeof cb !== 'function' ) {
                 return;
             }
-            var pri = ( typeof priority === 'number' && isFinite( priority ) ) ? priority : 10;
+            const pri = ( typeof priority === 'number' && isFinite( priority ) ) ? priority : 10;
             insertCallback( queueName, cb, pri );
 
             // Late subscriber — replay against already-initialized instances
@@ -283,8 +283,8 @@
             if ( instances.length === 0 ) {
                 return;
             }
-            for ( var i = 0; i < instances.length; i++ ) {
-                var rec = instances[ i ];
+            for ( let i = 0; i < instances.length; i++ ) {
+                const rec = instances[ i ];
                 if ( queueName !== 'collection' && rec.kind !== queueName ) {
                     continue;
                 }
@@ -303,7 +303,7 @@
     // Public API
     // -------------------------------------------------------------------------
 
-    var publicApi = {
+    const publicApi = {
         version: VERSION,
 
         /**

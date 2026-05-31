@@ -1,18 +1,13 @@
 {
     "id": "pagination",
     "label": "Pagination",
-    "icon": "arrow_square_down",
+    "icon": "layers",
     "condition": {
         "dependsOn": "layout",
         "values": [
             "grid",
             "masonry",
-            "justified",
-            "slider",
-            "image-viewer",
-            "video",
-            "carousel",
-            "products"
+            "justified"
         ]
     },
     "settings": [

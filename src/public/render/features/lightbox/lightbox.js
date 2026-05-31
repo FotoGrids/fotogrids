@@ -226,7 +226,7 @@ function buildSlideFromTrigger( triggerEl ) {
         triggerEl,
         figureEl,
         sequenceIndex,
-        fullSrc:  triggerEl.href || ( img ? img.dataset.full || img.src : '' ),
+        fullSrc:  triggerEl.href || ( img ? img.dataset.fgFullSrc || img.src : '' ),
         thumbSrc: img ? img.src : '',
         alt:      img ? img.alt : '',
         caption:  triggerEl.dataset.fgCaption || '',
@@ -2117,14 +2117,22 @@ class FotoGridsLightbox {
             ? Object.assign( {}, config, overrides )
             : config;
 
-        const bar = window.FotoGridsSharing.renderShareBar( effectiveConfig, {
-            id:        item.id || '',
-            fullUrl:   item.fullSrc || '',
-            caption:   item.caption || item.alt || '',
-            galleryEl: this.galleryEl,
-            // Pipeline writes data-fg-gallery-id on the wrapper.
-            galleryId: this.galleryEl.dataset.fgGalleryId || '',
-        } );
+        // Both lightbox usages (info-panel block and the toolbar popover) want
+        // the 2-column grid layout. The popover later adds its own
+        // --lightbox-popover class which overrides the grid to a 3-up compact
+        // grid, so requesting 'grid' here is safe for both.
+        const bar = window.FotoGridsSharing.renderShareBar(
+            effectiveConfig,
+            {
+                id:        item.id || '',
+                fullUrl:   item.fullSrc || '',
+                caption:   item.caption || item.alt || '',
+                galleryEl: this.galleryEl,
+                // Pipeline writes data-fg-gallery-id on the wrapper.
+                galleryId: this.galleryEl.dataset.fgGalleryId || '',
+            },
+            { layout: 'grid' }
+        );
 
         if ( bar ) {
             bar.classList.add( 'fotogrids-share-bar--lightbox' );

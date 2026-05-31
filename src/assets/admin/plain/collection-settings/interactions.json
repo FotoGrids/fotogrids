@@ -37,7 +37,7 @@
                         {
                             "label": "Click",
                             "value": "click",
-                            "icon": "click",
+                            "icon": "click_alt",
                             "tier_required": "free"
                         }
                     ],

@@ -16,6 +16,7 @@ use FotoGrids\Render\Api\Render_Mode;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Sorter;
 use FotoGrids\Render\Features\Pagination\Page_Size_Resolver;
+use FotoGrids\Render\Layouts\Justified\Snap_Resolver;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -111,6 +112,9 @@ final class Context_Builder {
             random_seed:        $random_seed,
             view_page:          $view_page,
             is_ajax_swap:       $is_ajax_swap,
+            container_width:    isset( $meta_overrides['container_width'] ) && (int) $meta_overrides['container_width'] > 0
+                                    ? (int) $meta_overrides['container_width']
+                                    : null,
         );
 
         // Visit-context album. Honour an explicit meta override (REST /
@@ -155,12 +159,9 @@ final class Context_Builder {
         $single_item_full_count = $is_single_item ? count( $sorted_ids ) : null;
         if ( $is_single_item ) {
             $sorted_ids = array_slice( $sorted_ids, 0, 1 );
-            // The "thumbnail" we render IS the full image - a Single Item is
-            // a hero, not a derivative. Forcing SLUG_FULL also gives the
-            // correct srcset candidates so the browser picks an appropriate
-            // resolution for the viewport.
-            $thumb_size = Image_Size_Manager::SLUG_FULL;
         }
+
+        $thumb_size = $this->apply_layout_thumb_size( $thumb_size, $render_settings, $sort_context );
 
         $loaded_items = $this->load_items( $sorted_ids, $thumb_size, $full_size );
         $loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
@@ -205,18 +206,45 @@ final class Context_Builder {
         // Pagination slicing. Runs after sorter selection (canonical order
         // already established) and after caption resolution + filtering (so
         // the slice contains fully-prepared Item_Views from the filtered set).
+        // Layouts that opt out via the `paginates` capability (slider,
+        // image-viewer) skip slicing entirely — their own navigation walks
+        // the full item list.
+        $paginates_capability = Layout_Capabilities::supports( $sort_context, 'paginates' );
         if ( ( $render_settings['pagination_type'] ?? 'show_all' ) === 'paginated'
             && $render_meta->collection_kind === Collection_Kind::GALLERY
+            && $paginates_capability
         ) {
             $per_page_override = $render_meta->requested_per_page;
             $page_size         = $per_page_override !== null && $per_page_override > 0
                 ? $per_page_override
                 : Page_Size_Resolver::resolve_page_size( $render_settings, $sort_context );
+            $page              = max( 1, (int) ( $render_meta->requested_page ?? 1 ) );
 
-            if ( Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
-                $page         = max( 1, (int) ( $render_meta->requested_page ?? 1 ) );
+            if ( self::is_snap_pagination_active( $render_settings ) && Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
+                $snap = self::resolve_justified_snap(
+                    $loaded_items,
+                    $page_size,
+                    $page,
+                    $render_settings,
+                    $render_meta
+                );
+                $loaded_items = array_slice( $loaded_items, $snap['offset'], $snap['page_size'] );
+                $render_meta  = $render_meta->with( [
+                    'pagination_page_size'   => $snap['page_size'],
+                    'pagination_total_pages' => $snap['total_pages'],
+                ] );
+            } elseif ( Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
                 $offset       = ( $page - 1 ) * $page_size;
                 $loaded_items = array_slice( $loaded_items, $offset, $page_size );
+                $render_meta  = $render_meta->with( [
+                    'pagination_page_size'   => $page_size,
+                    'pagination_total_pages' => (int) ceil( $total_item_count / $page_size ),
+                ] );
+            } else {
+                $render_meta = $render_meta->with( [
+                    'pagination_page_size'   => $page_size,
+                    'pagination_total_pages' => 1,
+                ] );
             }
         }
 
@@ -255,6 +283,7 @@ final class Context_Builder {
         $render_settings = array_replace_recursive( $base_settings, $settings_overlay );
         $warnings = [];
         [ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
+        $thumb_size = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
         $collection_items = $this->load_items( $collection_item_ids, $thumb_size, $full_size );
         if ( ! empty( $item_overrides ) ) {
             $collection_items = $this->apply_item_overrides( $collection_items, $item_overrides );
@@ -326,9 +355,12 @@ final class Context_Builder {
             collection_kind: Collection_Kind::ALBUM,
         );
 
+        [ $thumb_size ] = $this->resolve_size_settings( $render_settings );
+        $thumb_size = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
+
         // Load gallery-summary items directly via Album_Item_Loader, bypassing
         // the attachment-flavoured items_loader path entirely.
-        $loaded_items = Album_Item_Loader::load( $child_gallery_ids );
+        $loaded_items = Album_Item_Loader::load( $child_gallery_ids, $thumb_size );
         // Captions decorator picks up caption_title / caption_description
         // from the Item_View. For albums we always pass the gallery title
         // through as caption_title — call resolve_captions to handle the
@@ -608,21 +640,33 @@ final class Context_Builder {
 
                 $link_meta = $item_link_meta[ $attachment_id ] ?? [];
 
-                // Resolve sizes per attachment - falls back gracefully if a derivative
-                // does not exist on disk for this specific image.
                 $resolved_thumb = Image_Size_Manager::resolve_size( $attachment_id, $thumb_size, 'thumbnail' );
                 $resolved_full  = Image_Size_Manager::resolve_size( $attachment_id, $full_size,  'full' );
 
+                $thumb_src = wp_get_attachment_image_src( $attachment_id, $resolved_thumb );
+                $thumb_url = is_array( $thumb_src ) ? (string) ( $thumb_src[0] ?? '' ) : '';
+                $thumb_w   = is_array( $thumb_src ) && isset( $thumb_src[1] ) ? (int) $thumb_src[1] : null;
+                $thumb_h   = is_array( $thumb_src ) && isset( $thumb_src[2] ) ? (int) $thumb_src[2] : null;
+
+                $full_src  = wp_get_attachment_image_src( $attachment_id, $resolved_full );
+                $full_url  = is_array( $full_src ) ? (string) ( $full_src[0] ?? '' ) : '';
+                $full_w    = is_array( $full_src ) && isset( $full_src[1] ) ? (int) $full_src[1] : null;
+                $full_h    = is_array( $full_src ) && isset( $full_src[2] ) ? (int) $full_src[2] : null;
+
                 $loaded_items[] = new Item_View(
                     id: $attachment_id,
-                    thumb_url: (string) ( wp_get_attachment_image_url( $attachment_id, $resolved_thumb ) ?: '' ),
-                    full_url: (string) ( wp_get_attachment_image_url( $attachment_id, $resolved_full ) ?: '' ),
+                    thumb_url: $thumb_url,
+                    full_url: $full_url,
                     alt: (string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
                     title: (string) $attachment_post->post_title,
                     caption: (string) $attachment_post->post_excerpt,
                     description: (string) $attachment_post->post_content,
+                    width: ( $thumb_w !== null && $thumb_w > 0 ) ? $thumb_w : null,
+                    height: ( $thumb_h !== null && $thumb_h > 0 ) ? $thumb_h : null,
                     meta: $link_meta,
                     thumb_size: $resolved_thumb,
+                    full_width: ( $full_w !== null && $full_w > 0 ) ? $full_w : null,
+                    full_height: ( $full_h !== null && $full_h > 0 ) ? $full_h : null,
                 );
             }
 
@@ -707,6 +751,201 @@ final class Context_Builder {
         }
 
         return [ $thumb_slug, $full_slug ];
+    }
+
+    /**
+     * Asks the active layout module for its preferred thumbnail size and
+     * swaps the default fotogrids_thumbnail for it. A user-picked
+     * non-default size is left untouched so explicit choices still win.
+     *
+     * Layouts express their preference via Layout::preferred_thumbnail_size().
+     * Returning null means "no preference" and the configured value is
+     * returned unchanged. The returned slug still flows through
+     * Image_Size_Manager's fallback chain so a missing derivative degrades
+     * to fotogrids_thumbnail → thumbnail → medium → full.
+     *
+     * @since  1.0.0
+     * @param  string               $thumb_size      Currently resolved size slug.
+     * @param  array<string, mixed> $render_settings Render settings.
+     * @param  Render_Context|null  $context         Optional pre-built context shell. When omitted a minimal one is constructed from $render_settings.
+     * @return string
+     */
+    private function apply_layout_thumb_size( string $thumb_size, array $render_settings, ?Render_Context $context = null ): string {
+        if ( $thumb_size !== Image_Size_Manager::SLUG_THUMBNAIL ) {
+            return $thumb_size;
+        }
+
+        if ( $context === null ) {
+            $context = $this->build_minimal_context( $render_settings );
+        }
+
+        $active = Module_Registry::active_modules( 'layouts', $context );
+        $layout = $active[0] ?? null;
+        if ( $layout === null ) {
+            return $thumb_size;
+        }
+
+        $preferred = $layout->preferred_thumbnail_size( $context );
+        return is_string( $preferred ) && $preferred !== '' ? $preferred : $thumb_size;
+    }
+
+    /**
+     * Builds a settings-only Render_Context shell for callers that need to
+     * consult the module registry before they have item data. Used by the
+     * preview and album code paths where the full pre-sort context shell
+     * doesn't exist yet.
+     *
+     * @since  1.0.0
+     * @param  array<string, mixed> $render_settings
+     * @return Render_Context
+     */
+    private function build_minimal_context( array $render_settings ): Render_Context {
+        $meta = new Render_Meta(
+            gallery_id:     0,
+            album_id:       null,
+            instance_id:    'shell',
+            source:         Request_Source::SHORTCODE,
+            is_preview:     false,
+            mode:           Render_Mode::INITIAL,
+            schema_version: 2,
+        );
+
+        return new Render_Context(
+            meta:     $meta,
+            layout:   $this->build_layout( $render_settings ),
+            behavior: $this->build_behavior( $render_settings ),
+            settings: $render_settings,
+            items:    [],
+            warnings: [],
+        );
+    }
+
+    /**
+     * Whether snap pagination is active for the given settings. Snap
+     * applies to paginated justified galleries when the page-trailing-row
+     * mode is set to 'fill'.
+     *
+     * @since 1.0.0
+     * @param array<string, mixed> $render_settings
+     */
+    private static function is_snap_pagination_active( array $render_settings ): bool {
+        if ( ( $render_settings['layout'] ?? '' ) !== 'justified' ) {
+            return false;
+        }
+        if ( ( $render_settings['layout_justified_page_trailing_row'] ?? '' ) !== 'fill' ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Build aspect ratios + invoke the snap resolver.
+     *
+     * @since 1.0.0
+     * @param array<int, \FotoGrids\Render\Api\Item_View> $items
+     * @param int                                          $target_page_size
+     * @param int                                          $requested_page
+     * @param array<string, mixed>                         $render_settings
+     * @param \FotoGrids\Render\Api\Render_Meta            $render_meta
+     * @return array{ page_size: int, offset: int, total_pages: int }
+     */
+    private static function resolve_justified_snap(
+        array $items,
+        int $target_page_size,
+        int $requested_page,
+        array $render_settings,
+        Render_Meta $render_meta
+    ): array {
+        $breakpoint = is_string( $render_meta->breakpoint ?? null ) && $render_meta->breakpoint !== ''
+            ? $render_meta->breakpoint
+            : 'desktop';
+
+        $aspect_ratios = [];
+        foreach ( $items as $item ) {
+            $w = $item->width  ?? null;
+            $h = $item->height ?? null;
+            $aspect_ratios[] = ( is_int( $w ) && $w > 0 && is_int( $h ) && $h > 0 )
+                ? ( $w / $h )
+                : 1.5;
+        }
+
+        $container_width = $render_meta->container_width !== null && $render_meta->container_width > 0
+            ? (float) $render_meta->container_width
+            : Snap_Resolver::assumed_width_for( $breakpoint );
+
+        return Snap_Resolver::resolve( [
+            'aspect_ratios'     => $aspect_ratios,
+            'target_page_size'  => $target_page_size,
+            'requested_page'    => $requested_page,
+            'container_width'   => $container_width,
+            'gap'               => self::resolve_gap_for_breakpoint( $render_settings, $breakpoint ),
+            'target_row_height' => self::resolve_row_height_for_breakpoint( $render_settings, $breakpoint ),
+            'window_percent'    => (float) ( $render_settings['layout_justified_snap_window']        ?? 20 ),
+            'fill_threshold'    => (float) ( $render_settings['layout_justified_snap_fill_threshold'] ?? 60 ),
+            'direction'         => (string) ( $render_settings['layout_justified_snap_direction']     ?? 'auto' ),
+        ] );
+    }
+
+    /**
+     * Resolve the per-breakpoint --fg-gap value from item_spacing settings.
+     *
+     * @since 1.0.0
+     * @param array<string, mixed> $render_settings
+     * @param string               $breakpoint
+     * @return float
+     */
+    private static function resolve_gap_for_breakpoint( array $render_settings, string $breakpoint ): float {
+        $spacing = $render_settings['item_spacing'] ?? null;
+        if ( ! is_array( $spacing ) ) {
+            return 10.0;
+        }
+
+        $cascade = [ $breakpoint, 'tablet', 'desktop' ];
+        foreach ( $cascade as $bp ) {
+            if ( ! isset( $spacing[ $bp ] ) ) {
+                continue;
+            }
+            $value = is_array( $spacing[ $bp ] ) ? ( $spacing[ $bp ]['value'] ?? null ) : $spacing[ $bp ];
+            if ( is_numeric( $value ) && (float) $value >= 0 ) {
+                return (float) $value;
+            }
+        }
+
+        return 10.0;
+    }
+
+    /**
+     * Resolve the per-breakpoint justified row height in pixels.
+     *
+     * @since 1.0.0
+     * @param array<string, mixed> $render_settings
+     * @param string               $breakpoint
+     * @return float
+     */
+    private static function resolve_row_height_for_breakpoint( array $render_settings, string $breakpoint ): float {
+        $row_height = $render_settings['layout_justified_row_height'] ?? null;
+        if ( ! is_array( $row_height ) ) {
+            return 220.0;
+        }
+
+        $cascade  = [ $breakpoint, 'tablet', 'desktop' ];
+        $fallback = [
+            'desktop' => 220.0,
+            'tablet'  => 180.0,
+            'mobile'  => 140.0,
+        ];
+
+        foreach ( $cascade as $bp ) {
+            $raw = $row_height[ $bp ] ?? null;
+            if ( is_array( $raw ) ) {
+                $raw = $raw['value'] ?? null;
+            }
+            if ( is_numeric( $raw ) && (float) $raw > 0 ) {
+                return (float) $raw;
+            }
+        }
+
+        return $fallback[ $breakpoint ] ?? 220.0;
     }
 
     /**

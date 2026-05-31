@@ -9,6 +9,8 @@ use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Filter_Option;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Api\Responsive_Var;
+use FotoGrids\Render\Api\Setting_Helpers;
 use FotoGrids\Render\Internal\Layout_Capabilities;
 use FotoGrids\Render\Internal\Module_Registry;
 
@@ -39,6 +41,8 @@ if ( ! defined( 'WPINC' ) ) {
  * @since   1.0.0
  */
 final class Filter_Ui implements Feature {
+
+    use Setting_Helpers;
 
     /** @var array<string, string> Allowed filter_ui_style values. */
     private const ALLOWED_STYLES = [ 'buttons', 'dropdowns', 'checkboxes' ];
@@ -116,11 +120,13 @@ final class Filter_Ui implements Feature {
             return '';
         }
 
-        $style        = $this->resolve_style( $render_context );
-        $position     = $this->resolve_position( $render_context );
-        $display_mode = $this->resolve_display_mode( $render_context );
-        $all_label    = $this->resolve_all_label( $render_context );
-        $show_count   = (bool) ( $render_context->settings['show_filter_count'] ?? true );
+        $style          = $this->resolve_style( $render_context );
+        $position       = $this->resolve_position( $render_context );
+        $display_mode   = $this->resolve_display_mode( $render_context );
+        $reset_enabled  = (bool) ( $render_context->settings['filter_reset_btn_enabled'] ?? true );
+        $reset_position = $this->resolve_reset_position( $render_context );
+        $reset_label    = $this->resolve_reset_label( $render_context );
+        $show_count     = (bool) ( $render_context->settings['show_filter_count'] ?? true );
 
         // When toggle mode is active, the filter bar starts collapsed. The
         // toggle button lives inside .fotogrids-filters as its first child so
@@ -143,8 +149,18 @@ final class Filter_Ui implements Feature {
             $html .= $this->render_toggle_button();
         }
 
-        // "All" control - resets all active filters.
-        $html .= $this->render_all_control( $style, $all_label );
+        // Reset control + filter groups share a single wrapper so the
+        // reset button can be flex-ordered relative to the groups
+        // (Start | End) and so the wrapper itself can switch axis
+        // between top (row) and sidebar (column) positions.
+        $html .= sprintf(
+            '<div class="fg-filter__wrapper" data-fg-filter-reset-position="%s">',
+            esc_attr( $reset_position )
+        );
+
+        if ( $reset_enabled ) {
+            $html .= $this->render_all_control( $style, $reset_label );
+        }
 
         foreach ( $sources as $source ) {
             $options = $source->get_options( $render_context );
@@ -180,6 +196,7 @@ final class Filter_Ui implements Feature {
             $html .= '</div>'; // .fg-filter-group
         }
 
+        $html .= '</div>'; // .fg-filter__wrapper
         $html .= '</div>'; // .fotogrids-filters
 
         return $html;
@@ -214,6 +231,7 @@ final class Filter_Ui implements Feature {
             'data-fg-filter-style'    => $this->resolve_style( $render_context ),
             'data-fg-filter-position' => $this->resolve_position( $render_context ),
             'data-fg-filter-display'  => $this->resolve_display_mode( $render_context ),
+            'data-fg-filter-multiple' => $this->resolve_multiple( $render_context ) ? 'true' : 'false',
         ];
 
         if ( $this->resolve_position( $render_context ) === 'sidebar' ) {
@@ -238,40 +256,151 @@ final class Filter_Ui implements Feature {
         $vars = [];
 
         // ---- Spacing ----
-        $this->maybe_add_var( $vars, '--fg-filter-wrapper-gap',    $this->unit_val( $s['filter_wrapper_gap'] ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-bar-gap',        $this->unit_val( $s['filter_bar_gap']     ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-gap',            $this->unit_val( $s['filter_gap']         ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-sidebar-width',  $this->unit_val( $s['filter_sidebar_width'] ?? null, 'px' ) );
+        // All four are responsive_range settings with px/em/rem units.
+        // resolve_responsive_value() reads the per-breakpoint {value, unit}
+        // object (or scalar) and falls back to px when no unit is stored.
+        $responsive_specs = [
+            '--fg-filter-wrapper-gap'   => 'filter_wrapper_gap',
+            '--fg-filter-bar-gap'       => 'filter_bar_gap',
+            '--fg-filter-gap'           => 'filter_gap',
+            '--fg-filter-sidebar-width' => 'filter_sidebar_width',
+        ];
+        foreach ( $responsive_specs as $css_var => $setting_key ) {
+            $raw     = $s[ $setting_key ] ?? null;
+            $desktop = $this->resolve_responsive_value( $raw, 'desktop', 'px' );
+            $tablet  = $this->resolve_responsive_value( $raw, 'tablet',  'px' );
+            $mobile  = $this->resolve_responsive_value( $raw, 'mobile',  'px' );
+
+            if ( $desktop !== '' || $tablet !== '' || $mobile !== '' ) {
+                $vars[ $css_var ] = new Responsive_Var(
+                    desktop: $desktop,
+                    tablet:  $tablet,
+                    mobile:  $mobile,
+                );
+            }
+        }
+
+        // filter_panel_padding - responsive four-sided, drives the bar's
+        // own internal padding via --fg-filter-panel-padding.
+        $panel_padding = $s['filter_panel_padding'] ?? null;
+        $desktop_panel = $this->resolve_four_sided_value( $panel_padding, 'desktop', 'px' );
+        $tablet_panel  = $this->resolve_four_sided_value( $panel_padding, 'tablet',  'px' );
+        $mobile_panel  = $this->resolve_four_sided_value( $panel_padding, 'mobile',  'px' );
+
+        if ( $desktop_panel !== '' || $tablet_panel !== '' || $mobile_panel !== '' ) {
+            $vars['--fg-filter-panel-padding'] = new Responsive_Var(
+                desktop: $desktop_panel,
+                tablet:  $tablet_panel,
+                mobile:  $mobile_panel,
+            );
+        }
+
+        // Filter panel surface: background colour + corner radius.
+        $this->maybe_add_var( $vars, '--fg-filter-panel-bg',     $s['filter_panel_bg']     ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-panel-radius', $this->unit_val( $s['filter_panel_radius'] ?? null, 'px' ) );
 
         // ---- Button shape ----
-        $this->maybe_add_var( $vars, '--fg-filter-btn-padding',   $s['filter_btn_padding']   ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-radius',    $this->unit_val( $s['filter_btn_radius']   ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-font-size', $this->unit_val( $s['filter_btn_font_size'] ?? null, 'rem' ) );
+        // filter_btn_padding is a responsive four-sided setting. Each
+        // breakpoint resolves to a CSS shorthand string ("T R B L"),
+        // emitted as a Responsive_Var so the per-breakpoint <style>
+        // block can swap the value at runtime.
+        $padding = $s['filter_btn_padding'] ?? null;
+        $desktop_padding = $this->resolve_four_sided_value( $padding, 'desktop', 'px' );
+        $tablet_padding  = $this->resolve_four_sided_value( $padding, 'tablet',  'px' );
+        $mobile_padding  = $this->resolve_four_sided_value( $padding, 'mobile',  'px' );
 
-        // ---- Button colors ----
-        $this->maybe_add_var( $vars, '--fg-filter-btn-bg',           $s['filter_btn_bg']           ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-color',        $s['filter_btn_color']        ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-border',       $s['filter_btn_border']       ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-active-bg',    $s['filter_btn_active_bg']    ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-active-color', $s['filter_btn_active_color'] ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-hover-bg',     $s['filter_btn_hover_bg']     ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-btn-hover-color',  $s['filter_btn_hover_color']  ?? null );
+        if ( $desktop_padding !== '' || $tablet_padding !== '' || $mobile_padding !== '' ) {
+            $vars['--fg-filter-btn-padding'] = new Responsive_Var(
+                desktop: $desktop_padding,
+                tablet:  $tablet_padding,
+                mobile:  $mobile_padding,
+            );
+        }
+        $this->maybe_add_var( $vars, '--fg-filter-btn-radius',    $this->unit_val( $s['filter_btn_radius']   ?? null, 'px' ) );
+
+        // filter_btn_font_size is a responsive_range with per-side units
+        // (px / em / rem). resolve_responsive_value() reads the stored unit
+        // off each breakpoint's {value, unit} object and falls back to px
+        // when the user hasn't picked one.
+        $font_size = $s['filter_btn_font_size'] ?? null;
+        $desktop_font = $this->resolve_responsive_value( $font_size, 'desktop', 'px' );
+        $tablet_font  = $this->resolve_responsive_value( $font_size, 'tablet',  'px' );
+        $mobile_font  = $this->resolve_responsive_value( $font_size, 'mobile',  'px' );
+
+        if ( $desktop_font !== '' || $tablet_font !== '' || $mobile_font !== '' ) {
+            $vars['--fg-filter-btn-font-size'] = new Responsive_Var(
+                desktop: $desktop_font,
+                tablet:  $tablet_font,
+                mobile:  $mobile_font,
+            );
+        }
+
+        // ---- Button colors + borders ----
+        // Each state (regular / hover / active) carries its own border colour
+        // and width; the SCSS composes them into the final `border` shorthand.
+        $this->maybe_add_var( $vars, '--fg-filter-btn-bg',                  $s['filter_btn_bg']                  ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-color',               $s['filter_btn_color']               ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-border-color',        $s['filter_btn_border_color']        ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-border-width',        $this->unit_val( $s['filter_btn_border_width']        ?? null, 'px' ) );
+
+        $this->maybe_add_var( $vars, '--fg-filter-btn-hover-bg',            $s['filter_btn_hover_bg']            ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-hover-color',         $s['filter_btn_hover_color']         ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-hover-border-color',  $s['filter_btn_hover_border_color']  ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-hover-border-width',  $this->unit_val( $s['filter_btn_hover_border_width']  ?? null, 'px' ) );
+
+        $this->maybe_add_var( $vars, '--fg-filter-btn-active-bg',           $s['filter_btn_active_bg']           ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-active-color',        $s['filter_btn_active_color']        ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-active-border-color', $s['filter_btn_active_border_color'] ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-btn-active-border-width', $this->unit_val( $s['filter_btn_active_border_width'] ?? null, 'px' ) );
 
         // ---- Dropdown trigger ----
-        $this->maybe_add_var( $vars, '--fg-filter-select-padding', $s['filter_select_padding'] ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-select-radius',  $this->unit_val( $s['filter_select_radius'] ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-select-bg',      $s['filter_select_bg']      ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-select-color',   $s['filter_select_color']   ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-select-border',  $s['filter_select_border']  ?? null );
+        // Padding is responsive four-sided, mirroring filter_btn_padding.
+        $select_padding = $s['filter_select_padding'] ?? null;
+        $desktop_select_pad = $this->resolve_four_sided_value( $select_padding, 'desktop', 'px' );
+        $tablet_select_pad  = $this->resolve_four_sided_value( $select_padding, 'tablet',  'px' );
+        $mobile_select_pad  = $this->resolve_four_sided_value( $select_padding, 'mobile',  'px' );
 
-        // ---- Dropdown popover overrides (share select vars; these map 1-to-1) ----
-        // filter_dropdown_list_bg   → --fg-filter-select-bg is already set above from the same var;
-        // separate overrides if the user sets popover-specific values.
-        $this->maybe_add_var( $vars, '--fg-filter-dropdown-list-bg',     $s['filter_dropdown_list_bg']     ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-dropdown-list-border',  $s['filter_dropdown_list_border']  ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-dropdown-list-radius',  $this->unit_val( $s['filter_dropdown_list_radius'] ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-hover-bg',     $s['filter_dropdown_option_hover_bg']     ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-active-color', $s['filter_dropdown_option_active_color'] ?? null );
+        if ( $desktop_select_pad !== '' || $tablet_select_pad !== '' || $mobile_select_pad !== '' ) {
+            $vars['--fg-filter-select-padding'] = new Responsive_Var(
+                desktop: $desktop_select_pad,
+                tablet:  $tablet_select_pad,
+                mobile:  $mobile_select_pad,
+            );
+        }
+
+        $this->maybe_add_var( $vars, '--fg-filter-select-radius',       $this->unit_val( $s['filter_select_radius']       ?? null, 'px' ) );
+        $this->maybe_add_var( $vars, '--fg-filter-select-border-width', $this->unit_val( $s['filter_select_border_width'] ?? null, 'px' ) );
+
+        // Per-state trigger colours (Regular / Mouseover / Open).
+        $this->maybe_add_var( $vars, '--fg-filter-select-bg',                 $s['filter_select_bg']                 ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-select-color',              $s['filter_select_color']              ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-select-border-color',       $s['filter_select_border_color']       ?? null );
+
+        $this->maybe_add_var( $vars, '--fg-filter-select-hover-bg',           $s['filter_select_hover_bg']           ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-select-hover-color',        $s['filter_select_hover_color']        ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-select-hover-border-color', $s['filter_select_hover_border_color'] ?? null );
+
+        $this->maybe_add_var( $vars, '--fg-filter-select-open-bg',            $s['filter_select_open_bg']            ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-select-open-color',         $s['filter_select_open_color']         ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-select-open-border-color',  $s['filter_select_open_border_color']  ?? null );
+
+        // ---- Dropdown popover ----
+        // Shared chrome on the popover panel: radius, border, separator
+        // colour. Per-option-state vars only carry bg + text colour.
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-list-radius',           $this->unit_val( $s['filter_dropdown_list_radius']       ?? null, 'px' ) );
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-list-border-color',     $s['filter_dropdown_list_border_color']      ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-list-border-width',     $this->unit_val( $s['filter_dropdown_list_border_width'] ?? null, 'px' ) );
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-separator-color', $s['filter_dropdown_option_separator_color'] ?? null );
+
+        // Per-option state colours (Regular / Mouseover / Selected).
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-bg',              $s['filter_dropdown_option_bg']              ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-color',           $s['filter_dropdown_option_color']           ?? null );
+
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-hover-bg',        $s['filter_dropdown_option_hover_bg']        ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-hover-color',     $s['filter_dropdown_option_hover_color']     ?? null );
+
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-selected-bg',     $s['filter_dropdown_option_selected_bg']     ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-dropdown-option-selected-color',  $s['filter_dropdown_option_selected_color']  ?? null );
 
         // ---- Checkbox shape ----
         $this->maybe_add_var( $vars, '--fg-filter-cb-size',   $this->unit_val( $s['filter_cb_size']   ?? null, 'px' ) );
@@ -279,18 +408,71 @@ final class Filter_Ui implements Feature {
         $this->maybe_add_var( $vars, '--fg-filter-cb-gap',    $this->unit_val( $s['filter_cb_gap']    ?? null, 'px' ) );
 
         // ---- Checkbox colors ----
-        $this->maybe_add_var( $vars, '--fg-filter-cb-border',               $s['filter_cb_border']               ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-cb-bg',                   $s['filter_cb_bg']                   ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-cb-checked-bg',           $s['filter_cb_checked_bg']           ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-cb-checked-border-color', $s['filter_cb_checked_border_color'] ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-cb-checkmark-color',      $s['filter_cb_checkmark_color']      ?? null );
+        // Shared border width + per-state checkbox colours. The SCSS
+        // composes `border` from --fg-filter-cb-border-width + the
+        // state's --fg-filter-cb[-checked]-border-color.
+        $this->maybe_add_var( $vars, '--fg-filter-cb-border-width',           $this->unit_val( $s['filter_cb_border_width'] ?? null, 'px' ) );
+
+        // Unchecked - no checkmark renders, so no checkmark var.
+        $this->maybe_add_var( $vars, '--fg-filter-cb-bg',                     $s['filter_cb_bg']                     ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-cb-border-color',           $s['filter_cb_border_color']           ?? null );
+
+        // Mouseover - shows a semi-transparent checkmark to preview the
+        // checked state.
+        $this->maybe_add_var( $vars, '--fg-filter-cb-hover-bg',               $s['filter_cb_hover_bg']               ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-cb-hover-border-color',     $s['filter_cb_hover_border_color']     ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-cb-hover-checkmark-color',  $s['filter_cb_hover_checkmark_color']  ?? null );
+
+        // Checked - filled box + tick.
+        $this->maybe_add_var( $vars, '--fg-filter-cb-checked-bg',             $s['filter_cb_checked_bg']             ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-cb-checked-border-color',   $s['filter_cb_checked_border_color']   ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-cb-checked-checkmark-color',$s['filter_cb_checked_checkmark_color']?? null );
 
         // ---- Count badge ----
-        $this->maybe_add_var( $vars, '--fg-filter-count-color',     $s['filter_count_color']     ?? null );
-        $this->maybe_add_var( $vars, '--fg-filter-count-font-size', $this->unit_val( $s['filter_count_font_size'] ?? null, 'em' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-count-bg',        $s['filter_count_bg']        ?? null );
+        // Per-state colours mirror the surrounding button so the badge
+        // tracks the button's hover / active state. The SCSS scopes
+        // .fg-filter-count under :hover and .fg-is-active.
+        $this->maybe_add_var( $vars, '--fg-filter-count-bg',           $s['filter_count_bg']           ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-count-color',        $s['filter_count_color']        ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-count-hover-bg',     $s['filter_count_hover_bg']     ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-count-hover-color',  $s['filter_count_hover_color']  ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-count-active-bg',    $s['filter_count_active_bg']    ?? null );
+        $this->maybe_add_var( $vars, '--fg-filter-count-active-color', $s['filter_count_active_color'] ?? null );
+
+        // filter_count_font_size is a responsive_range with per-side units
+        // (px / em / rem). resolve_responsive_value() reads the stored unit
+        // off each breakpoint's {value, unit} object and falls back to px
+        // when the user hasn't picked one.
+        $count_font = $s['filter_count_font_size'] ?? null;
+        $desktop_count_font = $this->resolve_responsive_value( $count_font, 'desktop', 'px' );
+        $tablet_count_font  = $this->resolve_responsive_value( $count_font, 'tablet',  'px' );
+        $mobile_count_font  = $this->resolve_responsive_value( $count_font, 'mobile',  'px' );
+
+        if ( $desktop_count_font !== '' || $tablet_count_font !== '' || $mobile_count_font !== '' ) {
+            $vars['--fg-filter-count-font-size'] = new Responsive_Var(
+                desktop: $desktop_count_font,
+                tablet:  $tablet_count_font,
+                mobile:  $mobile_count_font,
+            );
+        }
+
         $this->maybe_add_var( $vars, '--fg-filter-count-radius',    $this->unit_val( $s['filter_count_radius']    ?? null, 'px' ) );
-        $this->maybe_add_var( $vars, '--fg-filter-count-padding',   $s['filter_count_padding']   ?? null );
+
+        // filter_count_padding is a responsive four-sided setting. Same
+        // shape as filter_btn_padding - resolves to a CSS shorthand string
+        // per breakpoint, emitted as a Responsive_Var.
+        $count_padding = $s['filter_count_padding'] ?? null;
+        $desktop_count_pad = $this->resolve_four_sided_value( $count_padding, 'desktop', 'px' );
+        $tablet_count_pad  = $this->resolve_four_sided_value( $count_padding, 'tablet',  'px' );
+        $mobile_count_pad  = $this->resolve_four_sided_value( $count_padding, 'mobile',  'px' );
+
+        if ( $desktop_count_pad !== '' || $tablet_count_pad !== '' || $mobile_count_pad !== '' ) {
+            $vars['--fg-filter-count-padding'] = new Responsive_Var(
+                desktop: $desktop_count_pad,
+                tablet:  $tablet_count_pad,
+                mobile:  $mobile_count_pad,
+            );
+        }
 
         return $vars;
     }
@@ -430,12 +612,19 @@ final class Filter_Ui implements Feature {
             esc_html( $group_label )
         );
 
-        // Trigger button - shows the currently-selected value
+        // Trigger button - shows the currently-selected value. The caret
+        // SVG mirrors fg-filter-toggle-icon so the two chrome elements
+        // look consistent; it rotates 180deg when aria-expanded is true.
         $html .= sprintf(
             '<div class="fg-filter-dropdown" data-fg-filter-dropdown="%s">'
             . '<button class="fg-filter-dropdown-trigger" type="button" id="%s"'
             . ' aria-haspopup="listbox" aria-expanded="false" aria-labelledby="%s-label %s">'
             . '<span class="fg-filter-dropdown-value">%s</span>'
+            . '<svg class="fg-filter-dropdown-caret" width="12" height="12" viewBox="0 0 12 12"'
+            . ' aria-hidden="true" focusable="false">'
+            . '<path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"'
+            . ' stroke-linecap="round" stroke-linejoin="round"/>'
+            . '</svg>'
             . '</button>',
             esc_attr( $group_id ),
             esc_attr( $trigger_id ),
@@ -538,13 +727,48 @@ final class Filter_Ui implements Feature {
     }
 
     private function resolve_display_mode( Render_Context $render_context ): string {
+        // Sidebar position has no room for a collapse/expand affordance and
+        // the bar is meant to live alongside the gallery permanently - force
+        // 'always' so the toggle UI is never rendered or referenced in that
+        // layout, regardless of what filter_display_mode is set to.
+        if ( $this->resolve_position( $render_context ) === 'sidebar' ) {
+            return 'always';
+        }
+
         $mode = $render_context->settings['filter_display_mode'] ?? 'toggle';
 
         return in_array( $mode, self::ALLOWED_DISPLAY_MODES, true ) ? (string) $mode : 'toggle';
     }
 
-    private function resolve_all_label( Render_Context $render_context ): string {
-        $label = $render_context->settings['filter_all_label'] ?? '';
+    /**
+     * Whether the visitor may select multiple options within a single source.
+     *
+     * Drives JS behaviour for the buttons and checkboxes styles - when false
+     * they act like a radio group (selecting a value replaces any previously
+     * active value for that source). Dropdowns are inherently single-select
+     * and ignore this setting.
+     *
+     * @since 1.0.0
+     */
+    private function resolve_multiple( Render_Context $render_context ): bool {
+        return (bool) ( $render_context->settings['filtering_multiple_enabled'] ?? true );
+    }
+
+    /**
+     * Where the reset button sits inside .fg-filter__wrapper. 'start'
+     * (default) places it before the groups; 'end' flips it to the
+     * far edge via flex order in SCSS.
+     *
+     * @since 1.0.0
+     */
+    private function resolve_reset_position( Render_Context $render_context ): string {
+        $position = $render_context->settings['filter_reset_btn_position'] ?? 'start';
+
+        return in_array( $position, [ 'start', 'end' ], true ) ? (string) $position : 'start';
+    }
+
+    private function resolve_reset_label( Render_Context $render_context ): string {
+        $label = $render_context->settings['filter_reset_btn_label'] ?? '';
 
         if ( is_string( $label ) && $label !== '' ) {
             return sanitize_text_field( $label );

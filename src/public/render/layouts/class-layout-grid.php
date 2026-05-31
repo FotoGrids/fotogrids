@@ -92,6 +92,10 @@ final class Layout_Grid implements Layout {
         );
     }
 
+    public function preferred_thumbnail_size( Render_Context $render_context ): ?string {
+        return null;
+    }
+
     public function capabilities(): array {
         return [
             'enforces_item_box' => true,

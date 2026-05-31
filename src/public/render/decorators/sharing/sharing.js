@@ -62,7 +62,7 @@
      * Inline brand/glyph SVGs keyed by network id. Use currentColor so
      * they inherit the button's text colour.
      */
-    var NETWORK_ICONS = {
+    const NETWORK_ICONS = {
         facebook:  '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07Z"/></svg>',
         x:         '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>',
         pinterest: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.08 3.16 9.42 7.62 11.16-.1-.95-.2-2.4.04-3.44.22-.93 1.4-5.96 1.4-5.96s-.36-.72-.36-1.78c0-1.67.97-2.92 2.17-2.92 1.02 0 1.52.77 1.52 1.69 0 1.03-.66 2.57-1 4-.28 1.2.6 2.18 1.78 2.18 2.14 0 3.78-2.26 3.78-5.51 0-2.88-2.07-4.9-5.02-4.9-3.42 0-5.43 2.56-5.43 5.21 0 1.03.4 2.14.9 2.74.1.12.11.22.08.34l-.33 1.37c-.05.22-.18.27-.4.16-1.5-.7-2.43-2.88-2.43-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.39 2.96 7.39 6.92 0 4.13-2.6 7.45-6.22 7.45-1.21 0-2.35-.63-2.74-1.38l-.75 2.84c-.27 1.04-1 2.35-1.49 3.15A12 12 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>',
@@ -142,18 +142,18 @@
      * @returns {string}
      */
     function resolveShareUrl( img ) {
-        var settings   = window.fotogridsSharing || window.fotogrids || {};
-        var itemId     = img.dataset ? ( img.dataset.id || '' ) : '';
-        var base       = window.location.href.split( '#' )[ 0 ];
+        const settings   = window.fotogridsSharing || window.fotogrids || {};
+        let itemId     = img.dataset ? ( img.dataset.id || '' ) : '';
+        const base       = window.location.href.split( '#' )[ 0 ];
         // The View Page sets `fotogrids-view` on <body>, not <html>.
-        var isViewPage = ( document.body && document.body.classList.contains( 'fotogrids-view' ) )
+        const isViewPage = ( document.body && document.body.classList.contains( 'fotogrids-view' ) )
             || document.documentElement.classList.contains( 'fotogrids-view' );
-        var deepLink   = settings.deep_linking_enabled !== false;
+        const deepLink   = settings.deep_linking_enabled !== false;
 
         if ( isViewPage ) {
             if ( deepLink && itemId ) {
                 try {
-                    var url = new URL( window.location.href );
+                    let url = new URL( window.location.href );
                     url.searchParams.set( 'fg-item', String( itemId ) );
                     url.hash = '';
                     return url.toString();
@@ -164,11 +164,11 @@
             return base;
         }
 
-        var target = settings.embedded_share_target || 'image';
+        const target = settings.embedded_share_target || 'image';
         if ( target === 'image' && deepLink && itemId ) {
-            var galleryEl = img.closest ? img.closest( '.fotogrids-collection.fotogrids-gallery' ) : null;
+            const galleryEl = img.closest ? img.closest( '.fotogrids-collection.fotogrids-gallery' ) : null;
             // Pipeline writes data-fg-gallery-id on the wrapper.
-            var galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
+            let galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
             if ( galleryId ) {
                 return base + '#fg-' + galleryId + '-' + itemId;
             }
@@ -228,13 +228,13 @@
         // Pick the right parent. If a modal <dialog> is open we mount
         // inside it (focus trap won't block the .select()). Otherwise
         // fall back to <body>.
-        var openDialog = null;
+        let openDialog = null;
         document.querySelectorAll( 'dialog[open]' ).forEach( function ( dlg ) {
             if ( ! openDialog ) openDialog = dlg;
         } );
-        var parent = openDialog || document.body;
+        const parent = openDialog || document.body;
 
-        var ta = document.createElement( 'textarea' );
+        const ta = document.createElement( 'textarea' );
         ta.value = text;
         // Avoid scrolling to bottom / visible jump.
         ta.setAttribute( 'readonly', '' );
@@ -252,8 +252,8 @@
         // the textarea, select its contents, copy, then restore. The focus
         // restoration is critical — without it the share button's blur
         // handler fires and hides its tooltip just after the click.
-        var previouslyFocused = document.activeElement;
-        var previousSelection = document.getSelection
+        const previouslyFocused = document.activeElement;
+        const previousSelection = document.getSelection
             && document.getSelection().rangeCount > 0
                 ? document.getSelection().getRangeAt( 0 )
                 : null;
@@ -264,7 +264,7 @@
             ta.setSelectionRange( 0, text.length );
         }
 
-        var ok = false;
+        let ok = false;
         try {
             ok = document.execCommand( 'copy' );
         } catch ( err ) {
@@ -288,7 +288,7 @@
         }
 
         if ( previousSelection ) {
-            var sel = document.getSelection();
+            const sel = document.getSelection();
             sel.removeAllRanges();
             sel.addRange( previousSelection );
         }
@@ -305,16 +305,16 @@
      * opened, false otherwise. For copy it resolves to whether the
      * clipboard write succeeded.
      *
-     * @param {HTMLElement} img       Proxy element carrying data-id / data-full / alt.
+     * @param {HTMLElement} img       Proxy element carrying data-id / data-fg-full-src / alt.
      * @param {string}      network   shareItem network key (e.g. 'twitter', 'copy').
      * @returns {Promise<boolean>}
      */
     function shareItem( img, network ) {
-        var itemUrl     = img.dataset && img.dataset.full ? img.dataset.full : img.src;
-        var caption     = img.alt || '';
-        var shareTarget = resolveShareUrl( img );
+        const itemUrl     = img.dataset && img.dataset.fgFullSrc ? img.dataset.fgFullSrc : img.src;
+        const caption     = img.alt || '';
+        const shareTarget = resolveShareUrl( img );
 
-        var shareUrl = '';
+        let shareUrl = '';
 
         switch ( network ) {
             case 'facebook':
@@ -355,28 +355,34 @@
      * context. Reused by the lightbox toolbar, the thumbnail decorator
      * and the view-page footer.
      *
-     * @param {Object} config   Resolved sharing — { networks, button_style, button_size }.
-     * @param {Object} context  { id, fullUrl, caption, galleryId, galleryEl }.
+     * @param {Object} config             Resolved sharing — { networks, button_style, button_size }.
+     * @param {Object} context            { id, fullUrl, caption, galleryId, galleryEl }.
+     * @param {Object} [options]          Optional layout overrides.
+     * @param {string} [options.layout]   'grid' | 'row'. 'grid' adds a 2-column grid
+     *                                    modifier (used inside the lightbox info panel and
+     *                                    anywhere a balanced 2-up cluster reads better).
+     *                                    'row' (default) keeps the base flex row.
      * @returns {HTMLElement|null}
      */
-    function renderShareBar( config, context ) {
+    function renderShareBar( config, context, options ) {
         if ( ! config || ! config.networks ) return null;
 
-        var order  = [ 'facebook', 'x', 'pinterest', 'linkedin', 'whatsapp', 'telegram', 'reddit', 'email', 'copy_link' ];
-        var active = order.filter( function ( n ) { return config.networks[ n ]; } );
+        const order  = [ 'facebook', 'x', 'pinterest', 'linkedin', 'whatsapp', 'telegram', 'reddit', 'email', 'copy_link' ];
+        const active = order.filter( function ( n ) { return config.networks[ n ]; } );
         if ( active.length === 0 ) return null;
 
-        var labels = networkLabels();
-        var style  = config.button_style || 'icons_only';
-        var size   = config.button_size || 'medium';
+        const labels = networkLabels();
+        const style  = config.button_style || 'icons_only';
+        const size   = config.button_size || 'medium';
+        const layout = ( options && options.layout === 'grid' ) ? 'grid' : 'row';
 
-        var bar = document.createElement( 'div' );
-        bar.className = 'fotogrids-share-bar fotogrids-share-bar--' + style + ' fotogrids-share-bar--' + size;
+        let bar = document.createElement( 'div' );
+        bar.className = 'fotogrids-share-bar fotogrids-share-bar--' + style + ' fotogrids-share-bar--' + size + ' fotogrids-share-bar--' + layout;
 
         // A detached proxy carrying the item data shareItem expects.
-        var proxy = document.createElement( 'span' );
+        const proxy = document.createElement( 'span' );
         proxy.dataset.id   = context.id != null ? String( context.id ) : '';
-        proxy.dataset.full = context.fullUrl || '';
+        proxy.dataset.fgFullSrc = context.fullUrl || '';
         proxy.alt          = context.caption || '';
         if ( context.galleryEl ) {
             // proxy.dataset.galleryId is what resolveShareUrl reads (via
@@ -403,29 +409,29 @@
         }
 
         active.forEach( function ( network ) {
-            var btn = document.createElement( 'button' );
+            const btn = document.createElement( 'button' );
             btn.type = 'button';
             btn.className = 'fotogrids-share-bar__btn fotogrids-share-bar__btn--' + network;
             btn.setAttribute( 'aria-label', labelFor( network ) );
             btn.dataset.network = network;
 
-            var showIcon  = style !== 'labels_only';
-            var showLabel = style !== 'icons_only';
+            const showIcon  = style !== 'labels_only';
+            const showLabel = style !== 'icons_only';
 
             if ( showIcon && NETWORK_ICONS[ network ] ) {
-                var iconWrap = document.createElement( 'span' );
+                const iconWrap = document.createElement( 'span' );
                 iconWrap.className = 'fotogrids-share-bar__icon';
                 iconWrap.innerHTML = NETWORK_ICONS[ network ];
                 btn.appendChild( iconWrap );
             }
             if ( showLabel ) {
-                var labelEl = document.createElement( 'span' );
+                const labelEl = document.createElement( 'span' );
                 labelEl.className = 'fotogrids-share-bar__label';
                 labelEl.textContent = labelFor( network );
                 btn.appendChild( labelEl );
             }
 
-            var tooltip = ( network === 'copy_link' )
+            const tooltip = ( network === 'copy_link' )
                 ? __( 'Copy link' )
                 : __( 'Share on %s' ).replace( '%s', labelFor( network ) );
             btn.dataset.fgTooltip    = tooltip;
@@ -438,7 +444,7 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                var result = shareItem( proxy, networkKeyFor( network ) );
+                const result = shareItem( proxy, networkKeyFor( network ) );
 
                 if ( network === 'copy_link' ) {
                     // Tooltip feedback depends on whether the copy
@@ -446,11 +452,11 @@
                     // the failure message and flip to success on
                     // resolution — that way a stuck/unresolved Promise
                     // doesn't lie to the user.
-                    var successLabel = __( 'Link copied' );
-                    var failureLabel = __( 'Copy failed' );
-                    var baseLabel    = __( 'Copy link' );
+                    const successLabel = __( 'Link copied' );
+                    const failureLabel = __( 'Copy failed' );
+                    const baseLabel    = __( 'Copy link' );
 
-                    var showFeedback = function ( label, kind ) {
+                    const showFeedback = function ( label, kind ) {
                         // FgTooltip.refresh() reads aria-label first, then
                         // title. Update both — without aria-label being
                         // up-to-date, refresh() shows the stale label and
@@ -505,10 +511,10 @@
      * @param {Element} galleryEl
      */
     function attachThumbnailBars( galleryEl ) {
-        var raw = galleryEl.dataset.fgSharing;
+        const raw = galleryEl.dataset.fgSharing;
         if ( ! raw ) return;
 
-        var config;
+        let config;
         try {
             config = JSON.parse( raw );
         } catch ( e ) {
@@ -520,19 +526,19 @@
         }
 
         // Pipeline writes data-fg-gallery-id on the wrapper.
-        var galleryId = galleryEl.dataset.fgGalleryId || '';
+        let galleryId = galleryEl.dataset.fgGalleryId || '';
 
         galleryEl.querySelectorAll( '.fg-item' ).forEach( function ( figure ) {
             if ( figure.querySelector( '.fotogrids-share-bar' ) ) return;
-            var img = figure.querySelector( 'img' );
+            const img = figure.querySelector( 'img' );
             if ( ! img ) return;
 
-            var triggerEl = figure.querySelector( '[data-fg-item-id]' );
-            var itemId = img.dataset.id || ( triggerEl ? triggerEl.dataset.fgItemId : '' );
+            const triggerEl = figure.querySelector( '[data-fg-item-id]' );
+            let itemId = img.dataset.id || ( triggerEl ? triggerEl.dataset.fgItemId : '' );
 
-            var bar = renderShareBar( config, {
+            let bar = renderShareBar( config, {
                 id:        itemId,
-                fullUrl:   img.dataset.full || img.src,
+                fullUrl:   img.dataset.fgFullSrc || img.src,
                 caption:   img.alt || '',
                 galleryEl: galleryEl,
                 galleryId: galleryId,
@@ -558,7 +564,7 @@
         document.querySelectorAll( '[data-fg-share-footer]' ).forEach( function ( container ) {
             if ( container.querySelector( '.fotogrids-share-bar' ) ) return;
 
-            var config;
+            let config;
             try {
                 config = JSON.parse( container.dataset.fgShareFooter );
             } catch ( e ) {
@@ -566,13 +572,17 @@
             }
             if ( ! config || ! config.enabled ) return;
 
-            var bar = renderShareBar( config, {
-                id:        '',
-                fullUrl:   '',
-                caption:   document.title || '',
-                galleryEl: null,
-                galleryId: '',
-            } );
+            let bar = renderShareBar(
+                config,
+                {
+                    id:        '',
+                    fullUrl:   '',
+                    caption:   document.title || '',
+                    galleryEl: null,
+                    galleryId: '',
+                },
+                { layout: 'row' }
+            );
             if ( bar ) {
                 bar.classList.add( 'fotogrids-share-bar--footer' );
                 container.appendChild( bar );
@@ -584,7 +594,7 @@
     // Public API + boot
     // -------------------------------------------------------------------------
 
-    var publicApi = {
+    const publicApi = {
         renderShareBar: renderShareBar,
         shareItem:      shareItem,
         resolveShareUrl: resolveShareUrl,

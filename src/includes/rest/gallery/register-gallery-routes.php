@@ -123,6 +123,10 @@ class Register_Gallery_Routes {
                         'default'           => 0,
                         'sanitize_callback' => 'absint',
                     ),
+                    'container_width' => array(
+                        'default'           => 0,
+                        'sanitize_callback' => 'absint',
+                    ),
                     'breakpoint'     => array(
                         'default'           => 'desktop',
                         'sanitize_callback' => 'sanitize_key',

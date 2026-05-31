@@ -2,10 +2,13 @@
 @use '../sizes.scss' as *;
 
 .fotogrids-setting-group {
-    border: ui-size(border-width, base) solid ui-color(border, primary);
-    border-radius: ui-size(border-radius, base);
-    position: relative;
-    
+    position: relative;    
+
+    &:not(&--chromeless) {
+        border: ui-size(border-width, base) solid ui-color(border, primary);
+        border-radius: ui-size(border-radius, base);
+    }
+
     &__label {
         position: absolute;
         top: calc(-#{ui-size(font-size, md)} / 2);
@@ -20,10 +23,13 @@
         align-items: center;
         gap: 8px;
     }
-    
-    &__content {
+
+    &:not(&--chromeless) &__content {
         padding: ui-size(padding, xl);
-        padding-top: calc( ui-size(padding, xl) + (ui-size(padding,base) / 2));
+        padding-top: calc( ui-size(padding, xl) + (ui-size(padding,base) / 2));    
+    }
+
+    &__content {
 		display: flex;
 		flex-direction: column;
 		gap: ui-size(padding, 2xl);

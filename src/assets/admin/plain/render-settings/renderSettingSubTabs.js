@@ -17,6 +17,8 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (setting, isDisabled, {
         return shouldDisplaySetting({ condition: subTab.condition });
     });
 
+    const annotateChild = (child, ctx) => ({ ...child, __chromeWhenContext: ctx });
+
     // If only one sub-tab is available, render its content directly without wrapper
     if (availableSubTabs.length === 1) {
         const singleSubTab = availableSubTabs[0];
@@ -25,7 +27,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (setting, isDisabled, {
         }, [
             h('div', {
                 className: 'fotogrids-lightbox-subtab-content__inner'
-            }, singleSubTab.settings?.map(subSetting => renderSetting(subSetting)) || [])
+            }, singleSubTab.settings?.map(subSetting => renderSetting(annotateChild(subSetting, 'single_subtab'))) || [])
         ]);
     }
 
@@ -68,7 +70,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (setting, isDisabled, {
                 const resolvedTab = visibleIds.has(activeSubTab)
                     ? activeSubTab
                     : availableSubTabs[0]?.id;
-                return setting.subTabs[resolvedTab]?.settings.map(subSetting => renderSetting(subSetting)) || [];
+                return setting.subTabs[resolvedTab]?.settings.map(subSetting => renderSetting(annotateChild(subSetting, 'multi_subtab'))) || [];
             })())
         ])
     ]);

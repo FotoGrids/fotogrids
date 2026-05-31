@@ -19,10 +19,10 @@
     'use strict';
 
     /** Per-gallery state. Keyed by gallery wrapper element (WeakMap). */
-    var galleryState = new WeakMap();
+    const galleryState = new WeakMap();
 
     /** Per-gallery change listeners. Keyed by gallery wrapper element. */
-    var listeners = new WeakMap();
+    const listeners = new WeakMap();
 
     /**
      * Per-gallery filter-view cache. Maps gallery → Map<fingerprint, snapshot>.
@@ -42,7 +42,7 @@
      *
      * @type {WeakMap<Element, Map<string, object>>}
      */
-    var filterViewCache = new WeakMap();
+    const filterViewCache = new WeakMap();
 
     /**
      * Per-gallery "last known filter fingerprint" so we know which cache
@@ -50,7 +50,7 @@
      *
      * @type {WeakMap<Element, string>}
      */
-    var activeFingerprint = new WeakMap();
+    const activeFingerprint = new WeakMap();
 
     /**
      * Per-gallery monotonic request token. Bumped every time we kick off
@@ -67,16 +67,45 @@
      *
      * @type {WeakMap<Element, number>}
      */
-    var inflightToken = new WeakMap();
+    const inflightToken = new WeakMap();
 
     function nextToken( galleryEl ) {
-        var t = ( inflightToken.get( galleryEl ) || 0 ) + 1;
+        const t = ( inflightToken.get( galleryEl ) || 0 ) + 1;
         inflightToken.set( galleryEl, t );
         return t;
     }
 
     function isCurrentToken( galleryEl, token ) {
         return ( inflightToken.get( galleryEl ) || 0 ) === token;
+    }
+
+    /**
+     * Filter-handling strategy.
+     *
+     *   'server' (default) — every filter change goes through a server
+     *                        fetch. The server's total_pages is the only
+     *                        thing that ever writes data-fg-page-total.
+     *                        Single source of truth, no cache poisoning
+     *                        possible.
+     *   'cache'            — original behaviour: snapshot every paint into
+     *                        a per-fingerprint cache, restore from cache
+     *                        on filter revisits, fall back to server fetch
+     *                        on cache miss. Kept as a fallback so we can
+     *                        flip back without a code change if the
+     *                        per-toggle round trip is felt as too sluggish.
+     *
+     * Toggle via:
+     *   - data-fg-filter-strategy="cache" on the gallery wrapper (per-gallery)
+     *   - FotoGrids.modules.pagination.setFilterStrategy('cache') (global default)
+     *
+     * @type {'server'|'cache'}
+     */
+    let defaultFilterStrategy = 'server';
+
+    function strategyFor( galleryEl ) {
+        const attr = galleryEl && galleryEl.dataset && galleryEl.dataset.fgFilterStrategy;
+        if ( attr === 'server' || attr === 'cache' ) return attr;
+        return defaultFilterStrategy;
     }
 
     /**
@@ -88,10 +117,10 @@
      * @returns {{page:number,totalPages:number,pageSize:number,method:string,preload:boolean,hasMore:boolean}}
      */
     function readState( galleryEl ) {
-        var ds = galleryEl.dataset;
-        var page       = parseInt( ds.fgPageCurrent || '1', 10 );
-        var totalPages = parseInt( ds.fgPageTotal   || '1', 10 );
-        var pageSize   = parseInt( ds.fgPageSize    || '0', 10 );
+        const ds = galleryEl.dataset;
+        const page       = parseInt( ds.fgPageCurrent || '1', 10 );
+        const totalPages = parseInt( ds.fgPageTotal   || '1', 10 );
+        const pageSize   = parseInt( ds.fgPageSize    || '0', 10 );
 
         return {
             page:       page,
@@ -130,20 +159,20 @@
      * @returns {Element|null}
      */
     function resolveItemsRoot( galleryEl ) {
-        var explicit = galleryEl.querySelector( '[data-fg-items-root="true"]' );
+        const explicit = galleryEl.querySelector( '[data-fg-items-root="true"]' );
         if ( explicit ) return explicit;
 
         // Fallback: first child that isn't a known chrome element.
-        var chromeSelectors = [
+        const chromeSelectors = [
             '.fotogrids-filters',
             '.fg-pagination',
             'style',
             '.fotogrids-password-gate',
         ];
-        var children = Array.prototype.slice.call( galleryEl.children );
-        for ( var i = 0; i < children.length; i++ ) {
-            var el = children[ i ];
-            var isChrome = chromeSelectors.some( function ( sel ) {
+        const children = Array.prototype.slice.call( galleryEl.children );
+        for ( let i = 0; i < children.length; i++ ) {
+            const el = children[ i ];
+            const isChrome = chromeSelectors.some( function ( sel ) {
                 return el.matches( sel );
             } );
             if ( ! isChrome ) return el;
@@ -161,11 +190,11 @@
     function injectMissingStyles( cssUrls ) {
         if ( ! cssUrls || typeof cssUrls !== 'object' ) return;
         Object.keys( cssUrls ).forEach( function ( handle ) {
-            var url = cssUrls[ handle ];
+            let url = cssUrls[ handle ];
             if ( ! handle || ! url ) return;
-            var linkId = 'fotogrids-css-' + handle;
+            const linkId = 'fotogrids-css-' + handle;
             if ( document.getElementById( linkId ) ) return;
-            var link = document.createElement( 'link' );
+            const link = document.createElement( 'link' );
             link.rel  = 'stylesheet';
             link.id   = linkId;
             link.href = url;
@@ -180,7 +209,7 @@
      * @param {object}  detail
      */
     function notify( galleryEl, detail ) {
-        var cbs = listeners.get( galleryEl );
+        const cbs = listeners.get( galleryEl );
         if ( cbs ) {
             cbs.forEach( function ( cb ) {
                 try { cb( detail ); } catch ( err ) { /* swallow listener errors */ }
@@ -206,15 +235,15 @@
      * @returns {Promise<object>}
      */
     function fetchPage( galleryEl, page ) {
-        var url   = galleryEl.dataset.fgRenderUrl   || ( window.fotogrids && window.fotogrids.renderUrl )   || '';
-        var nonce = galleryEl.dataset.fgRenderNonce || ( window.fotogrids && window.fotogrids.renderNonce ) || '';
-        var galleryId = parseInt( galleryEl.dataset.fgGalleryId || '0', 10 );
+        let url   = galleryEl.dataset.fgRenderUrl   || ( window.fotogrids && window.fotogrids.renderUrl )   || '';
+        const nonce = galleryEl.dataset.fgRenderNonce || ( window.fotogrids && window.fotogrids.renderNonce ) || '';
+        const galleryId = parseInt( galleryEl.dataset.fgGalleryId || '0', 10 );
 
         if ( ! url || ! galleryId ) {
             return Promise.reject( new Error( 'pagination/no-render-context' ) );
         }
 
-        var breakpoint = ( window.FotoGrids && window.FotoGrids.activeBreakpoint )
+        const breakpoint = ( window.FotoGrids && window.FotoGrids.activeBreakpoint )
             ? window.FotoGrids.activeBreakpoint()
             : 'desktop';
 
@@ -222,7 +251,7 @@
         // Sent on every fetch so the server returns items from the
         // filtered set. When no filters are active, sends an empty
         // object which the server treats as "no filter".
-        var filters = ( window.FotoGrids
+        const filters = ( window.FotoGrids
             && window.FotoGrids.modules
             && window.FotoGrids.modules.filters
             && typeof window.FotoGrids.modules.filters.getActive === 'function' )
@@ -233,7 +262,9 @@
         // 'random'. Sending it back unchanged on every paginated request
         // is what keeps the shuffle stable across pages. The server
         // ignores zero/missing.
-        var randomSeed = parseInt( galleryEl.dataset.fgRandomSeed || '0', 10 );
+        const randomSeed = parseInt( galleryEl.dataset.fgRandomSeed || '0', 10 );
+
+        const containerWidth = parseInt( galleryEl.dataset.fgContainerWidth || '0', 10 );
 
         return fetch( url, {
             method:      'POST',
@@ -243,12 +274,13 @@
             },
             credentials: 'same-origin',
             body: JSON.stringify( {
-                gallery_id:  galleryId,
-                page:        page,
-                breakpoint:  breakpoint,
-                partial:     'items_only',
-                filters:     filters,
-                random_seed: randomSeed,
+                gallery_id:      galleryId,
+                page:            page,
+                breakpoint:      breakpoint,
+                partial:         'items_only',
+                filters:         filters,
+                random_seed:     randomSeed,
+                container_width: containerWidth > 0 ? containerWidth : 0,
             } ),
         } )
             .then( function ( response ) {
@@ -273,7 +305,7 @@
     function applyPage( galleryEl, payload, mode, capturedFingerprint ) {
         injectMissingStyles( payload.css || {} );
 
-        var root = resolveItemsRoot( galleryEl );
+        let root = resolveItemsRoot( galleryEl );
         if ( ! root ) {
             throw new Error( 'pagination/no-items-root' );
         }
@@ -283,15 +315,15 @@
         // and "items_only" returns that whole wrapper. We must unwrap
         // it before appending — otherwise we'd nest a second
         // .fg-grid-track inside the existing one.
-        var template = document.createElement( 'template' );
+        const template = document.createElement( 'template' );
         template.innerHTML = payload.html;
 
-        var inserted = [];
+        let inserted = [];
 
         // If the top-level element of the response is itself an items
         // root, unwrap it. Otherwise, just take all top-level children.
-        var topLevel = Array.prototype.slice.call( template.content.children );
-        var sourceChildren = [];
+        const topLevel = Array.prototype.slice.call( template.content.children );
+        let sourceChildren = [];
         if ( topLevel.length === 1 && topLevel[ 0 ].dataset && topLevel[ 0 ].dataset.fgItemsRoot === 'true' ) {
             sourceChildren = Array.prototype.slice.call( topLevel[ 0 ].children );
         } else {
@@ -325,10 +357,17 @@
         // time — not whatever activeFingerprint holds now — so an
         // earlier-arriving response can't be filed under a later
         // filter's slot.
-        if ( typeof capturedFingerprint === 'string' ) {
-            snapshotCurrentViewAs( galleryEl, capturedFingerprint );
-        } else {
-            snapshotCurrentView( galleryEl );
+        //
+        // Skipped entirely under the 'server' strategy: there's no
+        // value in building cache state that swapToFilterState will
+        // never read, and a stale snapshot here is exactly the class
+        // of bug we're removing.
+        if ( strategyFor( galleryEl ) !== 'server' ) {
+            if ( typeof capturedFingerprint === 'string' ) {
+                snapshotCurrentViewAs( galleryEl, capturedFingerprint );
+            } else {
+                snapshotCurrentView( galleryEl );
+            }
         }
 
         writeState( galleryEl, {
@@ -356,7 +395,7 @@
      * @param {number}  page
      */
     function schedulePreload( galleryEl, page ) {
-        var run = function () { fetchPage( galleryEl, page ).catch( function () { /* preload errors are silent */ } ); };
+        const run = function () { fetchPage( galleryEl, page ).catch( function () { /* preload errors are silent */ } ); };
 
         if ( typeof window.requestIdleCallback === 'function' ) {
             window.requestIdleCallback( run, { timeout: 1500 } );
@@ -382,9 +421,9 @@
      * @returns {string}
      */
     function currentFingerprint( galleryEl ) {
-        var fmod = window.FotoGrids && window.FotoGrids.modules && window.FotoGrids.modules.filters;
+        const fmod = window.FotoGrids && window.FotoGrids.modules && window.FotoGrids.modules.filters;
         if ( ! fmod ) return '';
-        var map = fmod.getActive ? fmod.getActive( galleryEl ) : {};
+        const map = fmod.getActive ? fmod.getActive( galleryEl ) : {};
         return fmod.fingerprint ? fmod.fingerprint( map ) : '';
     }
 
@@ -406,14 +445,14 @@
      * @param {Element} galleryEl
      */
     function snapshotCurrentView( galleryEl ) {
-        var root = resolveItemsRoot( galleryEl );
+        let root = resolveItemsRoot( galleryEl );
         if ( ! root ) return;
 
         if ( ! activeFingerprint.has( galleryEl ) ) {
             activeFingerprint.set( galleryEl, currentFingerprint( galleryEl ) );
         }
-        var fp = activeFingerprint.get( galleryEl );
-        var s  = readState( galleryEl );
+        const fp = activeFingerprint.get( galleryEl );
+        let s  = readState( galleryEl );
 
         ensureCacheBucket( galleryEl ).set( fp, {
             html:       root.innerHTML,
@@ -434,9 +473,9 @@
      * @param {string}  fp
      */
     function snapshotCurrentViewAs( galleryEl, fp ) {
-        var root = resolveItemsRoot( galleryEl );
+        let root = resolveItemsRoot( galleryEl );
         if ( ! root ) return;
-        var s = readState( galleryEl );
+        let s = readState( galleryEl );
         ensureCacheBucket( galleryEl ).set( fp, {
             html:       root.innerHTML,
             page:       s.page,
@@ -455,18 +494,18 @@
      * @returns {{page:number, hasMore:boolean}|null} restored state or null if cache miss.
      */
     function restoreCachedView( galleryEl, fingerprint ) {
-        var bucket = filterViewCache.get( galleryEl );
+        const bucket = filterViewCache.get( galleryEl );
         if ( ! bucket ) return null;
-        var snap = bucket.get( fingerprint );
+        const snap = bucket.get( fingerprint );
         if ( ! snap ) return null;
 
-        var root = resolveItemsRoot( galleryEl );
+        let root = resolveItemsRoot( galleryEl );
         if ( ! root ) return null;
 
         // Take the new items list to dispatch in fotogrids:items_inserted
         // so lazy-load, loading-icon, etc. re-bind on the restored DOM.
         root.innerHTML = snap.html;
-        var inserted = Array.prototype.slice.call( root.children );
+        let inserted = Array.prototype.slice.call( root.children );
 
         writeState( galleryEl, {
             page:       snap.page,
@@ -513,6 +552,23 @@
      * @returns {Promise<{page:number,hasMore:boolean,fromCache:boolean}>}
      */
     function swapToFilterState( galleryEl ) {
+        const newFp = currentFingerprint( galleryEl );
+
+        // Server-authoritative strategy: skip the cache entirely. The
+        // server's total_pages becomes the only writer of
+        // data-fg-page-total — no cache slot can carry stale state
+        // because nothing reads the cache. The fingerprint+token race
+        // guard inside goToPage stays active as defence-in-depth, but
+        // is no longer load-bearing.
+        if ( strategyFor( galleryEl ) === 'server' ) {
+            activeFingerprint.set( galleryEl, newFp );
+            return goToPage( galleryEl, 1, { mode: 'replace', fingerprint: newFp } ).then( function ( result ) {
+                return { page: result.page, hasMore: result.hasMore, fromCache: false };
+            } );
+        }
+
+        // 'cache' strategy — original behaviour.
+        //
         // DO NOT snapshot here. By the time this fires, filter-ui has
         // already mutated the DOM (added fg-is-filtered-out classes to
         // non-matching items in preparation for the new filter state).
@@ -526,9 +582,7 @@
         //      cache[<the fingerprint that was active during fetch>].
         // Both run while the DOM is in its canonical state for that
         // fingerprint.
-
-        var newFp = currentFingerprint( galleryEl );
-        var restored = restoreCachedView( galleryEl, newFp );
+        const restored = restoreCachedView( galleryEl, newFp );
 
         if ( restored ) {
             return Promise.resolve( { page: restored.page, hasMore: restored.hasMore, fromCache: true } );
@@ -570,17 +624,17 @@
      * @returns {Promise<{page:number,hasMore:boolean}>}
      */
     function goToPage( galleryEl, page, opts ) {
-        var mode = ( opts && opts.mode ) || 'replace';
+        const mode = ( opts && opts.mode ) || 'replace';
 
         // Capture the filter fingerprint and a fresh request token at the
         // moment we kick the fetch off. If a later goToPage/swapToFilterState
         // bumps the token before this response lands, we drop the result —
         // both the DOM write and the cache snapshot — so the late response
         // can't poison a newer filter's view.
-        var capturedFp    = ( opts && typeof opts.fingerprint === 'string' )
+        const capturedFp    = ( opts && typeof opts.fingerprint === 'string' )
             ? opts.fingerprint
             : currentFingerprint( galleryEl );
-        var capturedToken = nextToken( galleryEl );
+        const capturedToken = nextToken( galleryEl );
 
         galleryEl.classList.add( 'fotogrids-gallery--is-paginating' );
 
@@ -635,7 +689,7 @@
     }
 
     function expose() {
-        var FG = window.FotoGrids;
+        const FG = window.FotoGrids;
         if ( ! FG ) return false;
         if ( ! FG.modules ) FG.modules = {};
         FG.modules.pagination = {
@@ -644,6 +698,27 @@
             prefetch:           prefetch,
             onChange:           onChange,
             swapToFilterState:  swapToFilterState,
+            /**
+             * Set the global filter strategy. Per-gallery overrides via
+             * data-fg-filter-strategy still win.
+             *
+             * @param {'server'|'cache'} s
+             */
+            setFilterStrategy: function ( s ) {
+                if ( s === 'server' || s === 'cache' ) {
+                    defaultFilterStrategy = s;
+                }
+            },
+            /**
+             * Read the strategy that would currently apply to a gallery.
+             * Useful for tests / debugging.
+             *
+             * @param {Element} galleryEl
+             * @returns {'server'|'cache'}
+             */
+            getFilterStrategy: function ( galleryEl ) {
+                return strategyFor( galleryEl );
+            },
         };
         return true;
     }
@@ -656,15 +731,18 @@
         }
 
         // For every gallery that already has a paginated wrapper:
-        //   1. Snapshot the initial server-rendered slice into the
-        //      filter-view cache under the current (likely empty)
-        //      filter fingerprint. This makes "filter, then un-filter"
-        //      restore the original view instantly without a fetch.
+        //   1. (cache strategy only) Snapshot the initial server-
+        //      rendered slice into the filter-view cache under the
+        //      current (likely empty) filter fingerprint. This makes
+        //      "filter, then un-filter" restore the original view
+        //      instantly without a fetch.
         //   2. Kick off a preload if preload_next_page is enabled.
         window.FotoGrids.onGallery( function ( gEl ) {
             if ( gEl.dataset.fgPaginated !== 'true' ) return;
-            snapshotCurrentView( gEl );
-            var s = readState( gEl );
+            if ( strategyFor( gEl ) !== 'server' ) {
+                snapshotCurrentView( gEl );
+            }
+            let s = readState( gEl );
             if ( s.preload && s.hasMore ) {
                 schedulePreload( gEl, s.page + 1 );
             }

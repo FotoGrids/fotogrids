@@ -1,9 +1,48 @@
+/* Pre-JS fallback: pure CSS multicol so the gallery is not broken when
+   JS fails to run or is disabled. JS replaces this with absolute
+   positioning by setting data-fg-masonry-positioned="1" on the wrapper. */
+
 [data-fg-layout="masonry"] .fg-masonry-track {
-    column-count: var(--fg-cols, 4);
     column-gap: var(--fg-gap, 10px);
 }
 
+[data-fg-layout="masonry"][data-fg-columns-mode="fixed"] .fg-masonry-track {
+    column-count: var(--fg-cols, 4);
+}
+
+[data-fg-layout="masonry"][data-fg-columns-mode="auto"] .fg-masonry-track {
+    column-count: auto;
+    column-width: var(--fg-col-min, 240px);
+}
+
 [data-fg-layout="masonry"] .fg-masonry-track .fg-item {
+    display: block;
     break-inside: avoid;
-    margin-bottom: var(--fg-gap, 10px);
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 0 0 var(--fg-gap, 10px);
+    width: 100%;
+}
+
+[data-fg-layout="masonry"] .fg-masonry-track .fg-item > a {
+    display: block;
+}
+
+/* JS-positioned mode: track becomes a relative container, items are
+   placed absolutely at their JS-computed top/left/width. Heights come
+   from the items' natural intrinsic content. */
+
+[data-fg-layout="masonry"][data-fg-masonry-positioned="1"] .fg-masonry-track {
+    position: relative;
+    column-count: auto;
+    column-width: auto;
+    column-gap: 0;
+}
+
+[data-fg-layout="masonry"][data-fg-masonry-positioned="1"] .fg-masonry-track .fg-item {
+    position: absolute;
+    margin: 0;
+    break-inside: auto;
+    -webkit-column-break-inside: auto;
+    page-break-inside: auto;
 }

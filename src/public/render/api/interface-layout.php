@@ -100,6 +100,23 @@ interface Layout {
     public function assets( Render_Context $render_context ): Module_Assets;
 
     /**
+     * Preferred WP thumbnail size slug for this layout, or null when the
+     * layout has no preference and the user's configured thumbnail_size
+     * setting should be used as-is.
+     *
+     * Only consulted when the user has left thumbnail_size on its default
+     * (fotogrids_thumbnail). An explicit non-default user choice always
+     * wins. The returned slug still flows through Image_Size_Manager's
+     * fallback chain, so a missing derivative falls back to fotogrids_thumbnail
+     * → thumbnail → medium → full.
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  string|null
+     */
+    public function preferred_thumbnail_size( Render_Context $render_context ): ?string;
+
+    /**
      * Capability flags this layout advertises to the rest of the render
      * pipeline. Lets cross-cutting features (pagination, filtering, etc.)
      * ask the active layout "do you support this?" without hardcoding a

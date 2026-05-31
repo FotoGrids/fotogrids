@@ -31,10 +31,10 @@
      * @returns {{enabled: boolean, restUrl: string, nonce: string}|null}
      */
     function readConfig( galleryEl ) {
-        var raw = galleryEl.dataset.fgStats;
+        const raw = galleryEl.dataset.fgStats;
         if ( ! raw ) return null;
         try {
-            var cfg = JSON.parse( raw );
+            const cfg = JSON.parse( raw );
             if ( ! cfg.enabled ) return null;
             return cfg;
         } catch ( e ) {
@@ -60,7 +60,7 @@
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify( body ),
-            } ).catch( function () {} );
+            } ).catch( () => {} );
         } catch ( e ) {
             // ignore
         }
@@ -79,11 +79,11 @@
      */
     function trackView( galleryEl ) {
         if ( galleryEl.dataset.fgStatsViewSent === '1' ) return;
-        var cfg = readConfig( galleryEl );
+        const cfg = readConfig( galleryEl );
         if ( ! cfg ) return;
 
-        var objectType = cfg.objectType || 'gallery';
-        var objectId   = parseInt( cfg.objectId || '0', 10 );
+        const objectType = cfg.objectType || 'gallery';
+        const objectId   = parseInt( cfg.objectId || '0', 10 );
         if ( ! objectId ) return;
 
         galleryEl.dataset.fgStatsViewSent = '1';
@@ -106,17 +106,17 @@
      * @param {CustomEvent} e
      */
     function trackShare( e ) {
-        var detail = e && e.detail;
+        const detail = e && e.detail;
         if ( ! detail || ! detail.itemId || ! detail.network ) return;
 
         // Find any gallery on the page that has stats enabled so we can
         // reuse its restUrl + nonce.
-        var anyGallery = document.querySelector( '.fotogrids-collection.fotogrids-gallery[data-fg-stats]' );
+        const anyGallery = document.querySelector( '.fotogrids-collection.fotogrids-gallery[data-fg-stats]' );
         if ( ! anyGallery ) return;
-        var cfg = readConfig( anyGallery );
+        const cfg = readConfig( anyGallery );
         if ( ! cfg ) return;
 
-        var itemId = parseInt( detail.itemId, 10 );
+        const itemId = parseInt( detail.itemId, 10 );
         if ( ! itemId ) return;
 
         ping( cfg.restUrl + 'stats/share', cfg.nonce, {

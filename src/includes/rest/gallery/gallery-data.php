@@ -269,15 +269,16 @@ class Gallery_Data {
      * @return \WP_REST_Response|\WP_Error
      */
     public static function render_gallery( $request ) {
-        $gallery_id     = (int) $request->get_param( 'gallery_id' );
-        $page           = max( 1, (int) $request->get_param( 'page' ) );
-        $items_per_page = (int) $request->get_param( 'items_per_page' );
-        $breakpoint     = (string) $request->get_param( 'breakpoint' );
-        $partial        = (string) $request->get_param( 'partial' );
-        $filters_raw    = $request->get_param( 'filters' );
-        $filters        = is_array( $filters_raw ) ? $filters_raw : array();
-        $random_seed    = (int) $request->get_param( 'random_seed' );
-        $via_album_id   = (int) $request->get_param( 'via_album_id' );
+        $gallery_id      = (int) $request->get_param( 'gallery_id' );
+        $page            = max( 1, (int) $request->get_param( 'page' ) );
+        $items_per_page  = (int) $request->get_param( 'items_per_page' );
+        $container_width = (int) $request->get_param( 'container_width' );
+        $breakpoint      = (string) $request->get_param( 'breakpoint' );
+        $partial         = (string) $request->get_param( 'partial' );
+        $filters_raw     = $request->get_param( 'filters' );
+        $filters         = is_array( $filters_raw ) ? $filters_raw : array();
+        $random_seed     = (int) $request->get_param( 'random_seed' );
+        $via_album_id    = (int) $request->get_param( 'via_album_id' );
 
         if ( $gallery_id <= 0 ) {
             return new \WP_Error(
@@ -310,7 +311,7 @@ class Gallery_Data {
         // behaviour for that caller. When ANY pagination param is set,
         // use the dedicated REST entry point that threads meta_overrides
         // into Context_Builder.
-        $is_paginated_request = $page > 1 || $items_per_page > 0 || $partial !== '' || $breakpoint !== 'desktop' || ! empty( $filters ) || $random_seed > 0;
+        $is_paginated_request = $page > 1 || $items_per_page > 0 || $container_width > 0 || $partial !== '' || $breakpoint !== 'desktop' || ! empty( $filters ) || $random_seed > 0;
 
         // Visit-context: any render emitted from this endpoint is an AJAX
         // swap. We pass via_album_id through both branches so the rendered
@@ -346,6 +347,9 @@ class Gallery_Data {
         );
         if ( $items_per_page > 0 ) {
             $meta_overrides['requested_per_page'] = $items_per_page;
+        }
+        if ( $container_width > 0 ) {
+            $meta_overrides['container_width'] = $container_width;
         }
         if ( $partial !== '' ) {
             $meta_overrides['partial'] = $partial;
@@ -393,7 +397,13 @@ class Gallery_Data {
             $total     = is_array( $all_items ) ? count( $all_items ) : 0;
         }
 
-        $total_pages = $page_size > 0 ? max( 1, (int) ceil( $total / $page_size ) ) : 1;
+        $meta = \FotoGrids\Public_Render::last_render_meta();
+        if ( $meta !== null && $meta->pagination_page_size !== null ) {
+            $page_size = (int) $meta->pagination_page_size;
+        }
+        $total_pages = $meta !== null && $meta->pagination_total_pages !== null
+            ? (int) $meta->pagination_total_pages
+            : ( $page_size > 0 ? max( 1, (int) ceil( $total / $page_size ) ) : 1 );
         $has_more    = $page < $total_pages;
 
         return rest_ensure_response( array(

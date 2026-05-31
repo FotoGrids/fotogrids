@@ -120,9 +120,11 @@ trait Pagination_Common {
      * @return array<string, string>
      */
     protected function common_wrapper_attrs( Render_Context $render_context, string $method ): array {
-        $page_size   = self::resolve_page_size( $render_context->settings, $render_context );
+        $page_size   = $render_context->meta->pagination_page_size
+            ?? self::resolve_page_size( $render_context->settings, $render_context );
         $total       = (int) ( $render_context->meta->total_item_count ?? count( $render_context->items ) );
-        $total_pages = (int) ceil( $total / $page_size );
+        $total_pages = $render_context->meta->pagination_total_pages
+            ?? (int) ceil( $total / max( 1, $page_size ) );
         $current     = (int) ( $render_context->meta->requested_page ?? 1 );
 
         // The REST URL + nonce for the JS to fetch additional pages.

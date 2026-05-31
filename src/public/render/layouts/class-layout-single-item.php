@@ -100,6 +100,10 @@ final class Layout_Single_Item implements Layout {
         );
     }
 
+    public function preferred_thumbnail_size( Render_Context $render_context ): ?string {
+        return \FotoGrids\Image_Size_Manager::SLUG_FULL;
+    }
+
     public function capabilities(): array {
         return [
             'enforces_item_box' => true,

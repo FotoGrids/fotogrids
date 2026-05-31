@@ -36,7 +36,7 @@
      *
      * @type {WeakSet<Element>}
      */
-    var boundBackLinks = new WeakSet();
+    const boundBackLinks = new WeakSet();
 
     /**
      * Intercept a Back button click. Returns nothing — calls
@@ -57,12 +57,12 @@
         // .fotogrids-album is unambiguous — it only appears on album
         // wrappers — so a short selector is fine here (same lookup as
         // Album_To_Gallery_Ajax).
-        var albumEl = backLink.closest( '.fotogrids-album' );
+        const albumEl = backLink.closest( '.fotogrids-album' );
         if ( ! albumEl ) {
             return; // Embedded outside an album or no album in scope — natural nav.
         }
 
-        var api = window.FotoGrids && window.FotoGrids.modules && window.FotoGrids.modules.albumAjax;
+        const api = window.FotoGrids && window.FotoGrids.modules && window.FotoGrids.modules.albumAjax;
         if ( ! api || typeof api.restore !== 'function' ) {
             return; // AJAX module not loaded — natural nav back to album page.
         }
@@ -84,7 +84,7 @@
         if ( boundBackLinks.has( backLink ) ) return;
         boundBackLinks.add( backLink );
 
-        backLink.addEventListener( 'click', function ( event ) {
+        backLink.addEventListener( 'click', ( event ) => {
             handleBackClick( backLink, event );
         } );
     }

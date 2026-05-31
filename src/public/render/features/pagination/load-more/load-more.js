@@ -26,20 +26,20 @@
         if ( gEl.dataset.fgLoadMoreBound === '1' ) return;
         gEl.dataset.fgLoadMoreBound = '1';
 
-        var bar    = gEl.querySelector( '[data-fg-pagination-role="load-more"]' );
-        var button = bar && bar.querySelector( '[data-fg-pagination-trigger="load-more"]' );
+        const bar    = gEl.querySelector( '[data-fg-pagination-role="load-more"]' );
+        const button = bar && bar.querySelector( '[data-fg-pagination-trigger="load-more"]' );
         if ( ! button ) return;
 
-        var pagination = window.FotoGrids
+        const pagination = window.FotoGrids
             && window.FotoGrids.modules
             && window.FotoGrids.modules.pagination;
         if ( ! pagination ) return;
 
-        button.addEventListener( 'click', function ( event ) {
+        button.addEventListener( 'click', ( event ) => {
             event.preventDefault();
             if ( button.disabled ) return;
 
-            var s = pagination.state( gEl );
+            const s = pagination.state( gEl );
             if ( ! s.hasMore ) {
                 bar.classList.add( 'fg-pagination--exhausted' );
                 return;
@@ -50,13 +50,13 @@
 
             pagination
                 .goToPage( gEl, s.page + 1, { mode: 'append' } )
-                .then( function ( result ) {
+                .then( ( result ) => {
                     if ( ! result.hasMore ) {
                         bar.classList.add( 'fg-pagination--exhausted' );
                     }
                 } )
-                .catch( function () { /* surfaced inside goToPage */ } )
-                .then( function () {
+                .catch( () => { /* surfaced inside goToPage */ } )
+                .then( () => {
                     button.disabled = false;
                     button.classList.remove( 'fg-is-loading' );
                 } );
@@ -65,20 +65,20 @@
         // Filter change → swap to the new filter state. swapToFilterState
         // restores from cache instantly if the user has visited this
         // filter combination before; otherwise it fetches page 1.
-        gEl.addEventListener( 'fotogrids:filters_changed', function () {
+        gEl.addEventListener( 'fotogrids:filters_changed', () => {
             bar.classList.remove( 'fg-pagination--exhausted' );
             button.disabled = true;
             button.classList.add( 'fg-is-loading' );
 
             pagination
                 .swapToFilterState( gEl )
-                .then( function ( result ) {
+                .then( ( result ) => {
                     if ( ! result.hasMore ) {
                         bar.classList.add( 'fg-pagination--exhausted' );
                     }
                 } )
-                .catch( function () { /* surfaced inside goToPage */ } )
-                .then( function () {
+                .catch( () => { /* surfaced inside goToPage */ } )
+                .then( () => {
                     button.disabled = false;
                     button.classList.remove( 'fg-is-loading' );
                 } );

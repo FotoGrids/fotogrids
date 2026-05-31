@@ -34,7 +34,7 @@
      *
      * @type {WeakMap<Element, string>}
      */
-    var originalHtmlByAlbum = new WeakMap();
+    const originalHtmlByAlbum = new WeakMap();
 
     /**
      * Triggers that already have a click listener attached. WeakSet so we
@@ -53,7 +53,7 @@
      *
      * @type {WeakSet<Element>}
      */
-    var boundTriggers = new WeakSet();
+    const boundTriggers = new WeakSet();
 
     /**
      * Inject <link rel="stylesheet"> tags for any CSS handles the render
@@ -66,12 +66,12 @@
         if ( ! cssUrls || typeof cssUrls !== 'object' ) return;
 
         Object.keys( cssUrls ).forEach( function ( handle ) {
-            var url = cssUrls[ handle ];
+            let url = cssUrls[ handle ];
             if ( ! handle || ! url ) return;
-            var linkId = 'fotogrids-css-' + handle;
+            const linkId = 'fotogrids-css-' + handle;
             if ( document.getElementById( linkId ) ) return;
 
-            var link = document.createElement( 'link' );
+            const link = document.createElement( 'link' );
             link.rel  = 'stylesheet';
             link.id   = linkId;
             link.href = url;
@@ -100,17 +100,17 @@
         if ( ! jsData || typeof jsData !== 'object' ) return;
 
         Object.keys( jsData ).forEach( function ( handle ) {
-            var entry = jsData[ handle ];
-            var url   = entry && entry.src ? entry.src : '';
+            const entry = jsData[ handle ];
+            let url   = entry && entry.src ? entry.src : '';
             if ( ! handle || ! url ) return;
-            var scriptId = 'fotogrids-js-' + handle;
+            const scriptId = 'fotogrids-js-' + handle;
             if ( document.getElementById( scriptId ) ) return;
             // Also skip if WordPress already enqueued this handle the
             // normal way (id="<handle>-js"), to avoid loading the same
             // module twice.
             if ( document.getElementById( handle + '-js' ) ) return;
 
-            var script   = document.createElement( 'script' );
+            const script   = document.createElement( 'script' );
             script.id    = scriptId;
             script.src   = url;
             script.async = false; // preserve load order between siblings
@@ -141,11 +141,11 @@
         if ( event.button !== 0 ) return;
         if ( event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ) return;
 
-        var galleryId  = parseInt( trigger.dataset.fgGalleryId || '0', 10 );
-        var renderUrl  = trigger.dataset.fgRenderUrl || '';
-        var nonce      = trigger.dataset.fgRenderNonce || '';
-        var viaAlbumId = parseInt( trigger.dataset.fgViaAlbum || '0', 10 );
-        var albumEl    = albumWrapperFor( trigger );
+        const galleryId  = parseInt( trigger.dataset.fgGalleryId || '0', 10 );
+        const renderUrl  = trigger.dataset.fgRenderUrl || '';
+        const nonce      = trigger.dataset.fgRenderNonce || '';
+        const viaAlbumId = parseInt( trigger.dataset.fgViaAlbum || '0', 10 );
+        const albumEl    = albumWrapperFor( trigger );
 
         if ( ! galleryId || ! renderUrl || ! albumEl ) {
             // Missing context → let the link navigate normally.
@@ -159,7 +159,7 @@
         // Visit-context: forward the source album so the rendered gallery
         // can build a "back to this album" breadcrumb. Falls back to the
         // ?fg_via= already baked into the href on JS-off / fetch failure.
-        var requestBody = { gallery_id: galleryId };
+        const requestBody = { gallery_id: galleryId };
         if ( viaAlbumId > 0 ) {
             requestBody.via_album_id = viaAlbumId;
         }
@@ -217,7 +217,7 @@
             .catch( function () {
                 // Whatever went wrong, navigate to the gallery's view page
                 // — that's the URL the <a> would have used by default.
-                var href = trigger.getAttribute( 'href' );
+                let href = trigger.getAttribute( 'href' );
                 if ( href && href !== '#' ) {
                     window.location.href = href;
                 }
@@ -267,7 +267,7 @@
             return false;
         }
 
-        var original = originalHtmlByAlbum.get( albumEl );
+        const original = originalHtmlByAlbum.get( albumEl );
         originalHtmlByAlbum.delete( albumEl );
         delete albumEl.dataset.fgAjaxSwapped;
 

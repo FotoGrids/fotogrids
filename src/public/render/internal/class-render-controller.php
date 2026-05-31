@@ -183,12 +183,28 @@ final class Render_Controller {
             $css_variables      = Hooks::apply_filter( 'css_variables', $css_variables, $render );
             $active_modules     = Hooks::apply_filter( 'active_modules', $active_modules, $render );
 
+            // Layouts that support pagination get the track + pagination
+            // chrome wrapped in a single fg-layout-body container, so CSS
+            // can treat that pair as one block (filter sidebar layouts,
+            // grid spacing rules, future "below-the-grid" chrome). Layouts
+            // that opt out of paginates() (Single Item, Slider) skip the
+            // wrapper - there's no pagination to bundle and an extra div
+            // would just complicate their own internal layout.
+            if ( Layout_Capabilities::supports( $render, 'paginates' ) ) {
+                $layout_body_html = '<div class="fg-layout-body">'
+                    . $layout_inner_html
+                    . $feature_appendix_html
+                    . '</div>';
+            } else {
+                $layout_body_html = $layout_inner_html . $feature_appendix_html;
+            }
+
             $wrapper_html = $this->build_wrapper(
                 render:             $render,
                 layout_css_classes: $layout_css_classes,
                 wrapper_data_attrs: $wrapper_data_attrs,
                 css_variables:      $css_variables,
-                inner_html:         $feature_before_html . $layout_inner_html . $feature_appendix_html,
+                inner_html:         $feature_before_html . $layout_body_html,
             );
 
             $render_result = new Render_Result(

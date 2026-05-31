@@ -375,13 +375,12 @@ $settings-sidebar-width: 200px;
 
     &__range {
         flex: 1;
-        min-width: 120px;
     }
 
     &__input {
         flex-shrink: 0;
         display: inline-flex;
-        align-items: flex-end;
+        align-items: flex-start;
         gap: 4px;
     }
 

@@ -12,28 +12,28 @@
                     "label": "Grid",
                     "value": "grid",
                     "icon": "layout_grid",
-                    "description": "Evenly spaced grid layout",
+                    "description": "Evenly spaced items in straight rows and columns - the classic, predictable, clean look. ",
                     "tier_required": "free"
                 },
                 {
                     "label": "Masonry",
                     "value": "masonry",
                     "icon": "layout_masonry",
-                    "description": "Pinterest-style masonry layout",
+                    "description": "Pinterest-style columns that fit items snugly without cropping. Ideal for editorial layouts.",
                     "tier_required": "free"
                 },
                 {
                     "label": "Justified",
                     "value": "justified",
                     "icon": "layout_justified",
-                    "description": "Justified rows with equal heights",
+                    "description": "Equal-height rows that fill each line edge-to-edge. Great for big galleries of mixed proportions.",
                     "tier_required": "free"
                 },
                 {
                     "label": "Slider",
                     "value": "slider",
                     "icon": "layout_slider",
-                    "description": "Full-width item slider",
+                    "description": "Flexible, highly interactive slider with full control over items per view, timing, and navigation.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -43,7 +43,7 @@
                     "label": "Image Viewer",
                     "value": "image-viewer",
                     "icon": "layout_image_viewer",
-                    "description": "Large image viewer with navigation",
+                    "description": "Distraction-free single-image view with subtle controls - built to keep focus on the photo.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -53,7 +53,17 @@
                     "label": "Single Item",
                     "value": "single-item",
                     "icon": "layout_single_item",
-                    "description": "Display one item at a time",
+                    "description": "Shows one item at a time. Best paired with random sort for a rotating spotlight on each load.",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Featured Item",
+                    "value": "featured-item",
+                    "icon": "layout_featured_item",
+                    "description": "Big image with thumbnails - thumbnails change the image, the big image runs item actions.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -63,7 +73,7 @@
                     "label": "Video Playlist",
                     "value": "video",
                     "icon": "layout_video",
-                    "description": "Large video with thumbnail gallery",
+                    "description": "Embedded video player paired with a thumbnail playlist for video-led galleries.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -73,7 +83,7 @@
                     "label": "Carousel",
                     "value": "carousel",
                     "icon": "layout_carousel",
-                    "description": "Horizontal scrolling carousel",
+                    "description": "Horizontal strip of items the visitor can slide or swipe through - compact and touch-friendly.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -83,7 +93,7 @@
                     "label": "Product Gallery",
                     "value": "products",
                     "icon": "layout_product_gallery",
-                    "description": "E-commerce style product gallery with main image and thumbnails",
+                    "description": "Hero image plus thumbnail strip, built for shop and product pages - the perfect e-commerce companion.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -145,7 +155,9 @@
                     "condition": {
                         "dependsOn": "layout",
                         "values": [
-                            "single-item"
+                            "single-item",
+                            "image-viewer",
+                            "slider"
                         ]
                     },
                     "tier_required": "free"
@@ -199,7 +211,8 @@
                 "values": [
                     "grid",
                     "single-item",
-                    "image-viewer"
+                    "image-viewer",
+                    "slider"
                 ]
             },
             "tier_required": "free",
@@ -237,7 +250,8 @@
                         "values": [
                             "grid",
                             "single-item",
-                            "image-viewer"
+                            "image-viewer",
+                            "slider"
                         ]
                     },
                     {
@@ -433,39 +447,10 @@
                     "visible_when_uninstalled": true
                 },
                 {
-                    "key": "layout_masonry_column_balancing",
-                    "type": "button_group",
-                    "label": "Column Balancing",
-                    "description": "Balanced fills columns evenly. Sequential keeps items in their original order down each column.",
-                    "options": [
-                        {
-                            "label": "Balanced",
-                            "value": "balanced",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Sequential",
-                            "value": "sequential",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "default": "balanced",
-                    "condition": {
-                        "dependsOn": "layout",
-                        "values": [
-                            "masonry"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
                     "key": "layout_masonry_order",
                     "type": "button_group",
                     "label": "Item Order",
-                    "description": "Row-major reads left-to-right. Column-major reads top-to-bottom by column.",
+                    "description": "Row-major fills each row before moving down. Column-major arranges items top to bottom, column by column.",
                     "options": [
                         {
                             "label": "Row-major",
@@ -497,104 +482,38 @@
             "visible_when_uninstalled": true
         },
         {
-            "key": "layout_rows_group",
+            "key": "layout_slider_items_group",
             "type": "setting_group",
-            "label": "Rows",
+            "label": "Slider Items",
             "condition": {
                 "dependsOn": "layout",
                 "values": [
-                    "justified"
+                    "slider"
                 ]
             },
             "settings": [
                 {
-                    "key": "layout_justified_row_height",
+                    "key": "layout_items_per_view",
                     "type": "responsive_range",
-                    "label": "Target Row Height",
-                    "description": "Approximate height of each row. Actual row heights vary slightly so images can fill the row.",
-                    "unit": "px",
+                    "label": "Items Per View",
+                    "description": "How many items are visible in the slider at once for each device.",
                     "responsive": {
                         "desktop": {
-                            "min": 80,
-                            "max": 300,
-                            "default": 200
+                            "min": 1,
+                            "max": 5,
+                            "default": 3
                         },
                         "tablet": {
-                            "min": 60,
-                            "max": 300,
-                            "default": 160
+                            "min": 1,
+                            "max": 5,
+                            "default": 3
                         },
                         "mobile": {
-                            "min": 60,
-                            "max": 200,
-                            "default": 120
+                            "min": 1,
+                            "max": 5,
+                            "default": 1
                         }
                     },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "layout_justified_row_height_tolerance",
-                    "type": "range",
-                    "label": "Row Height Tolerance",
-                    "description": "How much actual row height can deviate from the target. Higher values give more freedom to fit images per row.",
-                    "min": 0,
-                    "max": 100,
-                    "default": 25,
-                    "unit": "%",
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "layout_justified_last_row",
-                    "type": "button_group",
-                    "label": "Last Row Behavior",
-                    "description": "How to handle the final row when it does not fill the full width.",
-                    "options": [
-                        {
-                            "label": "Keep Natural",
-                            "value": "nojustify",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Justify",
-                            "value": "justify",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Left",
-                            "value": "left",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Center",
-                            "value": "center",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Hide",
-                            "value": "hide",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "default": "nojustify",
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "layout_justified_max_rows",
-                    "type": "range",
-                    "label": "Max Rows",
-                    "description": "Limit the number of rows. 0 means unlimited.",
-                    "min": 0,
-                    "max": 50,
-                    "default": 0,
                     "tier_required": "free",
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",
@@ -607,11 +526,354 @@
             "visible_when_uninstalled": true
         },
         {
+            "key": "layout_height_group",
+            "type": "setting_group",
+            "label": "Height",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "slider",
+                    "image-viewer"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "layout_height_mode",
+                    "type": "button_group",
+                    "label": "Height Mode",
+                    "description": "Auto sizes the viewport from the Item Aspect Ratio and the number of items per view. Fixed uses an explicit pixel height.",
+                    "options": [
+                        {
+                            "label": "Auto",
+                            "value": "auto",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Fixed",
+                            "value": "fixed",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "auto",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "layout_height_fixed",
+                    "type": "responsive_range",
+                    "label": "Fixed Height",
+                    "description": "Viewport height for each device. Items keep their aspect ratio inside this height.",
+                    "responsive": {
+                        "desktop": { "min": 100, "max": 1200, "default": 500 },
+                        "tablet":  { "min": 100, "max": 1000, "default": 400 },
+                        "mobile":  { "min": 100, "max": 800,  "default": 300 }
+                    },
+                    "unit": "px",
+                    "condition": {
+                        "dependsOn": "layout_height_mode",
+                        "values": [ "fixed" ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "layout_height_max",
+                    "type": "responsive_range",
+                    "label": "Maximum Height",
+                    "description": "Limits how tall the viewport can grow. Use 0 for no limit. Only applies when Height Mode is Auto.",
+                    "responsive": {
+                        "desktop": { "min": 0, "max": 1500, "default": 0 },
+                        "tablet":  { "min": 0, "max": 1200, "default": 0 },
+                        "mobile":  { "min": 0, "max": 900,  "default": 0 }
+                    },
+                    "unit": "px",
+                    "condition": {
+                        "dependsOn": "layout_height_mode",
+                        "values": [ "auto" ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "layout_justified_subtabs",
+            "type": "setting_subtabs",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "justified"
+                ]
+            },
+            "subTabs": {
+                "rows": {
+                    "id": "rows",
+                    "label": "Rows",
+                    "icon": "rows",
+                    "settings": [
+                        {
+                            "key": "layout_justified_rows_group",
+                            "type": "setting_group",
+                            "label": "Rows",
+                            "chrome_when": "single_subtab",
+                            "settings": [
+                                {
+                                    "key": "layout_justified_row_height",
+                                    "type": "responsive_range",
+                                    "label": "Target Row Height",
+                                    "description": "Approximate height of each row. Actual row heights vary slightly so images can fill the row.",
+                                    "unit": "px",
+                                    "responsive": {
+                                        "desktop": {
+                                            "min": 80,
+                                            "max": 300,
+                                            "default": 200
+                                        },
+                                        "tablet": {
+                                            "min": 60,
+                                            "max": 300,
+                                            "default": 160
+                                        },
+                                        "mobile": {
+                                            "min": 60,
+                                            "max": 200,
+                                            "default": 120
+                                        }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_justified_row_height_tolerance",
+                                    "type": "range",
+                                    "label": "Row Height Tolerance",
+                                    "description": "How much actual row height can deviate from the target. Higher values give more freedom to fit images per row.",
+                                    "min": 0,
+                                    "max": 100,
+                                    "default": 25,
+                                    "unit": "%",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_justified_last_row",
+                                    "type": "button_group",
+                                    "label": "Last Row Behavior",
+                                    "description": "How to handle the {postType}'s final row when it does not fill the full width. With pagination on, this only applies to the very last page; trailing rows on intermediate pages are controlled by the Pagination tab.",
+                                    "options": [
+                                        {
+                                            "label": "Keep Natural",
+                                            "value": "nojustify",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Justify",
+                                            "value": "justify",
+                                            "icon": "align_justify",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Left",
+                                            "value": "left",
+                                            "icon": "align_left_full",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Center",
+                                            "value": "center",
+                                            "icon": "align_center_full",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Right",
+                                            "value": "right",
+                                            "icon": "align_right_full",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Hide",
+                                            "value": "hide",
+                                            "icon": "align_justify_hide",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "nojustify",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_justified_max_rows",
+                                    "type": "range",
+                                    "label": "Max Rows",
+                                    "description": "Limit the number of rows. 0 means unlimited.",
+                                    "min": 0,
+                                    "max": 50,
+                                    "default": 0,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "pagination": {
+                    "id": "pagination",
+                    "label": "Pagination",
+                    "icon": "layers",
+                    "condition": {
+                        "dependsOn": "pagination_type",
+                        "values": [
+                            "paginated"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "layout_justified_page_trailing_row_info",
+                            "type": "info_block",
+                            "subtitle": "About Page Trailing Row",
+                            "message": "When a page does not divide evenly into rows, the last row often shows just one or two items with a lot of empty space on the end.<br/>Choose how to handle the last row of each page when there are more pages after it. The {postType}'s actual final row still follows the Last Row Behavior setting on the Rows tab.",
+                            "icon": "bulb",
+                            "full_width": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_justified_page_trailing_row",
+                            "type": "button_group",
+                            "label": "Page Trailing Row",
+                            "description": "Pick how the trailing row of every intermediate page is handled.",
+                            "options": [
+                                {
+                                    "label": "Fill with Items",
+                                    "value": "fill",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Same as {postType}'s Last Row",
+                                    "value": "match",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "fill",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_justified_snap_window",
+                            "type": "range",
+                            "label": "Adjustment Window",
+                            "description": "How far the actual items-per-page count is allowed to drift from the configured value. 20% of a 20-item page means 16 to 24 items.",
+                            "min": 0,
+                            "max": 50,
+                            "default": 20,
+                            "unit": "%",
+                            "condition": {
+                                "dependsOn": "layout_justified_page_trailing_row",
+                                "values": [
+                                    "fill"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_justified_snap_fill_threshold",
+                            "type": "range",
+                            "label": "Clean Row Threshold",
+                            "description": "Treat the last row as clean when it fills at least this much of the container width. Above the threshold the page is left alone; below it, items are added or removed within the adjustment window.",
+                            "min": 0,
+                            "max": 100,
+                            "default": 85,
+                            "unit": "%",
+                            "condition": {
+                                "dependsOn": "layout_justified_page_trailing_row",
+                                "values": [
+                                    "fill"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_justified_snap_direction",
+                            "type": "button_group",
+                            "label": "Snap Direction",
+                            "description": "How to choose between adding more items or removing the last few. Auto removes items when the last row is less than half full and adds items when it is more than half full.",
+                            "options": [
+                                {
+                                    "label": "Auto",
+                                    "value": "auto",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Prefer Remove",
+                                    "value": "prefer_remove",
+                                    "icon": "minus_square",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Prefer Add",
+                                    "value": "prefer_add",
+                                    "icon": "plus_square",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "auto",
+                            "condition": {
+                                "dependsOn": "layout_justified_page_trailing_row",
+                                "values": [
+                                    "fill"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
             "key": "margin",
             "type": "responsive_range",
             "label": "Margin",
             "unit": "px",
-            "fourSided": true,
+            "four_sided": true,
             "responsive": {
                 "desktop": {
                     "min": 0,
@@ -639,7 +901,7 @@
             "type": "responsive_range",
             "label": "Padding",
             "unit": "px",
-            "fourSided": true,
+            "four_sided": true,
             "responsive": {
                 "desktop": {
                     "min": 0,

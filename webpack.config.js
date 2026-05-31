@@ -120,6 +120,9 @@ module.exports = {
         'sharing': './src/public/render/decorators/sharing/sharing.js',
         'password-gate': './src/public/render/gates/password/password-gate.js',
         'lazy-load': './src/public/render/features/lazy-load/lazy-load.js',
+        'layout-justified': './src/public/render/layouts/justified/justified.js',
+        'layout-masonry': './src/public/render/layouts/masonry/masonry.js',
+        'layout-slider': './src/public/render/layouts/slider/slider.js',
         'stats': './src/public/render/features/stats/stats.js',
         'album-to-gallery-ajax': './src/public/render/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
         'collection-header': './src/public/render/features/collection-header/collection-header.js',
@@ -393,6 +396,10 @@ module.exports = {
                             '**/decorators/sharing/sharing.js',
                             '**/gates/password/password-gate.js',
                             '**/features/lazy-load/lazy-load.js',
+                            '**/layouts/justified/justified.js',
+                            '**/layouts/masonry/masonry.js',
+                            '**/layouts/slider/slider.js',
+                            '**/layouts/_helpers/**',
                             '**/features/stats/stats.js',
                             '**/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
                             '**/features/collection-header/collection-header.js',
@@ -446,14 +453,16 @@ module.exports = {
             }),
         ],
         splitChunks: {
-            // Exclude metabox, per-tool, and per-module bundles from chunk
-            // splitting. These are loaded standalone by WordPress with no
-            // awareness of sibling chunk files; splitting them causes a silent
-            // runtime failure.
+            // Exclude metabox, per-tool, per-module, and per-layout bundles
+            // from chunk splitting. These are loaded standalone by WordPress
+            // with no awareness of sibling chunk files; splitting them causes
+            // a silent runtime failure (the dynamic import for the split-out
+            // chunk fails because WP never enqueued the chunk file).
             chunks: (chunk) =>
                 chunk.name !== 'metabox' &&
                 !chunk.name?.startsWith('tool-') &&
-                !chunk.name?.startsWith('module-'),
+                !chunk.name?.startsWith('module-') &&
+                !chunk.name?.startsWith('layout-'),
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
@@ -461,7 +470,8 @@ module.exports = {
                     chunks: (chunk) =>
                         chunk.name !== 'metabox' &&
                         !chunk.name?.startsWith('tool-') &&
-                        !chunk.name?.startsWith('module-'),
+                        !chunk.name?.startsWith('module-') &&
+                        !chunk.name?.startsWith('layout-'),
                 },
             },
         },

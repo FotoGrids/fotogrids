@@ -44,9 +44,10 @@ final class Album_Item_Loader {
      *
      * @since  1.0.0
      * @param  array<int, mixed> $gallery_ids Gallery post IDs.
+     * @param  string            $thumb_size  WP image size slug used for the album's gallery-cover thumbs.
      * @return array<int, Item_View>
      */
-    public static function load( array $gallery_ids ): array {
+    public static function load( array $gallery_ids, string $thumb_size = 'medium' ): array {
         $items = [];
 
         foreach ( $gallery_ids as $raw_id ) {
@@ -60,8 +61,8 @@ final class Album_Item_Loader {
                 continue;
             }
 
-            $thumb_url = self::resolve_thumbnail_url( $gallery_id );
-            if ( $thumb_url === '' ) {
+            $thumb = self::resolve_thumbnail( $gallery_id, $thumb_size );
+            if ( $thumb['url'] === '' ) {
                 // A gallery with no featured image and no items at all gets
                 // skipped — there is literally nothing to show for it.
                 continue;
@@ -69,19 +70,18 @@ final class Album_Item_Loader {
 
             $items[] = new Item_View(
                 id:          $gallery_id,
-                thumb_url:   $thumb_url,
-                full_url:    $thumb_url,
+                thumb_url:   $thumb['url'],
+                full_url:    $thumb['url'],
                 alt:         (string) $gallery_post->post_title,
                 title:       (string) $gallery_post->post_title,
                 caption:     (string) $gallery_post->post_excerpt,
                 description: (string) $gallery_post->post_content,
+                width:       $thumb['width'],
+                height:      $thumb['height'],
                 meta:        [
-                    // Decorators that want to write album-specific data
-                    // attributes (e.g. Album_To_View_Page writing the
-                    // view-page URL) read this meta map.
                     'item_count' => self::count_items( $gallery_id ),
                 ],
-                thumb_size:  'medium',
+                thumb_size:  $thumb_size,
             );
         }
 
@@ -89,35 +89,52 @@ final class Album_Item_Loader {
     }
 
     /**
-     * Resolve the gallery's thumbnail URL: featured image first, then
-     * fall back to the first attachment's medium URL.
+     * Resolve the gallery's thumbnail (featured image first, then the first
+     * attachment's image at the requested size) as an associative array with
+     * url + intrinsic dimensions.
      *
      * @since  1.0.0
-     * @param  int $gallery_id Gallery post ID.
-     * @return string Empty string if neither source resolves.
+     * @param  int    $gallery_id Gallery post ID.
+     * @param  string $thumb_size WP image size slug.
+     * @return array{url: string, width: int|null, height: int|null}
      */
-    private static function resolve_thumbnail_url( int $gallery_id ): string {
-        $featured = get_the_post_thumbnail_url( $gallery_id, 'medium' );
-        if ( is_string( $featured ) && $featured !== '' ) {
-            return $featured;
+    private static function resolve_thumbnail( int $gallery_id, string $thumb_size ): array {
+        $featured_id = (int) get_post_thumbnail_id( $gallery_id );
+        if ( $featured_id > 0 ) {
+            $src = wp_get_attachment_image_src( $featured_id, $thumb_size );
+            if ( is_array( $src ) && ! empty( $src[0] ) ) {
+                return [
+                    'url'    => (string) $src[0],
+                    'width'  => isset( $src[1] ) ? (int) $src[1] : null,
+                    'height' => isset( $src[2] ) ? (int) $src[2] : null,
+                ];
+            }
         }
 
         if ( ! function_exists( 'fotogrids_get_gallery_item_ids' ) ) {
-            return '';
+            return [ 'url' => '', 'width' => null, 'height' => null ];
         }
 
         $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
         if ( ! is_array( $item_ids ) || empty( $item_ids ) ) {
-            return '';
+            return [ 'url' => '', 'width' => null, 'height' => null ];
         }
 
         $first_id = (int) reset( $item_ids );
         if ( $first_id <= 0 ) {
-            return '';
+            return [ 'url' => '', 'width' => null, 'height' => null ];
         }
 
-        $url = wp_get_attachment_image_url( $first_id, 'medium' );
-        return is_string( $url ) ? $url : '';
+        $src = wp_get_attachment_image_src( $first_id, $thumb_size );
+        if ( ! is_array( $src ) || empty( $src[0] ) ) {
+            return [ 'url' => '', 'width' => null, 'height' => null ];
+        }
+
+        return [
+            'url'    => (string) $src[0],
+            'width'  => isset( $src[1] ) ? (int) $src[1] : null,
+            'height' => isset( $src[2] ) ? (int) $src[2] : null,
+        ];
     }
 
     /**
