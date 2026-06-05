@@ -29,13 +29,17 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
     const showSettingBadge = settingState !== 'editable';
     const ProBadge = window.FotoGridsTooltip && window.FotoGridsTooltip.ProBadge;
 
-    const buttonsContainerClass = 'fotogrids-button-group__buttons' + (buttonsClassName ? ' ' + buttonsClassName : '');
+    const baseClass = 'fg-button-group';
+    const buttonsContainerClass = [
+        `${baseClass}__buttons`,
+        buttonsClassName,
+    ].filter(Boolean).join(' ');
 
     const wrapperClassName = [
         'fotogrids-button-group',
-        setting.bigIcons ? 'fotogrids-button-group--big-icons' : '',
-        setting.sameWidth ? 'fotogrids-button-group--same-width' : '',
-        setting.extraBigIcons ? 'fotogrids-button-group--extra-big-icons' : ''
+        setting.bigIcons ? `${baseClass}--big-icons` : '',
+        setting.sameWidth ? `${baseClass}--same-width` : '',
+        setting.extraBigIcons ? `${baseClass}--extra-big-icons` : ''
     ].filter(Boolean).join(' ');
 
     return h('div', {
@@ -57,7 +61,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
             if (!option) {
                 return h('div', {
                     key: `empty-${index}`,
-                    className: 'fotogrids-button-group__button--empty'
+                    className: `${baseClass}__button--empty`
                 });
             }
             const optionState = typeof getOptionState === 'function'
@@ -65,8 +69,8 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
                 : 'editable';
             const isPro = optionState !== 'editable';
             const buttonClassName = [
-                'fotogrids-button-group__button',
-                isPro ? 'fotogrids-button-group__button__pro' : '',
+                `${baseClass}__button`,
+                isPro ? `${baseClass}__button__pro` : '',
                 currentValue === option.value ? 'fg-is-active' : ''
             ].filter(Boolean).join(' ');
 
@@ -79,17 +83,17 @@ window.FotoGridsRenderSettings.renderButtonGroup = (setting, currentValue, isDis
                 title: option.label || ''
             }, [
                 option.icon && h('span', {
-                    className: 'fotogrids-button-icon'
+                    className: 'fg-button-icon'
                 }, renderIcon(option.icon)),
                 option.label && h('span', {
-                    className: 'fotogrids-button-label'
+                    className: 'fg-button-label'
                 }, [
                     option.label,
                     option.unit && h('span', {
-                        className: 'fotogrids-button-unit'
+                        className: 'fg-button-unit'
                     }, ` (${option.value}${option.unit})`),
                     option.note && h('span', {
-                        className: 'fotogrids-button-note'
+                        className: 'fg-button-note'
                     }, ` (${option.note})`)
                 ].filter(Boolean)),
                 isPro && ProBadge && h(ProBadge, {

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Api;
 
+use FotoGrids\Hooks\Filters_Render;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -68,6 +70,15 @@ final class Font_Resolver {
     private bool $enqueue_hook_registered = false;
 
     /**
+     * Whether the combined Google Fonts stylesheet has already been emitted
+     * (either via wp_enqueue_style at wp_enqueue_scripts time or via the
+     * footer fallback). Prevents double-printing when both passes fire.
+     *
+     * @var bool
+     */
+    private bool $stylesheet_printed = false;
+
+    /**
      * Returns the request-scoped singleton instance.
      *
      * One instance per PHP request ensures Google Font names are collected
@@ -114,7 +125,7 @@ final class Font_Resolver {
 
         // Let Pro / 3rd parties intercept before default resolution.
         // A non-empty string returned by the filter short-circuits local logic.
-        $filtered = (string) apply_filters( 'fotogrids/render/font/resolve_family', '', $normalized, $render );
+        $filtered = (string) apply_filters( Filters_Render::FONT_RESOLVE_FAMILY, '', $normalized, $render );
         if ( $filtered !== '' ) {
             return $filtered;
         }
@@ -152,7 +163,7 @@ final class Font_Resolver {
         $normalized = $this->normalize_scalar( $raw );
 
         // Let Pro / 3rd parties intercept before default resolution.
-        $filtered = (string) apply_filters( 'fotogrids/render/font/resolve_weight', '', $normalized, $render );
+        $filtered = (string) apply_filters( Filters_Render::FONT_RESOLVE_WEIGHT, '', $normalized, $render );
         if ( $filtered !== '' ) {
             return $filtered;
         }
@@ -170,10 +181,24 @@ final class Font_Resolver {
     }
 
     /**
-     * Registers the wp_enqueue_scripts hook for Google Fonts loading.
+     * Registers the hooks that try to enqueue Google Fonts at three points
+     * across the request, in order of preference:
+     *
+     *   1. `wp_enqueue_scripts` priority 20. The cleanest option (stylesheet
+     *      goes into wp_head, no FOUT) but only catches fonts collected
+     *      from sources that resolve BEFORE `the_content` runs — primarily
+     *      View Page renders that go through a template hook before
+     *      wp_head, and admin previews.
+     *   2. `wp_footer` priority 1. Catches fonts collected during normal
+     *      shortcode/block rendering inside `the_content`, which fires
+     *      after wp_head and after the original enqueue window has closed.
+     *      Emits the stylesheet via `<link>` printed directly into the
+     *      footer because the wp_enqueue_styles pipeline is long past.
+     *   3. `wp_print_footer_scripts` as a last-chance backstop for late
+     *      registrations from pagination / AJAX-album flows.
      *
      * Called from boot.php once per request. Safe to call multiple times -
-     * the hook is only registered on the first call.
+     * the hooks are only registered on the first call.
      *
      * @since  1.0.0
      * @return void
@@ -185,24 +210,31 @@ final class Font_Resolver {
 
         $this->enqueue_hook_registered = true;
 
-        // Priority 20: runs after shortcodes / blocks have processed during
-        // the_content (priority 10–11), so all galleries on the page have
-        // had a chance to call resolve_font_family() and register their fonts.
+        // First pass — best case, lands in wp_head.
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_google_fonts' ], 20 );
+
+        // Footer pass — catches fonts collected during the_content
+        // rendering (the common case for shortcodes / blocks).
+        add_action( 'wp_footer', [ $this, 'print_google_fonts_footer' ], 1 );
+        add_action( 'wp_print_footer_scripts', [ $this, 'print_google_fonts_footer' ], 1 );
     }
 
     /**
      * Enqueues a single combined Google Fonts stylesheet for all collected fonts.
      *
      * Called automatically via the wp_enqueue_scripts hook registered in
-     * register_enqueue_hook(). Skips silently when no Google Fonts were used
-     * or when wp_head has already fired (e.g. AJAX / REST renders - the font
-     * will already be loaded from the initial page HTML).
+     * register_enqueue_hook(). Skips silently when no Google Fonts have been
+     * collected yet (the common case — the_content hasn't run at this point
+     * for shortcodes/blocks; see print_google_fonts_footer() for the second
+     * pass that handles that case).
      *
      * @since  1.0.0
      * @return void
      */
     public function enqueue_google_fonts(): void {
+        if ( $this->stylesheet_printed ) {
+            return;
+        }
         if ( empty( $this->google_fonts_seen ) ) {
             return;
         }
@@ -217,6 +249,40 @@ final class Font_Resolver {
             $url,
             [],
             null // No version - Google Fonts URLs are self-versioning.
+        );
+
+        $this->stylesheet_printed = true;
+    }
+
+    /**
+     * Footer fallback for fonts that were collected after wp_enqueue_scripts
+     * already fired. Prints a `<link rel="stylesheet">` directly because the
+     * enqueue pipeline is closed by the time wp_footer runs.
+     *
+     * Idempotent across both wp_footer and wp_print_footer_scripts (whichever
+     * fires first wins — the second call returns early).
+     *
+     * @since  1.0.0
+     * @return void
+     */
+    public function print_google_fonts_footer(): void {
+        if ( $this->stylesheet_printed ) {
+            return;
+        }
+        if ( empty( $this->google_fonts_seen ) ) {
+            return;
+        }
+
+        $url = $this->build_google_fonts_url( array_keys( $this->google_fonts_seen ) );
+        if ( $url === '' ) {
+            return;
+        }
+
+        $this->stylesheet_printed = true;
+
+        printf(
+            '<link rel="stylesheet" id="fotogrids-google-fonts-css" href="%s" media="all" />' . "\n",
+            esc_url( $url )
         );
     }
 

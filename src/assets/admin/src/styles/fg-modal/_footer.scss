@@ -1,0 +1,37 @@
+.fg-modal {
+    $modal: &;
+
+    &__footer {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 24px;
+        border-top: 1px solid var(--fg-border-primary);
+        justify-content: flex-end;
+    
+        &--compact {
+            padding: 16px;
+        }
+
+        &--no-divider {
+            border-top: none;
+        }
+    
+        &--align-left {
+            justify-content: flex-start;
+        }
+    
+        &--align-between {
+            justify-content: space-between;
+        }
+    }
+
+    &--compact {
+        #{$modal}__footer {
+            &, &--compact {
+                padding: 12px;
+            }
+        }
+    }
+}

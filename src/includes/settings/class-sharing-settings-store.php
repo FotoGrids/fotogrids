@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Settings;
 
+use FotoGrids\Hooks\Filters_Sharing;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -74,7 +76,7 @@ final class Sharing_Settings_Store {
          * @since 1.0.0
          * @param array<string,mixed> $defaults
          */
-        return apply_filters( 'fotogrids/sharing/defaults', $defaults );
+        return apply_filters( Filters_Sharing::DEFAULTS, $defaults );
     }
 
     /**
@@ -103,7 +105,7 @@ final class Sharing_Settings_Store {
          * @since 1.0.0
          * @param array<string,mixed> $settings
          */
-        return apply_filters( 'fotogrids/sharing/settings', $settings );
+        return apply_filters( Filters_Sharing::SETTINGS, $settings );
     }
 
     /**
@@ -166,7 +168,7 @@ final class Sharing_Settings_Store {
          * @param array<string,mixed> $sanitized
          * @param array<string,mixed> $input
          */
-        return apply_filters( 'fotogrids/sharing/sanitize', $sanitized, $input );
+        return apply_filters( Filters_Sharing::SANITIZE, $sanitized, $input );
     }
 
     /**
@@ -240,7 +242,7 @@ final class Sharing_Settings_Store {
          * @param array<string,mixed> $resolved
          * @param int                 $collection_id
          */
-        return apply_filters( 'fotogrids/sharing/resolved', $resolved, $collection_id );
+        return apply_filters( Filters_Sharing::RESOLVED, $resolved, $collection_id );
     }
 
     /**

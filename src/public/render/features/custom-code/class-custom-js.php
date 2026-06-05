@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Features\Custom_Code;
 
+use FotoGrids\Hooks\Filters_Features;
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
@@ -181,7 +183,7 @@ final class Custom_Js implements Feature {
          * @param string         $script_html  The full <script>…</script> block.
          * @param Render_Context $render_context Render context.
          */
-        $filtered = apply_filters( 'fotogrids/render/custom_js/output', $script_html, $render_context );
+        $filtered = apply_filters( Filters_Render::CUSTOM_JS_OUTPUT, $script_html, $render_context );
 
         return is_string( $filtered ) ? $filtered : '';
     }
@@ -232,7 +234,7 @@ final class Custom_Js implements Feature {
          * @param string         $raw            Original unsanitized value from settings.
          * @param Render_Context $render_context Render context.
          */
-        $filtered = apply_filters( 'fotogrids/render/custom_js/sanitize', $sanitized, $raw, $render_context );
+        $filtered = apply_filters( Filters_Render::CUSTOM_JS_SANITIZE, $sanitized, $raw, $render_context );
 
         return is_string( $filtered ) ? trim( $filtered ) : '';
     }
@@ -269,7 +271,7 @@ final class Custom_Js implements Feature {
          * @param Render_Context $render_context Render context.
          */
         $filtered = apply_filters(
-            'fotogrids/features/custom_js/allow_dynamic_execution',
+            Filters_Features::CUSTOM_JS_ALLOW_DYNAMIC,
             $setting_value,
             $render_context
         );

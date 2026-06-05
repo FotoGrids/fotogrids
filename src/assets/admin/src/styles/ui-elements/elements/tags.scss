@@ -2,14 +2,23 @@
 @use '../../../styles/sizes.scss' as *;
 
 .fotogrids-tag {
-	background: ui-color(background, tertiary);
-	border-radius: ui-size(border-radius, base);
-	padding: ui-size(padding, base);
-	padding-inline-start: ui-size(padding, md);
-	font-size: ui-size(font-size, base);
-	color: ui-color(text, primary);
-	display: flex;
-	gap: ui-size(padding, base);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--fg-background-secondary);
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    padding: 8px;
+	padding-inline-start: 12px;
+    font-size: 13px;
+    color: var(--fg-text-primary);
+    position: relative;
+
+    &__coordinates {
+        font-size: 11px;
+        color: #666;
+        font-weight: normal;
+    }
 
 	.fotogrids-tag-text {
 		font-weight: 500;

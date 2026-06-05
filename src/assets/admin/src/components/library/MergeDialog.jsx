@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, Button, TextControl, Spinner, Notice } from '@wordpress/components';
+import { Spinner, Notice } from '@wordpress/components';
+import { Modal } from '../shared/Modal';
+import { Button } from '../shared/Button';
+import { FormField } from '../shared/FormField';
 
 const { __, sprintf, _n } = wp.i18n;
 const apiFetch = wp.apiFetch;
@@ -62,90 +65,102 @@ const MergeDialog = ({ entityType, selectedIds, items, onCancel, onMerge, restBa
 
     return (
         <Modal
-            title={sprintf(__('Merge %s', 'fotogrids'), (entityType.label_plural || '').toLowerCase())}
-            onRequestClose={onCancel}
+            isOpen
+            onClose={onCancel}
+            size="md"
+            preventClose={busy}
         >
-            <p>
-                {sprintf(
-                    _n(
-                        'You selected %d source entry. Choose the entry to merge it into.',
-                        'You selected %d source entries. Choose the entry to merge them into.',
-                        sources.length,
-                        'fotogrids'
-                    ),
-                    sources.length
-                )}
-            </p>
+            <Modal.Header>
+                <Modal.HeaderTitle>
+                    {sprintf(__('Merge %s', 'fotogrids'), (entityType.label_plural || '').toLowerCase())}
+                </Modal.HeaderTitle>
+            </Modal.Header>
 
-            <ul className="fotogrids-library-merge-sources">
-                {sources.map((s) => (
-                    <li key={s.id}>
-                        <strong>{s.name}</strong>
-                        <span className="fotogrids-library-muted">
-                            {' '}
-                            ({sprintf(_n('%d item', '%d items', s.usage_count || 0, 'fotogrids'), s.usage_count || 0)})
-                        </span>
-                    </li>
-                ))}
-            </ul>
-
-            <TextControl
-                label={__('Search for target entry', 'fotogrids')}
-                value={search}
-                onChange={setSearch}
-                placeholder={__('Type to search…', 'fotogrids')}
-                __nextHasNoMarginBottom
-            />
-
-            {loading ? (
-                <Spinner />
-            ) : (
-                <ul className="fotogrids-library-merge-targets">
-                    {results.length === 0 && (
-                        <li className="fotogrids-library-muted">
-                            {__('No matching entries.', 'fotogrids')}
-                        </li>
+            <Modal.Body>
+                <p>
+                    {sprintf(
+                        _n(
+                            'You selected %d source entry. Choose the entry to merge it into.',
+                            'You selected %d source entries. Choose the entry to merge them into.',
+                            sources.length,
+                            'fotogrids'
+                        ),
+                        sources.length
                     )}
-                    {results.map((r) => (
-                        <li key={r.id}>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="fotogrids-merge-target"
-                                    value={r.id}
-                                    checked={targetId === r.id}
-                                    onChange={() => setTargetId(r.id)}
-                                />
-                                <span>{r.name}</span>
-                                <span className="fotogrids-library-muted">
-                                    {' '}({sprintf(_n('%d item', '%d items', r.usage_count || 0, 'fotogrids'), r.usage_count || 0)})
-                                </span>
-                            </label>
+                </p>
+
+                <ul className="fotogrids-library-merge-sources">
+                    {sources.map((s) => (
+                        <li key={s.id}>
+                            <strong>{s.name}</strong>
+                            <span className="fotogrids-library-muted">
+                                {' '}
+                                ({sprintf(_n('%d item', '%d items', s.usage_count || 0, 'fotogrids'), s.usage_count || 0)})
+                            </span>
                         </li>
                     ))}
                 </ul>
-            )}
 
-            {target && (
-                <Notice status="info" isDismissible={false}>
-                    {sprintf(
-                        __('All %1$d linked items will be re-pointed to "%2$s", and the source entries will be deleted.', 'fotogrids'),
-                        totalLinkedItems,
-                        target.name
-                    )}
-                </Notice>
-            )}
+                <FormField label={__('Search for target entry', 'fotogrids')} htmlFor="fg-merge-search" layout="column">
+                    <input
+                        id="fg-merge-search"
+                        type="search"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder={__('Type to search…', 'fotogrids')}
+                    />
+                </FormField>
 
-            {error && <Notice status="error" isDismissible={false}>{error}</Notice>}
+                {loading ? (
+                    <Spinner />
+                ) : (
+                    <ul className="fotogrids-library-merge-targets">
+                        {results.length === 0 && (
+                            <li className="fotogrids-library-muted">
+                                {__('No matching entries.', 'fotogrids')}
+                            </li>
+                        )}
+                        {results.map((r) => (
+                            <li key={r.id}>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="fotogrids-merge-target"
+                                        value={r.id}
+                                        checked={targetId === r.id}
+                                        onChange={() => setTargetId(r.id)}
+                                    />
+                                    <span>{r.name}</span>
+                                    <span className="fotogrids-library-muted">
+                                        {' '}({sprintf(_n('%d item', '%d items', r.usage_count || 0, 'fotogrids'), r.usage_count || 0)})
+                                    </span>
+                                </label>
+                            </li>
+                        ))}
+                    </ul>
+                )}
 
-            <div className="fotogrids-library-modal-actions">
-                <Button variant="primary" onClick={handleConfirm} disabled={!target || busy} isBusy={busy}>
-                    {__('Merge', 'fotogrids')}
-                </Button>
-                <Button variant="tertiary" onClick={onCancel} disabled={busy}>
+                {target && (
+                    <Notice status="info" isDismissible={false}>
+                        {sprintf(
+                            __('All %1$d linked items will be re-pointed to "%2$s", and the source entries will be deleted.', 'fotogrids'),
+                            totalLinkedItems,
+                            target.name
+                        )}
+                    </Notice>
+                )}
+
+                {error && <Notice status="error" isDismissible={false}>{error}</Notice>}
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onCancel} disabled={busy}>
                     {__('Cancel', 'fotogrids')}
                 </Button>
-            </div>
+                <Button variant="primary" onClick={handleConfirm} disabled={!target || busy} busy={busy}>
+                    {__('Merge', 'fotogrids')}
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 };

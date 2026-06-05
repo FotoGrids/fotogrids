@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Filters_View;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -84,7 +86,7 @@ class SEO_Conflict_Guard {
          * @param bool     $enabled Default true.
          * @param \WP_Post $post    The view-page collection post.
          */
-        $enabled = (bool) apply_filters( 'fotogrids/view/seo_conflict_guard/enabled', true, $post );
+        $enabled = (bool) apply_filters( Filters_View::SEO_CONFLICT_GUARD_ENABLED, true, $post );
         if ( ! $enabled ) {
             return;
         }

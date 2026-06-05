@@ -91,12 +91,12 @@ abstract class Metadata_Filter_Source implements Filter_Source {
         // shows tags found on page 1, hiding tags that live on later
         // pages and giving wrong item counts.
         //
-        // The unsliced IDs come from fotogrids_get_gallery_item_ids().
+        // The unsliced IDs come from Gallery_Repository::get_item_ids().
         // For album-as-collection renders we'd want a different lookup,
         // but supports() in this base bails on albums anyway.
         $gallery_id = (int) $render_context->meta->gallery_id;
-        $all_ids    = $gallery_id > 0 && function_exists( 'fotogrids_get_gallery_item_ids' )
-            ? fotogrids_get_gallery_item_ids( $gallery_id )
+        $all_ids    = $gallery_id > 0 && class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
+            ? \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id )
             : [];
 
         $item_ids = is_array( $all_ids )

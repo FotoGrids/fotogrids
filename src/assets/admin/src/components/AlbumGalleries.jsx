@@ -88,7 +88,7 @@ const AlbumGalleries = () => {
                             <Tooltip content={featuredTooltip} position="top">
                                 <button
                                     type="button"
-                                    className={`fotogrids-action-button fotogrids-featured-button${isFeatured ? ' is-featured' : ''}`}
+                                    className={`fg-action-button fotogrids-featured-button${isFeatured ? ' is-featured' : ''}`}
                                     onClick={() => handleSetFeaturedGallery(g.id)}
                                     disabled={saving}
                                     title={featuredTooltip}
@@ -102,7 +102,7 @@ const AlbumGalleries = () => {
                         <Tooltip content={config.strings.viewGallery} position="top">
                             <a
                                 href={g.permalink}
-                                className="fotogrids-action-button fotogrids-view-button"
+                                className="fg-action-button fg-action-button--view"
                                 title={config.strings.viewGallery}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -113,7 +113,7 @@ const AlbumGalleries = () => {
                         <Tooltip content={config.strings.editGallery} position="top">
                             <a
                                 href={`${window.location.origin}/wp-admin/post.php?post=${g.id}&action=edit`}
-                                className="fotogrids-action-button fotogrids-edit-button"
+                                className="fg-action-button fg-action-button--edit"
                                 title={config.strings.editGallery}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -377,7 +377,7 @@ const AlbumGalleries = () => {
                             renderGalleryItem(gallery, 'assigned',
                                     <button
                                         type="button"
-                                        className="fotogrids-action-button fotogrids-remove-button"
+                                        className="fg-action-button fg-action-button--remove"
                                         onClick={() => handleRemoveGallery(gallery.ID)}
                                         disabled={saving}
                                         title={config.strings.removeFromAlbum}
@@ -413,7 +413,7 @@ const AlbumGalleries = () => {
                             renderGalleryItem(gallery, 'available',
                                 <button
                                     type="button"
-                                    className="fotogrids-action-button fotogrids-add-button"
+                                    className="fg-action-button fg-action-button--add"
                                     onClick={() => handleAddGallery(gallery.id)}
                                     disabled={saving}
                                     title={config.strings.addToAlbum}

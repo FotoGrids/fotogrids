@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from '../../shared/Icon';
+import { Button } from '../../shared/Button';
 
 const TabSEO = ({ formData, handleInputChange, disabled = false, strings = {} }) => {
     const seoFeatures = [
@@ -59,13 +60,9 @@ const TabSEO = ({ formData, handleInputChange, disabled = false, strings = {} })
                 </div>
 
                 <div className="fotogrids-pro-content__actions">
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--primary"
-                        onClick={handleUpgrade}
-                    >
+                    <Button variant="primary" onClick={handleUpgrade}>
                         {strings.upgradeToPro}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

@@ -8,6 +8,7 @@ import {
     Segmented,
     SaveBar,
 } from '../../shared/settings';
+import { Button } from '../../shared/Button';
 import Select from '../../shared/Select';
 
 const { __ } = wp.i18n;
@@ -125,9 +126,9 @@ const MediaTab = () => {
                 title={__('Gallery thumbnails', 'fotogrids')}
                 description={__('The size used in the gallery grid. Changing these requires regenerating thumbnails for existing images.', 'fotogrids')}
                 action={
-                    <a href={regenUrl} className="fotogrids-button fotogrids-button--secondary fotogrids-button--small">
+                    <Button href={regenUrl} variant="secondary" size="xs">
                         {__('Regenerate', 'fotogrids')}
-                    </a>
+                    </Button>
                 }
             >
                 <PanelRow
@@ -224,9 +225,9 @@ const MediaTab = () => {
                 title={__('Layout-specific sizes', 'fotogrids')}
                 description={__('Used by layouts where only one dimension is fixed - Masonry uses the width, Justified uses the height. The other dimension stays proportional, so these are never cropped. Changing these requires regenerating thumbnails for existing images.', 'fotogrids')}
                 action={
-                    <a href={regenUrl} className="fotogrids-button fotogrids-button--secondary fotogrids-button--small">
+                    <Button href={regenUrl} variant="secondary" size="xs">
                         {__('Regenerate', 'fotogrids')}
-                    </a>
+                    </Button>
                 }
             >
                 <PanelRow
@@ -297,9 +298,9 @@ const MediaTab = () => {
                 onSave={handleSave}
                 onDiscard={handleDiscard}
                 extraAction={
-                    <a href={regenUrl} className="fotogrids-button fotogrids-button--secondary fotogrids-button--small">
+                    <Button href={regenUrl} variant="secondary" size="xs">
                         {__('Regenerate thumbnails', 'fotogrids')}
-                    </a>
+                    </Button>
                 }
             />
         </div>

@@ -87,6 +87,11 @@ class REST {
         require_once $base_path . 'maintenance/maintenance-data.php';
         require_once $base_path . 'maintenance/register-maintenance-routes.php';
 
+        // Permissions files (Plugin Settings > Permissions Manager tab)
+        require_once $base_path . 'permissions/permissions-permissions.php';
+        require_once $base_path . 'permissions/permissions-data.php';
+        require_once $base_path . 'permissions/register-permissions-routes.php';
+
         // Tools infrastructure files are loaded in fotogrids.php (required before REST::init).
         // Tools_Rest only registers the manifest route; individual tool routes are
         // registered by each tool's init() method via Tools_Registry::init_all().
@@ -111,6 +116,7 @@ class REST {
         \FotoGrids\REST\Lightbox\Register_Lightbox_Routes::register();
         \FotoGrids\REST\Admin\Register_Admin_Routes::register();
         \FotoGrids\REST\Maintenance\Register_Maintenance_Routes::register();
+        \FotoGrids\REST\Permissions\Register_Permissions_Routes::register();
         \FotoGrids\Tools\Tools_Rest::register_routes();
     }
 }

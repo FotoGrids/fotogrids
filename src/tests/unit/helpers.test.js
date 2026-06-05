@@ -50,7 +50,7 @@ describe('FotoGrids Helper Functions', () => {
         jest.clearAllMocks();
     });
 
-    describe('fotogrids_get_gallery', () => {
+    describe('Gallery_Repository::get', () => {
         test('should return gallery post when valid', () => {
             const mockGallery = {
                 ID: 123,

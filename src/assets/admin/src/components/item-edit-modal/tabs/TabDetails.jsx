@@ -3,8 +3,8 @@ import React from 'react';
 const TabDetails = ({ formData, handleInputChange, strings, disabled = false }) => {
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-form-fields">
-                <div className="fotogrids-form-field">
+            <div className="fg-form-fields">
+                <div className="fg-form-field">
                     <label htmlFor="fotogrids-item-title">
                         {strings.title || 'Title'}
                     </label>
@@ -16,7 +16,7 @@ const TabDetails = ({ formData, handleInputChange, strings, disabled = false }) 
                         disabled={disabled}
                     />
                 </div>
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fotogrids-item-alt">
                         {strings.altText || 'Alt Text'}
                     </label>
@@ -28,7 +28,7 @@ const TabDetails = ({ formData, handleInputChange, strings, disabled = false }) 
                         disabled={disabled}
                     />
                 </div>
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fotogrids-item-caption">
                         {strings.caption || 'Caption'}
                     </label>
@@ -40,7 +40,7 @@ const TabDetails = ({ formData, handleInputChange, strings, disabled = false }) 
                         disabled={disabled}
                     />
                 </div>
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fotogrids-item-description">
                         {strings.description || 'Description'}
                     </label>
@@ -52,7 +52,7 @@ const TabDetails = ({ formData, handleInputChange, strings, disabled = false }) 
                         disabled={disabled}
                     />
                 </div>
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fotogrids-item-credit">
                         {strings.credit || 'Credit'}
                     </label>

@@ -79,8 +79,8 @@ final class Endless_Scroll implements Feature {
         // the gallery instead of being a generic CSS circle.
         $icon_name = $render_context->settings['loading_icon'] ?? 'spinner';
         $icon_name = is_string( $icon_name ) && $icon_name !== '' ? $icon_name : 'spinner';
-        $svg       = function_exists( 'fotogrids_get_loading_icon_svg' )
-            ? fotogrids_get_loading_icon_svg( $icon_name, '' )
+        $svg       = class_exists( '\FotoGrids\Assets\Loading_Icon_Library' )
+            ? \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, '' )
             : '';
 
         return sprintf(
@@ -103,10 +103,11 @@ final class Endless_Scroll implements Feature {
     }
 
     public function style_vars( Render_Context $render_context ): array {
-        // No theming hooks for endless-scroll in v1. The spinner uses the
-        // gallery's existing --fg-color-primary if defined; otherwise
-        // falls back to currentColor in the CSS.
-        return [];
+        // Inherits `--fg-pagination-distance` (margin above the bar) from
+        // the shared trait. No endless-scroll-specific theming in v1 — the
+        // spinner uses the gallery's existing --fg-color-primary if
+        // defined; otherwise falls back to currentColor in the CSS.
+        return $this->common_style_vars( $render_context );
     }
 
     public function assets( Render_Context $render_context ): Module_Assets {

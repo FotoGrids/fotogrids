@@ -63,6 +63,13 @@
                     "tier_required": "free"
                 }
             ],
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "instant-photos"
+                ],
+                "condition_operator": "not_in"
+            },
             "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",

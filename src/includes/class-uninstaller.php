@@ -47,10 +47,6 @@ class Uninstaller {
         
         // Remove transients
         self::remove_transients();
-        
-        // Clear any scheduled events
-        wp_clear_scheduled_hook( 'fotogrids_daily_cleanup' );
-        wp_clear_scheduled_hook( 'fotogrids_stats_aggregation' );
     }
     
     /**
@@ -72,8 +68,13 @@ class Uninstaller {
         $tables = array(
             $wpdb->prefix . 'fotogrids_item_meta',
             $wpdb->prefix . 'fotogrids_statistics',
+            $wpdb->prefix . 'fotogrids_statistics_daily',
             $wpdb->prefix . 'fotogrids_licenses',
+            $wpdb->prefix . 'fotogrids_gallery_albums',
+            $wpdb->prefix . 'fotogrids_tags',
+            $wpdb->prefix . 'fotogrids_item_metadata',
             $wpdb->prefix . 'fotogrids_render_cache',
+            $wpdb->prefix . 'fotogrids_permission_grants',
         );
         
         foreach ( $tables as $table ) {
@@ -82,27 +83,36 @@ class Uninstaller {
     }
     
     /**
-     * Remove plugin capabilities from all roles
+     * Remove plugin capabilities from all roles.
+     *
+     * Reads the full list of FotoGrids-owned atomic caps from
+     * Permission_Registry so this stays in sync as new caps are added or
+     * Pro contributes its own.
      */
     private static function remove_capabilities() {
-        $capabilities = array(
-            'manage_fotogrids',
-            'edit_fotogrids',
-            'publish_fotogrids',
-            'delete_fotogrids',
-            'view_fotogrids_stats',
-            'manage_fotogrids_settings',
-        );
-        
-        // Get all roles
+        // Boot the registry. Uninstall runs in an isolated request - fire
+        // the registration actions explicitly so harvested caps (Tools,
+        // Modules, Pro filters) are included.
+        if ( class_exists( '\FotoGrids\Hooks\Actions_System' ) ) {
+            do_action( \FotoGrids\Hooks\Actions_System::MODULES_REGISTER );
+            do_action( \FotoGrids\Hooks\Actions_System::TOOLS_INIT );
+        }
+
+        if ( ! class_exists( '\FotoGrids\Permissions\Permission_Registry' ) ) {
+            return;
+        }
+
+        \FotoGrids\Permissions\Permission_Registry::boot();
+        $caps = \FotoGrids\Permissions\Permission_Registry::get_all_atomic_caps();
+
         $roles = wp_roles()->roles;
-        
         foreach ( $roles as $role_name => $role_info ) {
             $role = get_role( $role_name );
-            if ( $role ) {
-                foreach ( $capabilities as $cap ) {
-                    $role->remove_cap( $cap );
-                }
+            if ( ! $role ) {
+                continue;
+            }
+            foreach ( $caps as $cap ) {
+                $role->remove_cap( $cap );
             }
         }
     }

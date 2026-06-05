@@ -14,10 +14,6 @@ import LicensePage from './components/pages/LicensePage';
 import ToolsPage from './components/pages/ToolsPage';
 import LibraryPage from './components/pages/LibraryPage';
 
-import { registerFotoGridsBlocks } from './utils/registerBlocks';
-
-registerFotoGridsBlocks();
-
 /**
  * Mount a React component into a DOM container by ID, idempotently. No-ops
  * when the container is not on the current page.

@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Stats;
 
+use FotoGrids\Hooks\Actions_Gallery;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -68,7 +70,7 @@ class Stats_Data {
         }
 
         if ( $network ) {
-            do_action( 'fotogrids/actions/share/tracked', $object_type, $object_id, $network );
+            do_action( Actions_Gallery::SHARE_TRACKED, $object_type, $object_id, $network );
         }
 
         return rest_ensure_response( array( 'success' => true ) );

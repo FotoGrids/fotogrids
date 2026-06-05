@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Licensing;
 
+use FotoGrids\Hooks\Filters_Licensing;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -112,7 +114,7 @@ class Freemius_License_Provider implements License_Provider {
      */
     private function resolve_freemius_slugs_for_tier( string $tier ): array {
         $tier_to_freemius_plans = apply_filters(
-            'fotogrids/licensing/tier_to_freemius_plan',
+            Filters_Licensing::TIER_TO_FREEMIUS_PLAN,
             [
                 'pro_starter' => [ 'pro_starter_01' ],
                 'pro_plus'    => [ 'pro_plus_01' ],
@@ -393,7 +395,7 @@ class Freemius_License_Provider implements License_Provider {
          * @since 1.0.0
          * @param array<string,string> $map
          */
-        $this->feature_plan_map = (array) apply_filters( 'fotogrids/licensing/feature_plan_map', $defaults );
+        $this->feature_plan_map = (array) apply_filters( Filters_Licensing::FEATURE_PLAN_MAP, $defaults );
 
         return $this->feature_plan_map;
     }

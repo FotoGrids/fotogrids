@@ -1,6 +1,9 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Cron;
+use FotoGrids\Hooks\Filters_Settings;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -335,7 +338,7 @@ class Statistics {
                     return array(
                         'title' => $post->post_title,
                         'url' => get_permalink( $post->ID ),
-                        'thumbnail' => fotogrids_get_collection_cover_url( $post->ID, 'thumbnail' ),
+                        'thumbnail' => \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'thumbnail' ),
                     );
                 }
                 break;
@@ -346,7 +349,7 @@ class Statistics {
                     return array(
                         'title' => $post->post_title,
                         'url' => get_permalink( $post->ID ),
-                        'thumbnail' => fotogrids_get_collection_cover_url( $post->ID, 'thumbnail' ),
+                        'thumbnail' => \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'thumbnail' ),
                     );
                 }
                 break;
@@ -370,8 +373,8 @@ class Statistics {
      * Initialize scheduled cleanup
      */
     public static function init_cleanup_schedule() {
-        if ( ! wp_next_scheduled( 'fotogrids_stats_cleanup' ) ) {
-            wp_schedule_event( time(), 'weekly', 'fotogrids_stats_cleanup' );
+        if ( ! wp_next_scheduled( Actions_Cron::STATS_CLEANUP ) ) {
+            wp_schedule_event( time(), 'weekly', Actions_Cron::STATS_CLEANUP );
         }
     }
 
@@ -379,10 +382,10 @@ class Statistics {
      * Run scheduled cleanup
      */
     public static function run_scheduled_cleanup() {
-        $days_to_keep = apply_filters( 'fotogrids/settings/stats/retention_days', 365 );
+        $days_to_keep = apply_filters( Filters_Settings::STATS_RETENTION_DAYS, 365 );
         self::cleanup_old_data( $days_to_keep );
     }
 }
 
 add_action( 'init', array( 'FotoGrids\Statistics', 'init_cleanup_schedule' ) );
-add_action( 'fotogrids_stats_cleanup', array( 'FotoGrids\Statistics', 'run_scheduled_cleanup' ) );
+add_action( Actions_Cron::STATS_CLEANUP, array( 'FotoGrids\Statistics', 'run_scheduled_cleanup' ) );

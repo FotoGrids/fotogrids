@@ -47,7 +47,7 @@
     gap: 6px;
 }
 
-.fotogrids-button {
+.fg-button {
     &.fg-is-loading &__icon {
         animation: fg-spin 0.8s linear infinite;
     }

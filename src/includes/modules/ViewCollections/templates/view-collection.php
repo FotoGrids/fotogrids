@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Actions_View;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -36,7 +38,7 @@ $fg_view->track_view();
      * @since 1.0.0
      * @param \WP_Post $fg_post
      */
-    do_action( 'fotogrids/view/head', $fg_post );
+    do_action( Actions_View::HEAD, $fg_post );
 
     wp_head();
     ?>
@@ -49,7 +51,7 @@ $fg_view->track_view();
      * @since 1.0.0
      * @param \WP_Post $fg_post
      */
-    do_action( 'fotogrids/view/before_shell', $fg_post );
+    do_action( Actions_View::BEFORE_SHELL, $fg_post );
     ?>
 
     <?php if ( $fg_view->is_draft_preview() ) : ?>
@@ -69,7 +71,7 @@ $fg_view->track_view();
          * @since 1.0.0
          * @param \WP_Post $fg_post
          */
-        do_action( 'fotogrids/view/header', $fg_post );
+        do_action( Actions_View::HEADER, $fg_post );
         ?>
     </header>
     <?php endif; ?>
@@ -82,7 +84,7 @@ $fg_view->track_view();
          * @since 1.0.0
          * @param \WP_Post $fg_post
          */
-        do_action( 'fotogrids/view/before_gallery', $fg_post );
+        do_action( Actions_View::BEFORE_GALLERY, $fg_post );
 
         echo $fg_view->gallery_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
@@ -92,7 +94,7 @@ $fg_view->track_view();
          * @since 1.0.0
          * @param \WP_Post $fg_post
          */
-        do_action( 'fotogrids/view/after_gallery', $fg_post );
+        do_action( Actions_View::AFTER_GALLERY, $fg_post );
         ?>
     </main>
 
@@ -107,7 +109,7 @@ $fg_view->track_view();
          * @since 1.0.0
          * @param \WP_Post $fg_post
          */
-        do_action( 'fotogrids/view/footer', $fg_post );
+        do_action( Actions_View::FOOTER, $fg_post );
         ?>
     </footer>
 
@@ -118,7 +120,7 @@ $fg_view->track_view();
      * @since 1.0.0
      * @param \WP_Post $fg_post
      */
-    do_action( 'fotogrids/view/after_shell', $fg_post );
+    do_action( Actions_View::AFTER_SHELL, $fg_post );
 
     wp_footer();
     ?>

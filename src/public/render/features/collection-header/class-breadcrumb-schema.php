@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Features\Collection_Header;
 
+use FotoGrids\Hooks\Filters_Breadcrumb;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -68,7 +70,7 @@ final class Breadcrumb_Schema {
          * @param int   $album_id    Resolved parent album.
          * @param array $context     ['source' => 'fotogrids'|'auto'|'yoast'|'rank_math']
          */
-        $should_emit = apply_filters( 'fotogrids/breadcrumb/should_emit_schema', true, $gallery_id, $album_id, $context );
+        $should_emit = apply_filters( Filters_Breadcrumb::SHOULD_EMIT_SCHEMA, true, $gallery_id, $album_id, $context );
         if ( ! $should_emit ) {
             return '';
         }

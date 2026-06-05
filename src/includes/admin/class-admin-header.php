@@ -4,7 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use FotoGrids\Admin_Helpers;
 
 class FotoGrids_Admin_Header {
 
@@ -16,7 +15,7 @@ class FotoGrids_Admin_Header {
     }
 
     public function enqueue_assets( $hook ) {
-        if ( ! Admin_Helpers::is_fotogrids_page( $hook ) ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ) ) {
             return;
         }
 
@@ -46,7 +45,7 @@ class FotoGrids_Admin_Header {
     }
 
     public function render() {
-        if ( ! Admin_Helpers::is_fotogrids_page() ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
             return;
         }
 
@@ -150,7 +149,7 @@ class FotoGrids_Admin_Header {
      * Modify page structure using CSS and minimal JavaScript
      */
     public function modify_page_structure() {
-        if ( ! Admin_Helpers::is_fotogrids_page() ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
             return;
         }
 
@@ -222,6 +221,25 @@ class FotoGrids_Admin_Header {
                 ];
 
                 function isInsideUpgradeModal(element) {
+                    // Always skip the FotoGrids modal system. Modal portals
+                    // mount these directly under <body>, not inside the legacy
+                    // #fotogrids-upgrade-modal container, so the contains()
+                    // check below would otherwise remove them as "promotional".
+                    if (element.classList && (
+                        element.classList.contains('fg-modal') ||
+                        element.classList.contains('fg-confirm') ||
+                        element.classList.contains('fg-prompt') ||
+                        element.classList.contains('fg-alert')
+                    )) {
+                        return true;
+                    }
+                    if (element.closest && element.closest('.fg-modal, #fotogrids-modal-root')) {
+                        return true;
+                    }
+                    if (element.id === 'fotogrids-modal-root') {
+                        return true;
+                    }
+
                     const upgradeModalContainer = document.getElementById('fotogrids-upgrade-modal');
                     if (!upgradeModalContainer) {
                         return false;
@@ -326,7 +344,7 @@ class FotoGrids_Admin_Header {
 
                 const pageTitleAction = pageHeader.querySelector('.page-title-action');
                 if (pageTitleAction) {
-                    pageTitleAction.className = 'fotogrids-button fotogrids-button--primary fotogrids-button--smaller';
+                    pageTitleAction.className = 'fg-button fg-button--variant-primary fg-button--size-sm';
                 }
 
                 const remainingElements = Array.from(wrap.children).filter(function(child) {

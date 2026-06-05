@@ -5,8 +5,7 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-use FotoGrids\Admin_Helpers;
-
+use FotoGrids\Hooks\Actions_Cron;
 /**
  * Admin Footer Review Prompt Class
  *
@@ -24,7 +23,7 @@ class Review_Prompt {
 
         // Schedule statistics sending if enabled
         add_action( 'update_option_fotogrids_share_statistics', array( __CLASS__, 'handle_statistics_sharing_change' ), 10, 2 );
-        add_action( 'fotogrids_send_statistics', array( __CLASS__, 'send_statistics' ) );
+        add_action( Actions_Cron::SEND_STATISTICS, array( __CLASS__, 'send_statistics' ) );
     }
 
     /**
@@ -52,7 +51,7 @@ class Review_Prompt {
         }
 
         // Check if we're on a FotoGrids admin page
-        if ( ! Admin_Helpers::is_fotogrids_page() ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
             return false;
         }
 
@@ -291,7 +290,7 @@ class Review_Prompt {
             self::send_statistics();
         } else {
             // If disabled, clear scheduled sends
-            wp_clear_scheduled_hook( 'fotogrids_send_statistics' );
+            wp_clear_scheduled_hook( Actions_Cron::SEND_STATISTICS );
         }
     }
 

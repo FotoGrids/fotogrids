@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Render_Context;
 
@@ -127,7 +128,7 @@ final class Layout_Capabilities {
          * @param Layout              $layout
          */
         $filtered = apply_filters(
-            'fotogrids/render/layout/capabilities',
+            Filters_Render::LAYOUT_CAPABILITIES,
             $capabilities,
             $layout->id(),
             $render_context,

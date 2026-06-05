@@ -314,7 +314,7 @@ class Regenerate_Thumbnails_Data {
 		global $wpdb;
 
 		// One pull of every gallery's items list. The meta_value is a JSON
-		// array of attachment IDs written by fotogrids_add_item_to_gallery().
+		// array of attachment IDs written by Gallery_Items::add().
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$rows = $wpdb->get_col(
 			$wpdb->prepare(

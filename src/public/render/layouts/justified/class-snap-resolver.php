@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Layouts\Justified;
 
+use FotoGrids\Hooks\Filters_Render;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -70,7 +72,7 @@ final class Snap_Resolver {
          * @since 1.0.0
          * @param array{desktop:int,tablet:int,mobile:int} $defaults
          */
-        $resolved = apply_filters( 'fotogrids/render/justified/assumed_width', $defaults );
+        $resolved = apply_filters( Filters_Render::JUSTIFIED_ASSUMED_WIDTH, $defaults );
         if ( ! is_array( $resolved ) ) {
             $resolved = $defaults;
         }

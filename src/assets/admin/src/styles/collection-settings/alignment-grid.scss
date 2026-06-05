@@ -1,4 +1,4 @@
-.fotogrids-button-group__buttons.fotogrids-alignment-grid {
+.fg-button-group__buttons.fotogrids-alignment-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -7,7 +7,7 @@
     max-width: 100%;
     margin-top: 12px;
 
-    .fotogrids-button-group__button {
+    .fg-button-group__button {
         padding: 7px;
 
         svg {

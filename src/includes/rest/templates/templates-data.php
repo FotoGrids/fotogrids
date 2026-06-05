@@ -28,7 +28,7 @@ class Templates_Data {
         // Ensure we have a trailing slash
         $templates_dir = rtrim( FOTOGRIDS_PLUGIN_DIR, '/' ) . '/includes/rest/templates/templates/';
         $templates = array();
-        $is_pro = fotogrids_has_pro();
+        $is_pro = \FotoGrids\License_Manager::has_pro();
 
         // Scan gallery and album directories
         $categories = array( 'gallery', 'album' );
@@ -108,7 +108,7 @@ class Templates_Data {
      */
     public static function get_templates( $request ) {
         $category = $request->get_param( 'category' ); // 'gallery' or 'album'
-        $is_pro = fotogrids_has_pro();
+        $is_pro = \FotoGrids\License_Manager::has_pro();
 
         // Load pre-defined templates from JSON files
         $predefined_templates = self::load_predefined_templates( $category, true );
@@ -226,7 +226,7 @@ class Templates_Data {
      */
     public static function download_template( $request ) {
         $template_id = $request->get_param( 'id' );
-        $is_pro = fotogrids_has_pro();
+        $is_pro = \FotoGrids\License_Manager::has_pro();
 
         if ( ! $template_id ) {
             return new \WP_Error( 'missing_template_id', __( 'Template ID is required.', 'fotogrids' ), array( 'status' => 400 ) );
@@ -291,8 +291,19 @@ class Templates_Data {
         }
 
         // Check if Pro template requires Pro license
-        if ( isset( $template['type'] ) && $template['type'] !== 'free' && ! fotogrids_has_pro() ) {
+        if ( isset( $template['type'] ) && $template['type'] !== 'free' && ! \FotoGrids\License_Manager::has_pro() ) {
             return new \WP_Error( 'pro_required', __( 'Pro license required for this template.', 'fotogrids' ), array( 'status' => 403 ) );
+        }
+
+        // Applying a template is a bulk write of every setting on the target
+        // post - gated on the per-CPT settings cap.
+        $settings_cap = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $expected_post_type );
+        if ( $settings_cap !== null && ! \FotoGrids\Permissions\Permission_Check::can( $settings_cap, $post_id ) ) {
+            return new \WP_Error(
+                'fotogrids_forbidden_settings',
+                __( 'You do not have permission to change settings on this post.', 'fotogrids' ),
+                array( 'status' => 403 )
+            );
         }
 
         // Apply template settings to post
@@ -465,7 +476,7 @@ class Templates_Data {
         // For Pro templates, use preview_settings if available (limited settings for preview)
         // Otherwise use full settings
         $is_pro_template = isset( $template['type'] ) && $template['type'] === 'pro';
-        $has_pro_license = fotogrids_has_pro();
+        $has_pro_license = \FotoGrids\License_Manager::has_pro();
 
         // If Pro template and user doesn't have license, use preview_settings if available
         if ( $is_pro_template && ! $has_pro_license && isset( $template['preview_settings'] ) && is_array( $template['preview_settings'] ) ) {
@@ -477,7 +488,7 @@ class Templates_Data {
         }
 
         // Merge with defaults
-        $defaults = fotogrids_get_default_gallery_settings();
+        $defaults = \FotoGrids\Collection_Defaults::resolve_gallery();
         $final_settings = array_merge( $defaults, $settings );
 
         // Get layout from template settings or infer from template ID

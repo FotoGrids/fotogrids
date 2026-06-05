@@ -142,7 +142,7 @@ const AlbumAssignment = () => {
                         React.createElement('button', {
                             key: 'action',
                             type: 'button',
-                            className: 'fotogrids-action-button fotogrids-remove-button',
+                            className: 'fg-action-button fg-action-button--remove',
                             onClick: () => handleAlbumToggle(album.ID),
                             disabled: saving,
                             title: 'Remove from album'
@@ -208,7 +208,7 @@ const AlbumAssignment = () => {
                             React.createElement('button', {
                                 key: 'action',
                                 type: 'button',
-                                className: 'fotogrids-action-button fotogrids-add-button',
+                                className: 'fg-action-button fg-action-button--add',
                                 onClick: () => handleAlbumToggle(album.id),
                                 disabled: saving,
                                 title: 'Add to album'
@@ -227,7 +227,7 @@ const AlbumAssignment = () => {
         React.createElement('div', { className: 'fotogrids-create-album' },
             React.createElement('button', {
                 type: 'button',
-                className: 'fotogrids-button fotogrids-button--outline fotogrids-button--primary fotogrids-button--smaller',
+                className: 'fg-button fg-button--outline fg-button--variant-primary fg-button--size-sm',
                 onClick: handleCreateNewAlbum
             },
                 React.createElement('span', {

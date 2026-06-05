@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Api;
 
+use FotoGrids\Hooks\Filters_Render;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -74,6 +76,6 @@ final class Breakpoint_Config {
          * @since 1.0.0
          * @param Breakpoint_Config $config The resolved configuration.
          */
-        return apply_filters( 'fotogrids/render/breakpoint_config', $config );
+        return apply_filters( Filters_Render::BREAKPOINT_CONFIG, $config );
     }
 }

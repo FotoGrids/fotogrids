@@ -1,6 +1,9 @@
 <?php
 namespace FotoGrids\REST\Maintenance;
 
+use FotoGrids\Hooks\Actions_Maintenance;
+use FotoGrids\Hooks\Filters_Maintenance;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -92,7 +95,7 @@ class Maintenance_Data {
          * @since 1.0.0
          * @param array<int, string> $defaults Default preserved keys.
          */
-        $filtered = apply_filters( 'fotogrids/maintenance/reset_options/preserve_keys', $defaults );
+        $filtered = apply_filters( Filters_Maintenance::RESET_OPTIONS_PRESERVE_KEYS, $defaults );
 
         if ( ! is_array( $filtered ) ) {
             return $defaults;
@@ -139,7 +142,7 @@ class Maintenance_Data {
          * @param array<int, string> $resettable Keys that were cleared.
          * @param array<int, string> $preserved  Keys that were preserved.
          */
-        do_action( 'fotogrids/maintenance/options_reset', $resettable, $preserved );
+        do_action( Actions_Maintenance::OPTIONS_RESET, $resettable, $preserved );
 
         return rest_ensure_response( array(
             'success'    => true,
@@ -176,7 +179,7 @@ class Maintenance_Data {
          *
          * @since 1.0.0
          */
-        do_action( 'fotogrids/maintenance/tables_reinstalled' );
+        do_action( Actions_Maintenance::TABLES_REINSTALLED );
 
         global $wpdb;
         $tables = array(

@@ -90,6 +90,7 @@ const TabLocation = ({
                 maxItems={1}
                 showProNotice={!isProActive}
                 proNoticeContent={proNoticeContent}
+                itemClassName="fotogrids-metadata-item fotogrids-tag"
             />
 
             {/* ── Map preview (when a location with coordinates is set) ── */}
@@ -100,7 +101,7 @@ const TabLocation = ({
             {/* ── No-coords empty state for set location without coords ── */}
             {currentLocation && (currentLocation.latitude == null || currentLocation.longitude == null) && (
                 <div className="fotogrids-location-no-coords">
-                    <span className="fotogrids-location-no-coords__icon">🗺</span>
+                    <span className="fotogrids-location-no-coords__icon"></span>
                     <span>{__('No coordinates for this location.', 'fotogrids')}</span>
                     <a
                         href={`${window.fotogridsAdmin?.adminUrl || '#'}admin.php?page=fotogrids-library&tab=locations`}

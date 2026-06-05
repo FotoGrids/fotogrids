@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Licensing;
 
+use FotoGrids\Hooks\Actions_Licensing;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -87,7 +89,7 @@ class Freemius_Bootstrap {
          * @since 1.0.0
          * @param \Freemius $instance
          */
-        do_action( 'fotogrids/licensing/freemius_loaded', self::$instance );
+        do_action( Actions_Licensing::FREEMIUS_LOADED, self::$instance );
 
         return self::$instance;
     }

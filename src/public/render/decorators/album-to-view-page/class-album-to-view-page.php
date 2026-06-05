@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Decorators\Album_To_View_Page;
 
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Item_Wrapper;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Internal\Hooks;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -96,13 +98,17 @@ final class Album_To_View_Page implements Decorator {
                 $href = add_query_arg( 'fg_via', (int) $via_album_id, $href );
             }
 
+            $wrapper_attrs = [
+                'href'                 => esc_url( $href ),
+                'data-fg-album-target' => 'view-page',
+                'data-fg-gallery-id'   => (string) $gallery_id,
+            ];
+
+            $wrapper_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $wrapper_attrs, $render_context );
+
             $figure_wrapper = new Item_Wrapper(
                 tag:   'a',
-                attrs: [
-                    'href'                 => esc_url( $href ),
-                    'data-fg-album-target' => 'view-page',
-                    'data-fg-gallery-id'   => (string) $gallery_id,
-                ],
+                attrs: $wrapper_attrs,
             );
 
             $decorated[] = $item_view->with( [

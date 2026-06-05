@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import PreviewTemplateModal from '../templates/PreviewTemplateModal';
 import ApplyTemplateModal from '../templates/ApplyTemplateModal';
 import Icon from '../shared/Icon';
+import { Button } from '../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -137,29 +138,29 @@ const TemplatesPage = () => {
                     )}
 
                     <div className="fotogrids-template-card__actions">
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                        <Button
+                            variant="secondary"
+                            size="xs"
                             onClick={() => handlePreview(template)}
                         >
                             {__('Preview', 'fotogrids')}
-                        </button>
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--primary fotogrids-button--small"
+                        </Button>
+                        <Button
+                            variant="primary"
+                            size="xs"
                             onClick={() => handleApply(template)}
                             disabled={isProTemplate}
                         >
                             {__('Apply', 'fotogrids')}
-                        </button>
+                        </Button>
                         {template.type !== 'free' && (
-                            <button
-                                type="button"
-                                className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                            <Button
+                                variant="secondary"
+                                size="xs"
                                 onClick={() => handleDownload(template)}
                             >
                                 {__('Download', 'fotogrids')}
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>

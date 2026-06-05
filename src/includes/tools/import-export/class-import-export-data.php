@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\Tools\ImportExport;
 
+use FotoGrids\Hooks\Actions_Gallery;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -721,7 +723,7 @@ class Import_Export_Data {
 			}
 
 			if ( $post_type === 'fotogrids_gallery' ) {
-				do_action( 'fotogrids/actions/gallery/imported', $new_id, $old_id );
+				do_action( Actions_Gallery::IMPORTED, $new_id, $old_id );
 			}
 
 			$id_map[ $old_id ] = $new_id;

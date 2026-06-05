@@ -1,0 +1,885 @@
+@use '../colors.scss' as *;
+@use '../sizes.scss' as *;
+
+// Loading state for modal content during navigation
+// Metadata sections with autocomplete
+.fotogrids-tags-section,
+.fotogrids-people-section,
+.fotogrids-location-section {
+    .description {
+        margin: 8px 0 0 0;
+        color: #666;
+        font-style: italic;
+        font-size: 13px;
+    }
+}
+
+// Autocomplete wrapper
+.fotogrids-autocomplete-wrapper {
+    margin-bottom: 15px;
+
+    .fotogrids-autocomplete {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        max-width: 300px;
+        margin-right: 10px;
+        vertical-align: top;
+
+        input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--fg-border-primary);
+            border-radius: 4px;
+            font-size: 13px;
+
+            &:focus {
+                border-color: #007cba;
+                outline: none;
+                box-shadow: 0 0 0 1px #007cba;
+            }
+        }
+    }
+
+    .button {
+        vertical-align: top;
+        margin-left: 5px;
+    }
+}
+
+.fotogrids-metadata-input {
+    display: flex;
+    gap: 4px;
+
+    .fotogrids-input-with-icon {
+        flex: 1;
+        position: relative;
+
+        .fotogrids-input-icon {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 18px;
+        }
+
+        input[type='text'] {
+            width: 100%;
+            height: 40px;
+            padding-inline-start: 36px;
+
+            &:disabled {
+                background-color: #f6f7f7;
+                color: var(--fg-text-tertiary);
+                cursor: not-allowed;
+                opacity: 0.7;
+            }
+        }
+    }
+}
+
+.fotogrids-autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--fg-border-primary);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+
+    &:empty {
+        display: none;
+    }
+}
+
+// Autocomplete items
+.fotogrids-autocomplete-divider {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f6f7f7;
+    border-top: 1px solid var(--fg-border-primary);
+    border-bottom: 1px solid var(--fg-border-primary);
+    margin-top: 4px;
+}
+
+.fotogrids-autocomplete-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background-color: #f6f7f7;
+    }
+
+    &.fotogrids-autocomplete-new {
+        background-color: var(--fg-status-info-bg);
+        border-left: 3px solid #007cba;
+
+        &:hover {
+            background-color: #e6f2ff;
+        }
+
+        .fotogrids-autocomplete-text {
+            font-style: italic;
+        }
+    }
+
+    &.fotogrids-autocomplete-item--api {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px;
+
+        .fotogrids-autocomplete-item__name {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .fotogrids-autocomplete-item__type {
+            font-size: 11px;
+            color: #666;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-transform: capitalize;
+        }
+    }
+
+    &.fotogrids-autocomplete-item--loading {
+        cursor: default;
+        color: #666;
+        font-style: italic;
+        background-color: #f9f9f9;
+
+        &:hover {
+            background-color: #f9f9f9;
+        }
+    }
+}
+
+.fotogrids-metadata-list {
+    margin: 20px 0 0;
+    display: flex;
+    gap: 8px;
+}
+
+.fotogrids-pro-feature-notice {
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--fg-background-secondary);
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    &__content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    &__text {
+        font-size: 13px;
+        color: var(--fg-text-secondary);
+    }
+
+    .fg-button--link {
+        background: none;
+        border: 1px solid transparent;
+        color: var(--fg-text-link);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 4px 8px;
+        white-space: nowrap;
+
+        &:hover {
+            border-color: currentColor;
+        }
+    }
+}
+
+.fotogrids-autocomplete-text {
+    flex: 1;
+    font-size: 13px;
+    color: #333;
+}
+
+.fotogrids-autocomplete-usage {
+    font-size: 11px;
+    color: #666;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+// Location coordinates
+.fotogrids-location-coords {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+
+    input {
+        flex: 1;
+        padding: 6px 8px;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 4px;
+        font-size: 12px;
+
+        &:focus {
+            border-color: #007cba;
+            outline: none;
+            box-shadow: 0 0 0 1px #007cba;
+        }
+    }
+}
+
+// Metadata display lists
+.fotogrids-tags-list,
+.fotogrids-people-list {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.fotogrids-tag-item,
+.fotogrids-person-item {
+    display: inline-flex;
+    align-items: center;
+    background: var(--fg-status-info-bg);
+    border: 1px solid var(--fg-status-info-border);
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--fg-blue);
+
+    .fotogrids-tag-text,
+    .fotogrids-person-name {
+        margin-right: 6px;
+        font-weight: 500;
+    }
+
+    .fotogrids-person-details {
+        font-size: 11px;
+        color: #666;
+        margin-right: 6px;
+        font-style: italic;
+    }
+
+    .fotogrids-remove-tag,
+    .fotogrids-remove-person {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #d63638;
+        }
+    }
+}
+
+.fotogrids-person-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 6px 10px;
+    position: relative;
+
+    .fotogrids-remove-person {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+    }
+
+    .fotogrids-person-name {
+        margin: 0 16px 0 0;
+        font-weight: 600;
+    }
+
+    .fotogrids-person-details {
+        margin: 2px 16px 0 0;
+        font-size: 10px;
+    }
+}
+
+.fotogrids-tags-input,
+.fotogrids-people-input,
+.fotogrids-location-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    input[type="text"] {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid var(--fg-border-dark);
+        border-radius: 4px;
+        font-size: 14px;
+
+        &:focus {
+            border-color: #007cba;
+            outline: none;
+            box-shadow: 0 0 0 1px #007cba;
+        }
+    }
+
+    .button {
+        white-space: nowrap;
+    }
+}
+
+.fotogrids-location-input {
+    flex-direction: column;
+
+    input[type="text"] {
+        margin-bottom: 8px;
+    }
+}
+
+.fotogrids-people-input {
+    flex-wrap: wrap;
+
+    input[type="text"] {
+        min-width: 200px;
+    }
+}
+
+.fotogrids-tags-list,
+.fotogrids-people-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.fotogrids-tag-item {
+    display: inline-flex;
+    align-items: center;
+    background: var(--fg-status-info-bg);
+    border: 1px solid var(--fg-status-info-border);
+    border-radius: 16px;
+    padding: 4px 8px 4px 12px;
+    font-size: 13px;
+    color: var(--fg-blue);
+
+    .fotogrids-tag-text {
+        margin-right: 6px;
+    }
+
+    .fotogrids-tag-remove {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        padding: 0;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #000;
+        }
+    }
+}
+
+.fotogrids-person-item {
+    display: flex;
+    align-items: center;
+    background: #f6f7f7;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    width: 100%;
+
+    .fotogrids-person-info {
+        flex: 1;
+
+        .fotogrids-person-name {
+            display: block;
+            font-weight: 600;
+            color: var(--fg-text-primary);
+            margin-bottom: 2px;
+        }
+
+        .fotogrids-person-details {
+            display: block;
+            color: #666;
+            font-size: 13px;
+        }
+    }
+
+    .fotogrids-person-remove {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 4px;
+        margin-left: 8px;
+        border-radius: 4px;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #000;
+        }
+    }
+}
+
+// Interactions section styling
+.fotogrids-interactions-section {
+    h4 {
+        margin: 0 0 20px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .fotogrids-external-url-section {
+        .fotogrids-field-group {
+            margin-bottom: 20px;
+
+            label {
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 500;
+                color: #333;
+            }
+
+            input[type="url"],
+            select {
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid var(--fg-border-primary);
+                border-radius: 4px;
+                font-size: 13px;
+
+                &:focus {
+                    border-color: #007cba;
+                    outline: none;
+                    box-shadow: 0 0 0 1px #007cba;
+                }
+
+                &:disabled {
+                    background-color: #f6f7f7;
+                    color: var(--fg-text-tertiary);
+                    cursor: not-allowed;
+                    opacity: 0.7;
+                }
+            }
+
+            .description {
+                margin: 6px 0 0 0;
+                font-size: 12px;
+                color: #666;
+                font-style: italic;
+            }
+        }
+    }
+}
+
+.fotogrids-pro-content {
+    color: var(--fg-text-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    &__header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+
+        h4 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--fg-text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0;
+        }
+    }
+
+    &__description {
+        margin: 0;
+        font-size: 13px;
+        line-height: 17px;
+        color: var(--fg-text-secondary);
+        max-width: 440px;
+    }
+
+    &__actions {
+        text-align: center;
+    }
+}
+
+.fotogrids-feature-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.fotogrids-feature-item {
+    padding: 24px 16px 16px;
+    margin-bottom: 0;
+    border: 1px solid var(--fg-border-primary);
+    position: relative;
+    background: var(--fg-background-card);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--fg-text-primary);
+
+    &__icon {
+        font-size: 0;
+        line-height: 0;
+        position: absolute;
+        width: 24px;
+        top: -16px;
+        inset-inline-start: 12px;
+        border-radius: 50%;
+        border: 4px solid var(--fg-background-card);
+        box-shadow: 0 1px 0 0 var(--fg-border-primary);
+        background: var(--fg-background-card);
+        color: var(--fg-green);
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    &__title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--fg-text-primary);
+    }
+
+    &__description {
+        margin: 0;
+        font-size: 13px;
+        line-height: 17px;
+        color: var(--fg-text-secondary);
+    }
+}
+
+.fotogrids-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+.fotogrids-item-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fotogrids-file-info {
+    background: #f6f7f7;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    font-size: 12px;
+
+    &--error {
+        .fotogrids-file-info__error-message {
+            padding: 16px 12px;
+            color: #d32f2f;
+            font-weight: 500;
+            text-align: center;
+        }
+    }
+
+    &__item {
+        padding: 8px 12px;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--fg-border-primary);
+        }
+
+        &--animate {
+            animation: fade-in-slide 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+
+    &__label {
+        font-weight: 600;
+        color: #50575e;
+        margin-right: 8px;
+    }
+}
+
+@keyframes fade-in-slide {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .fotogrids-modal-content {
+        width: 95vw;
+        height: 90vh;
+    }
+
+    .fotogrids-modal-layout {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .fotogrids-modal__body__sidebar {
+        flex: none;
+
+        .fotogrids-item-preview img {
+            max-height: 200px;
+            width: auto;
+            margin: 0 auto;
+            display: block;
+        }
+    }
+
+    .fotogrids-modal-tabs {
+        flex-wrap: wrap;
+
+        .fotogrids-tab-button {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+    }
+
+    .fotogrids-people-input {
+        flex-direction: column;
+
+        input[type="text"] {
+            min-width: auto;
+        }
+    }
+}
+
+// ─── People tab: AI faces detected strip ─────────────────────────────────
+.fotogrids-faces-detected {
+    margin-bottom: 14px;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #1d2327;
+        margin-bottom: 8px;
+    }
+
+    &__icon { font-size: 16px; }
+
+    &__count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--fg-blue, #3c46f0);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    &__divider {
+        margin-top: 14px;
+        border-top: 1px solid #dcdcde;
+    }
+}
+
+.fotogrids-face-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 20px;
+    padding: 4px 10px 4px 5px;
+    font-size: 12px;
+
+    &__avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(60, 70, 240, 0.1);
+        color: var(--fg-blue, #3c46f0);
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__name {
+        color: #1d2327;
+        em { color: #50575e; font-style: italic; }
+    }
+
+    &__action {
+        font-family: inherit;
+        font-size: 10.5px;
+        font-weight: 600;
+        background: var(--fg-blue, #3c46f0);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 2px 9px;
+        cursor: pointer;
+        margin-left: 2px;
+        transition: background 0.15s;
+
+        &:hover:not(:disabled) { background: #2d35c7; }
+        &:disabled { opacity: 0.5; cursor: default; }
+
+        &--muted {
+            background: #8c8f94;
+            &:hover:not(:disabled) { background: #50575e; }
+        }
+    }
+}
+
+// ─── Location tab: smart suggestion banner ────────────────────────────────
+.fotogrids-location-suggestion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 13px;
+    background: #f0faf0;
+    border: 1px solid #a7dba7;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+
+    &__icon { font-size: 16px; flex-shrink: 0; }
+
+    &__body {
+        flex: 1;
+        color: #1d2327;
+
+        strong { display: block; font-size: 12px; margin-bottom: 2px; }
+        span { color: #50575e; }
+    }
+}
+
+// ─── Location tab: inline map SVG ─────────────────────────────────────────
+.fotogrids-location-map-wrap {
+    margin-top: 12px;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0f4f8;
+}
+
+.fotogrids-location-map-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 140px;
+}
+
+.fotogrids-location-map-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid #dcdcde;
+    font-size: 11px;
+
+    &__name {
+        font-weight: 600;
+        color: #1d2327;
+    }
+
+    &__coords {
+        font-family: monospace;
+        color: #50575e;
+    }
+}
+
+// ─── Location tab: no-coords empty state ──────────────────────────────────
+.fotogrids-location-no-coords {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 9px 12px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #50575e;
+
+    &__icon { font-size: 16px; opacity: 0.6; }
+
+    &__link {
+        margin-left: auto;
+        font-size: 11.5px;
+        color: var(--fg-blue, #3c46f0);
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover { text-decoration: underline; }
+    }
+}

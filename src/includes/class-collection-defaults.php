@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Filters_Settings;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -16,6 +18,42 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Collection_Defaults {
+
+    /**
+     * Resolve the full default settings for a gallery (base + gallery-specific + filter).
+     *
+     * Single entry point for gallery defaults. Callers should use this instead
+     * of composing `get_base_defaults()` + `get_gallery_defaults()` themselves.
+     *
+     * @since 1.0.0
+     * @param bool $is_defaults_page If true, use second item from array defaults
+     *                               (for settings with isGlobalDefault options).
+     * @return array Default gallery settings.
+     */
+    public static function resolve_gallery( $is_defaults_page = false ) {
+        $defaults = array_merge(
+            self::get_base_defaults( $is_defaults_page ),
+            self::get_gallery_defaults( $is_defaults_page )
+        );
+
+        return apply_filters( Filters_Settings::DEFAULTS_GALLERY, $defaults, $is_defaults_page );
+    }
+
+    /**
+     * Resolve the full default settings for an album (base + album-specific + filter).
+     *
+     * @since 1.0.0
+     * @param bool $is_defaults_page If true, use second item from array defaults.
+     * @return array Default album settings.
+     */
+    public static function resolve_album( $is_defaults_page = false ) {
+        $defaults = array_merge(
+            self::get_base_defaults( $is_defaults_page ),
+            self::get_album_defaults( $is_defaults_page )
+        );
+
+        return apply_filters( Filters_Settings::DEFAULTS_ALBUM, $defaults, $is_defaults_page );
+    }
 
     /**
      * Get base defaults (shared by both galleries and albums)
@@ -57,6 +95,22 @@ class Collection_Defaults {
             'layout_item_object_fit' => 'cover',
             // Masonry-only.
             'layout_masonry_order' => 'row',
+            // Instant Photos-only.
+            'instant_photo_max_rotation' => array(
+                'desktop' => 15,
+                'tablet'  => 12,
+                'mobile'  => 8,
+            ),
+            'instant_photo_hover_action' => 'straighten',
+            'instant_photo_elevation' => true,
+            'instant_photo_sticker' => false,
+            'instant_photo_sticker_color' => 'rgba(225, 210, 175, 0.85)',
+            'instant_photo_sticker_hide_on_hover' => false,
+            'instant_photo_frame_thickness' => array(
+                'desktop' => 16,
+                'tablet'  => 14,
+                'mobile'  => 12,
+            ),
             // Justified-only.
             'layout_justified_row_height' => array(
                 'desktop' => 220,
@@ -144,7 +198,7 @@ class Collection_Defaults {
             'interactions_zoom_mode' => 'hover',
             'interactions_zoom_style' => 'inline',
             'interactions_zoom_hover_delay' => 300,
-            'interactions_zoom_popover_bg' => 'rgba(0,0,0,0.2)',
+            'interactions_zoom_popover_bg' => 'rgba(0, 0, 0, 0.2)',
             'interactions_zoom_popover_bg_blur' => 8,
             'interactions_zoom_popover_padding' => 24,
             'interactions_zoom_popover_close_button' => true,
@@ -493,6 +547,28 @@ class Collection_Defaults {
             'load_more_button_text' => 'Load More',
             'load_more_button_alignment' => 'center',
             'load_more_button_full_width' => false,
+            'pagination_button_font_family' => '',
+            'pagination_button_font_weight' => '',
+            'pagination_button_font_size' => array(
+                'desktop' => 14,
+                'tablet'  => 14,
+                'mobile'  => 13,
+            ),
+            'pagination_button_bg' => 'rgba(255, 255, 255, 0)',
+            'pagination_button_color' => 'rgba(0, 0, 0, 1)',
+            'pagination_button_border_width' => 1,
+            'pagination_button_border_color' => 'rgba(0, 0, 0, 1)',
+            'pagination_button_hover_bg' => 'rgba(60, 70, 240, 0.05)',
+            'pagination_button_hover_color' => 'rgba(0, 0, 0, 1)',
+            'pagination_button_hover_border_color' => 'rgba(60, 70, 240, 1)',
+            'pagination_button_active_bg' => 'rgba(60, 70, 240, 1)',
+            'pagination_button_active_color' => 'rgba(255, 255, 255, 1)',
+            'pagination_button_active_border_color' => 'rgba(60, 70, 240, 1)',
+            'pagination_distance_from_items' => array(
+                'desktop' => 16,
+                'tablet'  => 16,
+                'mobile'  => 16,
+            ),
             'pagination_alignment' => 'stretch',
             'pages_show_prev_next' => true,
             'pages_prev_text' => 'Previous',
@@ -728,7 +804,7 @@ class Collection_Defaults {
         $defaults = self::process_defaults_array( $defaults, $is_defaults_page );
 
         // Apply filter
-        return apply_filters( 'fotogrids/settings/defaults/base', $defaults, $is_defaults_page );
+        return apply_filters( Filters_Settings::DEFAULTS_BASE, $defaults, $is_defaults_page );
     }
 
     /**
@@ -741,7 +817,7 @@ class Collection_Defaults {
         // Gallery-specific defaults can be added here as needed
         $defaults = array();
 
-        return apply_filters( 'fotogrids/settings/defaults/gallery', $defaults, $is_defaults_page );
+        return apply_filters( Filters_Settings::DEFAULTS_GALLERY, $defaults, $is_defaults_page );
     }
 
     /**
@@ -754,7 +830,7 @@ class Collection_Defaults {
         // Album-specific defaults can be added here as needed
         $defaults = array();
 
-        return apply_filters( 'fotogrids/settings/defaults/album', $defaults, $is_defaults_page );
+        return apply_filters( Filters_Settings::DEFAULTS_ALBUM, $defaults, $is_defaults_page );
     }
 
     /**

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Features\Loading_Icon;
 
+use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
@@ -325,8 +326,8 @@ final class Loading_Icon implements Feature {
         $first   = null;
 
         foreach ( array_keys( $icon_names_seen ) as $icon_name ) {
-            $svg        = fotogrids_get_loading_icon_svg( $icon_name, '' );
-            $animate_fn = fotogrids_get_loading_icon_animate_fn( $icon_name );
+            $svg        = \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, '' );
+            $animate_fn = \FotoGrids\Assets\Loading_Icon_Library::animate_fn( $icon_name );
             if ( $animate_fn === '' ) {
                 $animate_fn = 'function animate(){return [];}';
             }
@@ -349,8 +350,8 @@ final class Loading_Icon implements Feature {
         // lightbox.js and other callers that use the single-icon API.
         $default_js = '';
         if ( $first !== null ) {
-            $svg        = fotogrids_get_loading_icon_svg( $first, '' );
-            $animate_fn = fotogrids_get_loading_icon_animate_fn( $first );
+            $svg        = \FotoGrids\Assets\Loading_Icon_Library::svg( $first, '' );
+            $animate_fn = \FotoGrids\Assets\Loading_Icon_Library::animate_fn( $first );
             if ( $animate_fn === '' ) {
                 $animate_fn = 'function animate(){return [];}';
             }
@@ -477,7 +478,7 @@ final class Loading_Icon implements Feature {
         };
 
         add_action( 'wp_footer', $publish_inline, 10 );
-        add_action( 'fotogrids/render/late_assets', $publish_inline, 10 );
+        add_action( Actions_Render::LATE_ASSETS, $publish_inline, 10 );
     }
 
     /**

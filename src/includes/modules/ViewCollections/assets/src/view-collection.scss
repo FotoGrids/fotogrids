@@ -108,3 +108,53 @@ html.fotogrids-view,
         font-size: 22px;
     }
 }
+
+/* -----------------------------------------------------------------------
+ * Integrated mode
+ *
+ * The active theme owns the document, so these styles must NOT touch the
+ * page frame, body, container, typography, or colours. They only style the
+ * elements FotoGrids injects into `the_content`: the optional draft notice,
+ * the optional title block, and the share-footer container.
+ *
+ * Anything that needs theme-aware spacing (margin between gallery and theme
+ * content) is intentionally `inherit`/`unset` so the theme's content rhythm
+ * stays in charge.
+ * --------------------------------------------------------------------- */
+
+.fotogrids-view--integrated {
+    .fotogrids-view__notice--integrated {
+        margin: 0 0 16px;
+        padding: 10px 16px;
+        font-size: 14px;
+        text-align: center;
+        color: #663c00;
+        background: #fcf0d8;
+        border-radius: 4px;
+    }
+
+    .fotogrids-view__title-block--integrated {
+        margin: 0 0 16px;
+
+        .fotogrids-view__title {
+            margin: 0 0 4px;
+            font-size: inherit;
+            font-weight: 600;
+        }
+
+        .fotogrids-view__meta {
+            font-size: 0.875em;
+            opacity: 0.7;
+        }
+    }
+
+    /*
+     * Footer share bar inside the_content. The standalone shell put share
+     * inside a <footer> with a border-top; integrated mode just needs a
+     * little breathing room above the share row so it doesn't crowd the
+     * gallery, but no border, no full-width frame, no fixed colours.
+     */
+    .fotogrids-view__share {
+        margin-top: 24px;
+    }
+}

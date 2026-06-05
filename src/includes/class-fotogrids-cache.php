@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Cache;
+use FotoGrids\Hooks\Actions_Gallery;
+use FotoGrids\Hooks\Actions_Item;
+use FotoGrids\Hooks\Filters_Cache;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -33,13 +38,13 @@ class FotoGrids_Cache {
 	 * @return void
 	 */
 	public static function init(): void {
-		add_action( 'fotogrids/actions/item/added',              [ __CLASS__, 'on_item_mutation' ],   10, 2 );
-		add_action( 'fotogrids/actions/item/removed',            [ __CLASS__, 'on_item_mutation' ],   10, 2 );
-		add_action( 'fotogrids/actions/item/meta/updated',       [ __CLASS__, 'on_item_mutation' ],   10, 2 );
-		add_action( 'fotogrids/actions/gallery/reordered',       [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
-		add_action( 'fotogrids/actions/gallery/settings/saved',  [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
-		add_action( 'fotogrids/actions/gallery/deleted',         [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
-		add_action( 'fotogrids/actions/gallery/imported',        [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
+		add_action( Actions_Item::ADDED,              [ __CLASS__, 'on_item_mutation' ],    10, 2 );
+		add_action( Actions_Item::REMOVED,            [ __CLASS__, 'on_item_mutation' ],    10, 2 );
+		add_action( Actions_Item::META_UPDATED,       [ __CLASS__, 'on_item_mutation' ],    10, 2 );
+		add_action( Actions_Gallery::REORDERED,       [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
+		add_action( Actions_Gallery::SETTINGS_SAVED,  [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
+		add_action( Actions_Gallery::DELETED,         [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
+		add_action( Actions_Gallery::IMPORTED,        [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
 	}
 
 	// -------------------------------------------------------------------------
@@ -193,7 +198,7 @@ class FotoGrids_Cache {
 			wp_cache_delete( (string) $key, self::OBJECT_CACHE_GROUP );
 		}
 
-		do_action( 'fotogrids/cache/flushed_for_gallery', $gallery_id );
+		do_action( Actions_Cache::FLUSHED_FOR_GALLERY, $gallery_id );
 	}
 
 	/**
@@ -210,7 +215,7 @@ class FotoGrids_Cache {
 
 		wp_cache_flush_group( self::OBJECT_CACHE_GROUP );
 
-		do_action( 'fotogrids/cache/flushed_all' );
+		do_action( Actions_Cache::FLUSHED_ALL );
 	}
 
 	/**
@@ -271,7 +276,7 @@ class FotoGrids_Cache {
 		$deleted = is_int( $result ) ? $result : 0;
 
 		if ( $deleted > 0 ) {
-			do_action( 'fotogrids/cache/purged_expired', $deleted );
+			do_action( Actions_Cache::PURGED_EXPIRED, $deleted );
 		}
 
 		return $deleted;
@@ -314,7 +319,7 @@ class FotoGrids_Cache {
 			return false;
 		}
 
-		return (bool) apply_filters( 'fotogrids/cache/should_cache', true, $settings, $gallery_id );
+		return (bool) apply_filters( Filters_Cache::SHOULD_CACHE, true, $settings, $gallery_id );
 	}
 
 	/**
@@ -337,7 +342,7 @@ class FotoGrids_Cache {
 		$cache_settings = $settings;
 		unset( $cache_settings['enable_cache'], $cache_settings['cache_duration'] );
 
-		$bucket = (string) apply_filters( 'fotogrids/cache/bucket', 'default', $settings, $gallery_id );
+		$bucket = (string) apply_filters( Filters_Cache::BUCKET, 'default', $settings, $gallery_id );
 
 		$payload = implode( '|', [
 			$gallery_id,

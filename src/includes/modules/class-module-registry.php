@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Modules;
 
+use FotoGrids\Hooks\Actions_System;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -126,7 +128,7 @@ final class Module_Registry {
          *
          * @since 1.0.0
          */
-        do_action( 'fotogrids/modules/register' );
+        do_action( Actions_System::MODULES_REGISTER );
 
         foreach ( self::resolve_init_order() as $entry ) {
             $module = $entry['module'];

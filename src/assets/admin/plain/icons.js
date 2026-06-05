@@ -217,12 +217,22 @@ const FotoGridsIcons = {
     </svg>`,
 
     layout_carousel: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8,8h8v27H8c-1.1,0-2-.9-2-2V10c0-1.1.9-2,2-2Z" fill="currentColor" opacity="0.3"/>
-        <rect x="16" y="4" width="32" height="35" rx="2" ry="2" fill="currentColor" opacity="0.8"/>
-        <path d="M48,8h8c1.1,0,2,.9,2,2v23c0,1.1-.9,2-2,2h-8V8h0Z" fill="currentColor" opacity="0.3"/>
+        <path d="M8,8h8v27H8c-1.1,0-2-.9-2-2V10c0-1.1.9-2,2-2Z" fill="currentColor" opacity="0.5"/>
+        <rect x="16" y="4" width="32" height="35" rx="2" ry="2" fill="currentColor"/>
+        <path d="M48,8h8c1.1,0,2,.9,2,2v23c0,1.1-.9,2-2,2h-8V8h0Z" fill="currentColor" opacity="0.5"/>
         <circle cx="25" cy="43" r="2" fill="currentColor" opacity="0.5"/>
-        <circle cx="32" cy="43" r="2" fill="currentColor" opacity="0.8"/>
+        <circle cx="32" cy="43" r="2" fill="currentColor"/>
         <circle cx="39" cy="43" r="2" fill="currentColor" opacity="0.5"/>
+    </svg>`,
+
+    layout_mixed_tiles: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="26" height="25" rx="2" fill="currentColor"></rect>
+        <rect x="33" y="4" width="12" height="15" rx="2" fill="currentColor"></rect>
+        <rect x="48" y="4" width="12" height="25" rx="2" fill="currentColor"></rect>
+        <rect x="33" y="22" width="12" height="7" rx="2" fill="currentColor"></rect>
+        <rect x="4" y="32" width="12" height="12" rx="2" fill="currentColor"></rect>
+        <rect x="19" y="32" width="26" height="12" rx="2" fill="currentColor"></rect>
+        <rect x="48" y="32" width="12" height="12" rx="2" fill="currentColor"></rect>
     </svg>`,
 
     layout_slider: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -237,14 +247,14 @@ const FotoGridsIcons = {
     </svg>`,
 
     layout_video: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="6" width="40" height="30" rx="2" ry="2" fill="currentColor" opacity="0.8"/>
-        <polygon points="19.5 16 28.5 21 19.5 26 19.5 16" fill="white" opacity="0.9"/>
-        <rect x="46.5" y="6" width="14.5" height="8" rx="1" ry="1" fill="currentColor" opacity="0.6"/>
-        <rect x="46.5" y="17" width="14.5" height="8" rx="1" ry="1" fill="currentColor" opacity="0.6"/>
-        <rect x="46.5" y="28" width="14.5" height="8" rx="1" ry="1" fill="currentColor" opacity="0.6"/>
-        <circle cx="23" cy="41" r="2" fill="currentColor" opacity="0.4"/>
-        <rect x="27" y="39" width="8" height="4" rx="1" ry="1" fill="currentColor" opacity="0.4"/>
-        <rect x="37" y="39" width="6" height="4" rx="1" ry="1" fill="currentColor" opacity="0.4"/>
+        <rect x="2" y="6" width="43" height="30" rx="2" ry="2" fill="currentColor"></rect>
+        <polygon points="20.5 16 29.5 21 20.5 26 20.5 16" fill="white" opacity="0.9"></polygon>
+        <rect x="48.5" y="6" width="14.5" height="7" rx="1" ry="1" fill="currentColor"></rect>
+        <rect x="48.5" y="16" width="14.5" height="7" rx="1" ry="1" fill="currentColor"></rect>
+        <rect x="48.5" y="26" width="14.5" height="7" rx="1" ry="1" fill="currentColor"></rect>
+        <rect x="48.5" y="36" width="14.5" height="7" rx="1" ry="1" fill="currentColor"></rect><circle cx="4" cy="41" r="2" fill="currentColor" opacity="0.5"></circle>
+        <rect x="9" y="39" width="27" height="4" rx="1" ry="1" fill="currentColor" opacity="0.5"></rect>
+        <rect x="39" y="39" width="6" height="4" rx="1" ry="1" fill="currentColor" opacity="0.5"></rect>
     </svg>`,
 
     layout_image_viewer: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -268,12 +278,27 @@ const FotoGridsIcons = {
         <rect x="50" y="25.5" width="14" height="14" rx="2" fill="currentColor" />
     </svg>`,
 
+    layout_instant_photos: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="16" height="18" rx="2" fill="currentColor"/>
+        <rect x="6" y="6" width="12" height="12" rx="1" fill="white" opacity="0.7"/>
+        <rect x="24" y="4" width="16" height="18" rx="2" fill="currentColor"/>
+        <rect x="26" y="6" width="12" height="12" rx="1" fill="white" opacity="0.7"/>
+        <rect x="44" y="4" width="16" height="18" rx="2" fill="currentColor"/>
+        <rect x="46" y="6" width="12" height="12" rx="1" fill="white" opacity="0.7"/>
+        <rect x="4" y="26" width="16" height="18" rx="2" fill="currentColor"/>
+        <rect x="6" y="28" width="12" height="12" rx="1" fill="white" opacity="0.7"/>
+        <rect x="24" y="26" width="16" height="18" rx="2" fill="currentColor"/>
+        <rect x="26" y="28" width="12" height="12" rx="1" fill="white" opacity="0.7"/>
+        <rect x="44" y="26" width="16" height="18" rx="2" fill="currentColor"/>
+        <rect x="46" y="28" width="12" height="12" rx="1" fill="white" opacity="0.7"/>
+    </svg>`,
+
     layout_product_gallery: `<svg width="100%" height="100%" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="40" height="40" rx="2" ry="2" fill="currentColor" opacity="0.8"/>
-        <rect x="48" y="4" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.6"/>
-        <rect x="48" y="14.67" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.4"/>
-        <rect x="48" y="25.33" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.4"/>
-        <rect x="48" y="36" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.4"/>
+        <rect x="4" y="4" width="40" height="40" rx="2" ry="2" fill="currentColor"/>
+        <rect x="48" y="4" width="12" height="8" rx="1" ry="1" fill="currentColor"/>
+        <rect x="48" y="14.67" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.5"/>
+        <rect x="48" y="25.33" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.5"/>
+        <rect x="48" y="36" width="12" height="8" rx="1" ry="1" fill="currentColor" opacity="0.5"/>
     </svg>`,
 
     chevron: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -1014,6 +1039,10 @@ const FotoGridsIcons = {
         <circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         <circle cx="20" cy="12" r="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
     </svg>`,
+
+    trash: `<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 3H15M3 6H21M19 6L18.2987 16.5193C18.1935 18.0975 18.1409 18.8867 17.8 19.485C17.4999 20.0118 17.0472 20.4353 16.5017 20.6997C15.882 21 15.0911 21 13.5093 21H10.4907C8.90891 21 8.11803 21 7.49834 20.6997C6.95276 20.4353 6.50009 20.0118 6.19998 19.485C5.85911 18.8867 5.8065 18.0975 5.70129 16.5193L5 6M10 10.5V15.5M14 10.5V15.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`
 };
 
 if (typeof module !== 'undefined' && module.exports) {

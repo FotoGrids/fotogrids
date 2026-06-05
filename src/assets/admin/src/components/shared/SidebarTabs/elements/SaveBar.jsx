@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Button } from '../../Button';
 
 const { __ } = wp.i18n;
 
@@ -82,28 +83,30 @@ const SaveBar = ({
             </span>
 
             {dirty && onDiscard && (
-                <button
-                    type="button"
-                    className="fotogrids-button fotogrids-button--ghost fotogrids-button--small"
+                <Button
+                    variant="secondary"
+                    style="ghost"
+                    size="xs"
                     onClick={onDiscard}
                     disabled={saving}
                 >
                     {__('Discard', 'fotogrids')}
-                </button>
+                </Button>
             )}
 
             {extraAction}
 
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--primary fotogrids-button--small"
+            <Button
+                variant="primary"
+                size="xs"
                 onClick={onSave}
                 disabled={saving || !dirty}
+                busy={saving}
             >
                 {saving
                     ? __('Saving…', 'fotogrids')
                     : (saveLabel || __('Save changes', 'fotogrids'))}
-            </button>
+            </Button>
         </div>
         <div ref={sentinelRef} className="fotogrids-save-bar__sentinel" aria-hidden="true" />
         </>

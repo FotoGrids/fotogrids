@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Cache;
+use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
@@ -60,7 +62,6 @@ class Public_Render {
         add_shortcode( 'fotogrids_album', array( __CLASS__, 'album_shortcode' ) );
 
         add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_frontend_scripts' ) );
-        add_action( 'init', array( __CLASS__, 'register_gutenberg_blocks' ) );
     }
 
     /**
@@ -70,7 +71,7 @@ class Public_Render {
      * @return array Gallery settings
      */
     private static function get_gallery_settings( $gallery_id ) {
-        return fotogrids_get_gallery_settings( $gallery_id );
+        return \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $gallery_id );
     }
 
     /**
@@ -232,13 +233,13 @@ class Public_Render {
      * @return string Rendered HTML (or empty string when the gallery cannot be rendered).
      */
     public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), Request_Source $source = Request_Source::ALBUM_AJAX ): string {
-        $gallery = fotogrids_get_gallery( $gallery_id );
+        $gallery = \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id );
         if ( ! $gallery || $gallery->post_status !== 'publish' ) {
             return '';
         }
 
         $settings = self::get_gallery_settings( $gallery_id );
-        $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
+        $item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
         if ( empty( $item_ids ) ) {
             return '';
         }
@@ -293,11 +294,11 @@ class Public_Render {
             if ( ! empty( $atts['template_settings'] ) ) {
                 $decoded = json_decode( $atts['template_settings'], true );
                 if ( is_array( $decoded ) ) {
-                    $defaults = fotogrids_get_default_gallery_settings();
+                    $defaults = \FotoGrids\Collection_Defaults::resolve_gallery();
                     $settings = array_merge( $defaults, $decoded );
                 }
             } else {
-                $settings = fotogrids_get_default_gallery_settings();
+                $settings = \FotoGrids\Collection_Defaults::resolve_gallery();
             }
 
             $items = array();
@@ -320,7 +321,7 @@ class Public_Render {
             return '<div class="fotogrids-error">FotoGrids: No gallery ID specified. Usage: [fotogrids_gallery id="1"] or [fotogrids_gallery test="true"]</div>';
         }
 
-        $gallery = fotogrids_get_gallery( $gallery_id );
+        $gallery = \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id );
         if ( ! $gallery ) {
             return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' not found.</div>';
         }
@@ -331,7 +332,7 @@ class Public_Render {
 
         $settings = self::get_gallery_settings( $gallery_id );
 
-        $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
+        $item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
         if ( empty( $item_ids ) ) {
             return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' exists but has no items.</div>';
         }
@@ -339,6 +340,9 @@ class Public_Render {
         $source = Request_Source::SHORTCODE;
         if ( $atts['_source'] === Request_Source::BLOCK->value ) {
             $source = Request_Source::BLOCK;
+        }
+        if ( $atts['_source'] === Request_Source::ELEMENTOR->value ) {
+            $source = Request_Source::ELEMENTOR;
         }
         if ( $atts['_source'] === Request_Source::ALBUM_AJAX->value ) {
             $source = Request_Source::ALBUM_AJAX;
@@ -353,7 +357,7 @@ class Public_Render {
             $cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
             if ( $cached !== false ) {
                 self::replay_cached_assets( $cached['css'], $cached['js'] );
-                do_action( 'fotogrids/cache/hit', $gallery_id, $cache_key );
+                do_action( Actions_Cache::HIT, $gallery_id, $cache_key );
                 return $cached['html'];
             }
         }
@@ -366,7 +370,7 @@ class Public_Render {
             $css      = $resolver->get_css_asset_urls();
             $js       = $resolver->get_js_asset_data();
             \FotoGrids\FotoGrids_Cache::put( $gallery_id, $cache_key, $html, $css, $js, $duration );
-            do_action( 'fotogrids/cache/written', $gallery_id, $cache_key );
+            do_action( Actions_Cache::WRITTEN, $gallery_id, $cache_key );
         }
 
         return $html;
@@ -397,7 +401,7 @@ class Public_Render {
             return '';
         }
 
-        $album = fotogrids_get_album( $album_id );
+        $album = \FotoGrids\Albums\Album_Repository::get( $album_id );
         if ( ! $album || $album->post_status !== 'publish' ) {
             return '';
         }
@@ -425,7 +429,7 @@ class Public_Render {
             return '';
         }
 
-        $album_settings = fotogrids_get_album_settings( $album_id );
+        $album_settings = \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
 
         // Allow the shortcode's `template` attribute to override the
         // layout (e.g. [fotogrids_album id=42 template=masonry]).
@@ -514,60 +518,6 @@ class Public_Render {
     }
 
     /**
-     * Register Gutenberg blocks
-     */
-    public static function register_gutenberg_blocks() {
-        if ( ! function_exists( 'register_block_type' ) ) {
-            return;
-        }
-
-        register_block_type( 'fotogrids/gallery', array(
-            'editor_script' => 'fotogrids-admin',
-            'render_callback' => array( __CLASS__, 'render_gallery_block' ),
-            'attributes' => array(
-                'galleryId' => array(
-                    'type' => 'number',
-                    'default' => 0,
-                ),
-                'template' => array(
-                    'type' => 'string',
-                    'default' => 'grid',
-                ),
-                'columns' => array(
-                    'type' => 'number',
-                    'default' => 3,
-                ),
-                'showCaptions' => array(
-                    'type' => 'boolean',
-                    'default' => true,
-                ),
-                'lightbox' => array(
-                    'type' => 'boolean',
-                    'default' => true,
-                ),
-            ),
-        ) );
-    }
-
-    /**
-     * Render gallery block
-     */
-    public static function render_gallery_block( $attributes ) {
-        if ( empty( $attributes['galleryId'] ) ) {
-            return '';
-        }
-
-        return self::gallery_shortcode( array(
-            'id' => $attributes['galleryId'],
-            'template' => $attributes['template'],
-            'cols' => $attributes['columns'],
-            'captions' => $attributes['showCaptions'] ? 'true' : 'false',
-            'lightbox' => $attributes['lightbox'] ? 'true' : 'false',
-            '_source' => Request_Source::BLOCK->value,
-        ) );
-    }
-
-    /**
      * Render gallery preview (for admin)
      *
      * Similar to gallery_shortcode but allows previewing unpublished galleries
@@ -595,7 +545,7 @@ class Public_Render {
             'captions' => 'true',
         ), $atts, 'fotogrids_gallery' );
 
-        $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
+        $item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
         if ( empty( $item_ids ) ) {
             return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . $gallery_id . ' exists but has no items.</div>';
         }
@@ -719,27 +669,39 @@ class Public_Render {
     // standard Render_Controller pipeline. See album_shortcode() above.
 
     /**
-     * Check if current page has FotoGrids content
+     * Check if current page has FotoGrids content.
+     *
+     * Gates the pre-registration of `fotogrids-runtime` (so wp_localize_script
+     * can attach the `window.fotogrids` payload) and the always-on
+     * `fotogrids-errors.css` stylesheet. Per-render module CSS/JS is owned
+     * by Asset_Resolver and ships regardless of this gate.
+     *
+     * Page-builder integrations (Elementor, Divi, Bricks, …) store their
+     * widget trees outside `$post->post_content`, so the default
+     * shortcode + block detection cannot see them. They hook the
+     * {@see Filters_Page_Builders::HAS_CONTENT} filter to opt the page in.
+     *
+     * @since 1.0.0
+     * @return bool
      */
     private static function has_fotogrids_content() {
         global $post;
 
-        if ( ! $post ) {
-            return false;
-        }
+        $detected = false;
 
-        if ( has_shortcode( $post->post_content, 'fotogrids_gallery' ) ||
-             has_shortcode( $post->post_content, 'fotogrids_album' ) ) {
-            return true;
-        }
-
-        if ( function_exists( 'has_block' ) ) {
-            if ( has_block( 'fotogrids/gallery', $post ) ) {
-                return true;
+        if ( $post ) {
+            if ( has_shortcode( $post->post_content, 'fotogrids_gallery' ) ||
+                 has_shortcode( $post->post_content, 'fotogrids_album' ) ) {
+                $detected = true;
             }
+            // Block detection lives on the page-builders filter (see
+            // PageBuilders\Builders\Gutenberg\Module::detect_in_gutenberg),
+            // mirroring how Elementor / Divi / Bricks opt their pages
+            // in. Every host stays self-contained and this method
+            // doesn't grow per-builder branches.
         }
 
-        return false;
+        return (bool) apply_filters( Filters_Page_Builders::HAS_CONTENT, $detected, $post );
     }
 
     /**
@@ -775,7 +737,7 @@ class Public_Render {
             ),
         );
 
-        $test_settings = fotogrids_get_default_gallery_settings();
+        $test_settings = \FotoGrids\Collection_Defaults::resolve_gallery();
         $test_responsive_columns = array( 'desktop' => $columns, 'tablet' => $columns, 'mobile' => $columns );
         $test_responsive_spacing = $test_settings['item_spacing'];
 

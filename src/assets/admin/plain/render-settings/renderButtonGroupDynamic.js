@@ -82,7 +82,7 @@ const ButtonGroupDynamicComponent = ({ setting, currentValue, isDisabled, update
         const ProBadge = window.FotoGridsTooltip && window.FotoGridsTooltip.ProBadge;
 
         return React.createElement('div', {
-            className: 'fotogrids-button-group fotogrids-loading'
+            className: 'fg-button-group fotogrids-loading'
         }, [
             React.createElement('label', {
                 key: 'label',
@@ -97,7 +97,7 @@ const ButtonGroupDynamicComponent = ({ setting, currentValue, isDisabled, update
             ].filter(Boolean)),
             React.createElement('div', {
                 key: 'buttons',
-                className: 'fotogrids-button-group__buttons'
+                className: 'fg-button-group__buttons'
             }, __('Loading options...', 'fotogrids'))
         ]);
     }
@@ -130,7 +130,7 @@ const ButtonGroupDynamicComponent = ({ setting, currentValue, isDisabled, update
 
     // Wrap in a container to allow additional content
     return h('div', {
-        className: 'fotogrids-button-group-dynamic-wrapper'
+        className: 'fg-button-group-dynamic-wrapper'
     }, [
         buttonGroupElement,
         // Allow extending with additional content

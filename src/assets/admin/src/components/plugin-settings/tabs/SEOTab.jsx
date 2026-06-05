@@ -7,6 +7,7 @@ import {
     SaveBar,
 } from '../../shared/settings';
 import Toggle from '../../shared/Toggle';
+import { Button } from '../../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -216,21 +217,22 @@ const SEOTab = () => {
                                     />
                                 ) : null}
                                 <div style={{ display: 'flex', gap: 8 }}>
-                                    <button
-                                        type="button"
-                                        className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                                    <Button
+                                        variant="secondary"
+                                        size="xs"
                                         onClick={openMediaPicker}
                                     >
                                         {settings.default_og_image_id ? __('Replace image', 'fotogrids') : __('Choose image', 'fotogrids')}
-                                    </button>
+                                    </Button>
                                     {settings.default_og_image_id ? (
-                                        <button
-                                            type="button"
-                                            className="fotogrids-button fotogrids-button--ghost fotogrids-button--small"
+                                        <Button
+                                            variant="secondary"
+                                            style="ghost"
+                                            size="xs"
                                             onClick={clearImage}
                                         >
                                             {__('Remove', 'fotogrids')}
-                                        </button>
+                                        </Button>
                                     ) : null}
                                 </div>
                             </div>

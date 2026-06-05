@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Settings;
 
+use FotoGrids\Hooks\Filters_Seo;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -37,7 +39,7 @@ final class SEO_Settings_Store {
      *
      * - 'featured' — use the Featured Item (gallery) / Featured Gallery
      *   (album) cover, as resolved by
-     *   `fotogrids_get_collection_cover_attachment_id()`.
+     *   `Cover_Resolver::for_collection()`.
      * - 'custom'   — use the per-collection custom image (`og_image_custom`).
      *
      * @var string[]
@@ -78,7 +80,7 @@ final class SEO_Settings_Store {
          * @since 1.0.0
          * @param array<string, mixed> $defaults
          */
-        return apply_filters( 'fotogrids/seo/defaults', $defaults );
+        return apply_filters( Filters_Seo::DEFAULTS, $defaults );
     }
 
     /**
@@ -103,7 +105,7 @@ final class SEO_Settings_Store {
          * @since 1.0.0
          * @param array<string, mixed> $settings
          */
-        return apply_filters( 'fotogrids/seo/settings', $settings );
+        return apply_filters( Filters_Seo::SETTINGS, $settings );
     }
 
     /**
@@ -148,7 +150,7 @@ final class SEO_Settings_Store {
          * @param array<string, mixed> $sanitized
          * @param array<string, mixed> $input
          */
-        return apply_filters( 'fotogrids/seo/sanitize', $sanitized, $input );
+        return apply_filters( Filters_Seo::SANITIZE, $sanitized, $input );
     }
 
     /**
@@ -232,7 +234,7 @@ final class SEO_Settings_Store {
          * @param array<string, mixed> $resolved
          * @param int                  $collection_id
          */
-        return apply_filters( 'fotogrids/seo/resolved', $resolved, $collection_id );
+        return apply_filters( Filters_Seo::RESOLVED, $resolved, $collection_id );
     }
 
     /**

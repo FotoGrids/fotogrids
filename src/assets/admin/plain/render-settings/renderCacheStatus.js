@@ -177,7 +177,7 @@ const CacheStatusComponent = ({
             isCached && React.createElement('button', {
                 key: 'flush',
                 type: 'button',
-                className: 'fotogrids-button fotogrids-button--primary',
+                className: 'fg-button fg-button--variant-primary',
                 onClick: handleFlush,
                 disabled: isDisabled || flushState === 'loading',
             }, flushState === 'loading'

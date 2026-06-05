@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import Modal from '../shared/Modal';
-import Icon from '../shared/Icon';
+import { Modal } from '../shared/Modal';
+import { Button } from '../shared/Button';
+import { FormField } from '../shared/FormField';
 import TemplateInfoModal from './TemplateInfoModal';
 import ApplyTemplateModal from './ApplyTemplateModal';
 
@@ -63,16 +64,6 @@ const PreviewTemplateModal = ({ template, onClose, onApply }) => {
 
     const modalTitle = template ? `${__('Template Library', 'fotogrids')} - ${template.name}` : '';
 
-    const logoIcon = (
-        <svg width="20" height="20" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-            <rect x="1.42" y="1.42" width="56.69" height="14.17" fill="#3c46f0"/>
-            <rect x="1.42" y="22.68" width="35.43" height="14.17" fill="#f01e32"/>
-            <rect x="1.42" y="43.94" width="14.17" height="14.17" fill="#ffb914"/>
-            <rect x="22.68" y="43.94" width="14.17" height="14.17" fill="#323232"/>
-            <rect x="43.94" y="22.68" width="14.17" height="35.43" fill="#323232"/>
-        </svg>
-    );
-
     const titleWithBadge = (
         <>
             {modalTitle}
@@ -80,97 +71,104 @@ const PreviewTemplateModal = ({ template, onClose, onApply }) => {
         </>
     );
 
-    const headerButtons = (
-        <>
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-button--icon-only"
-                onClick={() => setShowInfoModal(true)}
-                title={__('Info', 'fotogrids')}
-            >
-                <Icon name="info_circle" />
-            </button>
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--primary fotogrids-button--smaller"
-                onClick={() => {
-                    if (onApply) {
-                        onApply(template);
-                    } else {
-                        setShowApplyModal(true);
-                    }
-                }}
-            >
-                {__('Apply', 'fotogrids')}
-            </button>
-        </>
-    );
-
-    const sidebarContent = (
-        <div className="fotogrids-template-preview-sidebar">
-            {template?.description && (
-                <div className="fotogrids-template-preview--description">
-                    <h4>{__('Description', 'fotogrids')}</h4>
-                    <p>{template.description}</p>
-                </div>
-            )}
-
-            <div className="fotogrids-template-preview-options">
-                <h4>{__('Preview Options', 'fotogrids')}</h4>
-
-                <div className="fotogrids-form-group">
-                    <label htmlFor="preview-background">{__('Page Background', 'fotogrids')}</label>
-                    <select
-                        id="preview-background"
-                        className="fotogrids-input"
-                        value={pageBackground}
-                        onChange={(e) => setPageBackground(e.target.value)}
-                    >
-                        <option value="light">{__('Light', 'fotogrids')}</option>
-                        <option value="dark">{__('Dark', 'fotogrids')}</option>
-                        <option value="custom">{__('Custom', 'fotogrids')}</option>
-                    </select>
-                </div>
-
-                <div className="fotogrids-form-group">
-                    <label htmlFor="preview-width">{__('Page Layout Width', 'fotogrids')}</label>
-                    <select
-                        id="preview-width"
-                        className="fotogrids-input"
-                        value={pageWidth}
-                        onChange={(e) => setPageWidth(e.target.value)}
-                    >
-                        <option value="full">{__('Full Screen', 'fotogrids')}</option>
-                        <option value="custom">{__('Custom', 'fotogrids')}</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <>
             <Modal
                 isOpen={!!template}
                 onClose={onClose}
-                title={titleWithBadge}
-                size="full"
-                footer={false}
-                headerSize="small"
-                headerButtons={headerButtons}
-                logo={logoIcon}
-                sidebar={sidebarContent}
-                sidebarCollapsable={true}
+                size="cover"
+                hasSidebar
+                sidebarCollapsible
             >
-                <div className="fotogrids-template-preview--container" style={getContainerStyle()}>
-                    <iframe
-                        src={getPreviewUrl(template)}
-                        title={template?.name}
-                        className="fotogrids-template-preview--iframe"
-                        style={getIframeStyle()}
-                        loading="lazy"
-                    />
-                </div>
+                <Modal.Header size="sm" divider={false}>
+                    <Modal.HeaderLogo />
+                    <Modal.HeaderTitle level={3}>
+                        {titleWithBadge}
+                    </Modal.HeaderTitle>
+                    <Modal.HeaderActions>
+                        <Button
+                            variant="secondary"
+                            size="xs"
+                            iconOnly
+                            icon="info_circle"
+                            ariaLabel={__('Info', 'fotogrids')}
+                            onClick={() => setShowInfoModal(true)}
+                        />
+                        <Button
+                            variant="primary"
+                            size="xs"
+                            onClick={() => {
+                                if (onApply) {
+                                    onApply(template);
+                                } else {
+                                    setShowApplyModal(true);
+                                }
+                            }}
+                        >
+                            {__('Apply', 'fotogrids')}
+                        </Button>
+                    </Modal.HeaderActions>
+                </Modal.Header>
+
+                <Modal.Body padding={false}>
+                    <Modal.Sidebar>
+                        <div className="fotogrids-template-preview-sidebar">
+                            {template?.description && (
+                                <div className="fotogrids-template-preview--description">
+                                    <h4>{__('Description', 'fotogrids')}</h4>
+                                    <p>{template.description}</p>
+                                </div>
+                            )}
+
+                            <div className="fotogrids-template-preview-options">
+                                <h4>{__('Preview Options', 'fotogrids')}</h4>
+
+                                <FormField
+                                    label={__('Page Background', 'fotogrids')}
+                                    htmlFor="preview-background"
+                                    layout="column"
+                                >
+                                    <select
+                                        id="preview-background"
+                                        value={pageBackground}
+                                        onChange={(e) => setPageBackground(e.target.value)}
+                                    >
+                                        <option value="light">{__('Light', 'fotogrids')}</option>
+                                        <option value="dark">{__('Dark', 'fotogrids')}</option>
+                                        <option value="custom">{__('Custom', 'fotogrids')}</option>
+                                    </select>
+                                </FormField>
+
+                                <FormField
+                                    label={__('Page Layout Width', 'fotogrids')}
+                                    htmlFor="preview-width"
+                                    layout="column"
+                                >
+                                    <select
+                                        id="preview-width"
+                                        value={pageWidth}
+                                        onChange={(e) => setPageWidth(e.target.value)}
+                                    >
+                                        <option value="full">{__('Full Screen', 'fotogrids')}</option>
+                                        <option value="custom">{__('Custom', 'fotogrids')}</option>
+                                    </select>
+                                </FormField>
+                            </div>
+                        </div>
+                    </Modal.Sidebar>
+
+                    <Modal.Main>
+                        <div className="fotogrids-template-preview--container" style={getContainerStyle()}>
+                            <iframe
+                                src={getPreviewUrl(template)}
+                                title={template?.name}
+                                className="fotogrids-template-preview--iframe"
+                                style={getIframeStyle()}
+                                loading="lazy"
+                            />
+                        </div>
+                    </Modal.Main>
+                </Modal.Body>
             </Modal>
 
             <TemplateInfoModal

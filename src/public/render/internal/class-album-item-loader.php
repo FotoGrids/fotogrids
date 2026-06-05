@@ -111,11 +111,11 @@ final class Album_Item_Loader {
             }
         }
 
-        if ( ! function_exists( 'fotogrids_get_gallery_item_ids' ) ) {
+        if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
             return [ 'url' => '', 'width' => null, 'height' => null ];
         }
 
-        $item_ids = fotogrids_get_gallery_item_ids( $gallery_id );
+        $item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
         if ( ! is_array( $item_ids ) || empty( $item_ids ) ) {
             return [ 'url' => '', 'width' => null, 'height' => null ];
         }
@@ -147,14 +147,9 @@ final class Album_Item_Loader {
      * @return int
      */
     private static function count_items( int $gallery_id ): int {
-        if ( function_exists( 'fotogrids_get_gallery_item_count' ) ) {
-            $count = fotogrids_get_gallery_item_count( $gallery_id );
-            return is_numeric( $count ) ? (int) $count : 0;
+        if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
+            return 0;
         }
-        if ( function_exists( 'fotogrids_get_gallery_item_ids' ) ) {
-            $ids = fotogrids_get_gallery_item_ids( $gallery_id );
-            return is_array( $ids ) ? count( $ids ) : 0;
-        }
-        return 0;
+        return \FotoGrids\Galleries\Gallery_Repository::get_item_count( $gallery_id );
     }
 }

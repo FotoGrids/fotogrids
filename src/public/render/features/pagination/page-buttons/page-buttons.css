@@ -54,11 +54,15 @@
 /*
  * Active (current) page chip. Only numbered buttons use this state —
  * load-more never has an active state because there's only one button.
+ *
+ * The three colour tokens come from the Active subtab in the Styling
+ * panel (resolved via Pagination_Common::common_style_vars()), with
+ * the brand-blue defaults from pagination.css as fallback.
  */
 .fotogrids-collection.fotogrids-gallery .fg-pagination--pages .fg-pagination__btn.fg-is-active {
-    background: var( --fg-colors-blue );
-    border-color: var( --fg-colors-blue );
-    color: var( --fg-colors-white );
+    background: var( --fg-pagination-btn-active-bg );
+    border-color: var( --fg-pagination-btn-active-border-color );
+    color: var( --fg-pagination-btn-active-color );
     cursor: default;
 }
 

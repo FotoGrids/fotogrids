@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '../../shared/Button';
 
 const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }) => {
     const isProActive = window.fotogridsSettings?.isProActive || false;
@@ -31,9 +32,9 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
 
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-form-fields">
+            <div className="fg-form-fields">
                 {exifFields.map((field) => (
-                    <div key={field.key} className="fotogrids-form-field">
+                    <div key={field.key} className="fg-form-field">
                         <label htmlFor={`fotogrids-exif-${field.key}`}>
                             {field.label}
                         </label>
@@ -62,13 +63,9 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
                             <strong>{strings.exifPerImageOverrides || ''}</strong>
                         </span>
                     </div>
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--link"
-                        onClick={handleUpgrade}
-                    >
+                    <Button variant="link" onClick={handleUpgrade}>
                         {strings.upgradeToPro || ''}
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

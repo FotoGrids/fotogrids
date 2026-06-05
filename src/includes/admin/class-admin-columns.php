@@ -115,7 +115,7 @@ class Admin_Columns {
         ?>
         <div class="fotogrids-shortcode-cell">
             <div class="fotogrids-shortcode-text" tabindex="0"><?php echo esc_html( $shortcode ); ?></div>
-            <button type="button" class="fotogrids-button fotogrids-button--small fotogrids-button--secondary fotogrids-button--outline fotogrids-button--icon-only fotogrids-shortcode-copy-btn" data-shortcode="<?php echo esc_attr( $shortcode ); ?>" title="<?php esc_attr_e( 'Copy shortcode', 'fotogrids' ); ?>">
+            <button type="button" class="fg-button fg-button--size-sm fg-button--variant-secondary fg-button--outline fg-button--icon-only fotogrids-shortcode-copy-btn" data-shortcode="<?php echo esc_attr( $shortcode ); ?>" title="<?php esc_attr_e( 'Copy shortcode', 'fotogrids' ); ?>">
                 <span class="fotogrids-icon" data-icon="clipboard"></span>
             </button>
         </div>
@@ -168,7 +168,7 @@ class Admin_Columns {
                 break;
 
             case 'fotogrids_items':
-                $item_count = fotogrids_get_gallery_item_count( $post_id );
+                $item_count = \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $post_id );
                 echo $item_count === 0
                     ? '<span class="fotogrids-text--error">0</span>'
                     : esc_html( (string) $item_count );
@@ -176,14 +176,15 @@ class Admin_Columns {
 
             case 'fotogrids_stats':
                 $stats = \FotoGrids\Statistics::get( 'gallery', $post_id );
-                if ( $stats ) {
-                    echo '<div class="fotogrids-stats">';
-                    echo '<span class="views">' . number_format( $stats['views'] ) . ' ' . __( 'views', 'fotogrids' ) . '</span><br>';
-                    echo '<span class="shares">' . number_format( $stats['shares'] ) . ' ' . __( 'shares', 'fotogrids' ) . '</span>';
-                    echo '</div>';
-                } else {
-                    echo '0 ' . __( 'views', 'fotogrids' ) . '<br>0 ' . __( 'shares', 'fotogrids' );
-                }
+                $views = (int) ( $stats['views'] ?? 0 );
+                $shares = (int) ( $stats['shares'] ?? 0 );
+                printf(
+                    '%1$s %2$s<br>%3$s %4$s',
+                    number_format_i18n( $views ),
+                    esc_html__( 'views', 'fotogrids' ),
+                    number_format_i18n( $shares ),
+                    esc_html__( 'shares', 'fotogrids' )
+                );
                 break;
         }
     }
@@ -248,24 +249,22 @@ class Admin_Columns {
             case 'fotogrids_galleries':
                 $galleries = \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $post_id );
                 $count = count( $galleries );
-
-                if ( $count > 0 ) {
-                    echo '<strong>' . $count . '</strong>';
-                } else {
-                    echo '<span style="color: #999;">0</span>';
-                }
+                echo $count === 0
+                    ? '<span class="fotogrids-text--error">0</span>'
+                    : esc_html( (string) $count );
                 break;
 
             case 'fotogrids_stats':
                 $stats = \FotoGrids\Statistics::get( 'album', $post_id );
-                if ( $stats ) {
-                    echo '<div class="fotogrids-stats">';
-                    echo '<span class="views">' . number_format( $stats['views'] ) . ' ' . __( 'views', 'fotogrids' ) . '</span><br>';
-                    echo '<span class="shares">' . number_format( $stats['shares'] ) . ' ' . __( 'shares', 'fotogrids' ) . '</span>';
-                    echo '</div>';
-                } else {
-                    echo '0 ' . __( 'views', 'fotogrids' ) . '<br>0 ' . __( 'shares', 'fotogrids' );
-                }
+                $views = (int) ( $stats['views'] ?? 0 );
+                $shares = (int) ( $stats['shares'] ?? 0 );
+                printf(
+                    '%1$s %2$s<br>%3$s %4$s',
+                    number_format_i18n( $views ),
+                    esc_html__( 'views', 'fotogrids' ),
+                    number_format_i18n( $shares ),
+                    esc_html__( 'shares', 'fotogrids' )
+                );
                 break;
         }
     }

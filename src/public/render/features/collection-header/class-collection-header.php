@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Features\Collection_Header;
 
+use FotoGrids\Hooks\Filters_Breadcrumb;
 use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
@@ -146,7 +147,7 @@ final class Collection_Header implements Feature {
          * @param int         $album_id     Resolved parent album.
          * @param array       $context      placement / show_* / source flags.
          */
-        $overridden = apply_filters( 'fotogrids/breadcrumb/render_html', null, $gallery_id, $album_id, $filter_context );
+        $overridden = apply_filters( Filters_Breadcrumb::RENDER_HTML, null, $gallery_id, $album_id, $filter_context );
         if ( is_string( $overridden ) ) {
             return $overridden;
         }
@@ -252,10 +253,10 @@ final class Collection_Header implements Feature {
             return null;
         }
 
-        $album_settings = function_exists( 'fotogrids_get_album_settings' )
-            ? fotogrids_get_album_settings( $album_id )
-            : ( function_exists( 'fotogrids_get_gallery_settings' )
-                ? fotogrids_get_gallery_settings( $album_id )
+        $album_settings = class_exists( '\FotoGrids\Albums\Album_Repository' )
+            ? \FotoGrids\Albums\Album_Repository::get_settings( $album_id )
+            : ( class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
+                ? \FotoGrids\Galleries\Gallery_Repository::get_settings( $album_id )
                 : [] );
 
         if ( ! is_array( $album_settings ) ) {
@@ -405,7 +406,7 @@ final class Collection_Header implements Feature {
          * @since 1.0.0
          * @param string $svg Default chevron SVG.
          */
-        $separator_svg = (string) apply_filters( 'fotogrids/breadcrumb/separator_svg', self::DEFAULT_SEPARATOR_SVG );
+        $separator_svg = (string) apply_filters( Filters_Breadcrumb::SEPARATOR_SVG, self::DEFAULT_SEPARATOR_SVG );
 
         $album_label = $album_title !== '' ? $album_title : __( 'Album', 'fotogrids' );
         $current_label = $gallery_title !== '' ? $gallery_title : __( 'Gallery', 'fotogrids' );

@@ -1,6 +1,9 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Library;
+use FotoGrids\Hooks\Filters_Data;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -22,7 +25,7 @@ class Metadata_Manager {
      */
     public static function get_allowed_types() {
         $default_types = array( 'tag', 'person', 'location' );
-        return apply_filters( 'fotogrids/data/metadata/types', $default_types );
+        return apply_filters( Filters_Data::METADATA_TYPES, $default_types );
     }
 
     /**
@@ -740,7 +743,7 @@ class Metadata_Manager {
 
         $wpdb->update( $table, $data, array( 'id' => (int) $id ), $formats, array( '%d' ) );
 
-        do_action( 'fotogrids/actions/library/updated', $row->type, (int) $id );
+        do_action( Actions_Library::UPDATED, $row->type, (int) $id );
 
         return self::get_metadata_by_id( $id );
     }
@@ -773,7 +776,7 @@ class Metadata_Manager {
         $deleted = $wpdb->delete( $tags_table, array( 'id' => (int) $id ), array( '%d' ) );
 
         if ( $deleted ) {
-            do_action( 'fotogrids/actions/library/deleted', $row->type, (int) $id );
+            do_action( Actions_Library::DELETED, $row->type, (int) $id );
             return true;
         }
 
@@ -905,13 +908,13 @@ class Metadata_Manager {
             $wpdb->delete( $wpdb->prefix . 'fotogrids_tags', array( 'id' => $source_id ), array( '%d' ) );
             $merged++;
 
-            do_action( 'fotogrids/actions/library/deleted', $type, $source_id );
+            do_action( Actions_Library::DELETED, $type, $source_id );
         }
 
         // Recompute target usage_count from authoritative join data.
         self::recompute_usage_count( $type, (int) $target_id );
 
-        do_action( 'fotogrids/actions/library/merged', $type, (int) $target_id, array_map( 'intval', (array) $source_ids ) );
+        do_action( Actions_Library::MERGED, $type, (int) $target_id, array_map( 'intval', (array) $source_ids ) );
 
         return array(
             'merged' => $merged,

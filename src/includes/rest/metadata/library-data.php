@@ -1,6 +1,9 @@
 <?php
 namespace FotoGrids\REST\Metadata;
 
+use FotoGrids\Hooks\Actions_Library;
+use FotoGrids\Hooks\Filters_Library;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -83,7 +86,7 @@ class Library_Data {
          * @since 1.0.0
          * @param array $entity_types Default tag/person/location config.
          */
-        $entity_types = apply_filters( 'fotogrids/library/entity_types', $defaults );
+        $entity_types = apply_filters( Filters_Library::ENTITY_TYPES, $defaults );
 
         return is_array( $entity_types ) ? $entity_types : $defaults;
     }
@@ -218,7 +221,7 @@ class Library_Data {
             return new \WP_Error( 'fotogrids_library_create_failed', __( 'Failed to create entry.', 'fotogrids' ), array( 'status' => 500 ) );
         }
 
-        do_action( 'fotogrids/actions/library/created', $type, (int) $row->id );
+        do_action( Actions_Library::CREATED, $type, (int) $row->id );
 
         return rest_ensure_response( self::serialize_row( $row ) );
     }

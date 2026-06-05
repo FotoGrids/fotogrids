@@ -1,376 +1,361 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import apiFetch from '@wordpress/api-fetch';
 import Icon from '../../shared/Icon';
+import InfoBlock from '../../shared/InfoBlock';
+import Segmented from '../../shared/Segmented';
+import { Button } from '../../shared/Button';
+import Panel from '../../shared/SidebarTabs/elements/Panel';
+import PanelRow from '../../shared/SidebarTabs/elements/PanelRow';
 
 const { __ } = wp.i18n;
 
-const FOTOGRIDS_PERMISSIONS = [
-    {
-        key: 'edit_fotogrids_gallery',
-        label: __('Edit Gallery Items', 'fotogrids'),
-        description: __('Allows users to edit individual gallery items and their metadata.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'read_fotogrids_gallery',
-        label: __('Read Gallery Items', 'fotogrids'),
-        description: __('Allows users to view gallery items and their details.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'delete_fotogrids_gallery',
-        label: __('Delete Gallery Items', 'fotogrids'),
-        description: __('Allows users to delete individual gallery items.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'edit_fotogrids_galleries',
-        label: __('Edit Gallery Settings', 'fotogrids'),
-        description: __('Allows users to edit gallery settings, layout, and configuration.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'edit_others_fotogrids_galleries',
-        label: __('Edit Others\' Galleries', 'fotogrids'),
-        description: __('Allows users to edit galleries created by other users.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'publish_fotogrids_galleries',
-        label: __('Publish Galleries', 'fotogrids'),
-        description: __('Allows users to publish galleries and make them publicly visible.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'read_private_fotogrids_galleries',
-        label: __('Read Private Galleries', 'fotogrids'),
-        description: __('Allows users to view private galleries that are not publicly accessible.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'delete_fotogrids_galleries',
-        label: __('Delete Galleries', 'fotogrids'),
-        description: __('Allows users to delete entire galleries.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'delete_private_fotogrids_galleries',
-        label: __('Delete Private Galleries', 'fotogrids'),
-        description: __('Allows users to delete private galleries.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'delete_published_fotogrids_galleries',
-        label: __('Delete Published Galleries', 'fotogrids'),
-        description: __('Allows users to delete published galleries.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'delete_others_fotogrids_galleries',
-        label: __('Delete Others\' Galleries', 'fotogrids'),
-        description: __('Allows users to delete galleries created by other users.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'edit_private_fotogrids_galleries',
-        label: __('Edit Private Galleries', 'fotogrids'),
-        description: __('Allows users to edit private galleries.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'edit_published_fotogrids_galleries',
-        label: __('Edit Published Galleries', 'fotogrids'),
-        description: __('Allows users to edit published galleries.', 'fotogrids'),
-        category: 'gallery'
-    },
-    {
-        key: 'edit_fotogrids_album',
-        label: __('Edit Album Items', 'fotogrids'),
-        description: __('Allows users to edit individual album items.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'read_fotogrids_album',
-        label: __('Read Album Items', 'fotogrids'),
-        description: __('Allows users to view album items and their details.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'delete_fotogrids_album',
-        label: __('Delete Album Items', 'fotogrids'),
-        description: __('Allows users to delete individual album items.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'edit_fotogrids_albums',
-        label: __('Edit Album Settings', 'fotogrids'),
-        description: __('Allows users to edit album settings and configuration.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'edit_others_fotogrids_albums',
-        label: __('Edit Others\' Albums', 'fotogrids'),
-        description: __('Allows users to edit albums created by other users.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'publish_fotogrids_albums',
-        label: __('Publish Albums', 'fotogrids'),
-        description: __('Allows users to publish albums and make them publicly visible.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'read_private_fotogrids_albums',
-        label: __('Read Private Albums', 'fotogrids'),
-        description: __('Allows users to view private albums that are not publicly accessible.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'delete_fotogrids_albums',
-        label: __('Delete Albums', 'fotogrids'),
-        description: __('Allows users to delete entire albums.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'delete_private_fotogrids_albums',
-        label: __('Delete Private Albums', 'fotogrids'),
-        description: __('Allows users to delete private albums.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'delete_published_fotogrids_albums',
-        label: __('Delete Published Albums', 'fotogrids'),
-        description: __('Allows users to delete published albums.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'delete_others_fotogrids_albums',
-        label: __('Delete Others\' Albums', 'fotogrids'),
-        description: __('Allows users to delete albums created by other users.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'edit_private_fotogrids_albums',
-        label: __('Edit Private Albums', 'fotogrids'),
-        description: __('Allows users to edit private albums.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'edit_published_fotogrids_albums',
-        label: __('Edit Published Albums', 'fotogrids'),
-        description: __('Allows users to edit published albums.', 'fotogrids'),
-        category: 'album'
-    },
-    {
-        key: 'manage_fotogrids',
-        label: __('Manage FotoGrids', 'fotogrids'),
-        description: __('Full access to all FotoGrids features and administration.', 'fotogrids'),
-        category: 'plugin'
-    },
-    {
-        key: 'view_fotogrids_stats',
-        label: __('View Statistics', 'fotogrids'),
-        description: __('Allows users to view gallery and album statistics and analytics.', 'fotogrids'),
-        category: 'plugin'
-    },
-    {
-        key: 'manage_fotogrids_settings',
-        label: __('Manage Plugin Settings', 'fotogrids'),
-        description: __('Allows users to access and modify global plugin settings.', 'fotogrids'),
-        category: 'plugin'
-    },
-    {
-        key: 'assign_albums_to_galleries',
-        label: __('Assign Albums to Galleries', 'fotogrids'),
-        description: __('Allows users to assign albums to galleries and manage relationships.', 'fotogrids'),
-        category: 'plugin'
-    },
-    {
-        key: 'apply_templates',
-        label: __('Apply Templates', 'fotogrids'),
-        description: __('Allows users to apply templates to galleries and albums.', 'fotogrids'),
-        category: 'plugin'
+const ROLE_LADDER = ['administrator', 'editor', 'author', 'contributor', 'subscriber'];
+
+const ROLE_LABEL_OVERRIDES = {
+    administrator: __('Administrator', 'fotogrids'),
+    editor: __('Editor', 'fotogrids'),
+    author: __('Author', 'fotogrids'),
+    contributor: __('Contributor', 'fotogrids'),
+    subscriber: __('Subscriber', 'fotogrids'),
+};
+
+const GROUP_LABELS = {
+    gallery: __('Galleries', 'fotogrids'),
+    album: __('Albums', 'fotogrids'),
+    media: __('Library', 'fotogrids'),
+    stats: __('Statistics', 'fotogrids'),
+    tools: __('Tools', 'fotogrids'),
+    modules: __('Modules', 'fotogrids'),
+    plugin: __('Plugin', 'fotogrids'),
+};
+
+/**
+ * Determine the current "lowest role" value for a logical permission, based
+ * on which standard roles currently hold every cap in its underlying_caps.
+ * Returns one of the ladder slugs, or 'custom' when the grants do not form
+ * a clean ladder (e.g. Pro has been used to flip individual caps).
+ */
+const resolveLowestRole = (logical, rolesByKey) => {
+    if (!logical.underlying_caps || logical.underlying_caps.length === 0) {
+        return 'custom';
     }
-];
+
+    const ladderHasAll = (roleKey) => {
+        const role = rolesByKey[roleKey];
+        if (!role) return false;
+        return logical.underlying_caps.every((cap) => role.capabilities[cap] === true);
+    };
+
+    // Walk from least privileged up; first role that holds every cap is the
+    // "lowest". If the higher roles don't all hold every cap too, it's custom.
+    for (let i = ROLE_LADDER.length - 1; i >= 0; i -= 1) {
+        const roleKey = ROLE_LADDER[i];
+        if (!rolesByKey[roleKey]) continue;
+        if (ladderHasAll(roleKey)) {
+            // Validate inheritance - every role above must also have all caps.
+            const higher = ROLE_LADDER.slice(0, i);
+            const inheritanceOk = higher.every((r) => !rolesByKey[r] || ladderHasAll(r));
+            return inheritanceOk ? roleKey : 'custom';
+        }
+    }
+
+    return 'custom';
+};
 
 const PermissionsManagerTab = () => {
-    const [roles, setRoles] = useState([]);
+    const [registry, setRegistry] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [saving, setSaving] = useState({});
+    const [overrideMatrix, setOverrideMatrix] = useState(null);
+    const [overridePanelOne, setOverridePanelOne] = useState(null);
 
+    // Pro extension point: Pro replaces the Panel 2 matrix component by
+    // calling window.FotoGridsAdmin.permissions.registerMatrixOverride(C).
+    // Pro can also augment Panel 1 via registerPanelOverride('simple', C).
     useEffect(() => {
-        const fetchRoles = async () => {
-            try {
-                const apiUrl = window.fotogridsAdmin?.apiUrl || '';
-                const restUrl = window.fotogridsAdmin?.restUrl || 'fotogrids/v1/';
-                const nonce = window.fotogridsAdmin?.restNonce || '';
+        const namespace = window.FotoGridsAdmin?.permissions;
+        if (!namespace) return;
+        setOverrideMatrix(() => namespace._matrixOverride || null);
+        setOverridePanelOne(() => namespace._simplePanelOverride || null);
 
-                const response = await fetch(`${apiUrl}${restUrl}admin/roles`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': nonce
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setRoles(data.roles || []);
-                } else {
-                    console.error('Failed to fetch roles');
-                }
-            } catch (error) {
-                console.error('Error fetching roles:', error);
-            } finally {
-                setLoading(false);
+        const onOverride = (event) => {
+            const { panel, component } = event.detail || {};
+            if (panel === 'matrix') {
+                setOverrideMatrix(() => component || null);
+            }
+            if (panel === 'simple') {
+                setOverridePanelOne(() => component || null);
             }
         };
-
-        fetchRoles();
+        document.addEventListener('fotogrids:admin:permissions:override', onOverride);
+        return () => document.removeEventListener('fotogrids:admin:permissions:override', onOverride);
     }, []);
 
-    const hasCapability = (role, capability) => {
-        return role.capabilities && role.capabilities[capability] === true;
-    };
-
-    const getPermissionsByCategory = (category) => {
-        return FOTOGRIDS_PERMISSIONS.filter(perm => perm.category === category);
-    };
-
-    const getCategoryLabel = (category) => {
-        switch (category) {
-            case 'gallery':
-                return __('Gallery Permissions', 'fotogrids');
-            case 'album':
-                return __('Album Permissions', 'fotogrids');
-            case 'plugin':
-                return __('Plugin Permissions', 'fotogrids');
-            default:
-                return '';
+    const loadRegistry = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await apiFetch({ path: '/fotogrids/v1/permissions/registry' });
+            setRegistry(data);
+            if (window.FotoGridsAdmin?.permissions) {
+                window.FotoGridsAdmin.permissions._registry = data;
+            }
+        } catch (e) {
+            setError(e?.message || __('Failed to load permissions.', 'fotogrids'));
+        } finally {
+            setLoading(false);
         }
-    };
+    }, []);
 
-    const buildRows = () => {
-        const rows = [];
-        const categories = ['gallery', 'album', 'plugin'];
+    useEffect(() => { loadRegistry(); }, [loadRegistry]);
 
-        categories.forEach((category, categoryIndex) => {
-            const permissions = getPermissionsByCategory(category);
+    const rolesByKey = useMemo(() => {
+        if (!registry?.roles) return {};
+        const map = {};
+        registry.roles.forEach((r) => { map[r.key] = r; });
+        return map;
+    }, [registry]);
 
-            rows.push({
-                type: 'header',
-                category: category,
-                label: getCategoryLabel(category)
+    const availableLadderRoles = useMemo(() => {
+        // Only show standard WP roles in Panel 1 - custom roles are not on
+        // the inheritance ladder and aren't meaningful for "lowest role".
+        return ROLE_LADDER.filter((key) => rolesByKey[key]);
+    }, [rolesByKey]);
+
+    const handleOptionChange = useCallback(async (key, value) => {
+        try {
+            await apiFetch({
+                path: '/fotogrids/v1/permissions/options',
+                method: 'POST',
+                data: { key, value },
             });
+            await loadRegistry();
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error('FotoGrids permissions: failed to save option', e);
+        }
+    }, [loadRegistry]);
 
-            permissions.forEach(permission => {
-                rows.push({
-                    type: 'permission',
-                    permission: permission
-                });
+    const handleSimpleChange = useCallback(async (key, lowestRole) => {
+        setSaving((prev) => ({ ...prev, [key]: true }));
+        try {
+            await apiFetch({
+                path: '/fotogrids/v1/permissions/simple',
+                method: 'POST',
+                data: { key, lowest_role: lowestRole },
             });
-        });
-
-        return rows;
-    };
-
-    const rows = buildRows();
-    const totalColumns = Math.max(roles.length, 1);
+            await loadRegistry();
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error('FotoGrids permissions: failed to save', e);
+        } finally {
+            setSaving((prev) => ({ ...prev, [key]: false }));
+        }
+    }, [loadRegistry]);
 
     if (loading) {
         return (
             <div className="fotogrids-permissions-manager">
-                <p>{__('Loading roles...', 'fotogrids')}</p>
+                <p>{__('Loading permissions…', 'fotogrids')}</p>
             </div>
         );
     }
 
-    if (roles.length === 0) {
+    if (error) {
         return (
             <div className="fotogrids-permissions-manager">
-                <h3>{__('Permissions Manager', 'fotogrids')}</h3>
-                <p className="description">
-                    {__('No roles found.', 'fotogrids')}
-                </p>
+                <p className="description">{error}</p>
             </div>
         );
     }
 
-    const handleUpgradeClick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+    if (!registry) return null;
 
-        const upgradeUrl = window.fotogridsUpgradeModal?.urls?.upgrade;
-        window.open(upgradeUrl, '_blank');
+    // ---- Panel 1: Capability Settings (logical, lowest-role dropdowns) ----
+    const renderSimplePanel = () => {
+        if (overridePanelOne) {
+            const C = overridePanelOne;
+            return <C registry={registry} reload={loadRegistry} />;
+        }
+        const unauthorisedVisibility = registry.options?.unauthorised_visibility || 'readonly';
+        return (
+            <>
+                <InfoBlock
+                    icon="info_square"
+                    title={__('How roles & capabilities work', 'fotogrids')}
+                    description={__(
+                        'Pick the lowest role that should have each capability. Higher roles automatically inherit it. For example, setting a capability to "Editor" means editors and administrators have it; authors and below do not.',
+                        'fotogrids'
+                    )}
+                />
+
+                <PanelRow
+                    title={__('Unauthorised settings panels', 'fotogrids')}
+                    description={__(
+                        'How to render the Settings and Templates metaboxes for users who can edit a gallery or album but cannot modify its settings.',
+                        'fotogrids'
+                    )}
+                    largerLabels
+                >
+                    <Segmented
+                        ariaLabel={__('Unauthorised settings panels', 'fotogrids')}
+                        value={unauthorisedVisibility}
+                        onChange={(v) => handleOptionChange('unauthorised_visibility', v)}
+                        options={[
+                            { value: 'readonly', label: __('Read-only with notice', 'fotogrids') },
+                            { value: 'hidden', label: __('Hide entirely', 'fotogrids') },
+                        ]}
+                    />
+                </PanelRow>
+
+                {registry.simple.map((def) => {
+                    const currentValue = resolveLowestRole(def, rolesByKey);
+                    const isCustom = currentValue === 'custom';
+                    const isSaving = !!saving[def.key];
+                    const selectId = `fg-perm-${def.key}`;
+                    return (
+                        <PanelRow
+                            key={def.key}
+                            title={def.label}
+                            description={def.description}
+                            htmlFor={selectId}
+                            largerLabels
+                        >
+                            <select
+                                id={selectId}
+                                value={isCustom ? '__custom__' : currentValue}
+                                disabled={isSaving}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (v === '__custom__') return;
+                                    handleSimpleChange(def.key, v);
+                                }}
+                            >
+                                {isCustom && (
+                                    <option value="__custom__">
+                                        {__('Custom (configured in matrix)', 'fotogrids')}
+                                    </option>
+                                )}
+                                {availableLadderRoles.map((roleKey) => (
+                                    <option key={roleKey} value={roleKey}>
+                                        {ROLE_LABEL_OVERRIDES[roleKey] || rolesByKey[roleKey].name}
+                                    </option>
+                                ))}
+                            </select>
+                        </PanelRow>
+                    );
+                })}
+            </>
+        );
     };
 
-    return (
-        <div className="fotogrids-permissions-manager">
-            <div className="fg-rpm__pro-box">
-                <span className="fotogrids-pro-badge">{__('PRO', 'fotogrids')}</span>
-                <div className="fg-rpm__pro-box-text">
-                    {__('Take full control of permissions for any role and customize access levels with precision.', 'fotogrids')}
-                </div>
-                <button
-                    type="button"
-                    className="fotogrids-button fotogrids-button--primary fotogrids-button--small"
-                    onClick={handleUpgradeClick}
-                >
-                    {__('Upgrade Now', 'fotogrids')}
-                </button>
-            </div>
+    // ---- Panel 2: Permissions Manager matrix (Free readonly, Pro override) ----
+    const renderMatrixPanel = () => {
+        if (overrideMatrix) {
+            const C = overrideMatrix;
+            return <C registry={registry} reload={loadRegistry} />;
+        }
 
-            <div
-                className="fg-rpm__table"
-                style={{ '--columns': totalColumns }}
-            >
-                <div className="fg-rpm__header-cell fg-rpm__header-cell--permission">
-                </div>
-                {roles.map((role) => (
-                    <div key={`header-${role.key}`} className="fg-rpm__header-cell">
-                        {role.name}
+        const grouped = registry.advanced.reduce((acc, def) => {
+            const g = def.group || 'plugin';
+            if (!acc[g]) acc[g] = [];
+            acc[g].push(def);
+            return acc;
+        }, {});
+
+        const groupKeys = Object.keys(grouped);
+        const allRoles = registry.roles;
+        const totalColumns = Math.max(allRoles.length, 1);
+
+        return (
+            <>
+                <div className="fg-rpm__pro-box">
+                    <span className="fotogrids-pro-badge">{__('PRO', 'fotogrids')}</span>
+                    <div className="fg-rpm__pro-box-text">
+                        {__(
+                            'Take full control of every capability per role, override permissions per user, and grant access per gallery or album.',
+                            'fotogrids'
+                        )}
                     </div>
-                ))}
+                    <Button
+                        variant="primary"
+                        size="xs"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const url = window.fotogridsUpgradeModal?.urls?.upgrade;
+                            if (url) window.open(url, '_blank');
+                        }}
+                    >
+                        {__('Upgrade Now', 'fotogrids')}
+                    </Button>
+                </div>
 
-                {rows.map((row, rowIndex) => {
-                    if (row.type === 'header') {
-                        return (
-                            <div key={`header-${row.category}`} className="fg-rpm__category-header">
+                <div className="fg-rpm__table" style={{ '--columns': totalColumns }}>
+                    <div className="fg-rpm__header-cell fg-rpm__header-cell--permission" />
+                    {allRoles.map((role) => (
+                        <div key={`header-${role.key}`} className="fg-rpm__header-cell">
+                            {ROLE_LABEL_OVERRIDES[role.key] || role.name}
+                        </div>
+                    ))}
+
+                    {groupKeys.map((groupKey) => (
+                        <React.Fragment key={groupKey}>
+                            <div className="fg-rpm__category-header">
                                 <div className="fg-rpm__category-header-content">
-                                    {row.label}
+                                    {GROUP_LABELS[groupKey] || groupKey}
                                 </div>
                             </div>
-                        );
-                    }
-
-                    const { permission } = row;
-                    const permissionRows = rows.filter(r => r.type === 'permission');
-                    const permissionIndex = permissionRows.findIndex(r => r.permission.key === permission.key);
-                    const isEven = permissionIndex % 2 === 0;
-
-                    return (
-                        <React.Fragment key={permission.key}>
-                            <div className={`fg-rpm__cell fg-rpm__cell--permission ${isEven ? 'fg-rpm__cell--even' : 'fg-rpm__cell--odd'}`}>
-                                <span
-                                    className="fg-rpm__permission-name"
-                                    data-tooltip={permission.description}
-                                >
-                                    {permission.label}
-                                </span>
-                            </div>
-                            {roles.map((role) => {
-                                const isChecked = hasCapability(role, permission.key);
-                                const iconName = isChecked ? 'check_circle' : 'circle';
-
+                            {grouped[groupKey].map((def, idx) => {
+                                const isEven = idx % 2 === 0;
                                 return (
-                                    <div key={role.key} className={`fg-rpm__cell fg-rpm__cell--checkbox ${isChecked ? 'fg-rpm__cell--checkbox-checked' : ''} ${isEven ? 'fg-rpm__cell--even' : 'fg-rpm__cell--odd'}`}>
-                                        <Icon name={iconName} />
-                                    </div>
+                                    <React.Fragment key={def.key}>
+                                        <div className={`fg-rpm__cell fg-rpm__cell--permission ${isEven ? 'fg-rpm__cell--even' : 'fg-rpm__cell--odd'}`}>
+                                            <span
+                                                className="fg-rpm__permission-name"
+                                                data-tooltip={def.description || def.key}
+                                            >
+                                                {def.label}
+                                            </span>
+                                        </div>
+                                        {allRoles.map((role) => {
+                                            const checked = role.capabilities[def.key] === true;
+                                            const iconName = checked ? 'check_circle' : 'circle';
+                                            return (
+                                                <div
+                                                    key={`${def.key}-${role.key}`}
+                                                    className={`fg-rpm__cell fg-rpm__cell--checkbox ${checked ? 'fg-rpm__cell--checkbox-checked' : ''} ${isEven ? 'fg-rpm__cell--even' : 'fg-rpm__cell--odd'}`}
+                                                >
+                                                    <Icon name={iconName} />
+                                                </div>
+                                            );
+                                        })}
+                                    </React.Fragment>
                                 );
                             })}
                         </React.Fragment>
-                    );
-                })}
-            </div>
-        </div>
+                    ))}
+                </div>
+            </>
+        );
+    };
+
+    return (
+        <>
+            <Panel
+                title={__('Capability Settings', 'fotogrids')}
+                description={__('Quick lowest-role configuration for the most common permissions.', 'fotogrids')}
+            >
+                {renderSimplePanel()}
+            </Panel>
+
+            <Panel
+                title={__('Permissions Manager', 'fotogrids')}
+                description={__('Full granular view of every FotoGrids capability per role.', 'fotogrids')}
+            >
+                {renderMatrixPanel()}
+            </Panel>
+        </>
     );
 };
 

@@ -1,0 +1,19 @@
+.fg-modal {
+    $modal: &;
+
+    &__main {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    &--has-sidebar {
+        #{$modal}__main {
+            // The body owns padding when there's no sidebar; with a sidebar, the
+            // main pane provides its own to keep parity with the sidebar block.
+            padding: 0;
+        }
+    }
+}

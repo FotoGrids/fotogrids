@@ -303,7 +303,7 @@
         grid-auto-flow: column;
         grid-auto-columns: 1fr;
 
-        .fotogrids-button {
+        .fg-button {
             border-radius: 2px;
         }
     }
@@ -440,22 +440,6 @@
 
     &-options {
         margin-top: 32px;
-
-        .fotogrids-form-group {
-            margin-bottom: 20px;
-
-            label {
-                display: block;
-                margin-bottom: 8px;
-                font-size: 13px;
-                font-weight: 500;
-                color: #1e1e1e;
-            }
-
-            .fotogrids-input {
-                width: 100%;
-            }
-        }
     }
 }
 
@@ -545,7 +529,7 @@
         gap: 12px;
         margin-bottom: 24px;
 
-        .fotogrids-button.fg-is-active {
+        .fg-button.fg-is-active {
             background: var(--fg-blue);
             color: white;
         }

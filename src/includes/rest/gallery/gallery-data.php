@@ -60,7 +60,7 @@ class Gallery_Data {
             );
         }
 
-        $item_ids = array_map( 'intval', fotogrids_get_gallery_item_ids( $gallery_id ) );
+        $item_ids = array_map( 'intval', \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id ) );
         if ( ! in_array( $item_id, $item_ids, true ) ) {
             return new \WP_Error(
                 'fotogrids_item_not_in_gallery',
@@ -199,7 +199,7 @@ class Gallery_Data {
         }
 
         $stored   = (string) get_post_meta( $gallery_id, 'fotogrids_password', true );
-        $settings = fotogrids_get_gallery_settings( $gallery_id );
+        $settings = \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
 
         if ( ! \FotoGrids\Password_Crypto::verify( $submitted, $stored ) ) {
             return new \WP_Error(
@@ -380,7 +380,7 @@ class Gallery_Data {
         // present, we still use the raw total but the client treats
         // has_more as authoritative — the renderer sets total_pages
         // to be consistent with what was sliced.
-        $settings    = fotogrids_get_gallery_settings( $gallery_id );
+        $settings    = \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
         $page_size   = $items_per_page > 0
             ? $items_per_page
             : \FotoGrids\Render\Features\Pagination\Page_Size_Resolver::resolve_page_size( $settings );
@@ -393,7 +393,7 @@ class Gallery_Data {
             $filtered_total = self::count_filtered_items( $gallery_id, $filters );
             $total          = $filtered_total;
         } else {
-            $all_items = fotogrids_get_gallery_item_ids( $gallery_id );
+            $all_items = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
             $total     = is_array( $all_items ) ? count( $all_items ) : 0;
         }
 
@@ -442,7 +442,7 @@ class Gallery_Data {
      * @return int
      */
     private static function count_filtered_items( int $gallery_id, array $filters ): int {
-        $settings = fotogrids_get_gallery_settings( $gallery_id );
+        $settings = \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
         return \FotoGrids\Render\Internal\Gallery_Item_Sequence::count( $gallery_id, $settings, $filters );
     }
 
@@ -483,7 +483,7 @@ class Gallery_Data {
 
         foreach ( $query->posts as $post ) {
             $item_count    = self::get_gallery_item_count( $post->ID );
-            $featured_item = fotogrids_get_collection_cover_url( $post->ID, 'medium' );
+            $featured_item = \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'medium' );
 
             $galleries[] = array(
                 'id' => $post->ID,

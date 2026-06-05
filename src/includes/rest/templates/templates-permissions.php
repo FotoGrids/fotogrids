@@ -69,7 +69,7 @@ class Templates_Permissions {
         }
 
         // Templates saving is a Pro feature
-        return fotogrids_has_pro();
+        return \FotoGrids\License_Manager::has_pro();
     }
 
     /**

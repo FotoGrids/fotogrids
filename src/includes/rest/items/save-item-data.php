@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Items;
 
+use FotoGrids\Hooks\Filters_Save;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -235,7 +237,7 @@ class Save_Item_Data {
          * @param int              $item_id      The attachment ID being saved.
          * @param \WP_REST_Request $request      The full REST request (allows access to extra params).
          */
-        $meta_results = apply_filters( 'fotogrids/save/item/metadata', $meta_results, $item_id, $request );
+        $meta_results = apply_filters( Filters_Save::ITEM_METADATA, $meta_results, $item_id, $request );
 
         return rest_ensure_response( array(
             'success'  => true,

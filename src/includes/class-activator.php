@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_System;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -34,6 +36,7 @@ class Activator {
         flush_rewrite_rules();
 
         self::add_capabilities();
+        update_option( 'fotogrids_caps_version', self::CAPS_VERSION, false );
 
         update_option( 'fotogrids_version', FOTOGRIDS_VERSION );
         update_option( 'fotogrids_activated_time', current_time( 'timestamp' ) );
@@ -74,7 +77,7 @@ class Activator {
         }
 
         // Ensure modules are registered for this isolated request.
-        do_action( 'fotogrids/modules/register' );
+        do_action( Actions_System::MODULES_REGISTER );
 
         foreach ( \FotoGrids\Modules\Module_Registry::get_all() as $entry ) {
             $module = $entry['module'];
@@ -116,6 +119,7 @@ class Activator {
         $table_tags = $wpdb->prefix . 'fotogrids_tags';
         $table_item_metadata = $wpdb->prefix . 'fotogrids_item_metadata';
         $table_render_cache = $wpdb->prefix . 'fotogrids_render_cache';
+        $table_permission_grants = $wpdb->prefix . 'fotogrids_permission_grants';
 
         $sql = "
         CREATE TABLE $table_item_meta (
@@ -238,14 +242,33 @@ class Activator {
           KEY object_lookup (object_type, object_id),
           KEY expires_at (expires_at)
         ) $charset_collate;
+
+        CREATE TABLE $table_permission_grants (
+          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          grantee_type ENUM('role','user','token') NOT NULL,
+          grantee_id VARCHAR(64) NOT NULL,
+          scope_type ENUM('global','gallery','album') NOT NULL DEFAULT 'global',
+          scope_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+          capability VARCHAR(96) NOT NULL,
+          state ENUM('granted','denied') NOT NULL DEFAULT 'granted',
+          source VARCHAR(32) NOT NULL DEFAULT 'fotogrids',
+          created_by BIGINT UNSIGNED NOT NULL DEFAULT 0,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          expires_at DATETIME NULL,
+          PRIMARY KEY (id),
+          UNIQUE KEY grant_idx (grantee_type, grantee_id, scope_type, scope_id, capability),
+          KEY capability (capability),
+          KEY scope_lookup (scope_type, scope_id),
+          KEY expires_at (expires_at)
+        ) $charset_collate;
         ";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
 
-        do_action( 'fotogrids/system/activate' );
+        do_action( Actions_System::ACTIVATE );
 
-        update_option( 'fotogrids_db_version', '1.3' );
+        update_option( 'fotogrids_db_version', '1.4' );
     }
 
     /**
@@ -260,106 +283,121 @@ class Activator {
      */
     public static function maybe_upgrade() {
         $current = get_option( 'fotogrids_db_version', '0' );
-        if ( version_compare( $current, '1.3', '>=' ) ) {
-            return; // Already up to date - nothing to do.
+        if ( version_compare( $current, '1.4', '<' ) ) {
+            self::create_tables();
         }
 
-        self::create_tables();
+        // Cap resync runs on 'init' priority 8 - after Permission_Registry::boot
+        // (priority 7) and after Pro's listeners are attached, so module / tool
+        // / Pro caps are all visible to the registry walk.
+        if ( ! has_action( 'init', [ __CLASS__, 'maybe_resync_capabilities' ] ) ) {
+            add_action( 'init', [ __CLASS__, 'maybe_resync_capabilities' ], 8 );
+        }
     }
 
     /**
-     * Add plugin capabilities to WordPress roles
+     * Re-run capability grants on existing installs whenever the cap catalogue
+     * version moves forward.
      *
-     * Assigns appropriate capabilities to WordPress user roles:
-     * - Administrator: Full access to all plugin features
-     * - Editor: Gallery/album management + statistics viewing
-     * - Author: Basic gallery/album creation and editing
+     * Activator::activate() only fires on plugin (re)activation, so any cap
+     * added to the Permission_Registry after first install would never reach
+     * the admin role on existing sites - producing silent permission denials
+     * downstream (e.g. the modify_fotogrids_{gallery|album}_settings caps,
+     * added with the Permissions Manager, gated every settings save and
+     * caused the save pipeline to drop the payload while still returning a
+     * success response).
      *
-     * Capabilities are based on the capability_type defined in Post_Types class.
+     * Bump CAPS_VERSION whenever atomic caps are added to Core_Permissions or
+     * to a module's harvester so this resync runs once on next page load.
+     *
+     * Public so the 'init' hook can call it; not part of the external API.
      *
      * @since 1.0.0
      */
-    private static function add_capabilities() {
-        $gallery_capabilities = array(
-            'edit_fotogrids_gallery',
-            'read_fotogrids_gallery',
-            'delete_fotogrids_gallery',
-            'edit_fotogrids_galleries',
-            'edit_others_fotogrids_galleries',
-            'publish_fotogrids_galleries',
-            'read_private_fotogrids_galleries',
-            'delete_fotogrids_galleries',
-            'delete_private_fotogrids_galleries',
-            'delete_published_fotogrids_galleries',
-            'delete_others_fotogrids_galleries',
-            'edit_private_fotogrids_galleries',
-            'edit_published_fotogrids_galleries',
-        );
-
-        $album_capabilities = array(
-            'edit_fotogrids_album',
-            'read_fotogrids_album',
-            'delete_fotogrids_album',
-            'edit_fotogrids_albums',
-            'edit_others_fotogrids_albums',
-            'publish_fotogrids_albums',
-            'read_private_fotogrids_albums',
-            'delete_fotogrids_albums',
-            'delete_private_fotogrids_albums',
-            'delete_published_fotogrids_albums',
-            'delete_others_fotogrids_albums',
-            'edit_private_fotogrids_albums',
-            'edit_published_fotogrids_albums',
-        );
-
-        $plugin_capabilities = array(
-            'manage_fotogrids',
-            'view_fotogrids_stats',
-            'manage_fotogrids_settings',
-            'manage_fotogrids_library',
-        );
-
-        $all_capabilities = array_merge( $gallery_capabilities, $album_capabilities, $plugin_capabilities );
-
-        $admin_role = get_role( 'administrator' );
-        if ( $admin_role ) {
-            foreach ( $all_capabilities as $cap ) {
-                $admin_role->add_cap( $cap );
-            }
+    public static function maybe_resync_capabilities(): void {
+        $current = get_option( 'fotogrids_caps_version', '0' );
+        if ( version_compare( $current, self::CAPS_VERSION, '>=' ) ) {
+            return;
         }
 
-        $editor_role = get_role( 'editor' );
-        if ( $editor_role ) {
-            $editor_caps = array_merge(
-                $gallery_capabilities,
-                $album_capabilities,
-                array( 'view_fotogrids_stats', 'manage_fotogrids_library' )
-            );
-            foreach ( $editor_caps as $cap ) {
-                $editor_role->add_cap( $cap );
-            }
+        // 'init' has already fired by the time this runs (priority 8),
+        // so the module/tool registries are already populated - pass false
+        // to skip re-firing their registration actions.
+        self::add_capabilities( false );
+        update_option( 'fotogrids_caps_version', self::CAPS_VERSION, false );
+    }
+
+    /**
+     * Current capability-catalogue version. Bump whenever new atomic caps are
+     * added to Core_Permissions or to a module's harvester so existing installs
+     * receive them via Activator::maybe_resync_capabilities.
+     */
+    private const CAPS_VERSION = '1.1';
+
+    /**
+     * Add plugin capabilities to WordPress roles.
+     *
+     * Reads every atomic capability from Permission_Registry and grants it to
+     * its default lowest role plus every role above on the WP role ladder.
+     * The historical hand-rolled cap arrays are gone - the registry is the
+     * single source of truth.
+     *
+     * Pro plugins can contribute additional capabilities via the
+     * 'fotogrids/permissions/register' filter; those will be granted here
+     * too when Pro is active during activation.
+     *
+     * @since 1.0.0
+     */
+    private static function add_capabilities( bool $bootstrap_registries = true ) {
+        // The registry needs Tools_Registry and Module_Registry to be
+        // populated to harvest their capabilities. Activation runs in an
+        // isolated request where 'init' has not fired, so trigger the
+        // registration actions explicitly. When called from the resync path
+        // on a normal request, 'init' has already fired and re-firing these
+        // actions would invoke listeners a second time - skip them.
+        if ( $bootstrap_registries ) {
+            do_action( Actions_System::MODULES_REGISTER );
+            do_action( Actions_System::TOOLS_INIT );
         }
 
-        $author_role = get_role( 'author' );
-        if ( $author_role ) {
-            $author_caps = array(
-                'edit_fotogrids_gallery',
-                'read_fotogrids_gallery',
-                'delete_fotogrids_gallery',
-                'edit_fotogrids_galleries',
-                'publish_fotogrids_galleries',
-                'delete_fotogrids_galleries',
-                'edit_fotogrids_album',
-                'read_fotogrids_album',
-                'delete_fotogrids_album',
-                'edit_fotogrids_albums',
-                'publish_fotogrids_albums',
-                'delete_fotogrids_albums',
-            );
-            foreach ( $author_caps as $cap ) {
-                $author_role->add_cap( $cap );
+        \FotoGrids\Permissions\Permission_Registry::boot();
+
+        foreach ( \FotoGrids\Permissions\Permission_Registry::get_all() as $def ) {
+            if ( $def->is_logical() ) {
+                // Logical caps are not real WP caps - their underlying atomic
+                // caps each registered separately and get granted there.
+                continue;
+            }
+
+            $roles = self::roles_at_or_above( $def->default_lowest_role );
+            foreach ( $roles as $role_name ) {
+                $role = get_role( $role_name );
+                if ( $role ) {
+                    $role->add_cap( $def->key );
+                }
             }
         }
+    }
+
+    /**
+     * Return the standard WP role ladder from the given role and up.
+     *
+     * Used by the activator and by the permissions REST endpoints. Roles
+     * outside the standard ladder (custom roles created by other plugins)
+     * are not granted defaults - administrators can grant them via the
+     * matrix later if Pro is active.
+     *
+     * @param string $lowest_role 'administrator' | 'editor' | 'author' | 'contributor' | 'subscriber'.
+     * @return string[] Role slugs, most-privileged first.
+     */
+    public static function roles_at_or_above( string $lowest_role ): array {
+        $ladder = [ 'administrator', 'editor', 'author', 'contributor', 'subscriber' ];
+        $index  = array_search( $lowest_role, $ladder, true );
+        if ( $index === false ) {
+            // Unknown role - grant administrators only.
+            return [ 'administrator' ];
+        }
+        return array_slice( $ladder, 0, $index + 1 );
     }
 
     /**

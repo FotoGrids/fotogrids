@@ -59,7 +59,7 @@ window.FotoGridsRenderSettings.renderPromo = (setting, currentValue, isDisabled,
         })),
         h('button', {
             type: 'button',
-            className: 'fotogrids-button fotogrids-button--primary fotogrids-button--small',
+            className: 'fg-button fg-button--variant-primary fg-button--size-sm',
             onClick: handleUpgradeClick
         }, __('Upgrade Now', 'fotogrids'))
     ]);

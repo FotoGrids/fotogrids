@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, memo, useRef, useState } from 'react';
 import {
-    Button,
     Notice,
     Spinner,
-    CheckboxControl,
     TextControl,
     Popover,
-    Modal,
 } from '@wordpress/components';
+import { Modal, Confirm } from '../shared/Modal';
+import { Button } from '../shared/Button';
+import Checkbox from '../shared/Checkbox';
+import { FormField } from '../shared/FormField';
 import MergeDialog from './MergeDialog';
 import Panel from '../shared/SidebarTabs/elements/Panel';
 import Toggle from '../shared/Toggle';
@@ -46,12 +47,10 @@ const LibraryTableRow = memo(({
         <React.Fragment key={item.id}>
             <tr className={isSelected ? 'fotogrids-library-row-selected' : ''}>
                 <td scope="row" className="check-column">
-                    <CheckboxControl
-                        label={''}
+                    <Checkbox
                         checked={isSelected}
                         onChange={() => onToggleSelected(item.id)}
-                        aria-label={sprintf(__('Select %s', 'fotogrids'), item.name)}
-                        __nextHasNoMarginBottom
+                        ariaLabel={sprintf(__('Select %s', 'fotogrids'), item.name)}
                     />
                 </td>
                 <td className="fotogrids-library-table__column-name">
@@ -111,17 +110,17 @@ const LibraryTableRow = memo(({
                 <td className="fotogrids-library-table__column--small fotogrids-library-table__column-actions">
                     {isEditing ? (
                         <div className="fotogrids-library-actions">
-                            <button className="fotogrids-button fotogrids-button--primary fotogrids-button--small" onClick={onSaveEdit}>{__('Save', 'fotogrids')}</button>
-                            <button className="fotogrids-button fotogrids-button--secondary fotogrids-button--small" onClick={onCancelEdit}>{__('Cancel', 'fotogrids')}</button>
+                            <Button variant="primary" size="xs" onClick={onSaveEdit}>{__('Save', 'fotogrids')}</Button>
+                            <Button variant="secondary" size="xs" onClick={onCancelEdit}>{__('Cancel', 'fotogrids')}</Button>
                         </div>
                     ) : (
                         <Button
-                            size="small"
-                            variant="tertiary"
-                            isDestructive
+                            size="xs"
+                            variant="danger"
+                            style="ghost"
                             disabled={!canManage}
                             onClick={() => onRequestDelete(item)}
-                            aria-label={sprintf(__('Delete %s', 'fotogrids'), item.name)}
+                            ariaLabel={sprintf(__('Delete %s', 'fotogrids'), item.name)}
                         >
                             {__('Delete', 'fotogrids')}
                         </Button>
@@ -149,10 +148,10 @@ const LibraryTableRow = memo(({
                                     }
                                 </p>
                                 <div className="fotogrids-library-delete-popover-actions">
-                                    <Button size="small" variant="primary" isDestructive onClick={onConfirmDelete}>
+                                    <Button size="xs" variant="danger" onClick={onConfirmDelete}>
                                         {__('Delete', 'fotogrids')}
                                     </Button>
-                                    <Button size="small" variant="tertiary" onClick={onCancelDelete}>
+                                    <Button size="xs" variant="tertiary" onClick={onCancelDelete}>
                                         {__('Cancel', 'fotogrids')}
                                     </Button>
                                 </div>
@@ -223,14 +222,14 @@ const LibraryTableToolbar = memo(({
 
             <div className="fotogrids-library-toolbar-actions">
                 {canManage && entityType.supports_create && (
-                    <button className="fotogrids-button fotogrids-button--primary fotogrids-button--small" onClick={onOpenCreate}>
+                    <Button variant="primary" size="xs" onClick={onOpenCreate}>
                         {sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
-                    </button>
+                    </Button>
                 )}
                 {canManage && (
-                    <button className="fotogrids-button fotogrids-button--secondary fotogrids-button--small" onClick={onRecalc} disabled={recalcing}>
+                    <Button variant="secondary" size="xs" onClick={onRecalc} disabled={recalcing} busy={recalcing}>
                         {__('Recalculate counts', 'fotogrids')}
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>
@@ -244,7 +243,7 @@ const LibraryTableBulkBar = memo(({ selectedCount, canManage, onDeleteSelected, 
     return (
         <div className="fotogrids-library-bulkbar">
             <span>{sprintf(_n('%d selected', '%d selected', selectedCount, 'fotogrids'), selectedCount)}</span>
-            <Button variant="secondary" isDestructive onClick={onDeleteSelected} disabled={!canManage}>
+            <Button variant="danger" style="outline" onClick={onDeleteSelected} disabled={!canManage}>
                 {__('Delete selected', 'fotogrids')}
             </Button>
             {selectedCount >= 2 && (
@@ -258,7 +257,7 @@ const LibraryTableBulkBar = memo(({ selectedCount, canManage, onDeleteSelected, 
 
 LibraryTableBulkBar.displayName = 'LibraryTableBulkBar';
 
-const LibraryTableHead = memo(({ entityType, orderby, order, allSelectedOnPage, onSort, onToggleSelectAll }) => {
+const LibraryTableHead = memo(({ entityType, orderby, order, allSelectedOnPage, someSelectedOnPage, onSort, onToggleSelectAll }) => {
     const { __ } = wp.i18n;
 
     const sortIndicator = (column) => {
@@ -278,12 +277,11 @@ const LibraryTableHead = memo(({ entityType, orderby, order, allSelectedOnPage, 
         <thead>
             <tr>
                 <th scope="col" className="check-column">
-                    <CheckboxControl
-                        label={''}
+                    <Checkbox
                         checked={allSelectedOnPage}
+                        indeterminate={!allSelectedOnPage && someSelectedOnPage}
                         onChange={onToggleSelectAll}
-                        aria-label={__('Select all on this page', 'fotogrids')}
-                        __nextHasNoMarginBottom
+                        ariaLabel={__('Select all on this page', 'fotogrids')}
                     />
                 </th>
                 <th className="fotogrids-library-table__column-name" scope="col">
@@ -709,6 +707,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 
     // ─── Render ──────────────────────────────────────────────────────────────
     const allSelectedOnPage = items.length > 0 && selectedIds.size === items.length;
+    const someSelectedOnPage = items.length > 0 && selectedIds.size > 0 && selectedIds.size < items.length;
 
     return (
         <Panel
@@ -744,6 +743,7 @@ const LibraryTabBase = ({ entityType, config }) => {
                     orderby={orderby}
                     order={order}
                     allSelectedOnPage={allSelectedOnPage}
+                    someSelectedOnPage={someSelectedOnPage}
                     onSort={toggleSort}
                     onToggleSelectAll={toggleSelectAll}
                 />
@@ -821,81 +821,85 @@ const LibraryTabBase = ({ entityType, config }) => {
                 </div>
             )}
 
-            {bulkConfirmOpen && (
-                <Modal
-                    title={__('Delete selected entries?', 'fotogrids')}
-                    onRequestClose={() => setBulkConfirmOpen(false)}
-                >
-                    <p>
-                        {sprintf(
-                            _n(
-                                'You are about to delete %d entry. Linked items will lose this %s.',
-                                'You are about to delete %d entries. Linked items will lose these %s.',
-                                selectedIds.size,
-                                'fotogrids'
-                            ),
-                            selectedIds.size,
-                            (entityType.label_plural || '').toLowerCase()
-                        )}
-                    </p>
-                    <div className="fotogrids-library-modal-actions">
-                        <Button variant="primary" isDestructive onClick={confirmBulkDelete}>
-                            {__('Delete', 'fotogrids')}
-                        </Button>
-                        <Button variant="tertiary" onClick={() => setBulkConfirmOpen(false)}>
-                            {__('Cancel', 'fotogrids')}
-                        </Button>
-                    </div>
-                </Modal>
-            )}
+            <Confirm
+                isOpen={bulkConfirmOpen}
+                onClose={() => setBulkConfirmOpen(false)}
+                onConfirm={confirmBulkDelete}
+                variant="danger"
+                title={__('Delete selected entries?', 'fotogrids')}
+                message={sprintf(
+                    _n(
+                        'You are about to delete %d entry. Linked items will lose this %s.',
+                        'You are about to delete %d entries. Linked items will lose these %s.',
+                        selectedIds.size,
+                        'fotogrids'
+                    ),
+                    selectedIds.size,
+                    (entityType.label_plural || '').toLowerCase()
+                )}
+                confirmLabel={__('Delete', 'fotogrids')}
+            />
 
-            {createOpen && (
-                <Modal
-                    title={sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
-                    onRequestClose={() => setCreateOpen(false)}
-                >
-                    <TextControl
-                        label={__('Name', 'fotogrids')}
-                        value={createDraft.name || ''}
-                        onChange={(v) => setCreateDraft({ ...createDraft, name: v })}
-                        __nextHasNoMarginBottom
-                    />
+            <Modal
+                isOpen={createOpen}
+                onClose={() => setCreateOpen(false)}
+                size="sm"
+            >
+                <Modal.Header>
+                    <Modal.HeaderTitle>
+                        {sprintf(__('Add %s', 'fotogrids'), entityType.label_singular || __('entry', 'fotogrids'))}
+                    </Modal.HeaderTitle>
+                </Modal.Header>
+                <Modal.Body>
+                    <FormField label={__('Name', 'fotogrids')} htmlFor="fg-library-create-name" layout="column" required>
+                        <input
+                            id="fg-library-create-name"
+                            type="text"
+                            value={createDraft.name || ''}
+                            onChange={(e) => setCreateDraft({ ...createDraft, name: e.target.value })}
+                            autoFocus
+                        />
+                    </FormField>
                     {entityType.type === 'location' && (
                         <>
-                            <TextControl
-                                label={__('Latitude', 'fotogrids')}
-                                value={createDraft.latitude ?? ''}
-                                onChange={(v) => setCreateDraft({ ...createDraft, latitude: v })}
-                                type="number"
-                                __nextHasNoMarginBottom
-                            />
-                            <TextControl
-                                label={__('Longitude', 'fotogrids')}
-                                value={createDraft.longitude ?? ''}
-                                onChange={(v) => setCreateDraft({ ...createDraft, longitude: v })}
-                                type="number"
-                                __nextHasNoMarginBottom
-                            />
+                            <FormField label={__('Latitude', 'fotogrids')} htmlFor="fg-library-create-lat" layout="column">
+                                <input
+                                    id="fg-library-create-lat"
+                                    type="number"
+                                    value={createDraft.latitude ?? ''}
+                                    onChange={(e) => setCreateDraft({ ...createDraft, latitude: e.target.value })}
+                                />
+                            </FormField>
+                            <FormField label={__('Longitude', 'fotogrids')} htmlFor="fg-library-create-lng" layout="column">
+                                <input
+                                    id="fg-library-create-lng"
+                                    type="number"
+                                    value={createDraft.longitude ?? ''}
+                                    onChange={(e) => setCreateDraft({ ...createDraft, longitude: e.target.value })}
+                                />
+                            </FormField>
                         </>
                     )}
                     {entityType.type === 'person' && (
-                        <TextControl
-                            label={__('Details (optional)', 'fotogrids')}
-                            value={createDraft.details ?? ''}
-                            onChange={(v) => setCreateDraft({ ...createDraft, details: v })}
-                            __nextHasNoMarginBottom
-                        />
+                        <FormField label={__('Details (optional)', 'fotogrids')} htmlFor="fg-library-create-details" layout="column">
+                            <input
+                                id="fg-library-create-details"
+                                type="text"
+                                value={createDraft.details ?? ''}
+                                onChange={(e) => setCreateDraft({ ...createDraft, details: e.target.value })}
+                            />
+                        </FormField>
                     )}
-                    <div className="fotogrids-library-modal-actions">
-                        <Button variant="primary" onClick={submitCreate} disabled={!createDraft.name?.trim()}>
-                            {__('Create', 'fotogrids')}
-                        </Button>
-                        <Button variant="tertiary" onClick={() => setCreateOpen(false)}>
-                            {__('Cancel', 'fotogrids')}
-                        </Button>
-                    </div>
-                </Modal>
-            )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setCreateOpen(false)}>
+                        {__('Cancel', 'fotogrids')}
+                    </Button>
+                    <Button variant="primary" onClick={submitCreate} disabled={!createDraft.name?.trim()}>
+                        {__('Create', 'fotogrids')}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {mergeOpen && (
                 <MergeDialog

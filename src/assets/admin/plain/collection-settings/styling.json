@@ -107,6 +107,13 @@
                             "key": "border_radius_group",
                             "type": "setting_group",
                             "label": "Border Radius",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos"
+                                ],
+                                "condition_operator": "not_in"
+                            },
                             "settings": [
                                 {
                                     "key": "border_radius",
@@ -146,6 +153,13 @@
                             "key": "border_group",
                             "type": "setting_group",
                             "label": "Border",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos"
+                                ],
+                                "condition_operator": "not_in"
+                            },
                             "settings": [
                                 {
                                     "key": "border_enabled",
@@ -332,6 +346,13 @@
                             "key": "shadow_group",
                             "type": "setting_group",
                             "label": "Shadow",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos"
+                                ],
+                                "condition_operator": "not_in"
+                            },
                             "settings": [
                                 {
                                     "key": "shadow_enabled",

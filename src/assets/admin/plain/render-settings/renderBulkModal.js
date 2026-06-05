@@ -103,12 +103,12 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
             }, [
                 h('button', {
                     type: 'button',
-                    className: 'fotogrids-button fotogrids-button--secondary',
+                    className: 'fg-button fg-button--variant-secondary',
                     onClick: closeBulkModal
                 }, __('Cancel', 'fotogrids')),
                 h('button', {
                     type: 'button',
-                    className: `fotogrids-button fotogrids-button--primary`,
+                    className: `fg-button fg-button--variant-primary`,
                     onClick: executeBulkAction,
                     disabled: !canExecute
                 }, bulkAction === 'apply_to_all' ? __('Apply to All', 'fotogrids') : __('Clear All', 'fotogrids'))

@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Settings;
 
+use FotoGrids\Hooks\Filters_View;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -32,10 +34,27 @@ final class View_Settings_Store {
      */
     public static function defaults(): array {
         $defaults = array(
-            'accent_color' => '#3c46f0',
-            'theme'        => 'light',
-            'max_width'    => 1200,
-            'show_header'  => true,
+            // Site-wide layout mode for view pages. 'integrated' (default)
+            // lets the active theme render the page (header/footer/sidebar),
+            // injecting the gallery via the_content. 'standalone' renders the
+            // theme-less shell that this module ships.
+            'layout_mode'                     => 'integrated',
+
+            // Standalone-only appearance. Only consulted when
+            // layout_mode === 'standalone'.
+            'accent_color'                    => '#3c46f0',
+            'theme'                           => 'light',
+            'max_width'                       => 1200,
+            'show_header'                     => true,
+
+            // Integrated-mode toggles. Only consulted when
+            // layout_mode === 'integrated'. Each has a paired
+            // fotogrids/view/integrated/* filter for runtime override.
+            'integrated_show_title_block'     => false,
+            'integrated_hide_featured_image'  => true,
+            'integrated_allow_comments'       => false,
+            'integrated_include_in_archives'  => false,
+            'integrated_post_navigation'      => false,
         );
 
         /**
@@ -44,7 +63,7 @@ final class View_Settings_Store {
          * @since 1.0.0
          * @param array<string,mixed> $defaults
          */
-        return apply_filters( 'fotogrids/view/appearance/defaults', $defaults );
+        return apply_filters( Filters_View::APPEARANCE_DEFAULTS, $defaults );
     }
 
     /**
@@ -69,7 +88,7 @@ final class View_Settings_Store {
          * @since 1.0.0
          * @param array<string,mixed> $settings
          */
-        return apply_filters( 'fotogrids/view/appearance', $settings );
+        return apply_filters( Filters_View::APPEARANCE, $settings );
     }
 
     /**
@@ -100,11 +119,24 @@ final class View_Settings_Store {
             $accent = $defaults['accent_color'];
         }
 
+        $layout_mode = sanitize_key( $input['layout_mode'] ?? $defaults['layout_mode'] );
+        if ( ! in_array( $layout_mode, array( 'integrated', 'standalone' ), true ) ) {
+            $layout_mode = $defaults['layout_mode'];
+        }
+
         $sanitized = array(
-            'accent_color' => $accent,
-            'theme'        => $theme,
-            'max_width'    => $max_width,
-            'show_header'  => self::truthy( $input['show_header'] ?? $defaults['show_header'] ),
+            'layout_mode'                    => $layout_mode,
+
+            'accent_color'                   => $accent,
+            'theme'                          => $theme,
+            'max_width'                      => $max_width,
+            'show_header'                    => self::truthy( $input['show_header'] ?? $defaults['show_header'] ),
+
+            'integrated_show_title_block'    => self::truthy( $input['integrated_show_title_block']    ?? $defaults['integrated_show_title_block'] ),
+            'integrated_hide_featured_image' => self::truthy( $input['integrated_hide_featured_image'] ?? $defaults['integrated_hide_featured_image'] ),
+            'integrated_allow_comments'      => self::truthy( $input['integrated_allow_comments']      ?? $defaults['integrated_allow_comments'] ),
+            'integrated_include_in_archives' => self::truthy( $input['integrated_include_in_archives'] ?? $defaults['integrated_include_in_archives'] ),
+            'integrated_post_navigation'     => self::truthy( $input['integrated_post_navigation']     ?? $defaults['integrated_post_navigation'] ),
         );
 
         /**
@@ -115,7 +147,7 @@ final class View_Settings_Store {
          * @param array<string,mixed> $sanitized
          * @param array<string,mixed> $input
          */
-        return apply_filters( 'fotogrids/view/appearance/sanitize', $sanitized, $input );
+        return apply_filters( Filters_View::APPEARANCE_SANITIZE, $sanitized, $input );
     }
 
     /**

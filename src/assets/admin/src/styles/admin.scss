@@ -6,10 +6,18 @@
 @use './sizes.scss' as *;
 @use './pro.scss' as *;
 @use './inputs.scss' as *;
+@use './fg-button/fg-button.scss' as *;
+@use './fg-checkbox/fg-checkbox.scss' as *;
+@use './fg-form-field/fg-form-field.scss' as *;
+@use './fg-modal/fg-modal.scss' as *;
+@use './SearchBar/SearchBar.scss' as *;
+@use './item-edit/item-edit.scss' as *;
+@use './video-embed/video-embed.scss' as *;
 @use './blocks.scss' as *;
 @use './items.scss' as *;
-@use './item-edit-modal.scss' as *;
 @use './settings.scss' as *;
+@use './settings-lock.scss' as *;
+@use './collection-settings/readonly-mode.scss' as *;
 @use './ajax-save.scss' as *;
 @use './album-assignment.scss' as *;
 @use './album-galleries.scss' as *;
@@ -29,18 +37,7 @@
 @use './ui-elements/ui-elements.scss' as *;
 @use './toast.scss' as *;
 @use './tooltip.scss' as *;
-
-.fotogrids-icon {
-    line-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-        width: 16px;
-        height: 16px;
-    }
-}
+@use './fg-icon/fg-icon.scss' as *;
 
 #fotogrids_gallery_items > .inside {
     padding: 0;
@@ -50,7 +47,7 @@
 .fotogrids-gallery-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: -1px;
 }
 
@@ -138,9 +135,10 @@
     gap: 4px;
     padding-inline-start: 14px;
 
-    span {
+    span.fotogrids-icon {
         font-size: 0;
         line-height: 1;
+        height: auto;
 
         svg {
             width: 16px;
@@ -230,8 +228,14 @@
     align-items: stretch;
     overflow: hidden;
 
-    .fotogrids-pro-badge {
+    .fg-button__label {
         display: flex;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .fotogrids-pro-badge {
+        display: inline-flex;
         align-items: center;
     }
 }
@@ -353,37 +357,6 @@ body[class*="post-type-fotogrids_"] {
 
         @media (max-width: 768px) {
             grid-template-columns: 1fr;
-        }
-    }
-
-    .fotogrids-form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-
-        label {
-            font-weight: 600;
-            color: #1e1e1e;
-        }
-
-        input,
-        select,
-        textarea {
-            padding: 0.5rem;
-            border: 1px solid var(--fg-border-dark);
-            border-radius: 4px;
-            font-size: 14px;
-
-            &:focus {
-                border-color: var(--fg-blue);
-                box-shadow: 0 0 0 1px var(--fg-blue);
-                outline: none;
-            }
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
         }
     }
 

@@ -1,6 +1,7 @@
 <?php
 namespace FotoGrids\Modules\Templates;
 
+use FotoGrids\Hooks\Filters_Templates;
 use FotoGrids\Modules\Abstract_Module;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -95,7 +96,22 @@ class Module extends Abstract_Module {
      * @return void
      */
     public function register_metabox(): void {
+        global $post;
+
         foreach ( [ 'fotogrids_gallery', 'fotogrids_album' ] as $post_type ) {
+            // Templates are settings (applying overrides every setting). Same
+            // visibility rule as the Collection Settings metabox.
+            $settings_cap = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $post_type );
+            $post_id      = ( $post instanceof \WP_Post && $post->post_type === $post_type ) ? (int) $post->ID : 0;
+            $can_settings = $settings_cap === null
+                || ( $post_id > 0
+                    ? \FotoGrids\Permissions\Permission_Check::can( $settings_cap, $post_id )
+                    : \FotoGrids\Permissions\Permission_Check::can( $settings_cap ) );
+
+            if ( ! $can_settings && \FotoGrids\Permissions\Permission_Options::get_unauthorised_visibility() === 'hidden' ) {
+                continue;
+            }
+
             add_meta_box(
                 $post_type . '_templates',
                 __( 'Templates', 'fotogrids' ),
@@ -126,10 +142,14 @@ class Module extends Abstract_Module {
          * @param \WP_Post    $post
          */
         $save_as_template_button = apply_filters(
-            'fotogrids/templates/save_as_template_button',
+            Filters_Templates::SAVE_AS_TEMPLATE_BUTTON,
             null,
             $post
         );
+
+        $settings_cap       = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $post->post_type );
+        $editable           = $settings_cap === null
+            || \FotoGrids\Permissions\Permission_Check::can( $settings_cap, (int) $post->ID );
 
         wp_localize_script(
             'fotogrids-module-templates-metabox',
@@ -137,11 +157,13 @@ class Module extends Abstract_Module {
             [
                 'postId'               => $post->ID,
                 'postType'             => $post_type,
-                'isPro'                => fotogrids_has_pro(),
+                'isPro'                => \FotoGrids\License_Manager::has_pro(),
                 'nonce'                => wp_create_nonce( 'wp_rest' ),
                 'restUrl'              => 'fotogrids/v1/',
                 'templatesUrl'         => admin_url( 'admin.php?page=fotogrids-templates' ),
                 'saveAsTemplateButton' => $save_as_template_button,
+                'editable'             => $editable,
+                'unauthorisedNotice'   => __( 'You\'re viewing templates in read-only mode. Ask a site administrator if a different template should be applied.', 'fotogrids' ),
                 'strings'              => $this->metabox_strings(),
             ]
         );

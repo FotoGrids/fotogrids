@@ -154,6 +154,7 @@ const TabPeople = ({
                 iconName="people"
                 showProNotice={!isProActive}
                 proNoticeContent={proNoticeContent}
+                itemClassName="fotogrids-metadata-item fotogrids-tag"
             />
         </div>
     );

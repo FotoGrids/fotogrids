@@ -18,8 +18,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Hooks {
 
-    public const HOOK_REGISTER_MODULES = 'fotogrids/render/register_modules';
-
     /**
      * Fires an action with flat, type, and scoped variants.
      *

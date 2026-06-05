@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections\REST;
 
+use FotoGrids\Hooks\Filters_View;
 use FotoGrids\Modules\ViewCollections\Settings;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -53,7 +54,7 @@ class View_Collections_Data {
          * @param array    $data
          * @param \WP_Post $post
          */
-        $data = apply_filters( 'fotogrids/view/rest/settings_response', $data, $post );
+        $data = apply_filters( Filters_View::REST_SETTINGS_RESPONSE, $data, $post );
 
         return rest_ensure_response( $data );
     }

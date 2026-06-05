@@ -63,7 +63,7 @@ class Licensing_Toasts {
             return;
         }
 
-        if ( ! \FotoGrids\Admin_Helpers::is_fotogrids_page() ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
             return;
         }
 

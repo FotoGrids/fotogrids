@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Filters_View;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -46,7 +48,7 @@ class Settings {
          * @since 1.0.0
          * @param array<string,mixed> $defaults
          */
-        return apply_filters( 'fotogrids/view/settings/defaults', $defaults );
+        return apply_filters( Filters_View::SETTINGS_DEFAULTS, $defaults );
     }
 
     /**
@@ -68,6 +70,6 @@ class Settings {
          * @param array<string,mixed> $settings
          * @param int                 $post_id
          */
-        return apply_filters( 'fotogrids/view/settings', $settings, $post_id );
+        return apply_filters( Filters_View::SETTINGS, $settings, $post_id );
     }
 }

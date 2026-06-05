@@ -389,74 +389,10 @@ class Register_Admin_Routes {
             ),
         ) );
 
-        // Get gallery preview HTML: GET /admin/galleries/{id}/preview
-        register_rest_route( 'fotogrids/v1', '/admin/galleries/(?P<id>\d+)/preview', array(
-            array(
-                'methods'  => \WP_REST_Server::READABLE,
-                'callback' => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_gallery_preview' ),
-                'args' => array(
-                    'id' => array(
-                        'required' => true,
-                        'sanitize_callback' => 'absint',
-                        'validate_callback' => function( $param ) {
-                            return is_numeric( $param ) && $param > 0;
-                        },
-                    ),
-                    'template' => array(
-                        'default' => '',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ),
-                    'cols' => array(
-                        'default' => 0,
-                        'sanitize_callback' => 'absint',
-                    ),
-                    'lazy' => array(
-                        'default' => true,
-                        'sanitize_callback' => 'rest_sanitize_boolean',
-                    ),
-                    'lightbox' => array(
-                        'default' => true,
-                        'sanitize_callback' => 'rest_sanitize_boolean',
-                    ),
-                    'captions' => array(
-                        'default' => true,
-                        'sanitize_callback' => 'rest_sanitize_boolean',
-                    ),
-                ),
-                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_edit' ),
-            ),
-            array(
-                'methods'  => \WP_REST_Server::CREATABLE,
-                'callback' => array( '\FotoGrids\REST\Admin\Preview_Endpoint', 'preview' ),
-                'args' => array(
-                    'id' => array(
-                        'required' => true,
-                        'sanitize_callback' => 'absint',
-                        'validate_callback' => function( $param ) {
-                            return is_numeric( $param ) && $param > 0;
-                        },
-                    ),
-                    'version' => array(
-                        'default' => 2,
-                        'sanitize_callback' => 'absint',
-                    ),
-                    'settings' => array(
-                        'default' => array(),
-                    ),
-                    'item_order' => array(
-                        'default' => array(),
-                    ),
-                    'item_overrides' => array(
-                        'default' => array(),
-                    ),
-                    'simulate_state' => array(
-                        'default' => null,
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ),
-                ),
-                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_gallery_edit' ),
-            ),
-        ) );
+        // Note: the old /admin/galleries/{id}/preview route was removed when
+        // the PageBuilders module took over preview rendering. The metabox
+        // and every other host now use POST /preview/gallery/{id}, which
+        // delegates to the same Preview_Endpoint internally.
 
         // Get catalog field states: GET /admin/catalog/field-states
         register_rest_route( 'fotogrids/v1', '/admin/catalog/field-states', array(

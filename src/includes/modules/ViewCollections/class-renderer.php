@@ -8,6 +8,9 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Actions_View;
+use FotoGrids\Hooks\Filters_View;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -93,7 +96,7 @@ class Renderer {
          * @param string   $title
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/page_title', $title, $this->post );
+        return (string) apply_filters( Filters_View::PAGE_TITLE, $title, $this->post );
     }
 
     /**
@@ -124,7 +127,7 @@ class Renderer {
          * @param bool     $noindex
          * @param \WP_Post $post
          */
-        $noindex = (bool) apply_filters( 'fotogrids/view/robots', $noindex, $this->post );
+        $noindex = (bool) apply_filters( Filters_View::ROBOTS, $noindex, $this->post );
 
         // Canonical: per-collection override wins; otherwise the permalink.
         $canonical = $seo['canonical_override'] !== '' ? $seo['canonical_override'] : get_permalink( $this->post );
@@ -140,7 +143,7 @@ class Renderer {
          * @param string   $canonical Default: permalink of the view page.
          * @param \WP_Post $post
          */
-        $canonical = (string) apply_filters( 'fotogrids/view/canonical', $canonical, $this->post );
+        $canonical = (string) apply_filters( Filters_View::CANONICAL, $canonical, $this->post );
 
         $meta = '';
         if ( $noindex ) {
@@ -164,7 +167,7 @@ class Renderer {
          * @param string   $meta
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/head_meta', $meta, $this->post );
+        return (string) apply_filters( Filters_View::HEAD_META, $meta, $this->post );
     }
 
     /**
@@ -193,7 +196,7 @@ class Renderer {
         // Master switch: site-wide "OG off" or per-collection "defer to other
         // SEO plugins" both kill OG emission before any filter runs.
         if ( empty( $seo['enable_open_graph'] ) || ! empty( $seo['defer_to_seo_plugins'] ) ) {
-            return (string) apply_filters( 'fotogrids/view/og/enabled', '', $this->post, $item );
+            return (string) apply_filters( Filters_View::OG_ENABLED, '', $this->post, $item );
         }
 
         /**
@@ -208,7 +211,7 @@ class Renderer {
          * @param \WP_Post   $post
          * @param array|null $item     Deep-linked item context (or null).
          */
-        $enabled = (bool) apply_filters( 'fotogrids/view/og/enabled', true, $this->post, $item );
+        $enabled = (bool) apply_filters( Filters_View::OG_ENABLED, true, $this->post, $item );
         if ( ! $enabled ) {
             return '';
         }
@@ -252,7 +255,7 @@ class Renderer {
                 $image_id = (int) $seo['og_image_custom_id'];
             }
             if ( $image_id <= 0 ) {
-                $image_id = fotogrids_get_collection_cover_attachment_id( (int) $this->post->ID );
+                $image_id = \FotoGrids\Galleries\Cover_Resolver::for_collection( (int) $this->post->ID );
             }
             if ( $image_id <= 0 && $seo['og_image_fallback_id'] > 0 ) {
                 $image_id = (int) $seo['og_image_fallback_id'];
@@ -280,7 +283,7 @@ class Renderer {
          * @param \WP_Post   $post
          * @param array|null $item Deep-linked item context (or null).
          */
-        $title = (string) apply_filters( 'fotogrids/view/og/title', $title, $this->post, $item );
+        $title = (string) apply_filters( Filters_View::OG_TITLE, $title, $this->post, $item );
 
         /**
          * Filter the og:description emitted for a view page.
@@ -290,7 +293,7 @@ class Renderer {
          * @param \WP_Post   $post
          * @param array|null $item Deep-linked item context (or null).
          */
-        $description = (string) apply_filters( 'fotogrids/view/og/description', $description, $this->post, $item );
+        $description = (string) apply_filters( Filters_View::OG_DESCRIPTION, $description, $this->post, $item );
 
         /**
          * Filter the og:url emitted for a view page.
@@ -300,7 +303,7 @@ class Renderer {
          * @param \WP_Post   $post
          * @param array|null $item Deep-linked item context (or null).
          */
-        $url = (string) apply_filters( 'fotogrids/view/og/url', $url, $this->post, $item );
+        $url = (string) apply_filters( Filters_View::OG_URL, $url, $this->post, $item );
 
         /**
          * Filter the og:image data structure emitted for a view page.
@@ -314,7 +317,7 @@ class Renderer {
          * @param \WP_Post   $post
          * @param array|null $item Deep-linked item context (or null).
          */
-        $image = (array) apply_filters( 'fotogrids/view/og/image', $image, $this->post, $item );
+        $image = (array) apply_filters( Filters_View::OG_IMAGE, $image, $this->post, $item );
 
         $image_url    = isset( $image['url'] )    ? (string) $image['url']    : '';
         $image_width  = isset( $image['width'] )  ? (int)    $image['width']  : 0;
@@ -420,7 +423,7 @@ class Renderer {
             );
         }
 
-        $count = fotogrids_get_gallery_item_count( (int) $this->post->ID );
+        $count = \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $this->post->ID );
         if ( $count <= 0 ) {
             return '';
         }
@@ -505,7 +508,7 @@ class Renderer {
          * @param string   $type Default from `fotogrids/seo/settings`.
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/og/type', $type, $this->post );
+        return (string) apply_filters( Filters_View::OG_TYPE, $type, $this->post );
     }
 
     /**
@@ -521,13 +524,13 @@ class Renderer {
             return null;
         }
 
-        $item_ids = fotogrids_get_gallery_item_ids( (int) $this->post->ID );
+        $item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( (int) $this->post->ID );
         if ( ! in_array( $item_id, array_map( 'absint', (array) $item_ids ), true ) ) {
             return null;
         }
 
         $caption = '';
-        foreach ( fotogrids_get_gallery_items( (int) $this->post->ID ) as $item ) {
+        foreach ( \FotoGrids\Galleries\Gallery_Repository::get_items( (int) $this->post->ID ) as $item ) {
             if ( (int) ( $item['id'] ?? 0 ) === $item_id ) {
                 $caption = (string) ( $item['caption'] ?? '' );
                 break;
@@ -569,7 +572,7 @@ class Renderer {
          * @param string[] $classes
          * @param \WP_Post  $post
          */
-        $classes = (array) apply_filters( 'fotogrids/view/body_classes', $classes, $this->post );
+        $classes = (array) apply_filters( Filters_View::BODY_CLASSES, $classes, $this->post );
         $classes = array_map( 'sanitize_html_class', $classes );
 
         $accent     = $this->settings['accent_color'] ?? '#3c46f0';
@@ -596,7 +599,7 @@ class Renderer {
          * @param bool     $show
          * @param \WP_Post $post
          */
-        return (bool) apply_filters( 'fotogrids/view/show_header', $show, $this->post );
+        return (bool) apply_filters( Filters_View::SHOW_HEADER, $show, $this->post );
     }
 
     /**
@@ -608,7 +611,7 @@ class Renderer {
     public function header_html(): string {
         $count = $this->is_album()
             ? count( \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( (int) $this->post->ID ) )
-            : fotogrids_get_gallery_item_count( (int) $this->post->ID );
+            : \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $this->post->ID );
 
         $meta_label = $this->is_album()
             ? sprintf( _n( '%d gallery', '%d galleries', $count, 'fotogrids' ), $count )
@@ -624,7 +627,7 @@ class Renderer {
          * @param string   $html
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/header_html', $html, $this->post );
+        return (string) apply_filters( Filters_View::HEADER_HTML, $html, $this->post );
     }
 
     /**
@@ -662,7 +665,7 @@ class Renderer {
          * @param string   $html
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/gallery_html', $html, $this->post );
+        return (string) apply_filters( Filters_View::GALLERY_HTML, $html, $this->post );
     }
 
     /**
@@ -682,7 +685,7 @@ class Renderer {
      * @return string
      */
     public function share_html(): string {
-        $resolved = fotogrids_get_resolved_sharing( (int) $this->post->ID );
+        $resolved = \FotoGrids\Settings\Sharing_Settings_Store::resolve( (int) $this->post->ID );
 
         $shows_footer_bar = ! empty( $resolved['enabled'] )
             && in_array( 'view_page', (array) $resolved['placements'], true );
@@ -718,7 +721,7 @@ class Renderer {
          * @param string   $html
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/share_buttons', $html, $this->post );
+        return (string) apply_filters( Filters_View::SHARE_BUTTONS, $html, $this->post );
     }
 
     /**
@@ -736,7 +739,7 @@ class Renderer {
          * @param string   $html
          * @param \WP_Post $post
          */
-        return (string) apply_filters( 'fotogrids/view/footer_credit', '', $this->post );
+        return (string) apply_filters( Filters_View::FOOTER_CREDIT, '', $this->post );
     }
 
     /**
@@ -857,6 +860,6 @@ class Renderer {
          * @since 1.0.0
          * @param \WP_Post $post
          */
-        do_action( 'fotogrids/view/tracked', $this->post );
+        do_action( Actions_View::TRACKED, $this->post );
     }
 }

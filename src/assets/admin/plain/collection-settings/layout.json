@@ -70,10 +70,30 @@
                     "tier_required": "free"
                 },
                 {
+                    "label": "Instant Photos",
+                    "value": "instant-photos",
+                    "icon": "layout_instant_photos",
+                    "description": "Turns any gallery into a playful wall of instant-style prints - perfect for a relaxed, casual feel.",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "free"
+                },
+                {
                     "label": "Video Playlist",
                     "value": "video",
                     "icon": "layout_video",
                     "description": "Embedded video player paired with a thumbnail playlist for video-led galleries.",
+                    "postTypes": [
+                        "gallery"
+                    ],
+                    "tier_required": "pro_starter"
+                },
+                {
+                    "label": "Mixed Tiles",
+                    "value": "mixed-tiles",
+                    "icon": "layout_mixed_tiles",
+                    "description": "A mosaic magazine-style layout where items span different numbers of rows and columns.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -132,7 +152,8 @@
                 "values": [
                     "grid",
                     "masonry",
-                    "justified"
+                    "justified",
+                    "instant-photos"
                 ]
             },
             "tier_required": "free",
@@ -315,6 +336,186 @@
             "visible_when_uninstalled": true
         },
         {
+            "key": "instant_photo_effects_group",
+            "type": "setting_group",
+            "label": "Instant Photo Effects",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "instant-photos"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "instant_photo_max_rotation",
+                    "type": "responsive_range",
+                    "label": "Maximum Rotation",
+                    "description": "Each item is randomly tilted between minus and plus this angle. Set to 0 to keep all items straight.",
+                    "unit": "deg",
+                    "responsive": {
+                        "desktop": {
+                            "min": 0,
+                            "max": 30,
+                            "default": 15
+                        },
+                        "tablet": {
+                            "min": 0,
+                            "max": 30,
+                            "default": 12
+                        },
+                        "mobile": {
+                            "min": 0,
+                            "max": 30,
+                            "default": 8
+                        }
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "instant_photo_hover_action",
+                    "type": "button_group",
+                    "label": "Action on Mouseover",
+                    "description": "How each item reacts when the visitor hovers over it.",
+                    "options": [
+                        {
+                            "label": "Straighten",
+                            "value": "straighten",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Tilt Further",
+                            "value": "tilt",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "straighten",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "instant_photo_frame_thickness",
+                    "type": "responsive_range",
+                    "label": "Frame Thickness",
+                    "description": "Width of the white photo border around each image.",
+                    "unit": "px",
+                    "responsive": {
+                        "desktop": {
+                            "min": 8,
+                            "max": 40,
+                            "default": 16
+                        },
+                        "tablet": {
+                            "min": 8,
+                            "max": 40,
+                            "default": 14
+                        },
+                        "mobile": {
+                            "min": 8,
+                            "max": 40,
+                            "default": 12
+                        }
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "instant_photo_elevation",
+                    "type": "toggle",
+                    "label": "Elevation",
+                    "description": "Soft shadow under each item, lit from above.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "type": "side_by_side",
+                    "settings": [
+                        {
+                            "key": "instant_photo_sticker",
+                            "type": "toggle",
+                            "label": "Add Sticker",
+                            "description": "Decorative tape strip across the top of each item.",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "instant_photo_sticker_hide_on_hover",
+                            "type": "toggle",
+                            "label": "Hide on Mouseover",
+                            "description": "Fade the sticker out when the visitor hovers over the item.",
+                            "default": false,
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "instant_photo_sticker",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ],
+                    "condition": {
+                        "dependsOn": "instant_photo_elevation",
+                        "values": [
+                            false,
+                            "0"
+                        ]
+                    }
+                },
+                {
+                    "key": "instant_photo_sticker_color",
+                    "type": "color",
+                    "label": "Sticker Color",
+                    "default": "rgba(225, 210, 175, 0.85)",
+                    "condition": {
+                        "all": [
+                            {
+                                "dependsOn": "instant_photo_elevation",
+                                "values": [
+                                    false,
+                                    "0"
+                                ]
+                            },
+                            {
+                                "dependsOn": "instant_photo_sticker",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            }
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
             "key": "columns_group",
             "type": "setting_group",
             "label": "Columns",
@@ -322,7 +523,8 @@
                 "dependsOn": "layout",
                 "values": [
                     "grid",
-                    "masonry"
+                    "masonry",
+                    "instant-photos"
                 ]
             },
             "settings": [
@@ -350,7 +552,8 @@
                         "dependsOn": "layout",
                         "values": [
                             "grid",
-                            "masonry"
+                            "masonry",
+                            "instant-photos"
                         ]
                     },
                     "tier_required": "free",

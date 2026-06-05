@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import ModalStructure from './item-edit-modal/ModalStructure';
+import { ItemPreviewPane, ItemEditTabs } from './item-edit-modal/ModalBody';
+import { Modal } from './shared/Modal';
+import { Button } from './shared/Button';
 
 /**
  * Metadata type registry.
@@ -344,31 +346,83 @@ const ItemEditModal = ({
         onNavigate(direction);
     };
 
+    const currentIndex = items.findIndex(img => img.id === itemId);
+    const hasMultipleItems = items.length > 1;
+
     return (
-        <ModalStructure
-            itemId={itemId}
-            itemData={itemData}
-            loading={loading}
-            items={items}
+        <Modal
+            isOpen
             onClose={handleClose}
-            onNavigate={handleNavigate}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            formData={formData}
-            handleInputChange={handleInputChange}
-            metadata={metadata}
-            availableMetadata={availableMetadata}
-            metadataInput={metadataInput}
-            setMetadataInput={setMetadataInput}
-            addMetadataItem={addMetadataItem}
-            removeMetadataItem={removeMetadataItem}
-            selectExistingMetadata={selectExistingMetadata}
-            handleSave={handleSave}
-            saving={saving}
-            hasChanges={hasChanges}
-            saveSuccess={saveSuccess}
-            strings={strings}
-        />
+            size="lg"
+            hasSidebar
+            preventClose={saving}
+            type="item-edit"
+        >
+            <Modal.Header>
+                <Modal.HeaderTitle>{strings.editItem || 'Edit Item'}</Modal.HeaderTitle>
+            </Modal.Header>
+
+            <Modal.Body padding={false}>
+                <Modal.Sidebar>
+                    <ItemPreviewPane
+                        itemData={itemData}
+                        loading={loading}
+                        formData={formData}
+                        strings={strings}
+                    />
+                </Modal.Sidebar>
+
+                <Modal.Main>
+                    <ItemEditTabs
+                        itemData={itemData}
+                        loading={loading}
+                        formData={formData}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        handleInputChange={handleInputChange}
+                        metadata={metadata}
+                        availableMetadata={availableMetadata}
+                        metadataInput={metadataInput}
+                        setMetadataInput={setMetadataInput}
+                        addMetadataItem={addMetadataItem}
+                        removeMetadataItem={removeMetadataItem}
+                        selectExistingMetadata={selectExistingMetadata}
+                        strings={strings}
+                    />
+                </Modal.Main>
+            </Modal.Body>
+
+            <Modal.Footer>
+                {!loading && itemData && (
+                    <Button
+                        variant="primary"
+                        onClick={handleSave}
+                        disabled={!hasChanges}
+                        busy={saving}
+                    >
+                        {strings.saveChanges || 'Save Changes'}
+                    </Button>
+                )}
+                <Button variant="secondary" onClick={handleClose} disabled={saving}>
+                    {strings.close || 'Close'}
+                </Button>
+            </Modal.Footer>
+
+            {hasMultipleItems && (
+                <>
+                    <Modal.Nav
+                        direction="prev"
+                        onClick={() => handleNavigate('prev')}
+                        ariaLabel={strings.prevItem || 'Previous item'}
+                    />
+                    <Modal.Nav
+                        direction="next"
+                        onClick={() => handleNavigate('next')}
+                        ariaLabel={strings.nextItem || 'Next item'}
+                    />
+                </>
+            )}
+        </Modal>
     );
 };
 

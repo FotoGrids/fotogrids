@@ -8,6 +8,7 @@ import Segmented from '@/admin/src/components/shared/Segmented.jsx';
 import DangerZone from '@/admin/src/components/shared/DangerZone.jsx';
 import Toggle from '@/admin/src/components/shared/Toggle.jsx';
 import ToggleList from '@/admin/src/components/shared/ToggleList.jsx';
+import { Button } from '@/admin/src/components/shared/Button';
 import TabBar from '@/admin/src/components/shared/TabBar.jsx';
 import Icon from '@/admin/src/components/shared/Icon.jsx';
 
@@ -201,14 +202,14 @@ const ExportPanel = ( { onOperationStart, onOperationEnd } ) => {
                 ) }
 
                 <div className="fg-ie-actions">
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--primary"
-                        disabled={ busy || include.size === 0 }
+                    <Button
+                        variant="primary"
+                        disabled={ include.size === 0 }
+                        busy={ busy }
                         onClick={ handleExport }
                     >
                         { busy ? __( 'Exporting…', 'fotogrids' ) : __( 'Export', 'fotogrids' ) }
-                    </button>
+                    </Button>
                     { include.size === 0 && (
                         <span className="fg-ie-warning">
                             { __( 'Select at least one item to export.', 'fotogrids' ) }
@@ -348,9 +349,9 @@ const ImportPanel = ( { onOperationStart, onOperationEnd } ) => {
                         <h3>{ __( 'Import complete', 'fotogrids' ) }</h3>
                         <p>{ __( 'Your data has been imported successfully.', 'fotogrids' ) }</p>
                     </div>
-                    <button type="button" className="fotogrids-button fotogrids-button--primary" onClick={ resetFile }>
+                    <Button variant="primary" onClick={ resetFile }>
                         { __( 'Import another file', 'fotogrids' ) }
-                    </button>
+                    </Button>
                 </div>
             </Panel>
         );
@@ -457,16 +458,16 @@ const ImportPanel = ( { onOperationStart, onOperationEnd } ) => {
                             'fotogrids'
                         ) }
                     >
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--primary"
-                            disabled={ phase === 'importing' || include.size === 0 }
+                        <Button
+                            variant="primary"
+                            disabled={ include.size === 0 }
+                            busy={ phase === 'importing' }
                             onClick={ handleImport }
                         >
                             { phase === 'importing'
                                 ? __( 'Importing…', 'fotogrids' )
                                 : __( 'Import', 'fotogrids' ) }
-                        </button>
+                        </Button>
                     </DangerZone>
                 </Panel>
             ) }

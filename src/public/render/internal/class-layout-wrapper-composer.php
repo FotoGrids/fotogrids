@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Columns_Mode;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Render_Context;
@@ -96,7 +97,7 @@ final class Layout_Wrapper_Composer {
          * @param Render_Context          $render_context
          */
         $adapters = apply_filters(
-            'fotogrids/render/layout/adapters',
+            Filters_Render::LAYOUT_ADAPTERS,
             self::ADAPTERS,
             $layout,
             $render_context
@@ -137,7 +138,7 @@ final class Layout_Wrapper_Composer {
          * @param Render_Context                       $render_context
          */
         $style_vars = apply_filters(
-            'fotogrids/render/layout/style_vars',
+            Filters_Render::LAYOUT_STYLE_VARS,
             $style_vars,
             $layout,
             $render_context
@@ -153,7 +154,7 @@ final class Layout_Wrapper_Composer {
          * @param Render_Context        $render_context
          */
         $wrapper_data_attrs = apply_filters(
-            'fotogrids/render/layout/wrapper_attrs',
+            Filters_Render::LAYOUT_WRAPPER_ATTRS,
             $wrapper_data_attrs,
             $layout,
             $render_context
@@ -217,14 +218,14 @@ final class Layout_Wrapper_Composer {
      * right grid-template strategy.
      *
      * Falls back to the global defaults from
-     * fotogrids_get_default_gallery_settings() for any missing values,
+     * Collection_Defaults::resolve_gallery() for any missing values,
      * matching the historical Layout_Grid behaviour.
      *
      * @return array{style_vars: array<string, string|Responsive_Var>, wrapper_data_attrs: array<string, string>}
      */
     private static function columns_adapter( Layout $layout, Render_Context $render_context ): array {
-        $defaults = function_exists( 'fotogrids_get_default_gallery_settings' )
-            ? fotogrids_get_default_gallery_settings()
+        $defaults = class_exists( '\FotoGrids\Collection_Defaults' )
+            ? \FotoGrids\Collection_Defaults::resolve_gallery()
             : [];
 
         $responsive_columns = $render_context->layout->responsive_columns;
@@ -294,8 +295,8 @@ final class Layout_Wrapper_Composer {
      * @return array{style_vars: array<string, Responsive_Var>}
      */
     private static function item_spacing_adapter( Layout $layout, Render_Context $render_context ): array {
-        $defaults = function_exists( 'fotogrids_get_default_gallery_settings' )
-            ? fotogrids_get_default_gallery_settings()
+        $defaults = class_exists( '\FotoGrids\Collection_Defaults' )
+            ? \FotoGrids\Collection_Defaults::resolve_gallery()
             : [];
 
         $responsive_spacing = $render_context->layout->responsive_spacing;

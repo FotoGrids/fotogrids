@@ -5,7 +5,6 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-use FotoGrids\Admin_Helpers;
 
 /**
  * Admin Interface Initialization Class
@@ -28,7 +27,7 @@ class Admin_Init {
         // Fix menu highlighting for custom post types
         add_action( 'admin_head', array( __CLASS__, 'fix_menu_highlighting' ) );
 
-        if ( ! fotogrids_has_pro() ) {
+        if ( ! \FotoGrids\License_Manager::has_pro() ) {
             add_action( 'admin_head', array( __CLASS__, 'add_upgrade_menu_styles' ) );
         }
 
@@ -46,7 +45,7 @@ class Admin_Init {
         add_action( 'admin_footer-edit.php', array( __CLASS__, 'bulk_action_album_selector' ) );
 
         // Initialize upgrade modal integration (for non-Pro users)
-        if ( ! fotogrids_has_pro() ) {
+        if ( ! \FotoGrids\License_Manager::has_pro() ) {
             require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-upgrade-modal-integration.php';
             require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-upgrade-modal.php';
             \FotoGrids_Upgrade_Modal_Integration::init();
@@ -160,7 +159,7 @@ class Admin_Init {
         );
 
         // Add upgrade submenu only for non-Pro users
-        if ( ! fotogrids_has_pro() ) {
+        if ( ! \FotoGrids\License_Manager::has_pro() ) {
             add_submenu_page(
                 'fotogrids',
                 __( 'Upgrade to Pro', 'fotogrids' ),
@@ -294,12 +293,12 @@ class Admin_Init {
             // Log panel only renders when WP_DEBUG is actually on.
             'wpDebug' => defined( 'WP_DEBUG' ) && WP_DEBUG,
             'settingsBaseUrl' => admin_url( 'admin.php?page=fotogrids-settings' ),
-            'isFotoGridsPage' => Admin_Helpers::is_fotogrids_page( $hook ),
-            'capabilities' => array(
-                'manage_fotogrids' => current_user_can( 'manage_fotogrids' ),
-                'edit_fotogrids' => current_user_can( 'edit_fotogrids' ),
-                'view_fotogrids_stats' => current_user_can( 'view_fotogrids_stats' ),
-            ),
+            'isFotoGridsPage' => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
+            // Snapshot of every FotoGrids atomic capability the current user
+            // holds, sourced from Permission_Registry. New caps added by Free
+            // tools/modules, Pro, or 3rd-party plugins flow through here
+            // automatically - no hand-curated list to keep in sync.
+            'capabilities' => self::get_current_user_capabilities_snapshot(),
         ) );
 
         wp_localize_script( 'fotogrids-loading-icons', 'fotogridsAdmin', array(
@@ -351,13 +350,13 @@ class Admin_Init {
 
         // Enqueue settings-specific scripts only on settings page
         if ( $hook === 'fotogrids_page_fotogrids-settings' || strpos( $hook, 'fotogrids-settings' ) !== false ) {
-            fotogrids_enqueue_collection_settings_scripts( true, false );
+            \FotoGrids\Assets\Collection_Settings_Assets::enqueue( true, false );
 
             // Determine post type from subtab parameter, default to gallery
             $subtab = isset( $_GET['subtab'] ) ? sanitize_text_field( $_GET['subtab'] ) : 'gallery';
             $post_type = ( $subtab === 'album' ) ? 'album' : 'gallery';
 
-            $localized_data = Admin_Helpers::get_collection_settings_localized_data( array(
+            $localized_data = \FotoGrids\Admin\Settings_Localizer::data_for_collection( array(
                 'post_id' => 0,
                 'post_type' => $post_type,
                 'is_defaults' => true,
@@ -417,7 +416,7 @@ class Admin_Init {
             return array();
         }
 
-        $defaults = fotogrids_get_default_gallery_settings();
+        $defaults = \FotoGrids\Collection_Defaults::resolve_gallery();
         $sanitized = array();
 
         foreach ( $defaults as $key => $default_value ) {
@@ -459,6 +458,38 @@ class Admin_Init {
      */
     private static function get_general_settings_defaults() {
         return \FotoGrids\Settings\Plugin_Settings_Store::general_defaults();
+    }
+
+    /**
+     * Snapshot of every FotoGrids atomic cap the current user holds.
+     *
+     * Reads the full atomic-cap list from Permission_Registry and calls
+     * current_user_can() on each. Localised to the React side as
+     * `fotogrids.capabilities` so client components can render the right
+     * controls (enabled / disabled / hidden) without making per-cap REST
+     * roundtrips.
+     *
+     * @since 1.0.0
+     * @return array<string, bool>
+     */
+    private static function get_current_user_capabilities_snapshot() {
+        $snapshot = array();
+
+        if ( ! class_exists( '\FotoGrids\Permissions\Permission_Registry' ) ) {
+            return $snapshot;
+        }
+
+        \FotoGrids\Permissions\Permission_Registry::boot();
+        foreach ( \FotoGrids\Permissions\Permission_Registry::get_all() as $def ) {
+            if ( $def->is_logical() || $def->is_meta_cap ) {
+                // Logical caps are not real WP caps. Meta caps require a
+                // post id - calling current_user_can on them globally
+                // triggers a _doing_it_wrong notice in WP 6.1+.
+                continue;
+            }
+            $snapshot[ $def->key ] = current_user_can( $def->key );
+        }
+        return $snapshot;
     }
 
     /**
@@ -707,7 +738,7 @@ class Admin_Init {
      * Check if current page is a FotoGrids admin page
      */
     private static function is_fotogrids_admin_page( $hook ) {
-        return Admin_Helpers::is_fotogrids_page( $hook );
+        return \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook );
     }
 
     /**
@@ -941,6 +972,12 @@ class Admin_Init {
 
     /**
      * Add album selector for bulk actions
+     *
+     * Renders two hidden selector blocks (one for the top bulk-action row,
+     * one for the bottom) and inserts each inside its sibling `.bulkactions`
+     * container, right next to the Apply button. Visibility is driven by the
+     * corresponding bulk action dropdown's value. The two selects are kept
+     * in sync so picking an album on either row submits the same value.
      */
     public static function bulk_action_album_selector() {
         global $post_type;
@@ -961,74 +998,119 @@ class Admin_Init {
             return;
         }
 
+        $render_selector = function( $which ) use ( $albums ) {
+            $id = 'fotogrids-bulk-album-selector-' . $which;
+            $select_id = 'fotogrids-album-select-' . $which;
+            ?>
+            <span id="<?php echo esc_attr( $id ); ?>" class="fotogrids-bulk-album-selector" style="display: none; margin-left: 6px;">
+                <label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
+                    <?php _e( 'Select Album:', 'fotogrids' ); ?>
+                </label>
+                <select name="album_id" id="<?php echo esc_attr( $select_id ); ?>" data-fg-album-select="<?php echo esc_attr( $which ); ?>">
+                    <option value=""><?php _e( 'Choose an album...', 'fotogrids' ); ?></option>
+                    <?php foreach ( $albums as $album ) : ?>
+                        <option value="<?php echo esc_attr( $album->ID ); ?>">
+                            <?php echo esc_html( $album->post_title ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </span>
+            <?php
+        };
+
         ?>
-        <div id="fotogrids-bulk-album-selector" style="display: none">
-            <label for="fotogrids-album-select">
-                <?php _e( 'Select Album:', 'fotogrids' ); ?>
-            </label>
-            <select name="album_id" id="fotogrids-album-select" style="margin-left: 10px;">
-                <option value=""><?php _e( 'Choose an album...', 'fotogrids' ); ?></option>
-                <?php foreach ( $albums as $album ) : ?>
-                    <option value="<?php echo esc_attr( $album->ID ); ?>">
-                        <?php echo esc_html( $album->post_title ); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+        <div id="fotogrids-bulk-album-selector-templates" style="display: none">
+            <?php $render_selector( 'top' ); ?>
+            <?php $render_selector( 'bottom' ); ?>
         </div>
 
         <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            var bulkActionTop = document.getElementById('bulk-action-selector-top');
-            var bulkActionBottom = document.getElementById('bulk-action-selector-bottom');
-            var albumSelector = document.getElementById('fotogrids-bulk-album-selector');
-            var albumSelect = document.getElementById('fotogrids-album-select');
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                var rows = ['top', 'bottom'];
 
-            function toggleAlbumSelector() {
-                var selectedTop = bulkActionTop ? bulkActionTop.value : '';
-                var selectedBottom = bulkActionBottom ? bulkActionBottom.value : '';
+                rows.forEach(function (which) {
+                    var actionSelect = document.getElementById('bulk-action-selector-' + which);
+                    var selector = document.getElementById('fotogrids-bulk-album-selector-' + which);
+                    if (!actionSelect || !selector) {
+                        return;
+                    }
 
-                if (selectedTop === 'assign_to_album' || selectedBottom === 'assign_to_album') {
-                    if (albumSelector) {
-                        albumSelector.style.display = 'block';
+                    // Place the selector next to the Apply button.
+                    var bulkActions = actionSelect.closest('.bulkactions');
+                    if (bulkActions) {
+                        bulkActions.appendChild(selector);
                     }
-                } else {
-                    if (albumSelector) {
-                        albumSelector.style.display = 'none';
-                    }
+
+                    var updateVisibility = function () {
+                        selector.style.display = actionSelect.value === 'assign_to_album'
+                            ? 'inline-block'
+                            : 'none';
+                    };
+
+                    actionSelect.addEventListener('change', updateVisibility);
+                    updateVisibility();
+                });
+
+                // Keep top/bottom selects in sync so submitting from either row
+                // posts the user's pick.
+                var albumSelects = document.querySelectorAll('select[data-fg-album-select]');
+                albumSelects.forEach(function (sel) {
+                    sel.addEventListener('change', function () {
+                        albumSelects.forEach(function (other) {
+                            if (other !== sel) {
+                                other.value = sel.value;
+                            }
+                        });
+                    });
+                });
+
+                // Disable the unused (hidden) select on submit so only one
+                // album_id field is sent — the one tied to the row the user
+                // actually used to submit.
+                var postsFilter = document.getElementById('posts-filter');
+                if (!postsFilter) {
+                    return;
                 }
-            }
 
-            // Show/hide album selector based on bulk action selection
-            if (bulkActionTop) {
-                bulkActionTop.addEventListener('change', toggleAlbumSelector);
-            }
-            if (bulkActionBottom) {
-                bulkActionBottom.addEventListener('change', toggleAlbumSelector);
-            }
+                postsFilter.addEventListener('submit', function (e) {
+                    var topAction = document.getElementById('bulk-action-selector-top');
+                    var bottomAction = document.getElementById('bulk-action-selector-bottom');
+                    var topVal = topAction ? topAction.value : '';
+                    var bottomVal = bottomAction ? bottomAction.value : '';
+                    var assigning = topVal === 'assign_to_album' || bottomVal === 'assign_to_album';
 
-            // Validate album selection before form submission
-            var postsFilter = document.getElementById('posts-filter');
-            if (postsFilter) {
-                postsFilter.addEventListener('submit', function(e) {
-                    var selectedTop = bulkActionTop ? bulkActionTop.value : '';
-                    var selectedBottom = bulkActionBottom ? bulkActionBottom.value : '';
-                    var albumId = albumSelect ? albumSelect.value : '';
+                    if (!assigning) {
+                        return;
+                    }
 
-                    if ((selectedTop === 'assign_to_album' || selectedBottom === 'assign_to_album') && !albumId) {
+                    // Determine which row submitted: WordPress disables the
+                    // non-submitting row's hidden inputs via the bulk action
+                    // logic, but to be safe, prefer the row whose action is
+                    // assign_to_album.
+                    var activeWhich = topVal === 'assign_to_album' ? 'top' : 'bottom';
+                    var activeSelect = document.querySelector('select[data-fg-album-select="' + activeWhich + '"]');
+                    var albumId = activeSelect ? activeSelect.value : '';
+
+                    if (!albumId) {
                         e.preventDefault();
-                        alert('<?php echo esc_js( __( 'Please select an album to assign galleries to.', 'fotogrids' ) ); ?>');
+                        e.stopImmediatePropagation();
+                        window.alert('<?php echo esc_js( __( 'Please select an album to assign galleries to.', 'fotogrids' ) ); ?>');
+                        if (activeSelect) {
+                            activeSelect.focus();
+                        }
                         return false;
                     }
-                });
-            }
 
-            // Insert album selector after bulk actions
-            var tablenavPages = document.querySelector('.tablenav-pages');
-            if (tablenavPages && albumSelector) {
-                tablenavPages.insertAdjacentElement('afterend', albumSelector);
-                albumSelector.style.display = 'block';
-            }
-        });
+                    // Disable the other album_id select so only one value posts.
+                    var otherWhich = activeWhich === 'top' ? 'bottom' : 'top';
+                    var otherSelect = document.querySelector('select[data-fg-album-select="' + otherWhich + '"]');
+                    if (otherSelect) {
+                        otherSelect.disabled = true;
+                    }
+                });
+            });
+        })();
         </script>
         <?php
     }
@@ -1038,7 +1120,7 @@ class Admin_Init {
      * Removes all admin notices except FotoGrids' own notices
      */
     public static function suppress_admin_notices() {
-        if ( ! Admin_Helpers::is_fotogrids_page() ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
             return;
         }
 

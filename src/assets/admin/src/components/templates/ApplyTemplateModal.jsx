@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../shared/Modal';
+import { Modal } from '../shared/Modal';
+import { Button } from '../shared/Button';
+import { FormField } from '../shared/FormField';
 
 const { __ } = wp.i18n;
 
@@ -94,90 +96,86 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 
     const selectedTarget = targets.find(t => t.id.toString() === targetId.toString());
 
-    const footer = (
-        <>
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--secondary"
-                onClick={onClose}
-                disabled={applying}
-            >
-                {__('Cancel', 'fotogrids')}
-            </button>
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--primary"
-                onClick={handleApply}
-                disabled={applying || !targetId || loading}
-            >
-                {applying ? __('Applying...', 'fotogrids') : __('Apply Template', 'fotogrids')}
-            </button>
-        </>
-    );
-
     return (
         <Modal
             isOpen={isOpen !== undefined ? isOpen : !!template}
             onClose={onClose}
-            title={__('Apply Template', 'fotogrids')}
-            size="small"
-            footer={footer}
+            size="sm"
+            preventClose={applying}
         >
-            <p>{__('Select a target to apply the template to:', 'fotogrids')}</p>
+            <Modal.Header>
+                <Modal.HeaderTitle>{__('Apply Template', 'fotogrids')}</Modal.HeaderTitle>
+            </Modal.Header>
 
-            <div className="fotogrids-form-group">
-                <label htmlFor="apply-target-type">{__('Target Type', 'fotogrids')}</label>
-                <select
-                    id="apply-target-type"
-                    className="fotogrids-input"
-                    value={targetType}
-                    onChange={(e) => {
-                        setTargetType(e.target.value);
-                        setTargetId('');
-                    }}
-                    disabled={applying || loading}
-                >
-                    <option value="gallery">{__('Gallery', 'fotogrids')}</option>
-                    <option value="album">{__('Album', 'fotogrids')}</option>
-                </select>
-            </div>
+            <Modal.Body>
+                <p>{__('Select a target to apply the template to:', 'fotogrids')}</p>
 
-            <div className="fotogrids-form-group">
-                <label htmlFor="apply-target-id">
-                    {targetType === 'gallery' ? __('Select Gallery', 'fotogrids') : __('Select Album', 'fotogrids')}
-                </label>
-                {loading ? (
-                    <div className="fotogrids-loading">
-                        <span className="spinner fg-is-active"></span>
-                        <span>{__('Loading...', 'fotogrids')}</span>
-                    </div>
-                ) : (
+                <FormField label={__('Target Type', 'fotogrids')} htmlFor="apply-target-type" layout="column">
                     <select
-                        id="apply-target-id"
-                        className="fotogrids-input"
-                        value={targetId}
-                        onChange={(e) => setTargetId(e.target.value)}
-                        disabled={applying}
+                        id="apply-target-type"
+                        value={targetType}
+                        onChange={(e) => {
+                            setTargetType(e.target.value);
+                            setTargetId('');
+                        }}
+                        disabled={applying || loading}
                     >
-                        <option value="">{__('- Select -', 'fotogrids')}</option>
-                        {targets.map(target => (
-                            <option key={target.id} value={target.id}>
-                                {target.title}
-                            </option>
-                        ))}
+                        <option value="gallery">{__('Gallery', 'fotogrids')}</option>
+                        <option value="album">{__('Album', 'fotogrids')}</option>
                     </select>
-                )}
-            </div>
+                </FormField>
 
-            {targetId && selectedTarget && (
-                <div className="fotogrids-notice fotogrids-notice--warning">
-                    <p>
-                        {__('Warning: Applying this template will overwrite all existing settings for', 'fotogrids')}
-                        <strong> {selectedTarget.title}</strong>.
-                        {__(' Are you sure you want to proceed?', 'fotogrids')}
-                    </p>
-                </div>
-            )}
+                <FormField
+                    label={targetType === 'gallery' ? __('Select Gallery', 'fotogrids') : __('Select Album', 'fotogrids')}
+                    htmlFor="apply-target-id"
+                    layout="column"
+                >
+                    {loading ? (
+                        <div className="fotogrids-loading">
+                            <span className="spinner fg-is-active"></span>
+                            <span>{__('Loading...', 'fotogrids')}</span>
+                        </div>
+                    ) : (
+                        <select
+                            id="apply-target-id"
+                            value={targetId}
+                            onChange={(e) => setTargetId(e.target.value)}
+                            disabled={applying}
+                        >
+                            <option value="">{__('- Select -', 'fotogrids')}</option>
+                            {targets.map(target => (
+                                <option key={target.id} value={target.id}>
+                                    {target.title}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                </FormField>
+
+                {targetId && selectedTarget && (
+                    <div className="fotogrids-notice fotogrids-notice--warning">
+                        <p>
+                            {__('Warning: Applying this template will overwrite all existing settings for', 'fotogrids')}
+                            <strong> {selectedTarget.title}</strong>.
+                            {__(' Are you sure you want to proceed?', 'fotogrids')}
+                        </p>
+                    </div>
+                )}
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onClose} disabled={applying}>
+                    {__('Cancel', 'fotogrids')}
+                </Button>
+                <Button
+                    variant="primary"
+                    onClick={handleApply}
+                    disabled={!targetId || loading}
+                    busy={applying}
+                >
+                    {applying ? __('Applying...', 'fotogrids') : __('Apply Template', 'fotogrids')}
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 };

@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Gallery;
 
+use FotoGrids\Hooks\Filters_Security;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -121,7 +123,7 @@ class Gallery_Permissions {
         $default_allowed = current_user_can( 'administrator' );
 
         $allowed = apply_filters(
-            'fotogrids/security/can_view_gallery_password',
+            Filters_Security::CAN_VIEW_GALLERY_PASSWORD,
             $default_allowed,
             $gallery_id,
             $user_id

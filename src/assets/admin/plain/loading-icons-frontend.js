@@ -3,7 +3,7 @@
  * Optimized to only include the selected icon
  * 
  * This file should be dynamically generated or only include the selected icon
- * For best performance, use the PHP function fotogrids_get_loading_icon_svg() 
+ * For best performance, use Loading_Icon_Library::svg() in PHP
  * to output the icon inline in HTML instead of loading this file.
  */
 (function() {

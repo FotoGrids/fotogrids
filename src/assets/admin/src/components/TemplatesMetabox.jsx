@@ -5,6 +5,7 @@
  */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Select from './shared/Select';
+import { Button } from './shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -23,10 +24,12 @@ const SaveButton = ({ strings, postId, postType, onSaveSuccess }) => {
     }
 
     return (
-        <button
-            type="button"
-            className="fotogrids-button fotogrids-button--secondary fotogrids-button--small fotogrids-button--disabled fotogrids-button--full-width"
-            aria-label={strings.saveAsTemplate}
+        <Button
+            variant="secondary"
+            size="xs"
+            disabled
+            fullWidth
+            ariaLabel={strings.saveAsTemplate}
             onClick={() => {
                 if (window.FotoGridsUpgrade?.launchForFeature?.templates) {
                     window.FotoGridsUpgrade.launchForFeature.templates();
@@ -34,7 +37,7 @@ const SaveButton = ({ strings, postId, postType, onSaveSuccess }) => {
             }}
         >
             {strings.saveAsTemplate}
-        </button>
+        </Button>
     );
 };
 
@@ -48,6 +51,9 @@ const TemplatesMetabox = () => {
     const postId = config.postId || 0;
     const postType = config.postType || 'gallery';
     const strings = config.strings || {};
+    const editable = config.editable !== false;
+    const unauthorisedNotice = config.unauthorisedNotice
+        || __('You are viewing templates in read-only mode.', 'fotogrids');
 
     const hasProSaveButton = config.saveAsTemplateButton &&
         (window.fotogridsProComponents || {})[config.saveAsTemplateButton];
@@ -202,7 +208,7 @@ const TemplatesMetabox = () => {
         }
     };
 
-    return (
+    const body = (
         <>
             {loading ? (
                 <div className="fotogrids-templates-metabox__loading">
@@ -228,26 +234,30 @@ const TemplatesMetabox = () => {
                     </div>
 
                     {selectedTemplate && (
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--primary fotogrids-button--small fotogrids-button--full-width"
+                        <Button
+                            variant="primary"
+                            size="xs"
+                            fullWidth
                             onClick={() => handleApply(selectedTemplate)}
                             disabled={applying}
+                            busy={applying}
                         >
                             {applying ? strings.applying : strings.applyTemplate}
-                        </button>
+                        </Button>
                     )}
                 </>
             )}
 
             {noticeDismissed ? (
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--outline fotogrids-button--primary fotogrids-button--small fotogrids-button--full-width"
+                    <Button
+                        variant="primary"
+                        style="outline"
+                        size="xs"
+                        fullWidth
                         onClick={handleGoToTemplatesLibrary}
                     >
                         {strings.templatesLibrary}
-                    </button>
+                    </Button>
             ) : (
                 <div className="fotogrids-templates-metabox__notice">
                     <button
@@ -260,13 +270,15 @@ const TemplatesMetabox = () => {
                     </button>
                     <p>{strings.templatesNoticeDescription}</p>
                     <div className="fotogrids-templates-metabox__pro-actions">
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--outline fotogrids-button--primary fotogrids-button--small fotogrids-button--full-width"
+                        <Button
+                            variant="primary"
+                            style="outline"
+                            size="xs"
+                            fullWidth
                             onClick={handleGoToTemplatesLibrary}
                         >
                             {strings.templatesLibrary}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
@@ -288,6 +300,26 @@ const TemplatesMetabox = () => {
 
         </>
     );
+
+    if (!editable) {
+        return (
+            <div className="fotogrids-templates-metabox--readonly">
+                <div className="fotogrids-readonly-notice" role="note">
+                    <strong>{__('Read-only', 'fotogrids')}</strong>
+                    <span> — {unauthorisedNotice}</span>
+                </div>
+                <fieldset
+                    className="fotogrids-templates-metabox__fieldset"
+                    disabled
+                    aria-disabled="true"
+                >
+                    {body}
+                </fieldset>
+            </div>
+        );
+    }
+
+    return body;
 };
 
 export default TemplatesMetabox;

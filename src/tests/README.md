@@ -54,7 +54,7 @@ Test individual components and functions in isolation.
 
 ```javascript
 // src/tests/unit/helpers.test.js
-describe('fotogrids_get_gallery', () => {
+describe('Gallery_Repository::get', () => {
     test('should return gallery when valid', () => {
         // Test implementation
     });

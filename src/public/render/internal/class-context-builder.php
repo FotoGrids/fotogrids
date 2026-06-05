@@ -66,6 +66,7 @@ final class Context_Builder {
         ?int $album_id = null,
         array $meta_overrides = []
     ): Render_Context {
+        $render_settings = self::coerce_layout_settings( $render_settings );
         // Random sort seed.
         //   - If the caller (typically the paginated REST handler) supplied
         //     one, honour it so paginated requests draw from the same
@@ -281,6 +282,7 @@ final class Context_Builder {
         ?string $simulate_state = null
     ): Render_Context {
         $render_settings = array_replace_recursive( $base_settings, $settings_overlay );
+        $render_settings = self::coerce_layout_settings( $render_settings );
         $warnings = [];
         [ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
         $thumb_size = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
@@ -340,6 +342,8 @@ final class Context_Builder {
         array $child_gallery_ids = [],
         Request_Source $source = Request_Source::SHORTCODE
     ): Render_Context {
+        $render_settings = self::coerce_layout_settings( $render_settings );
+
         $render_meta = new Render_Meta(
             // gallery_id is intentionally 0 — the render's primary identity
             // is the album. instance_id_factory needs SOMETHING unique to
@@ -1018,5 +1022,34 @@ final class Context_Builder {
         }
 
         return $overridden_items;
+    }
+
+    /**
+     * Apply layout-driven coercions to the resolved settings array before
+     * decorators and the layout consume it.
+     *
+     * Some layouts treat individual settings as fixed by design (e.g. Instant
+     * Photos always renders captions below the image). The admin UI hides the
+     * picker but stored values from a previous layout choice can persist on
+     * a gallery that was switched over. Coercing here means every consumer
+     * (Captions decorator, layout class, REST handlers) sees the layout's
+     * intended value without each having to special-case it.
+     *
+     * @since   1.0.0
+     * @param   array<string, mixed> $render_settings Resolved settings.
+     * @return  array<string, mixed>
+     */
+    private static function coerce_layout_settings( array $render_settings ): array {
+        $layout = $render_settings['layout'] ?? '';
+
+        if ( $layout === 'instant-photos' ) {
+            // The Instant Photos layout always renders the caption below the
+            // image; the placement picker is hidden in the admin for this
+            // layout. Force the value here so the Captions decorator stamps
+            // data-fg-caption="bottom" regardless of what's stored.
+            $render_settings['caption_placement'] = 'bottom';
+        }
+
+        return $render_settings;
     }
 }

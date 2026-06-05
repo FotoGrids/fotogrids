@@ -154,15 +154,20 @@ The plugin provides REST API endpoints for frontend functionality:
 
 ### Actions
 
--   `fotogrids_item_added_to_gallery` - Fired when item is added to gallery
--   `fotogrids_item_removed_from_gallery` - Fired when item is removed
--   `fotogrids_gallery_items_reordered` - Fired when items are reordered
--   `fotogrids_share_tracked` - Fired when a share is tracked
+-   `fotogrids/actions/item/added` - Fired when an item is added to a gallery
+-   `fotogrids/actions/item/removed` - Fired when an item is removed
+-   `fotogrids/actions/item/meta/updated` - Fired when item metadata is updated
+-   `fotogrids/actions/gallery/reordered` - Fired when gallery items are reordered
+-   `fotogrids/actions/share/tracked` - Fired when a share is tracked
 
 ### Filters
 
--   `fotogrids_available_layouts` - Modify available gallery layouts
--   `fotogrids_sanitize_gallery_settings` - Sanitize gallery settings
+-   `fotogrids/features/layouts/available` - Modify available gallery layouts
+-   `fotogrids/settings/sanitize` - Override settings sanitization
+-   `fotogrids/features/pro/can_use` - Per-feature Pro gating
+-   `fotogrids/permissions/check` - Layer additional permission rules
+
+Full hook catalogue: `Plugin/src/includes/hooks/`.
 
 ## Contributing
 

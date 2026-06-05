@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from '../../shared/Icon';
+import { Button } from '../../shared/Button';
 
 const MetadataTab = ({
     metadata,
@@ -89,14 +90,14 @@ const MetadataTab = ({
                             already set - the user should select from autocomplete
                             to replace, not add a second entry. */}
                         {(!isReplaceType || currentItems.length === 0) && (
-                            <button
-                                type="button"
-                                className="fotogrids-button fotogrids-button--primary fotogrids-button--outline"
+                            <Button
+                                variant="primary"
+                                style="outline"
                                 onClick={() => !disabled && addMetadataItem(metadataKey, currentInput)}
                                 disabled={disabled}
                             >
                                 {strings.add}
-                            </button>
+                            </Button>
                         )}
                     </div>
                 )}
@@ -125,13 +126,9 @@ const MetadataTab = ({
                                 <strong>{proNoticeContent.title}</strong> {proNoticeContent.description}
                             </span>
                         </div>
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--link"
-                            onClick={handleUpgrade}
-                        >
+                        <Button variant="link" onClick={handleUpgrade}>
                             {proNoticeContent.upgradeText || strings.upgradeToPro}
-                        </button>
+                        </Button>
                     </div>
                 )}
 
@@ -142,6 +139,9 @@ const MetadataTab = ({
                             <span key={item.id} className={itemClassName}>
                                 {renderItemContent ? renderItemContent(item) : (
                                     <>
+                                        {iconName && (
+                                            <Icon name={ iconName } className="fotogrids-metadata-item__icon" />
+                                        )}
                                         <span className={itemClassName.includes('fotogrids-tag') ? 'fotogrids-tag-text' : ''}>
                                             {item.name}
                                         </span>

@@ -8,6 +8,7 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Filters_View;
 use FotoGrids\Modules\Abstract_Module;
 use FotoGrids\Modules\Lifecycle_Module_Interface;
 
@@ -53,7 +54,7 @@ class Module extends Abstract_Module implements Lifecycle_Module_Interface {
          * @since 1.0.0
          * @param bool $enabled
          */
-        return (bool) apply_filters( 'fotogrids/view/enabled', true );
+        return (bool) apply_filters( Filters_View::ENABLED, true );
     }
 
     /**
@@ -66,9 +67,11 @@ class Module extends Abstract_Module implements Lifecycle_Module_Interface {
         require_once __DIR__ . '/class-settings.php';
         require_once __DIR__ . '/class-router.php';
         require_once __DIR__ . '/class-renderer.php';
+        require_once __DIR__ . '/class-integrated-renderer.php';
         require_once __DIR__ . '/class-seo-conflict-guard.php';
 
         Router::init();
+        Integrated_Renderer::init();
         SEO_Conflict_Guard::init();
 
         add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );

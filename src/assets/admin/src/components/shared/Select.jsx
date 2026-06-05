@@ -11,7 +11,12 @@ const Select = ({
     placeholder = '',
     disabled = false,
     className = '',
-    groups = null // Array of { label: string, options: array }
+    groups = null, // Array of { label: string, options: array }
+    // Optional fixed width for the trigger (and dropdown, which mirrors
+    // the trigger's measured width). Accepts a number (treated as px) or
+    // any valid CSS length string (e.g. '12rem'). When omitted the
+    // trigger sizes to its container.
+    width = null,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -119,10 +124,19 @@ const Select = ({
 
     const displayText = selectedOption ? selectedOption.label : placeholder;
 
+    // When `width` is set, expose it as the `--fotogrids-select-width` CSS
+    // custom property; the stylesheet decides whether/how to apply it. Numbers
+    // become px; strings pass through. When unset, no inline style is
+    // emitted and the component sizes to its container as usual.
+    const rootStyle = width != null
+        ? { '--fotogrids-select-width': typeof width === 'number' ? `${width}px` : width }
+        : undefined;
+
     return (
         <div
             ref={selectRef}
             className={`fotogrids-select ${isOpen ? 'fotogrids-select--is-open' : ''} ${disabled ? 'fotogrids-select--is-disabled' : ''} ${className}`}
+            style={rootStyle}
         >
             <button
                 type="button"

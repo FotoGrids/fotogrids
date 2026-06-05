@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Internal;
 
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Module_Assets;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -143,6 +144,7 @@ final class Asset_Resolver {
      */
     public function flush(): void {
         $new_css_handles = [];
+        $new_js_handles  = [];
 
         foreach ( $this->css_queue as $css_asset ) {
             $handle = $css_asset['handle'];
@@ -155,12 +157,6 @@ final class Asset_Resolver {
             wp_enqueue_style( $handle );
             $this->enqueued_css_handles[ $handle ] = $css_asset['src'];
             $new_css_handles[] = $handle;
-        }
-
-        // wp_head has already fired (shortcode / block rendered in content) -
-        // print new styles inline so they arrive before their HTML.
-        if ( ! empty( $new_css_handles ) && ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) ) {
-            wp_print_styles( $new_css_handles );
         }
 
         foreach ( $this->js_queue as $js_asset ) {
@@ -182,6 +178,24 @@ final class Asset_Resolver {
                 'src'       => $js_asset['src'],
                 'in_footer' => $js_asset['in_footer'],
             ];
+            $new_js_handles[] = $handle;
+        }
+
+        // Default: inline-print whenever wp_head / admin_head has already
+        // fired (the classic "shortcode rendered in the_content past wp_head"
+        // case — styles would otherwise never reach the page). Page-builder
+        // sub-modules can opt their preview / partial-render contexts in
+        // unconditionally via the SHOULD_INLINE_ASSETS filter.
+        $default_inline = did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0;
+        $should_inline  = (bool) apply_filters( Filters_Render::SHOULD_INLINE_ASSETS, $default_inline );
+
+        if ( $should_inline ) {
+            if ( ! empty( $new_css_handles ) ) {
+                wp_print_styles( $new_css_handles );
+            }
+            if ( ! empty( $new_js_handles ) ) {
+                wp_print_scripts( $new_js_handles );
+            }
         }
 
         // Clear the per-render queues so the next gallery render starts fresh.

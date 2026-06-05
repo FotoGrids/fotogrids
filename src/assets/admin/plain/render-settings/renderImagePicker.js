@@ -105,14 +105,14 @@ window.FotoGridsRenderSettings.renderImagePicker = (setting, currentValue, isDis
                 h('button', {
                     key: 'choose',
                     type: 'button',
-                    className: 'fotogrids-button fotogrids-button--secondary fotogrids-button--small',
+                    className: 'fg-button fg-button--variant-secondary fg-button--size-sm',
                     onClick: openPicker,
                     disabled: isDisabled,
                 }, chooseLabel),
                 attachmentId > 0 && h('button', {
                     key: 'clear',
                     type: 'button',
-                    className: 'fotogrids-button fotogrids-button--ghost fotogrids-button--small',
+                    className: 'fg-button fg-button--ghost fg-button--size-sm',
                     onClick: clear,
                     disabled: isDisabled,
                 }, __('Remove', 'fotogrids')),

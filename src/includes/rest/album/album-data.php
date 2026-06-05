@@ -135,7 +135,7 @@ class Album_Data {
 
         $gallery_data = array();
         foreach ( $galleries as $gallery ) {
-            $thumb = fotogrids_get_collection_cover_url( $gallery->ID, 'medium' );
+            $thumb = \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $gallery->ID, 'medium' );
             $gallery_data[] = array(
                 'id' => $gallery->ID,
                 'title' => $gallery->post_title,

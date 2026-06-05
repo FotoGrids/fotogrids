@@ -8,6 +8,8 @@
 
 namespace FotoGrids\Modules\ViewCollections;
 
+use FotoGrids\Hooks\Filters_View;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -146,7 +148,7 @@ class Router {
          * @param array  $args
          * @param string $post_type
          */
-        return apply_filters( 'fotogrids/view/cpt_args', $args, $post_type );
+        return apply_filters( Filters_View::CPT_ARGS, $args, $post_type );
     }
 
     /**
@@ -166,15 +168,27 @@ class Router {
          * @param string $slug
          * @param string $post_type
          */
-        return (string) apply_filters( 'fotogrids/view/base_slug', $slug, $post_type );
+        return (string) apply_filters( Filters_View::BASE_SLUG, $slug, $post_type );
     }
 
     /**
-     * Serve the standalone shell for a collection view request.
+     * Route a collection view request to either the standalone shell or the
+     * active theme (Integrated mode).
      *
-     * Unpublished collections return the original template (a 404 for the
-     * public) unless the current user can edit them, which enables draft
-     * preview for editors.
+     * Resolution order:
+     *   1. Bail unless this is a singular request for one of our CPTs.
+     *   2. Bail unless the post is published, or the current user can edit it
+     *      (the latter enables draft preview for editors).
+     *   3. Stash the resolved post on the Router so SEO_Conflict_Guard and
+     *      Integrated_Renderer can pick it up regardless of mode.
+     *   4. Honour the `fotogrids/view/pre_render` short-circuit (used by Pro
+     *      for password forms / expiry screens). Returns the filter path
+     *      regardless of mode.
+     *   5. In Integrated mode, return the WordPress-resolved template (the
+     *      active theme owns rendering; Integrated_Renderer injects the
+     *      gallery via the_content).
+     *   6. In Standalone mode, return the theme override `fotogrids/single-*.php`
+     *      if present, else the standalone shell.
      *
      * @since 1.0.0
      * @param string $template Template path WordPress resolved.
@@ -198,20 +212,44 @@ class Router {
          * Short-circuit before the shell renders.
          *
          * Returning a template path here wins (Pro uses this for password
-         * forms and expiry screens). Returning null falls through to the
-         * default shell.
+         * forms and expiry screens). Returning null falls through to either
+         * the Integrated mode theme template or the standalone shell.
          *
          * @since 1.0.0
          * @param string|null $pre
          * @param \WP_Post    $post
          */
-        $pre = apply_filters( 'fotogrids/view/pre_render', null, $post );
+        $pre = apply_filters( Filters_View::PRE_RENDER, null, $post );
         if ( is_string( $pre ) && $pre !== '' ) {
             self::$current_post = $post;
             return $pre;
         }
 
+        // Always stash the post: Integrated_Renderer and SEO_Conflict_Guard
+        // both key off Router::current_post() regardless of mode.
         self::$current_post = $post;
+
+        $settings    = \FotoGrids\Settings\View_Settings_Store::get();
+        $layout_mode = isset( $settings['layout_mode'] ) ? (string) $settings['layout_mode'] : 'integrated';
+
+        /**
+         * Filter the resolved view-page layout mode for this request.
+         *
+         * Pro and 3rd-party code can override the site-wide mode per request
+         * (e.g. force standalone for a specific collection, or vice versa).
+         *
+         * @since 1.0.0
+         * @param string   $layout_mode 'integrated' | 'standalone'
+         * @param \WP_Post $post
+         */
+        $layout_mode = (string) apply_filters( Filters_View::LAYOUT_MODE, $layout_mode, $post );
+
+        if ( $layout_mode === 'integrated' ) {
+            // Theme owns the document. Integrated_Renderer's hooks contribute
+            // the title, head meta, body classes, asset enqueues, stats, and
+            // the gallery markup itself (via the_content).
+            return $template;
+        }
 
         $override = locate_template(
             array(
@@ -231,7 +269,7 @@ class Router {
          * @param \WP_Post $post
          */
         return apply_filters(
-            'fotogrids/view/template',
+            Filters_View::TEMPLATE,
             FOTOGRIDS_PLUGIN_DIR . 'includes/modules/ViewCollections/templates/view-collection.php',
             $post
         );

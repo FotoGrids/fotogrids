@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Decorators\Album_To_Gallery_Ajax;
 
+use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Decorator;
@@ -10,6 +11,7 @@ use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Api\Item_Wrapper;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Internal\Hooks;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -107,6 +109,8 @@ final class Album_To_Gallery_Ajax implements Decorator {
             if ( $via_album_id !== null && $via_album_id > 0 ) {
                 $trigger_attrs['data-fg-via-album'] = (string) $via_album_id;
             }
+
+            $trigger_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $trigger_attrs, $render_context );
 
             $figure_wrapper = new Item_Wrapper(
                 tag:   'a',

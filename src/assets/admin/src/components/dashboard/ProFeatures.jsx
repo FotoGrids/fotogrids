@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import Icon from '../shared/Icon';
+import { Button } from '../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -41,22 +42,21 @@ const ProFeatures = () => {
                 </div>
                 <p>{__('Plus many more powerful features designed to save time, optimize performance, and help you grow.', 'fotogrids')}</p>
                 <div className="fg-abc-buttons">
-                    <a
+                    <Button
                         href="https://go.fotogrids.com/upgrade"
                         target="_blank"
-                        rel="noopener noreferrer"
-                        className="fotogrids-button fotogrids-button--primary"
+                        variant="primary"
                     >
                         {__('Upgrade Now', 'fotogrids')}
-                    </a>
-                    <a
+                    </Button>
+                    <Button
                         href="https://go.fotogrids.com/free-vs-pro"
                         target="_blank"
-                        rel="noopener noreferrer"
-                        className="fotogrids-button fotogrids-button--invert fotogrids-button--accent"
+                        variant="accent"
+                        className="fg-button--invert"
                     >
                         {__('Free vs. Pro', 'fotogrids')}
-                    </a>
+                    </Button>
                 </div>
             </div>
         </div>

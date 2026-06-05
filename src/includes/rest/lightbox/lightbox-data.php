@@ -83,9 +83,9 @@ class Lightbox_Data {
         // This handles items that were added before EXIF extraction ran, or
         // whose exif_data column was never populated.
         if ( null === $exif && $gallery_id > 0 ) {
-            $enabled_fields = fotogrids_get_enabled_exif_fields( $gallery_id );
+            $enabled_fields = \FotoGrids\Exif\Exif_Extractor::enabled_fields_for_gallery( $gallery_id );
             if ( ! empty( $enabled_fields ) ) {
-                $live_exif = fotogrids_extract_exif_data( $item_id, $enabled_fields );
+                $live_exif = \FotoGrids\Exif\Exif_Extractor::extract( $item_id, $enabled_fields );
                 if ( ! empty( $live_exif ) ) {
                     $exif = $live_exif;
                 }

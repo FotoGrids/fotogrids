@@ -58,7 +58,7 @@
             line-height: 17px;
         }
 
-        .fotogrids-button {
+        .fg-button {
             font-family: 'Poppins', sans-serif;
         }
 
@@ -477,12 +477,12 @@
                 gap: 8px;
                 flex-wrap: wrap;
 
-                .fotogrids-button {
+                .fg-button {
                     font-size: 13px;
                     padding: 10px 20px;
                 }
 
-                .fotogrids-button--accent {
+                .fg-button--variant-accent {
                     border-color: rgba(255, 255, 255, 0.4);
 
                     &:hover {

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Catalog;
 
+use FotoGrids\Hooks\Filters_Catalog;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -135,7 +137,7 @@ final class Catalog {
             $free_catalog_dir . 'ecommerce.json',
         ];
 
-        $json_file_paths = apply_filters( 'fotogrids/catalog/json_files', $json_file_paths );
+        $json_file_paths = apply_filters( Filters_Catalog::JSON_FILES, $json_file_paths );
 
         if ( ! is_array( $json_file_paths ) ) {
             return [];

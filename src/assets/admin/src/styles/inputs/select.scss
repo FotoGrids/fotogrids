@@ -4,6 +4,14 @@
 .fotogrids-select {
     position: relative;
 
+    // When a consumer sets the `--fotogrids-select-width` custom property
+    // (via the JS `width` prop or directly in CSS), the wrapper takes that
+    // exact width. No fallback — without the variable, the component sizes
+    // to its container as usual.
+    &[style*='--fotogrids-select-width'] {
+        width: var(--fotogrids-select-width);
+    }
+
     &__trigger {
         width: 100%;
         display: flex;
@@ -15,7 +23,7 @@
         border-radius: 4px;
         cursor: pointer;
         font-size: 14px;
-        line-height: 1.5;
+        line-height: 22px;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
         margin: 0;
 
@@ -65,7 +73,7 @@
         border: 1px solid var(--fg-border-primary);
         border-radius: 4px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        z-index: 9999;
+        z-index: 100001;
         overflow-y: auto;
     }
 

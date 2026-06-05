@@ -9,7 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use FotoGrids\Admin_Helpers;
 
 class FotoGrids_Upgrade_Modal_Integration {
 
@@ -22,25 +21,20 @@ class FotoGrids_Upgrade_Modal_Integration {
     }
 
     /**
-     * Enqueue modal assets on admin pages
+     * Enqueue modal assets on admin pages.
+     *
+     * The global modal init script always enqueues so the Modal imperative
+     * API (window.FotoGridsAdmin.modal) is available on every admin page,
+     * including for Pro users. The upgrade modal stylesheet only enqueues
+     * for non-Pro users since they're the only ones who see it.
      *
      * @param string $hook Current admin page hook
      */
     public static function enqueue_assets( $hook ) {
-        // Don't enqueue for Pro users
-        if ( fotogrids_has_pro() || ! is_admin() ) {
+        if ( ! is_admin() ) {
             return;
         }
 
-        // Enqueue modal styles
-        wp_enqueue_style(
-            'fotogrids-upgrade-modal',
-            FOTOGRIDS_PLUGIN_URL . 'assets/css/upgrade-modal.css',
-            array(),
-            FOTOGRIDS_VERSION
-        );
-
-        // Enqueue global modal initialization script
         wp_enqueue_script(
             'fotogrids-global-modal',
             FOTOGRIDS_PLUGIN_URL . 'assets/js/global-modal-init.js',
@@ -49,32 +43,44 @@ class FotoGrids_Upgrade_Modal_Integration {
             true
         );
 
-        // Mark as Pro user for JS
         wp_localize_script( 'fotogrids-global-modal', 'fotogridsGlobalSettings', array(
-            'isPro' => fotogrids_has_pro(),
-            'debugMode' => defined( 'WP_DEBUG' ) && WP_DEBUG
+            'isPro'     => \FotoGrids\License_Manager::has_pro(),
+            'debugMode' => defined( 'WP_DEBUG' ) && WP_DEBUG,
         ) );
+
+        if ( ! \FotoGrids\License_Manager::has_pro() ) {
+            wp_enqueue_style(
+                'fotogrids-upgrade-modal',
+                FOTOGRIDS_PLUGIN_URL . 'assets/css/upgrade-modal.css',
+                array(),
+                FOTOGRIDS_VERSION
+            );
+        }
     }
 
     /**
-     * Render modal data in admin footer
+     * Render modal containers and bootstrap data in the admin footer. The
+     * modal-root container always renders so imperative modals can mount;
+     * the upgrade-modal container only renders for non-Pro users.
      */
     public static function render_modal_data() {
-        // Don't render for Pro users
-        if ( fotogrids_has_pro() || ! is_admin() ) {
+        if ( ! is_admin() ) {
             return;
         }
 
-        $modal_data = FotoGrids_Upgrade_Modal::get_modal_data();
-
-        // Ensure fotogridsAdmin.isFotoGridsPage is set for modal init (e.g. on post edit where fotogrids-admin may load late)
-        $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-        $is_fotogrids_page = $screen && Admin_Helpers::is_fotogrids_page( $screen );
+        $screen            = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+        $is_fotogrids_page = $screen && \FotoGrids\Admin\Admin_Screen::is_fotogrids( $screen );
+        $is_pro            = \FotoGrids\License_Manager::has_pro();
         ?>
+        <div id="fotogrids-modal-root"></div>
+        <?php if ( ! $is_pro ) : ?>
         <div id="fotogrids-upgrade-modal"></div>
+        <?php endif; ?>
         <script type="text/javascript">
-            window.fotogridsUpgradeModal = <?php echo wp_json_encode( $modal_data ); ?>;
-            window.fotogridsIsPro = <?php echo fotogrids_has_pro() ? 'true' : 'false'; ?>;
+            window.fotogridsIsPro = <?php echo $is_pro ? 'true' : 'false'; ?>;
+            <?php if ( ! $is_pro ) : ?>
+            window.fotogridsUpgradeModal = <?php echo wp_json_encode( FotoGrids_Upgrade_Modal::get_modal_data() ); ?>;
+            <?php endif; ?>
             <?php if ( $is_fotogrids_page ) : ?>
             if ( ! window.fotogridsAdmin ) {
                 window.fotogridsAdmin = {};
@@ -94,7 +100,7 @@ class FotoGrids_Upgrade_Modal_Integration {
      * @return bool
      */
     private static function is_fotogrids_admin_page( $hook ) {
-        return Admin_Helpers::is_fotogrids_page( $hook );
+        return \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook );
     }
 
     /**
@@ -104,7 +110,7 @@ class FotoGrids_Upgrade_Modal_Integration {
      */
     private static function should_show_modal() {
         // Don't show for Pro users
-        if ( fotogrids_has_pro() ) {
+        if ( \FotoGrids\License_Manager::has_pro() ) {
             return false;
         }
 
@@ -121,7 +127,7 @@ class FotoGrids_Upgrade_Modal_Integration {
      * Add pro feature indicators to admin UI
      */
     public static function add_pro_indicators() {
-        if ( fotogrids_has_pro() ) {
+        if ( \FotoGrids\License_Manager::has_pro() ) {
             return;
         }
 
@@ -190,7 +196,7 @@ class FotoGrids_Upgrade_Modal_Integration {
      * @return string Button HTML
      */
     public static function create_upgrade_button( $feature, $text, $args = array() ) {
-        if ( fotogrids_has_pro() ) {
+        if ( \FotoGrids\License_Manager::has_pro() ) {
             return '';
         }
 

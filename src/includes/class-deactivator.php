@@ -20,9 +20,6 @@ class Deactivator {
     public static function deactivate() {
         flush_rewrite_rules();
 
-        wp_clear_scheduled_hook( 'fotogrids_daily_cleanup' );
-        wp_clear_scheduled_hook( 'fotogrids_stats_aggregation' );
-
         if ( class_exists( '\FotoGrids\FotoGrids_Cache' ) ) {
             \FotoGrids\FotoGrids_Cache::flush_all();
         }

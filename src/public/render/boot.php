@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Render\Internal\Asset_Resolver;
-use FotoGrids\Render\Internal\Hooks;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -68,13 +68,13 @@ add_action(
 add_action(
     'wp_loaded',
     static function (): void {
-        do_action( Hooks::HOOK_REGISTER_MODULES );
+        do_action( Actions_Render::REGISTER_MODULES );
     },
     5
 );
 
 add_action(
-    Hooks::HOOK_REGISTER_MODULES,
+    Actions_Render::REGISTER_MODULES,
     static function (): void {
         if ( ! class_exists( \FotoGrids\Render\Internal\Module_Registry::class ) ) {
             return;
@@ -95,6 +95,7 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Justified::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Single_Item::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Slider::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Instant_Photos::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Captions\Captions::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Image_Filters\Image_Filters::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Border_Radius\Border_Radius::class );

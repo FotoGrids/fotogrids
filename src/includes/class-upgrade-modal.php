@@ -23,7 +23,7 @@ class FotoGrids_Upgrade_Modal {
                 'shortTitle' => __( 'Layouts', 'fotogrids' ),
                 'title' => __( 'Turn Browsers Into Buyers with', 'fotogrids' ),
                 'subtitle' => __( 'Advanced Layout Options!', 'fotogrids' ),
-                'content' => __( 'Make every gallery feel like a curated experience. Unlock premium layouts like Video, Polaroid, Carousel, Slideshow, and more - crafted to grab attention, spark emotion, and boost engagement.', 'fotogrids' ),
+                'content' => __( 'Carousel for hero sliders and lookbooks. Video Playlist for video-led galleries. Product Gallery for shop pages. Mixed Tiles for bento-style mosaics. Same builder, same controls - four more shapes to reach for.', 'fotogrids' ),
                 'color' => '#8b5cf6',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/advanced-layouts.svg'
             ),
@@ -49,8 +49,8 @@ class FotoGrids_Upgrade_Modal {
                 'key' => 'custom_css',
                 'shortTitle' => __( 'Styling', 'fotogrids' ),
                 'title' => __( 'Own Your Aesthetic with', 'fotogrids' ),
-                'subtitle' => __( 'Custom CSS & Styling!', 'fotogrids' ),
-                'content' => __( 'Match your brand perfectly. From micro-details to full theme overhauls, gain complete visual freedom with custom CSS, advanced color controls, and endless styling possibilities.', 'fotogrids' ),
+                'subtitle' => __( 'Advanced Global Styling!', 'fotogrids' ),
+                'content' => __( 'Match your brand perfectly. From micro-details to full theme overhauls, gain complete visual freedom with Global Color Palette, Global Typography, advanced customization controls, and endless styling possibilities.', 'fotogrids' ),
                 'color' => '#06b6d4',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/custom-styling.svg'
             ),
@@ -68,7 +68,7 @@ class FotoGrids_Upgrade_Modal {
                 'shortTitle' => __( 'Analytics', 'fotogrids' ),
                 'title' => __( 'Make Smarter Decisions with', 'fotogrids' ),
                 'subtitle' => __( 'Advanced Analytics!', 'fotogrids' ),
-                'content' => __( 'Understand exactly what your audience loves. Track views, clicks, and engagement to optimize your galleries, improve conversions, and create content that actually performs.', 'fotogrids' ),
+                'content' => __( 'Understand exactly what your audience loves. Engagement tracking, user behavior insights, and traffic sources to optimize your galleries, improve conversions, and create content that actually performs.', 'fotogrids' ),
                 'color' => '#ef4444',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/analytics.svg'
             ),
@@ -77,7 +77,7 @@ class FotoGrids_Upgrade_Modal {
                 'shortTitle' => __( 'Integrations', 'fotogrids' ),
                 'title' => __( 'Connect Your Entire Workflow with', 'fotogrids' ),
                 'subtitle' => __( 'Powerful Integrations!', 'fotogrids' ),
-                'content' => __( 'Integrate seamlessly with Google Photos, Dropbox, Instagram, and other top platforms. Import faster, organize easier, and build galleries without breaking your creative flow.', 'fotogrids' ),
+                'content' => __( 'Integrate seamlessly with Google Photos, Dropbox, Instagram, Lightroom, and other top platforms. Import faster, organize easier, and build galleries without breaking your creative flow.', 'fotogrids' ),
                 'color' => '#8b5cf6',
                 'image' => FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/upgrade/integrations.svg'
             ),

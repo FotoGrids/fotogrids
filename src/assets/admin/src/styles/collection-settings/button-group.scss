@@ -1,4 +1,4 @@
-.fotogrids-button-group {
+.fg-button-group {
     &__buttons {
         display: flex;
         flex-wrap: wrap;
@@ -34,7 +34,7 @@
             cursor: not-allowed;
         }
 
-        .fotogrids-button-icon {
+        .fg-button-icon {
             display: flex;
             align-items: center;
             font-size: 0;
@@ -45,7 +45,7 @@
             }
         }
 
-        .fotogrids-button-label {
+        .fg-button-label {
             font-weight: 400;
         }
 
@@ -56,7 +56,7 @@
             align-items: stretch;
             overflow: visible; // allow tooltip bubble to escape
 
-            .fotogrids-button-label {
+            .fg-button-label {
                 display: flex;
                 align-items: center;
                 padding-bottom: 2px;
@@ -79,30 +79,30 @@
     }
 
     &--big-icons {
-        .fotogrids-button-group__button {
+        .fg-button-group__button {
             padding: 24px;
             flex-direction: column;
             border-color: var(--fg-border-primary);
 
-            .fotogrids-button-icon svg {
+            .fg-button-icon svg {
                 width: 24px;
                 height: 24px;
             }
         }
     }
 
-    &--big-icons.fotogrids-button-group--same-width {
-        .fotogrids-button-group__buttons {
+    &--big-icons.fg-button-group--same-width {
+        .fg-button-group__buttons {
             display: grid;
             align-items: center;
             justify-content: start;
             grid-template-columns: repeat(auto-fill, minmax(80px, 100px));
 
-            .fotogrids-button-group__button {
+            .fg-button-group__button {
                 padding: 20px;
                 gap: 8px;
 
-                .fotogrids-button-icon svg {
+                .fg-button-icon svg {
                     path, rect, line {
                         stroke-width: 1.4;
                     }
@@ -111,12 +111,12 @@
         }
     }
 
-    &--big-icons.fotogrids-button-group--extra-big-icons {
-        .fotogrids-button-group__buttons {
-            .fotogrids-button-group__button {
+    &--big-icons.fg-button-group--extra-big-icons {
+        .fg-button-group__buttons {
+            .fg-button-group__button {
                 padding: 16px 24px;
     
-                .fotogrids-button-icon svg {
+                .fg-button-icon svg {
                     width: 40px;
                     height: 40px;
     

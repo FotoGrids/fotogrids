@@ -652,11 +652,19 @@ class Admin_Data {
             return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
         }
 
-        $cache_key = 'fotogrids_google_fonts_families_v1';
-        $cached_families = get_transient( $cache_key );
+        // Cache key bumped to _v2 when the payload shape grew from a flat
+        // array of family names to {families, categories}. Old _v1 transients
+        // are left to expire naturally.
+        $cache_key = 'fotogrids_google_fonts_families_v2';
+        $cached    = get_transient( $cache_key );
 
-        if ( is_array( $cached_families ) && ! empty( $cached_families ) ) {
-            return rest_ensure_response( array( 'families' => array_values( $cached_families ) ) );
+        if ( is_array( $cached ) && ! empty( $cached['families'] ) ) {
+            return rest_ensure_response( array(
+                'families'   => array_values( $cached['families'] ),
+                'categories' => isset( $cached['categories'] ) && is_array( $cached['categories'] )
+                    ? $cached['categories']
+                    : (object) array(),
+            ) );
         }
 
         $response = wp_remote_get(
@@ -691,15 +699,28 @@ class Admin_Data {
             ? $parsed['familyMetadataList']
             : array();
 
-        $families = array();
+        // Allowed categories mirror Google's `category` taxonomy. Anything
+        // outside this list is normalised to '' so the client doesn't have
+        // to filter unknowns.
+        $allowed_categories = array( 'sans-serif', 'serif', 'display', 'handwriting', 'monospace' );
+
+        $families   = array();
+        $categories = array();
         foreach ( $family_metadata as $font_entry ) {
             if ( ! is_array( $font_entry ) || ! isset( $font_entry['family'] ) ) {
                 continue;
             }
 
             $family = trim( (string) $font_entry['family'] );
-            if ( '' !== $family ) {
-                $families[] = $family;
+            if ( '' === $family ) {
+                continue;
+            }
+
+            $families[] = $family;
+
+            $category = isset( $font_entry['category'] ) ? strtolower( trim( (string) $font_entry['category'] ) ) : '';
+            if ( in_array( $category, $allowed_categories, true ) ) {
+                $categories[ $family ] = $category;
             }
         }
 
@@ -714,9 +735,15 @@ class Admin_Data {
             );
         }
 
-        set_transient( $cache_key, $families, 12 * HOUR_IN_SECONDS );
+        set_transient( $cache_key, array(
+            'families'   => $families,
+            'categories' => $categories,
+        ), 12 * HOUR_IN_SECONDS );
 
-        return rest_ensure_response( array( 'families' => $families ) );
+        return rest_ensure_response( array(
+            'families'   => $families,
+            'categories' => empty( $categories ) ? (object) array() : $categories,
+        ) );
     }
 
     /**
@@ -997,7 +1024,7 @@ class Admin_Data {
         $errors = array();
 
         foreach ( $item_ids as $item_id ) {
-            $result = fotogrids_add_item_to_gallery( $gallery_id, $item_id );
+            $result = \FotoGrids\Galleries\Gallery_Items::add( (int) $gallery_id, (int) $item_id );
 
             if ( $result ) {
                 $added[] = $item_id;
@@ -1022,74 +1049,8 @@ class Admin_Data {
         ) );
     }
 
-    /**
-     * Get gallery preview HTML
-     *
-     * @param \WP_REST_Request $request Request object
-     * @return \WP_REST_Response|\WP_Error Response object
-     */
-    public static function get_gallery_preview( $request ) {
-        $gallery_id = absint( $request->get_param( 'id' ) );
-
-        if ( ! $gallery_id ) {
-            return new \WP_Error(
-                'invalid_gallery_id',
-                __( 'Invalid gallery ID.', 'fotogrids' ),
-                array( 'status' => 400 )
-            );
-        }
-
-        $gallery = get_post( $gallery_id );
-        if ( ! $gallery || $gallery->post_type !== 'fotogrids_gallery' ) {
-            return new \WP_Error(
-                'gallery_not_found',
-                __( 'Gallery not found.', 'fotogrids' ),
-                array( 'status' => 404 )
-            );
-        }
-
-        if ( ! current_user_can( 'edit_post', $gallery_id ) ) {
-            return new \WP_Error(
-                'forbidden',
-                __( 'Insufficient permissions.', 'fotogrids' ),
-                array( 'status' => 403 )
-            );
-        }
-
-        $atts = array();
-
-        $template = $request->get_param( 'template' );
-        if ( $template ) {
-            $atts['template'] = sanitize_text_field( $template );
-        }
-
-        $cols = absint( $request->get_param( 'cols' ) );
-        if ( $cols ) {
-            $atts['cols'] = $cols;
-        }
-
-        $lazy = $request->get_param( 'lazy' );
-        if ( $lazy !== null ) {
-            $atts['lazy'] = $lazy ? 'true' : 'false';
-        }
-
-        $lightbox = $request->get_param( 'lightbox' );
-        if ( $lightbox !== null ) {
-            $atts['lightbox'] = $lightbox ? 'true' : 'false';
-        }
-
-        $captions = $request->get_param( 'captions' );
-        if ( $captions !== null ) {
-            $atts['captions'] = $captions ? 'true' : 'false';
-        }
-
-        $html = \FotoGrids\Public_Render::render_gallery_preview( $gallery_id, $atts );
-
-        return rest_ensure_response( array(
-            'html'       => $html,
-            'gallery_id' => $gallery_id,
-        ) );
-    }
+    // get_gallery_preview() was removed when the PageBuilders module took
+    // over preview rendering. Hosts now use POST /preview/gallery/{id}.
 
     /**
      * Get recently edited galleries and albums

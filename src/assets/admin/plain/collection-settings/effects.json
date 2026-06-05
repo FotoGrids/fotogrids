@@ -278,6 +278,13 @@
                     "id": "hover_effects",
                     "label": "Hover Effects",
                     "icon": "hover",
+                    "condition": {
+                        "dependsOn": "layout",
+                        "values": [
+                            "instant-photos"
+                        ],
+                        "condition_operator": "not_in"
+                    },
                     "settings": [
                         {
                             "key": "hover_cursor_icon",

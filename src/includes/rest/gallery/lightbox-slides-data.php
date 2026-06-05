@@ -60,7 +60,7 @@ class Lightbox_Slides_Data {
             );
         }
 
-        $settings = fotogrids_get_gallery_settings( $gallery_id );
+        $settings = \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $gallery_id );
 
         // Resolve the full filtered + sorted sequence. Random seed = 0
         // (the param default for "no seed") becomes null so the sorter

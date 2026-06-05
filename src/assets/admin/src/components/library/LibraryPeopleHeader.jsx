@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import useLibraryStats from './useLibraryStats';
 import Panel from '../shared/SidebarTabs/elements/Panel';
 import LibraryStatCard from './LibraryStatCard';
+import { Button } from '../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -187,9 +188,9 @@ const LibraryPeopleHeader = ({ entityType, total: externalTotal }) => {
                                 <strong>{__('AI Facial Recognition', 'fotogrids')}</strong>
                                 {__('Auto-detect people in images', 'fotogrids')}
                             </span>
-                            <button
-                                type="button"
-                                className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                            <Button
+                                variant="secondary"
+                                size="xs"
                                 onClick={() => {
                                     if (window.FotoGridsUpgrade) { window.FotoGridsUpgrade.launch(); }
                                     else if (window.fotogridsUpgradeModal?.urls?.upgrade) {
@@ -198,7 +199,7 @@ const LibraryPeopleHeader = ({ entityType, total: externalTotal }) => {
                                 }}
                             >
                                 {__('Learn more', 'fotogrids')}
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>

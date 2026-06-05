@@ -99,13 +99,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                 className: 'fotogrids-bulk-actions__defaults'
             }, [
                 h('div', {
-                    className: 'fotogrids-button-group'
+                    className: 'fg-button-group'
                 }, [
                     h('label', {
                         className: 'fotogrids-setting__label'
                     }, __('Default Link Target', 'fotogrids')),
                     h('div', {
-                        className: 'fotogrids-button-group__buttons'
+                        className: 'fg-button-group__buttons'
                     }, [
                         { label: __('Same Tab', 'fotogrids'), value: '_self', icon: 'check_square' },
                         { label: __('New Tab', 'fotogrids'), value: '_blank', icon: 'plus_square' }
@@ -113,16 +113,16 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                         h('button', {
                             key: option.value,
                             type: 'button',
-                            className: `fotogrids-button-group__button ${globalTarget === option.value ? 'fg-is-active' : ''}`,
+                            className: `fg-button-group__button ${globalTarget === option.value ? 'fg-is-active' : ''}`,
                             onClick: () => !isDisabled && updateSetting('external_link_target', option.value),
                             disabled: isDisabled,
                             title: option.label || ''
                         }, [
                             option.icon && h('span', {
-                                className: 'fotogrids-button-icon'
+                                className: 'fg-button-icon'
                             }, renderIcon(option.icon)),
                             option.label && h('span', {
-                                className: 'fotogrids-button-label'
+                                className: 'fg-button-label'
                             }, option.label)
                         ])
                     ))
@@ -135,16 +135,16 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (setting, isDisabled, 
                     className: 'fotogrids-setting__label'
                 }, __('Bulk Actions', 'fotogrids')),
                 h('div', {
-                    className: 'fotogrids-button-group__buttons'
+                    className: 'fg-button-group__buttons'
                 }, [
                     h('button', {
                         type: 'button',
-                        className: 'fotogrids-button fotogrids-button--secondary',
+                        className: 'fg-button fg-button--variant-secondary',
                         onClick: () => openBulkModal('apply_to_all')
                     }, __('Apply URL to All', 'fotogrids')),
                     h('button', {
                         type: 'button',
-                        className: 'fotogrids-button fotogrids-button--secondary',
+                        className: 'fg-button fg-button--variant-secondary',
                         onClick: () => openBulkModal('clear_all')
 
                     }, __('Clear All URLs', 'fotogrids'))

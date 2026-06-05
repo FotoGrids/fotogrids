@@ -1,0 +1,38 @@
+@use '../colors.scss' as *;
+
+/**
+ * Optional fixed band beneath the header. Mirrors the header's
+ * structural traits — never shrinks, bottom-divider by default — but
+ * leaves the inner content layout entirely to the consumer. Two
+ * common patterns:
+ *
+ *   1. Search + sort row (picker modal): a single horizontal flex
+ *      row with the search input growing to fill remaining space and
+ *      the sort dropdown sitting on the trailing edge.
+ *
+ *   2. Filter pills row: a wrapping flex row of small chips that
+ *      reflow on narrow modals.
+ *
+ * Padding mirrors the header so the two bands feel like one continuous
+ * chrome region above the scrolling body.
+ */
+.fg-modal {
+    $modal: &;
+
+    &__sub-header {
+        flex-shrink: 0;
+        padding: 12px 24px;
+        border-bottom: 1px solid var(--fg-border-primary);
+        background: var(--fg-surface-secondary, transparent);
+    
+        &--no-divider {
+            border-bottom: none;
+        }
+    }
+
+    &--compact {
+        #{$modal}__sub-header {
+            padding: 12px;
+        }
+    }
+}

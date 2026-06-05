@@ -6,6 +6,7 @@ import TabBar from '@/admin/src/components/shared/TabBar.jsx';
 import Icon from '@/admin/src/components/shared/Icon.jsx';
 import Toggle from '@/admin/src/components/shared/Toggle.jsx';
 import Tooltip from '@/admin/src/components/Tooltip.jsx';
+import { Button } from '@/admin/src/components/shared/Button';
 
 const baseClass = 'fg-regenerate-thumbnails';
 
@@ -386,17 +387,17 @@ const RegenerateThumbnailsTool = () => {
                     <div className={`${baseClass}__toolbar`}>
                         <div className={`${baseClass}__toolbar-left`}>
                             {!regenActive ? (
-                                <button
-                                    className="fotogrids-button fotogrids-button--primary"
+                                <Button
+                                    variant="primary"
                                     onClick={handleRegenAll}
                                     disabled={items.length === 0}
                                 >
                                     {__('Regenerate All', 'fotogrids')}
-                                </button>
+                                </Button>
                             ) : (
-                                <button className="fotogrids-button fotogrids-button--secondary" onClick={handleCancel}>
+                                <Button variant="secondary" onClick={handleCancel}>
                                     {__('Cancel', 'fotogrids')}
-                                </button>
+                                </Button>
                             )}
                             <Toggle
                                 checked={includeUnused}
@@ -407,14 +408,15 @@ const RegenerateThumbnailsTool = () => {
                             />
                         </div>
                         <div className={`${baseClass}__toolbar-right`}>
-                            <button
-                                className={`fotogrids-button fotogrids-button--secondary ${baseClass}__refresh-btn`}
+                            <Button
+                                variant="secondary"
+                                className={`${baseClass}__refresh-btn`}
                                 onClick={loadStatus}
                                 disabled={regenActive}
+                                icon="refresh_cv"
                             >
-                                <Icon name="refresh_cv" />
                                 {__('Refresh Status', 'fotogrids')}
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
@@ -547,13 +549,14 @@ const RegenerateThumbnailsTool = () => {
                                                         {isBeingRegen ? (
                                                             <span className={`spinner is-active ${baseClass}__row-spinner`} />
                                                         ) : (
-                                                            <button
-                                                                className="fotogrids-button fotogrids-button--primary fotogrids-button--small"
+                                                            <Button
+                                                                variant="primary"
+                                                                size="xs"
                                                                 onClick={() => handleRegenSingle(item)}
                                                                 disabled={regenActive}
                                                             >
                                                                 {__('Regenerate', 'fotogrids')}
-                                                            </button>
+                                                            </Button>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -565,14 +568,14 @@ const RegenerateThumbnailsTool = () => {
 
                             {totalPages > 1 && (
                                 <div className={`${baseClass}__pagination`}>
-                                    <button
-                                        type="button"
-                                        className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                                    <Button
+                                        variant="secondary"
+                                        size="xs"
                                         onClick={() => setPage(p => Math.max(1, p - 1))}
                                         disabled={page <= 1 || regenActive}
                                     >
                                         {__('← Prev', 'fotogrids')}
-                                    </button>
+                                    </Button>
                                     <span className={`${baseClass}__pagination-status`}>
                                         {sprintf(
                                             /* translators: 1: current page, 2: total pages, 3: total item count */
@@ -582,14 +585,14 @@ const RegenerateThumbnailsTool = () => {
                                             total
                                         )}
                                     </span>
-                                    <button
-                                        type="button"
-                                        className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                                    <Button
+                                        variant="secondary"
+                                        size="xs"
                                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                         disabled={page >= totalPages || regenActive}
                                     >
                                         {__('Next →', 'fotogrids')}
-                                    </button>
+                                    </Button>
                                 </div>
                             )}
                         </>
@@ -612,13 +615,13 @@ const RegenerateThumbnailsTool = () => {
                             </div>
                         </div>
                         {regenActive && (
-                            <button
-                                type="button"
-                                className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                            <Button
+                                variant="secondary"
+                                size="xs"
                                 onClick={handleCancel}
                             >
                                 {__('Cancel', 'fotogrids')}
-                            </button>
+                            </Button>
                         )}
                     </div>
 

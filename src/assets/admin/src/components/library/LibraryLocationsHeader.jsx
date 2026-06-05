@@ -3,6 +3,7 @@ import useLibraryStats from './useLibraryStats';
 import Panel from '../shared/SidebarTabs/elements/Panel';
 import LibraryStatCard from './LibraryStatCard';
 import Icon from '../shared/Icon';
+import { Button } from '../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -182,9 +183,9 @@ const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
                                 <strong>{__('Interactive Map View', 'fotogrids')}</strong>
                                 {__('With smart EXIF locations', 'fotogrids')}
                             </span>
-                            <button
-                                type="button"
-                                className="fotogrids-button fotogrids-button--secondary fotogrids-button--small"
+                            <Button
+                                variant="secondary"
+                                size="xs"
                                 onClick={() => {
                                     if (window.FotoGridsUpgrade) { window.FotoGridsUpgrade.launch(); }
                                     else if (window.fotogridsUpgradeModal?.urls?.upgrade) {
@@ -193,7 +194,7 @@ const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
                                 }}
                             >
                                 {__('Learn more', 'fotogrids')}
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>

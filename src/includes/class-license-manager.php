@@ -1,6 +1,10 @@
 <?php
 namespace FotoGrids;
 
+use FotoGrids\Hooks\Actions_Cron;
+use FotoGrids\Hooks\Filters_Features;
+use FotoGrids\Hooks\Filters_Licensing;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -50,8 +54,7 @@ class License_Manager {
         add_action( 'admin_init', array( __CLASS__, 'maybe_verify_license' ), 20 );
         add_action( 'activated_plugin', array( __CLASS__, 'clear_cache_on_plugin_change' ), 10, 2 );
         add_action( 'deactivated_plugin', array( __CLASS__, 'clear_cache_on_plugin_change' ), 10, 2 );
-        add_filter( 'fotogrids/can_use_pro_feature', array( __CLASS__, 'can_use_pro_feature' ), 10, 2 );
-        add_action( 'fotogrids_verify_license', array( __CLASS__, 'verify_license_from_server' ) );
+        add_action( Actions_Cron::VERIFY_LICENSE, array( __CLASS__, 'verify_license_from_server' ) );
     }
 
     /**
@@ -62,7 +65,7 @@ class License_Manager {
      * @return bool True if feature is enabled
      */
     public static function feature_enabled( $feature_name ) {
-        return apply_filters( 'fotogrids/features/pro/can_use', false, $feature_name );
+        return apply_filters( Filters_Features::PRO_CAN_USE, false, $feature_name );
     }
 
     /**
@@ -271,7 +274,7 @@ class License_Manager {
      * @since 1.0.0
      */
     public static function maybe_verify_license() {
-        if ( ! Admin_Helpers::is_fotogrids_page() ) {
+        if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
             return;
         }
 
@@ -438,7 +441,7 @@ class License_Manager {
          * @since 1.0.0
          * @param \FotoGrids\Licensing\License_Provider|null $override
          */
-        $override = apply_filters( 'fotogrids/licensing/provider', null );
+        $override = apply_filters( Filters_Licensing::PROVIDER, null );
         if ( $override instanceof \FotoGrids\Licensing\License_Provider ) {
             self::$provider = $override;
             return self::$provider;
@@ -476,6 +479,20 @@ class License_Manager {
      */
     public static function pro_is_active(): bool {
         return self::provider()->is_pro_active();
+    }
+
+    /**
+     * Whether the FotoGrids Pro plugin is loaded on this site.
+     *
+     * Constant-only check — does NOT validate license state. Use can_use()
+     * or on_plan() when you need to know whether a specific Pro feature
+     * is actually enabled for the current site / user.
+     *
+     * @since  1.0.0
+     * @return bool
+     */
+    public static function has_pro(): bool {
+        return defined( 'FOTOGRIDS_PRO_VERSION' );
     }
 
     /**

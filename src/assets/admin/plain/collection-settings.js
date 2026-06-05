@@ -886,6 +886,20 @@ function CollectionSettings() {
                         : storedArray.includes(expectedValues);
                 }
 
+                // not_in: passes when the dependent value is NOT in the expected list.
+                if (op === 'not_in') {
+                    return Array.isArray(expectedValues)
+                        ? !expectedValues.includes(currentValue)
+                        : expectedValues !== currentValue;
+                }
+
+                // numeric_gt: passes when the dependent value (number) is strictly greater than the expected number.
+                if (op === 'numeric_gt') {
+                    const num = Number(currentValue);
+                    const threshold = Number(Array.isArray(expectedValues) ? expectedValues[0] : expectedValues);
+                    return !Number.isNaN(num) && !Number.isNaN(threshold) && num > threshold;
+                }
+
                 return Array.isArray(expectedValues)
                     ? expectedValues.includes(currentValue)
                     : expectedValues === currentValue;
@@ -911,6 +925,24 @@ function CollectionSettings() {
                 return Array.isArray(values)
                     ? values.some(v => storedArray.includes(v))
                     : storedArray.includes(values);
+            }
+
+            // not_in: passes when the dependent value is NOT in the listed values.
+            // Useful for hiding settings on a specific layout (or any other discrete
+            // value) without enumerating every other layout explicitly.
+            if (conditionOperator === 'not_in') {
+                return Array.isArray(values)
+                    ? !values.includes(dependentValue)
+                    : values !== dependentValue;
+            }
+
+            // numeric_gt: passes when the dependent value (number) is strictly
+            // greater than the expected number. Lets a setting depend on another
+            // setting's magnitude (e.g. show only when max_rotation > 0).
+            if (conditionOperator === 'numeric_gt') {
+                const num = Number(dependentValue);
+                const threshold = Number(Array.isArray(values) ? values[0] : values);
+                return !Number.isNaN(num) && !Number.isNaN(threshold) && num > threshold;
             }
 
             if ((dependentValue === undefined || dependentValue === null) && Array.isArray(values)) {
@@ -1005,15 +1037,10 @@ function CollectionSettings() {
 
         if (!group.condition) return true;
 
-        // any / all composite predicates (mirrors shouldDisplaySetting).
-        if (Array.isArray(group.condition.any) || Array.isArray(group.condition.all)) {
-            return shouldDisplaySetting({ condition: group.condition });
-        }
-
-        const { dependsOn, values } = group.condition;
-        const dependentValue = settings[dependsOn];
-
-        return values.includes(dependentValue);
+        // Delegate to shouldDisplaySetting so tabs honour the full predicate
+        // surface (any / all trees, condition_operator including not_in /
+        // numeric_gt / array_includes / array_not_empty).
+        return shouldDisplaySetting({ condition: group.condition });
     };
 
     const findSettingByKey = (key) => {
@@ -1619,7 +1646,7 @@ function CollectionSettings() {
                     }, [
                         h('button', {
                             type: 'button',
-                            className: 'fotogrids-button fotogrids-button--primary',
+                            className: 'fg-button fg-button--variant-primary',
                             onClick: () => {
                                 const upgradeUrl = window.fotogridsUpgradeModal?.urls?.upgrade;
                                 if (upgradeUrl) {
@@ -1629,7 +1656,7 @@ function CollectionSettings() {
                         }, __('Upgrade to Pro', 'fotogrids')),
                         h('button', {
                             type: 'button',
-                            className: 'fotogrids-button fotogrids-button--secondary',
+                            className: 'fg-button fg-button--variant-secondary',
                             onClick: () => {
                                 window.open(`https://go.fotogrids.com/feature-${group.id}`, '_blank');
                             }
@@ -1824,12 +1851,47 @@ function CollectionSettings() {
     ]);
 }
 
+function ReadonlyNotice() {
+    const notice = window.fotogridsSettings?.unauthorisedNotice
+        || 'You are viewing these settings in read-only mode.';
+    return h(
+        'div',
+        { className: 'fotogrids-readonly-notice', role: 'note' },
+        h('strong', null, 'Read-only'),
+        h('span', null, ' — ' + notice)
+    );
+}
+
+function ReadonlyWrapper(props) {
+    // Render the existing tree inside a disabled fieldset and a notice.
+    // This is the metabox-level gate; granular per-control locking is the
+    // job of <SettingsLock> in newer code.
+    return h(
+        'div',
+        { className: 'fotogrids-collection-settings--readonly' },
+        h(ReadonlyNotice),
+        h(
+            'fieldset',
+            {
+                className: 'fotogrids-collection-settings__fieldset',
+                disabled: true,
+                'aria-disabled': 'true',
+            },
+            props.children
+        )
+    );
+}
+
 function initializeCollectionSettings() {
     const container = document.getElementById('fotogrids-collection-settings-root');
 
     if (container && window.wp && window.wp.element) {
         const { createRoot } = wp.element;
-        createRoot(container).render(h(CollectionSettings));
+        const editable = window.fotogridsSettings?.editable !== false;
+        const tree = editable
+            ? h(CollectionSettings)
+            : h(ReadonlyWrapper, null, h(CollectionSettings));
+        createRoot(container).render(tree);
     } else {
         setTimeout(initializeCollectionSettings, 100);
     }

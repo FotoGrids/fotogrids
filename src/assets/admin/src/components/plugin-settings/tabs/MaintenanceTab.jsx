@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import Toggle from '../../shared/Toggle';
-import Modal from '../../shared/Modal';
+import { Confirm } from '../../shared/Modal';
+import { Button } from '../../shared/Button';
 import InfoBlock from '../../shared/InfoBlock';
 import {
     SettingsPanel,
@@ -226,14 +227,15 @@ const MaintenanceTab = () => {
                     description={__('Restores every Plugin Settings tab to defaults. Galleries, albums, statistics and your Pro licence are preserved.', 'fotogrids')}
                     icon="settings"
                 >
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--danger fotogrids-button--small"
+                    <Button
+                        variant="danger"
+                        size="xs"
                         onClick={() => { setResult(null); setPending('reset'); }}
                         disabled={running !== null}
+                        busy={running === 'reset'}
                     >
                         {running === 'reset' ? __('Resetting…', 'fotogrids') : __('Reset settings', 'fotogrids')}
-                    </button>
+                    </Button>
                 </DangerZone>
                 {result && result.kind === 'reset' && (
                     <div
@@ -248,14 +250,15 @@ const MaintenanceTab = () => {
                     title={__('Reinstall database tables', 'fotogrids')}
                     description={__('Re-runs the FotoGrids schema migration to add any missing tables, columns or indexes. Existing data is preserved.', 'fotogrids')}
                 >
-                    <button
-                        type="button"
-                        className="fotogrids-button fotogrids-button--danger fotogrids-button--small"
+                    <Button
+                        variant="danger"
+                        size="xs"
                         onClick={() => { setResult(null); setPending('reinstall'); }}
                         disabled={running !== null}
+                        busy={running === 'reinstall'}
                     >
                         {running === 'reinstall' ? __('Reinstalling…', 'fotogrids') : __('Reinstall tables', 'fotogrids')}
-                    </button>
+                    </Button>
                 </DangerZone>
                 {result && result.kind === 'reinstall' && (
                     <div
@@ -324,38 +327,16 @@ const MaintenanceTab = () => {
                 onDiscard={handleDebugDiscard}
             />
 
-            <Modal
+            <Confirm
                 isOpen={pending !== null}
                 onClose={closeModal}
+                onConfirm={activeConfirm?.handler}
+                variant="danger"
                 title={activeConfirm?.title || ''}
-                closeOnOverlayClick={running === null}
-                showCloseButton={running === null}
-                size="small"
-                footer={(
-                    <>
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--ghost fotogrids-button--small"
-                            onClick={closeModal}
-                            disabled={running !== null}
-                        >
-                            {__('Cancel', 'fotogrids')}
-                        </button>
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--danger fotogrids-button--small"
-                            onClick={activeConfirm?.handler}
-                            disabled={running !== null}
-                        >
-                            {running !== null
-                                ? activeConfirm?.runningLabel
-                                : activeConfirm?.actionLabel}
-                        </button>
-                    </>
-                )}
-            >
-                <p>{activeConfirm?.body}</p>
-            </Modal>
+                message={activeConfirm?.body || ''}
+                confirmLabel={activeConfirm?.actionLabel}
+                busy={running !== null}
+            />
         </div>
     );
 };

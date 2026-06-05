@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import StatCard from '../shared/StatCard';
 import StatsTable from '../shared/StatsTable';
 import Icon from '../shared/Icon';
+import { Button } from '../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -248,26 +249,27 @@ const StatsPage = () => {
             <div className="fg-stats-toolbar">
                 <div className="fg-stats-period" role="group" aria-label={ __( 'Time period', 'fotogrids' ) }>
                     { PERIODS.map( ( p ) => (
-                        <button
+                        <Button
                             key={ p.days }
-                            className={ `fotogrids-button fotogrids-button--${ selectedPeriod === p.days ? 'primary' : 'secondary' }` }
+                            variant={ selectedPeriod === p.days ? 'primary' : 'secondary' }
                             onClick={ () => setSelectedPeriod( p.days ) }
                             aria-pressed={ selectedPeriod === p.days }
                         >
                             { p.label }
-                        </button>
+                        </Button>
                     ) ) }
                 </div>
 
-                <button
-                    className={ `fotogrids-button fotogrids-button--secondary ${ loading ? 'fg-is-loading' : '' }` }
+                <Button
+                    variant="secondary"
+                    icon="refresh_cv"
                     onClick={ () => setRefreshToken( ( t ) => t + 1 ) }
                     disabled={ loading }
-                    aria-label={ __( 'Refresh stats', 'fotogrids' ) }
+                    busy={ loading }
+                    ariaLabel={ __( 'Refresh stats', 'fotogrids' ) }
                 >
-                    <Icon name="refresh_cv" />
                     { __( 'Refresh', 'fotogrids' ) }
-                </button>
+                </Button>
             </div>
 
             { error && (

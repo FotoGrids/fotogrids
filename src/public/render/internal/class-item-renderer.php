@@ -49,6 +49,7 @@ final class Item_Renderer {
         // is visible from the moment the HTML is parsed.
         $state_attr      = ' data-fg-media-state="loading"';
         $data_attributes = $this->serialize_data_attrs( $item_view->data_attrs );
+        $style_attribute = $this->serialize_style( $item_view->style );
 
         $image_html          = $this->render_img( $item_view, $render_context );
         $image_with_overlays = $this->wrap_with_overlays( $image_html, $item_view->thumb_overlays, $item_view, $render_context );
@@ -71,12 +72,33 @@ final class Item_Renderer {
         $figure_inner = $this->apply_wrappers( $image_with_wrappers . $caption_html, $item_view->figure_wrappers );
 
         return sprintf(
-            '<figure class="%s"%s%s>%s</figure>',
+            '<figure class="%s"%s%s%s>%s</figure>',
             $class_attribute,
             $state_attr,
             $data_attributes,
+            $style_attribute,
             $figure_inner
         );
+    }
+
+    /**
+     * Serializes inline CSS declarations to a `style="..."` attribute string.
+     * Returns an empty string when the declarations array is empty so the
+     * attribute is omitted altogether.
+     *
+     * @since   1.0.0
+     * @param   array<string, string> $declarations Property => value map.
+     * @return  string
+     */
+    private function serialize_style( array $declarations ): string {
+        if ( empty( $declarations ) ) {
+            return '';
+        }
+        $pairs = [];
+        foreach ( $declarations as $property => $value ) {
+            $pairs[] = $property . ':' . $value;
+        }
+        return ' style="' . esc_attr( implode( ';', $pairs ) ) . '"';
     }
 
     /**
@@ -238,7 +260,7 @@ final class Item_Renderer {
             $instance_id = 'fgic' . $this->loader_counter;
         }
 
-        $svg = fotogrids_get_loading_icon_svg( $icon_name, $instance_id );
+        $svg = \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, $instance_id );
 
         if ( $svg === '' ) {
             return '';

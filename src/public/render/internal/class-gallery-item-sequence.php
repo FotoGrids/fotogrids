@@ -108,10 +108,10 @@ final class Gallery_Item_Sequence {
      * @return array<int, int>
      */
     private static function raw_ids( int $gallery_id ): array {
-        if ( ! function_exists( 'fotogrids_get_gallery_item_ids' ) ) {
+        if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
             return [];
         }
-        $raw = fotogrids_get_gallery_item_ids( $gallery_id );
+        $raw = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
         return is_array( $raw ) ? array_values( array_map( 'absint', $raw ) ) : [];
     }
 

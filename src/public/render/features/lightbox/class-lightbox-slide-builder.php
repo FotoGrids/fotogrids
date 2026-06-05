@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Features\Lightbox;
 
+use FotoGrids\Hooks\Filters_Lightbox;
 use FotoGrids\Image_Size_Manager;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -105,7 +106,7 @@ final class Lightbox_Slide_Builder {
          * @param array<int, int>                  $attachment_ids
          * @param array<string, mixed>             $settings
          */
-        return (array) apply_filters( 'fotogrids/lightbox/slides', $slides, $ids, $settings );
+        return (array) apply_filters( Filters_Lightbox::SLIDES, $slides, $ids, $settings );
     }
 
     // -------------------------------------------------------------------------

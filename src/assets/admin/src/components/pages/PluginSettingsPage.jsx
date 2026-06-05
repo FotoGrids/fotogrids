@@ -10,6 +10,7 @@ import MediaTab from '../plugin-settings/tabs/MediaTab';
 import SharingTab from '../plugin-settings/tabs/SharingTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
+import { Button } from '../shared/Button';
 import TabBar from '../shared/TabBar.jsx';
 
 const { __ } = wp.i18n;
@@ -214,9 +215,9 @@ const PluginSettingsPage = () => {
                                 <input type="hidden" name="action" value="update" />
                                 <input type="hidden" name="_wpnonce" value={window.fotogridsAdmin?.settingsNonce || ''} />
                                 <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />
-                                <button type="submit" className="fotogrids-button fotogrids-button--primary fotogrids-button--small">
+                                <Button type="submit" variant="primary" size="xs">
                                     {__('Save Defaults', 'fotogrids')}
-                                </button>
+                                </Button>
                             </form>
                         </Panel>
                     </>
@@ -228,14 +229,7 @@ const PluginSettingsPage = () => {
             case 'seo':
                 return <SEOTab />;
             case 'permissions_manager':
-                return (
-                    <Panel
-                        title={__('Permissions Manager', 'fotogrids')}
-                        description={__('Control which roles can create and manage galleries and albums.', 'fotogrids')}
-                    >
-                        <PermissionsManagerTab />
-                    </Panel>
-                );
+                return <PermissionsManagerTab />;
             case 'advanced':
                 return <AdvancedTab />;
             case 'maintenance':

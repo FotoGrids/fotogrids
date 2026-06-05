@@ -185,7 +185,7 @@ class Post_Types {
             // 'excerpt' — backs the `og:description` fallback chain for albums.
             // Albums intentionally do NOT declare 'thumbnail' support — the
             // album cover is resolved at runtime from the Featured Gallery
-            // (see `fotogrids_get_album_cover_attachment_id()`), not stored
+            // (see `Cover_Resolver::for_album()`), not stored
             // as a native `_thumbnail_id` on the album post.
             'supports'              => array( 'title', 'excerpt' ),
             'show_in_rest'          => true,
@@ -271,7 +271,7 @@ class Post_Types {
         <div class="fotogrids-shortcode-container">
             <input type="text" value="<?php echo esc_attr( $shortcode ); ?>"
                 readonly onclick="this.select();" class="fotogrids-shortcode-input" />
-            <button type="button" class="fotogrids-button fotogrids-button--outline fotogrids-button--primary fotogrids-button--icon-only fotogrids-shortcode-copy"
+            <button type="button" class="fg-button fg-button--outline fg-button--variant-primary fg-button--icon-only fotogrids-shortcode-copy"
                 data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
                 data-fg-tooltip="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>"
                 data-fg-tooltip-dir="below"

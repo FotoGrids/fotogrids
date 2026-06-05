@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Icon from '../shared/Icon';
+import { Button } from '../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -186,13 +187,14 @@ const LicensePage = () => {
                                             className="fotogrids-license-input"
                                         />
                                     </div>
-                                    <button
+                                    <Button
                                         type="submit"
-                                        className="fotogrids-button fotogrids-button--primary"
-                                        disabled={activating || !licenseKey.trim()}
+                                        variant="primary"
+                                        disabled={!licenseKey.trim()}
+                                        busy={activating}
                                     >
                                         {activating ? __('Activating...', 'fotogrids') : __('Activate License', 'fotogrids')}
-                                    </button>
+                                    </Button>
                                 </form>
                                 <p className="fotogrids-license-no-key">
                                     {__("Don’t have a license yet? ", 'fotogrids')}
@@ -200,7 +202,7 @@ const LicensePage = () => {
                                         href="https://go.fotogrids.com/pricing/?utm_source=plugin&utm_medium=license-page&utm_campaign=no-key"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="fotogrids--inline-link fotogrids--inline-link--primary"
+                                        className="fg-inline-link fg-inline-link--variant-primary"
                                     >
                                         {__('See plans', 'fotogrids')}
                                     </a>
@@ -218,31 +220,28 @@ const LicensePage = () => {
                                                     : licenseStatus.license_key}
                                             </code>
                                             {licenseStatus.license_key_full && (
-                                                <button
-                                                    type="button"
-                                                    className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-button--icon-only"
+                                                <Button
+                                                    variant="secondary"
+                                                    size="xs"
+                                                    iconOnly
+                                                    icon={ keyRevealed ? 'eye_off' : 'eye' }
+                                                    ariaLabel={keyRevealed ? __('Hide license key', 'fotogrids') : __('Reveal license key', 'fotogrids')}
                                                     onClick={() => setKeyRevealed(!keyRevealed)}
-                                                    aria-label={keyRevealed ? __('Hide license key', 'fotogrids') : __('Reveal license key', 'fotogrids')}
-                                                >
-                                                    <Icon
-                                                        name={ keyRevealed ? 'eye_off' : 'eye' }
-                                                        className="fotogrids-button__icon"
-                                                    />
-                                                </button>
+                                                />
                                             )}
                                             {licenseStatus.license_key_full && (
-                                                <button
-                                                    type="button"
-                                                    className="fotogrids-button fotogrids-button--primary fotogrids-button--smaller"
+                                                <Button
+                                                    variant="primary"
+                                                    size="xs"
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(licenseStatus.license_key_full);
                                                         setKeyCopied(true);
                                                         setTimeout(() => setKeyCopied(false), 2000);
                                                     }}
-                                                    aria-label={__('Copy license key to clipboard', 'fotogrids')}
+                                                    ariaLabel={__('Copy license key to clipboard', 'fotogrids')}
                                                 >
                                                     {keyCopied ? __('Copied!', 'fotogrids') : __('Copy', 'fotogrids')}
-                                                </button>
+                                                </Button>
                                             )}
                                         </div>
                                     </div>
@@ -330,21 +329,21 @@ const LicensePage = () => {
                             </ol>
                             <div className="fg-abc-buttons">
                                 {licenseStatus.pro_download_url && (
-                                    <a
+                                    <Button
                                         href={licenseStatus.pro_download_url}
-                                        className="fotogrids-button fotogrids-button--primary"
+                                        variant="primary"
                                     >
                                         {__('Download Pro plugin', 'fotogrids')}
-                                    </a>
+                                    </Button>
                                 )}
-                                <a
+                                <Button
                                     href="https://go.fotogrids.com/install-pro"
                                     target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="fotogrids-button fotogrids-button--invert fotogrids-button--accent"
+                                    variant="accent"
+                                    className="fg-button--invert"
                                 >
                                     {__('How to upload & activate', 'fotogrids')}
-                                </a>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -377,22 +376,21 @@ const LicensePage = () => {
                             </div>
                             <p>{__('Plus many more powerful features designed to save time, optimize performance, and help you grow like never before.', 'fotogrids')}</p>
                             <div className="fg-abc-buttons">
-                                <a
+                                <Button
                                     href="https://go.fotogrids.com/upgrade"
                                     target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="fotogrids-button fotogrids-button--primary"
+                                    variant="primary"
                                 >
                                     {__('Upgrade Now', 'fotogrids')}
-                                </a>
-                                <a
+                                </Button>
+                                <Button
                                     href="https://go.fotogrids.com/free-vs-pro"
                                     target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="fotogrids-button fotogrids-button--invert fotogrids-button--accent"
+                                    variant="accent"
+                                    className="fg-button--invert"
                                 >
                                     {__('Free vs. Pro', 'fotogrids')}
-                                </a>
+                                </Button>
                             </div>
                         </div>
                     </div>

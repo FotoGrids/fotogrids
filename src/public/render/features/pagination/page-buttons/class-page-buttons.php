@@ -194,9 +194,13 @@ final class Page_Buttons implements Feature {
     }
 
     public function style_vars( Render_Context $render_context ): array {
-        // When truncation is off we render the full list — no CSS vars needed.
+        // Start from the shared trait — currently emits
+        // `--fg-pagination-distance` (margin above the bar).
+        $vars = $this->common_style_vars( $render_context );
+
+        // When truncation is off we render the full list — no sibling var needed.
         if ( ! (bool) ( $render_context->settings['pages_truncate'] ?? true ) ) {
-            return [];
+            return $vars;
         }
 
         // Sibling count is hardcoded — the user only chooses truncate on/off.
@@ -209,13 +213,13 @@ final class Page_Buttons implements Feature {
         //
         // The Responsive_Var flows the mobile value through whatever
         // mobile_breakpoint the user has configured — see Breakpoint_Config.
-        return [
-            '--fg-pagination-siblings' => new Responsive_Var(
-                desktop: '2',
-                tablet:  '2',
-                mobile:  '1',
-            ),
-        ];
+        $vars['--fg-pagination-siblings'] = new Responsive_Var(
+            desktop: '2',
+            tablet:  '2',
+            mobile:  '1',
+        );
+
+        return $vars;
     }
 
     public function assets( Render_Context $render_context ): Module_Assets {

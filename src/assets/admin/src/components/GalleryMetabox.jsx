@@ -6,7 +6,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ItemEditModal from './ItemEditModal.jsx';
 import VideoEmbedModal from './VideoEmbedModal.jsx';
 import Icon from './shared/Icon.jsx';
-import Modal from './shared/Modal.jsx';
+import { Confirm } from './shared/Modal';
+import { Button } from './shared/Button';
+import Checkbox from './shared/Checkbox';
+import DangerZone from './shared/DangerZone.jsx';
 import Tooltip from './Tooltip.jsx';
 import GalleryPreview from './GalleryPreview.jsx';
 import MediaUpload from './blocks/MediaUpload.jsx';
@@ -319,7 +322,7 @@ const GalleryMetabox = ({
             const attachments = mediaUploader.state().get('selection').toJSON();
 
             // New items are never auto-featured. The server-side resolver
-            // (`fotogrids_get_gallery_cover_attachment_id`) falls back to
+            // (`Cover_Resolver::for_gallery()`) falls back to
             // the first valid item when nothing is explicitly chosen, so
             // the UI accurately reflects "the user hasn't picked one yet".
             const newItems = attachments.map(attachment => ({
@@ -438,19 +441,13 @@ const GalleryMetabox = ({
     }, []);
 
     const confirmClearAllItems = useCallback(() => {
-        if (clearAllConfirmValue !== 'REMOVE ALL') {
-            return;
-        }
         setItems([]);
-        closeClearAllModal();
         // Clear the explicit featured choice when the gallery is emptied.
         saveFeaturedItem(null);
-
-        // Update state manager
         if (State) {
             State.items.setItems([]);
         }
-    }, [clearAllConfirmValue, closeClearAllModal, saveFeaturedItem]);
+    }, [saveFeaturedItem]);
 
     // Handle item reordering.
     //
@@ -462,10 +459,10 @@ const GalleryMetabox = ({
     // badge and can click Update; if it's on, the standard debounced
     // saveCollectionAjax() fires and produces the usual save toast.
     //
-    // We deliberately don't hit the legacy `fotogrids_reorder_gallery_items`
-    // endpoint anymore — order is persisted by `fotogrids_save_collection`
-    // via the hidden `fotogrids_gallery_items[]` inputs rendered for each
-    // item below.
+    // We deliberately don't hit the legacy `wp_ajax_fotogrids_reorder_gallery_items`
+    // endpoint anymore — order is persisted by the standard save pipeline
+    // (`fotogrids_save_collection` AJAX action) via the hidden
+    // `fotogrids_gallery_items[]` inputs rendered for each item below.
     const handleReorderItems = useCallback((newOrder) => {
         // Reorder items in state to match new order using functional update
         setItems(prevItems => {
@@ -764,15 +761,16 @@ const GalleryMetabox = ({
 
     const renderAddDropdown = () => (
         <div className="fotogrids-add-new-dropdown">
-            <button
-                type="button"
-                className={`fotogrids-button fotogrids-button--primary fotogrids-button--smaller fotogrids-add-new-toggle ${showAddDropdown ? 'fotogrids-dropdown-open' : ''}`}
+            <Button
+                variant="primary"
+                size="sm"
+                className={`fotogrids-add-new-toggle ${showAddDropdown ? 'fotogrids-dropdown-open' : ''}`}
                 onClick={() => setShowAddDropdown(!showAddDropdown)}
+                icon="plus"
+                iconRight="chevron_down"
             >
-                <Icon name="plus" />
                 {strings.addNew}
-                <Icon name="chevron_down" />
-            </button>
+            </Button>
             {showAddDropdown && (
                 <div className="fotogrids-add-new-menu fotogrids-dropdown-open">
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('upload')}>
@@ -810,26 +808,6 @@ const GalleryMetabox = ({
         return () => document.removeEventListener('click', handleClickOutside);
     }, [showAddDropdown]);
 
-    const clearAllFooter = (
-        <>
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--secondary"
-                onClick={closeClearAllModal}
-            >
-                {strings.cancel}
-            </button>
-            <button
-                type="button"
-                className="fotogrids-button fotogrids-button--danger"
-                onClick={confirmClearAllItems}
-                disabled={clearAllConfirmValue !== 'REMOVE ALL'}
-            >
-                {strings.removeAllItems}
-            </button>
-        </>
-    );
-
     return (
         <div className="fotogrids-gallery-metabox">
             {/* Header with tabs and actions */}
@@ -856,16 +834,18 @@ const GalleryMetabox = ({
                 {activeTab === 'manage' && (
                     <div className="fotogrids-gallery-actions">
                         {renderAddDropdown()}
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-items-remove-all"
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="fotogrids-items-remove-all"
                             onClick={clearAllItems}
                         >
                             {strings.removeAll}
-                        </button>
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--secondary fotogrids-button--smaller fotogrids-items-bulk-editor"
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="fotogrids-items-bulk-editor"
                             onClick={() => {
                                 if (window.FotoGridsUpgrade) {
                                     window.FotoGridsUpgrade.launchForFeature.bulkOperations();
@@ -874,7 +854,7 @@ const GalleryMetabox = ({
                         >
                             {strings.bulkEditor}
                             <span className="fotogrids-pro-badge">Pro</span>
-                        </button>
+                        </Button>
                     </div>
                 )}
             </div>
@@ -918,41 +898,32 @@ const GalleryMetabox = ({
                 strings={strings}
             />
 
-            <Modal
+            <Confirm
                 isOpen={showClearAllModal}
                 onClose={closeClearAllModal}
+                onConfirm={confirmClearAllItems}
+                variant="danger"
+                headerIcon={false}
                 title={strings.removeAllModalTitle}
-                size="small"
-                footer={clearAllFooter}
+                confirmLabel={strings.removeAllItems}
+                cancelLabel={strings.cancel}
+                requireText="REMOVE ALL"
             >
-                <div className="fotogrids-notice fotogrids-notice--warning">
-                    <p><strong>{strings.removeAllModalWarning}</strong></p>
-                </div>
-                <p>{strings.removeAllModalBody}</p>
-                <label className="fotogrids-checkbox">
-                    <input
-                        type="checkbox"
-                        checked={clearAllDeleteCustomData}
-                        onChange={(e) => setClearAllDeleteCustomData(e.target.checked)}
-                    />
-                    <span className="fotogrids-checkbox__indicator"></span>
-                    <span>{strings.removeAllModalDeleteCustomDataLabel}</span>
-                </label>
-                <p className="description">{strings.removeAllModalDeleteCustomDataHelp}</p>
-                <div className="fotogrids-form-group">
-                    <label htmlFor="fotogrids-remove-all-confirm-input">
-                        {strings.removeAllModalConfirmPrompt}
-                    </label>
-                    <input
-                        id="fotogrids-remove-all-confirm-input"
-                        type="text"
-                        className="fotogrids-input"
-                        value={clearAllConfirmValue}
-                        onChange={(e) => setClearAllConfirmValue(e.target.value)}
-                        placeholder={strings.removeAllModalConfirmPlaceholder}
-                    />
-                </div>
-            </Modal>
+                <DangerZone
+                    title={strings.removeAllModalWarning}
+                    description={strings.removeAllModalBody}
+                    icon="trash"
+                />
+                <Checkbox
+                    checked={clearAllDeleteCustomData}
+                    onChange={(next) => setClearAllDeleteCustomData(next)}
+                    label={strings.removeAllModalDeleteCustomDataLabel}
+                    labelStronger
+                    description={strings.removeAllModalDeleteCustomDataHelp}
+                />
+                {/* <div className="fotogrids-notice fotogrids-notice--warning">
+                </div> */}
+            </Confirm>
         </div>
     );
 };

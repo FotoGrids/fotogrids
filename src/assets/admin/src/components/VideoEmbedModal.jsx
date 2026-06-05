@@ -5,7 +5,8 @@
  */
 
 import React, { useState, useCallback, useRef } from 'react';
-import Modal  from './shared/Modal.jsx';
+import { Modal } from './shared/Modal';
+import { Button } from './shared/Button';
 import Icon   from './shared/Icon.jsx';
 import Toggle from './shared/Toggle.jsx';
 
@@ -177,6 +178,33 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
     const hasVideo = !! form.videoId;
 
+    // Reuse the plugin's existing color picker widget (plain global) by passing
+    // a synthetic setting descriptor. Falls back to a native input.
+    const renderControlsColor = () => {
+        const renderer = window.FotoGridsRenderSettings?.renderColorPicker;
+        if ( ! renderer ) {
+            return (
+                <input
+                    id="fg-embed-color"
+                    type="color"
+                    value={ form.controlsColor || '#000000' }
+                    onChange={ e => set( 'controlsColor', e.target.value ) }
+                    className="fotogrids-embed-color-input"
+                />
+            );
+        }
+        return renderer(
+            { key: 'controlsColor', default: '#000000' },
+            form.controlsColor || '#000000',
+            false,
+            {
+                updateSetting: ( key, value ) => set( 'controlsColor', value ),
+                getFieldState: () => 'editable',
+                __: ( s ) => s,
+            }
+        );
+    };
+
     const renderSidebar = () => (
         <>
             <div className="fotogrids-item-preview">
@@ -225,25 +253,25 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
     const renderLinkTab = () => (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-form-fields">
+            <div className="fg-form-fields">
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label>{ strings.source || 'Source' }</label>
-                    <div className="fotogrids-button-group__buttons">
+                    <div className="fg-button-group__buttons">
                         { SOURCES.map( src => (
                             <button
                                 key={ src.value }
                                 type="button"
-                                className={ `fotogrids-button-group__button ${ form.source === src.value ? 'fg-is-active' : '' }` }
+                                className={ `fg-button-group__button ${ form.source === src.value ? 'fg-is-active' : '' }` }
                                 onClick={ () => handleSourceChange( src.value ) }
                             >
-                                <span className="fotogrids-button-label">{ src.label }</span>
+                                <span className="fg-button-label">{ src.label }</span>
                             </button>
                         ) ) }
                     </div>
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fg-embed-url">
                         { strings.link || 'Link' }
                     </label>
@@ -277,18 +305,16 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                             autoComplete="off"
                             spellCheck={ false }
                         />
-                        <button
-                            type="button"
-                            className="fotogrids-button fotogrids-button--secondary fotogrids-embed-resolve-btn"
+                        <Button
+                            variant="secondary"
+                            className="fotogrids-embed-resolve-btn"
                             onClick={ () => resolveUrl( urlDraft ) }
                             disabled={ resolving || ! urlDraft }
-                            title={ strings.loadVideo || 'Load video' }
-                        >
-                            { resolving
-                                ? <span className="fotogrids-embed-spinner" />
-                                : <Icon name="link" />
-                            }
-                        </button>
+                            ariaLabel={ strings.loadVideo || 'Load video' }
+                            busy={ resolving }
+                            icon="link"
+                        />
+
                     </div>
                     { resolveError && (
                         <p className="description fotogrids-text--error" style={ { marginTop: 4 } }>
@@ -302,7 +328,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     ) }
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fg-embed-start">
                         { strings.startTime || 'Start Time' }
                     </label>
@@ -320,7 +346,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
                 {/* End time - YouTube only */}
                 { form.source === 'youtube' && (
-                    <div className="fotogrids-form-field">
+                    <div className="fg-form-field">
                         <label htmlFor="fg-embed-end">
                             { strings.endTime || 'End Time' }
                         </label>
@@ -337,7 +363,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     </div>
                 ) }
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fg-embed-caption">
                         { strings.caption || 'Caption' }
                     </label>
@@ -356,9 +382,9 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
     const renderYouTubeOptions = () => (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-form-fields">
+            <div className="fg-form-fields">
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-autoplay"
                         label={ strings.autoplay || 'Autoplay' }
@@ -368,7 +394,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-mute"
                         label={ strings.mute || 'Mute' }
@@ -377,7 +403,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-loop"
                         label={ strings.loop || 'Loop' }
@@ -386,7 +412,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-controls"
                         label={ strings.playerControls || 'Player Controls' }
@@ -395,7 +421,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-captions"
                         label={ strings.captions || 'Captions' }
@@ -404,7 +430,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-privacy"
                         label={ strings.privacyMode || 'Privacy Mode' }
@@ -414,7 +440,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fg-embed-suggested">
                         { strings.suggestedVideos || 'Suggested Videos' }
                     </label>
@@ -435,9 +461,9 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
     const renderVimeoOptions = () => (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-form-fields">
+            <div className="fg-form-fields">
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-autoplay"
                         label={ strings.autoplay || 'Autoplay' }
@@ -447,7 +473,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-mute"
                         label={ strings.mute || 'Mute' }
@@ -456,7 +482,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-loop"
                         label={ strings.loop || 'Loop' }
@@ -465,7 +491,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-privacy"
                         label={ strings.privacyMode || 'Privacy Mode' }
@@ -475,7 +501,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-intro-title"
                         label={ strings.introTitle || 'Intro Title' }
@@ -484,7 +510,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-intro-portrait"
                         label={ strings.introPortrait || 'Intro Portrait' }
@@ -493,7 +519,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <Toggle
                         id="fg-embed-intro-byline"
                         label={ strings.introByline || 'Intro Byline' }
@@ -502,17 +528,11 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fotogrids-form-field">
+                <div className="fg-form-field">
                     <label htmlFor="fg-embed-color">
                         { strings.controlsColor || 'Controls Color' }
                     </label>
-                    <input
-                        id="fg-embed-color"
-                        type="color"
-                        value={ form.controlsColor || '#000000' }
-                        onChange={ e => set( 'controlsColor', e.target.value ) }
-                        className="fotogrids-embed-color-input"
-                    />
+                    { renderControlsColor() }
                 </div>
 
             </div>
@@ -521,65 +541,59 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
     const tabs = TABS[ form.source ];
 
-    const renderBody = () => (
-        <>
-            <div className="fotogrids-modal-tabs">
-                { tabs.map( tab => (
-                    <button
-                        key={ tab.id }
-                        type="button"
-                        className={ `fotogrids-tab-button ${ activeTab === tab.id ? 'fg-is-active' : '' }` }
-                        onClick={ () => setActiveTab( tab.id ) }
-                    >
-                        { tab.label }
-                    </button>
-                ) ) }
-            </div>
-
-            <div className="fotogrids-tab-content">
-                { activeTab === 'link' && renderLinkTab() }
-                { activeTab === 'options' && (
-                    form.source === 'youtube' ? renderYouTubeOptions() : renderVimeoOptions()
-                ) }
-            </div>
-        </>
-    );
-
-    const renderFooter = () => (
-        <>
-            <button
-                type="button"
-                className="button fotogrids-modal-cancel"
-                onClick={ handleClose }
-                disabled={ adding }
-            >
-                { strings.cancel || 'Cancel' }
-            </button>
-            <button
-                type="button"
-                className="button button-primary"
-                onClick={ handleAdd }
-                disabled={ ! hasVideo || adding }
-            >
-                { adding
-                    ? ( strings.adding     || 'Adding…'        )
-                    : ( strings.addToGallery || 'Add to Gallery' )
-                }
-            </button>
-        </>
-    );
+    const tabItems = tabs.map(tab => ({ id: tab.id, label: tab.label }));
 
     return (
         <Modal
             isOpen={ isOpen }
             onClose={ handleClose }
-            title={ strings.addVideoEmbed || 'Add Video Embed' }
-            size="medium"
-            sidebar={ renderSidebar() }
-            footer={ renderFooter() }
-            closeOnOverlayClick={ false }
+            size="md"
+            hasSidebar
+            closeOnOverlay={ false }
+            preventClose={ adding }
         >
-            { renderBody() }
+            <Modal.Header>
+                <Modal.HeaderTitle>
+                    { strings.addVideoEmbed || 'Add Video Embed' }
+                </Modal.HeaderTitle>
+            </Modal.Header>
+
+            <Modal.Body padding={ false }>
+                <Modal.Sidebar>
+                    { renderSidebar() }
+                </Modal.Sidebar>
+
+                <Modal.Main>
+                    <Modal.Tabs
+                        tabs={ tabItems }
+                        activeId={ activeTab }
+                        onChange={ setActiveTab }
+                    />
+                    <Modal.TabsPanel id="link" activeId={ activeTab }>
+                        { renderLinkTab() }
+                    </Modal.TabsPanel>
+                    <Modal.TabsPanel id="options" activeId={ activeTab }>
+                        { form.source === 'youtube' ? renderYouTubeOptions() : renderVimeoOptions() }
+                    </Modal.TabsPanel>
+                </Modal.Main>
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button variant="secondary" onClick={ handleClose } disabled={ adding }>
+                    { strings.cancel || 'Cancel' }
+                </Button>
+                <Button
+                    variant="primary"
+                    onClick={ handleAdd }
+                    disabled={ ! hasVideo }
+                    busy={ adding }
+                >
+                    { adding
+                        ? ( strings.adding     || 'Adding…'        )
+                        : ( strings.addToGallery || 'Add to Gallery' )
+                    }
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 };

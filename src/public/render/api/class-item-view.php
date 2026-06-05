@@ -19,6 +19,7 @@ final class Item_View {
      * @param array<string, mixed> $meta Per-item metadata values.
      * @param array<int, string> $classes Item classes.
      * @param array<string, string> $data_attrs Item data attributes.
+     * @param array<string, string> $style Inline CSS declarations (property => value) emitted on the figure element. Used by layouts/decorators that need per-item CSS custom properties (e.g. Instant Photos per-item rotation/shadow).
      * @param array<int, Item_Overlay> $thumb_overlays Thumbnail overlays.
      * @param array<int, Item_Overlay> $lightbox_overlays Lightbox overlays.
      * @param array<int, Item_Wrapper> $wrappers Wrappers applied around the media node (fg-item-media) only.
@@ -51,6 +52,7 @@ final class Item_View {
         public readonly array $meta = [],
         public readonly array $classes = [],
         public readonly array $data_attrs = [],
+        public readonly array $style = [],
         public readonly array $thumb_overlays = [],
         public readonly array $lightbox_overlays = [],
         public readonly array $wrappers = [],
@@ -92,6 +94,7 @@ final class Item_View {
             meta: $changes['meta'] ?? $this->meta,
             classes: $changes['classes'] ?? $this->classes,
             data_attrs: $changes['data_attrs'] ?? $this->data_attrs,
+            style: $changes['style'] ?? $this->style,
             thumb_overlays: $changes['thumb_overlays'] ?? $this->thumb_overlays,
             lightbox_overlays: $changes['lightbox_overlays'] ?? $this->lightbox_overlays,
             wrappers: $changes['wrappers'] ?? $this->wrappers,

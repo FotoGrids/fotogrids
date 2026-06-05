@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from '../shared/Modal';
+import { Modal } from '../shared/Modal';
 
 const { __ } = wp.i18n;
 
@@ -8,9 +8,12 @@ const TemplateInfoModal = ({ isOpen, onClose }) => {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={__('About Templates', 'fotogrids')}
-            size="medium"
+            size="md"
         >
+            <Modal.Header>
+                <Modal.HeaderTitle>{__('About Templates', 'fotogrids')}</Modal.HeaderTitle>
+            </Modal.Header>
+            <Modal.Body>
             <div className="fotogrids-template-info-content">
                 <div className="fotogrids-template-info-content__section fg-tm-cs__50">
                     <h4>{__("What's a Gallery Template?", 'fotogrids')}</h4>
@@ -53,6 +56,7 @@ const TemplateInfoModal = ({ isOpen, onClose }) => {
                     {__('Happy browsing!', 'fotogrids')}
                 </p>
             </div>
+            </Modal.Body>
         </Modal>
     );
 };

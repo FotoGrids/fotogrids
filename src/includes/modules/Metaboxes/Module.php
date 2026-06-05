@@ -1,6 +1,9 @@
 <?php
 namespace FotoGrids\Modules\Metaboxes;
 
+use FotoGrids\Metaboxes\Collection_Save_Pipeline;
+use FotoGrids\Metaboxes\Item_Ajax_Endpoints;
+use FotoGrids\Metaboxes\Metabox_Registrar;
 use FotoGrids\Modules\Abstract_Module;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -10,13 +13,15 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Metaboxes Module
  *
- * Thin wrapper around the existing Meta_Boxes class. Handles gallery items,
- * collection settings, album assignment, and templates metaboxes.
+ * Composes three single-purpose classes that together own the gallery /
+ * album edit screens:
  *
- * Runs in 'admin' and 'rest' contexts but not 'frontend': Meta_Boxes::init()
- * registers add_meta_boxes / save_post (wp-admin) AND wp_ajax_* handlers
- * (AJAX) - and save_post also fires on Gutenberg REST saves - so both the
- * 'admin' and 'rest' contexts are required. It never needs to boot on a
+ *   - Metabox_Registrar         — UI shells, render functions, asset enqueue
+ *   - Item_Ajax_Endpoints       — per-item `wp_ajax_*` endpoints
+ *   - Collection_Save_Pipeline  — `save_post` + `wp_ajax_fotogrids_save_collection`
+ *
+ * Runs in 'admin' and 'rest' contexts but not 'frontend': the save and AJAX
+ * paths fire from admin and REST (Gutenberg's `save_post`), never from a
  * public frontend render.
  *
  * @since 1.0.0
@@ -40,7 +45,8 @@ class Module extends Abstract_Module {
     }
 
     public function init(): void {
-        require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-meta-boxes.php';
-        \FotoGrids\Meta_Boxes::init();
+        Metabox_Registrar::init();
+        Item_Ajax_Endpoints::init();
+        Collection_Save_Pipeline::init();
     }
 }

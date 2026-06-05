@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\REST\Items;
 
+use FotoGrids\Hooks\Actions_Item;
+
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
@@ -226,7 +228,7 @@ class Embed_Data {
          * @param int    $gallery_id The gallery it belongs to.
          * @param string $source     The platform identifier (video_youtube|video_vimeo).
          */
-        do_action( 'fotogrids/actions/item/added', $item_id, $gallery_id, $source );
+        do_action( Actions_Item::ADDED, $item_id, $gallery_id, $source );
 
         return rest_ensure_response( array(
             'id'          => $item_id,

@@ -60,7 +60,7 @@ final class Sharing_Decorator implements Decorator {
         if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
             return false;
         }
-        $resolved = fotogrids_get_resolved_sharing( $render_context->meta->gallery_id );
+        $resolved = \FotoGrids\Settings\Sharing_Settings_Store::resolve( (int) $render_context->meta->gallery_id );
         return ! empty( $resolved['enabled'] );
     }
 
@@ -84,7 +84,7 @@ final class Sharing_Decorator implements Decorator {
      * @return array<string, string>
      */
     public function wrapper_data_attrs( Render_Context $render_context ): array {
-        $resolved = fotogrids_get_resolved_sharing( $render_context->meta->gallery_id );
+        $resolved = \FotoGrids\Settings\Sharing_Settings_Store::resolve( (int) $render_context->meta->gallery_id );
 
         $payload = array(
             'enabled'      => (bool) $resolved['enabled'],

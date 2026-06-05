@@ -1,27 +1,49 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Modal } from '../shared/Modal';
+import { Button } from '../shared/Button';
+
+const readModalData = () => {
+    const data = (typeof window !== 'undefined' && window.fotogridsUpgradeModal) || {};
+    return {
+        benefits:       data.benefits      || [],
+        strings:        data.strings       || {},
+        upgradeUrl:     data.urls?.upgrade,
+        comparisonUrl:  data.urls?.comparison,
+    };
+};
+
 const UpgradeModal = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentBenefit, setCurrentBenefit] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [slideFromRight, setSlideFromRight] = useState(false);
+    const [, forceUpdate] = useState(0);
     const autoAdvanceRef = useRef(null);
 
-    const modalData = window.fotogridsUpgradeModal || {};
-    const benefits = modalData.benefits || [];
-    const strings = modalData.strings;
-    const upgradeUrl = modalData.urls?.upgrade;
-    const comparisonUrl = modalData.urls?.comparison;
+    // Re-read on every render so a late-arriving window.fotogridsUpgradeModal
+    // (race with the inline footer script on first paint) still populates the
+    // carousel once the user opens it.
+    const { benefits, strings, upgradeUrl, comparisonUrl } = readModalData();
 
+    // Install the public window.FotoGridsUpgrade API exactly once per mount.
+    // openModal reads benefits live from the global so we don't capture a
+    // stale (possibly empty) closure value if the inline-script payload races
+    // the React mount.
     useEffect(() => {
         const openModal = (benefitKey = 0) => {
+            const liveBenefits = (window.fotogridsUpgradeModal && window.fotogridsUpgradeModal.benefits) || [];
             let benefitIndex = 0;
             if (typeof benefitKey === 'string') {
-                benefitIndex = benefits.findIndex(benefit => benefit.key === benefitKey);
+                benefitIndex = liveBenefits.findIndex(benefit => benefit.key === benefitKey);
                 if (benefitIndex === -1) benefitIndex = 0;
             } else if (typeof benefitKey === 'number') {
-                benefitIndex = Math.max(0, Math.min(benefitKey, benefits.length - 1));
+                benefitIndex = Math.max(0, Math.min(benefitKey, liveBenefits.length - 1));
             }
 
+            // forceUpdate ensures a fresh render that picks up
+            // window.fotogridsUpgradeModal even if the inline script wrote it
+            // after our initial mount.
+            forceUpdate((n) => n + 1);
             setCurrentBenefit(benefitIndex);
             setIsOpen(true);
         };
@@ -32,33 +54,31 @@ const UpgradeModal = () => {
             launch: openModal,
             close: closeModal,
             launchForFeature: {
-                bulkOperations: () => openModal('bulk_operations'),
-                advancedLayouts: () => openModal('advanced_layouts'),
-                customCSS: () => openModal('custom_css'),
-                prioritySupport: () => openModal('priority_support'),
-                templates: () => openModal('templates'),
-                analytics: () => openModal('analytics'),
-                integrations: () => openModal('integrations'),
+                bulkOperations:     () => openModal('bulk_operations'),
+                advancedLayouts:    () => openModal('advanced_layouts'),
+                customCSS:          () => openModal('custom_css'),
+                prioritySupport:    () => openModal('priority_support'),
+                templates:          () => openModal('templates'),
+                analytics:          () => openModal('analytics'),
+                integrations:       () => openModal('integrations'),
                 unlimitedGalleries: () => openModal('unlimited_galleries'),
-                templates: () => openModal('templates')
             },
             BENEFIT_KEYS: {
-                BULK_OPERATIONS: 'bulk_operations',
-                ADVANCED_LAYOUTS: 'advanced_layouts',
-                CUSTOM_CSS: 'custom_css',
-                PRIORITY_SUPPORT: 'priority_support',
-                TEMPLATES: 'templates',
-                ANALYTICS: 'analytics',
-                INTEGRATIONS: 'integrations',
+                BULK_OPERATIONS:     'bulk_operations',
+                ADVANCED_LAYOUTS:    'advanced_layouts',
+                CUSTOM_CSS:          'custom_css',
+                PRIORITY_SUPPORT:    'priority_support',
+                TEMPLATES:           'templates',
+                ANALYTICS:           'analytics',
+                INTEGRATIONS:        'integrations',
                 UNLIMITED_GALLERIES: 'unlimited_galleries',
-                TEMPLATES: 'templates'
-            }
+            },
         };
 
         return () => {
             delete window.FotoGridsUpgrade;
         };
-    }, [benefits]);
+    }, []);
 
     const startAutoAdvance = () => {
         if (autoAdvanceRef.current) {
@@ -157,25 +177,27 @@ const UpgradeModal = () => {
         if (comparisonUrl) window.open(comparisonUrl, '_blank');
     };
 
-    if (benefits.length === 0) {
+    if (benefits.length === 0 && !isOpen) {
         return null;
     }
 
-    const currentBenefitData = benefits[currentBenefit];
+    const currentBenefitData = benefits[currentBenefit] || {
+        title:      strings.upgradeToProTitle    || 'Upgrade to FotoGrids Pro',
+        subtitle:   '',
+        content:    strings.upgradeToProContent  || 'Unlock the full FotoGrids experience.',
+        color:      '#3c46f0',
+        image:      null,
+    };
 
     return (
-        <div
-            className={`fotogrids-upgrade-modal-overlay ${isOpen ? 'fotogrids-modal--open' : ''}`}
-            style={{
-                pointerEvents: isOpen ? 'auto' : 'none',
-                opacity: isOpen ? 1 : 0,
-                visibility: isOpen ? 'visible' : 'hidden'
-            }}
-            onClick={() => setIsOpen(false)}
+        <Modal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            size="ml"
+            className="fg-modal--upgrade"
+            type="upgrade"
         >
-            <div className="fotogrids-upgrade-modal" onClick={e => e.stopPropagation()}>
-                <button className="fotogrids-upgrade-modal__close" onClick={() => setIsOpen(false)}>×</button>
-
+            <Modal.Body padding={false} scroll={false}>
                 <div className="fotogrids-upgrade-modal__content">
                     <div
                         className={`fotogrids-upgrade-modal__image ${isTransitioning ? 'transitioning' : ''} ${slideFromRight ? 'slide-from-right' : ''}`}
@@ -191,28 +213,24 @@ const UpgradeModal = () => {
                     </div>
 
                     <div className="fotogrids-upgrade-modal__text">
-                        <div className={`fotogrids-upgrade-modal__text-content ${isTransitioning ? 'transitioning' : ''}`}>
-                            <h2>
-                                {currentBenefitData.title}
-                                <br />
-                                <span className="highlight">{currentBenefitData.subtitle}</span>
-                            </h2>
-                            <p>{currentBenefitData.content}</p>
-                        </div>
+                        <div className="fotogrids-upgrade-modal__content-inner">
+                            <div className={`fotogrids-upgrade-modal__text-content ${isTransitioning ? 'transitioning' : ''}`}>
+                                <h2>
+                                    {currentBenefitData.title}
+                                    <br />
+                                    <span className="fg-highlight">{currentBenefitData.subtitle}</span>
+                                </h2>
+                                <p>{currentBenefitData.content}</p>
+                            </div>
 
-                        <div className="fotogrids-upgrade-modal__actions">
-                            <button
-                                className="fotogrids-upgrade-modal__upgrade-btn"
-                                onClick={handleUpgrade}
-                            >
-                                {strings.upgradeNow}
-                            </button>
-                            <button
-                                className="fotogrids-upgrade-modal__comparison-btn"
-                                onClick={handleComparison}
-                            >
-                                {strings.freeVsPro}
-                            </button>
+                            <div className="fotogrids-upgrade-modal__actions">
+                                <Button variant="primary" size="lg" onClick={handleUpgrade}>
+                                    {strings.upgradeNow}
+                                </Button>
+                                <Button variant="secondary" size="lg" onClick={handleComparison}>
+                                    {strings.freeVsPro}
+                                </Button>
+                            </div>
                         </div>
 
                         {benefits.length > 1 && (
@@ -235,8 +253,8 @@ const UpgradeModal = () => {
                         )}
                     </div>
                 </div>
-            </div>
-        </div>
+            </Modal.Body>
+        </Modal>
     );
 };
 

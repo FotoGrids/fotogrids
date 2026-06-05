@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FotoGrids\REST\Admin;
 
+use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Asset_Resolver;
 use FotoGrids\Render\Internal\Context_Builder;
@@ -54,10 +55,10 @@ final class Preview_Endpoint {
 
         $item_order = $validated_payload['item_order'];
         if ( empty( $item_order ) ) {
-            $item_order = fotogrids_get_gallery_item_ids( $gallery_id );
+            $item_order = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( (int) $gallery_id );
         }
 
-        $base_settings = fotogrids_get_gallery_settings( $gallery_id );
+        $base_settings = \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $gallery_id );
         $context_builder = Context_Builder::for_preview();
         $render_context = $context_builder->build_for_preview(
             gallery_id: $gallery_id,
@@ -97,7 +98,7 @@ final class Preview_Endpoint {
         // Using a custom action instead of do_action('wp_footer') keeps third-
         // party footer callbacks (analytics, social pixels, etc.) out of the
         // REST response cycle.
-        do_action( 'fotogrids/render/late_assets', $render_context );
+        do_action( Actions_Render::LATE_ASSETS, $render_context );
 
         $css_assets = Asset_Resolver::instance()->get_css_asset_urls();
         $js_assets  = Asset_Resolver::instance()->get_js_asset_data();
