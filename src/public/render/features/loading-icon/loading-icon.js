@@ -143,6 +143,18 @@
 
         img.addEventListener( 'load',  onSettle );
         img.addEventListener( 'error', onSettle );
+
+        // Race guard: the image can finish loading in the window between the
+        // img.complete check above and addEventListener here — its load event
+        // then fires with no listener attached and is lost forever, leaving
+        // the item stuck in data-fg-media-state="loading". This is easy to hit
+        // on pages where other work (lazy-load wiring, the image-zoom lens's
+        // full-size background fetch, watermark URL rewrites) shifts decode
+        // timing. Re-check after binding: if it already completed, settle now.
+        // onSettle removes its own listeners, so this can't double-fire.
+        if ( img.complete ) {
+            onSettle();
+        }
     }
 
     /**
@@ -287,20 +299,32 @@
         observer.observe( document.body, { childList: true, subtree: true } );
     }
 
-    // The script is enqueued in_footer:true, so by the time it evaluates
-    // the gallery markup has already been parsed and is queryable in the
-    // DOM. We must NOT wait for DOMContentLoaded — that event doesn't fire
-    // until every in-flight <img> on the page settles, which can be
-    // multiple seconds on a cold cache. During that window, every cached
-    // image silently completes in the background and arrives at init()
-    // simultaneously — which is what produced the "everything appears
-    // together after a long pause" symptom we were chasing.
+    // Wire galleries at several points and let idempotency sort it out.
     //
-    // observeDynamic() still uses DOMContentLoaded because the
-    // MutationObserver only needs to be installed before any LATE
-    // insertion can happen (pagination, album AJAX), and those flows
-    // can't run until the page is interactive anyway.
+    // The script is enqueued in_footer:true, so USUALLY the gallery markup
+    // is already parsed and queryable when this evaluates — so we call
+    // init() synchronously, which also avoids waiting on DOMContentLoaded
+    // (that event doesn't fire until every in-flight <img> settles, which on
+    // a cold cache batches all reveals into one late paint).
+    //
+    // BUT "footer script runs after the gallery is in the DOM" is not
+    // guaranteed across all themes/page builders. With some builders the
+    // footer script can run before the builder has finished committing the
+    // gallery node, so a single synchronous init() wires nothing and the
+    // items sit forever in data-fg-media-state="loading". We therefore ALSO
+    // run init() on DOMContentLoaded and (when present) via the FotoGrids
+    // runtime's onGallery hook. Re-running is safe: wireImage() short-circuits
+    // already-loaded items and its load listener removes itself, so an item
+    // is never double-processed.
     init();
+    if ( document.readyState === 'loading' ) {
+        document.addEventListener( 'DOMContentLoaded', init );
+    }
+    if ( window.FotoGrids && typeof window.FotoGrids.onGallery === 'function' ) {
+        window.FotoGrids.onGallery( function ( galleryEl ) {
+            wireGallery( galleryEl, { initial: true } );
+        } );
+    }
     if ( document.readyState === 'loading' ) {
         document.addEventListener( 'DOMContentLoaded', observeDynamic );
     } else {

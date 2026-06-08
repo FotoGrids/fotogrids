@@ -233,6 +233,52 @@ class Register_Admin_Routes {
             ),
         ) );
 
+        // Watermark settings: GET / POST /admin/watermark-settings
+        register_rest_route( 'fotogrids/v1', '/admin/watermark-settings', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_watermark_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_watermark_settings' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+            ),
+        ) );
+
+        // Watermark variant status: GET /admin/watermark/status (optional gallery_id)
+        register_rest_route( 'fotogrids/v1', '/admin/watermark/status', array(
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( '\FotoGrids\Watermark\Watermark_Regenerate_Data', 'get_status' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+                'args'                => array(
+                    'gallery_id' => array(
+                        'type'    => 'integer',
+                        'minimum' => 0,
+                        'default' => 0,
+                    ),
+                ),
+            ),
+        ) );
+
+        // Watermark regenerate one attachment: POST /admin/watermark/regenerate
+        register_rest_route( 'fotogrids/v1', '/admin/watermark/regenerate', array(
+            array(
+                'methods'             => \WP_REST_Server::CREATABLE,
+                'callback'            => array( '\FotoGrids\Watermark\Watermark_Regenerate_Data', 'regenerate_attachment' ),
+                'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+                'args'                => array(
+                    'attachment_id' => array(
+                        'type'     => 'integer',
+                        'minimum'  => 1,
+                        'required' => true,
+                    ),
+                ),
+            ),
+        ) );
+
         // SEO settings: GET / POST /admin/seo-settings
         register_rest_route( 'fotogrids/v1', '/admin/seo-settings', array(
             array(

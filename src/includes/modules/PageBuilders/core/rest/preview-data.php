@@ -584,21 +584,11 @@ final class Preview_Data {
      * @return string|null
      */
     private static function resolve_gallery_thumb_url( int $gallery_id ): ?string {
-        $featured_id = (int) get_post_meta( $gallery_id, '_fotogrids_featured_item', true );
-        if ( $featured_id > 0 ) {
-            $url = wp_get_attachment_image_url( $featured_id, 'medium' );
-            if ( $url ) {
-                return $url;
-            }
-        }
-
-        $item_ids = class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
-            ? (array) \FotoGrids\Galleries\Gallery_Repository::get_item_ids( (int) $gallery_id )
-            : [];
-
-        foreach ( $item_ids as $attachment_id ) {
-            $url = wp_get_attachment_image_url( (int) $attachment_id, 'medium' );
-            if ( $url ) {
+        // Poster-aware cover resolution handles image, video-file, and embed
+        // items uniformly, so embed-only / video-only galleries still preview.
+        if ( class_exists( '\FotoGrids\Galleries\Cover_Resolver' ) ) {
+            $url = \FotoGrids\Galleries\Cover_Resolver::url_for_collection( (int) $gallery_id, 'medium' );
+            if ( '' !== $url ) {
                 return $url;
             }
         }

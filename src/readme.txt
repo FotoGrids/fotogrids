@@ -1,147 +1,183 @@
-=== FotoGrids ===
+=== FotoGrids - Photo Gallery, Albums, Lightbox, Masonry, Slider & Portfolio ===
 Contributors: FotoGrids
 Donate link: https://go.fotogrids.com/donate
-Tags: gallery, galleries, album, albums, photos, items, lightbox, masonry, grid, responsive, photography, slider, sliders
+Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 5.8
-Tested up to: 6.4
+Tested up to: 7.0
 Requires PHP: 8.0
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create beautiful, responsive photo galleries and albums with modern templates, lightbox, and built-in statistics. Freemium plugin with Pro features.
+The only WordPress gallery plugin you'll ever need. Six layouts, an immersive lightbox, albums, SEO, and built-in analytics - beautiful by default.
 
 == Description ==
 
-FotoGrids is a modern WordPress gallery plugin that makes it easy to create stunning photo galleries and albums. Built with performance and user experience in mind, it offers both free and premium features to suit photographers, agencies, bloggers, and e-commerce stores.
+= The only WordPress gallery plugin you'll ever need =
 
-### Free Features
+Whether you're a developer building for clients, a photographer showcasing your work, or a store displaying products - **FotoGrids delivers everything you need. Beautifully. In one plugin.**
 
-* **Unlimited Galleries & Albums** - Create as many galleries and albums as you need
-* **Multiple Layouts** - Grid, Masonry, and Justified layouts included
-* **Responsive Design** - Looks great on all devices
-* **Lightbox** - Beautiful lightbox with keyboard navigation
-* **Lazy Loading** - Items load as they come into view for better performance
-* **Statistics** - Track views and shares for your galleries
-* **Shortcodes** - Easy to embed galleries anywhere with `[fotogrids_gallery id="123"]`
-* **Gutenberg Blocks** - Native WordPress block editor support
-* **Item Management** - Add captions, tags, people, and location data
-* **Drag & Drop** - Reorder items easily in the admin
+We couldn't find the perfect WordPress gallery plugin, so we built it ourselves - a tool that respects your time, your site speed, and your creative vision. FotoGrids looks stunning the moment you activate it, gives developers the hooks and APIs they actually need, and never pads its features with bloat.
 
-### Pro Features
+No artificial limits. No dark patterns. No fake urgency timers. Just the best gallery plugin we could possibly build.
 
-**Starter Pro:**
-* Advanced templates (Slider, Polaroid)
-* Page builder widgets (Elementor, Divi, Beaver Builder, etc.)
-* Hover effects and animations
-* Custom thumbnail filters
+[View Live Demos](https://go.fotogrids.com/demos/) &nbsp;|&nbsp; [Documentation](https://go.fotogrids.com/docs/) &nbsp;|&nbsp; [Free vs Pro](https://go.fotogrids.com/free-vs-pro/)
 
-**Expert Pro:**
-* Everything in Starter Pro
-* Video gallery support
-* EXIF data extraction and map view
-* Advanced filtering and search
-* Dynamic galleries from external sources
+= Every layout your photos deserve =
 
-**Commerce Pro:**
-* Everything in Expert Pro
-* WooCommerce integration
-* Watermarking and item protection
-* White labeling options
-* CTA buttons and sale ribbons
+Most gallery plugins give you one or two layouts for free and lock the rest behind a paywall. FotoGrids ships **six fully responsive layouts in the free version**, each crafted to make your images look their absolute best:
 
-### Why Choose FotoGrids?
+* **Grid** - clean, even rows of thumbnails.
+* **Masonry** - Pinterest-style flowing layout for mixed image sizes.
+* **Justified** - balanced rows where every image keeps its aspect ratio.
+* **Slider** - a swipeable slider for hero areas and lookbooks.
+* **Single Item** - one image at a time, perfect for spotlights.
+* **Instant Photos** - a playful, photo-stack style display.
 
-* **Modern Technology** - Built with vanilla JavaScript (no jQuery) and React admin interface
-* **SEO Friendly** - Server-side rendered HTML for better search engine visibility
-* **Performance Focused** - Conditional asset loading and optimized database queries
-* **Developer Friendly** - Hooks, filters, and REST API for customization
-* **Regular Updates** - Actively maintained with new features and improvements
+Pick the one that fits and fine-tune spacing, aspect ratios, and hover effects - without writing a single line of CSS.
 
-### Perfect For
+= An immersive lightbox, built in =
 
-* **Photographers** - Showcase your portfolio with beautiful galleries
-* **Agencies** - Present client work professionally
-* **Bloggers** - Enhance your posts with engaging photo galleries
-* **E-commerce** - Display product items effectively (with Pro features)
-* **Anyone** - Who wants beautiful, fast-loading item galleries
+Click any image to open a full-screen lightbox with swipe gestures, keyboard navigation, captions and descriptions, an autoplay slideshow, and a share bar. It works on every device, loads instantly, and respects your visitors' accessibility out of the box.
+
+* Keyboard friendly - arrow keys to navigate, Esc to close.
+* Social sharing - Facebook, X, Pinterest, LinkedIn, WhatsApp, Telegram, Reddit, email, and copy-link.
+* Deep linking - link straight to a single image inside a gallery.
+
+= Effortless by design =
+
+Whether you're a solo photographer with 10,000 images or an agency juggling 20 client sites, FotoGrids fits how you already work.
+
+* **Drag & drop everything** - upload from your computer or the Media Library, then sort, reorder, and organize in seconds.
+* **Albums & collections** - group related galleries into albums and display an entire collection with a single shortcode. Perfect for portfolios, product catalogs, and event series.
+* **Rich image details** - add per-image captions, descriptions, alt text, tags, people, and location data. Great for SEO and accessibility.
+
+= Fast by default, friendly to search engines =
+
+FotoGrids renders your galleries server-side as clean, semantic HTML, then loads only the assets each gallery actually needs. Your galleries work as hard for Google as they do for your visitors.
+
+* Server-side rendered, SEO-friendly markup.
+* Conditional asset loading - no bloat on pages without a gallery.
+* Lazy loading - images load only when they enter the viewport.
+* Pagination for large galleries.
+* Built with vanilla JavaScript - no jQuery dependency.
+
+= Analytics without a third party =
+
+Track views and shares per gallery right inside your WordPress dashboard. Know which galleries perform and which images get the most attention - no Google Analytics account required.
+
+= Works everywhere you build =
+
+* **Gutenberg blocks** - add a gallery or album block in the WordPress editor.
+* **Shortcodes** - drop `[fotogrids_gallery id="123"]` or `[fotogrids_album id="123"]` into any post, page, or widget.
+* **Any theme** - galleries inherit your site's width and styling.
+
+= A complete toolkit, not just a plugin =
+
+From drag-and-drop simplicity to REST API power, FotoGrids is built to handle anything, for anyone:
+
+* **Photographers** - showcase portfolios and deliver client galleries.
+* **Developers & agencies** - a drag-and-drop interface clients can manage themselves, plus a REST API, hooks, filters, and CSS controls you can depend on.
+* **Bloggers & creators** - beautiful galleries the same day you publish, no code required.
+* **Online shops** - display products beautifully, then sell them with Pro.
+
+= FotoGrids Pro =
+
+The free version is powerful on its own. **Pro layers on the layouts, analytics, and conversion tools when you're ready** - it's not a crippled starter tier, it's more.
+
+* **3 additional layouts** - Carousel, Video Playlist, and Product Gallery.
+* **30+ premium templates** plus reusable theme templates for galleries and albums.
+* **36 advanced hover effects**, robust filtering, and dynamic captions with EXIF data.
+* **Professional gallery SEO** with AI-powered optimization, structured data, and ImageGallery schema.
+* **Global styling** - Global Color Palette, Global Typography, and custom CSS controls.
+* **Full e-commerce kit** - sell prints, downloads, and licenses with WooCommerce and Easy Digital Downloads, with secure gallery downloads.
+* **Image protection** - watermarking, password protection, and right-click protection.
+* **Comments, ratings & reviews**, advanced user permissions, security, and an activity log.
+* **Performance** - automatic image optimizer, advanced pagination, and smart preloading.
+* **Integrations** - import from Google Photos, Dropbox, Instagram, and Lightroom, with bulk import and editing.
+* **Agency tools** - white label, client proofing, and multisite management.
+* **Page builders** - dedicated widgets for Elementor, Divi, and Bricks.
+
+[Compare Free vs Pro &rarr;](https://go.fotogrids.com/free-vs-pro/?utm_source=plugin&utm_medium=readme&utm_campaign=comparison)
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/fotogrids` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Go to FotoGrids in your WordPress admin menu to create your first gallery
-4. Add items from your media library and configure the layout
-5. Copy the shortcode and paste it into any post or page
+1. Upload the plugin files to the `/wp-content/plugins/fotogrids` directory, or install the plugin directly through the WordPress Plugins screen.
+2. Activate the plugin through the 'Plugins' screen in WordPress.
+3. Go to **FotoGrids** in your WordPress admin menu and create your first gallery.
+4. Add images from your Media Library and choose a layout.
+5. Copy the shortcode or add the FotoGrids block to any post or page.
 
 == Frequently Asked Questions ==
 
-= Is FotoGrids free? =
+= Is FotoGrids really free? =
 
-Yes! FotoGrids offers a comprehensive free version with unlimited galleries, multiple layouts, lightbox, and statistics. Pro features are available for advanced users who need additional functionality.
+Yes, and it stays useful on its own. The free version includes unlimited galleries and albums, six layouts, the full lightbox with social sharing, statistics, lazy loading, and Gutenberg blocks - with no artificial limits. FotoGrids Pro adds advanced layouts, e-commerce, SEO tools, and more when you need them.
 
-= What item formats are supported? =
+= Do I need to know how to code? =
 
-FotoGrids supports all item formats that WordPress supports natively: JPEG, PNG, GIF, WebP, and SVG.
+No. You build galleries visually in the admin and add them with a block or a shortcode. There's nothing to write by hand. Developers who want more can reach for the REST API, hooks, filters, and custom CSS.
 
-= Can I customize the appearance? =
+= Will it slow down my site? =
 
-Yes! The free version includes multiple layout options, and you can add custom CSS. Pro versions offer additional templates and customization options.
+No. FotoGrids renders galleries server-side, loads assets only on pages that contain a gallery, lazy-loads images, and uses no jQuery - so your site stays fast even with large galleries.
+
+= What image formats are supported? =
+
+FotoGrids supports every image format WordPress handles natively, including JPEG, PNG, GIF, WebP, and SVG.
 
 = Does it work with page builders? =
 
-The free version works with shortcodes in any page builder. Pro versions include dedicated widgets for popular page builders like Elementor, Divi, and Beaver Builder.
+The free version works through shortcodes in any page builder. Pro adds dedicated widgets for Elementor, Divi, and Bricks.
 
 = Is it mobile-friendly? =
 
-Absolutely! FotoGrids is built with responsive design principles and looks great on all devices.
+Yes. Every layout and the lightbox are fully responsive and built for touch.
 
-= Can I migrate from other gallery plugins? =
+= Can I migrate from another gallery plugin? =
 
-We provide migration tools and guides for popular gallery plugins. Contact support for assistance with your specific migration needs.
+Yes. FotoGrids includes an import tool to bring galleries over from other popular gallery plugins. See our [documentation](https://go.fotogrids.com/docs/) for step-by-step guides.
+
+= Where can I get support? =
+
+Free users can post in the [WordPress.org support forum](https://wordpress.org/support/plugin/fotogrids/). Pro users get priority support at [fotogrids.com](https://go.fotogrids.com/help/).
 
 == Screenshots ==
 
-1. Gallery admin interface with drag & drop item management
-2. Beautiful grid layout with hover effects
-3. Responsive masonry layout
-4. Full-featured lightbox with keyboard navigation
-5. Statistics dashboard showing views and shares
-6. Template selection with Pro upgrade options
+1. Gallery admin interface with drag-and-drop image management.
+2. Grid layout with hover effects.
+3. Responsive masonry layout.
+4. Full-featured lightbox with keyboard navigation and sharing.
+5. Albums grouping multiple galleries.
+6. Statistics dashboard showing views and shares.
 
 == Changelog ==
 
 = 1.0.0 =
-* Initial release
-* Unlimited galleries and albums
-* Grid, Masonry, and Justified layouts
-* Lightbox with keyboard navigation
-* Statistics tracking (views and shares)
-* Shortcodes and Gutenberg blocks
-* Drag & drop item reordering
-* Item metadata (captions, tags, people, location)
-* Responsive design
-* Lazy loading
-* Admin interface with React components
-* REST API for frontend functionality
+* Initial release.
+* Six gallery layouts: Grid, Masonry, Justified, Slider, Single Item, and Instant Photos.
+* Albums for grouping galleries.
+* Immersive lightbox with keyboard navigation, autoplay, swipe gestures, and social sharing.
+* View and share statistics.
+* Gutenberg blocks and shortcodes.
+* Drag-and-drop image reordering.
+* Image details: captions, descriptions, tags, people, and location.
+* Lazy loading and pagination.
+* Server-side rendered, SEO-friendly markup.
+* React-based admin interface and REST API.
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of FotoGrids. Create beautiful photo galleries with modern templates and built-in statistics.
-
-== Support ==
-
-For support, please visit our [support forum](https://wordpress.org/support/plugin/fotogrids/) or check out our [documentation](https://go.fotogrids.com/docs/).
-
-Pro users can access priority support at [fotogrids.com/support](https://go.fotogrids.com/support/).
+The only WordPress gallery plugin you'll ever need. Six layouts, an immersive lightbox, albums, and built-in statistics - beautiful by default.
 
 == Privacy Policy ==
 
-FotoGrids respects your privacy. The plugin:
-* Does not collect personal data without consent
-* Stores gallery statistics locally in your database
-* Does not send data to external servers (except for Pro license validation)
-* Complies with GDPR and other privacy regulations
+FotoGrids respects your privacy:
+
+* It does not collect personal data without consent.
+* Gallery statistics are stored locally in your own WordPress database.
+* No data is sent to external servers, except for Pro license validation.
+* It is built to support GDPR and other privacy requirements.
 
 For more details, see our [Privacy Policy](https://go.fotogrids.com/privacy/).

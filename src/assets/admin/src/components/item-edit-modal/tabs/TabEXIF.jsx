@@ -1,5 +1,7 @@
 import React from 'react';
 import { Button } from '../../shared/Button';
+import FormField from '../../shared/FormField/FormField.jsx';
+import FormFields from '../../shared/FormField/FormFields.jsx';
 
 const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }) => {
     const isProActive = window.fotogridsSettings?.isProActive || false;
@@ -32,12 +34,14 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
 
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fg-form-fields">
+            <FormFields>
                 {exifFields.map((field) => (
-                    <div key={field.key} className="fg-form-field">
-                        <label htmlFor={`fotogrids-exif-${field.key}`}>
-                            {field.label}
-                        </label>
+                    <FormField
+                        key={field.key}
+                        label={field.label}
+                        htmlFor={`fotogrids-exif-${field.key}`}
+                        layout="column"
+                    >
                         <input
                             type={field.type}
                             id={`fotogrids-exif-${field.key}`}
@@ -51,9 +55,9 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
                             }}
                             disabled={allFieldsDisabled}
                         />
-                    </div>
+                    </FormField>
                 ))}
-            </div>
+            </FormFields>
 
             {!isProActive && (
                 <div className="fotogrids-pro-feature-notice">

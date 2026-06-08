@@ -57,6 +57,8 @@ class Post_Types {
         self::register_gallery_cpt();
 
         self::register_album_cpt();
+
+        self::register_embed_cpt();
     }
 
     /**
@@ -197,6 +199,56 @@ class Post_Types {
     }
 
     /**
+     * Register Embed Custom Post Type
+     *
+     * Creates the fotogrids_embed post type used to represent virtual video
+     * embed items (YouTube / Vimeo). Embeds are real posts so their IDs can
+     * live in a gallery's item list alongside attachment IDs (post IDs are
+     * globally unique, so there is no collision), which lets them participate
+     * in manual ordering and sorting exactly like attachments.
+     *
+     * The type has no admin UI of its own — embeds are created, edited, and
+     * deleted entirely through the gallery items metabox. It declares 'title'
+     * (the caption) and 'thumbnail' (the custom poster via _thumbnail_id).
+     *
+     * @since 1.1.0
+     */
+    private static function register_embed_cpt() {
+        $args = array(
+            'labels'              => array(
+                'name'          => _x( 'Video Embeds', 'Post type general name', 'fotogrids' ),
+                'singular_name' => _x( 'Video Embed', 'Post type singular name', 'fotogrids' ),
+            ),
+            'public'              => false,
+            'publicly_queryable'  => false,
+            'show_ui'             => false,
+            'show_in_menu'        => false,
+            'show_in_nav_menus'   => false,
+            'show_in_admin_bar'   => false,
+            'exclude_from_search' => true,
+            'query_var'           => false,
+            'rewrite'             => false,
+            // Embeds have no admin screen and are created only through the
+            // gallery items REST endpoints, which already gate on
+            // `manage_fotogrids`. The CPT itself uses standard 'post'
+            // capabilities (which admins and editors already hold) so embed
+            // posts can be written without remapping caps — remapping primitive
+            // caps to `manage_fotogrids` interferes with map_meta_cap when that
+            // capability is itself checked.
+            'capability_type'     => 'post',
+            'map_meta_cap'        => true,
+            'has_archive'         => false,
+            'hierarchical'        => false,
+            // 'title'     — the embed caption.
+            // 'thumbnail' — backs the custom poster via WP-native _thumbnail_id.
+            'supports'            => array( 'title', 'thumbnail' ),
+            'show_in_rest'        => false,
+        );
+
+        register_post_type( 'fotogrids_embed', $args );
+    }
+
+    /**
      * Add meta boxes to post edit screens
      *
      * Registers meta boxes for both gallery and album post types.
@@ -321,7 +373,7 @@ class Post_Types {
      * @return bool Whether to use block editor
      */
     public static function disable_gutenberg( $current_status, $post_type ) {
-        if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ) ) ) {
+        if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' ) ) ) {
             return false;
         }
 

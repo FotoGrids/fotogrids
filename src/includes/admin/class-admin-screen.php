@@ -42,6 +42,10 @@ final class Admin_Screen {
         'fotogrids_page_fotogrids-license',
         'fotogrids_page_fotogrids-upgrade',
         'fotogrids_page_fotogrids-tools',
+        // Hidden child of the FotoGrids menu — registered under 'fotogrids'
+        // and immediately removed from the visible submenu, so the screen
+        // hook is the normal fotogrids_page_* form.
+        'fotogrids_page_fotogrids-setup',
     ];
 
     /**

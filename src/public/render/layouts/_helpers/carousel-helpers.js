@@ -485,9 +485,10 @@ export function createIntersectionPauser( opts ) {
  *
  * @param {Element} el The scrollable container (carousel viewport).
  * @param {{
- *   onDragStart?: () => void,
- *   onDragEnd?:   ( dragDistance: number ) => void,
- *   threshold?:   number,
+ *   onDragStart?:        () => void,
+ *   onDragEnd?:          ( dragDistance: number ) => void,
+ *   threshold?:          number,
+ *   ignoreClickSelector?: string,
  * }} [opts]
  * @return {() => void} Destroy.
  */
@@ -497,6 +498,9 @@ export function createPointerDrag( el, opts ) {
     const threshold  = options.threshold || 4;
     const onDragStart = typeof options.onDragStart === 'function' ? options.onDragStart : null;
     const onDragEnd   = typeof options.onDragEnd   === 'function' ? options.onDragEnd   : null;
+    const ignoreClickSelector = typeof options.ignoreClickSelector === 'string'
+        ? options.ignoreClickSelector
+        : '';
 
     let isDragging   = false;
     let startX       = 0;
@@ -514,7 +518,6 @@ export function createPointerDrag( el, opts ) {
         pointerId    = e.pointerId;
         totalDelta   = 0;
         didExceedThreshold = false;
-        try { el.setPointerCapture( e.pointerId ); } catch ( err ) {}
     };
 
     const onPointerMove = ( e ) => {
@@ -525,6 +528,10 @@ export function createPointerDrag( el, opts ) {
             didExceedThreshold = true;
             el.style.scrollSnapType = 'none';
             el.style.cursor = 'grabbing';
+            // Capture only once a real drag begins. Capturing on pointerdown
+            // would retarget the eventual click to el, hiding the true target
+            // (e.g. an inline-video tile) from delegated click handlers.
+            try { el.setPointerCapture( e.pointerId ); } catch ( err ) {}
             if ( onDragStart ) onDragStart();
         }
         if ( didExceedThreshold ) {
@@ -536,7 +543,9 @@ export function createPointerDrag( el, opts ) {
     const onPointerEnd = ( e ) => {
         if ( ! isDragging || e.pointerId !== pointerId ) return;
         isDragging = false;
-        try { el.releasePointerCapture( e.pointerId ); } catch ( err ) {}
+        if ( didExceedThreshold ) {
+            try { el.releasePointerCapture( e.pointerId ); } catch ( err ) {}
+        }
         el.style.scrollSnapType = '';
         el.style.cursor = '';
         if ( didExceedThreshold && onDragEnd ) onDragEnd( totalDelta );
@@ -544,11 +553,16 @@ export function createPointerDrag( el, opts ) {
     };
 
     const onClick = ( e ) => {
-        if ( didExceedThreshold ) {
-            e.preventDefault();
-            e.stopPropagation();
-            didExceedThreshold = false;
+        if ( ! didExceedThreshold ) return;
+        didExceedThreshold = false;
+        if ( ignoreClickSelector
+            && e.target
+            && typeof e.target.closest === 'function'
+            && e.target.closest( ignoreClickSelector ) ) {
+            return;
         }
+        e.preventDefault();
+        e.stopPropagation();
     };
 
     el.addEventListener( 'pointerdown',   onPointerDown );

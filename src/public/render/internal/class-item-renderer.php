@@ -43,11 +43,15 @@ final class Item_Renderer {
         $item_classes    = array_unique( array_merge( [ 'fg-item' ], $item_view->classes ) );
         $class_attribute = esc_attr( implode( ' ', $item_classes ) );
 
-        // data-fg-media-state drives both the loader visibility (CSS) and the
-        // pointer-events block (CSS) until the image settles. JS sets it to
-        // "loaded" on img load/error; it starts as "loading" here so the loader
-        // is visible from the moment the HTML is parsed.
-        $state_attr      = ' data-fg-media-state="loading"';
+        // data-fg-media-state drives the loader visibility and the reveal
+        // animation. JS flips it to "loaded" on img load/error; it starts as
+        // "loading" here so the loader is visible from the moment the HTML is
+        // parsed. Video items carry no loadable image (poster aside), so they
+        // start "loaded" to avoid a stuck loader on posterless embeds.
+        $is_video        = \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type );
+        $state_attr      = $is_video
+            ? ' data-fg-media-state="loaded"'
+            : ' data-fg-media-state="loading"';
         $data_attributes = $this->serialize_data_attrs( $item_view->data_attrs );
         $style_attribute = $this->serialize_style( $item_view->style );
 
@@ -110,6 +114,10 @@ final class Item_Renderer {
      * @return  string
      */
     private function render_img( Item_View $item_view, Render_Context $render_context ): string {
+        if ( \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type ) ) {
+            return $this->render_video_poster( $item_view, $render_context );
+        }
+
         $srcset = '';
         $sizes = '';
         if ( $item_view->id > 0 ) {
@@ -130,11 +138,18 @@ final class Item_Renderer {
 
         $lazy_load = (bool) ( $render_context->settings['lazy_load'] ?? true );
 
+        // When the collection being rendered is watermark-enabled, serve the
+        // watermarked sibling for the thumbnail and full image. The filter
+        // returns the clean URL unchanged when watermarking is off for this
+        // collection or the variant file does not exist.
+        $thumb_url = \FotoGrids\Watermark\Watermark_Render_Filter::rewrite_url( $item_view->thumb_url );
+        $full_url  = \FotoGrids\Watermark\Watermark_Render_Filter::rewrite_url( $item_view->full_url );
+
         $image_attributes = [
-            'src'                => esc_url( $item_view->thumb_url ),
+            'src'                => esc_url( $thumb_url ),
             'alt'                => esc_attr( $item_view->alt !== '' ? $item_view->alt : $item_view->title ),
-            'data-fg-thumb-src'  => esc_url( $item_view->thumb_url ),
-            'data-fg-full-src'   => esc_url( $item_view->full_url ),
+            'data-fg-thumb-src'  => esc_url( $thumb_url ),
+            'data-fg-full-src'   => esc_url( $full_url ),
             'data-id'            => (string) $item_view->id,
         ];
 
@@ -192,6 +207,82 @@ final class Item_Renderer {
     }
 
     /**
+     * Renders the poster markup for a video item.
+     *
+     * Emits the poster image (or a placeholder when no poster resolved) plus a
+     * play badge and the data-fg-* attributes the inline-playback and lightbox
+     * frontend modules read to know how to play the item. The actual player
+     * (<video> / <iframe>) is injected client-side on interaction.
+     *
+     * @since   1.1.0
+     * @param   Item_View      $item_view      Item data.
+     * @param   Render_Context $render_context Render context (used for playback mode).
+     * @return  string
+     */
+    private function render_video_poster( Item_View $item_view, Render_Context $render_context ): string {
+        $playback_mode = $render_context->settings['video_playback_mode'] ?? 'inline';
+        if ( ! is_string( $playback_mode ) || '' === $playback_mode ) {
+            $playback_mode = 'inline';
+        }
+
+        $lazy_load = (bool) ( $render_context->settings['lazy_load'] ?? true );
+
+        $poster_attrs = [
+            'class'              => 'fg-video-poster',
+            'src'                => esc_url( $item_view->poster_url ),
+            'alt'                => esc_attr( $item_view->alt !== '' ? $item_view->alt : $item_view->title ),
+            'data-fg-thumb-src'  => esc_url( $item_view->poster_url ),
+            'data-id'            => (string) $item_view->id,
+        ];
+
+        if ( $lazy_load ) {
+            $poster_attrs['loading']  = 'lazy';
+            $poster_attrs['decoding'] = 'async';
+        }
+
+        if ( '' !== $item_view->poster_url ) {
+            $serialized = [];
+            foreach ( $poster_attrs as $name => $value ) {
+                $serialized[] = sprintf( '%s="%s"', $name, $value );
+            }
+            $poster_html = '<img ' . implode( ' ', $serialized ) . ' />';
+        } else {
+            $poster_html = '<span class="fg-video-poster fg-video-poster--placeholder" aria-hidden="true"></span>';
+        }
+
+        $badge_html = '<span class="fg-video-badge" aria-hidden="true"></span>';
+
+        $video_attrs = [
+            'class'                  => 'fg-video',
+            'data-fg-item-type'      => esc_attr( $item_view->item_type ),
+            'data-fg-playback-mode'  => esc_attr( $playback_mode ),
+        ];
+
+        if ( '' !== $item_view->video_src ) {
+            $video_attrs['data-fg-video-src'] = esc_url( $item_view->video_src );
+        }
+        if ( '' !== $item_view->embed_provider ) {
+            $video_attrs['data-fg-embed-provider'] = esc_attr( $item_view->embed_provider );
+        }
+        if ( '' !== $item_view->embed_id ) {
+            $video_attrs['data-fg-embed-id'] = esc_attr( $item_view->embed_id );
+        }
+        if ( ! empty( $item_view->embed_settings ) ) {
+            $encoded = wp_json_encode( $item_view->embed_settings );
+            if ( is_string( $encoded ) ) {
+                $video_attrs['data-fg-embed-settings'] = esc_attr( $encoded );
+            }
+        }
+
+        $serialized_video = '';
+        foreach ( $video_attrs as $name => $value ) {
+            $serialized_video .= sprintf( ' %s="%s"', $name, $value );
+        }
+
+        return '<span' . $serialized_video . '>' . $poster_html . $badge_html . '</span>';
+    }
+
+    /**
      * Wraps item media in overlay containers and injects the loading icon.
      *
      * The loading icon is a full inline SVG (not a <symbol>/<use> reference)
@@ -227,7 +318,11 @@ final class Item_Renderer {
             );
         }
 
-        $loader_html = $this->render_loader( $item_view, $render_context );
+        // Video items show their own play badge and have no loadable image to
+        // wait on, so the loading-icon loader is omitted for them.
+        $loader_html = \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type )
+            ? ''
+            : $this->render_loader( $item_view, $render_context );
 
         return '<div class="fg-item-media">' . $image_html . $overlay_html . $loader_html . '</div>';
     }

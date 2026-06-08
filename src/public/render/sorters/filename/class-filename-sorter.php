@@ -63,12 +63,24 @@ final class Filename_Sorter extends Abstract_Db_Sorter implements Sorter {
 
         [ $sortable, $unsortable ] = $this->split_sortable( $item_ids, $row_map );
 
+        // Precompute a sort key per item: an attachment sorts by its filename
+        // (guid basename); an embed has no filename, so it sorts by its video
+        // ID instead.
+        $keys = [];
+        foreach ( $sortable as $id ) {
+            $row = $row_map[ $id ];
+            if ( ( $row['post_type'] ?? '' ) === \FotoGrids\Galleries\Embed_Store::POST_TYPE ) {
+                $embed       = \FotoGrids\Galleries\Embed_Store::get( $id );
+                $keys[ $id ] = $embed ? (string) $embed['video_id'] : '';
+            } else {
+                $keys[ $id ] = basename( (string) $row['guid'] );
+            }
+        }
+
         usort(
             $sortable,
-            static function ( int $a, int $b ) use ( $row_map ): int {
-                $name_a = basename( (string) $row_map[ $a ]['guid'] );
-                $name_b = basename( (string) $row_map[ $b ]['guid'] );
-                return strcasecmp( $name_a, $name_b );
+            static function ( int $a, int $b ) use ( $keys ): int {
+                return strcasecmp( $keys[ $a ], $keys[ $b ] );
             }
         );
 

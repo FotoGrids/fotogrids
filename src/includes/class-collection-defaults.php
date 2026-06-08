@@ -578,6 +578,8 @@ class Collection_Defaults {
             'pages_truncate' => true,
             'item_click_behavior' => 'lightbox',
             'external_link_target' => '_self',
+            // Video items: how a video opens when clicked (inline | lightbox).
+            'video_playback_mode' => 'inline',
             'lightbox_img_shadow_enabled'             => false,
             'lightbox_img_shadow_offset_x'            => array( 'desktop' => 0,  'tablet' => 0,  'mobile' => 0 ),
             'lightbox_img_shadow_offset_y'            => array( 'desktop' => 4,  'tablet' => 4,  'mobile' => 4 ),
@@ -725,30 +727,10 @@ class Collection_Defaults {
             'password_remember' => false,
             'password_remember_days' => 7,
             'disable_right_click' => false,
-            'enable_watermark' => false,
-            'watermark_type' => 'text',
-            'watermark_image_url' => '',
-            'watermark_image_size' => 20,
-            'watermark_text' => '© Your Name',
-            'watermark_font_size' => 24,
-            'watermark_text_color' => 'light',
-            'watermark_custom_text_color' => '#ffffff',
-            'watermark_font_family' => 'Arial',
-            'watermark_custom_font' => '',
-            'watermark_position' => 'bottom-right',
-            'watermark_opacity' => 70,
-            'watermark_margin' => array(
-                'desktop' => 20,
-                'tablet' => 15,
-                'mobile' => 10
-            ),
-            'watermark_apply_to' => 'full',
-            'watermark_repeat' => false,
-            'watermark_repeat_spacing' => array(
-                'desktop' => 200,
-                'tablet' => 150,
-                'mobile' => 100
-            ),
+            // Per-collection watermark opt-out. The watermark itself is now
+            // configured site-wide (Plugin Settings → Watermark); a collection
+            // can only opt out of having it applied.
+            'watermark_apply_to_collection' => true,
             'sharing_override' => false,
             'sharing_disabled_for_collection' => false,
             'sharing_networks_override' => array( 'facebook', 'x', 'pinterest', 'email', 'copy_link' ),

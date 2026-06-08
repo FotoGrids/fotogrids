@@ -8,7 +8,7 @@
  * (lightbox, gallery overlay, etc.) can restyle without overrides.
  */
 
-.fg-tooltip {
+.fg-f-tooltip {
     // Tokens - override at :root or on a parent to retheme.
     --fg-tt-bg:          rgba(20, 20, 20, 0.92);
     --fg-tt-color:       #ffffff;
@@ -114,7 +114,7 @@
     &[data-dir="right"] { transform: translateX(calc(-1 * var(--fg-tt-offset))); }
     // "above" uses the default translateY(-offset) set above.
 
-    &.fg-tooltip--visible {
+    &.fg-f-tooltip--visible {
         opacity:    1;
         visibility: visible;
         transform:  none;
@@ -129,7 +129,7 @@
     //   • white-space relaxes so multi-row content lays out naturally
     //   • slightly more inner padding to give the content room
     // The trigger flow (open / dismiss / Escape) lives in fg-tooltip.js.
-    &.fg-tooltip--interactive {
+    &.fg-f-tooltip--interactive {
         pointer-events: auto;
         user-select:    auto;
         white-space:    normal;
@@ -162,19 +162,19 @@
 
 // Inner content wrapper added by showInteractive(). Lets us crossfade
 // the content while the outer container resizes/animates separately.
-.fg-tooltip__inner {
+.fg-f-tooltip__inner {
     opacity:    0;
     transition: opacity var(--fg-tt-duration, 140ms) ease;
 }
 
-.fg-tooltip__inner.fg-tooltip__inner--visible {
+.fg-f-tooltip__inner.fg-f-tooltip__inner--visible {
     opacity: 1;
 }
 
 // While JS is mid-swap (text → interactive), force the inner-content
 // opacity to 0 even though the tooltip itself stays visible. Outer
 // chrome (bg, arrow, shadow) keeps showing through.
-.fg-tooltip.fg-tooltip--swapping {
+.fg-f-tooltip.fg-f-tooltip--swapping {
     // textContent is what's currently inside (the "Sharing" label).
     // Plain text doesn't have a wrapper, so we fade it via the parent's
     // color transition — visually equivalent.

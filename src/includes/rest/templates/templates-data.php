@@ -535,6 +535,34 @@ class Templates_Data {
             $gallery_html = '<div class="fotogrids-error">' . __( 'Failed to generate gallery preview.', 'fotogrids' ) . '</div>';
         }
 
+        // TEMPORARY DIAGNOSTIC — remove before release.
+        // Hit the preview URL with &fg_debug=1 (requires WP_DEBUG) to dump what
+        // the render pipeline collected vs. what the standalone HTML page links.
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $request->get_param( 'fg_debug' ) ) {
+            $css_urls = array();
+            $js_data  = array();
+            if ( class_exists( '\FotoGrids\Render\Internal\Asset_Resolver' ) ) {
+                $resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+                $css_urls = $resolver->get_css_asset_urls();
+                $js_data  = $resolver->get_js_asset_data();
+            }
+            $diag = array(
+                'template_id'         => $template_id,
+                'resolved_layout'     => $layout,
+                'settings_layout'     => $settings['layout'] ?? '(none)',
+                'final_columns'       => $columns,
+                'collected_css_urls'  => $css_urls,
+                'collected_js_data'   => $js_data,
+                'legacy_css_checked'  => $template_css_url,
+                'legacy_css_exists'   => $template_css_exists,
+                'gallery_html_length' => strlen( $gallery_html ),
+                'gallery_html_head'   => substr( $gallery_html, 0, 600 ),
+            );
+            $response = new \WP_REST_Response( $diag );
+            $response->set_status( 200 );
+            return $response;
+        }
+
         // Get frontend CSS and JS URLs
         $frontend_css_url = FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids.css';
         $template_css_url = FOTOGRIDS_PLUGIN_DIR . 'public/assets/templates/' . $layout . '.css';

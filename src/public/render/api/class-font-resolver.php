@@ -287,6 +287,29 @@ final class Font_Resolver {
     }
 
     /**
+     * Returns the combined Google Fonts stylesheet URL for every font collected
+     * so far this request, or '' if none were collected.
+     *
+     * Unlike enqueue_google_fonts() / print_google_fonts_footer(), this does NOT
+     * mark the stylesheet as printed and does not touch WordPress enqueue/footer
+     * hooks. It exists for REST flows (gallery unlock, album-to-gallery AJAX)
+     * that render a gallery in a separate request whose wp_footer never reaches
+     * the visitor's already-loaded page — those handlers read this URL and
+     * return it in the JSON response so the client can inject the <link>
+     * itself. See Gallery_Data::unlock_gallery() / render_gallery().
+     *
+     * @since  1.0.0
+     * @return string Combined Google Fonts URL, or '' when no fonts collected.
+     */
+    public function get_collected_fonts_url(): string {
+        if ( empty( $this->google_fonts_seen ) ) {
+            return '';
+        }
+
+        return $this->build_google_fonts_url( array_keys( $this->google_fonts_seen ) );
+    }
+
+    /**
      * Collects a Google Font name and ensures the enqueue hook is registered.
      *
      * @since  1.0.0

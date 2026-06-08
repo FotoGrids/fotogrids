@@ -23,12 +23,13 @@ if ( ! defined( 'WPINC' ) ) {
  * UI, inspector primitives) and one sub-module per builder under `builders/`:
  *
  *   - builders/Gutenberg/  - the Gutenberg blocks (gallery + album)
- *   - builders/Elementor/  - FUTURE
- *   - builders/Divi/       - FUTURE
+ *   - builders/Elementor/  - Elementor widgets (gallery + album)
+ *   - builders/Divi/       - Divi modules (gallery + album)
  *   - builders/Bricks/     - FUTURE
  *
- * Each sub-module decides its own activation (e.g. Elementor sub-module only
- * boots when the Elementor plugin is present). Gutenberg always boots.
+ * Each sub-module decides its own activation (e.g. the Elementor and Divi
+ * sub-modules only boot when their builder is present). Gutenberg always
+ * boots.
  *
  * The shared `core/` REST endpoints (`/preview/gallery/{id}`,
  * `/preview/album/{id}`, `/picker/items`) are registered once here, regardless
@@ -141,6 +142,12 @@ class Module extends Abstract_Module {
         // loaded, so safe to require unconditionally.
         require_once __DIR__ . '/builders/Elementor/Module.php';
         Builders\Elementor\Module::init();
+
+        // Divi sub-module — no-ops internally when Divi isn't loaded, so
+        // safe to require unconditionally. Registers its modules on
+        // `et_builder_ready` once Divi's framework is up.
+        require_once __DIR__ . '/builders/Divi/Module.php';
+        Builders\Divi\Module::init();
     }
 
     /**

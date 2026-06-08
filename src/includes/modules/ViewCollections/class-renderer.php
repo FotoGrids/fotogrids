@@ -271,6 +271,24 @@ class Renderer {
                     'alt'    => (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
                 );
             }
+
+            // Poster fallback: an embed-only or video-only collection has no
+            // image attachment cover, so use its resolved poster URL for OG.
+            if ( empty( $image['url'] ) ) {
+                $descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
+                    (int) $this->post->ID,
+                    'large'
+                );
+                if ( '' !== $descriptor['url'] ) {
+                    $image = array(
+                        'id'     => 0,
+                        'url'    => $descriptor['url'],
+                        'width'  => 0,
+                        'height' => 0,
+                        'alt'    => '',
+                    );
+                }
+            }
         }
 
         $type = $this->og_type( $seo );

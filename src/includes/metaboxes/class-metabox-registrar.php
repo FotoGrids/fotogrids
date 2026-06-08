@@ -208,22 +208,21 @@ final class Metabox_Registrar {
         // featured" state until the user clicks a star.
         $featured_item_id = (int) get_post_thumbnail_id( $post->ID );
 
+        // The item list holds attachment IDs and embed post IDs interleaved in
+        // display order. Build each item by branching on its post type.
         $items_data = [];
         foreach ( (array) $gallery_items as $item_id ) {
-            $item_url      = wp_get_attachment_image_url( $item_id, 'full' );
-            $thumbnail_url = wp_get_attachment_image_url( $item_id, 'thumbnail' );
-            $item_title    = get_the_title( $item_id );
-            $item_alt      = get_post_meta( $item_id, '_wp_attachment_image_alt', true );
-
-            if ( $item_url ) {
-                $items_data[] = [
-                    'id'        => (int) $item_id,
-                    'title'     => $item_title ?: 'Untitled',
-                    'url'       => $item_url,
-                    'thumbnail' => $thumbnail_url ?: $item_url,
-                    'alt'       => $item_alt ?: $item_title ?: '',
-                    'featured'  => ( $featured_item_id > 0 && (int) $item_id === $featured_item_id ),
-                ];
+            $item_id = (int) $item_id;
+            if ( \FotoGrids\Galleries\Embed_Store::is_embed( $item_id ) ) {
+                $embed_item = self::build_embed_item_data( $item_id, $featured_item_id );
+                if ( null !== $embed_item ) {
+                    $items_data[] = $embed_item;
+                }
+                continue;
+            }
+            $item_data = self::build_attachment_item_data( $item_id, $featured_item_id );
+            if ( null !== $item_data ) {
+                $items_data[] = $item_data;
             }
         }
 
@@ -240,6 +239,171 @@ final class Metabox_Registrar {
         ?>
         <div id="fotogrids-gallery-metabox-root"></div>
         <?php
+    }
+
+    /**
+     * Build the metabox grid payload for one attachment item.
+     *
+     * Handles both image and Media Library video attachments. Videos resolve
+     * their grid thumbnail through the poster chain instead of an image URL, so
+     * they survive a reload (previously they were dropped when
+     * wp_get_attachment_image_url returned false for a video).
+     *
+     * @since 1.1.0
+     * @param int $item_id          The attachment ID.
+     * @param int $featured_item_id The gallery's featured attachment ID, or 0.
+     * @return array<string, mixed>|null Item payload, or null if the attachment no longer exists.
+     */
+    private static function build_attachment_item_data( int $item_id, int $featured_item_id ): ?array {
+        $attachment = get_post( $item_id );
+        if ( ! $attachment || 'attachment' !== $attachment->post_type ) {
+            return null;
+        }
+
+        $item_type  = \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $item_id );
+        $is_video   = \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE === $item_type;
+        $item_title = get_the_title( $item_id );
+        $item_alt   = get_post_meta( $item_id, '_wp_attachment_image_alt', true );
+
+        if ( $is_video ) {
+            // Per-attachment item data (incl. any custom poster) is stored in
+            // the global gallery_id = 0 row, mirroring the item edit modal.
+            $custom_data = self::get_item_custom_data( $item_id, 0 );
+            $poster      = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+                $item_type,
+                $item_id,
+                $custom_data,
+                'thumbnail'
+            );
+
+            return [
+                'id'        => $item_id,
+                'title'     => $item_title ?: 'Untitled',
+                'url'       => (string) ( wp_get_attachment_url( $item_id ) ?: '' ),
+                'thumbnail' => $poster,
+                'alt'       => $item_alt ?: $item_title ?: '',
+                'featured'  => ( $featured_item_id > 0 && $item_id === $featured_item_id ),
+                'item_type' => $item_type,
+            ];
+        }
+
+        $item_url      = wp_get_attachment_image_url( $item_id, 'full' );
+        $thumbnail_url = wp_get_attachment_image_url( $item_id, 'thumbnail' );
+
+        if ( ! $item_url ) {
+            return null;
+        }
+
+        return [
+            'id'        => $item_id,
+            'title'     => $item_title ?: 'Untitled',
+            'url'       => $item_url,
+            'thumbnail' => $thumbnail_url ?: $item_url,
+            'alt'       => $item_alt ?: $item_title ?: '',
+            'featured'  => ( $featured_item_id > 0 && $item_id === $featured_item_id ),
+            'item_type' => $item_type,
+        ];
+    }
+
+    /**
+     * Build the metabox grid payload for one embed post.
+     *
+     * @since 1.1.0
+     * @param int $embed_id         The fotogrids_embed post ID.
+     * @param int $featured_item_id The gallery's featured item ID, or 0.
+     * @return array<string, mixed>|null Item payload, or null if not an embed.
+     */
+    private static function build_embed_item_data( int $embed_id, int $featured_item_id ): ?array {
+        $embed = \FotoGrids\Galleries\Embed_Store::get( $embed_id );
+        if ( null === $embed ) {
+            return null;
+        }
+
+        $item_type   = (string) $embed['item_type'];
+        $custom_data = self::embed_to_custom_data( $embed );
+        $poster      = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+            $item_type,
+            0,
+            $custom_data,
+            'thumbnail'
+        );
+        $caption = (string) $embed['caption'];
+
+        return [
+            'id'        => $embed_id,
+            'title'     => $caption ?: 'Video',
+            'url'       => (string) $embed['url'],
+            'thumbnail' => $poster,
+            'alt'       => $caption,
+            'featured'  => ( $featured_item_id > 0 && $embed_id === $featured_item_id ),
+            'item_type' => $item_type,
+            'source'    => \FotoGrids\Render\Video\Video_Item_Helpers::provider_for_type( $item_type ),
+            // Full embed payload so the edit modal can prefill without an extra
+            // round-trip.
+            'embed'     => [
+                'caption'       => $caption,
+                'embed_url'     => (string) $embed['url'],
+                'video_id'      => (string) $embed['video_id'],
+                'thumbnail_url' => $poster,
+                'settings'      => $custom_data,
+            ],
+        ];
+    }
+
+    /**
+     * Flatten an Embed_Store record into the custom_data-shaped array the admin
+     * grid + edit modal expect.
+     *
+     * @since 1.1.0
+     * @param array<string, mixed> $embed Embed_Store::get() result.
+     * @return array<string, mixed>
+     */
+    private static function embed_to_custom_data( array $embed ): array {
+        $out = array_merge(
+            array(
+                'embed_url'     => $embed['url'] ?? '',
+                'video_id'      => $embed['video_id'] ?? '',
+                'thumbnail_url' => $embed['thumbnail_url'] ?? '',
+            ),
+            is_array( $embed['settings'] ?? null ) ? $embed['settings'] : array()
+        );
+        if ( ! empty( $embed['poster_id'] ) ) {
+            $out['poster_id'] = (int) $embed['poster_id'];
+        }
+        if ( ! empty( $embed['poster_url'] ) ) {
+            $out['poster_url'] = (string) $embed['poster_url'];
+        }
+        return $out;
+    }
+
+    /**
+     * Read and decode the custom_data JSON for an item row.
+     *
+     * @since 1.1.0
+     * @param int $attachment_id The attachment ID (0 for embeds).
+     * @param int $gallery_id    The gallery scope for the row.
+     * @return array<string, mixed> Decoded custom_data, or empty array.
+     */
+    private static function get_item_custom_data( int $attachment_id, int $gallery_id ): array {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+
+        $raw = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT custom_data FROM {$table}
+                 WHERE attachment_id = %d AND gallery_id = %d
+                 LIMIT 1",
+                $attachment_id,
+                $gallery_id
+            )
+        );
+
+        if ( empty( $raw ) ) {
+            return [];
+        }
+
+        $decoded = json_decode( (string) $raw, true );
+        return is_array( $decoded ) ? $decoded : [];
     }
 
     /**
@@ -437,6 +601,18 @@ final class Metabox_Registrar {
             'addVideoEmbed'                        => __( 'Add a video embed', 'fotogrids' ),
             'addVideoEmbedDescription'             => __( 'YouTube / Vimeo', 'fotogrids' ),
             'videoEmbedAdded'                      => __( 'Video added to gallery.', 'fotogrids' ),
+            'videoEmbedUpdated'                    => __( 'Video updated.', 'fotogrids' ),
+            'videoEmbedRemoveFailed'               => __( 'Failed to remove the video.', 'fotogrids' ),
+            'editVideoEmbed'                       => __( 'Edit Video Embed', 'fotogrids' ),
+            'saveChanges'                          => __( 'Save Changes', 'fotogrids' ),
+            'saving'                               => __( 'Saving…', 'fotogrids' ),
+            'video'                                => __( 'Video', 'fotogrids' ),
+            'posterImage'                          => __( 'Poster Image', 'fotogrids' ),
+            'posterImageDesc'                      => __( 'Shown in the gallery before the video plays. Defaults to the video’s own thumbnail.', 'fotogrids' ),
+            'choosePoster'                         => __( 'Choose Poster', 'fotogrids' ),
+            'changePoster'                         => __( 'Change Poster', 'fotogrids' ),
+            'usePoster'                            => __( 'Use as poster', 'fotogrids' ),
+            'removePoster'                         => __( 'Remove', 'fotogrids' ),
             'link'                                 => __( 'Link', 'fotogrids' ),
             'loadVideo'                            => __( 'Load video', 'fotogrids' ),
             'videoLoaded'                          => __( 'Video loaded successfully.', 'fotogrids' ),

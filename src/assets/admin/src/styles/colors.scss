@@ -143,8 +143,8 @@ $fotogrids-ui-colors: (
         border: $fotogrids-colors-grey-02,
         border-hover: #50575e,
         border-focus: $fotogrids-colors-blue,
-        border-error: #d63638,
-        border-success: #00a32a,
+        border-error: $fotogrids-colors-red,
+        border-success: $fotogrids-colors-green,
         shadow-focus: rgba(34, 113, 177, 0.25),
         disabled-bg: #f6f7f7,
         disabled-text: #a7aaad,
@@ -154,11 +154,11 @@ $fotogrids-ui-colors: (
     // Status Colors
     status: (
         error-bg: #fcf0f1,
-        error-text: #d63638,
+        error-text: $fotogrids-colors-red,
         error-border: #f087a3,
 
         success-bg: #f0f6fc,
-        success-text: #00a32a,
+        success-text: $fotogrids-colors-green,
         success-border: #68de7c,
 
         warning-bg: #fcf9e8,

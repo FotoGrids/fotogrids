@@ -9,7 +9,7 @@
  * Text Domain: fotogrids
  * Domain Path: /languages
  * Requires at least: 5.8
- * Tested up to: 6.8
+ * Tested up to: 7.0
  * Requires PHP: 8.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -56,6 +56,12 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-freemius-bootstrap
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-licensing-toasts.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-license-manager.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-image-size-manager.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-paths.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-engine.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-generator.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-hooks.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-render-filter.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-regenerate-data.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-collection-defaults.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-password-crypto.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-screen.php';
@@ -68,6 +74,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-normalizer
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-setting-value-codec.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-plugin-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-sharing-settings-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-watermark-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
@@ -89,6 +96,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/assets/class-loading-icon-library.
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/assets/class-collection-settings-assets.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-items.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-embed-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-registrar.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoints.php';
@@ -132,6 +140,7 @@ function fotogrids_init() {
     FotoGrids\License_Manager::init();
     FotoGrids\Licensing\Licensing_Toasts::init();
     FotoGrids\Image_Size_Manager::init();
+    FotoGrids\Watermark\Watermark_Hooks::init();
 
     // Boot the module registry on 'init' (priority 5), not here on
     // 'plugins_loaded'. This is the robust fix for the same-priority load-order
@@ -176,6 +185,14 @@ function fotogrids_init() {
     // (priority 10) has already registered 'fotogrids-admin'. This guarantees the
     // dependency declared by each tool script resolves correctly.
     add_action( 'admin_enqueue_scripts', array( '\FotoGrids\Tools\Tools_Registry', 'enqueue_all' ), 20 );
+
+    // Divi 5 native modules must register their dependency-tree hook
+    // BEFORE 'init' runs: Divi fires the tree from `et_setup_builder_5` on
+    // 'init' priority 0, earlier than Module_Registry::boot() (init:5).
+    // We attach those timing-sensitive Divi hooks here, at plugins_loaded.
+    // No-ops internally when Divi 5 isn't present.
+    require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/PageBuilders/builders/Divi/Module.php';
+    \FotoGrids\Modules\PageBuilders\Builders\Divi\Module::boot_early();
 
     if ( is_admin() ) {
         require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-admin-init.php';

@@ -64,7 +64,20 @@ final class Lightbox_Slide_Builder {
         $slides = [];
         foreach ( $ids as $aid ) {
             $post = get_post( $aid );
-            if ( ! $post || $post->post_type !== 'attachment' ) {
+            if ( ! $post ) {
+                continue;
+            }
+
+            // Embed posts produce a video slide built from their stored data.
+            if ( \FotoGrids\Galleries\Embed_Store::POST_TYPE === $post->post_type ) {
+                $embed_slide = self::build_embed_slide( $aid, $full_size_slug );
+                if ( null !== $embed_slide ) {
+                    $slides[] = $embed_slide;
+                }
+                continue;
+            }
+
+            if ( $post->post_type !== 'attachment' ) {
                 continue;
             }
 
@@ -88,6 +101,27 @@ final class Lightbox_Slide_Builder {
                 'external_url' => (string) ( $link_meta[ $aid ]['external_url'] ?? '' ),
                 'link_target'  => (string) ( $link_meta[ $aid ]['link_target']  ?? 'global' ),
             ];
+
+            // Media Library videos carry no image src; supply video fields so
+            // the lightbox renders a player. The poster (custom or native)
+            // becomes the slide thumb/full image.
+            if ( \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE
+                === \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $aid ) ) {
+                $custom_data = self::load_custom_data( $aid );
+                $poster      = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+                    \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE,
+                    $aid,
+                    $custom_data,
+                    $full_resolved
+                );
+                $slide['item_type']      = \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE;
+                $slide['video_src']      = (string) ( wp_get_attachment_url( $aid ) ?: '' );
+                $slide['embed_provider'] = '';
+                $slide['embed_id']       = '';
+                $slide['embed_settings'] = $custom_data;
+                $slide['thumb_url']      = $poster;
+                $slide['full_url']       = $poster;
+            }
 
             if ( $include_exif ) {
                 $slide['exif'] = self::load_exif( $aid, $settings );
@@ -159,6 +193,78 @@ final class Lightbox_Slide_Builder {
      * @param array<int, int> $ids
      * @return array<int, array{external_url: string, link_target: string}>
      */
+    /**
+     * Build a lightbox slide dict for an embed post.
+     *
+     * @since 1.1.0
+     * @param int    $embed_id        The fotogrids_embed post ID.
+     * @param string $full_size_slug  Resolved WP size slug for the poster.
+     * @return array<string, mixed>|null
+     */
+    private static function build_embed_slide( int $embed_id, string $full_size_slug ): ?array {
+        $embed = \FotoGrids\Galleries\Embed_Store::get( $embed_id );
+        if ( null === $embed ) {
+            return null;
+        }
+
+        $item_type = (string) $embed['item_type'];
+        $caption   = (string) $embed['caption'];
+        $poster    = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+            $item_type,
+            0,
+            array(
+                'thumbnail_url' => (string) $embed['thumbnail_url'],
+                'poster_id'     => (int) $embed['poster_id'],
+                'poster_url'    => (string) $embed['poster_url'],
+            ),
+            $full_size_slug
+        );
+
+        return array(
+            'id'             => $embed_id,
+            'thumb_url'      => $poster,
+            'full_url'       => $poster,
+            'alt'            => $caption,
+            'title'          => $caption,
+            'caption'        => $caption,
+            'description'    => '',
+            'tags'           => array(),
+            'people'         => array(),
+            'location'       => array(),
+            'external_url'   => '',
+            'link_target'    => 'global',
+            'item_type'      => $item_type,
+            'video_src'      => '',
+            'embed_provider' => \FotoGrids\Render\Video\Video_Item_Helpers::provider_for_type( $item_type ),
+            'embed_id'       => (string) $embed['video_id'],
+            'embed_settings' => is_array( $embed['settings'] ?? null ) ? $embed['settings'] : array(),
+        );
+    }
+
+    /**
+     * Read and decode custom_data for one attachment's global item row.
+     *
+     * @since 1.1.0
+     * @param int $aid Attachment ID.
+     * @return array<string, mixed>
+     */
+    private static function load_custom_data( int $aid ): array {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+
+        $raw = $wpdb->get_var( $wpdb->prepare(
+            "SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = 0 LIMIT 1",
+            $aid
+        ) );
+
+        if ( empty( $raw ) ) {
+            return [];
+        }
+
+        $decoded = json_decode( (string) $raw, true );
+        return is_array( $decoded ) ? $decoded : [];
+    }
+
     private static function batch_load_link_meta( array $ids ): array {
         if ( empty( $ids ) ) {
             return [];

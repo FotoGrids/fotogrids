@@ -85,19 +85,47 @@ function pageCount( total, itemsPerView ) {
 }
 
 /**
- * Scroll the wrapper viewport to the given page index.
+ * The largest scrollLeft the wrapper can reach. The final page is often
+ * a partial viewport, so this is less than pageCount * clientWidth.
+ *
+ * @param {Element} scrollerEl
+ * @return {number}
+ */
+function maxScrollLeft( scrollerEl ) {
+    return Math.max( 0, scrollerEl.scrollWidth - scrollerEl.clientWidth );
+}
+
+/**
+ * Scroll the wrapper viewport to the given page index. The target is
+ * clamped to the real maximum scroll so the final partial page lands at
+ * the track end rather than overshooting and being silently clamped by
+ * the browser (which would desync the page index from the scroll).
+ *
+ * @param {Element} scrollerEl
+ * @param {number}  page
+ * @param {number}  durationMs
+ * @return {() => void} Cancel.
  */
 function scrollToPage( scrollerEl, page, durationMs ) {
-    const target = page * scrollerEl.clientWidth;
+    const target = Math.min( page * scrollerEl.clientWidth, maxScrollLeft( scrollerEl ) );
     return scrollToDuration( scrollerEl, target, durationMs );
 }
 
 /**
- * Compute which page is currently visible based on scrollLeft.
+ * Compute which page is currently visible based on scrollLeft. When the
+ * wrapper is scrolled to (or within a pixel of) its maximum, the last
+ * page is returned directly so a partial final page is always reachable.
+ *
+ * @param {Element} scrollerEl
+ * @param {number}  pageTotal
+ * @return {number}
  */
-function currentPageFromScroll( scrollerEl ) {
+function currentPageFromScroll( scrollerEl, pageTotal ) {
     const w = scrollerEl.clientWidth;
     if ( w <= 0 ) return 0;
+    if ( pageTotal > 0 && scrollerEl.scrollLeft >= maxScrollLeft( scrollerEl ) - 1 ) {
+        return pageTotal - 1;
+    }
     return Math.round( scrollerEl.scrollLeft / w );
 }
 
@@ -236,7 +264,7 @@ function setup( collectionEl ) {
         if ( ! indexState ) return;
         clearTimeout( scrollSyncTimer );
         scrollSyncTimer = window.setTimeout( () => {
-            const page = currentPageFromScroll( trackWrapperEl );
+            const page = currentPageFromScroll( trackWrapperEl, indexState.total() );
             if ( page !== indexState.current() ) {
                 indexState.goTo( page );
             }
@@ -260,6 +288,7 @@ function setup( collectionEl ) {
     createPointerDrag( trackWrapperEl, {
         onDragStart: pauseAutoplayBriefly,
         onDragEnd:   pauseAutoplayBriefly,
+        ignoreClickSelector: '.fg-video[data-fg-playback-mode="inline"]',
     } );
 
     /* Reveal items now that initial layout is ready. */
@@ -299,6 +328,21 @@ function setup( collectionEl ) {
     } );
 }
 
+/**
+ * Resolve the thumbnail image source for a slider item. Plain image items
+ * expose their source on the item <img>; video items expose it on the
+ * .fg-video-poster <img>. Posterless videos render a placeholder span
+ * instead of an <img>, so this returns an empty string for them.
+ *
+ * @param {Element} itemEl
+ * @return {string}
+ */
+function thumbSrcFor( itemEl ) {
+    const img = itemEl.querySelector( 'img' );
+    if ( ! img ) return '';
+    return img.dataset.fgThumbSrc || img.getAttribute( 'src' ) || '';
+}
+
 function revealAllItems( trackEl ) {
     const all = Array.prototype.slice.call(
         trackEl.querySelectorAll( ':scope > .fg-item' )
@@ -326,19 +370,36 @@ function renderThumbnails( containerEl, collectionEl, items, indexState ) {
     const thumbs = [];
 
     for ( let i = 0; i < items.length; i++ ) {
-        const img = items[ i ].querySelector( 'img' );
-        if ( ! img ) continue;
-
         const btn = document.createElement( 'button' );
         btn.type = 'button';
         btn.className = 'fg-carousel-thumb';
         btn.setAttribute( 'aria-label', 'Go to slide ' + ( i + 1 ) );
 
-        const t = document.createElement( 'img' );
-        t.src = img.dataset.fgThumbSrc || img.getAttribute( 'src' );
-        t.alt = '';
-        t.loading = 'lazy';
-        btn.appendChild( t );
+        const isVideo = !! items[ i ].querySelector( '.fg-video' );
+        if ( isVideo ) {
+            btn.classList.add( 'fg-carousel-thumb--video' );
+        }
+
+        const thumbSrc = thumbSrcFor( items[ i ] );
+        if ( thumbSrc ) {
+            const t = document.createElement( 'img' );
+            t.src = thumbSrc;
+            t.alt = '';
+            t.loading = 'lazy';
+            btn.appendChild( t );
+        } else {
+            const placeholder = document.createElement( 'span' );
+            placeholder.className = 'fg-carousel-thumb-placeholder';
+            placeholder.setAttribute( 'aria-hidden', 'true' );
+            btn.appendChild( placeholder );
+        }
+
+        if ( isVideo ) {
+            const badge = document.createElement( 'span' );
+            badge.className = 'fg-carousel-thumb-badge';
+            badge.setAttribute( 'aria-hidden', 'true' );
+            btn.appendChild( badge );
+        }
 
         const itemIndex = i;
         btn.addEventListener( 'click', ( e ) => {
@@ -382,11 +443,14 @@ function renderThumbnails( containerEl, collectionEl, items, indexState ) {
     const updateActive = ( pageIndex ) => {
         const itemsPerView = readItemsPerView( collectionEl );
         const firstItemInPage = pageIndex * itemsPerView;
+        const lastItemInPage  = firstItemInPage + itemsPerView - 1;
         let activeBtn = null;
         for ( let i = 0; i < thumbs.length; i++ ) {
-            if ( i === firstItemInPage ) {
+            if ( i >= firstItemInPage && i <= lastItemInPage ) {
                 thumbs[ i ].classList.add( 'fg-is-active' );
-                activeBtn = thumbs[ i ];
+                if ( activeBtn === null ) {
+                    activeBtn = thumbs[ i ];
+                }
             } else {
                 thumbs[ i ].classList.remove( 'fg-is-active' );
             }

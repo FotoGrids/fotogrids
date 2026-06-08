@@ -69,6 +69,41 @@ final class Item_View {
          */
         public readonly ?int $full_width = null,
         public readonly ?int $full_height = null,
+        /**
+         * Item kind. 'image' for attachments that resolve to an image, or one
+         * of the video identifiers ('video_file', 'video_youtube',
+         * 'video_vimeo'). Drives the video render branch in Item_Renderer and
+         * the playback routing in the frontend modules.
+         */
+        public readonly string $item_type = 'image',
+        /**
+         * Poster image URL shown in the gallery grid for video items. Resolved
+         * through the poster chain (custom → WP poster → oEmbed → extracted
+         * frame → placeholder). Empty for image items, which use thumb_url.
+         */
+        public readonly string $poster_url = '',
+        /**
+         * Direct media URL for a Media Library video file (video_file items).
+         * Empty for images and for embed items, which carry embed_id instead.
+         */
+        public readonly string $video_src = '',
+        /**
+         * Embed provider slug for embed items ('youtube' | 'vimeo'). Empty for
+         * images and file videos.
+         */
+        public readonly string $embed_provider = '',
+        /**
+         * Platform video ID for embed items. Empty for images and file videos.
+         */
+        public readonly string $embed_id = '',
+        /**
+         * Per-item embed playback settings (autoplay, mute, loop, controls,
+         * start/end, etc.) as stored in fotogrids_item_meta.custom_data. Empty
+         * for images and file videos.
+         *
+         * @var array<string, mixed>
+         */
+        public readonly array $embed_settings = [],
     ) {}
 
     /**
@@ -102,6 +137,12 @@ final class Item_View {
             thumb_size: $changes['thumb_size'] ?? $this->thumb_size,
             full_width: $changes['full_width'] ?? $this->full_width,
             full_height: $changes['full_height'] ?? $this->full_height,
+            item_type: $changes['item_type'] ?? $this->item_type,
+            poster_url: $changes['poster_url'] ?? $this->poster_url,
+            video_src: $changes['video_src'] ?? $this->video_src,
+            embed_provider: $changes['embed_provider'] ?? $this->embed_provider,
+            embed_id: $changes['embed_id'] ?? $this->embed_id,
+            embed_settings: $changes['embed_settings'] ?? $this->embed_settings,
         );
     }
 }

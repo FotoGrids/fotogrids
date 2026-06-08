@@ -59,6 +59,8 @@ final class Render_Controller {
      * @return Render_Result
      */
     public function render( Render_Context $render ): Render_Result {
+        \FotoGrids\Watermark\Watermark_Render_Filter::begin( $render->meta->gallery_id );
+
         try {
             $render = Hooks::apply_filter( 'render_settings', $render, $render );
             Hooks::fire_action( 'before_render', $render );
@@ -231,6 +233,8 @@ final class Render_Controller {
                 show_inline_error: $show_inline_error,
                 http_status:       500
             );
+        } finally {
+            \FotoGrids\Watermark\Watermark_Render_Filter::end();
         }
     }
 

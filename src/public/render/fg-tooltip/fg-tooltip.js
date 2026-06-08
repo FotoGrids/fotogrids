@@ -97,7 +97,7 @@ function getTooltipEl( host ) {
     if ( ! tooltipEl ) {
         tooltipEl = document.createElement( 'div' );
         tooltipEl.id        = TOOLTIP_ID;
-        tooltipEl.className = 'fg-tooltip';
+        tooltipEl.className = 'fg-f-tooltip';
         tooltipEl.role      = 'tooltip';
         tooltipEl.hidden    = true;
         tooltipEl.setAttribute( 'aria-hidden', 'true' );
@@ -241,7 +241,7 @@ function showImmediately( host, label ) {
     el.textContent = label;
     el.hidden      = false;
     el.removeAttribute( 'aria-hidden' );
-    el.classList.add( 'fg-tooltip--visible' );
+    el.classList.add( 'fg-f-tooltip--visible' );
     position( host );
     activeHost = host;
 }
@@ -272,9 +272,9 @@ function reallyHide() {
 
     tooltipEl.hidden  = true;
     tooltipEl.setAttribute( 'aria-hidden', 'true' );
-    tooltipEl.classList.remove( 'fg-tooltip--visible' );
-    tooltipEl.classList.remove( 'fg-tooltip--interactive' );
-    tooltipEl.classList.remove( 'fg-tooltip--swapping' );
+    tooltipEl.classList.remove( 'fg-f-tooltip--visible' );
+    tooltipEl.classList.remove( 'fg-f-tooltip--interactive' );
+    tooltipEl.classList.remove( 'fg-f-tooltip--swapping' );
     tooltipEl.dataset.dir = '';
     // Clear any custom content so the next text tooltip starts clean.
     tooltipEl.textContent = '';
@@ -401,7 +401,7 @@ function showInteractive( host, contentEl, opts ) {
     // we do a fade-out → swap content → reposition → fade-in dance.
     // If the tooltip wasn't visible (e.g. opened via keyboard), we
     // skip the fade-out leg.
-    const wasVisible = el.classList.contains( 'fg-tooltip--visible' );
+    const wasVisible = el.classList.contains( 'fg-f-tooltip--visible' );
 
     const finishOpen = () => {
         // Swap content.
@@ -410,14 +410,14 @@ function showInteractive( host, contentEl, opts ) {
         // outer container (which carries the arrow + chrome) stays put
         // while only the inner crossfades.
         const inner = document.createElement( 'div' );
-        inner.className = 'fg-tooltip__inner';
+        inner.className = 'fg-f-tooltip__inner';
         inner.appendChild( contentEl );
         el.appendChild( inner );
 
-        el.classList.add( 'fg-tooltip--interactive' );
+        el.classList.add( 'fg-f-tooltip--interactive' );
         el.hidden = false;
         el.removeAttribute( 'aria-hidden' );
-        el.classList.add( 'fg-tooltip--visible' );
+        el.classList.add( 'fg-f-tooltip--visible' );
 
         // Reposition for the new content size. The outer tooltip's
         // width/height transition (set in fg-tooltip.scss) makes the
@@ -430,7 +430,7 @@ function showInteractive( host, contentEl, opts ) {
         // Fade inner content back in on next frame so the browser has
         // committed the size change before the opacity transition runs.
         requestAnimationFrame( () => {
-            inner.classList.add( 'fg-tooltip__inner--visible' );
+            inner.classList.add( 'fg-f-tooltip__inner--visible' );
         } );
     };
 
@@ -438,7 +438,7 @@ function showInteractive( host, contentEl, opts ) {
         // Fade-out leg. The inner content fades; the outer container
         // (background + arrow) stays on screen so the user sees a
         // continuous "morphing" tooltip rather than a flash.
-        el.classList.add( 'fg-tooltip--swapping' );
+        el.classList.add( 'fg-f-tooltip--swapping' );
         // Match the CSS fg-tt-swap-duration; if styles aren't loaded,
         // we fall through after 0ms.
         const SWAP_MS = 120;
@@ -446,7 +446,7 @@ function showInteractive( host, contentEl, opts ) {
         if ( interactiveSwapTimer !== null ) clearTimeout( interactiveSwapTimer );
         interactiveSwapTimer = setTimeout( () => {
             interactiveSwapTimer = null;
-            el.classList.remove( 'fg-tooltip--swapping' );
+            el.classList.remove( 'fg-f-tooltip--swapping' );
             // If something closed the popover during the morph window
             // (toggle re-click, programmatic hideInteractive, ...) we
             // skip finishOpen — the popover is gone.

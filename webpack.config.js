@@ -142,7 +142,8 @@ function discoverModuleEntries() {
     return entries;
 }
 
-module.exports = {
+const mainConfig = {
+    name: 'main',
     entry: {
         'admin': './src/assets/admin/src/index.js',
         'metabox': './src/assets/admin/src/metabox.js',
@@ -156,12 +157,16 @@ module.exports = {
         'filter-ui': './src/public/render/filters/features/ui/filter-ui.js',
         'filter-ui-styles': './src/public/render/filters/features/ui/filter-ui.scss',
         'sharing': './src/public/render/decorators/sharing/sharing.js',
+        'image-zoom': './src/public/render/decorators/image-zoom/image-zoom.js',
         'password-gate': './src/public/render/gates/password/password-gate.js',
         'lazy-load': './src/public/render/features/lazy-load/lazy-load.js',
         'layout-justified': './src/public/render/layouts/justified/justified.js',
         'layout-masonry': './src/public/render/layouts/masonry/masonry.js',
         'layout-slider': './src/public/render/layouts/slider/slider.js',
         'stats': './src/public/render/features/stats/stats.js',
+        'video-inline': './src/public/render/video/video-inline.js',
+        'video-lightbox-mini': './src/public/render/video/video-lightbox-mini.js',
+        'lightbox-mini': './src/public/render/lightbox-mini/lightbox-mini.js',
         'album-to-gallery-ajax': './src/public/render/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
         'collection-header': './src/public/render/features/collection-header/collection-header.js',
         'pagination-core': './src/public/render/features/pagination/pagination-core.js',
@@ -323,6 +328,38 @@ module.exports = {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');
                     },
+                    globOptions: {
+                        // The native Divi 5 bundle's BUILD-ARTIFACT dirs
+                        // (build/, styles/, modules-json/) are written into
+                        // dist/ exclusively by the `divi-native` config's
+                        // afterEmit mirror — including their index.php silence
+                        // files. Excluding them here guarantees a SINGLE writer
+                        // to those dist dirs. Two writers targeting the same
+                        // native/build dir is what broke the build: the copy
+                        // collided with the mirror's rmSync/cpSync, webpack
+                        // exited non-zero, and the dist sync to the live plugin
+                        // never completed — leaving stale frontend JS (items
+                        // stuck in data-fg-media-state="loading") and 404s on
+                        // the native bundle. The native PHP render classes
+                        // (native/php/*.php) and native/index.php are NOT
+                        // excluded — those still ship via this pattern.
+                        ignore: [
+                            '**/Divi/native/build/**',
+                            '**/Divi/native/styles/**',
+                            '**/Divi/native/modules-json/**',
+                        ],
+                    },
+                },
+                {
+                    // Bundled watermark fonts (TTF + licences). Referenced at
+                    // runtime by a PHP-emitted @font-face and by the server-side
+                    // watermark engine, so they are copied verbatim rather than
+                    // resolved through a webpack url() import.
+                    from: 'src/assets/fonts/**/*',
+                    to: ({ context, absoluteFilename }) => {
+                        const relativePath = path.relative(context, absoluteFilename);
+                        return relativePath.replace('src/', '');
+                    },
                 },
                 {
                     from: 'src/includes/rest/templates/templates/**/*.json',
@@ -348,7 +385,74 @@ module.exports = {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');
                     },
+                    // loading-icons-waapi.json stores one self-contained
+                    // `function animate(svg){...}` source string per icon, each
+                    // carrying the full shared helper block with its JSDoc and
+                    // inline comments. PHP emits the selected icon's string
+                    // verbatim as inline frontend JS, so those comments are dead
+                    // weight on both disk and the page. In production builds we
+                    // run each function string through Terser (comments off,
+                    // whitespace collapsed) before it lands in dist/. The
+                    // committed src/config copy is left untouched and readable.
+                    // Identifiers are preserved (no mangle/compress) so the
+                    // emitted JS stays one safe step from the source — the only
+                    // change is comment/whitespace removal.
+                    async transform(content, absoluteFilename) {
+                        if (
+                            !isProduction ||
+                            !absoluteFilename.endsWith('loading-icons-waapi.json')
+                        ) {
+                            return content;
+                        }
+
+                        const terser = require('terser');
+                        let map;
+                        try {
+                            map = JSON.parse(
+                                Buffer.isBuffer(content)
+                                    ? content.toString('utf8')
+                                    : String(content)
+                            );
+                        } catch (e) {
+                            console.warn(
+                                'loading-icons-waapi: parse failed, copying verbatim:',
+                                e.message
+                            );
+                            return content;
+                        }
+
+                        const out = {};
+                        for (const [name, fnSource] of Object.entries(map)) {
+                            try {
+                                const result = await terser.minify(String(fnSource), {
+                                    compress: false,
+                                    mangle: false,
+                                    format: { comments: false },
+                                });
+                                out[name] =
+                                    result && result.code ? result.code : fnSource;
+                            } catch (e) {
+                                console.warn(
+                                    'loading-icons-waapi: minify failed for',
+                                    name,
+                                    '- keeping original:',
+                                    e.message
+                                );
+                                out[name] = fnSource;
+                            }
+                        }
+
+                        return Buffer.from(JSON.stringify(out, null, 2), 'utf8');
+                    },
                 },
+                // NOTE: the native Divi 5 VB bundle (build/, styles/,
+                // modules-json/) is intentionally NOT copied here. It's built
+                // and mirrored into dist/ by the separate `divi-native`
+                // webpack config (see the second config in this array's
+                // export). Keeping it out of the `main` config means a
+                // native-side issue can never interfere with the front-end
+                // build — see the long note on `diviNativeConfig` for why
+                // that isolation matters (stuck `data-fg-media-state` bug).
                 {
                     from: 'src/fotogrids.php',
                     to: 'fotogrids.php',
@@ -373,7 +477,16 @@ module.exports = {
                         return relativePath.replace('src/', '');
                     },
                     globOptions: {
-                        ignore: ['**/*.php'],
+                        ignore: [
+                            '**/*.php',
+                            // Pricing page is disabled in our Freemius config
+                            // ('pricing' => false), so its React widget (~488KB)
+                            // is dead weight in the release zip.
+                            '**/freemius/assets/js/pricing/**',
+                            // .pot is a translation source artifact, not runtime;
+                            // compiled .mo locales are kept.
+                            '**/freemius/languages/*.pot',
+                        ],
                     },
                 },
                 {
@@ -469,6 +582,7 @@ module.exports = {
                             '**/fg-tooltip/fg-tooltip.js',
                             '**/internal/runtime/runtime.js',
                             '**/decorators/sharing/sharing.js',
+                            '**/decorators/image-zoom/image-zoom.js',
                             '**/gates/password/password-gate.js',
                             '**/features/lazy-load/lazy-load.js',
                             '**/layouts/justified/justified.js',
@@ -476,6 +590,9 @@ module.exports = {
                             '**/layouts/slider/slider.js',
                             '**/layouts/_helpers/**',
                             '**/features/stats/stats.js',
+                            '**/video/video-inline.js',
+                            '**/video/video-lightbox-mini.js',
+                            '**/lightbox-mini/lightbox-mini.js',
                             '**/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
                             '**/features/collection-header/collection-header.js',
                             '**/features/pagination/pagination-core.js',
@@ -590,3 +707,227 @@ module.exports = {
         poll: 1000,
     },
 };
+
+/**
+ * Native Divi 5 module bundle.
+ *
+ * The native module package (PageBuilders/builders/Divi/native/) is built
+ * as part of the plugin's own `npm run dev` / `npm run build` — there is no
+ * separate build step. Its VB bundle is fundamentally different from every
+ * other entry: it consumes Divi's own runtime (`@divi/*`), React, and a
+ * couple of WordPress packages off the `window.divi` / `vendor` / `wp`
+ * globals that Divi enqueues in the Visual Builder, so all of those are
+ * webpack `externals` and never bundled. Because they're externals, the
+ * `@divi/*` type packages are only needed for type-checking — we transpile
+ * with `transpileOnly` and skip them at build time.
+ *
+ * Output lands directly in the package's committed artifact dirs under
+ * `src/.../native/{build,styles,modules-json}`, and an afterEmit hook
+ * mirrors those into `dist/`.
+ *
+ * IMPORTANT: this config is intentionally INDEPENDENT of the `main` config
+ * — there is no `dependencies: ['divi-native']` coupling. webpack-cli runs
+ * a multi-config array as a multi-compiler, and if one config errors the
+ * whole run is treated as failed; with a dependency link, a failure (or
+ * even a transient dist permission error) in this native config would leave
+ * the main config's frontend bundles UNWRITTEN/STALE — which manifested as
+ * gallery items stuck in `data-fg-media-state="loading"` because the
+ * loading-icon JS never refreshed. Keeping the two configs decoupled means
+ * a native-side problem can never break the front-end build. The dist
+ * mirror below also makes this config self-sufficient, so it doesn't rely
+ * on the main config's copy pass or any build ordering.
+ */
+const diviNativeBase = path.resolve(
+    __dirname,
+    'src/includes/modules/PageBuilders/builders/Divi/native'
+);
+const diviNativeDistBase = path.resolve(
+    __dirname,
+    'dist/includes/modules/PageBuilders/builders/Divi/native'
+);
+
+const diviNativeConfig = {
+    name: 'divi-native',
+    context: diviNativeBase,
+    entry: {
+        bundle: './src/index.ts',
+    },
+    externals: {
+        // Third-party globals Divi already enqueues in the VB.
+        jquery: 'jQuery',
+        underscore: '_',
+        lodash: 'lodash',
+        react: ['vendor', 'React'],
+        'react-dom': ['vendor', 'ReactDOM'],
+
+        // WordPress runtime (read off Divi's `vendor.wp`).
+        '@wordpress/i18n': ['vendor', 'wp', 'i18n'],
+        '@wordpress/hooks': ['vendor', 'wp', 'hooks'],
+
+        // Divi runtime packages (read off `window.divi`).
+        '@divi/rest': ['divi', 'rest'],
+        '@divi/data': ['divi', 'data'],
+        '@divi/module': ['divi', 'module'],
+        '@divi/module-utils': ['divi', 'moduleUtils'],
+        '@divi/modal': ['divi', 'modal'],
+        '@divi/field-library': ['divi', 'fieldLibrary'],
+        '@divi/icon-library': ['divi', 'iconLibrary'],
+        '@divi/module-library': ['divi', 'moduleLibrary'],
+        '@divi/style-library': ['divi', 'styleLibrary'],
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        // The `@divi/*` types aren't installed (they're only
+                        // needed for type-checking, and the runtime is an
+                        // external), so transpile without type-checking.
+                        transpileOnly: true,
+                        compilerOptions: {
+                            // Self-contained: don't depend on the package's
+                            // tsconfig (which referenced the example repo).
+                            jsx: 'react',
+                            target: 'es2018',
+                            module: 'esnext',
+                            moduleResolution: 'node',
+                            allowJs: true,
+                            resolveJsonModule: true,
+                            esModuleInterop: true,
+                            allowSyntheticDefaultImports: true,
+                            noImplicitAny: false,
+                            skipLibCheck: true,
+                        },
+                    },
+                },
+            },
+            {
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                    },
+                },
+            },
+            {
+                test: /\.s?css$/i,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    { loader: 'css-loader', options: { url: false, importLoaders: 2 } },
+                    { loader: 'sass-loader', options: { api: 'modern', implementation: require('sass') } },
+                ],
+            },
+        ],
+    },
+    optimization: {
+        minimize: isProduction,
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                    compress: { drop_console: isProduction, drop_debugger: true },
+                    format: { comments: false },
+                },
+                extractComments: false,
+            }),
+        ],
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: '../styles/[name].css',
+        }),
+        // Emit `vb-bundle.css` as an identical sibling of `bundle.css`. The
+        // runtime enqueues a separate VB stylesheet handle; here the VB and
+        // front-end CSS are the same rules, so we duplicate the emitted asset
+        // rather than maintain a second source file. If the two ever diverge,
+        // split them into `style.scss` (VB) + `module.scss` (front end) and
+        // route via MiniCssExtractPlugin filenames instead.
+        {
+            apply(compiler) {
+                const { RawSource } = compiler.webpack.sources;
+                compiler.hooks.thisCompilation.tap('FgDuplicateVbCss', (compilation) => {
+                    compilation.hooks.processAssets.tap(
+                        {
+                            name: 'FgDuplicateVbCss',
+                            stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+                        },
+                        (assets) => {
+                            const src = '../styles/bundle.css';
+                            const dst = '../styles/vb-bundle.css';
+                            if (assets[src] && !assets[dst]) {
+                                compilation.emitAsset(
+                                    dst,
+                                    new RawSource(assets[src].source())
+                                );
+                            }
+                        }
+                    );
+                });
+            },
+        },
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    // Compiled module metadata: copied from each component's
+                    // module.json into modules-json/<name>/module.json, which
+                    // is what the PHP side passes to register_module().
+                    from: '**/module.json',
+                    context: 'src/components',
+                    to: path.resolve(diviNativeBase, 'modules-json'),
+                },
+            ],
+        }),
+        // Mirror the freshly-built artifacts from src/ into dist/ so the
+        // plugin folder a Local site serves is self-contained, including
+        // under `webpack --watch`. Runs on afterEmit (assets already on
+        // disk). Failures here are swallowed with a warning so a dist
+        // permission hiccup can never fail this config (which, in a
+        // multi-compiler run, must never be allowed to take the front-end
+        // build down with it).
+        {
+            apply(compiler) {
+                compiler.hooks.afterEmit.tapPromise('FgMirrorNativeToDist', async () => {
+                    for (const relDir of ['build', 'styles', 'modules-json']) {
+                        const from = path.resolve(diviNativeBase, relDir);
+                        const to = path.resolve(diviNativeDistBase, relDir);
+                        if (!fs.existsSync(from)) continue;
+                        try {
+                            fs.rmSync(to, { recursive: true, force: true });
+                            fs.mkdirSync(to, { recursive: true });
+                            fs.cpSync(from, to, { recursive: true });
+                        } catch (e) {
+                            console.warn(
+                                '[divi-native] could not mirror',
+                                relDir,
+                                'to dist (non-fatal):',
+                                e.message
+                            );
+                        }
+                    }
+                });
+            },
+        },
+    ],
+    resolve: {
+        extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+    },
+    output: {
+        filename: '[name].js',
+        path: path.resolve(diviNativeBase, 'build'),
+        clean: false,
+    },
+    devtool: isProduction ? false : 'source-map',
+    mode: isProduction ? 'production' : 'development',
+    watch: isDevelopment,
+    watchOptions: {
+        ignored: /node_modules/,
+        poll: 1000,
+    },
+    stats: { errorDetails: true },
+};
+
+module.exports = [mainConfig, diviNativeConfig];

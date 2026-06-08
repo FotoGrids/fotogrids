@@ -244,11 +244,18 @@ class Gallery_Data {
         $css_urls  = $resolver->get_css_asset_urls();
         $js_data   = $resolver->get_js_asset_data();
 
+        // Google Fonts are enqueued via wp_footer on a normal page load, but
+        // this unlock render happens in a separate REST request whose footer
+        // never reaches the visitor's already-loaded page. Return the combined
+        // fonts URL so the client can inject the <link> alongside the CSS/JS.
+        $fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
+
         return rest_ensure_response( array(
             'success'  => true,
             'html'     => $html,
             'css'      => $css_urls,
             'js'       => $js_data,
+            'fonts'    => $fonts_url,
             'remember' => $remember,
         ) );
     }
@@ -332,12 +339,14 @@ class Gallery_Data {
             $resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
             $css_urls = $resolver->get_css_asset_urls();
             $js_data  = $resolver->get_js_asset_data();
+            $fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
 
             return rest_ensure_response( array(
                 'success' => true,
                 'html'    => $html,
                 'css'     => $css_urls,
                 'js'      => $js_data,
+                'fonts'   => $fonts_url,
             ) );
         }
 
@@ -406,11 +415,14 @@ class Gallery_Data {
             : ( $page_size > 0 ? max( 1, (int) ceil( $total / $page_size ) ) : 1 );
         $has_more    = $page < $total_pages;
 
+        $fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
+
         return rest_ensure_response( array(
             'success'     => true,
             'html'        => $html,
             'css'         => $css_urls,
             'js'          => $js_data,
+            'fonts'       => $fonts_url,
             'page'        => $page,
             'page_size'   => $page_size,
             'total_pages' => $total_pages,

@@ -73,7 +73,20 @@ final class Lightbox_Decorator implements Decorator {
     public function decorate_items( array $collection_items, Render_Context $render_context ): array {
         $decorated = [];
 
+        $inline_video_playback =
+            ( $render_context->settings['video_playback_mode'] ?? 'inline' ) === 'inline';
+
         foreach ( $collection_items as $item_view ) {
+            // Video items set to inline playback are handled by the inline
+            // module's own click handler, so they must not receive the lightbox
+            // trigger wrapper (which would otherwise capture the click and open
+            // the lightbox instead of playing in place).
+            if ( $inline_video_playback
+                && \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type ) ) {
+                $decorated[] = $item_view;
+                continue;
+            }
+
             $wrapper_attrs = [
                 'href'                    => esc_url( $item_view->full_url ?: $item_view->thumb_url ),
                 'data-fg-lightbox-trigger' => '',

@@ -78,6 +78,62 @@
     }
 
     /**
+     * Inject the combined Google Fonts stylesheet for the unlocked gallery.
+     *
+     * On a normal page load the render pipeline enqueues this via wp_footer,
+     * but the unlock render happens in a separate REST request whose footer
+     * never reaches this already-loaded page — so a gallery whose captions use
+     * a custom Google Font would render unstyled. The unlock response carries
+     * the combined fonts URL; we add the <link> once, keyed by a fixed id so
+     * repeat unlocks on the same page don't duplicate it.
+     *
+     * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
+     */
+    function injectFontStylesheet( fontsUrl ) {
+        if ( ! fontsUrl || typeof fontsUrl !== 'string' ) return;
+
+        // Both the wp_enqueue_style handle and the wp_footer fallback emit the
+        // <link> with this id, so one check covers a font sheet already present
+        // from the original page render, a prior unlock, or another gallery.
+        const linkId = 'fotogrids-google-fonts-css';
+        if ( document.getElementById( linkId ) ) return;
+
+        const link = document.createElement( 'link' );
+        link.rel  = 'stylesheet';
+        link.id   = linkId;
+        link.href = fontsUrl;
+        document.head.appendChild( link );
+    }
+
+    /**
+     * Ask the browser to save the just-used gallery password.
+     *
+     * The form submits via fetch() and swaps the DOM in place — it never
+     * navigates — so browsers won't fire their native "save password?"
+     * prompt on their own. The Credential Management API lets us nudge it
+     * explicitly after a successful unlock. The credential is keyed on the
+     * per-gallery username (the hidden .fg-lock-user field) so the browser
+     * scopes the saved password to THIS gallery rather than the whole site.
+     *
+     * Best-effort only: unsupported browsers, insecure (non-HTTPS) origins,
+     * and user refusals all fail silently — unlocking already succeeded.
+     *
+     * @param {HTMLFormElement} form
+     */
+    function storeCredential( form ) {
+        try {
+            if ( ! window.PasswordCredential || ! navigator.credentials ) {
+                return;
+            }
+            const cred = new window.PasswordCredential( form );
+            navigator.credentials.store( cred ).catch( function () {} );
+        } catch ( _e ) {
+            // PasswordCredential( form ) throws if the form lacks the expected
+            // autocomplete fields, or on insecure origins. Non-fatal.
+        }
+    }
+
+    /**
      * Wire up a single lock form. Idempotent — repeat calls on the
      * same form are no-ops.
      *
@@ -149,8 +205,14 @@
                     return;
                 }
 
+                // Offer to save the password in the browser, scoped to this
+                // gallery. Must run while the form is still in the DOM, i.e.
+                // before the wrapper swap below.
+                storeCredential( form );
+
                 injectMissingStyles( data.css || {} );
                 injectMissingScripts( data.js || {} );
+                injectFontStylesheet( data.fonts || '' );
 
                 const html = data.html || '';
                 if ( ! html || ! wrapper ) {

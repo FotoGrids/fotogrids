@@ -103,6 +103,7 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Shadow\Shadow::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Spacing\Spacing::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Effects\Hover_Effects::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Image_Zoom\Image_Zoom::class );
         // Click-behavior decorators must run after all visual decorators so the
         // <a> wraps the fully-decorated item media. Only one of these will be
         // active at a time (each checks click_behavior in supports()).
@@ -134,6 +135,11 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Stats\Stats::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Css::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Js::class );
+        // Inline video playback — active when video_playback_mode is "inline".
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Inline::class );
+        // Minimal video lightbox — active when video_playback_mode is "lightbox"
+        // but the gallery's click behaviour is not the full lightbox.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Lightbox_Mini::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Lightbox\Lightbox::class );
         // Filter sources must be registered before Filter_UI so the feature can
         // call Module_Registry::active_modules('filter_sources', ...) during

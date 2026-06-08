@@ -781,13 +781,18 @@ function CollectionSettings() {
         }
 
         // condition_global: predicate resolved against a global settings
-        // store (sharing or seo) rather than sibling fields. Same shape as
-        // condition (dependsOn + values); dependsOn may be a dotted key
-        // (e.g. "networks.facebook"). The optional `source` field selects
+        // store (sharing, seo or watermark) rather than sibling fields. Same
+        // shape as condition (dependsOn + values); dependsOn may be a dotted
+        // key (e.g. "networks.facebook"). The optional `source` field selects
         // which global store to read - defaults to 'sharing' for back-compat.
         // Absent condition_global always passes.
         if (setting.condition_global) {
-            const source = setting.condition_global.source === 'seo' ? 'globalSeo' : 'globalSharing';
+            const GLOBAL_SOURCES = {
+                sharing: 'globalSharing',
+                seo: 'globalSeo',
+                watermark: 'globalWatermark',
+            };
+            const source = GLOBAL_SOURCES[setting.condition_global.source] || 'globalSharing';
             const globalState = window.fotogridsSettings?.[source] || {};
             const { dependsOn, values } = setting.condition_global;
 
@@ -1426,6 +1431,15 @@ function CollectionSettings() {
                 });
                 break;
 
+            case 'watermark_status':
+                control = window.FotoGridsRenderSettings?.renderWatermarkStatus(setting, currentValue, isDisabled, {
+                    __,
+                    postId: window.fotogridsSettings?.postId || 0,
+                    restUrl: window.fotogridsSettings?.restUrl || window.wpApiSettings?.root || '',
+                    restNonce: window.fotogridsSettings?.restNonce || window.wpApiSettings?.nonce || '',
+                });
+                break;
+
             case 'promo':
                 control = window.FotoGridsRenderSettings?.renderPromo(setting, currentValue, isDisabled, {
                     __
@@ -1440,6 +1454,13 @@ function CollectionSettings() {
 
             default:
                 return null;
+        }
+
+        // A null control means the renderer chose to show nothing (e.g. a
+        // status field with no pending state). Render no wrapper at all so an
+        // empty .fotogrids-setting row is not left in the DOM.
+        if (!control) {
+            return null;
         }
 
         const gatedControl = h(FieldGate, {

@@ -120,6 +120,84 @@ final class Gallery_Repository {
     }
 
     /**
+     * Persist a gallery's item-id list (mixed attachment + embed post IDs).
+     *
+     * @since 1.1.0
+     * @param int   $gallery_id Gallery post ID.
+     * @param int[] $item_ids   Ordered item IDs.
+     * @return void
+     */
+    public static function set_item_ids( int $gallery_id, array $item_ids ): void {
+        $clean = array_values( array_map( 'intval', $item_ids ) );
+        update_post_meta( $gallery_id, 'fotogrids_gallery_items', wp_json_encode( $clean ) );
+    }
+
+    /**
+     * Append an item ID to the end of a gallery's item list.
+     *
+     * No-op when the ID is already present.
+     *
+     * @since 1.1.0
+     * @param int $gallery_id Gallery post ID.
+     * @param int $item_id    Item ID (attachment or embed post).
+     * @return void
+     */
+    public static function append_item_id( int $gallery_id, int $item_id ): void {
+        $ids = self::get_item_ids( $gallery_id );
+        if ( in_array( $item_id, $ids, true ) ) {
+            return;
+        }
+        $ids[] = $item_id;
+        self::set_item_ids( $gallery_id, $ids );
+    }
+
+    /**
+     * Remove an item ID from a gallery's item list.
+     *
+     * @since 1.1.0
+     * @param int $gallery_id Gallery post ID.
+     * @param int $item_id    Item ID to remove.
+     * @return void
+     */
+    public static function remove_item_id( int $gallery_id, int $item_id ): void {
+        $ids = self::get_item_ids( $gallery_id );
+        $next = array_values( array_filter( $ids, static fn ( $id ) => (int) $id !== $item_id ) );
+        if ( count( $next ) !== count( $ids ) ) {
+            self::set_item_ids( $gallery_id, $next );
+        }
+    }
+
+    /**
+     * Find which gallery an embed post belongs to, by scanning item lists.
+     *
+     * Embeds are one-per-gallery, so this returns the first gallery whose item
+     * list contains the embed ID. Used to clean up the list on embed delete.
+     *
+     * @since 1.1.0
+     * @param int $embed_id Embed post ID.
+     * @return int Gallery ID, or 0 when none references it.
+     */
+    public static function find_gallery_for_embed( int $embed_id ): int {
+        global $wpdb;
+
+        $rows = $wpdb->get_col( $wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta}
+             WHERE meta_key = 'fotogrids_gallery_items'
+               AND meta_value LIKE %s",
+            '%' . $wpdb->esc_like( (string) $embed_id ) . '%'
+        ) );
+
+        foreach ( (array) $rows as $gallery_id ) {
+            $ids = self::get_item_ids( (int) $gallery_id );
+            if ( in_array( $embed_id, $ids, true ) ) {
+                return (int) $gallery_id;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * Count valid attachments referenced by a gallery's item list.
      *
      * Skips ids whose `get_post()` either returns null or is no longer an
@@ -136,9 +214,9 @@ final class Gallery_Repository {
         }
 
         $count = 0;
-        foreach ( $item_ids as $attachment_id ) {
-            $attachment = get_post( (int) $attachment_id );
-            if ( $attachment && $attachment->post_type === 'attachment' ) {
+        foreach ( $item_ids as $item_id ) {
+            $item = get_post( (int) $item_id );
+            if ( $item && in_array( $item->post_type, array( 'attachment', Embed_Store::POST_TYPE ), true ) ) {
                 $count++;
             }
         }

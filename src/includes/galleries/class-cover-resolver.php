@@ -12,6 +12,7 @@ namespace FotoGrids\Galleries;
 
 use FotoGrids\Gallery_Album_Relations;
 use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Galleries\Embed_Store;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -58,13 +59,20 @@ final class Cover_Resolver {
     /**
      * Resolve the cover-image attachment ID for a gallery.
      *
-     * Reads the gallery's `_thumbnail_id`. If it still points to an attachment
-     * that exists AND is still in the gallery's `fotogrids_gallery_items`,
-     * that ID wins. Otherwise the first valid item is returned.
+     * Reads the gallery's `_thumbnail_id`. If it still points to an image
+     * attachment that exists AND is still in the gallery's
+     * `fotogrids_gallery_items`, that ID wins. Otherwise the first image
+     * attachment is returned.
+     *
+     * This returns an attachment ID only — for callers that need a raw
+     * attachment (e.g. attachment-meta consumers). Video and embed covers do
+     * not have an attachment, so they are skipped here; use
+     * `descriptor_for_gallery()` / `url_for_collection()` when a poster URL is
+     * acceptable (the common case).
      *
      * @since 1.0.0
      * @param int $gallery_id Gallery post ID.
-     * @return int Attachment ID, or 0 when nothing resolves.
+     * @return int Attachment ID, or 0 when no image attachment resolves.
      */
     public static function for_gallery( int $gallery_id ): int {
         if ( $gallery_id <= 0 ) {
@@ -88,12 +96,131 @@ final class Cover_Resolver {
                 continue;
             }
             $attachment = get_post( $attachment_id );
-            if ( $attachment && $attachment->post_type === 'attachment' ) {
+            // Only an image attachment can serve as a raw-attachment cover; a
+            // video attachment has no image src (use the descriptor instead).
+            if ( $attachment
+                && $attachment->post_type === 'attachment'
+                && wp_attachment_is_image( $attachment_id ) ) {
                 return $attachment_id;
             }
         }
 
         return 0;
+    }
+
+    /**
+     * Resolve a cover descriptor for a gallery.
+     *
+     * Unlike for_gallery(), this returns the first displayable item of ANY kind
+     * so embed-only and video-only galleries get a cover. The descriptor's
+     * `url` is the image URL for an image attachment, or the resolved poster
+     * URL for a video / embed.
+     *
+     * @since 1.1.0
+     * @param int    $gallery_id Gallery post ID.
+     * @param string $size       Image size keyword for the resolved URL.
+     * @return array{kind:string, id:int, url:string} kind is 'attachment'|'embed'|'none'.
+     */
+    public static function descriptor_for_gallery( int $gallery_id, string $size = 'thumbnail' ): array {
+        $none = array( 'kind' => 'none', 'id' => 0, 'url' => '' );
+
+        if ( $gallery_id <= 0 ) {
+            return $none;
+        }
+
+        $item_ids = self::gallery_item_ids( $gallery_id );
+        if ( empty( $item_ids ) ) {
+            return $none;
+        }
+
+        $picked     = (int) get_post_thumbnail_id( $gallery_id );
+        $candidates = ( $picked > 0 && in_array( $picked, $item_ids, true ) )
+            ? array_merge( [ $picked ], $item_ids )
+            : $item_ids;
+
+        foreach ( $candidates as $item_id ) {
+            $item_id = (int) $item_id;
+            if ( $item_id <= 0 || ! in_array( $item_id, $item_ids, true ) ) {
+                continue;
+            }
+
+            $post = get_post( $item_id );
+            if ( ! $post ) {
+                continue;
+            }
+
+            if ( Embed_Store::POST_TYPE === $post->post_type ) {
+                $embed = Embed_Store::get( $item_id );
+                if ( null === $embed ) {
+                    continue;
+                }
+                $url = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+                    (string) $embed['item_type'],
+                    0,
+                    array(
+                        'thumbnail_url' => (string) $embed['thumbnail_url'],
+                        'poster_id'     => (int) $embed['poster_id'],
+                        'poster_url'    => (string) $embed['poster_url'],
+                    ),
+                    $size
+                );
+                if ( '' !== $url ) {
+                    return array( 'kind' => 'embed', 'id' => $item_id, 'url' => $url );
+                }
+                continue;
+            }
+
+            if ( 'attachment' !== $post->post_type ) {
+                continue;
+            }
+
+            // Image attachment: use its image URL directly.
+            if ( wp_attachment_is_image( $item_id ) ) {
+                $url = (string) ( wp_get_attachment_image_url( $item_id, $size ) ?: '' );
+                if ( '' !== $url ) {
+                    return array( 'kind' => 'attachment', 'id' => $item_id, 'url' => $url );
+                }
+                continue;
+            }
+
+            // Video-file attachment: resolve its poster.
+            $item_type = \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $item_id );
+            if ( \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE === $item_type ) {
+                $custom_data = self::attachment_custom_data( $item_id );
+                $url = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+                    $item_type,
+                    $item_id,
+                    $custom_data,
+                    $size
+                );
+                if ( '' !== $url ) {
+                    return array( 'kind' => 'attachment', 'id' => $item_id, 'url' => $url );
+                }
+            }
+        }
+
+        return $none;
+    }
+
+    /**
+     * Read the global custom_data row for a video attachment (for its poster).
+     *
+     * @since 1.1.0
+     * @param int $attachment_id Attachment ID.
+     * @return array<string, mixed>
+     */
+    private static function attachment_custom_data( int $attachment_id ): array {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+        $raw   = $wpdb->get_var( $wpdb->prepare(
+            "SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = 0 LIMIT 1",
+            $attachment_id
+        ) );
+        if ( empty( $raw ) ) {
+            return array();
+        }
+        $decoded = json_decode( (string) $raw, true );
+        return is_array( $decoded ) ? $decoded : array();
     }
 
     /**
@@ -159,13 +286,85 @@ final class Cover_Resolver {
      * @return string Cover image URL, or empty string when nothing resolves.
      */
     public static function url_for_collection( int $post_id, string $size = 'thumbnail' ): string {
-        $attachment_id = self::for_collection( $post_id );
-        if ( $attachment_id <= 0 ) {
-            return '';
+        return self::descriptor_for_collection( $post_id, $size )['url'];
+    }
+
+    /**
+     * Resolve a cover descriptor for a gallery or album.
+     *
+     * Poster-aware: yields a URL for image, video-file, and embed covers, so
+     * embed-only and video-only collections are never blank.
+     *
+     * @since 1.1.0
+     * @param int    $post_id Gallery or album post ID.
+     * @param string $size    Image size keyword for the URL.
+     * @return array{kind:string, id:int, url:string}
+     */
+    public static function descriptor_for_collection( int $post_id, string $size = 'thumbnail' ): array {
+        $none = array( 'kind' => 'none', 'id' => 0, 'url' => '' );
+
+        if ( $post_id <= 0 ) {
+            return $none;
         }
 
-        $url = wp_get_attachment_image_url( $attachment_id, $size );
-        return is_string( $url ) ? $url : '';
+        $post_type = get_post_type( $post_id );
+        if ( 'fotogrids_gallery' === $post_type ) {
+            return self::descriptor_for_gallery( $post_id, $size );
+        }
+        if ( 'fotogrids_album' === $post_type ) {
+            return self::descriptor_for_album( $post_id, $size );
+        }
+
+        return $none;
+    }
+
+    /**
+     * Resolve a cover descriptor for an album from its child galleries.
+     *
+     * @since 1.1.0
+     * @param int    $album_id Album post ID.
+     * @param string $size     Image size keyword for the URL.
+     * @return array{kind:string, id:int, url:string}
+     */
+    public static function descriptor_for_album( int $album_id, string $size = 'thumbnail' ): array {
+        $none = array( 'kind' => 'none', 'id' => 0, 'url' => '' );
+
+        if ( $album_id <= 0 ) {
+            return $none;
+        }
+
+        $galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id );
+        if ( empty( $galleries ) ) {
+            return $none;
+        }
+
+        $child_ids = [];
+        foreach ( $galleries as $gallery ) {
+            $gid = is_object( $gallery ) ? (int) ( $gallery->ID ?? $gallery->id ?? 0 ) : (int) $gallery;
+            if ( $gid > 0 ) {
+                $child_ids[] = $gid;
+            }
+        }
+        if ( empty( $child_ids ) ) {
+            return $none;
+        }
+
+        $picked = (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true );
+        if ( $picked > 0 && in_array( $picked, $child_ids, true ) ) {
+            $cover = self::descriptor_for_gallery( $picked, $size );
+            if ( 'none' !== $cover['kind'] ) {
+                return $cover;
+            }
+        }
+
+        foreach ( $child_ids as $gid ) {
+            $cover = self::descriptor_for_gallery( $gid, $size );
+            if ( 'none' !== $cover['kind'] ) {
+                return $cover;
+            }
+        }
+
+        return $none;
     }
 
     /**

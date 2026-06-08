@@ -17,6 +17,10 @@ const Select = ({
     // any valid CSS length string (e.g. '12rem'). When omitted the
     // trigger sizes to its container.
     width = null,
+    // Optional callback returning an inline style object for a given option,
+    // applied to both the dropdown option and the selected trigger value.
+    // Used e.g. to render each label in its own font family.
+    optionStyle = null,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -144,7 +148,12 @@ const Select = ({
                 onClick={handleToggle}
                 disabled={disabled}
             >
-                <span className="fotogrids-select__value">{displayText}</span>
+                <span
+                    className="fotogrids-select__value"
+                    style={selectedOption && optionStyle ? optionStyle(selectedOption) : undefined}
+                >
+                    {displayText}
+                </span>
                 <Icon name="chevron_down" className="fotogrids-select__icon" />
             </button>
 
@@ -174,6 +183,7 @@ const Select = ({
                                         key={optionIndex}
                                         type="button"
                                         className={`fotogrids-select__option ${value === option.value ? 'is-selected' : ''}`}
+                                        style={optionStyle ? optionStyle(option) : undefined}
                                         onClick={() => handleSelect(option)}
                                     >
                                         {option.label}
@@ -187,6 +197,7 @@ const Select = ({
                                 key={index}
                                 type="button"
                                 className={`fotogrids-select__option ${value === option.value ? 'is-selected' : ''}`}
+                                style={optionStyle ? optionStyle(option) : undefined}
                                 onClick={() => handleSelect(option)}
                             >
                                 {option.label}

@@ -70,7 +70,10 @@
                     "max": 365,
                     "condition": {
                         "dependsOn": "password_remember",
-                        "values": [true, "1"]
+                        "values": [
+                            true,
+                            "1"
+                        ]
                     },
                     "tier_required": "free",
                     "render_when_unlicensed": true,
@@ -89,366 +92,60 @@
             "label": "Watermark Generation",
             "settings": [
                 {
-                    "key": "enable_watermark",
+                    "key": "watermark_global_off_notice",
+                    "type": "info_block",
+                    "subtitle": "Watermarking is turned off site-wide",
+                    "message": "Watermarks are disabled in FotoGrids settings. Turn them on under <a href=\"admin.php?page=fotogrids-settings&tab=watermark\" target=\"_blank\" rel=\"noopener noreferrer\">FotoGrids → Settings → Watermark</a> to apply a watermark to this {postType.lower}.",
+                    "icon": "security",
+                    "button_label": "Open Watermark settings",
+                    "button_url": "admin.php?page=fotogrids-settings&tab=watermark",
+                    "full_width": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true,
+                    "condition_global": {
+                        "source": "watermark",
+                        "dependsOn": "enable_watermark",
+                        "values": [
+                            false
+                        ]
+                    }
+                },
+                {
+                    "key": "watermark_apply_to_collection",
                     "type": "toggle",
-                    "label": "Enable Watermark",
-                    "default": false,
+                    "label": "Apply watermark to this {postType}",
+                    "description": "The site-wide watermark is burned into this {postType.lower}'s images. Turn this off to leave this {postType.lower}'s images unwatermarked. Configure the watermark itself under <a href=\"admin.php?page=fotogrids-settings&tab=watermark\" target=\"_blank\" rel=\"noopener noreferrer\">FotoGrids → Settings → Watermark</a>.",
+                    "default": true,
                     "tier_required": "free",
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "watermark_type",
-                    "type": "button_group",
-                    "label": "Watermark Type",
-                    "options": [
-                        {
-                            "label": "Text",
-                            "value": "text",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Image",
-                            "value": "image",
-                            "tier_required": "pro_starter"
-                        }
-                    ],
-                    "default": "text",
-                    "condition": {
+                    "visible_when_uninstalled": true,
+                    "condition_global": {
+                        "source": "watermark",
                         "dependsOn": "enable_watermark",
                         "values": [
                             true,
                             "1"
                         ]
-                    },
+                    }
+                },
+                {
+                    "key": "watermark_status",
+                    "type": "watermark_status",
                     "tier_required": "free",
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "watermark_image_settings_group",
-                    "type": "setting_group",
-                    "label": "Image Settings",
-                    "condition": {
-                        "dependsOn": [
-                            "enable_watermark",
-                            "watermark_type"
-                        ],
-                        "values": [
-                            [
-                                true,
-                                "1"
-                            ],
-                            [
-                                "image"
-                            ]
-                        ]
-                    },
-                    "settings": [
-                        {
-                            "key": "watermark_image_url",
-                            "type": "text_input",
-                            "label": "Watermark Image URL",
-                            "default": "",
-                            "placeholder": "Enter image URL or upload",
-                            "tier_required": "pro_starter",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
-                        },
-                        {
-                            "key": "watermark_image_size",
-                            "type": "range",
-                            "label": "Image Size",
-                            "unit": "%",
-                            "min": 5,
-                            "max": 50,
-                            "default": 20,
-                            "tier_required": "pro_starter",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
-                        }
-                    ],
-                    "tier_required": "pro_starter",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "watermark_settings_subtabs",
-                    "type": "setting_subtabs",
-                    "label": "Watermark Settings",
-                    "condition": {
+                    "visible_when_uninstalled": true,
+                    "condition_global": {
+                        "source": "watermark",
                         "dependsOn": "enable_watermark",
                         "values": [
                             true,
                             "1"
                         ]
-                    },
-                    "subTabs": {
-                        "text_settings": {
-                            "id": "text_settings",
-                            "label": "Text Settings",
-                            "icon": "text",
-                            "condition": {
-                                "dependsOn": "watermark_type",
-                                "values": [
-                                    "text"
-                                ]
-                            },
-                            "settings": [
-                                {
-                                    "key": "watermark_text",
-                                    "type": "text_input",
-                                    "label": "Watermark Text",
-                                    "default": "\u00a9 Your Name",
-                                    "placeholder": "Enter watermark text",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_font_family",
-                                    "type": "font_family",
-                                    "label": "Font Family",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_font_size",
-                                    "type": "range",
-                                    "label": "Font Size",
-                                    "unit": "px",
-                                    "min": 12,
-                                    "max": 48,
-                                    "default": 24,
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_text_color",
-                                    "type": "button_group",
-                                    "label": "Text Color",
-                                    "options": [
-                                        {
-                                            "label": "Light",
-                                            "value": "light",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "label": "Dark",
-                                            "value": "dark",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "label": "Custom",
-                                            "value": "custom",
-                                            "tier_required": "pro_starter"
-                                        }
-                                    ],
-                                    "default": "light",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                }
-                            ]
-                        },
-                        "position_styling": {
-                            "id": "position_styling",
-                            "label": "Position & Styling",
-                            "icon": "styling",
-                            "settings": [
-                                {
-                                    "key": "watermark_position",
-                                    "type": "alignment_grid",
-                                    "label": "Position",
-                                    "options": [
-                                        {
-                                            "value": "top-left",
-                                            "icon": "dots_grid_top_left",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "top-center",
-                                            "icon": "dots_grid_top_center",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "top-right",
-                                            "icon": "dots_grid_top_right",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "center-left",
-                                            "icon": "dots_grid_center_left",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "center",
-                                            "icon": "dots_grid_center",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "center-right",
-                                            "icon": "dots_grid_center_right",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "bottom-left",
-                                            "icon": "dots_grid_bottom_left",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "bottom-center",
-                                            "icon": "dots_grid_bottom_center",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "value": "bottom-right",
-                                            "icon": "dots_grid_bottom_right",
-                                            "tier_required": "free"
-                                        }
-                                    ],
-                                    "default": "bottom-right",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_opacity",
-                                    "type": "range",
-                                    "label": "Opacity",
-                                    "unit": "%",
-                                    "min": 10,
-                                    "max": 100,
-                                    "default": 70,
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_margin",
-                                    "type": "responsive_range",
-                                    "label": "Margin",
-                                    "responsive": {
-                                        "desktop": {
-                                            "min": 0,
-                                            "max": 100,
-                                            "default": 20
-                                        },
-                                        "tablet": {
-                                            "min": 0,
-                                            "max": 80,
-                                            "default": 15
-                                        },
-                                        "mobile": {
-                                            "min": 0,
-                                            "max": 60,
-                                            "default": 10
-                                        }
-                                    },
-                                    "unit": "px",
-                                    "tier_required": "pro_starter",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                }
-                            ]
-                        },
-                        "advanced": {
-                            "id": "advanced",
-                            "label": "Advanced",
-                            "icon": "settings",
-                            "settings": [
-                                {
-                                    "key": "watermark_apply_to",
-                                    "type": "button_group",
-                                    "label": "Apply Watermark To",
-                                    "options": [
-                                        {
-                                            "label": "Full Images Only",
-                                            "value": "full",
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "label": "Thumbnails Only",
-                                            "value": "thumbnails",
-                                            "tier_required": "pro_starter"
-                                        },
-                                        {
-                                            "label": "Both",
-                                            "value": "both",
-                                            "tier_required": "pro_starter"
-                                        }
-                                    ],
-                                    "default": "full",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_repeat",
-                                    "type": "toggle",
-                                    "label": "Repeat Watermark",
-                                    "default": false,
-                                    "tier_required": "pro_starter",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "watermark_repeat_spacing",
-                                    "type": "responsive_range",
-                                    "label": "Repeat Spacing",
-                                    "responsive": {
-                                        "desktop": {
-                                            "min": 50,
-                                            "max": 500,
-                                            "default": 200
-                                        },
-                                        "tablet": {
-                                            "min": 40,
-                                            "max": 400,
-                                            "default": 150
-                                        },
-                                        "mobile": {
-                                            "min": 30,
-                                            "max": 300,
-                                            "default": 100
-                                        }
-                                    },
-                                    "unit": "px",
-                                    "condition": {
-                                        "dependsOn": "watermark_repeat",
-                                        "values": [
-                                            true,
-                                            "1"
-                                        ]
-                                    },
-                                    "tier_required": "pro_starter",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                }
-                            ]
-                        }
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                    }
                 }
             ],
             "tier_required": "free",

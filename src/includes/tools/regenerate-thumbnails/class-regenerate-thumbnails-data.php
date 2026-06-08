@@ -335,7 +335,10 @@ class Regenerate_Thumbnails_Data {
 			}
 			foreach ( $decoded as $id ) {
 				$id = (int) $id;
-				if ( $id > 0 ) {
+				// Only real image attachments can be regenerated; gallery item
+				// lists also contain video-file attachments and embed posts,
+				// which must be excluded from the regen set.
+				if ( $id > 0 && wp_attachment_is_image( $id ) ) {
 					$used[ $id ] = true;
 				}
 			}

@@ -52,15 +52,15 @@
         right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 12.5px;
+        font-size: 12px;
         color: var(--fg-text-tertiary);
         pointer-events: none;
     }
 
     &__help {
         margin: 6px 0 0;
-        font-size: 12.5px;
-        color: var(--fg-text-secondary);
+        font-size: 12px;
+        color: var(--fg-text-tertiary);
         line-height: 1.5;
     }
 }
@@ -157,7 +157,7 @@
 
     &__description {
         margin: 3px 0 0;
-        font-size: 12.5px;
+        font-size: 12px;
         color: var(--fg-text-secondary);
         line-height: 1.5;
     }

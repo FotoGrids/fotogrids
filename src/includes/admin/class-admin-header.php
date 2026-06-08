@@ -49,9 +49,18 @@ class FotoGrids_Admin_Header {
             return;
         }
 
-        $this->render_notice_bar();
+        // The Setup Wizard wants the FotoGrids brand bar for context, but
+        // not the upgrade notice bar (competes with its own footer) and not
+        // the Docs / Support / What's New links (the wizard is a focused
+        // first-run flow — we don't want to encourage navigation away).
+        $screen     = get_current_screen();
+        $is_wizard  = $screen && $screen->id === 'fotogrids_page_fotogrids-setup';
+
+        if ( ! $is_wizard ) {
+            $this->render_notice_bar();
+        }
         $this->render_screen_meta();
-        $this->render_header();
+        $this->render_header( array( 'show_links' => ! $is_wizard ) );
     }
 
     private function render_notice_bar() {
@@ -86,13 +95,15 @@ class FotoGrids_Admin_Header {
         <?php
     }
 
-    private function render_header() {
-        $logo_svg = $this->get_logo_svg();
+    private function render_header( array $args = array() ) {
+        $args      = array_merge( array( 'show_links' => true ), $args );
+        $logo_svg  = $this->get_logo_svg();
         ?>
         <div id="fotogrids-header" class="fotogrids-header">
             <div class="fotogrids-header-logo">
                 <?php echo $logo_svg; ?>
             </div>
+            <?php if ( $args['show_links'] ) : ?>
             <div class="fotogrids-links">
                 <a href="<?php echo esc_url( 'https://go.fotogrids.com/docs/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=header_links&utm_content=about_docs&utm_locale=' . get_locale() ); ?>" target="_blank" rel="noopener noreferrer" class="fotogrids-link fotogrids-link-docs">
                     <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -113,6 +124,7 @@ class FotoGrids_Admin_Header {
                     <?php esc_html_e( "What's New", 'fotogrids' ); ?>
                 </a>
             </div>
+            <?php endif; ?>
         </div>
         <?php
     }

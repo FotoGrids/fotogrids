@@ -79,6 +79,15 @@ class Admin_Init {
 
         add_submenu_page(
             'fotogrids',
+            __( 'FotoGrids Setup Wizard', 'fotogrids' ),
+            __( 'Setup Wizard', 'fotogrids' ),
+            'manage_fotogrids',
+            'fotogrids-setup',
+            array( __CLASS__, 'setup_wizard_page' )
+        );
+
+        add_submenu_page(
+            'fotogrids',
             __( 'Dashboard', 'fotogrids' ),
             __( 'Dashboard', 'fotogrids' ),
             'manage_fotogrids',
@@ -171,6 +180,11 @@ class Admin_Init {
         }
 
         remove_submenu_page( 'fotogrids', 'fotogrids' );
+
+        $current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+        if ( $current_page !== 'fotogrids-setup' ) {
+            remove_submenu_page( 'fotogrids', 'fotogrids-setup' );
+        }
     }
 
     /**
@@ -273,6 +287,13 @@ class Admin_Init {
             FOTOGRIDS_VERSION
         );
 
+        // @font-face rules for the bundled watermark fonts, so the Watermark
+        // settings font picker can preview each option in its own typeface.
+        wp_add_inline_style(
+            'fotogrids-admin',
+            \FotoGrids\Settings\Watermark_Settings_Store::font_face_css()
+        );
+
         // Localize script with data
         wp_localize_script( 'fotogrids-admin', 'fotogridsAdmin', array(
             'nonce' => wp_create_nonce( 'fotogrids_admin' ),
@@ -283,6 +304,7 @@ class Admin_Init {
             'apiUrl' => home_url( '/wp-json/' ),
             'generalSettings' => self::get_general_settings(),
             'sharingSettings' => \FotoGrids\Settings\Sharing_Settings_Store::get(),
+            'watermarkSettings' => \FotoGrids\Settings\Watermark_Settings_Store::get(),
             'seoSettings' => \FotoGrids\Settings\SEO_Settings_Store::get(),
             'viewSettings' => \FotoGrids\Settings\View_Settings_Store::get(),
             'currentUser' => wp_get_current_user(),
@@ -642,7 +664,9 @@ class Admin_Init {
 
         $pages_with_icon = array( 'stats', 'settings', 'license' );
         $show_icon = in_array( $page_id, $pages_with_icon );
-        $show_header = $page_id !== 'main';
+        // The Setup Wizard renders its own brand header inside the React
+        // tree, so suppress the default page header on that page.
+        $show_header = $page_id !== 'main' && $page_id !== 'setup';
 
         ?>
         <div class="wrap">
@@ -724,6 +748,18 @@ class Admin_Init {
      */
     public static function tools_page() {
         self::render_admin_page( 'tools' );
+    }
+
+    /**
+     * Setup Wizard admin page
+     *
+     * Hidden submenu (registered with a null parent slug) reached at
+     * ?page=fotogrids-setup. Renders a React mount point — the wizard UI is
+     * a self-contained tree in src/assets/admin/src/components/pages/SetupWizardPage.jsx
+     * and lives inside the existing admin.js bundle.
+     */
+    public static function setup_wizard_page() {
+        self::render_admin_page( 'setup' );
     }
 
     /**

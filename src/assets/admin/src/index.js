@@ -13,6 +13,7 @@ import PluginSettingsPage from './components/pages/PluginSettingsPage';
 import LicensePage from './components/pages/LicensePage';
 import ToolsPage from './components/pages/ToolsPage';
 import LibraryPage from './components/pages/LibraryPage';
+import SetupWizardPage from './components/pages/SetupWizardPage';
 
 /**
  * Mount a React component into a DOM container by ID, idempotently. No-ops
@@ -56,6 +57,7 @@ function initializeAdminPages() {
     renderComponent('fotogrids-license-page', LicensePage);
     renderComponent('fotogrids-tools-page', ToolsPage);
     renderComponent('fotogrids-library-page', LibraryPage);
+    renderComponent('fotogrids-setup-page', SetupWizardPage);
 }
 
 if (document.readyState === 'loading') {

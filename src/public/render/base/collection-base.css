@@ -12,6 +12,10 @@
     font-size: 12px;
 }
 
+.fotogrids-collection:focus {
+    outline: none;
+}
+
 .fg-item-hidden {
     visibility: hidden;
 }
@@ -44,6 +48,7 @@
     flex: inherit;
     cursor: var(--fg-hover-cursor-link, pointer);
     min-width: 0;
+    max-height: 100%;
     text-decoration: none;
 }
 
@@ -65,6 +70,57 @@
     width: 100%;
     height: auto;
     max-width: 100%;
+}
+
+/* Video items. The .fg-video wrapper holds a poster (image or placeholder)
+   and a play badge; the player is injected client-side on interaction. The
+   wrapper behaves like the picture/img above so layout sizing is shared. */
+.fotogrids-collection .fg-item-media .fg-video {
+    position: relative;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-poster {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-poster--placeholder {
+    aspect-ratio: var(--fg-item-aspect-ratio, 16 / 9);
+    background-color: #1d2327;
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+
+.fotogrids-collection .fg-item-media .fg-video-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 56px;
+    height: 56px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    transition: background 0.15s ease;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-badge::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 54%;
+    transform: translate(-50%, -50%);
+    border-style: solid;
+    border-width: 11px 0 11px 18px;
+    border-color: transparent transparent transparent #fff;
+}
+
+.fotogrids-collection .fg-item-media .fg-video:hover .fg-video-badge {
+    background: rgba(0, 0, 0, 0.75);
 }
 
 /* Box-and-fit layouts. Grid, Single Item, and Image Viewer give the media
@@ -89,6 +145,21 @@
     [data-fg-layout="single-item"],
     [data-fg-layout="image-viewer"]
 ) .fg-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--fg-item-fit, cover);
+}
+
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"]
+) .fg-item-media .fg-video,
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"]
+) .fg-item-media .fg-video-poster {
     width: 100%;
     height: 100%;
     object-fit: var(--fg-item-fit, cover);

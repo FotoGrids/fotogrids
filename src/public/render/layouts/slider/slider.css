@@ -43,10 +43,15 @@
     scrollbar-width: none;
     container-type: inline-size;
     container-name: fg-carousel-track-wrapper;
+    max-height: 100%;
 }
 
 [data-fg-carousel="1"] .fg-carousel-track-wrapper::-webkit-scrollbar {
     display: none;
+}
+
+[data-fg-layout="slider"][data-fg-height-mode="auto"] .fg-carousel-track-wrapper {
+    max-height: var( --fg-height-max, 100vh );
 }
 
 [data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track-wrapper {
@@ -98,6 +103,17 @@
 [data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track .fg-item {
     height: 100%;
     aspect-ratio: auto;
+}
+
+/* The image fills the item box and honours the Item Fit setting
+   (--fg-item-fit). Without this the image keeps its intrinsic height and
+   ignores both the box height and the Cover / Contain choice. */
+
+[data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media picture,
+[data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: var( --fg-item-fit, cover );
 }
 
 [data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track .fg-item .fg-item-media {
@@ -236,17 +252,21 @@
     background: rgba(0, 0, 0, 0.7);
 }
 
+[data-fg-carousel="1"] .fg-carousel-bullet:focus {
+    outline: none;
+}
+
 /* Counter — inside viewport, top-right corner overlay. */
 
 [data-fg-carousel="1"] .fg-carousel-viewport .fg-carousel-counter {
     position: absolute;
     top: 8px;
-    right: 12px;
+    right: 8px;
     padding: 4px 10px;
     background: rgba(0, 0, 0, 0.55);
     color: #fff;
     font-size: 12px;
-    border-radius: 12px;
+    border-radius: 4px;
     z-index: 2;
     pointer-events: none;
 }
@@ -311,6 +331,10 @@
     opacity: 1;
 }
 
+[data-fg-carousel="1"] .fg-carousel-thumb:focus {
+    outline: none;
+}
+
 [data-fg-carousel="1"] .fg-carousel-thumb img {
     display: block;
     width:  var(--fg-thumb-size-px, 60px);
@@ -347,4 +371,46 @@
 
 [data-fg-layout="slider"][data-fg-thumbs-location="left"] .fg-carousel-thumbs {
     order: -1;
+}
+
+/* Video thumbnails. Posterless videos get a placeholder fill; every video
+   thumb carries a small play badge so it reads as a video at a glance. */
+
+[data-fg-carousel="1"] .fg-carousel-thumb-placeholder {
+    display: block;
+    width:  var(--fg-thumb-size-px, 60px);
+    height: var(--fg-thumb-size-px, 60px);
+    background-color: #1d2327;
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+
+[data-fg-carousel="1"] .fg-carousel-thumb--video {
+    position: relative;
+}
+
+[data-fg-carousel="1"] .fg-carousel-thumb-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent #fff;
+    transform: translate(-40%, -50%);
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+    pointer-events: none;
+}
+
+/* Video items inside the slider. The .fg-video wrapper fills the item box
+   so the injected player (which replaces the poster on click) has a defined
+   height instead of collapsing. */
+
+[data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media .fg-video {
+    height: 100%;
+}
+
+[data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media .fg-video-poster {
+    height: 100%;
+    object-fit: var(--fg-item-fit, cover);
 }

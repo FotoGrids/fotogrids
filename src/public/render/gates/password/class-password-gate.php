@@ -192,11 +192,23 @@ final class Password_Gate implements Gate {
         /* translators: error shown when the visitor enters an incorrect gallery password */
         $error_text = esc_html__( 'Incorrect password. Please try again.', 'fotogrids' );
 
+        // Per-gallery credential identity. Browsers key saved passwords on
+        // (username + origin), so a hidden username field carrying a stable
+        // per-gallery token makes the browser store and autofill the password
+        // for THIS gallery specifically rather than offering one site-wide
+        // credential on every lock screen. It is visually hidden (not
+        // type="hidden") because credential managers ignore type="hidden"
+        // fields - they need a real, autocomplete="username" input in the form.
+        $credential_user = esc_attr( 'fotogrids-gallery-' . $gallery_id );
+
         $body_html = sprintf(
             '<form class="fg-lock-form" method="post"'
             . ' data-gallery-id="%1$d"'
             . ' data-unlock-url="%2$s"'
             . ' data-nonce="%3$s">'
+            . '<input class="fg-lock-user" type="text" name="fg_gallery_user"'
+            . ' value="%7$s" autocomplete="username" readonly tabindex="-1"'
+            . ' aria-hidden="true" />'
             . '<div class="fg-lock-input-wrap">'
             . '<input class="fg-lock-input" type="password" name="password" placeholder="%4$s" autocomplete="current-password" required />'
             . '<button class="fg-lock-submit" type="submit">%5$s</button>'
@@ -208,7 +220,8 @@ final class Password_Gate implements Gate {
             $nonce,
             $placeholder,
             $submit_label,
-            $error_text
+            $error_text,
+            $credential_user
         );
 
         $card = new Gate_Card(

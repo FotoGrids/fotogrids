@@ -7,314 +7,341 @@
     ],
     "settings": [
         {
-            "key": "interactions_zoom_group",
-            "type": "setting_group",
-            "label": "Image Zoom",
-            "settings": [
-                {
-                    "key": "interactions_zoom",
-                    "type": "toggle",
-                    "label": "Enable Zoom",
-                    "description": "Allow visitors to zoom into the image on hover or click.",
-                    "default": false,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "interactions_zoom_mode",
-                    "type": "button_group",
-                    "label": "Zoom Mode",
-                    "description": "How the zoom is triggered. Click mode replaces Item Click Behavior.",
-                    "options": [
-                        {
-                            "label": "Hover",
-                            "value": "hover",
-                            "icon": "hover",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Click",
-                            "value": "click",
-                            "icon": "click_alt",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "default": "hover",
-                    "condition": {
-                        "dependsOn": "interactions_zoom",
-                        "values": [
-                            true,
-                            "1"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "interactions_zoom_style",
-                    "type": "button_group",
-                    "label": "Zoom Style",
-                    "description": "Inline zooms inside the item. Popover opens a lightweight overlay above the page.",
-                    "options": [
-                        {
-                            "label": "Inline",
-                            "value": "inline",
-                            "icon": "scale_down",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Popover",
-                            "value": "popover",
-                            "icon": "scale_up",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "default": "inline",
-                    "condition": {
-                        "dependsOn": "interactions_zoom",
-                        "values": [
-                            true,
-                            "1"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "interactions_zoom_hover_delay",
-                    "type": "range",
-                    "label": "Hover Delay",
-                    "description": "Wait this long before opening the popover on hover.",
-                    "min": 0,
-                    "max": 2000,
-                    "step": 50,
-                    "default": 300,
-                    "unit": "ms",
-                    "condition": {
-                        "dependsOn": [
-                            "interactions_zoom",
-                            "interactions_zoom_mode",
-                            "interactions_zoom_style"
-                        ],
-                        "values": [
-                            [
-                                true,
-                                "1"
-                            ],
-                            [
-                                "hover"
-                            ],
-                            [
-                                "popover"
-                            ]
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "interactions_zoom_popover_group",
-                    "type": "setting_group",
-                    "label": "Popover Appearance",
-                    "condition": {
-                        "dependsOn": [
-                            "interactions_zoom",
-                            "interactions_zoom_style"
-                        ],
-                        "values": [
-                            [
-                                true,
-                                "1"
-                            ],
-                            [
-                                "popover"
-                            ]
-                        ]
-                    },
+            "key": "interactions_subtabs",
+            "type": "setting_subtabs",
+            "subTabs": {
+                "item_click_behavior": {
+                    "id": "item_click_behavior",
+                    "label": "Item Click Behavior",
+                    "icon": "click",
                     "settings": [
                         {
-                            "key": "interactions_zoom_popover_bg",
-                            "type": "color",
-                            "label": "Background Color",
-                            "default": "rgba(0, 0, 0, 0.2)",
-                            "tier_required": "free",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
-                        },
-                        {
-                            "key": "interactions_zoom_popover_bg_blur",
+                            "key": "item_click_behavior",
                             "type": "button_group",
-                            "label": "Background Blur Intensity",
+                            "label": "Item Click Behavior",
                             "options": [
                                 {
-                                    "label": "Light",
-                                    "value": 8,
+                                    "label": "Do Nothing",
+                                    "value": "nothing",
+                                    "icon": "click_nothing",
                                     "tier_required": "free"
                                 },
                                 {
-                                    "label": "Strong",
-                                    "value": 24,
+                                    "label": "Open in Lightbox",
+                                    "value": "lightbox",
+                                    "icon": "click_lightbox",
+                                    "tier_required": "free",
+                                    "on_change": {
+                                        "switch_tab": "lightbox"
+                                    }
+                                },
+                                {
+                                    "label": "Direct Link to Item",
+                                    "value": "direct",
+                                    "icon": "click_direct",
                                     "tier_required": "free"
                                 },
                                 {
-                                    "label": "None",
-                                    "value": 0,
+                                    "label": "External URL",
+                                    "value": "external",
+                                    "icon": "click_external",
                                     "tier_required": "free"
                                 }
                             ],
-                            "default": 8,
+                            "condition": {
+                                "any": [
+                                    {
+                                        "dependsOn": "interactions_zoom",
+                                        "values": [
+                                            false,
+                                            "0",
+                                            0
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "interactions_zoom_style",
+                                        "values": [
+                                            "inline"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "interactions_zoom_mode",
+                                        "values": [
+                                            "hover"
+                                        ]
+                                    }
+                                ]
+                            },
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
                         },
                         {
-                            "key": "interactions_zoom_popover_padding",
-                            "type": "range",
-                            "label": "Padding",
-                            "description": "Breathing room between the image and the viewport edges.",
-                            "min": 0,
-                            "max": 80,
-                            "default": 24,
-                            "unit": "px",
+                            "key": "external_link_target",
+                            "type": "hidden",
+                            "label": "Default Link Target",
+                            "options": [
+                                {
+                                    "label": "Same Tab",
+                                    "value": "_self",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "New Tab",
+                                    "value": "_blank",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "condition": {
+                                "dependsOn": "item_click_behavior",
+                                "values": [
+                                    "external"
+                                ]
+                            },
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
                         },
                         {
-                            "key": "interactions_zoom_popover_close_button",
-                            "type": "toggle",
-                            "label": "Show Close Button",
-                            "default": true,
-                            "tier_required": "free",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
-                        },
-                        {
-                            "key": "interactions_zoom_popover_click_outside_to_close",
-                            "type": "toggle",
-                            "label": "Click Outside to Close",
-                            "default": true,
+                            "key": "external_url_manager",
+                            "type": "external_url_manager",
+                            "label": "Item URLs",
+                            "condition": {
+                                "dependsOn": "item_click_behavior",
+                                "values": [
+                                    "external"
+                                ]
+                            },
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
                         }
-                    ],
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
+                    ]
+                },
+                "image_zoom": {
+                    "id": "image_zoom",
+                    "label": "Image Zoom",
+                    "icon": "zoom",
+                    "settings": [
+                        {
+                            "key": "interactions_zoom",
+                            "type": "toggle",
+                            "label": "Enable Zoom",
+                            "description": "Allow visitors to zoom into the image on hover or click.",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "interactions_zoom_style",
+                            "type": "button_group",
+                            "label": "Zoom Style",
+                            "description": "Inline zooms inside the item. Popover opens a lightweight overlay above the page.",
+                            "options": [
+                                {
+                                    "label": "Inline",
+                                    "value": "inline",
+                                    "icon": "scale_down",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Popover",
+                                    "value": "popover",
+                                    "icon": "scale_up",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "inline",
+                            "condition": {
+                                "dependsOn": "interactions_zoom",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "interactions_zoom_mode",
+                            "type": "button_group",
+                            "label": "Zoom Mode",
+                            "description": "How the popover zoom is triggered. Click mode replaces Item Click Behavior.",
+                            "options": [
+                                {
+                                    "label": "Hover",
+                                    "value": "hover",
+                                    "icon": "hover",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Click",
+                                    "value": "click",
+                                    "icon": "click_alt",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "hover",
+                            "condition": {
+                                "dependsOn": [
+                                    "interactions_zoom",
+                                    "interactions_zoom_style"
+                                ],
+                                "values": [
+                                    [
+                                        true,
+                                        "1"
+                                    ],
+                                    [
+                                        "popover"
+                                    ]
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "interactions_zoom_hover_delay",
+                            "type": "range",
+                            "label": "Hover Delay",
+                            "description": "Wait this long before opening the popover on hover.",
+                            "min": 0,
+                            "max": 2000,
+                            "step": 50,
+                            "default": 300,
+                            "unit": "ms",
+                            "condition": {
+                                "dependsOn": [
+                                    "interactions_zoom",
+                                    "interactions_zoom_mode",
+                                    "interactions_zoom_style"
+                                ],
+                                "values": [
+                                    [
+                                        true,
+                                        "1"
+                                    ],
+                                    [
+                                        "hover"
+                                    ],
+                                    [
+                                        "popover"
+                                    ]
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "interactions_zoom_popover_group",
+                            "type": "setting_group",
+                            "label": "Popover Appearance",
+                            "condition": {
+                                "dependsOn": [
+                                    "interactions_zoom",
+                                    "interactions_zoom_style"
+                                ],
+                                "values": [
+                                    [
+                                        true,
+                                        "1"
+                                    ],
+                                    [
+                                        "popover"
+                                    ]
+                                ]
+                            },
+                            "settings": [
+                                {
+                                    "key": "interactions_zoom_popover_bg",
+                                    "type": "color",
+                                    "label": "Background Color",
+                                    "default": "rgba(0, 0, 0, 0.2)",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "interactions_zoom_popover_bg_blur",
+                                    "type": "button_group",
+                                    "label": "Background Blur Intensity",
+                                    "options": [
+                                        {
+                                            "label": "Light",
+                                            "value": 8,
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Strong",
+                                            "value": 24,
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "None",
+                                            "value": 0,
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": 8,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "interactions_zoom_popover_padding",
+                                    "type": "range",
+                                    "label": "Padding",
+                                    "description": "Breathing room between the image and the viewport edges.",
+                                    "min": 0,
+                                    "max": 80,
+                                    "default": 24,
+                                    "unit": "px",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "interactions_zoom_popover_close_button",
+                                    "type": "toggle",
+                                    "label": "Show Close Button",
+                                    "default": true,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "interactions_zoom_popover_click_outside_to_close",
+                                    "type": "toggle",
+                                    "label": "Click Outside to Close",
+                                    "default": true,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
                 }
-            ],
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "item_click_behavior",
-            "type": "button_group",
-            "label": "Item Click Behavior",
-            "options": [
-                {
-                    "label": "Do Nothing",
-                    "value": "nothing",
-                    "icon": "click_nothing",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Open in Lightbox",
-                    "value": "lightbox",
-                    "icon": "click_lightbox",
-                    "tier_required": "free",
-                    "on_change": {
-                        "switch_tab": "lightbox"
-                    }
-                },
-                {
-                    "label": "Direct Link to Item",
-                    "value": "direct",
-                    "icon": "click_direct",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "External URL",
-                    "value": "external",
-                    "icon": "click_external",
-                    "tier_required": "free"
-                }
-            ],
-            "condition": {
-                "any": [
-                    {
-                        "dependsOn": "interactions_zoom",
-                        "values": [
-                            false,
-                            "0",
-                            0
-                        ]
-                    },
-                    {
-                        "dependsOn": "interactions_zoom_mode",
-                        "values": [
-                            "hover"
-                        ]
-                    }
-                ]
-            },
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "external_link_target",
-            "type": "hidden",
-            "label": "Default Link Target",
-            "options": [
-                {
-                    "label": "Same Tab",
-                    "value": "_self",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "New Tab",
-                    "value": "_blank",
-                    "tier_required": "free"
-                }
-            ],
-            "condition": {
-                "dependsOn": "item_click_behavior",
-                "values": [
-                    "external"
-                ]
-            },
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "external_url_manager",
-            "type": "external_url_manager",
-            "label": "Item URLs",
-            "condition": {
-                "dependsOn": "item_click_behavior",
-                "values": [
-                    "external"
-                ]
             },
             "tier_required": "free",
             "render_when_unlicensed": true,

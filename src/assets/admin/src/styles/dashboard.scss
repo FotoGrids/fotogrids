@@ -1,35 +1,6 @@
 @use 'colors' as *;
 @use 'colors' as *;
 
-body[class*="fotogrids_page_fotogrids-dashboard"] {
-	#fotogrids-header {
-		border-bottom: 0;
-		padding: 32px 32px 16px;
-		position: relative;
-
-		.fotogrids-header-logo svg {
-			width: 240px;
-		}
-	}
-
-	#wpcontent {
-		&::before {
-			content: '';
-			position: absolute;
-			width: 720px;
-			height: 240px;
-			inset: 0;
-			z-index: -1;
-			clip-path: polygon(0 0, 0% 100%, 100% 0);
-			background: white;
-		}
-	}
-
-	#fotogrids-main-page.fotogrids-admin-page {
-		padding: 14px 32px 32px;
-	}
-}
-
 .fotogrids-dashboard {
     .fotogrids-dashboard-header {
         display: flex;

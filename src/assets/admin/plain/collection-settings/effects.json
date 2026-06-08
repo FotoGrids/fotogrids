@@ -1,7 +1,7 @@
 {
     "id": "effects",
     "label": "Effects",
-    "icon": "effects",
+    "icon": "magic",
     "settings": [
         {
             "key": "effects_section",
@@ -312,7 +312,7 @@
                                 {
                                     "label": "Zoom In",
                                     "value": "zoom-in",
-                                    "icon": "cursor_zoom",
+                                    "icon": "zoom",
                                     "tier_required": "free"
                                 },
                                 {

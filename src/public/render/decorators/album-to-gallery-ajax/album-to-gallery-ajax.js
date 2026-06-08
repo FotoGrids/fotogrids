@@ -119,6 +119,31 @@
     }
 
     /**
+     * Inject the combined Google Fonts stylesheet for the swapped-in gallery.
+     *
+     * The render pipeline normally enqueues this via wp_footer, but this AJAX
+     * render happens in a separate REST request whose footer never reaches the
+     * already-loaded album page — so a gallery whose captions use a custom
+     * Google Font would render unstyled after the swap. The render response
+     * carries the combined fonts URL; we add the <link> once, keyed by the
+     * standard id so we never duplicate a sheet the page already has.
+     *
+     * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
+     */
+    function injectFontStylesheet( fontsUrl ) {
+        if ( ! fontsUrl || typeof fontsUrl !== 'string' ) return;
+
+        const linkId = 'fotogrids-google-fonts-css';
+        if ( document.getElementById( linkId ) ) return;
+
+        const link = document.createElement( 'link' );
+        link.rel  = 'stylesheet';
+        link.id   = linkId;
+        link.href = fontsUrl;
+        document.head.appendChild( link );
+    }
+
+    /**
      * Resolve the album wrapper that owns a trigger. Used as the target
      * container for the swap.
      *
@@ -188,6 +213,7 @@
 
                 injectMissingStyles( data.css || {} );
                 injectMissingScripts( data.js || {} );
+                injectFontStylesheet( data.fonts || '' );
 
                 // Stash the album's original HTML before the swap so the
                 // in-place Back button (rendered inside the swapped-in

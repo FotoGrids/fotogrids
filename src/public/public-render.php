@@ -344,6 +344,9 @@ class Public_Render {
         if ( $atts['_source'] === Request_Source::ELEMENTOR->value ) {
             $source = Request_Source::ELEMENTOR;
         }
+        if ( $atts['_source'] === Request_Source::DIVI->value ) {
+            $source = Request_Source::DIVI;
+        }
         if ( $atts['_source'] === Request_Source::ALBUM_AJAX->value ) {
             $source = Request_Source::ALBUM_AJAX;
         }

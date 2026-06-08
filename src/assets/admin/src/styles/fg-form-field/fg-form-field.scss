@@ -9,7 +9,7 @@
 
 .fg-form-field {
     display: grid;
-    gap: 0;
+    gap: 6px;
     align-items: start;
     margin-bottom: 0;
 
@@ -17,7 +17,7 @@
         padding: 0;
         font-weight: 600;
         color: var(--fg-text-primary);
-        font-size: 14px;
+        font-size: 13px;
         line-height: 40px;
         display: flex;
         align-items: center;
@@ -97,7 +97,7 @@
     // Column layout: label on top, control below
     &--layout-column {
         grid-template-columns: 1fr;
-        gap: 4px;
+        gap: 6px;
 
         .fg-form-field__label {
             line-height: 1.4;

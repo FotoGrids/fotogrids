@@ -62,6 +62,7 @@ final class Collection_Settings_Assets {
         'renderInfoBlock',
         'renderTokenSelect',
         'renderCacheStatus',
+        'renderWatermarkStatus',
         'renderImagePicker',
     ];
 

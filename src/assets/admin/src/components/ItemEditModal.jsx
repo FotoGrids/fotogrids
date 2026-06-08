@@ -77,6 +77,8 @@ const ItemEditModal = ({
     const [originalMetadata, setOriginalMetadata] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [videoSettings, setVideoSettings] = useState({});
+    const [originalVideoSettings, setOriginalVideoSettings] = useState({});
 
     useEffect(() => {
         if (itemData) {
@@ -94,7 +96,33 @@ const ItemEditModal = ({
             setOriginalData(initialFormData);
             setHasChanges(false);
             setSaveSuccess(false);
+
+            // Seed video settings from custom_data for Media Library videos.
+            if (itemData.item_type === 'video_file') {
+                const cd = itemData.custom_data || {};
+                const initialVideo = {
+                    autoplay:   !!cd.autoplay,
+                    mute:       !!cd.mute,
+                    loop:       !!cd.loop,
+                    controls:   cd.controls === undefined ? true : !!cd.controls,
+                    poster_id:  cd.poster_id || 0,
+                    poster_url: cd.poster_url || '',
+                    poster_preview: itemData.poster_url || cd.poster_url || '',
+                };
+                setVideoSettings(initialVideo);
+                setOriginalVideoSettings(initialVideo);
+            } else {
+                setVideoSettings({});
+                setOriginalVideoSettings({});
+            }
+
+            // The Video tab only exists for video files; if we navigated away
+            // from a video while it was active, fall back to Details.
+            if (activeTab === 'video' && itemData.item_type !== 'video_file') {
+                setActiveTab('details');
+            }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [itemData]);
 
     useEffect(() => {
@@ -118,8 +146,12 @@ const ItemEditModal = ({
             originalMetadata.people.some(person => !metadata.people.find(p => p.id === person.id)) ||
             (originalMetadata.locations[0]?.id !== metadata.locations[0]?.id);
 
-        setHasChanges(formDataChanged || metadataChanged);
-    }, [formData, originalData, metadata, originalMetadata]);
+        const videoChanged = ['autoplay', 'mute', 'loop', 'controls', 'poster_id', 'poster_url'].some(
+            key => (originalVideoSettings[key] ?? '') !== (videoSettings[key] ?? '')
+        );
+
+        setHasChanges(formDataChanged || metadataChanged || videoChanged);
+    }, [formData, originalData, metadata, originalMetadata, videoSettings, originalVideoSettings]);
 
     const loadItemMetadata = async () => {
         try {
@@ -258,6 +290,18 @@ const ItemEditModal = ({
                 payload[key] = serialize(metadata);
             });
 
+            // Video items send their poster + playback settings for custom_data.
+            if (itemData?.item_type === 'video_file') {
+                payload.video_settings = {
+                    autoplay:   !!videoSettings.autoplay,
+                    mute:       !!videoSettings.mute,
+                    loop:       !!videoSettings.loop,
+                    controls:   videoSettings.controls === undefined ? true : !!videoSettings.controls,
+                    poster_id:  videoSettings.poster_id || 0,
+                    poster_url: videoSettings.poster_url || '',
+                };
+            }
+
             const response = await fetch(
                 `${window.wpApiSettings.root}fotogrids/v1/items/${itemId}/save`,
                 {
@@ -279,6 +323,7 @@ const ItemEditModal = ({
                     people: [...metadata.people],
                     locations: [...metadata.locations]
                 });
+                setOriginalVideoSettings({ ...videoSettings });
 
                 setHasChanges(false);
                 setSaving(false);
@@ -387,6 +432,8 @@ const ItemEditModal = ({
                         addMetadataItem={addMetadataItem}
                         removeMetadataItem={removeMetadataItem}
                         selectExistingMetadata={selectExistingMetadata}
+                        videoSettings={videoSettings}
+                        setVideoSettings={setVideoSettings}
                         strings={strings}
                     />
                 </Modal.Main>

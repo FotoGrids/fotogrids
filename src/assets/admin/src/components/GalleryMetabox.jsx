@@ -40,6 +40,7 @@ const GalleryMetabox = ({
     const [items, setItems] = useState(Array.isArray(galleryItems) ? galleryItems : []);
     const [showModal, setShowModal] = useState(false);
     const [showVideoEmbedModal, setShowVideoEmbedModal] = useState(false);
+    const [editingEmbed, setEditingEmbed] = useState(null);
     const [showClearAllModal, setShowClearAllModal] = useState(false);
     const [clearAllConfirmValue, setClearAllConfirmValue] = useState('');
     const [clearAllDeleteCustomData, setClearAllDeleteCustomData] = useState(false);
@@ -406,26 +407,66 @@ const GalleryMetabox = ({
         await saveFeaturedItem(nextItemId);
     }, [saveFeaturedItem]);
 
+    /**
+     * Delete a virtual embed item row via REST. Embeds are not part of the
+     * gallery's post-meta item list, so they require an explicit delete.
+     */
+    const deleteEmbedItem = useCallback(async (embedId) => {
+        const restBase  = window.wpApiSettings?.root || '/wp-json/';
+        const restNonce = window.wpApiSettings?.nonce || '';
+
+        try {
+            const response = await fetch(
+                `${restBase}fotogrids/v1/items/embed/${embedId}`,
+                {
+                    method:  'DELETE',
+                    headers: { 'X-WP-Nonce': restNonce },
+                }
+            );
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.message || `HTTP ${response.status}`);
+            }
+        } catch (err) {
+            console.error('[FotoGrids] Failed to delete video embed', err);
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(strings.videoEmbedRemoveFailed || 'Failed to remove the video.');
+            }
+        }
+    }, [strings]);
+
     // Remove item. We never auto-promote a different item to featured —
     // the runtime resolver handles that fallback. We just clear the
     // explicit featured choice when the user removes the featured item.
     const removeItem = useCallback((itemId) => {
         let needsClear = false;
+        let removedEmbed = null;
         setItems(prevItems => {
             const itemToRemove = prevItems.find(item => item.id === itemId);
             needsClear = !!itemToRemove?.featured;
+            const itemType = itemToRemove?.item_type || 'image';
+            if (itemType === 'video_youtube' || itemType === 'video_vimeo') {
+                removedEmbed = itemToRemove;
+            }
             const remainingItems = prevItems.filter(img => img.id !== itemId);
 
-            if (State) {
+            // Embeds are not in the State manager's attachment list, so only
+            // attachment-backed items are removed from it.
+            if (State && !removedEmbed) {
                 State.items.removeItem(String(itemId));
             }
 
             return remainingItems;
         });
+        // Embeds persist as item_meta rows independent of gallery save, so
+        // removing one from the grid must delete its row via REST.
+        if (removedEmbed) {
+            deleteEmbedItem(itemId);
+        }
         if (needsClear) {
             saveFeaturedItem(null);
         }
-    }, [saveFeaturedItem]);
+    }, [saveFeaturedItem, deleteEmbedItem]);
 
     // Clear all items
     const closeClearAllModal = useCallback(() => {
@@ -532,9 +573,20 @@ const GalleryMetabox = ({
     }, [ajaxUrl, nonce, strings]);
 
     const openItemModal = useCallback(async (itemId) => {
+        // Video embeds are virtual item_meta rows, not attachments, so the
+        // attachment-only item-data endpoint can't load them. Route them to
+        // the embed modal in edit mode instead of the standard item editor.
+        const clicked = items.find(it => it.id === itemId);
+        const itemType = clicked?.item_type || 'image';
+        if (itemType === 'video_youtube' || itemType === 'video_vimeo') {
+            setEditingEmbed(clicked);
+            setShowVideoEmbedModal(true);
+            return;
+        }
+
         setShowModal(true);
         await loadItemData(itemId);
-    }, [loadItemData]);
+    }, [items, loadItemData]);
 
     // Navigate between items in modal
     const navigateItem = useCallback(async (direction) => {
@@ -595,6 +647,14 @@ const GalleryMetabox = ({
         const restNonce = window.wpApiSettings?.nonce || '';
         const galleryId = window.fotogridsMetaBoxes?.postId || '';
 
+        // The modal carries a UI-facing source ('youtube' | 'vimeo'); the REST
+        // endpoint expects the canonical item_type identifier
+        // ('video_youtube' | 'video_vimeo'). Map it before sending so the
+        // create_embed handler recognises the source.
+        const canonicalSource = embedForm.source === 'vimeo'
+            ? 'video_vimeo'
+            : 'video_youtube';
+
         const response = await fetch(
             `${restBase}fotogrids/v1/items/embed`,
             {
@@ -606,6 +666,7 @@ const GalleryMetabox = ({
                 body: JSON.stringify({
                     gallery_id: galleryId,
                     ...embedForm,
+                    source: canonicalSource,
                 }),
             }
         );
@@ -624,26 +685,92 @@ const GalleryMetabox = ({
         const newItem = {
             id:          data.id,
             item_type:   data.item_type,
-            title:       data.title  || embedForm.title  || 'Video',
+            title:       data.caption || embedForm.caption || embedForm.title || 'Video',
             thumbnail:   data.thumbnail_url || '',
-            alt:         data.title  || '',
+            alt:         embedForm.caption || '',
             featured:    false,
-            // carry embed meta so the grid can render the badge
             source:      embedForm.source,
+            // Full embed payload so re-opening the item prefills the edit modal.
+            embed: {
+                caption:       embedForm.caption || '',
+                embed_url:     embedForm.url || '',
+                video_id:      embedForm.videoId || '',
+                thumbnail_url: data.thumbnail_url || '',
+                settings:      data.custom_data || {},
+            },
         };
 
-        setItems(prevItems => {
-            const updatedItems = [...prevItems, newItem];
-
-            if (State) {
-                State.items.setItems(updatedItems.map(i => String(i.id)).filter(Boolean));
-            }
-
-            return updatedItems;
-        });
+        // Embeds are not part of the State manager's attachment list; appending
+        // them locally keeps the grid in sync without touching that list.
+        setItems(prevItems => [...prevItems, newItem]);
 
         if (window.fotogridsToast) {
             window.fotogridsToast.success(strings.videoEmbedAdded);
+        }
+    }, [strings]);
+
+    /**
+     * Called by VideoEmbedModal when editing an existing embed. PUTs to the
+     * embed update endpoint and refreshes the item in the grid.
+     */
+    const handleUpdateVideoEmbed = useCallback(async (embedForm) => {
+        const restBase  = window.wpApiSettings?.root || '/wp-json/';
+        const restNonce = window.wpApiSettings?.nonce || '';
+        const embedId   = embedForm.id;
+
+        const canonicalSource = embedForm.source === 'vimeo'
+            ? 'video_vimeo'
+            : 'video_youtube';
+
+        const response = await fetch(
+            `${restBase}fotogrids/v1/items/embed/${embedId}`,
+            {
+                method:  'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce':   restNonce,
+                },
+                body: JSON.stringify({
+                    ...embedForm,
+                    source: canonicalSource,
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            const msg = err.message || `HTTP ${response.status}`;
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(msg);
+            }
+            throw new Error(msg);
+        }
+
+        const data = await response.json();
+
+        setItems(prevItems => prevItems.map(it => {
+            if (it.id !== embedId) {
+                return it;
+            }
+            return {
+                ...it,
+                item_type: data.item_type,
+                title:     data.caption || 'Video',
+                thumbnail: data.thumbnail_url || it.thumbnail,
+                alt:       data.caption || '',
+                source:    embedForm.source,
+                embed: {
+                    caption:       data.caption || '',
+                    embed_url:     embedForm.url || '',
+                    video_id:      (data.custom_data && data.custom_data.video_id) || '',
+                    thumbnail_url: data.thumbnail_url || '',
+                    settings:      data.custom_data || {},
+                },
+            };
+        }));
+
+        if (window.fotogridsToast) {
+            window.fotogridsToast.success(strings.videoEmbedUpdated || strings.videoEmbedAdded);
         }
     }, [strings]);
 
@@ -702,14 +829,38 @@ const GalleryMetabox = ({
 
         return (
             <div id="fotogrids-items-grid" className="fotogrids-sortable">
-                {items.map((item) => (
-                    <div key={item.id} className="fotogrids-item-item" data-id={item.id} draggable="true">
-                        <img
-                            src={item.thumbnail}
-                            alt={item.alt}
-                            onClick={() => openItemModal(item.id)}
-                            style={{ cursor: 'pointer' }}
-                        />
+                {items.map((item) => {
+                    const itemType = typeof item.item_type === 'string' ? item.item_type : 'image';
+                    const isVideo  = itemType.indexOf('video') === 0;
+
+                    return (
+                    <div
+                        key={item.id}
+                        className={`fotogrids-item-item${isVideo ? ' fotogrids-item-item--video' : ''}`}
+                        data-id={item.id}
+                        data-item-type={item.item_type || 'image'}
+                        draggable="true"
+                    >
+                        {item.thumbnail ? (
+                            <img
+                                src={item.thumbnail}
+                                alt={item.alt}
+                                onClick={() => openItemModal(item.id)}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        ) : (
+                            <div
+                                className="fotogrids-item-thumb-placeholder"
+                                onClick={() => openItemModal(item.id)}
+                                style={{ cursor: 'pointer' }}
+                                aria-label={item.alt || item.title}
+                            />
+                        )}
+                        {isVideo && (
+                            <span className="fotogrids-item-video-badge" aria-hidden="true">
+                                <Icon name="play" />
+                            </span>
+                        )}
                         <div className={`fotogrids-item-featured ${item.featured ? 'is-featured' : ''}`}>
                             <Tooltip content={item.featured ? strings.clearFeatured : strings.setAsFeatured} position="top">
                                 <button
@@ -754,7 +905,8 @@ const GalleryMetabox = ({
                             value={item.id}
                         />
                     </div>
-                ))}
+                    );
+                })}
             </div>
         );
     };
@@ -890,11 +1042,13 @@ const GalleryMetabox = ({
                 />
             )}
 
-            {/* Video Embed Modal */}
+            {/* Video Embed Modal (add + edit) */}
             <VideoEmbedModal
                 isOpen={showVideoEmbedModal}
-                onClose={() => setShowVideoEmbedModal(false)}
+                editItem={editingEmbed}
+                onClose={() => { setShowVideoEmbedModal(false); setEditingEmbed(null); }}
                 onAdd={handleAddVideoEmbed}
+                onUpdate={handleUpdateVideoEmbed}
                 strings={strings}
             />
 

@@ -222,7 +222,7 @@ function buildSlideFromTrigger( triggerEl ) {
         ? parseInt( sequenceIndexRaw, 10 )
         : null;
 
-    return {
+    const slide = {
         triggerEl,
         figureEl,
         sequenceIndex,
@@ -233,6 +233,109 @@ function buildSlideFromTrigger( triggerEl ) {
         title:    triggerEl.dataset.fgTitle   || '',
         id:       triggerEl.dataset.fgItemId  || '',
     };
+
+    // Video items carry their playback data on the .fg-video node rather than
+    // an <img>. The poster (an <img class="fg-video-poster"> when present)
+    // becomes the slide's thumb so the thumb strip still shows something.
+    const videoEl = triggerEl.querySelector( '.fg-video' );
+    if ( videoEl ) {
+        const posterImg = videoEl.querySelector( '.fg-video-poster' );
+        slide.itemType       = videoEl.dataset.fgItemType || '';
+        slide.videoSrc       = videoEl.dataset.fgVideoSrc || '';
+        slide.embedProvider  = videoEl.dataset.fgEmbedProvider || '';
+        slide.embedId        = videoEl.dataset.fgEmbedId || '';
+        slide.embedSettings  = parseEmbedSettings( videoEl.dataset.fgEmbedSettings );
+        slide.thumbSrc       = posterImg ? posterImg.src : slide.thumbSrc;
+        slide.fullSrc        = posterImg ? posterImg.src : '';
+        slide.alt            = posterImg ? posterImg.alt : slide.alt;
+    }
+
+    return slide;
+}
+
+/**
+ * Parse the JSON embed-settings dataset attribute, tolerating absence/bad data.
+ *
+ * @param {string} raw
+ * @returns {object}
+ */
+function parseEmbedSettings( raw ) {
+    if ( ! raw ) {
+        return {};
+    }
+    try {
+        const parsed = JSON.parse( raw );
+        return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch ( err ) {
+        return {};
+    }
+}
+
+/**
+ * Build a YouTube embed URL from stored settings.
+ *
+ * @param {string}  embedId
+ * @param {object}  settings
+ * @param {boolean} forceAutoplay  When true, autoplay regardless of the setting.
+ * @returns {string}
+ */
+function buildYouTubeEmbedSrc( embedId, settings, forceAutoplay ) {
+    const privacy = !! settings.privacy_mode;
+    const host = privacy ? 'https://www.youtube-nocookie.com' : 'https://www.youtube.com';
+    const params = new URLSearchParams();
+
+    params.set( 'autoplay', ( forceAutoplay || settings.autoplay ) ? '1' : '0' );
+    params.set( 'mute', settings.mute ? '1' : '0' );
+    params.set( 'controls', settings.controls === false ? '0' : '1' );
+    params.set( 'cc_load_policy', settings.captions ? '1' : '0' );
+    params.set( 'rel', settings.suggested_videos === 'any' ? '1' : '0' );
+    params.set( 'playsinline', '1' );
+
+    if ( settings.loop ) {
+        params.set( 'loop', '1' );
+        params.set( 'playlist', embedId );
+    }
+    if ( settings.start_time ) {
+        params.set( 'start', String( parseInt( settings.start_time, 10 ) || 0 ) );
+    }
+    if ( settings.end_time ) {
+        params.set( 'end', String( parseInt( settings.end_time, 10 ) || 0 ) );
+    }
+
+    return `${ host }/embed/${ encodeURIComponent( embedId ) }?${ params.toString() }`;
+}
+
+/**
+ * Build a Vimeo embed URL from stored settings.
+ *
+ * @param {string}  embedId
+ * @param {object}  settings
+ * @param {boolean} forceAutoplay
+ * @returns {string}
+ */
+function buildVimeoEmbedSrc( embedId, settings, forceAutoplay ) {
+    const params = new URLSearchParams();
+
+    params.set( 'autoplay', ( forceAutoplay || settings.autoplay ) ? '1' : '0' );
+    params.set( 'muted', settings.mute ? '1' : '0' );
+    params.set( 'loop', settings.loop ? '1' : '0' );
+    params.set( 'dnt', settings.privacy_mode ? '1' : '0' );
+    params.set( 'title', settings.intro_title ? '1' : '0' );
+    params.set( 'portrait', settings.intro_portrait ? '1' : '0' );
+    params.set( 'byline', settings.intro_byline ? '1' : '0' );
+    params.set( 'playsinline', '1' );
+
+    if ( typeof settings.controls_color === 'string'
+        && /^#[0-9a-fA-F]{3,6}$/.test( settings.controls_color ) ) {
+        params.set( 'color', settings.controls_color.replace( '#', '' ) );
+    }
+
+    let hash = '';
+    if ( settings.start_time ) {
+        hash = `#t=${ parseInt( settings.start_time, 10 ) || 0 }s`;
+    }
+
+    return `https://player.vimeo.com/video/${ encodeURIComponent( embedId ) }?${ params.toString() }${ hash }`;
 }
 
 /**
@@ -278,6 +381,13 @@ function buildSlideFromApi( apiSlide ) {
         location:      Array.isArray( apiSlide.location ) ? apiSlide.location : [],
         exif:          ( apiSlide.exif && typeof apiSlide.exif === 'object' ) ? apiSlide.exif : null,
         externalUrl:   apiSlide.external_url || '',
+        itemType:      apiSlide.item_type || '',
+        videoSrc:      apiSlide.video_src || '',
+        embedProvider: apiSlide.embed_provider || '',
+        embedId:       apiSlide.embed_id || '',
+        embedSettings: ( apiSlide.embed_settings && typeof apiSlide.embed_settings === 'object' )
+            ? apiSlide.embed_settings
+            : {},
     };
 }
 
@@ -735,9 +845,9 @@ class FotoGridsLightbox {
                         <div class="fg-lb-media-wrap">
                             <img class="fg-lb-img" src="" alt="" draggable="false" />
                             <div class="fg-lb-spinner" aria-hidden="true"></div>
-                            <button class="fg-lb-prev" aria-label="Previous image" type="button" hidden></button>
-                            <button class="fg-lb-next" aria-label="Next image"     type="button" hidden></button>
-                            <div class="fg-lb-dots" role="tablist" aria-label="Image navigation" hidden></div>
+                            <button class="fg-lb-prev" aria-label="Previous item" type="button" hidden></button>
+                            <button class="fg-lb-next" aria-label="Next item"     type="button" hidden></button>
+                            <div class="fg-lb-dots" role="tablist" aria-label="Item navigation" hidden></div>
                         </div>
                         <div class="fg-lb-thumbs" hidden></div>
                     </div>
@@ -950,6 +1060,9 @@ class FotoGridsLightbox {
         if ( ! this.dialog ) return;
         if ( this._closeInProgress ) return;
         this._closeInProgress = true;
+
+        // Stop any playing video before the dialog closes.
+        this._clearVideoPane();
 
         this._stopAuto();
         this._teardownAutoListeners();
@@ -1460,7 +1573,7 @@ class FotoGridsLightbox {
         }
 
         dlg.setAttribute( 'aria-label',
-            `Gallery lightbox - ${this.items.length} image${this.items.length === 1 ? '' : 's'}` );
+            `Gallery lightbox - ${this.items.length} item${this.items.length === 1 ? '' : 's'}` );
     }
 
     /**
@@ -1801,7 +1914,7 @@ class FotoGridsLightbox {
             btn.className       = `fg-lb-dot fg-lb-dot-${s.dotStyle}`;
             btn.dataset.lbIndex = i;
             btn.setAttribute( 'role',       'tab' );
-            btn.setAttribute( 'aria-label', `Image ${i + 1} of ${this.items.length}` );
+            btn.setAttribute( 'aria-label', `Item ${i + 1} of ${this.items.length}` );
             // Colors flow from --fg-lb-dot-color / --fg-lb-dot-active-color
             // declared in the <style> block - no inline styles needed.
             container.appendChild( btn );
@@ -1852,22 +1965,51 @@ class FotoGridsLightbox {
             btn.type            = 'button';
             btn.className       = 'fg-lb-thumb';
             btn.dataset.lbIndex = i;
-            btn.setAttribute( 'aria-label', `Go to image ${i + 1}` );
+            btn.setAttribute( 'aria-label', `Go to item ${i + 1}` );
 
-            const img    = document.createElement( 'img' );
-            // Empty slot in the sparse cache — render a placeholder
-            // <img> so the strip's layout stays stable. _refreshChrome
-            // re-renders the strip once fetches resolve, filling in
-            // the real thumbSrc.
-            img.src      = item && item.thumbSrc ? item.thumbSrc : '';
-            img.alt      = '';
-            img.loading  = 'lazy';
-            img.decoding = 'async';
+            const isVideo = !! item && typeof item.itemType === 'string'
+                && item.itemType.indexOf( 'video' ) === 0;
+            const thumbSrc = item && item.thumbSrc ? item.thumbSrc : '';
+
+            if ( thumbSrc ) {
+                const img    = document.createElement( 'img' );
+                // Empty slot in the sparse cache — render a placeholder
+                // <img> so the strip's layout stays stable. _refreshChrome
+                // re-renders the strip once fetches resolve, filling in
+                // the real thumbSrc.
+                img.src      = thumbSrc;
+                img.alt      = '';
+                img.loading  = 'lazy';
+                img.decoding = 'async';
+                btn.appendChild( img );
+            } else if ( isVideo ) {
+                // Video with no resolvable poster — show the styled placeholder
+                // instead of a broken image.
+                const ph = document.createElement( 'span' );
+                ph.className = 'fg-lb-thumb-placeholder';
+                btn.appendChild( ph );
+            } else {
+                const img    = document.createElement( 'img' );
+                img.src      = '';
+                img.alt      = '';
+                img.loading  = 'lazy';
+                img.decoding = 'async';
+                btn.appendChild( img );
+            }
+
+            // Play badge on video thumbs so they read as videos in the strip.
+            if ( isVideo ) {
+                btn.classList.add( 'fg-lb-thumb--video' );
+                const badge = document.createElement( 'span' );
+                badge.className = 'fg-lb-thumb-badge';
+                badge.setAttribute( 'aria-hidden', 'true' );
+                btn.appendChild( badge );
+            }
+
             if ( ! item ) {
                 btn.classList.add( 'fg-lb-thumb--pending' );
             }
 
-            btn.appendChild( img );
             track.appendChild( btn );
         } );
 
@@ -1902,7 +2044,7 @@ class FotoGridsLightbox {
         // Reset zoom on every slide change so the new image starts at 1×.
         if ( s.zoom ) this._resetZoom();
 
-        dlg.setAttribute( 'aria-label', `Image ${index + 1} of ${this._total}` );
+        dlg.setAttribute( 'aria-label', `Item ${index + 1} of ${this._total}` );
 
         // Slide not yet loaded — show the lightbox spinner, update
         // chrome to reflect the new index, and bail. Once the fetch
@@ -1933,6 +2075,16 @@ class FotoGridsLightbox {
         this._updateCounter();
         this._updateThumbs();
         this._updateNavEnds();
+
+        // Always tear down a previous video pane before painting the new slide,
+        // which stops playback when navigating away from a video.
+        this._clearVideoPane();
+
+        if ( this._isVideoSlide( item ) ) {
+            this._showVideoSlide( item );
+            this._preloadAdjacentSlides( index );
+            return;
+        }
 
         const imgEl  = dlg.querySelector( '.fg-lb-img' );
         const spinner = dlg.querySelector( '.fg-lb-spinner' );
@@ -1979,6 +2131,114 @@ class FotoGridsLightbox {
         }
 
         this._preloadAdjacentSlides( index );
+    }
+
+    /**
+     * Whether a slide represents a video item.
+     *
+     * @param {object} item
+     * @returns {boolean}
+     */
+    _isVideoSlide( item ) {
+        return !! item && typeof item.itemType === 'string'
+            && item.itemType.indexOf( 'video' ) === 0;
+    }
+
+    /**
+     * Render a video player into the media wrap for a video slide. The image
+     * element is hidden while a video plays; _clearVideoPane restores it.
+     *
+     * @param {object} item
+     */
+    _showVideoSlide( item ) {
+        const dlg = this.dialog;
+        const wrap = dlg.querySelector( '.fg-lb-media-wrap' );
+        const imgEl = dlg.querySelector( '.fg-lb-img' );
+        const spinner = dlg.querySelector( '.fg-lb-spinner' );
+
+        if ( ! wrap ) return;
+
+        if ( spinner ) spinner.hidden = true;
+        if ( imgEl ) {
+            imgEl.classList.remove( 'fg-lb-img--loading' );
+            imgEl.classList.add( 'fg-lb-img--hidden' );
+        }
+
+        const player = this._buildVideoPlayer( item );
+        if ( ! player ) {
+            // Fall back to showing the poster if we couldn't build a player.
+            if ( imgEl ) {
+                imgEl.classList.remove( 'fg-lb-img--hidden' );
+                imgEl.src = item.fullSrc || item.thumbSrc || '';
+            }
+            return;
+        }
+
+        const pane = document.createElement( 'div' );
+        pane.className = 'fg-lb-video';
+        pane.appendChild( player );
+        wrap.appendChild( pane );
+        this._videoPane = pane;
+    }
+
+    /**
+     * Remove the active video pane (stopping playback) and restore the image
+     * element for the next image slide.
+     */
+    _clearVideoPane() {
+        if ( this._videoPane ) {
+            // Pausing the <video> (or removing the <iframe>) halts playback and
+            // audio; removing the node is enough for both.
+            this._videoPane.remove();
+            this._videoPane = null;
+        }
+        const imgEl = this.dialog?.querySelector( '.fg-lb-img' );
+        if ( imgEl ) {
+            imgEl.classList.remove( 'fg-lb-img--hidden' );
+        }
+    }
+
+    /**
+     * Build the <video> or <iframe> element for a video slide. Autoplays on
+     * open (muted where required by browser policy is the caller's concern).
+     *
+     * @param {object} item
+     * @returns {HTMLElement|null}
+     */
+    _buildVideoPlayer( item ) {
+        const settings = item.embedSettings || {};
+
+        if ( item.itemType === 'video_file' ) {
+            if ( ! item.videoSrc ) return null;
+            const video = document.createElement( 'video' );
+            video.className = 'fg-lb-video-player';
+            video.src = item.videoSrc;
+            video.controls = settings.controls === false ? false : true;
+            video.autoplay = true;
+            video.playsInline = true;
+            video.muted = !! settings.mute;
+            video.loop = !! settings.loop;
+            if ( item.fullSrc ) {
+                video.poster = item.fullSrc;
+            }
+            return video;
+        }
+
+        if ( ! item.embedId ) return null;
+        const src = item.itemType === 'video_vimeo'
+            ? buildVimeoEmbedSrc( item.embedId, settings, true )
+            : buildYouTubeEmbedSrc( item.embedId, settings, true );
+        if ( ! src ) return null;
+
+        const iframe = document.createElement( 'iframe' );
+        iframe.className = 'fg-lb-video-player';
+        iframe.src = src;
+        iframe.setAttribute( 'frameborder', '0' );
+        iframe.setAttribute( 'allow',
+            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' );
+        iframe.setAttribute( 'allowfullscreen', '' );
+        iframe.setAttribute( 'title', item.title || item.alt || 'Video' );
+        return iframe;
     }
 
     _preloadAdjacentSlides( index ) {

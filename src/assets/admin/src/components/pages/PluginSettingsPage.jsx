@@ -8,6 +8,7 @@ import MaintenanceTab from '../plugin-settings/tabs/MaintenanceTab';
 import PermissionsManagerTab from '../plugin-settings/tabs/PermissionsManagerTab';
 import MediaTab from '../plugin-settings/tabs/MediaTab';
 import SharingTab from '../plugin-settings/tabs/SharingTab';
+import WatermarkTab from '../plugin-settings/tabs/WatermarkTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
 import { Button } from '../shared/Button';
@@ -15,7 +16,7 @@ import TabBar from '../shared/TabBar.jsx';
 
 const { __ } = wp.i18n;
 
-const TAB_IDS = ['media', 'responsiveness', 'defaults', 'view_pages', 'sharing', 'seo', 'permissions_manager', 'advanced', 'maintenance'];
+const TAB_IDS = ['media', 'responsiveness', 'defaults', 'view_pages', 'sharing', 'watermark', 'seo', 'permissions_manager', 'advanced', 'maintenance', 'setup_wizard'];
 const DEFAULTS_TABS = [
     { id: 'gallery', label: __('Gallery Defaults', 'fotogrids'), icon: 'layout_3x3' },
     { id: 'album', label: __('Album Defaults', 'fotogrids'), icon: 'layout_2x2' }
@@ -30,18 +31,36 @@ const PluginSettingsPage = () => {
         { id: 'defaults', label: __('Defaults', 'fotogrids'), icon: 'layout', group: 'setup' },
         { id: 'view_pages', label: __('View Pages', 'fotogrids'), icon: 'image', group: 'setup' },
         { id: 'sharing', label: __('Sharing', 'fotogrids'), icon: 'share', group: 'setup' },
+        { id: 'watermark', label: __('Watermark', 'fotogrids'), icon: 'security', group: 'setup' },
         { id: 'seo', label: __('SEO', 'fotogrids'), icon: 'search_md', group: 'setup' },
         { id: 'permissions_manager', label: __('Permissions Manager', 'fotogrids'), icon: 'security', group: 'setup' },
         { id: 'advanced', label: __('Advanced', 'fotogrids'), icon: 'settings', group: 'system' },
-        { id: 'maintenance', label: __('Maintenance', 'fotogrids'), icon: 'tools', group: 'system' }
+        { id: 'maintenance', label: __('Maintenance', 'fotogrids'), icon: 'tools', group: 'system' },
+        { id: 'setup_wizard', label: __('Setup Wizard', 'fotogrids'), icon: 'magic', group: 'getting_started', external: true }
     ];
 
     const tabGroups = [
         { id: 'setup', label: __('Setup', 'fotogrids') },
-        { id: 'system', label: __('System', 'fotogrids') }
+        { id: 'system', label: __('System', 'fotogrids') },
+        { id: 'getting_started', label: __('Getting Started', 'fotogrids') }
     ];
 
+    // URL builder for the wizard launcher tab. Lives at the top so the rest of
+    // the component can reference it without re-reading window.location.
+    const getSetupWizardUrl = () => {
+        const url = new URL(window.location.href);
+        url.pathname = url.pathname.replace(/\/$/, '');
+        url.searchParams.set('page', 'fotogrids-setup');
+        url.searchParams.delete('tab');
+        url.searchParams.delete('subtab');
+        url.searchParams.delete('field');
+        return url.toString();
+    };
+
     const getTabUrl = (tabId) => {
+        if (tabId === 'setup_wizard') {
+            return getSetupWizardUrl();
+        }
         const url = new URL(window.location.href);
         url.searchParams.set('tab', tabId);
         url.searchParams.delete('field');
@@ -139,6 +158,14 @@ const PluginSettingsPage = () => {
     }, [activeTab]);
 
     const handleTabChange = (tabId) => {
+        // The Setup Wizard tab is a launcher, not a tab panel. Navigate
+        // directly to the hidden wizard page and bail before we touch state
+        // or persist 'setup_wizard' as the active tab.
+        if (tabId === 'setup_wizard') {
+            window.location.assign(getSetupWizardUrl());
+            return;
+        }
+
         setActiveTab(tabId);
 
         if (uiState) {
@@ -226,6 +253,8 @@ const PluginSettingsPage = () => {
                 return <ViewPagesTab />;
             case 'sharing':
                 return <SharingTab />;
+            case 'watermark':
+                return <WatermarkTab />;
             case 'seo':
                 return <SEOTab />;
             case 'permissions_manager':

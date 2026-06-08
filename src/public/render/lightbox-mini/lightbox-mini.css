@@ -1,0 +1,79 @@
+.fg-lb-mini {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fg-lb-mini-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--fg-lb-mini-backdrop, rgba(0, 0, 0, 0.9));
+    backdrop-filter: blur(var(--fg-lb-mini-backdrop-blur, 0px));
+}
+
+.fg-lb-mini-stage {
+    position: relative;
+    max-width: 92vw;
+    max-height: 92vh;
+    padding: var(--fg-lb-mini-padding, 0px);
+    z-index: 1;
+}
+
+/* The single content node the caller hands to open(). Sizes to its own
+   intrinsic dimensions, capped to the stage. Video players opt into a 16:9
+   box via the modifier below. */
+.fg-lb-mini-content {
+    display: block;
+    max-width: 92vw;
+    max-height: 92vh;
+    border-radius: 6px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+}
+
+img.fg-lb-mini-content {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Video players (video / iframe) fill a responsive 16:9 box. */
+video.fg-lb-mini-content,
+iframe.fg-lb-mini-content {
+    width: min(92vw, calc((92vh - 40px) * 16 / 9));
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    background: #000;
+}
+
+.fg-lb-mini-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    line-height: 1;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.fg-lb-mini-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+@media (max-width: 600px) {
+    .fg-lb-mini-close {
+        top: -40px;
+    }
+}

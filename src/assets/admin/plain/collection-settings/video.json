@@ -8,56 +8,6 @@
     ],
     "settings": [
         {
-            "key": "enable_gallery_videos",
-            "type": "toggle",
-            "label": "Enable Video Items",
-            "description": "Allow videos from your Media Library to appear inside the gallery.",
-            "default": true,
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true,
-            "tier_required": "free"
-        },
-        {
-            "key": "mix_media_galleries",
-            "type": "toggle",
-            "label": "Mix Images and Videos",
-            "description": "Display images and Media Library videos together in the same gallery.",
-            "default": true,
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true,
-            "tier_required": "free"
-        },
-        {
-            "key": "video_source_mode",
-            "type": "button_group",
-            "label": "Video Source",
-            "description": "Choose where videos in this gallery come from.",
-            "options": [
-                {
-                    "label": "Media Library",
-                    "value": "media_library",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "YouTube",
-                    "value": "youtube",
-                    "tier_required": "pro_starter"
-                },
-                {
-                    "label": "Vimeo",
-                    "value": "vimeo",
-                    "tier_required": "pro_starter"
-                }
-            ],
-            "default": "media_library",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true,
-            "tier_required": "free"
-        },
-        {
             "key": "video_playback_mode",
             "type": "button_group",
             "label": "Video Playback",
@@ -71,21 +21,10 @@
                 {
                     "label": "Video Lightbox",
                     "value": "lightbox",
-                    "tier_required": "pro_starter"
+                    "tier_required": "free"
                 }
             ],
             "default": "inline",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true,
-            "tier_required": "free"
-        },
-        {
-            "key": "show_video_badge",
-            "type": "toggle",
-            "label": "Show Video Badge",
-            "description": "Show a visual indicator on video items so visitors can tell them apart from images.",
-            "default": true,
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
             "visible_when_uninstalled": true,
@@ -136,7 +75,7 @@
                     "visible_when_uninstalled": true
                 }
             ],
-            "tier_required": "pro_starter",
+            "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
             "visible_when_uninstalled": true
@@ -146,13 +85,8 @@
             "type": "promo",
             "messages": [
                 {
-                    "subtitle": "YouTube & Vimeo Embeds",
-                    "message": "Connect and embed videos from YouTube and Vimeo directly inside your {postType.lower}.",
-                    "learn_more": "feature-video"
-                },
-                {
                     "subtitle": "More Video Platforms",
-                    "message": "Unlock Facebook, Dailymotion, and TED Talks embeds for broader video source support.",
+                    "message": "Unlock TikTok, Instagram, Facebook, Dailymotion, Twitch, Wistia, VideoPress, Loom, and more embeds for broader video source support.",
                     "learn_more": "feature-video"
                 },
                 {

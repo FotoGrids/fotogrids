@@ -130,6 +130,21 @@ final class Item_Ajax_Endpoints {
             $height = $attachment_meta['height'];
         }
 
+        $item_type  = \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $item_id );
+        $is_video   = \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE === $item_type;
+        $video_url  = '';
+        $poster_url = '';
+
+        if ( $is_video ) {
+            $video_url  = (string) ( wp_get_attachment_url( $item_id ) ?: '' );
+            $poster_url = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
+                $item_type,
+                $item_id,
+                is_array( $custom_data ) ? $custom_data : [],
+                'medium'
+            );
+        }
+
         wp_send_json_success( [
             'id'            => $item_id,
             'title'         => $attachment->post_title,
@@ -149,6 +164,9 @@ final class Item_Ajax_Endpoints {
             'width'         => $width,
             'height'        => $height,
             'mime_type'     => $mime_type,
+            'item_type'     => $item_type,
+            'video_url'     => $video_url,
+            'poster_url'    => $poster_url,
         ] );
     }
 

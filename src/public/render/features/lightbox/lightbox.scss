@@ -318,6 +318,35 @@
     &.fg-lb-img--in {
         opacity: 1;
     }
+
+    // Fully removed from layout while a video plays. Uses a class (not the
+    // [hidden] attribute) because .fg-lb-img sets display: block, which wins
+    // over the UA [hidden] { display: none } rule.
+    &.fg-lb-img--hidden {
+        display: none;
+    }
+}
+
+// Video slide pane. Fills the media wrap; the player keeps a 16:9 box and
+// scales down to fit smaller viewports.
+.fg-lb-video {
+    position: relative;
+    width:  min(100%, calc((100vh - 160px) * 16 / 9));
+    max-width:  100%;
+    max-height: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fg-lb-video-player {
+    width:  100%;
+    height: 100%;
+    border: 0;
+    border-radius: 4px;
+    background: #000;
+    box-shadow: 0 8px 32px var(--fg-lb-color-img-shadow);
 }
 
 // Full-image filter hover - --fg-lb-full-filter-hover is only set when a hover
@@ -1050,6 +1079,7 @@
 }
 
 .fg-lb-thumb {
+    position:      relative;
     flex-shrink:   0;
     padding:       0;
     border:        2px solid transparent;
@@ -1075,10 +1105,46 @@
     }
 }
 
+// Placeholder shown for a video thumb with no resolvable poster.
+.fg-lb-thumb-placeholder {
+    display: block;
+    background-color: #1d2327;
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.10), transparent 70%);
+}
+
+// Play badge on video thumbs.
+.fg-lb-thumb-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40%;
+    height: 40%;
+    max-width: 26px;
+    max-height: 26px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 54%;
+        transform: translate(-50%, -50%);
+        border-style: solid;
+        border-width: 5px 0 5px 8px;
+        border-color: transparent transparent transparent #fff;
+    }
+}
+
 // Thumbnail size variants
-.fg-lb-thumbs--small  .fg-lb-thumb img { width: 50px; height: 50px; }
-.fg-lb-thumbs--normal .fg-lb-thumb img { width: 70px; height: 70px; }
-.fg-lb-thumbs--large  .fg-lb-thumb img { width: 90px; height: 90px; }
+.fg-lb-thumbs--small  .fg-lb-thumb img,
+.fg-lb-thumbs--small  .fg-lb-thumb .fg-lb-thumb-placeholder { width: 50px; height: 50px; }
+.fg-lb-thumbs--normal .fg-lb-thumb img,
+.fg-lb-thumbs--normal .fg-lb-thumb .fg-lb-thumb-placeholder { width: 70px; height: 70px; }
+.fg-lb-thumbs--large  .fg-lb-thumb img,
+.fg-lb-thumbs--large  .fg-lb-thumb .fg-lb-thumb-placeholder { width: 90px; height: 90px; }
 
 // Thumbnail strip image filter - --fg-lb-thumb-filter is set by buildVarsCSS()
 // when the thumbnail filter is configured; falls back to 'none' when not set.
@@ -1114,9 +1180,12 @@
         --fg-lb-nav-btn-offset:      12px;
     }
 
-    .fg-lb-thumbs--small  .fg-lb-thumb img { width: 40px; height: 40px; }
-    .fg-lb-thumbs--normal .fg-lb-thumb img { width: 55px; height: 55px; }
-    .fg-lb-thumbs--large  .fg-lb-thumb img { width: 70px; height: 70px; }
+    .fg-lb-thumbs--small  .fg-lb-thumb img,
+    .fg-lb-thumbs--small  .fg-lb-thumb .fg-lb-thumb-placeholder { width: 40px; height: 40px; }
+    .fg-lb-thumbs--normal .fg-lb-thumb img,
+    .fg-lb-thumbs--normal .fg-lb-thumb .fg-lb-thumb-placeholder { width: 55px; height: 55px; }
+    .fg-lb-thumbs--large  .fg-lb-thumb img,
+    .fg-lb-thumbs--large  .fg-lb-thumb .fg-lb-thumb-placeholder { width: 70px; height: 70px; }
 
     .fg-lb-dot { --fg-lb-dot-size: 10px; }
 }

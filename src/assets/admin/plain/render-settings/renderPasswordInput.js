@@ -86,9 +86,14 @@ const PasswordInputComponent = ({
 
     const isSavedAndUnchanged = passwordIsSet && !hasUserTyped && revealState !== 'done';
 
-    // Placeholder text depends on whether a password is already saved.
+    // Placeholder depends on whether a password is already saved. When one is
+    // saved we show a FIXED-WIDTH dot mask rather than the real character count
+    // - revealing the true length would shrink an attacker's brute-force space,
+    // and this field is visible to every gallery editor (a wider audience than
+    // the permission-gated eye-reveal). The dot count is intentionally constant.
+    const SAVED_PASSWORD_MASK = '••••••••';
     const placeholder = isSavedAndUnchanged
-        ? __('Password already set - type to change', 'fotogrids')
+        ? SAVED_PASSWORD_MASK
         : ( setting.placeholder || '' );
 
     // Eye-button handler.
@@ -166,6 +171,26 @@ const PasswordInputComponent = ({
         : ( showPassword ? 'eye_off' : 'eye' );
     const iconElement = renderIcon ? renderIcon(iconName) : null;
 
+    // Tooltip label for the eye button. Kept in sync with show/hide state.
+    const toggleLabel = showPassword
+        ? __('Hide password', 'fotogrids')
+        : __('Show password', 'fotogrids');
+
+    // Bind the shared FgTooltip to the eye button once it mounts. The button
+    // mounts after FgTooltip.init()'s first declarative pass, so we bind
+    // imperatively via a ref. FgTooltip.bind reads aria-label, which we keep
+    // current on every render; refresh() updates an already-visible tooltip
+    // after the label flips on toggle.
+    const toggleRef = React.useCallback((node) => {
+        if (node && window.FgTooltip) {
+            if (node.dataset.fgTooltipBound !== '1') {
+                window.FgTooltip.bind(node);
+            } else {
+                window.FgTooltip.refresh(node);
+            }
+        }
+    }, [toggleLabel]);
+
     // Inline message shown when permission is denied.
     let revealMessage = null;
     if (revealState === 'denied') {
@@ -208,13 +233,13 @@ const PasswordInputComponent = ({
             }),
             React.createElement('button', {
                 key: 'toggle',
+                ref: toggleRef,
                 type: 'button',
                 className: 'fotogrids-password-input__toggle',
                 onClick: handleEyeClick,
                 disabled: isDisabled || revealState === 'loading',
-                title: showPassword
-                    ? __('Hide password', 'fotogrids')
-                    : __('Show password', 'fotogrids'),
+                'aria-label': toggleLabel,
+                'data-fg-tooltip': toggleLabel,
             }, iconElement),
         ]),
 

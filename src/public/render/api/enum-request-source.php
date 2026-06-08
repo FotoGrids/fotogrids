@@ -17,6 +17,7 @@ enum Request_Source: string {
     case SHORTCODE = 'shortcode';
     case BLOCK = 'block';
     case ELEMENTOR = 'elementor';
+    case DIVI = 'divi';
     case PREVIEW_SAVED = 'preview_saved';
     case PREVIEW_UNSAVED = 'preview_unsaved';
     case ALBUM_AJAX = 'album_ajax';

@@ -162,7 +162,7 @@ class Uninstaller {
      * This will be called automatically by WordPress when CPTs are unregistered
      */
     private static function remove_cpt_posts() {
-        $post_types = array( 'fotogrids_gallery', 'fotogrids_album' );
+        $post_types = array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' );
         
         foreach ( $post_types as $post_type ) {
             $posts = get_posts( array(

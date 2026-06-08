@@ -15,6 +15,7 @@ use FotoGrids\License_Manager;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Settings\SEO_Settings_Store;
 use FotoGrids\Settings\Sharing_Settings_Store;
+use FotoGrids\Settings\Watermark_Settings_Store;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -253,6 +254,7 @@ final class Settings_Localizer {
             'defaults'         => $args['defaults'],
             'globalSharing'    => Sharing_Settings_Store::get(),
             'globalSeo'        => SEO_Settings_Store::get(),
+            'globalWatermark'  => Watermark_Settings_Store::get(),
             'postId'           => $args['post_id'],
             'postType'         => $args['post_type'],
             'nonce'            => wp_create_nonce( 'fotogrids_settings' ),

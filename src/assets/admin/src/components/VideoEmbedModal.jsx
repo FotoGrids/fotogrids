@@ -4,11 +4,15 @@
  * Add a YouTube or Vimeo video as a virtual gallery item.
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Modal } from './shared/Modal';
 import { Button } from './shared/Button';
-import Icon   from './shared/Icon.jsx';
-import Toggle from './shared/Toggle.jsx';
+import Icon        from './shared/Icon.jsx';
+import Toggle      from './shared/Toggle.jsx';
+import NumberField from './shared/NumberField.jsx';
+import Select      from './shared/Select.jsx';
+import FormField   from './shared/FormField/FormField.jsx';
+import FormFields  from './shared/FormField/FormFields.jsx';
 
 function extractYouTubeId( url ) {
     if ( ! url ) return null;
@@ -36,6 +40,16 @@ const SOURCES = [
     { value: 'vimeo',   label: 'Vimeo'   },
 ];
 
+/**
+ * Map the modal's UI-facing source value to the canonical item_type / embed
+ * source identifier the REST API expects. The backend keys its oEmbed
+ * endpoints and stores item_type as 'video_youtube' / 'video_vimeo', while
+ * the modal uses the shorter 'youtube' / 'vimeo' for its conditional UI.
+ */
+function canonicalSource( source ) {
+    return source === 'vimeo' ? 'video_vimeo' : 'video_youtube';
+}
+
 const TABS = {
     youtube: [
         { id: 'link',    label: 'Link'    },
@@ -60,8 +74,8 @@ const DEFAULT_STATE = {
     thumbnailUrl:      null,
     title:             '',
     caption:           '',
-    startTime:         '',
-    endTime:           '',
+    startTime:         0,
+    endTime:           0,
     autoplay:          false,
     mute:              false,
     loop:              false,
@@ -73,9 +87,89 @@ const DEFAULT_STATE = {
     showIntroPortrait: true,
     showIntroByline:   true,
     controlsColor:     '',
+    posterId:          0,
+    posterUrl:         '',
+    posterPreview:     '',
 };
 
-const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
+/**
+ * Map the modal's camelCase form state to the snake_case embed_settings the
+ * REST API stores. Only playback-relevant keys are included; identity fields
+ * (url, videoId, caption) are sent as their own request params.
+ *
+ * @param {Object} form
+ * @return {Object}
+ */
+function formToSettings( form ) {
+    const settings = {
+        autoplay:     !! form.autoplay,
+        mute:         !! form.mute,
+        loop:         !! form.loop,
+        controls:     !! form.showControls,
+        captions:     !! form.showCaptions,
+        privacy_mode: !! form.privacyMode,
+        suggested_videos: form.suggestedVideos || 'channel',
+        intro_title:    !! form.showIntroTitle,
+        intro_portrait: !! form.showIntroPortrait,
+        intro_byline:   !! form.showIntroByline,
+    };
+
+    const startTime = parseInt( form.startTime, 10 ) || 0;
+    if ( startTime > 0 ) {
+        settings.start_time = startTime;
+    }
+    const endTime = parseInt( form.endTime, 10 ) || 0;
+    if ( endTime > 0 ) {
+        settings.end_time = endTime;
+    }
+    if ( form.controlsColor ) {
+        settings.controls_color = form.controlsColor;
+    }
+
+    return settings;
+}
+
+/**
+ * Map a stored embed item into modal form state for editing.
+ *
+ * @param {Object} editItem Grid item with an `embed` payload.
+ * @return {Object} Form state.
+ */
+function editItemToForm( editItem ) {
+    const embed    = editItem.embed || {};
+    const settings = embed.settings || {};
+    const source   = editItem.source === 'vimeo' ? 'vimeo' : 'youtube';
+
+    return {
+        ...DEFAULT_STATE,
+        source,
+        url:               embed.embed_url || '',
+        videoId:           embed.video_id || null,
+        thumbnailUrl:      embed.thumbnail_url || null,
+        title:             embed.caption || '',
+        caption:           embed.caption || '',
+        startTime:         parseInt( settings.start_time, 10 ) || 0,
+        endTime:           parseInt( settings.end_time, 10 ) || 0,
+        autoplay:          !! settings.autoplay,
+        mute:              !! settings.mute,
+        loop:              !! settings.loop,
+        privacyMode:       !! settings.privacy_mode,
+        showControls:      settings.controls === undefined ? true : !! settings.controls,
+        showCaptions:      !! settings.captions,
+        suggestedVideos:   settings.suggested_videos || 'channel',
+        showIntroTitle:    settings.intro_title === undefined ? true : !! settings.intro_title,
+        showIntroPortrait: settings.intro_portrait === undefined ? true : !! settings.intro_portrait,
+        showIntroByline:   settings.intro_byline === undefined ? true : !! settings.intro_byline,
+        controlsColor:     settings.controls_color || '',
+        posterId:          settings.poster_id || 0,
+        posterUrl:         settings.poster_url || '',
+        posterPreview:     settings.poster_url || '',
+    };
+}
+
+const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, strings = {} } ) => {
+
+    const isEditing = !! editItem;
 
     const [ form, setForm ]           = useState( { ...DEFAULT_STATE } );
     const [ urlDraft, setUrlDraft ]   = useState( '' );
@@ -83,6 +177,26 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
     const [ resolving, setResolving ] = useState( false );
     const [ resolveError, setResolveError ] = useState( '' );
     const [ adding, setAdding ]       = useState( false );
+
+    // Prefill the form when opening in edit mode; reset to defaults on open in
+    // add mode. Keyed on the embed's id so re-opening a different embed reloads.
+    useEffect( () => {
+        if ( ! isOpen ) {
+            return;
+        }
+        if ( editItem ) {
+            setForm( editItemToForm( editItem ) );
+            setUrlDraft( editItem.embed?.embed_url || '' );
+            setResolveError( '' );
+            setActiveTab( 'link' );
+        } else {
+            setForm( { ...DEFAULT_STATE } );
+            setUrlDraft( '' );
+            setResolveError( '' );
+            setActiveTab( 'link' );
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ isOpen, editItem?.id ] );
 
     const set = useCallback( ( key, value ) =>
         setForm( prev => ( { ...prev, [ key ]: value } ) ), [] );
@@ -132,14 +246,27 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
             const res  = await fetch( `${ restBase }fotogrids/v1/items/resolve-embed`, {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': restNonce },
-                body:    JSON.stringify( { platform: form.source, url } ),
+                body:    JSON.stringify( { source: canonicalSource( form.source ), url } ),
             } );
 
             if ( ! res.ok ) throw new Error( `HTTP ${ res.status }` );
             const json = await res.json();
 
             if ( json.video_id ) {
-                setForm( prev => ( { ...prev, url, videoId: json.video_id, thumbnailUrl: json.thumbnail_url || null, title: json.title || '' } ) );
+                const resolvedTitle = json.title || '';
+                setForm( prev => ( {
+                    ...prev,
+                    url,
+                    videoId:      json.video_id,
+                    thumbnailUrl: json.thumbnail_url || null,
+                    title:        resolvedTitle,
+                    // Seed the caption from the fetched title, but only when the
+                    // user hasn't already typed one, so manual captions are kept.
+                    caption:      prev.caption ? prev.caption : resolvedTitle,
+                } ) );
+                if ( window.fotogridsToast ) {
+                    window.fotogridsToast.success( strings.videoLoaded || 'Video loaded successfully.' );
+                }
             } else {
                 throw new Error( json.message || 'Could not resolve video.' );
             }
@@ -166,15 +293,38 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
     const handleAdd = useCallback( async () => {
         if ( ! form.videoId ) return;
         setAdding( true );
+
+        // Build the wire payload: identity fields plus a normalised
+        // embed_settings object the REST endpoint stores in custom_data.
+        const payload = {
+            source:         form.source,
+            url:            form.url,
+            videoId:        form.videoId,
+            // Fall back to the resolved title when the user left the caption
+            // empty, so the embed always has a name (the caption field shows
+            // the title as a placeholder, which is not a real value).
+            caption:        form.caption || form.title,
+            thumbnailUrl:   form.thumbnailUrl,
+            embed_settings: formToSettings( form ),
+            poster:         {
+                poster_id:  form.posterId || 0,
+                poster_url: form.posterUrl || '',
+            },
+        };
+
         try {
-            await onAdd( form );
+            if ( isEditing ) {
+                await onUpdate( { ...payload, id: editItem.id } );
+            } else {
+                await onAdd( payload );
+            }
             handleClose();
         } catch ( err ) {
-            console.error( '[FotoGrids] VideoEmbedModal: onAdd failed', err );
+            console.error( '[FotoGrids] VideoEmbedModal: save failed', err );
         } finally {
             setAdding( false );
         }
-    }, [ form, onAdd, handleClose ] );
+    }, [ form, isEditing, editItem, onAdd, onUpdate, handleClose ] );
 
     const hasVideo = !! form.videoId;
 
@@ -205,18 +355,64 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
         );
     };
 
+    const choosePoster = () => {
+        if ( ! window.wp || ! window.wp.media ) {
+            return;
+        }
+        const frame = window.wp.media( {
+            title:   strings.choosePoster || 'Choose Poster Image',
+            library: { type: 'image' },
+            button:  { text: strings.usePoster || 'Use as poster' },
+            multiple: false,
+        } );
+        frame.on( 'select', () => {
+            const attachment = frame.state().get( 'selection' ).first().toJSON();
+            setForm( prev => ( {
+                ...prev,
+                posterId:      attachment.id,
+                posterUrl:     attachment.url,
+                posterPreview: ( attachment.sizes && attachment.sizes.medium )
+                    ? attachment.sizes.medium.url
+                    : attachment.url,
+            } ) );
+        } );
+        frame.open();
+    };
+
+    const clearPoster = () => {
+        setForm( prev => ( { ...prev, posterId: 0, posterUrl: '', posterPreview: '' } ) );
+    };
+
+    const previewSrc = form.posterPreview || form.posterUrl || form.thumbnailUrl;
+    const hasCustomPoster = !! ( form.posterId || form.posterUrl );
+
     const renderSidebar = () => (
         <>
             <div className="fotogrids-item-preview">
-                { hasVideo && form.thumbnailUrl ? (
+                { hasVideo && previewSrc ? (
                     <img
-                        src={ form.thumbnailUrl }
+                        src={ previewSrc }
                         alt={ form.title || 'Video thumbnail' }
                     />
                 ) : (
                     <div className="fotogrids-item-preview__skeleton" />
                 ) }
             </div>
+
+            { hasVideo && (
+                <div className="fotogrids-embed-poster-actions">
+                    <Button variant="secondary" size="sm" onClick={ choosePoster }>
+                        { hasCustomPoster
+                            ? ( strings.changePoster || 'Change Poster' )
+                            : ( strings.choosePoster || 'Choose Poster' ) }
+                    </Button>
+                    { hasCustomPoster && (
+                        <Button variant="tertiary" size="sm" onClick={ clearPoster }>
+                            { strings.removePoster || 'Remove' }
+                        </Button>
+                    ) }
+                </div>
+            ) }
 
             <div className="fotogrids-file-info">
                 <div className="fotogrids-file-info__item">
@@ -253,10 +449,9 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
 
     const renderLinkTab = () => (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fg-form-fields">
+            <FormFields>
 
-                <div className="fg-form-field">
-                    <label>{ strings.source || 'Source' }</label>
+                <FormField label={ strings.source || 'Source' } layout="column">
                     <div className="fg-button-group__buttons">
                         { SOURCES.map( src => (
                             <button
@@ -269,12 +464,14 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                             </button>
                         ) ) }
                     </div>
-                </div>
+                </FormField>
 
-                <div className="fg-form-field">
-                    <label htmlFor="fg-embed-url">
-                        { strings.link || 'Link' }
-                    </label>
+                <FormField
+                    label={ strings.link || 'Link' }
+                    htmlFor="fg-embed-url"
+                    layout="column"
+                    error={ resolveError || undefined }
+                >
                     <div className="fotogrids-embed-url-row">
                         <input
                             id="fg-embed-url"
@@ -300,7 +497,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                                     ? 'https?://(www\\.)?(youtube\\.com/(watch\\?.*v=|embed/|shorts/)|youtu\\.be/)[a-zA-Z0-9_-]{11}.*'
                                     : 'https?://(www\\.)?vimeo\\.com/(video/)?[0-9]+'
                             }
-                            className={ `fotogrids-embed-url-input ${ resolveError ? 'fotogrids-embed-url-input--error' : '' } ${ hasVideo ? 'fotogrids-embed-url-input--ok' : '' }` }
+                            className={ `fotogrids-embed-url-input ${ resolveError ? 'fotogrids-embed-url-input--error' : '' }` }
                             disabled={ resolving }
                             autoComplete="off"
                             spellCheck={ false }
@@ -316,57 +513,46 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                         />
 
                     </div>
-                    { resolveError && (
-                        <p className="description fotogrids-text--error" style={ { marginTop: 4 } }>
-                            { resolveError }
-                        </p>
-                    ) }
-                    { hasVideo && ! resolveError && (
-                        <p className="description" style={ { marginTop: 4, color: '#2e7d32' } }>
-                            { strings.videoLoaded || 'Video loaded successfully.' }
-                        </p>
-                    ) }
-                </div>
+                </FormField>
 
-                <div className="fg-form-field">
-                    <label htmlFor="fg-embed-start">
-                        { strings.startTime || 'Start Time' }
-                    </label>
-                    <input
+                <FormField
+                    label={ strings.startTime || 'Start Time' }
+                    htmlFor="fg-embed-start"
+                    layout="column"
+                >
+                    <NumberField
                         id="fg-embed-start"
-                        type="number"
-                        min="0"
                         value={ form.startTime }
-                        onChange={ e => set( 'startTime', e.target.value ) }
-                        placeholder="-"
-                        className="fotogrids-embed-time-input"
+                        onChange={ v => set( 'startTime', v ) }
+                        min={ 0 }
+                        unit="s"
+                        help={ strings.startTimeDesc || 'Specify a start time (in seconds)' }
                     />
-                    <p className="description">{ strings.startTimeDesc || 'Specify a start time (in seconds)' }</p>
-                </div>
+                </FormField>
 
                 {/* End time - YouTube only */}
                 { form.source === 'youtube' && (
-                    <div className="fg-form-field">
-                        <label htmlFor="fg-embed-end">
-                            { strings.endTime || 'End Time' }
-                        </label>
-                        <input
+                    <FormField
+                        label={ strings.endTime || 'End Time' }
+                        htmlFor="fg-embed-end"
+                        layout="column"
+                    >
+                        <NumberField
                             id="fg-embed-end"
-                            type="number"
-                            min="0"
                             value={ form.endTime }
-                            onChange={ e => set( 'endTime', e.target.value ) }
-                            placeholder="-"
-                            className="fotogrids-embed-time-input"
+                            onChange={ v => set( 'endTime', v ) }
+                            min={ 0 }
+                            unit="s"
+                            help={ strings.endTimeDesc || 'Specify an end time (in seconds)' }
                         />
-                        <p className="description">{ strings.endTimeDesc || 'Specify an end time (in seconds)' }</p>
-                    </div>
+                    </FormField>
                 ) }
 
-                <div className="fg-form-field">
-                    <label htmlFor="fg-embed-caption">
-                        { strings.caption || 'Caption' }
-                    </label>
+                <FormField
+                    label={ strings.caption || 'Caption' }
+                    htmlFor="fg-embed-caption"
+                    layout="column"
+                >
                     <textarea
                         id="fg-embed-caption"
                         rows="3"
@@ -374,15 +560,15 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                         onChange={ e => set( 'caption', e.target.value ) }
                         placeholder={ form.title || '' }
                     />
-                </div>
+                </FormField>
 
-            </div>
+            </FormFields>
         </div>
     );
 
     const renderYouTubeOptions = () => (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fg-form-fields">
+            <FormFields>
 
                 <div className="fg-form-field">
                     <Toggle
@@ -440,28 +626,25 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fg-form-field">
-                    <label htmlFor="fg-embed-suggested">
-                        { strings.suggestedVideos || 'Suggested Videos' }
-                    </label>
-                    <select
-                        id="fg-embed-suggested"
+                <FormField
+                    label={ strings.suggestedVideos || 'Suggested Videos' }
+                    htmlFor="fg-embed-suggested"
+                    layout="column"
+                >
+                    <Select
                         value={ form.suggestedVideos }
-                        onChange={ e => set( 'suggestedVideos', e.target.value ) }
-                    >
-                        { SUGGESTED_VIDEOS_OPTIONS.map( opt => (
-                            <option key={ opt.value } value={ opt.value }>{ opt.label }</option>
-                        ) ) }
-                    </select>
-                </div>
+                        onChange={ v => set( 'suggestedVideos', v ) }
+                        options={ SUGGESTED_VIDEOS_OPTIONS }
+                    />
+                </FormField>
 
-            </div>
+            </FormFields>
         </div>
     );
 
     const renderVimeoOptions = () => (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fg-form-fields">
+            <FormFields>
 
                 <div className="fg-form-field">
                     <Toggle
@@ -528,14 +711,15 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     />
                 </div>
 
-                <div className="fg-form-field">
-                    <label htmlFor="fg-embed-color">
-                        { strings.controlsColor || 'Controls Color' }
-                    </label>
+                <FormField
+                    label={ strings.controlsColor || 'Controls Color' }
+                    htmlFor="fg-embed-color"
+                    layout="column"
+                >
                     { renderControlsColor() }
-                </div>
+                </FormField>
 
-            </div>
+            </FormFields>
         </div>
     );
 
@@ -554,7 +738,9 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
         >
             <Modal.Header>
                 <Modal.HeaderTitle>
-                    { strings.addVideoEmbed || 'Add Video Embed' }
+                    { isEditing
+                        ? ( strings.editVideoEmbed || 'Edit Video Embed' )
+                        : ( strings.addVideoEmbed  || 'Add Video Embed' ) }
                 </Modal.HeaderTitle>
             </Modal.Header>
 
@@ -589,8 +775,10 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, strings = {} } ) => {
                     busy={ adding }
                 >
                     { adding
-                        ? ( strings.adding     || 'Adding…'        )
-                        : ( strings.addToGallery || 'Add to Gallery' )
+                        ? ( isEditing ? ( strings.saving || 'Saving…' ) : ( strings.adding || 'Adding…' ) )
+                        : ( isEditing
+                            ? ( strings.saveChanges  || 'Save Changes' )
+                            : ( strings.addToGallery || 'Add to Gallery' ) )
                     }
                 </Button>
             </Modal.Footer>

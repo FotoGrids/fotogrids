@@ -455,6 +455,36 @@ class Admin_Data {
     }
 
     /**
+     * Get the global watermark settings.
+     *
+     * GET /wp-json/fotogrids/v1/admin/watermark-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function get_watermark_settings( $request ): \WP_REST_Response {
+        return rest_ensure_response( array(
+            'settings' => \FotoGrids\Settings\Watermark_Settings_Store::get(),
+        ) );
+    }
+
+    /**
+     * Save the global watermark settings.
+     *
+     * POST /wp-json/fotogrids/v1/admin/watermark-settings
+     *
+     * @since  1.0.0
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response
+     */
+    public static function save_watermark_settings( $request ): \WP_REST_Response {
+        $settings = \FotoGrids\Settings\Watermark_Settings_Store::save( $request->get_json_params() ?: $request->get_params() );
+
+        return rest_ensure_response( array( 'settings' => $settings ) );
+    }
+
+    /**
      * Get the global view page appearance settings.
      *
      * GET /wp-json/fotogrids/v1/admin/view-settings

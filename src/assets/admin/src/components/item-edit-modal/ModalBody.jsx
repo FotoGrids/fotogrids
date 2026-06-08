@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TabDetails from './tabs/TabDetails';
+import TabVideo from './tabs/TabVideo';
 import TabTags from './tabs/TabTags';
 import TabPeople from './tabs/TabPeople';
 import TabLocation from './tabs/TabLocation';
@@ -40,6 +41,14 @@ export const ItemPreviewPane = ({ itemData, loading, formData, strings }) => {
                     <div className="fotogrids-item-preview__error">
                         <Icon name="x_circle" className="fotogrids-item-preview__error-icon" />
                     </div>
+                ) : itemData?.item_type === 'video_file' ? (
+                    <video
+                        src={itemData.video_url}
+                        poster={itemData.poster_url || undefined}
+                        controls
+                        preload="metadata"
+                        playsInline
+                    />
                 ) : itemData?.thumbnail_url ? (
                     <img src={itemData.thumbnail_url} alt={formData?.alt || ''} />
                 ) : null}
@@ -82,8 +91,10 @@ export const ItemPreviewPane = ({ itemData, loading, formData, strings }) => {
     );
 };
 
-const tabConfig = (strings) => [
+const tabConfig = (strings, isVideoFile) => [
     { id: 'details',      label: strings.details },
+    // Video tab appears right after Details, for Media Library video items only.
+    ...(isVideoFile ? [{ id: 'video', label: strings.video || 'Video' }] : []),
     { id: 'tags',         label: strings.tags },
     { id: 'people',       label: strings.people },
     { id: 'location',     label: strings.location },
@@ -110,15 +121,18 @@ export const ItemEditTabs = ({
     addMetadataItem,
     removeMetadataItem,
     selectExistingMetadata,
+    videoSettings,
+    setVideoSettings,
     strings,
 }) => {
     const hasError = !loading && !itemData;
     const isDisabled = loading || hasError;
+    const isVideoFile = itemData?.item_type === 'video_file';
 
     return (
         <>
             <Modal.Tabs
-                tabs={tabConfig(strings)}
+                tabs={tabConfig(strings, isVideoFile)}
                 activeId={activeTab}
                 onChange={setActiveTab}
                 disabled={isDisabled}
@@ -132,6 +146,18 @@ export const ItemEditTabs = ({
                     disabled={isDisabled}
                 />
             </Modal.TabsPanel>
+
+            {isVideoFile && (
+                <Modal.TabsPanel id="video" activeId={activeTab}>
+                    <TabVideo
+                        itemData={itemData}
+                        videoSettings={videoSettings}
+                        onChange={setVideoSettings}
+                        disabled={isDisabled}
+                        strings={strings}
+                    />
+                </Modal.TabsPanel>
+            )}
 
             <Modal.TabsPanel id="tags" activeId={activeTab}>
                 <TabTags

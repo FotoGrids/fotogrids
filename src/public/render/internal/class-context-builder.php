@@ -17,6 +17,8 @@ use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Sorter;
 use FotoGrids\Render\Features\Pagination\Page_Size_Resolver;
 use FotoGrids\Render\Layouts\Justified\Snap_Resolver;
+use FotoGrids\Render\Video\Video_Item_Helpers;
+use FotoGrids\Render\Video\Video_Poster_Resolver;
 
 if ( ! defined( 'WPINC' ) ) {
     die;
@@ -602,6 +604,121 @@ final class Context_Builder {
     }
 
     /**
+     * Build an Item_View for a Media Library video attachment.
+     *
+     * Video attachments produce no image src, so the grid thumbnail comes from
+     * the poster chain instead. The poster URL is used for both thumb_url and
+     * full_url so layout sizing and the lightbox poster work unchanged; the
+     * direct video file URL is carried in video_src for the player.
+     *
+     * @since   1.1.0
+     * @param   int                    $attachment_id   The video attachment ID.
+     * @param   \WP_Post               $attachment_post The attachment post.
+     * @param   array<string, mixed>   $link_meta       external_url/link_target meta.
+     * @param   string                 $thumb_size      Resolved WP size slug for the poster.
+     * @return  \FotoGrids\Render\Api\Item_View
+     */
+    private function build_file_video_item_view(
+        int $attachment_id,
+        \WP_Post $attachment_post,
+        array $link_meta,
+        string $thumb_size
+    ): Item_View {
+        $custom_data = $this->load_item_custom_data( $attachment_id, 0 );
+        $poster_url  = Video_Poster_Resolver::resolve(
+            Video_Item_Helpers::TYPE_FILE,
+            $attachment_id,
+            $custom_data,
+            $thumb_size
+        );
+
+        return new Item_View(
+            id: $attachment_id,
+            thumb_url: $poster_url,
+            full_url: $poster_url,
+            alt: (string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+            title: (string) $attachment_post->post_title,
+            caption: (string) $attachment_post->post_excerpt,
+            description: (string) $attachment_post->post_content,
+            meta: $link_meta,
+            thumb_size: $thumb_size,
+            item_type: Video_Item_Helpers::TYPE_FILE,
+            poster_url: $poster_url,
+            video_src: (string) ( wp_get_attachment_url( $attachment_id ) ?: '' ),
+        );
+    }
+
+    /**
+     * Build an Item_View for a single embed post.
+     *
+     * @since   1.1.0
+     * @param   int    $embed_id   The fotogrids_embed post ID.
+     * @param   string $thumb_size Resolved WP size slug for custom posters.
+     * @return  \FotoGrids\Render\Api\Item_View|null
+     */
+    private function build_embed_item_view( int $embed_id, string $thumb_size ): ?Item_View {
+        $embed = \FotoGrids\Galleries\Embed_Store::get( $embed_id );
+        if ( null === $embed ) {
+            return null;
+        }
+
+        $item_type = (string) $embed['item_type'];
+        $caption   = (string) $embed['caption'];
+
+        // Re-assemble the custom_data shape the poster resolver expects.
+        $custom_data = array(
+            'thumbnail_url' => (string) $embed['thumbnail_url'],
+            'poster_id'     => (int) $embed['poster_id'],
+            'poster_url'    => (string) $embed['poster_url'],
+        );
+        $poster = Video_Poster_Resolver::resolve( $item_type, 0, $custom_data, $thumb_size );
+
+        $settings = is_array( $embed['settings'] ?? null ) ? $embed['settings'] : [];
+
+        return new Item_View(
+            id: $embed_id,
+            thumb_url: $poster,
+            full_url: $poster,
+            alt: $caption,
+            title: $caption,
+            caption: $caption,
+            description: '',
+            poster_url: $poster,
+            thumb_size: $thumb_size,
+            item_type: $item_type,
+            embed_provider: Video_Item_Helpers::provider_for_type( $item_type ),
+            embed_id: (string) $embed['video_id'],
+            embed_settings: $settings,
+        );
+    }
+
+    /**
+     * Read and decode the custom_data JSON for a single item row.
+     *
+     * @since   1.1.0
+     * @param   int $attachment_id Attachment ID (0 for embeds).
+     * @param   int $gallery_id    Gallery scope for the row.
+     * @return  array<string, mixed> Decoded custom_data, or empty array.
+     */
+    private function load_item_custom_data( int $attachment_id, int $gallery_id ): array {
+        global $wpdb;
+        $table = $wpdb->prefix . 'fotogrids_item_meta';
+
+        $raw = $wpdb->get_var( $wpdb->prepare(
+            "SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = %d LIMIT 1",
+            $attachment_id,
+            $gallery_id
+        ) );
+
+        if ( empty( $raw ) ) {
+            return [];
+        }
+
+        $decoded = json_decode( (string) $raw, true );
+        return is_array( $decoded ) ? $decoded : [];
+    }
+
+    /**
      * Loads item view data through the configured loader callback.
      *
      * When no custom loader is provided the method performs two queries:
@@ -637,12 +754,39 @@ final class Context_Builder {
             $item_link_meta = $this->batch_load_link_meta( $valid_ids );
 
             foreach ( $valid_ids as $attachment_id ) {
-                $attachment_post = get_post( $attachment_id );
-                if ( ! $attachment_post || $attachment_post->post_type !== 'attachment' ) {
+                $item_post = get_post( $attachment_id );
+                if ( ! $item_post ) {
                     continue;
                 }
 
+                // Embed posts are first-class list members; build their view
+                // directly. Anything that is neither an attachment nor an embed
+                // is skipped.
+                if ( \FotoGrids\Galleries\Embed_Store::POST_TYPE === $item_post->post_type ) {
+                    $embed_view = $this->build_embed_item_view( $attachment_id, $thumb_size );
+                    if ( null !== $embed_view ) {
+                        $loaded_items[] = $embed_view;
+                    }
+                    continue;
+                }
+
+                if ( $item_post->post_type !== 'attachment' ) {
+                    continue;
+                }
+
+                $attachment_post = $item_post;
                 $link_meta = $item_link_meta[ $attachment_id ] ?? [];
+                $item_type = Video_Item_Helpers::type_for_attachment( $attachment_id );
+
+                if ( Video_Item_Helpers::TYPE_FILE === $item_type ) {
+                    $loaded_items[] = $this->build_file_video_item_view(
+                        $attachment_id,
+                        $attachment_post,
+                        $link_meta,
+                        $thumb_size
+                    );
+                    continue;
+                }
 
                 $resolved_thumb = Image_Size_Manager::resolve_size( $attachment_id, $thumb_size, 'thumbnail' );
                 $resolved_full  = Image_Size_Manager::resolve_size( $attachment_id, $full_size,  'full' );

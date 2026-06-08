@@ -10,6 +10,13 @@
     align-items: stretch;
 }
 
+// Custom poster actions below the sidebar preview.
+.fotogrids-embed-poster-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 .fotogrids-embed-url-input {
     flex: 1;
     font-family: monospace;

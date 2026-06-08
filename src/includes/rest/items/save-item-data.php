@@ -91,7 +91,7 @@ class Save_Item_Data {
         $meta_table = $wpdb->prefix . 'fotogrids_item_meta';
 
         $existing = $wpdb->get_row( $wpdb->prepare(
-            "SELECT id FROM {$meta_table} WHERE attachment_id = %d AND gallery_id = 0",
+            "SELECT id, custom_data FROM {$meta_table} WHERE attachment_id = %d AND gallery_id = 0",
             $item_id
         ) );
 
@@ -107,20 +107,47 @@ class Save_Item_Data {
             'updated_at'    => current_time( 'mysql', true ),
         );
 
+        // Video settings (poster + playback) for Media Library video items are
+        // stored in custom_data. Merge into any existing custom_data so other
+        // keys are preserved.
+        $is_video_file = \FotoGrids\Render\Video\Video_Item_Helpers::TYPE_FILE
+            === \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $item_id );
+        $custom_data_json = self::merge_video_settings(
+            $request,
+            $existing->custom_data ?? null,
+            $is_video_file
+        );
+
         if ( $existing ) {
+            if ( null !== $custom_data_json ) {
+                $meta_row['custom_data'] = $custom_data_json;
+            }
+            // wpdb maps formats positionally to the data array's key order.
+            $format = array_fill( 0, count( $meta_row ), null );
+            $i = 0;
+            foreach ( $meta_row as $key => $value ) {
+                $format[ $i++ ] = ( 'attachment_id' === $key || 'gallery_id' === $key ) ? '%d' : '%s';
+            }
             $wpdb->update(
                 $meta_table,
                 $meta_row,
                 array( 'id' => $existing->id ),
-                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' ),
+                $format,
                 array( '%d' )
             );
         } else {
             $meta_row['created_at'] = current_time( 'mysql', true );
+            if ( null !== $custom_data_json ) {
+                $meta_row['custom_data'] = $custom_data_json;
+            }
+            $format = array();
+            foreach ( $meta_row as $key => $value ) {
+                $format[] = ( 'attachment_id' === $key || 'gallery_id' === $key ) ? '%d' : '%s';
+            }
             $wpdb->insert(
                 $meta_table,
                 $meta_row,
-                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s' )
+                $format
             );
         }
 
@@ -244,5 +271,65 @@ class Save_Item_Data {
             'message'  => __( 'Item saved successfully.', 'fotogrids' ),
             'metadata' => $meta_results,
         ) );
+    }
+
+    /**
+     * Merge incoming video settings into an item's existing custom_data.
+     *
+     * Only applies to Media Library video items. Returns the JSON string to
+     * store, or null when there is nothing to write (non-video item or no
+     * video_settings param) so the caller can leave custom_data untouched.
+     *
+     * @since 1.1.0
+     * @param \WP_REST_Request $request       The save request.
+     * @param string|null      $existing_json Existing custom_data JSON, if any.
+     * @param bool             $is_video_file Whether the item is a video file.
+     * @return string|null JSON to store, or null to leave custom_data unchanged.
+     */
+    private static function merge_video_settings( \WP_REST_Request $request, $existing_json, bool $is_video_file ) {
+        if ( ! $is_video_file ) {
+            return null;
+        }
+
+        $incoming = $request->get_param( 'video_settings' );
+        if ( ! is_array( $incoming ) ) {
+            return null;
+        }
+
+        $existing = array();
+        if ( ! empty( $existing_json ) ) {
+            $decoded = json_decode( (string) $existing_json, true );
+            if ( is_array( $decoded ) ) {
+                $existing = $decoded;
+            }
+        }
+
+        $bool_keys = array( 'autoplay', 'mute', 'loop', 'controls' );
+        foreach ( $bool_keys as $key ) {
+            if ( array_key_exists( $key, $incoming ) ) {
+                $existing[ $key ] = (bool) $incoming[ $key ];
+            }
+        }
+
+        // Custom poster: poster_id (attachment) wins; poster_url is a fallback.
+        if ( array_key_exists( 'poster_id', $incoming ) ) {
+            $poster_id = absint( $incoming['poster_id'] );
+            if ( $poster_id > 0 ) {
+                $existing['poster_id'] = $poster_id;
+            } else {
+                unset( $existing['poster_id'] );
+            }
+        }
+
+        if ( array_key_exists( 'poster_url', $incoming ) ) {
+            $poster_url = esc_url_raw( (string) $incoming['poster_url'] );
+            if ( '' !== $poster_url ) {
+                $existing['poster_url'] = $poster_url;
+            } else {
+                unset( $existing['poster_url'] );
+            }
+        }
+
+        return wp_json_encode( $existing );
     }
 }

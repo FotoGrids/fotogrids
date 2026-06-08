@@ -70,10 +70,10 @@ abstract class Abstract_Db_Sorter {
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $rows = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT ID, post_title, post_date, post_modified, guid
+                "SELECT ID, post_type, post_title, post_date, post_modified, guid
                  FROM {$wpdb->posts}
                  WHERE ID IN ({$placeholders})
-                   AND post_type = 'attachment'",
+                   AND post_type IN ('attachment', 'fotogrids_embed')",
                 ...$item_ids
             ),
             ARRAY_A
