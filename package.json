@@ -18,9 +18,10 @@
     "test:ci": "npm run test:ci:render-guards && npm run test:ci:php-integration && jest --ci --coverage --watchAll=false",
     "test:ci:render-guards": "bash tests/ci/run-render-guards.sh",
     "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh",
-    "zip:dev": "npm run build:dev && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && rm -f ../fotogrids-dev.zip && zip -r ../fotogrids-dev.zip fotogrids -x '*.map' && rm -rf fotogrids",
-    "zip:prod": "npm run build && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && rm -f ../fotogrids-v$npm_package_version.zip && zip -r ../fotogrids-v$npm_package_version.zip fotogrids -x '*.map' && rm -rf fotogrids",
+    "zip:dev": "npm run build:dev && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-dev.zip && zip -r ../fotogrids-dev.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
+    "zip:prod": "npm run build && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-v$npm_package_version.zip && zip -r ../fotogrids-v$npm_package_version.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
     "release": "npm run clean && npm run build && npm run zip:prod",
+    "i18n:makepot": "wp i18n make-pot src src/languages/fotogrids.pot --slug=fotogrids --domain=fotogrids --exclude=freemius,dist,node_modules,tests",
     "icons:build": "node scripts/loading-icons-build.js",
     "icons:yaml": "node scripts/json-to-yaml.js"
   },

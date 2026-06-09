@@ -97,20 +97,20 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
      * @return void
      */
     public function content_template(): void {
-        $kind_attr  = esc_attr( $this->get_kind() );
+        $kind_attr  = $this->get_kind();
         $browse_lbl = $this->get_kind() === 'album'
-            ? esc_html__( 'Browse all albums', 'fotogrids' )
-            : esc_html__( 'Browse all galleries', 'fotogrids' );
+            ? __( 'Browse all albums', 'fotogrids' )
+            : __( 'Browse all galleries', 'fotogrids' );
         $edit_lbl   = $this->get_kind() === 'album'
-            ? esc_html__( 'Edit album', 'fotogrids' )
-            : esc_html__( 'Edit gallery', 'fotogrids' );
+            ? __( 'Edit album', 'fotogrids' )
+            : __( 'Edit gallery', 'fotogrids' );
         ?>
         <div class="elementor-control-field">
             <# if ( data.label ) { #>
                 <label for="<?php $this->print_control_uid(); ?>" class="elementor-control-title">{{{ data.label }}}</label>
             <# } #>
             <div class="elementor-control-input-wrapper elementor-control-unit-5">
-                <div class="fg-pb-elementor-picker" data-fg-picker-kind="<?php echo $kind_attr; ?>">
+                <div class="fg-pb-elementor-picker" data-fg-picker-kind="<?php echo esc_attr( $kind_attr ); ?>">
                     <select
                         id="<?php $this->print_control_uid(); ?>"
                         class="fg-pb-elementor-picker__select"
@@ -121,7 +121,7 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
                             type="button"
                             class="fg-pb-elementor-picker__browse fg-button fg-button--variant-primary fg-button--size-sm"
                         >
-                            <span class="fg-button__label"><?php echo $browse_lbl; ?></span>
+                            <span class="fg-button__label"><?php echo esc_html( $browse_lbl ); ?></span>
                         </button>
                         <a
                             href="#"
@@ -130,7 +130,7 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
                             rel="noopener noreferrer"
                             hidden
                         >
-                            <span class="fg-button__label"><?php echo $edit_lbl; ?></span>
+                            <span class="fg-button__label"><?php echo esc_html( $edit_lbl ); ?></span>
                             <span class="fotogrids-icon fotogrids-icon--click_external fg-button__icon fg-pb-elementor-picker__edit-icon" aria-hidden="true"></span>
                         </a>
                     </div>

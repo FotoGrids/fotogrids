@@ -632,7 +632,9 @@ class Renderer {
             : \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $this->post->ID );
 
         $meta_label = $this->is_album()
+            /* translators: %d: number of galleries in the album. */
             ? sprintf( _n( '%d gallery', '%d galleries', $count, 'fotogrids' ), $count )
+            /* translators: %d: number of items in the gallery. */
             : sprintf( _n( '%d item', '%d items', $count, 'fotogrids' ), $count );
 
         $html  = '<h1 class="fotogrids-view__title">' . esc_html( get_the_title( $this->post ) ) . '</h1>';

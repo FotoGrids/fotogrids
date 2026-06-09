@@ -174,7 +174,8 @@ class Save_Item_Data {
                     $meta_results['tags'][] = array( 'id' => $tag_id );
                 } else {
                     $meta_results['errors'][] = sprintf(
-                        __( 'Failed to link tag ID %d to item %d', 'fotogrids' ),
+                        /* translators: 1: tag ID, 2: item ID. */
+                        __( 'Failed to link tag ID %1$d to item %2$d', 'fotogrids' ),
                         $tag_id,
                         $item_id
                     );
@@ -190,7 +191,8 @@ class Save_Item_Data {
                     $meta_results['tags'][] = array( 'name' => $tag_name );
                 } else {
                     $meta_results['errors'][] = sprintf(
-                        __( 'Failed to add tag: %s to item %d', 'fotogrids' ),
+                        /* translators: 1: tag name, 2: item ID. */
+                        __( 'Failed to add tag: %1$s to item %2$d', 'fotogrids' ),
                         $tag_name,
                         $item_id
                     );
@@ -210,7 +212,8 @@ class Save_Item_Data {
                     $meta_results['people'][] = array( 'id' => $person_id, 'name' => $name );
                 } else {
                     $meta_results['errors'][] = sprintf(
-                        __( 'Failed to link person ID %d to item %d', 'fotogrids' ),
+                        /* translators: 1: person ID, 2: item ID. */
+                        __( 'Failed to link person ID %1$d to item %2$d', 'fotogrids' ),
                         $person_id,
                         $item_id
                     );
@@ -220,6 +223,7 @@ class Save_Item_Data {
                 if ( $result ) {
                     $meta_results['people'][] = array( 'name' => $name );
                 } else {
+                    /* translators: %s: person name. */
                     $meta_results['errors'][] = sprintf( __( 'Failed to add person: %s', 'fotogrids' ), $name );
                 }
             }
@@ -238,7 +242,8 @@ class Save_Item_Data {
                     $meta_results['locations'][] = array( 'id' => $location_id, 'name' => $name );
                 } else {
                     $meta_results['errors'][] = sprintf(
-                        __( 'Failed to link location ID %d to item %d', 'fotogrids' ),
+                        /* translators: 1: location ID, 2: item ID. */
+                        __( 'Failed to link location ID %1$d to item %2$d', 'fotogrids' ),
                         $location_id,
                         $item_id
                     );
@@ -248,6 +253,7 @@ class Save_Item_Data {
                 if ( $result ) {
                     $meta_results['locations'][] = array( 'name' => $name );
                 } else {
+                    /* translators: %s: location name. */
                     $meta_results['errors'][] = sprintf( __( 'Failed to add location: %s', 'fotogrids' ), $name );
                 }
             }

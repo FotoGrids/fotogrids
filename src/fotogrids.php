@@ -8,12 +8,11 @@
  * Author URI: https://www.fotogrids.com
  * Text Domain: fotogrids
  * Domain Path: /languages
- * Requires at least: 5.8
+ * Requires at least: 6.1
  * Tested up to: 7.0
  * Requires PHP: 8.0
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Network: false
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,6 +37,7 @@ foreach ( [ 'actions', 'filters', 'js-events' ] as $fotogrids_hooks_group ) {
     }
 }
 unset( $fotogrids_hooks_group, $fotogrids_hooks_file );
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-svg.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-activator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-deactivator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
@@ -247,11 +247,11 @@ add_action( \FotoGrids\Hooks\Actions_System::TOOLS_INIT, function () {
  * Plugin activation check
  */
 function fotogrids_activation_check() {
-    if ( version_compare( get_bloginfo( 'version' ), '5.8', '<' ) ) {
+    if ( version_compare( get_bloginfo( 'version' ), '6.1', '<' ) ) {
         deactivate_plugins( plugin_basename( __FILE__ ) );
         wp_die(
-            __( 'FotoGrids requires WordPress version 5.8 or higher.', 'fotogrids' ),
-            __( 'Plugin Activation Error', 'fotogrids' ),
+            esc_html__( 'FotoGrids requires WordPress version 6.1 or higher.', 'fotogrids' ),
+            esc_html__( 'Plugin Activation Error', 'fotogrids' ),
             array( 'back_link' => true )
         );
     }
@@ -259,8 +259,8 @@ function fotogrids_activation_check() {
     if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
         deactivate_plugins( plugin_basename( __FILE__ ) );
         wp_die(
-            __( 'FotoGrids requires PHP version 8.0 or higher.', 'fotogrids' ),
-            __( 'Plugin Activation Error', 'fotogrids' ),
+            esc_html__( 'FotoGrids requires PHP version 8.0 or higher.', 'fotogrids' ),
+            esc_html__( 'Plugin Activation Error', 'fotogrids' ),
             array( 'back_link' => true )
         );
     }

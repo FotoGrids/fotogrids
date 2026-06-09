@@ -96,7 +96,7 @@ class Public_Render {
             if ( isset( $already_css[ $handle ] ) ) {
                 continue;
             }
-            wp_register_style( $handle, $src, [], false );
+            wp_register_style( $handle, $src, [], FOTOGRIDS_VERSION );
             wp_enqueue_style( $handle );
             $new_css_handles[] = $handle;
         }
@@ -109,7 +109,7 @@ class Public_Render {
             if ( isset( $already_js[ $handle ] ) ) {
                 continue;
             }
-            wp_register_script( $handle, $meta['src'], [], false, $meta['in_footer'] );
+            wp_register_script( $handle, $meta['src'], [], FOTOGRIDS_VERSION, $meta['in_footer'] );
             wp_enqueue_script( $handle );
         }
     }

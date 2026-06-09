@@ -119,7 +119,7 @@ final class Password_Gate implements Gate {
         if ( $simulate !== 'password_required' ) {
             $stored     = (string) ( $settings['_password_encrypted'] ?? '' );
             $cookie_key = 'fotogrids_unlocked_' . $gallery_id;
-            $cookie_val = (string) ( $_COOKIE[ $cookie_key ] ?? '' );
+            $cookie_val = sanitize_text_field( wp_unslash( $_COOKIE[ $cookie_key ] ?? '' ) );
 
             if (
                 $cookie_val !== ''

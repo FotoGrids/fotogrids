@@ -205,7 +205,8 @@ class Metadata_Data {
                 if ( $result ) {
                     $results['tags'][] = array( 'id' => $tag_id );
                 } else {
-                    $results['errors'][] = sprintf( __( 'Failed to link tag ID %d to item %d', 'fotogrids' ), $tag_id, $item_id );
+                    /* translators: 1: tag ID, 2: item ID. */
+                    $results['errors'][] = sprintf( __( 'Failed to link tag ID %1$d to item %2$d', 'fotogrids' ), $tag_id, $item_id );
                 }
             } else {
                 // Fallback: name string (backwards compat for external callers).
@@ -217,7 +218,8 @@ class Metadata_Data {
                 if ( $result ) {
                     $results['tags'][] = array( 'name' => $tag_name );
                 } else {
-                    $results['errors'][] = sprintf( __( 'Failed to add tag: %s to item %d', 'fotogrids' ), $tag_name, $item_id );
+                    /* translators: 1: tag name, 2: item ID. */
+                    $results['errors'][] = sprintf( __( 'Failed to add tag: %1$s to item %2$d', 'fotogrids' ), $tag_name, $item_id );
                 }
             }
         }
@@ -235,7 +237,8 @@ class Metadata_Data {
                 if ( $result ) {
                     $results['people'][] = array( 'id' => $person_id, 'name' => $name );
                 } else {
-                    $results['errors'][] = sprintf( __( 'Failed to link person ID %d to item %d', 'fotogrids' ), $person_id, $item_id );
+                    /* translators: 1: person ID, 2: item ID. */
+                    $results['errors'][] = sprintf( __( 'Failed to link person ID %1$d to item %2$d', 'fotogrids' ), $person_id, $item_id );
                 }
             } elseif ( ! empty( $name ) ) {
                 // Fallback: no ID supplied - find or create by name.
@@ -243,6 +246,7 @@ class Metadata_Data {
                 if ( $result ) {
                     $results['people'][] = array( 'name' => $name );
                 } else {
+                    /* translators: %s: person name. */
                     $results['errors'][] = sprintf( __( 'Failed to add person: %s', 'fotogrids' ), $name );
                 }
             }
@@ -262,7 +266,8 @@ class Metadata_Data {
                 if ( $result ) {
                     $results['locations'][] = array( 'id' => $location_id, 'name' => $name );
                 } else {
-                    $results['errors'][] = sprintf( __( 'Failed to link location ID %d to item %d', 'fotogrids' ), $location_id, $item_id );
+                    /* translators: 1: location ID, 2: item ID. */
+                    $results['errors'][] = sprintf( __( 'Failed to link location ID %1$d to item %2$d', 'fotogrids' ), $location_id, $item_id );
                 }
             } elseif ( ! empty( $name ) ) {
                 // Fallback: no ID supplied - find or create by name.
@@ -270,6 +275,7 @@ class Metadata_Data {
                 if ( $result ) {
                     $results['locations'][] = array( 'name' => $name );
                 } else {
+                    /* translators: %s: location name. */
                     $results['errors'][] = sprintf( __( 'Failed to add location: %s', 'fotogrids' ), $name );
                 }
             }

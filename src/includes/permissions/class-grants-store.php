@@ -168,10 +168,10 @@ final class Grants_Store {
             'expires_at'   => array_key_exists( 'expires_at', $grant ) ? $grant['expires_at'] : null,
         ];
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $table = self::table();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
         $existing = $wpdb->get_var( $wpdb->prepare(
-            'SELECT id FROM ' . self::table() .
-            ' WHERE grantee_type = %s AND grantee_id = %s AND scope_type = %s AND scope_id = %d AND capability = %s',
+            "SELECT id FROM {$table} WHERE grantee_type = %s AND grantee_id = %s AND scope_type = %s AND scope_id = %d AND capability = %s",
             $grantee_type, $grantee_id, $scope_type, $scope_id, $capability
         ) );
 
@@ -221,11 +221,10 @@ final class Grants_Store {
             return false;
         }
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL
-        $deleted = $wpdb->query( $wpdb->prepare(
-            'DELETE FROM ' . self::table() . ' WHERE ' . implode( ' AND ', $where ),
-            $params
-        ) );
+        $table = self::table();
+        $sql   = "DELETE FROM {$table} WHERE " . implode( ' AND ', $where );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+        $deleted = $wpdb->query( $wpdb->prepare( $sql, ...$params ) );
 
         return $deleted === false ? false : (int) $deleted;
     }

@@ -386,7 +386,7 @@ final class Module {
 
         if ( wp_doing_ajax()
             && isset( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            && str_starts_with( (string) $_REQUEST['action'], 'elementor' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            && str_starts_with( (string) sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ), 'elementor' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             return true;
         }
 

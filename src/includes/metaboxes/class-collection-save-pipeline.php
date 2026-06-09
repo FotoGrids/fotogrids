@@ -52,7 +52,7 @@ final class Collection_Save_Pipeline {
      */
     public static function on_save_post( $post_id ): void {
         if ( ! isset( $_POST['fotogrids_meta_box_nonce'] )
-            || ! wp_verify_nonce( $_POST['fotogrids_meta_box_nonce'], 'fotogrids_meta_box' )
+            || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['fotogrids_meta_box_nonce'] ) ), 'fotogrids_meta_box' )
         ) {
             return;
         }
@@ -85,7 +85,7 @@ final class Collection_Save_Pipeline {
      * @since 1.0.0
      */
     public static function on_ajax_save_collection(): void {
-        $nonce = $_POST['nonce'] ?? $_POST['fotogrids_meta_box_nonce'] ?? '';
+        $nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? $_POST['fotogrids_meta_box_nonce'] ?? '' ) );
         if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'fotogrids_meta_box' ) ) {
             wp_send_json_error( [ 'message' => __( 'Security check failed', 'fotogrids' ) ] );
         }
@@ -112,17 +112,17 @@ final class Collection_Save_Pipeline {
         $post_updated = false;
 
         if ( isset( $_POST['post_title'] ) && ! empty( $_POST['post_title'] ) ) {
-            $post_data['post_title'] = sanitize_text_field( $_POST['post_title'] );
+            $post_data['post_title'] = sanitize_text_field( wp_unslash( $_POST['post_title'] ) );
             $post_updated            = true;
         }
 
         if ( isset( $_POST['content'] ) ) {
-            $post_data['post_content'] = wp_kses_post( $_POST['content'] );
+            $post_data['post_content'] = wp_kses_post( wp_unslash( $_POST['content'] ) );
             $post_updated              = true;
         }
 
         if ( isset( $_POST['post_status'] ) ) {
-            $post_data['post_status'] = sanitize_text_field( $_POST['post_status'] );
+            $post_data['post_status'] = sanitize_text_field( wp_unslash( $_POST['post_status'] ) );
             $post_updated             = true;
         }
 
@@ -149,6 +149,7 @@ final class Collection_Save_Pipeline {
             : __( 'Gallery', 'fotogrids' );
 
         wp_send_json_success( [
+            /* translators: %s: collection type (Gallery or Album). */
             'message'      => sprintf( __( '%s saved successfully', 'fotogrids' ), $collection_type ),
             'post_id'      => $post_id,
             'post_title'   => get_the_title( $post_id ),

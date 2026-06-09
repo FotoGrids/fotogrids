@@ -280,10 +280,16 @@ final class Font_Resolver {
 
         $this->stylesheet_printed = true;
 
+        // Google Fonts link is printed inline at the exact point fonts are resolved
+        // during render; deferring to wp_enqueue_style() would lose the per-render
+        // font set. The <link> string sits on its own line inside the printf(), so a
+        // disable/enable block is used rather than a single next-line ignore.
+        // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
         printf(
             '<link rel="stylesheet" id="fotogrids-google-fonts-css" href="%s" media="all" />' . "\n",
             esc_url( $url )
         );
+        // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
     }
 
     /**

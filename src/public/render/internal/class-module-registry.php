@@ -37,7 +37,7 @@ final class Module_Registry {
      */
     public static function register( string $category, string $module_class ): void {
         if ( ! in_array( $category, self::CATEGORIES, true ) ) {
-            throw new \InvalidArgumentException( sprintf( "Unknown category: '%s'", $category ) );
+            throw new \InvalidArgumentException( sprintf( "Unknown category: '%s'", esc_html( $category ) ) );
         }
 
         self::$registered_modules[ $category ] ??= [];
@@ -54,7 +54,7 @@ final class Module_Registry {
      */
     public static function active_modules( string $category, Render_Context $render_context ): array {
         if ( ! in_array( $category, self::CATEGORIES, true ) ) {
-            throw new \InvalidArgumentException( sprintf( "Unknown category: '%s'", $category ) );
+            throw new \InvalidArgumentException( sprintf( "Unknown category: '%s'", esc_html( $category ) ) );
         }
 
         $registered_classes = self::$registered_modules[ $category ] ?? [];
@@ -118,7 +118,7 @@ final class Module_Registry {
      */
     public static function all_modules( string $category ): array {
         if ( ! in_array( $category, self::CATEGORIES, true ) ) {
-            throw new \InvalidArgumentException( sprintf( "Unknown category: '%s'", $category ) );
+            throw new \InvalidArgumentException( sprintf( "Unknown category: '%s'", esc_html( $category ) ) );
         }
 
         return self::$registered_modules[ $category ] ?? [];

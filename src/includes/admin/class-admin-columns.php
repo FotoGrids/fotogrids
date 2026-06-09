@@ -152,10 +152,11 @@ class Admin_Columns {
                     foreach ( $albums as $album ) {
                         $album_links[] = '<a href="' . get_edit_post_link( $album->ID ) . '">' . esc_html( $album->post_title ) . '</a>';
                     }
-                    echo implode( ', ', $album_links );
+                    echo wp_kses_post( implode( ', ', $album_links ) );
 
                     if ( count( $albums ) > 1 ) {
-                        echo '<br><small style="color: #666;">(' . sprintf( __( '%d albums', 'fotogrids' ), count( $albums ) ) . ')</small>';
+                        /* translators: %d: number of albums the gallery belongs to. */
+                        echo '<br><small style="color: #666;">(' . esc_html( sprintf( __( '%d albums', 'fotogrids' ), count( $albums ) ) ) . ')</small>';
                     }
                 } else {
                     echo '-';
@@ -180,9 +181,9 @@ class Admin_Columns {
                 $shares = (int) ( $stats['shares'] ?? 0 );
                 printf(
                     '%1$s %2$s<br>%3$s %4$s',
-                    number_format_i18n( $views ),
+                    esc_html( number_format_i18n( $views ) ),
                     esc_html__( 'views', 'fotogrids' ),
-                    number_format_i18n( $shares ),
+                    esc_html( number_format_i18n( $shares ) ),
                     esc_html__( 'shares', 'fotogrids' )
                 );
                 break;
@@ -260,9 +261,9 @@ class Admin_Columns {
                 $shares = (int) ( $stats['shares'] ?? 0 );
                 printf(
                     '%1$s %2$s<br>%3$s %4$s',
-                    number_format_i18n( $views ),
+                    esc_html( number_format_i18n( $views ) ),
                     esc_html__( 'views', 'fotogrids' ),
-                    number_format_i18n( $shares ),
+                    esc_html( number_format_i18n( $shares ) ),
                     esc_html__( 'shares', 'fotogrids' )
                 );
                 break;

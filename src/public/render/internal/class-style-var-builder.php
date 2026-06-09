@@ -73,7 +73,7 @@ final class Style_Var_Builder {
 
         foreach ( $css_variables as $name => $value ) {
             if ( ! str_starts_with( $name, '--' ) ) {
-                throw new \InvalidArgumentException( sprintf( "Style var '%s' must start with '--'", $name ) );
+                throw new \InvalidArgumentException( sprintf( "Style var '%s' must start with '--'", esc_html( $name ) ) );
             }
 
             if ( $value instanceof Responsive_Var ) {

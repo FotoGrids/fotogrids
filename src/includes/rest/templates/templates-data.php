@@ -70,14 +70,6 @@ class Templates_Data {
                 $template['isUserTemplate'] = false;
                 $template['category'] = $cat;
 
-                // Translate strings if needed
-                if ( isset( $template['name'] ) ) {
-                    $template['name'] = __( $template['name'], 'fotogrids' );
-                }
-                if ( isset( $template['description'] ) ) {
-                    $template['description'] = __( $template['description'], 'fotogrids' );
-                }
-
                 // Filter Pro templates based on license
                 if ( isset( $template['type'] ) && $template['type'] === 'pro' ) {
                     if ( ! $include_pro || ! $is_pro ) {
@@ -576,9 +568,11 @@ class Templates_Data {
         $html .= '    <meta charset="UTF-8">' . "\n";
         $html .= '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' . "\n";
         $html .= '    <title>' . esc_html( $template_name ) . ' - ' . __( 'Preview', 'fotogrids' ) . '</title>' . "\n";
+        // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- This is a self-contained preview document returned by a REST endpoint, not the WP frontend; there is no wp_head to enqueue into.
         $html .= '    <link rel="stylesheet" href="' . esc_url( $frontend_css_url ) . '?ver=' . FOTOGRIDS_VERSION . '">' . "\n";
 
         if ( $template_css_exists ) {
+            // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Self-contained preview document; see note above.
             $html .= '    <link rel="stylesheet" href="' . esc_url( $template_css_url_public ) . '?ver=' . FOTOGRIDS_VERSION . '">' . "\n";
         }
 
@@ -732,9 +726,11 @@ class Templates_Data {
 
             // Fallback to defaults if manifest not available or missing entry
             if ( ! $title ) {
+                /* translators: %d: demo image number. */
                 $title = sprintf( __( 'Demo Image %d', 'fotogrids' ), $i );
             }
             if ( ! $alt ) {
+                /* translators: %d: demo image number. */
                 $alt = sprintf( __( 'Template preview demo image %d', 'fotogrids' ), $i );
             }
             if ( ! $caption ) {
@@ -789,11 +785,24 @@ class Templates_Data {
         $items = array();
         for ( $i = 1; $i <= 6; $i++ ) {
             $is_video = ( $i % 3 === 0 ); // Every 3rd item is a video
+
+            if ( $is_video ) {
+                /* translators: %d: preview item number. */
+                $item_title = sprintf( __( 'Video Item %d', 'fotogrids' ), $i );
+                /* translators: %d: preview item number. */
+                $item_alt = sprintf( __( 'Video placeholder %d', 'fotogrids' ), $i );
+            } else {
+                /* translators: %d: preview item number. */
+                $item_title = sprintf( __( 'Image Item %d', 'fotogrids' ), $i );
+                /* translators: %d: preview item number. */
+                $item_alt = sprintf( __( 'Image placeholder %d', 'fotogrids' ), $i );
+            }
+
             $items[] = array(
                 'id' => $i,
-                'title' => $is_video ? sprintf( __( 'Video Item %d', 'fotogrids' ), $i ) : sprintf( __( 'Image Item %d', 'fotogrids' ), $i ),
-                'alt' => $is_video ? sprintf( __( 'Video placeholder %d', 'fotogrids' ), $i ) : sprintf( __( 'Image placeholder %d', 'fotogrids' ), $i ),
-                'caption' => sprintf( __( 'This is how your gallery will look with this template', 'fotogrids' ) ),
+                'title' => $item_title,
+                'alt' => $item_alt,
+                'caption' => __( 'This is how your gallery will look with this template', 'fotogrids' ),
                 'medium' => $is_video ? $video_icon_data_uri : $image_icon_data_uri,
                 'full' => $is_video ? $video_icon_data_uri : $image_icon_data_uri,
             );

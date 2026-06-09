@@ -471,7 +471,7 @@ final class Metabox_Registrar {
             <!-- React Album Assignment component will mount here -->
             <div class="fotogrids-loading">
                 <span class="spinner fg-is-active"></span>
-                <?php _e( 'Loading albums...', 'fotogrids' ); ?>
+                <?php esc_html_e( 'Loading albums...', 'fotogrids' ); ?>
             </div>
         </div>
         <?php

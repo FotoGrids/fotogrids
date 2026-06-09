@@ -2,7 +2,7 @@
 Contributors: FotoGrids
 Donate link: https://go.fotogrids.com/donate
 Tags: gallery, album, lightbox, slider, portfolio
-Requires at least: 5.8
+Requires at least: 6.1
 Tested up to: 7.0
 Requires PHP: 8.0
 Stable tag: 1.0.0

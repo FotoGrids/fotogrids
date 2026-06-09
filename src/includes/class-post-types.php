@@ -319,7 +319,8 @@ class Post_Types {
         }
 
         ?>
-        <p class="fotogrids-shortcode-title"><?php printf( __( 'Use this shortcode to display the %s', 'fotogrids' ), $type_label ); ?></p>
+        <?php /* translators: %s: collection type label (gallery or album). */ ?>
+        <p class="fotogrids-shortcode-title"><?php printf( esc_html__( 'Use this shortcode to display the %s', 'fotogrids' ), esc_html( $type_label ) ); ?></p>
         <div class="fotogrids-shortcode-container">
             <input type="text" value="<?php echo esc_attr( $shortcode ); ?>"
                 readonly onclick="this.select();" class="fotogrids-shortcode-input" />
@@ -354,7 +355,7 @@ class Post_Types {
         <div id="fotogrids-album-galleries-root">
             <div class="fotogrids-loading">
                 <span class="spinner fg-is-active"></span>
-                <?php _e( 'Loading gallery manager...', 'fotogrids' ); ?>
+                <?php esc_html_e( 'Loading gallery manager...', 'fotogrids' ); ?>
             </div>
         </div>
         <?php

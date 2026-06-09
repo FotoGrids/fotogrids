@@ -21,6 +21,11 @@ class Admin_Init {
         add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_scripts' ) );
         add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
 
+        // Allow wp_safe_redirect() to reach the external hosts FotoGrids links
+        // out to (review page, upgrade/marketing). Keeps redirects on the
+        // safe-redirect path while permitting our own known destinations.
+        add_filter( 'allowed_redirect_hosts', array( __CLASS__, 'allowed_redirect_hosts' ) );
+
         // Suppress admin notices on FotoGrids pages
         add_action( 'admin_head', array( __CLASS__, 'suppress_admin_notices' ) );
 
@@ -265,19 +270,15 @@ class Admin_Init {
             true
         );
 
-        // Enqueue Google Fonts - Poppins
+        // Enqueue Poppins - self-hosted (SIL OFL), no external CDN. The
+        // @font-face rules reference .ttf files relative to the stylesheet's
+        // own directory, so no path rewriting is needed.
         wp_enqueue_style(
             'fotogrids-google-fonts',
-            'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
+            FOTOGRIDS_PLUGIN_URL . 'assets/admin/fonts/poppins/poppins.css',
             array(),
-            null
+            FOTOGRIDS_VERSION
         );
-
-        // Add preconnect links for Google Fonts in admin
-        add_action( 'admin_head', function() {
-            echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
-            echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
-        } );
 
         // Enqueue admin styles
         wp_enqueue_style(
@@ -343,7 +344,7 @@ class Admin_Init {
         ) {
             wp_enqueue_script(
                 'chartjs',
-                'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js',
+                FOTOGRIDS_PLUGIN_URL . 'assets/admin/vendor/chartjs/chart.umd.js',
                 array(),
                 '4.4.0',
                 true
@@ -375,7 +376,7 @@ class Admin_Init {
             \FotoGrids\Assets\Collection_Settings_Assets::enqueue( true, false );
 
             // Determine post type from subtab parameter, default to gallery
-            $subtab = isset( $_GET['subtab'] ) ? sanitize_text_field( $_GET['subtab'] ) : 'gallery';
+            $subtab = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
             $post_type = ( $subtab === 'album' ) ? 'album' : 'gallery';
 
             $localized_data = \FotoGrids\Admin\Settings_Localizer::data_for_collection( array(
@@ -401,8 +402,16 @@ class Admin_Init {
                 'sanitize_callback' => array( __CLASS__, 'sanitize_general_settings' ),
             )
         );
-        register_setting( 'fotogrids_settings', 'fotogrids_permission_settings' );
-        register_setting( 'fotogrids_settings', 'fotogrids_integration_settings' );
+        register_setting( 'fotogrids_settings', 'fotogrids_permission_settings', array(
+            'type'              => 'array',
+            'default'           => array(),
+            'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
+        ) );
+        register_setting( 'fotogrids_settings', 'fotogrids_integration_settings', array(
+            'type'              => 'array',
+            'default'           => array(),
+            'sanitize_callback' => array( __CLASS__, 'sanitize_settings_array' ),
+        ) );
         register_setting( 'fotogrids_settings', 'fotogrids_share_statistics', array(
             'type' => 'boolean',
             'default' => false,
@@ -549,6 +558,40 @@ class Admin_Init {
     }
 
     /**
+     * Generic array-settings sanitizer.
+     *
+     * Recursively sanitises an arbitrary settings array: scalar values are
+     * passed through sanitize_text_field() and nested arrays are walked. Used
+     * for option groups that do not (yet) have a typed per-key sanitizer of
+     * their own. Non-array input collapses to an empty array.
+     *
+     * @since  1.0.0
+     * @param  mixed $value Raw option value from options.php.
+     * @return array<string, mixed>
+     */
+    public static function sanitize_settings_array( $value ): array {
+        if ( ! is_array( $value ) ) {
+            return array();
+        }
+
+        $sanitized = array();
+        foreach ( $value as $key => $item ) {
+            $clean_key = sanitize_key( (string) $key );
+            if ( is_array( $item ) ) {
+                $sanitized[ $clean_key ] = self::sanitize_settings_array( $item );
+            } elseif ( is_bool( $item ) ) {
+                $sanitized[ $clean_key ] = $item;
+            } elseif ( is_int( $item ) || is_float( $item ) ) {
+                $sanitized[ $clean_key ] = $item;
+            } else {
+                $sanitized[ $clean_key ] = sanitize_text_field( (string) $item );
+            }
+        }
+
+        return $sanitized;
+    }
+
+    /**
      * Sanitize a boolean setting submitted via a Toggle component.
      *
      * Toggle uses a hidden input that is always present in POST with value
@@ -604,8 +647,8 @@ class Admin_Init {
             wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
         }
 
-        $setting = isset( $_POST['setting'] ) ? sanitize_text_field( $_POST['setting'] ) : '';
-        $value = isset( $_POST['value'] ) ? $_POST['value'] : '';
+        $setting = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
+        $value = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
         $allowed_settings = array( 'fotogrids_autosave', 'fotogrids_auto_clear_cache', 'fotogrids_enable_statistics' );
         if ( ! in_array( $setting, $allowed_settings, true ) ) {
@@ -656,7 +699,7 @@ class Admin_Init {
      */
     private static function render_admin_page( $page_id ) {
         // Get the SVG icon content
-        $icon_path = FOTOGRIDS_PLUGIN_DIR . 'assets/admin/items/fotogrids-icon-color.svg';
+        $icon_path = FOTOGRIDS_PLUGIN_DIR . 'assets/admin/images/fotogrids-icon-color.svg';
         $icon_svg = '';
         if ( file_exists( $icon_path ) ) {
             $icon_svg = file_get_contents( $icon_path );
@@ -674,7 +717,7 @@ class Admin_Init {
             <div class="fotogrids-page-header">
                 <h1 class="fotogrids-heading-inline">
                     <?php if ( $show_icon && $icon_svg ) : ?>
-                        <span class="fotogrids-page-icon"><?php echo $icon_svg; ?></span>
+                        <span class="fotogrids-page-icon"><?php \FotoGrids\Svg::render( $icon_svg ); ?></span>
                     <?php endif; ?>
                     <?php echo esc_html( get_admin_page_title() ); ?>
                 </h1>
@@ -763,10 +806,24 @@ class Admin_Init {
     }
 
     /**
+     * Allow FotoGrids' own external hosts through wp_safe_redirect().
+     *
+     * @param string[] $hosts Allowed redirect hostnames.
+     * @return string[]
+     */
+    public static function allowed_redirect_hosts( $hosts ) {
+        $hosts[] = 'wordpress.org';
+        $hosts[] = 'fotogrids.com';
+        $hosts[] = 'go.fotogrids.com';
+
+        return $hosts;
+    }
+
+    /**
      * Upgrade redirect - redirects to external upgrade URL
      */
     public static function upgrade_redirect() {
-        wp_redirect( 'https://go.fotogrids.com/upgrade' );
+        wp_safe_redirect( 'https://go.fotogrids.com/upgrade' );
         exit;
     }
 
@@ -906,6 +963,7 @@ class Admin_Init {
 
             if ( $assigned > 0 ) {
                 $message = sprintf(
+                    /* translators: 1: number of galleries assigned, 2: album name. */
                     _n(
                         '%1$d gallery assigned to "%2$s".',
                         '%1$d galleries assigned to "%2$s".',
@@ -918,6 +976,7 @@ class Admin_Init {
 
                 if ( $errors > 0 ) {
                     $message .= ' ' . sprintf(
+                        /* translators: %d: number of galleries that could not be assigned. */
                         _n(
                             '%d gallery could not be assigned.',
                             '%d galleries could not be assigned.',
@@ -931,6 +990,7 @@ class Admin_Init {
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( $message ) . '</p></div>';
             } elseif ( $errors > 0 ) {
                 $message = sprintf(
+                    /* translators: %d: number of galleries that could not be assigned. */
                     _n(
                         '%d gallery could not be assigned.',
                         '%d galleries could not be assigned.',
@@ -949,6 +1009,7 @@ class Admin_Init {
 
             if ( $removed > 0 ) {
                 $message = sprintf(
+                    /* translators: %d: number of galleries removed from all albums. */
                     _n(
                         '%d gallery removed from all albums.',
                         '%d galleries removed from all albums.',
@@ -960,6 +1021,7 @@ class Admin_Init {
 
                 if ( $errors > 0 ) {
                     $message .= ' ' . sprintf(
+                        /* translators: %d: number of galleries that could not be processed. */
                         _n(
                             '%d gallery could not be processed.',
                             '%d galleries could not be processed.',
@@ -973,6 +1035,7 @@ class Admin_Init {
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( $message ) . '</p></div>';
             } elseif ( $errors > 0 ) {
                 $message = sprintf(
+                    /* translators: %d: number of galleries that could not be processed. */
                     _n(
                         '%d gallery could not be processed.',
                         '%d galleries could not be processed.',
@@ -986,7 +1049,7 @@ class Admin_Init {
         }
 
         if ( isset( $_REQUEST['bulk_error'] ) ) {
-            $error = sanitize_text_field( $_REQUEST['bulk_error'] );
+            $error = sanitize_text_field( wp_unslash( $_REQUEST['bulk_error'] ) );
             $message = '';
 
             switch ( $error ) {
@@ -1040,10 +1103,10 @@ class Admin_Init {
             ?>
             <span id="<?php echo esc_attr( $id ); ?>" class="fotogrids-bulk-album-selector" style="display: none; margin-left: 6px;">
                 <label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
-                    <?php _e( 'Select Album:', 'fotogrids' ); ?>
+                    <?php esc_html_e( 'Select Album:', 'fotogrids' ); ?>
                 </label>
                 <select name="album_id" id="<?php echo esc_attr( $select_id ); ?>" data-fg-album-select="<?php echo esc_attr( $which ); ?>">
-                    <option value=""><?php _e( 'Choose an album...', 'fotogrids' ); ?></option>
+                    <option value=""><?php esc_html_e( 'Choose an album...', 'fotogrids' ); ?></option>
                     <?php foreach ( $albums as $album ) : ?>
                         <option value="<?php echo esc_attr( $album->ID ); ?>">
                             <?php echo esc_html( $album->post_title ); ?>

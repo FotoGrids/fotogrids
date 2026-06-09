@@ -462,6 +462,10 @@ const mainConfig = {
                     to: 'readme.txt',
                 },
                 {
+                    from: 'src/license.txt',
+                    to: 'license.txt',
+                },
+                {
                     from: 'src/index.php',
                     to: 'index.php',
                 },
@@ -552,6 +556,27 @@ const mainConfig = {
                 },
                 {
                     from: 'src/assets/admin/images/**/*',
+                    to: ({ context, absoluteFilename }) => {
+                        const relativePath = path.relative(context, absoluteFilename);
+                        return relativePath.replace('src/', '');
+                    },
+                },
+                {
+                    // Bundled third-party admin vendor scripts (e.g. Chart.js).
+                    // Shipped verbatim with their source map so WordPress.org's
+                    // "include source for minified files" rule is satisfied; we
+                    // do NOT load these from a CDN.
+                    from: 'src/assets/admin/vendor/**/*',
+                    to: ({ context, absoluteFilename }) => {
+                        const relativePath = path.relative(context, absoluteFilename);
+                        return relativePath.replace('src/', '');
+                    },
+                },
+                {
+                    // Self-hosted admin web fonts (Poppins, SIL OFL). Bundled
+                    // locally instead of loading from fonts.googleapis.com so no
+                    // visitor/admin data is sent to Google.
+                    from: 'src/assets/admin/fonts/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');

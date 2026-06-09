@@ -49,7 +49,6 @@ class Dashboard_Widget {
             FOTOGRIDS_PLUGIN_DIR . 'assets/css/dashboard-widget.css',
         );
 
-        $css_enqueued = false;
         foreach ( $css_paths as $css_path ) {
             if ( file_exists( $css_path ) ) {
                 $css_url = FOTOGRIDS_PLUGIN_URL . str_replace( FOTOGRIDS_PLUGIN_DIR, '', $css_path );
@@ -59,14 +58,8 @@ class Dashboard_Widget {
                     array(),
                     FOTOGRIDS_VERSION
                 );
-                $css_enqueued = true;
                 break;
             }
-        }
-
-        if ( ! $css_enqueued ) {
-            // Add inline styles as fallback
-            add_action( 'admin_head', array( __CLASS__, 'add_inline_styles' ) );
         }
 
         // Try to enqueue JS - check both possible locations
@@ -74,7 +67,6 @@ class Dashboard_Widget {
             FOTOGRIDS_PLUGIN_DIR . 'assets/js/dashboard-widget.js',
         );
 
-        $js_enqueued = false;
         foreach ( $js_paths as $js_path ) {
             if ( file_exists( $js_path ) ) {
                 $js_url = FOTOGRIDS_PLUGIN_URL . str_replace( FOTOGRIDS_PLUGIN_DIR, '', $js_path );
@@ -92,138 +84,8 @@ class Dashboard_Widget {
                     'pluginUrl' => FOTOGRIDS_PLUGIN_URL,
                     'version' => FOTOGRIDS_VERSION,
                 ) );
-                $js_enqueued = true;
                 break;
             }
-        }
-
-        if ( ! $js_enqueued ) {
-            // Add inline script as fallback
-            add_action( 'admin_footer', array( __CLASS__, 'add_inline_script' ) );
-        }
-    }
-
-    /**
-     * Add inline styles as fallback
-     */
-    public static function add_inline_styles() {
-        echo '<style id="fotogrids-dashboard-widget-styles">' . self::get_basic_styles() . '</style>';
-    }
-
-    /**
-     * Get basic inline styles
-     */
-    private static function get_basic_styles() {
-        return '
-        .fotogrids-dashboard-widget {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-        }
-        .fotogrids-dw-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: white;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            gap: 16px;
-        }
-        .fotogrids-dw-header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .fotogrids-dw-version {
-            font-size: 13px;
-            color: #646970;
-            font-weight: 500;
-        }
-        .fotogrids-dw-header-right {
-            display: flex;
-            gap: 8px;
-        }
-        .fotogrids-dw-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .fotogrids-dw-stat-card {
-            background: white;
-            border-radius: 4px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .fotogrids-dw-stat-number {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e1e1e;
-        }
-        .fotogrids-dw-stat-label {
-            font-size: 11px;
-            color: #646970;
-            text-transform: uppercase;
-        }
-        .fotogrids-dw-button {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            border: 1px solid transparent;
-        }
-        .fotogrids-dw-button-primary {
-            background-color: #3c46f0;
-            color: white;
-        }
-        .fotogrids-dw-button-secondary {
-            background-color: white;
-            color: #1e1e1e;
-            border-color: #dcdcde;
-        }
-        .fotogrids-dw-recent, .fotogrids-dw-news {
-            margin-bottom: 16px;
-        }
-        .fotogrids-dw-section-title {
-            font-weight: 600;
-        }
-        .fotogrids-dw-recent-list, .fotogrids-dw-news-list {
-            background: white;
-            border-radius: 4px;
-            padding: 8px;
-        }
-        .fotogrids-dw-recent-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px;
-        }
-        .fotogrids-dw-footer {
-            display: flex;
-            gap: 8px;
-            padding-top: 12px;
-            border-top: 1px solid #f0f0f1;
-        }
-        ';
-    }
-
-    /**
-     * Add inline script as fallback
-     */
-    public static function add_inline_script() {
-        $script_path = FOTOGRIDS_PLUGIN_DIR . 'assets/admin/src/dashboard-widget.js';
-        if ( file_exists( $script_path ) ) {
-            $script = file_get_contents( $script_path );
-            $localized = 'window.fotogridsDashboard = ' . wp_json_encode( array(
-                'restUrl' => 'fotogrids/v1/',
-                'restNonce' => wp_create_nonce( 'wp_rest' ),
-                'pluginUrl' => FOTOGRIDS_PLUGIN_URL,
-                'version' => FOTOGRIDS_VERSION,
-            ) ) . ';';
-            echo '<script id="fotogrids-dashboard-widget-script">' . $localized . $script . '</script>';
         }
     }
 
@@ -281,7 +143,7 @@ class Dashboard_Widget {
             <div class="fotogrids-dw-header">
                 <div class="fotogrids-dw-header-left">
                     <div class="fotogrids-dw-logo">
-                        <?php echo $logo_svg; ?>
+                        <?php \FotoGrids\Svg::render( $logo_svg ); ?>
                     </div>
                     <span class="fotogrids-dw-version">FotoGrids v<?php echo esc_html( $version ); ?></span>
                 </div>
@@ -299,7 +161,7 @@ class Dashboard_Widget {
                 <?php foreach ( $stat_cards as $card ) : ?>
                     <a href="<?php echo esc_url( $card['url'] ); ?>" class="fotogrids-dw-stat-card" data-stat="<?php echo esc_attr( $card['key'] ); ?>" data-color="<?php echo esc_attr( $card['color'] ); ?>">
                         <div class="fotogrids-dw-stat-icon">
-                            <?php echo self::get_icon( $card['icon'] ); ?>
+                            <?php \FotoGrids\Svg::render( self::get_icon( $card['icon'] ) ); ?>
                         </div>
                         <div class="fotogrids-dw-stat-content">
                             <span class="fotogrids-dw-stat-number"><?php echo esc_html( number_format_i18n( $card['value'] ) ); ?></span>

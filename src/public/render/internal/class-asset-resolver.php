@@ -254,7 +254,7 @@ final class Asset_Resolver {
      */
     private function resolve_url( string $origin, string $relative_path ): string {
         if ( ! isset( self::$plugin_render_urls[ $origin ] ) ) {
-            throw new \RuntimeException( sprintf( "Asset origin '%s' is not registered", $origin ) );
+            throw new \RuntimeException( sprintf( "Asset origin '%s' is not registered", esc_html( $origin ) ) );
         }
 
         return self::$plugin_render_urls[ $origin ] . ltrim( $relative_path, '/' );
@@ -269,7 +269,7 @@ final class Asset_Resolver {
      */
     private function resolve_version( string $origin ): string {
         if ( ! isset( self::$plugin_versions[ $origin ] ) ) {
-            throw new \RuntimeException( sprintf( "Asset version for origin '%s' is not registered", $origin ) );
+            throw new \RuntimeException( sprintf( "Asset version for origin '%s' is not registered", esc_html( $origin ) ) );
         }
 
         return self::$plugin_versions[ $origin ];

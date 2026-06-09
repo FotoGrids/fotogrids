@@ -123,7 +123,7 @@ final class Exif_Extractor {
         if ( in_array( 'date_taken', $enabled_fields, true ) && ! empty( $image_meta['created_timestamp'] ) ) {
             $timestamp = $image_meta['created_timestamp'];
             $exif_data['date_taken'] = is_numeric( $timestamp )
-                ? date( 'Y-m-d H:i:s', (int) $timestamp )
+                ? gmdate( 'Y-m-d H:i:s', (int) $timestamp )
                 : sanitize_text_field( $timestamp );
         }
 

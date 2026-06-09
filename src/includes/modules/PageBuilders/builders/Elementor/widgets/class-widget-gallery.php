@@ -227,10 +227,11 @@ class Widget_Gallery extends Widget_Base {
             return;
         }
 
-        echo \FotoGrids\Public_Render::gallery_shortcode( [ // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        $shortcode_args = [
             'id'      => $gallery_id,
             '_source' => Request_Source::ELEMENTOR->value,
-        ] );
+        ];
+        echo \FotoGrids\Public_Render::gallery_shortcode( $shortcode_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -253,7 +254,7 @@ class Widget_Gallery extends Widget_Base {
         }
         if ( wp_doing_ajax()
             && isset( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            && str_starts_with( (string) $_REQUEST['action'], 'elementor' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            && str_starts_with( (string) sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ), 'elementor' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             return true;
         }
         return false;

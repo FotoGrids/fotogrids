@@ -248,8 +248,7 @@ class Review_Prompt {
             FOTOGRIDS_VERSION
         );
 
-        // Redirect to WordPress.org reviews page
-        wp_redirect( 'https://wordpress.org/plugins/fotogrids/#reviews' );
+        wp_safe_redirect( 'https://wordpress.org/plugins/fotogrids/#reviews' );
         exit;
     }
 

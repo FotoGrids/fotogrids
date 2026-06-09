@@ -184,8 +184,12 @@ class Register_Templates_Routes {
             nocache_headers();
             header( 'Content-Type: text/html; charset=UTF-8' );
 
-            // Output the HTML
-            echo $data;
+            // $data is a complete standalone HTML document assembled by
+            // Templates_Data::render_template_preview() with every dynamic value
+            // escaped at construction (esc_html/esc_url/esc_attr). It contains
+            // DOCTYPE/<head>/<link>/<style>, so no output escaper can run over it
+            // without breaking the page.
+            echo $data; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pre-escaped full HTML document; see note above.
             exit;
         }
 

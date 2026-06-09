@@ -104,6 +104,7 @@ final class Layout_Instant_Photos implements Layout {
             $decorated = $this->decorate_item( $item_view, $seed_base, $max_rotation, $elevation_on, $sticker_on, $sticker_hide );
             $items_html .= $item_renderer->render( $decorated, $render_context );
         }
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_seeding_mt_srand -- Restores entropy-fresh global PRNG state after per-item deterministic seeding; no argument = re-seed from entropy.
         mt_srand();
 
         // data-fg-items-root marks this element as the container that
@@ -208,9 +209,11 @@ final class Layout_Instant_Photos implements Layout {
         $rotation = 0.0;
         if ( $max_rotation > 0.0 ) {
             $seed = $this->seed_from( $seed_base, $item_view->id );
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_seeding_mt_srand -- Per-item deterministic seed so each tile's tilt angle is stable across renders; wp_rand() is non-seedable by design.
             mt_srand( $seed );
             // mt_rand range is integer; multiply by 100 to retain two
             // decimal places of randomness in the chosen angle.
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand -- Paired with the seeded mt_srand() above for a reproducible tilt angle, not a security-sensitive RNG.
             $cents      = mt_rand( (int) ( -$max_rotation * 100 ), (int) ( $max_rotation * 100 ) );
             $rotation   = $cents / 100;
         }

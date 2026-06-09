@@ -86,8 +86,10 @@ final class Random_Sorter implements Sorter {
         // Seed once and consume mt_rand() values. mt_srand resets the
         // global PHP Mersenne Twister state — fine here because the
         // renderer runs synchronously per request.
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_seeding_mt_srand -- Deterministic, seed-reproducible shuffle is required so a gallery renders the same order across requests/pagination; wp_rand() is non-seedable by design.
         mt_srand( (int) $seed );
         for ( $i = $count - 1; $i > 0; $i-- ) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_mt_rand -- Paired with the seeded mt_srand() above for a reproducible shuffle, not a security-sensitive RNG.
             $j = mt_rand( 0, $i );
             $tmp           = $shuffled[ $i ];
             $shuffled[ $i ] = $shuffled[ $j ];
@@ -95,6 +97,7 @@ final class Random_Sorter implements Sorter {
         }
         // Re-seed from time so any later mt_rand() callers aren't
         // pinned to our seed.
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_seeding_mt_srand -- Restores entropy-fresh global PRNG state after our deterministic shuffle; no argument = re-seed from entropy.
         mt_srand();
 
         return $shuffled;

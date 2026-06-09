@@ -101,7 +101,7 @@ class FotoGrids_Admin_Header {
         ?>
         <div id="fotogrids-header" class="fotogrids-header">
             <div class="fotogrids-header-logo">
-                <?php echo $logo_svg; ?>
+                <?php \FotoGrids\Svg::render( $logo_svg ); ?>
             </div>
             <?php if ( $args['show_links'] ) : ?>
             <div class="fotogrids-links">
@@ -149,7 +149,7 @@ class FotoGrids_Admin_Header {
     }
 
     public function dismiss_notice() {
-        if ( ! wp_verify_nonce( $_POST['nonce'], 'fotogrids_dismiss_notice' ) ) {
+        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'fotogrids_dismiss_notice' ) ) {
             wp_die( esc_html__( 'Security check failed.', 'fotogrids' ) );
         }
 

@@ -183,17 +183,17 @@ final class Item_Ajax_Endpoints {
         }
 
         $item_id      = intval( $_POST['item_id'] ?? 0 );
-        $title        = sanitize_text_field( $_POST['title'] ?? '' );
-        $alt          = sanitize_text_field( $_POST['alt'] ?? '' );
-        $caption      = sanitize_textarea_field( $_POST['caption'] ?? '' );
-        $description  = sanitize_textarea_field( $_POST['description'] ?? '' );
-        $credit       = sanitize_text_field( $_POST['credit'] ?? '' );
-        $external_url = sanitize_url( $_POST['external_url'] ?? '' );
-        $link_target  = sanitize_text_field( $_POST['link_target'] ?? 'global' );
+        $title        = sanitize_text_field( wp_unslash( $_POST['title'] ?? '' ) );
+        $alt          = sanitize_text_field( wp_unslash( $_POST['alt'] ?? '' ) );
+        $caption      = sanitize_textarea_field( wp_unslash( $_POST['caption'] ?? '' ) );
+        $description  = sanitize_textarea_field( wp_unslash( $_POST['description'] ?? '' ) );
+        $credit       = sanitize_text_field( wp_unslash( $_POST['credit'] ?? '' ) );
+        $external_url = sanitize_url( wp_unslash( $_POST['external_url'] ?? '' ) );
+        $link_target  = sanitize_text_field( wp_unslash( $_POST['link_target'] ?? 'global' ) );
 
         $exif_data = [];
         if ( isset( $_POST['exif'] ) ) {
-            $exif_raw = json_decode( stripslashes( $_POST['exif'] ), true );
+            $exif_raw = json_decode( wp_unslash( $_POST['exif'] ), true );
             if ( is_array( $exif_raw ) ) {
                 $exif_data = array_map( 'sanitize_text_field', $exif_raw );
             }
@@ -330,8 +330,8 @@ final class Item_Ajax_Endpoints {
         }
 
         $item_id = intval( $_POST['item_id'] ?? 0 );
-        $url     = sanitize_url( $_POST['url'] ?? '' );
-        $target  = sanitize_text_field( $_POST['target'] ?? 'global' );
+        $url     = sanitize_url( wp_unslash( $_POST['url'] ?? '' ) );
+        $target  = sanitize_text_field( wp_unslash( $_POST['target'] ?? 'global' ) );
 
         if ( ! $item_id ) {
             wp_send_json_error( 'Invalid item ID' );
@@ -394,10 +394,10 @@ final class Item_Ajax_Endpoints {
             wp_die( -1 );
         }
 
-        $action   = sanitize_text_field( $_POST['bulk_action'] ?? '' );
-        $item_ids = isset( $_POST['item_ids'] ) ? array_map( 'intval', $_POST['item_ids'] ) : [];
-        $url      = sanitize_url( $_POST['url'] ?? '' );
-        $target   = sanitize_text_field( $_POST['target'] ?? 'global' );
+        $action   = sanitize_text_field( wp_unslash( $_POST['bulk_action'] ?? '' ) );
+        $item_ids = isset( $_POST['item_ids'] ) ? array_map( 'intval', (array) $_POST['item_ids'] ) : [];
+        $url      = sanitize_url( wp_unslash( $_POST['url'] ?? '' ) );
+        $target   = sanitize_text_field( wp_unslash( $_POST['target'] ?? 'global' ) );
 
         if ( empty( $item_ids ) ) {
             wp_send_json_error( 'No item IDs provided' );
@@ -474,6 +474,7 @@ final class Item_Ajax_Endpoints {
         wp_send_json_success( [
             'updated' => $updated,
             'action'  => $action,
+            /* translators: %d: number of items updated. */
             'message' => sprintf( __( 'Bulk action completed. Updated %d items.', 'fotogrids' ), $updated ),
         ] );
     }
@@ -504,7 +505,7 @@ final class Item_Ajax_Endpoints {
             wp_send_json_error( [ 'message' => __( 'Cannot edit this gallery', 'fotogrids' ) ] );
         }
 
-        $item_order = isset( $_POST['item_order'] ) ? json_decode( stripslashes( $_POST['item_order'] ), true ) : [];
+        $item_order = isset( $_POST['item_order'] ) ? json_decode( wp_unslash( $_POST['item_order'] ), true ) : [];
         if ( ! is_array( $item_order ) ) {
             wp_send_json_error( [ 'message' => __( 'Invalid item order data', 'fotogrids' ) ] );
         }

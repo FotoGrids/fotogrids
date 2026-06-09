@@ -48,7 +48,7 @@ final class Render_Context {
 
         foreach ( array_keys( $changes ) as $change_key ) {
             if ( ! in_array( $change_key, $allowed_keys, true ) ) {
-                throw new \InvalidArgumentException( sprintf( "Render_Context::with() does not support replacing '%s'", $change_key ) );
+                throw new \InvalidArgumentException( sprintf( "Render_Context::with() does not support replacing '%s'", esc_html( $change_key ) ) );
             }
         }
 

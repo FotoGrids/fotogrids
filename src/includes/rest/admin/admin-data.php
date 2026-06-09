@@ -50,6 +50,7 @@ class Admin_Data {
             'added' => $added,
             'errors' => $errors,
             'message' => sprintf(
+                /* translators: %d: number of galleries added to the album. */
                 _n(
                     '%d gallery added to album.',
                     '%d galleries added to album.',
@@ -157,6 +158,7 @@ class Admin_Data {
             'added' => $added,
             'errors' => $errors,
             'message' => sprintf(
+                /* translators: %d: number of albums the gallery was added to. */
                 _n(
                     'Gallery added to %d album.',
                     'Gallery added to %d albums.',
@@ -852,8 +854,8 @@ class Admin_Data {
         $data = array();
 
         for ( $i = $days - 1; $i >= 0; $i-- ) {
-            $date = date( 'Y-m-d', strtotime( "-$i days" ) );
-            $labels[] = date( 'M j', strtotime( "-$i days" ) );
+            $date = gmdate( 'Y-m-d', strtotime( "-$i days" ) );
+            $labels[] = gmdate( 'M j', strtotime( "-$i days" ) );
             $data[] = $views_by_date[ $date ] ?? 0;
         }
 
@@ -1068,6 +1070,7 @@ class Admin_Data {
             'added' => $added,
             'errors' => $errors,
             'message' => sprintf(
+                /* translators: %d: number of items added to the gallery. */
                 _n(
                     '%d item added to gallery.',
                     '%d items added to gallery.',
