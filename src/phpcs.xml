@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<ruleset name="FotoGrids">
+    <description>
+        FotoGrids coding-standards configuration for WordPress Plugin Check / PHPCS.
+
+        This file documents the project-wide, deliberately-accepted exceptions so
+        they live in one reviewable place instead of being scattered as inline
+        annotations. Each exclusion below is a reviewed decision, not an oversight.
+    </description>
+
+    <!-- Scan PHP only; skip build output, deps, and the bundled Freemius SDK. -->
+    <arg name="extensions" value="php"/>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/dist/*</exclude-pattern>
+    <exclude-pattern>*/freemius/*</exclude-pattern>
+
+    <!--
+        Declare FotoGrids' real symbol prefixes so the PrefixAllGlobals sniff
+        knows what "prefixed" means for this plugin. Without this, the sniff
+        treats hierarchical hook-name strings (see below) as if they were symbol
+        prefixes and reports InvalidPrefixPassed. These are the genuine PHP
+        prefixes used across the codebase.
+    -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="fotogrids"/>
+                <element value="FOTOGRIDS"/>
+                <element value="FotoGrids"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        DynamicHooknameFound: deliberately suppressed project-wide.
+
+        FotoGrids hook names are hierarchical, slash-namespaced string CONSTANTS
+        centralised in includes/hooks/ (e.g.
+        Filters_Settings::DEFAULTS_GALLERY = 'fotogrids/settings/defaults/gallery',
+        Actions_Library::ITEM_METADATA   = 'fotogrids/save/item/metadata').
+
+        Every hook name is always prefixed 'fotogrids/'. The sniff fires only
+        because it cannot statically resolve a class constant to its string
+        value, so it cannot see that the prefix is present. This is therefore a
+        reviewed false positive, not an unprefixed-hook risk. Suppressing it here
+        (rather than with 130+ identical inline ignores) keeps the intent in one
+        documented place.
+    -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound">
+        <severity>0</severity>
+    </rule>
+</ruleset>

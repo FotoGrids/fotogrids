@@ -164,10 +164,10 @@ const LicensePage = () => {
             <div className="fotogrids-admin-blocks-grid">
                 <div className="fotogrids-admin-block-card fg-abc-license">
                     <div className="fotogrids-admin-block-card-header">
-                            <Icon
-                                name="check_verified"
-                                className={`fotogrids-admin-block-card-header-icon${isPro ? ' fg-abc-header-icon-pro' : ''}`}
-                            />
+                        <Icon
+                            name="check_verified"
+                            className={`fotogrids-admin-block-card-header-icon${isPro ? ' fg-abc-header-icon-pro' : ''}`}
+                        />
                         <h3>{__('Your License', 'fotogrids')}</h3>
                     </div>
                     <div className="fotogrids-license-card-content">

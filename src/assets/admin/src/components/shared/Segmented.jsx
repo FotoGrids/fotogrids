@@ -24,10 +24,15 @@ const Segmented = ({
     ariaLabel,
     disabled = false,
     className = '',
+    size = 'default',
+    variant = 'default',
 }) => {
+    const baseClass = 'fotogrids-segmented';
+    const wrapperClass = `${baseClass} ${baseClass}--size-${size} ${baseClass}--variant-${variant}`;
+
     return (
         <div
-            className={`fotogrids-segmented ${className}`.trim()}
+            className={`${wrapperClass} ${className}`.trim()}
             role="radiogroup"
             aria-label={ariaLabel}
         >
@@ -41,16 +46,16 @@ const Segmented = ({
                         aria-checked={isActive}
                         disabled={disabled}
                         className={
-                            'fotogrids-segmented__option' +
+                            `${baseClass}__option` +
                             (isActive ? ' fg-is-active' : '')
                         }
                         onClick={() => !disabled && onChange(opt.value)}
                     >
                         {opt.icon && (
-                            <Icon name={opt.icon} className="fotogrids-segmented__icon" />
+                            <Icon name={opt.icon} className={`${baseClass}__icon`} />
                         )}
                         {opt.label && (
-                            <span className="fotogrids-segmented__label">{opt.label}</span>
+                            <span className={`${baseClass}__label`}>{opt.label}</span>
                         )}
                     </button>
                 );

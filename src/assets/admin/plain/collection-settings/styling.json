@@ -12,6 +12,11 @@
                     "id": "thumbnails",
                     "label": "Thumbnails",
                     "icon": "layout",
+                    "condition": {
+                        "dependsOn": "layout",
+                        "values": ["image-viewer"],
+                        "condition_operator": "not_in"
+                    },
                     "settings": [
                         {
                             "key": "background_group",

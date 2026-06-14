@@ -52,15 +52,43 @@ final class Item_Renderer {
         $state_attr      = $is_video
             ? ' data-fg-media-state="loaded"'
             : ' data-fg-media-state="loading"';
-        $data_attributes = $this->serialize_data_attrs( $item_view->data_attrs );
         $style_attribute = $this->serialize_style( $item_view->style );
+
+        $data_attrs = $item_view->data_attrs;
 
         $image_html          = $this->render_img( $item_view, $render_context );
         $image_with_overlays = $this->wrap_with_overlays( $image_html, $item_view->thumb_overlays, $item_view, $render_context );
         $image_with_wrappers = $this->apply_wrappers( $image_with_overlays, $item_view->wrappers );
 
+        // An overlay caption is absolutely positioned over the media. For a
+        // video that plays inline, the player replaces the poster in place, so
+        // the overlay caption would sit on top of the playing video. Omit it
+        // from the thumbnail grid for inline-video items with overlay captions.
+        $caption_placement = $render_context->settings['caption_placement'] ?? 'overlay';
+        $playback_mode     = $render_context->settings['video_playback_mode'] ?? 'inline';
+
+        // Image Viewer renders the caption title in its control bar, not as a
+        // per-item caption. Suppress the figcaption here and expose the title
+        // on a data attribute the layout's bar JS reads. The Item Description
+        // and per-item placement settings are hidden for this layout, so only
+        // the title travels to the bar.
+        $is_image_viewer = $render_context->layout->layout_id === 'image-viewer';
+
+        $suppress_caption = $is_image_viewer
+            || (
+                $is_video
+                && 'overlay' === $caption_placement
+                && 'inline' === $playback_mode
+            );
+
+        if ( $is_image_viewer && $item_view->caption_title !== '' ) {
+            $data_attrs['data-fg-caption-title'] = $item_view->caption_title;
+        }
+
+        $data_attributes = $this->serialize_data_attrs( $data_attrs );
+
         $caption_html = '';
-        if ( $item_view->caption_title !== '' || $item_view->caption_description !== '' ) {
+        if ( ! $suppress_caption && ( $item_view->caption_title !== '' || $item_view->caption_description !== '' ) ) {
             $inner = '';
             if ( $item_view->caption_title !== '' ) {
                 $inner .= '<span class="fg-caption-title">' . esc_html( $item_view->caption_title ) . '</span>';

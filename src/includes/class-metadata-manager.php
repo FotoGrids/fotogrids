@@ -15,6 +15,43 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Metadata_Manager {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * Metadata_Manager is the dedicated data layer for the custom
+     * fotogrids_tags and fotogrids_item_metadata tables. The WPDB sniffs
+     * below are suppressed class-wide with the following justifications:
+     *
+     *  - DirectDatabaseQuery.DirectQuery: these are custom tables with no
+     *    WP_Query / core API equivalent; direct $wpdb access is required.
+     *
+     *  - DirectDatabaseQuery.NoCaching: the one hot read on the frontend
+     *    render path, get_item_metadata(), IS object-cached (see the cache
+     *    helpers below, with per-item and version-bump invalidation wired
+     *    into every write path). The remaining reads are admin-side, low
+     *    frequency, and often carry search/pagination args that would churn
+     *    cache keys for near-zero hit rate, so caching them is an intentional
+     *    non-goal rather than an oversight.
+     *
+     *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
+     *    Security.DirectDB.UnescapedDBParameter: every interpolated table
+     *    name in this class is built as `$wpdb->prefix . 'fotogrids_*'`
+     *    (a trusted, hardcoded literal — WP placeholders cannot bind table
+     *    identifiers). All user-supplied *values* are passed through
+     *    $wpdb->prepare(); where SQL is assembled incrementally the prepare
+     *    call is a separate statement from the get_*()/query() call, which
+     *    the sniff cannot follow. ORDER BY columns are allowlisted via
+     *    in_array() and the direction is forced to ASC|DESC.
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Get allowed metadata types
      *
@@ -40,6 +77,22 @@ class Metadata_Manager {
         $allowed = self::get_allowed_types();
         return in_array( $type, $allowed, true );
     }
+
+    // -------------------------------------------------------------------------
+    // Object cache for get_item_metadata()
+    // -------------------------------------------------------------------------
+    //
+    // get_item_metadata() runs on the frontend render / lightbox path and can
+    // be hit many times per page load, so its result is cached per attachment
+    // via \FotoGrids\Cache\Metadata_Cache (a thin wrapper over the shared
+    // Object_Cache primitive; transparent no-op without a persistent backend).
+    //
+    // Invalidation is two-tier and wired into the write paths below:
+    //   - Per-attachment writes (add/remove/clear links) call
+    //     Metadata_Cache::forget_item() to drop that one attachment's entry.
+    //   - Tag-definition writes (rename / delete / bulk-delete / merge) can
+    //     change the output for an unknown set of attachments, so they call
+    //     Metadata_Cache::forget_all().
 
     /**
      * Get metadata by type with optional search and limit
@@ -253,7 +306,7 @@ class Metadata_Manager {
             return true;
         }
 
-        return $wpdb->insert(
+        $inserted = $wpdb->insert(
             $table,
             array(
                 'attachment_id' => $attachment_id,
@@ -263,6 +316,12 @@ class Metadata_Manager {
             ),
             array( '%d', '%s', '%d', '%s' )
         );
+
+        if ( $inserted ) {
+            \FotoGrids\Cache\Metadata_Cache::forget_item( (int) $attachment_id );
+        }
+
+        return $inserted;
     }
 
     /**
@@ -417,6 +476,7 @@ class Metadata_Manager {
 
         if ( $result ) {
             self::decrement_usage_count( $type, $metadata_id );
+            \FotoGrids\Cache\Metadata_Cache::forget_item( (int) $attachment_id );
         }
 
         return $result;
@@ -429,6 +489,24 @@ class Metadata_Manager {
      * @return array Array with 'tags', 'people', and 'locations' keys
      */
     public static function get_item_metadata( $attachment_id ) {
+        $attachment_id = (int) $attachment_id;
+
+        return \FotoGrids\Cache\Metadata_Cache::remember_item(
+            $attachment_id,
+            static function () use ( $attachment_id ) {
+                return self::query_item_metadata( $attachment_id );
+            }
+        );
+    }
+
+    /**
+     * Uncached fetch of an item's metadata (tags / people / locations).
+     *
+     * @since  1.0.0
+     * @param  int $attachment_id
+     * @return array{tags: array, people: array, locations: array}
+     */
+    private static function query_item_metadata( int $attachment_id ): array {
         global $wpdb;
 
         $metadata_table = $wpdb->prefix . 'fotogrids_item_metadata';
@@ -485,11 +563,15 @@ class Metadata_Manager {
             self::decrement_usage_count( $item->metadata_type, $item->metadata_id );
         }
 
-        return $wpdb->delete(
+        $deleted = $wpdb->delete(
             $table,
             array( 'attachment_id' => $attachment_id ),
             array( '%d' )
         );
+
+        \FotoGrids\Cache\Metadata_Cache::forget_item( (int) $attachment_id );
+
+        return $deleted;
     }
 
     /**
@@ -743,6 +825,9 @@ class Metadata_Manager {
 
         $wpdb->update( $table, $data, array( 'id' => (int) $id ), $formats, array( '%d' ) );
 
+        // A renamed tag changes get_item_metadata() output for every linked item.
+        \FotoGrids\Cache\Metadata_Cache::forget_all();
+
         do_action( Actions_Library::UPDATED, $row->type, (int) $id );
 
         return self::get_metadata_by_id( $id );
@@ -776,6 +861,8 @@ class Metadata_Manager {
         $deleted = $wpdb->delete( $tags_table, array( 'id' => (int) $id ), array( '%d' ) );
 
         if ( $deleted ) {
+            // Cascade dropped links for an unknown set of attachments.
+            \FotoGrids\Cache\Metadata_Cache::forget_all();
             do_action( Actions_Library::DELETED, $row->type, (int) $id );
             return true;
         }
@@ -914,6 +1001,9 @@ class Metadata_Manager {
         // Recompute target usage_count from authoritative join data.
         self::recompute_usage_count( $type, (int) $target_id );
 
+        // Re-pointed/dropped links touch an unknown set of attachments.
+        \FotoGrids\Cache\Metadata_Cache::forget_all();
+
         do_action( Actions_Library::MERGED, $type, (int) $target_id, array_map( 'intval', (array) $source_ids ) );
 
         return array(
@@ -990,4 +1080,11 @@ class Metadata_Manager {
 
         return $touched;
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

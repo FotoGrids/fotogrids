@@ -115,6 +115,24 @@
             height: 15px;
         }
     }
+
+    &--size-small {
+        padding: 2px;
+
+        .fotogrids-segmented__option {
+            padding: 4px 12px;
+            font-size: 12px;
+            line-height: 14px;
+        }
+    }
+
+    &--variant-rounded {
+        border-radius: 32px;
+
+        .fotogrids-segmented__option {
+            border-radius: 16px;
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------

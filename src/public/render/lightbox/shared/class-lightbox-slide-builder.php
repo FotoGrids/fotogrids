@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace FotoGrids\Render\Features\Lightbox;
+namespace FotoGrids\Render\Lightbox\Shared;
 
 use FotoGrids\Hooks\Filters_Lightbox;
 use FotoGrids\Image_Size_Manager;
@@ -26,10 +26,32 @@ if ( ! defined( 'WPINC' ) ) {
  * extending the returned array via a filter — but Free defines the
  * canonical contract here.
  *
- * @package FotoGrids\Render\Features\Lightbox
+ * @package FotoGrids\Render\Lightbox\Shared
  * @since   1.0.0
  */
 final class Lightbox_Slide_Builder {
+
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * This class is part of the FotoGrids custom-table data layer. Every
+     * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
+     * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
+     * WP placeholders cannot bind. All user-supplied *values* are passed
+     * through $wpdb->prepare(); where SQL is assembled incrementally or uses
+     * a generated %d IN() list, the prepare call is a separate statement the
+     * sniff cannot follow. Custom tables have no WP_Query / core-API
+     * equivalent and no object-cache layer applies at this level.
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
 
     /**
      * Build slide dicts for an ordered list of attachment IDs.
@@ -311,7 +333,10 @@ final class Lightbox_Slide_Builder {
         global $wpdb;
         $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 
-        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        // Trusted prefix table names; the IN() list is generated %d placeholders,
+        // so the prepare() arg count is correct (two %s + the expanded $ids) --
+        // the sniff just cannot count the dynamic list.
+        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
         $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT im.attachment_id, t.slug
@@ -327,7 +352,7 @@ final class Lightbox_Slide_Builder {
             ),
             ARRAY_A
         );
-        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
         $out = [];
         if ( is_array( $rows ) ) {
@@ -396,4 +421,12 @@ final class Lightbox_Slide_Builder {
         }
         return $out;
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

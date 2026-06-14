@@ -13,6 +13,7 @@ import React from 'react';
  * @param {string}                 [props.titleTag]      HTML tag used for the title (h1-h6, p, div, span).
  * @param {string|React.ReactNode} [props.description]   Sub-text under the heading.
  * @param {React.ReactNode}        [props.action]        Right-aligned header action (e.g. a button).
+ * @param {boolean}                [props.noBody]        Omit the body wrapper; header-only panel.
  * @param {boolean}                [props.noBodyPadding] Drop the body padding (for tables/grids that pad themselves).
  * @param {boolean}                [props.bare]          Remove background, border, border-radius, and padding
  *                                                       entirely. Use when the parent already provides a surface
@@ -26,6 +27,7 @@ const Panel = ({
     titleTag = 'h2',
     description,
     action,
+    noBody = false,
     noBodyPadding = false,
     equalBodyPadding = false,
     bare = false,
@@ -48,7 +50,12 @@ const Panel = ({
     return (
         <section className={rootClass}>
             {hasHeader && (
-                <header className={`${baseClass}__head`}>
+                <header
+                    className={[
+                        `${baseClass}__head`,
+                        noBody ? `${baseClass}__head--no-body` : '',
+                    ].filter(Boolean).join(' ')}
+                >
                     <div className={`${baseClass}__heading`}>
                         {title && (
                             <TitleTag className={`${baseClass}__title ${baseClass}__title--${safeTitleTag}`}>{title}</TitleTag>
@@ -62,15 +69,17 @@ const Panel = ({
                     )}
                 </header>
             )}
-            <div
-                className={[
-                    `${baseClass}__body`,
-                    noBodyPadding ? `${baseClass}__body--flush` : '',
-                    equalBodyPadding ? `${baseClass}__body--equal` : '',
-                ].filter(Boolean).join(' ')}
-            >
-                {children}
-            </div>
+            {!noBody && (
+                <div
+                    className={[
+                        `${baseClass}__body`,
+                        noBodyPadding ? `${baseClass}__body--flush` : '',
+                        equalBodyPadding ? `${baseClass}__body--equal` : '',
+                    ].filter(Boolean).join(' ')}
+                >
+                    {children}
+                </div>
+            )}
         </section>
     );
 };

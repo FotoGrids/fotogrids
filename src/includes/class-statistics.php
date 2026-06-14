@@ -15,6 +15,34 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Statistics {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * Statistics is the data layer for the custom fotogrids_statistics
+     * table(s). The WPDB sniffs below are suppressed class-wide:
+     *
+     *  - DirectDatabaseQuery.DirectQuery: custom tables with no WP_Query /
+     *    core API equivalent; direct $wpdb access is required.
+     *  - DirectDatabaseQuery.NoCaching: counters are written on view/share
+     *    events and read for admin reporting; caching a constantly-mutating
+     *    counter would be counterproductive, so it is an intentional non-goal.
+     *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
+     *    Security.DirectDB.UnescapedDBParameter: every interpolated table
+     *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal — WP
+     *    placeholders cannot bind table identifiers). All user-supplied
+     *    *values* are passed through $wpdb->prepare(); where SQL is built
+     *    incrementally the prepare call is a separate statement from the
+     *    get_*()/query() call, which the sniff cannot follow.
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Increment a statistic counter
      *
@@ -385,6 +413,13 @@ class Statistics {
         $days_to_keep = apply_filters( Filters_Settings::STATS_RETENTION_DAYS, 365 );
         self::cleanup_old_data( $days_to_keep );
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }
 
 add_action( 'init', array( 'FotoGrids\Statistics', 'init_cleanup_schedule' ) );

@@ -12,6 +12,7 @@ const ModalHeader = ({
     closeButton = true,
     size = 'md',
     className = '',
+    compact = false,
     children,
     ...rest
 }) => {
@@ -30,6 +31,7 @@ const ModalHeader = ({
         size === 'sm' && 'fg-modal__header--size-sm',
         !divider && 'fg-modal__header--no-divider',
         closeButton && 'fg-modal__header--has-close-button',
+        compact && 'fg-modal__header--compact',
         className,
     ].filter(Boolean).join(' ');
 

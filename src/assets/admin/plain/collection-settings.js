@@ -252,6 +252,14 @@ function CollectionSettings() {
     const [bulkUrl, setBulkUrl] = useState('');
     const [bulkTarget, setBulkTarget] = useState('global');
     const [autosaveValue, setAutosaveValue] = useState(window.fotogridsAdmin?.autosave || false);
+    // "Easy" / "Advanced" mode controls how dense the collection settings
+    // appear. The wizard's step 3 writes the same option; this Segmented
+    // in the docs strip mirrors it so users can flip modes without
+    // reopening the wizard. The actual UI effects are planned separately
+    // (see wizard-complexity-mode-plan.md).
+    const [settingsMode, setSettingsMode] = useState(
+        window.fotogridsAdmin?.settingsMode === 'advanced' ? 'advanced' : 'easy'
+    );
     const State = window.FotoGridsCollectionState;
 
     const isProActive = window.fotogridsSettings?.isProActive || false;
@@ -1490,6 +1498,55 @@ function CollectionSettings() {
             `<a href="${documentationUrl}" target="_blank" class="fotogrids-settings-docs-strip__link">`
         );
 
+        // Save the new "Easy" / "Advanced" mode to the
+        // fotogrids_settings_mode option via the shared AJAX endpoint
+        // and mirror it into the localized globals so other components
+        // that re-render later see the new value.
+        const handleModeChange = (nextMode) => {
+            if (nextMode !== 'easy' && nextMode !== 'advanced') return;
+            if (nextMode === settingsMode) return;
+
+            const previousMode = settingsMode;
+            setSettingsMode(nextMode);
+
+            const formData = new FormData();
+            formData.append('action', 'fotogrids_update_plugin_setting');
+            formData.append('nonce', window.fotogridsAdmin?.nonce || '');
+            formData.append('setting', 'fotogrids_settings_mode');
+            formData.append('value', nextMode);
+
+            fetch(window.fotogridsAdmin?.ajaxUrl || window.ajaxurl, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+              .then(data => {
+                  if (data.success) {
+                      if (window.fotogridsAdmin) {
+                          window.fotogridsAdmin.settingsMode = nextMode;
+                      }
+                  } else {
+                      setSettingsMode(previousMode);
+                      if (window.fotogridsToast) {
+                          window.fotogridsToast.error(
+                              data.data?.message || __('Failed to update setup mode', 'fotogrids')
+                          );
+                      }
+                  }
+              })
+              .catch(error => {
+                  setSettingsMode(previousMode);
+                  console.error('FotoGrids: Error updating settings_mode:', error);
+                  if (window.fotogridsToast) {
+                      window.fotogridsToast.error(__('Failed to update setup mode', 'fotogrids'));
+                  }
+              });
+        };
+
         const handleAutosaveToggle = (e) => {
             e.preventDefault();
             const newValue = !autosaveValue;
@@ -1556,8 +1613,9 @@ function CollectionSettings() {
         return h('div', {
             className: 'fotogrids-settings-docs-strip'
         }, [
-            h('span', {
-                dangerouslySetInnerHTML: { __html: helpText }
+            h('div', {
+                dangerouslySetInnerHTML: { __html: helpText },
+                className: 'fotogrids-settings-docs-strip__help'
             }),
             h('div', {
                 className: 'fotogrids-settings-docs-strip__buttons'
@@ -1574,6 +1632,63 @@ function CollectionSettings() {
                         : __('Configure Gallery defaults', 'fotogrids'),
                     'data-fg-tooltip-dir': 'below'
                 }, __('Defaults', 'fotogrids')),
+                // Per-button tooltips, bottom-anchored. The *selected*
+                // option gets no tooltip (hovering it has nothing to
+                // suggest); the unselected option gets the persuasive
+                // copy describing what flipping the control will do.
+                // No need to dynamically refresh the tooltip text on
+                // mode change — the active button is unmounted by
+                // React and the newly-inactive one is freshly bound on
+                // the next FgTooltip.init() pass.
+                h('div', {
+                    className: 'fotogrids-settings-docs-strip__mode'
+                }, [
+                    h('div', {
+                        className: 'fotogrids-segmented fotogrids-segmented--size-small fotogrids-segmented--variant-rounded',
+                        role: 'radiogroup',
+                        'aria-label': __('Setup mode', 'fotogrids')
+                    }, ['easy', 'advanced'].map((m) => {
+                        const isActive = settingsMode === m;
+                        const tooltip = isActive
+                            ? null
+                            : (m === 'advanced'
+                                ? __('Switch to Advanced for fine-grained controls', 'fotogrids')
+                                : __('Switch to Easy to show only the essential controls', 'fotogrids'));
+
+                        // The key embeds the active state so React
+                        // remounts the <button> when the mode flips.
+                        // FgTooltip's `bind()` captures both the label
+                        // text and the direction in a closure at bind
+                        // time, and there's no public `unbind()`.
+                        // Without a remount the previously-bound (now-
+                        // active) button keeps showing its old tooltip
+                        // — even after we strip the data-attributes,
+                        // because the listeners and the captured
+                        // closure still reference the original copy.
+                        // Forcing a remount drops the old listeners
+                        // along with the DOM node.
+                        const attrs = {
+                            key: `${m}-${isActive ? 'active' : 'inactive'}`,
+                            type: 'button',
+                            role: 'radio',
+                            'aria-checked': isActive,
+                            className: 'fotogrids-segmented__option'
+                                + (isActive ? ' fg-is-active' : ''),
+                            onClick: () => handleModeChange(m)
+                        };
+                        if (tooltip) {
+                            attrs['data-fg-tooltip'] = tooltip;
+                            attrs['data-fg-tooltip-dir'] = 'below';
+                            attrs['aria-label'] = tooltip;
+                        }
+
+                        return h('button', attrs, h('span', {
+                            className: 'fotogrids-segmented__label'
+                        }, m === 'easy'
+                            ? __('Easy', 'fotogrids')
+                            : __('Advanced', 'fotogrids')));
+                    }))
+                ]),
                 h('div', {
                     className: 'fotogrids-settings-docs-strip__autosave'
                 }, [

@@ -44,6 +44,8 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-post-types.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-rest.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-statistics.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-object-cache.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-metadata-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-fotogrids-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-gallery-album-relations.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-metadata-manager.php';
@@ -125,6 +127,10 @@ register_uninstall_hook( __FILE__, array( 'FotoGrids\Uninstaller', 'uninstall' )
  * Initialize the plugin
  */
 function fotogrids_init() {
+    // Kept intentionally: WordPress 4.6+ auto-loads textdomains for .org-hosted
+    // plugins, but FotoGrids also ships off-.org (Pro/licensing site) where the
+    // explicit call still loads translations. Harmless for the .org build.
+    // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
     load_plugin_textdomain(
         'fotogrids',
         false,
@@ -238,9 +244,11 @@ add_action( \FotoGrids\Hooks\Actions_System::MODULES_REGISTER, function () {
 add_action( \FotoGrids\Hooks\Actions_System::TOOLS_INIT, function () {
     require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-tool.php';
     require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/import-export/class-import-export-tool.php';
+    require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/migration/class-migration-tool.php';
 
     \FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\RegenerateThumbnails\Regenerate_Thumbnails_Tool() );
     \FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\ImportExport\Import_Export_Tool() );
+    \FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\Migration\Migration_Tool() );
 }, 10 );
 
 /**

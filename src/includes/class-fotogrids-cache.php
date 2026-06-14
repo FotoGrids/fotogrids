@@ -24,8 +24,53 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class FotoGrids_Cache {
 
+	/*
+	 * ---------------------------------------------------------------------
+	 * PHPCS: WPDB direct-query sniffs disabled for this class.
+	 * ---------------------------------------------------------------------
+	 * FotoGrids_Cache is the L2 data layer over the custom
+	 * fotogrids_render_cache table (with a composed Object_Cache as L1).
+	 * The WPDB sniffs below are suppressed class-wide:
+	 *
+	 *  - DirectDatabaseQuery.DirectQuery: custom table, no WP_Query / core
+	 *    API equivalent.
+	 *  - DirectDatabaseQuery.NoCaching: this class IS the cache; wrapping its
+	 *    own table reads in another object cache is meaningless.
+	 *  - PreparedSQL.InterpolatedNotPrepared /
+	 *    Security.DirectDB.UnescapedDBParameter: the interpolated table name
+	 *    is `$wpdb->prefix . 'fotogrids_render_cache'` (a trusted literal --
+	 *    WP placeholders cannot bind table identifiers). All user-supplied
+	 *    *values* are passed through $wpdb->prepare().
+	 * ---------------------------------------------------------------------
+	 */
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
 	private const OBJECT_CACHE_GROUP = 'fotogrids_render';
 	private const OBJECT_CACHE_TTL   = 0;
+
+	/**
+	 * Shared object-cache (L1) primitive for the render cache.
+	 *
+	 * @var \FotoGrids\Cache\Object_Cache|null
+	 */
+	private static ?\FotoGrids\Cache\Object_Cache $l1 = null;
+
+	/**
+	 * Lazily build the L1 object-cache wrapper.
+	 *
+	 * @since  1.0.0
+	 * @return \FotoGrids\Cache\Object_Cache
+	 */
+	private static function l1(): \FotoGrids\Cache\Object_Cache {
+		if ( self::$l1 === null ) {
+			self::$l1 = new \FotoGrids\Cache\Object_Cache( self::OBJECT_CACHE_GROUP, self::OBJECT_CACHE_TTL );
+		}
+		return self::$l1;
+	}
 
 	// -------------------------------------------------------------------------
 	// Bootstrap
@@ -91,7 +136,7 @@ class FotoGrids_Cache {
 	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}|false
 	 */
 	public static function get( int $gallery_id, string $cache_key ) {
-		$l1 = wp_cache_get( $cache_key, self::OBJECT_CACHE_GROUP );
+		$l1 = self::l1()->get( $cache_key );
 		if ( $l1 !== false ) {
 			return self::decode_entry( (string) $l1 );
 		}
@@ -113,7 +158,7 @@ class FotoGrids_Cache {
 			return false;
 		}
 
-		wp_cache_set( $cache_key, $row->html, self::OBJECT_CACHE_GROUP, self::OBJECT_CACHE_TTL );
+		self::l1()->set( $cache_key, $row->html );
 
 		return self::decode_entry( $row->html );
 	}
@@ -159,7 +204,7 @@ class FotoGrids_Cache {
 		);
 
 		if ( $result !== false ) {
-			wp_cache_set( $cache_key, $payload, self::OBJECT_CACHE_GROUP, self::OBJECT_CACHE_TTL );
+			self::l1()->set( $cache_key, $payload );
 		}
 
 		return $result !== false;
@@ -195,7 +240,7 @@ class FotoGrids_Cache {
 		);
 
 		foreach ( (array) $keys as $key ) {
-			wp_cache_delete( (string) $key, self::OBJECT_CACHE_GROUP );
+			self::l1()->delete( (string) $key );
 		}
 
 		do_action( Actions_Cache::FLUSHED_FOR_GALLERY, $gallery_id );
@@ -213,7 +258,9 @@ class FotoGrids_Cache {
 		$table = $wpdb->prefix . 'fotogrids_render_cache';
 		$wpdb->query( "DELETE FROM {$table}" );
 
-		wp_cache_flush_group( self::OBJECT_CACHE_GROUP );
+		// Backend-agnostic group invalidation (orphans every namespaced L1 key)
+		// in place of wp_cache_flush_group(), which not all backends implement.
+		self::l1()->flush_namespace();
 
 		do_action( Actions_Cache::FLUSHED_ALL );
 	}
@@ -409,4 +456,10 @@ class FotoGrids_Cache {
 
 		return [ 'html' => $stored, 'css' => [], 'js' => [] ];
 	}
+
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

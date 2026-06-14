@@ -48,11 +48,17 @@ class Items_Data {
             $where_sql = 'WHERE ' . implode( ' AND ', $where_conditions );
         }
         
+        // $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal -- WP
+        // placeholders cannot bind table identifiers); $where_sql is assembled
+        // only from %d placeholders, and every value is bound via the
+        // $wpdb->prepare() call below. Custom table, so direct query + no cache.
+        // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $sql = "SELECT * FROM $table $where_sql ORDER BY position ASC LIMIT %d OFFSET %d";
         $query_params[] = $limit;
         $query_params[] = $offset;
-        
+
         $results = $wpdb->get_results( $wpdb->prepare( $sql, $query_params ), ARRAY_A );
+        // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         
         $items = array();
         foreach ( $results as $row ) {

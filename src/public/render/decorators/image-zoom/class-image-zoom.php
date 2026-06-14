@@ -181,7 +181,7 @@ final class Image_Zoom implements Decorator {
 
         if ( $is_popover ) {
             $css['fotogrids-lightbox-mini'] = new Asset_Decl(
-                path: 'lightbox-mini/lightbox-mini.css',
+                path: 'lightbox/mini/lightbox-mini.css',
             );
             $js['fotogrids-lightbox-mini'] = new Asset_Decl(
                 path:      '../../assets/js/lightbox-mini.js',

@@ -14,6 +14,10 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
+// This standalone view-page template is include()d by the router. $fg_post and
+// $fg_view are file-scoped locals (note the fg_ prefix already); the sniff flags
+// them only because a template's top level is technically global scope.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 $fg_post = Router::current_post();
 if ( ! $fg_post instanceof \WP_Post ) {
     return;
@@ -22,6 +26,7 @@ if ( ! $fg_post instanceof \WP_Post ) {
 $fg_view = Renderer::for_post( $fg_post );
 $fg_view->enqueue_assets();
 $fg_view->track_view();
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>

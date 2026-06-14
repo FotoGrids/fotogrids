@@ -189,6 +189,10 @@ final class Layout_Instant_Photos implements Layout {
         return null;
     }
 
+    public function requires_thumbnail_size( Render_Context $render_context ): bool {
+        return false;
+    }
+
     public function capabilities(): array {
         return [
             'enforces_item_box' => true,

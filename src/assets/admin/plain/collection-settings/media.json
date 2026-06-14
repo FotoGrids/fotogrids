@@ -10,6 +10,11 @@
             "key": "thumbnail_size_group",
             "type": "setting_group",
             "label": "Thumbnail Size",
+            "condition": {
+                "dependsOn": "layout",
+                "values": ["image-viewer"],
+                "condition_operator": "not_in"
+            },
             "settings": [
                 {
                     "key": "thumbnail_size",

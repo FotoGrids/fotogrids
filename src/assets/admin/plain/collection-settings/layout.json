@@ -63,7 +63,7 @@
                     "label": "Featured Item",
                     "value": "featured-item",
                     "icon": "layout_featured_item",
-                    "description": "Big image with thumbnails - thumbnails change the image, the big image runs item actions.",
+                    "description": "Lead with a featured photo beside a compact grid, reveal everything on Show All.",
                     "postTypes": [
                         "gallery"
                     ],
@@ -153,8 +153,382 @@
                     "grid",
                     "masonry",
                     "justified",
+                    "featured-item",
                     "instant-photos"
                 ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "featured_item_subtabs",
+            "type": "setting_subtabs",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "featured-item"
+                ]
+            },
+            "subTabs": {
+                "layout": {
+                    "id": "layout",
+                    "label": "Featured Item Layout",
+                    "icon": "layout_featured_left",
+                    "settings": [
+                        {
+                            "type": "side_by_side",
+                            "settings": [
+                                {
+                                    "key": "featured_image_side",
+                                    "type": "button_group",
+                                    "label": "Featured Image Side",
+                                    "description": "Which side the large featured image sits on. The grid fills the other half.",
+                                    "options": [
+                                        {
+                                            "label": "Left",
+                                            "value": "left",
+                                            "icon": "layout_featured_left",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Right",
+                                            "value": "right",
+                                            "icon": "layout_featured_right",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "left",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "featured_thumbs_count",
+                                    "type": "button_group",
+                                    "label": "Grid Items",
+                                    "description": "How many items the grid shows beside the featured image.",
+                                    "options": [
+                                        {
+                                            "label": "4",
+                                            "value": 4,
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "6",
+                                            "value": 6,
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "9",
+                                            "value": 9,
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": 6,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "showAll": {
+                    "id": "showAll",
+                    "label": "Show All Button",
+                    "icon": "dots_grid_full",
+                    "settings": [
+                        {
+                            "key": "featured_show_all_info",
+                            "type": "info_block",
+                            "subtitle": "About the Show All button",
+                            "message": "The Show all button appears automatically when the gallery has more photos than the featured image and grid can show. It opens a full-screen grid of every item.",
+                            "icon": "bulb",
+                            "full_width": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "featured_show_all_subtabs",
+                            "type": "setting_subtabs",
+                            "subTabs": {
+                                "general": {
+                                    "id": "general",
+                                    "label": "General",
+                                    "icon": "settings",
+                                    "settings": [
+                                        {
+                                            "key": "featured_show_all_label",
+                                            "type": "text_input",
+                                            "label": "Button Label",
+                                            "description": "The text shown on the Show all button.",
+                                            "default": "Show all images",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "type": "side_by_side",
+                                            "settings": [
+                                                {
+                                                    "key": "featured_show_all_position",
+                                                    "type": "button_group",
+                                                    "label": "Button Position",
+                                                    "description": "Which corner of the layout the Show all button sits in.",
+                                                    "options": [
+                                                        {
+                                                            "label": "",
+                                                            "value": "top-left",
+                                                            "icon": "arrow_up_left",
+                                                            "tier_required": "free"
+                                                        },
+                                                        {
+                                                            "label": "",
+                                                            "value": "top-right",
+                                                            "icon": "arrow_up_right",
+                                                            "tier_required": "free"
+                                                        },
+                                                        {
+                                                            "label": "",
+                                                            "value": "bottom-left",
+                                                            "icon": "arrow_down_left",
+                                                            "tier_required": "free"
+                                                        },
+                                                        {
+                                                            "label": "",
+                                                            "value": "bottom-right",
+                                                            "icon": "arrow_down_right",
+                                                            "tier_required": "free"
+                                                        }
+                                                    ],
+                                                    "default": "bottom-right",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "featured_show_all_offset",
+                                                    "type": "range",
+                                                    "label": "Edge Offset",
+                                                    "description": "Gap between the button and the edges of its corner.",
+                                                    "min": 0,
+                                                    "max": 48,
+                                                    "step": 1,
+                                                    "default": 12,
+                                                    "unit": "px",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }        
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "styling": {
+                                    "id": "styling",
+                                    "label": "Styling",
+                                    "icon": "styling",
+                                    "settings": [
+                                        {
+                                            "type": "side_by_side",
+                                            "settings": [
+                                                {
+                                                    "key": "featured_show_all_font_family",
+                                                    "type": "font_family",
+                                                    "label": "Font Family",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "featured_show_all_font_weight",
+                                                    "type": "font_weight",
+                                                    "label": "Font Weight",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "featured_show_all_font_size",
+                                            "type": "responsive_range",
+                                            "label": "Font Size",
+                                            "units": [ "px", "em", "rem" ],
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 32, "default": 12 },
+                                                "tablet":  { "min": 8, "max": 28, "default": 12 },
+                                                "mobile":  { "min": 8, "max": 24, "default": 12 }
+                                            },
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "type": "side_by_side",
+                                            "settings": [
+                                                {
+                                                    "key": "featured_show_all_radius",
+                                                    "type": "range",
+                                                    "label": "Border Radius",
+                                                    "min": 0,
+                                                    "max": 40,
+                                                    "step": 1,
+                                                    "default": 4,
+                                                    "unit": "px",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "featured_show_all_border_width",
+                                                    "type": "range",
+                                                    "label": "Border Width",
+                                                    "unit": "px",
+                                                    "min": 0,
+                                                    "max": 10,
+                                                    "default": 0,
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "featured_show_all_padding",
+                                            "type": "responsive_range",
+                                            "label": "Padding",
+                                            "unit": "px",
+                                            "four_sided": true,
+                                            "responsive": {
+                                                "desktop": { "min": 0, "max": 48, "default": 8 },
+                                                "tablet":  { "min": 0, "max": 48, "default": 8 },
+                                                "mobile":  { "min": 0, "max": 48, "default": 8 }
+                                            },
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "featured_show_all_state_subtabs",
+                                            "type": "setting_subtabs",
+                                            "label": "Button States",
+                                            "subTabs": {
+                                                "regular": {
+                                                    "id": "regular",
+                                                    "label": "Regular",
+                                                    "icon": "square",
+                                                    "settings": [
+                                                        {
+                                                            "type": "side_by_side",
+                                                            "settings": [
+                                                                {
+                                                                    "key": "featured_show_all_bg",
+                                                                    "type": "color",
+                                                                    "label": "Background Color",
+                                                                    "default": "rgba(255, 255, 255, 0.8)",
+                                                                    "tier_required": "free",
+                                                                    "render_when_unlicensed": true,
+                                                                    "setting_lives_in": "free",
+                                                                    "visible_when_uninstalled": true
+                                                                },
+                                                                {
+                                                                    "key": "featured_show_all_text",
+                                                                    "type": "color",
+                                                                    "label": "Text Color",
+                                                                    "default": "rgba(0, 0, 0, 1)",
+                                                                    "tier_required": "free",
+                                                                    "render_when_unlicensed": true,
+                                                                    "setting_lives_in": "free",
+                                                                    "visible_when_uninstalled": true
+                                                                },
+                                                                {
+                                                                    "key": "featured_show_all_border_color",
+                                                                    "type": "color",
+                                                                    "label": "Border Color",
+                                                                    "default": "rgba(255, 255, 255, 0)",
+                                                                    "tier_required": "free",
+                                                                    "render_when_unlicensed": true,
+                                                                    "setting_lives_in": "free",
+                                                                    "visible_when_uninstalled": true
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                "hover": {
+                                                    "id": "hover",
+                                                    "label": "Mouseover",
+                                                    "icon": "hover",
+                                                    "settings": [
+                                                        {
+                                                            "type": "side_by_side",
+                                                            "settings": [
+                                                                {
+                                                                    "key": "featured_show_all_hover_bg",
+                                                                    "type": "color",
+                                                                    "label": "Background Color",
+                                                                    "default": "rgba(255, 255, 255, 1)",
+                                                                    "tier_required": "free",
+                                                                    "render_when_unlicensed": true,
+                                                                    "setting_lives_in": "free",
+                                                                    "visible_when_uninstalled": true
+                                                                },
+                                                                {
+                                                                    "key": "featured_show_all_hover_text",
+                                                                    "type": "color",
+                                                                    "label": "Text Color",
+                                                                    "default": "rgba(0, 0, 0, 1)",
+                                                                    "tier_required": "free",
+                                                                    "render_when_unlicensed": true,
+                                                                    "setting_lives_in": "free",
+                                                                    "visible_when_uninstalled": true
+                                                                },
+                                                                {
+                                                                    "key": "featured_show_all_hover_border_color",
+                                                                    "type": "color",
+                                                                    "label": "Border Color",
+                                                                    "default": "rgba(255, 255, 255, 1)",
+                                                                    "tier_required": "free",
+                                                                    "render_when_unlicensed": true,
+                                                                    "setting_lives_in": "free",
+                                                                    "visible_when_uninstalled": true
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
             },
             "tier_required": "free",
             "render_when_unlicensed": true,
@@ -233,6 +607,7 @@
                     "grid",
                     "single-item",
                     "image-viewer",
+                    "featured-item",
                     "slider"
                 ]
             },
@@ -272,6 +647,7 @@
                             "grid",
                             "single-item",
                             "image-viewer",
+                            "featured-item",
                             "slider"
                         ]
                     },

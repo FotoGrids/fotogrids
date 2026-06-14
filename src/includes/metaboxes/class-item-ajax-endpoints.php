@@ -34,6 +34,32 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_Ajax_Endpoints {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * Item_Ajax_Endpoints reads/writes the custom fotogrids_item_meta table
+     * for the admin item editor. The WPDB sniffs below are suppressed
+     * class-wide:
+     *
+     *  - DirectDatabaseQuery.DirectQuery: custom table, no WP_Query / core
+     *    API equivalent.
+     *  - DirectDatabaseQuery.NoCaching: admin-side, user-action reads/writes;
+     *    caching is a non-goal.
+     *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
+     *    Security.DirectDB.UnescapedDBParameter: the interpolated $table is
+     *    `$wpdb->prefix . 'fotogrids_item_meta'` (trusted literal), and the
+     *    dynamic IN() list is built from generated %d placeholders. All
+     *    user-supplied *values* go through $wpdb->prepare().
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Wire the 6 `wp_ajax_*` endpoints.
      *
@@ -193,6 +219,7 @@ final class Item_Ajax_Endpoints {
 
         $exif_data = [];
         if ( isset( $_POST['exif'] ) ) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Raw JSON is decoded then every value is sanitized via array_map( 'sanitize_text_field', ... ) on the next lines.
             $exif_raw = json_decode( wp_unslash( $_POST['exif'] ), true );
             if ( is_array( $exif_raw ) ) {
                 $exif_data = array_map( 'sanitize_text_field', $exif_raw );
@@ -505,6 +532,7 @@ final class Item_Ajax_Endpoints {
             wp_send_json_error( [ 'message' => __( 'Cannot edit this gallery', 'fotogrids' ) ] );
         }
 
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Decoded JSON is validated as an array below and its IDs are cast to int by Gallery_Items::reorder().
         $item_order = isset( $_POST['item_order'] ) ? json_decode( wp_unslash( $_POST['item_order'] ), true ) : [];
         if ( ! is_array( $item_order ) ) {
             wp_send_json_error( [ 'message' => __( 'Invalid item order data', 'fotogrids' ) ] );
@@ -522,4 +550,11 @@ final class Item_Ajax_Endpoints {
             wp_send_json_error( [ 'message' => __( 'Failed to reorder items', 'fotogrids' ) ] );
         }
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

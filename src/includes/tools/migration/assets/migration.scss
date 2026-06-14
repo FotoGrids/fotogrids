@@ -1,0 +1,117 @@
+.fg-migration {
+
+    &__sources {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+
+    &__source-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+        padding: 16px;
+        text-align: left;
+        background: var(--fg-surface, #fff);
+        border: 1px solid var(--fg-border, #dcdcde);
+        border-radius: var(--fg-radius-md, 8px);
+        cursor: pointer;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover {
+            border-color: var(--fg-interactive-selected-border, #2271b1);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--fg-interactive-selected-border, #2271b1);
+            outline-offset: 2px;
+        }
+
+        &--active {
+            border-color: var(--fg-interactive-selected-border, #2271b1);
+            box-shadow: 0 0 0 1px var(--fg-interactive-selected-border, #2271b1);
+        }
+    }
+
+    &__source-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        width: 36px;
+        height: 36px;
+        color: var(--fg-text-secondary, #50575e);
+
+        .fotogrids-icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    &__source-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    &__source-label {
+        font-weight: 600;
+        color: var(--fg-text-primary, #1d2327);
+    }
+
+    &__source-description {
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--fg-text-secondary, #50575e);
+    }
+
+    &__source-status {
+        flex: 0 0 auto;
+        align-self: flex-start;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--fg-text-secondary, #50575e);
+        background: var(--fg-surface-subtle, #f0f0f1);
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    &__placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        padding: 24px 16px;
+        color: var(--fg-text-secondary, #50575e);
+    }
+
+    &__placeholder-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        color: var(--fg-interactive-selected-border, #2271b1);
+
+        .fotogrids-icon {
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+    &__placeholder-title {
+        margin: 4px 0 0;
+        color: var(--fg-text-primary, #1d2327);
+    }
+
+    &__placeholder-text {
+        max-width: 420px;
+        margin: 0;
+        line-height: 1.5;
+    }
+}

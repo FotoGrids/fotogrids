@@ -114,7 +114,7 @@ final class Collection_Permissions implements Gate {
      * @return  string
      */
     private function render_guest_only_screen( Render_Context $render_context ): string {
-        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
+        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/';
         $login_url   = wp_login_url( home_url( $request_uri ) );
 
         /* translators: heading shown when gallery requires login */

@@ -629,6 +629,7 @@ final class Watermark_Engine {
      */
     private static function fail( string $message ): bool {
         if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Diagnostic logging, gated behind WP_DEBUG.
             error_log( '[FotoGrids watermark] ' . $message );
         }
         return false;

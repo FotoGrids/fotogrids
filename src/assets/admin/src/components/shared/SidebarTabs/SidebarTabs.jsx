@@ -15,7 +15,7 @@ import SidebarTabsNav from './SidebarTabsNav';
  *
  * @param {Object}   props
  * @param {Array}    props.tabs        Tab descriptors: { id, label, icon?, group? }.
- * @param {Array}    [props.groups]    Group descriptors: { id, label }. Omit for a flat list.
+ * @param {Array}    [props.groups]    Group descriptors: { id, label, icon?, onClick? }. Omit for a flat list. A group with an onClick renders its label as a button.
  * @param {string}   props.activeTab   Currently active tab id.
  * @param {Function} props.onTabChange Called with the tab id when a tab is chosen.
  * @param {Function} [props.getTabHref] Optional (id) => href for real-link tabs.

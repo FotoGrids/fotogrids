@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace FotoGrids\Render\Features\Lightbox;
+namespace FotoGrids\Render\Lightbox\Classic;
 
 use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Collection_Kind;
@@ -113,7 +113,7 @@ if ( ! defined( 'WPINC' ) ) {
  * convention: they are only emitted when the setting is truthy. The JS reads them
  * with hasAttribute() or dataset checks rather than comparing against the string "true".
  *
- * @package FotoGrids\Render\Features\Lightbox
+ * @package FotoGrids\Render\Lightbox\Classic
  * @since   1.0.0
  */
 final class Lightbox implements Feature {
@@ -134,7 +134,7 @@ final class Lightbox implements Feature {
         if ( self::$arrow_icons_cache !== null ) {
             return self::$arrow_icons_cache;
         }
-        $path = __DIR__ . '/arrow-icons.json';
+        $path = __DIR__ . '/../shared/arrow-icons.json';
         if ( file_exists( $path ) ) {
             $decoded = json_decode( file_get_contents( $path ), true );
             if ( is_array( $decoded ) ) {
@@ -194,117 +194,19 @@ final class Lightbox implements Feature {
         $attrs = [ 'data-fg-click' => 'lightbox' ];
 
         // Theme
-        $theme = is_string( $s['lightbox_theme'] ?? null ) ? (string) $s['lightbox_theme'] : 'dark';
+        $theme = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::theme( $s );
         $attrs['data-fg-lb-theme'] = $theme;
 
-        // ── Per-theme colour defaults ─────────────────────────────────────────
-        // JS uses these to build the full CSS variable block - no theme classes
-        // in SCSS. Defaults differ per theme; custom theme reads saved settings.
-        // All values are rgba() - no hex literals.
-        $dark_defaults = [
-            'bg'                 => 'rgba(0, 0, 0, 0.92)',
-            'toolbar_bg'         => 'rgba(0, 0, 0, 0.35)',
-            'toolbar_btn_color'  => 'rgba(255, 255, 255, 0.7)',
-            'toolbar_btn_hover'  => 'rgba(255, 255, 255, 1)',
-            'toolbar_btn_active' => 'rgba(255, 255, 255, 0.15)',
-            'arrow_bg'           => 'rgba(0, 0, 0, 0.45)',
-            'arrow_bg_hover'     => 'rgba(0, 0, 0, 0.75)',
-            'arrow_color'        => 'rgba(255, 255, 255, 1)',
-            'arrow_hover_color'  => 'rgba(255, 255, 255, 1)',
-            'bullet_color'       => 'rgba(255, 255, 255, 1)',
-            'bullet_hover'       => 'rgba(255, 255, 255, 1)',
-            'bullet_active'      => 'rgba(60, 70, 240, 1)',
-            'thumbs_bg'          => 'rgba(0, 0, 0, 0.7)',
-            'thumb_border'       => 'rgba(255, 255, 255, 0.45)',
-            'thumb_active'       => 'rgba(60, 70, 240, 1)',
-            'info_bg'            => 'rgba(0, 0, 0, 0.25)',
-            'info_block_bg'      => 'rgba(255, 255, 255, 0.06)',
-            'info_block_divider' => 'rgba(255, 255, 255, 0.12)',
-            'info_text'          => 'rgba(255, 255, 255, 0.85)',
-            'info_title'         => 'rgba(255, 255, 255, 1)',
-            'spinner_color'      => 'rgba(255, 255, 255, 0.8)',
-        ];
-
-        $light_defaults = [
-            'bg'                 => 'rgba(255, 255, 255, 0.96)',
-            'toolbar_bg'         => 'rgba(255, 255, 255, 0.35)',
-            'toolbar_btn_color'  => 'rgba(0, 0, 0, 0.6)',
-            'toolbar_btn_hover'  => 'rgba(0, 0, 0, 0.9)',
-            'toolbar_btn_active' => 'rgba(0, 0, 0, 0.1)',
-            'arrow_bg'           => 'rgba(255, 255, 255, 0.75)',
-            'arrow_bg_hover'     => 'rgba(255, 255, 255, 1)',
-            'arrow_color'        => 'rgba(0, 0, 0, 0.8)',
-            'arrow_hover_color'  => 'rgba(0, 0, 0, 1)',
-            'bullet_color'       => 'rgba(0, 0, 0, 0.5)',
-            'bullet_hover'       => 'rgba(0, 0, 0, 0.8)',
-            'bullet_active'      => 'rgba(60, 70, 240, 1)',
-            'thumbs_bg'          => 'rgba(0, 0, 0, 0.08)',
-            'thumb_border'       => 'rgba(0, 0, 0, 0.3)',
-            'thumb_active'       => 'rgba(60, 70, 240, 1)',
-            'info_bg'            => 'rgba(255, 255, 255, 0.25)',
-            'info_block_bg'      => 'rgba(0, 0, 0, 0.04)',
-            'info_block_divider' => 'rgba(0, 0, 0, 0.12)',
-            'info_text'          => 'rgba(0, 0, 0, 0.7)',
-            'info_title'         => 'rgba(0, 0, 0, 0.9)',
-            'spinner_color'      => 'rgba(0, 0, 0, 0.6)',
-        ];
-
-        // For dark/light: use the static defaults directly.
-        // For custom: use saved settings, falling back to dark defaults.
-        if ( $theme === 'light' ) {
-            $td = $light_defaults;
-        } else {
-            $td = $dark_defaults; // dark and custom both start from dark defaults
-        }
-
-        $attrs['data-fg-lb-bg']                    = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_background_color'] ?? null, $td['bg'] )
-            : $td['bg'];
-        $attrs['data-fg-lb-toolbar-bg']             = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_top_toolbar_background'] ?? null, $td['toolbar_bg'] )
-            : $td['toolbar_bg'];
-        $attrs['data-fg-lb-toolbar-btn-color']      = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_toolbar_button_color'] ?? null, $td['toolbar_btn_color'] )
-            : $td['toolbar_btn_color'];
-        $attrs['data-fg-lb-toolbar-btn-hover']      = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_toolbar_button_hover_color'] ?? null, $td['toolbar_btn_hover'] )
-            : $td['toolbar_btn_hover'];
-        $attrs['data-fg-lb-toolbar-btn-active-bg']  = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_toolbar_btn_active_bg'] ?? null, $td['toolbar_btn_active'] )
-            : $td['toolbar_btn_active'];
-        $attrs['data-fg-lb-arrow-bg']               = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_navigation_arrow_background'] ?? null, $td['arrow_bg'] )
-            : $td['arrow_bg'];
-        $attrs['data-fg-lb-arrow-bg-hover']         = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_navigation_arrow_background_hover'] ?? null, $td['arrow_bg_hover'] )
-            : $td['arrow_bg_hover'];
-        $attrs['data-fg-lb-arrow-color']            = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_navigation_arrow_color'] ?? null, $td['arrow_color'] )
-            : $td['arrow_color'];
-        $attrs['data-fg-lb-arrow-hover-color']      = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_navigation_arrow_mouseover_color'] ?? null, $td['arrow_hover_color'] )
-            : $td['arrow_hover_color'];
-        $attrs['data-fg-lb-bullet-color']           = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_bullet_color'] ?? null, $td['bullet_color'] )
-            : $td['bullet_color'];
-        $attrs['data-fg-lb-bullet-hover-color']     = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_bullet_mouseover_color'] ?? null, $td['bullet_hover'] )
-            : $td['bullet_hover'];
-        $attrs['data-fg-lb-bullet-active-color']    = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_bullet_active_color'] ?? null, $td['bullet_active'] )
-            : $td['bullet_active'];
-        $attrs['data-fg-lb-thumbs-bg']              = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_thumbnails_background'] ?? null, $td['thumbs_bg'] )
-            : $td['thumbs_bg'];
-        $attrs['data-fg-lb-thumb-border-color']     = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_thumbnail_border_color'] ?? null, $td['thumb_border'] )
-            : $td['thumb_border'];
-        $attrs['data-fg-lb-thumb-active-color']     = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_thumbnail_active_color'] ?? null, $td['thumb_active'] )
-            : $td['thumb_active'];
-        $attrs['data-fg-lb-info-bg']                = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_info_panel_background'] ?? null, $td['info_bg'] )
-            : $td['info_bg'];
+        // ── Colour palette ────────────────────────────────────────────────────
+        // The dark/light/custom palette is resolved by the shared
+        // Lightbox_Colors helper (also used by LightboxGrid). attrs() returns
+        // the always-on data-fg-lb-* colour map; the conditional colours
+        // (info-block bg/divider, image shadow) are emitted below because they
+        // depend on non-colour settings. $palette gives the resolved fallback
+        // values those conditional emissions need. JS uses these to build the
+        // full CSS variable block - no theme classes in SCSS.
+        $attrs   = array_merge( $attrs, \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::attrs( $s ) );
+        $palette = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::palette( $s );
 
         // Info blocks style - drives visual separation between blocks.
         $info_blocks_style = is_string( $s['lightbox_info_blocks_style'] ?? null ) ? (string) $s['lightbox_info_blocks_style'] : 'boxed';
@@ -317,26 +219,16 @@ final class Lightbox implements Feature {
         // Info block background - only when style = boxed.
         if ( $info_blocks_style === 'boxed' ) {
             $attrs['data-fg-lb-info-block-bg'] = $theme === 'custom'
-                ? $this->safe_color( $s['lightbox_info_block_bg'] ?? null, $td['info_block_bg'] )
-                : $td['info_block_bg'];
+                ? $this->safe_color( $s['lightbox_info_block_bg'] ?? null, $palette['info_block_bg'] )
+                : $palette['info_block_bg'];
         }
 
         // Info block divider colour - only when style = divided.
         if ( $info_blocks_style === 'divided' ) {
             $attrs['data-fg-lb-info-block-divider'] = $theme === 'custom'
-                ? $this->safe_color( $s['lightbox_info_block_divider'] ?? null, $td['info_block_divider'] )
-                : $td['info_block_divider'];
+                ? $this->safe_color( $s['lightbox_info_block_divider'] ?? null, $palette['info_block_divider'] )
+                : $palette['info_block_divider'];
         }
-
-        $attrs['data-fg-lb-info-text']              = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_info_panel_text'] ?? null, $td['info_text'] )
-            : $td['info_text'];
-        $attrs['data-fg-lb-info-title']             = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_info_panel_title'] ?? null, $td['info_title'] )
-            : $td['info_title'];
-        $attrs['data-fg-lb-spinner-color']          = $theme === 'custom'
-            ? $this->safe_color( $s['lightbox_spinner_color'] ?? null, $td['spinner_color'] )
-            : $td['spinner_color'];
 
         // Image shadow - emitted only when the shadow is enabled.
         if ( $this->setting_to_bool( $s['lightbox_img_shadow_enabled'] ?? false ) ) {
@@ -680,7 +572,7 @@ final class Lightbox implements Feature {
      *   ../../assets/js/lightbox.js          → overlay JS    (webpack: lightbox entry)
      *
      * Both the JS and SCSS sources now live alongside this file in
-     * public/render/features/lightbox/ and are compiled by webpack from there.
+     * public/render/lightbox/classic/ and are compiled by webpack from there.
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.

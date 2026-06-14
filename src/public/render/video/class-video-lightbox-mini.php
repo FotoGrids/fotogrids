@@ -112,7 +112,7 @@ final class Video_Lightbox_Mini implements Feature {
             css: [
                 // Shared, general-purpose mini overlay (also usable for images).
                 'fotogrids-lightbox-mini' => new Asset_Decl(
-                    path: 'lightbox-mini/lightbox-mini.css',
+                    path: 'lightbox/mini/lightbox-mini.css',
                 ),
             ],
             js: [

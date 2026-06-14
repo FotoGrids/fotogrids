@@ -53,7 +53,7 @@ const ToolsPage = () => {
                     const exists = (data || []).some(t => t.id === urlParam);
                     if (!exists) {
                         setActiveTool(null);
-                        if (uiState) uiState.setValue({ key: 'tool', value: null, urlParam: 'tool' });
+                        if (uiState) uiState.clearValue({ key: 'tool', urlParam: 'tool' });
                     } else {
                         setActiveTool(urlParam);
                     }
@@ -105,6 +105,11 @@ const ToolsPage = () => {
         if (uiState) uiState.setValue({ key: 'tool', value: toolId, urlParam: 'tool' });
     };
 
+    const backToGrid = () => {
+        setActiveTool(null);
+        if (uiState) uiState.clearValue({ key: 'tool', urlParam: 'tool' });
+    };
+
     const getTabHref = (toolId) => {
         const url = new URL(window.location.href);
         url.searchParams.set('tool', toolId);
@@ -142,13 +147,25 @@ const ToolsPage = () => {
         // Unknown tool id - silently fall back to grid.
         if (!currentTool) {
             setActiveTool(null);
-            if (uiState) uiState.setValue({ key: 'tool', value: null, urlParam: 'tool' });
+            if (uiState) uiState.clearValue({ key: 'tool', urlParam: 'tool' });
         }
+
+        // All tools live under a single group whose actionable label doubles
+        // as a "< All Tools" back link to the card-grid overview.
+        const groups = [
+            {
+                id: 'all-tools',
+                label: __('All Tools', 'fotogrids'),
+                icon: 'chevron_left',
+                onClick: backToGrid,
+            },
+        ];
 
         const tabs = tools.map(t => ({
             id: t.id,
             label: t.label,
             icon: t.icon,
+            group: 'all-tools',
         }));
 
         const ToolComponent = ToolsComponents.get(currentTool?.component);
@@ -158,6 +175,7 @@ const ToolsPage = () => {
                 <SidebarTabs
                     className="fotogrids-sidebar-tabs--bare-content"
                     tabs={tabs}
+                    groups={groups}
                     activeTab={activeTool}
                     onTabChange={handleToolChange}
                     getTabHref={getTabHref}

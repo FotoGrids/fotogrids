@@ -35,6 +35,28 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Module {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * This class is part of the FotoGrids custom-table data layer. Every
+     * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
+     * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
+     * WP placeholders cannot bind. All user-supplied *values* are passed
+     * through $wpdb->prepare(); where SQL is assembled incrementally or uses
+     * a generated %d IN() list, the prepare call is a separate statement the
+     * sniff cannot follow. Custom tables have no WP_Query / core-API
+     * equivalent and no object-cache layer applies at this level.
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Script handle for the gallery block editor bundle.
      *
@@ -237,6 +259,7 @@ final class Module {
             $block_path = $blocks_dir . $block_name;
             if ( ! is_dir( $block_path ) || ! file_exists( $block_path . '/block.json' ) ) {
                 if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Diagnostic logging, gated behind WP_DEBUG.
                     error_log( sprintf(
                         '[FotoGrids PageBuilders/Gutenberg] block.json missing at %s',
                         $block_path . '/block.json'
@@ -248,6 +271,7 @@ final class Module {
             try {
                 $result = register_block_type( $block_path );
                 if ( ! $result && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Diagnostic logging, gated behind WP_DEBUG.
                     error_log( sprintf(
                         '[FotoGrids PageBuilders/Gutenberg] register_block_type() failed for %s',
                         $block_name
@@ -255,6 +279,7 @@ final class Module {
                 }
             } catch ( \Throwable $e ) {
                 if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Diagnostic logging, gated behind WP_DEBUG.
                     error_log( sprintf(
                         '[FotoGrids PageBuilders/Gutenberg] exception registering %s: %s',
                         $block_name,
@@ -347,4 +372,12 @@ final class Module {
         $wpdb->suppress_errors( $previous );
         return $count > 0 ? 'lapsed' : 'none';
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

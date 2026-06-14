@@ -1,0 +1,194 @@
+/* LightboxGrid — a scrollable, Airbnb-style "show all" overlay.
+
+   Chrome is just a toolbar (Back inline-start, Share inline-end) over a
+   scrollable content grid: one full-width image, then a row of two
+   side-by-side, repeating. Colours come from the gallery's lightbox theme
+   via --fg-lb-* custom properties the JS sets on the overlay root from the
+   stamped data-fg-lb-* attributes. */
+
+.fg-lb-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    background: var( --fg-lb-bg, rgba( 0, 0, 0, 0.92 ) );
+    color: var( --fg-lb-info-text, rgba( 255, 255, 255, 0.85 ) );
+}
+
+/* Toolbar — sticky top bar. */
+
+.fg-lb-grid-toolbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var( --fg-lb-toolbar-bg, rgba( 0, 0, 0, 0.35 ) );
+    backdrop-filter: blur( 6px );
+}
+
+.fg-lb-grid-toolbar-start,
+.fg-lb-grid-toolbar-end {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fg-lb-grid-share-wrap {
+    position: relative;
+}
+
+.fg-lb-grid-share-popover {
+    position: absolute;
+    top: calc( 100% + 8px );
+    inset-inline-end: 0;
+    z-index: 2;
+    padding: 12px;
+    border-radius: 8px;
+    background: var( --fg-lb-toolbar-bg, rgba( 0, 0, 0, 0.85 ) );
+    box-shadow: 0 8px 24px rgba( 0, 0, 0, 0.4 );
+}
+
+.fg-lb-grid-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var( --fg-lb-toolbar-btn-color, rgba( 255, 255, 255, 0.7 ) );
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.fg-lb-grid-btn:hover,
+.fg-lb-grid-btn:focus-visible {
+    color: var( --fg-lb-toolbar-btn-hover, rgba( 255, 255, 255, 1 ) );
+    background: var( --fg-lb-toolbar-btn-active-bg, rgba( 255, 255, 255, 0.15 ) );
+    outline: none;
+}
+
+.fg-lb-grid-btn > svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+}
+
+/* Content — the scrollable region. */
+
+.fg-lb-grid-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+}
+
+.fg-lb-grid-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var( --fg-lb-grid-gap, 12px );
+}
+
+/* A "row" is either one full-width tile or a 2-up pair. The JS groups
+   tiles into rows; CSS just lays each row out. */
+
+.fg-lb-grid-row {
+    display: grid;
+    gap: var( --fg-lb-grid-gap, 12px );
+}
+
+.fg-lb-grid-row--single {
+    grid-template-columns: 1fr;
+}
+
+.fg-lb-grid-row--pair {
+    grid-template-columns: 1fr 1fr;
+}
+
+.fg-lb-grid-tile {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.fg-lb-grid-row--single .fg-lb-grid-tile {
+    aspect-ratio: 16 / 9;
+}
+
+.fg-lb-grid-row--pair .fg-lb-grid-tile {
+    aspect-ratio: 4 / 3;
+}
+
+.fg-lb-grid-tile img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+}
+
+.fg-lb-grid-tile:hover img,
+.fg-lb-grid-tile:focus-visible img {
+    transform: scale( 1.03 );
+}
+
+.fg-lb-grid-tile:focus-visible {
+    outline: 2px solid var( --fg-lb-toolbar-btn-hover, #fff );
+    outline-offset: 2px;
+}
+
+/* Video tiles get a play badge. */
+
+.fg-lb-grid-tile--video::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 9px 0 9px 15px;
+    border-color: transparent transparent transparent #fff;
+    transform: translate( -40%, -50% );
+    filter: drop-shadow( 0 0 3px rgba( 0, 0, 0, 0.6 ) );
+    pointer-events: none;
+}
+
+/* Mobile — single column. */
+
+@media ( max-width: 600px ) {
+    .fg-lb-grid-row--pair {
+        grid-template-columns: 1fr;
+    }
+
+    .fg-lb-grid-row--single .fg-lb-grid-tile,
+    .fg-lb-grid-row--pair .fg-lb-grid-tile {
+        aspect-ratio: 4 / 3;
+    }
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+    .fg-lb-grid-tile img {
+        transition: none;
+    }
+
+    .fg-lb-grid-tile:hover img,
+    .fg-lb-grid-tile:focus-visible img {
+        transform: none;
+    }
+}

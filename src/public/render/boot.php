@@ -95,6 +95,8 @@ add_action(
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Justified::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Single_Item::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Slider::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Image_Viewer::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Featured_Item::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'layouts', \FotoGrids\Render\Layouts\Layout_Instant_Photos::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Captions\Captions::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Image_Filters\Image_Filters::class );
@@ -107,7 +109,7 @@ add_action(
         // Click-behavior decorators must run after all visual decorators so the
         // <a> wraps the fully-decorated item media. Only one of these will be
         // active at a time (each checks click_behavior in supports()).
-        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Lightbox\Lightbox_Decorator::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Lightbox\Classic\Lightbox_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Direct_Link\Direct_Link_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\External_Link\External_Link_Decorator::class );
         \FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::class );
@@ -140,7 +142,10 @@ add_action(
         // Minimal video lightbox — active when video_playback_mode is "lightbox"
         // but the gallery's click behaviour is not the full lightbox.
         \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Lightbox_Mini::class );
-        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Lightbox\Lightbox::class );
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Lightbox\Classic\Lightbox::class );
+        // LightboxGrid — the "show all" overlay for the Featured Item layout.
+        // Active only when that layout overflows its inline display.
+        \FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Lightbox\Grid\Lightbox_Grid::class );
         // Filter sources must be registered before Filter_UI so the feature can
         // call Module_Registry::active_modules('filter_sources', ...) during
         // supports() and html_before(). Tags decorator runs with decorators so

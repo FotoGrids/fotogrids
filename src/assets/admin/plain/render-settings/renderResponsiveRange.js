@@ -187,10 +187,6 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                 h('span', { className: 'fotogrids-responsive-setting__device-icon' }, renderIcon(activeDeviceData.icon))
             ]),
 
-            setting.description && h('p', {
-                className: 'fotogrids-setting__description'
-            }, setting.description),
-
             h('div', { className: 'fotogrids-responsive-setting__controls fotogrids-responsive-setting__controls--four-sided' }, [
 
                 // Range slider - always visible, disabled when unlinked
@@ -263,7 +259,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                         }, renderIcon(device.icon))
                     )
                 )
-            ])
+            ]),
+
+            setting.description && h('p', {
+                className: 'fotogrids-setting__description'
+            }, setting.description),
         ]);
     }
 
@@ -457,10 +457,6 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                 }, renderIcon(activeDeviceData.icon))
             ]),
 
-            setting.description && h('p', {
-                className: 'fotogrids-setting__description'
-            }, setting.description),
-
             h('div', {
                 className: 'fotogrids-responsive-minmax-range__controls'
             }, [
@@ -608,7 +604,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                         title: device.label
                     }, renderIcon(device.icon))
                 ))
-            ])
+            ]),
+
+            setting.description && h('p', {
+                className: 'fotogrids-setting__description'
+            }, setting.description),
         ]);
     }
 
@@ -641,10 +641,6 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                 className: 'fotogrids-responsive-setting__device-icon'
             }, renderIcon(activeDeviceData.icon))
         ]),
-
-        setting.description && h('p', {
-            className: 'fotogrids-setting__description'
-        }, setting.description),
 
         h('div', {
             className: 'fotogrids-responsive-setting__controls'
@@ -716,7 +712,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (setting, currentValue, i
                     title: device.label
                 }, renderIcon(device.icon))
             ))
-        ])
+        ]),
+
+        setting.description && h('p', {
+            className: 'fotogrids-setting__description'
+        }, setting.description),
     ]);
 };
 

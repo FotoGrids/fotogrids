@@ -111,6 +111,34 @@ class Collection_Defaults {
                 'tablet'  => 14,
                 'mobile'  => 12,
             ),
+            // Featured Item-only.
+            'featured_image_side'           => 'left',
+            'featured_thumbs_count'         => 6,
+            'featured_show_all_position'    => 'bottom-right',
+            'featured_show_all_offset'      => 12,
+            'featured_show_all_label'       => 'Show all images',
+            'featured_show_all_font_family' => '',
+            'featured_show_all_font_weight' => '',
+            'featured_show_all_font_size'   => array(
+                'desktop' => 12,
+                'tablet'  => 12,
+                'mobile'  => 12,
+            ),
+            'featured_show_all_radius'      => 4,
+            'featured_show_all_border_width' => 0,
+            'featured_show_all_padding'     => array(
+                'desktop' => array( 'top' => 8, 'right' => 12, 'bottom' => 8, 'left' => 12 ),
+                'tablet'  => array( 'top' => 8, 'right' => 12, 'bottom' => 8, 'left' => 12 ),
+                'mobile'  => array( 'top' => 8, 'right' => 12, 'bottom' => 8, 'left' => 12 ),
+            ),
+            // Regular state.
+            'featured_show_all_bg'           => 'rgba(255, 255, 255, 0.8)',
+            'featured_show_all_text'         => 'rgba(0, 0, 0, 1)',
+            'featured_show_all_border_color' => 'rgba(255, 255, 255, 0)',
+            // Mouseover state.
+            'featured_show_all_hover_bg'           => 'rgba(255, 255, 255, 1)',
+            'featured_show_all_hover_text'         => 'rgba(0, 0, 0, 1)',
+            'featured_show_all_hover_border_color' => 'rgba(255, 255, 255, 1)',
             // Justified-only.
             'layout_justified_row_height' => array(
                 'desktop' => 220,

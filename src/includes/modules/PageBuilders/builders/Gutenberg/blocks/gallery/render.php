@@ -14,6 +14,12 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
+// This is a WordPress block render template, include()d by the block renderer.
+// The variables below are file-scoped locals for this template (not plugin
+// globals); the sniff flags them only because a template's top level is
+// technically global scope.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 $gallery_id = isset( $attributes['galleryId'] ) ? absint( $attributes['galleryId'] ) : 0;
 if ( $gallery_id <= 0 ) {
     return; // Unconfigured block - emit nothing on the front end.
@@ -38,3 +44,4 @@ if ( method_exists( '\FotoGrids\Public_Render', 'gallery_shortcode' ) ) {
         echo $inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 }
+// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

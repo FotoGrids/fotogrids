@@ -58,9 +58,7 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
                 key: 'pro-badge'
             }, settingBadgeText)
         ].filter(Boolean)),
-        setting.description && h('p', {
-            className: 'fotogrids-setting__description'
-        }, setting.description),
+
         h('div', {
             className: 'fotogrids-range-control__controls'
         }, [
@@ -109,6 +107,10 @@ window.FotoGridsRenderSettings.renderRange = (setting, currentValue, isDisabled,
                     ))
                 )
             ].filter(Boolean))
-        ])
+        ]),
+
+        setting.description && h('p', {
+            className: 'fotogrids-setting__description'
+        }, setting.description),
     ]);
 };

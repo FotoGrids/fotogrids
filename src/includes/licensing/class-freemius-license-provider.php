@@ -336,6 +336,15 @@ class Freemius_License_Provider implements License_Provider {
         }
 
         if ( is_string( $result ) ) {
+            // `$fs->opt_in( ..., $redirect=false )` returns the next-page
+            // URL as a string on the *success* path so the legacy admin
+            // handler can wp_redirect() to it. We don't want to redirect
+            // — but we also don't want to misread that URL as an error
+            // message. Treat a syntactically-valid URL as success;
+            // anything else is a real error string.
+            if ( filter_var( $result, FILTER_VALIDATE_URL ) ) {
+                return true;
+            }
             return new \WP_Error( 'fotogrids_activation_failed', $result );
         }
 

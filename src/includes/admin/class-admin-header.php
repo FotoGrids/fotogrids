@@ -49,18 +49,9 @@ class FotoGrids_Admin_Header {
             return;
         }
 
-        // The Setup Wizard wants the FotoGrids brand bar for context, but
-        // not the upgrade notice bar (competes with its own footer) and not
-        // the Docs / Support / What's New links (the wizard is a focused
-        // first-run flow — we don't want to encourage navigation away).
-        $screen     = get_current_screen();
-        $is_wizard  = $screen && $screen->id === 'fotogrids_page_fotogrids-setup';
-
-        if ( ! $is_wizard ) {
-            $this->render_notice_bar();
-        }
+        $this->render_notice_bar();
         $this->render_screen_meta();
-        $this->render_header( array( 'show_links' => ! $is_wizard ) );
+        $this->render_header();
     }
 
     private function render_notice_bar() {
@@ -95,15 +86,13 @@ class FotoGrids_Admin_Header {
         <?php
     }
 
-    private function render_header( array $args = array() ) {
-        $args      = array_merge( array( 'show_links' => true ), $args );
-        $logo_svg  = $this->get_logo_svg();
+    private function render_header() {
+        $logo_svg = $this->get_logo_svg();
         ?>
         <div id="fotogrids-header" class="fotogrids-header">
             <div class="fotogrids-header-logo">
                 <?php \FotoGrids\Svg::render( $logo_svg ); ?>
             </div>
-            <?php if ( $args['show_links'] ) : ?>
             <div class="fotogrids-links">
                 <a href="<?php echo esc_url( 'https://go.fotogrids.com/docs/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=header_links&utm_content=about_docs&utm_locale=' . get_locale() ); ?>" target="_blank" rel="noopener noreferrer" class="fotogrids-link fotogrids-link-docs">
                     <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -124,32 +113,17 @@ class FotoGrids_Admin_Header {
                     <?php esc_html_e( "What's New", 'fotogrids' ); ?>
                 </a>
             </div>
-            <?php endif; ?>
         </div>
         <?php
     }
 
     private function get_logo_svg() {
-        return '<svg id="fotogrids-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 351.5 59.53">
-            <rect x="1.42" y="1.42" width="56.69" height="14.17" style="fill:#3c46f0;"/>
-            <rect x="1.42" y="22.68" width="35.43" height="14.17" style="fill:#f01e32;"/>
-            <rect x="1.42" y="43.94" width="14.17" height="14.17" style="fill:#ffb914;"/>
-            <rect x="22.68" y="43.94" width="14.17" height="14.17" style="fill:#323232;"/>
-            <rect x="43.94" y="22.68" width="14.17" height="35.43" style="fill:#323232;"/>
-            <rect x="282.15" y="22.68" width="4.25" height="35.43" style="fill:#323232;"/>
-            <polygon points="167.24 22.68 138.9 22.68 138.9 31.18 147.4 31.18 147.4 58.11 158.74 58.11 158.74 31.18 167.24 31.18 167.24 22.68" style="fill:#323232;"/>
-            <polygon points="97.8 31.18 97.8 22.68 72.28 22.68 72.28 58.11 83.62 58.11 83.62 46.77 94.96 46.77 94.96 38.27 83.62 38.27 83.62 31.18 97.8 31.18" style="fill:#323232;"/>
-            <path d="M119.06,33.31c3.91,0,7.09,3.18,7.09,7.09s-3.18,7.09-7.09,7.09-7.09-3.18-7.09-7.09,3.18-7.09,7.09-7.09M119.06,21.97c-10.18,0-18.43,8.25-18.43,18.43s8.25,18.43,18.43,18.43,18.43-8.25,18.43-18.43-8.25-18.43-18.43-18.43h0Z" style="fill:#323232;"/>
-            <path d="M187.09,33.31c3.91,0,7.09,3.18,7.09,7.09s-3.18,7.09-7.09,7.09-7.09-3.18-7.09-7.09,3.18-7.09,7.09-7.09M187.09,21.97c-10.18,0-18.43,8.25-18.43,18.43s8.25,18.43,18.43,18.43,18.43-8.25,18.43-18.43-8.25-18.43-18.43-18.43h0Z" style="fill:#323232;"/>
-            <path d="M338.84,58.82c-6.25,0-11.34-5.09-11.34-11.34h4.25c0,3.91,3.18,7.09,7.09,7.09,3.43,0,7.09-1.49,7.09-5.67,0-2.93-2.99-4.43-7.93-6.55-4.92-2.12-10.5-4.51-10.5-10.46s4.56-9.92,11.34-9.92c6.25,0,11.34,5.09,11.34,11.34h-4.25c0-3.91-3.18-7.09-7.09-7.09-3.43,0-7.09,1.49-7.09,5.67,0,2.93,2.99,4.43,7.93,6.55,4.92,2.12,10.5,4.51,10.5,10.46s-4.56,9.92-11.34,9.92Z" style="fill:#323232;"/>
-            <path d="M226.77,40.39v4.25h16.35c-1.81,5.74-7.19,9.92-13.52,9.92-7.82,0-14.17-6.36-14.17-14.17s6.36-14.17,14.17-14.17c5.23,0,9.8,2.86,12.26,7.09h4.75c-2.78-6.66-9.34-11.34-17.01-11.34-10.18,0-18.43,8.25-18.43,18.43s8.25,18.43,18.43,18.43,18.43-8.25,18.43-18.43h-21.26Z" style="fill:#323232;"/>
-            <path d="M305.54,22.68h-12.05v35.43h12.05c9.78,0,17.72-7.93,17.72-17.72s-7.93-17.72-17.72-17.72ZM305.54,53.86h0s-7.8,0-7.8,0v-26.93h7.8c7.42,0,13.46,6.04,13.46,13.46s-6.04,13.46-13.46,13.46Z" style="fill:#323232;"/>
-            <path d="M276.38,33.66c0-6.07-4.92-10.98-10.98-10.98h-13.11v35.43h4.25v-13.46h6.9l7.77,13.46h4.91l-7.98-13.82c4.74-1.22,8.24-5.51,8.24-10.63ZM265.39,40.39h-8.86v-13.46h8.86c3.71,0,6.73,3.02,6.73,6.73s-3.02,6.73-6.73,6.73h0Z" style="fill:#323232;"/>
-        </svg>';
+        return \FotoGrids\Svg::fotogrids_logo();
     }
 
     public function dismiss_notice() {
-        if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'fotogrids_dismiss_notice' ) ) {
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'fotogrids_dismiss_notice' ) ) {
             wp_die( esc_html__( 'Security check failed.', 'fotogrids' ) );
         }
 

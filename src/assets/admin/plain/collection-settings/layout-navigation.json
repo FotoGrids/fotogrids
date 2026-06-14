@@ -237,6 +237,12 @@
                             "label": "Show Arrows",
                             "description": "Show previous and next arrows.",
                             "default": true,
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "slider"
+                                ]
+                            },
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
@@ -290,10 +296,20 @@
                             ],
                             "default": "chevron",
                             "condition": {
-                                "dependsOn": "layout_show_arrows",
-                                "values": [
-                                    true,
-                                    "1"
+                                "any": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "image-viewer"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
                                 ]
                             },
                             "tier_required": "free",
@@ -315,10 +331,20 @@
                                 "%"
                             ],
                             "condition": {
-                                "dependsOn": "layout_show_arrows",
-                                "values": [
-                                    true,
-                                    "1"
+                                "any": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "image-viewer"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
                                 ]
                             },
                             "tier_required": "free",
@@ -361,21 +387,9 @@
                             ],
                             "default": "inset",
                             "condition": {
-                                "all": [
-                                    {
-                                        "dependsOn": "layout_show_arrows",
-                                        "values": [
-                                            true,
-                                            "1"
-                                        ]
-                                    },
-                                    {
-                                        "dependsOn": "layout",
-                                        "values": [
-                                            "image-viewer",
-                                            "slider"
-                                        ]
-                                    }
+                                "dependsOn": "layout",
+                                "values": [
+                                    "slider"
                                 ]
                             },
                             "tier_required": "free",
@@ -396,6 +410,12 @@
                             ],
                             "condition": {
                                 "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
                                     {
                                         "dependsOn": "layout_show_arrows",
                                         "values": [
@@ -425,6 +445,12 @@
                             "default": false,
                             "condition": {
                                 "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
                                     {
                                         "dependsOn": "layout_show_arrows",
                                         "values": [
@@ -472,10 +498,20 @@
                             ],
                             "default": "always",
                             "condition": {
-                                "dependsOn": "layout_show_arrows",
-                                "values": [
-                                    true,
-                                    "1"
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
                                 ]
                             },
                             "tier_required": "free",
@@ -491,6 +527,12 @@
                             "default": false,
                             "condition": {
                                 "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
                                     {
                                         "dependsOn": "layout_show_arrows",
                                         "values": [
@@ -518,6 +560,12 @@
                     "id": "bullets",
                     "label": "Bullets",
                     "icon": "bullets",
+                    "condition": {
+                        "dependsOn": "layout",
+                        "values": [
+                            "slider"
+                        ]
+                    },
                     "settings": [
                         {
                             "key": "layout_show_bullets",

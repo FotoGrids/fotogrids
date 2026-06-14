@@ -7,6 +7,11 @@
             "key": "caption_type",
             "type": "button_group",
             "label": "Caption Type",
+            "condition": {
+                "dependsOn": "layout",
+                "values": ["image-viewer"],
+                "condition_operator": "not_in"
+            },
             "options": [
                 {
                     "label": "Default",
@@ -27,6 +32,11 @@
         {
             "key": "caption_type_promotion",
             "type": "promo",
+            "condition": {
+                "dependsOn": "layout",
+                "values": ["image-viewer"],
+                "condition_operator": "not_in"
+            },
             "messages": [
                 {
                     "subtitle": "Advanced custom captions with HTML and dynamic placeholders.",
@@ -66,7 +76,8 @@
             "condition": {
                 "dependsOn": "layout",
                 "values": [
-                    "instant-photos"
+                    "instant-photos",
+                    "image-viewer"
                 ],
                 "condition_operator": "not_in"
             },
@@ -197,6 +208,11 @@
             "key": "caption_alignment_group",
             "type": "setting_group",
             "label": "Caption Alignment",
+            "condition": {
+                "dependsOn": "layout",
+                "values": ["image-viewer"],
+                "condition_operator": "not_in"
+            },
             "settings": [
                 {
                     "key": "caption_alignment",
@@ -442,10 +458,19 @@
                         }
                     ],
                     "condition": {
-                        "dependsOn": "caption_hide_title",
-                        "values": [
-                            false,
-                            "0"
+                        "all": [
+                            {
+                                "dependsOn": "caption_hide_title",
+                                "values": [
+                                    false,
+                                    "0"
+                                ]
+                            },
+                            {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            }
                         ]
                     },
                     "tier_required": "free",
@@ -477,18 +502,27 @@
                     },
                     "unit": "characters",
                     "condition": {
-                        "dependsOn": [
-                            "caption_limit_title_length",
-                            "caption_hide_title"
-                        ],
-                        "values": [
-                            [
-                                "characters"
-                            ],
-                            [
-                                false,
-                                "0"
-                            ]
+                        "all": [
+                            {
+                                "dependsOn": [
+                                    "caption_limit_title_length",
+                                    "caption_hide_title"
+                                ],
+                                "values": [
+                                    [
+                                        "characters"
+                                    ],
+                                    [
+                                        false,
+                                        "0"
+                                    ]
+                                ]
+                            },
+                            {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            }
                         ]
                     },
                     "tier_required": "free",
@@ -520,18 +554,27 @@
                     },
                     "unit": "lines",
                     "condition": {
-                        "dependsOn": [
-                            "caption_limit_title_length",
-                            "caption_hide_title"
-                        ],
-                        "values": [
-                            [
-                                "lines"
-                            ],
-                            [
-                                false,
-                                "0"
-                            ]
+                        "all": [
+                            {
+                                "dependsOn": [
+                                    "caption_limit_title_length",
+                                    "caption_hide_title"
+                                ],
+                                "values": [
+                                    [
+                                        "lines"
+                                    ],
+                                    [
+                                        false,
+                                        "0"
+                                    ]
+                                ]
+                            },
+                            {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            }
                         ]
                     },
                     "tier_required": "free",
@@ -549,6 +592,11 @@
             "key": "caption_description_group",
             "type": "setting_group",
             "label": "Item Description",
+            "condition": {
+                "dependsOn": "layout",
+                "values": ["image-viewer"],
+                "condition_operator": "not_in"
+            },
             "settings": [
                 {
                     "key": "caption_hide_description",

@@ -12,6 +12,10 @@
         gap: 16px;
         border-bottom: 1px solid var(--fg-border-primary);
     
+        &--compact {
+            padding: 16px;
+        }
+
         &--no-divider {
             border-bottom: none;
         }

@@ -1,0 +1,398 @@
+/* Image Viewer — one image at a time on a stacked stage.
+
+   The stage stacks every item absolutely; only the active item is shown.
+   image-viewer.js toggles .fg-is-active on the active item and
+   .fg-is-leaving on the outgoing one so the transition mode (fade /
+   horizontal / vertical / none) can animate the swap. Chrome is a single
+   control bar beneath the image (.fg-viewer-bar) holding the prev/next
+   arrows and a centred counter — no bullets, no thumbnail strip. */
+
+[data-fg-layout="image-viewer"] {
+    /* Stage height contract. The PHP layout always emits --fg-height-max
+       (defaulting to 100vh) and --fg-height-fixed; --fg-viewer-height-cap
+       is the absolute ceiling the viewer never exceeds. */
+    --fg-viewer-height-cap: 100vh;
+
+    /* Transition timing. JS stamps --fg-viewer-duration (ms) on the wrapper.
+       --fg-viewer-height-duration animates the auto-height frame between
+       images (None aspect ratio); JS keeps it in step with the image
+       transition so the height slides at the same pace as the swap. */
+    --fg-viewer-duration: 300ms;
+    --fg-viewer-height-duration: 300ms;
+
+    --fg-viewer-stage-bg: rgba( 0, 0, 0, 0.1 );
+    --fg-viewer-stage-radius: 6px;
+
+    /* Control bar. */
+    --fg-viewer-bar-gap: 12px;
+    --fg-viewer-bar-padding: 8px;
+    --fg-viewer-bar-bg: rgba( 0, 0, 0, 0.1 );
+    --fg-viewer-bar-radius: 6px;
+
+    /* Arrows. */
+    --fg-arrow-size: 40px;
+    --fg-viewer-arrow-radius: 4px;
+    --fg-viewer-arrow-hover-bg: rgba( 0, 0, 0, 0.08 );
+    --fg-viewer-arrow-disabled-opacity: 0.3;
+    --fg-viewer-arrow-icon-size: 60%;
+    --fg-viewer-arrow-transition: background-color 0.15s ease, opacity 0.15s ease;
+
+    /* Counter + caption title. */
+    --fg-viewer-counter-font-size: 13px;
+    --fg-viewer-counter-opacity: 0.8;
+    --fg-viewer-title-gap: 8px;
+
+    position: relative;
+}
+
+[data-fg-viewer="1"] .fg-viewer-container {
+    position: relative;
+}
+
+/* Stage — positioning frame. Owns the height contract and clips the
+   sliding transitions. */
+
+[data-fg-viewer="1"] .fg-viewer-stage {
+    position: relative;
+    overflow: hidden;
+    max-height: var( --fg-viewer-height-cap, 100vh );
+    background: var( --fg-viewer-stage-bg );
+    border-radius: var( --fg-viewer-stage-radius );
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="auto"] .fg-viewer-stage {
+    max-height: var( --fg-height-max, var( --fg-viewer-height-cap, 100vh ) );
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="fixed"] .fg-viewer-stage {
+    height: min( var( --fg-height-fixed, 500px ), var( --fg-viewer-height-cap, 100vh ) );
+}
+
+/* Track — the relative box the absolutely-positioned items stack inside.
+   In auto height mode the track sizes to the active item; in fixed mode
+   it fills the stage. */
+
+[data-fg-viewer="1"] .fg-viewer-track {
+    position: relative;
+    width: 100%;
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="fixed"] .fg-viewer-track {
+    height: 100%;
+}
+
+/* Items. The active one defines the track height in auto mode (position
+   relative, in flow); all others are absolutely stacked on top. */
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item {
+    margin: 0;
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="auto"] .fg-viewer-track .fg-item {
+    aspect-ratio: var( --fg-item-aspect-ratio, 4 / 3 );
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="auto"] .fg-viewer-track .fg-item .fg-item-media {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="fixed"] .fg-viewer-track .fg-item {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media picture,
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: var( --fg-item-fit, cover );
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="fixed"] .fg-viewer-track .fg-item .fg-item-media {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+/* ----------------------------------------------------------------------
+   Aspect ratio "None". The wrapper carries data-fg-natural-ratio="1" and
+   --fg-item-aspect-ratio is not stamped. The image must show whole — no
+   crop, no stretch — so we drop the fixed item box (aspect-ratio: auto)
+   and switch object-fit to contain.
+
+   Height contract for "None":
+   - Fixed mode: the stage takes --fg-height-fixed (the existing fixed-mode
+     rule applies); the image letterboxes inside it via contain.
+   - Auto mode: the frame fits the ACTIVE image's natural height, capped at
+     --fg-height-max. image-viewer.js measures the active image after each
+     swap and stamps the resolved height on --fg-viewer-auto-height; the
+     stage/track follow that variable and the height transition animates the
+     frame up/down between images of different heights. Before JS measures
+     (or with motion reduced) the frame falls back to the max so nothing is
+     clipped.
+   ---------------------------------------------------------------------- */
+
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item {
+    aspect-ratio: auto;
+    height: 100%;
+}
+
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+/* Auto mode: fit the active image's measured height, capped at the max. The
+   stage and track share the height so the absolutely-stacked items have a
+   box to contain inside.
+
+   image-viewer.js resolves the clamped pixel height and sets it inline on
+   these elements, which is what actually animates: a concrete length
+   transitions cleanly, whereas a min()/calc() wrapping a custom property
+   does not (the browser treats it as a discrete change and jumps). The
+   height below is only the pre-JS fallback so nothing is clipped before the
+   first measure; the transition declaration drives the inline-height slide. */
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-stage,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-track {
+    height: min(
+        var( --fg-height-max, var( --fg-viewer-height-cap, 100vh ) ),
+        var( --fg-viewer-height-cap, 100vh )
+    );
+    transition: height var( --fg-viewer-height-duration, 300ms ) ease;
+}
+
+/* JS adds this for the first measure and for resize re-fits so those height
+   changes land instantly; navigation between images keeps the transition. */
+[data-fg-viewer="1"] .fg-viewer-stage.fg-viewer-no-anim,
+[data-fg-viewer="1"] .fg-viewer-track.fg-viewer-no-anim {
+    transition: none;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+    [data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-stage,
+    [data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-track {
+        transition: none;
+    }
+}
+
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media picture,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media img,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster {
+    object-fit: contain;
+}
+
+/* Stacking. The active item is in flow (position: relative) so it sets the
+   track height; every other item is absolutely positioned on top of it.
+   .fg-item-hidden (from PHP, before JS boots) keeps everything invisible
+   to avoid a flash of stacked images. */
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item.fg-is-active {
+    position: relative;
+}
+
+/* Video items fill the item box like images do. */
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video,
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster {
+    height: 100%;
+    object-fit: var( --fg-item-fit, cover );
+}
+
+/* ----------------------------------------------------------------------
+   Transitions. JS sets data-fg-transition on the wrapper and stamps the
+   resolved duration on --fg-viewer-duration (ms). Default state: every
+   non-active item hidden; active item shown. Each mode overrides how the
+   show/hide animates.
+   ---------------------------------------------------------------------- */
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity   var( --fg-viewer-duration ) ease,
+        transform var( --fg-viewer-duration ) ease,
+        visibility 0s linear var( --fg-viewer-duration );
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item.fg-is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+        opacity   var( --fg-viewer-duration ) ease,
+        transform var( --fg-viewer-duration ) ease,
+        visibility 0s linear 0s;
+}
+
+/* None — instant swap, no animation. */
+
+[data-fg-layout="image-viewer"][data-fg-transition="none"] .fg-viewer-track .fg-item,
+[data-fg-layout="image-viewer"][data-fg-transition="none"] .fg-viewer-track .fg-item.fg-is-active {
+    transition: none;
+}
+
+/* Horizontal — the outgoing item slides out left, the incoming slides in
+   from the right. data-fg-dir tells us travel direction (next/prev). */
+
+[data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item {
+    transform: translateX( 100% );
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="horizontal"][data-fg-dir="prev"] .fg-viewer-track .fg-item {
+    transform: translateX( -100% );
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item.fg-is-active {
+    transform: translateX( 0 );
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item.fg-is-leaving {
+    transform: translateX( -100% );
+    opacity: 1;
+    visibility: visible;
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="horizontal"][data-fg-dir="prev"] .fg-viewer-track .fg-item.fg-is-leaving {
+    transform: translateX( 100% );
+}
+
+/* Vertical — same as horizontal on the Y axis. */
+
+[data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item {
+    transform: translateY( 100% );
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="vertical"][data-fg-dir="prev"] .fg-viewer-track .fg-item {
+    transform: translateY( -100% );
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item.fg-is-active {
+    transform: translateY( 0 );
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item.fg-is-leaving {
+    transform: translateY( -100% );
+    opacity: 1;
+    visibility: visible;
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="vertical"][data-fg-dir="prev"] .fg-viewer-track .fg-item.fg-is-leaving {
+    transform: translateY( 100% );
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+    [data-fg-viewer="1"] .fg-viewer-track .fg-item,
+    [data-fg-viewer="1"] .fg-viewer-track .fg-item.fg-is-active {
+        transition-duration: 0s;
+        transform: none;
+    }
+}
+
+/* ----------------------------------------------------------------------
+   Control bar — sits BELOW the image (not overlaid). A light-grey strip
+   with the prev arrow on the inline-start side, the next arrow on the
+   inline-end side, and the counter centred between them. The bar colour is
+   a CSS variable so it can be themed/overridden.
+   ---------------------------------------------------------------------- */
+
+[data-fg-viewer="1"] .fg-viewer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var( --fg-viewer-bar-gap );
+    margin-top: var( --fg-gap );
+    padding: var( --fg-viewer-bar-padding );
+    background: var( --fg-viewer-bar-bg );
+    border-radius: var( --fg-viewer-bar-radius );
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width:  var( --fg-arrow-size );
+    height: var( --fg-arrow-size );
+    padding: 0;
+    border: 0;
+    border-radius: var( --fg-viewer-arrow-radius );
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: var( --fg-viewer-arrow-transition, background-color 0.15s ease, opacity 0.15s ease );
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow:hover,
+[data-fg-viewer="1"] .fg-viewer-arrow:focus-visible {
+    background: var( --fg-viewer-arrow-hover-bg );
+    outline: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow[disabled] {
+    opacity: var( --fg-viewer-arrow-disabled-opacity );
+    pointer-events: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow > svg {
+    width: var( --fg-viewer-arrow-icon-size );
+    height: var( --fg-viewer-arrow-icon-size );
+}
+
+/* Centre group — counter + caption title, kept centred between the arrows.
+   The group absorbs the space between the arrows; the title inside it
+   truncates so the group never pushes the next arrow off the bar. */
+[data-fg-viewer="1"] .fg-viewer-bar-centre {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: var( --fg-viewer-title-gap );
+}
+
+[data-fg-viewer="1"] .fg-viewer-counter {
+    flex: 0 0 auto;
+    text-align: center;
+    font-size: var( --fg-viewer-counter-font-size );
+    line-height: 1;
+    opacity: var( --fg-viewer-counter-opacity );
+    user-select: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-counter--hidden {
+    /* Collapse entirely (not just visibility:hidden) so the title reclaims
+       the centre space when the counter is turned off. */
+    display: none;
+}
+
+/* Caption title — sits to the right of the counter, absorbs the remaining
+   centre width, and truncates with an ellipsis when it overflows. The title
+   styling variables are emitted by the Captions decorator (title colour,
+   font family/weight, and the desktop font size). */
+[data-fg-viewer="1"] .fg-viewer-title {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+    color: var( --fg-caption-title-color );
+    font-family: var( --fg-caption-title-font-family, inherit );
+    font-weight: var( --fg-caption-title-font-weight, inherit );
+    font-size: var( --fg-caption-title-font-size, var( --fg-viewer-counter-font-size ) );
+    user-select: none;
+}
+
+/* No title on the active item — collapse so the counter stays centred. */
+[data-fg-viewer="1"] .fg-viewer-title--empty {
+    display: none;
+}
+

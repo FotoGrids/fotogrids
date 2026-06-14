@@ -291,9 +291,14 @@ final class Settings_Localizer {
         }
 
         if ( current_user_can( 'manage_fotogrids_settings' ) ) {
+            // Read-only admin preview toggle, capability-gated above, sanitised
+            // and allowlisted below. No form submission/state change, so nonce
+            // verification does not apply.
+            // phpcs:disable WordPress.Security.NonceVerification.Recommended
             $simulate_state = isset( $_GET['fotogrids_simulate_state'] )
                 ? sanitize_text_field( wp_unslash( (string) $_GET['fotogrids_simulate_state'] ) )
                 : '';
+            // phpcs:enable WordPress.Security.NonceVerification.Recommended
             if ( in_array( $simulate_state, [ 'ok', 'password_required', 'expired', 'unauthorized' ], true ) ) {
                 $data['catalogSimulateState'] = $simulate_state;
             }

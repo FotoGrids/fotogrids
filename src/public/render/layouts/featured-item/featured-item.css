@@ -1,0 +1,223 @@
+/* Featured Item (Airbnb-style) — one big featured image beside a compact
+   grid of items. No navigation: every tile is a normal decorated item that
+   runs the gallery's click behaviour. An auto "Show all" button overlays
+   the whole layout when there are more items than fit inline.
+
+   Spacing: a single value (--fg-gap, the Item Spacing setting) is used both
+   between the featured image and the grid AND between grid tiles.
+
+   Aspect ratio: the Item Aspect Ratio setting applies to the featured
+   image on desktop only; the grid sizes itself to the height the featured
+   image takes. On mobile the columns stack and the featured image falls
+   back to its own natural box. */
+
+[data-fg-layout="featured-item"] {
+    position: relative;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var( --fg-gap );
+    align-items: stretch;
+}
+
+/* Side. Default (left) = featured first; right swaps the columns' order. */
+
+[data-fg-layout="featured-item"][data-fg-featured-side="right"] .fg-featured-main {
+    order: 2;
+}
+
+[data-fg-layout="featured-item"][data-fg-featured-side="right"] .fg-featured-grid {
+    order: 1;
+}
+
+/* Featured image. */
+
+[data-fg-layout="featured-item"] .fg-featured-main {
+    position: relative;
+    min-width: 0;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item {
+    margin: 0;
+    height: 100%;
+}
+
+/* The direct child of .fg-item is the click wrapper (an <a> when the item
+   links/lightboxes, or a <div> otherwise). It must fill the item box so the
+   media inside resolves its height:100% against a real height. */
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item > a,
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item > div,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item > a,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item > div {
+    display: block;
+    height: 100%;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media,
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media picture,
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media img,
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media .fg-video,
+[data-fg-layout="featured-item"] .fg-featured-main .fg-item .fg-item-media .fg-video-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: var( --fg-item-fit );
+}
+
+/* Grid. 4 -> 2x2, 6 -> 3x2, 9 -> 3x3 (cols/rows from the layout's vars).
+   The grid panel stretches to the featured column's height and distributes
+   it across the rows, so tiles align to the height the featured image
+   takes. */
+
+[data-fg-layout="featured-item"] .fg-featured-grid {
+    display: grid;
+    grid-template-columns: repeat( var( --fg-featured-grid-cols ), minmax( 0, 1fr ) );
+    /* minmax(0, 1fr) rows: their min-content contribution is 0, so the grid
+       never reports an intrinsic height taller than the featured column.
+       That makes the FEATURED image the row-height authority — the grid
+       stretches to match it (align-items:stretch on the container) and
+       divides that height across its rows, rather than the grid's own
+       content dictating the layout height. */
+    grid-template-rows: repeat( var( --fg-featured-grid-rows ), minmax( 0, 1fr ) );
+    gap: var( --fg-gap );
+    min-width: 0;
+    /* height:0 removes the grid's own content from the container's row-height
+       calculation, so the FEATURED column's aspect-ratio is the sole height
+       authority. min-height:100% then makes the grid fill that row height,
+       and the minmax(0,1fr) rows divide it. Without height:0 the grid's
+       images would report a taller intrinsic height and win the stretch. */
+    height: 0;
+    min-height: 100%;
+    overflow: hidden;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item {
+    margin: 0;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media picture,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media img,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media .fg-video,
+[data-fg-layout="featured-item"] .fg-featured-grid .fg-item .fg-item-media .fg-video-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: var( --fg-item-fit );
+}
+
+/* Desktop only: the featured image takes the chosen aspect ratio, which in
+   turn drives the height the grid column stretches to match. Below the
+   mobile breakpoint the columns stack and this is dropped. */
+
+@media ( min-width: 601px ) {
+    [data-fg-layout="featured-item"] .fg-featured-main .fg-item {
+        aspect-ratio: var( --fg-item-aspect-ratio );
+        height: auto;
+    }
+}
+
+/* ----------------------------------------------------------------------
+   Show all button — overlays the whole layout in a chosen corner.
+   Styling is driven by CSS vars the layout stamps on the wrapper.
+   ---------------------------------------------------------------------- */
+
+[data-fg-layout="featured-item"] .fg-featured-show-all {
+    position: absolute;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: var( --fg-show-all-padding );
+    border: var( --fg-show-all-border-width ) solid var( --fg-show-all-border-color );
+    border-radius: var( --fg-show-all-radius );
+    background: var( --fg-show-all-bg );
+    color: var( --fg-show-all-text );
+    font-family: var( --fg-show-all-font-family, inherit );
+    font-size: var( --fg-show-all-font-size );
+    font-weight: var( --fg-show-all-font-weight, 600 );
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-show-all-icon {
+    width: 1.2em;
+    height: 1.2em;
+    flex: 0 0 auto;
+    display: block;
+}
+
+[data-fg-layout="featured-item"] .fg-featured-show-all:hover,
+[data-fg-layout="featured-item"] .fg-featured-show-all:focus-visible {
+    background: var( --fg-show-all-hover-bg );
+    color: var( --fg-show-all-hover-text );
+    border-color: var( --fg-show-all-hover-border-color );
+    outline: none;
+}
+
+[data-fg-layout="featured-item"][data-fg-show-all-position="top-left"] .fg-featured-show-all {
+    top: var( --fg-show-all-offset );
+    left: var( --fg-show-all-offset );
+}
+
+[data-fg-layout="featured-item"][data-fg-show-all-position="top-right"] .fg-featured-show-all {
+    top: var( --fg-show-all-offset );
+    right: var( --fg-show-all-offset );
+}
+
+[data-fg-layout="featured-item"][data-fg-show-all-position="bottom-left"] .fg-featured-show-all {
+    bottom: var( --fg-show-all-offset );
+    left: var( --fg-show-all-offset );
+}
+
+[data-fg-layout="featured-item"][data-fg-show-all-position="bottom-right"] .fg-featured-show-all {
+    bottom: var( --fg-show-all-offset );
+    right: var( --fg-show-all-offset );
+}
+
+/* ----------------------------------------------------------------------
+   Mobile — stack featured on top, grid below, full width. Applies for
+   both side values.
+   ---------------------------------------------------------------------- */
+
+@media ( max-width: 600px ) {
+    [data-fg-layout="featured-item"] .fg-featured-container {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    [data-fg-layout="featured-item"][data-fg-featured-side="right"] .fg-featured-main,
+    [data-fg-layout="featured-item"] .fg-featured-main {
+        order: 1;
+    }
+
+    [data-fg-layout="featured-item"][data-fg-featured-side="right"] .fg-featured-grid,
+    [data-fg-layout="featured-item"] .fg-featured-grid {
+        order: 2;
+    }
+
+    /* Mobile: the columns stack, so there's no featured column to derive
+       the grid height from. Undo the desktop height:0 / min-height:100%
+       trick and let each grid tile size itself by the aspect ratio instead
+       (otherwise the grid would collapse to zero height). */
+    [data-fg-layout="featured-item"] .fg-featured-grid {
+        grid-template-rows: none;
+        grid-auto-rows: auto;
+        height: auto;
+        min-height: 0;
+    }
+
+    [data-fg-layout="featured-item"] .fg-featured-grid .fg-item {
+        aspect-ratio: var( --fg-item-aspect-ratio );
+    }
+
+    [data-fg-layout="featured-item"] .fg-featured-main .fg-item {
+        height: auto;
+    }
+}

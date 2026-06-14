@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Loads the arrow-icon SVG library shared by every layout that needs
  * prev/next chrome (lightbox, slider, image viewer). Reads from the
- * authoritative JSON file under features/lightbox/ so a single edit
+ * authoritative JSON file under lightbox/shared/ so a single edit
  * updates every consumer.
  *
  * @package FotoGrids\Render\Internal
@@ -39,7 +39,7 @@ final class Arrow_Icons {
             return self::$cache;
         }
 
-        $path = FOTOGRIDS_PLUGIN_DIR . 'public/render/features/lightbox/arrow-icons.json';
+        $path = FOTOGRIDS_PLUGIN_DIR . 'public/render/lightbox/shared/arrow-icons.json';
         if ( file_exists( $path ) ) {
             $decoded = json_decode( (string) file_get_contents( $path ), true );
             if ( is_array( $decoded ) ) {

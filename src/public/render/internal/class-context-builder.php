@@ -128,9 +128,17 @@ final class Context_Builder {
         if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
             $candidate    = (int) $meta_overrides['via_album_id'];
             $via_album_id = $candidate > 0 ? $candidate : null;
-        } elseif ( isset( $_GET['fg_via'] ) ) {
-            $candidate    = (int) wp_unslash( $_GET['fg_via'] );
-            $via_album_id = $candidate > 0 ? $candidate : null;
+        } else {
+            // Public breadcrumb context hint read from a normal front-end page
+            // view (no form submission, no state change), so nonce verification
+            // does not apply. The (int) cast is the sanitization, and the value
+            // is only validated/used as an album id by Breadcrumb_Resolver.
+            // phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            if ( isset( $_GET['fg_via'] ) ) {
+                $candidate    = (int) wp_unslash( $_GET['fg_via'] );
+                $via_album_id = $candidate > 0 ? $candidate : null;
+            }
+            // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         }
 
         [ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
@@ -704,11 +712,15 @@ final class Context_Builder {
         global $wpdb;
         $table = $wpdb->prefix . 'fotogrids_item_meta';
 
+        // $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal); all
+        // values are bound via $wpdb->prepare(). Custom table: direct query, no cache.
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $raw = $wpdb->get_var( $wpdb->prepare(
             "SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = %d LIMIT 1",
             $attachment_id,
             $gallery_id
         ) );
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
         if ( empty( $raw ) ) {
             return [];
@@ -841,6 +853,17 @@ final class Context_Builder {
      * @return array<int, Item_View>
      */
     private function resolve_captions( array $items, array $render_settings ): array {
+        // Image Viewer renders only the caption title, in its control bar, and
+        // hides Item Description and Limit Title Length in the admin. Neutralise
+        // those hidden settings here so they can never apply at the frontend:
+        // force the description off and the title-length limit to "no" before
+        // the content builder reads them.
+        $layout = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : '';
+        if ( $layout === 'image-viewer' ) {
+            $render_settings['caption_hide_description']    = true;
+            $render_settings['caption_limit_title_length']  = 'no';
+        }
+
         $builder = new Caption_Content_Builder();
         $resolved = [];
 
@@ -903,14 +926,18 @@ final class Context_Builder {
 
     /**
      * Asks the active layout module for its preferred thumbnail size and
-     * swaps the default fotogrids_thumbnail for it. A user-picked
-     * non-default size is left untouched so explicit choices still win.
+     * swaps in for it.
      *
      * Layouts express their preference via Layout::preferred_thumbnail_size().
      * Returning null means "no preference" and the configured value is
-     * returned unchanged. The returned slug still flows through
-     * Image_Size_Manager's fallback chain so a missing derivative degrades
-     * to fotogrids_thumbnail → thumbnail → medium → full.
+     * returned unchanged. A soft preference only replaces the default
+     * fotogrids_thumbnail, leaving an explicit user pick untouched. A
+     * mandatory preference (Layout::requires_thumbnail_size() === true, used
+     * by Justified and Masonry) overrides the user pick too, because those
+     * layouts cannot render with an arbitrary cropped derivative. The
+     * returned slug still flows through Image_Size_Manager's fallback chain
+     * so a missing derivative degrades to fotogrids_thumbnail → thumbnail →
+     * medium → full.
      *
      * @since  1.0.0
      * @param  string               $thumb_size      Currently resolved size slug.
@@ -919,10 +946,6 @@ final class Context_Builder {
      * @return string
      */
     private function apply_layout_thumb_size( string $thumb_size, array $render_settings, ?Render_Context $context = null ): string {
-        if ( $thumb_size !== Image_Size_Manager::SLUG_THUMBNAIL ) {
-            return $thumb_size;
-        }
-
         if ( $context === null ) {
             $context = $this->build_minimal_context( $render_settings );
         }
@@ -934,7 +957,20 @@ final class Context_Builder {
         }
 
         $preferred = $layout->preferred_thumbnail_size( $context );
-        return is_string( $preferred ) && $preferred !== '' ? $preferred : $thumb_size;
+        if ( ! is_string( $preferred ) || $preferred === '' ) {
+            return $thumb_size;
+        }
+
+        // A mandatory preference (Justified, Masonry) overrides even an
+        // explicit user-picked size — those layouts cannot render with an
+        // arbitrary cropped derivative. A soft preference only applies when
+        // the user has left thumbnail_size on its default, so explicit
+        // choices still win for layouts that can honour them.
+        if ( $layout->requires_thumbnail_size( $context ) ) {
+            return $preferred;
+        }
+
+        return $thumb_size === Image_Size_Manager::SLUG_THUMBNAIL ? $preferred : $thumb_size;
     }
 
     /**
@@ -1119,12 +1155,16 @@ final class Context_Builder {
 
         // Fetch global item rows (gallery_id = 0) only; these carry the
         // external_url / link_target set via the item edit modal.
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        // $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal); the
+        // IN() list is built from generated %d placeholders and bound through
+        // $wpdb->prepare(). Custom table, so direct query + no object cache.
+        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
         $sql  = "SELECT attachment_id, external_url, link_target FROM {$table} WHERE gallery_id = 0 AND attachment_id IN ({$placeholders})";
         $rows = $wpdb->get_results(
-            $wpdb->prepare( $sql, ...$attachment_ids ), // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+            $wpdb->prepare( $sql, ...$attachment_ids ),
             ARRAY_A
         );
+        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
         $result = [];
         if ( is_array( $rows ) ) {

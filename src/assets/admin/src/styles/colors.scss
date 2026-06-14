@@ -13,6 +13,7 @@ $fotogrids-colors-green-hover: #5ac162;
 // Other FotoGrids Colors
 $fotogrids-colors-red: #f01e32;
 $fotogrids-colors-yellow: #ffb914;
+$fotogrids-colors-teal: #0d9488;
 $fotogrids-colors-grey-02: #8c8f94;
 $fotogrids-colors-grey-06: #323232;
 $fotogrids-colors-charcoal: #1d2327;
@@ -172,6 +173,7 @@ $fotogrids-ui-colors: (
 
     // Interactive Colors
     interactive: (
+        bg: #f0f0f1,
         hover-bg: #e6e7e8,
         active-bg: #c3c4c7,
         selected-bg: #f0f6fc,
@@ -234,6 +236,7 @@ $fotogrids-ui-colors: (
     --fg-yellow: #{$fotogrids-colors-yellow};
     --fg-green: #{$fotogrids-colors-green};
     --fg-green-hover: #{$fotogrids-colors-green-hover};
+    --fg-teal: #{$fotogrids-colors-teal};
     --fg-grey: #{$fotogrids-colors-grey-06};
 
     @each $category, $colors in $fotogrids-ui-colors {

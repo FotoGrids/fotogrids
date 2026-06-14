@@ -145,6 +145,20 @@ final class Layout_Justified implements Layout {
         return \FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED;
     }
 
+    /**
+     * Justified packs items at a fixed row height with variable widths, so
+     * it requires the proportional fotogrids_justified derivative. A cropped
+     * or square user-picked size would force every tile to the same aspect
+     * ratio and defeat the layout — the preference is mandatory.
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  bool
+     */
+    public function requires_thumbnail_size( Render_Context $render_context ): bool {
+        return true;
+    }
+
     public function capabilities(): array {
         return [
             'uses_item_spacing' => true,

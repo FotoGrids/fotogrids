@@ -44,6 +44,38 @@
         color: var(--fg-text-tertiary);
     }
 
+    &__group-label--action {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        margin: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        text-align: left;
+        transition: color 0.12s ease;
+        padding-inline-start: 6px;
+        padding-block-end: 12px;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--fg-text-primary);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--fg-accent, currentColor);
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+    }
+
+    &__group-label-icon {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+    }
+
     &__item {
         display: flex;
         align-items: center;
@@ -70,6 +102,7 @@
         &:focus {
             outline: none;
             box-shadow: none;
+            color: var(--fg-blue);
         }
 
         &:focus-visible {
@@ -212,6 +245,11 @@
         gap: 16px;
         padding: 24px 32px 20px;
         border-bottom: 1px solid var(--fg-border-primary);
+
+        &--no-body {
+            border-bottom: 0;
+            padding-bottom: 24px;
+        }
     }
 
     &__heading {

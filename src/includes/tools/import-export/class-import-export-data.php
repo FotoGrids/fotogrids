@@ -20,6 +20,36 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Import_Export_Data {
 
+	/*
+	 * ---------------------------------------------------------------------
+	 * PHPCS: WPDB direct-query sniffs disabled for this class.
+	 * ---------------------------------------------------------------------
+	 * Import_Export_Data is the admin-only, user-triggered REST tool for
+	 * exporting/importing the custom fotogrids_* tables. The WPDB sniffs
+	 * below are suppressed class-wide:
+	 *
+	 *  - DirectDatabaseQuery.DirectQuery: these are custom tables with no
+	 *    WP_Query / core API equivalent. Several flagged statements are also
+	 *    transaction control (START TRANSACTION / COMMIT / ROLLBACK), which
+	 *    are not queries at all.
+	 *
+	 *  - DirectDatabaseQuery.NoCaching: this tool runs on explicit admin
+	 *    action (export/import), not on any render or request hot path, so
+	 *    object caching is a non-goal here — not deferred debt.
+	 *
+	 *  - PreparedSQL.InterpolatedNotPrepared /
+	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
+	 *    name is built as `$wpdb->prefix . 'fotogrids_*'` (a trusted,
+	 *    hardcoded literal — WP placeholders cannot bind table identifiers).
+	 *    All user-supplied *values* are passed through $wpdb->prepare().
+	 * ---------------------------------------------------------------------
+	 */
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
 	// -------------------------------------------------------------------------
 	// Option key for the operation log
 	// -------------------------------------------------------------------------
@@ -963,4 +993,10 @@ class Import_Export_Data {
 
 		update_option( self::LOG_OPTION, $log, false );
 	}
+
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	// phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

@@ -212,6 +212,10 @@ final class Layout_Slider implements Layout {
         return \FotoGrids\Image_Size_Manager::SLUG_FULL;
     }
 
+    public function requires_thumbnail_size( Render_Context $render_context ): bool {
+        return false;
+    }
+
     public function capabilities(): array {
         return [
             'enforces_item_box'  => true,

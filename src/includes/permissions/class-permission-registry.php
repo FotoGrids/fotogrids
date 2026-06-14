@@ -324,6 +324,10 @@ final class Permission_Registry {
      * at the first frame outside this class.
      */
     private static function detect_source(): string {
+        // Intentional caller introspection (not debug output): inspects the call
+        // stack to attribute a permission check to its originating subsystem.
+        // DEBUG_BACKTRACE_IGNORE_ARGS + depth limit keep it cheap.
+        // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
         $trace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 6 );
         foreach ( $trace as $frame ) {
             if ( empty( $frame['class'] ) ) {

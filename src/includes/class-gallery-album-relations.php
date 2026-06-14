@@ -14,6 +14,35 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Album_Relations {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * Gallery_Album_Relations is the data layer for the custom
+     * fotogrids_gallery_albums join table. The WPDB sniffs below are
+     * suppressed class-wide:
+     *
+     *  - DirectDatabaseQuery.DirectQuery: custom table with no WP_Query /
+     *    core API equivalent; direct $wpdb access (incl. JOINs to wp_posts)
+     *    is required.
+     *  - DirectDatabaseQuery.NoCaching: relationship reads back admin list
+     *    views; caching is a non-goal at this layer.
+     *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
+     *    Security.DirectDB.UnescapedDBParameter: the interpolated
+     *    $table_name is `$wpdb->prefix . 'fotogrids_gallery_albums'` (a
+     *    trusted literal — WP placeholders cannot bind table identifiers),
+     *    and ORDER BY clauses are built from a fixed allowlist. All
+     *    user-supplied *values* are passed through $wpdb->prepare(), which
+     *    on the flagged lines is a separate statement from the get_*() call.
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Table name for gallery-album relationships
      */
@@ -530,4 +559,11 @@ class Gallery_Album_Relations {
             $wpdb->delete( $table_name, array( 'album_id' => $post_id ), array( '%d' ) );
         }
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

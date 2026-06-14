@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace FotoGrids\Render\Decorators\Lightbox;
+namespace FotoGrids\Render\Lightbox\Classic;
 
 use FotoGrids\Hooks\Filters_Render;
 use FotoGrids\Render\Api\Collection_Kind;
@@ -24,7 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
  * lightbox JS uses event delegation on [data-fg-lightbox-trigger] so no
  * per-item JS handlers are needed.
  *
- * @package FotoGrids\Render\Decorators\Lightbox
+ * @package FotoGrids\Render\Lightbox\Classic
  * @since   1.0.0
  */
 final class Lightbox_Decorator implements Decorator {

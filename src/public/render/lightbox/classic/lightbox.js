@@ -26,7 +26,7 @@
  *   data-fg-lightbox-trigger  on the <a> that wraps each item's media
  *   data-fg-caption / data-fg-title on the same <a>
  *
- * Source: src/public/render/features/lightbox/lightbox.js
+ * Source: src/public/render/lightbox/classic/lightbox.js
  * Webpack entry key: 'lightbox'  →  assets/js/lightbox.js
  *
  * Attribute contract (read from gallery wrapper, all optional with sane defaults)
@@ -1043,6 +1043,62 @@ class FotoGridsLightbox {
         // Focus the sentinel - a zero-size aria-hidden element - so the browser's
         // auto-focus doesn't land on a real button (which would show a tooltip or
         // fire on Space/Enter before the user has interacted).
+        this._focusSentinel?.focus( { preventScroll: true } );
+
+        document.body.style.overflow = 'hidden';
+        document.addEventListener( 'keydown', this._onKeydown );
+
+        if ( this.settings.autoProgress && this.items.length > 1 ) {
+            this._startAuto();
+        }
+
+        this._trackView( this.items[ this.index ] );
+        this._fire( 'open', { index: this.index, item: this.items[ this.index ] } );
+    }
+
+    /**
+     * Open the lightbox over an explicit, externally-supplied flat slide
+     * array rather than sourcing slides from the gallery DOM.
+     *
+     * Used by LightboxGrid: the grid shows every item, but the gallery
+     * wrapper only contains the inline (featured + grid) items, so the
+     * normal collectItems() path would see a partial list. This bypasses
+     * collectItems() and treats the supplied slides as the full,
+     * non-paginated set. Settings (colours, transition, info panel, etc.)
+     * are still read from galleryEl so the overlay matches the gallery.
+     *
+     * @param {HTMLElement} galleryEl Gallery wrapper (settings source).
+     * @param {Array<object>} slides  Flat slide dicts (see buildSlideFromTrigger shape).
+     * @param {number} index          Start index into slides.
+     */
+    openSlides( galleryEl, slides, index ) {
+        if ( ! Array.isArray( slides ) || slides.length === 0 ) return;
+        if ( ! this.dialog ) this._createDialog();
+
+        this.galleryEl     = galleryEl;
+        this.settings      = readSettings( galleryEl );
+        this._preloadCache = new Set();
+
+        this._teardownAutoListeners();
+
+        // Treat the supplied slides as the full, non-paginated flat list.
+        this.items  = slides;
+        this._total = slides.length;
+        this.index  = Math.max( 0, Math.min( index | 0, this._total - 1 ) );
+
+        this._applySettings();
+        this._renderNav();
+        this._renderDots();
+        this._renderThumbs();
+
+        this._showItem( this.index, false );
+
+        if ( typeof this.dialog.showModal === 'function' ) {
+            this.dialog.showModal();
+        } else {
+            this.dialog.setAttribute( 'open', '' );
+        }
+
         this._focusSentinel?.focus( { preventScroll: true } );
 
         document.body.style.overflow = 'hidden';

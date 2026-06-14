@@ -14,6 +14,30 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Admin_Data {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * Admin_Data backs admin-only REST endpoints over the custom fotogrids_*
+     * tables. The WPDB sniffs below are suppressed class-wide:
+     *
+     *  - DirectDatabaseQuery.DirectQuery: custom tables with no WP_Query /
+     *    core API equivalent; direct $wpdb access is required.
+     *  - DirectDatabaseQuery.NoCaching: admin dashboard reads triggered on
+     *    explicit navigation, not a render hot path; caching is a non-goal.
+     *  - PreparedSQL.InterpolatedNotPrepared /
+     *    Security.DirectDB.UnescapedDBParameter: every interpolated table
+     *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal — WP
+     *    placeholders cannot bind table identifiers). All user-supplied
+     *    *values* are passed through $wpdb->prepare().
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Add galleries to album
      *
@@ -1198,4 +1222,10 @@ class Admin_Data {
             'status'  => \FotoGrids\License_Manager::status_snapshot(),
         ) );
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

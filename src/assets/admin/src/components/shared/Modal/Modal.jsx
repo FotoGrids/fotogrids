@@ -30,10 +30,6 @@ const Modal = ({
     hasSidebar = false,
     sidebarCollapsible = false,
     sidebarInitiallyCollapsed = false,
-    // Independent of `size`: just stamps `fg-modal--compact` on the
-    // root so consumer SCSS can tighten paddings / font sizes / divider
-    // weights without redefining a whole size variant. Defaults off so
-    // existing modals are unaffected.
     compact = false,
     closeOnOverlay = true,
     closeOnEsc = true,

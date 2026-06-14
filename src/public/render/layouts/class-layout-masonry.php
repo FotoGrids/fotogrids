@@ -107,6 +107,20 @@ final class Layout_Masonry implements Layout {
         return \FotoGrids\Image_Size_Manager::SLUG_MASONRY;
     }
 
+    /**
+     * Masonry stacks items at a fixed column width with variable heights, so
+     * it requires the proportional fotogrids_masonry derivative. A cropped
+     * or square user-picked size would flatten the column rhythm and defeat
+     * the layout — the preference is mandatory.
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  bool
+     */
+    public function requires_thumbnail_size( Render_Context $render_context ): bool {
+        return true;
+    }
+
     public function capabilities(): array {
         return [
             'uses_columns'      => true,

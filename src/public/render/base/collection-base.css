@@ -52,7 +52,14 @@
     text-decoration: none;
 }
 
-.fotogrids-collection .fg-item a:focus {
+/* Suppress the default :focus outline on every focusable control in a
+   collection (anchors, buttons, custom tabindex elements such as slider
+   arrows/dots, pagination, and lightbox toolbar buttons). Keyboard focus is
+   still made visible via the :focus-visible ring on .fg-item and on each
+   control's own :focus-visible rule. */
+.fotogrids-collection a:focus,
+.fotogrids-collection button:focus,
+.fotogrids-collection [tabindex]:focus {
     outline: none;
 }
 
@@ -106,6 +113,7 @@
     background: rgba(0, 0, 0, 0.55);
     pointer-events: none;
     transition: background 0.15s ease;
+    z-index: 1;
 }
 
 .fotogrids-collection .fg-item-media .fg-video-badge::after {
@@ -135,15 +143,22 @@
     aspect-ratio: var(--fg-item-aspect-ratio, 4 / 3);
 }
 
+/* Featured Item applies the chosen aspect-ratio to the featured image only,
+   and only on desktop (see featured-item.css). The grid tiles instead size
+   themselves to the height the featured image takes, so the ratio setting
+   does not blanket the grid here. */
+
 .fotogrids-collection:where(
     [data-fg-layout="grid"],
     [data-fg-layout="single-item"],
-    [data-fg-layout="image-viewer"]
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
 ) .fg-item-media picture,
 .fotogrids-collection:where(
     [data-fg-layout="grid"],
     [data-fg-layout="single-item"],
-    [data-fg-layout="image-viewer"]
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
 ) .fg-item-media img {
     width: 100%;
     height: 100%;
@@ -153,12 +168,14 @@
 .fotogrids-collection:where(
     [data-fg-layout="grid"],
     [data-fg-layout="single-item"],
-    [data-fg-layout="image-viewer"]
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
 ) .fg-item-media .fg-video,
 .fotogrids-collection:where(
     [data-fg-layout="grid"],
     [data-fg-layout="single-item"],
-    [data-fg-layout="image-viewer"]
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
 ) .fg-item-media .fg-video-poster {
     width: 100%;
     height: 100%;

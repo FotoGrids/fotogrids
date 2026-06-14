@@ -50,6 +50,14 @@ final class Captions implements Decorator {
     }
 
     public function wrapper_data_attrs( Render_Context $render_context ): array {
+        // Image Viewer shows the caption title in its control bar, not as a
+        // per-item caption, so the placement attribute (overlay/top/bottom)
+        // has no meaning here and the Caption Placement setting is hidden in
+        // the admin. Don't stamp it so the hidden setting never applies.
+        if ( $this->is_image_viewer( $render_context ) ) {
+            return [];
+        }
+
         $caption_placement = $this->setting_scalar( $render_context->settings['caption_placement'] ?? null, 'overlay' );
 
         return [
@@ -57,8 +65,30 @@ final class Captions implements Decorator {
         ];
     }
 
+    /**
+     * True when the active layout is Image Viewer. That layout renders only
+     * the caption title (in its control bar) and hides Caption Placement,
+     * Distance from Media, Alignment, Item Description, and Limit Title Length
+     * in the admin — so the decorator must ignore those settings entirely and
+     * emit only the title styling variables.
+     *
+     * @since 1.0.0
+     */
+    private function is_image_viewer( Render_Context $render_context ): bool {
+        return $render_context->layout->layout_id === 'image-viewer';
+    }
+
     public function style_vars( Render_Context $render_context ): array {
-        $settings          = $render_context->settings;
+        $settings = $render_context->settings;
+
+        // Image Viewer only renders the caption title (in its control bar).
+        // Emit just the title styling variables — colour, font, and size —
+        // and ignore placement, alignment, gap, overlay, description, and the
+        // title line-clamp, all of which are hidden for this layout.
+        if ( $this->is_image_viewer( $render_context ) ) {
+            return $this->title_only_style_vars( $render_context );
+        }
+
         $caption_placement = $this->setting_scalar( $settings['caption_placement'] ?? null, 'overlay' );
         $caption_alignment = $this->setting_scalar( $settings['caption_alignment'] ?? null, 'left' );
         $caption_gap       = $settings['caption_gap'] ?? [];
@@ -167,6 +197,47 @@ final class Captions implements Decorator {
             $vars['--fg-caption-title-font-family'] = $font_family;
         }
 
+        if ( $font_weight !== '' ) {
+            $vars['--fg-caption-title-font-weight'] = $font_weight;
+        }
+
+        return $vars;
+    }
+
+    /**
+     * Title-only style variables for the Image Viewer layout. Produces the
+     * title colour, font family/weight, and responsive font size — the same
+     * values the per-item caption would use — so the layout can style the
+     * title it renders in its control bar. No placement, alignment, gap,
+     * overlay, description, or line-clamp variables are emitted.
+     *
+     * @since  1.0.0
+     * @return array<string, mixed>
+     */
+    private function title_only_style_vars( Render_Context $render_context ): array {
+        $settings        = $render_context->settings;
+        $title_font_size = $settings['caption_title_font_size'] ?? [];
+
+        $vars = [
+            '--fg-caption-title-font-size' => new Responsive_Var(
+                desktop: $this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
+                tablet:  $this->resolve_responsive_value( $title_font_size, 'tablet',  'px', '16px' ),
+                mobile:  $this->resolve_responsive_value( $title_font_size, 'mobile',  'px', '14px' ),
+            ),
+        ];
+
+        $title_color = is_string( $settings['caption_title_color'] ?? null ) ? $settings['caption_title_color'] : '';
+        if ( $title_color !== '' ) {
+            $vars['--fg-caption-title-color'] = $title_color;
+        }
+
+        $resolver    = Font_Resolver::instance();
+        $font_family = $resolver->resolve_font_family( $settings['caption_title_font_family'] ?? null, $render_context );
+        $font_weight = $resolver->resolve_font_weight( $settings['caption_title_font_weight'] ?? null, $render_context );
+
+        if ( $font_family !== '' ) {
+            $vars['--fg-caption-title-font-family'] = $font_family;
+        }
         if ( $font_weight !== '' ) {
             $vars['--fg-caption-title-font-weight'] = $font_weight;
         }

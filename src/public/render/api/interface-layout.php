@@ -104,17 +104,42 @@ interface Layout {
      * layout has no preference and the user's configured thumbnail_size
      * setting should be used as-is.
      *
-     * Only consulted when the user has left thumbnail_size on its default
-     * (fotogrids_thumbnail). An explicit non-default user choice always
-     * wins. The returned slug still flows through Image_Size_Manager's
-     * fallback chain, so a missing derivative falls back to fotogrids_thumbnail
-     * → thumbnail → medium → full.
+     * By default this is a *soft* preference: it is only consulted when the
+     * user has left thumbnail_size on its default (fotogrids_thumbnail), and
+     * an explicit non-default user choice wins. Structural layouts that
+     * cannot render correctly with an arbitrary size (Justified needs a
+     * fixed-height/variable-width derivative; Masonry needs a
+     * fixed-width/variable-height one) can promote this to a *mandatory*
+     * preference via requires_thumbnail_size(), in which case it overrides
+     * the user's pick too.
+     *
+     * The returned slug still flows through Image_Size_Manager's fallback
+     * chain, so a missing derivative falls back to fotogrids_thumbnail →
+     * thumbnail → medium → full.
      *
      * @since   1.0.0
      * @param   Render_Context $render_context Render context.
      * @return  string|null
      */
     public function preferred_thumbnail_size( Render_Context $render_context ): ?string;
+
+    /**
+     * Whether preferred_thumbnail_size() is mandatory for this layout.
+     *
+     * When TRUE, the layout's preferred size overrides an explicit
+     * user-picked thumbnail_size as well as the default — the layout cannot
+     * lay out correctly with any other size. Justified and Masonry return
+     * TRUE; every other layout returns FALSE and keeps the soft-preference
+     * behaviour (only applied when thumbnail_size is on its default).
+     *
+     * A layout returning TRUE here must return a non-null slug from
+     * preferred_thumbnail_size().
+     *
+     * @since   1.0.0
+     * @param   Render_Context $render_context Render context.
+     * @return  bool
+     */
+    public function requires_thumbnail_size( Render_Context $render_context ): bool;
 
     /**
      * Capability flags this layout advertises to the rest of the render

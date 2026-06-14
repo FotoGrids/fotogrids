@@ -84,15 +84,6 @@ class Admin_Init {
 
         add_submenu_page(
             'fotogrids',
-            __( 'FotoGrids Setup Wizard', 'fotogrids' ),
-            __( 'Setup Wizard', 'fotogrids' ),
-            'manage_fotogrids',
-            'fotogrids-setup',
-            array( __CLASS__, 'setup_wizard_page' )
-        );
-
-        add_submenu_page(
-            'fotogrids',
             __( 'Dashboard', 'fotogrids' ),
             __( 'Dashboard', 'fotogrids' ),
             'manage_fotogrids',
@@ -185,11 +176,6 @@ class Admin_Init {
         }
 
         remove_submenu_page( 'fotogrids', 'fotogrids' );
-
-        $current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
-        if ( $current_page !== 'fotogrids-setup' ) {
-            remove_submenu_page( 'fotogrids', 'fotogrids-setup' );
-        }
     }
 
     /**
@@ -309,8 +295,17 @@ class Admin_Init {
             'seoSettings' => \FotoGrids\Settings\SEO_Settings_Store::get(),
             'viewSettings' => \FotoGrids\Settings\View_Settings_Store::get(),
             'currentUser' => wp_get_current_user(),
-            'shareStatistics' => (bool) get_option( 'fotogrids_share_statistics', false ),
+            // Prefer the real Freemius tracking state when available so
+            // the toggle reflects what's actually happening — not just
+            // our local mirror option. Falls back to the option if
+            // Freemius isn't loaded yet (early activation, etc).
+            'shareStatistics' => self::resolve_share_statistics_state(),
             'autosave' => (bool) get_option( 'fotogrids_autosave', '0' ),
+            // Wizard step 3 — collection-settings UI complexity mode.
+            // Read by collection-settings.js and surfaced through the
+            // docs-strip Segmented control.
+            'settingsMode' => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
+            'userPersona'  => (string) get_option( 'fotogrids_user_persona', '' ),
             'customJsAllowDynamicExecution' => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
             // Surfaced to the Plugin Settings > Maintenance tab so the Debug
             // Log panel only renders when WP_DEBUG is actually on.
@@ -357,6 +352,9 @@ class Admin_Init {
         if ( $hook === 'fotogrids_page_fotogrids-library' || strpos( $hook, 'fotogrids-library' ) !== false ) {
             $entity_types = \FotoGrids\REST\Metadata\Library_Data::get_entity_types();
             $tab_slugs    = array_keys( $entity_types );
+            // Read-only tab routing for asset enqueue; sanitised and allowlisted
+            // below. No state change, so nonce verification is N/A.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $requested    = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : '';
             $initial_tab  = in_array( $requested, $tab_slugs, true ) ? $requested : ( $tab_slugs[0] ?? 'tags' );
 
@@ -375,7 +373,9 @@ class Admin_Init {
         if ( $hook === 'fotogrids_page_fotogrids-settings' || strpos( $hook, 'fotogrids-settings' ) !== false ) {
             \FotoGrids\Assets\Collection_Settings_Assets::enqueue( true, false );
 
-            // Determine post type from subtab parameter, default to gallery
+            // Determine post type from subtab parameter, default to gallery.
+            // Read-only routing, sanitised; no state change so nonce is N/A.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $subtab = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
             $post_type = ( $subtab === 'album' ) ? 'album' : 'gallery';
 
@@ -641,6 +641,12 @@ class Admin_Init {
      * AJAX handler to update plugin setting
      */
     public static function ajax_update_plugin_setting() {
+        \FotoGrids\Debug_Log::write( 'license', sprintf(
+            'ajax_update_plugin_setting: entry | setting=%s value=%s',
+            isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '(unset)',
+            isset( $_POST['value'] )   ? sanitize_text_field( wp_unslash( $_POST['value'] ) )   : '(unset)'
+        ) );
+
         check_ajax_referer( 'fotogrids_admin', 'nonce' );
 
         if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
@@ -650,16 +656,78 @@ class Admin_Init {
         $setting = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
         $value = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-        $allowed_settings = array( 'fotogrids_autosave', 'fotogrids_auto_clear_cache', 'fotogrids_enable_statistics' );
-        if ( ! in_array( $setting, $allowed_settings, true ) ) {
+        // Allowlist split into "boolean" and "string" buckets so the handler
+        // knows how to coerce each one. New settings added here should also
+        // be added to the relevant bucket below.
+        $boolean_settings = array(
+            'fotogrids_autosave',
+            'fotogrids_auto_clear_cache',
+            'fotogrids_enable_statistics',
+            // Wizard step 1 — anonymous usage data toggle. Mirrors the
+            // Settings > Advanced > Share statistics flag, with the same
+            // Freemius side-effect handled below.
+            'fotogrids_share_statistics',
+        );
+        $string_settings = array(
+            // Wizard step 2 — user persona pick (developer / photographer /
+            // personal / agency / business / shop). Stored for telemetry
+            // segmentation and per-persona tailoring later.
+            'fotogrids_user_persona',
+            // Wizard step 3 — "easy" vs "advanced" UI mode for the
+            // collection settings panels. Read by collection-settings.js
+            // and surfaced through window.fotogridsAdmin.settingsMode.
+            'fotogrids_settings_mode',
+        );
+
+        if ( ! in_array( $setting, array_merge( $boolean_settings, $string_settings ), true ) ) {
             wp_send_json_error( array( 'message' => __( 'Invalid setting', 'fotogrids' ) ) );
         }
 
-        if ( in_array( $setting, array( 'fotogrids_autosave', 'fotogrids_auto_clear_cache', 'fotogrids_enable_statistics' ), true ) ) {
+        // -------- String settings --------------------------------------------
+        if ( in_array( $setting, $string_settings, true ) ) {
+            $allowed_values = self::allowed_values_for_string_setting( $setting );
+
+            // An empty value is "clear the persona" — accepted; anything
+            // else has to come from the allowlist for the setting.
+            if ( $value !== '' && ! in_array( $value, $allowed_values, true ) ) {
+                wp_send_json_error( array( 'message' => __( 'Invalid value', 'fotogrids' ) ) );
+            }
+
+            $result = update_option( $setting, $value, true );
+            // update_option returns false when the new value matches the
+            // existing one — that's still success from the caller's POV.
+            if ( $result || (string) get_option( $setting, '' ) === $value ) {
+                wp_send_json_success( array( 'value' => $value ) );
+            }
+
+            wp_send_json_error( array( 'message' => __( 'Failed to save setting', 'fotogrids' ) ) );
+        }
+
+        // -------- Boolean settings -------------------------------------------
+        if ( in_array( $setting, $boolean_settings, true ) ) {
             $sanitized_bool = ( $value === '1' || $value === 'true' || $value === true || $value === 'on' );
+
+            // `fotogrids_share_statistics` has a Freemius side-effect AND
+            // historically the Settings tab stores it as a real bool
+            // (`'1'` / `''`). The legacy AJAX path stored `'1'` / `'0'`
+            // strings, which `(bool)` casts as truthy in both cases. To
+            // keep the wizard and the Settings tab in sync, route this
+            // setting through the same shared helper. Other booleans
+            // keep the original `'1'` / `'0'` storage.
+            if ( $setting === 'fotogrids_share_statistics' ) {
+                $applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_share_statistics_consent( $sanitized_bool );
+                wp_send_json_success( array( 'value' => $applied ) );
+            }
+
             $sanitized_value = $sanitized_bool ? '1' : '0';
 
             global $wpdb;
+            // Direct existence check on the core options table: we must know
+            // whether the row already exists to choose add_option() (to force
+            // autoload='yes' on first create) vs update_option(), which
+            // get_option() cannot distinguish from a falsey stored value. The
+            // query is prepared; no object cache applies to this one-off check.
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $option_exists = $wpdb->get_var( $wpdb->prepare(
                 "SELECT option_id FROM {$wpdb->options} WHERE option_name = %s",
                 $setting
@@ -693,32 +761,108 @@ class Admin_Init {
     }
 
     /**
+     * Allowed-value list for each string-typed setting accepted by
+     * ajax_update_plugin_setting().
+     *
+     * @since 1.0.0
+     * @param string $setting Option name.
+     * @return array<int, string>
+     */
+    private static function allowed_values_for_string_setting( string $setting ): array {
+        switch ( $setting ) {
+            case 'fotogrids_user_persona':
+                return array( 'developer', 'photographer', 'personal', 'agency', 'business', 'shop' );
+            case 'fotogrids_settings_mode':
+                return array( 'easy', 'advanced' );
+            default:
+                return array();
+        }
+    }
+
+    /**
+     * Resolve the current "share anonymous statistics" state.
+     *
+     * The wizard / Settings toggle reflects whether Freemius is actually
+     * tracking, not just whether our `fotogrids_share_statistics` option
+     * flag is set. Users can opt in / out through Freemius's own native
+     * UI (the connect screen, the account page), and those changes
+     * don't touch our option. Reading the real tracking state keeps the
+     * toggle honest.
+     *
+     * Falls back to the option flag when the Freemius SDK isn't loaded
+     * (very early in admin boot, CLI requests, etc).
+     *
+     * @since 1.0.0
+     * @return bool
+     */
+    private static function resolve_share_statistics_state(): bool {
+        $option_raw  = get_option( 'fotogrids_share_statistics', null );
+        // Tolerant cast: historically this option was written as `'1'` /
+        // `'0'` strings, and `(bool) '0'` is `true` in PHP. Treat
+        // '', '0', 0, false, null all as off.
+        $option_bool = ! (
+            $option_raw === null  ||
+            $option_raw === false ||
+            $option_raw === ''    ||
+            $option_raw === '0'   ||
+            $option_raw === 0
+        );
+
+        // We previously preferred Freemius's per-site tracking state, but
+        // that means a fresh install (no Freemius site yet) reads as
+        // false even if the user *did* opt in via our own toggle before
+        // any opt-in flow. Worse, when Freemius has been registered for
+        // licensing purposes only, it can return tracking_allowed=true
+        // even when our option says off — making the wizard show "on"
+        // for a user who clearly opted out. The local option is the
+        // single source of truth for the in-product toggle; we mirror
+        // it to Freemius on write but don't read back from there.
+        $resolved = $option_bool;
+
+        if ( \FotoGrids\Debug_Log::should_log( 'license' ) ) {
+            $fs_state = \FotoGrids\Settings\Plugin_Settings_Store::probe_freemius_state();
+            \FotoGrids\Debug_Log::write( 'license', sprintf(
+                'resolve_share_statistics_state: option_raw=%s option_bool=%s resolved=%s | FS tracking_allowed=%s registered=%s install_exists=%s',
+                self::dump_log_value( $option_raw ),
+                $option_bool ? 'true' : 'false',
+                $resolved ? 'true' : 'false',
+                self::dump_log_value( $fs_state['tracking_allowed'] ?? null ),
+                self::dump_log_value( $fs_state['is_registered'] ?? null ),
+                self::dump_log_value( $fs_state['install_exists'] ?? null )
+            ) );
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Stringify a mixed value for compact debug-log lines.
+     *
+     * @param mixed $v
+     * @return string
+     */
+    private static function dump_log_value( $v ): string {
+        if ( $v === null )  return 'null';
+        if ( $v === true )  return 'true';
+        if ( $v === false ) return 'false';
+        if ( $v === '' )    return '""';
+        if ( is_scalar( $v ) ) return (string) $v;
+        return wp_json_encode( $v );
+    }
+
+    /**
      * Unified admin page renderer
      *
      * @param string $page_id The unique page identifier for the React mount point
      */
     private static function render_admin_page( $page_id ) {
-        // Get the SVG icon content
-        $icon_path = FOTOGRIDS_PLUGIN_DIR . 'assets/admin/images/fotogrids-icon-color.svg';
-        $icon_svg = '';
-        if ( file_exists( $icon_path ) ) {
-            $icon_svg = file_get_contents( $icon_path );
-        }
-
-        $pages_with_icon = array( 'stats', 'settings', 'license' );
-        $show_icon = in_array( $page_id, $pages_with_icon );
-        // The Setup Wizard renders its own brand header inside the React
-        // tree, so suppress the default page header on that page.
-        $show_header = $page_id !== 'main' && $page_id !== 'setup';
+        $show_header = $page_id !== 'main';
 
         ?>
         <div class="wrap">
             <?php if ( $show_header ) : ?>
             <div class="fotogrids-page-header">
                 <h1 class="fotogrids-heading-inline">
-                    <?php if ( $show_icon && $icon_svg ) : ?>
-                        <span class="fotogrids-page-icon"><?php \FotoGrids\Svg::render( $icon_svg ); ?></span>
-                    <?php endif; ?>
                     <?php echo esc_html( get_admin_page_title() ); ?>
                 </h1>
             </div>
@@ -794,18 +938,6 @@ class Admin_Init {
     }
 
     /**
-     * Setup Wizard admin page
-     *
-     * Hidden submenu (registered with a null parent slug) reached at
-     * ?page=fotogrids-setup. Renders a React mount point — the wizard UI is
-     * a self-contained tree in src/assets/admin/src/components/pages/SetupWizardPage.jsx
-     * and lives inside the existing admin.js bundle.
-     */
-    public static function setup_wizard_page() {
-        self::render_admin_page( 'setup' );
-    }
-
-    /**
      * Allow FotoGrids' own external hosts through wp_safe_redirect().
      *
      * @param string[] $hosts Allowed redirect hostnames.
@@ -838,8 +970,9 @@ class Admin_Init {
      * Get custom menu icon
      */
     private static function get_menu_icon() {
-        // Custom SVG icon as base64 data URI
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.53 59.53" fill="currentColor"><rect fill="#a7aaad" x="1.42" y="1.42" width="56.69" height="14.17"/><rect fill="#a7aaad" x="1.42" y="22.68" width="35.43" height="14.17"/><rect fill="#a7aaad" x="1.42" y="43.94" width="14.17" height="14.17"/><rect fill="#a7aaad" x="22.68" y="43.94" width="14.17" height="14.17"/><rect fill="#a7aaad" x="43.94" y="22.68" width="14.17" height="35.43"/></svg>';
+        // Custom SVG icon as base64 data URI. WP admin forces the menu-icon
+        // colour via core CSS, so we hand it the neutral admin grey.
+        $svg = \FotoGrids\Svg::fotogrids_icon( array( 'fill' => '#a7aaad' ) );
         return 'data:image/svg+xml;base64,' . base64_encode( $svg );
     }
 
@@ -867,6 +1000,12 @@ class Admin_Init {
      * Handle bulk actions for galleries
      */
     public static function handle_gallery_bulk_actions( $redirect_to, $doaction, $post_ids ) {
+        // This is a `handle_bulk_actions-{screen}` callback. WordPress core
+        // verifies the bulk-action nonce (check_admin_referer) in wp-admin
+        // before invoking this filter, so the bulk-action nonce is already
+        // checked upstream. The $_REQUEST reads below are additional params on
+        // that already-verified request.
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
         if ( ! in_array( $doaction, array( 'assign_to_album', 'remove_from_albums' ) ) ) {
             return $redirect_to;
         }
@@ -938,6 +1077,7 @@ class Admin_Init {
         }
 
         return $redirect_to;
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
     }
 
     /**
@@ -946,6 +1086,12 @@ class Admin_Init {
     public static function bulk_action_admin_notices() {
         global $post_type, $pagenow;
 
+        // Renders one-time admin notices from post-redirect ?bulk_* flags after
+        // a bulk action already handled (and nonce-verified) by WordPress core.
+        // These are read-only display values (counts / an error slug), all run
+        // through absint()/sanitize_text_field(); there is nothing to nonce on a
+        // redirected GET notice render.
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
         if ( $pagenow !== 'edit.php' || $post_type !== 'fotogrids_gallery' ) {
             return;
         }
@@ -1067,6 +1213,7 @@ class Admin_Init {
                 echo '<div class="notice notice-error is-dismissible"><p>' . esc_html( $message ) . '</p></div>';
             }
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
     }
 
     /**

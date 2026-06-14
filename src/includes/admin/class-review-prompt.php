@@ -220,6 +220,11 @@ class Review_Prompt {
      * Tracks the click, stores user meta, and redirects to WordPress.org reviews
      */
     public static function handle_review_click() {
+        // Read-only handling of a review-prompt click link in wp-admin: detects
+        // the ?fotogrids_review marker and an absint() variant index, records
+        // dismissal, and redirects. No state-changing form submission, so nonce
+        // verification does not apply.
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
         if ( ! is_admin() || ! isset( $_GET['fotogrids_review'] ) ) {
             return;
         }
@@ -250,6 +255,7 @@ class Review_Prompt {
 
         wp_safe_redirect( 'https://wordpress.org/plugins/fotogrids/#reviews' );
         exit;
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
     }
 
     /**

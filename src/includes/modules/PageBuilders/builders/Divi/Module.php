@@ -237,8 +237,11 @@ final class Module {
         if ( ! function_exists( 'et_core_is_fb_enabled' ) || ! et_core_is_fb_enabled() ) {
             return;
         }
-        // App window only — the module library + registration store live
-        // in the app window, not the top window. phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        // App window only — the module library + registration store live in the
+        // app window, not the top window. Read-only detection of Divi's own
+        // ?app_window marker on an editor request; no state change, so nonce
+        // verification does not apply.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( ! isset( $_GET['app_window'] ) ) {
             return;
         }

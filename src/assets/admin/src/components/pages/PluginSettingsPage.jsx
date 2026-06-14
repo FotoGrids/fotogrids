@@ -45,15 +45,14 @@ const PluginSettingsPage = () => {
         { id: 'getting_started', label: __('Getting Started', 'fotogrids') }
     ];
 
-    // URL builder for the wizard launcher tab. Lives at the top so the rest of
-    // the component can reference it without re-reading window.location.
+    // URL builder for the wizard launcher tab — adds the setup-step param
+    // to the current URL so the wizard opens *over* the Settings page,
+    // no navigation. We don't strip the existing tab / subtab params so
+    // closing the wizard returns the user to the tab they were on.
     const getSetupWizardUrl = () => {
         const url = new URL(window.location.href);
-        url.pathname = url.pathname.replace(/\/$/, '');
-        url.searchParams.set('page', 'fotogrids-setup');
-        url.searchParams.delete('tab');
-        url.searchParams.delete('subtab');
-        url.searchParams.delete('field');
+        const param = window.FotoGridsSetupQueryParam || 'fotogrids_setup_step';
+        url.searchParams.set(param, '1');
         return url.toString();
     };
 
@@ -158,11 +157,15 @@ const PluginSettingsPage = () => {
     }, [activeTab]);
 
     const handleTabChange = (tabId) => {
-        // The Setup Wizard tab is a launcher, not a tab panel. Navigate
-        // directly to the hidden wizard page and bail before we touch state
-        // or persist 'setup_wizard' as the active tab.
+        // The Setup Wizard tab is a launcher, not a tab panel. Add the
+        // wizard query param to the current URL so the wizard opens *on
+        // top of* the Settings page, then dispatch a popstate so the
+        // wizard component picks the change up without a full reload.
+        // Bail before we touch state or persist 'setup_wizard' as the
+        // active tab.
         if (tabId === 'setup_wizard') {
-            window.location.assign(getSetupWizardUrl());
+            window.history.pushState({}, '', getSetupWizardUrl());
+            window.dispatchEvent(new PopStateEvent('popstate'));
             return;
         }
 

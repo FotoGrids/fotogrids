@@ -12,6 +12,28 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Dashboard_Widget {
 
+    /*
+     * ---------------------------------------------------------------------
+     * PHPCS: WPDB direct-query sniffs disabled for this class.
+     * ---------------------------------------------------------------------
+     * This class is part of the FotoGrids custom-table data layer. Every
+     * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
+     * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
+     * WP placeholders cannot bind. All user-supplied *values* are passed
+     * through $wpdb->prepare(); where SQL is assembled incrementally or uses
+     * a generated %d IN() list, the prepare call is a separate statement the
+     * sniff cannot follow. Custom tables have no WP_Query / core-API
+     * equivalent and no object-cache layer applies at this level.
+     * ---------------------------------------------------------------------
+     */
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+
     /**
      * Initialize the dashboard widget
      */
@@ -336,13 +358,14 @@ class Dashboard_Widget {
      * Get logo SVG
      */
     private static function get_logo_svg() {
-        return '<svg id="fotogrids-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59.53 59.53" width="20" height="20">
-            <rect x="1.42" y="1.42" width="56.69" height="14.17" style="fill:#3c46f0;"/>
-            <rect x="1.42" y="22.68" width="35.43" height="14.17" style="fill:#f01e32;"/>
-            <rect x="1.42" y="43.94" width="14.17" height="14.17" style="fill:#ffb914;"/>
-            <rect x="22.68" y="43.94" width="14.17" height="14.17" style="fill:#323232;"/>
-            <rect x="43.94" y="22.68" width="14.17" height="35.43" style="fill:#323232;"/>
-            <rect x="282.15" y="22.68" width="4.25" height="35.43" style="fill:#323232;"/>
-        </svg>';
+        return \FotoGrids\Svg::fotogrids_icon( array( 'size' => 20 ) );
     }
+
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
+    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

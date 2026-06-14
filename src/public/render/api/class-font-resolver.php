@@ -244,6 +244,9 @@ final class Font_Resolver {
             return;
         }
 
+        // Version is intentionally null: $url is an external Google Fonts URL
+        // that carries its own versioning; appending ?ver= would be wrong.
+        // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
         wp_enqueue_style(
             'fotogrids-google-fonts',
             $url,

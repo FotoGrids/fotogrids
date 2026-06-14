@@ -12,9 +12,14 @@ import Icon from '../Icon';
  * This component is intentionally presentational: it owns no state. The
  * parent decides what is active and what happens on change.
  *
+ * A group label can also be made actionable by giving its descriptor an
+ * `onClick` handler (and, optionally, an `icon`). When `onClick` is present
+ * the label renders as a <button> - e.g. a "< All Tools" back action - and
+ * stays a static <div> otherwise.
+ *
  * @param {Object}   props
  * @param {Array}    props.tabs        Tab descriptors: { id, label, icon?, group? }.
- * @param {Array}    [props.groups]    Group descriptors: { id, label }. Omit for a flat list.
+ * @param {Array}    [props.groups]    Group descriptors: { id, label, icon?, onClick? }. Omit for a flat list.
  * @param {string}   props.activeTab   Currently active tab id.
  * @param {Function} props.onTabChange Called with the tab id when a tab is chosen.
  * @param {Function} [props.getTabHref] Optional (id) => href, used so tabs are
@@ -58,6 +63,33 @@ const SidebarTabsNav = ({
         );
     };
 
+    const renderGroupLabel = (group) => {
+        if (!group.label) return null;
+
+        // Actionable label: render as a button so it is keyboard-focusable
+        // and announced as a control. Falls back to a static div otherwise.
+        if (typeof group.onClick === 'function') {
+            return (
+                <button
+                    type="button"
+                    className="fotogrids-sidebar-tabs__group-label fotogrids-sidebar-tabs__group-label--action"
+                    onClick={() => group.onClick(group)}
+                >
+                    {group.icon && (
+                        <Icon name={group.icon} className="fotogrids-sidebar-tabs__group-label-icon" />
+                    )}
+                    <span className="fotogrids-sidebar-tabs__group-label-text">{group.label}</span>
+                </button>
+            );
+        }
+
+        return (
+            <div className="fotogrids-sidebar-tabs__group-label">
+                {group.label}
+            </div>
+        );
+    };
+
     // Flat list when no groups are supplied.
     if (!Array.isArray(groups) || groups.length === 0) {
         return (
@@ -86,11 +118,7 @@ const SidebarTabsNav = ({
 
                 return (
                     <div className="fotogrids-sidebar-tabs__group" key={group.id}>
-                        {group.label && (
-                            <div className="fotogrids-sidebar-tabs__group-label">
-                                {group.label}
-                            </div>
-                        )}
+                        {renderGroupLabel(group)}
                         {groupTabs.map(renderTab)}
                     </div>
                 );
