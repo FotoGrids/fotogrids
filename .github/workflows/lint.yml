@@ -6,6 +6,59 @@ on:
   pull_request:
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # Syntax matrix: parse every source PHP file on each supported PHP version.
+  #
+  # `php -l` is a real parser, so this is the authoritative check for whether
+  # the code is syntactically valid on a given PHP version. The lowest version
+  # in the matrix is the effective floor — if the plugin declares support for a
+  # PHP version, that version must be green here.
+  #
+  # During the PHP 7.4 downgrade, the 7.4 leg will fail on every remaining 8.x
+  # construct (enum / readonly / match / named args / union types) and report
+  # the exact file:line, turning the refactor into a checklist instead of a
+  # blind sweep. Bump or drop matrix versions as the supported range changes.
+  # ---------------------------------------------------------------------------
+  php-syntax:
+    name: PHP syntax (${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.4', '8.1', '8.3' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Lint all source PHP (php -l)
+        run: |
+          set -e
+          # Exclude build output, deps, and the bundled Freemius SDK — same as phpcs.xml.
+          files=$(find src -name '*.php' \
+            -not -path '*/vendor/*' \
+            -not -path '*/dist/*' \
+            -not -path '*/freemius/*' \
+            -not -path '*/node_modules/*')
+          status=0
+          for f in $files; do
+            if ! php -l "$f" > /dev/null 2>err.txt; then
+              echo "::error file=$f::$(tail -n1 err.txt)"
+              cat err.txt
+              status=1
+            fi
+          done
+          exit $status
+
+  # ---------------------------------------------------------------------------
+  # Coding standards: PHPCS against the project ruleset, on the declared floor.
+  # ---------------------------------------------------------------------------
   phpcs:
     name: PHP_CodeSniffer
     runs-on: ubuntu-latest
@@ -17,7 +70,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           tools: composer
           coverage: none
 
@@ -34,5 +87,5 @@ jobs:
       - name: Run PHPCS
         run: composer lint
 
-      - name: Check PHP 8.0+ compatibility
+      - name: Check PHP compatibility
         run: composer lint:compat
