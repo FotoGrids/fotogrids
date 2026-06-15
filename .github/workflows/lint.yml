@@ -38,23 +38,59 @@ jobs:
           coverage: none
 
       - name: Lint all source PHP (php -l)
+        id: phplint
         run: |
-          set -e
           # Exclude build output, deps, and the bundled Freemius SDK — same as phpcs.xml.
           files=$(find src -name '*.php' \
             -not -path '*/vendor/*' \
             -not -path '*/dist/*' \
             -not -path '*/freemius/*' \
-            -not -path '*/node_modules/*')
+            -not -path '*/node_modules/*' | sort)
+
+          report="php-syntax-${{ matrix.php }}.txt"
+          {
+            echo "PHP syntax report — PHP ${{ matrix.php }}"
+            echo "Generated: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "PHP: $(php -r 'echo PHP_VERSION;')"
+            echo "Files checked: $(echo "$files" | wc -l | tr -d ' ')"
+            echo "================================================================"
+            echo ""
+          } > "$report"
+
           status=0
+          fail_count=0
           for f in $files; do
-            if ! php -l "$f" > /dev/null 2>err.txt; then
-              echo "::error file=$f::$(tail -n1 err.txt)"
-              cat err.txt
+            # php -l writes its message to stdout; capture both streams.
+            if ! err=$(php -l "$f" 2>&1); then
+              # One block per failing file: path, then the parser's message.
+              {
+                echo "FILE: $f"
+                echo "$err" | sed 's/^/    /'
+                echo ""
+              } >> "$report"
+              echo "::error file=$f::$(echo "$err" | tail -n1)"
+              fail_count=$((fail_count + 1))
               status=1
             fi
           done
+
+          if [ "$status" -eq 0 ]; then
+            echo "All files parse cleanly on PHP ${{ matrix.php }}." >> "$report"
+          else
+            # Put the count at the top of the report for a quick read.
+            sed -i "5a Files FAILING to parse: ${fail_count}" "$report"
+          fi
+
+          echo "report=$report" >> "$GITHUB_OUTPUT"
           exit $status
+
+      - name: Upload syntax report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-syntax-report-${{ matrix.php }}
+          path: php-syntax-${{ matrix.php }}.txt
+          retention-days: 14
 
   # ---------------------------------------------------------------------------
   # Coding standards: PHPCS against the project ruleset, on the declared floor.
