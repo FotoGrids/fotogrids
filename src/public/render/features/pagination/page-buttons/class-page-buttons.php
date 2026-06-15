@@ -214,9 +214,9 @@ final class Page_Buttons implements Feature {
 		// The Responsive_Var flows the mobile value through whatever
 		// mobile_breakpoint the user has configured — see Breakpoint_Config.
 		$vars['--fg-pagination-siblings'] = new Responsive_Var(
-			desktop: '2',
-			tablet:  '2',
-			mobile:  '1',
+			'2',
+			'2',
+			'1',
 		);
 
 		return $vars;
@@ -226,22 +226,23 @@ final class Page_Buttons implements Feature {
 		$common = $this->common_assets();
 
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				$common->css,
 				array(
 					'fotogrids-pagination-page-buttons' => new Asset_Decl(
-						path:      'features/pagination/page-buttons/page-buttons.css',
-						in_footer: false,
+						'features/pagination/page-buttons/page-buttons.css',
+						array(),
+						false,
 					),
 				)
 			),
-			js: array_merge(
+			array_merge(
 				$common->js,
 				array(
 					'fotogrids-pagination-page-buttons' => new Asset_Decl(
-						path:      '../../assets/js/page-buttons.js',
-						deps:      array( 'fotogrids-pagination-core' ),
-						in_footer: true,
+						'../../assets/js/page-buttons.js',
+						array( 'fotogrids-pagination-core' ),
+						true,
 					),
 				)
 			)

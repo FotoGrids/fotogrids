@@ -108,17 +108,17 @@ class Hover_Effects implements Decorator {
 
 		$css_assets = array(
 			'fotogrids-hover-base' => new Asset_Decl(
-				path: 'decorators/hover/effects/none.css'
+				'decorators/hover/effects/none.css'
 			),
 		);
 
 		if ( 'none' !== $effect_id ) {
 			$css_assets[ 'fotogrids-hover-' . $effect_id ] = new Asset_Decl(
-				path: 'decorators/hover/effects/' . $effect_id . '.css'
+				'decorators/hover/effects/' . $effect_id . '.css'
 			);
 		}
 
-		return new Module_Assets( css: $css_assets );
+		return new Module_Assets( $css_assets );
 	}
 
 	protected function effect_id( Render_Context $render_context ): string {

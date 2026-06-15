@@ -61,13 +61,13 @@ final class Preview_Endpoint {
 		$base_settings   = \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $gallery_id );
 		$context_builder = Context_Builder::for_preview();
 		$render_context  = $context_builder->build_for_preview(
-			gallery_id: $gallery_id,
-			base_settings: is_array( $base_settings ) ? $base_settings : array(),
-			settings_overlay: $validated_payload['settings'],
-			collection_item_ids: $item_order,
-			item_overrides: $validated_payload['item_overrides'],
-			source: Request_Source::PREVIEW_UNSAVED,
-			simulate_state: $validated_payload['simulate_state']
+			$gallery_id,
+			is_array( $base_settings ) ? $base_settings : array(),
+			$validated_payload['settings'],
+			$item_order,
+			$validated_payload['item_overrides'],
+			Request_Source::PREVIEW_UNSAVED,
+			$validated_payload['simulate_state']
 		);
 
 		$render_context = $render_context->with(

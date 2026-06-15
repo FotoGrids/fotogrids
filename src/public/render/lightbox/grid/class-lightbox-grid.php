@@ -172,14 +172,14 @@ final class Lightbox_Grid implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-lightbox-grid' => new Asset_Decl( path: 'lightbox/grid/lightbox-grid.css' ),
+			array(
+				'fotogrids-lightbox-grid' => new Asset_Decl( 'lightbox/grid/lightbox-grid.css' ),
 			),
-			js: array(
+			array(
 				'fotogrids-lightbox-grid' => new Asset_Decl(
-					path:      '../../assets/js/lightbox-grid.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/lightbox-grid.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

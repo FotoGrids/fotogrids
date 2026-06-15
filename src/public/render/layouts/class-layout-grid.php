@@ -81,12 +81,12 @@ final class Layout_Grid implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-render-base' => new Asset_Decl(
-					path: 'base/collection-base.css'
+					'base/collection-base.css'
 				),
 				'fotogrids-layout-grid' => new Asset_Decl(
-					path: 'layouts/grid/grid.css'
+					'layouts/grid/grid.css'
 				),
 			)
 		);

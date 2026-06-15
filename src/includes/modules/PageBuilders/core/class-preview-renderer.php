@@ -68,10 +68,10 @@ final class Preview_Renderer {
 		}
 
 		$context = Context_Builder::for_preview()->build_for_public(
-			gallery_id:          $gallery_id,
-			render_settings:     $render_settings,
-			collection_item_ids: $item_ids,
-			source:              Request_Source::PREVIEW_SAVED
+			$gallery_id,
+			$render_settings,
+			$item_ids,
+			Request_Source::PREVIEW_SAVED
 		);
 
 		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED );
@@ -125,10 +125,10 @@ final class Preview_Renderer {
 		}
 
 		$context = Context_Builder::for_preview()->build_for_album(
-			album_id:          $album_id,
-			render_settings:   $album_settings,
-			child_gallery_ids: $child_ids,
-			source:            Request_Source::PREVIEW_SAVED
+			$album_id,
+			$album_settings,
+			$child_ids,
+			Request_Source::PREVIEW_SAVED
 		);
 
 		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED );
@@ -172,13 +172,13 @@ final class Preview_Renderer {
 		);
 
 		return new Render_Context(
-			meta:         $preview_meta,
-			layout:       $context->layout,
-			behavior:     $context->behavior,
-			settings:     $preview_settings,
-			items:        $context->items,
-			warnings:     $context->warnings,
-			via_album_id: $context->via_album_id,
+			$preview_meta,
+			$context->layout,
+			$context->behavior,
+			$preview_settings,
+			$context->items,
+			$context->warnings,
+			$context->via_album_id,
 		);
 	}
 

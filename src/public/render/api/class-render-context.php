@@ -53,13 +53,13 @@ final class Render_Context {
 		}
 
 		return new self(
-			meta: $this->meta,
-			layout: $this->layout,
-			behavior: $this->behavior,
-			settings: $changes['settings'] ?? $this->settings,
-			items: $changes['items'] ?? $this->items,
-			warnings: $changes['warnings'] ?? $this->warnings,
-			via_album_id: array_key_exists( 'via_album_id', $changes ) ? $changes['via_album_id'] : $this->via_album_id,
+			$this->meta,
+			$this->layout,
+			$this->behavior,
+			$changes['settings'] ?? $this->settings,
+			$changes['items'] ?? $this->items,
+			$changes['warnings'] ?? $this->warnings,
+			array_key_exists( 'via_album_id', $changes ) ? $changes['via_album_id'] : $this->via_album_id,
 		);
 	}
 }

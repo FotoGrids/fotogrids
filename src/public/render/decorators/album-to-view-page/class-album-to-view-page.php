@@ -107,8 +107,8 @@ final class Album_To_View_Page implements Decorator {
 			$wrapper_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $wrapper_attrs, $render_context );
 
 			$figure_wrapper = new Item_Wrapper(
-				tag:   'a',
-				attrs: $wrapper_attrs,
+				'a',
+				$wrapper_attrs,
 			);
 
 			$decorated[] = $item_view->with(

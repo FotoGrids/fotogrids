@@ -130,19 +130,19 @@ final class Captions implements Decorator {
 			'--fg-caption-align'           => $caption_alignment,
 			'--fg-caption-media-align'     => $media_align,
 			'--fg-caption-gap'             => new Responsive_Var(
-				desktop: $gap_desktop,
-				tablet:  $gap_tablet,
-				mobile:  $gap_mobile,
+				$gap_desktop,
+				$gap_tablet,
+				$gap_mobile,
 			),
 			'--fg-caption-title-font-size' => new Responsive_Var(
-				desktop: $this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
-				tablet:  $this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
-				mobile:  $this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
+				$this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
+				$this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
+				$this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
 			),
 			'--fg-caption-desc-font-size'  => new Responsive_Var(
-				desktop: $this->resolve_responsive_value( $desc_font_size, 'desktop', 'px', '14px' ),
-				tablet:  $this->resolve_responsive_value( $desc_font_size, 'tablet', 'px', '12px' ),
-				mobile:  $this->resolve_responsive_value( $desc_font_size, 'mobile', 'px', '12px' ),
+				$this->resolve_responsive_value( $desc_font_size, 'desktop', 'px', '14px' ),
+				$this->resolve_responsive_value( $desc_font_size, 'tablet', 'px', '12px' ),
+				$this->resolve_responsive_value( $desc_font_size, 'mobile', 'px', '12px' ),
 			),
 		);
 
@@ -173,9 +173,9 @@ final class Captions implements Decorator {
 		if ( 'lines' === $title_limit_mode ) {
 			$title_lines                      = $settings['caption_max_title_lines'] ?? array();
 			$vars['--fg-caption-title-lines'] = new Responsive_Var(
-				desktop: $this->responsive_line_count( $title_lines, 'desktop', 1 ),
-				tablet:  $this->responsive_line_count( $title_lines, 'tablet', 1 ),
-				mobile:  $this->responsive_line_count( $title_lines, 'mobile', 1 ),
+				$this->responsive_line_count( $title_lines, 'desktop', 1 ),
+				$this->responsive_line_count( $title_lines, 'tablet', 1 ),
+				$this->responsive_line_count( $title_lines, 'mobile', 1 ),
 			);
 		}
 
@@ -183,9 +183,9 @@ final class Captions implements Decorator {
 		if ( 'lines' === $desc_limit_mode ) {
 			$desc_lines                      = $settings['caption_max_desc_lines'] ?? array();
 			$vars['--fg-caption-desc-lines'] = new Responsive_Var(
-				desktop: $this->responsive_line_count( $desc_lines, 'desktop', 2 ),
-				tablet:  $this->responsive_line_count( $desc_lines, 'tablet', 2 ),
-				mobile:  $this->responsive_line_count( $desc_lines, 'mobile', 2 ),
+				$this->responsive_line_count( $desc_lines, 'desktop', 2 ),
+				$this->responsive_line_count( $desc_lines, 'tablet', 2 ),
+				$this->responsive_line_count( $desc_lines, 'mobile', 2 ),
 			);
 		}
 
@@ -220,9 +220,9 @@ final class Captions implements Decorator {
 
 		$vars = array(
 			'--fg-caption-title-font-size' => new Responsive_Var(
-				desktop: $this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
-				tablet:  $this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
-				mobile:  $this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
+				$this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
+				$this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
+				$this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
 			),
 		);
 
@@ -247,9 +247,9 @@ final class Captions implements Decorator {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-captions' => new Asset_Decl(
-					path: 'decorators/captions/captions.css'
+					'decorators/captions/captions.css'
 				),
 			)
 		);

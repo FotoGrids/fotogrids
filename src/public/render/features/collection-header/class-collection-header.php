@@ -199,21 +199,21 @@ final class Collection_Header implements Feature {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-collection-header' => new Asset_Decl(
-					path: 'features/collection-header/collection-header.css',
+					'features/collection-header/collection-header.css',
 				),
 			),
-			js: array(
+			array(
 				// Tiny behaviour bundle whose only job is to make the
 				// in-place "Back" button restore the AJAX-swapped album
 				// wrapper instead of navigating. Declares the runtime
 				// as a dep so onGallery() is callable and
 				// FotoGrids.modules.albumAjax is reachable.
 				'fotogrids-collection-header' => new Asset_Decl(
-					path:      '../../assets/js/collection-header.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/collection-header.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

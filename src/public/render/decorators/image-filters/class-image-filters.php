@@ -261,9 +261,9 @@ final class Image_Filters implements Decorator {
 		}
 
 		return new Responsive_Var(
-			desktop: $per_bp['desktop'],
-			tablet:  $per_bp['tablet'],
-			mobile:  $per_bp['mobile'],
+			$per_bp['desktop'],
+			$per_bp['tablet'],
+			$per_bp['mobile'],
 		);
 	}
 }

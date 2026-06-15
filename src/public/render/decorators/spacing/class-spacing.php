@@ -72,17 +72,17 @@ final class Spacing implements Decorator {
 
 		if ( $this->has_any_value( $margin ) ) {
 			$vars['--fg-margin'] = new Responsive_Var(
-				desktop: $this->resolve_four_sided_value( $margin, 'desktop', 'px' ),
-				tablet:  $this->resolve_four_sided_value( $margin, 'tablet', 'px' ),
-				mobile:  $this->resolve_four_sided_value( $margin, 'mobile', 'px' ),
+				$this->resolve_four_sided_value( $margin, 'desktop', 'px' ),
+				$this->resolve_four_sided_value( $margin, 'tablet', 'px' ),
+				$this->resolve_four_sided_value( $margin, 'mobile', 'px' ),
 			);
 		}
 
 		if ( $this->has_any_value( $padding ) ) {
 			$vars['--fg-padding'] = new Responsive_Var(
-				desktop: $this->resolve_four_sided_value( $padding, 'desktop', 'px' ),
-				tablet:  $this->resolve_four_sided_value( $padding, 'tablet', 'px' ),
-				mobile:  $this->resolve_four_sided_value( $padding, 'mobile', 'px' ),
+				$this->resolve_four_sided_value( $padding, 'desktop', 'px' ),
+				$this->resolve_four_sided_value( $padding, 'tablet', 'px' ),
+				$this->resolve_four_sided_value( $padding, 'mobile', 'px' ),
 			);
 		}
 

@@ -125,8 +125,8 @@ final class Password_Gate implements Gate {
 		}
 
 		return Gate_Result::block(
-			html:        $this->render_lock_screen( $render_context ),
-			http_status: 200
+			$this->render_lock_screen( $render_context ),
+			200
 		);
 	}
 
@@ -139,19 +139,19 @@ final class Password_Gate implements Gate {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				Gate_Renderer::shared_asset_decl(),
 				array(
 					'fotogrids-password-lock' => new Asset_Decl(
-						path: 'gates/password/password-lock.css'
+						'gates/password/password-lock.css'
 					),
 				)
 			),
-			js: array(
+			array(
 				'fotogrids-password-gate' => new Asset_Decl(
-					path:      '../../assets/js/password-gate.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/password-gate.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);
@@ -213,11 +213,11 @@ final class Password_Gate implements Gate {
 		);
 
 		$card = new Gate_Card(
-			title:       $title,
-			description: $description,
-			body_html:   $body_html,
-			aria_label:  $title,
-			icon_svg:    $this->lock_icon_svg(),
+			$title,
+			$description,
+			$body_html,
+			$title,
+			$this->lock_icon_svg(),
 		);
 
 		return Gate_Renderer::render( $render_context, $card );

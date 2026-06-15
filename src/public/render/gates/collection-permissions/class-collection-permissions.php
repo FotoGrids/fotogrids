@@ -70,8 +70,8 @@ final class Collection_Permissions implements Gate {
 		}
 
 		return Gate_Result::block(
-			html:        $this->render_guest_only_screen( $render_context ),
-			http_status: 200
+			$this->render_guest_only_screen( $render_context ),
+			200
 		);
 	}
 
@@ -84,11 +84,11 @@ final class Collection_Permissions implements Gate {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				Gate_Renderer::shared_asset_decl(),
 				array(
 					'fotogrids-collection-permissions' => new Asset_Decl(
-						path: 'gates/collection-permissions/collection-permissions.css'
+						'gates/collection-permissions/collection-permissions.css'
 					),
 				)
 			)
@@ -133,11 +133,13 @@ final class Collection_Permissions implements Gate {
 		);
 
 		$card = new Gate_Card(
-			title:       $title,
-			description: $description,
-			body_html:   $body_html,
-			aria_label:  $title,
-			data_attrs:  array( 'data-fg-restricted' => 'registered-users' ),
+			$title,
+			$description,
+			$body_html,
+			$title,
+			'',
+			'',
+			array( 'data-fg-restricted' => 'registered-users' ),
 		);
 
 		return Gate_Renderer::render( $render_context, $card );

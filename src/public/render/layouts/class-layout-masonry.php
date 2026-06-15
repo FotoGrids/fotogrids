@@ -91,15 +91,15 @@ final class Layout_Masonry implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'    => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-masonry' => new Asset_Decl( path: 'layouts/masonry/masonry.css' ),
+			array(
+				'fotogrids-render-base'    => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-masonry' => new Asset_Decl( 'layouts/masonry/masonry.css' ),
 			),
-			js: array(
+			array(
 				'fotogrids-layout-masonry' => new Asset_Decl(
-					path:      '../../assets/js/layout-masonry.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/layout-masonry.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

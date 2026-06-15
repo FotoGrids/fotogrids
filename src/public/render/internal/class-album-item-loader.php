@@ -69,19 +69,28 @@ final class Album_Item_Loader {
 			}
 
 			$items[] = new Item_View(
-				id:          $gallery_id,
-				thumb_url:   $thumb['url'],
-				full_url:    $thumb['url'],
-				alt:         (string) $gallery_post->post_title,
-				title:       (string) $gallery_post->post_title,
-				caption:     (string) $gallery_post->post_excerpt,
-				description: (string) $gallery_post->post_content,
-				width:       $thumb['width'],
-				height:      $thumb['height'],
-				meta:        array(
+				$gallery_id,
+				$thumb['url'],
+				$thumb['url'],
+				(string) $gallery_post->post_title,
+				(string) $gallery_post->post_title,
+				(string) $gallery_post->post_excerpt,
+				(string) $gallery_post->post_content,
+				'',
+				'',
+				$thumb['width'],
+				$thumb['height'],
+				array(
 					'item_count' => self::count_items( $gallery_id ),
 				),
-				thumb_size:  $thumb_size,
+				array(),
+				array(),
+				array(),
+				array(),
+				array(),
+				array(),
+				array(),
+				$thumb_size,
 			);
 		}
 

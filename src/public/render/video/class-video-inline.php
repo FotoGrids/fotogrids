@@ -100,16 +100,16 @@ final class Video_Inline implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-video-inline' => new Asset_Decl(
-					path: 'video/video-inline.css',
+					'video/video-inline.css',
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-video-inline' => new Asset_Decl(
-					path:      '../../assets/js/video-inline.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/video-inline.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

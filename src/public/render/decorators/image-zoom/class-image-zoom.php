@@ -164,7 +164,7 @@ final class Image_Zoom implements Decorator {
 
 		$css = array(
 			'fotogrids-decorator-image-zoom' => new Asset_Decl(
-				path: 'decorators/image-zoom/image-zoom.css',
+				'decorators/image-zoom/image-zoom.css',
 			),
 		);
 
@@ -175,24 +175,24 @@ final class Image_Zoom implements Decorator {
 
 		$js = array(
 			'fotogrids-image-zoom' => new Asset_Decl(
-				path:      '../../assets/js/image-zoom.js',
-				deps:      $image_zoom_deps,
-				in_footer: true,
+				'../../assets/js/image-zoom.js',
+				$image_zoom_deps,
+				true,
 			),
 		);
 
 		if ( $is_popover ) {
 			$css['fotogrids-lightbox-mini'] = new Asset_Decl(
-				path: 'lightbox/mini/lightbox-mini.css',
+				'lightbox/mini/lightbox-mini.css',
 			);
 			$js['fotogrids-lightbox-mini']  = new Asset_Decl(
-				path:      '../../assets/js/lightbox-mini.js',
-				deps:      array( 'fotogrids-runtime' ),
-				in_footer: true,
+				'../../assets/js/lightbox-mini.js',
+				array( 'fotogrids-runtime' ),
+				true,
 			);
 		}
 
-		return new Module_Assets( css: $css, js: $js );
+		return new Module_Assets( $css, $js );
 	}
 
 	/**

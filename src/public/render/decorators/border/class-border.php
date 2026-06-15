@@ -67,9 +67,9 @@ final class Border implements Decorator {
 
 		return array(
 			'--fg-border-w'     => new Responsive_Var(
-				desktop: $this->resolve_four_sided_value( $border_width, 'desktop', 'px' ),
-				tablet:  $this->resolve_four_sided_value( $border_width, 'tablet', 'px' ),
-				mobile:  $this->resolve_four_sided_value( $border_width, 'mobile', 'px' ),
+				$this->resolve_four_sided_value( $border_width, 'desktop', 'px' ),
+				$this->resolve_four_sided_value( $border_width, 'tablet', 'px' ),
+				$this->resolve_four_sided_value( $border_width, 'mobile', 'px' ),
 			),
 			'--fg-border-color' => $border_color,
 			'--fg-border-style' => $border_style,

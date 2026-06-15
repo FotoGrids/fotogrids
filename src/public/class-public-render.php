@@ -157,13 +157,13 @@ class Public_Render {
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
 		if ( $is_preview ) {
 			$render_context = $context_builder->build_for_preview(
-				gallery_id: (int) $gallery_id,
-				base_settings: is_array( $settings ) ? $settings : array(),
-				settings_overlay: $settings_overlay,
-				collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
-				item_overrides: array(),
-				source: Request_Source::is_valid( $source ) ? $source : Request_Source::PREVIEW_UNSAVED,
-				simulate_state: null
+				(int) $gallery_id,
+				is_array( $settings ) ? $settings : array(),
+				$settings_overlay,
+				is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
+				array(),
+				Request_Source::is_valid( $source ) ? $source : Request_Source::PREVIEW_UNSAVED,
+				null
 			);
 		} else {
 			$render_settings          = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
@@ -175,12 +175,12 @@ class Public_Render {
 				$effective_meta_overrides['view_page'] = true;
 			}
 			$render_context = $context_builder->build_for_public(
-				gallery_id: (int) $gallery_id,
-				render_settings: $render_settings,
-				collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
-				source: Request_Source::is_valid( $source ) ? $source : Request_Source::SHORTCODE,
-				album_id: absint( $atts['album_id'] ?? 0 ) ?: null,
-				meta_overrides: $effective_meta_overrides
+				(int) $gallery_id,
+				$render_settings,
+				is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
+				Request_Source::is_valid( $source ) ? $source : Request_Source::SHORTCODE,
+				absint( $atts['album_id'] ?? 0 ) ?: null,
+				$effective_meta_overrides
 			);
 		}
 
@@ -456,9 +456,9 @@ class Public_Render {
 		}
 
 		$context = Context_Builder::for_public()->build_for_album(
-			album_id:          $album_id,
-			render_settings:   $album_settings,
-			child_gallery_ids: $child_gallery_ids,
+			$album_id,
+			$album_settings,
+			$child_gallery_ids,
 		);
 
 		$result = Render_Controller::factory()->render( $context );
@@ -642,13 +642,13 @@ class Public_Render {
 
 		$render_settings = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
 		$render_context  = Context_Builder::for_preview()->build_for_preview(
-			gallery_id: 0,
-			base_settings: $render_settings,
-			settings_overlay: array(),
-			collection_item_ids: array(),
-			item_overrides: array(),
-			source: Request_Source::TEMPLATE_PREVIEW,
-			simulate_state: null
+			0,
+			$render_settings,
+			array(),
+			array(),
+			array(),
+			Request_Source::TEMPLATE_PREVIEW,
+			null
 		);
 
 		$render_context = $render_context->with(
@@ -680,14 +680,18 @@ class Public_Render {
 			}
 
 			$item_views[] = new Item_View(
-				id: $item_id,
-				thumb_url: (string) ( $item['medium'] ?? $item['thumb'] ?? $item['full'] ?? '' ),
-				full_url: (string) ( $item['full'] ?? $item['medium'] ?? '' ),
-				alt: (string) ( $item['alt'] ?? '' ),
-				title: (string) ( $item['title'] ?? '' ),
-				caption: (string) ( $item['caption'] ?? '' ),
-				description: (string) ( $item['description'] ?? '' ),
-				meta: array()
+				$item_id,
+				(string) ( $item['medium'] ?? $item['thumb'] ?? $item['full'] ?? '' ),
+				(string) ( $item['full'] ?? $item['medium'] ?? '' ),
+				(string) ( $item['alt'] ?? '' ),
+				(string) ( $item['title'] ?? '' ),
+				(string) ( $item['caption'] ?? '' ),
+				(string) ( $item['description'] ?? '' ),
+				null,
+				null,
+				'',
+				'',
+				array()
 			);
 		}
 

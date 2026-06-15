@@ -146,14 +146,14 @@ final class Layout_Image_Viewer implements Layout {
 
 		return array(
 			'--fg-height-fixed'    => new Responsive_Var(
-				desktop: self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
-				tablet:  self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
-				mobile:  self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
+				self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
+				self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
+				self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
 			),
 			'--fg-height-max'      => new Responsive_Var(
-				desktop: self::height_max_value( $height_max, 'desktop' ),
-				tablet:  self::height_max_value( $height_max, 'tablet' ),
-				mobile:  self::height_max_value( $height_max, 'mobile' ),
+				self::height_max_value( $height_max, 'desktop' ),
+				self::height_max_value( $height_max, 'tablet' ),
+				self::height_max_value( $height_max, 'mobile' ),
 			),
 			'--fg-arrow-size'      => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
 			'--fg-arrow-distance'  => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
@@ -165,15 +165,15 @@ final class Layout_Image_Viewer implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'         => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-image-viewer' => new Asset_Decl( path: 'layouts/image-viewer/image-viewer.css' ),
+			array(
+				'fotogrids-render-base'         => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-image-viewer' => new Asset_Decl( 'layouts/image-viewer/image-viewer.css' ),
 			),
-			js: array(
+			array(
 				'fotogrids-layout-image-viewer' => new Asset_Decl(
-					path:      '../../assets/js/layout-image-viewer.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/layout-image-viewer.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

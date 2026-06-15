@@ -286,9 +286,9 @@ final class Layout_Featured_Item implements Layout {
 		$pad_mobile  = $this->resolve_four_sided_value( $pad, 'mobile', 'px' );
 		if ( '' !== $pad_desktop || '' !== $pad_tablet || '' !== $pad_mobile ) {
 			$vars['--fg-show-all-padding'] = new Responsive_Var(
-				desktop: $pad_desktop,
-				tablet:  $pad_tablet,
-				mobile:  $pad_mobile,
+				$pad_desktop,
+				$pad_tablet,
+				$pad_mobile,
 			);
 		}
 		$offset = $s['featured_show_all_offset'] ?? null;
@@ -332,9 +332,9 @@ final class Layout_Featured_Item implements Layout {
 		$fs_mobile  = $this->resolve_responsive_value( $font_size, 'mobile', 'px' );
 		if ( '' !== $fs_desktop || '' !== $fs_tablet || '' !== $fs_mobile ) {
 			$vars['--fg-show-all-font-size'] = new Responsive_Var(
-				desktop: $fs_desktop,
-				tablet:  $fs_tablet,
-				mobile:  $fs_mobile,
+				$fs_desktop,
+				$fs_tablet,
+				$fs_mobile,
 			);
 		}
 
@@ -343,9 +343,9 @@ final class Layout_Featured_Item implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'          => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-featured-item' => new Asset_Decl( path: 'layouts/featured-item/featured-item.css' ),
+			array(
+				'fotogrids-render-base'          => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-featured-item' => new Asset_Decl( 'layouts/featured-item/featured-item.css' ),
 			)
 		);
 	}

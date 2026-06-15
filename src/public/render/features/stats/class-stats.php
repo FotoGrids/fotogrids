@@ -119,11 +119,12 @@ final class Stats implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			js: array(
+			array(),
+			array(
 				'fotogrids-stats' => new Asset_Decl(
-					path:      '../../assets/js/stats.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/stats.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

@@ -34,10 +34,10 @@ final class Render_Result {
 	 */
 	public function with_html( string $html ): self {
 		return new self(
-			html: $html,
-			instance_id: $this->instance_id,
-			active_modules: $this->active_modules,
-			http_status: $this->http_status,
+			$html,
+			$this->instance_id,
+			$this->active_modules,
+			$this->http_status,
 		);
 	}
 
@@ -73,10 +73,10 @@ final class Render_Result {
 		}
 
 		return new self(
-			html: $html,
-			instance_id: $instance_id,
-			active_modules: array(),
-			http_status: $http_status,
+			$html,
+			$instance_id,
+			array(),
+			$http_status,
 		);
 	}
 }

@@ -274,17 +274,18 @@ final class Loading_Icon implements Feature {
 		$this->maybe_schedule_footer_global();
 
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-loading-icon' => new Asset_Decl(
-					path:      '../../assets/css/loading-icon-styles.css',
-					in_footer: false,
+					'../../assets/css/loading-icon-styles.css',
+					array(),
+					false,
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-loading-icon' => new Asset_Decl(
-					path:      '../../assets/js/loading-icon.js',
-					deps:      array(),
-					in_footer: true,
+					'../../assets/js/loading-icon.js',
+					array(),
+					true,
 				),
 			)
 		);

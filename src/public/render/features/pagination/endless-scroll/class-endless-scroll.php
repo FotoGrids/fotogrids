@@ -115,22 +115,23 @@ final class Endless_Scroll implements Feature {
 
 		// Merge per-method CSS + JS on top of the shared pagination-core JS.
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				$common->css,
 				array(
 					'fotogrids-pagination-endless-scroll' => new Asset_Decl(
-						path:      'features/pagination/endless-scroll/endless-scroll.css',
-						in_footer: false,
+						'features/pagination/endless-scroll/endless-scroll.css',
+						array(),
+						false,
 					),
 				)
 			),
-			js: array_merge(
+			array_merge(
 				$common->js,
 				array(
 					'fotogrids-pagination-endless-scroll' => new Asset_Decl(
-						path:      '../../assets/js/endless-scroll.js',
-						deps:      array( 'fotogrids-pagination-core' ),
-						in_footer: true,
+						'../../assets/js/endless-scroll.js',
+						array( 'fotogrids-pagination-core' ),
+						true,
 					),
 				)
 			)

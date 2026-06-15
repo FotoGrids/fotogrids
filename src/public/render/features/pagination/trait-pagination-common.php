@@ -200,9 +200,9 @@ trait Pagination_Common {
 
 		if ( '' !== $distance_desktop || '' !== $distance_tablet || '' !== $distance_mobile ) {
 			$vars['--fg-pagination-distance'] = new Responsive_Var(
-				desktop: $distance_desktop,
-				tablet:  $distance_tablet,
-				mobile:  $distance_mobile,
+				$distance_desktop,
+				$distance_tablet,
+				$distance_mobile,
 			);
 		}
 
@@ -235,9 +235,9 @@ trait Pagination_Common {
 		$fs_mobile  = $this->resolve_responsive_value( $font_size, 'mobile', 'px' );
 		if ( '' !== $fs_desktop || '' !== $fs_tablet || '' !== $fs_mobile ) {
 			$vars['--fg-pagination-button-font-size'] = new Responsive_Var(
-				desktop: $fs_desktop,
-				tablet:  $fs_tablet,
-				mobile:  $fs_mobile,
+				$fs_desktop,
+				$fs_tablet,
+				$fs_mobile,
 			);
 		}
 
@@ -320,17 +320,18 @@ trait Pagination_Common {
 	 */
 	protected function common_assets(): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-pagination' => new Asset_Decl(
-					path:      'features/pagination/pagination.css',
-					in_footer: false,
+					'features/pagination/pagination.css',
+					array(),
+					false,
 				),
 			),
-			js:  array(
+			array(
 				'fotogrids-pagination-core' => new Asset_Decl(
-					path:      '../../assets/js/pagination-core.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/pagination-core.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

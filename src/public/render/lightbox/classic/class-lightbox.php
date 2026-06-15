@@ -579,29 +579,31 @@ final class Lightbox implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				// Tooltip styles - shared across all frontend surfaces.
 				'fotogrids-tooltip'  => new Asset_Decl(
-					path:      '../../assets/css/fg-tooltip.css',
-					in_footer: false,
+					'../../assets/css/fg-tooltip.css',
+					array(),
+					false,
 				),
 				// Full overlay stylesheet compiled from lightbox.scss.
 				'fotogrids-lightbox' => new Asset_Decl(
-					path:      '../../assets/css/lightbox-styles.css',
-					in_footer: false,
+					'../../assets/css/lightbox-styles.css',
+					array(),
+					false,
 				),
 			),
-			js: array(
+			array(
 				// Tooltip module - loaded before lightbox so FgTooltip is available.
 				'fotogrids-tooltip'  => new Asset_Decl(
-					path:      '../../assets/js/fg-tooltip.js',
-					deps:      array(),
-					in_footer: true,
+					'../../assets/js/fg-tooltip.js',
+					array(),
+					true,
 				),
 				'fotogrids-lightbox' => new Asset_Decl(
-					path:      '../../assets/js/lightbox.js',
-					deps:      array( 'fotogrids-tooltip' ),
-					in_footer: true,
+					'../../assets/js/lightbox.js',
+					array( 'fotogrids-tooltip' ),
+					true,
 				),
 			)
 		);

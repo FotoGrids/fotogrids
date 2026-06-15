@@ -78,7 +78,7 @@ final class Gate_Renderer {
 	public static function shared_asset_decl(): array {
 		return array(
 			self::SHARED_CSS_HANDLE => new Asset_Decl(
-				path: self::SHARED_CSS_PATH
+				self::SHARED_CSS_PATH
 			),
 		);
 	}

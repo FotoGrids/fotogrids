@@ -109,23 +109,23 @@ final class Video_Lightbox_Mini implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				// Shared, general-purpose mini overlay (also usable for images).
 				'fotogrids-lightbox-mini' => new Asset_Decl(
-					path: 'lightbox/mini/lightbox-mini.css',
+					'lightbox/mini/lightbox-mini.css',
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-lightbox-mini'       => new Asset_Decl(
-					path:      '../../assets/js/lightbox-mini.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/lightbox-mini.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 				// Video glue: builds the player and hands it to the mini overlay.
 				'fotogrids-video-lightbox-mini' => new Asset_Decl(
-					path:      '../../assets/js/video-lightbox-mini.js',
-					deps:      array( 'fotogrids-runtime', 'fotogrids-lightbox-mini' ),
-					in_footer: true,
+					'../../assets/js/video-lightbox-mini.js',
+					array( 'fotogrids-runtime', 'fotogrids-lightbox-mini' ),
+					true,
 				),
 			)
 		);

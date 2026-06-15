@@ -163,9 +163,9 @@ abstract class Metadata_Filter_Source implements Filter_Source {
 		$options = array();
 		foreach ( $rows as $row ) {
 			$options[] = new Filter_Option(
-				value: (string) $row['slug'],
-				label: (string) $row['name'],
-				count: (int) $row['item_count'],
+				(string) $row['slug'],
+				(string) $row['name'],
+				(int) $row['item_count'],
 			);
 		}
 		return $options;

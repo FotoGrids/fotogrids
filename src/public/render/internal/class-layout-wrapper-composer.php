@@ -241,9 +241,9 @@ final class Layout_Wrapper_Composer {
 
 		if ( Columns_Mode::FIXED === $mode ) {
 			$style_vars['--fg-cols'] = new Responsive_Var(
-				desktop: self::resolve_column_count( $responsive_columns, 'desktop', $default_columns ),
-				tablet:  self::resolve_column_count( $responsive_columns, 'tablet', $default_columns ),
-				mobile:  self::resolve_column_count( $responsive_columns, 'mobile', $default_columns ),
+				self::resolve_column_count( $responsive_columns, 'desktop', $default_columns ),
+				self::resolve_column_count( $responsive_columns, 'tablet', $default_columns ),
+				self::resolve_column_count( $responsive_columns, 'mobile', $default_columns ),
 			);
 
 			return array(
@@ -268,14 +268,14 @@ final class Layout_Wrapper_Composer {
 		);
 
 		$style_vars['--fg-col-min'] = new Responsive_Var(
-			desktop: $desktop_auto['min'],
-			tablet:  $tablet_auto['min'],
-			mobile:  $mobile_auto['min'],
+			$desktop_auto['min'],
+			$tablet_auto['min'],
+			$mobile_auto['min'],
 		);
 		$style_vars['--fg-col-max'] = new Responsive_Var(
-			desktop: $desktop_auto['max'],
-			tablet:  $tablet_auto['max'],
-			mobile:  $mobile_auto['max'],
+			$desktop_auto['max'],
+			$tablet_auto['max'],
+			$mobile_auto['max'],
 		);
 
 		return array(
@@ -305,9 +305,9 @@ final class Layout_Wrapper_Composer {
 		return array(
 			'style_vars' => array(
 				'--fg-gap' => new Responsive_Var(
-					desktop: self::resolve_spacing_value( $responsive_spacing, 'desktop', $default_spacing ),
-					tablet:  self::resolve_spacing_value( $responsive_spacing, 'tablet', $default_spacing ),
-					mobile:  self::resolve_spacing_value( $responsive_spacing, 'mobile', $default_spacing ),
+					self::resolve_spacing_value( $responsive_spacing, 'desktop', $default_spacing ),
+					self::resolve_spacing_value( $responsive_spacing, 'tablet', $default_spacing ),
+					self::resolve_spacing_value( $responsive_spacing, 'mobile', $default_spacing ),
 				),
 			),
 		);

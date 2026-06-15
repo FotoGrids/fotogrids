@@ -149,9 +149,9 @@ final class Layout_Instant_Photos implements Layout {
 		// existing direction.
 		$vars = array(
 			'--fg-frame-thickness' => new Responsive_Var(
-				desktop: $desktop . 'px',
-				tablet:  $tablet . 'px',
-				mobile:  $mobile . 'px',
+				$desktop . 'px',
+				$tablet . 'px',
+				$mobile . 'px',
 			),
 			'--fg-hover-boost'     => (string) self::HOVER_BOOST_DEG,
 		);
@@ -174,12 +174,12 @@ final class Layout_Instant_Photos implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-render-base'           => new Asset_Decl(
-					path: 'base/collection-base.css'
+					'base/collection-base.css'
 				),
 				'fotogrids-layout-instant-photos' => new Asset_Decl(
-					path: 'layouts/instant-photos/instant-photos.css'
+					'layouts/instant-photos/instant-photos.css'
 				),
 			)
 		);

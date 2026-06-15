@@ -170,19 +170,19 @@ final class Layout_Slider implements Layout {
 
 		$vars = array(
 			'--fg-items-per-view'  => new Responsive_Var(
-				desktop: self::resolve_int( $items_per_view, 'desktop', 3 ),
-				tablet:  self::resolve_int( $items_per_view, 'tablet', 2 ),
-				mobile:  self::resolve_int( $items_per_view, 'mobile', 1 ),
+				self::resolve_int( $items_per_view, 'desktop', 3 ),
+				self::resolve_int( $items_per_view, 'tablet', 2 ),
+				self::resolve_int( $items_per_view, 'mobile', 1 ),
 			),
 			'--fg-height-fixed'    => new Responsive_Var(
-				desktop: self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
-				tablet:  self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
-				mobile:  self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
+				self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
+				self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
+				self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
 			),
 			'--fg-height-max'      => new Responsive_Var(
-				desktop: self::height_max_value( $height_max, 'desktop' ),
-				tablet:  self::height_max_value( $height_max, 'tablet' ),
-				mobile:  self::height_max_value( $height_max, 'mobile' ),
+				self::height_max_value( $height_max, 'desktop' ),
+				self::height_max_value( $height_max, 'tablet' ),
+				self::height_max_value( $height_max, 'mobile' ),
 			),
 			'--fg-arrow-size'      => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
 			'--fg-arrow-distance'  => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
@@ -196,15 +196,15 @@ final class Layout_Slider implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'   => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-slider' => new Asset_Decl( path: 'layouts/slider/slider.css' ),
+			array(
+				'fotogrids-render-base'   => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-slider' => new Asset_Decl( 'layouts/slider/slider.css' ),
 			),
-			js: array(
+			array(
 				'fotogrids-layout-slider' => new Asset_Decl(
-					path:      '../../assets/js/layout-slider.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/layout-slider.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

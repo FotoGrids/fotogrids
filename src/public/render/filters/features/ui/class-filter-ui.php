@@ -273,9 +273,9 @@ final class Filter_Ui implements Feature {
 
 			if ( '' !== $desktop || '' !== $tablet || '' !== $mobile ) {
 				$vars[ $css_var ] = new Responsive_Var(
-					desktop: $desktop,
-					tablet:  $tablet,
-					mobile:  $mobile,
+					$desktop,
+					$tablet,
+					$mobile,
 				);
 			}
 		}
@@ -289,9 +289,9 @@ final class Filter_Ui implements Feature {
 
 		if ( '' !== $desktop_panel || '' !== $tablet_panel || '' !== $mobile_panel ) {
 			$vars['--fg-filter-panel-padding'] = new Responsive_Var(
-				desktop: $desktop_panel,
-				tablet:  $tablet_panel,
-				mobile:  $mobile_panel,
+				$desktop_panel,
+				$tablet_panel,
+				$mobile_panel,
 			);
 		}
 
@@ -311,9 +311,9 @@ final class Filter_Ui implements Feature {
 
 		if ( '' !== $desktop_padding || '' !== $tablet_padding || '' !== $mobile_padding ) {
 			$vars['--fg-filter-btn-padding'] = new Responsive_Var(
-				desktop: $desktop_padding,
-				tablet:  $tablet_padding,
-				mobile:  $mobile_padding,
+				$desktop_padding,
+				$tablet_padding,
+				$mobile_padding,
 			);
 		}
 		$this->maybe_add_var( $vars, '--fg-filter-btn-radius', $this->unit_val( $s['filter_btn_radius'] ?? null, 'px' ) );
@@ -329,9 +329,9 @@ final class Filter_Ui implements Feature {
 
 		if ( '' !== $desktop_font || '' !== $tablet_font || '' !== $mobile_font ) {
 			$vars['--fg-filter-btn-font-size'] = new Responsive_Var(
-				desktop: $desktop_font,
-				tablet:  $tablet_font,
-				mobile:  $mobile_font,
+				$desktop_font,
+				$tablet_font,
+				$mobile_font,
 			);
 		}
 
@@ -362,9 +362,9 @@ final class Filter_Ui implements Feature {
 
 		if ( '' !== $desktop_select_pad || '' !== $tablet_select_pad || '' !== $mobile_select_pad ) {
 			$vars['--fg-filter-select-padding'] = new Responsive_Var(
-				desktop: $desktop_select_pad,
-				tablet:  $tablet_select_pad,
-				mobile:  $mobile_select_pad,
+				$desktop_select_pad,
+				$tablet_select_pad,
+				$mobile_select_pad,
 			);
 		}
 
@@ -450,9 +450,9 @@ final class Filter_Ui implements Feature {
 
 		if ( '' !== $desktop_count_font || '' !== $tablet_count_font || '' !== $mobile_count_font ) {
 			$vars['--fg-filter-count-font-size'] = new Responsive_Var(
-				desktop: $desktop_count_font,
-				tablet:  $tablet_count_font,
-				mobile:  $mobile_count_font,
+				$desktop_count_font,
+				$tablet_count_font,
+				$mobile_count_font,
 			);
 		}
 
@@ -468,9 +468,9 @@ final class Filter_Ui implements Feature {
 
 		if ( '' !== $desktop_count_pad || '' !== $tablet_count_pad || '' !== $mobile_count_pad ) {
 			$vars['--fg-filter-count-padding'] = new Responsive_Var(
-				desktop: $desktop_count_pad,
-				tablet:  $tablet_count_pad,
-				mobile:  $mobile_count_pad,
+				$desktop_count_pad,
+				$tablet_count_pad,
+				$mobile_count_pad,
 			);
 		}
 
@@ -484,17 +484,18 @@ final class Filter_Ui implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-filter-ui' => new Asset_Decl(
-					path:      '../../assets/css/filter-ui-styles.css',
-					in_footer: false,
+					'../../assets/css/filter-ui-styles.css',
+					array(),
+					false,
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-filter-ui' => new Asset_Decl(
-					path:      '../../assets/js/filter-ui.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/filter-ui.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

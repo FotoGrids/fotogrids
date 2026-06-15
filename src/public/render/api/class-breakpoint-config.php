@@ -65,9 +65,9 @@ final class Breakpoint_Config {
 		}
 
 		$config = new self(
-			tablet_max_width:  $tablet,
-			mobile_max_width:  $mobile,
-			detect_by_browser: $by_browser,
+			$tablet,
+			$mobile,
+			$by_browser,
 		);
 
 		/**
