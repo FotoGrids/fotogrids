@@ -14,10 +14,10 @@ jobs:
   # in the matrix is the effective floor — if the plugin declares support for a
   # PHP version, that version must be green here.
   #
-  # During the PHP 7.4 downgrade, the 7.4 leg will fail on every remaining 8.x
-  # construct (enum / readonly / match / named args / union types) and report
-  # the exact file:line, turning the refactor into a checklist instead of a
-  # blind sweep. Bump or drop matrix versions as the supported range changes.
+  # The declared floor is PHP 7.4, so the 7.4 leg must stay green: any 8.x-only
+  # construct (enum / readonly / match / named args / union types) reintroduced
+  # into src/ will fail it with the exact file:line. Bump or drop matrix
+  # versions as the supported range changes.
   # ---------------------------------------------------------------------------
   php-syntax:
     name: PHP syntax (${{ matrix.php }})
@@ -103,10 +103,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up PHP
+      - name: Set up PHP 7.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '7.4'
           tools: composer
           coverage: none
 

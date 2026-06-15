@@ -14,7 +14,7 @@ root.
 
 | Tool      | Version           |
 | --------- | ----------------- |
-| PHP       | 8.0+              |
+| PHP       | 7.4+              |
 | WordPress | 6.1+ (tested 6.8) |
 | Node.js   | 18+               |
 | npm       | 8+                |
@@ -105,7 +105,7 @@ required) and the CI guard scripts under `tests/ci/`. Both are wired into
 
 ## Architecture at a glance
 
-- **Backend**: PHP 8.0+, explicit `require_once` bootstrap (no autoloader or
+- **Backend**: PHP 7.4+, explicit `require_once` bootstrap (no autoloader or
   service container), custom database tables, REST API under `fotogrids/v1`.
 - **Admin UI**: React 18 (mostly `.jsx`, some `.tsx`) using
   `@wordpress/components`, mounted into PHP-rendered containers. No SPA router,

@@ -27,8 +27,8 @@ final class Item_Overlay {
 		string $position_class,
 		array $extra_classes = array()
 	) {
-		$this->html = $html;
+		$this->html           = $html;
 		$this->position_class = $position_class;
-		$this->extra_classes = $extra_classes;
+		$this->extra_classes  = $extra_classes;
 	}
 }

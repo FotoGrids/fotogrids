@@ -82,25 +82,25 @@ final class Render_Meta {
 		?int $pagination_page_size = null,
 		?int $pagination_total_pages = null
 	) {
-		$this->gallery_id = $gallery_id;
-		$this->album_id = $album_id;
-		$this->instance_id = $instance_id;
-		$this->source = $source;
-		$this->is_preview = $is_preview;
-		$this->mode = $mode;
-		$this->schema_version = $schema_version;
-		$this->collection_kind = $collection_kind;
-		$this->requested_page = $requested_page;
-		$this->requested_per_page = $requested_per_page;
-		$this->breakpoint = $breakpoint;
-		$this->partial = $partial;
-		$this->total_item_count = $total_item_count;
-		$this->active_filters = $active_filters;
-		$this->random_seed = $random_seed;
-		$this->view_page = $view_page;
-		$this->is_ajax_swap = $is_ajax_swap;
-		$this->container_width = $container_width;
-		$this->pagination_page_size = $pagination_page_size;
+		$this->gallery_id             = $gallery_id;
+		$this->album_id               = $album_id;
+		$this->instance_id            = $instance_id;
+		$this->source                 = $source;
+		$this->is_preview             = $is_preview;
+		$this->mode                   = $mode;
+		$this->schema_version         = $schema_version;
+		$this->collection_kind        = $collection_kind;
+		$this->requested_page         = $requested_page;
+		$this->requested_per_page     = $requested_per_page;
+		$this->breakpoint             = $breakpoint;
+		$this->partial                = $partial;
+		$this->total_item_count       = $total_item_count;
+		$this->active_filters         = $active_filters;
+		$this->random_seed            = $random_seed;
+		$this->view_page              = $view_page;
+		$this->is_ajax_swap           = $is_ajax_swap;
+		$this->container_width        = $container_width;
+		$this->pagination_page_size   = $pagination_page_size;
 		$this->pagination_total_pages = $pagination_total_pages;
 	}
 

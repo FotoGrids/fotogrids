@@ -141,10 +141,10 @@ final class Gallery_Item_Sequence {
 					'',
 					'',
 					'',
-					null,
-					null,
 					'',
 					'',
+					null,
+					null,
 					array(),
 				);
 			},

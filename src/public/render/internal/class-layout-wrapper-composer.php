@@ -233,7 +233,7 @@ final class Layout_Wrapper_Composer {
 		$default_columns    = is_array( $defaults['columns'] ?? null ) ? $defaults['columns'] : array();
 		$default_auto_range = is_array( $defaults['columns_auto_range'] ?? null ) ? $defaults['columns_auto_range'] : array();
 
-		$mode               = $render_context->layout->columns_mode->value;
+		$mode               = $render_context->layout->columns_mode;
 		$style_vars         = array();
 		$wrapper_data_attrs = array(
 			'data-fg-columns-mode' => $mode,

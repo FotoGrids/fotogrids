@@ -29,10 +29,10 @@ final class Render_Result {
 		array $active_modules,
 		int $http_status
 	) {
-		$this->html = $html;
-		$this->instance_id = $instance_id;
+		$this->html           = $html;
+		$this->instance_id    = $instance_id;
 		$this->active_modules = $active_modules;
-		$this->http_status = $http_status;
+		$this->http_status    = $http_status;
 	}
 
 	/**

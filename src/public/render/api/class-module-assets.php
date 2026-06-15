@@ -27,6 +27,6 @@ final class Module_Assets {
 		array $js = array()
 	) {
 		$this->css = $css;
-		$this->js = $js;
+		$this->js  = $js;
 	}
 }

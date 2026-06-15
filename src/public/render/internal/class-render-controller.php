@@ -32,9 +32,9 @@ final class Render_Controller {
 		Breakpoint_Config $breakpoints
 	) {
 		$this->style_var_builder = $style_var_builder;
-		$this->asset_resolver = $asset_resolver;
-		$this->item_renderer = $item_renderer;
-		$this->breakpoints = $breakpoints;
+		$this->asset_resolver    = $asset_resolver;
+		$this->item_renderer     = $item_renderer;
+		$this->breakpoints       = $breakpoints;
 	}
 
 	/**

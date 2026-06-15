@@ -30,7 +30,7 @@ final class Caption_Content {
 		string $title,
 		string $description
 	) {
-		$this->title = $title;
+		$this->title       = $title;
 		$this->description = $description;
 	}
 

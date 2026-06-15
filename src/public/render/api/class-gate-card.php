@@ -53,12 +53,12 @@ final class Gate_Card {
 		string $extra_class = '',
 		array $data_attrs = array()
 	) {
-		$this->title = $title;
+		$this->title       = $title;
 		$this->description = $description;
-		$this->body_html = $body_html;
-		$this->aria_label = $aria_label;
-		$this->icon_svg = $icon_svg;
+		$this->body_html   = $body_html;
+		$this->aria_label  = $aria_label;
+		$this->icon_svg    = $icon_svg;
 		$this->extra_class = $extra_class;
-		$this->data_attrs = $data_attrs;
+		$this->data_attrs  = $data_attrs;
 	}
 }

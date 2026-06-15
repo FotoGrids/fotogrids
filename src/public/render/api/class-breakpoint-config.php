@@ -46,8 +46,8 @@ final class Breakpoint_Config {
 		int $mobile_max_width,
 		bool $detect_by_browser = false
 	) {
-		$this->tablet_max_width = $tablet_max_width;
-		$this->mobile_max_width = $mobile_max_width;
+		$this->tablet_max_width  = $tablet_max_width;
+		$this->mobile_max_width  = $mobile_max_width;
 		$this->detect_by_browser = $detect_by_browser;
 	}
 

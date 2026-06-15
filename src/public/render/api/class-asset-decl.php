@@ -29,9 +29,9 @@ final class Asset_Decl {
 		bool $in_footer = false,
 		?string $plugin_origin = null
 	) {
-		$this->path = $path;
-		$this->deps = $deps;
-		$this->in_footer = $in_footer;
+		$this->path          = $path;
+		$this->deps          = $deps;
+		$this->in_footer     = $in_footer;
 		$this->plugin_origin = $plugin_origin;
 	}
 }

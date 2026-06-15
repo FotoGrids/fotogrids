@@ -687,10 +687,10 @@ class Public_Render {
 				(string) ( $item['title'] ?? '' ),
 				(string) ( $item['caption'] ?? '' ),
 				(string) ( $item['description'] ?? '' ),
-				null,
-				null,
 				'',
 				'',
+				null,
+				null,
 				array()
 			);
 		}

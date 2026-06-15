@@ -43,12 +43,12 @@ final class Render_Context {
 		array $warnings = array(),
 		?int $via_album_id = null
 	) {
-		$this->meta = $meta;
-		$this->layout = $layout;
-		$this->behavior = $behavior;
-		$this->settings = $settings;
-		$this->items = $items;
-		$this->warnings = $warnings;
+		$this->meta         = $meta;
+		$this->layout       = $layout;
+		$this->behavior     = $behavior;
+		$this->settings     = $settings;
+		$this->items        = $items;
+		$this->warnings     = $warnings;
 		$this->via_album_id = $via_album_id;
 	}
 

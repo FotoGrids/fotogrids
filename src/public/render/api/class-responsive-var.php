@@ -40,8 +40,8 @@ final class Responsive_Var {
 		string $mobile = ''
 	) {
 		$this->desktop = $desktop;
-		$this->tablet = $tablet;
-		$this->mobile = $mobile;
+		$this->tablet  = $tablet;
+		$this->mobile  = $mobile;
 	}
 
 	/**

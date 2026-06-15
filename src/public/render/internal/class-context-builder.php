@@ -43,7 +43,7 @@ final class Context_Builder {
 		mixed $items_loader = null
 	) {
 		$this->instance_id_factory = $instance_id_factory;
-		$this->items_loader = $items_loader;
+		$this->items_loader        = $items_loader;
 	}
 
 	/**
@@ -678,10 +678,10 @@ final class Context_Builder {
 			(string) $attachment_post->post_title,
 			(string) $attachment_post->post_excerpt,
 			(string) $attachment_post->post_content,
-			null,
-			null,
 			'',
 			'',
+			null,
+			null,
 			$link_meta,
 			array(),
 			array(),

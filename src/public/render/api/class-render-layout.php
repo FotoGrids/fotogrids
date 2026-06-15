@@ -39,12 +39,12 @@ final class Render_Layout {
 		string $item_aspect_ratio = '',
 		string $item_object_fit = ''
 	) {
-		$this->layout_id = $layout_id;
-		$this->columns_mode = $columns_mode;
+		$this->layout_id          = $layout_id;
+		$this->columns_mode       = $columns_mode;
 		$this->responsive_columns = $responsive_columns;
 		$this->responsive_spacing = $responsive_spacing;
 		$this->columns_auto_range = $columns_auto_range;
-		$this->item_aspect_ratio = $item_aspect_ratio;
-		$this->item_object_fit = $item_object_fit;
+		$this->item_aspect_ratio  = $item_aspect_ratio;
+		$this->item_object_fit    = $item_object_fit;
 	}
 }

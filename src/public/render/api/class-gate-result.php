@@ -31,9 +31,9 @@ final class Gate_Result {
 		string $blocked_html,
 		int $http_status
 	) {
-		$this->passed = $passed;
+		$this->passed       = $passed;
 		$this->blocked_html = $blocked_html;
-		$this->http_status = $http_status;
+		$this->http_status  = $http_status;
 	}
 
 	/**

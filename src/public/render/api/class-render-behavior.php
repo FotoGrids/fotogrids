@@ -34,9 +34,9 @@ final class Render_Behavior {
 		string $pagination_method,
 		?string $hover_effect
 	) {
-		$this->click_behavior = $click_behavior;
-		$this->pagination_type = $pagination_type;
+		$this->click_behavior    = $click_behavior;
+		$this->pagination_type   = $pagination_type;
 		$this->pagination_method = $pagination_method;
-		$this->hover_effect = $hover_effect;
+		$this->hover_effect      = $hover_effect;
 	}
 }

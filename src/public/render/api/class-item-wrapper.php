@@ -25,7 +25,7 @@ final class Item_Wrapper {
 		string $tag,
 		array $attrs
 	) {
-		$this->tag = $tag;
+		$this->tag   = $tag;
 		$this->attrs = $attrs;
 	}
 }

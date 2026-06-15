@@ -4,7 +4,7 @@
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=8.1"
+        "php": ">=7.4"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.10",
@@ -21,14 +21,14 @@
         "lint": "phpcs --standard=src/phpcs.xml",
         "lint:summary": "phpcs --standard=src/phpcs.xml --report=summary",
         "lint:fix": "phpcbf --standard=src/phpcs.xml",
-        "lint:compat": "phpcs --standard=PHPCompatibilityWP --runtime-set testVersion 8.1- --extensions=php --ignore=*/freemius/*,*/dist/*,*/node_modules/*,*/vendor/* src",
+        "lint:compat": "phpcs --standard=PHPCompatibilityWP --runtime-set testVersion 7.4- --extensions=php --ignore=*/freemius/*,*/dist/*,*/node_modules/*,*/vendor/* src",
         "setup-hooks": "git config core.hooksPath .githooks && echo \"Git hooks installed (core.hooksPath -> .githooks).\""
     },
     "scripts-descriptions": {
         "lint": "Run PHP_CodeSniffer over the plugin using src/phpcs.xml.",
         "lint:summary": "Run phpcs with a per-file summary report.",
         "lint:fix": "Auto-fix what PHP Code Beautifier can fix in place.",
-        "lint:compat": "Check PHP 8.1+ compatibility of src/ with PHPCompatibilityWP.",
+        "lint:compat": "Check PHP 7.4+ compatibility of src/ with PHPCompatibilityWP.",
         "setup-hooks": "Point git at the committed .githooks/ directory (run once per clone)."
     }
 }

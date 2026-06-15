@@ -10,7 +10,7 @@
  * Domain Path: /languages
  * Requires at least: 6.1
  * Tested up to: 7.0
- * Requires PHP: 8.1
+ * Requires PHP: 7.4
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -242,10 +242,10 @@ function fotogrids_activation_check() {
 		);
 	}
 
-	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
-			esc_html__( 'FotoGrids requires PHP version 8.1 or higher.', 'fotogrids' ),
+			esc_html__( 'FotoGrids requires PHP version 7.4 or higher.', 'fotogrids' ),
 			esc_html__( 'Plugin Activation Error', 'fotogrids' ),
 			array( 'back_link' => true )
 		);

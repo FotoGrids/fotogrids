@@ -149,7 +149,7 @@ final class State_Resolver {
 
 		static $already_logged = array();
 
-		$signature = $field_id . '|' . ( $option_value ?? '' ) . '|' . $required_tier . '|' . $state->value;
+		$signature = $field_id . '|' . ( $option_value ?? '' ) . '|' . $required_tier . '|' . $state;
 		if ( isset( $already_logged[ $signature ] ) ) {
 			return;
 		}
@@ -162,7 +162,7 @@ final class State_Resolver {
 				$field_id,
 				null !== $option_value ? '.' . $option_value : '',
 				$required_tier,
-				$state->value,
+				$state,
 				$reason
 			)
 		);

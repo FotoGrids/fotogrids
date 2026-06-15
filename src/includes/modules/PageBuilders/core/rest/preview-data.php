@@ -189,7 +189,7 @@ final class Preview_Data {
 		$preview_settings = array_merge(
 			$context->settings,
 			array(
-				'_preview_source'     => $source->value,
+				'_preview_source'     => $source,
 				'_show_render_errors' => current_user_can( 'edit_posts' ),
 			)
 		);

@@ -134,34 +134,34 @@ final class Item_View {
 		 */
 		array $embed_settings = array()
 	) {
-		$this->id = $id;
-		$this->thumb_url = $thumb_url;
-		$this->full_url = $full_url;
-		$this->alt = $alt;
-		$this->title = $title;
-		$this->caption = $caption;
-		$this->description = $description;
-		$this->caption_title = $caption_title;
+		$this->id                  = $id;
+		$this->thumb_url           = $thumb_url;
+		$this->full_url            = $full_url;
+		$this->alt                 = $alt;
+		$this->title               = $title;
+		$this->caption             = $caption;
+		$this->description         = $description;
+		$this->caption_title       = $caption_title;
 		$this->caption_description = $caption_description;
-		$this->width = $width;
-		$this->height = $height;
-		$this->meta = $meta;
-		$this->classes = $classes;
-		$this->data_attrs = $data_attrs;
-		$this->style = $style;
-		$this->thumb_overlays = $thumb_overlays;
-		$this->lightbox_overlays = $lightbox_overlays;
-		$this->wrappers = $wrappers;
-		$this->figure_wrappers = $figure_wrappers;
-		$this->thumb_size = $thumb_size;
-		$this->full_width = $full_width;
-		$this->full_height = $full_height;
-		$this->item_type = $item_type;
-		$this->poster_url = $poster_url;
-		$this->video_src = $video_src;
-		$this->embed_provider = $embed_provider;
-		$this->embed_id = $embed_id;
-		$this->embed_settings = $embed_settings;
+		$this->width               = $width;
+		$this->height              = $height;
+		$this->meta                = $meta;
+		$this->classes             = $classes;
+		$this->data_attrs          = $data_attrs;
+		$this->style               = $style;
+		$this->thumb_overlays      = $thumb_overlays;
+		$this->lightbox_overlays   = $lightbox_overlays;
+		$this->wrappers            = $wrappers;
+		$this->figure_wrappers     = $figure_wrappers;
+		$this->thumb_size          = $thumb_size;
+		$this->full_width          = $full_width;
+		$this->full_height         = $full_height;
+		$this->item_type           = $item_type;
+		$this->poster_url          = $poster_url;
+		$this->video_src           = $video_src;
+		$this->embed_provider      = $embed_provider;
+		$this->embed_id            = $embed_id;
+		$this->embed_settings      = $embed_settings;
 	}
 
 	/**
