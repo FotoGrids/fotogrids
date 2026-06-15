@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# FotoGrids pre-commit hook — runs PHP_CodeSniffer on staged PHP files only.
+#
+# Blocks the commit if any staged .php file fails the project ruleset
+# (src/phpcs.xml). Scoped to staged files so it stays fast and only gates
+# what you're actually committing.
+#
+# Install once per clone:  composer setup-hooks
+# Bypass (discouraged):    git commit --no-verify
+#
+set -euo pipefail
+
+# Collect staged PHP files (Added/Copied/Modified), excluding paths the
+# ruleset itself ignores (vendor, dist, the bundled Freemius SDK).
+mapfile -t STAGED < <(
+	git diff --cached --name-only --diff-filter=ACM -- '*.php' \
+		| grep -vE '(^|/)(vendor|dist|node_modules|freemius)/' || true
+)
+
+if [ ${#STAGED[@]} -eq 0 ]; then
+	exit 0
+fi
+
+# Locate phpcs (prefer the project's vendored copy).
+PHPCS=""
+if [ -x "vendor/bin/phpcs" ]; then
+	PHPCS="vendor/bin/phpcs"
+elif command -v phpcs >/dev/null 2>&1; then
+	PHPCS="phpcs"
+else
+	echo "pre-commit: phpcs not found. Run 'composer install' first." >&2
+	exit 1
+fi
+
+echo "pre-commit: linting ${#STAGED[@]} staged PHP file(s)…"
+
+# Lint only the staged files against the project ruleset.
+if ! "$PHPCS" --standard=src/phpcs.xml -q "${STAGED[@]}"; then
+	echo "" >&2
+	echo "pre-commit: PHPCS found issues in staged files (see above)." >&2
+	echo "  • Auto-fix what's mechanical:  composer lint:fix" >&2
+	echo "  • Re-stage and commit again." >&2
+	echo "  • To bypass intentionally:     git commit --no-verify" >&2
+	exit 1
+fi
+
+echo "pre-commit: PHPCS clean."
+exit 0
