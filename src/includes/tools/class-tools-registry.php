@@ -42,7 +42,7 @@ class Tools_Registry {
 	 *
 	 * @var array<string, array{tool: Tool_Interface, source: string}>
 	 */
-	private static array $tools = [];
+	private static array $tools = array();
 
 	/**
 	 * Whether the sorted manifest is current.
@@ -56,11 +56,11 @@ class Tools_Registry {
 	 *
 	 * @var array<string, int>
 	 */
-	private const SOURCE_PRIORITY = [
+	private const SOURCE_PRIORITY = array(
 		'fotogrids'     => 0,
 		'fotogrids-pro' => 1,
 		'third-party'   => 2,
-	];
+	);
 
 	/**
 	 * Register a tool.
@@ -79,20 +79,22 @@ class Tools_Registry {
 			// Intentional replacement - log in debug mode only.
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				error_log( sprintf(
-					'FotoGrids Tools: tool "%s" (%s) replaced by %s (%s).',
-					$id,
-					self::$tools[ $id ]['source'],
-					get_class( $tool ),
-					$source
-				) );
+				error_log(
+					sprintf(
+						'FotoGrids Tools: tool "%s" (%s) replaced by %s (%s).',
+						$id,
+						self::$tools[ $id ]['source'],
+						get_class( $tool ),
+						$source
+					)
+				);
 			}
 		}
 
-		self::$tools[ $id ] = [
+		self::$tools[ $id ] = array(
 			'tool'   => $tool,
 			'source' => $source,
-		];
+		);
 
 		self::$sorted = false;
 	}
@@ -107,23 +109,26 @@ class Tools_Registry {
 	public static function get_all_for_user(): array {
 		$tools = self::get_all();
 
-		return array_filter( $tools, static function ( $entry ) {
-			$capability = $entry['tool']->get_capability();
+		return array_filter(
+			$tools,
+			static function ( $entry ) {
+				$capability = $entry['tool']->get_capability();
 
-			// If the custom capability isn't assigned to any role yet (e.g. before
-			// the Permissions Manager has run), fall back to manage_fotogrids so
-			// tools remain accessible to admins during development and before
-			// per-tool capabilities are explicitly granted.
-			if ( current_user_can( $capability ) ) {
-				return true;
+				// If the custom capability isn't assigned to any role yet (e.g. before
+				// the Permissions Manager has run), fall back to manage_fotogrids so
+				// tools remain accessible to admins during development and before
+				// per-tool capabilities are explicitly granted.
+				if ( current_user_can( $capability ) ) {
+					return true;
+				}
+
+				if ( 'manage_fotogrids' !== $capability && current_user_can( 'manage_fotogrids' ) ) {
+					return true;
+				}
+
+				return false;
 			}
-
-			if ( $capability !== 'manage_fotogrids' && current_user_can( 'manage_fotogrids' ) ) {
-				return true;
-			}
-
-			return false;
-		} );
+		);
 	}
 
 	/**
@@ -212,24 +217,31 @@ class Tools_Registry {
 
 		// PHP's uasort is not guaranteed stable before 8.0; we implement
 		// a stable sort by tagging each entry with its insertion index.
-		$indexed = [];
+		$indexed = array();
 		$i       = 0;
 		foreach ( self::$tools as $id => $entry ) {
-			$indexed[] = [ 'id' => $id, 'entry' => $entry, 'order' => $i++ ];
+			$indexed[] = array(
+				'id'    => $id,
+				'entry' => $entry,
+				'order' => $i++,
+			);
 		}
 
-		usort( $indexed, static function ( $a, $b ) use ( $priority ) {
-			$pa = $priority[ $a['entry']['source'] ] ?? 99;
-			$pb = $priority[ $b['entry']['source'] ] ?? 99;
+		usort(
+			$indexed,
+			static function ( $a, $b ) use ( $priority ) {
+				$pa = $priority[ $a['entry']['source'] ] ?? 99;
+				$pb = $priority[ $b['entry']['source'] ] ?? 99;
 
-			if ( $pa !== $pb ) {
-				return $pa - $pb;
+				if ( $pa !== $pb ) {
+					return $pa - $pb;
+				}
+
+				return $a['order'] - $b['order'];
 			}
+		);
 
-			return $a['order'] - $b['order'];
-		} );
-
-		$sorted = [];
+		$sorted = array();
 		foreach ( $indexed as $item ) {
 			$sorted[ $item['id'] ] = $item['entry'];
 		}

@@ -2,7 +2,7 @@
 namespace FotoGrids\REST\Maintenance;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -17,14 +17,14 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Maintenance_Permissions {
 
-    /**
-     * Check whether the current user can perform Maintenance operations.
-     *
-     * @since 1.0.0
-     * @param \WP_REST_Request $request Request object.
-     * @return bool
-     */
-    public static function check_manage_fotogrids( $request ) {
-        return current_user_can( 'manage_fotogrids' );
-    }
+	/**
+	 * Check whether the current user can perform Maintenance operations.
+	 *
+	 * @since 1.0.0
+	 * @param \WP_REST_Request $request Request object.
+	 * @return bool
+	 */
+	public static function check_manage_fotogrids( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return current_user_can( 'manage_fotogrids' );
+	}
 }

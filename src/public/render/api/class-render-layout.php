@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Api;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -15,20 +15,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Layout {
 
-    /**
-     * @param array<string, int> $responsive_columns Breakpoint columns map.
-     * @param array<string, array{value: int|float, unit: string}> $responsive_spacing Breakpoint spacing map.
-     * @param array<string, mixed> $columns_auto_range Auto column configuration map.
-     * @param string $item_aspect_ratio Resolved CSS aspect-ratio value (e.g. "4 / 3"). Empty string falls through to CSS default.
-     * @param string $item_object_fit   CSS object-fit value ("cover" | "contain"). Empty string falls through to CSS default.
-     */
-    public function __construct(
-        public readonly string $layout_id,
-        public readonly Columns_Mode $columns_mode,
-        public readonly array $responsive_columns,
-        public readonly array $responsive_spacing,
-        public readonly array $columns_auto_range,
-        public readonly string $item_aspect_ratio = '',
-        public readonly string $item_object_fit = '',
-    ) {}
+	/**
+	 * @param array<string, int> $responsive_columns Breakpoint columns map.
+	 * @param array<string, array{value: int|float, unit: string}> $responsive_spacing Breakpoint spacing map.
+	 * @param array<string, mixed> $columns_auto_range Auto column configuration map.
+	 * @param string $item_aspect_ratio Resolved CSS aspect-ratio value (e.g. "4 / 3"). Empty string falls through to CSS default.
+	 * @param string $item_object_fit   CSS object-fit value ("cover" | "contain"). Empty string falls through to CSS default.
+	 */
+	public function __construct(
+		public readonly string $layout_id,
+		public readonly Columns_Mode $columns_mode,
+		public readonly array $responsive_columns,
+		public readonly array $responsive_spacing,
+		public readonly array $columns_auto_range,
+		public readonly string $item_aspect_ratio = '',
+		public readonly string $item_object_fit = '',
+	) {}
 }

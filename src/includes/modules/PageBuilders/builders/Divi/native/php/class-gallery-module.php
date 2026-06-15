@@ -13,7 +13,7 @@ namespace FotoGrids\Modules\PageBuilders\Builders\Divi\Native;
 use FotoGrids\Render\Api\Request_Source;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -44,97 +44,97 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Interfaces\DependencyInterface {
 
-    /**
-     * Register the block + render callback on `init`.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public function load(): void {
-        $json_folder = dirname( __DIR__ ) . '/modules-json/gallery';
+	/**
+	 * Register the block + render callback on `init`.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function load(): void {
+		$json_folder = dirname( __DIR__ ) . '/modules-json/gallery';
 
-        $register = static function () use ( $json_folder ) {
-            if ( ! class_exists( '\ET\Builder\Packages\ModuleLibrary\ModuleRegistration' ) ) {
-                return;
-            }
+		$register = static function () use ( $json_folder ) {
+			if ( ! class_exists( '\ET\Builder\Packages\ModuleLibrary\ModuleRegistration' ) ) {
+				return;
+			}
 
-            require_once __DIR__ . '/class-collection-options.php';
+			require_once __DIR__ . '/class-collection-options.php';
 
-            $args = [
-                'render_callback' => [ self::class, 'render_callback' ],
-            ];
+			$args = array(
+				'render_callback' => array( self::class, 'render_callback' ),
+			);
 
-            // Populate the native select with the site's published
-            // galleries. Args win the merge over the JSON metadata,
-            // so this overrides the empty `options: {}` shipped in
-            // module.json.
-            $attributes = Collection_Options::attributes_with_options(
-                $json_folder . '/module.json',
-                'gallery',
-                'galleryId',
-                'gallery'
-            );
-            if ( ! empty( $attributes ) ) {
-                $args['attributes'] = $attributes;
-            }
+			// Populate the native select with the site's published
+			// galleries. Args win the merge over the JSON metadata,
+			// so this overrides the empty `options: {}` shipped in
+			// module.json.
+			$attributes = Collection_Options::attributes_with_options(
+				$json_folder . '/module.json',
+				'gallery',
+				'galleryId',
+				'gallery'
+			);
+			if ( ! empty( $attributes ) ) {
+				$args['attributes'] = $attributes;
+			}
 
-            \ET\Builder\Packages\ModuleLibrary\ModuleRegistration::register_module(
-                $json_folder,
-                $args
-            );
-        };
+			\ET\Builder\Packages\ModuleLibrary\ModuleRegistration::register_module(
+				$json_folder,
+				$args
+			);
+		};
 
-        // Divi calls load() from FrontEnd/Admin construction, which runs
-        // synchronously inside `et_setup_builder_5` on `init:0` — Divi 5
-        // (and ModuleRegistration) is fully loaded at this point. So we
-        // register immediately rather than deferring to a nested `init`
-        // callback (which would be re-entrant and fragile).
-        $register();
-    }
+		// Divi calls load() from FrontEnd/Admin construction, which runs
+		// synchronously inside `et_setup_builder_5` on `init:0` — Divi 5
+		// (and ModuleRegistration) is fully loaded at this point. So we
+		// register immediately rather than deferring to a nested `init`
+		// callback (which would be re-entrant and fragile).
+		$register();
+	}
 
-    /**
-     * Front-end render callback.
-     *
-     * @since 1.0.0
-     * @param array       $attrs    Block attributes saved by the VB.
-     * @param string      $content  Block inner content (unused).
-     * @param \WP_Block   $block    Parsed block instance.
-     * @param mixed       $elements Divi ModuleElements instance (unused — we
-     *                              delegate the whole render to the shortcode
-     *                              pipeline rather than composing Divi
-     *                              elements).
-     * @return string
-     */
-    public static function render_callback( $attrs, $content, $block, $elements ): string {
-        $gallery_id = self::resolve_id( $attrs );
+	/**
+	 * Front-end render callback.
+	 *
+	 * @since 1.0.0
+	 * @param array       $attrs    Block attributes saved by the VB.
+	 * @param string      $content  Block inner content (unused).
+	 * @param \WP_Block   $block    Parsed block instance.
+	 * @param mixed       $elements Divi ModuleElements instance (unused — we
+	 *                              delegate the whole render to the shortcode
+	 *                              pipeline rather than composing Divi
+	 *                              elements).
+	 * @return string
+	 */
+	public static function render_callback( $attrs, $content, $block, $elements ): string {
+		$gallery_id = self::resolve_id( $attrs );
 
-        if ( $gallery_id <= 0 ) {
-            return '';
-        }
+		if ( $gallery_id <= 0 ) {
+			return '';
+		}
 
-        if ( ! class_exists( '\FotoGrids\Public_Render' )
-            || ! method_exists( '\FotoGrids\Public_Render', 'gallery_shortcode' ) ) {
-            return '';
-        }
+		if ( ! class_exists( '\FotoGrids\Public_Render' )
+			|| ! method_exists( '\FotoGrids\Public_Render', 'gallery_shortcode' ) ) {
+			return '';
+		}
 
-        return \FotoGrids\Public_Render::gallery_shortcode(
-            [
-                'id'      => $gallery_id,
-                '_source' => Request_Source::DIVI->value,
-            ]
-        );
-    }
+		return \FotoGrids\Public_Render::gallery_shortcode(
+			array(
+				'id'      => $gallery_id,
+				'_source' => Request_Source::DIVI->value,
+			)
+		);
+	}
 
-    /**
-     * Pull the gallery ID out of the multi-breakpoint/state attribute
-     * shape Divi 5 saves (`gallery.innerContent.desktop.value.galleryId`).
-     *
-     * @since 1.0.0
-     * @param array $attrs Block attributes.
-     * @return int
-     */
-    private static function resolve_id( array $attrs ): int {
-        $raw = $attrs['gallery']['innerContent']['desktop']['value']['galleryId'] ?? 0;
-        return absint( $raw );
-    }
+	/**
+	 * Pull the gallery ID out of the multi-breakpoint/state attribute
+	 * shape Divi 5 saves (`gallery.innerContent.desktop.value.galleryId`).
+	 *
+	 * @since 1.0.0
+	 * @param array $attrs Block attributes.
+	 * @return int
+	 */
+	private static function resolve_id( array $attrs ): int {
+		$raw = $attrs['gallery']['innerContent']['desktop']['value']['galleryId'] ?? 0;
+		return absint( $raw );
+	}
 }

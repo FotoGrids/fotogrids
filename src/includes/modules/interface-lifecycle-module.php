@@ -9,7 +9,7 @@
 namespace FotoGrids\Modules;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -26,30 +26,30 @@ if ( ! defined( 'WPINC' ) ) {
  */
 interface Lifecycle_Module_Interface extends Module_Interface {
 
-    /**
-     * Run on plugin activation: create tables, seed options, schedule events.
-     *
-     * Must be idempotent - activation can run more than once.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public function on_activate(): void;
+	/**
+	 * Run on plugin activation: create tables, seed options, schedule events.
+	 *
+	 * Must be idempotent - activation can run more than once.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function on_activate(): void;
 
-    /**
-     * Run on plugin deactivation: clear scheduled events. Do NOT drop data
-     * here - deactivation is reversible.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public function on_deactivate(): void;
+	/**
+	 * Run on plugin deactivation: clear scheduled events. Do NOT drop data
+	 * here - deactivation is reversible.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function on_deactivate(): void;
 
-    /**
-     * Run on plugin uninstall: drop tables and delete options the module owns.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public function on_uninstall(): void;
+	/**
+	 * Run on plugin uninstall: drop tables and delete options the module owns.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function on_uninstall(): void;
 }

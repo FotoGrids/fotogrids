@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Cache;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -26,74 +26,74 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Metadata_Cache {
 
-    /**
-     * Object-cache group for per-item metadata.
-     *
-     * @var string
-     */
-    private const GROUP = 'fotogrids_item_metadata';
+	/**
+	 * Object-cache group for per-item metadata.
+	 *
+	 * @var string
+	 */
+	private const GROUP = 'fotogrids_item_metadata';
 
-    /**
-     * Shared object-cache instance.
-     *
-     * @var Object_Cache|null
-     */
-    private static ?Object_Cache $store = null;
+	/**
+	 * Shared object-cache instance.
+	 *
+	 * @var Object_Cache|null
+	 */
+	private static ?Object_Cache $store = null;
 
-    /**
-     * Lazily build the backing Object_Cache.
-     *
-     * @since 1.0.0
-     * @return Object_Cache
-     */
-    private static function store(): Object_Cache {
-        if ( self::$store === null ) {
-            self::$store = new Object_Cache( self::GROUP, 0 );
-        }
-        return self::$store;
-    }
+	/**
+	 * Lazily build the backing Object_Cache.
+	 *
+	 * @since 1.0.0
+	 * @return Object_Cache
+	 */
+	private static function store(): Object_Cache {
+		if ( null === self::$store ) {
+			self::$store = new Object_Cache( self::GROUP, 0 );
+		}
+		return self::$store;
+	}
 
-    /**
-     * Return cached metadata for an attachment, or compute and cache it.
-     *
-     * @since 1.0.0
-     * @param int      $attachment_id Attachment ID.
-     * @param callable $producer      Returns the metadata array on a cache miss.
-     * @return array{tags: array, people: array, locations: array}
-     */
-    public static function remember_item( int $attachment_id, callable $producer ): array {
-        return (array) self::store()->remember( self::item_key( $attachment_id ), $producer );
-    }
+	/**
+	 * Return cached metadata for an attachment, or compute and cache it.
+	 *
+	 * @since 1.0.0
+	 * @param int      $attachment_id Attachment ID.
+	 * @param callable $producer      Returns the metadata array on a cache miss.
+	 * @return array{tags: array, people: array, locations: array}
+	 */
+	public static function remember_item( int $attachment_id, callable $producer ): array {
+		return (array) self::store()->remember( self::item_key( $attachment_id ), $producer );
+	}
 
-    /**
-     * Invalidate one attachment's cached metadata.
-     *
-     * @since 1.0.0
-     * @param int $attachment_id Attachment ID.
-     * @return void
-     */
-    public static function forget_item( int $attachment_id ): void {
-        self::store()->delete( self::item_key( $attachment_id ) );
-    }
+	/**
+	 * Invalidate one attachment's cached metadata.
+	 *
+	 * @since 1.0.0
+	 * @param int $attachment_id Attachment ID.
+	 * @return void
+	 */
+	public static function forget_item( int $attachment_id ): void {
+		self::store()->delete( self::item_key( $attachment_id ) );
+	}
 
-    /**
-     * Invalidate cached metadata for every attachment.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public static function forget_all(): void {
-        self::store()->flush_namespace();
-    }
+	/**
+	 * Invalidate cached metadata for every attachment.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public static function forget_all(): void {
+		self::store()->flush_namespace();
+	}
 
-    /**
-     * Logical cache key for one attachment.
-     *
-     * @since 1.0.0
-     * @param int $attachment_id Attachment ID.
-     * @return string
-     */
-    private static function item_key( int $attachment_id ): string {
-        return 'item_' . $attachment_id;
-    }
+	/**
+	 * Logical cache key for one attachment.
+	 *
+	 * @since 1.0.0
+	 * @param int $attachment_id Attachment ID.
+	 * @return string
+	 */
+	private static function item_key( int $attachment_id ): string {
+		return 'item_' . $attachment_id;
+	}
 }

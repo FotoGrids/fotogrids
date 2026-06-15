@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -19,11 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Filters_Maintenance {
 
-    /**
-     * Option keys preserved through an options reset.
-     *
-     * @since 1.0.0
-     * @param string[] $defaults Preserved keys.
-     */
-    public const RESET_OPTIONS_PRESERVE_KEYS = 'fotogrids/maintenance/reset_options/preserve_keys';
+	/**
+	 * Option keys preserved through an options reset.
+	 *
+	 * @since 1.0.0
+	 * @param string[] $defaults Preserved keys.
+	 */
+	public const RESET_OPTIONS_PRESERVE_KEYS = 'fotogrids/maintenance/reset_options/preserve_keys';
 }

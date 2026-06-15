@@ -2,7 +2,7 @@
 namespace FotoGrids;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -12,372 +12,372 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Post_Types {
 
-    /**
-     * Initialize the class
-     */
-    public static function init() {
-        add_action( 'init', array( __CLASS__, 'register_cpts' ) );
-        add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
-        add_action( 'add_meta_boxes', array( __CLASS__, 'hide_featured_image_metabox' ), 99 );
+	/**
+	 * Initialize the class
+	 */
+	public static function init() {
+		add_action( 'init', array( __CLASS__, 'register_cpts' ) );
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
+		add_action( 'add_meta_boxes', array( __CLASS__, 'hide_featured_image_metabox' ), 99 );
 
-        add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
-    }
+		add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
+	}
 
-    /**
-     * Hide the native WordPress Featured Image metabox for FotoGrids CPTs.
-     *
-     * The gallery CPT declares 'thumbnail' support so that `_thumbnail_id`
-     * is a first-class field (read by `get_post_thumbnail_id()` from REST
-     * handlers, statistics, OG, etc.), but the user-facing way to choose
-     * the cover is the in-metabox "Featured Item" star picker on each
-     * gallery item — not the generic media-library Featured Image picker.
-     * Showing both pickers would confuse users.
-     *
-     * Albums don't declare 'thumbnail' support (their cover is resolved
-     * at runtime from the chosen child gallery), so this is a no-op for
-     * them — included for safety in case that ever changes.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public static function hide_featured_image_metabox() {
-        remove_meta_box( 'postimagediv', 'fotogrids_gallery', 'side' );
-        remove_meta_box( 'postimagediv', 'fotogrids_album', 'side' );
-    }
+	/**
+	 * Hide the native WordPress Featured Image metabox for FotoGrids CPTs.
+	 *
+	 * The gallery CPT declares 'thumbnail' support so that `_thumbnail_id`
+	 * is a first-class field (read by `get_post_thumbnail_id()` from REST
+	 * handlers, statistics, OG, etc.), but the user-facing way to choose
+	 * the cover is the in-metabox "Featured Item" star picker on each
+	 * gallery item — not the generic media-library Featured Image picker.
+	 * Showing both pickers would confuse users.
+	 *
+	 * Albums don't declare 'thumbnail' support (their cover is resolved
+	 * at runtime from the chosen child gallery), so this is a no-op for
+	 * them — included for safety in case that ever changes.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public static function hide_featured_image_metabox() {
+		remove_meta_box( 'postimagediv', 'fotogrids_gallery', 'side' );
+		remove_meta_box( 'postimagediv', 'fotogrids_album', 'side' );
+	}
 
-    /**
-     * Register custom post types
-     *
-     * Registers both Gallery and Album custom post types with their
-     * respective labels, capabilities, and settings.
-     *
-     * @since 1.0.0
-     */
-    public static function register_cpts() {
-        self::register_gallery_cpt();
+	/**
+	 * Register custom post types
+	 *
+	 * Registers both Gallery and Album custom post types with their
+	 * respective labels, capabilities, and settings.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function register_cpts() {
+		self::register_gallery_cpt();
 
-        self::register_album_cpt();
+		self::register_album_cpt();
 
-        self::register_embed_cpt();
-    }
+		self::register_embed_cpt();
+	}
 
-    /**
-     * Register Gallery Custom Post Type
-     *
-     * Creates the fotogrids_gallery post type with appropriate labels,
-     * capabilities, and REST API support. Post type is private but
-     * accessible through the admin interface.
-     *
-     * @since 1.0.0
-     */
-    private static function register_gallery_cpt() {
-        $labels = array(
-            'name'                  => _x( 'Galleries', 'Post type general name', 'fotogrids' ),
-            'singular_name'         => _x( 'Gallery', 'Post type singular name', 'fotogrids' ),
-            'menu_name'             => _x( 'Galleries', 'Admin Menu text', 'fotogrids' ),
-            'name_admin_bar'        => _x( 'Gallery', 'Add New on Toolbar', 'fotogrids' ),
-            'add_new'               => __( 'Add New', 'fotogrids' ),
-            'add_new_item'          => __( 'Add New Gallery', 'fotogrids' ),
-            'new_item'              => __( 'New Gallery', 'fotogrids' ),
-            'edit_item'             => __( 'Edit Gallery', 'fotogrids' ),
-            'view_item'             => __( 'View Gallery', 'fotogrids' ),
-            'all_items'             => __( 'All Galleries', 'fotogrids' ),
-            'search_items'          => __( 'Search Galleries', 'fotogrids' ),
-            'parent_item_colon'     => __( 'Parent Galleries:', 'fotogrids' ),
-            'not_found'             => __( 'No galleries found.', 'fotogrids' ),
-            'not_found_in_trash'    => __( 'No galleries found in Trash.', 'fotogrids' ),
-            'featured_item'        => _x( 'Gallery Featured Item', 'Overrides the "Featured Item" phrase', 'fotogrids' ),
-            'set_featured_item'    => _x( 'Set featured item', 'Overrides the "Set featured item" phrase', 'fotogrids' ),
-            'remove_featured_item' => _x( 'Remove featured item', 'Overrides the "Remove featured item" phrase', 'fotogrids' ),
-            'use_featured_item'    => _x( 'Use as featured item', 'Overrides the "Use as featured item" phrase', 'fotogrids' ),
-            'archives'              => _x( 'Gallery archives', 'The post type archive label', 'fotogrids' ),
-            'insert_into_item'      => _x( 'Insert into gallery', 'Overrides the "Insert into post" phrase', 'fotogrids' ),
-            'uploaded_to_this_item' => _x( 'Uploaded to this gallery', 'Overrides the "Uploaded to this post" phrase', 'fotogrids' ),
-            'filter_items_list'     => _x( 'Filter galleries list', 'Screen reader text for the filter links', 'fotogrids' ),
-            'items_list_navigation' => _x( 'Galleries list navigation', 'Screen reader text for the pagination', 'fotogrids' ),
-            'items_list'            => _x( 'Galleries list', 'Screen reader text for the items list', 'fotogrids' ),
-        );
+	/**
+	 * Register Gallery Custom Post Type
+	 *
+	 * Creates the fotogrids_gallery post type with appropriate labels,
+	 * capabilities, and REST API support. Post type is private but
+	 * accessible through the admin interface.
+	 *
+	 * @since 1.0.0
+	 */
+	private static function register_gallery_cpt() {
+		$labels = array(
+			'name'                  => _x( 'Galleries', 'Post type general name', 'fotogrids' ),
+			'singular_name'         => _x( 'Gallery', 'Post type singular name', 'fotogrids' ),
+			'menu_name'             => _x( 'Galleries', 'Admin Menu text', 'fotogrids' ),
+			'name_admin_bar'        => _x( 'Gallery', 'Add New on Toolbar', 'fotogrids' ),
+			'add_new'               => __( 'Add New', 'fotogrids' ),
+			'add_new_item'          => __( 'Add New Gallery', 'fotogrids' ),
+			'new_item'              => __( 'New Gallery', 'fotogrids' ),
+			'edit_item'             => __( 'Edit Gallery', 'fotogrids' ),
+			'view_item'             => __( 'View Gallery', 'fotogrids' ),
+			'all_items'             => __( 'All Galleries', 'fotogrids' ),
+			'search_items'          => __( 'Search Galleries', 'fotogrids' ),
+			'parent_item_colon'     => __( 'Parent Galleries:', 'fotogrids' ),
+			'not_found'             => __( 'No galleries found.', 'fotogrids' ),
+			'not_found_in_trash'    => __( 'No galleries found in Trash.', 'fotogrids' ),
+			'featured_item'         => _x( 'Gallery Featured Item', 'Overrides the "Featured Item" phrase', 'fotogrids' ),
+			'set_featured_item'     => _x( 'Set featured item', 'Overrides the "Set featured item" phrase', 'fotogrids' ),
+			'remove_featured_item'  => _x( 'Remove featured item', 'Overrides the "Remove featured item" phrase', 'fotogrids' ),
+			'use_featured_item'     => _x( 'Use as featured item', 'Overrides the "Use as featured item" phrase', 'fotogrids' ),
+			'archives'              => _x( 'Gallery archives', 'The post type archive label', 'fotogrids' ),
+			'insert_into_item'      => _x( 'Insert into gallery', 'Overrides the "Insert into post" phrase', 'fotogrids' ),
+			'uploaded_to_this_item' => _x( 'Uploaded to this gallery', 'Overrides the "Uploaded to this post" phrase', 'fotogrids' ),
+			'filter_items_list'     => _x( 'Filter galleries list', 'Screen reader text for the filter links', 'fotogrids' ),
+			'items_list_navigation' => _x( 'Galleries list navigation', 'Screen reader text for the pagination', 'fotogrids' ),
+			'items_list'            => _x( 'Galleries list', 'Screen reader text for the items list', 'fotogrids' ),
+		);
 
-        $args = array(
-            'labels'                => $labels,
-            'public'                => false,
-            // The View Collections module may override publicly_queryable and
-            // rewrite via the register_post_type_args filter.
-            'publicly_queryable'    => false,
-            'show_ui'               => true,
-            'show_in_menu'          => false,
-            'query_var'             => true,
-            'rewrite'               => array( 'slug' => 'fotogrids-gallery' ),
-            'capability_type'       => array( 'fotogrids_gallery', 'fotogrids_galleries' ),
-            'map_meta_cap'          => true,
-            'has_archive'           => false,
-            'hierarchical'          => false,
-            'menu_position'         => null,
-            'menu_icon'             => 'dashicons-format-gallery',
-            // 'title'    — gallery name shown in lists and as the page <title>.
-            // 'thumbnail' — backs the Featured Item picker via WP-native
-            //               `_thumbnail_id`. The native Featured Image
-            //               metabox is hidden in `hide_featured_image_metabox()`.
-            // 'excerpt'  — backs the `og:description` fallback chain. The
-            //               native Excerpt metabox renders below the title
-            //               unless the user has hidden it via Screen Options.
-            'supports'              => array( 'title', 'thumbnail', 'excerpt' ),
-            'show_in_rest'          => true,
-            'rest_base'             => 'fotogrids-galleries',
-            'rest_controller_class' => 'WP_REST_Posts_Controller',
-        );
+		$args = array(
+			'labels'                => $labels,
+			'public'                => false,
+			// The View Collections module may override publicly_queryable and
+			// rewrite via the register_post_type_args filter.
+			'publicly_queryable'    => false,
+			'show_ui'               => true,
+			'show_in_menu'          => false,
+			'query_var'             => true,
+			'rewrite'               => array( 'slug' => 'fotogrids-gallery' ),
+			'capability_type'       => array( 'fotogrids_gallery', 'fotogrids_galleries' ),
+			'map_meta_cap'          => true,
+			'has_archive'           => false,
+			'hierarchical'          => false,
+			'menu_position'         => null,
+			'menu_icon'             => 'dashicons-format-gallery',
+			// 'title'    — gallery name shown in lists and as the page <title>.
+			// 'thumbnail' — backs the Featured Item picker via WP-native
+			//               `_thumbnail_id`. The native Featured Image
+			//               metabox is hidden in `hide_featured_image_metabox()`.
+			// 'excerpt'  — backs the `og:description` fallback chain. The
+			//               native Excerpt metabox renders below the title
+			//               unless the user has hidden it via Screen Options.
+			'supports'              => array( 'title', 'thumbnail', 'excerpt' ),
+			'show_in_rest'          => true,
+			'rest_base'             => 'fotogrids-galleries',
+			'rest_controller_class' => 'WP_REST_Posts_Controller',
+		);
 
-        register_post_type( 'fotogrids_gallery', $args );
-    }
+		register_post_type( 'fotogrids_gallery', $args );
+	}
 
-    /**
-     * Register Album Custom Post Type
-     *
-     * Creates the fotogrids_album post type with appropriate labels,
-     * capabilities, and REST API support. Albums serve as containers
-     * for organizing multiple galleries.
-     *
-     * @since 1.0.0
-     */
-    private static function register_album_cpt() {
-        $labels = array(
-            'name'                  => _x( 'Albums', 'Post type general name', 'fotogrids' ),
-            'singular_name'         => _x( 'Album', 'Post type singular name', 'fotogrids' ),
-            'menu_name'             => _x( 'Albums', 'Admin Menu text', 'fotogrids' ),
-            'name_admin_bar'        => _x( 'Album', 'Add New on Toolbar', 'fotogrids' ),
-            'add_new'               => __( 'Add New', 'fotogrids' ),
-            'add_new_item'          => __( 'Add New Album', 'fotogrids' ),
-            'new_item'              => __( 'New Album', 'fotogrids' ),
-            'edit_item'             => __( 'Edit Album', 'fotogrids' ),
-            'view_item'             => __( 'View Album', 'fotogrids' ),
-            'all_items'             => __( 'All Albums', 'fotogrids' ),
-            'search_items'          => __( 'Search Albums', 'fotogrids' ),
-            'parent_item_colon'     => __( 'Parent Albums:', 'fotogrids' ),
-            'not_found'             => __( 'No albums found.', 'fotogrids' ),
-            'not_found_in_trash'    => __( 'No albums found in Trash.', 'fotogrids' ),
-            'featured_item'        => _x( 'Album Featured Item', 'Overrides the "Featured Item" phrase', 'fotogrids' ),
-            'set_featured_item'    => _x( 'Set featured item', 'Overrides the "Set featured item" phrase', 'fotogrids' ),
-            'remove_featured_item' => _x( 'Remove featured item', 'Overrides the "Remove featured item" phrase', 'fotogrids' ),
-            'use_featured_item'    => _x( 'Use as featured item', 'Overrides the "Use as featured item" phrase', 'fotogrids' ),
-            'archives'              => _x( 'Album archives', 'The post type archive label', 'fotogrids' ),
-            'insert_into_item'      => _x( 'Insert into album', 'Overrides the "Insert into post" phrase', 'fotogrids' ),
-            'uploaded_to_this_item' => _x( 'Uploaded to this album', 'Overrides the "Uploaded to this post" phrase', 'fotogrids' ),
-            'filter_items_list'     => _x( 'Filter albums list', 'Screen reader text for the filter links', 'fotogrids' ),
-            'items_list_navigation' => _x( 'Albums list navigation', 'Screen reader text for the pagination', 'fotogrids' ),
-            'items_list'            => _x( 'Albums list', 'Screen reader text for the items list', 'fotogrids' ),
-        );
+	/**
+	 * Register Album Custom Post Type
+	 *
+	 * Creates the fotogrids_album post type with appropriate labels,
+	 * capabilities, and REST API support. Albums serve as containers
+	 * for organizing multiple galleries.
+	 *
+	 * @since 1.0.0
+	 */
+	private static function register_album_cpt() {
+		$labels = array(
+			'name'                  => _x( 'Albums', 'Post type general name', 'fotogrids' ),
+			'singular_name'         => _x( 'Album', 'Post type singular name', 'fotogrids' ),
+			'menu_name'             => _x( 'Albums', 'Admin Menu text', 'fotogrids' ),
+			'name_admin_bar'        => _x( 'Album', 'Add New on Toolbar', 'fotogrids' ),
+			'add_new'               => __( 'Add New', 'fotogrids' ),
+			'add_new_item'          => __( 'Add New Album', 'fotogrids' ),
+			'new_item'              => __( 'New Album', 'fotogrids' ),
+			'edit_item'             => __( 'Edit Album', 'fotogrids' ),
+			'view_item'             => __( 'View Album', 'fotogrids' ),
+			'all_items'             => __( 'All Albums', 'fotogrids' ),
+			'search_items'          => __( 'Search Albums', 'fotogrids' ),
+			'parent_item_colon'     => __( 'Parent Albums:', 'fotogrids' ),
+			'not_found'             => __( 'No albums found.', 'fotogrids' ),
+			'not_found_in_trash'    => __( 'No albums found in Trash.', 'fotogrids' ),
+			'featured_item'         => _x( 'Album Featured Item', 'Overrides the "Featured Item" phrase', 'fotogrids' ),
+			'set_featured_item'     => _x( 'Set featured item', 'Overrides the "Set featured item" phrase', 'fotogrids' ),
+			'remove_featured_item'  => _x( 'Remove featured item', 'Overrides the "Remove featured item" phrase', 'fotogrids' ),
+			'use_featured_item'     => _x( 'Use as featured item', 'Overrides the "Use as featured item" phrase', 'fotogrids' ),
+			'archives'              => _x( 'Album archives', 'The post type archive label', 'fotogrids' ),
+			'insert_into_item'      => _x( 'Insert into album', 'Overrides the "Insert into post" phrase', 'fotogrids' ),
+			'uploaded_to_this_item' => _x( 'Uploaded to this album', 'Overrides the "Uploaded to this post" phrase', 'fotogrids' ),
+			'filter_items_list'     => _x( 'Filter albums list', 'Screen reader text for the filter links', 'fotogrids' ),
+			'items_list_navigation' => _x( 'Albums list navigation', 'Screen reader text for the pagination', 'fotogrids' ),
+			'items_list'            => _x( 'Albums list', 'Screen reader text for the items list', 'fotogrids' ),
+		);
 
-        $args = array(
-            'labels'                => $labels,
-            'public'                => false,
-            // The View Collections module may override publicly_queryable and
-            // rewrite via the register_post_type_args filter.
-            'publicly_queryable'    => false,
-            'show_ui'               => true,
-            'show_in_menu'          => false,
-            'query_var'             => true,
-            'rewrite'               => array( 'slug' => 'fotogrids-album' ),
-            'capability_type'       => array( 'fotogrids_album', 'fotogrids_albums' ),
-            'map_meta_cap'          => true,
-            'has_archive'           => false,
-            'hierarchical'          => false,
-            'menu_position'         => null,
-            'menu_icon'             => 'dashicons-album',
-            // 'title'   — album name shown in lists and as the page <title>.
-            // 'excerpt' — backs the `og:description` fallback chain for albums.
-            // Albums intentionally do NOT declare 'thumbnail' support — the
-            // album cover is resolved at runtime from the Featured Gallery
-            // (see `Cover_Resolver::for_album()`), not stored
-            // as a native `_thumbnail_id` on the album post.
-            'supports'              => array( 'title', 'excerpt' ),
-            'show_in_rest'          => true,
-            'rest_base'             => 'fotogrids-albums',
-            'rest_controller_class' => 'WP_REST_Posts_Controller',
-        );
+		$args = array(
+			'labels'                => $labels,
+			'public'                => false,
+			// The View Collections module may override publicly_queryable and
+			// rewrite via the register_post_type_args filter.
+			'publicly_queryable'    => false,
+			'show_ui'               => true,
+			'show_in_menu'          => false,
+			'query_var'             => true,
+			'rewrite'               => array( 'slug' => 'fotogrids-album' ),
+			'capability_type'       => array( 'fotogrids_album', 'fotogrids_albums' ),
+			'map_meta_cap'          => true,
+			'has_archive'           => false,
+			'hierarchical'          => false,
+			'menu_position'         => null,
+			'menu_icon'             => 'dashicons-album',
+			// 'title'   — album name shown in lists and as the page <title>.
+			// 'excerpt' — backs the `og:description` fallback chain for albums.
+			// Albums intentionally do NOT declare 'thumbnail' support — the
+			// album cover is resolved at runtime from the Featured Gallery
+			// (see `Cover_Resolver::for_album()`), not stored
+			// as a native `_thumbnail_id` on the album post.
+			'supports'              => array( 'title', 'excerpt' ),
+			'show_in_rest'          => true,
+			'rest_base'             => 'fotogrids-albums',
+			'rest_controller_class' => 'WP_REST_Posts_Controller',
+		);
 
-        register_post_type( 'fotogrids_album', $args );
-    }
+		register_post_type( 'fotogrids_album', $args );
+	}
 
-    /**
-     * Register Embed Custom Post Type
-     *
-     * Creates the fotogrids_embed post type used to represent virtual video
-     * embed items (YouTube / Vimeo). Embeds are real posts so their IDs can
-     * live in a gallery's item list alongside attachment IDs (post IDs are
-     * globally unique, so there is no collision), which lets them participate
-     * in manual ordering and sorting exactly like attachments.
-     *
-     * The type has no admin UI of its own — embeds are created, edited, and
-     * deleted entirely through the gallery items metabox. It declares 'title'
-     * (the caption) and 'thumbnail' (the custom poster via _thumbnail_id).
-     *
-     * @since 1.1.0
-     */
-    private static function register_embed_cpt() {
-        $args = array(
-            'labels'              => array(
-                'name'          => _x( 'Video Embeds', 'Post type general name', 'fotogrids' ),
-                'singular_name' => _x( 'Video Embed', 'Post type singular name', 'fotogrids' ),
-            ),
-            'public'              => false,
-            'publicly_queryable'  => false,
-            'show_ui'             => false,
-            'show_in_menu'        => false,
-            'show_in_nav_menus'   => false,
-            'show_in_admin_bar'   => false,
-            'exclude_from_search' => true,
-            'query_var'           => false,
-            'rewrite'             => false,
-            // Embeds have no admin screen and are created only through the
-            // gallery items REST endpoints, which already gate on
-            // `manage_fotogrids`. The CPT itself uses standard 'post'
-            // capabilities (which admins and editors already hold) so embed
-            // posts can be written without remapping caps — remapping primitive
-            // caps to `manage_fotogrids` interferes with map_meta_cap when that
-            // capability is itself checked.
-            'capability_type'     => 'post',
-            'map_meta_cap'        => true,
-            'has_archive'         => false,
-            'hierarchical'        => false,
-            // 'title'     — the embed caption.
-            // 'thumbnail' — backs the custom poster via WP-native _thumbnail_id.
-            'supports'            => array( 'title', 'thumbnail' ),
-            'show_in_rest'        => false,
-        );
+	/**
+	 * Register Embed Custom Post Type
+	 *
+	 * Creates the fotogrids_embed post type used to represent virtual video
+	 * embed items (YouTube / Vimeo). Embeds are real posts so their IDs can
+	 * live in a gallery's item list alongside attachment IDs (post IDs are
+	 * globally unique, so there is no collision), which lets them participate
+	 * in manual ordering and sorting exactly like attachments.
+	 *
+	 * The type has no admin UI of its own — embeds are created, edited, and
+	 * deleted entirely through the gallery items metabox. It declares 'title'
+	 * (the caption) and 'thumbnail' (the custom poster via _thumbnail_id).
+	 *
+	 * @since 1.1.0
+	 */
+	private static function register_embed_cpt() {
+		$args = array(
+			'labels'              => array(
+				'name'          => _x( 'Video Embeds', 'Post type general name', 'fotogrids' ),
+				'singular_name' => _x( 'Video Embed', 'Post type singular name', 'fotogrids' ),
+			),
+			'public'              => false,
+			'publicly_queryable'  => false,
+			'show_ui'             => false,
+			'show_in_menu'        => false,
+			'show_in_nav_menus'   => false,
+			'show_in_admin_bar'   => false,
+			'exclude_from_search' => true,
+			'query_var'           => false,
+			'rewrite'             => false,
+			// Embeds have no admin screen and are created only through the
+			// gallery items REST endpoints, which already gate on
+			// `manage_fotogrids`. The CPT itself uses standard 'post'
+			// capabilities (which admins and editors already hold) so embed
+			// posts can be written without remapping caps — remapping primitive
+			// caps to `manage_fotogrids` interferes with map_meta_cap when that
+			// capability is itself checked.
+			'capability_type'     => 'post',
+			'map_meta_cap'        => true,
+			'has_archive'         => false,
+			'hierarchical'        => false,
+			// 'title'     — the embed caption.
+			// 'thumbnail' — backs the custom poster via WP-native _thumbnail_id.
+			'supports'            => array( 'title', 'thumbnail' ),
+			'show_in_rest'        => false,
+		);
 
-        register_post_type( 'fotogrids_embed', $args );
-    }
+		register_post_type( 'fotogrids_embed', $args );
+	}
 
-    /**
-     * Add meta boxes to post edit screens
-     *
-     * Registers meta boxes for both gallery and album post types.
-     * Gallery meta boxes include shortcode display, while album meta boxes
-     * include gallery management, settings, and shortcode display.
-     *
-     * @since 1.0.0
-     */
-    public static function add_meta_boxes() {
-        global $post;
+	/**
+	 * Add meta boxes to post edit screens
+	 *
+	 * Registers meta boxes for both gallery and album post types.
+	 * Gallery meta boxes include shortcode display, while album meta boxes
+	 * include gallery management, settings, and shortcode display.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function add_meta_boxes() {
+		global $post;
 
-        $is_saved = $post && $post->ID > 0 && $post->post_status !== 'auto-draft';
+		$is_saved = $post && $post->ID > 0 && 'auto-draft' !== $post->post_status;
 
-        if ( $is_saved ) {
-            add_meta_box(
-                'fotogrids_gallery_shortcode',
-                __( 'Gallery Shortcode', 'fotogrids' ),
-                array( __CLASS__, 'shortcode_meta_box' ),
-                'fotogrids_gallery',
-                'side',
-                'high'
-            );
+		if ( $is_saved ) {
+			add_meta_box(
+				'fotogrids_gallery_shortcode',
+				__( 'Gallery Shortcode', 'fotogrids' ),
+				array( __CLASS__, 'shortcode_meta_box' ),
+				'fotogrids_gallery',
+				'side',
+				'high'
+			);
 
-            add_meta_box(
-                'fotogrids_album_shortcode',
-                __( 'Album Shortcode', 'fotogrids' ),
-                array( __CLASS__, 'shortcode_meta_box' ),
-                'fotogrids_album',
-                'side',
-                'high'
-            );
-        }
+			add_meta_box(
+				'fotogrids_album_shortcode',
+				__( 'Album Shortcode', 'fotogrids' ),
+				array( __CLASS__, 'shortcode_meta_box' ),
+				'fotogrids_album',
+				'side',
+				'high'
+			);
+		}
 
-        add_meta_box(
-            'fotogrids_album_galleries',
-            __( 'Galleries', 'fotogrids' ),
-            array( __CLASS__, 'album_galleries_meta_box' ),
-            'fotogrids_album',
-            'normal',
-            'high'
-        );
-    }
+		add_meta_box(
+			'fotogrids_album_galleries',
+			__( 'Galleries', 'fotogrids' ),
+			array( __CLASS__, 'album_galleries_meta_box' ),
+			'fotogrids_album',
+			'normal',
+			'high'
+		);
+	}
 
 
-    /**
-     * Shared shortcode meta box callback
-     *
-     * Displays the appropriate shortcode for both galleries and albums.
-     * Shown for any saved post status (draft, publish, pending, etc.) so users
-     * can copy the shortcode as soon as the post has been saved once.
-     * Determines the post type and generates the correct shortcode format.
-     * Includes copy functionality for easy shortcode usage.
-     *
-     * @since 1.0.0
-     *
-     * @param WP_Post $post The post object
-     */
-    public static function shortcode_meta_box( $post ) {
-        $post_id   = (int) $post->ID;
-        $post_type = get_post_type( $post );
+	/**
+	 * Shared shortcode meta box callback
+	 *
+	 * Displays the appropriate shortcode for both galleries and albums.
+	 * Shown for any saved post status (draft, publish, pending, etc.) so users
+	 * can copy the shortcode as soon as the post has been saved once.
+	 * Determines the post type and generates the correct shortcode format.
+	 * Includes copy functionality for easy shortcode usage.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Post $post The post object
+	 */
+	public static function shortcode_meta_box( $post ) {
+		$post_id   = (int) $post->ID;
+		$post_type = get_post_type( $post );
 
-        if ( $post_type === 'fotogrids_gallery' ) {
-            $shortcode  = '[fotogrids_gallery id="' . $post_id . '"]';
-            $type_label = __( 'gallery', 'fotogrids' );
-        } else {
-            $shortcode  = '[fotogrids_album id="' . $post_id . '"]';
-            $type_label = __( 'album', 'fotogrids' );
-        }
+		if ( 'fotogrids_gallery' === $post_type ) {
+			$shortcode  = '[fotogrids_gallery id="' . $post_id . '"]';
+			$type_label = __( 'gallery', 'fotogrids' );
+		} else {
+			$shortcode  = '[fotogrids_album id="' . $post_id . '"]';
+			$type_label = __( 'album', 'fotogrids' );
+		}
 
-        ?>
-        <?php /* translators: %s: collection type label (gallery or album). */ ?>
-        <p class="fotogrids-shortcode-title"><?php printf( esc_html__( 'Use this shortcode to display the %s', 'fotogrids' ), esc_html( $type_label ) ); ?></p>
-        <div class="fotogrids-shortcode-container">
-            <input type="text" value="<?php echo esc_attr( $shortcode ); ?>"
-                readonly onclick="this.select();" class="fotogrids-shortcode-input" />
-            <button type="button" class="fg-button fg-button--outline fg-button--variant-primary fg-button--icon-only fotogrids-shortcode-copy"
-                data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
-                data-fg-tooltip="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>"
-                data-fg-tooltip-dir="below"
-                aria-label="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
-                <span class="fotogrids-icon" data-icon="clipboard"></span>
-            </button>
-        </div>
-        <?php if ( $post->post_status !== 'publish' ) : ?>
-        <p class="description"><?php esc_html_e( 'Publish to display on the frontend.', 'fotogrids' ); ?></p>
-        <?php endif; ?>
-        <?php
-    }
+		?>
+		<?php /* translators: %s: collection type label (gallery or album). */ ?>
+		<p class="fotogrids-shortcode-title"><?php printf( esc_html__( 'Use this shortcode to display the %s', 'fotogrids' ), esc_html( $type_label ) ); ?></p>
+		<div class="fotogrids-shortcode-container">
+			<input type="text" value="<?php echo esc_attr( $shortcode ); ?>"
+				readonly onclick="this.select();" class="fotogrids-shortcode-input" />
+			<button type="button" class="fg-button fg-button--outline fg-button--variant-primary fg-button--icon-only fotogrids-shortcode-copy"
+				data-shortcode="<?php echo esc_attr( $shortcode ); ?>"
+				data-fg-tooltip="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>"
+				data-fg-tooltip-dir="below"
+				aria-label="<?php esc_attr_e( 'Copy shortcode to clipboard', 'fotogrids' ); ?>">
+				<span class="fotogrids-icon" data-icon="clipboard"></span>
+			</button>
+		</div>
+		<?php if ( 'publish' !== $post->post_status ) : ?>
+		<p class="description"><?php esc_html_e( 'Publish to display on the frontend.', 'fotogrids' ); ?></p>
+		<?php endif; ?>
+		<?php
+	}
 
-    /**
-     * Album galleries meta box callback
-     *
-     * Renders the React component container for managing gallery assignments
-     * within an album. The actual functionality is handled by the React component.
-     *
-     * @since 1.0.0
-     *
-     * @param WP_Post $post The album post object
-     */
-    public static function album_galleries_meta_box( $post ) {
-        wp_nonce_field( 'fotogrids_album_galleries', 'fotogrids_album_galleries_nonce' );
+	/**
+	 * Album galleries meta box callback
+	 *
+	 * Renders the React component container for managing gallery assignments
+	 * within an album. The actual functionality is handled by the React component.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Post $post The album post object
+	 */
+	public static function album_galleries_meta_box( $post ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		wp_nonce_field( 'fotogrids_album_galleries', 'fotogrids_album_galleries_nonce' );
 
-        ?>
-        <div id="fotogrids-album-galleries-root">
-            <div class="fotogrids-loading">
-                <span class="spinner fg-is-active"></span>
-                <?php esc_html_e( 'Loading gallery manager...', 'fotogrids' ); ?>
-            </div>
-        </div>
-        <?php
-    }
+		?>
+		<div id="fotogrids-album-galleries-root">
+			<div class="fotogrids-loading">
+				<span class="spinner fg-is-active"></span>
+				<?php esc_html_e( 'Loading gallery manager...', 'fotogrids' ); ?>
+			</div>
+		</div>
+		<?php
+	}
 
-    /**
-     * Disable Gutenberg block editor for FotoGrids post types
-     *
-     * Prevents the block editor from being used on FotoGrids custom post types
-     * since they use custom meta boxes and React components for content management.
-     *
-     * @since 1.0.0
-     *
-     * @param bool   $current_status Current block editor status
-     * @param string $post_type      Post type being checked
-     * @return bool Whether to use block editor
-     */
-    public static function disable_gutenberg( $current_status, $post_type ) {
-        if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' ) ) ) {
-            return false;
-        }
+	/**
+	 * Disable Gutenberg block editor for FotoGrids post types
+	 *
+	 * Prevents the block editor from being used on FotoGrids custom post types
+	 * since they use custom meta boxes and React components for content management.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool   $current_status Current block editor status
+	 * @param string $post_type      Post type being checked
+	 * @return bool Whether to use block editor
+	 */
+	public static function disable_gutenberg( $current_status, $post_type ) {
+		if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' ), true ) ) {
+			return false;
+		}
 
-        return $current_status;
-    }
+		return $current_status;
+	}
 }

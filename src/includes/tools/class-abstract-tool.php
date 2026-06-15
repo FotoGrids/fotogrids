@@ -118,7 +118,7 @@ abstract class Abstract_Tool implements Tool_Interface {
 			wp_enqueue_script(
 				'fotogrids-tool-' . $this->get_id(),
 				$script_url,
-				[ 'wp-element', 'wp-i18n', 'wp-api-fetch', 'fotogrids-admin' ],
+				array( 'wp-element', 'wp-i18n', 'wp-api-fetch', 'fotogrids-admin' ),
 				$version,
 				true // Load in footer - fotogrids-admin and the DOM are ready.
 			);
@@ -131,7 +131,7 @@ abstract class Abstract_Tool implements Tool_Interface {
 			wp_enqueue_style(
 				'fotogrids-tool-' . $this->get_id(),
 				$style_url,
-				[ 'fotogrids-admin' ],
+				array( 'fotogrids-admin' ),
 				$version
 			);
 		}

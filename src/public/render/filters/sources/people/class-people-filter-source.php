@@ -6,7 +6,7 @@ namespace FotoGrids\Render\Filters\Sources\People;
 use FotoGrids\Render\Filters\Sources\Metadata_Filter_Source;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -23,27 +23,27 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class People_Filter_Source extends Metadata_Filter_Source {
 
-    public function id(): string {
-        return 'fotogrids/filter/people';
-    }
+	public function id(): string {
+		return 'fotogrids/filter/people';
+	}
 
-    public function item_data_attr_key(): string {
-        return 'data-fg-people';
-    }
+	public function item_data_attr_key(): string {
+		return 'data-fg-people';
+	}
 
-    public function filter_arg_key(): string {
-        return 'people';
-    }
+	public function filter_arg_key(): string {
+		return 'people';
+	}
 
-    protected function filter_by_token(): string {
-        return 'people';
-    }
+	protected function filter_by_token(): string {
+		return 'people';
+	}
 
-    protected function metadata_type(): string {
-        return 'person';
-    }
+	protected function metadata_type(): string {
+		return 'person';
+	}
 
-    protected function group_label_string(): string {
-        return __( 'People', 'fotogrids' );
-    }
+	protected function group_label_string(): string {
+		return __( 'People', 'fotogrids' );
+	}
 }

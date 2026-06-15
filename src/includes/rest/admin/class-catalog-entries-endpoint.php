@@ -7,7 +7,7 @@ use FotoGrids\Catalog\Catalog;
 use FotoGrids\Catalog\Catalog_Assembler;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -27,60 +27,62 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Catalog_Entries_Endpoint {
 
-    /**
-     * Build the assembled settings tree response.
-     *
-     * @since   1.0.0
-     * @param   \WP_REST_Request $request Request object.
-     * @return  \WP_REST_Response
-     */
-    public static function get_entries( \WP_REST_Request $request ): \WP_REST_Response {
-        $post_type = sanitize_text_field( (string) ( $request->get_param( 'post_type' ) ?? 'gallery' ) );
-        if ( $post_type === 'fotogrids_gallery' ) {
-            $post_type = 'gallery';
-        } elseif ( $post_type === 'fotogrids_album' ) {
-            $post_type = 'album';
-        }
+	/**
+	 * Build the assembled settings tree response.
+	 *
+	 * @since   1.0.0
+	 * @param   \WP_REST_Request $request Request object.
+	 * @return  \WP_REST_Response
+	 */
+	public static function get_entries( \WP_REST_Request $request ): \WP_REST_Response {
+		$post_type = sanitize_text_field( (string) ( $request->get_param( 'post_type' ) ?? 'gallery' ) );
+		if ( 'fotogrids_gallery' === $post_type ) {
+			$post_type = 'gallery';
+		} elseif ( 'fotogrids_album' === $post_type ) {
+			$post_type = 'album';
+		}
 
-        $raw_files = Catalog::raw_files();
+		$raw_files = Catalog::raw_files();
 
-        $assembler = new Catalog_Assembler();
-        $assembly_result = $assembler->assemble( $raw_files );
+		$assembler       = new Catalog_Assembler();
+		$assembly_result = $assembler->assemble( $raw_files );
 
-        $tree = self::filter_tree_by_post_type( $assembly_result['tree'], $post_type );
+		$tree = self::filter_tree_by_post_type( $assembly_result['tree'], $post_type );
 
-        return rest_ensure_response( [
-            'groups'    => $tree,
-            'warnings'  => $assembly_result['warnings'],
-            'post_type' => $post_type,
-        ] );
-    }
+		return rest_ensure_response(
+			array(
+				'groups'    => $tree,
+				'warnings'  => $assembly_result['warnings'],
+				'post_type' => $post_type,
+			)
+		);
+	}
 
-    /**
-     * Drop top-level tabs whose `postTypes` array excludes the requested post type.
-     *
-     * The JS layer also applies per-setting and per-subtab postType filtering,
-     * but tab-level filtering happens server-side so we don't ship tabs the user
-     * can never see.
-     *
-     * @since   1.0.0
-     * @param   array<string, array<string, mixed>> $tree Assembled tree.
-     * @param   string                              $post_type Normalized post type slug.
-     * @return  array<string, array<string, mixed>>
-     */
-    private static function filter_tree_by_post_type( array $tree, string $post_type ): array {
-        $filtered = [];
+	/**
+	 * Drop top-level tabs whose `postTypes` array excludes the requested post type.
+	 *
+	 * The JS layer also applies per-setting and per-subtab postType filtering,
+	 * but tab-level filtering happens server-side so we don't ship tabs the user
+	 * can never see.
+	 *
+	 * @since   1.0.0
+	 * @param   array<string, array<string, mixed>> $tree Assembled tree.
+	 * @param   string                              $post_type Normalized post type slug.
+	 * @return  array<string, array<string, mixed>>
+	 */
+	private static function filter_tree_by_post_type( array $tree, string $post_type ): array {
+		$filtered = array();
 
-        foreach ( $tree as $tab_id => $tab_node ) {
-            $allowed_post_types = $tab_node['postTypes'] ?? null;
+		foreach ( $tree as $tab_id => $tab_node ) {
+			$allowed_post_types = $tab_node['postTypes'] ?? null;
 
-            if ( is_array( $allowed_post_types ) && ! in_array( $post_type, $allowed_post_types, true ) ) {
-                continue;
-            }
+			if ( is_array( $allowed_post_types ) && ! in_array( $post_type, $allowed_post_types, true ) ) {
+				continue;
+			}
 
-            $filtered[ $tab_id ] = $tab_node;
-        }
+			$filtered[ $tab_id ] = $tab_node;
+		}
 
-        return $filtered;
-    }
+		return $filtered;
+	}
 }

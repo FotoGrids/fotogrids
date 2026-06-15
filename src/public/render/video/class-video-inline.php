@@ -17,7 +17,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -33,85 +33,85 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Video_Inline implements Feature {
 
-    public function id(): string {
-        return 'fotogrids/video-inline';
-    }
+	public function id(): string {
+		return 'fotogrids/video-inline';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    /**
-     * Active for galleries whose video playback mode is inline, unless item
-     * clicks are disabled ('nothing', e.g. the page-builder "Make items
-     * clickable" toggle is off).
-     *
-     * @since 1.1.0
-     * @param Render_Context $render_context Render context.
-     * @return bool
-     */
-    public function supports( Render_Context $render_context ): bool {
-        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
-            return false;
-        }
+	/**
+	 * Active for galleries whose video playback mode is inline, unless item
+	 * clicks are disabled ('nothing', e.g. the page-builder "Make items
+	 * clickable" toggle is off).
+	 *
+	 * @since 1.1.0
+	 * @param Render_Context $render_context Render context.
+	 * @return bool
+	 */
+	public function supports( Render_Context $render_context ): bool {
+		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
+			return false;
+		}
 
-        if ( 'nothing' === $render_context->behavior->click_behavior ) {
-            return false;
-        }
+		if ( 'nothing' === $render_context->behavior->click_behavior ) {
+			return false;
+		}
 
-        $mode = $render_context->settings['video_playback_mode'] ?? 'inline';
-        return 'inline' === $mode;
-    }
+		$mode = $render_context->settings['video_playback_mode'] ?? 'inline';
+		return 'inline' === $mode;
+	}
 
-    public function html_before( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_before( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_appendix( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_after( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_after( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    /**
-     * Inline-playback CSS + JS.
-     *
-     * @since 1.1.0
-     * @param Render_Context $render_context Render context.
-     * @return Module_Assets
-     */
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets(
-            css: [
-                'fotogrids-video-inline' => new Asset_Decl(
-                    path: 'video/video-inline.css',
-                ),
-            ],
-            js: [
-                'fotogrids-video-inline' => new Asset_Decl(
-                    path:      '../../assets/js/video-inline.js',
-                    deps:      [ 'fotogrids-runtime' ],
-                    in_footer: true,
-                ),
-            ]
-        );
-    }
+	/**
+	 * Inline-playback CSS + JS.
+	 *
+	 * @since 1.1.0
+	 * @param Render_Context $render_context Render context.
+	 * @return Module_Assets
+	 */
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets(
+			css: array(
+				'fotogrids-video-inline' => new Asset_Decl(
+					path: 'video/video-inline.css',
+				),
+			),
+			js: array(
+				'fotogrids-video-inline' => new Asset_Decl(
+					path:      '../../assets/js/video-inline.js',
+					deps:      array( 'fotogrids-runtime' ),
+					in_footer: true,
+				),
+			)
+		);
+	}
 }

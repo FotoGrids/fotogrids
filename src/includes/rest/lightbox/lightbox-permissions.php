@@ -2,7 +2,7 @@
 namespace FotoGrids\REST\Lightbox;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -15,12 +15,12 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Lightbox_Permissions {
 
-    /**
-     * Public read - no authentication required.
-     *
-     * @return true
-     */
-    public static function check_lightbox_read(): bool {
-        return true;
-    }
+	/**
+	 * Public read - no authentication required.
+	 *
+	 * @return true
+	 */
+	public static function check_lightbox_read(): bool {
+		return true;
+	}
 }

@@ -10,7 +10,7 @@ use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Api\Setting_Helpers;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -21,61 +21,61 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Border_Radius implements Decorator {
 
-    use Setting_Helpers;
+	use Setting_Helpers;
 
-    public function id(): string {
-        return 'fotogrids/border-radius';
-    }
+	public function id(): string {
+		return 'fotogrids/border-radius';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    public function supports( Render_Context $render_context ): bool {
-        $border_radius = $render_context->settings['border_radius'] ?? [];
+	public function supports( Render_Context $render_context ): bool {
+		$border_radius = $render_context->settings['border_radius'] ?? array();
 
-        if ( ! is_array( $border_radius ) ) {
-            return false;
-        }
+		if ( ! is_array( $border_radius ) ) {
+			return false;
+		}
 
-        foreach ( [ 'desktop', 'tablet', 'mobile' ] as $breakpoint ) {
-            if ( $this->breakpoint_has_value( $border_radius[ $breakpoint ] ?? null ) ) {
-                return true;
-            }
-        }
+		foreach ( array( 'desktop', 'tablet', 'mobile' ) as $breakpoint ) {
+			if ( $this->breakpoint_has_value( $border_radius[ $breakpoint ] ?? null ) ) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public function decorate_items( array $collection_items, Render_Context $render_context ): array {
-        return $collection_items;
-    }
+	public function decorate_items( array $collection_items, Render_Context $render_context ): array {
+		return $collection_items;
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        $border_radius = $render_context->settings['border_radius'] ?? [];
+	public function style_vars( Render_Context $render_context ): array {
+		$border_radius = $render_context->settings['border_radius'] ?? array();
 
-        return [
-            '--fg-radius' => new Responsive_Var(
-                desktop: $this->resolve_four_sided_value( $border_radius, 'desktop', 'px' ),
-                tablet:  $this->resolve_four_sided_value( $border_radius, 'tablet',  'px' ),
-                mobile:  $this->resolve_four_sided_value( $border_radius, 'mobile',  'px' ),
-            ),
-        ];
-    }
+		return array(
+			'--fg-radius' => new Responsive_Var(
+				desktop: $this->resolve_four_sided_value( $border_radius, 'desktop', 'px' ),
+				tablet:  $this->resolve_four_sided_value( $border_radius, 'tablet', 'px' ),
+				mobile:  $this->resolve_four_sided_value( $border_radius, 'mobile', 'px' ),
+			),
+		);
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
-    }
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets();
+	}
 }

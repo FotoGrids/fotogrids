@@ -66,7 +66,7 @@ class FotoGrids_Cache {
 	 * @return \FotoGrids\Cache\Object_Cache
 	 */
 	private static function l1(): \FotoGrids\Cache\Object_Cache {
-		if ( self::$l1 === null ) {
+		if ( null === self::$l1 ) {
 			self::$l1 = new \FotoGrids\Cache\Object_Cache( self::OBJECT_CACHE_GROUP, self::OBJECT_CACHE_TTL );
 		}
 		return self::$l1;
@@ -83,13 +83,13 @@ class FotoGrids_Cache {
 	 * @return void
 	 */
 	public static function init(): void {
-		add_action( Actions_Item::ADDED,              [ __CLASS__, 'on_item_mutation' ],    10, 2 );
-		add_action( Actions_Item::REMOVED,            [ __CLASS__, 'on_item_mutation' ],    10, 2 );
-		add_action( Actions_Item::META_UPDATED,       [ __CLASS__, 'on_item_mutation' ],    10, 2 );
-		add_action( Actions_Gallery::REORDERED,       [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
-		add_action( Actions_Gallery::SETTINGS_SAVED,  [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
-		add_action( Actions_Gallery::DELETED,         [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
-		add_action( Actions_Gallery::IMPORTED,        [ __CLASS__, 'on_gallery_mutation' ], 10, 1 );
+		add_action( Actions_Item::ADDED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
+		add_action( Actions_Item::REMOVED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
+		add_action( Actions_Item::META_UPDATED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
+		add_action( Actions_Gallery::REORDERED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+		add_action( Actions_Gallery::IMPORTED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 	}
 
 	// -------------------------------------------------------------------------
@@ -137,7 +137,7 @@ class FotoGrids_Cache {
 	 */
 	public static function get( int $gallery_id, string $cache_key ) {
 		$l1 = self::l1()->get( $cache_key );
-		if ( $l1 !== false ) {
+		if ( false !== $l1 ) {
 			return self::decode_entry( (string) $l1 );
 		}
 
@@ -185,10 +185,11 @@ class FotoGrids_Cache {
 	public static function put( int $gallery_id, string $cache_key, string $html, array $css, array $js, int $duration_hours ): bool {
 		global $wpdb;
 
-		$payload    = self::encode_entry( $html, $css, $js );
-		$table      = $wpdb->prefix . 'fotogrids_render_cache';
-		$now        = current_time( 'mysql' );
-		$expires_at = gmdate( 'Y-m-d H:i:s', current_time( 'timestamp' ) + $duration_hours * HOUR_IN_SECONDS );
+		$payload = self::encode_entry( $html, $css, $js );
+		$table   = $wpdb->prefix . 'fotogrids_render_cache';
+		$now     = current_time( 'mysql' );
+		// Intentionally WP-local frame: expires_at is compared against current_time('mysql') (local) on read, so the write must match it.
+		$expires_at = gmdate( 'Y-m-d H:i:s', current_time( 'timestamp' ) + $duration_hours * HOUR_IN_SECONDS ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- local-frame TTL, see read-side comparisons.
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
@@ -203,11 +204,11 @@ class FotoGrids_Cache {
 			)
 		);
 
-		if ( $result !== false ) {
+		if ( false !== $result ) {
 			self::l1()->set( $cache_key, $payload );
 		}
 
-		return $result !== false;
+		return false !== $result;
 	}
 
 	/**
@@ -235,8 +236,11 @@ class FotoGrids_Cache {
 
 		$wpdb->delete(
 			$table,
-			[ 'object_type' => 'gallery', 'object_id' => $gallery_id ],
-			[ '%s', '%d' ]
+			array(
+				'object_type' => 'gallery',
+				'object_id'   => $gallery_id,
+			),
+			array( '%s', '%d' )
 		);
 
 		foreach ( (array) $keys as $key ) {
@@ -290,15 +294,15 @@ class FotoGrids_Cache {
 			)
 		);
 
-		if ( ! $row || (int) $row->entry_count === 0 ) {
+		if ( ! $row || (int) 0 === $row->entry_count ) {
 			return null;
 		}
 
-		return [
+		return array(
 			'cached_at'   => $row->cached_at,
 			'expires_at'  => $row->expires_at,
 			'entry_count' => (int) $row->entry_count,
-		];
+		);
 	}
 
 	/**
@@ -391,14 +395,17 @@ class FotoGrids_Cache {
 
 		$bucket = (string) apply_filters( Filters_Cache::BUCKET, 'default', $settings, $gallery_id );
 
-		$payload = implode( '|', [
-			$gallery_id,
-			FOTOGRIDS_VERSION,
-			$bucket,
-			md5( serialize( $cache_settings ) ),
-			implode( ',', $item_ids ),
-			md5( serialize( $atts ) ),
-		] );
+		$payload = implode(
+			'|',
+			array(
+				$gallery_id,
+				FOTOGRIDS_VERSION,
+				$bucket,
+				md5( serialize( $cache_settings ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Internal cache payload (own data); not unserializing untrusted input.
+				implode( ',', $item_ids ),
+				md5( serialize( $atts ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Internal cache payload (own data); not unserializing untrusted input.
+			)
+		);
 
 		return md5( $payload );
 	}
@@ -431,7 +438,14 @@ class FotoGrids_Cache {
 	 * @return string
 	 */
 	private static function encode_entry( string $html, array $css, array $js ): string {
-		return json_encode( [ 'html' => $html, 'css' => $css, 'js' => $js ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		return wp_json_encode(
+			array(
+				'html' => $html,
+				'css'  => $css,
+				'js'   => $js,
+			),
+			JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+		);
 	}
 
 	/**
@@ -447,14 +461,18 @@ class FotoGrids_Cache {
 	private static function decode_entry( string $stored ): array {
 		$decoded = json_decode( $stored, true );
 		if ( is_array( $decoded ) && isset( $decoded['html'] ) ) {
-			return [
+			return array(
 				'html' => (string) $decoded['html'],
-				'css'  => is_array( $decoded['css'] ?? null ) ? $decoded['css'] : [],
-				'js'   => is_array( $decoded['js'] ?? null ) ? $decoded['js'] : [],
-			];
+				'css'  => is_array( $decoded['css'] ?? null ) ? $decoded['css'] : array(),
+				'js'   => is_array( $decoded['js'] ?? null ) ? $decoded['js'] : array(),
+			);
 		}
 
-		return [ 'html' => $stored, 'css' => [], 'js' => [] ];
+		return array(
+			'html' => $stored,
+			'css'  => array(),
+			'js'   => array(),
+		);
 	}
 
 	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Api;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -14,7 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @since   1.0.0
  */
 enum Field_State: string {
-    case TEASER = 'teaser';
-    case LOCKED = 'locked';
-    case EDITABLE = 'editable';
+	case TEASER   = 'teaser';
+	case LOCKED   = 'locked';
+	case EDITABLE = 'editable';
 }

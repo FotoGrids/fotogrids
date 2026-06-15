@@ -71,26 +71,26 @@ final class Password_Crypto {
 	 * @return string            Encrypted value ready for post meta storage, or ''.
 	 */
 	public static function encrypt( string $plaintext ): string {
-		if ( $plaintext === '' ) {
+		if ( '' === $plaintext ) {
 			return '';
 		}
 
 		$key = self::derive_key();
-		if ( $key === '' ) {
+		if ( '' === $key ) {
 			return '';
 		}
 
 		$iv = openssl_random_pseudo_bytes( self::IV_LENGTH );
-		if ( $iv === false ) {
+		if ( false === $iv ) {
 			return '';
 		}
 
 		$ciphertext = openssl_encrypt( $plaintext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv );
-		if ( $ciphertext === false ) {
+		if ( false === $ciphertext ) {
 			return '';
 		}
 
-		return base64_encode( $iv . $ciphertext );
+		return base64_encode( $iv . $ciphertext ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Crypto routine: encoding ciphertext for storage.
 	}
 
 	/**
@@ -104,17 +104,17 @@ final class Password_Crypto {
 	 * @return string         Original plaintext password, or '' on failure.
 	 */
 	public static function decrypt( string $stored ): string {
-		if ( $stored === '' ) {
+		if ( '' === $stored ) {
 			return '';
 		}
 
 		$key = self::derive_key();
-		if ( $key === '' ) {
+		if ( '' === $key ) {
 			return '';
 		}
 
-		$raw = base64_decode( $stored, true );
-		if ( $raw === false || strlen( $raw ) <= self::IV_LENGTH ) {
+		$raw = base64_decode( $stored, true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Crypto routine: decoding stored ciphertext.
+		if ( false === $raw || strlen( $raw ) <= self::IV_LENGTH ) {
 			return '';
 		}
 
@@ -122,7 +122,7 @@ final class Password_Crypto {
 		$ciphertext = substr( $raw, self::IV_LENGTH );
 
 		$plaintext = openssl_decrypt( $ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv );
-		if ( $plaintext === false ) {
+		if ( false === $plaintext ) {
 			return '';
 		}
 
@@ -142,12 +142,12 @@ final class Password_Crypto {
 	 * @return bool              True if the password matches.
 	 */
 	public static function verify( string $submitted, string $stored ): bool {
-		if ( $submitted === '' || $stored === '' ) {
+		if ( '' === $submitted || '' === $stored ) {
 			return false;
 		}
 
 		$plaintext = self::decrypt( $stored );
-		if ( $plaintext === '' ) {
+		if ( '' === $plaintext ) {
 			return false;
 		}
 
@@ -172,13 +172,13 @@ final class Password_Crypto {
 	 * @return bool
 	 */
 	public static function is_encrypted( string $stored ): bool {
-		if ( $stored === '' ) {
+		if ( '' === $stored ) {
 			return false;
 		}
 
-		$raw = base64_decode( $stored, true );
+		$raw = base64_decode( $stored, true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Crypto routine: decoding stored ciphertext.
 		// Must decode cleanly and be longer than a bare IV.
-		return $raw !== false && strlen( $raw ) > self::IV_LENGTH;
+		return false !== $raw && strlen( $raw ) > self::IV_LENGTH;
 	}
 
 	/**
@@ -192,10 +192,10 @@ final class Password_Crypto {
 	 * @return string 32-byte raw key, or '' on failure.
 	 */
 	private static function derive_key(): string {
-		$auth_key        = defined( 'AUTH_KEY' )        ? AUTH_KEY        : '';
+		$auth_key        = defined( 'AUTH_KEY' ) ? AUTH_KEY : '';
 		$secure_auth_key = defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : '';
 
-		if ( $auth_key === '' && $secure_auth_key === '' ) {
+		if ( '' === $auth_key && '' === $secure_auth_key ) {
 			return '';
 		}
 

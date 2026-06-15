@@ -80,4 +80,72 @@
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound">
         <severity>0</severity>
     </rule>
+
+    <!--
+        Custom capabilities. FotoGrids registers its own capabilities in
+        class-activator.php (manage_fotogrids and friends, added to admin/
+        editor/author roles). The Capabilities sniff only knows WordPress core
+        capabilities, so it reports these real, registered ones as "Unknown".
+        Declaring them here teaches the sniff they are legitimate.
+    -->
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="manage_fotogrids"/>
+                <element value="manage_fotogrids_settings"/>
+                <element value="manage_fotogrids_library"/>
+                <element value="view_fotogrids_stats"/>
+                <element value="edit_fotogrids_galleries"/>
+                <element value="edit_fotogrids_albums"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        File-naming conventions. Two deliberate naming systems coexist here and
+        are documented in CLAUDE.md:
+          1. REST resources use the three-file pattern <resource>-data.php /
+             <resource>-permissions.php / register-<resource>-routes.php. These
+             files DO contain classes but are intentionally not class-*.php.
+          2. Namespaced modules use PSR-style Module.php / ModuleInterface.php.
+        WordPress.Files.FileName expects class-<kebab>.php for any file holding a
+        class, so it flags both systems. These are reviewed conventions, not
+        oversights, so the sniff is scoped off for those paths only.
+    -->
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+        <exclude-pattern>*/includes/rest/*</exclude-pattern>
+        <exclude-pattern>*/modules/*/rest/*</exclude-pattern>
+        <exclude-pattern>*/modules/*/Module.php</exclude-pattern>
+        <exclude-pattern>*/modules/*/*/Module.php</exclude-pattern>
+        <exclude-pattern>*/PageBuilders/*/Module.php</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+        <exclude-pattern>*/Module.php</exclude-pattern>
+    </rule>
+
+    <!--
+        Hook-name underscores. FotoGrids hook names are slash-namespaced
+        ('fotogrids/settings/defaults/gallery'), the same convention already
+        documented for DynamicHooknameFound above. ValidHookName wants
+        underscores; our slash style is intentional and consistent across the
+        hook catalogue in includes/hooks/.
+    -->
+    <rule ref="WordPress.NamingConventions.ValidHookName.UseUnderscores">
+        <severity>0</severity>
+    </rule>
+
+    <!--
+        Short ternary (?:). The simple-variable cases (e.g. $title ?: 'Untitled')
+        have been rewritten to the explicit $a ? $a : $b form. The remaining uses
+        all have a function/method call as the left operand (e.g.
+        get_post_meta(...) ?: 'grid', $request->get_json_params() ?: ...,
+        $wpdb->get_results(...) ?: array()). For those, the short ternary is the
+        CORRECT tool: expanding to $a ? $a : $b would evaluate the call twice
+        (re-running queries / REST parsing), and switching to ?? would change the
+        falsy-vs-null fallback semantics the code relies on. The sniff is
+        therefore suppressed as a reviewed, deliberate decision.
+    -->
+    <rule ref="Universal.Operators.DisallowShortTernary.Found">
+        <severity>0</severity>
+    </rule>
 </ruleset>

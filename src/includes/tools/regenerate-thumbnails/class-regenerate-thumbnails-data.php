@@ -14,20 +14,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Regenerate_Thumbnails_Data {
 
-    /*
-     * ---------------------------------------------------------------------
-     * PHPCS: WPDB direct-query sniffs disabled for this class.
-     * ---------------------------------------------------------------------
-     * This class is part of the FotoGrids custom-table data layer. Every
-     * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-     * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-     * WP placeholders cannot bind. All user-supplied *values* are passed
-     * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-     * a generated %d IN() list, the prepare call is a separate statement the
-     * sniff cannot follow. Custom tables have no WP_Query / core-API
-     * equivalent and no object-cache layer applies at this level.
-     * ---------------------------------------------------------------------
-     */
+	/*
+	 * ---------------------------------------------------------------------
+	 * PHPCS: WPDB direct-query sniffs disabled for this class.
+	 * ---------------------------------------------------------------------
+	 * This class is part of the FotoGrids custom-table data layer. Every
+	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
+	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
+	 * WP placeholders cannot bind. All user-supplied *values* are passed
+	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
+	 * a generated %d IN() list, the prepare call is a separate statement the
+	 * sniff cannot follow. Custom tables have no WP_Query / core-API
+	 * equivalent and no object-cache layer applies at this level.
+	 * ---------------------------------------------------------------------
+	 */
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
     // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
@@ -65,13 +65,13 @@ class Regenerate_Thumbnails_Data {
 		$per_page       = (int) ( $request->get_param( 'per_page' ) ?: self::PAGE_SIZE );
 		$per_page       = max( 1, min( 200, $per_page ) );
 
-		$plugin_sizes = [
+		$plugin_sizes = array(
 			\FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE,
 			\FotoGrids\Image_Size_Manager::SLUG_MASONRY,
 			\FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED,
-		];
+		);
 		$custom_sizes = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
 		$other_sizes  = self::get_other_registered_sizes( $plugin_sizes, $custom_sizes );
 
@@ -81,14 +81,14 @@ class Regenerate_Thumbnails_Data {
 
 		// Look up which attachment IDs are used in galleries so we can mark
 		// unused rows in the table when include_unused is on.
-		$used_ids = $include_unused ? self::get_used_attachment_ids() : [];
+		$used_ids = $include_unused ? self::get_used_attachment_ids() : array();
 
 		// Per-attachment set of layout IDs used by the galleries containing it.
 		// Lets the client grey out layout-specific size rows (Masonry/Justified)
 		// for attachments whose galleries don't use that layout.
 		$layouts_by_attachment = self::get_layouts_by_attachment();
 
-		$items = [];
+		$items = array();
 		foreach ( $attachment_ids as $attachment_id ) {
 			$attachment_id   = (int) $attachment_id;
 			$attachment_post = get_post( $attachment_id );
@@ -96,22 +96,22 @@ class Regenerate_Thumbnails_Data {
 				continue;
 			}
 
-			$size_statuses = [];
+			$size_statuses = array();
 			foreach ( $all_slugs as $slug ) {
 				$data                   = image_get_intermediate_size( $attachment_id, $slug );
-				$size_statuses[ $slug ] = [
-					'exists' => ( $data !== false && ! empty( $data['file'] ) ),
-					'width'  => $data['width']  ?? null,
+				$size_statuses[ $slug ] = array(
+					'exists' => ( false !== $data && ! empty( $data['file'] ) ),
+					'width'  => $data['width'] ?? null,
 					'height' => $data['height'] ?? null,
-				];
+				);
 			}
 
 			// Orphan-safe: an attachment in no FotoGrids gallery is treated as
 			// "uses every layout" so its rows aren't greyed out misleadingly.
 			$layouts_used = $layouts_by_attachment[ $attachment_id ]
-				?? [ 'grid', 'masonry', 'justified' ];
+				?? array( 'grid', 'masonry', 'justified' );
 
-			$items[] = [
+			$items[] = array(
 				'attachment_id' => $attachment_id,
 				'title'         => get_the_title( $attachment_id ),
 				'filename'      => basename( get_attached_file( $attachment_id ) ?: '' ),
@@ -119,19 +119,21 @@ class Regenerate_Thumbnails_Data {
 				'sizes'         => $size_statuses,
 				'in_gallery'    => $include_unused ? in_array( $attachment_id, $used_ids, true ) : true,
 				'layouts_used'  => array_values( $layouts_used ),
-			];
+			);
 		}
 
-		return rest_ensure_response( [
-			'items'        => $items,
-			'plugin_sizes' => $plugin_sizes,
-			'custom_sizes' => $custom_sizes,
-			'other_sizes'  => $other_sizes,
-			'page'         => $page,
-			'per_page'     => $per_page,
-			'total'        => $total,
-			'total_pages'  => (int) ceil( $total / $per_page ),
-		] );
+		return rest_ensure_response(
+			array(
+				'items'        => $items,
+				'plugin_sizes' => $plugin_sizes,
+				'custom_sizes' => $custom_sizes,
+				'other_sizes'  => $other_sizes,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'total'        => $total,
+				'total_pages'  => (int) ceil( $total / $per_page ),
+			)
+		);
 	}
 
 	/**
@@ -148,11 +150,11 @@ class Regenerate_Thumbnails_Data {
 		$attachment_id = (int) $request->get_param( 'attachment_id' );
 
 		$attachment_post = get_post( $attachment_id );
-		if ( ! $attachment_post || $attachment_post->post_type !== 'attachment' ) {
+		if ( ! $attachment_post || 'attachment' !== $attachment_post->post_type ) {
 			return new \WP_Error(
 				'invalid_attachment',
 				__( 'Attachment not found.', 'fotogrids' ),
-				[ 'status' => 404 ]
+				array( 'status' => 404 )
 			);
 		}
 
@@ -161,7 +163,7 @@ class Regenerate_Thumbnails_Data {
 			return new \WP_Error(
 				'file_missing',
 				__( 'Attachment file not found on disk.', 'fotogrids' ),
-				[ 'status' => 422 ]
+				array( 'status' => 422 )
 			);
 		}
 
@@ -176,28 +178,28 @@ class Regenerate_Thumbnails_Data {
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
 		// Build per-size status + reason map.
-		$plugin_sizes      = [
+		$plugin_sizes     = array(
 			\FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL_MOBILE,
 			\FotoGrids\Image_Size_Manager::SLUG_MASONRY,
 			\FotoGrids\Image_Size_Manager::SLUG_JUSTIFIED,
-		];
-		$custom_sizes      = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
-		$other_sizes       = self::get_other_registered_sizes( $plugin_sizes, $custom_sizes );
-		$registered_sizes  = wp_get_registered_image_subsizes();
-		$size_statuses     = [];
+		);
+		$custom_sizes     = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
+		$other_sizes      = self::get_other_registered_sizes( $plugin_sizes, $custom_sizes );
+		$registered_sizes = wp_get_registered_image_subsizes();
+		$size_statuses    = array();
 
 		foreach ( array_merge( $plugin_sizes, $custom_sizes, $other_sizes ) as $slug ) {
 			$data   = image_get_intermediate_size( $attachment_id, $slug );
-			$exists = ( $data !== false && ! empty( $data['file'] ) );
+			$exists = ( false !== $data && ! empty( $data['file'] ) );
 
-			$status = [
+			$status = array(
 				'exists' => $exists,
-				'width'  => $data['width']  ?? null,
+				'width'  => $data['width'] ?? null,
 				'height' => $data['height'] ?? null,
 				'reason' => null,
-			];
+			);
 
 			if ( ! $exists ) {
 				$status['reason'] = self::infer_missing_reason(
@@ -210,11 +212,13 @@ class Regenerate_Thumbnails_Data {
 			$size_statuses[ $slug ] = $status;
 		}
 
-		return rest_ensure_response( [
-			'attachment_id' => $attachment_id,
-			'sizes'         => $size_statuses,
-			'source'        => $source_dims, // { width, height }
-		] );
+		return rest_ensure_response(
+			array(
+				'attachment_id' => $attachment_id,
+				'sizes'         => $size_statuses,
+				'source'        => $source_dims, // { width, height }
+			)
+		);
 	}
 
 	/**
@@ -248,21 +252,24 @@ class Regenerate_Thumbnails_Data {
 	private static function get_source_dimensions( int $attachment_id, string $file ): array {
 		$meta = wp_get_attachment_metadata( $attachment_id );
 		if ( is_array( $meta ) && ! empty( $meta['width'] ) && ! empty( $meta['height'] ) ) {
-			return [
+			return array(
 				'width'  => (int) $meta['width'],
 				'height' => (int) $meta['height'],
-			];
+			);
 		}
 
-		$size = @getimagesize( $file );
+		$size = wp_getimagesize( $file );
 		if ( is_array( $size ) && isset( $size[0], $size[1] ) ) {
-			return [
+			return array(
 				'width'  => (int) $size[0],
 				'height' => (int) $size[1],
-			];
+			);
 		}
 
-		return [ 'width' => null, 'height' => null ];
+		return array(
+			'width'  => null,
+			'height' => null,
+		);
 	}
 
 	/**
@@ -289,7 +296,7 @@ class Regenerate_Thumbnails_Data {
 			return __( 'Source dimensions unknown - image may be corrupt or unreadable.', 'fotogrids' );
 		}
 
-		$target_w = (int) ( $size_def['width']  ?? 0 );
+		$target_w = (int) ( $size_def['width'] ?? 0 );
 		$target_h = (int) ( $size_def['height'] ?? 0 );
 		$crop     = ! empty( $size_def['crop'] );
 
@@ -345,7 +352,7 @@ class Regenerate_Thumbnails_Data {
 			)
 		);
 
-		$used = [];
+		$used = array();
 		foreach ( $rows as $raw ) {
 			$decoded = is_string( $raw ) ? json_decode( $raw, true ) : null;
 			if ( ! is_array( $decoded ) ) {
@@ -402,10 +409,10 @@ class Regenerate_Thumbnails_Data {
 			ARRAY_A
 		);
 
-		$layout_by_gallery = [];
+		$layout_by_gallery = array();
 		foreach ( $layout_rows as $row ) {
-			$gallery_id = (int) $row['post_id'];
-			$layout     = is_string( $row['meta_value'] ) && $row['meta_value'] !== ''
+			$gallery_id                       = (int) $row['post_id'];
+			$layout                           = is_string( $row['meta_value'] ) && '' !== $row['meta_value']
 				? $row['meta_value']
 				: 'grid';
 			$layout_by_gallery[ $gallery_id ] = $layout;
@@ -421,7 +428,7 @@ class Regenerate_Thumbnails_Data {
 			ARRAY_A
 		);
 
-		$layouts_by_attachment = [];
+		$layouts_by_attachment = array();
 		foreach ( $item_rows as $row ) {
 			$gallery_id = (int) $row['post_id'];
 			$layout     = $layout_by_gallery[ $gallery_id ] ?? 'grid';
@@ -460,24 +467,26 @@ class Regenerate_Thumbnails_Data {
 	private static function collect_attachment_ids( bool $include_unused, int $page, int $per_page ): array {
 		if ( $include_unused ) {
 			// All image attachments in the media library, ordered most recent first.
-			$query = new \WP_Query( [
-				'post_type'              => 'attachment',
-				'post_status'            => 'inherit',
-				'post_mime_type'         => 'image',
-				'fields'                 => 'ids',
-				'orderby'                => 'date',
-				'order'                  => 'DESC',
-				'posts_per_page'         => $per_page,
-				'paged'                  => $page,
-				'no_found_rows'          => false,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-			] );
+			$query = new \WP_Query(
+				array(
+					'post_type'              => 'attachment',
+					'post_status'            => 'inherit',
+					'post_mime_type'         => 'image',
+					'fields'                 => 'ids',
+					'orderby'                => 'date',
+					'order'                  => 'DESC',
+					'posts_per_page'         => $per_page,
+					'paged'                  => $page,
+					'no_found_rows'          => false,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			);
 
-			return [
+			return array(
 				array_map( 'intval', $query->posts ),
 				(int) $query->found_posts,
-			];
+			);
 		}
 
 		// Gallery items only.
@@ -491,7 +500,7 @@ class Regenerate_Thumbnails_Data {
 		$offset = ( $page - 1 ) * $per_page;
 		$slice  = array_slice( $used_ids, $offset, $per_page );
 
-		return [ $slice, $total ];
+		return array( $slice, $total );
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

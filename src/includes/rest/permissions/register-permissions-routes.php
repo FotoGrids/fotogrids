@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\REST\Permissions;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -21,65 +21,65 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Register_Permissions_Routes {
 
-    public static function register(): void {
-        register_rest_route(
-            'fotogrids/v1',
-            '/permissions/registry',
-            [
-                [
-                    'methods'             => \WP_REST_Server::READABLE,
-                    'callback'            => [ Permissions_Data::class, 'get_registry' ],
-                    'permission_callback' => [ Permissions_Permissions::class, 'check_read' ],
-                ],
-            ]
-        );
+	public static function register(): void {
+		register_rest_route(
+			'fotogrids/v1',
+			'/permissions/registry',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( Permissions_Data::class, 'get_registry' ),
+					'permission_callback' => array( Permissions_Permissions::class, 'check_read' ),
+				),
+			)
+		);
 
-        register_rest_route(
-            'fotogrids/v1',
-            '/permissions/options',
-            [
-                [
-                    'methods'             => \WP_REST_Server::CREATABLE,
-                    'callback'            => [ Permissions_Data::class, 'set_option' ],
-                    'permission_callback' => [ Permissions_Permissions::class, 'check_write_simple' ],
-                    'args'                => [
-                        'key'   => [
-                            'required'          => true,
-                            'type'              => 'string',
-                            'sanitize_callback' => 'sanitize_key',
-                        ],
-                        'value' => [
-                            'required'          => true,
-                            'type'              => 'string',
-                            'sanitize_callback' => 'sanitize_text_field',
-                        ],
-                    ],
-                ],
-            ]
-        );
+		register_rest_route(
+			'fotogrids/v1',
+			'/permissions/options',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( Permissions_Data::class, 'set_option' ),
+					'permission_callback' => array( Permissions_Permissions::class, 'check_write_simple' ),
+					'args'                => array(
+						'key'   => array(
+							'required'          => true,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'value' => array(
+							'required'          => true,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+					),
+				),
+			)
+		);
 
-        register_rest_route(
-            'fotogrids/v1',
-            '/permissions/simple',
-            [
-                [
-                    'methods'             => \WP_REST_Server::CREATABLE,
-                    'callback'            => [ Permissions_Data::class, 'set_simple' ],
-                    'permission_callback' => [ Permissions_Permissions::class, 'check_write_simple' ],
-                    'args'                => [
-                        'key' => [
-                            'required'          => true,
-                            'type'              => 'string',
-                            'sanitize_callback' => 'sanitize_key',
-                        ],
-                        'lowest_role' => [
-                            'required'          => true,
-                            'type'              => 'string',
-                            'sanitize_callback' => 'sanitize_key',
-                        ],
-                    ],
-                ],
-            ]
-        );
-    }
+		register_rest_route(
+			'fotogrids/v1',
+			'/permissions/simple',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( Permissions_Data::class, 'set_simple' ),
+					'permission_callback' => array( Permissions_Permissions::class, 'check_write_simple' ),
+					'args'                => array(
+						'key'         => array(
+							'required'          => true,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'lowest_role' => array(
+							'required'          => true,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_key',
+						),
+					),
+				),
+			)
+		);
+	}
 }

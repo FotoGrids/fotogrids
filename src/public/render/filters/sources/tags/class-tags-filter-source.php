@@ -6,7 +6,7 @@ namespace FotoGrids\Render\Filters\Sources\Tags;
 use FotoGrids\Render\Filters\Sources\Metadata_Filter_Source;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -22,27 +22,27 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Tags_Filter_Source extends Metadata_Filter_Source {
 
-    public function id(): string {
-        return 'fotogrids/filter/tags';
-    }
+	public function id(): string {
+		return 'fotogrids/filter/tags';
+	}
 
-    public function item_data_attr_key(): string {
-        return 'data-fg-tags';
-    }
+	public function item_data_attr_key(): string {
+		return 'data-fg-tags';
+	}
 
-    public function filter_arg_key(): string {
-        return 'tags';
-    }
+	public function filter_arg_key(): string {
+		return 'tags';
+	}
 
-    protected function filter_by_token(): string {
-        return 'tags';
-    }
+	protected function filter_by_token(): string {
+		return 'tags';
+	}
 
-    protected function metadata_type(): string {
-        return 'tag';
-    }
+	protected function metadata_type(): string {
+		return 'tag';
+	}
 
-    protected function group_label_string(): string {
-        return __( 'Tags', 'fotogrids' );
-    }
+	protected function group_label_string(): string {
+		return __( 'Tags', 'fotogrids' );
+	}
 }

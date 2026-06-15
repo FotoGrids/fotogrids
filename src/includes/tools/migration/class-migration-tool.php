@@ -100,5 +100,4 @@ class Migration_Tool extends Abstract_Tool {
 	public function init(): void {
 		// Intentionally empty - scaffold stage, no REST routes yet.
 	}
-
 }

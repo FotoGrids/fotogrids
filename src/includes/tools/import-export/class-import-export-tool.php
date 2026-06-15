@@ -70,79 +70,79 @@ class Import_Export_Tool extends Abstract_Tool {
 		register_rest_route(
 			'fotogrids/v1',
 			'/admin/tools/import-export/export',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ Import_Export_Data::class, 'export' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'include' => [
+					'callback'            => array( Import_Export_Data::class, 'export' ),
+					'permission_callback' => array( $this, 'check_permission' ),
+					'args'                => array(
+						'include' => array(
 							'type'    => 'array',
-							'items'   => [ 'type' => 'string' ],
-							'default' => [ 'galleries', 'albums', 'items', 'tags', 'settings', 'statistics', 'templates' ],
-						],
-						'format'  => [
+							'items'   => array( 'type' => 'string' ),
+							'default' => array( 'galleries', 'albums', 'items', 'tags', 'settings', 'statistics', 'templates' ),
+						),
+						'format'  => array(
 							'type'    => 'string',
-							'enum'    => [ 'json', 'xml' ],
+							'enum'    => array( 'json', 'xml' ),
 							'default' => 'json',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// Import - analyse or execute phase.
 		register_rest_route(
 			'fotogrids/v1',
 			'/admin/tools/import-export/import',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ Import_Export_Data::class, 'import' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'phase'  => [
+					'callback'            => array( Import_Export_Data::class, 'import' ),
+					'permission_callback' => array( $this, 'check_permission' ),
+					'args'                => array(
+						'phase'     => array(
 							'type'     => 'string',
-							'enum'     => [ 'analyse', 'execute' ],
+							'enum'     => array( 'analyse', 'execute' ),
 							'required' => true,
-						],
-						'file'   => [
+						),
+						'file'      => array(
 							'type'     => 'string',
 							'required' => true,
-						],
-						'format' => [
+						),
+						'format'    => array(
 							'type' => 'string',
-							'enum' => [ 'json', 'xml' ],
-						],
+							'enum' => array( 'json', 'xml' ),
+						),
 						// Execute-only params.
-						'include'   => [
+						'include'   => array(
 							'type'  => 'array',
-							'items' => [ 'type' => 'string' ],
-						],
-						'galleries' => [
+							'items' => array( 'type' => 'string' ),
+						),
+						'galleries' => array(
 							'type' => 'string',
-							'enum' => [ 'skip', 'overwrite', 'duplicate' ],
-						],
-						'albums'    => [
+							'enum' => array( 'skip', 'overwrite', 'duplicate' ),
+						),
+						'albums'    => array(
 							'type' => 'string',
-							'enum' => [ 'skip', 'overwrite', 'duplicate' ],
-						],
-					],
-				],
-			]
+							'enum' => array( 'skip', 'overwrite', 'duplicate' ),
+						),
+					),
+				),
+			)
 		);
 
 		// Operation log.
 		register_rest_route(
 			'fotogrids/v1',
 			'/admin/tools/import-export/log',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ Import_Export_Data::class, 'log' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-				],
-			]
+					'callback'            => array( Import_Export_Data::class, 'log' ),
+					'permission_callback' => array( $this, 'check_permission' ),
+				),
+			)
 		);
 	}
 }

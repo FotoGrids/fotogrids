@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Modules\PageBuilders\REST;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -26,14 +26,14 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Preview_Permissions {
 
-    /**
-     * Whether the current user can request a gallery / album preview or
-     * search the picker.
-     *
-     * @since 1.0.0
-     * @return bool
-     */
-    public static function check_preview_read(): bool {
-        return current_user_can( 'manage_fotogrids' );
-    }
+	/**
+	 * Whether the current user can request a gallery / album preview or
+	 * search the picker.
+	 *
+	 * @since 1.0.0
+	 * @return bool
+	 */
+	public static function check_preview_read(): bool {
+		return current_user_can( 'manage_fotogrids' );
+	}
 }

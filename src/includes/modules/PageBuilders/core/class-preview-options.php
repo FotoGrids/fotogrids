@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Modules\PageBuilders;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -43,59 +43,59 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Preview_Options {
 
-    /**
-     * Canonical attribute key for the click-behavior toggle.
-     *
-     * @var string
-     */
-    public const ATTR_CLICK_BEHAVIOR = 'preview_click_behavior';
+	/**
+	 * Canonical attribute key for the click-behavior toggle.
+	 *
+	 * @var string
+	 */
+	public const ATTR_CLICK_BEHAVIOR = 'preview_click_behavior';
 
-    /**
-     * Canonical attribute key for the pagination toggle.
-     *
-     * @var string
-     */
-    public const ATTR_PAGINATION = 'preview_pagination';
+	/**
+	 * Canonical attribute key for the pagination toggle.
+	 *
+	 * @var string
+	 */
+	public const ATTR_PAGINATION = 'preview_pagination';
 
-    /**
-     * Default values for new widgets / blocks.
-     *
-     * @since 1.0.0
-     * @return array{preview_click_behavior: bool, preview_pagination: bool}
-     */
-    public static function defaults(): array {
-        return [
-            self::ATTR_CLICK_BEHAVIOR => false,
-            self::ATTR_PAGINATION     => false,
-        ];
-    }
+	/**
+	 * Default values for new widgets / blocks.
+	 *
+	 * @since 1.0.0
+	 * @return array{preview_click_behavior: bool, preview_pagination: bool}
+	 */
+	public static function defaults(): array {
+		return array(
+			self::ATTR_CLICK_BEHAVIOR => false,
+			self::ATTR_PAGINATION     => false,
+		);
+	}
 
-    /**
-     * Normalise an arbitrary host-supplied input map into the canonical
-     * `{click_behavior, pagination}` shape consumed by the REST
-     * `/preview/{kind}/{id}` endpoint and the in-process preview
-     * renderer.
-     *
-     * Accepts either canonical keys (`preview_click_behavior`,
-     * `preview_pagination`) or the shorthand REST keys
-     * (`click_behavior`, `pagination`). Missing keys take the helper's
-     * default. Non-boolean inputs are coerced via PHP truthiness so an
-     * Elementor switcher's `'yes'`/`''` string values work without per-
-     * host normalisation.
-     *
-     * @since 1.0.0
-     * @param array<string, mixed> $input Raw host-supplied values.
-     * @return array{click_behavior: bool, pagination: bool}
-     */
-    public static function normalise( array $input ): array {
-        $defaults = self::defaults();
+	/**
+	 * Normalise an arbitrary host-supplied input map into the canonical
+	 * `{click_behavior, pagination}` shape consumed by the REST
+	 * `/preview/{kind}/{id}` endpoint and the in-process preview
+	 * renderer.
+	 *
+	 * Accepts either canonical keys (`preview_click_behavior`,
+	 * `preview_pagination`) or the shorthand REST keys
+	 * (`click_behavior`, `pagination`). Missing keys take the helper's
+	 * default. Non-boolean inputs are coerced via PHP truthiness so an
+	 * Elementor switcher's `'yes'`/`''` string values work without per-
+	 * host normalisation.
+	 *
+	 * @since 1.0.0
+	 * @param array<string, mixed> $input Raw host-supplied values.
+	 * @return array{click_behavior: bool, pagination: bool}
+	 */
+	public static function normalise( array $input ): array {
+		$defaults = self::defaults();
 
-        $click = $input[ self::ATTR_CLICK_BEHAVIOR ] ?? $input['click_behavior'] ?? $defaults[ self::ATTR_CLICK_BEHAVIOR ];
-        $pag   = $input[ self::ATTR_PAGINATION ]     ?? $input['pagination']     ?? $defaults[ self::ATTR_PAGINATION ];
+		$click = $input[ self::ATTR_CLICK_BEHAVIOR ] ?? $input['click_behavior'] ?? $defaults[ self::ATTR_CLICK_BEHAVIOR ];
+		$pag   = $input[ self::ATTR_PAGINATION ] ?? $input['pagination'] ?? $defaults[ self::ATTR_PAGINATION ];
 
-        return [
-            'click_behavior' => (bool) $click,
-            'pagination'     => (bool) $pag,
-        ];
-    }
+		return array(
+			'click_behavior' => (bool) $click,
+			'pagination'     => (bool) $pag,
+		);
+	}
 }

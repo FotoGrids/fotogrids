@@ -11,7 +11,7 @@ use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Internal\Gallery_Item_Sequence;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -35,82 +35,84 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Sequence_Index_Decorator implements Decorator {
 
-    public function id(): string {
-        return 'fotogrids/decorator/sequence-index';
-    }
+	public function id(): string {
+		return 'fotogrids/decorator/sequence-index';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    public function supports( Render_Context $render_context ): bool {
-        return $render_context->meta->collection_kind === Collection_Kind::GALLERY;
-    }
+	public function supports( Render_Context $render_context ): bool {
+		return Collection_Kind::GALLERY === $render_context->meta->collection_kind;
+	}
 
-    /**
-     * Stamps data-fg-sequence-index on each item with its position in
-     * the full filtered+sorted sequence for this gallery.
-     *
-     * @since 1.0.0
-     * @param array<int, Item_View> $collection_items
-     * @return array<int, Item_View>
-     */
-    public function decorate_items( array $collection_items, Render_Context $render_context ): array {
-        if ( empty( $collection_items ) ) {
-            return $collection_items;
-        }
+	/**
+	 * Stamps data-fg-sequence-index on each item with its position in
+	 * the full filtered+sorted sequence for this gallery.
+	 *
+	 * @since 1.0.0
+	 * @param array<int, Item_View> $collection_items
+	 * @return array<int, Item_View>
+	 */
+	public function decorate_items( array $collection_items, Render_Context $render_context ): array {
+		if ( empty( $collection_items ) ) {
+			return $collection_items;
+		}
 
-        $sequence = Gallery_Item_Sequence::resolve(
-            (int) $render_context->meta->gallery_id,
-            $render_context->settings,
-            $render_context->meta->random_seed,
-            $render_context->meta->active_filters
-        );
+		$sequence = Gallery_Item_Sequence::resolve(
+			(int) $render_context->meta->gallery_id,
+			$render_context->settings,
+			$render_context->meta->random_seed,
+			$render_context->meta->active_filters
+		);
 
-        if ( empty( $sequence ) ) {
-            return $collection_items;
-        }
+		if ( empty( $sequence ) ) {
+			return $collection_items;
+		}
 
-        // Build a flipped lookup so the per-item search is O(1).
-        $index_by_id = array_flip( $sequence );
+		// Build a flipped lookup so the per-item search is O(1).
+		$index_by_id = array_flip( $sequence );
 
-        return array_map(
-            static function ( Item_View $item ) use ( $index_by_id ): Item_View {
-                $index = $index_by_id[ $item->id ] ?? null;
-                if ( $index === null ) {
-                    // Item isn't in the filtered sequence (shouldn't
-                    // happen — filtering ran upstream in Context_Builder
-                    // — but be defensive).
-                    return $item;
-                }
-                return $item->with( [
-                    'data_attrs' => array_merge(
-                        $item->data_attrs,
-                        [ 'data-fg-sequence-index' => (string) $index ]
-                    ),
-                ] );
-            },
-            $collection_items
-        );
-    }
+		return array_map(
+			static function ( Item_View $item ) use ( $index_by_id ): Item_View {
+				$index = $index_by_id[ $item->id ] ?? null;
+				if ( null === $index ) {
+					// Item isn't in the filtered sequence (shouldn't
+					// happen — filtering ran upstream in Context_Builder
+					// — but be defensive).
+					return $item;
+				}
+				return $item->with(
+					array(
+						'data_attrs' => array_merge(
+							$item->data_attrs,
+							array( 'data-fg-sequence-index' => (string) $index )
+						),
+					)
+				);
+			},
+			$collection_items
+		);
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
-    }
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets();
+	}
 }

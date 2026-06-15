@@ -79,51 +79,50 @@ class Regenerate_Thumbnails_Tool extends Abstract_Tool {
 		register_rest_route(
 			'fotogrids/v1',
 			'/admin/tools/regenerate-thumbnails/status',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ Regenerate_Thumbnails_Data::class, 'get_status' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'include_unused' => [
+					'callback'            => array( Regenerate_Thumbnails_Data::class, 'get_status' ),
+					'permission_callback' => array( $this, 'check_permission' ),
+					'args'                => array(
+						'include_unused' => array(
 							'type'              => 'boolean',
 							'default'           => false,
 							'sanitize_callback' => 'rest_sanitize_boolean',
-						],
-						'page'           => [
+						),
+						'page'           => array(
 							'type'    => 'integer',
 							'minimum' => 1,
 							'default' => 1,
-						],
-						'per_page'       => [
+						),
+						'per_page'       => array(
 							'type'    => 'integer',
 							'minimum' => 1,
 							'maximum' => 200,
 							'default' => 50,
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		register_rest_route(
 			'fotogrids/v1',
 			'/admin/tools/regenerate-thumbnails/regenerate',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ Regenerate_Thumbnails_Data::class, 'regenerate_attachment' ],
-					'permission_callback' => [ $this, 'check_permission' ],
-					'args'                => [
-						'attachment_id' => [
+					'callback'            => array( Regenerate_Thumbnails_Data::class, 'regenerate_attachment' ),
+					'permission_callback' => array( $this, 'check_permission' ),
+					'args'                => array(
+						'attachment_id' => array(
 							'type'     => 'integer',
 							'minimum'  => 1,
 							'required' => true,
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 	}
-
 }

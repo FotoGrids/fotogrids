@@ -9,7 +9,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -40,156 +40,156 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Loaded_Effect implements Feature {
 
-    /**
-     * Default effect when no setting is configured.
-     *
-     * @since 1.0.0
-     */
-    private const DEFAULT_EFFECT = 'fade';
+	/**
+	 * Default effect when no setting is configured.
+	 *
+	 * @since 1.0.0
+	 */
+	private const DEFAULT_EFFECT = 'fade';
 
-    /**
-     * @var array<int, string>
-     */
-    private const SUPPORTED_EFFECTS = [
-        'none',
-        'fade',
-        'rise',
-        'drop',
-        'zoom',
-        'blur',
-    ];
+	/**
+	 * @var array<int, string>
+	 */
+	private const SUPPORTED_EFFECTS = array(
+		'none',
+		'fade',
+		'rise',
+		'drop',
+		'zoom',
+		'blur',
+	);
 
-    // -------------------------------------------------------------------------
-    // Feature contract
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Feature contract
+	// -------------------------------------------------------------------------
 
-    public function id(): string {
-        return 'fotogrids/loaded-effect';
-    }
+	public function id(): string {
+		return 'fotogrids/loaded-effect';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    /**
-     * Always active - every gallery has a loaded effect (even if "none").
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  bool
-     */
-    public function supports( Render_Context $render_context ): bool {
-        return true;
-    }
+	/**
+	 * Always active - every gallery has a loaded effect (even if "none").
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  bool
+	 */
+	public function supports( Render_Context $render_context ): bool {
+		return true;
+	}
 
-    /**
-     * No markup before the layout content.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  string
-     */
-    public function html_before( Render_Context $render_context ): string {
-        return '';
-    }
+	/**
+	 * No markup before the layout content.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string
+	 */
+	public function html_before( Render_Context $render_context ): string {
+		return '';
+	}
 
-    /**
-     * No extra markup appended inside the gallery wrapper.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  string
-     */
-    public function html_appendix( Render_Context $render_context ): string {
-        return '';
-    }
+	/**
+	 * No extra markup appended inside the gallery wrapper.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string
+	 */
+	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
 
-    /**
-     * No per-gallery inline script needed.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  string
-     */
-    public function html_after( Render_Context $render_context ): string {
-        return '';
-    }
+	/**
+	 * No per-gallery inline script needed.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string
+	 */
+	public function html_after( Render_Context $render_context ): string {
+		return '';
+	}
 
-    /**
-     * Writes data-fg-loaded-effect onto the gallery wrapper.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  array<string, string>
-     */
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [
-            'data-fg-loaded-effect' => $this->resolve_effect( $render_context ),
-        ];
-    }
+	/**
+	 * Writes data-fg-loaded-effect onto the gallery wrapper.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  array<string, string>
+	 */
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array(
+			'data-fg-loaded-effect' => $this->resolve_effect( $render_context ),
+		);
+	}
 
-    /**
-     * No CSS custom properties needed - effects are CSS-only.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  array<string, string>
-     */
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	/**
+	 * No CSS custom properties needed - effects are CSS-only.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  array<string, string>
+	 */
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    /**
-     * Enqueues the base stylesheet and the per-effect stylesheet.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  Module_Assets
-     */
-    public function assets( Render_Context $render_context ): Module_Assets {
-        $effect = $this->resolve_effect( $render_context );
+	/**
+	 * Enqueues the base stylesheet and the per-effect stylesheet.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  Module_Assets
+	 */
+	public function assets( Render_Context $render_context ): Module_Assets {
+		$effect = $this->resolve_effect( $render_context );
 
-        $css_assets = [
-            'fotogrids-loaded-effect-base' => new Asset_Decl(
-                path: 'features/loaded-effect/effects/base.css',
-            ),
-        ];
+		$css_assets = array(
+			'fotogrids-loaded-effect-base' => new Asset_Decl(
+				path: 'features/loaded-effect/effects/base.css',
+			),
+		);
 
-        if ( $effect !== 'none' ) {
-            $css_assets[ 'fotogrids-loaded-effect-' . $effect ] = new Asset_Decl(
-                path: 'features/loaded-effect/effects/' . $effect . '.css',
-            );
-        }
+		if ( 'none' !== $effect ) {
+			$css_assets[ 'fotogrids-loaded-effect-' . $effect ] = new Asset_Decl(
+				path: 'features/loaded-effect/effects/' . $effect . '.css',
+			);
+		}
 
-        return new Module_Assets( css: $css_assets );
-    }
+		return new Module_Assets( css: $css_assets );
+	}
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Private helpers
+	// -------------------------------------------------------------------------
 
-    /**
-     * Resolves and validates the effect ID from settings.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  string
-     */
-    private function resolve_effect( Render_Context $render_context ): string {
-        $effect = $render_context->settings['loaded_effect'] ?? '';
+	/**
+	 * Resolves and validates the effect ID from settings.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string
+	 */
+	private function resolve_effect( Render_Context $render_context ): string {
+		$effect = $render_context->settings['loaded_effect'] ?? '';
 
-        if ( ! is_string( $effect ) || $effect === '' ) {
-            return self::DEFAULT_EFFECT;
-        }
+		if ( ! is_string( $effect ) || '' === $effect ) {
+			return self::DEFAULT_EFFECT;
+		}
 
-        return in_array( $effect, self::SUPPORTED_EFFECTS, true ) ? $effect : self::DEFAULT_EFFECT;
-    }
+		return in_array( $effect, self::SUPPORTED_EFFECTS, true ) ? $effect : self::DEFAULT_EFFECT;
+	}
 }

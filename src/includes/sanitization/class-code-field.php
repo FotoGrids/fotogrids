@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Sanitization;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -38,18 +38,18 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Code_Field {
 
-    /**
-     * Sanitise a raw code string for storage.
-     *
-     * @since 1.0.0
-     * @param string $raw Raw code input.
-     * @return string Sanitised code, safe for storage in post meta.
-     */
-    public static function sanitize( string $raw ): string {
-        // Strip null bytes and ASCII control characters, preserving tab (\x09),
-        // newline (\x0A), and carriage return (\x0D) which are valid in code.
-        $sanitized = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $raw );
+	/**
+	 * Sanitise a raw code string for storage.
+	 *
+	 * @since 1.0.0
+	 * @param string $raw Raw code input.
+	 * @return string Sanitised code, safe for storage in post meta.
+	 */
+	public static function sanitize( string $raw ): string {
+		// Strip null bytes and ASCII control characters, preserving tab (\x09),
+		// newline (\x0A), and carriage return (\x0D) which are valid in code.
+		$sanitized = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $raw );
 
-        return is_string( $sanitized ) ? $sanitized : '';
-    }
+		return is_string( $sanitized ) ? $sanitized : '';
+	}
 }

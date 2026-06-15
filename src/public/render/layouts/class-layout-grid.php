@@ -10,7 +10,7 @@ use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Internal\Item_Renderer;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -32,79 +32,79 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Layout_Grid implements Layout {
 
-    public function id(): string {
-        return 'fotogrids/grid';
-    }
+	public function id(): string {
+		return 'fotogrids/grid';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    public function layout_key(): string {
-        return 'grid';
-    }
+	public function layout_key(): string {
+		return 'grid';
+	}
 
-    public function supports( Render_Context $render_context ): bool {
-        return $render_context->layout->layout_id === 'grid';
-    }
+	public function supports( Render_Context $render_context ): bool {
+		return 'grid' === $render_context->layout->layout_id;
+	}
 
-    public function render( Render_Context $render_context, Item_Renderer $item_renderer ): string {
-        $items_html = '';
-        foreach ( $render_context->items as $item_view ) {
-            $items_html .= $item_renderer->render( $item_view, $render_context );
-        }
+	public function render( Render_Context $render_context, Item_Renderer $item_renderer ): string {
+		$items_html = '';
+		foreach ( $render_context->items as $item_view ) {
+			$items_html .= $item_renderer->render( $item_view, $render_context );
+		}
 
-        // data-fg-items-root marks this element as the container that
-        // pagination-core.js can append/replace items inside.
-        return '<div class="fg-grid-track" data-fg-items-root="true">' . $items_html . '</div>';
-    }
+		// data-fg-items-root marks this element as the container that
+		// pagination-core.js can append/replace items inside.
+		return '<div class="fg-grid-track" data-fg-items-root="true">' . $items_html . '</div>';
+	}
 
-    public function structural_classes( Render_Context $render_context ): array {
-        return [];
-    }
+	public function structural_classes( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets(
-            css: [
-                'fotogrids-render-base' => new Asset_Decl(
-                    path: 'base/collection-base.css'
-                ),
-                'fotogrids-layout-grid' => new Asset_Decl(
-                    path: 'layouts/grid/grid.css'
-                ),
-            ]
-        );
-    }
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets(
+			css: array(
+				'fotogrids-render-base' => new Asset_Decl(
+					path: 'base/collection-base.css'
+				),
+				'fotogrids-layout-grid' => new Asset_Decl(
+					path: 'layouts/grid/grid.css'
+				),
+			)
+		);
+	}
 
-    public function preferred_thumbnail_size( Render_Context $render_context ): ?string {
-        return null;
-    }
+	public function preferred_thumbnail_size( Render_Context $render_context ): ?string {
+		return null;
+	}
 
-    public function requires_thumbnail_size( Render_Context $render_context ): bool {
-        return false;
-    }
+	public function requires_thumbnail_size( Render_Context $render_context ): bool {
+		return false;
+	}
 
-    public function capabilities(): array {
-        return [
-            'enforces_item_box' => true,
-            'uses_columns'      => true,
-            'uses_item_spacing' => true,
-        ];
-    }
+	public function capabilities(): array {
+		return array(
+			'enforces_item_box' => true,
+			'uses_columns'      => true,
+			'uses_item_spacing' => true,
+		);
+	}
 }

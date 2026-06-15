@@ -7,7 +7,7 @@ use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Responsive_Var;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -47,105 +47,105 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Style_Var_Builder {
 
-    /**
-     * Serializes the variable map into a complete inline style element.
-     *
-     * @since  1.0.0
-     * @param  array<string, string|Responsive_Var> $css_variables Variable map.
-     * @param  string                               $instance_id   Gallery wrapper element ID.
-     * @param  Breakpoint_Config                    $breakpoints   User-configured breakpoints.
-     * @return string  The full <style> element, or '' when the map is empty.
-     */
-    public function build_style_element(
-        array $css_variables,
-        string $instance_id,
-        Breakpoint_Config $breakpoints
-    ): string {
-        if ( empty( $css_variables ) ) {
-            return '';
-        }
+	/**
+	 * Serializes the variable map into a complete inline style element.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, string|Responsive_Var> $css_variables Variable map.
+	 * @param  string                               $instance_id   Gallery wrapper element ID.
+	 * @param  Breakpoint_Config                    $breakpoints   User-configured breakpoints.
+	 * @return string  The full <style> element, or '' when the map is empty.
+	 */
+	public function build_style_element(
+		array $css_variables,
+		string $instance_id,
+		Breakpoint_Config $breakpoints
+	): string {
+		if ( empty( $css_variables ) ) {
+			return '';
+		}
 
-        ksort( $css_variables );
+		ksort( $css_variables );
 
-        $base_vars    = [];
-        $tablet_vars  = [];
-        $mobile_vars  = [];
+		$base_vars   = array();
+		$tablet_vars = array();
+		$mobile_vars = array();
 
-        foreach ( $css_variables as $name => $value ) {
-            if ( ! str_starts_with( $name, '--' ) ) {
-                throw new \InvalidArgumentException( sprintf( "Style var '%s' must start with '--'", esc_html( $name ) ) );
-            }
+		foreach ( $css_variables as $name => $value ) {
+			if ( ! str_starts_with( $name, '--' ) ) {
+				throw new \InvalidArgumentException( sprintf( "Style var '%s' must start with '--'", esc_html( $name ) ) );
+			}
 
-            if ( $value instanceof Responsive_Var ) {
-                $desktop_val = $this->sanitize( $value->for_breakpoint( 'desktop' ) );
-                $tablet_val  = $this->sanitize( $value->for_breakpoint( 'tablet' ) );
-                $mobile_val  = $this->sanitize( $value->for_breakpoint( 'mobile' ) );
+			if ( $value instanceof Responsive_Var ) {
+				$desktop_val = $this->sanitize( $value->for_breakpoint( 'desktop' ) );
+				$tablet_val  = $this->sanitize( $value->for_breakpoint( 'tablet' ) );
+				$mobile_val  = $this->sanitize( $value->for_breakpoint( 'mobile' ) );
 
-                if ( $desktop_val !== '' ) {
-                    $base_vars[ $name ] = $desktop_val;
-                }
-                // Only emit a tablet override when the value actually differs from desktop.
-                if ( $tablet_val !== '' && $tablet_val !== $desktop_val ) {
-                    $tablet_vars[ $name ] = $tablet_val;
-                }
-                // Only emit a mobile override when the value actually differs from tablet.
-                if ( $mobile_val !== '' && $mobile_val !== $tablet_val ) {
-                    $mobile_vars[ $name ] = $mobile_val;
-                }
-            } else {
-                $safe = $this->sanitize( (string) $value );
-                if ( $safe !== '' ) {
-                    $base_vars[ $name ] = $safe;
-                }
-            }
-        }
+				if ( '' !== $desktop_val ) {
+					$base_vars[ $name ] = $desktop_val;
+				}
+				// Only emit a tablet override when the value actually differs from desktop.
+				if ( '' !== $tablet_val && $tablet_val !== $desktop_val ) {
+					$tablet_vars[ $name ] = $tablet_val;
+				}
+				// Only emit a mobile override when the value actually differs from tablet.
+				if ( '' !== $mobile_val && $mobile_val !== $tablet_val ) {
+					$mobile_vars[ $name ] = $mobile_val;
+				}
+			} else {
+				$safe = $this->sanitize( (string) $value );
+				if ( '' !== $safe ) {
+					$base_vars[ $name ] = $safe;
+				}
+			}
+		}
 
-        if ( empty( $base_vars ) && empty( $tablet_vars ) && empty( $mobile_vars ) ) {
-            return '';
-        }
+		if ( empty( $base_vars ) && empty( $tablet_vars ) && empty( $mobile_vars ) ) {
+			return '';
+		}
 
-        $selector = '#' . esc_attr( $instance_id );
-        $output   = "<style class=\"fg-vars\">\n";
+		$selector = '#' . esc_attr( $instance_id );
+		$output   = "<style class=\"fg-vars\">\n";
 
-        $output .= $selector . " {\n";
-        foreach ( $base_vars as $name => $val ) {
-            $output .= '    ' . $name . ': ' . $val . ";\n";
-        }
-        $output .= "}\n";
+		$output .= $selector . " {\n";
+		foreach ( $base_vars as $name => $val ) {
+			$output .= '    ' . $name . ': ' . $val . ";\n";
+		}
+		$output .= "}\n";
 
-        if ( ! empty( $tablet_vars ) ) {
-            $output .= '@media (max-width: ' . $breakpoints->tablet_max_width . "px) {\n";
-            $output .= '    ' . $selector . " {\n";
-            foreach ( $tablet_vars as $name => $val ) {
-                $output .= '        ' . $name . ': ' . $val . ";\n";
-            }
-            $output .= "    }\n";
-            $output .= "}\n";
-        }
+		if ( ! empty( $tablet_vars ) ) {
+			$output .= '@media (max-width: ' . $breakpoints->tablet_max_width . "px) {\n";
+			$output .= '    ' . $selector . " {\n";
+			foreach ( $tablet_vars as $name => $val ) {
+				$output .= '        ' . $name . ': ' . $val . ";\n";
+			}
+			$output .= "    }\n";
+			$output .= "}\n";
+		}
 
-        if ( ! empty( $mobile_vars ) ) {
-            $output .= '@media (max-width: ' . $breakpoints->mobile_max_width . "px) {\n";
-            $output .= '    ' . $selector . " {\n";
-            foreach ( $mobile_vars as $name => $val ) {
-                $output .= '        ' . $name . ': ' . $val . ";\n";
-            }
-            $output .= "    }\n";
-            $output .= "}\n";
-        }
+		if ( ! empty( $mobile_vars ) ) {
+			$output .= '@media (max-width: ' . $breakpoints->mobile_max_width . "px) {\n";
+			$output .= '    ' . $selector . " {\n";
+			foreach ( $mobile_vars as $name => $val ) {
+				$output .= '        ' . $name . ': ' . $val . ";\n";
+			}
+			$output .= "    }\n";
+			$output .= "}\n";
+		}
 
-        $output .= '</style>';
+		$output .= '</style>';
 
-        return $output;
-    }
+		return $output;
+	}
 
-    /**
-     * Strips characters that would break out of a CSS declaration value.
-     *
-     * @since  1.0.0
-     * @param  string $value Raw value.
-     * @return string
-     */
-    private function sanitize( string $value ): string {
-        return str_replace( [ ';', "\n", "\r" ], '', $value );
-    }
+	/**
+	 * Strips characters that would break out of a CSS declaration value.
+	 *
+	 * @since  1.0.0
+	 * @param  string $value Raw value.
+	 * @return string
+	 */
+	private function sanitize( string $value ): string {
+		return str_replace( array( ';', "\n", "\r" ), '', $value );
+	}
 }

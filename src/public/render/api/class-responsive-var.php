@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Api;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -24,31 +24,31 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Responsive_Var {
 
-    /**
-     * @since 1.0.0
-     * @param string $desktop Value for the desktop breakpoint (always set).
-     * @param string $tablet  Value for the tablet breakpoint (falls back to desktop if empty).
-     * @param string $mobile  Value for the mobile breakpoint (falls back to tablet if empty).
-     */
-    public function __construct(
-        public readonly string $desktop,
-        public readonly string $tablet  = '',
-        public readonly string $mobile  = '',
-    ) {}
+	/**
+	 * @since 1.0.0
+	 * @param string $desktop Value for the desktop breakpoint (always set).
+	 * @param string $tablet  Value for the tablet breakpoint (falls back to desktop if empty).
+	 * @param string $mobile  Value for the mobile breakpoint (falls back to tablet if empty).
+	 */
+	public function __construct(
+		public readonly string $desktop,
+		public readonly string $tablet = '',
+		public readonly string $mobile = '',
+	) {}
 
-    /**
-     * Returns the effective value for a given breakpoint, cascading upward
-     * through desktop → tablet → mobile when a tier is empty.
-     *
-     * @since  1.0.0
-     * @param  string $breakpoint One of 'desktop', 'tablet', 'mobile'.
-     * @return string
-     */
-    public function for_breakpoint( string $breakpoint ): string {
-        return match ( $breakpoint ) {
-            'mobile'  => $this->mobile  !== '' ? $this->mobile  : $this->for_breakpoint( 'tablet' ),
-            'tablet'  => $this->tablet  !== '' ? $this->tablet  : $this->desktop,
-            default   => $this->desktop,
-        };
-    }
+	/**
+	 * Returns the effective value for a given breakpoint, cascading upward
+	 * through desktop → tablet → mobile when a tier is empty.
+	 *
+	 * @since  1.0.0
+	 * @param  string $breakpoint One of 'desktop', 'tablet', 'mobile'.
+	 * @return string
+	 */
+	public function for_breakpoint( string $breakpoint ): string {
+		return match ( $breakpoint ) {
+			'mobile'  => '' !== $this->mobile ? $this->mobile : $this->for_breakpoint( 'tablet' ),
+			'tablet'  => '' !== $this->tablet ? $this->tablet : $this->desktop,
+			default   => $this->desktop,
+		};
+	}
 }

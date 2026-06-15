@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Api;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -30,126 +30,126 @@ if ( ! defined( 'WPINC' ) ) {
  */
 interface Filter_Source {
 
-    /**
-     * Unique stable identifier for this source.
-     *
-     * @since   1.0.0
-     * @return  string  E.g. 'fotogrids/filter/tags'
-     */
-    public function id(): string;
+	/**
+	 * Unique stable identifier for this source.
+	 *
+	 * @since   1.0.0
+	 * @return  string  E.g. 'fotogrids/filter/tags'
+	 */
+	public function id(): string;
 
-    /**
-     * Origin slug used for precedence ranking in the module registry.
-     *
-     * @since   1.0.0
-     * @return  string  'fotogrids' | 'fotogrids-pro' | vendor slug
-     */
-    public function origin(): string;
+	/**
+	 * Origin slug used for precedence ranking in the module registry.
+	 *
+	 * @since   1.0.0
+	 * @return  string  'fotogrids' | 'fotogrids-pro' | vendor slug
+	 */
+	public function origin(): string;
 
-    /**
-     * ID of another filter source this module should displace, or null.
-     *
-     * @since   1.0.0
-     * @return  string|null
-     */
-    public function replaces(): ?string;
+	/**
+	 * ID of another filter source this module should displace, or null.
+	 *
+	 * @since   1.0.0
+	 * @return  string|null
+	 */
+	public function replaces(): ?string;
 
-    /**
-     * ID of a filter source this module augments (without replacing), or null.
-     *
-     * @since   1.0.0
-     * @return  string|null
-     */
-    public function extends_id(): ?string;
+	/**
+	 * ID of a filter source this module augments (without replacing), or null.
+	 *
+	 * @since   1.0.0
+	 * @return  string|null
+	 */
+	public function extends_id(): ?string;
 
-    /**
-     * Returns true when this source should be active for the given context.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  bool
-     */
-    public function supports( Render_Context $render_context ): bool;
+	/**
+	 * Returns true when this source should be active for the given context.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  bool
+	 */
+	public function supports( Render_Context $render_context ): bool;
 
-    /**
-     * Human-readable label for the filter group heading.
-     *
-     * Used as the dropdown trigger label or the group heading in buttons/
-     * checkboxes mode. Already translated - do not pass through __() again.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  string
-     */
-    public function group_label( Render_Context $render_context ): string;
+	/**
+	 * Human-readable label for the filter group heading.
+	 *
+	 * Used as the dropdown trigger label or the group heading in buttons/
+	 * checkboxes mode. Already translated - do not pass through __() again.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string
+	 */
+	public function group_label( Render_Context $render_context ): string;
 
-    /**
-     * The data-* attribute key stamped on each item element by the decorator.
-     *
-     * Must be in the form 'data-fg-<something>' and match exactly what the
-     * corresponding decorator writes onto Item_View::data_attrs.
-     *
-     * The JS filter engine reads this key to retrieve the item's space-separated
-     * token list and test it against the active filter value.
-     *
-     * @since   1.0.0
-     * @return  string  E.g. 'data-fg-tags'
-     */
-    public function item_data_attr_key(): string;
+	/**
+	 * The data-* attribute key stamped on each item element by the decorator.
+	 *
+	 * Must be in the form 'data-fg-<something>' and match exactly what the
+	 * corresponding decorator writes onto Item_View::data_attrs.
+	 *
+	 * The JS filter engine reads this key to retrieve the item's space-separated
+	 * token list and test it against the active filter value.
+	 *
+	 * @since   1.0.0
+	 * @return  string  E.g. 'data-fg-tags'
+	 */
+	public function item_data_attr_key(): string;
 
-    /**
-     * Returns the ordered list of filter options for items in this gallery.
-     *
-     * Called once by Filter_UI during html_before() generation. The source must
-     * only return options for items that actually exist in the current gallery
-     * (i.e. intersect with the IDs in $render_context->items). Options with
-     * count === 0 should be omitted.
-     *
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  array<int, Filter_Option>
-     */
-    public function get_options( Render_Context $render_context ): array;
+	/**
+	 * Returns the ordered list of filter options for items in this gallery.
+	 *
+	 * Called once by Filter_UI during html_before() generation. The source must
+	 * only return options for items that actually exist in the current gallery
+	 * (i.e. intersect with the IDs in $render_context->items). Options with
+	 * count === 0 should be omitted.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  array<int, Filter_Option>
+	 */
+	public function get_options( Render_Context $render_context ): array;
 
-    /**
-     * @since   1.0.0
-     * @param   Render_Context $render_context Render context.
-     * @return  Module_Assets
-     */
-    public function assets( Render_Context $render_context ): Module_Assets;
+	/**
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  Module_Assets
+	 */
+	public function assets( Render_Context $render_context ): Module_Assets;
 
-    /**
-     * REST arg key under which the client sends selected values for this
-     * source. E.g. 'tags' → POST body `{ filters: { tags: ['nature'] } }`.
-     *
-     * Must be a short, stable identifier (sanitize_key safe).
-     *
-     * @since 1.0.0
-     * @return string
-     */
-    public function filter_arg_key(): string;
+	/**
+	 * REST arg key under which the client sends selected values for this
+	 * source. E.g. 'tags' → POST body `{ filters: { tags: ['nature'] } }`.
+	 *
+	 * Must be a short, stable identifier (sanitize_key safe).
+	 *
+	 * @since 1.0.0
+	 * @return string
+	 */
+	public function filter_arg_key(): string;
 
-    /**
-     * Returns true when the given item matches at least one of the values
-     * selected for this source (OR within source).
-     *
-     * Used for server-side filtering when pagination interleaves with active
-     * filters — the server has to know which items belong on each filtered
-     * page so the client can request "page N of the filtered set" without
-     * ever pulling non-matching items over the wire.
-     *
-     * Implementations should mirror the client-side predicate exactly so
-     * the initial paint and subsequent paginated renders agree on which
-     * items are visible. For Tags, that means: "tokens stamped on
-     * data-fg-tags intersect $values".
-     *
-     * @since 1.0.0
-     * @param int                $item_id        Attachment ID.
-     * @param array<int, string> $values         Selected filter values
-     *                                           (typically slugs).
-     * @param Render_Context     $render_context Render context (carrying
-     *                                           the gallery being filtered).
-     * @return bool
-     */
-    public function matches( int $item_id, array $values, Render_Context $render_context ): bool;
+	/**
+	 * Returns true when the given item matches at least one of the values
+	 * selected for this source (OR within source).
+	 *
+	 * Used for server-side filtering when pagination interleaves with active
+	 * filters — the server has to know which items belong on each filtered
+	 * page so the client can request "page N of the filtered set" without
+	 * ever pulling non-matching items over the wire.
+	 *
+	 * Implementations should mirror the client-side predicate exactly so
+	 * the initial paint and subsequent paginated renders agree on which
+	 * items are visible. For Tags, that means: "tokens stamped on
+	 * data-fg-tags intersect $values".
+	 *
+	 * @since 1.0.0
+	 * @param int                $item_id        Attachment ID.
+	 * @param array<int, string> $values         Selected filter values
+	 *                                           (typically slugs).
+	 * @param Render_Context     $render_context Render context (carrying
+	 *                                           the gallery being filtered).
+	 * @return bool
+	 */
+	public function matches( int $item_id, array $values, Render_Context $render_context ): bool;
 }

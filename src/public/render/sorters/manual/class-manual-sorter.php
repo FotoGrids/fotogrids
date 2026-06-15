@@ -8,7 +8,7 @@ use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Sorter;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -23,46 +23,46 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Manual_Sorter implements Sorter {
 
-    public function id(): string {
-        return 'fotogrids/sort/manual';
-    }
+	public function id(): string {
+		return 'fotogrids/sort/manual';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    /**
-     * Active when default_sort_order is 'manual' (or absent) on a public render.
-     *
-     * @since  1.0.0
-     */
-    public function supports( Render_Context $render_context ): bool {
-        if ( $render_context->meta->is_preview ) {
-            return false;
-        }
+	/**
+	 * Active when default_sort_order is 'manual' (or absent) on a public render.
+	 *
+	 * @since  1.0.0
+	 */
+	public function supports( Render_Context $render_context ): bool {
+		if ( $render_context->meta->is_preview ) {
+			return false;
+		}
 
-        $order = $render_context->settings['default_sort_order'] ?? 'manual';
-        return ! is_string( $order ) || $order === 'manual';
-    }
+		$order = $render_context->settings['default_sort_order'] ?? 'manual';
+		return ! is_string( $order ) || 'manual' === $order;
+	}
 
-    /**
-     * No-op: returns IDs unchanged.
-     *
-     * @since  1.0.0
-     */
-    public function sort( array $item_ids, Render_Context $render_context ): array {
-        return $item_ids;
-    }
+	/**
+	 * No-op: returns IDs unchanged.
+	 *
+	 * @since  1.0.0
+	 */
+	public function sort( array $item_ids, Render_Context $render_context ): array {
+		return $item_ids;
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
-    }
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets();
+	}
 }

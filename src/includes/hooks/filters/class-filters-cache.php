@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -19,23 +19,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Filters_Cache {
 
-    /**
-     * Whether a render should be cached at all.
-     *
-     * @since 1.0.0
-     * @param bool  $should_cache Default true.
-     * @param array $settings     Collection settings.
-     * @param int   $gallery_id   Gallery ID.
-     */
-    public const SHOULD_CACHE = 'fotogrids/cache/should_cache';
+	/**
+	 * Whether a render should be cached at all.
+	 *
+	 * @since 1.0.0
+	 * @param bool  $should_cache Default true.
+	 * @param array $settings     Collection settings.
+	 * @param int   $gallery_id   Gallery ID.
+	 */
+	public const SHOULD_CACHE = 'fotogrids/cache/should_cache';
 
-    /**
-     * Cache bucket identifier for partitioning the cache (e.g. by locale).
-     *
-     * @since 1.0.0
-     * @param string $bucket     Default 'default'.
-     * @param array  $settings   Collection settings.
-     * @param int    $gallery_id Gallery ID.
-     */
-    public const BUCKET = 'fotogrids/cache/bucket';
+	/**
+	 * Cache bucket identifier for partitioning the cache (e.g. by locale).
+	 *
+	 * @since 1.0.0
+	 * @param string $bucket     Default 'default'.
+	 * @param array  $settings   Collection settings.
+	 * @param int    $gallery_id Gallery ID.
+	 */
+	public const BUCKET = 'fotogrids/cache/bucket';
 }

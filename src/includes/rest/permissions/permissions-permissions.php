@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\REST\Permissions;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -24,25 +24,25 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Permissions_Permissions {
 
-    /**
-     * Read the registry (definitions + roles + current grants).
-     *
-     * @param \WP_REST_Request $request
-     * @return bool
-     */
-    public static function check_read( $request ): bool {
-        return \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids_permissions' )
-            || \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids' );
-    }
+	/**
+	 * Read the registry (definitions + roles + current grants).
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return bool
+	 */
+	public static function check_read( $request ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids_permissions' )
+			|| \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids' );
+	}
 
-    /**
-     * Write Panel-1 (simple) lowest-role dropdowns.
-     *
-     * @param \WP_REST_Request $request
-     * @return bool
-     */
-    public static function check_write_simple( $request ): bool {
-        return \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids_permissions' )
-            || \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids' );
-    }
+	/**
+	 * Write Panel-1 (simple) lowest-role dropdowns.
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return bool
+	 */
+	public static function check_write_simple( $request ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids_permissions' )
+			|| \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids' );
+	}
 }

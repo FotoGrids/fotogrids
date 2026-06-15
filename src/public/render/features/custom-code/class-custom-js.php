@@ -10,7 +10,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -114,263 +114,263 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Custom_Js implements Feature {
 
-    /**
-     * Token users write to reference the current collection instance ID.
-     *
-     * Written as the bare word COLLECTION_ID (all-caps, no punctuation).
-     * The token is resolved to a single-quoted JS string literal of the real
-     * instance ID before the IIFE wrapper is emitted.
-     *
-     * @since 1.0.0
-     */
-    private const COLLECTION_ID_TOKEN = 'COLLECTION_ID';
+	/**
+	 * Token users write to reference the current collection instance ID.
+	 *
+	 * Written as the bare word COLLECTION_ID (all-caps, no punctuation).
+	 * The token is resolved to a single-quoted JS string literal of the real
+	 * instance ID before the IIFE wrapper is emitted.
+	 *
+	 * @since 1.0.0
+	 */
+	private const COLLECTION_ID_TOKEN = 'COLLECTION_ID';
 
-    public function id(): string {
-        return 'fotogrids/custom-js';
-    }
+	public function id(): string {
+		return 'fotogrids/custom-js';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    public function supports( Render_Context $render_context ): bool {
-        return $this->resolve_custom_js( $render_context ) !== '';
-    }
+	public function supports( Render_Context $render_context ): bool {
+		return $this->resolve_custom_js( $render_context ) !== '';
+	}
 
-    public function html_before( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_before( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_appendix( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
 
-    /**
-     * Returns a sandboxed, sanitized `<script>` block placed after the wrapper.
-     *
-     * @since  1.0.0
-     * @param  Render_Context $render_context Render context.
-     * @return string
-     */
-    public function html_after( Render_Context $render_context ): string {
-        $custom_js = $this->resolve_custom_js( $render_context );
-        if ( $custom_js === '' ) {
-            return '';
-        }
+	/**
+	 * Returns a sandboxed, sanitized `<script>` block placed after the wrapper.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	public function html_after( Render_Context $render_context ): string {
+		$custom_js = $this->resolve_custom_js( $render_context );
+		if ( '' === $custom_js ) {
+			return '';
+		}
 
-        $instance_id  = $render_context->meta->instance_id;
-        $escaped_id   = esc_js( $instance_id );
-        $wrapped_js   = $this->wrap_iife( $custom_js, $escaped_id );
+		$instance_id = $render_context->meta->instance_id;
+		$escaped_id  = esc_js( $instance_id );
+		$wrapped_js  = $this->wrap_iife( $custom_js, $escaped_id );
 
-        $script_html = '<script class="fg-custom-js">' . "\n" . $wrapped_js . "\n" . '</script>';
+		$script_html = '<script class="fg-custom-js">' . "\n" . $wrapped_js . "\n" . '</script>';
 
-        /**
-         * Filters the final <script> HTML string.
-         *
-         * Use this to add a CSP nonce attribute, a type attribute, or any
-         * other script tag modification. Return a non-string or empty string
-         * to suppress the output entirely.
-         *
-         * @since 1.0.0
-         * @param string         $script_html  The full <script>…</script> block.
-         * @param Render_Context $render_context Render context.
-         */
-        $filtered = apply_filters( Filters_Render::CUSTOM_JS_OUTPUT, $script_html, $render_context );
+		/**
+		 * Filters the final <script> HTML string.
+		 *
+		 * Use this to add a CSP nonce attribute, a type attribute, or any
+		 * other script tag modification. Return a non-string or empty string
+		 * to suppress the output entirely.
+		 *
+		 * @since 1.0.0
+		 * @param string         $script_html  The full <script>…</script> block.
+		 * @param Render_Context $render_context Render context.
+		 */
+		$filtered = apply_filters( Filters_Render::CUSTOM_JS_OUTPUT, $script_html, $render_context );
 
-        return is_string( $filtered ) ? $filtered : '';
-    }
+		return is_string( $filtered ) ? $filtered : '';
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
-    }
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets();
+	}
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Private helpers
+	// -------------------------------------------------------------------------
 
-    /**
-     * Extracts and sanitizes the raw JS string from render settings.
-     *
-     * Returns '' when the value is absent, non-string, or rejected by the
-     * sanitizer.
-     *
-     * @since  1.0.0
-     * @param  Render_Context $render_context Render context.
-     * @return string
-     */
-    private function resolve_custom_js( Render_Context $render_context ): string {
-        $raw = $render_context->settings['custom_js'] ?? '';
-        if ( ! is_string( $raw ) || $raw === '' ) {
-            return '';
-        }
+	/**
+	 * Extracts and sanitizes the raw JS string from render settings.
+	 *
+	 * Returns '' when the value is absent, non-string, or rejected by the
+	 * sanitizer.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	private function resolve_custom_js( Render_Context $render_context ): string {
+		$raw = $render_context->settings['custom_js'] ?? '';
+		if ( ! is_string( $raw ) || '' === $raw ) {
+			return '';
+		}
 
-        $allow_dynamic = $this->allow_dynamic_execution( $render_context );
-        $sanitized     = $this->sanitize( $raw, $allow_dynamic );
+		$allow_dynamic = $this->allow_dynamic_execution( $render_context );
+		$sanitized     = $this->sanitize( $raw, $allow_dynamic );
 
-        /**
-         * Filters the sanitized JS string after the built-in sanitizer runs.
-         *
-         * Return '' to suppress output. Return the original $raw to bypass all
-         * built-in checks (use with care - only for fully trusted contexts).
-         *
-         * @since 1.0.0
-         * @param string         $sanitized      Output of the built-in sanitizer, or '' if rejected.
-         * @param string         $raw            Original unsanitized value from settings.
-         * @param Render_Context $render_context Render context.
-         */
-        $filtered = apply_filters( Filters_Render::CUSTOM_JS_SANITIZE, $sanitized, $raw, $render_context );
+		/**
+		 * Filters the sanitized JS string after the built-in sanitizer runs.
+		 *
+		 * Return '' to suppress output. Return the original $raw to bypass all
+		 * built-in checks (use with care - only for fully trusted contexts).
+		 *
+		 * @since 1.0.0
+		 * @param string         $sanitized      Output of the built-in sanitizer, or '' if rejected.
+		 * @param string         $raw            Original unsanitized value from settings.
+		 * @param Render_Context $render_context Render context.
+		 */
+		$filtered = apply_filters( Filters_Render::CUSTOM_JS_SANITIZE, $sanitized, $raw, $render_context );
 
-        return is_string( $filtered ) ? trim( $filtered ) : '';
-    }
+		return is_string( $filtered ) ? trim( $filtered ) : '';
+	}
 
-    /**
-     * Resolves whether dynamic code execution is permitted for this render.
-     *
-     * Administrators are always allowed - the restriction only applies to
-     * lower-privilege roles that have gallery editing access. For everyone
-     * else, the per-collection setting (which defaults to the global plugin
-     * option) is the baseline, and the filter is the override point for the
-     * Permissions Manager and other access-control integrations.
-     *
-     * @since  1.0.0
-     * @param  Render_Context $render_context Render context.
-     * @return bool
-     */
-    private function allow_dynamic_execution( Render_Context $render_context ): bool {
-        // Administrators are never restricted.
-        if ( current_user_can( 'administrator' ) ) {
-            return true;
-        }
+	/**
+	 * Resolves whether dynamic code execution is permitted for this render.
+	 *
+	 * Administrators are always allowed - the restriction only applies to
+	 * lower-privilege roles that have gallery editing access. For everyone
+	 * else, the per-collection setting (which defaults to the global plugin
+	 * option) is the baseline, and the filter is the override point for the
+	 * Permissions Manager and other access-control integrations.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return bool
+	 */
+	private function allow_dynamic_execution( Render_Context $render_context ): bool {
+		// Administrators are never restricted.
+		if ( current_user_can( 'manage_options' ) ) {
+			return true;
+		}
 
-        $setting_value = ! empty( $render_context->settings['custom_js_allow_dynamic_execution'] );
+		$setting_value = ! empty( $render_context->settings['custom_js_allow_dynamic_execution'] );
 
-        /**
-         * Filters whether dynamic code execution (eval, Function constructor,
-         * string-form setTimeout/setInterval) is permitted in custom JS.
-         *
-         * Off by default. Enable only for explicitly trusted contexts.
-         *
-         * @since 1.0.0
-         * @param bool           $allowed        Whether dynamic execution is currently allowed.
-         * @param Render_Context $render_context Render context.
-         */
-        $filtered = apply_filters(
-            Filters_Features::CUSTOM_JS_ALLOW_DYNAMIC,
-            $setting_value,
-            $render_context
-        );
+		/**
+		 * Filters whether dynamic code execution (eval, Function constructor,
+		 * string-form setTimeout/setInterval) is permitted in custom JS.
+		 *
+		 * Off by default. Enable only for explicitly trusted contexts.
+		 *
+		 * @since 1.0.0
+		 * @param bool           $allowed        Whether dynamic execution is currently allowed.
+		 * @param Render_Context $render_context Render context.
+		 */
+		$filtered = apply_filters(
+			Filters_Features::CUSTOM_JS_ALLOW_DYNAMIC,
+			$setting_value,
+			$render_context
+		);
 
-        return (bool) $filtered;
-    }
+		return (bool) $filtered;
+	}
 
-    /**
-     * Sanitizes a raw JS string.
-     *
-     * Removes dangerous constructs while preserving valid JavaScript. The method
-     * is intentionally focused on HTML-breakout prevention rather than attempting
-     * a full JS sandbox - that would be security theatre for a capability-gated
-     * field. When in doubt, the input is rejected entirely.
-     *
-     * @since  1.0.0
-     * @param  string $js             Raw JS input from settings storage.
-     * @param  bool   $allow_dynamic  Whether eval / Function / string timers are permitted.
-     * @return string Clean JS, or '' if nothing safe survives.
-     */
-    private function sanitize( string $js, bool $allow_dynamic ): string {
-        // 1. Null bytes and ASCII control characters (except tab/newline/CR).
-        $js = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $js );
-        if ( ! is_string( $js ) ) {
-            return '';
-        }
+	/**
+	 * Sanitizes a raw JS string.
+	 *
+	 * Removes dangerous constructs while preserving valid JavaScript. The method
+	 * is intentionally focused on HTML-breakout prevention rather than attempting
+	 * a full JS sandbox - that would be security theatre for a capability-gated
+	 * field. When in doubt, the input is rejected entirely.
+	 *
+	 * @since  1.0.0
+	 * @param  string $js             Raw JS input from settings storage.
+	 * @param  bool   $allow_dynamic  Whether eval / Function / string timers are permitted.
+	 * @return string Clean JS, or '' if nothing safe survives.
+	 */
+	private function sanitize( string $js, bool $allow_dynamic ): string {
+		// 1. Null bytes and ASCII control characters (except tab/newline/CR).
+		$js = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $js );
+		if ( ! is_string( $js ) ) {
+			return '';
+		}
 
-        // 2. Strip JS block comments /* … */ before further analysis.
-        //    This prevents payloads hidden inside /* </script> */ boundaries.
-        $js = preg_replace( '#/\*.*?\*/#s', '', $js );
-        if ( ! is_string( $js ) ) {
-            return '';
-        }
+		// 2. Strip JS block comments /* … */ before further analysis.
+		//    This prevents payloads hidden inside /* </script> */ boundaries.
+		$js = preg_replace( '#/\*.*?\*/#s', '', $js );
+		if ( ! is_string( $js ) ) {
+			return '';
+		}
 
-        // 3. Strip JS line comments // … (to end of line).
-        //    Prevents payloads like:  // </script><script>evil()
-        $js = preg_replace( '#//[^\r\n]*#', '', $js );
-        if ( ! is_string( $js ) ) {
-            return '';
-        }
+		// 3. Strip JS line comments // … (to end of line).
+		//    Prevents payloads like:  // </script><script>evil()
+		$js = preg_replace( '#//[^\r\n]*#', '', $js );
+		if ( ! is_string( $js ) ) {
+			return '';
+		}
 
-        // 4. Reject any </script closing sequence (case-insensitive, with optional
-        //    whitespace or slash variants). A legitimate script block never needs to
-        //    close an HTML tag.
-        if ( preg_match( '#</\s*script#i', $js ) ) {
-            return '';
-        }
+		// 4. Reject any </script closing sequence (case-insensitive, with optional
+		//    whitespace or slash variants). A legitimate script block never needs to
+		//    close an HTML tag.
+		if ( preg_match( '#</\s*script#i', $js ) ) {
+			return '';
+		}
 
-        // 5. Reject bare < and > to prevent HTML smuggling (e.g. a second <script>
-        //    tag injected inside the block).
-        if ( strpos( $js, '<' ) !== false || strpos( $js, '>' ) !== false ) {
-            return '';
-        }
+		// 5. Reject bare < and > to prevent HTML smuggling (e.g. a second <script>
+		//    tag injected inside the block).
+		if ( strpos( $js, '<' ) !== false || strpos( $js, '>' ) !== false ) {
+			return '';
+		}
 
-        // 6. Dynamic execution gate - blocked unless explicitly enabled.
-        //    eval()           - direct JS evaluation.
-        //    Function(…)      - Function constructor (equivalent to eval).
-        //    new Function(…)  - same, with new keyword.
-        //    setTimeout / setInterval with a string first argument - the string
-        //    is evaluated as code. The callback form (fn, ms) is legitimate and
-        //    is NOT blocked (we check for a quote character after the opening
-        //    parenthesis to distinguish the two forms).
-        if ( ! $allow_dynamic ) {
-            if ( preg_match( '/\beval\s*\(/i', $js ) ) {
-                return '';
-            }
+		// 6. Dynamic execution gate - blocked unless explicitly enabled.
+		//    eval()           - direct JS evaluation.
+		//    Function(…)      - Function constructor (equivalent to eval).
+		//    new Function(…)  - same, with new keyword.
+		//    setTimeout / setInterval with a string first argument - the string
+		//    is evaluated as code. The callback form (fn, ms) is legitimate and
+		//    is NOT blocked (we check for a quote character after the opening
+		//    parenthesis to distinguish the two forms).
+		if ( ! $allow_dynamic ) {
+			if ( preg_match( '/\beval\s*\(/i', $js ) ) {
+				return '';
+			}
 
-            if ( preg_match( '/\bFunction\s*\(/i', $js ) ) {
-                return '';
-            }
+			if ( preg_match( '/\bFunction\s*\(/i', $js ) ) {
+				return '';
+			}
 
-            if ( preg_match( '/\b(setTimeout|setInterval)\s*\(\s*[\'"`]/i', $js ) ) {
-                return '';
-            }
-        }
+			if ( preg_match( '/\b(setTimeout|setInterval)\s*\(\s*[\'"`]/i', $js ) ) {
+				return '';
+			}
+		}
 
-        return trim( $js );
-    }
+		return trim( $js );
+	}
 
-    /**
-     * Wraps the user's code in a scoped IIFE.
-     *
-     * The IIFE receives the live collection DOM element as its first parameter
-     * (`collection`). The COLLECTION_ID token is replaced with the single-quoted
-     * instance ID string before wrapping.
-     *
-     * @since  1.0.0
-     * @param  string $js          Sanitized JS input.
-     * @param  string $escaped_id  esc_js()-escaped instance ID (no surrounding quotes).
-     * @return string
-     */
-    private function wrap_iife( string $js, string $escaped_id ): string {
-        // Replace the explicit user token with a single-quoted JS string literal.
-        $js = str_replace( self::COLLECTION_ID_TOKEN, "'" . $escaped_id . "'", $js );
+	/**
+	 * Wraps the user's code in a scoped IIFE.
+	 *
+	 * The IIFE receives the live collection DOM element as its first parameter
+	 * (`collection`). The COLLECTION_ID token is replaced with the single-quoted
+	 * instance ID string before wrapping.
+	 *
+	 * @since  1.0.0
+	 * @param  string $js          Sanitized JS input.
+	 * @param  string $escaped_id  esc_js()-escaped instance ID (no surrounding quotes).
+	 * @return string
+	 */
+	private function wrap_iife( string $js, string $escaped_id ): string {
+		// Replace the explicit user token with a single-quoted JS string literal.
+		$js = str_replace( self::COLLECTION_ID_TOKEN, "'" . $escaped_id . "'", $js );
 
-        return sprintf(
-            "(function(collection) {\n%s\n})(document.getElementById('%s'));",
-            $js,
-            $escaped_id
-        );
-    }
+		return sprintf(
+			"(function(collection) {\n%s\n})(document.getElementById('%s'));",
+			$js,
+			$escaped_id
+		);
+	}
 }

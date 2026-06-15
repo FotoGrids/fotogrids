@@ -6,7 +6,7 @@ namespace FotoGrids\Render\Internal;
 use FotoGrids\Render\Api\Item_View;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -36,120 +36,136 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Album_Item_Loader {
 
-    /**
-     * Build Item_Views from a list of gallery post IDs.
-     *
-     * Signature matches Context_Builder's items_loader contract:
-     * receives an array of IDs, returns an array of Item_View.
-     *
-     * @since  1.0.0
-     * @param  array<int, mixed> $gallery_ids Gallery post IDs.
-     * @param  string            $thumb_size  WP image size slug used for the album's gallery-cover thumbs.
-     * @return array<int, Item_View>
-     */
-    public static function load( array $gallery_ids, string $thumb_size = 'medium' ): array {
-        $items = [];
+	/**
+	 * Build Item_Views from a list of gallery post IDs.
+	 *
+	 * Signature matches Context_Builder's items_loader contract:
+	 * receives an array of IDs, returns an array of Item_View.
+	 *
+	 * @since  1.0.0
+	 * @param  array<int, mixed> $gallery_ids Gallery post IDs.
+	 * @param  string            $thumb_size  WP image size slug used for the album's gallery-cover thumbs.
+	 * @return array<int, Item_View>
+	 */
+	public static function load( array $gallery_ids, string $thumb_size = 'medium' ): array {
+		$items = array();
 
-        foreach ( $gallery_ids as $raw_id ) {
-            $gallery_id = (int) $raw_id;
-            if ( $gallery_id <= 0 ) {
-                continue;
-            }
+		foreach ( $gallery_ids as $raw_id ) {
+			$gallery_id = (int) $raw_id;
+			if ( $gallery_id <= 0 ) {
+				continue;
+			}
 
-            $gallery_post = get_post( $gallery_id );
-            if ( ! $gallery_post || $gallery_post->post_type !== 'fotogrids_gallery' ) {
-                continue;
-            }
+			$gallery_post = get_post( $gallery_id );
+			if ( ! $gallery_post || 'fotogrids_gallery' !== $gallery_post->post_type ) {
+				continue;
+			}
 
-            $thumb = self::resolve_thumbnail( $gallery_id, $thumb_size );
-            if ( $thumb['url'] === '' ) {
-                // A gallery with no featured image and no items at all gets
-                // skipped — there is literally nothing to show for it.
-                continue;
-            }
+			$thumb = self::resolve_thumbnail( $gallery_id, $thumb_size );
+			if ( '' === $thumb['url'] ) {
+				// A gallery with no featured image and no items at all gets
+				// skipped — there is literally nothing to show for it.
+				continue;
+			}
 
-            $items[] = new Item_View(
-                id:          $gallery_id,
-                thumb_url:   $thumb['url'],
-                full_url:    $thumb['url'],
-                alt:         (string) $gallery_post->post_title,
-                title:       (string) $gallery_post->post_title,
-                caption:     (string) $gallery_post->post_excerpt,
-                description: (string) $gallery_post->post_content,
-                width:       $thumb['width'],
-                height:      $thumb['height'],
-                meta:        [
-                    'item_count' => self::count_items( $gallery_id ),
-                ],
-                thumb_size:  $thumb_size,
-            );
-        }
+			$items[] = new Item_View(
+				id:          $gallery_id,
+				thumb_url:   $thumb['url'],
+				full_url:    $thumb['url'],
+				alt:         (string) $gallery_post->post_title,
+				title:       (string) $gallery_post->post_title,
+				caption:     (string) $gallery_post->post_excerpt,
+				description: (string) $gallery_post->post_content,
+				width:       $thumb['width'],
+				height:      $thumb['height'],
+				meta:        array(
+					'item_count' => self::count_items( $gallery_id ),
+				),
+				thumb_size:  $thumb_size,
+			);
+		}
 
-        return $items;
-    }
+		return $items;
+	}
 
-    /**
-     * Resolve the gallery's thumbnail (featured image first, then the first
-     * attachment's image at the requested size) as an associative array with
-     * url + intrinsic dimensions.
-     *
-     * @since  1.0.0
-     * @param  int    $gallery_id Gallery post ID.
-     * @param  string $thumb_size WP image size slug.
-     * @return array{url: string, width: int|null, height: int|null}
-     */
-    private static function resolve_thumbnail( int $gallery_id, string $thumb_size ): array {
-        $featured_id = (int) get_post_thumbnail_id( $gallery_id );
-        if ( $featured_id > 0 ) {
-            $src = wp_get_attachment_image_src( $featured_id, $thumb_size );
-            if ( is_array( $src ) && ! empty( $src[0] ) ) {
-                return [
-                    'url'    => (string) $src[0],
-                    'width'  => isset( $src[1] ) ? (int) $src[1] : null,
-                    'height' => isset( $src[2] ) ? (int) $src[2] : null,
-                ];
-            }
-        }
+	/**
+	 * Resolve the gallery's thumbnail (featured image first, then the first
+	 * attachment's image at the requested size) as an associative array with
+	 * url + intrinsic dimensions.
+	 *
+	 * @since  1.0.0
+	 * @param  int    $gallery_id Gallery post ID.
+	 * @param  string $thumb_size WP image size slug.
+	 * @return array{url: string, width: int|null, height: int|null}
+	 */
+	private static function resolve_thumbnail( int $gallery_id, string $thumb_size ): array {
+		$featured_id = (int) get_post_thumbnail_id( $gallery_id );
+		if ( $featured_id > 0 ) {
+			$src = wp_get_attachment_image_src( $featured_id, $thumb_size );
+			if ( is_array( $src ) && ! empty( $src[0] ) ) {
+				return array(
+					'url'    => (string) $src[0],
+					'width'  => isset( $src[1] ) ? (int) $src[1] : null,
+					'height' => isset( $src[2] ) ? (int) $src[2] : null,
+				);
+			}
+		}
 
-        if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
-            return [ 'url' => '', 'width' => null, 'height' => null ];
-        }
+		if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
+			return array(
+				'url'    => '',
+				'width'  => null,
+				'height' => null,
+			);
+		}
 
-        $item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
-        if ( ! is_array( $item_ids ) || empty( $item_ids ) ) {
-            return [ 'url' => '', 'width' => null, 'height' => null ];
-        }
+		$item_ids = \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id );
+		if ( ! is_array( $item_ids ) || empty( $item_ids ) ) {
+			return array(
+				'url'    => '',
+				'width'  => null,
+				'height' => null,
+			);
+		}
 
-        $first_id = (int) reset( $item_ids );
-        if ( $first_id <= 0 ) {
-            return [ 'url' => '', 'width' => null, 'height' => null ];
-        }
+		$first_id = (int) reset( $item_ids );
+		if ( $first_id <= 0 ) {
+			return array(
+				'url'    => '',
+				'width'  => null,
+				'height' => null,
+			);
+		}
 
-        $src = wp_get_attachment_image_src( $first_id, $thumb_size );
-        if ( ! is_array( $src ) || empty( $src[0] ) ) {
-            return [ 'url' => '', 'width' => null, 'height' => null ];
-        }
+		$src = wp_get_attachment_image_src( $first_id, $thumb_size );
+		if ( ! is_array( $src ) || empty( $src[0] ) ) {
+			return array(
+				'url'    => '',
+				'width'  => null,
+				'height' => null,
+			);
+		}
 
-        return [
-            'url'    => (string) $src[0],
-            'width'  => isset( $src[1] ) ? (int) $src[1] : null,
-            'height' => isset( $src[2] ) ? (int) $src[2] : null,
-        ];
-    }
+		return array(
+			'url'    => (string) $src[0],
+			'width'  => isset( $src[1] ) ? (int) $src[1] : null,
+			'height' => isset( $src[2] ) ? (int) $src[2] : null,
+		);
+	}
 
-    /**
-     * Count items in a gallery; used as item_count meta on the album
-     * item so a future decorator can render "12 items" badges without
-     * re-querying.
-     *
-     * @since  1.0.0
-     * @param  int $gallery_id Gallery post ID.
-     * @return int
-     */
-    private static function count_items( int $gallery_id ): int {
-        if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
-            return 0;
-        }
-        return \FotoGrids\Galleries\Gallery_Repository::get_item_count( $gallery_id );
-    }
+	/**
+	 * Count items in a gallery; used as item_count meta on the album
+	 * item so a future decorator can render "12 items" badges without
+	 * re-querying.
+	 *
+	 * @since  1.0.0
+	 * @param  int $gallery_id Gallery post ID.
+	 * @return int
+	 */
+	private static function count_items( int $gallery_id ): int {
+		if ( ! class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
+			return 0;
+		}
+		return \FotoGrids\Galleries\Gallery_Repository::get_item_count( $gallery_id );
+	}
 }

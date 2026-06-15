@@ -9,7 +9,7 @@
 namespace FotoGrids\Licensing;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -33,54 +33,54 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Access_State {
 
-    /**
-     * Editable state token.
-     *
-     * @var string
-     */
-    public const EDITABLE = 'editable';
+	/**
+	 * Editable state token.
+	 *
+	 * @var string
+	 */
+	public const EDITABLE = 'editable';
 
-    /**
-     * Teaser state token.
-     *
-     * @var string
-     */
-    public const TEASER = 'teaser';
+	/**
+	 * Teaser state token.
+	 *
+	 * @var string
+	 */
+	public const TEASER = 'teaser';
 
-    /**
-     * Locked state token.
-     *
-     * @var string
-     */
-    public const LOCKED = 'locked';
+	/**
+	 * Locked state token.
+	 *
+	 * @var string
+	 */
+	public const LOCKED = 'locked';
 
-    /**
-     * Resolve a required tier to an access state for the current user.
-     *
-     * Uses the static License_Manager tier API. Free tiers short-circuit
-     * before any provider round-trip.
-     *
-     * @since 1.0.0
-     * @param string $tier_required One of 'free' | 'pro_starter' | 'pro_plus' | 'agency'.
-     * @return string One of self::EDITABLE | self::TEASER | self::LOCKED.
-     */
-    public static function resolve( string $tier_required ): string {
-        if ( 'free' === $tier_required || '' === $tier_required ) {
-            return self::EDITABLE;
-        }
+	/**
+	 * Resolve a required tier to an access state for the current user.
+	 *
+	 * Uses the static License_Manager tier API. Free tiers short-circuit
+	 * before any provider round-trip.
+	 *
+	 * @since 1.0.0
+	 * @param string $tier_required One of 'free' | 'pro_starter' | 'pro_plus' | 'agency'.
+	 * @return string One of self::EDITABLE | self::TEASER | self::LOCKED.
+	 */
+	public static function resolve( string $tier_required ): string {
+		if ( 'free' === $tier_required || '' === $tier_required ) {
+			return self::EDITABLE;
+		}
 
-        // User is on the required plan (or higher).
-        if ( \FotoGrids\License_Manager::on_plan( $tier_required ) ) {
-            return self::EDITABLE;
-        }
+		// User is on the required plan (or higher).
+		if ( \FotoGrids\License_Manager::on_plan( $tier_required ) ) {
+			return self::EDITABLE;
+		}
 
-        // User has an active Pro license but not this tier / it has lapsed
-        // for this tier - treat as locked (they had access at some point).
-        if ( \FotoGrids\License_Manager::pro_is_active() ) {
-            return self::LOCKED;
-        }
+		// User has an active Pro license but not this tier / it has lapsed
+		// for this tier - treat as locked (they had access at some point).
+		if ( \FotoGrids\License_Manager::pro_is_active() ) {
+			return self::LOCKED;
+		}
 
-        // User has never been on this tier.
-        return self::TEASER;
-    }
+		// User has never been on this tier.
+		return self::TEASER;
+	}
 }

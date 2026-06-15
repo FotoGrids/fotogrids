@@ -7,7 +7,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -26,20 +26,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 abstract class Abstract_Db_Sorter {
 
-    /*
-     * ---------------------------------------------------------------------
-     * PHPCS: WPDB direct-query sniffs disabled for this class.
-     * ---------------------------------------------------------------------
-     * This class is part of the FotoGrids custom-table data layer. Every
-     * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-     * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-     * WP placeholders cannot bind. All user-supplied *values* are passed
-     * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-     * a generated %d IN() list, the prepare call is a separate statement the
-     * sniff cannot follow. Custom tables have no WP_Query / core-API
-     * equivalent and no object-cache layer applies at this level.
-     * ---------------------------------------------------------------------
-     */
+	/*
+	 * ---------------------------------------------------------------------
+	 * PHPCS: WPDB direct-query sniffs disabled for this class.
+	 * ---------------------------------------------------------------------
+	 * This class is part of the FotoGrids custom-table data layer. Every
+	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
+	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
+	 * WP placeholders cannot bind. All user-supplied *values* are passed
+	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
+	 * a generated %d IN() list, the prepare call is a separate statement the
+	 * sniff cannot follow. Custom tables have no WP_Query / core-API
+	 * equivalent and no object-cache layer applies at this level.
+	 * ---------------------------------------------------------------------
+	 */
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
     // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
@@ -48,96 +48,96 @@ abstract class Abstract_Db_Sorter {
     // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
     // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-    // -------------------------------------------------------------------------
-    // Shared interface stubs - concrete sorters only need to override what
-    // differs (id, origin, supports, sort).
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Shared interface stubs - concrete sorters only need to override what
+	// differs (id, origin, supports, sort).
+	// -------------------------------------------------------------------------
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
-    }
+	public function assets( Render_Context $render_context ): Module_Assets { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return new Module_Assets();
+	}
 
-    // -------------------------------------------------------------------------
-    // Batch DB helpers
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Batch DB helpers
+	// -------------------------------------------------------------------------
 
-    /**
-     * Batch-fetch sort columns from wp_posts for the given attachment IDs.
-     *
-     * Returns a map of attachment_id → row array (ID, post_title, post_date,
-     * post_modified, guid). Only rows with post_type = 'attachment' are returned,
-     * so any non-attachment ID simply won't appear in the map.
-     *
-     * @since   1.0.0
-     * @param   array<int, int> $item_ids Attachment IDs to fetch.
-     * @return  array<int, array{ID: string, post_title: string, post_date: string, post_modified: string, guid: string}>
-     */
-    protected function batch_fetch( array $item_ids ): array {
-        if ( empty( $item_ids ) ) {
-            return [];
-        }
+	/**
+	 * Batch-fetch sort columns from wp_posts for the given attachment IDs.
+	 *
+	 * Returns a map of attachment_id → row array (ID, post_title, post_date,
+	 * post_modified, guid). Only rows with post_type = 'attachment' are returned,
+	 * so any non-attachment ID simply won't appear in the map.
+	 *
+	 * @since   1.0.0
+	 * @param   array<int, int> $item_ids Attachment IDs to fetch.
+	 * @return  array<int, array{ID: string, post_title: string, post_date: string, post_modified: string, guid: string}>
+	 */
+	protected function batch_fetch( array $item_ids ): array {
+		if ( empty( $item_ids ) ) {
+			return array();
+		}
 
-        global $wpdb;
+		global $wpdb;
 
-        $placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
+		$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
 
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $rows = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT ID, post_type, post_title, post_date, post_modified, guid
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID, post_type, post_title, post_date, post_modified, guid
                  FROM {$wpdb->posts}
                  WHERE ID IN ({$placeholders})
                    AND post_type IN ('attachment', 'fotogrids_embed')",
-                ...$item_ids
-            ),
-            ARRAY_A
-        );
+				...$item_ids
+			),
+			ARRAY_A
+		);
 
-        if ( ! is_array( $rows ) ) {
-            return [];
-        }
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
 
-        $map = [];
-        foreach ( $rows as $row ) {
-            $map[ (int) $row['ID'] ] = $row;
-        }
+		$map = array();
+		foreach ( $rows as $row ) {
+			$map[ (int) $row['ID'] ] = $row;
+		}
 
-        return $map;
-    }
+		return $map;
+	}
 
-    /**
-     * Split $item_ids into two lists: those present in $row_map and those not.
-     *
-     * Returns [ $sortable, $unsortable ] where $sortable preserves original
-     * relative order before the caller applies usort().
-     *
-     * @since   1.0.0
-     * @param   array<int, int>   $item_ids Attachment IDs.
-     * @param   array<int, mixed> $row_map  Map keyed by attachment ID.
-     * @return  array{array<int, int>, array<int, int>}
-     */
-    protected function split_sortable( array $item_ids, array $row_map ): array {
-        $sortable   = [];
-        $unsortable = [];
+	/**
+	 * Split $item_ids into two lists: those present in $row_map and those not.
+	 *
+	 * Returns [ $sortable, $unsortable ] where $sortable preserves original
+	 * relative order before the caller applies usort().
+	 *
+	 * @since   1.0.0
+	 * @param   array<int, int>   $item_ids Attachment IDs.
+	 * @param   array<int, mixed> $row_map  Map keyed by attachment ID.
+	 * @return  array{array<int, int>, array<int, int>}
+	 */
+	protected function split_sortable( array $item_ids, array $row_map ): array {
+		$sortable   = array();
+		$unsortable = array();
 
-        foreach ( $item_ids as $id ) {
-            if ( isset( $row_map[ $id ] ) ) {
-                $sortable[] = $id;
-            } else {
-                $unsortable[] = $id;
-            }
-        }
+		foreach ( $item_ids as $id ) {
+			if ( isset( $row_map[ $id ] ) ) {
+				$sortable[] = $id;
+			} else {
+				$unsortable[] = $id;
+			}
+		}
 
-        return [ $sortable, $unsortable ];
-    }
+		return array( $sortable, $unsortable );
+	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching

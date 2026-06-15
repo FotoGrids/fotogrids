@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Api;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -15,17 +15,17 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Filter_Option {
 
-    /**
-     * @param string $value Machine-readable value (e.g. tag slug). Used in
-     *                      data-fg-* attributes and JS token matching. Must be
-     *                      safe for use as an HTML attribute value and a JS
-     *                      space-separated token (no spaces).
-     * @param string $label Human-readable display label (escaped before output).
-     * @param int    $count Number of items carrying this option value.
-     */
-    public function __construct(
-        public readonly string $value,
-        public readonly string $label,
-        public readonly int    $count,
-    ) {}
+	/**
+	 * @param string $value Machine-readable value (e.g. tag slug). Used in
+	 *                      data-fg-* attributes and JS token matching. Must be
+	 *                      safe for use as an HTML attribute value and a JS
+	 *                      space-separated token (no spaces).
+	 * @param string $label Human-readable display label (escaped before output).
+	 * @param int    $count Number of items carrying this option value.
+	 */
+	public function __construct(
+		public readonly string $value,
+		public readonly string $label,
+		public readonly int $count,
+	) {}
 }

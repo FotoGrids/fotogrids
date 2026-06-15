@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Modules\PageBuilders\REST;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -32,157 +32,173 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Register_Preview_Routes {
 
-    /**
-     * Register every Page Builders REST route.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    public static function register(): void {
-        self::register_gallery_preview_route();
-        self::register_album_preview_route();
-        self::register_picker_items_route();
-        self::register_import_core_gallery_route();
-    }
+	/**
+	 * Register every Page Builders REST route.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public static function register(): void {
+		self::register_gallery_preview_route();
+		self::register_album_preview_route();
+		self::register_picker_items_route();
+		self::register_import_core_gallery_route();
+	}
 
-    /**
-     * POST /import/core-gallery
-     *
-     * Powers the `core/gallery` -> `fotogrids/gallery` block transform.
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    private static function register_import_core_gallery_route(): void {
-        register_rest_route( 'fotogrids/v1', '/import/core-gallery', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ Preview_Data::class, 'import_core_gallery' ],
-                'permission_callback' => [ Preview_Permissions::class, 'check_preview_read' ],
-                'args'                => [
-                    'attachment_ids' => [
-                        'required'          => true,
-                        'sanitize_callback' => static function ( $value ) {
-                            if ( ! is_array( $value ) ) {
-                                return [];
-                            }
-                            return array_values( array_filter( array_map( 'absint', $value ) ) );
-                        },
-                        'validate_callback' => static fn( $value ) => is_array( $value ),
-                    ],
-                    'title'          => [
-                        'default'           => '',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                ],
-            ],
-        ] );
-    }
+	/**
+	 * POST /import/core-gallery
+	 *
+	 * Powers the `core/gallery` -> `fotogrids/gallery` block transform.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	private static function register_import_core_gallery_route(): void {
+		register_rest_route(
+			'fotogrids/v1',
+			'/import/core-gallery',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( Preview_Data::class, 'import_core_gallery' ),
+					'permission_callback' => array( Preview_Permissions::class, 'check_preview_read' ),
+					'args'                => array(
+						'attachment_ids' => array(
+							'required'          => true,
+							'sanitize_callback' => static function ( $value ) {
+								if ( ! is_array( $value ) ) {
+									return array();
+								}
+								return array_values( array_filter( array_map( 'absint', $value ) ) );
+							},
+							'validate_callback' => static fn( $value ) => is_array( $value ),
+						),
+						'title'          => array(
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+					),
+				),
+			)
+		);
+	}
 
-    /**
-     * POST /preview/gallery/{id}
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    private static function register_gallery_preview_route(): void {
-        register_rest_route( 'fotogrids/v1', '/preview/gallery/(?P<id>\d+)', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ Preview_Data::class, 'render_gallery_preview' ],
-                'permission_callback' => [ Preview_Permissions::class, 'check_preview_read' ],
-                'args'                => [
-                    'id'      => [
-                        'required'          => true,
-                        'sanitize_callback' => 'absint',
-                        'validate_callback' => static fn( $param ) => is_numeric( $param ) && (int) $param > 0,
-                    ],
-                    'version' => [
-                        'default'           => 2,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'preview_options' => [
-                        'default'           => [],
-                        'sanitize_callback' => static function ( $value ) {
-                            return is_array( $value ) ? $value : [];
-                        },
-                    ],
-                ],
-            ],
-        ] );
-    }
+	/**
+	 * POST /preview/gallery/{id}
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	private static function register_gallery_preview_route(): void {
+		register_rest_route(
+			'fotogrids/v1',
+			'/preview/gallery/(?P<id>\d+)',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( Preview_Data::class, 'render_gallery_preview' ),
+					'permission_callback' => array( Preview_Permissions::class, 'check_preview_read' ),
+					'args'                => array(
+						'id'              => array(
+							'required'          => true,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => static fn( $param ) => is_numeric( $param ) && (int) $param > 0,
+						),
+						'version'         => array(
+							'default'           => 2,
+							'sanitize_callback' => 'absint',
+						),
+						'preview_options' => array(
+							'default'           => array(),
+							'sanitize_callback' => static function ( $value ) {
+								return is_array( $value ) ? $value : array();
+							},
+						),
+					),
+				),
+			)
+		);
+	}
 
-    /**
-     * POST /preview/album/{id}
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    private static function register_album_preview_route(): void {
-        register_rest_route( 'fotogrids/v1', '/preview/album/(?P<id>\d+)', [
-            [
-                'methods'             => \WP_REST_Server::CREATABLE,
-                'callback'            => [ Preview_Data::class, 'render_album_preview' ],
-                'permission_callback' => [ Preview_Permissions::class, 'check_preview_read' ],
-                'args'                => [
-                    'id' => [
-                        'required'          => true,
-                        'sanitize_callback' => 'absint',
-                        'validate_callback' => static fn( $param ) => is_numeric( $param ) && (int) $param > 0,
-                    ],
-                    'preview_options' => [
-                        'default'           => [],
-                        'sanitize_callback' => static function ( $value ) {
-                            return is_array( $value ) ? $value : [];
-                        },
-                    ],
-                ],
-            ],
-        ] );
-    }
+	/**
+	 * POST /preview/album/{id}
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	private static function register_album_preview_route(): void {
+		register_rest_route(
+			'fotogrids/v1',
+			'/preview/album/(?P<id>\d+)',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( Preview_Data::class, 'render_album_preview' ),
+					'permission_callback' => array( Preview_Permissions::class, 'check_preview_read' ),
+					'args'                => array(
+						'id'              => array(
+							'required'          => true,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => static fn( $param ) => is_numeric( $param ) && (int) $param > 0,
+						),
+						'preview_options' => array(
+							'default'           => array(),
+							'sanitize_callback' => static function ( $value ) {
+								return is_array( $value ) ? $value : array();
+							},
+						),
+					),
+				),
+			)
+		);
+	}
 
-    /**
-     * GET /picker/items
-     *
-     * @since 1.0.0
-     * @return void
-     */
-    private static function register_picker_items_route(): void {
-        register_rest_route( 'fotogrids/v1', '/picker/items', [
-            [
-                'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => [ Preview_Data::class, 'get_picker_items' ],
-                'permission_callback' => [ Preview_Permissions::class, 'check_preview_read' ],
-                'args'                => [
-                    'type'     => [
-                        'default'           => 'gallery',
-                        'sanitize_callback' => static function ( $value ) {
-                            $value = is_string( $value ) ? strtolower( $value ) : 'gallery';
-                            return in_array( $value, [ 'gallery', 'album' ], true ) ? $value : 'gallery';
-                        },
-                    ],
-                    'page'     => [
-                        'default'           => 1,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'per_page' => [
-                        'default'           => 24,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'search'   => [
-                        'default'           => '',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'orderby'  => [
-                        'default'           => 'newest',
-                        'sanitize_callback' => static function ( $value ) {
-                            $value = is_string( $value ) ? strtolower( $value ) : 'newest';
-                            $allowed = [ 'newest', 'oldest', 'title', 'modified' ];
-                            return in_array( $value, $allowed, true ) ? $value : 'newest';
-                        },
-                    ],
-                ],
-            ],
-        ] );
-    }
+	/**
+	 * GET /picker/items
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	private static function register_picker_items_route(): void {
+		register_rest_route(
+			'fotogrids/v1',
+			'/picker/items',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( Preview_Data::class, 'get_picker_items' ),
+					'permission_callback' => array( Preview_Permissions::class, 'check_preview_read' ),
+					'args'                => array(
+						'type'     => array(
+							'default'           => 'gallery',
+							'sanitize_callback' => static function ( $value ) {
+								$value = is_string( $value ) ? strtolower( $value ) : 'gallery';
+								return in_array( $value, array( 'gallery', 'album' ), true ) ? $value : 'gallery';
+							},
+						),
+						'page'     => array(
+							'default'           => 1,
+							'sanitize_callback' => 'absint',
+						),
+						'per_page' => array(
+							'default'           => 24,
+							'sanitize_callback' => 'absint',
+						),
+						'search'   => array(
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'orderby'  => array(
+							'default'           => 'newest',
+							'sanitize_callback' => static function ( $value ) {
+								$value   = is_string( $value ) ? strtolower( $value ) : 'newest';
+								$allowed = array( 'newest', 'oldest', 'title', 'modified' );
+								return in_array( $value, $allowed, true ) ? $value : 'newest';
+							},
+						),
+					),
+				),
+			)
+		);
+	}
 }

@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Modules\PageBuilders\Builders\Elementor\Controls;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -27,13 +27,13 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Picker extends Base_Collection_Picker {
 
-    public const TYPE = 'fotogrids_gallery_picker';
+	public const TYPE = 'fotogrids_gallery_picker';
 
-    public function get_type(): string {
-        return self::TYPE;
-    }
+	public function get_type(): string {
+		return self::TYPE;
+	}
 
-    protected function get_kind(): string {
-        return 'gallery';
-    }
+	protected function get_kind(): string {
+		return 'gallery';
+	}
 }

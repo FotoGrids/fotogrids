@@ -53,7 +53,7 @@ final class Caption_Content_Builder {
 			$title_text = $this->pick_field( $item_view, $source );
 
 			$limit_mode = $this->scalar_limit( $settings['caption_limit_title_length'] ?? null );
-			if ( $limit_mode === 'characters' && $title_text !== '' ) {
+			if ( 'characters' === $limit_mode && '' !== $title_text ) {
 				$max        = $this->responsive_int( $settings['caption_max_title_characters'] ?? null, 200 );
 				$title_text = $this->truncate( $title_text, $max );
 			}
@@ -65,7 +65,7 @@ final class Caption_Content_Builder {
 			$description_text = $this->pick_field( $item_view, $source );
 
 			$limit_mode = $this->scalar_limit( $settings['caption_limit_description_length'] ?? null );
-			if ( $limit_mode === 'characters' && $description_text !== '' ) {
+			if ( 'characters' === $limit_mode && '' !== $description_text ) {
 				$max              = $this->responsive_int( $settings['caption_max_desc_characters'] ?? null, 200 );
 				$description_text = $this->truncate( $description_text, $max );
 			}
@@ -109,14 +109,14 @@ final class Caption_Content_Builder {
 	 * @param  string $default Fallback when value is absent or unrecognised.
 	 * @return string
 	 */
-	private function scalar_source( mixed $raw, string $default ): string {
+	private function scalar_source( mixed $raw, string $default_value ): string {
 		if ( is_array( $raw ) ) {
 			$raw = $raw[0] ?? null;
 		}
 
-		$allowed = [ 'item_title', 'item_caption', 'item_alt', 'item_description' ];
+		$allowed = array( 'item_title', 'item_caption', 'item_alt', 'item_description' );
 
-		return ( is_string( $raw ) && in_array( $raw, $allowed, true ) ) ? $raw : $default;
+		return ( is_string( $raw ) && in_array( $raw, $allowed, true ) ) ? $raw : $default_value;
 	}
 
 	/**
@@ -134,7 +134,7 @@ final class Caption_Content_Builder {
 			$raw = $raw[0] ?? null;
 		}
 
-		$allowed = [ 'no', 'characters', 'lines' ];
+		$allowed = array( 'no', 'characters', 'lines' );
 
 		return ( is_string( $raw ) && in_array( $raw, $allowed, true ) ) ? $raw : 'no';
 	}
@@ -151,12 +151,12 @@ final class Caption_Content_Builder {
 	 * @param  int   $default Fallback when value is absent.
 	 * @return int
 	 */
-	private function responsive_int( mixed $raw, int $default ): int {
+	private function responsive_int( mixed $raw, int $default_value ): int {
 		if ( is_array( $raw ) ) {
 			$raw = $raw['desktop'] ?? ( reset( $raw ) ?: null );
 		}
 
-		return is_numeric( $raw ) && (int) $raw > 0 ? (int) $raw : $default;
+		return is_numeric( $raw ) && (int) $raw > 0 ? (int) $raw : $default_value;
 	}
 
 	/**
@@ -177,39 +177,5 @@ final class Caption_Content_Builder {
 		}
 
 		return mb_substr( $text, 0, $max ) . '…';
-	}
-}
-
-/**
- * Resolved title and description strings for one thumbnail caption.
- *
- * Both fields are empty strings when the corresponding hide toggle is on,
- * meaning the caller can use strict empty checks to decide whether to render
- * each span.
- *
- * @package FotoGrids\Render\Internal
- * @since   1.0.0
- */
-final class Caption_Content {
-
-	/**
-	 * @param string $title       Resolved title text (empty when hidden).
-	 * @param string $description Resolved description text (empty when hidden).
-	 */
-	public function __construct(
-		public readonly string $title,
-		public readonly string $description,
-	) {}
-
-	/**
-	 * Returns true when both title and description are empty.
-	 *
-	 * Item_Renderer uses this to skip the <figcaption> entirely.
-	 *
-	 * @since  1.0.0
-	 * @return bool
-	 */
-	public function is_empty(): bool {
-		return $this->title === '' && $this->description === '';
 	}
 }

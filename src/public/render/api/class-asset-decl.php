@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Api;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -15,13 +15,13 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Asset_Decl {
 
-    /**
-     * @param array<int, string> $deps Asset dependency handles.
-     */
-    public function __construct(
-        public readonly string $path,
-        public readonly array $deps = [],
-        public readonly bool $in_footer = false,
-        public readonly ?string $plugin_origin = null,
-    ) {}
+	/**
+	 * @param array<int, string> $deps Asset dependency handles.
+	 */
+	public function __construct(
+		public readonly string $path,
+		public readonly array $deps = array(),
+		public readonly bool $in_footer = false,
+		public readonly ?string $plugin_origin = null,
+	) {}
 }

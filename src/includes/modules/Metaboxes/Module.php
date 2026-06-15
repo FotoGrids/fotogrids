@@ -7,7 +7,7 @@ use FotoGrids\Metaboxes\Metabox_Registrar;
 use FotoGrids\Modules\Abstract_Module;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -28,25 +28,25 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Module extends Abstract_Module {
 
-    public function get_id(): string {
-        return 'metaboxes';
-    }
+	public function get_id(): string {
+		return 'metaboxes';
+	}
 
-    public function get_name(): string {
-        return __( 'Metaboxes', 'fotogrids' );
-    }
+	public function get_name(): string {
+		return __( 'Metaboxes', 'fotogrids' );
+	}
 
-    public function get_description(): string {
-        return __( 'Gallery and album editing metaboxes in the post editor.', 'fotogrids' );
-    }
+	public function get_description(): string {
+		return __( 'Gallery and album editing metaboxes in the post editor.', 'fotogrids' );
+	}
 
-    public function get_contexts(): array {
-        return [ 'admin', 'rest' ];
-    }
+	public function get_contexts(): array {
+		return array( 'admin', 'rest' );
+	}
 
-    public function init(): void {
-        Metabox_Registrar::init();
-        Item_Ajax_Endpoints::init();
-        Collection_Save_Pipeline::init();
-    }
+	public function init(): void {
+		Metabox_Registrar::init();
+		Item_Ajax_Endpoints::init();
+		Collection_Save_Pipeline::init();
+	}
 }

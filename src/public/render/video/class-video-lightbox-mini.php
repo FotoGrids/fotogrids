@@ -17,7 +17,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -37,97 +37,97 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Video_Lightbox_Mini implements Feature {
 
-    public function id(): string {
-        return 'fotogrids/video-lightbox-mini';
-    }
+	public function id(): string {
+		return 'fotogrids/video-lightbox-mini';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    /**
-     * Active for galleries with lightbox video playback whose click behaviour
-     * is neither the full lightbox nor disabled.
-     *
-     * When click behaviour is 'lightbox', videos play in the full lightbox.
-     * When it is 'nothing' (e.g. the page-builder "Make items clickable" toggle
-     * is off), items are not interactive at all, so the mini overlay must not
-     * fire either.
-     *
-     * @since 1.1.0
-     * @param Render_Context $render_context Render context.
-     * @return bool
-     */
-    public function supports( Render_Context $render_context ): bool {
-        if ( $render_context->meta->collection_kind === Collection_Kind::ALBUM ) {
-            return false;
-        }
+	/**
+	 * Active for galleries with lightbox video playback whose click behaviour
+	 * is neither the full lightbox nor disabled.
+	 *
+	 * When click behaviour is 'lightbox', videos play in the full lightbox.
+	 * When it is 'nothing' (e.g. the page-builder "Make items clickable" toggle
+	 * is off), items are not interactive at all, so the mini overlay must not
+	 * fire either.
+	 *
+	 * @since 1.1.0
+	 * @param Render_Context $render_context Render context.
+	 * @return bool
+	 */
+	public function supports( Render_Context $render_context ): bool {
+		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
+			return false;
+		}
 
-        $mode = $render_context->settings['video_playback_mode'] ?? 'inline';
-        if ( 'lightbox' !== $mode ) {
-            return false;
-        }
+		$mode = $render_context->settings['video_playback_mode'] ?? 'inline';
+		if ( 'lightbox' !== $mode ) {
+			return false;
+		}
 
-        $click = $render_context->behavior->click_behavior;
-        return 'lightbox' !== $click && 'nothing' !== $click;
-    }
+		$click = $render_context->behavior->click_behavior;
+		return 'lightbox' !== $click && 'nothing' !== $click;
+	}
 
-    public function html_before( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_before( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_appendix( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_after( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_after( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    /**
-     * Minimal lightbox CSS + JS.
-     *
-     * @since 1.1.0
-     * @param Render_Context $render_context Render context.
-     * @return Module_Assets
-     */
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets(
-            css: [
-                // Shared, general-purpose mini overlay (also usable for images).
-                'fotogrids-lightbox-mini' => new Asset_Decl(
-                    path: 'lightbox/mini/lightbox-mini.css',
-                ),
-            ],
-            js: [
-                'fotogrids-lightbox-mini' => new Asset_Decl(
-                    path:      '../../assets/js/lightbox-mini.js',
-                    deps:      [ 'fotogrids-runtime' ],
-                    in_footer: true,
-                ),
-                // Video glue: builds the player and hands it to the mini overlay.
-                'fotogrids-video-lightbox-mini' => new Asset_Decl(
-                    path:      '../../assets/js/video-lightbox-mini.js',
-                    deps:      [ 'fotogrids-runtime', 'fotogrids-lightbox-mini' ],
-                    in_footer: true,
-                ),
-            ]
-        );
-    }
+	/**
+	 * Minimal lightbox CSS + JS.
+	 *
+	 * @since 1.1.0
+	 * @param Render_Context $render_context Render context.
+	 * @return Module_Assets
+	 */
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets(
+			css: array(
+				// Shared, general-purpose mini overlay (also usable for images).
+				'fotogrids-lightbox-mini' => new Asset_Decl(
+					path: 'lightbox/mini/lightbox-mini.css',
+				),
+			),
+			js: array(
+				'fotogrids-lightbox-mini'       => new Asset_Decl(
+					path:      '../../assets/js/lightbox-mini.js',
+					deps:      array( 'fotogrids-runtime' ),
+					in_footer: true,
+				),
+				// Video glue: builds the player and hands it to the mini overlay.
+				'fotogrids-video-lightbox-mini' => new Asset_Decl(
+					path:      '../../assets/js/video-lightbox-mini.js',
+					deps:      array( 'fotogrids-runtime', 'fotogrids-lightbox-mini' ),
+					in_footer: true,
+				),
+			)
+		);
+	}
 }

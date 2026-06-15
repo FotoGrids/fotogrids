@@ -8,7 +8,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -52,273 +52,273 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Custom_Css implements Feature {
 
-    /**
-     * Token users write to reference the current gallery selector.
-     *
-     * Written as the bare word SELECTOR (all-caps, no punctuation).
-     * The token is resolved to the real #instance_id selector before
-     * scoping runs, so rules containing it are never double-prefixed.
-     *
-     * @since 1.0.0
-     */
-    private const SELECTOR_TOKEN = 'SELECTOR';
+	/**
+	 * Token users write to reference the current gallery selector.
+	 *
+	 * Written as the bare word SELECTOR (all-caps, no punctuation).
+	 * The token is resolved to the real #instance_id selector before
+	 * scoping runs, so rules containing it are never double-prefixed.
+	 *
+	 * @since 1.0.0
+	 */
+	private const SELECTOR_TOKEN = 'SELECTOR';
 
-    public function id(): string {
-        return 'fotogrids/custom-css';
-    }
+	public function id(): string {
+		return 'fotogrids/custom-css';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    public function supports( Render_Context $render_context ): bool {
-        return $this->resolve_custom_css( $render_context ) !== '';
-    }
+	public function supports( Render_Context $render_context ): bool {
+		return $this->resolve_custom_css( $render_context ) !== '';
+	}
 
-    public function html_before( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_before( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_appendix( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
 
-    /**
-     * Returns a scoped, sanitized `<style>` block placed after the wrapper.
-     *
-     * @since  1.0.0
-     * @param  Render_Context $render_context Render context.
-     * @return string
-     */
-    public function html_after( Render_Context $render_context ): string {
-        $custom_css = $this->resolve_custom_css( $render_context );
-        if ( $custom_css === '' ) {
-            return '';
-        }
+	/**
+	 * Returns a scoped, sanitized `<style>` block placed after the wrapper.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	public function html_after( Render_Context $render_context ): string {
+		$custom_css = $this->resolve_custom_css( $render_context );
+		if ( '' === $custom_css ) {
+			return '';
+		}
 
-        $instance_id   = $render_context->meta->instance_id;
-        $selector      = '#' . esc_attr( $instance_id );
-        $scoped_css    = $this->scope_css( $custom_css, $selector );
+		$instance_id = $render_context->meta->instance_id;
+		$selector    = '#' . esc_attr( $instance_id );
+		$scoped_css  = $this->scope_css( $custom_css, $selector );
 
-        if ( $scoped_css === '' ) {
-            return '';
-        }
+		if ( '' === $scoped_css ) {
+			return '';
+		}
 
-        return '<style class="fg-custom-css">' . "\n" . $scoped_css . "\n" . '</style>';
-    }
+		return '<style class="fg-custom-css">' . "\n" . $scoped_css . "\n" . '</style>';
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets();
-    }
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets();
+	}
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Private helpers
+	// -------------------------------------------------------------------------
 
-    /**
-     * Extracts and sanitizes the raw CSS string from render settings.
-     *
-     * Returns '' when the value is absent, non-string, or rejected by the
-     * sanitizer.
-     *
-     * @since  1.0.0
-     * @param  Render_Context $render_context Render context.
-     * @return string
-     */
-    private function resolve_custom_css( Render_Context $render_context ): string {
-        $raw = $render_context->settings['custom_css'] ?? '';
-        if ( ! is_string( $raw ) ) {
-            return '';
-        }
+	/**
+	 * Extracts and sanitizes the raw CSS string from render settings.
+	 *
+	 * Returns '' when the value is absent, non-string, or rejected by the
+	 * sanitizer.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	private function resolve_custom_css( Render_Context $render_context ): string {
+		$raw = $render_context->settings['custom_css'] ?? '';
+		if ( ! is_string( $raw ) ) {
+			return '';
+		}
 
-        return $this->sanitize( $raw );
-    }
+		return $this->sanitize( $raw );
+	}
 
-    /**
-     * Sanitizes a raw CSS string.
-     *
-     * Removes dangerous constructs while preserving valid CSS. The method is
-     * intentionally strict: when in doubt, reject.
-     *
-     * @since  1.0.0
-     * @param  string $css Raw CSS input from settings storage.
-     * @return string Clean CSS, or '' if nothing safe survives.
-     */
-    private function sanitize( string $css ): string {
-        // 1. Null bytes and ASCII control characters (except tab/newline/CR).
-        $css = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $css );
-        if ( ! is_string( $css ) ) {
-            return '';
-        }
+	/**
+	 * Sanitizes a raw CSS string.
+	 *
+	 * Removes dangerous constructs while preserving valid CSS. The method is
+	 * intentionally strict: when in doubt, reject.
+	 *
+	 * @since  1.0.0
+	 * @param  string $css Raw CSS input from settings storage.
+	 * @return string Clean CSS, or '' if nothing safe survives.
+	 */
+	private function sanitize( string $css ): string {
+		// 1. Null bytes and ASCII control characters (except tab/newline/CR).
+		$css = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $css );
+		if ( ! is_string( $css ) ) {
+			return '';
+		}
 
-        // 2. Strip CSS block comments entirely before further analysis.
-        //    This prevents payloads hidden inside /* ... </style> ... */.
-        $css = preg_replace( '#/\*.*?\*/#s', '', $css );
-        if ( ! is_string( $css ) ) {
-            return '';
-        }
+		// 2. Strip CSS block comments entirely before further analysis.
+		//    This prevents payloads hidden inside /* ... </style> ... */.
+		$css = preg_replace( '#/\*.*?\*/#s', '', $css );
+		if ( ! is_string( $css ) ) {
+			return '';
+		}
 
-        // 3. Reject any </style closing sequence (case-insensitive, with optional
-        //    whitespace or slash variations).  A legitimate stylesheet never needs
-        //    to close an HTML tag.
-        if ( preg_match( '#</\s*style#i', $css ) ) {
-            return '';
-        }
+		// 3. Reject any </style closing sequence (case-insensitive, with optional
+		//    whitespace or slash variations).  A legitimate stylesheet never needs
+		//    to close an HTML tag.
+		if ( preg_match( '#</\s*style#i', $css ) ) {
+			return '';
+		}
 
-        // 4. Reject bare < and > to prevent any HTML smuggling.
-        if ( strpos( $css, '<' ) !== false || strpos( $css, '>' ) !== false ) {
-            return '';
-        }
+		// 4. Reject bare < and > to prevent any HTML smuggling.
+		if ( strpos( $css, '<' ) !== false || strpos( $css, '>' ) !== false ) {
+			return '';
+		}
 
-        // 5. Reject @import - prevents external stylesheet loading and exfiltration.
-        if ( preg_match( '/@import\b/i', $css ) ) {
-            return '';
-        }
+		// 5. Reject @import - prevents external stylesheet loading and exfiltration.
+		if ( preg_match( '/@import\b/i', $css ) ) {
+			return '';
+		}
 
-        // 6. Reject dangerous url() schemes: javascript:, data:text/html, vbscript:.
-        if ( preg_match( '#url\s*\(\s*["\']?\s*(javascript|vbscript|data\s*:\s*text/html)#i', $css ) ) {
-            return '';
-        }
+		// 6. Reject dangerous url() schemes: javascript:, data:text/html, vbscript:.
+		if ( preg_match( '#url\s*\(\s*["\']?\s*(javascript|vbscript|data\s*:\s*text/html)#i', $css ) ) {
+			return '';
+		}
 
-        // 7. Reject expression() - legacy IE CSS evaluation.
-        if ( preg_match( '/\bexpression\s*\(/i', $css ) ) {
-            return '';
-        }
+		// 7. Reject expression() - legacy IE CSS evaluation.
+		if ( preg_match( '/\bexpression\s*\(/i', $css ) ) {
+			return '';
+		}
 
-        return trim( $css );
-    }
+		return trim( $css );
+	}
 
-    /**
-     * Scopes every top-level CSS rule to the gallery's instance selector.
-     *
-     * Rules that already contain the `SELECTOR` token are resolved but not
-     * double-prefixed. At-rules (`@media`, `@keyframes`, etc.) are kept as-is
-     * and their inner rules are scoped recursively.
-     *
-     * The algorithm is a lightweight brace-counting parser - it handles nested
-     * at-rules (e.g. `@media { @supports { … } }`) correctly without requiring
-     * a full CSS parser.
-     *
-     * @since  1.0.0
-     * @param  string $css      Sanitized CSS input.
-     * @param  string $selector Real instance selector, e.g. `#fg-123-1`.
-     * @return string
-     */
-    private function scope_css( string $css, string $selector ): string {
-        // Replace the explicit user token wherever it appears.
-        $css = str_replace( self::SELECTOR_TOKEN, $selector, $css );
+	/**
+	 * Scopes every top-level CSS rule to the gallery's instance selector.
+	 *
+	 * Rules that already contain the `SELECTOR` token are resolved but not
+	 * double-prefixed. At-rules (`@media`, `@keyframes`, etc.) are kept as-is
+	 * and their inner rules are scoped recursively.
+	 *
+	 * The algorithm is a lightweight brace-counting parser - it handles nested
+	 * at-rules (e.g. `@media { @supports { … } }`) correctly without requiring
+	 * a full CSS parser.
+	 *
+	 * @since  1.0.0
+	 * @param  string $css      Sanitized CSS input.
+	 * @param  string $selector Real instance selector, e.g. `#fg-123-1`.
+	 * @return string
+	 */
+	private function scope_css( string $css, string $selector ): string {
+		// Replace the explicit user token wherever it appears.
+		$css = str_replace( self::SELECTOR_TOKEN, $selector, $css );
 
-        $output = '';
-        $len    = strlen( $css );
-        $i      = 0;
+		$output = '';
+		$len    = strlen( $css );
+		$i      = 0;
 
-        while ( $i < $len ) {
-            // Skip whitespace between top-level rules.
-            if ( ctype_space( $css[ $i ] ) ) {
-                ++$i;
-                continue;
-            }
+		while ( $i < $len ) {
+			// Skip whitespace between top-level rules.
+			if ( ctype_space( $css[ $i ] ) ) {
+				++$i;
+				continue;
+			}
 
-            // Find the end of the next top-level rule or block.
-            $brace_depth = 0;
-            $start       = $i;
-            $block_start = false; // position of the first '{', or false
+			// Find the end of the next top-level rule or block.
+			$brace_depth = 0;
+			$start       = $i;
+			$block_start = false; // position of the first '{', or false
 
-            while ( $i < $len ) {
-                $ch = $css[ $i ];
+			while ( $i < $len ) {
+				$ch = $css[ $i ];
 
-                if ( $ch === '{' ) {
-                    if ( $brace_depth === 0 ) {
-                        $block_start = $i;
-                    }
-                    ++$brace_depth;
-                } elseif ( $ch === '}' ) {
-                    --$brace_depth;
-                    if ( $brace_depth === 0 ) {
-                        ++$i; // include closing brace
-                        break;
-                    }
-                } elseif ( $ch === ';' && $brace_depth === 0 ) {
-                    // Bare declaration at top level (unusual but possible, e.g.
-                    // a stray `;`). Skip it silently.
-                    ++$i;
-                    break;
-                }
+				if ( '{' === $ch ) {
+					if ( 0 === $brace_depth ) {
+						$block_start = $i;
+					}
+					++$brace_depth;
+				} elseif ( '}' === $ch ) {
+					--$brace_depth;
+					if ( 0 === $brace_depth ) {
+						++$i; // include closing brace
+						break;
+					}
+				} elseif ( ';' === $ch && 0 === $brace_depth ) {
+					// Bare declaration at top level (unusual but possible, e.g.
+					// a stray `;`). Skip it silently.
+					++$i;
+					break;
+				}
 
-                ++$i;
-            }
+				++$i;
+			}
 
-            if ( $block_start === false ) {
-                // No `{` found - trailing garbage; skip.
-                continue;
-            }
+			if ( false === $block_start ) {
+				// No `{` found - trailing garbage; skip.
+				continue;
+			}
 
-            $selector_part = trim( substr( $css, $start, $block_start - $start ) );
-            $block_part    = substr( $css, $block_start, $i - $block_start );
+			$selector_part = trim( substr( $css, $start, $block_start - $start ) );
+			$block_part    = substr( $css, $block_start, $i - $block_start );
 
-            if ( $selector_part === '' ) {
-                continue;
-            }
+			if ( '' === $selector_part ) {
+				continue;
+			}
 
-            // Detect at-rules: @media, @keyframes, @supports, @layer, etc.
-            if ( str_starts_with( $selector_part, '@' ) ) {
-                $inner_raw = substr( $block_part, 1, -1 );
+			// Detect at-rules: @media, @keyframes, @supports, @layer, etc.
+			if ( str_starts_with( $selector_part, '@' ) ) {
+				$inner_raw = substr( $block_part, 1, -1 );
 
-                // @keyframes / @-webkit-keyframes contain keyframe stops (from,
-                // to, percentages), NOT regular selectors.  Pass the inner block
-                // through un-scoped so we don't prefix "from" and "to".
-                if ( preg_match( '/^@(-webkit-|-moz-|-o-)?keyframes\b/i', $selector_part ) ) {
-                    $output .= $selector_part . ' ' . $block_part . "\n";
-                } else {
-                    $inner_scoped = $this->scope_css( $inner_raw, $selector );
-                    $output      .= $selector_part . " {\n" . $inner_scoped . "}\n";
-                }
-                continue;
-            }
+				// @keyframes / @-webkit-keyframes contain keyframe stops (from,
+				// to, percentages), NOT regular selectors.  Pass the inner block
+				// through un-scoped so we don't prefix "from" and "to".
+				if ( preg_match( '/^@(-webkit-|-moz-|-o-)?keyframes\b/i', $selector_part ) ) {
+					$output .= $selector_part . ' ' . $block_part . "\n";
+				} else {
+					$inner_scoped = $this->scope_css( $inner_raw, $selector );
+					$output      .= $selector_part . " {\n" . $inner_scoped . "}\n";
+				}
+				continue;
+			}
 
-            // Regular rule: scope every comma-separated selector that does not
-            // already contain the instance selector (because the user already
-            // wrote #SELECTOR# which was expanded above).
-            $individual_selectors = explode( ',', $selector_part );
-            $scoped_selectors     = [];
+			// Regular rule: scope every comma-separated selector that does not
+			// already contain the instance selector (because the user already
+			// wrote #SELECTOR# which was expanded above).
+			$individual_selectors = explode( ',', $selector_part );
+			$scoped_selectors     = array();
 
-            foreach ( $individual_selectors as $sel ) {
-                $sel = trim( $sel );
-                if ( $sel === '' ) {
-                    continue;
-                }
+			foreach ( $individual_selectors as $sel ) {
+				$sel = trim( $sel );
+				if ( '' === $sel ) {
+					continue;
+				}
 
-                // Already contains the real selector - don't double-prefix.
-                if ( strpos( $sel, $selector ) !== false ) {
-                    $scoped_selectors[] = $sel;
-                } else {
-                    $scoped_selectors[] = $selector . ' ' . $sel;
-                }
-            }
+				// Already contains the real selector - don't double-prefix.
+				if ( strpos( $sel, $selector ) !== false ) {
+					$scoped_selectors[] = $sel;
+				} else {
+					$scoped_selectors[] = $selector . ' ' . $sel;
+				}
+			}
 
-            if ( empty( $scoped_selectors ) ) {
-                continue;
-            }
+			if ( empty( $scoped_selectors ) ) {
+				continue;
+			}
 
-            $output .= implode( ",\n", $scoped_selectors ) . ' ' . $block_part . "\n";
-        }
+			$output .= implode( ",\n", $scoped_selectors ) . ' ' . $block_part . "\n";
+		}
 
-        return $output;
-    }
+		return $output;
+	}
 }

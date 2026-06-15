@@ -9,7 +9,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -28,76 +28,76 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Runtime_Bootstrap implements Feature {
 
-    public function id(): string {
-        return 'fotogrids/runtime';
-    }
+	public function id(): string {
+		return 'fotogrids/runtime';
+	}
 
-    public function origin(): string {
-        return 'fotogrids';
-    }
+	public function origin(): string {
+		return 'fotogrids';
+	}
 
-    public function replaces(): ?string {
-        return null;
-    }
+	public function replaces(): ?string {
+		return null;
+	}
 
-    public function extends_id(): ?string {
-        return null;
-    }
+	public function extends_id(): ?string {
+		return null;
+	}
 
-    /**
-     * Always active. The runtime is the floor every other JS module
-     * builds on; there is no rendered gallery for which it is not
-     * needed.
-     *
-     * @since 1.0.0
-     * @param Render_Context $render_context Render context.
-     * @return bool
-     */
-    public function supports( Render_Context $render_context ): bool {
-        return true;
-    }
+	/**
+	 * Always active. The runtime is the floor every other JS module
+	 * builds on; there is no rendered gallery for which it is not
+	 * needed.
+	 *
+	 * @since 1.0.0
+	 * @param Render_Context $render_context Render context.
+	 * @return bool
+	 */
+	public function supports( Render_Context $render_context ): bool {
+		return true;
+	}
 
-    public function html_before( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_before( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_appendix( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function html_after( Render_Context $render_context ): string {
-        return '';
-    }
+	public function html_after( Render_Context $render_context ): string {
+		return '';
+	}
 
-    public function wrapper_data_attrs( Render_Context $render_context ): array {
-        return [];
-    }
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		return array();
+	}
 
-    public function style_vars( Render_Context $render_context ): array {
-        return [];
-    }
+	public function style_vars( Render_Context $render_context ): array {
+		return array();
+	}
 
-    /**
-     * Enqueues the runtime JS.
-     *
-     * Handle: `fotogrids-runtime`. Every other module's JS declares this
-     * handle in its `deps`, so the runtime is guaranteed to evaluate
-     * first and `window.FotoGrids` is defined by the time module code
-     * runs.
-     *
-     * @since 1.0.0
-     * @param Render_Context $render_context Render context.
-     * @return Module_Assets
-     */
-    public function assets( Render_Context $render_context ): Module_Assets {
-        return new Module_Assets(
-            js: [
-                'fotogrids-runtime' => new Asset_Decl(
-                    path:      '../../assets/js/fotogrids-runtime.js',
-                    deps:      [],
-                    in_footer: true,
-                ),
-            ],
-        );
-    }
+	/**
+	 * Enqueues the runtime JS.
+	 *
+	 * Handle: `fotogrids-runtime`. Every other module's JS declares this
+	 * handle in its `deps`, so the runtime is guaranteed to evaluate
+	 * first and `window.FotoGrids` is defined by the time module code
+	 * runs.
+	 *
+	 * @since 1.0.0
+	 * @param Render_Context $render_context Render context.
+	 * @return Module_Assets
+	 */
+	public function assets( Render_Context $render_context ): Module_Assets {
+		return new Module_Assets(
+			js: array(
+				'fotogrids-runtime' => new Asset_Decl(
+					path:      '../../assets/js/fotogrids-runtime.js',
+					deps:      array(),
+					in_footer: true,
+				),
+			),
+		);
+	}
 }

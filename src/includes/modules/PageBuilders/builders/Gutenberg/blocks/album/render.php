@@ -11,7 +11,7 @@
  */
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 // This is a WordPress block render template, include()d by the block renderer.
@@ -22,22 +22,24 @@ if ( ! defined( 'WPINC' ) ) {
 
 $album_id = isset( $attributes['albumId'] ) ? absint( $attributes['albumId'] ) : 0;
 if ( $album_id <= 0 ) {
-    return;
+	return;
 }
 
 $wrapper_attributes = function_exists( 'get_block_wrapper_attributes' )
-    ? get_block_wrapper_attributes()
-    : '';
+	? get_block_wrapper_attributes()
+	: '';
 
 if ( method_exists( '\FotoGrids\Public_Render', 'album_shortcode' ) ) {
-    $inner = \FotoGrids\Public_Render::album_shortcode( [
-        'id' => $album_id,
-    ] );
+	$inner = \FotoGrids\Public_Render::album_shortcode(
+		array(
+			'id' => $album_id,
+		)
+	);
 
-    if ( $wrapper_attributes !== '' ) {
-        printf( '<div %s>%s</div>', $wrapper_attributes, $inner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-    } else {
-        echo $inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-    }
+	if ( '' !== $wrapper_attributes ) {
+		printf( '<div %s>%s</div>', $wrapper_attributes, $inner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	} else {
+		echo $inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 }
 // phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

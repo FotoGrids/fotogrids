@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace FotoGrids\Hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -22,24 +22,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Actions_Cron {
 
-    /**
-     * Scheduled WP-Cron action used to verify a Pro license.
-     *
-     * @since 1.0.0
-     */
-    public const VERIFY_LICENSE = 'fotogrids/cron/verify_license';
+	/**
+	 * Scheduled WP-Cron action used to verify a Pro license.
+	 *
+	 * @since 1.0.0
+	 */
+	public const VERIFY_LICENSE = 'fotogrids/cron/verify_license';
 
-    /**
-     * Scheduled WP-Cron action used to purge expired statistics rows.
-     *
-     * @since 1.0.0
-     */
-    public const STATS_CLEANUP = 'fotogrids/cron/stats_cleanup';
+	/**
+	 * Scheduled WP-Cron action used to purge expired statistics rows.
+	 *
+	 * @since 1.0.0
+	 */
+	public const STATS_CLEANUP = 'fotogrids/cron/stats_cleanup';
 
-    /**
-     * Scheduled WP-Cron action used to send anonymous usage statistics.
-     *
-     * @since 1.0.0
-     */
-    public const SEND_STATISTICS = 'fotogrids/cron/send_statistics';
+	/**
+	 * Scheduled WP-Cron action used to send anonymous usage statistics.
+	 *
+	 * @since 1.0.0
+	 */
+	public const SEND_STATISTICS = 'fotogrids/cron/send_statistics';
 }

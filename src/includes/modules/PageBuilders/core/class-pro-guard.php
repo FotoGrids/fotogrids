@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Modules\PageBuilders;
 
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 /**
@@ -53,246 +53,246 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Pro_Guard {
 
-    /**
-     * Filter name for the Pro-feature registry. Pro hooks here to declare
-     * its features.
-     *
-     * @var string
-     */
-    public const FILTER_REGISTRY = 'fotogrids/page_builders/pro_features';
+	/**
+	 * Filter name for the Pro-feature registry. Pro hooks here to declare
+	 * its features.
+	 *
+	 * @var string
+	 */
+	public const FILTER_REGISTRY = 'fotogrids/page_builders/pro_features';
 
-    /**
-     * Filter name for the final per-collection decision. Lets Pro or
-     * third-party plugins force a result if their own logic needs to (e.g.
-     * a custom permission model not represented in settings).
-     *
-     * @var string
-     */
-    public const FILTER_REQUIRES_PRO = 'fotogrids/page_builders/requires_pro';
+	/**
+	 * Filter name for the final per-collection decision. Lets Pro or
+	 * third-party plugins force a result if their own logic needs to (e.g.
+	 * a custom permission model not represented in settings).
+	 *
+	 * @var string
+	 */
+	public const FILTER_REQUIRES_PRO = 'fotogrids/page_builders/requires_pro';
 
-    /**
-     * Returns true if a gallery requires Pro to render with its current
-     * settings.
-     *
-     * Pure read - never mutates settings or fires any side effect. Always
-     * safe to call from the REST layer.
-     *
-     * @since 1.0.0
-     * @param int $gallery_id Gallery post ID.
-     * @return bool
-     */
-    public static function gallery_requires_pro( int $gallery_id ): bool {
-        if ( $gallery_id <= 0 ) {
-            return false;
-        }
-        $settings = self::resolve_gallery_settings( $gallery_id );
-        return self::settings_require_pro( $settings, 'gallery', $gallery_id );
-    }
+	/**
+	 * Returns true if a gallery requires Pro to render with its current
+	 * settings.
+	 *
+	 * Pure read - never mutates settings or fires any side effect. Always
+	 * safe to call from the REST layer.
+	 *
+	 * @since 1.0.0
+	 * @param int $gallery_id Gallery post ID.
+	 * @return bool
+	 */
+	public static function gallery_requires_pro( int $gallery_id ): bool {
+		if ( $gallery_id <= 0 ) {
+			return false;
+		}
+		$settings = self::resolve_gallery_settings( $gallery_id );
+		return self::settings_require_pro( $settings, 'gallery', $gallery_id );
+	}
 
-    /**
-     * Returns true if an album requires Pro to render with its current
-     * settings.
-     *
-     * @since 1.0.0
-     * @param int $album_id Album post ID.
-     * @return bool
-     */
-    public static function album_requires_pro( int $album_id ): bool {
-        if ( $album_id <= 0 ) {
-            return false;
-        }
-        $settings = self::resolve_album_settings( $album_id );
-        return self::settings_require_pro( $settings, 'album', $album_id );
-    }
+	/**
+	 * Returns true if an album requires Pro to render with its current
+	 * settings.
+	 *
+	 * @since 1.0.0
+	 * @param int $album_id Album post ID.
+	 * @return bool
+	 */
+	public static function album_requires_pro( int $album_id ): bool {
+		if ( $album_id <= 0 ) {
+			return false;
+		}
+		$settings = self::resolve_album_settings( $album_id );
+		return self::settings_require_pro( $settings, 'album', $album_id );
+	}
 
-    /**
-     * Returns the list of Pro-feature ids triggered by a gallery's current
-     * settings. Useful for the picker tooltip ("Requires: Pro Layouts, EXIF
-     * Map") and for debugging.
-     *
-     * @since 1.0.0
-     * @param int $gallery_id Gallery post ID.
-     * @return string[] Feature ids; empty if the gallery does not require Pro.
-     */
-    public static function gallery_pro_features( int $gallery_id ): array {
-        if ( $gallery_id <= 0 ) {
-            return [];
-        }
-        return self::triggered_features(
-            self::resolve_gallery_settings( $gallery_id ),
-            'gallery',
-            $gallery_id
-        );
-    }
+	/**
+	 * Returns the list of Pro-feature ids triggered by a gallery's current
+	 * settings. Useful for the picker tooltip ("Requires: Pro Layouts, EXIF
+	 * Map") and for debugging.
+	 *
+	 * @since 1.0.0
+	 * @param int $gallery_id Gallery post ID.
+	 * @return string[] Feature ids; empty if the gallery does not require Pro.
+	 */
+	public static function gallery_pro_features( int $gallery_id ): array {
+		if ( $gallery_id <= 0 ) {
+			return array();
+		}
+		return self::triggered_features(
+			self::resolve_gallery_settings( $gallery_id ),
+			'gallery',
+			$gallery_id
+		);
+	}
 
-    /**
-     * Returns the list of Pro-feature ids triggered by an album's current
-     * settings.
-     *
-     * @since 1.0.0
-     * @param int $album_id Album post ID.
-     * @return string[] Feature ids; empty if the album does not require Pro.
-     */
-    public static function album_pro_features( int $album_id ): array {
-        if ( $album_id <= 0 ) {
-            return [];
-        }
-        return self::triggered_features(
-            self::resolve_album_settings( $album_id ),
-            'album',
-            $album_id
-        );
-    }
+	/**
+	 * Returns the list of Pro-feature ids triggered by an album's current
+	 * settings.
+	 *
+	 * @since 1.0.0
+	 * @param int $album_id Album post ID.
+	 * @return string[] Feature ids; empty if the album does not require Pro.
+	 */
+	public static function album_pro_features( int $album_id ): array {
+		if ( $album_id <= 0 ) {
+			return array();
+		}
+		return self::triggered_features(
+			self::resolve_album_settings( $album_id ),
+			'album',
+			$album_id
+		);
+	}
 
-    // -------------------------------------------------------------------------
-    // Internals
-    // -------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Internals
+	// -------------------------------------------------------------------------
 
-    /**
-     * Decision wrapper: inspect settings, then let the final
-     * `requires_pro` filter override.
-     *
-     * @since 1.0.0
-     * @param array  $settings    Resolved settings (defaults merged).
-     * @param string $kind        'gallery' | 'album'.
-     * @param int    $object_id   Post id, for the filter payload.
-     * @return bool
-     */
-    private static function settings_require_pro( array $settings, string $kind, int $object_id ): bool {
-        $features  = self::registry();
-        $triggered = self::run_detectors( $features, $settings );
+	/**
+	 * Decision wrapper: inspect settings, then let the final
+	 * `requires_pro` filter override.
+	 *
+	 * @since 1.0.0
+	 * @param array  $settings    Resolved settings (defaults merged).
+	 * @param string $kind        'gallery' | 'album'.
+	 * @param int    $object_id   Post id, for the filter payload.
+	 * @return bool
+	 */
+	private static function settings_require_pro( array $settings, string $kind, int $object_id ): bool {
+		$features  = self::registry();
+		$triggered = self::run_detectors( $features, $settings );
 
-        $requires = ! empty( $triggered );
+		$requires = ! empty( $triggered );
 
-        /**
-         * Final authority on whether a collection requires Pro to be
-         * inserted by a page-builder host. Pro and third parties can short
-         * circuit (return true) or override (return false) the
-         * settings-based decision.
-         *
-         * @since 1.0.0
-         * @param bool   $requires    Whether the collection requires Pro.
-         * @param string $kind        'gallery' | 'album'.
-         * @param int    $object_id   Post id.
-         * @param array  $settings    Resolved settings.
-         * @param array  $triggered   Pro feature ids the settings triggered.
-         */
-        return (bool) apply_filters(
-            self::FILTER_REQUIRES_PRO,
-            $requires,
-            $kind,
-            $object_id,
-            $settings,
-            $triggered
-        );
-    }
+		/**
+		 * Final authority on whether a collection requires Pro to be
+		 * inserted by a page-builder host. Pro and third parties can short
+		 * circuit (return true) or override (return false) the
+		 * settings-based decision.
+		 *
+		 * @since 1.0.0
+		 * @param bool   $requires    Whether the collection requires Pro.
+		 * @param string $kind        'gallery' | 'album'.
+		 * @param int    $object_id   Post id.
+		 * @param array  $settings    Resolved settings.
+		 * @param array  $triggered   Pro feature ids the settings triggered.
+		 */
+		return (bool) apply_filters(
+			self::FILTER_REQUIRES_PRO,
+			$requires,
+			$kind,
+			$object_id,
+			$settings,
+			$triggered
+		);
+	}
 
-    /**
-     * Returns the Pro feature ids triggered by a settings array.
-     *
-     * @since 1.0.0
-     * @param array  $settings  Resolved settings.
-     * @param string $kind      'gallery' | 'album'.
-     * @param int    $object_id Post id.
-     * @return string[]
-     */
-    private static function triggered_features( array $settings, string $kind, int $object_id ): array {
-        unset( $kind, $object_id );
-        return self::run_detectors( self::registry(), $settings );
-    }
+	/**
+	 * Returns the Pro feature ids triggered by a settings array.
+	 *
+	 * @since 1.0.0
+	 * @param array  $settings  Resolved settings.
+	 * @param string $kind      'gallery' | 'album'.
+	 * @param int    $object_id Post id.
+	 * @return string[]
+	 */
+	private static function triggered_features( array $settings, string $kind, int $object_id ): array {
+		unset( $kind, $object_id );
+		return self::run_detectors( self::registry(), $settings );
+	}
 
-    /**
-     * Run every registered detector against the settings array.
-     *
-     * @since 1.0.0
-     * @param array $registry Filter-built registry: [ id => [ 'detect' => callable, ... ] ].
-     * @param array $settings Resolved settings.
-     * @return string[] Triggered feature ids.
-     */
-    private static function run_detectors( array $registry, array $settings ): array {
-        $triggered = [];
+	/**
+	 * Run every registered detector against the settings array.
+	 *
+	 * @since 1.0.0
+	 * @param array $registry Filter-built registry: [ id => [ 'detect' => callable, ... ] ].
+	 * @param array $settings Resolved settings.
+	 * @return string[] Triggered feature ids.
+	 */
+	private static function run_detectors( array $registry, array $settings ): array {
+		$triggered = array();
 
-        foreach ( $registry as $feature_id => $spec ) {
-            if ( ! is_array( $spec ) || empty( $spec['detect'] ) || ! is_callable( $spec['detect'] ) ) {
-                continue;
-            }
-            try {
-                $hit = (bool) call_user_func( $spec['detect'], $settings );
-            } catch ( \Throwable $e ) {
-                // A misbehaving detector must not poison the whole guard.
-                $hit = false;
-            }
-            if ( $hit ) {
-                $triggered[] = (string) $feature_id;
-            }
-        }
+		foreach ( $registry as $feature_id => $spec ) {
+			if ( ! is_array( $spec ) || empty( $spec['detect'] ) || ! is_callable( $spec['detect'] ) ) {
+				continue;
+			}
+			try {
+				$hit = (bool) call_user_func( $spec['detect'], $settings );
+			} catch ( \Throwable $e ) {
+				// A misbehaving detector must not poison the whole guard.
+				$hit = false;
+			}
+			if ( $hit ) {
+				$triggered[] = (string) $feature_id;
+			}
+		}
 
-        return $triggered;
-    }
+		return $triggered;
+	}
 
-    /**
-     * Build the Pro-feature registry. Free ships an empty registry; Pro
-     * (and any third party) adds features via the filter.
-     *
-     * @since 1.0.0
-     * @return array<string, array<string, mixed>>
-     */
-    private static function registry(): array {
-        $registry = [];
+	/**
+	 * Build the Pro-feature registry. Free ships an empty registry; Pro
+	 * (and any third party) adds features via the filter.
+	 *
+	 * @since 1.0.0
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function registry(): array {
+		$registry = array();
 
-        /**
-         * Pro-feature registry. Each entry:
-         *   $registry['feature_id'] = [
-         *       'label'  => __( 'Human label', '...' ),
-         *       'detect' => function ( array $settings ): bool { ... },
-         *   ];
-         *
-         * @since 1.0.0
-         * @param array<string, array<string, mixed>> $registry
-         */
-        $registry = apply_filters( self::FILTER_REGISTRY, $registry );
+		/**
+		 * Pro-feature registry. Each entry:
+		 *   $registry['feature_id'] = [
+		 *       'label'  => __( 'Human label', '...' ),
+		 *       'detect' => function ( array $settings ): bool { ... },
+		 *   ];
+		 *
+		 * @since 1.0.0
+		 * @param array<string, array<string, mixed>> $registry
+		 */
+		$registry = apply_filters( self::FILTER_REGISTRY, $registry );
 
-        return is_array( $registry ) ? $registry : [];
-    }
+		return is_array( $registry ) ? $registry : array();
+	}
 
-    /**
-     * Resolve a gallery's current settings with defaults merged in.
-     *
-     * `Public_Render::get_gallery_settings()` is `private`, so the guard
-     * cannot delegate to it. Instead we merge defaults from
-     * Collection_Defaults onto the saved post meta directly. This is the
-     * same shape the renderer sees, minus the runtime filters - which is
-     * fine, because Pro_Guard only looks at opt-ins (post-meta values),
-     * never at defaults that would always be the same.
-     *
-     * @since 1.0.0
-     * @param int $gallery_id Gallery post ID.
-     * @return array
-     */
-    private static function resolve_gallery_settings( int $gallery_id ): array {
-        if ( class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
-            return (array) \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
-        }
-        return [];
-    }
+	/**
+	 * Resolve a gallery's current settings with defaults merged in.
+	 *
+	 * `Public_Render::get_gallery_settings()` is `private`, so the guard
+	 * cannot delegate to it. Instead we merge defaults from
+	 * Collection_Defaults onto the saved post meta directly. This is the
+	 * same shape the renderer sees, minus the runtime filters - which is
+	 * fine, because Pro_Guard only looks at opt-ins (post-meta values),
+	 * never at defaults that would always be the same.
+	 *
+	 * @since 1.0.0
+	 * @param int $gallery_id Gallery post ID.
+	 * @return array
+	 */
+	private static function resolve_gallery_settings( int $gallery_id ): array {
+		if ( class_exists( '\FotoGrids\Galleries\Gallery_Repository' ) ) {
+			return (array) \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
+		}
+		return array();
+	}
 
-    /**
-     * Resolve an album's current settings with defaults merged in.
-     *
-     * @since 1.0.0
-     * @param int $album_id Album post ID.
-     * @return array
-     */
-    private static function resolve_album_settings( int $album_id ): array {
-        if ( class_exists( '\FotoGrids\Albums\Album_Repository' ) ) {
-            return (array) \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
-        }
+	/**
+	 * Resolve an album's current settings with defaults merged in.
+	 *
+	 * @since 1.0.0
+	 * @param int $album_id Album post ID.
+	 * @return array
+	 */
+	private static function resolve_album_settings( int $album_id ): array {
+		if ( class_exists( '\FotoGrids\Albums\Album_Repository' ) ) {
+			return (array) \FotoGrids\Albums\Album_Repository::get_settings( $album_id );
+		}
 
-        $settings = [];
-        $saved    = get_post_meta( $album_id, 'fotogrids_settings', true );
-        if ( is_array( $saved ) ) {
-            $settings = array_merge( $settings, $saved );
-        }
-        return $settings;
-    }
+		$settings = array();
+		$saved    = get_post_meta( $album_id, 'fotogrids_settings', true );
+		if ( is_array( $saved ) ) {
+			$settings = array_merge( $settings, $saved );
+		}
+		return $settings;
+	}
 }

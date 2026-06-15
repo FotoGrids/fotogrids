@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 /**
@@ -19,13 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Filters_Lightbox {
 
-    /**
-     * The slide list resolved for a lightbox open.
-     *
-     * @since 1.0.0
-     * @param array $slides   Resolved slide payloads.
-     * @param int[] $ids      Attachment IDs.
-     * @param array $settings Collection settings.
-     */
-    public const SLIDES = 'fotogrids/lightbox/slides';
+	/**
+	 * The slide list resolved for a lightbox open.
+	 *
+	 * @since 1.0.0
+	 * @param array $slides   Resolved slide payloads.
+	 * @param int[] $ids      Attachment IDs.
+	 * @param array $settings Collection settings.
+	 */
+	public const SLIDES = 'fotogrids/lightbox/slides';
 }
