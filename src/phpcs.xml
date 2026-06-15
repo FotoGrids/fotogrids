@@ -8,12 +8,42 @@
         annotations. Each exclusion below is a reviewed decision, not an oversight.
     </description>
 
+    <!--
+        What to scan. This file lives in src/, so '.' is the plugin's PHP root.
+        Run from here with `phpcs -p` or via composer (`composer lint`), which
+        invokes `phpcs` with this file as the active ruleset.
+    -->
+    <file>.</file>
+
     <!-- Scan PHP only; skip build output, deps, and the bundled Freemius SDK. -->
     <arg name="extensions" value="php"/>
+    <arg name="basepath" value="."/>
+    <arg name="parallel" value="8"/>
+    <arg value="ps"/>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/dist/*</exclude-pattern>
     <exclude-pattern>*/freemius/*</exclude-pattern>
+    <exclude-pattern>*/index.php</exclude-pattern>
+
+    <!--
+        Base standard. WordPress-Extra covers coding style + best practices;
+        WordPress.WP adds WordPress-specific correctness/security sniffs. We
+        intentionally do NOT pull in WordPress-Docs (docblock formatting) as a
+        hard gate yet. Minimum supported versions are declared for the relevant
+        version-aware sniffs.
+    -->
+    <config name="minimum_wp_version" value="6.1"/>
+    <config name="testVersion" value="8.0-"/>
+
+    <rule ref="WordPress-Extra"/>
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="fotogrids"/>
+            </property>
+        </properties>
+    </rule>
 
     <!--
         Declare FotoGrids' real symbol prefixes so the PrefixAllGlobals sniff

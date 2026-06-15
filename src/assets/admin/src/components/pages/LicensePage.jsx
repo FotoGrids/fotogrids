@@ -291,7 +291,7 @@ const LicensePage = () => {
 
                                 {licenseStatus && licenseStatus.is_opted_in && (
                                     <div className="fotogrids-license-optin-status">
-                                        <span className="fotogrids-license-optin-icon" aria-hidden="true">✓</span>
+                                        <Icon name="check" className="fotogrids-license-optin-icon" />
                                         <span className="fotogrids-license-optin-text">
                                             {__('Opted in to update notifications', 'fotogrids')}
                                         </span>

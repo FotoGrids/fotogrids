@@ -730,7 +730,7 @@ function convertIcon(name, svg) {
     });
 
     if (MANUAL_REVIEW.has(name)) {
-        warnings.push(`⚠️  ${name} flagged for manual visual review (complex animation pattern)`);
+        warnings.push(`WARN: ${name} flagged for manual visual review (complex animation pattern)`);
     }
 
     // Generate the function body
@@ -1207,7 +1207,7 @@ ${htmlRows}
     console.log(`  ${CSS_KEYFRAME_ICONS.size} CSS-only (no conversion)`);
     console.log(`  ${Object.keys(icons).length - CSS_KEYFRAME_ICONS.size} SMIL converted`);
     if (warnCount) {
-        console.log(`\n⚠  ${warnCount} icons with warnings:`);
+        console.log(`\nWARN: ${warnCount} icons with warnings:`);
         for (const [name, warns] of Object.entries(allWarnings)) {
             console.log(`\n  ${name}:`);
             warns.forEach(w => console.log(`    - ${w}`));

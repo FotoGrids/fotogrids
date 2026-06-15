@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Select from './shared/Select';
 import { Button } from './shared/Button';
+import Icon from './shared/Icon';
 
 const { __ } = wp.i18n;
 
@@ -266,7 +267,7 @@ const TemplatesMetabox = () => {
                         onClick={handleDismissNotice}
                         aria-label={strings.dismiss}
                     >
-                        ✕
+                        <Icon name="x" />
                     </button>
                     <p>{strings.templatesNoticeDescription}</p>
                     <div className="fotogrids-templates-metabox__pro-actions">

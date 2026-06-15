@@ -10,5 +10,5 @@ module.exports = async () => {
     process.env.WP_DEBUG = 'true';
     
     // Global test setup can go here
-    console.log('🧪 Setting up FotoGrids test environment...');
+    console.log('Setting up FotoGrids test environment...');
 };

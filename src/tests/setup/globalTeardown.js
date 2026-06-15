@@ -6,5 +6,5 @@
 
 module.exports = async () => {
     // Global test cleanup can go here
-    console.log('🧹 Cleaning up FotoGrids test environment...');
+    console.log('Cleaning up FotoGrids test environment...');
 };

@@ -1,177 +1,125 @@
-T# FotoGrids WordPress Plugin - Development
+# FotoGrids (Free) — Developer Guide
 
-A modern, freemium WordPress gallery plugin with Pro features.
+FotoGrids is a modern WordPress gallery and slider plugin built around the
+WordPress Media Library. This repository holds the **Free** plugin. The Pro
+plugin lives in a sibling repository and extends Free purely through WordPress
+hooks — it never imports Free's classes directly.
 
-## 🚀 Quick Start
+This README covers local development of the Free plugin. For the full
+architecture reference (PHP bootstrap, database layer, the render pipeline,
+the Free↔Pro contract, REST conventions), see `CLAUDE.md` in the repository
+root.
 
-### Prerequisites
+## Requirements
 
--   Node.js 18+ and npm 8+
--   WordPress 5.8+ with PHP 8.0+
+| Tool      | Version            |
+| --------- | ------------------ |
+| PHP       | 8.0+               |
+| WordPress | 6.1+ (tested 6.8)  |
+| Node.js   | 18+                |
+| npm       | 8+                 |
 
-### Development Setup
+## Getting started
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development (watches for changes)
 npm run dev
-
-# The built plugin will be in dist/dev/ - install this folder as a WordPress plugin
 ```
 
-### Production Build
+`npm run dev` builds the loading-icon assets, then runs the YAML watcher and
+`webpack --watch` together. Webpack writes a complete, installable plugin into
+`dist/`. Point your local WordPress install at that folder (or use the zip
+tasks below) to test.
 
-```bash
-# Create production build
-npm run build
-
-# Create distributable ZIP
-npm run release
-```
-
-## 📁 Project Structure
+## Project layout
 
 ```
 Plugin/
-├── src/                    # Source code (edit these files)
-│   ├── fotogrids.php      # Main plugin file
-│   ├── admin/             # Admin interface
-│   ├── includes/          # Core PHP classes
-│   ├── public/            # Frontend functionality
-│   └── assets/            # React/JS/SCSS source files
-├── dist/                  # Built plugins (auto-generated)
-│   ├── dev/              # Development build
-│   └── prod/             # Production build
-├── package.json          # Build configuration
-└── webpack.config.js     # Build system
+├── src/                  Source — edit here
+│   ├── fotogrids.php      Main plugin file (bootstrap, constants, hooks)
+│   ├── config/           Module registry, loading-icon catalogues
+│   ├── includes/         PHP classes (REST, settings, modules, tools, render helpers)
+│   ├── assets/           React/TS admin UI, SCSS, plain-JS entrypoints
+│   ├── public/           Frontend render pipeline + shortcodes/blocks
+│   ├── languages/        Translations
+│   └── tests/            Jest unit + integration tests
+├── tests/                PHP integration tests + CI guard scripts
+├── scripts/              Build helpers (loading icons, JSON↔YAML)
+├── dist/                 Build output — generated, never edited, git-ignored
+├── webpack.config.js     Build configuration
+├── package.json
+└── CLAUDE.md             Full developer/architecture reference
 ```
 
-## 🔧 Build Commands
+The build output in `dist/` is produced entirely by webpack (including the
+`CopyWebpackPlugin` step that copies the PHP source). Do not hand-assemble it.
 
-| Command            | Description                          |
-| ------------------ | ------------------------------------ |
-| `npm run dev`      | Development build with file watching |
-| `npm run build`    | Production build (minified)          |
-| `npm run zip:dev`  | Create development ZIP for testing   |
-| `npm run zip:prod` | Create production ZIP for release    |
-| `npm run release`  | Full release: clean + build + zip    |
-| `npm run clean`    | Remove all built files               |
+## Scripts
 
-## 🎯 Development Workflow
+### Build
 
-1. **Edit source files** in `/src` directory
-2. **Run development build**: `npm run dev`
-3. **Install built plugin** from `/dist/dev` in WordPress
-4. **Test changes** - build automatically updates
-5. **Create release**: `npm run release`
+| Command             | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `npm run dev`       | Watch build (development): icons + YAML + webpack       |
+| `npm run build`     | Production build (icons + webpack, minified)            |
+| `npm run build:dev` | One-shot development build (no watch)                   |
+| `npm run clean`     | Remove `dist/`                                          |
+| `npm run icons:build` | Rebuild the loading-icon assets                      |
 
-## 📦 Installation
+### Package / release
 
-### For Development
+| Command            | Description                                             |
+| ------------------ | ------------------------------------------------------- |
+| `npm run zip:dev`  | Development build, zipped to `fotogrids-dev.zip`        |
+| `npm run zip:prod` | Production build, zipped to `fotogrids-v<version>.zip`  |
+| `npm run release`  | `clean` + `build` + `zip:prod`                          |
 
-```bash
-cd Plugin/
-npm install
-npm run dev
-# Install dist/dev/ folder as WordPress plugin
-```
+### Quality
 
-### For Production Use
+| Command              | Description                                           |
+| -------------------- | ----------------------------------------------------- |
+| `npm run lint`       | ESLint over `src/assets`                               |
+| `npm run lint:fix`   | ESLint with autofix                                    |
+| `npm run format`     | Prettier over assets and Markdown                      |
+| `npm run type-check` | `tsc --noEmit`                                         |
 
-```bash
-npm run release
-# Upload fotogrids-v0.1.0.zip to WordPress
-```
+### Tests
 
-## 🏗️ Architecture
+| Command                   | Description                                        |
+| ------------------------- | -------------------------------------------------- |
+| `npm test`                | Jest (JS/TS)                                        |
+| `npm run test:watch`      | Jest in watch mode                                 |
+| `npm run test:coverage`   | Jest with coverage                                 |
+| `npm run test:ci`         | Render guards + PHP integration tests + Jest CI run |
 
-### Frontend (No jQuery)
+The Jest suite lives in `src/tests/`. The root `tests/` directory holds
+self-contained PHP integration tests (run with the `php` binary, no PHPUnit
+required) and the CI guard scripts under `tests/ci/`. Both are wired into
+`npm run test:ci`.
 
--   **Admin**: React + TypeScript components
--   **Public**: Vanilla ES6+ JavaScript
--   **Styles**: SCSS compiled to CSS
+### Internationalisation
 
-### Backend
+| Command              | Description                                           |
+| -------------------- | ----------------------------------------------------- |
+| `npm run i18n:makepot` | Generate `src/languages/fotogrids.pot` (needs WP-CLI) |
 
--   **PHP 8.0+**: Modern WordPress development
--   **Custom Tables**: Optimized database structure
--   **REST API**: Frontend/admin communication
--   **Gutenberg**: Native block support
+## Architecture at a glance
 
-### Build System
+-   **Backend**: PHP 8.0+, explicit `require_once` bootstrap (no autoloader or
+    service container), custom database tables, REST API under `fotogrids/v1`.
+-   **Admin UI**: React 18 (mostly `.jsx`, some `.tsx`) using
+    `@wordpress/components`, mounted into PHP-rendered containers. No SPA router,
+    no Tailwind, no shadcn.
+-   **Frontend**: vanilla ES6+ (no jQuery, no React). Galleries and albums are
+    rendered by a modular pipeline under `src/public/render/`; per-gallery JS
+    behaviour attaches via the `window.FotoGrids` runtime.
+-   **Free ↔ Pro**: Pro detects Free via the `FOTOGRIDS_VERSION` constant and
+    extends it through filters and actions only.
 
--   **Webpack**: Asset compilation and optimization
--   **TypeScript**: Type safety for admin components
--   **SCSS**: Advanced styling capabilities
--   **File Copying**: Automatic PHP file handling
+See `CLAUDE.md` for the authoritative detail on all of the above, including the
+render pipeline stages, the `data-fg-*` attribute convention, and the list of
+extension hooks.
 
-## 🎨 Features
+## License
 
-### Free Version
-
--   ✅ Unlimited galleries & albums
--   ✅ Grid, Masonry, Justified layouts
--   ✅ Lightbox with keyboard navigation
--   ✅ Statistics tracking
--   ✅ Shortcodes & Gutenberg blocks
-
-### Pro Features
-
--   🔒 Advanced templates & animations
--   🔒 Page builder widgets
--   🔒 Video galleries & EXIF data
--   🔒 WooCommerce integration
-
-## 📚 Documentation
-
--   **[BUILD.md](BUILD.md)** - Detailed build system documentation
--   **[/Docs](../Docs/)** - Complete development guide
--   **[/Plan](../Plan/)** - Original planning documents
-
-## 🧪 Code Quality
-
-```bash
-npm run lint        # ESLint + WordPress standards
-npm run format      # Prettier code formatting
-npm run type-check  # TypeScript validation
-```
-
-## 🔒 Security
-
--   Nonce verification for all admin actions
--   Capability checks for user permissions
--   Input sanitization and output escaping
--   WordPress security best practices
-
-## 📈 Performance
-
--   Conditional asset loading
--   Lazy loading for items
--   Database query optimization
--   Modern JavaScript (ES6+)
-
-## 🌐 Internationalization
-
--   Full translation support (`fotogrids` textdomain)
--   `.pot` file generation
--   RTL language support
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch from `develop`
-3. Make changes in `/src` directory
-4. Test with `npm run dev`
-5. Submit pull request
-
-## 📄 License
-
-GPL v2 or later - WordPress compatible licensing
-
-## 🆘 Support
-
--   **Issues**: GitHub Issues
--   **Documentation**: `/Docs` folder
--   **WordPress.org**: Plugin support forum
+GPL-2.0-or-later.

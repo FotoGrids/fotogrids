@@ -110,7 +110,6 @@ const TabPeople = ({
             {isProActive && pendingFaces.length > 0 && (
                 <div className="fotogrids-faces-detected">
                     <div className="fotogrids-faces-detected__header">
-                        <span className="fotogrids-faces-detected__icon">🤖</span>
                         <strong>{__('AI detected faces', 'fotogrids')}</strong>
                         <span className="fotogrids-faces-detected__count">
                             {pendingFaces.length}
