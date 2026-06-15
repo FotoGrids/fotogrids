@@ -607,10 +607,6 @@ final class Lightbox implements Feature {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Returns $value if it looks like a valid CSS colour string, otherwise $default.
 	 *

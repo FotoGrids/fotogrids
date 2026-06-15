@@ -500,10 +500,6 @@ final class Filter_Ui implements Feature {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Render helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Renders the "All" reset control (a button for buttons/checkboxes style,
 	 * or a first <option> for dropdowns - emitted at the wrapper level since
@@ -703,10 +699,6 @@ final class Filter_Ui implements Feature {
 
 		return $html;
 	}
-
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
 
 	private function resolve_style( Render_Context $render_context ): string {
 		$style = $render_context->settings['filter_ui_style'] ?? 'buttons';

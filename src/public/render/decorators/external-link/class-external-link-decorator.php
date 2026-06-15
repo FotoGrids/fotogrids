@@ -143,10 +143,6 @@ final class External_Link_Decorator implements Decorator {
 		return new Module_Assets();
 	}
 
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Reads the gallery-level default link target from settings.
 	 *

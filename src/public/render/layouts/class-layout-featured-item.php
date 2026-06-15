@@ -257,7 +257,6 @@ final class Layout_Featured_Item implements Layout {
 			'--fg-featured-grid-rows' => (string) $rows,
 		);
 
-		// Show all button styling (fuller set).
 		$bg     = self::safe_color( $s['featured_show_all_bg'] ?? null );
 		$text   = self::safe_color( $s['featured_show_all_text'] ?? null );
 		$border = self::safe_color( $s['featured_show_all_border_color'] ?? null );

@@ -26,44 +26,34 @@ class Admin_Init {
 		// safe-redirect path while permitting our own known destinations.
 		add_filter( 'allowed_redirect_hosts', array( __CLASS__, 'allowed_redirect_hosts' ) );
 
-		// Suppress admin notices on FotoGrids pages
 		add_action( 'admin_head', array( __CLASS__, 'suppress_admin_notices' ) );
-
-		// Fix menu highlighting for custom post types
 		add_action( 'admin_head', array( __CLASS__, 'fix_menu_highlighting' ) );
 
 		if ( ! \FotoGrids\License_Manager::has_pro() ) {
 			add_action( 'admin_head', array( __CLASS__, 'add_upgrade_menu_styles' ) );
 		}
 
-		// AJAX handlers for plugin settings
 		add_action( 'wp_ajax_fotogrids_update_plugin_setting', array( __CLASS__, 'ajax_update_plugin_setting' ) );
 
-		// Initialize admin columns
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-columns.php';
 		\FotoGrids\Admin\Admin_Columns::init();
 
-		// Add bulk actions for gallery-album relationships
 		add_filter( 'bulk_actions-edit-fotogrids_gallery', array( __CLASS__, 'gallery_bulk_actions' ) );
 		add_filter( 'handle_bulk_actions-edit-fotogrids_gallery', array( __CLASS__, 'handle_gallery_bulk_actions' ), 10, 3 );
 		add_action( 'admin_notices', array( __CLASS__, 'bulk_action_admin_notices' ) );
 		add_action( 'admin_footer-edit.php', array( __CLASS__, 'bulk_action_album_selector' ) );
 
-		// Initialize upgrade modal integration (for non-Pro users)
 		if ( ! \FotoGrids\License_Manager::has_pro() ) {
 			require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-upgrade-modal-integration.php';
 			require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-upgrade-modal.php';
 			\FotoGrids\Admin\Upgrade_Modal_Integration::init();
 		}
 
-		// Initialize admin header
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-header.php';
 
-		// Initialize dashboard widget
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-dashboard-widget.php';
 		\FotoGrids\Admin\Dashboard_Widget::init();
 
-		// Initialize review prompt
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-review-prompt.php';
 		\FotoGrids\Admin\Review_Prompt::init();
 	}
@@ -163,7 +153,6 @@ class Admin_Init {
 			array( __CLASS__, 'license_page' )
 		);
 
-		// Add upgrade submenu only for non-Pro users
 		if ( ! \FotoGrids\License_Manager::has_pro() ) {
 			add_submenu_page(
 				'fotogrids',
@@ -266,7 +255,6 @@ class Admin_Init {
 			FOTOGRIDS_VERSION
 		);
 
-		// Enqueue admin styles
 		wp_enqueue_style(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/css/admin.css',
@@ -281,7 +269,6 @@ class Admin_Init {
 			\FotoGrids\Settings\Watermark_Settings_Store::font_face_css()
 		);
 
-		// Localize script with data
 		wp_localize_script(
 			'fotogrids-admin',
 			'fotogridsAdmin',
@@ -298,27 +285,14 @@ class Admin_Init {
 				'seoSettings'                   => \FotoGrids\Settings\SEO_Settings_Store::get(),
 				'viewSettings'                  => \FotoGrids\Settings\View_Settings_Store::get(),
 				'currentUser'                   => wp_get_current_user(),
-				// Prefer the real Freemius tracking state when available so
-				// the toggle reflects what's actually happening — not just
-				// our local mirror option. Falls back to the option if
-				// Freemius isn't loaded yet (early activation, etc).
 				'shareStatistics'               => self::resolve_share_statistics_state(),
 				'autosave'                      => (bool) get_option( 'fotogrids_autosave', '0' ),
-				// Wizard step 3 — collection-settings UI complexity mode.
-				// Read by collection-settings.js and surfaced through the
-				// docs-strip Segmented control.
 				'settingsMode'                  => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
 				'userPersona'                   => (string) get_option( 'fotogrids_user_persona', '' ),
 				'customJsAllowDynamicExecution' => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
-				// Surfaced to the Plugin Settings > Maintenance tab so the Debug
-				// Log panel only renders when WP_DEBUG is actually on.
 				'wpDebug'                       => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'settingsBaseUrl'               => admin_url( 'admin.php?page=fotogrids-settings' ),
 				'isFotoGridsPage'               => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
-				// Snapshot of every FotoGrids atomic capability the current user
-				// holds, sourced from Permission_Registry. New caps added by Free
-				// tools/modules, Pro, or 3rd-party plugins flow through here
-				// automatically - no hand-curated list to keep in sync.
 				'capabilities'                  => self::get_current_user_capabilities_snapshot(),
 			)
 		);
@@ -331,7 +305,6 @@ class Admin_Init {
 			)
 		);
 
-		// Configure wp.apiFetch with nonce
 		wp_add_inline_script(
 			'wp-api-fetch',
 			sprintf(
@@ -341,10 +314,8 @@ class Admin_Init {
 			'after'
 		);
 
-		// Set up translations
 		wp_set_script_translations( 'fotogrids-admin', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
-		// Enqueue Chart.js on stats page and library page (both use Chart.js charts).
 		if (
 			'fotogrids_page_fotogrids-stats' === $hook || strpos( $hook, 'fotogrids-stats' ) !== false ||
 			'fotogrids_page_fotogrids-library' === $hook || strpos( $hook, 'fotogrids-library' ) !== false
@@ -358,9 +329,6 @@ class Admin_Init {
 			);
 		}
 
-		// Localize Library page data only on the Library admin screen.
-		// Exposes the entity-type registry and the initial active tab so the
-		// React side does not have to make a separate roundtrip on mount.
 		if ( 'fotogrids_page_fotogrids-library' === $hook || strpos( $hook, 'fotogrids-library' ) !== false ) {
 			$entity_types = \FotoGrids\REST\Metadata\Library_Data::get_entity_types();
 			$tab_slugs    = array_keys( $entity_types );
@@ -385,11 +353,9 @@ class Admin_Init {
 			);
 		}
 
-		// Enqueue settings-specific scripts only on settings page
 		if ( 'fotogrids_page_fotogrids-settings' === $hook || strpos( $hook, 'fotogrids-settings' ) !== false ) {
 			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true, false );
 
-			// Determine post type from subtab parameter, default to gallery.
 			// Read-only routing, sanitised; no state change so nonce is N/A.
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$subtab    = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'gallery';
@@ -697,26 +663,15 @@ class Admin_Init {
 		$setting = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
 		$value   = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
 
-		// Allowlist split into "boolean" and "string" buckets so the handler
-		// knows how to coerce each one. New settings added here should also
-		// be added to the relevant bucket below.
+		// Allowlist split into boolean / string buckets so each is coerced correctly.
 		$boolean_settings = array(
 			'fotogrids_autosave',
 			'fotogrids_auto_clear_cache',
 			'fotogrids_enable_statistics',
-			// Wizard step 1 — anonymous usage data toggle. Mirrors the
-			// Settings > Advanced > Share statistics flag, with the same
-			// Freemius side-effect handled below.
 			'fotogrids_share_statistics',
 		);
 		$string_settings  = array(
-			// Wizard step 2 — user persona pick (developer / photographer /
-			// personal / agency / business / shop). Stored for telemetry
-			// segmentation and per-persona tailoring later.
 			'fotogrids_user_persona',
-			// Wizard step 3 — "easy" vs "advanced" UI mode for the
-			// collection settings panels. Read by collection-settings.js
-			// and surfaced through window.fotogridsAdmin.settingsMode.
 			'fotogrids_settings_mode',
 		);
 
@@ -823,17 +778,7 @@ class Admin_Init {
 	}
 
 	/**
-	 * Resolve the current "share anonymous statistics" state.
-	 *
-	 * The wizard / Settings toggle reflects whether Freemius is actually
-	 * tracking, not just whether our `fotogrids_share_statistics` option
-	 * flag is set. Users can opt in / out through Freemius's own native
-	 * UI (the connect screen, the account page), and those changes
-	 * don't touch our option. Reading the real tracking state keeps the
-	 * toggle honest.
-	 *
-	 * Falls back to the option flag when the Freemius SDK isn't loaded
-	 * (very early in admin boot, CLI requests, etc).
+	 * Resolve the current "share anonymous statistics" state from the local option.
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -851,15 +796,8 @@ class Admin_Init {
 			0 === $option_raw
 		);
 
-		// We previously preferred Freemius's per-site tracking state, but
-		// that means a fresh install (no Freemius site yet) reads as
-		// false even if the user *did* opt in via our own toggle before
-		// any opt-in flow. Worse, when Freemius has been registered for
-		// licensing purposes only, it can return tracking_allowed=true
-		// even when our option says off — making the wizard show "on"
-		// for a user who clearly opted out. The local option is the
-		// single source of truth for the in-product toggle; we mirror
-		// it to Freemius on write but don't read back from there.
+		// The local option is the single source of truth for the in-product
+		// toggle; it is mirrored to Freemius on write but never read back.
 		$resolved = $option_bool;
 
 		if ( \FotoGrids\Debug_Log::should_log( 'license' ) ) {
@@ -923,9 +861,7 @@ class Admin_Init {
 				</h1>
 			</div>
 			<?php endif; ?>
-			<div id="fotogrids-<?php echo esc_attr( $page_id ); ?>-page" class="fotogrids-admin-page">
-				<!-- React component will be mounted here -->
-			</div>
+			<div id="fotogrids-<?php echo esc_attr( $page_id ); ?>-page" class="fotogrids-admin-page"></div>
 		</div>
 		<?php
 	}
@@ -1501,11 +1437,9 @@ class Admin_Init {
 	public static function fix_menu_highlighting() {
 		global $parent_file, $submenu_file, $post_type;
 
-		// Check if we're editing/viewing FotoGrids post types
 		if ( in_array( $post_type, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
 			$parent_file = 'fotogrids'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 
-			// Set submenu highlighting based on post type.
 			if ( 'fotogrids_gallery' === $post_type ) {
 				$submenu_file = 'edit.php?post_type=fotogrids_gallery'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional admin-menu highlight fix.
 			} elseif ( 'fotogrids_album' === $post_type ) {

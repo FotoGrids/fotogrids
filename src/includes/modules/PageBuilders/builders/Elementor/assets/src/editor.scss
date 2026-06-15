@@ -4,8 +4,8 @@
  *
  * Naming is `.fg-pb-elementor-picker*` — keeps it out of the way of
  * the Gutenberg picker styles (which live under `.fg-pb-picker*`
- * shared between contexts) and lets us tune the Elementor sidebar
- * specifically without leaking to the wp-admin block editor.
+ * shared between contexts) and scopes the Elementor sidebar tuning
+ * so it doesn't leak to the wp-admin block editor.
  */
 
 .fg-pb-elementor-picker {
@@ -50,8 +50,8 @@
 
     /* Make the Select2 trigger grow to fit the row template (thumb +
        title + meta + status pill) instead of Select2's default 28px
-       single-line height. Scoped to .fg-pb-elementor-picker so we
-       don't disturb Elementor's other Select2 controls. */
+       single-line height. Scoped to .fg-pb-elementor-picker so
+       Elementor's other Select2 controls are not disturbed. */
     .select2-container--default .select2-selection--single {
         height: auto;
         min-height: 44px;

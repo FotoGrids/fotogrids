@@ -79,10 +79,6 @@ final class Preview_Data {
 	 */
 	private const PICKER_PER_PAGE_DEFAULT = 24;
 
-	// -------------------------------------------------------------------------
-	// Gallery preview
-	// -------------------------------------------------------------------------
-
 	/**
 	 * `POST /preview/gallery/{id}`.
 	 *
@@ -120,8 +116,6 @@ final class Preview_Data {
 			);
 		}
 
-		// Resolve normalized settings the renderer expects, plus the
-		// ordered item list. Same shape the shortcode handler uses.
 		$render_settings = self::resolve_gallery_settings( $gallery_id );
 		$item_ids        = class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
 			? (array) \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id )
@@ -252,10 +246,6 @@ final class Preview_Data {
 		return Preview_Options::normalise( is_array( $raw ) ? $raw : array() );
 	}
 
-	// -------------------------------------------------------------------------
-	// Album preview
-	// -------------------------------------------------------------------------
-
 	/**
 	 * `POST /preview/album/{id}`.
 	 *
@@ -300,10 +290,8 @@ final class Preview_Data {
 			$album_settings['item_click_behavior'] = 'nothing';
 		}
 
-		// Build the standard album context, then flip is_preview on the
-		// meta so the password gate (and any other preview-aware module)
-		// takes the admin path. We use the ->with() form so we don't have
-		// to re-construct Render_Meta with every field by hand.
+		// Flip is_preview on the meta so the password gate (and other
+		// preview-aware modules) take the admin path.
 		$render_context = Context_Builder::for_preview()->build_for_album(
 			album_id:          $album_id,
 			render_settings:   $album_settings,
@@ -318,9 +306,8 @@ final class Preview_Data {
 
 		$render_result = Render_Controller::factory()->render( $render_context );
 
-		// Allow modules that publish a page-scope global (loading-icon) to
-		// hook in - wp_footer never fires in REST, so we fire the
-		// FotoGrids-only late-assets action that those modules also hook.
+		// wp_footer never fires in REST, so fire the FotoGrids-only late-assets
+		// action that page-scope modules (loading-icon) also hook.
 		do_action( Actions_Render::LATE_ASSETS, $render_context );
 
 		$payload = self::serialize_render_payload( $render_result, $render_context );
@@ -329,10 +316,6 @@ final class Preview_Data {
 
 		return rest_ensure_response( $payload );
 	}
-
-	// -------------------------------------------------------------------------
-	// Picker
-	// -------------------------------------------------------------------------
 
 	/**
 	 * `GET /picker/items`.
@@ -442,10 +425,6 @@ final class Preview_Data {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Import (core/gallery -> fotogrids/gallery transform)
-	// -------------------------------------------------------------------------
-
 	/**
 	 * `POST /import/core-gallery`.
 	 *
@@ -505,10 +484,6 @@ final class Preview_Data {
 			)
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// Internals
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Build the picker card payload for a single gallery.
@@ -606,10 +581,7 @@ final class Preview_Data {
 
 	/**
 	 * Resolve a gallery's thumbnail URL: featured item -> first item ->
-	 * null.
-	 *
-	 * Matches the v1 behaviour Mark signed off on - one DB query at most,
-	 * no 4-up mosaic fallback.
+	 * null. One DB query at most, no mosaic fallback.
 	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id Gallery ID.
@@ -866,9 +838,8 @@ final class Preview_Data {
 		if ( License_Manager::is_pro_active() ) {
 			return 'active';
 		}
-		// No active license. If the user has ever recorded a Pro license,
-		// mark as lapsed; otherwise 'none'. We treat the presence of any
-		// saved license_key in the local license table as "ever had Pro".
+		// No active license: any saved license_key in the local table counts
+		// as "ever had Pro" and maps to 'lapsed'; otherwise 'none'.
 		global $wpdb;
 		$table = $wpdb->prefix . 'fotogrids_licenses';
 		// Defensive: the licenses table may not exist on very fresh installs.

@@ -131,10 +131,6 @@ final class People_Filter_Decorator implements Decorator {
 		return new Module_Assets();
 	}
 
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * @param  array<int, int> $item_ids
 	 * @return array<int, array<int, string>>

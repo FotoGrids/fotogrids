@@ -25,12 +25,8 @@ define( 'FOTOGRIDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_FILE', __FILE__ );
 define( 'FOTOGRIDS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-// Hook name catalogue. Every action / filter / JS-event identifier dispatched
-// by FotoGrids is declared as a class constant on a small category class
-// under one of: includes/hooks/actions/, includes/hooks/filters/,
-// includes/hooks/js-events/. Add a new class-<category>.php in the matching
-// folder and it loads automatically — no central list to keep in sync.
-// See docs/hooks-reference.md for the generated catalogue.
+// Hook name catalogue: each action / filter / JS-event identifier is a class
+// constant under includes/hooks/{actions,filters,js-events}/, auto-loaded by glob.
 foreach ( array( 'actions', 'filters', 'js-events' ) as $fotogrids_hooks_group ) {
 	foreach ( glob( FOTOGRIDS_PLUGIN_DIR . 'includes/hooks/' . $fotogrids_hooks_group . '/class-*.php' ) ?: array() as $fotogrids_hooks_file ) {
 		require_once $fotogrids_hooks_file;
@@ -127,9 +123,8 @@ register_uninstall_hook( __FILE__, array( 'FotoGrids\Uninstaller', 'uninstall' )
  * Initialize the plugin
  */
 function fotogrids_init() {
-	// Kept intentionally: WordPress 4.6+ auto-loads textdomains for .org-hosted
-	// plugins, but FotoGrids also ships off-.org (Pro/licensing site) where the
-	// explicit call still loads translations. Harmless for the .org build.
+	// Explicit load: FotoGrids also ships off-.org (Pro/licensing site) where the
+	// .org auto-loading of translations does not apply.
     // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
 	load_plugin_textdomain(
 		'fotogrids',
@@ -148,55 +143,33 @@ function fotogrids_init() {
 	FotoGrids\Image_Size_Manager::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
 
-	// Boot the module registry on 'init' (priority 5), not here on
-	// 'plugins_loaded'. This is the robust fix for the same-priority load-order
-	// fragility between Free and Pro: both plugins attach their
-	// 'fotogrids/modules/register' listeners at plugin-file load time, and
-	// boot() fires that action once 'init' runs - which is guaranteed to be
-	// after every plugin's 'plugins_loaded' callback. Source-derived sorting
-	// in the registry then guarantees Free modules init before Pro modules
-	// regardless of which plugin registered first.
+	// Boot on 'init' (not 'plugins_loaded') so it runs after every plugin's
+	// 'plugins_loaded' callback; source-derived sorting in the registry then
+	// guarantees Free modules init before Pro regardless of registration order.
 	add_action( 'init', array( '\FotoGrids\Modules\Module_Registry', 'boot' ), 5 );
 
-	// Boot the Permission_Registry after modules + tools have registered.
-	// The registry harvests definitions from both, then fires
-	// 'fotogrids/permissions/register' so Pro / third-party can extend.
-	// Priority 7 = after modules (5) and tools (registered on
-	// 'fotogrids/tools/init' fired below at 'plugins_loaded' time).
+	// Priority 7: after modules (5) and tools so the registry can harvest
+	// definitions from both before firing 'fotogrids/permissions/register'.
 	add_action( 'init', array( '\FotoGrids\Permissions\Permission_Registry', 'boot' ), 7 );
 
-	// The modules manifest endpoint (GET /fotogrids/v1/admin/modules) registers
-	// its own route on rest_api_init.
 	\FotoGrids\Modules\Modules_Rest::init();
 
-	// Module admin assets. enqueue_all() runs on admin_enqueue_scripts at
-	// priority 20 - after Admin_Init::enqueue_admin_scripts (priority 10) has
-	// registered 'fotogrids-admin' - so module scripts that declare it as a
-	// dependency resolve correctly. Each module guards its own screen. Mirrors
-	// the Tools_Registry::enqueue_all wiring.
+	// Priority 20: after Admin_Init::enqueue_admin_scripts (10) has registered
+	// 'fotogrids-admin', so module scripts declaring it as a dependency resolve.
 	add_action( 'admin_enqueue_scripts', array( '\FotoGrids\Modules\Module_Registry', 'enqueue_all' ), 20 );
 
-	// Fire the tools registration hook. Free registers at priority 10;
-	// Pro and third-party plugins hook in at priority 10 (Pro, runs after Free
-	// because Pro loads after plugins_loaded fires for Free) or 20+ (third-party).
 	do_action( \FotoGrids\Hooks\Actions_System::TOOLS_INIT );
 
-	// Tool init() methods call register_rest_route(), which must run on rest_api_init.
-	// Register at priority 5 so tool routes are in place before other rest_api_init
-	// callbacks that might inspect the route table.
+	// Priority 5: tool routes in place before other rest_api_init callbacks that
+	// might inspect the route table.
 	add_action( 'rest_api_init', array( '\FotoGrids\Tools\Tools_Registry', 'init_all' ), 5 );
 
-	// Tool asset enqueueing is separate from REST init - enqueue_all() runs on
-	// admin_enqueue_scripts at priority 20, after Admin_Init::enqueue_admin_scripts
-	// (priority 10) has already registered 'fotogrids-admin'. This guarantees the
-	// dependency declared by each tool script resolves correctly.
+	// Priority 20: see Module_Registry::enqueue_all above.
 	add_action( 'admin_enqueue_scripts', array( '\FotoGrids\Tools\Tools_Registry', 'enqueue_all' ), 20 );
 
-	// Divi 5 native modules must register their dependency-tree hook
-	// BEFORE 'init' runs: Divi fires the tree from `et_setup_builder_5` on
-	// 'init' priority 0, earlier than Module_Registry::boot() (init:5).
-	// We attach those timing-sensitive Divi hooks here, at plugins_loaded.
-	// No-ops internally when Divi 5 isn't present.
+	// Divi 5 fires its dependency tree from `et_setup_builder_5` on 'init'
+	// priority 0, earlier than Module_Registry::boot() (init:5), so these
+	// timing-sensitive hooks must attach at plugins_loaded. No-ops without Divi 5.
 	require_once FOTOGRIDS_PLUGIN_DIR . 'includes/modules/PageBuilders/builders/Divi/Module.php';
 	\FotoGrids\Modules\PageBuilders\Builders\Divi\Module::boot_early();
 
@@ -216,11 +189,9 @@ add_action( 'plugins_loaded', 'fotogrids_init' );
 /**
  * Register built-in Free modules.
  *
- * Runs on 'fotogrids/modules/register' at priority 10 (fired from
- * Module_Registry::boot() on 'init'). Pro modules register at the same
- * priority - source-derived sorting in the registry guarantees Free modules
- * init before Pro regardless of add order. Third-party plugins should use
- * priority 20 or higher.
+ * Runs on 'fotogrids/modules/register' at priority 10. Pro registers at the same
+ * priority; source-derived sorting guarantees Free inits first. Third-party
+ * plugins should use priority 20 or higher.
  */
 add_action(
 	\FotoGrids\Hooks\Actions_System::MODULES_REGISTER,
@@ -241,9 +212,8 @@ add_action(
 /**
  * Register built-in Free tools.
  *
- * Runs on 'fotogrids/tools/init' at priority 10 (fired from fotogrids_init).
- * Pro tools hook in at the same priority (Pro loads after Free so order is
- * guaranteed). Third-party plugins should use priority 20 or higher.
+ * Runs on 'fotogrids/tools/init' at priority 10. Pro hooks in at the same
+ * priority (loads after Free). Third-party plugins should use priority 20+.
  */
 add_action(
 	\FotoGrids\Hooks\Actions_System::TOOLS_INIT,
@@ -306,12 +276,11 @@ add_filter(
 		if ( \FotoGrids\License_Manager::has_pro() ) {
 			return $links;
 		}
-		$pro_link = '<a href="https://go.fotogrids.com/pro"
+		$pro_link  = '<a href="https://go.fotogrids.com/pro"
             target="_blank"
             style="font-weight:600;color:#3c46f0;">'
 			. __( 'Get FotoGrids Pro', 'fotogrids' ) .
 			'</a>';
-		// Insert AFTER Deactivate
 		$new_links = array();
 		foreach ( $links as $link ) {
 			$new_links[] = $link;

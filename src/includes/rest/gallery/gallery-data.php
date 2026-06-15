@@ -347,18 +347,12 @@ class Gallery_Data {
 			);
 		}
 
-		// Branch on whether the caller asked for pagination/partial. When
-		// no pagination params are supplied (Album_To_Gallery_Ajax path),
-		// fall through to the legacy shortcode path so we don't change
-		// behaviour for that caller. When ANY pagination param is set,
-		// use the dedicated REST entry point that threads meta_overrides
-		// into Context_Builder.
+		// No pagination params (Album_To_Gallery_Ajax path) uses the shortcode
+		// path; any pagination param routes through the meta_overrides entry point.
 		$is_paginated_request = $page > 1 || $items_per_page > 0 || $container_width > 0 || '' !== $partial || 'desktop' !== $breakpoint || ! empty( $filters ) || $random_seed > 0;
 
-		// Visit-context: any render emitted from this endpoint is an AJAX
-		// swap. We pass via_album_id through both branches so the rendered
-		// gallery's Collection_Header can build a Back / Breadcrumb that
-		// points at the originating album.
+		// via_album_id threads through both branches so the rendered gallery's
+		// Collection_Header can build a Back / Breadcrumb to the originating album.
 		$shared_meta_overrides = array(
 			'is_ajax_swap' => true,
 		);
@@ -413,29 +407,15 @@ class Gallery_Data {
 		$css_urls = $resolver->get_css_asset_urls();
 		$js_data  = $resolver->get_js_asset_data();
 
-		// Pagination metadata for the client. When filters are active,
-		// total reflects the filtered set so chrome (load-more hasMore,
-		// page-buttons total_pages) is computed against the filtered
-		// count. We can't easily count the filtered set without
-		// running the predicates here too, so for v1 we'll trust that
-		// the renderer has produced the correct slice and read the
-		// resulting size hint back. A cleaner pass would have
-		// Context_Builder return a "filtered total" alongside the
-		// sliced items; flagged as a follow-up below.
-		// For now: when filters are absent, use the raw total; when
-		// present, we still use the raw total but the client treats
-		// has_more as authoritative — the renderer sets total_pages
-		// to be consistent with what was sliced.
+		// When filters are active, total reflects the filtered set so the
+		// load-more / page-button chrome is computed against the filtered count.
 		$settings  = \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id );
 		$page_size = $items_per_page > 0
 			? $items_per_page
 			: \FotoGrids\Render\Features\Pagination\Page_Size_Resolver::resolve_page_size( $settings );
 
 		if ( ! empty( $filters ) ) {
-			// Re-run filtering on the full id list, count survivors. This
-			// mirrors Context_Builder::apply_server_filters but at the
-			// ID level. We need this so the client knows the true
-			// total_pages of the filtered set.
+			// Count survivors so the client knows the filtered set's total_pages.
 			$filtered_total = self::count_filtered_items( $gallery_id, $filters );
 			$total          = $filtered_total;
 		} else {

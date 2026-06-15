@@ -19,189 +19,257 @@
  * restNonce - wp_rest nonce for authenticating REST requests
  */
 const CacheStatusComponent = ({
-    setting,
-    isDisabled,
-    __,
-    postId,
-    restUrl,
-    restNonce,
+	setting,
+	isDisabled,
+	__,
+	postId,
+	restUrl,
+	restNonce,
 }) => {
-    const [status, setStatus] = React.useState(null);
-    const [loadState, setLoadState] = React.useState('loading');
-    const [flushState, setFlushState] = React.useState('idle');
+	const [status, setStatus] = React.useState(null);
+	const [loadState, setLoadState] = React.useState('loading');
+	const [flushState, setFlushState] = React.useState('idle');
 
-    const baseClass = 'fotogrids-settings_cache-status';
+	const baseClass = 'fotogrids-settings_cache-status';
 
-    const fetchStatus = async () => {
-        setLoadState('loading');
-        try {
-            const url = `${restUrl}gallery/${postId}/cache-status`;
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'X-WP-Nonce': restNonce,
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'same-origin',
-            });
+	const fetchStatus = async () => {
+		setLoadState('loading');
+		try {
+			const url = `${restUrl}gallery/${postId}/cache-status`;
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'X-WP-Nonce': restNonce,
+					'Content-Type': 'application/json',
+				},
+				credentials: 'same-origin',
+			});
 
-            if (!response.ok) {
-                setLoadState('error');
-                return;
-            }
+			if (!response.ok) {
+				setLoadState('error');
+				return;
+			}
 
-            const data = await response.json();
-            setStatus(data);
-            setLoadState('done');
-        } catch (_err) {
-            setLoadState('error');
-        }
-    };
+			const data = await response.json();
+			setStatus(data);
+			setLoadState('done');
+		} catch (_err) {
+			setLoadState('error');
+		}
+	};
 
-    React.useEffect(() => {
-        if (postId) {
-            fetchStatus();
-        }
-    }, [postId]);
+	React.useEffect(() => {
+		if (postId) {
+			fetchStatus();
+		}
+	}, [postId]);
 
-    const handleFlush = async () => {
-        if (isDisabled || flushState === 'loading') return;
+	const handleFlush = async () => {
+		if (isDisabled || flushState === 'loading') return;
 
-        setFlushState('loading');
-        try {
-            const url = `${restUrl}gallery/${postId}/cache`;
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'X-WP-Nonce': restNonce,
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'same-origin',
-            });
+		setFlushState('loading');
+		try {
+			const url = `${restUrl}gallery/${postId}/cache`;
+			const response = await fetch(url, {
+				method: 'DELETE',
+				headers: {
+					'X-WP-Nonce': restNonce,
+					'Content-Type': 'application/json',
+				},
+				credentials: 'same-origin',
+			});
 
-            if (!response.ok) {
-                setFlushState('error');
-                if (window.fotogridsToast) {
-                    window.fotogridsToast.error(__('Could not clear the cache. Please try again.', 'fotogrids'));
-                }
-                return;
-            }
+			if (!response.ok) {
+				setFlushState('error');
+				if (window.fotogridsToast) {
+					window.fotogridsToast.error(
+						__(
+							'Could not clear the cache. Please try again.',
+							'fotogrids',
+						),
+					);
+				}
+				return;
+			}
 
-            setFlushState('done');
-            if (window.fotogridsToast) {
-                window.fotogridsToast.success(__('Cache cleared.', 'fotogrids'));
-            }
-            await fetchStatus();
-        } catch (_err) {
-            setFlushState('error');
-            if (window.fotogridsToast) {
-                window.fotogridsToast.error(__('Could not clear the cache. Please try again.', 'fotogrids'));
-            }
-        }
-    };
+			setFlushState('done');
+			if (window.fotogridsToast) {
+				window.fotogridsToast.success(
+					__('Cache cleared.', 'fotogrids'),
+				);
+			}
+			await fetchStatus();
+		} catch (_err) {
+			setFlushState('error');
+			if (window.fotogridsToast) {
+				window.fotogridsToast.error(
+					__(
+						'Could not clear the cache. Please try again.',
+						'fotogrids',
+					),
+				);
+			}
+		}
+	};
 
-    const formatDate = (isoString) => {
-        if (!isoString) return __('-', 'fotogrids');
-        try {
-            return new Date(isoString).toLocaleString();
-        } catch (_err) {
-            return isoString;
-        }
-    };
+	const formatDate = isoString => {
+		if (!isoString) return __('-', 'fotogrids');
+		try {
+			return new Date(isoString).toLocaleString();
+		} catch (_err) {
+			return isoString;
+		}
+	};
 
-    const isCached = status?.cached === true;
+	const isCached = status?.cached === true;
 
-    let body;
+	let body;
 
-    if (loadState === 'loading') {
-        body = React.createElement('div', {
-            className: `${baseClass}__loading`,
-        }, __('Loading cache status…', 'fotogrids'));
+	if (loadState === 'loading') {
+		body = React.createElement(
+			'div',
+			{
+				className: `${baseClass}__loading`,
+			},
+			__('Loading cache status…', 'fotogrids'),
+		);
+	} else if (loadState === 'error') {
+		body = React.createElement(
+			'div',
+			{
+				className: `${baseClass}__error`,
+			},
+			__('Could not load cache status.', 'fotogrids'),
+		);
+	} else if (!isCached) {
+		body = React.createElement(
+			'div',
+			{
+				className: `${baseClass}__empty`,
+			},
+			__('No cache exists for this gallery yet.', 'fotogrids'),
+		);
+	} else {
+		const meta = status.meta || {};
 
-    } else if (loadState === 'error') {
-        body = React.createElement('div', {
-            className: `${baseClass}__error`,
-        }, __('Could not load cache status.', 'fotogrids'));
+		body = React.createElement(
+			'div',
+			{
+				className: `${baseClass}__meta`,
+			},
+			[
+				React.createElement(
+					'span',
+					{
+						key: 'label',
+						className: `${baseClass}__meta__label`,
+					},
+					__('Cached at', 'fotogrids'),
+				),
+				React.createElement(
+					'span',
+					{
+						key: 'value',
+						className: `${baseClass}__meta__value`,
+					},
+					formatDate(meta.cached_at),
+				),
+				React.createElement(
+					'span',
+					{
+						key: 'label',
+						className: `${baseClass}__meta__label`,
+					},
+					__('Expires at', 'fotogrids'),
+				),
+				React.createElement(
+					'span',
+					{
+						key: 'value',
+						className: `${baseClass}__meta__value`,
+					},
+					formatDate(meta.expires_at),
+				),
+			],
+		);
+	}
 
-    } else if (!isCached) {
-        body = React.createElement('div', {
-            className: `${baseClass}__empty`,
-        }, __('No cache exists for this gallery yet.', 'fotogrids'));
+	return React.createElement(
+		'div',
+		{
+			className: `${baseClass}`,
+		},
+		[
+			React.createElement(
+				'div',
+				{
+					key: 'content',
+					className: `${baseClass}__content`,
+				},
+				[
+					setting.label &&
+						React.createElement(
+							'div',
+							{
+								key: 'label',
+								className: 'fotogrids-setting__label',
+							},
+							setting.label,
+						),
+					React.createElement(
+						'div',
+						{
+							key: 'body',
+							className: `${baseClass}__body`,
+						},
+						body,
+					),
+				].filter(Boolean),
+			),
 
-    } else {
-        const meta = status.meta || {};
-
-        body = React.createElement('div', {
-            className: `${baseClass}__meta`,
-        }, [
-            React.createElement('span', {
-                key: 'label',
-                className: `${baseClass}__meta__label`,
-            }, __('Cached at', 'fotogrids')),
-            React.createElement('span', {
-                key: 'value',
-                className: `${baseClass}__meta__value`,
-            }, formatDate(meta.cached_at)),
-            React.createElement('span', {
-                key: 'label',
-                className: `${baseClass}__meta__label`,
-            }, __('Expires at', 'fotogrids')),
-            React.createElement('span', {
-                key: 'value',
-                className: `${baseClass}__meta__value`,
-            }, formatDate(meta.expires_at)),
-        ]);
-    }
-
-    return React.createElement('div', {
-        className: `${baseClass}`,
-    }, [
-        React.createElement('div', {
-            key: 'content',
-            className: `${baseClass}__content`,
-        }, [
-            setting.label && React.createElement('div', {
-                key: 'label',
-                className: 'fotogrids-setting__label',
-            }, setting.label),
-            React.createElement('div', {
-                key: 'body',
-                className: `${baseClass}__body`,
-            }, body),
-        ].filter(Boolean)),
-
-        React.createElement('div', {
-            key: 'actions',
-            className: `${baseClass}__actions`,
-        }, [
-            isCached && React.createElement('button', {
-                key: 'flush',
-                type: 'button',
-                className: 'fg-button fg-button--variant-primary',
-                onClick: handleFlush,
-                disabled: isDisabled || flushState === 'loading',
-            }, flushState === 'loading'
-                ? __('Clearing…', 'fotogrids')
-                : __('Clear Cache', 'fotogrids')
-            ),
-        ].filter(Boolean)),
-    ].filter(Boolean));
+			React.createElement(
+				'div',
+				{
+					key: 'actions',
+					className: `${baseClass}__actions`,
+				},
+				[
+					isCached &&
+						React.createElement(
+							'button',
+							{
+								key: 'flush',
+								type: 'button',
+								className:
+									'fg-button fg-button--variant-primary',
+								onClick: handleFlush,
+								disabled:
+									isDisabled || flushState === 'loading',
+							},
+							flushState === 'loading'
+								? __('Clearing…', 'fotogrids')
+								: __('Clear Cache', 'fotogrids'),
+						),
+				].filter(Boolean),
+			),
+		].filter(Boolean),
+	);
 };
 
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
-window.FotoGridsRenderSettings.renderCacheStatus = (setting, currentValue, isDisabled, {
-    __,
-    postId,
-    restUrl,
-    restNonce,
-}) => {
-    return React.createElement(CacheStatusComponent, {
-        setting,
-        isDisabled,
-        __,
-        postId,
-        restUrl,
-        restNonce,
-    });
+window.FotoGridsRenderSettings.renderCacheStatus = (
+	setting,
+	currentValue,
+	isDisabled,
+	{ __, postId, restUrl, restNonce },
+) => {
+	return React.createElement(CacheStatusComponent, {
+		setting,
+		isDisabled,
+		__,
+		postId,
+		restUrl,
+		restNonce,
+	});
 };

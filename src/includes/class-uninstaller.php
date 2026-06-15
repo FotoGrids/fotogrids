@@ -46,7 +46,6 @@ class Uninstaller {
 	 * Uninstall the plugin completely
 	 */
 	public static function uninstall() {
-		// Check if user really wants to delete everything
 		if ( ! self::should_delete_data() ) {
 			return;
 		}
@@ -60,19 +59,10 @@ class Uninstaller {
 			Activator::run_module_lifecycle( 'on_uninstall' );
 		}
 
-		// Remove database tables
 		self::drop_tables();
-
-		// Remove capabilities
 		self::remove_capabilities();
-
-		// Remove options
 		self::remove_options();
-
-		// Remove post meta
 		self::remove_post_meta();
-
-		// Remove transients
 		self::remove_transients();
 	}
 
@@ -80,7 +70,6 @@ class Uninstaller {
 	 * Check if we should delete plugin data
 	 */
 	private static function should_delete_data() {
-		// Check if there's a setting to preserve data
 		$preserve_data = get_option( 'fotogrids_preserve_data_on_uninstall', false );
 
 		return ! $preserve_data;

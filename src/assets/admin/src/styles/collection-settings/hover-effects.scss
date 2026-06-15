@@ -1,1097 +1,1191 @@
 .fotogrids-hover-effects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 8px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 8px;
 
-    @media (max-width: 782px) {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 12px;
-    }
+	@media (max-width: 782px) {
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 12px;
+	}
 }
 
 .fotogrids-hover-effect-option {
-    border: 1px solid var(--fg-border-primary);
-    border-radius: 6px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 200px;
+	border: 1px solid var(--fg-border-primary);
+	border-radius: 6px;
+	background: white;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 200px;
 
-    &:hover:not(.fg-is-disabled):not(.fg-is-active) {
-        border-color: var(--fg-blue);
-        box-shadow: 0 4px 12px rgba(0, 115, 170, 0.15);
-    }
+	&:hover:not(.fg-is-disabled):not(.fg-is-active) {
+		border-color: var(--fg-blue);
+		box-shadow: 0 4px 12px rgba(0, 115, 170, 0.15);
+	}
 
-    &:hover:not(.fg-is-disabled) {
-        &.fg-is-active {
-            box-shadow: 0 0 0 2px var(--fg-blue), 0 4px 12px rgba(0, 115, 170, 0.15);
-        }
-    }
+	&:hover:not(.fg-is-disabled) {
+		&.fg-is-active {
+			box-shadow:
+				0 0 0 2px var(--fg-blue),
+				0 4px 12px rgba(0, 115, 170, 0.15);
+		}
+	}
 
-    &.fg-is-active {
-        border-color: var(--fg-blue);
-        box-shadow: 0 0 0 2px var(--fg-blue);
-    }
+	&.fg-is-active {
+		border-color: var(--fg-blue);
+		box-shadow: 0 0 0 2px var(--fg-blue);
+	}
 
-    &__preview {
-        position: relative;
-        margin: 16px;
-        flex: 1;
-        display: inline-flex;
-        flex-direction: column;
+	&__preview {
+		position: relative;
+		margin: 16px;
+		flex: 1;
+		display: inline-flex;
+		flex-direction: column;
 
-        &.fotogrids-caption-placement-top {
-            .fotogrids-hover-effect-option__preview-content {
-                position: relative;
-                order: -1;
-                padding: 8px 0;
-            }
-            .fotogrids-hover-effect-option__preview-title {
-                color: var(--fg-text-primary);
-                text-shadow: none;
-            }
-            .fotogrids-hover-effect-option__preview-description {
-                color: var(--fg-text-secondary);
-                text-shadow: none;
-            }
-        }
+		&.fotogrids-caption-placement-top {
+			.fotogrids-hover-effect-option__preview-content {
+				position: relative;
+				order: -1;
+				padding: 8px 0;
+			}
+			.fotogrids-hover-effect-option__preview-title {
+				color: var(--fg-text-primary);
+				text-shadow: none;
+			}
+			.fotogrids-hover-effect-option__preview-description {
+				color: var(--fg-text-secondary);
+				text-shadow: none;
+			}
+		}
 
-        &.fotogrids-caption-placement-bottom {
-            .fotogrids-hover-effect-option__preview-content {
-                position: relative;
-                order: 1;
-                padding: 8px 0;
-                background: transparent;
-            }
-            .fotogrids-hover-effect-option__preview-title {
-                color: var(--fg-text-primary);
-                text-shadow: none;
-            }
-            .fotogrids-hover-effect-option__preview-description {
-                color: var(--fg-text-secondary);
-                text-shadow: none;
-            }
-        }
+		&.fotogrids-caption-placement-bottom {
+			.fotogrids-hover-effect-option__preview-content {
+				position: relative;
+				order: 1;
+				padding: 8px 0;
+				background: transparent;
+			}
+			.fotogrids-hover-effect-option__preview-title {
+				color: var(--fg-text-primary);
+				text-shadow: none;
+			}
+			.fotogrids-hover-effect-option__preview-description {
+				color: var(--fg-text-secondary);
+				text-shadow: none;
+			}
+		}
 
-        &.fotogrids-caption-placement-overlay {
-            .fotogrids-hover-effect-option__preview-content {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%);
-            }
-        }
+		&.fotogrids-caption-placement-overlay {
+			.fotogrids-hover-effect-option__preview-content {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					to bottom,
+					transparent 0%,
+					rgba(0, 0, 0, 0.3) 50%,
+					rgba(0, 0, 0, 0.8) 100%
+				);
+			}
+		}
 
-        &.fotogrids-caption-alignment-left .fotogrids-hover-effect-option__preview-content {
-            align-items: flex-start;
-            text-align: left;
-        }
+		&.fotogrids-caption-alignment-left
+			.fotogrids-hover-effect-option__preview-content {
+			align-items: flex-start;
+			text-align: left;
+		}
 
-        &.fotogrids-caption-alignment-center .fotogrids-hover-effect-option__preview-content {
-            align-items: center;
-            text-align: center;
-        }
+		&.fotogrids-caption-alignment-center
+			.fotogrids-hover-effect-option__preview-content {
+			align-items: center;
+			text-align: center;
+		}
 
-        &.fotogrids-caption-alignment-right .fotogrids-hover-effect-option__preview-content {
-            align-items: flex-end;
-            text-align: right;
-        }
+		&.fotogrids-caption-alignment-right
+			.fotogrids-hover-effect-option__preview-content {
+			align-items: flex-end;
+			text-align: right;
+		}
 
-        &.fotogrids-caption-alignment-justify .fotogrids-hover-effect-option__preview-content {
-            align-items: stretch;
-            text-align: justify;
-        }
-    }
+		&.fotogrids-caption-alignment-justify
+			.fotogrids-hover-effect-option__preview-content {
+			align-items: stretch;
+			text-align: justify;
+		}
+	}
 
-    &__preview-bg {
-        width: 100%;
-        overflow: hidden;
-        aspect-ratio: 1/1;
-        z-index: 0;
-        pointer-events: none;
+	&__preview-bg {
+		width: 100%;
+		overflow: hidden;
+		aspect-ratio: 1/1;
+		z-index: 0;
+		pointer-events: none;
 
-        svg {
-            width: 100%;
-            height: 100%;
-        }
+		svg {
+			width: 100%;
+			height: 100%;
+		}
 
-        picture,
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    }
+		picture,
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
 
-    &__preview-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 12px;
-        z-index: 1;
-    }
+	&__preview-content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		padding: 12px;
+		z-index: 1;
+	}
 
-    &__preview-title {
-        margin: 0 0 6px 0;
-        font-size: 14px;
-        font-weight: 600;
-        color: white;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    }
+	&__preview-title {
+		margin: 0 0 6px 0;
+		font-size: 14px;
+		font-weight: 600;
+		color: white;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	}
 
-    &__preview-description {
-        margin: 0;
-        font-size: 11px;
-        color: rgba(255, 255, 255, 0.9);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        line-height: 1.4;
-    }
+	&__preview-description {
+		margin: 0;
+		font-size: 11px;
+		color: rgba(255, 255, 255, 0.9);
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		text-align: center;
+		line-height: 1.4;
+	}
 
-    &__content {
-        flex: 0;
-        display: flex;
-        flex-direction: column;
-        padding: 12px;
-        background: var(--fg-background-secondary);
-        border-top: 1px solid var(--fg-border-primary);
-    }
+	&__content {
+		flex: 0;
+		display: flex;
+		flex-direction: column;
+		padding: 12px;
+		background: var(--fg-background-secondary);
+		border-top: 1px solid var(--fg-border-primary);
+	}
 
-    &__capability {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #f0f0f0;
-    }
+	&__capability {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #f0f0f0;
+	}
 
-    &__capability-icons {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
+	&__capability-icons {
+		display: flex;
+		gap: 6px;
+		align-items: center;
+	}
 
-    &__action-btn {
-        padding: 4px 10px;
-        font-size: 10px;
-        background: var(--fg-blue);
-        color: white;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
+	&__action-btn {
+		padding: 4px 10px;
+		font-size: 10px;
+		background: var(--fg-blue);
+		color: white;
+		border: none;
+		border-radius: 3px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		font-weight: 500;
 
-        &:hover {
-            background: #005a87;
-            transform: scale(1.05);
-        }
-    }
+		&:hover {
+			background: #005a87;
+			transform: scale(1.05);
+		}
+	}
 
-    &__info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
+	&__info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
 
-    &__name {
-        margin: 0 0 6px 0;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--fg-text-primary);
+	&__name {
+		margin: 0 0 6px 0;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
 
-        .fg-is-disabled & {
-            color: #9ca3af;
-        }
-    }
+		.fg-is-disabled & {
+			color: #9ca3af;
+		}
+	}
 
-    &__description {
-        margin: 0;
-        font-size: 11px;
-        color: var(--fg-text-secondary);
-        line-height: 1.4;
+	&__description {
+		margin: 0;
+		font-size: 11px;
+		color: var(--fg-text-secondary);
+		line-height: 1.4;
 
-        .fg-is-disabled & {
-            color: #9ca3af;
-        }
-    }
+		.fg-is-disabled & {
+			color: #9ca3af;
+		}
+	}
 }
 
 .fotogrids-capability-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    height: 20px;
-    background: #f0f4f8;
-    border-radius: 3px;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--fg-blue);
-    transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 4px;
+	height: 20px;
+	background: #f0f4f8;
+	border-radius: 3px;
+	font-size: 10px;
+	font-weight: 600;
+	color: var(--fg-blue);
+	transition: all 0.2s ease;
 
-    &--social {
-        svg {
-            width: 12px;
-            height: 12px;
-        }
-    }
+	&--social {
+		svg {
+			width: 12px;
+			height: 12px;
+		}
+	}
 }
 
 // Hover effect animations for preview content
 .hover-effect-slide-up {
-    .fotogrids-hover-effect-option__preview-title {
-        opacity: 1;
-        transform: translateY(0);
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		opacity: 1;
+		transform: translateY(0);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: translateY(10px);
-        max-height: 0;
-        overflow: hidden;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: translateY(10px);
+		max-height: 0;
+		overflow: hidden;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 100px;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: translateY(0);
+			max-height: 100px;
+		}
+	}
 }
 
 .hover-effect-fade-both {
-    .fotogrids-hover-effect-option__preview-title,
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0.6;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title,
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0.6;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title,
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title,
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-slide-left {
-    .fotogrids-hover-effect-option__preview-title {
-        opacity: 1;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		opacity: 1;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: translateX(-20px);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: translateX(-20px);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
 }
 
 .hover-effect-scale {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: scale(1);
-        transition: transform 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: scale(1);
+		transition: transform 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            transform: scale(1.05);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			transform: scale(1.05);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-rotate {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: rotate(0deg);
-        transition: transform 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: rotate(0deg);
+		transition: transform 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            transform: rotate(2deg);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			transform: rotate(2deg);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-slide-right {
-    .fotogrids-hover-effect-option__preview-title {
-        opacity: 1;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		opacity: 1;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: translateX(20px);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: translateX(20px);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
 }
 
 .hover-effect-bounce {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: translateY(0);
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: translateY(0);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: bounce 0.6s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: bounce 0.6s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
 }
 
 .hover-effect-slide-down {
-    .fotogrids-hover-effect-option__preview-title {
-        opacity: 1;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		opacity: 1;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: translateY(-10px);
-        max-height: 0;
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: translateY(-10px);
+		max-height: 0;
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 100px;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: translateY(0);
+			max-height: 100px;
+		}
+	}
 }
 
 .hover-effect-opacity {
-    .fotogrids-hover-effect-option__preview-title,
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0.5;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title,
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0.5;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title,
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title,
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-blur {
-    .fotogrids-hover-effect-option__preview-title {
-        filter: blur(0);
-        transition: filter 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		filter: blur(0);
+		transition: filter 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            filter: blur(1px);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			filter: blur(1px);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-slide-diagonal {
-    .fotogrids-hover-effect-option__preview-title {
-        opacity: 1;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		opacity: 1;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: translate(20px, -20px);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: translate(20px, -20px);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: translate(0, 0);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: translate(0, 0);
+		}
+	}
 }
 
 .hover-effect-pulse {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: scale(1);
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: scale(1);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: pulse 1s ease infinite;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: pulse 1s ease infinite;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.05);
+	}
 }
 
 // Pro effects
 .hover-effect-zoom {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: scale(1);
-        transition: transform 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: scale(1);
+		transition: transform 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: scale(0.8);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: scale(0.8);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            transform: scale(1.1);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			transform: scale(1.1);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
 }
 
 .hover-effect-flip {
-    .fotogrids-hover-effect-option__preview {
-        perspective: 1000px;
-    }
+	.fotogrids-hover-effect-option__preview {
+		perspective: 1000px;
+	}
 
-    .fotogrids-hover-effect-option__preview-content {
-        transform-style: preserve-3d;
-        transition: transform 0.6s;
-    }
+	.fotogrids-hover-effect-option__preview-content {
+		transform-style: preserve-3d;
+		transition: transform 0.6s;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-content {
-            transform: rotateY(180deg);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-content {
+			transform: rotateY(180deg);
+		}
+	}
 }
 
 .hover-effect-3d {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: perspective(1000px) rotateX(0deg);
-        transition: transform 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: perspective(1000px) rotateX(0deg);
+		transition: transform 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: perspective(1000px) rotateX(-90deg);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: perspective(1000px) rotateX(-90deg);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            transform: perspective(1000px) rotateX(90deg);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: perspective(1000px) rotateX(0deg);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			transform: perspective(1000px) rotateX(90deg);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: perspective(1000px) rotateX(0deg);
+		}
+	}
 }
 
 .hover-effect-gradient {
-    .fotogrids-hover-effect-option__preview {
-        position: relative;
+	.fotogrids-hover-effect-option__preview {
+		position: relative;
 
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.3) 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1;
-        }
-    }
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(
+				135deg,
+				rgba(255, 255, 255, 0.1) 0%,
+				rgba(255, 255, 255, 0.3) 100%
+			);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+			z-index: 1;
+		}
+	}
 
-    &:hover .fotogrids-hover-effect-option__preview::before {
-        opacity: 1;
-    }
+	&:hover .fotogrids-hover-effect-option__preview::before {
+		opacity: 1;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 2;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		z-index: 2;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-shine {
-    .fotogrids-hover-effect-option__preview {
-        position: relative;
-        overflow: hidden;
+	.fotogrids-hover-effect-option__preview {
+		position: relative;
+		overflow: hidden;
 
-        &::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
-            transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            transition: transform 0.6s;
-            z-index: 2;
-        }
-    }
+		&::after {
+			content: '';
+			position: absolute;
+			top: -50%;
+			left: -50%;
+			width: 200%;
+			height: 200%;
+			background: linear-gradient(
+				45deg,
+				transparent 30%,
+				rgba(255, 255, 255, 0.5) 50%,
+				transparent 70%
+			);
+			transform: translateX(-100%) translateY(-100%) rotate(45deg);
+			transition: transform 0.6s;
+			z-index: 2;
+		}
+	}
 
-    &:hover .fotogrids-hover-effect-option__preview::after {
-        transform: translateX(100%) translateY(100%) rotate(45deg);
-    }
+	&:hover .fotogrids-hover-effect-option__preview::after {
+		transform: translateX(100%) translateY(100%) rotate(45deg);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 3;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		z-index: 3;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-morph {
-    .fotogrids-hover-effect-option__preview {
-        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    }
+	.fotogrids-hover-effect-option__preview {
+		border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview {
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview {
+			border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+		}
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-glitch {
-    .fotogrids-hover-effect-option__preview-title {
-        position: relative;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		position: relative;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: glitch 0.3s ease infinite;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: glitch 0.3s ease infinite;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes glitch {
-    0%, 100% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
+	0%,
+	100% {
+		transform: translate(0);
+	}
+	20% {
+		transform: translate(-2px, 2px);
+	}
+	40% {
+		transform: translate(-2px, -2px);
+	}
+	60% {
+		transform: translate(2px, 2px);
+	}
+	80% {
+		transform: translate(2px, -2px);
+	}
 }
 
 .hover-effect-ripple {
-    .fotogrids-hover-effect-option__preview {
-        position: relative;
-        overflow: hidden;
+	.fotogrids-hover-effect-option__preview {
+		position: relative;
+		overflow: hidden;
 
-        &::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-            z-index: 1;
-        }
-    }
+		&::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 0;
+			height: 0;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.2);
+			transform: translate(-50%, -50%);
+			transition:
+				width 0.6s,
+				height 0.6s;
+			z-index: 1;
+		}
+	}
 
-    &:hover .fotogrids-hover-effect-option__preview::before {
-        width: 300px;
-        height: 300px;
-    }
+	&:hover .fotogrids-hover-effect-option__preview::before {
+		width: 300px;
+		height: 300px;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 2;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		z-index: 2;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-shadow {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-    &:hover {
-        box-shadow: 0 8px 24px rgba(0, 115, 170, 0.3);
-    }
+	&:hover {
+		box-shadow: 0 8px 24px rgba(0, 115, 170, 0.3);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-border {
-    border-width: 1px;
+	border-width: 1px;
 
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border: 2px solid var(--fg-blue);
-        border-radius: 6px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border: 2px solid var(--fg-blue);
+		border-radius: 6px;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover::before {
-        opacity: 1;
-        animation: borderPulse 1s ease infinite;
-    }
+	&:hover::before {
+		opacity: 1;
+		animation: borderPulse 1s ease infinite;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes borderPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.02); opacity: 0.8; }
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	50% {
+		transform: scale(1.02);
+		opacity: 0.8;
+	}
 }
 
 .hover-effect-glow {
-    &:hover {
-        box-shadow: 0 0 20px rgba(0, 115, 170, 0.5);
-    }
+	&:hover {
+		box-shadow: 0 0 20px rgba(0, 115, 170, 0.5);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-split {
-    .fotogrids-hover-effect-option__preview-title {
-        clip-path: inset(0 0 0 0);
-        transition: clip-path 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		clip-path: inset(0 0 0 0);
+		transition: clip-path 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        clip-path: inset(0 100% 0 0);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		clip-path: inset(0 100% 0 0);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            clip-path: inset(0 0 100% 0);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            clip-path: inset(0 0 0 0);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			clip-path: inset(0 0 100% 0);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			clip-path: inset(0 0 0 0);
+		}
+	}
 }
 
 .hover-effect-reveal {
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: scale(0);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: scale(0);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
 }
 
 .hover-effect-slide-rotate {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: rotate(0deg);
-        transition: transform 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: rotate(0deg);
+		transition: transform 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: translateX(-20px) rotate(-5deg);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: translateX(-20px) rotate(-5deg);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            transform: rotate(2deg);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: translateX(0) rotate(0deg);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			transform: rotate(2deg);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: translateX(0) rotate(0deg);
+		}
+	}
 }
 
 .hover-effect-elastic {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: scale(1);
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: scale(1);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: elastic 0.6s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: elastic 0.6s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes elastic {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); }
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.2);
+	}
+	70% {
+		transform: scale(0.9);
+	}
+	100% {
+		transform: scale(1);
+	}
 }
 
 .hover-effect-wobble {
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: wobble 0.5s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: wobble 0.5s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes wobble {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-3deg); }
-    75% { transform: rotate(3deg); }
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+	25% {
+		transform: rotate(-3deg);
+	}
+	75% {
+		transform: rotate(3deg);
+	}
 }
 
 .hover-effect-shake {
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: shake 0.5s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: shake 0.5s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-5px);
+	}
+	75% {
+		transform: translateX(5px);
+	}
 }
 
 .hover-effect-spin {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: rotate(0deg);
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: rotate(0deg);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: spin 0.6s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: spin 0.6s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .hover-effect-flash {
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: flash 0.5s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: flash 0.5s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes flash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.3;
+	}
 }
 
 .hover-effect-wave {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: translateY(0);
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: translateY(0);
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            animation: wave 0.6s ease;
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			animation: wave 0.6s ease;
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 @keyframes wave {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-5px) rotate(2deg); }
-    75% { transform: translateY(5px) rotate(-2deg); }
+	0%,
+	100% {
+		transform: translateY(0) rotate(0deg);
+	}
+	25% {
+		transform: translateY(-5px) rotate(2deg);
+	}
+	75% {
+		transform: translateY(5px) rotate(-2deg);
+	}
 }
 
 .hover-effect-spiral {
-    .fotogrids-hover-effect-option__preview-title {
-        transform: rotate(0deg) scale(1);
-        transition: transform 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		transform: rotate(0deg) scale(1);
+		transition: transform 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transform: rotate(-180deg) scale(0);
-        transition: all 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transform: rotate(-180deg) scale(0);
+		transition: all 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            transform: rotate(180deg) scale(0.8);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			transform: rotate(180deg) scale(0.8);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+	}
 }
 
 .hover-effect-matrix {
-    .fotogrids-hover-effect-option__preview-title {
-        text-shadow: 0 0 0 rgba(255, 255, 255, 0.5);
-        transition: text-shadow 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		text-shadow: 0 0 0 rgba(255, 255, 255, 0.5);
+		transition: text-shadow 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			text-shadow:
+				0 0 10px rgba(255, 255, 255, 0.8),
+				0 0 20px rgba(255, 255, 255, 0.6);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-neon {
-    .fotogrids-hover-effect-option__preview-title {
-        text-shadow: 0 0 0 rgba(255, 255, 255, 0.5);
-        transition: text-shadow 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-title {
+		text-shadow: 0 0 0 rgba(255, 255, 255, 0.5);
+		transition: text-shadow 0.3s ease;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-title {
-            text-shadow:
-                0 0 5px rgba(255, 255, 255, 0.9),
-                0 0 10px rgba(255, 255, 255, 0.8),
-                0 0 15px rgba(255, 255, 255, 0.7),
-                0 0 20px rgba(255, 255, 255, 0.6);
-        }
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-title {
+			text-shadow:
+				0 0 5px rgba(255, 255, 255, 0.9),
+				0 0 10px rgba(255, 255, 255, 0.8),
+				0 0 15px rgba(255, 255, 255, 0.7),
+				0 0 20px rgba(255, 255, 255, 0.6);
+		}
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
 
 .hover-effect-hologram {
-    .fotogrids-hover-effect-option__preview {
-        position: relative;
+	.fotogrids-hover-effect-option__preview {
+		position: relative;
 
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s;
-            z-index: 2;
-        }
-    }
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(
+				90deg,
+				transparent,
+				rgba(255, 255, 255, 0.4),
+				transparent
+			);
+			transition: left 0.5s;
+			z-index: 2;
+		}
+	}
 
-    &:hover .fotogrids-hover-effect-option__preview::before {
-        left: 100%;
-    }
+	&:hover .fotogrids-hover-effect-option__preview::before {
+		left: 100%;
+	}
 
-    .fotogrids-hover-effect-option__preview-description {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 3;
-    }
+	.fotogrids-hover-effect-option__preview-description {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		z-index: 3;
+	}
 
-    &:hover {
-        .fotogrids-hover-effect-option__preview-description {
-            opacity: 1;
-        }
-    }
+	&:hover {
+		.fotogrids-hover-effect-option__preview-description {
+			opacity: 1;
+		}
+	}
 }
-

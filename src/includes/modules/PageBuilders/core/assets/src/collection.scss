@@ -8,9 +8,8 @@
  * Imported by each builder's editor bundle (currently only Gutenberg).
  */
 
-/* -- Picker modal ------------------------------------------------------- */
-
-/*
+/* Picker modal.
+ *
  * The picker uses the standard Modal compound layout:
  *   Modal.Header       — title + close
  *   Modal.SubHeader    — search + sort (this `.fg-pb-picker__toolbar`)
@@ -299,7 +298,6 @@
         aspect-ratio: 1 / 1;
         background: #ddd;
         border-radius: 4px;
-        // background-image: linear-gradient(135deg, #ebebeb 0%, #f4f4f4 50%, #ebebeb 100%);
     }
 
     &--album &__grid {
@@ -312,7 +310,7 @@
     }
 }
 
-/* -- Live preview ------------------------------------------------------- */
+/* Live preview */
 
 .fg-pb-live-preview {
     position: relative;
@@ -364,7 +362,7 @@
     }
 }
 
-/* -- Inspector ---------------------------------------------------------- */
+/* Inspector */
 
 .fg-pb-inspector-summary {
     display: flex;

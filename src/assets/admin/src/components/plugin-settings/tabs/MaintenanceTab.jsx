@@ -39,8 +39,6 @@ const MaintenanceTab = () => {
         || seed.wpDebug === 'true'
         || seed.wpDebug === 1;
 
-    // === Destructive actions state =====================================
-
     // `pending` holds the action key currently being confirmed by the modal
     // (null if the modal is closed). `running` is the action key whose REST
     // call is in-flight. `result` is the most recent {kind: 'reset' |
@@ -128,8 +126,6 @@ const MaintenanceTab = () => {
 
     const activeConfirm = pending ? confirmConfig[pending] : null;
 
-    // === Debug Log state ===============================================
-
     // `null` while the initial GET is in flight; an array once loaded; never
     // observed when WP_DEBUG is off (the panel is skipped entirely).
     const [debugLoaded, setDebugLoaded] = useState(false);
@@ -213,8 +209,6 @@ const MaintenanceTab = () => {
         setEnabled(savedEnabled);
         setDebugStatus(null);
     };
-
-    // === Render ========================================================
 
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="maintenance-content">

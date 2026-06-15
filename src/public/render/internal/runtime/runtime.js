@@ -18,10 +18,6 @@
 
     const VERSION = '1.1.0';
 
-    // -------------------------------------------------------------------------
-    // Internal state
-    // -------------------------------------------------------------------------
-
     /**
      * Three independent callback queues, one per public subscription API.
      * Each queue is kept sorted by (priority asc, seq asc) so registration
@@ -66,9 +62,6 @@
      */
     let collectionObserver = null;
 
-    // -------------------------------------------------------------------------
-    // Collection-kind discriminator
-    // -------------------------------------------------------------------------
 
     /**
      * Returns the kind of collection wrapper this element represents.
@@ -83,9 +76,6 @@
         return el && el.classList && el.classList.contains( 'fotogrids-album' ) ? 'album' : 'gallery';
     }
 
-    // -------------------------------------------------------------------------
-    // Callback management
-    // -------------------------------------------------------------------------
 
     /**
      * Inserts a callback into the named queue, kept sorted by (priority, seq).
@@ -126,9 +116,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Collection initialization
-    // -------------------------------------------------------------------------
 
     /**
      * Initializes a single collection element: marks it initialized, records
@@ -187,10 +174,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // MutationObserver — picks up dynamically inserted collections
-    // -------------------------------------------------------------------------
-
     /**
      * Installs the runtime's single MutationObserver. Feature modules MUST
      * NOT install their own — they subscribe via FotoGrids.onGallery(),
@@ -215,12 +198,10 @@
                         continue;
                     }
 
-                    // The inserted node itself.
                     if ( node.matches && node.matches( '.fotogrids-collection' ) ) {
                         announceInserted( node );
                     }
 
-                    // Collections nested inside the inserted subtree.
                     if ( node.querySelectorAll ) {
                         const nested = node.querySelectorAll( '.fotogrids-collection' );
                         for ( let k = 0; k < nested.length; k++ ) {
@@ -257,9 +238,6 @@
         initializeCollection( collectionElement );
     }
 
-    // -------------------------------------------------------------------------
-    // Subscription factory
-    // -------------------------------------------------------------------------
 
     /**
      * Builds a subscription function (onGallery/onAlbum/onCollection).
@@ -299,9 +277,6 @@
         };
     }
 
-    // -------------------------------------------------------------------------
-    // Public API
-    // -------------------------------------------------------------------------
 
     const publicApi = {
         version: VERSION,
@@ -366,9 +341,6 @@
         modules: {},
     };
 
-    // -------------------------------------------------------------------------
-    // Boot
-    // -------------------------------------------------------------------------
 
     function boot() {
         installObserver();

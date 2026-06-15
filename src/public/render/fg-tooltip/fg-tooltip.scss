@@ -46,7 +46,7 @@
         visibility var(--fg-tt-duration) ease,
         transform  var(--fg-tt-duration) ease;
 
-    // ---------- Arrow ----------
+    // Arrow.
     // CSS-triangle-via-borders: a zero-size box with three transparent
     // borders and one coloured border. No rotated square, so the arrow has
     // no overlap with the tooltip body — which means transparent --fg-tt-bg
@@ -61,9 +61,8 @@
     // from the tooltip's top-left corner. This lets the arrow stay
     // pointed at the host even when the tooltip body has been clamped
     // away from the host centre near a viewport edge. When unset (first
-    // paint, or unusual layouts) we fall back to 50% so the arrow is
-    // centred on the tooltip body — same behaviour as before this var
-    // existed.
+    // paint, or unusual layouts) it falls back to 50% so the arrow is
+    // centred on the tooltip body.
     --fg-tt-arrow-x: 50%;
     --fg-tt-arrow-y: 50%;
 
@@ -120,7 +119,7 @@
         transform:  none;
     }
 
-    // ---------- Interactive mode ----------
+    // Interactive mode.
     // When the tooltip carries arbitrary content (a share grid, a quick
     // menu, …) it stops behaving like a passive hover hint and becomes
     // a popover-style surface:
@@ -139,10 +138,10 @@
         transform:      none !important;
     }
 
-    // ---------- Content morph (text → interactive) ----------
+    // Content morph (text → interactive).
     // When showInteractive() takes over an already-visible text tooltip
-    // we want a "morph" feel: the outer chrome (background, arrow,
-    // shadow) stays on screen while the inner content cross-fades and
+    // the outer chrome (background, arrow, shadow) stays on screen while
+    // the inner content cross-fades and
     // the outer container animates its size from the small text width
     // to whatever the new interactive content needs.
     //
@@ -160,8 +159,8 @@
         height     var(--fg-tt-duration) ease;
 }
 
-// Inner content wrapper added by showInteractive(). Lets us crossfade
-// the content while the outer container resizes/animates separately.
+// Inner content wrapper added by showInteractive(). Crossfades the
+// content while the outer container resizes/animates separately.
 .fg-f-tooltip__inner {
     opacity:    0;
     transition: opacity var(--fg-tt-duration, 140ms) ease;
@@ -176,7 +175,7 @@
 // chrome (bg, arrow, shadow) keeps showing through.
 .fg-f-tooltip.fg-f-tooltip--swapping {
     // textContent is what's currently inside (the "Sharing" label).
-    // Plain text doesn't have a wrapper, so we fade it via the parent's
+    // Plain text doesn't have a wrapper, so it fades via the parent's
     // color transition — visually equivalent.
     color: transparent;
     transition:

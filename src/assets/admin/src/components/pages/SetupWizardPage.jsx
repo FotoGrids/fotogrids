@@ -83,7 +83,6 @@ const SetupWizardPage = () => {
         persistSetting( 'fotogrids_user_persona', id );
     };
 
-    // ----- URL ↔ state sync -------------------------------------------------
     useEffect( () => {
         const sync = () => setStepIndex( readStepFromUrl() );
         window.addEventListener( 'popstate', sync );
@@ -126,7 +125,6 @@ const SetupWizardPage = () => {
     const isLast  = stepIndex === TOTAL;
     const isFirst = stepIndex === 1;
 
-    // Per-step Continue gating.
     const continueDisabled = ( () => {
         if ( current.id === 'persona' ) {
             return persona === null;
@@ -134,8 +132,6 @@ const SetupWizardPage = () => {
         return false;
     } )();
 
-    // Step-component props, picked by step id so each step only sees what
-    // it needs.
     const renderedStep = ( () => {
         if ( current.id === 'welcome' ) {
             return <StepComponent onStart={ goNext } onSkip={ closeWizard } />;

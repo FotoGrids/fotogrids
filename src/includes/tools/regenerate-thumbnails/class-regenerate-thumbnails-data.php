@@ -177,7 +177,6 @@ class Regenerate_Thumbnails_Data {
 		}
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
-		// Build per-size status + reason map.
 		$plugin_sizes     = array(
 			\FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
 			\FotoGrids\Image_Size_Manager::SLUG_FULL,
@@ -493,8 +492,8 @@ class Regenerate_Thumbnails_Data {
 		$used_ids = self::get_used_attachment_ids();
 		$total    = count( $used_ids );
 
-		// Newest-first by attachment ID approximates upload order; we don't
-		// sort by date here because that would need another query per page.
+		// Newest-first by attachment ID approximates upload order; sorting by
+		// date would need another query per page.
 		rsort( $used_ids );
 
 		$offset = ( $page - 1 ) * $per_page;

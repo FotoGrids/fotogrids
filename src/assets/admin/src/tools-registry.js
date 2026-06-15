@@ -19,39 +19,43 @@
 const componentMap = {};
 
 const ToolsComponents = {
-    /**
-     * Register a React component for a tool id.
-     * Calling register() twice for the same id replaces the first registration
-     * (Pro can override a Free component this way).
-     *
-     * @param {string}          id        Tool component id (matches tool.component in the manifest).
-     * @param {React.Component} component The React component to render for this tool.
-     */
-    register( id, component ) {
-        if ( !id || !component ) {
-            console.warn( 'FotoGridsToolsComponents.register: id and component are required.' );
-            return;
-        }
-        componentMap[ id ] = component;
+	/**
+	 * Register a React component for a tool id.
+	 * Calling register() twice for the same id replaces the first registration
+	 * (Pro can override a Free component this way).
+	 *
+	 * @param {string}          id        Tool component id (matches tool.component in the manifest).
+	 * @param {React.Component} component The React component to render for this tool.
+	 */
+	register(id, component) {
+		if (!id || !component) {
+			console.warn(
+				'FotoGridsToolsComponents.register: id and component are required.',
+			);
+			return;
+		}
+		componentMap[id] = component;
 
-        // Notify ToolsPage (and any other listener) that this component is now
-        // available. Fired after every registration so late-loading per-tool
-        // bundles cause a re-render if the page is already mounted.
-        window.dispatchEvent(
-            new CustomEvent( 'fotogrids:tool-component-registered', { detail: { id } } )
-        );
-    },
+		// Notify ToolsPage (and any other listener) that this component is now
+		// available. Fired after every registration so late-loading per-tool
+		// bundles cause a re-render if the page is already mounted.
+		window.dispatchEvent(
+			new CustomEvent('fotogrids:tool-component-registered', {
+				detail: { id },
+			}),
+		);
+	},
 
-    /**
-     * Look up a React component by id.
-     * Returns null if not found - callers should render a graceful fallback.
-     *
-     * @param  {string} id
-     * @return {React.Component|null}
-     */
-    get( id ) {
-        return componentMap[ id ] || null;
-    },
+	/**
+	 * Look up a React component by id.
+	 * Returns null if not found - callers should render a graceful fallback.
+	 *
+	 * @param  {string} id
+	 * @return {React.Component|null}
+	 */
+	get(id) {
+		return componentMap[id] || null;
+	},
 };
 
 // Expose globally so Pro and third-party bundles can register without

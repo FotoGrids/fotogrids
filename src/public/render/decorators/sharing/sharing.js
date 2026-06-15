@@ -26,20 +26,12 @@
 ( function () {
     'use strict';
 
-    // -------------------------------------------------------------------------
-    // i18n shim — match the original index.js pattern, falling back to identity
-    // -------------------------------------------------------------------------
-
     function __( s ) {
         if ( window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function' ) {
             return window.wp.i18n.__( s, 'fotogrids' );
         }
         return s;
     }
-
-    // -------------------------------------------------------------------------
-    // Network metadata
-    // -------------------------------------------------------------------------
 
     /**
      * Display labels keyed by the stored network id.
@@ -103,10 +95,6 @@
         return network;
     }
 
-    // -------------------------------------------------------------------------
-    // Stats tracking — fires fotogrids:share so the Stats module can record it
-    // -------------------------------------------------------------------------
-
     /**
      * Dispatch a fotogrids:share event so the Stats module (or any
      * listener) can record the share. Sharing itself does not call the
@@ -124,10 +112,6 @@
             },
         } ) );
     }
-
-    // -------------------------------------------------------------------------
-    // Share URL resolution
-    // -------------------------------------------------------------------------
 
     /**
      * Resolve the URL to share for an item, by context.
@@ -346,10 +330,6 @@
         return Promise.resolve( false );
     }
 
-    // -------------------------------------------------------------------------
-    // Share bar rendering
-    // -------------------------------------------------------------------------
-
     /**
      * Build a share bar element from a resolved sharing config and an item
      * context. Reused by the lightbox toolbar, the thumbnail decorator
@@ -500,10 +480,6 @@
         return bar;
     }
 
-    // -------------------------------------------------------------------------
-    // Per-gallery thumbnail bars
-    // -------------------------------------------------------------------------
-
     /**
      * For a gallery whose data-fg-sharing config includes 'thumbnail'
      * placement, render a share bar inside each .fg-item.
@@ -551,10 +527,6 @@
         } );
     }
 
-    // -------------------------------------------------------------------------
-    // Footer share bars (view page)
-    // -------------------------------------------------------------------------
-
     /**
      * Populate any [data-fg-share-footer] containers on the page from
      * their JSON config. Used by the View Page footer; placement is
@@ -590,10 +562,6 @@
         } );
     }
 
-    // -------------------------------------------------------------------------
-    // Public API + boot
-    // -------------------------------------------------------------------------
-
     const publicApi = {
         renderShareBar: renderShareBar,
         shareItem:      shareItem,
@@ -602,7 +570,6 @@
     };
 
     function init() {
-        // Cross-module API surfaces.
         if ( window.FotoGrids && window.FotoGrids.modules ) {
             window.FotoGrids.modules.sharing = publicApi;
         }

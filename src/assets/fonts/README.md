@@ -15,18 +15,18 @@ Drop the **Regular** weight of each face here, named exactly as below:
 All faces are shipped as static **SemiBold (weight 600)** instances — bolder
 than Regular so the watermark reads clearly over busy image areas.
 
-| Font key            | Filename                        | Family            | Licence    |
-| ------------------- | ------------------------------- | ----------------- | ---------- |
-| `inter`             | `Inter-SemiBold.ttf`            | Sans (default)    | SIL OFL    |
-| `roboto`            | `Roboto-SemiBold.ttf`           | Sans              | SIL OFL    |
-| `open-sans`         | `OpenSans-SemiBold.ttf`         | Sans (humanist)   | SIL OFL    |
-| `montserrat`        | `Montserrat-SemiBold.ttf`       | Sans (geometric)  | SIL OFL    |
-| `oswald`            | `Oswald-SemiBold.ttf`           | Sans (condensed)  | SIL OFL    |
-| `lora`              | `Lora-SemiBold.ttf`             | Serif             | SIL OFL    |
-| `playfair-display`  | `PlayfairDisplay-SemiBold.ttf`  | Serif (display)   | SIL OFL    |
-| `merriweather`      | `Merriweather-SemiBold.ttf`     | Serif             | SIL OFL    |
-| `jetbrains-mono`    | `JetBrainsMono-SemiBold.ttf`    | Monospace         | SIL OFL    |
-| `dancing-script`    | `DancingScript-SemiBold.ttf`    | Script            | SIL OFL    |
+| Font key           | Filename                       | Family           | Licence |
+| ------------------ | ------------------------------ | ---------------- | ------- |
+| `inter`            | `Inter-SemiBold.ttf`           | Sans (default)   | SIL OFL |
+| `roboto`           | `Roboto-SemiBold.ttf`          | Sans             | SIL OFL |
+| `open-sans`        | `OpenSans-SemiBold.ttf`        | Sans (humanist)  | SIL OFL |
+| `montserrat`       | `Montserrat-SemiBold.ttf`      | Sans (geometric) | SIL OFL |
+| `oswald`           | `Oswald-SemiBold.ttf`          | Sans (condensed) | SIL OFL |
+| `lora`             | `Lora-SemiBold.ttf`            | Serif            | SIL OFL |
+| `playfair-display` | `PlayfairDisplay-SemiBold.ttf` | Serif (display)  | SIL OFL |
+| `merriweather`     | `Merriweather-SemiBold.ttf`    | Serif            | SIL OFL |
+| `jetbrains-mono`   | `JetBrainsMono-SemiBold.ttf`   | Monospace        | SIL OFL |
+| `dancing-script`   | `DancingScript-SemiBold.ttf`   | Script           | SIL OFL |
 
 All faces are SIL OFL — redistributable under the plugin's GPL licence and
 acceptable for WordPress.org. Ship each font's licence file (e.g. `OFL.txt`)

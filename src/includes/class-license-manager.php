@@ -142,11 +142,9 @@ class License_Manager {
 
 			// Verify cached data integrity
 			if ( is_array( $cached_data ) && isset( $cached_data['signature'] ) ) {
-				// Verify signature
 				$expected_sig = self::generate_response_signature( $cached_data );
 
 				if ( hash_equals( $expected_sig, $cached_data['signature'] ) ) {
-					// Check if cache is still valid (not expired)
 					$expires = isset( $cached_data['expires'] ) ? strtotime( $cached_data['expires'] ) : 0;
 
 					if ( $expires > time() ) {

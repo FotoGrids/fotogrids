@@ -57,7 +57,6 @@ class Statistics {
 
 		$table = $wpdb->prefix . 'fotogrids_statistics';
 
-		// Validate parameters
 		if ( ! in_array( $object_type, array( 'gallery', 'album', 'item' ), true ) ) {
 			return false;
 		}
@@ -73,7 +72,6 @@ class Statistics {
 			return false;
 		}
 
-		// Try to update existing record first
 		$updated = $wpdb->query(
 			$wpdb->prepare(
 				"UPDATE $table
@@ -91,7 +89,6 @@ class Statistics {
 			return false;
 		}
 
-		// If no rows were updated, insert a new record
 		if ( 0 === $updated ) {
 			$data = array(
 				'object_type' => $object_type,
@@ -232,7 +229,6 @@ class Statistics {
 
 		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
 
-		// Enrich with object data
 		$enriched = array();
 		foreach ( $results as $row ) {
 			$object_data = self::get_object_data( $object_type, $row['object_id'] );
@@ -276,7 +272,6 @@ class Statistics {
 
 		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
 
-		// Enrich with object data
 		$enriched = array();
 		foreach ( $results as $row ) {
 			$object_data = self::get_object_data( $object_type, $row['object_id'] );

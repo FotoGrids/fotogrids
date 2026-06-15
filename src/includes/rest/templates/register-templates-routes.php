@@ -193,7 +193,6 @@ class Register_Templates_Routes {
 			return $served;
 		}
 
-		// Get the HTML from the response
 		$data = $result->get_data();
 
 		// If data is a string (HTML), output it directly

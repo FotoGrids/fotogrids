@@ -191,10 +191,6 @@ final class Image_Filters implements Decorator {
 		return new Module_Assets();
 	}
 
-	// -------------------------------------------------------------------------
-	// Helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Decode the filter_type setting into a validated array of CSS filter names.
 	 *

@@ -109,8 +109,7 @@ html.fotogrids-view,
     }
 }
 
-/* -----------------------------------------------------------------------
- * Integrated mode
+/* Integrated mode.
  *
  * The active theme owns the document, so these styles must NOT touch the
  * page frame, body, container, typography, or colours. They only style the
@@ -120,7 +119,7 @@ html.fotogrids-view,
  * Anything that needs theme-aware spacing (margin between gallery and theme
  * content) is intentionally `inherit`/`unset` so the theme's content rhythm
  * stays in charge.
- * --------------------------------------------------------------------- */
+ */
 
 .fotogrids-view--integrated {
     .fotogrids-view__notice--integrated {

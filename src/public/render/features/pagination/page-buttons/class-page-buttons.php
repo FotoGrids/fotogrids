@@ -248,10 +248,6 @@ final class Page_Buttons implements Feature {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Render helpers
-	// -------------------------------------------------------------------------
-
 	private function render_prev_button( Render_Context $render_context, int $current, string $icon ): string {
 		$label    = $this->resolve_prev_text( $render_context );
 		$disabled = $current <= 1 ? ' disabled' : '';
@@ -357,10 +353,6 @@ final class Page_Buttons implements Feature {
 			$svg
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// Setting resolution
-	// -------------------------------------------------------------------------
 
 	private function resolve_alignment( Render_Context $render_context ): string {
 		$value = $render_context->settings['pagination_alignment'] ?? 'center';

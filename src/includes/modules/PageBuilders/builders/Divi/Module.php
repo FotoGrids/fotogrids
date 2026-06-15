@@ -233,7 +233,6 @@ final class Module {
 	 * @return void
 	 */
 	public static function enqueue_vb_bundle_directly(): void {
-		// Only in a VB context.
 		if ( ! function_exists( 'et_core_is_fb_enabled' ) || ! et_core_is_fb_enabled() ) {
 			return;
 		}

@@ -3,18 +3,20 @@ import { createRoot } from 'react-dom/client';
 import AlbumAssignment from './components/AlbumAssignment.js';
 
 function initializeAlbumAssignment() {
-    const albumAssignmentRoot = document.getElementById('fotogrids-gallery-albums-root');
+	const albumAssignmentRoot = document.getElementById(
+		'fotogrids-gallery-albums-root',
+	);
 
-    if (!albumAssignmentRoot || !window.fotogridsAlbumAssignment) {
-        return;
-    }
+	if (!albumAssignmentRoot || !window.fotogridsAlbumAssignment) {
+		return;
+	}
 
-    const root = createRoot(albumAssignmentRoot);
-    root.render(React.createElement(AlbumAssignment));
+	const root = createRoot(albumAssignmentRoot);
+	root.render(React.createElement(AlbumAssignment));
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeAlbumAssignment);
+	document.addEventListener('DOMContentLoaded', initializeAlbumAssignment);
 } else {
-    setTimeout(initializeAlbumAssignment, 0);
+	setTimeout(initializeAlbumAssignment, 0);
 }

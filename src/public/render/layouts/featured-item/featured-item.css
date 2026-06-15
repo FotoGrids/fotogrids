@@ -121,10 +121,8 @@
     }
 }
 
-/* ----------------------------------------------------------------------
-   Show all button — overlays the whole layout in a chosen corner.
-   Styling is driven by CSS vars the layout stamps on the wrapper.
-   ---------------------------------------------------------------------- */
+/* Show all button — overlays the whole layout in a chosen corner.
+   Styling is driven by CSS vars the layout stamps on the wrapper. */
 
 [data-fg-layout="featured-item"] .fg-featured-show-all {
     position: absolute;
@@ -181,10 +179,8 @@
     right: var( --fg-show-all-offset );
 }
 
-/* ----------------------------------------------------------------------
-   Mobile — stack featured on top, grid below, full width. Applies for
-   both side values.
-   ---------------------------------------------------------------------- */
+/* Mobile — stack featured on top, grid below, full width. Applies for
+   both side values. */
 
 @media ( max-width: 600px ) {
     [data-fg-layout="featured-item"] .fg-featured-container {

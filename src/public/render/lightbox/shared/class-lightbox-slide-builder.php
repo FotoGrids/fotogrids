@@ -165,10 +165,6 @@ final class Lightbox_Slide_Builder {
 		return (array) apply_filters( Filters_Lightbox::SLIDES, $slides, $ids, $settings );
 	}
 
-	// -------------------------------------------------------------------------
-	// Helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Resolves thumb + full size slugs from gallery settings, mirroring
 	 * Context_Builder::resolve_size_settings. Registers custom sizes

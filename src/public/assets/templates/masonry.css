@@ -24,7 +24,6 @@
     display: block;
 }
 
-/* Column variations */
 .fotogrids-layout-masonry[data-columns="1"] {
     column-count: 1;
 }
@@ -49,18 +48,16 @@
     column-count: 6;
 }
 
-/* Responsive adjustments */
 @media (max-width: 767px) {
     .fotogrids-layout-masonry {
         column-count: 2;
         column-gap: 0.5rem;
     }
-    
+
     .fotogrids-layout-masonry .fotogrids-item {
         margin-bottom: 0.5rem;
     }
-    
-    /* Force fewer columns on mobile */
+
     .fotogrids-layout-masonry[data-columns="3"],
     .fotogrids-layout-masonry[data-columns="4"],
     .fotogrids-layout-masonry[data-columns="5"],
@@ -78,8 +75,7 @@
     .fotogrids-layout-masonry .fotogrids-item {
         margin-bottom: 0.75rem;
     }
-    
-    /* Single column on very small screens */
+
     .fotogrids-layout-masonry[data-columns] {
         column-count: 1;
     }
@@ -93,8 +89,7 @@
     .fotogrids-layout-masonry .fotogrids-item {
         margin-bottom: 1.5rem;
     }
-    
-    /* Adjust columns for tablet */
+
     .fotogrids-layout-masonry[data-columns="5"],
     .fotogrids-layout-masonry[data-columns="6"] {
         column-count: 3;
@@ -111,7 +106,6 @@
     }
 }
 
-/* Animation for loading */
 .fotogrids-layout-masonry .fotogrids-item {
     opacity: 0;
     animation: fadeInMasonry 0.5s ease forwards;
@@ -123,7 +117,6 @@
     }
 }
 
-/* Staggered animation delay */
 .fotogrids-layout-masonry .fotogrids-item:nth-child(1) { animation-delay: 0.1s; }
 .fotogrids-layout-masonry .fotogrids-item:nth-child(2) { animation-delay: 0.2s; }
 .fotogrids-layout-masonry .fotogrids-item:nth-child(3) { animation-delay: 0.3s; }
@@ -132,7 +125,6 @@
 .fotogrids-layout-masonry .fotogrids-item:nth-child(6) { animation-delay: 0.6s; }
 .fotogrids-layout-masonry .fotogrids-item:nth-child(n+7) { animation-delay: 0.7s; }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .fotogrids-layout-masonry .fotogrids-item {
         opacity: 1;

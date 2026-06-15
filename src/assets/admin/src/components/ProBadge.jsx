@@ -48,7 +48,6 @@ const LockIcon = () => (
  * @param {string}  [props.position]  Tooltip position, forwarded to <Tooltip>.
  */
 const ProBadge = ( { tier, state, position = 'top' } ) => {
-    // Never render for free-tier options.
     if ( ! tier || tier === 'free' ) {
         return null;
     }

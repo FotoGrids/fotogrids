@@ -1,513 +1,607 @@
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 const TokenSelectComponent = ({
-    setting,
-    currentValue,
-    isDisabled = false,
-    updateSetting,
-    getFieldState,
-    getOptionState,
-    renderIcon,
-    isDefaultsMode,
-    isOptionVisible,
-    __
+	setting,
+	currentValue,
+	isDisabled = false,
+	updateSetting,
+	getFieldState,
+	getOptionState,
+	renderIcon,
+	isDefaultsMode,
+	isOptionVisible,
+	__,
 }) => {
-    const {
-        createElement: h,
-        createPortal,
-        useCallback,
-        useEffect,
-        useRef,
-        useState
-    } = wp.element;
+	const {
+		createElement: h,
+		createPortal,
+		useCallback,
+		useEffect,
+		useRef,
+		useState,
+	} = wp.element;
 
-    // ---------------------------------------------------------------------------
-    // Helpers
-    // ---------------------------------------------------------------------------
+	// The setting stores JSON: ["caption","exif",...] or legacy comma-string;
+	// normalise to a plain JS array internally.
+	const parseValue = raw => {
+		if (Array.isArray(raw)) {
+			return raw;
+		}
+		if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+			try {
+				const parsed = JSON.parse(raw);
+				return Array.isArray(parsed) ? parsed : [];
+			} catch (e) {
+				return [];
+			}
+		}
+		if (typeof raw === 'string' && raw.trim().length > 0) {
+			return raw
+				.split(',')
+				.map(s => s.trim())
+				.filter(Boolean);
+		}
+		return [];
+	};
 
-    // Normalise stored value → always work with a plain JS array internally.
-    // The setting stores JSON: ["caption","exif",...] or legacy comma-string.
-    const parseValue = (raw) => {
-        if (Array.isArray(raw)) {
-            return raw;
-        }
-        if (typeof raw === 'string' && raw.trim().startsWith('[')) {
-            try {
-                const parsed = JSON.parse(raw);
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                return [];
-            }
-        }
-        if (typeof raw === 'string' && raw.trim().length > 0) {
-            return raw.split(',').map((s) => s.trim()).filter(Boolean);
-        }
-        return [];
-    };
+	const serializeValue = arr => JSON.stringify(arr);
 
-    const serializeValue = (arr) => JSON.stringify(arr);
+	// Options - filter isGlobalDefault in defaults mode (same as button_group),
+	// then drop any option whose per-option `condition` evaluates false against
+	// the current settings. Per-option conditions let us hide dropdown choices
+	// that only make sense when another setting is on (e.g. an "Embedded"
+	// placement that requires AJAX navigation to be on).
+	const baseOptions = isDefaultsMode
+		? (setting.options || []).filter(o => !o.isGlobalDefault)
+		: setting.options || [];
+	const allOptions = baseOptions.filter(option => {
+		if (!option || !option.condition) return true;
+		if (typeof isOptionVisible !== 'function') return true;
+		return isOptionVisible(option);
+	});
 
-    // Options - filter isGlobalDefault in defaults mode (same as button_group),
-    // then drop any option whose per-option `condition` evaluates false against
-    // the current settings. Per-option conditions let us hide dropdown choices
-    // that only make sense when another setting is on (e.g. an "Embedded"
-    // placement that requires AJAX navigation to be on).
-    const baseOptions = isDefaultsMode
-        ? (setting.options || []).filter((o) => !o.isGlobalDefault)
-        : (setting.options || []);
-    const allOptions = baseOptions.filter((option) => {
-        if (!option || !option.condition) return true;
-        if (typeof isOptionVisible !== 'function') return true;
-        return isOptionVisible(option);
-    });
+	const sortable = setting.sortable === true;
+	const keepOpen = setting.keep_open === true;
 
-    const sortable = setting.sortable === true;
-    const keepOpen = setting.keep_open === true;
+	const [selectedValues, setSelectedValues] = useState(() =>
+		parseValue(currentValue),
+	);
+	const [isOpen, setIsOpen] = useState(false);
+	const [dropdownPosition, setDropdownPosition] = useState(null);
+	const [dragOverIndex, setDragOverIndex] = useState(null);
 
-    // ---------------------------------------------------------------------------
-    // State
-    // ---------------------------------------------------------------------------
+	const triggerRef = useRef(null);
+	const dropdownRef = useRef(null);
+	const dragSrcIndex = useRef(null);
+	const dragInsertSlot = useRef(null);
 
-    const [selectedValues, setSelectedValues] = useState(() => parseValue(currentValue));
-    const [isOpen, setIsOpen] = useState(false);
-    const [dropdownPosition, setDropdownPosition] = useState(null);
-    const [dragOverIndex, setDragOverIndex] = useState(null);
+	useEffect(() => {
+		setSelectedValues(parseValue(currentValue));
+	}, [currentValue]);
 
-    const triggerRef = useRef(null);
-    const dropdownRef = useRef(null);
-    const dragSrcIndex = useRef(null);
-    const dragInsertSlot = useRef(null);
+	// When a per-option condition turns an option off, drop any stale selected
+	// value referencing it. Without this, the user would still see (and could
+	// not remove without re-enabling the gating setting) a chip whose option
+	// is no longer in the dropdown.
+	useEffect(() => {
+		const visibleValues = new Set(allOptions.map(o => o.value));
+		const pruned = selectedValues.filter(v => visibleValues.has(v));
+		if (pruned.length !== selectedValues.length) {
+			setSelectedValues(pruned);
+			updateSetting(setting.key, serializeValue(pruned));
+		}
+	}, [allOptions.map(o => o.value).join('|')]);
 
-    // Keep local state in sync if parent changes the value externally
-    useEffect(() => {
-        setSelectedValues(parseValue(currentValue));
-    }, [currentValue]);
+	const settingState =
+		typeof getFieldState === 'function'
+			? getFieldState(setting.key)
+			: 'editable';
+	const showSettingBadge = settingState !== 'editable';
+	const ProBadge =
+		window.FotoGridsTooltip && window.FotoGridsTooltip.ProBadge;
 
-    // When a per-option condition turns an option off, drop any stale selected
-    // value referencing it. Without this, the user would still see (and could
-    // not remove without re-enabling the gating setting) a chip whose option
-    // is no longer in the dropdown.
-    useEffect(() => {
-        const visibleValues = new Set(allOptions.map((o) => o.value));
-        const pruned = selectedValues.filter((v) => visibleValues.has(v));
-        if (pruned.length !== selectedValues.length) {
-            setSelectedValues(pruned);
-            updateSetting(setting.key, serializeValue(pruned));
-        }
-    }, [allOptions.map((o) => o.value).join('|')]);
+	const resolveOptionState = optionValue => {
+		if (typeof getOptionState === 'function') {
+			return getOptionState(setting.key, optionValue);
+		}
+		return 'editable';
+	};
 
-    // ---------------------------------------------------------------------------
-    // Field / option state (Pro gating)
-    // ---------------------------------------------------------------------------
+	const updateDropdownPosition = useCallback(() => {
+		if (!triggerRef.current) return;
 
-    const settingState = typeof getFieldState === 'function'
-        ? getFieldState(setting.key)
-        : 'editable';
-    const showSettingBadge = settingState !== 'editable';
-    const ProBadge = window.FotoGridsTooltip && window.FotoGridsTooltip.ProBadge;
+		const triggerRect = triggerRef.current.getBoundingClientRect();
+		const viewportHeight =
+			window.innerHeight || document.documentElement.clientHeight || 0;
+		const viewportWidth =
+			window.innerWidth || document.documentElement.clientWidth || 0;
+		const scrollX =
+			window.pageXOffset || document.documentElement.scrollLeft || 0;
+		const scrollY =
+			window.pageYOffset || document.documentElement.scrollTop || 0;
+		const sidePadding = 8;
+		const desiredMargin = 4;
+		const minPanelHeight = 160;
+		const availableBelow =
+			viewportHeight - triggerRect.bottom - desiredMargin - sidePadding;
+		const availableAbove = triggerRect.top - desiredMargin - sidePadding;
+		const placement =
+			availableBelow >= minPanelHeight || availableBelow >= availableAbove
+				? 'bottom'
+				: 'top';
+		const maxHeight = Math.max(
+			120,
+			placement === 'bottom' ? availableBelow : availableAbove,
+		);
+		const width = Math.min(
+			Math.max(triggerRect.width, 200),
+			viewportWidth - sidePadding * 2,
+		);
+		const left = Math.min(
+			Math.max(sidePadding, triggerRect.left),
+			Math.max(sidePadding, viewportWidth - width - sidePadding),
+		);
+		// For top placement we anchor at the trigger's top edge and use
+		// transform: translateY(-100%) in the dropdown style so the gap
+		// above the trigger is exactly `desiredMargin` regardless of the
+		// dropdown's actual rendered height. Matches Select.jsx.
+		const top =
+			placement === 'bottom'
+				? triggerRect.bottom + desiredMargin
+				: triggerRect.top - desiredMargin;
 
-    const resolveOptionState = (optionValue) => {
-        if (typeof getOptionState === 'function') {
-            return getOptionState(setting.key, optionValue);
-        }
-        return 'editable';
-    };
+		setDropdownPosition({
+			top: top + scrollY,
+			left: left + scrollX,
+			width,
+			maxHeight,
+			placement,
+		});
+	}, []);
 
-    // ---------------------------------------------------------------------------
-    // Dropdown positioning (portal, same approach as renderSelect.js)
-    // ---------------------------------------------------------------------------
+	useEffect(() => {
+		if (!isOpen) return;
+		updateDropdownPosition();
+		window.addEventListener('resize', updateDropdownPosition);
+		return () =>
+			window.removeEventListener('resize', updateDropdownPosition);
+	}, [isOpen, updateDropdownPosition]);
 
-    const updateDropdownPosition = useCallback(() => {
-        if (!triggerRef.current) return;
+	useEffect(() => {
+		if (!isOpen) return;
 
-        const triggerRect = triggerRef.current.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-        const scrollX = window.pageXOffset || document.documentElement.scrollLeft || 0;
-        const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-        const sidePadding = 8;
-        const desiredMargin = 4;
-        const minPanelHeight = 160;
-        const availableBelow = viewportHeight - triggerRect.bottom - desiredMargin - sidePadding;
-        const availableAbove = triggerRect.top - desiredMargin - sidePadding;
-        const placement = availableBelow >= minPanelHeight || availableBelow >= availableAbove ? 'bottom' : 'top';
-        const maxHeight = Math.max(120, placement === 'bottom' ? availableBelow : availableAbove);
-        const width = Math.min(Math.max(triggerRect.width, 200), viewportWidth - sidePadding * 2);
-        const left = Math.min(
-            Math.max(sidePadding, triggerRect.left),
-            Math.max(sidePadding, viewportWidth - width - sidePadding)
-        );
-        // For top placement we anchor at the trigger's top edge and use
-        // transform: translateY(-100%) in the dropdown style so the gap
-        // above the trigger is exactly `desiredMargin` regardless of the
-        // dropdown's actual rendered height. Matches Select.jsx.
-        const top = placement === 'bottom'
-            ? triggerRect.bottom + desiredMargin
-            : triggerRect.top - desiredMargin;
+		const handlePointerDown = e => {
+			const inTrigger =
+				triggerRef.current && triggerRef.current.contains(e.target);
+			const inDropdown =
+				dropdownRef.current && dropdownRef.current.contains(e.target);
+			if (!inTrigger && !inDropdown) setIsOpen(false);
+		};
+		const handleEscape = e => {
+			if (e.key === 'Escape') setIsOpen(false);
+		};
 
-        setDropdownPosition({
-            top: top + scrollY,
-            left: left + scrollX,
-            width,
-            maxHeight,
-            placement
-        });
-    }, []);
+		document.addEventListener('mousedown', handlePointerDown);
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('mousedown', handlePointerDown);
+			document.removeEventListener('keydown', handleEscape);
+		};
+	}, [isOpen]);
 
-    useEffect(() => {
-        if (!isOpen) return;
-        updateDropdownPosition();
-        window.addEventListener('resize', updateDropdownPosition);
-        return () => window.removeEventListener('resize', updateDropdownPosition);
-    }, [isOpen, updateDropdownPosition]);
+	const commit = useCallback(
+		nextValues => {
+			setSelectedValues(nextValues);
+			updateSetting(setting.key, serializeValue(nextValues));
+		},
+		[setting.key, updateSetting],
+	);
 
-    // Close on outside click / Escape
-    useEffect(() => {
-        if (!isOpen) return;
+	const toggleOption = useCallback(
+		value => {
+			if (isDisabled) return;
 
-        const handlePointerDown = (e) => {
-            const inTrigger = triggerRef.current && triggerRef.current.contains(e.target);
-            const inDropdown = dropdownRef.current && dropdownRef.current.contains(e.target);
-            if (!inTrigger && !inDropdown) setIsOpen(false);
-        };
-        const handleEscape = (e) => {
-            if (e.key === 'Escape') setIsOpen(false);
-        };
+			setSelectedValues(prev => {
+				const idx = prev.indexOf(value);
+				const next =
+					idx === -1
+						? [...prev, value]
+						: prev.filter(v => v !== value);
 
-        document.addEventListener('mousedown', handlePointerDown);
-        document.addEventListener('keydown', handleEscape);
-        return () => {
-            document.removeEventListener('mousedown', handlePointerDown);
-            document.removeEventListener('keydown', handleEscape);
-        };
-    }, [isOpen]);
+				updateSetting(setting.key, serializeValue(next));
+				return next;
+			});
 
-    // ---------------------------------------------------------------------------
-    // Selection logic
-    // ---------------------------------------------------------------------------
+			if (!keepOpen) setIsOpen(false);
+		},
+		[isDisabled, keepOpen, setting.key, updateSetting],
+	);
 
-    const commit = useCallback((nextValues) => {
-        setSelectedValues(nextValues);
-        updateSetting(setting.key, serializeValue(nextValues));
-    }, [setting.key, updateSetting]);
+	const removeToken = useCallback(
+		value => {
+			if (isDisabled) return;
+			setSelectedValues(prev => {
+				const next = prev.filter(v => v !== value);
+				updateSetting(setting.key, serializeValue(next));
+				return next;
+			});
+		},
+		[isDisabled, setting.key, updateSetting],
+	);
 
-    const toggleOption = useCallback((value) => {
-        if (isDisabled) return;
+	const handleDragStart = (e, index) => {
+		dragSrcIndex.current = index;
+		dragInsertSlot.current = null;
+		e.dataTransfer.effectAllowed = 'move';
+		// Firefox requires data to be set
+		e.dataTransfer.setData('text/plain', String(index));
+	};
 
-        setSelectedValues((prev) => {
-            const idx = prev.indexOf(value);
-            const next = idx === -1
-                ? [...prev, value]        // add
-                : prev.filter((v) => v !== value); // remove
+	// dragOverIndex represents the insertion slot *before* that index.
+	// Slot 0 = before first token, slot N = after last token.
+	// We compute the slot from which half of the token the cursor is on.
+	const getInsertionSlot = (e, index) => {
+		const rect = e.currentTarget.getBoundingClientRect();
+		const midX = rect.left + rect.width / 2;
+		return e.clientX < midX ? index : index + 1;
+	};
 
-            updateSetting(setting.key, serializeValue(next));
-            return next;
-        });
+	const handleDragOver = (e, index) => {
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'move';
+		const slot = getInsertionSlot(e, index);
+		dragInsertSlot.current = slot;
+		setDragOverIndex(slot);
+	};
 
-        if (!keepOpen) setIsOpen(false);
-    }, [isDisabled, keepOpen, setting.key, updateSetting]);
+	const handleDragLeave = e => {
+		// Only clear if we're truly leaving the tokens container
+		if (!e.currentTarget.contains(e.relatedTarget)) {
+			setDragOverIndex(null);
+			dragInsertSlot.current = null;
+		}
+	};
 
-    const removeToken = useCallback((value) => {
-        if (isDisabled) return;
-        setSelectedValues((prev) => {
-            const next = prev.filter((v) => v !== value);
-            updateSetting(setting.key, serializeValue(next));
-            return next;
-        });
-    }, [isDisabled, setting.key, updateSetting]);
+	const handleDrop = (e, index) => {
+		e.preventDefault();
+		// Read both refs immediately - handleDragEnd may fire synchronously
+		// in some browsers and would clear dragSrcIndex before we use it.
+		const srcIndex = dragSrcIndex.current;
+		// Use the last recorded slot from dragOver; fall back to computing
+		// it from the drop event in case dragOver didn't fire on this target.
+		const insertAt =
+			dragInsertSlot.current !== null
+				? dragInsertSlot.current
+				: getInsertionSlot(e, index);
 
-    // ---------------------------------------------------------------------------
-    // Drag-and-drop reordering (HTML5, no external lib)
-    // ---------------------------------------------------------------------------
+		dragSrcIndex.current = null;
+		dragInsertSlot.current = null;
+		setDragOverIndex(null);
 
-    const handleDragStart = (e, index) => {
-        dragSrcIndex.current = index;
-        dragInsertSlot.current = null;
-        e.dataTransfer.effectAllowed = 'move';
-        // Firefox requires data to be set
-        e.dataTransfer.setData('text/plain', String(index));
-    };
+		if (srcIndex === null) return;
+		// No-op: dropping in the slot immediately before or after itself
+		if (insertAt === srcIndex || insertAt === srcIndex + 1) return;
 
-    // dragOverIndex represents the insertion slot *before* that index.
-    // Slot 0 = before first token, slot N = after last token.
-    // We compute the slot from which half of the token the cursor is on.
-    const getInsertionSlot = (e, index) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const midX = rect.left + rect.width / 2;
-        return e.clientX < midX ? index : index + 1;
-    };
+		setSelectedValues(prev => {
+			const next = [...prev];
+			const [moved] = next.splice(srcIndex, 1);
+			// Adjust insertion point for the shift caused by removal
+			const adjustedInsert =
+				insertAt > srcIndex ? insertAt - 1 : insertAt;
+			next.splice(adjustedInsert, 0, moved);
+			updateSetting(setting.key, serializeValue(next));
+			return next;
+		});
+	};
 
-    const handleDragOver = (e, index) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        const slot = getInsertionSlot(e, index);
-        dragInsertSlot.current = slot;
-        setDragOverIndex(slot);
-    };
+	const handleDragEnd = () => {
+		// Fires after drop (or on cancel). Safe to clear here because
+		// handleDrop already captured both refs before this runs.
+		dragSrcIndex.current = null;
+		dragInsertSlot.current = null;
+		setDragOverIndex(null);
+	};
 
-    const handleDragLeave = (e) => {
-        // Only clear if we're truly leaving the tokens container
-        if (!e.currentTarget.contains(e.relatedTarget)) {
-            setDragOverIndex(null);
-            dragInsertSlot.current = null;
-        }
-    };
+	const optionByValue = {};
+	allOptions.forEach(o => {
+		optionByValue[o.value] = o;
+	});
 
-    const handleDrop = (e, index) => {
-        e.preventDefault();
-        // Read both refs immediately - handleDragEnd may fire synchronously
-        // in some browsers and would clear dragSrcIndex before we use it.
-        const srcIndex = dragSrcIndex.current;
-        // Use the last recorded slot from dragOver; fall back to computing
-        // it from the drop event in case dragOver didn't fire on this target.
-        const insertAt = dragInsertSlot.current !== null
-            ? dragInsertSlot.current
-            : getInsertionSlot(e, index);
+	const renderInsertionMarker = slotIndex => {
+		if (
+			!sortable ||
+			dragOverIndex !== slotIndex ||
+			dragSrcIndex.current === null
+		)
+			return null;
+		return h('span', {
+			key: `marker-${slotIndex}`,
+			className: 'fotogrids-token-select__insert-marker',
+			'aria-hidden': 'true',
+		});
+	};
 
-        // Clear all drag state
-        dragSrcIndex.current = null;
-        dragInsertSlot.current = null;
-        setDragOverIndex(null);
+	const renderToken = (value, index) => {
+		const option = optionByValue[value];
+		const label = option ? option.label : value;
 
-        if (srcIndex === null) return;
-        // No-op: dropping in the slot immediately before or after itself
-        if (insertAt === srcIndex || insertAt === srcIndex + 1) return;
+		const tokenProps = {
+			key: value,
+			className: [
+				'fotogrids-token-select__token',
+				sortable ? 'fotogrids-token-select__token--sortable' : '',
+			]
+				.filter(Boolean)
+				.join(' '),
+		};
 
-        setSelectedValues((prev) => {
-            const next = [...prev];
-            const [moved] = next.splice(srcIndex, 1);
-            // Adjust insertion point for the shift caused by removal
-            const adjustedInsert = insertAt > srcIndex ? insertAt - 1 : insertAt;
-            next.splice(adjustedInsert, 0, moved);
-            updateSetting(setting.key, serializeValue(next));
-            return next;
-        });
-    };
+		if (sortable && !isDisabled) {
+			tokenProps.draggable = true;
+			tokenProps.onDragStart = e => handleDragStart(e, index);
+			tokenProps.onDragOver = e => handleDragOver(e, index);
+			tokenProps.onDrop = e => handleDrop(e, index);
+			tokenProps.onDragEnd = handleDragEnd;
+		}
 
-    const handleDragEnd = () => {
-        // Fires after drop (or on cancel). Safe to clear here because
-        // handleDrop already captured both refs before this runs.
-        dragSrcIndex.current = null;
-        dragInsertSlot.current = null;
-        setDragOverIndex(null);
-    };
+		return [
+			renderInsertionMarker(index),
+			h(
+				'span',
+				tokenProps,
+				[
+					sortable &&
+						!isDisabled &&
+						h(
+							'span',
+							{
+								key: 'drag-handle',
+								className: 'fotogrids-token-select__token-drag',
+								'aria-hidden': 'true',
+							},
+							renderIcon('move'),
+						),
+					h(
+						'span',
+						{
+							key: 'label',
+							className: 'fotogrids-token-select__token-label',
+						},
+						label,
+					),
+					!isDisabled &&
+						h(
+							'button',
+							{
+								key: 'remove',
+								type: 'button',
+								className:
+									'fotogrids-token-select__token-remove',
+								'aria-label': `${__('Remove', 'fotogrids')} ${label}`,
+								onClick: e => {
+									e.stopPropagation();
+									removeToken(value);
+								},
+							},
+							renderIcon('x'),
+						),
+				].filter(Boolean),
+			),
+		];
+	};
 
-    // ---------------------------------------------------------------------------
-    // Build option map for quick lookup
-    // ---------------------------------------------------------------------------
+	const renderDropdownOption = option => {
+		const isSelected = selectedValues.includes(option.value);
+		const optionState = resolveOptionState(option.value);
+		const isLocked = optionState !== 'editable';
 
-    const optionByValue = {};
-    allOptions.forEach((o) => { optionByValue[o.value] = o; });
+		return h(
+			'button',
+			{
+				key: option.value,
+				type: 'button',
+				className: [
+					'fotogrids-token-select__option',
+					isSelected
+						? 'fotogrids-token-select__option--selected'
+						: '',
+					isLocked ? 'fotogrids-token-select__option--locked' : '',
+				]
+					.filter(Boolean)
+					.join(' '),
+				disabled: isLocked,
+				onClick: () => !isLocked && toggleOption(option.value),
+			},
+			[
+				h(
+					'span',
+					{
+						key: 'check',
+						className: 'fotogrids-token-select__option-check',
+						'aria-hidden': 'true',
+					},
+					isSelected ? renderIcon('check_square') : null,
+				),
+				h(
+					'span',
+					{
+						key: 'label',
+						className: 'fotogrids-token-select__option-label',
+					},
+					option.label,
+				),
+				isLocked &&
+					ProBadge &&
+					h(ProBadge, {
+						key: 'pro-badge',
+						tier: option.tier_required,
+						state: optionState,
+					}),
+			].filter(Boolean),
+		);
+	};
 
-    // ---------------------------------------------------------------------------
-    // Render helpers
-    // ---------------------------------------------------------------------------
+	const dropdownElement =
+		isOpen && dropdownPosition
+			? h(
+					'div',
+					{
+						ref: dropdownRef,
+						className: [
+							'fotogrids-token-select__dropdown',
+							`fotogrids-token-select__dropdown--${dropdownPosition.placement}`,
+						].join(' '),
+						style: {
+							position: 'absolute',
+							top: `${dropdownPosition.top}px`,
+							left: `${dropdownPosition.left}px`,
+							width: `${dropdownPosition.width}px`,
+							maxHeight: `${dropdownPosition.maxHeight}px`,
+							transform:
+								dropdownPosition.placement === 'top'
+									? 'translateY(-100%)'
+									: undefined,
+						},
+					},
+					h(
+						'div',
+						{
+							className: 'fotogrids-token-select__options',
+							role: 'listbox',
+							'aria-multiselectable': 'true',
+						},
+						allOptions.map(renderDropdownOption),
+					),
+				)
+			: null;
 
-    // Renders the dotted insertion line that appears between tokens while dragging.
-    const renderInsertionMarker = (slotIndex) => {
-        if (!sortable || dragOverIndex !== slotIndex || dragSrcIndex.current === null) return null;
-        return h('span', {
-            key: `marker-${slotIndex}`,
-            className: 'fotogrids-token-select__insert-marker',
-            'aria-hidden': 'true'
-        });
-    };
+	const portal =
+		dropdownElement && typeof createPortal === 'function'
+			? createPortal(dropdownElement, document.body)
+			: dropdownElement;
 
-    const renderToken = (value, index) => {
-        const option = optionByValue[value];
-        const label = option ? option.label : value;
+	const hasTokens = selectedValues.length > 0;
 
-        const tokenProps = {
-            key: value,
-            className: [
-                'fotogrids-token-select__token',
-                sortable ? 'fotogrids-token-select__token--sortable' : ''
-            ].filter(Boolean).join(' ')
-        };
+	return h(
+		'div',
+		{
+			className: [
+				'fotogrids-token-select',
+				isDisabled ? 'fotogrids-token-select--disabled' : '',
+				isOpen ? 'fotogrids-token-select--open' : '',
+			]
+				.filter(Boolean)
+				.join(' '),
+		},
+		[
+			setting.label &&
+				h(
+					'label',
+					{
+						key: 'label',
+						className: 'fotogrids-setting__label',
+					},
+					[
+						setting.label,
+						showSettingBadge &&
+							ProBadge &&
+							h(ProBadge, {
+								key: 'pro-badge',
+								tier: setting.tier_required,
+								state: settingState,
+							}),
+					].filter(Boolean),
+				),
 
-        if (sortable && !isDisabled) {
-            tokenProps.draggable = true;
-            tokenProps.onDragStart = (e) => handleDragStart(e, index);
-            tokenProps.onDragOver = (e) => handleDragOver(e, index);
-            tokenProps.onDrop = (e) => handleDrop(e, index);
-            tokenProps.onDragEnd = handleDragEnd;
-        }
+			h(
+				'div',
+				{
+					key: 'input',
+					ref: triggerRef,
+					className: 'fotogrids-token-select__input',
+					role: 'button',
+					tabIndex: isDisabled ? -1 : 0,
+					'aria-expanded': isOpen,
+					'aria-haspopup': 'listbox',
+					onClick: () => !isDisabled && setIsOpen(s => !s),
+					onKeyDown: e => {
+						if (
+							!isDisabled &&
+							(e.key === 'Enter' || e.key === ' ')
+						) {
+							e.preventDefault();
+							setIsOpen(s => !s);
+						}
+					},
+				},
+				[
+					hasTokens
+						? h(
+								'div',
+								{
+									key: 'tokens',
+									className: 'fotogrids-token-select__tokens',
+									onDragLeave: sortable
+										? handleDragLeave
+										: undefined,
+								},
+								[
+									...selectedValues.flatMap((v, i) =>
+										renderToken(v, i),
+									),
+									renderInsertionMarker(
+										selectedValues.length,
+									),
+								].filter(Boolean),
+							)
+						: h(
+								'span',
+								{
+									key: 'placeholder',
+									className:
+										'fotogrids-token-select__placeholder',
+								},
+								setting.placeholder ||
+									__('Select items…', 'fotogrids'),
+							),
 
-        return [
-            renderInsertionMarker(index),
-            h('span', tokenProps, [
-                sortable && !isDisabled && h('span', {
-                    key: 'drag-handle',
-                    className: 'fotogrids-token-select__token-drag',
-                    'aria-hidden': 'true'
-                }, renderIcon('move')),
-                h('span', {
-                    key: 'label',
-                    className: 'fotogrids-token-select__token-label'
-                }, label),
-                !isDisabled && h('button', {
-                    key: 'remove',
-                    type: 'button',
-                    className: 'fotogrids-token-select__token-remove',
-                    'aria-label': `${__('Remove', 'fotogrids')} ${label}`,
-                    onClick: (e) => {
-                        e.stopPropagation();
-                        removeToken(value);
-                    }
-                }, renderIcon('x'))
-            ].filter(Boolean))
-        ];
-    };
+					h(
+						'span',
+						{
+							key: 'caret',
+							className: 'fotogrids-token-select__caret',
+							'aria-hidden': 'true',
+						},
+						renderIcon('chevron_down'),
+					),
+				],
+			),
 
-    const renderDropdownOption = (option) => {
-        const isSelected = selectedValues.includes(option.value);
-        const optionState = resolveOptionState(option.value);
-        const isLocked = optionState !== 'editable';
+			setting.description &&
+				h(
+					'div',
+					{
+						key: 'description',
+						className: 'fotogrids-setting__description',
+					},
+					setting.description,
+				),
 
-        return h('button', {
-            key: option.value,
-            type: 'button',
-            className: [
-                'fotogrids-token-select__option',
-                isSelected ? 'fotogrids-token-select__option--selected' : '',
-                isLocked ? 'fotogrids-token-select__option--locked' : ''
-            ].filter(Boolean).join(' '),
-            disabled: isLocked,
-            onClick: () => !isLocked && toggleOption(option.value)
-        }, [
-            h('span', {
-                key: 'check',
-                className: 'fotogrids-token-select__option-check',
-                'aria-hidden': 'true'
-            }, isSelected ? renderIcon('check_square') : null),
-            h('span', {
-                key: 'label',
-                className: 'fotogrids-token-select__option-label'
-            }, option.label),
-            isLocked && ProBadge && h(ProBadge, {
-                key: 'pro-badge',
-                tier: option.tier_required,
-                state: optionState
-            })
-        ].filter(Boolean));
-    };
-
-    // ---------------------------------------------------------------------------
-    // Dropdown portal
-    // ---------------------------------------------------------------------------
-
-    const dropdownElement = isOpen && dropdownPosition
-        ? h('div', {
-            ref: dropdownRef,
-            className: [
-                'fotogrids-token-select__dropdown',
-                `fotogrids-token-select__dropdown--${dropdownPosition.placement}`
-            ].join(' '),
-            style: {
-                position: 'absolute',
-                top: `${dropdownPosition.top}px`,
-                left: `${dropdownPosition.left}px`,
-                width: `${dropdownPosition.width}px`,
-                maxHeight: `${dropdownPosition.maxHeight}px`,
-                transform: dropdownPosition.placement === 'top' ? 'translateY(-100%)' : undefined
-            }
-        },
-        h('div', {
-            className: 'fotogrids-token-select__options',
-            role: 'listbox',
-            'aria-multiselectable': 'true'
-        }, allOptions.map(renderDropdownOption))
-        )
-        : null;
-
-    const portal = dropdownElement && typeof createPortal === 'function'
-        ? createPortal(dropdownElement, document.body)
-        : dropdownElement;
-
-    // ---------------------------------------------------------------------------
-    // Root render
-    // ---------------------------------------------------------------------------
-
-    const hasTokens = selectedValues.length > 0;
-
-    return h('div', {
-        className: [
-            'fotogrids-token-select',
-            isDisabled ? 'fotogrids-token-select--disabled' : '',
-            isOpen ? 'fotogrids-token-select--open' : ''
-        ].filter(Boolean).join(' ')
-    }, [
-        // Label
-        setting.label && h('label', {
-            key: 'label',
-            className: 'fotogrids-setting__label'
-        }, [
-            setting.label,
-            showSettingBadge && ProBadge && h(ProBadge, {
-                key: 'pro-badge',
-                tier: setting.tier_required,
-                state: settingState
-            })
-        ].filter(Boolean)),
-
-        // Input area - tokens + open-dropdown trigger
-        h('div', {
-            key: 'input',
-            ref: triggerRef,
-            className: 'fotogrids-token-select__input',
-            role: 'button',
-            tabIndex: isDisabled ? -1 : 0,
-            'aria-expanded': isOpen,
-            'aria-haspopup': 'listbox',
-            onClick: () => !isDisabled && setIsOpen((s) => !s),
-            onKeyDown: (e) => {
-                if (!isDisabled && (e.key === 'Enter' || e.key === ' ')) {
-                    e.preventDefault();
-                    setIsOpen((s) => !s);
-                }
-            }
-        }, [
-            // Rendered tokens
-            hasTokens
-                ? h('div', {
-                    key: 'tokens',
-                    className: 'fotogrids-token-select__tokens',
-                    onDragLeave: sortable ? handleDragLeave : undefined
-                }, [
-                    ...selectedValues.flatMap((v, i) => renderToken(v, i)),
-                    // Insertion marker for the "after last token" slot
-                    renderInsertionMarker(selectedValues.length)
-                ].filter(Boolean))
-                : h('span', {
-                    key: 'placeholder',
-                    className: 'fotogrids-token-select__placeholder'
-                }, setting.placeholder || __('Select items…', 'fotogrids')),
-
-            // Caret
-            h('span', {
-                key: 'caret',
-                className: 'fotogrids-token-select__caret',
-                'aria-hidden': 'true'
-            }, renderIcon('chevron_down'))
-        ]),
-
-        // Description
-        setting.description && h('div', {
-            key: 'description',
-            className: 'fotogrids-setting__description'
-        }, setting.description),
-
-        // Dropdown (portal)
-        portal
-    ].filter(Boolean));
+			portal,
+		].filter(Boolean),
+	);
 };
 
-window.FotoGridsRenderSettings.renderTokenSelect = (setting, currentValue, isDisabled, context) => {
-    const { createElement: h } = wp.element;
-    return h(TokenSelectComponent, {
-        setting,
-        currentValue,
-        isDisabled,
-        ...context
-    });
+window.FotoGridsRenderSettings.renderTokenSelect = (
+	setting,
+	currentValue,
+	isDisabled,
+	context,
+) => {
+	const { createElement: h } = wp.element;
+	return h(TokenSelectComponent, {
+		setting,
+		currentValue,
+		isDisabled,
+		...context,
+	});
 };

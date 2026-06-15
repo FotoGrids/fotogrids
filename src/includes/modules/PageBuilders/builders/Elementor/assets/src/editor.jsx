@@ -381,24 +381,14 @@ if (window.elementor) {
 }
 
 /**
- * Capture-phase guard: when a widget's preview is rendered with
- * `preview_pagination=false`, the PHP wrap class
- * `is-fg-pb-pagination-frozen` is on the outer div. We swallow clicks
- * on `.fg-pagination` chrome inside that wrapper so users see the
- * pagination buttons in their final styling but the buttons don't
- * actually paginate. Mirrors LivePreview.jsx for the Gutenberg block.
+ * Capture-phase guard: when a widget's preview renders with
+ * `preview_pagination=false`, the wrapper carries `is-fg-pb-pagination-frozen`.
+ * Clicks on `.fg-pagination` chrome inside it are swallowed so the buttons
+ * show their final styling but don't paginate. Mirrors LivePreview.jsx.
  *
- * Bound at document level once at boot — one listener handles every
- * widget on the canvas, including widgets added after initial paint.
- */
-/**
- * Bind the capture-phase guard on every document the editor exposes.
- * Elementor renders widgets inside an iframe preview, so a listener on
- * the outer document only sees clicks from the panel chrome, not from
- * the canvas. We bind on the outer doc AND, when present, on the
- * preview iframe's document (resolved via the canonical
- * `elementor.$previewContents` jQuery accessor when Elementor exposes
- * it).
+ * Elementor renders widgets in an iframe, so a listener on the outer document
+ * only sees panel clicks; this binds on the outer doc and the preview iframe's
+ * document (via `elementor.$previewContents`) too.
  */
 function bindPaginationGuard(targetDocument) {
     if (!targetDocument || targetDocument.__fgPbGuardBound) return;
@@ -412,10 +402,6 @@ function bindPaginationGuard(targetDocument) {
             const frozen = target.closest('.is-fg-pb-pagination-frozen');
             if (!frozen) return;
             if (target.closest('.fg-pagination, .fg-pagination__btn')) {
-                // eslint-disable-next-line no-console
-                if (window.FOTOGRIDS_DEBUG_PAGINATION) {
-                    console.log('[FotoGrids/Elementor] pagination guard swallowing click', target);
-                }
                 event.stopPropagation();
                 event.stopImmediatePropagation();
                 event.preventDefault();
@@ -423,10 +409,6 @@ function bindPaginationGuard(targetDocument) {
         },
         true
     );
-    // eslint-disable-next-line no-console
-    if (window.FOTOGRIDS_DEBUG_PAGINATION) {
-        console.log('[FotoGrids/Elementor] pagination guard bound on', targetDocument === document ? 'outer doc' : 'iframe doc');
-    }
 }
 
 bindPaginationGuard(document);

@@ -140,7 +140,6 @@ const AlbumGalleries = () => {
         }
     }, []);
 
-    // Recalculate available galleries when assigned galleries change
     useEffect(() => {
         if (allGalleries.length > 0) {
             const assignedIds = assignedGalleries.map(g => parseInt(g.ID));

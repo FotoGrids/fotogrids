@@ -25,10 +25,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Image_Size_Manager {
 
-	// -------------------------------------------------------------------------
-	// Plugin-managed size slugs
-	// -------------------------------------------------------------------------
-
 	public const SLUG_THUMBNAIL     = 'fotogrids_thumbnail';
 	public const SLUG_FULL          = 'fotogrids_full';
 	public const SLUG_FULL_MOBILE   = 'fotogrids_full_mobile';  // hidden companion
@@ -68,10 +64,6 @@ final class Image_Size_Manager {
 		add_action( 'init', array( __CLASS__, 'add_image_sizes' ), 1 );
 	}
 
-	// -------------------------------------------------------------------------
-	// Image size registration
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Register all FotoGrids image sizes with WordPress.
 	 *
@@ -82,7 +74,6 @@ final class Image_Size_Manager {
 	public static function add_image_sizes(): void {
 		$settings = self::get_plugin_size_settings();
 
-		// fotogrids_thumbnail
 		$thumb_crop = self::build_crop_param(
 			(bool) $settings['thumbnail_crop'],
 			(string) $settings['thumbnail_alignment']
@@ -94,7 +85,6 @@ final class Image_Size_Manager {
 			$thumb_crop
 		);
 
-		// fotogrids_full
 		add_image_size(
 			self::SLUG_FULL,
 			(int) $settings['full_width'],
@@ -102,7 +92,7 @@ final class Image_Size_Manager {
 			false  // full size is never cropped
 		);
 
-		// fotogrids_full_mobile - hidden companion, always half fotogrids_full width
+		// Hidden companion, always half fotogrids_full width.
 		$mobile_width = max( 1, (int) floor( $settings['full_width'] / 2 ) );
 		add_image_size(
 			self::SLUG_FULL_MOBILE,
@@ -111,7 +101,6 @@ final class Image_Size_Manager {
 			false
 		);
 
-		// fotogrids_masonry - fixed width, variable height (used by the Masonry layout)
 		add_image_size(
 			self::SLUG_MASONRY,
 			max( 1, (int) $settings['masonry_width'] ),
@@ -119,7 +108,6 @@ final class Image_Size_Manager {
 			false  // never cropped - the layout decides
 		);
 
-		// fotogrids_justified - fixed height, variable width (used by the Justified layout)
 		add_image_size(
 			self::SLUG_JUSTIFIED,
 			0,     // 0 = proportional width (variable)
@@ -127,7 +115,6 @@ final class Image_Size_Manager {
 			false  // never cropped - the layout decides
 		);
 
-		// Re-register any gallery-custom sizes from the persistent registry
 		$custom_sizes = get_option( self::OPT_CUSTOM_SIZES, array() );
 		if ( is_array( $custom_sizes ) ) {
 			foreach ( $custom_sizes as $slug => $config ) {
@@ -147,10 +134,6 @@ final class Image_Size_Manager {
 			}
 		}
 	}
-
-	// -------------------------------------------------------------------------
-	// Size resolution (used at render time)
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Resolve a setting value to a WP size slug that exists for the given attachment.
@@ -172,7 +155,6 @@ final class Image_Size_Manager {
 		string $role = 'thumbnail',
 		?string $custom_slug = null
 	): string {
-		// Build the candidate chain for this setting value + role
 		$candidates = self::build_candidate_chain( $setting_value, $role, $custom_slug );
 
 		foreach ( $candidates as $candidate ) {
@@ -216,9 +198,8 @@ final class Image_Size_Manager {
 			return self::FALLBACK_FULL;
 		}
 
-		// Any other named WP size: try it directly, then fall back by role
+		// Any other named WP size: try it directly, then fall back by role.
 		$fallback = 'full' === $role ? self::FALLBACK_FULL : self::FALLBACK_THUMBNAIL;
-		// Insert the specific value at the front if it's not already in the chain
 		if ( ! in_array( $setting_value, $fallback, true ) ) {
 			array_unshift( $fallback, $setting_value );
 		}
@@ -243,10 +224,6 @@ final class Image_Size_Manager {
 		$data = image_get_intermediate_size( $attachment_id, $size_slug );
 		return ( false !== $data && ! empty( $data['file'] ) );
 	}
-
-	// -------------------------------------------------------------------------
-	// Custom size registration
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Compute the deterministic slug for a gallery-custom size.
@@ -291,10 +268,8 @@ final class Image_Size_Manager {
 		$slug       = self::compute_custom_slug( $width, $height, $crop );
 		$crop_param = self::build_crop_param( $crop, $alignment );
 
-		// Register with WordPress (safe to call even if already registered)
 		add_image_size( $slug, $width, $height, $crop_param );
 
-		// Persist to the registry option
 		self::save_custom_size_registry(
 			$slug,
 			array(
@@ -371,10 +346,6 @@ final class Image_Size_Manager {
 		}
 	}
 
-	// -------------------------------------------------------------------------
-	// Plugin-wide size settings
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Read the plugin-wide size settings option, with defaults filled in.
 	 *
@@ -426,8 +397,7 @@ final class Image_Size_Manager {
 
 		update_option( self::OPT_PLUGIN_SIZES, $settings, false );
 
-		// Re-register sizes immediately so they're available for the current request
-		// (WP image size registration is idempotent within a request)
+		// Re-register so the new sizes are available within the current request.
 		self::add_image_sizes();
 
 		return $settings;
@@ -474,10 +444,6 @@ final class Image_Size_Manager {
 
 		return $registry;
 	}
-
-	// -------------------------------------------------------------------------
-	// Helpers
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Build the WP crop parameter (bool or array) from crop flag + alignment string.

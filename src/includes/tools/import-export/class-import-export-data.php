@@ -50,16 +50,8 @@ class Import_Export_Data {
 	// phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
 	// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-	// -------------------------------------------------------------------------
-	// Option key for the operation log
-	// -------------------------------------------------------------------------
-
 	const LOG_OPTION = 'fotogrids_import_export_log';
 	const LOG_MAX    = 50;
-
-	// -------------------------------------------------------------------------
-	// Export
-	// -------------------------------------------------------------------------
 
 	/**
 	 * GET /fotogrids/v1/admin/tools/import-export/export
@@ -117,7 +109,6 @@ class Import_Export_Data {
 			$content_type = 'application/json';
 		}
 
-		// Send file download.
 		nocache_headers();
 		header( 'Content-Type: ' . $content_type . '; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
@@ -125,10 +116,6 @@ class Import_Export_Data {
 		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}
-
-	// -------------------------------------------------------------------------
-	// Import
-	// -------------------------------------------------------------------------
 
 	/**
 	 * POST /fotogrids/v1/admin/tools/import-export/import
@@ -158,7 +145,6 @@ class Import_Export_Data {
 			);
 		}
 
-		// Auto-detect format.
 		$format = sanitize_key( $request->get_param( 'format' ) ?? '' );
 		if ( ! in_array( $format, array( 'json', 'xml' ), true ) ) {
 			$format = self::detect_format( $raw );
@@ -194,10 +180,6 @@ class Import_Export_Data {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Log
-	// -------------------------------------------------------------------------
-
 	/**
 	 * GET /fotogrids/v1/admin/tools/import-export/log
 	 *
@@ -211,10 +193,6 @@ class Import_Export_Data {
 		}
 		return new \WP_REST_Response( array( 'log' => $log ), 200 );
 	}
-
-	// =========================================================================
-	// Private - data collection
-	// =========================================================================
 
 	/**
 	 * Collect all requested data types and return a normalised PHP array.
@@ -230,7 +208,6 @@ class Import_Export_Data {
 			),
 		);
 
-		// Galleries.
 		if ( in_array( 'galleries', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
@@ -257,7 +234,6 @@ class Import_Export_Data {
 			);
 		}
 
-		// Albums.
 		if ( in_array( 'albums', $include_types, true ) ) {
 			$posts = get_posts(
 				array(
@@ -284,7 +260,6 @@ class Import_Export_Data {
 			);
 		}
 
-		// Gallery-album relationships.
 		if ( in_array( 'albums', $include_types, true ) || in_array( 'galleries', $include_types, true ) ) {
 			$table                  = $wpdb->prefix . 'fotogrids_gallery_albums';
 			$data['gallery_albums'] = $wpdb->get_results(
@@ -293,7 +268,6 @@ class Import_Export_Data {
 			) ?: array();
 		}
 
-		// Gallery items & metadata.
 		if ( in_array( 'items', $include_types, true ) ) {
 			$table         = $wpdb->prefix . 'fotogrids_item_meta';
 			$data['items'] = $wpdb->get_results(
@@ -301,7 +275,6 @@ class Import_Export_Data {
 				ARRAY_A
 			) ?: array();
 
-			// Item metadata (tag/person/location joins).
 			$meta_table            = $wpdb->prefix . 'fotogrids_item_metadata';
 			$data['item_metadata'] = $wpdb->get_results(
 				"SELECT * FROM {$meta_table}",
@@ -309,7 +282,6 @@ class Import_Export_Data {
 			) ?: array();
 		}
 
-		// Tags / people / locations.
 		if ( in_array( 'tags', $include_types, true ) ) {
 			$table        = $wpdb->prefix . 'fotogrids_tags';
 			$data['tags'] = $wpdb->get_results(
@@ -318,7 +290,6 @@ class Import_Export_Data {
 			) ?: array();
 		}
 
-		// Plugin settings.
 		if ( in_array( 'settings', $include_types, true ) ) {
 			$data['settings'] = array(
 				'media'                             => get_option( 'fotogrids_media_settings', array() ),
@@ -330,7 +301,6 @@ class Import_Export_Data {
 			);
 		}
 
-		// Statistics.
 		if ( in_array( 'statistics', $include_types, true ) ) {
 			$table              = $wpdb->prefix . 'fotogrids_statistics';
 			$data['statistics'] = $wpdb->get_results(
@@ -339,7 +309,7 @@ class Import_Export_Data {
 			) ?: array();
 		}
 
-		// Templates (stored as user meta per user).
+		// Templates are stored as user meta, so collect across all users.
 		if ( in_array( 'templates', $include_types, true ) ) {
 			$users         = get_users( array( 'fields' => array( 'ID' ) ) );
 			$all_templates = array();
@@ -375,10 +345,6 @@ class Import_Export_Data {
 		return $meta;
 	}
 
-	// =========================================================================
-	// Private - serialisers
-	// =========================================================================
-
 	private static function serialise_json( array $data ): string {
 		return wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 	}
@@ -403,7 +369,6 @@ class Import_Export_Data {
 	 */
 	private static function array_to_dom( \DOMDocument $dom, \DOMElement $parent_el, $value ): void {
 		if ( is_array( $value ) ) {
-			// Detect list vs associative.
 			$is_list = array_keys( $value ) === range( 0, count( $value ) - 1 );
 			foreach ( $value as $key => $child ) {
 				$tag_name = $is_list ? 'item' : self::to_xml_tag( (string) $key );
@@ -432,10 +397,6 @@ class Import_Export_Data {
 		}
 		return $tag ? $tag : 'field';
 	}
-
-	// =========================================================================
-	// Private - parsers
-	// =========================================================================
 
 	/** Detect whether raw text is JSON or XML. */
 	private static function detect_format( string $raw ): string {
@@ -519,10 +480,6 @@ class Import_Export_Data {
 		return $data;
 	}
 
-	// =========================================================================
-	// Private - import phases
-	// =========================================================================
-
 	/**
 	 * Analyse phase: count entities and return a summary. Nothing is written.
 	 */
@@ -561,14 +518,12 @@ class Import_Export_Data {
 		$wpdb->query( 'START TRANSACTION' );
 
 		try {
-			// 1. Tags / people / locations.
 			if ( in_array( 'tags', $include, true ) && ! empty( $data['tags'] ) ) {
 				[ $imp, $skip ]   = self::import_tags( $data['tags'] );
 				$imported['tags'] = $imp;
 				$skipped['tags']  = $skip;
 			}
 
-			// 2. Galleries.
 			$gallery_id_map = array(); // old_id => new_id
 			if ( in_array( 'galleries', $include, true ) && ! empty( $data['galleries'] ) ) {
 				[ $imp, $skip, $map ]  = self::import_collections(
@@ -581,7 +536,6 @@ class Import_Export_Data {
 				$gallery_id_map        = $map;
 			}
 
-			// 3. Albums.
 			$album_id_map = array();
 			if ( in_array( 'albums', $include, true ) && ! empty( $data['albums'] ) ) {
 				[ $imp, $skip, $map ] = self::import_collections(
@@ -594,12 +548,10 @@ class Import_Export_Data {
 				$album_id_map         = $map;
 			}
 
-			// 4. Gallery-album relationships.
 			if ( ! empty( $data['gallery_albums'] ) && ( $gallery_id_map || $album_id_map ) ) {
 				self::import_gallery_albums( $data['gallery_albums'], $gallery_id_map, $album_id_map );
 			}
 
-			// 5. Gallery items.
 			$item_attachment_map = array(); // old_attachment_id => new_attachment_id (1:1 on same site)
 			if ( in_array( 'items', $include, true ) && ! empty( $data['items'] ) ) {
 				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map );
@@ -607,24 +559,21 @@ class Import_Export_Data {
 				$skipped['items']  = $skip;
 			}
 
-			// 6. Item metadata (tag/person/location joins) - import after both items and tags.
+			// Item metadata is imported after both items and tags exist.
 			if ( in_array( 'items', $include, true ) && ! empty( $data['item_metadata'] ) ) {
 				self::import_item_metadata( $data['item_metadata'] );
 			}
 
-			// 7. Plugin settings.
 			if ( in_array( 'settings', $include, true ) && ! empty( $data['settings'] ) ) {
 				self::import_settings( $data['settings'] );
 				$imported['settings'] = true;
 			}
 
-			// 8. Statistics.
 			if ( in_array( 'statistics', $include, true ) && ! empty( $data['statistics'] ) ) {
 				[ $imp ]                = self::import_statistics( $data['statistics'], $gallery_id_map, $album_id_map );
 				$imported['statistics'] = $imp;
 			}
 
-			// 9. Templates.
 			if ( in_array( 'templates', $include, true ) && ! empty( $data['templates'] ) ) {
 				[ $imp ]               = self::import_templates( $data['templates'] );
 				$imported['templates'] = $imp;
@@ -644,11 +593,9 @@ class Import_Export_Data {
 			);
 		}
 
-		// Determine status for the log.
 		$total_skipped = array_sum( array_filter( array_values( $skipped ), 'is_int' ) );
 		$status        = $total_skipped > 0 ? 'partial' : 'complete';
 
-		// Build summary string for the log.
 		$summary_parts = array();
 		foreach ( array( 'galleries', 'albums', 'items', 'tags', 'templates' ) as $key ) {
 			if ( isset( $imported[ $key ] ) && $imported[ $key ] > 0 ) {
@@ -680,10 +627,6 @@ class Import_Export_Data {
 			200
 		);
 	}
-
-	// =========================================================================
-	// Private - per-type importers
-	// =========================================================================
 
 	/**
 	 * Import tags. Returns [imported_count, skipped_count].
@@ -752,7 +695,6 @@ class Import_Export_Data {
 			$title  = sanitize_text_field( $post_data['title'] ?? '' );
 			$meta   = is_array( $post_data['meta'] ?? null ) ? $post_data['meta'] : array();
 
-			// Check for slug collision.
 			$existing = get_page_by_path( $slug, OBJECT, $post_type );
 
 			if ( $existing ) {
@@ -854,7 +796,6 @@ class Import_Export_Data {
 			$old_gallery   = (int) ( $item['gallery_id'] ?? 0 );
 			$gallery_id    = $gallery_id_map[ $old_gallery ] ?? $old_gallery;
 
-			// Verify the attachment exists on this site.
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
 				++$skipped;
 				continue;
@@ -969,7 +910,6 @@ class Import_Export_Data {
 			$object_type = sanitize_text_field( $row['object_type'] ?? '' );
 			$object_id   = (int) ( $row['object_id'] ?? 0 );
 
-			// Remap IDs for galleries and albums.
 			if ( 'gallery' === $object_type ) {
 				$object_id = $gallery_map[ $object_id ] ?? 0;
 			} elseif ( 'album' === $object_type ) {
@@ -1008,10 +948,10 @@ class Import_Export_Data {
 		$imported     = 0;
 
 		foreach ( $templates as $tpl ) {
-			unset( $tpl['_user_id'] ); // Remove export-only field.
+			unset( $tpl['_user_id'] ); // Export-only field.
 			$id = $tpl['id'] ?? null;
 			if ( $id && in_array( $id, $existing_ids, true ) ) {
-				continue; // Skip duplicate.
+				continue;
 			}
 			$existing[] = $tpl;
 			++$imported;
@@ -1020,10 +960,6 @@ class Import_Export_Data {
 		update_user_meta( $user_id, 'fotogrids_user_templates', wp_json_encode( $existing ) );
 		return array( $imported );
 	}
-
-	// =========================================================================
-	// Private - helpers
-	// =========================================================================
 
 	/** Generate a slug that doesn't collide with any existing post of the given type. */
 	private static function unique_slug( string $base, string $post_type ): string {

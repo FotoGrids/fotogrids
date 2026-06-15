@@ -1018,10 +1018,8 @@ class Collection_Defaults {
 			'custom_js_allow_dynamic_execution'           => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
 		);
 
-		// Process defaults for is_defaults_page
 		$defaults = self::process_defaults_array( $defaults, $is_defaults_page );
 
-		// Apply filter
 		return apply_filters( Filters_Settings::DEFAULTS_BASE, $defaults, $is_defaults_page );
 	}
 
@@ -1032,7 +1030,6 @@ class Collection_Defaults {
 	 * @return array Gallery-specific default settings
 	 */
 	public static function get_gallery_defaults( $is_defaults_page = false ) {
-		// Gallery-specific defaults can be added here as needed
 		$defaults = array();
 
 		return apply_filters( Filters_Settings::DEFAULTS_GALLERY, $defaults, $is_defaults_page );
@@ -1045,7 +1042,6 @@ class Collection_Defaults {
 	 * @return array Album-specific default settings
 	 */
 	public static function get_album_defaults( $is_defaults_page = false ) {
-		// Album-specific defaults can be added here as needed
 		$defaults = array();
 
 		return apply_filters( Filters_Settings::DEFAULTS_ALBUM, $defaults, $is_defaults_page );

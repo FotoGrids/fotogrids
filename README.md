@@ -12,12 +12,12 @@ root.
 
 ## Requirements
 
-| Tool      | Version            |
-| --------- | ------------------ |
-| PHP       | 8.0+               |
-| WordPress | 6.1+ (tested 6.8)  |
-| Node.js   | 18+                |
-| npm       | 8+                 |
+| Tool      | Version           |
+| --------- | ----------------- |
+| PHP       | 8.0+              |
+| WordPress | 6.1+ (tested 6.8) |
+| Node.js   | 18+               |
+| npm       | 8+                |
 
 ## Getting started
 
@@ -58,39 +58,39 @@ The build output in `dist/` is produced entirely by webpack (including the
 
 ### Build
 
-| Command             | Description                                            |
-| ------------------- | ------------------------------------------------------ |
-| `npm run dev`       | Watch build (development): icons + YAML + webpack       |
-| `npm run build`     | Production build (icons + webpack, minified)            |
-| `npm run build:dev` | One-shot development build (no watch)                   |
-| `npm run clean`     | Remove `dist/`                                          |
-| `npm run icons:build` | Rebuild the loading-icon assets                      |
+| Command               | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `npm run dev`         | Watch build (development): icons + YAML + webpack |
+| `npm run build`       | Production build (icons + webpack, minified)      |
+| `npm run build:dev`   | One-shot development build (no watch)             |
+| `npm run clean`       | Remove `dist/`                                    |
+| `npm run icons:build` | Rebuild the loading-icon assets                   |
 
 ### Package / release
 
-| Command            | Description                                             |
-| ------------------ | ------------------------------------------------------- |
-| `npm run zip:dev`  | Development build, zipped to `fotogrids-dev.zip`        |
-| `npm run zip:prod` | Production build, zipped to `fotogrids-v<version>.zip`  |
-| `npm run release`  | `clean` + `build` + `zip:prod`                          |
+| Command            | Description                                            |
+| ------------------ | ------------------------------------------------------ |
+| `npm run zip:dev`  | Development build, zipped to `fotogrids-dev.zip`       |
+| `npm run zip:prod` | Production build, zipped to `fotogrids-v<version>.zip` |
+| `npm run release`  | `clean` + `build` + `zip:prod`                         |
 
 ### Quality
 
-| Command              | Description                                           |
-| -------------------- | ----------------------------------------------------- |
-| `npm run lint`       | ESLint over `src/assets`                               |
-| `npm run lint:fix`   | ESLint with autofix                                    |
-| `npm run format`     | Prettier over assets and Markdown                      |
-| `npm run type-check` | `tsc --noEmit`                                         |
+| Command              | Description                       |
+| -------------------- | --------------------------------- |
+| `npm run lint`       | ESLint over `src/assets`          |
+| `npm run lint:fix`   | ESLint with autofix               |
+| `npm run format`     | Prettier over assets and Markdown |
+| `npm run type-check` | `tsc --noEmit`                    |
 
 ### Tests
 
-| Command                   | Description                                        |
-| ------------------------- | -------------------------------------------------- |
-| `npm test`                | Jest (JS/TS)                                        |
-| `npm run test:watch`      | Jest in watch mode                                 |
-| `npm run test:coverage`   | Jest with coverage                                 |
-| `npm run test:ci`         | Render guards + PHP integration tests + Jest CI run |
+| Command                 | Description                                         |
+| ----------------------- | --------------------------------------------------- |
+| `npm test`              | Jest (JS/TS)                                        |
+| `npm run test:watch`    | Jest in watch mode                                  |
+| `npm run test:coverage` | Jest with coverage                                  |
+| `npm run test:ci`       | Render guards + PHP integration tests + Jest CI run |
 
 The Jest suite lives in `src/tests/`. The root `tests/` directory holds
 self-contained PHP integration tests (run with the `php` binary, no PHPUnit
@@ -99,22 +99,22 @@ required) and the CI guard scripts under `tests/ci/`. Both are wired into
 
 ### Internationalisation
 
-| Command              | Description                                           |
-| -------------------- | ----------------------------------------------------- |
+| Command                | Description                                           |
+| ---------------------- | ----------------------------------------------------- |
 | `npm run i18n:makepot` | Generate `src/languages/fotogrids.pot` (needs WP-CLI) |
 
 ## Architecture at a glance
 
--   **Backend**: PHP 8.0+, explicit `require_once` bootstrap (no autoloader or
-    service container), custom database tables, REST API under `fotogrids/v1`.
--   **Admin UI**: React 18 (mostly `.jsx`, some `.tsx`) using
-    `@wordpress/components`, mounted into PHP-rendered containers. No SPA router,
-    no Tailwind, no shadcn.
--   **Frontend**: vanilla ES6+ (no jQuery, no React). Galleries and albums are
-    rendered by a modular pipeline under `src/public/render/`; per-gallery JS
-    behaviour attaches via the `window.FotoGrids` runtime.
--   **Free ↔ Pro**: Pro detects Free via the `FOTOGRIDS_VERSION` constant and
-    extends it through filters and actions only.
+- **Backend**: PHP 8.0+, explicit `require_once` bootstrap (no autoloader or
+  service container), custom database tables, REST API under `fotogrids/v1`.
+- **Admin UI**: React 18 (mostly `.jsx`, some `.tsx`) using
+  `@wordpress/components`, mounted into PHP-rendered containers. No SPA router,
+  no Tailwind, no shadcn.
+- **Frontend**: vanilla ES6+ (no jQuery, no React). Galleries and albums are
+  rendered by a modular pipeline under `src/public/render/`; per-gallery JS
+  behaviour attaches via the `window.FotoGrids` runtime.
+- **Free ↔ Pro**: Pro detects Free via the `FOTOGRIDS_VERSION` constant and
+  extends it through filters and actions only.
 
 See `CLAUDE.md` for the authoritative detail on all of the above, including the
 render pipeline stages, the `data-fg-*` attribute convention, and the list of

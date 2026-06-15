@@ -76,9 +76,6 @@
         }
     };
 
-    // -----------------------------------------------------------------------
-    // Style: buttons
-    // -----------------------------------------------------------------------
 
     FilterController.prototype._initButtons = function () {
         let self   = this;
@@ -140,9 +137,6 @@
         } );
     };
 
-    // -----------------------------------------------------------------------
-    // Style: dropdowns
-    // -----------------------------------------------------------------------
 
     FilterController.prototype._initDropdowns = function () {
         let self   = this;
@@ -271,9 +265,6 @@
         } );
     };
 
-    // -----------------------------------------------------------------------
-    // Style: checkboxes
-    // -----------------------------------------------------------------------
 
     FilterController.prototype._initCheckboxes = function () {
         let self   = this;
@@ -318,9 +309,6 @@
         } );
     };
 
-    // -----------------------------------------------------------------------
-    // Filter application + count recalculation
-    // -----------------------------------------------------------------------
 
     /**
      * Convert a data-fg-* attribute name to its dataset key.
@@ -480,9 +468,6 @@
         } );
     };
 
-    // -----------------------------------------------------------------------
-    // Per-gallery attach
-    // -----------------------------------------------------------------------
 
     function attach( galleryEl ) {
         const filterContainer = galleryEl.querySelector( '.fotogrids-filters' );
@@ -501,10 +486,6 @@
         // subscribe to changes.
         registerController( galleryEl, controller );
     }
-
-    // -----------------------------------------------------------------------
-    // Cross-module registry — `FotoGrids.modules.filters`
-    // -----------------------------------------------------------------------
 
     /** @type {WeakMap<Element, FilterController>} */
     const controllersByGallery = new WeakMap();
@@ -639,9 +620,6 @@
         return true;
     }
 
-    // -----------------------------------------------------------------------
-    // Boot
-    // -----------------------------------------------------------------------
 
     function init() {
         exposeFiltersApi();

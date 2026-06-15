@@ -5,10 +5,6 @@
  * webpack entry into includes/modules/Templates/assets/templates-page.css.
  */
 
-/**
- * Templates Page Styles
- */
-
 .fotogrids-templates-page {
     display: flex;
     align-items: flex-start;
@@ -146,16 +142,6 @@
         &.fg-is-active {
             background: #fff;
             font-weight: 600;
-
-            // &:before {
-            //     content: '';
-            //     position: absolute;
-            //     left: 0;
-            //     top: 0;
-            //     height: 100%;
-            //     width: 3px;
-            //     background: var(--fg-blue);
-            // }
 
             &:after {
                 content: '';

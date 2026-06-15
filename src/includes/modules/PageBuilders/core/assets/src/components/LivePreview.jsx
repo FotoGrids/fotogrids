@@ -62,20 +62,12 @@ const LivePreview = ({
         const blockPagination = (event) => {
             const target = event.target;
             if (target && target.closest && target.closest('.fg-pagination, .fg-pagination__btn')) {
-                // eslint-disable-next-line no-console
-                if (window.FOTOGRIDS_DEBUG_PAGINATION) {
-                    console.log('[FotoGrids/LivePreview] pagination guard swallowing click', target);
-                }
                 event.stopPropagation();
                 event.stopImmediatePropagation();
                 event.preventDefault();
             }
         };
         node.addEventListener('click', blockPagination, true);
-        // eslint-disable-next-line no-console
-        if (window.FOTOGRIDS_DEBUG_PAGINATION) {
-            console.log('[FotoGrids/LivePreview] pagination guard bound on', node);
-        }
         return () => node.removeEventListener('click', blockPagination, true);
     }, [pagination]);
 

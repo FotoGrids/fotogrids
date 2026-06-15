@@ -1,5 +1,4 @@
-// =============================================================================
-// FotoGrids - Loading Icon
+// Loading Icon
 //
 // State model - driven by data-fg-media-state on .fg-item (<figure>):
 //
@@ -15,18 +14,14 @@
 //
 // Color: SVGs use fill="currentColor", so --fg-loader-color drives the tint.
 // Falls back to a mid-gray that reads on both light and dark backgrounds.
-// =============================================================================
 
 // .fg-item-media must be position:relative so the absolute loader is contained.
-// collection-base.css already sets it, but we reinforce here in case of overrides.
+// collection-base.css already sets it; reinforced here in case of overrides.
 .fotogrids-collection .fg-item-media {
     position: relative;
 }
 
-// -----------------------------------------------------------------------------
 // Loader container - centred absolutely inside .fg-item-media
-// -----------------------------------------------------------------------------
-
 .fotogrids-collection .fg-item-loader {
     position:        absolute;
     inset:           0;
@@ -46,10 +41,7 @@
     }
 }
 
-// -----------------------------------------------------------------------------
-// Loading state
-// Loader visible, image hidden, anchor clicks blocked.
-// -----------------------------------------------------------------------------
+// Loading state - loader visible, image hidden, anchor clicks blocked.
 
 // Hide the image while it's loading so the loader reads clearly on the
 // background colour rather than competing with a half-decoded image.
@@ -64,11 +56,7 @@
     pointer-events: none;
 }
 
-// -----------------------------------------------------------------------------
-// Loaded state
-// Loader fades out, image fades in.
-// -----------------------------------------------------------------------------
-
+// Loaded state - loader fades out, image fades in.
 .fotogrids-collection .fg-item[data-fg-media-state="loaded"] .fg-item-loader {
     opacity: 0;
 }

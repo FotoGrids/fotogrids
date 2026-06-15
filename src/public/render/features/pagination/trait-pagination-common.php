@@ -109,9 +109,6 @@ trait Pagination_Common {
 			return false;
 		}
 
-		// TODO: also check License_Manager::feature_enabled( 'preload_next_page' )
-		// so the toggle doesn't activate on unlicensed sites even if the
-		// value is somehow saved as true.
 		return true;
 	}
 

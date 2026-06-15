@@ -1,208 +1,212 @@
-/**
- * FotoGrids AJAX Save Styles
- *
- * Styles for the asynchronous saving functionality
- */
-
-// Import colors for SCSS variables
 @use './colors.scss' as *;
 
 .fotogrids-save-status {
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    transition: all 0.3s ease;
+	margin: 10px 0;
+	padding: 10px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+	transition: all 0.3s ease;
 
-    &.loading {
-        background: #f0f6fc;
-        border: 1px solid #c3dcf3;
-        color: var(--fg-blue);
-    }
+	&.loading {
+		background: #f0f6fc;
+		border: 1px solid #c3dcf3;
+		color: var(--fg-blue);
+	}
 
-    &.success {
-        background: #f0f8f0;
-        border: 1px solid #c6e1c6;
-        color: #00a32a;
-    }
+	&.success {
+		background: #f0f8f0;
+		border: 1px solid #c6e1c6;
+		color: #00a32a;
+	}
 
-    &.error {
-        background: #fdf2f2;
-        border: 1px solid #f1c2c2;
-        color: #d63638;
-    }
+	&.error {
+		background: #fdf2f2;
+		border: 1px solid #f1c2c2;
+		color: #d63638;
+	}
 
-    &:not(.loading) .fotogrids-save-spinner {
-        display: none;
-    }
+	&:not(.loading) .fotogrids-save-spinner {
+		display: none;
+	}
 }
 
 .fotogrids-save-message {
-    flex: 1;
-    font-weight: 500;
+	flex: 1;
+	font-weight: 500;
 }
 
 .fotogrids-save-spinner {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 
-    .spinner {
-        float: none;
-        margin: 0;
-        width: 16px;
-        height: 16px;
-    }
+	.spinner {
+		float: none;
+		margin: 0;
+		width: 16px;
+		height: 16px;
+	}
 }
 
 .misc-pub-fg-last-saved {
-    &:before {
-        content: '\f15e';
-        color: var(--fg-text-tertiary);
-        font: normal 20px / 1 dashicons;
-        display: inline-block;
-        margin-left: -1px;
-        padding-right: 3px;
-        vertical-align: top;
-        -webkit-font-smoothing: antialiased;
-    }
+	&:before {
+		content: '\f15e';
+		color: var(--fg-text-tertiary);
+		font: normal 20px / 1 dashicons;
+		display: inline-block;
+		margin-left: -1px;
+		padding-right: 3px;
+		vertical-align: top;
+		-webkit-font-smoothing: antialiased;
+	}
 
-    .timestamp {
-        font-weight: 600;
-    }
+	.timestamp {
+		font-weight: 600;
+	}
 }
 
 .fotogrids-unsaved-changes {
-    border-top: 1px solid #dcdcde;
+	border-top: 1px solid #dcdcde;
 
-    &__btn {
-        margin: 10px;
-        padding: 8px 12px;
-        background: rgba($fotogrids-colors-blue, 0.1);
-        border: 1px solid rgba($fotogrids-colors-blue, 0.3);
-        border-radius: 4px;
-        color: $fotogrids-colors-blue;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 500;
+	&__btn {
+		margin: 10px;
+		padding: 8px 12px;
+		background: rgba($fotogrids-colors-blue, 0.1);
+		border: 1px solid rgba($fotogrids-colors-blue, 0.3);
+		border-radius: 4px;
+		color: $fotogrids-colors-blue;
+		font-size: 13px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-weight: 500;
 
-        .dashicons {
-            font-size: 16px;
-            width: 16px;
-            height: 16px;
-            margin: 0;
-        }
-    }
+		.dashicons {
+			font-size: 16px;
+			width: 16px;
+			height: 16px;
+			margin: 0;
+		}
+	}
 }
 
 #publish.fotogrids-has-changes:not([disabled]),
 #save-post.fotogrids-has-changes:not([disabled]) {
-    background: var(--fg-blue) !important;
-    border-color: var(--fg-blue-dark) !important;
-    animation: pulse-changes 2s infinite;
-    transition: all 0.3s ease;
+	background: var(--fg-blue) !important;
+	border-color: var(--fg-blue-dark) !important;
+	animation: pulse-changes 2s infinite;
+	transition: all 0.3s ease;
 
-    &:hover {
-        background: var(--fg-blue-hover) !important;
-        border-color: var(--fg-blue-dark) !important;
-    }
+	&:hover {
+		background: var(--fg-blue-hover) !important;
+		border-color: var(--fg-blue-dark) !important;
+	}
 
-    &:active {
-        background: var(--fg-blue-dark) !important;
-        border-color: var(--fg-blue-dark) !important;
-    }
+	&:active {
+		background: var(--fg-blue-dark) !important;
+		border-color: var(--fg-blue-dark) !important;
+	}
 }
 
 @keyframes pulse-changes {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba($fotogrids-colors-blue, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
-    }
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba($fotogrids-colors-blue, 0.4);
+	}
+	50% {
+		box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
+	}
 }
 
 #wp-admin-bar-fotogrids-quick-save {
-    .ab-icon {
-        margin-right: 5px !important;
+	.ab-icon {
+		margin-right: 5px !important;
 
-        &:before {
-            font-size: 16px;
-            line-height: 1;
-        }
-    }
+		&:before {
+			font-size: 16px;
+			line-height: 1;
+		}
+	}
 
-    &:hover .ab-item {
-        background: rgba(0, 0, 0, 0.1);
-    }
+	&:hover .ab-item {
+		background: rgba(0, 0, 0, 0.1);
+	}
 
-    .ab-label {
-        @media (max-width: 782px) {
-            display: none;
-        }
-    }
+	.ab-label {
+		@media (max-width: 782px) {
+			display: none;
+		}
+	}
 
-    &:focus {
-        outline: 2px solid var(--fg-blue);
-        outline-offset: 2px;
-    }
+	&:focus {
+		outline: 2px solid var(--fg-blue);
+		outline-offset: 2px;
+	}
 }
 
 #post.saving {
-    input, textarea, select, button {
-        opacity: 0.7;
-        pointer-events: none;
-    }
+	input,
+	textarea,
+	select,
+	button {
+		opacity: 0.7;
+		pointer-events: none;
+	}
 }
 
 @keyframes fadeInSuccess {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 @keyframes shakeError {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-5px);
+	}
+	75% {
+		transform: translateX(5px);
+	}
 }
 
 .fotogrids-save-status {
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 
-    &.success {
-        animation: fadeInSuccess 0.3s ease-out;
-    }
+	&.success {
+		animation: fadeInSuccess 0.3s ease-out;
+	}
 
-    &.error {
-        animation: shakeError 0.5s ease-out;
-    }
+	&.error {
+		animation: shakeError 0.5s ease-out;
+	}
 }
 
 @media (max-width: 782px) {
-    .fotogrids-save-status {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-    }
+	.fotogrids-save-status {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 5px;
+	}
 
-    .fotogrids-save-spinner {
-        align-self: center;
-    }
+	.fotogrids-save-spinner {
+		align-self: center;
+	}
 }
 
 @media print {
-    .fotogrids-save-status,
-    #wp-admin-bar-fotogrids-quick-save {
-        display: none !important;
-    }
+	.fotogrids-save-status,
+	#wp-admin-bar-fotogrids-quick-save {
+		display: none !important;
+	}
 }

@@ -219,10 +219,6 @@ final class Collection_Header implements Feature {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Internal — resolution + rendering
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Combine the Breadcrumb_Resolver result, the album's saved settings, and
 	 * the current placement into a single decision record. Returns null when

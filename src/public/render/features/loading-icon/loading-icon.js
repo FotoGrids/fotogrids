@@ -27,10 +27,6 @@
     const STATE_ATTR   = 'data-fg-media-state';
     const STATE_LOADED = 'loaded';
 
-    // -------------------------------------------------------------------------
-    // Handle map - shared with the inline per-gallery script
-    // -------------------------------------------------------------------------
-
     /**
      * Returns the global WeakMap where inline scripts store animation handles.
      * Creates it if it doesn't exist yet (handles the race where loading-icon.js
@@ -46,9 +42,6 @@
         return window.fgLoaderHandles;
     }
 
-    // -------------------------------------------------------------------------
-    // Animation cancellation
-    // -------------------------------------------------------------------------
 
     /**
      * Cancels all WAAPI Animation objects and rAF handles stored for an item.
@@ -74,9 +67,6 @@
         getHandleMap().delete( item );
     }
 
-    // -------------------------------------------------------------------------
-    // State management
-    // -------------------------------------------------------------------------
 
     /**
      * Marks a .fg-item as fully loaded: cancels its loader animations and sets
@@ -214,9 +204,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Bootstrap
-    // -------------------------------------------------------------------------
 
     /**
      * Initial pass - wire every gallery already in the DOM.

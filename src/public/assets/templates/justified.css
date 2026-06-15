@@ -27,7 +27,6 @@
     display: block;
 }
 
-/* Row height variations */
 .fotogrids-layout-justified[data-row-height="small"] .fotogrids-item {
     height: 200px;
 }
@@ -49,7 +48,6 @@
     margin-right: 100%;
 }
 
-/* Responsive adjustments */
 @media (max-width: 767px) {
     .fotogrids-layout-justified {
         gap: 0.5rem;
@@ -150,7 +148,6 @@
     }
 }
 
-/* Animation for loading */
 .fotogrids-layout-justified .fotogrids-item {
     opacity: 0;
     transform: translateY(20px);
@@ -164,7 +161,6 @@
     }
 }
 
-/* Staggered animation delay */
 .fotogrids-layout-justified .fotogrids-item:nth-child(1) { animation-delay: 0.1s; }
 .fotogrids-layout-justified .fotogrids-item:nth-child(2) { animation-delay: 0.2s; }
 .fotogrids-layout-justified .fotogrids-item:nth-child(3) { animation-delay: 0.3s; }
@@ -173,7 +169,6 @@
 .fotogrids-layout-justified .fotogrids-item:nth-child(6) { animation-delay: 0.6s; }
 .fotogrids-layout-justified .fotogrids-item:nth-child(n+7) { animation-delay: 0.7s; }
 
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .fotogrids-layout-justified .fotogrids-item {
         opacity: 1;

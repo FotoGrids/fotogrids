@@ -16,8 +16,6 @@
     color: var( --fg-lb-info-text, rgba( 255, 255, 255, 0.85 ) );
 }
 
-/* Toolbar — sticky top bar. */
-
 .fg-lb-grid-toolbar {
     flex: 0 0 auto;
     display: flex;
@@ -78,8 +76,6 @@
     height: 18px;
     flex: 0 0 auto;
 }
-
-/* Content — the scrollable region. */
 
 .fg-lb-grid-content {
     flex: 1 1 auto;
@@ -152,8 +148,6 @@
     outline-offset: 2px;
 }
 
-/* Video tiles get a play badge. */
-
 .fg-lb-grid-tile--video::after {
     content: "";
     position: absolute;
@@ -168,8 +162,6 @@
     filter: drop-shadow( 0 0 3px rgba( 0, 0, 0, 0.6 ) );
     pointer-events: none;
 }
-
-/* Mobile — single column. */
 
 @media ( max-width: 600px ) {
     .fg-lb-grid-row--pair {

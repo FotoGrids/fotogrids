@@ -1,156 +1,153 @@
-// Upload Area Component
-// Standalone drag-and-drop zone for image uploads
-
-// .fotogrids-upload-area-wrapper {}
-
 .fotogrids-upload-area {
-    border: 1px dashed var(--fg-border-secondary);
-    border-radius: 8px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	border: 1px dashed var(--fg-border-secondary);
+	border-radius: 8px;
+	padding: 1.5rem;
+	text-align: center;
+	transition: all 0.2s ease;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 
-    &:hover:not(.fotogrids-upload-area--uploading) {
-        border-color: var(--fg-blue);
-        background: var(--fg-background-secondary, #f6f7f7);
+	&:hover:not(.fotogrids-upload-area--uploading) {
+		border-color: var(--fg-blue);
+		background: var(--fg-background-secondary, #f6f7f7);
 
-        h4 {
-            color: var(--fg-blue);
-        }
+		h4 {
+			color: var(--fg-blue);
+		}
 
-        .fotogrids-upload-area__icon-folder {
-            opacity: 1;
-            color: var(--fg-blue);
-        }
-    }
+		.fotogrids-upload-area__icon-folder {
+			opacity: 1;
+			color: var(--fg-blue);
+		}
+	}
 
-    &--dragging {
-        border-color: var(--fg-blue);
-        background: #e8eaff;
-    }
+	&--dragging {
+		border-color: var(--fg-blue);
+		background: #e8eaff;
+	}
 
-    &--uploading {
-        pointer-events: none;
-        opacity: 0.9;
-    }
+	&--uploading {
+		pointer-events: none;
+		opacity: 0.9;
+	}
 
-    .fotogrids-upload-area__icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0;
-        line-height: 0;
-        position: relative;
-        margin-bottom: 12px;
+	.fotogrids-upload-area__icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0;
+		line-height: 0;
+		position: relative;
+		margin-bottom: 12px;
 
-        .fotogrids-upload-area__icon-folder {
-            transition: all 0.1s ease;
-            opacity: 0.3;
+		.fotogrids-upload-area__icon-folder {
+			transition: all 0.1s ease;
+			opacity: 0.3;
 
-            svg {
-                width: 36px;
-                height: auto;
-                color: inherit;
-                transition: all 0.1s ease;
+			svg {
+				width: 36px;
+				height: auto;
+				color: inherit;
+				transition: all 0.1s ease;
 
-                path {
-                    stroke-width: 1.5;
-                }
-            }
-        }
+				path {
+					stroke-width: 1.5;
+				}
+			}
+		}
 
-        .fotogrids-upload-area__icon-plus {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: var(--fg-blue);
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+		.fotogrids-upload-area__icon-plus {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			background: var(--fg-blue);
+			border-radius: 50%;
+			width: 16px;
+			height: 16px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 
-            svg {
-                width: 12px;
-                height: auto;
-                color: white;
+			svg {
+				width: 12px;
+				height: auto;
+				color: white;
 
-                path {
-                    stroke-width: 3;
-                }
-            }
-        }
-    }
+				path {
+					stroke-width: 3;
+				}
+			}
+		}
+	}
 
-    h4, p {
-        margin: 0;
-    }
+	h4,
+	p {
+		margin: 0;
+	}
 }
 
 .fotogrids-upload-area__progress {
-    width: 100%;
-    max-width: 200px;
+	width: 100%;
+	max-width: 200px;
 
-    .fotogrids-upload-area__progress-bar {
-        height: 6px;
-        background: var(--fg-border-light, #f0f0f0);
-        border-radius: 3px;
-        overflow: hidden;
-        margin-bottom: 8px;
-    }
+	.fotogrids-upload-area__progress-bar {
+		height: 6px;
+		background: var(--fg-border-light, #f0f0f0);
+		border-radius: 3px;
+		overflow: hidden;
+		margin-bottom: 8px;
+	}
 
-    .fotogrids-upload-area__progress-fill {
-        height: 100%;
-        background: var(--fg-blue);
-        transition: width 0.2s ease;
-    }
+	.fotogrids-upload-area__progress-fill {
+		height: 100%;
+		background: var(--fg-blue);
+		transition: width 0.2s ease;
+	}
 
-    p {
-        font-size: 12px;
-        color: var(--fg-text-secondary);
-    }
+	p {
+		font-size: 12px;
+		color: var(--fg-text-secondary);
+	}
 }
 
 .fotogrids-upload-area__error {
-    margin-top: 10px;
-    padding: 10px;
+	margin-top: 10px;
+	padding: 10px;
 }
 
 // "or choose from media library" link (used with UploadArea)
 .fotogrids-upload-or {
-    opacity: 1;
-    text-align: center;
-    margin: 0;
+	opacity: 1;
+	text-align: center;
+	margin: 0;
 
-    &__link {
-        color: var(--fg-blue);
-        text-decoration: none;
-        position: relative;
-        transition: color 0.2s ease;
+	&__link {
+		color: var(--fg-blue);
+		text-decoration: none;
+		position: relative;
+		transition: color 0.2s ease;
 
-        &::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background-color: var(--fg-blue);
-            transition: width 0.3s ease;
-        }
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: -2px;
+			left: 0;
+			width: 0;
+			height: 1px;
+			background-color: var(--fg-blue);
+			transition: width 0.3s ease;
+		}
 
-        &:hover, &:active {
-            color: var(--fg-blue);
+		&:hover,
+		&:active {
+			color: var(--fg-blue);
 
-            &::after {
-                width: 100%;
-            }
-        }
-    }
+			&::after {
+				width: 100%;
+			}
+		}
+	}
 }

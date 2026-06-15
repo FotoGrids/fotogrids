@@ -3,56 +3,62 @@ import { emit, on, off } from './events';
 import { useModal } from '../hooks/useModal';
 import { useModalContext } from '../hooks/useModalContext';
 
-const wrapConfirm = (variant) => (opts = {}) =>
-    new Promise((resolve) => {
-        modalRegistry.open({
-            type: 'confirm',
-            variant,
-            ...opts,
-            onConfirm: async () => {
-                if (typeof opts.onConfirm === 'function') {
-                    await opts.onConfirm();
-                }
-                resolve(true);
-            },
-            onClose: (reason) => {
-                opts.onClose?.(reason);
-                if (reason !== 'confirm') resolve(false);
-            },
-        });
-    });
+const wrapConfirm =
+	variant =>
+	(opts = {}) =>
+		new Promise(resolve => {
+			modalRegistry.open({
+				type: 'confirm',
+				variant,
+				...opts,
+				onConfirm: async () => {
+					if (typeof opts.onConfirm === 'function') {
+						await opts.onConfirm();
+					}
+					resolve(true);
+				},
+				onClose: reason => {
+					opts.onClose?.(reason);
+					if (reason !== 'confirm') resolve(false);
+				},
+			});
+		});
 
-const wrapPrompt = (variant) => (opts = {}) =>
-    new Promise((resolve) => {
-        modalRegistry.open({
-            type: 'prompt',
-            variant,
-            ...opts,
-            onSubmit: async (value) => {
-                if (typeof opts.onSubmit === 'function') {
-                    await opts.onSubmit(value);
-                }
-                resolve(value);
-            },
-            onClose: (reason) => {
-                opts.onClose?.(reason);
-                if (reason !== 'confirm') resolve(null);
-            },
-        });
-    });
+const wrapPrompt =
+	variant =>
+	(opts = {}) =>
+		new Promise(resolve => {
+			modalRegistry.open({
+				type: 'prompt',
+				variant,
+				...opts,
+				onSubmit: async value => {
+					if (typeof opts.onSubmit === 'function') {
+						await opts.onSubmit(value);
+					}
+					resolve(value);
+				},
+				onClose: reason => {
+					opts.onClose?.(reason);
+					if (reason !== 'confirm') resolve(null);
+				},
+			});
+		});
 
-const wrapAlert = (variant) => (opts = {}) =>
-    new Promise((resolve) => {
-        modalRegistry.open({
-            type: 'alert',
-            variant,
-            ...opts,
-            onClose: (reason) => {
-                opts.onClose?.(reason);
-                resolve();
-            },
-        });
-    });
+const wrapAlert =
+	variant =>
+	(opts = {}) =>
+		new Promise(resolve => {
+			modalRegistry.open({
+				type: 'alert',
+				variant,
+				...opts,
+				onClose: reason => {
+					opts.onClose?.(reason);
+					resolve();
+				},
+			});
+		});
 
 /**
  * Install the public modal API on window.FotoGridsAdmin.modal. Called once
@@ -76,33 +82,33 @@ const wrapAlert = (variant) => (opts = {}) =>
  *   tab-changed detail: { modalId, fromTab, toTab }
  */
 export const installPublicApi = () => {
-    if (typeof window === 'undefined') return;
+	if (typeof window === 'undefined') return;
 
-    window.FotoGridsAdmin = window.FotoGridsAdmin || {};
-    if (window.FotoGridsAdmin.modal) return;
+	window.FotoGridsAdmin = window.FotoGridsAdmin || {};
+	if (window.FotoGridsAdmin.modal) return;
 
-    window.FotoGridsAdmin.modal = {
-        open:    (opts) => modalRegistry.open(opts),
-        close:   (id) => modalRegistry.close(id),
-        closeAll: () => modalRegistry.closeAll(),
+	window.FotoGridsAdmin.modal = {
+		open: opts => modalRegistry.open(opts),
+		close: id => modalRegistry.close(id),
+		closeAll: () => modalRegistry.closeAll(),
 
-        confirm: wrapConfirm('question'),
-        prompt:  wrapPrompt('question'),
-        alert:   wrapAlert('info'),
+		confirm: wrapConfirm('question'),
+		prompt: wrapPrompt('question'),
+		alert: wrapAlert('info'),
 
-        info:     wrapAlert('info'),
-        success:  wrapAlert('success'),
-        warning:  wrapConfirm('warning'),
-        danger:   wrapConfirm('danger'),
-        question: wrapConfirm('question'),
+		info: wrapAlert('info'),
+		success: wrapAlert('success'),
+		warning: wrapConfirm('warning'),
+		danger: wrapConfirm('danger'),
+		question: wrapConfirm('question'),
 
-        on,
-        off,
-        emit,
+		on,
+		off,
+		emit,
 
-        hooks: {
-            useModal,
-            useModalContext,
-        },
-    };
+		hooks: {
+			useModal,
+			useModalContext,
+		},
+	};
 };

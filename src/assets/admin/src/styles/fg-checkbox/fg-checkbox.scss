@@ -1,6 +1,6 @@
 @use '../colors.scss' as *;
 
-// ── Sizing tokens ─────────────────────────────────────────────────────────────
+// Sizing tokens
 $fg-checkbox-size-sm: 14px;
 $fg-checkbox-size-md: 18px;
 $fg-checkbox-size-lg: 22px;
@@ -8,128 +8,139 @@ $fg-checkbox-radius: 4px;
 $fg-checkbox-border: 1.5px;
 
 .fg-checkbox__wrapper {
-    display: inline-flex;
-    flex-direction: column;
-    gap: 8px;
+	display: inline-flex;
+	flex-direction: column;
+	gap: 8px;
 
-    .fg-checkbox__description {
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 1.5;
-        color: var(--fg-text-secondary);
-    }
+	.fg-checkbox__description {
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 1.5;
+		color: var(--fg-text-secondary);
+	}
 }
 
 .fg-checkbox {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    user-select: none;
-    line-height: 1.4;
-    color: var(--fg-text-primary);
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	user-select: none;
+	line-height: 1.4;
+	color: var(--fg-text-primary);
 
-    &--disabled {
-        cursor: not-allowed;
-        opacity: 0.55;
-    }
+	&--disabled {
+		cursor: not-allowed;
+		opacity: 0.55;
+	}
 
-    &__label {
-        font-size: 13px;
+	&__label {
+		font-size: 13px;
 
-        &--stronger {
-            font-weight: 500;
-        }
-    }
+		&--stronger {
+			font-weight: 500;
+		}
+	}
 }
 
-// ── Control (input + visual box) ──────────────────────────────────────────────
+// Control (input + visual box)
 .fg-checkbox__control {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: $fg-checkbox-size-md;
-    height: $fg-checkbox-size-md;
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: $fg-checkbox-size-md;
+	height: $fg-checkbox-size-md;
 }
 
 .fg-checkbox__input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    cursor: inherit;
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	opacity: 0;
+	cursor: inherit;
 
-    // Keep the native input on top so it owns click/focus.
-    z-index: 1;
+	// Keep the native input on top so it owns click/focus.
+	z-index: 1;
 }
 
 .fg-checkbox__box {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--fg-background-primary, #fff);
-    border: $fg-checkbox-border solid var(--fg-border-dark, #8c8f94);
-    border-radius: $fg-checkbox-radius;
-    box-sizing: border-box;
-    transition:
-        background-color 0.15s ease,
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
-    color: #fff;
-    pointer-events: none;
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--fg-background-primary, #fff);
+	border: $fg-checkbox-border solid var(--fg-border-dark, #8c8f94);
+	border-radius: $fg-checkbox-radius;
+	box-sizing: border-box;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease,
+		box-shadow 0.15s ease;
+	color: #fff;
+	pointer-events: none;
 }
 
 .fg-checkbox__check {
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transform: scale(0.6);
-    transition: opacity 0.12s ease, transform 0.12s ease;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	transform: scale(0.6);
+	transition:
+		opacity 0.12s ease,
+		transform 0.12s ease;
 }
 
-.fg-checkbox__dash-path { display: none; }
+.fg-checkbox__dash-path {
+	display: none;
+}
 
-// ── States ────────────────────────────────────────────────────────────────────
+// States
 .fg-checkbox:hover:not(.fg-checkbox--disabled) .fg-checkbox__box {
-    border-color: var(--fg-blue);
+	border-color: var(--fg-blue);
 }
 
 .fg-checkbox__input:focus-visible + .fg-checkbox__box {
-    border-color: var(--fg-blue);
-    box-shadow: 0 0 0 3px rgba($fotogrids-colors-blue, 0.18);
+	border-color: var(--fg-blue);
+	box-shadow: 0 0 0 3px rgba($fotogrids-colors-blue, 0.18);
 }
 
 .fg-checkbox--checked .fg-checkbox__box,
 .fg-checkbox--indeterminate .fg-checkbox__box {
-    background: var(--fg-blue);
-    border-color: var(--fg-blue);
+	background: var(--fg-blue);
+	border-color: var(--fg-blue);
 }
 
 .fg-checkbox--checked .fg-checkbox__check {
-    opacity: 1;
-    transform: scale(1);
+	opacity: 1;
+	transform: scale(1);
 }
 
 .fg-checkbox--indeterminate {
-    .fg-checkbox__check { opacity: 1; transform: scale(1); }
-    .fg-checkbox__check-path { display: none; }
-    .fg-checkbox__dash-path { display: inline; }
+	.fg-checkbox__check {
+		opacity: 1;
+		transform: scale(1);
+	}
+	.fg-checkbox__check-path {
+		display: none;
+	}
+	.fg-checkbox__dash-path {
+		display: inline;
+	}
 }
 
-// ── Size modifiers ────────────────────────────────────────────────────────────
+// Size modifiers
 .fg-checkbox--size-sm .fg-checkbox__control {
-    width: $fg-checkbox-size-sm;
-    height: $fg-checkbox-size-sm;
+	width: $fg-checkbox-size-sm;
+	height: $fg-checkbox-size-sm;
 }
 
 .fg-checkbox--size-lg .fg-checkbox__control {
-    width: $fg-checkbox-size-lg;
-    height: $fg-checkbox-size-lg;
+	width: $fg-checkbox-size-lg;
+	height: $fg-checkbox-size-lg;
 }

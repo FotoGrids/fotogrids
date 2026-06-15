@@ -20,57 +20,58 @@ const MODAL_ROOT_ID = 'fotogrids-modal-root';
 const UPGRADE_MODAL_ID = 'fotogrids-upgrade-modal';
 
 function ensureContainer(id) {
-    let container = document.getElementById(id);
-    if (!container) {
-        container = document.createElement('div');
-        container.id = id;
-        document.body.appendChild(container);
-    }
-    return container;
+	let container = document.getElementById(id);
+	if (!container) {
+		container = document.createElement('div');
+		container.id = id;
+		document.body.appendChild(container);
+	}
+	return container;
 }
 
 function mountReactRoot(container, element) {
-    if (container._reactRootContainer) {
-        container._reactRootContainer.render(element);
-        return;
-    }
-    const root = createRoot(container);
-    container._reactRootContainer = root;
-    root.render(element);
+	if (container._reactRootContainer) {
+		container._reactRootContainer.render(element);
+		return;
+	}
+	const root = createRoot(container);
+	container._reactRootContainer = root;
+	root.render(element);
 }
 
 function initializeModalRoot() {
-    const container = ensureContainer(MODAL_ROOT_ID);
-    mountReactRoot(container, React.createElement(ModalRoot));
+	const container = ensureContainer(MODAL_ROOT_ID);
+	mountReactRoot(container, React.createElement(ModalRoot));
 }
 
 function initializeUpgradeModal() {
-    if (window.fotogridsIsPro === true) return;
-    if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage) return;
+	if (window.fotogridsIsPro === true) return;
+	if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage)
+		return;
 
-    const container = document.getElementById(UPGRADE_MODAL_ID);
-    if (!container) return;
+	const container = document.getElementById(UPGRADE_MODAL_ID);
+	if (!container) return;
 
-    mountReactRoot(container, React.createElement(UpgradeModal));
+	mountReactRoot(container, React.createElement(UpgradeModal));
 }
 
 function bootstrap() {
-    installPublicApi();
-    installPermissionsApi();
-    try {
-        initializeModalRoot();
-    } catch (error) {
-        console.error('FotoGrids: failed to mount ModalRoot', error);
-    }
-    try {
-        initializeUpgradeModal();
-    } catch (error) {
-        console.error('FotoGrids: failed to mount UpgradeModal', error);
-    }
+	installPublicApi();
+	installPermissionsApi();
+	try {
+		initializeModalRoot();
+	} catch (error) {
+		console.error('FotoGrids: failed to mount ModalRoot', error);
+	}
+	try {
+		initializeUpgradeModal();
+	} catch (error) {
+		console.error('FotoGrids: failed to mount UpgradeModal', error);
+	}
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bootstrap);
+	document.addEventListener('DOMContentLoaded', bootstrap);
 } else {
-    bootstrap();
+	bootstrap();
 }

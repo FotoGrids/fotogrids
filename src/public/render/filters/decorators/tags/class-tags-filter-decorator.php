@@ -158,10 +158,6 @@ final class Tags_Filter_Decorator implements Decorator {
 		return new Module_Assets();
 	}
 
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Fetches tag slugs for all given attachment IDs in a single query.
 	 *

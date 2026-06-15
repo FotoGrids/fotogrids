@@ -190,7 +190,6 @@ const PluginSettingsPage = () => {
             url.searchParams.delete('field');
             window.history.replaceState({}, '', url.toString());
         } catch ( _e ) {
-            // History API unavailable - fail silently.
         }
     };
 
@@ -208,7 +207,6 @@ const PluginSettingsPage = () => {
             url.searchParams.delete('field');
             window.history.replaceState({}, '', url.toString());
         } catch ( _e ) {
-            // History API unavailable - fail silently.
         }
     };
 

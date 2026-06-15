@@ -20,7 +20,6 @@ const apiFetch = wp.apiFetch;
 const DEFAULT_PER_PAGE = 50;
 const SEARCH_DEBOUNCE_MS = 300;
 
-// ─── Row component ────────────────────────────────────────────────────────────
 // Memoised so that only the row(s) whose props actually changed re-render when
 // the parent updates (e.g. a different row enters edit mode, selectedIds changes
 // for one item, or a new page of data arrives).
@@ -166,10 +165,8 @@ const LibraryTableRow = memo(({
 
 LibraryTableRow.displayName = 'LibraryTableRow';
 
-// ─── Toolbar component ────────────────────────────────────────────────────────
-// Owns the search input and unused-only toggle. Debounces internally so
-// LibraryTabBase never re-renders on a raw keystroke - it only hears the
-// stabilised value via onSearchChange.
+// Debounces internally so LibraryTabBase never re-renders on a raw keystroke -
+// it only hears the stabilised value via onSearchChange.
 const LibraryTableToolbar = memo(({
     entityType,
     canManage,
@@ -183,7 +180,6 @@ const LibraryTableToolbar = memo(({
     const [search, setSearch] = useState('');
     const [unusedOnly, setUnusedOnly] = useState(false);
 
-    // Debounce: notify parent only after the user stops typing.
     useEffect(() => {
         const t = setTimeout(() => onSearchChange(search.trim()), SEARCH_DEBOUNCE_MS);
         return () => clearTimeout(t);
@@ -323,7 +319,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     const restBase = library.restBase || 'fotogrids/v1/library';
     const canManage = Boolean(library.canManage);
 
-    // ─── List state ──────────────────────────────────────────────────────────
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
@@ -335,7 +330,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // ─── Selection / inline state ────────────────────────────────────────────
     const [selectedIds, setSelectedIds] = useState(new Set());
     const [editingId, setEditingId] = useState(null);
     const [editingDraft, setEditingDraft] = useState({});
@@ -346,7 +340,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     const [mergeOpen, setMergeOpen] = useState(false);
     const [recalcing, setRecalcing] = useState(false);
 
-    // ─── Data load ───────────────────────────────────────────────────────────
     const reqIdRef = useRef(0);
     const loadList = useCallback(() => {
         const reqId = ++reqIdRef.current;
@@ -382,7 +375,6 @@ const LibraryTabBase = ({ entityType, config }) => {
     // Reset to page 1 when the filter/search/sort changes.
     useEffect(() => { setPage(1); }, [debouncedSearch, orderby, order, unusedOnly]);
 
-    // ─── Toolbar / filter callbacks ───────────────────────────────────────────
     const handleSearchChange = useCallback((value) => {
         setDebouncedSearch(value);
     }, []);
@@ -391,7 +383,6 @@ const LibraryTabBase = ({ entityType, config }) => {
         setUnusedOnly(value);
     }, []);
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
     const totalPages = Math.max(1, Math.ceil(total / perPage));
 
     const toggleSelected = useCallback((id) => {
@@ -431,7 +422,6 @@ const LibraryTabBase = ({ entityType, config }) => {
         }
     }, []);
 
-    // ─── Inline rename ───────────────────────────────────────────────────────
     const startEdit = useCallback((item) => {
         setEditingId(item.id);
         const draft = { name: item.name };
@@ -492,7 +482,6 @@ const LibraryTabBase = ({ entityType, config }) => {
             });
     }, [editingId, editingDraft, entityType.type, entityType.slug, restBase, cancelEdit, flashNotice]);
 
-    // ─── Delete ──────────────────────────────────────────────────────────────
     const requestDelete = useCallback((item) => {
         setDeleteTarget(item);
     }, []);
@@ -538,7 +527,6 @@ const LibraryTabBase = ({ entityType, config }) => {
             });
     }, [deleteTarget, entityType.slug, entityType.label_singular, restBase, cancelDelete, flashNotice]);
 
-    // ─── Bulk delete ─────────────────────────────────────────────────────────
     const confirmBulkDelete = () => {
         const ids = Array.from(selectedIds);
         if (ids.length === 0) return;
@@ -578,7 +566,6 @@ const LibraryTabBase = ({ entityType, config }) => {
             });
     };
 
-    // ─── Create ──────────────────────────────────────────────────────────────
     const openCreate = () => {
         const draft = { name: '' };
         if (entityType.type === 'location') { draft.latitude = ''; draft.longitude = ''; }
@@ -629,7 +616,6 @@ const LibraryTabBase = ({ entityType, config }) => {
             });
     };
 
-    // ─── Merge ───────────────────────────────────────────────────────────────
     const openMerge = () => setMergeOpen(true);
     const closeMerge = () => setMergeOpen(false);
 
@@ -668,7 +654,6 @@ const LibraryTabBase = ({ entityType, config }) => {
         });
     };
 
-    // ─── Recalculate ─────────────────────────────────────────────────────────
     const handleRecalc = () => {
         setRecalcing(true);
         apiFetch({
@@ -705,13 +690,11 @@ const LibraryTabBase = ({ entityType, config }) => {
             .finally(() => setRecalcing(false));
     };
 
-    // ─── Render ──────────────────────────────────────────────────────────────
     const allSelectedOnPage = items.length > 0 && selectedIds.size === items.length;
     const someSelectedOnPage = items.length > 0 && selectedIds.size > 0 && selectedIds.size < items.length;
 
     return (
         <Panel
-            // className={`fotogrids-library-tab fotogrids-library-tab-${entityType.slug}`}
             equalBodyPadding
         >
             <LibraryTableToolbar

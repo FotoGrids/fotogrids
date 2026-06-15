@@ -28,7 +28,7 @@ const Tooltip = ( { children, content, position = 'top' } ) => {
         const bubble  = bubbleRef.current.getBoundingClientRect();
         const scrollY = window.scrollY;
         const scrollX = window.scrollX;
-        const gap     = 6; // px between trigger and bubble
+        const gap     = 6;
 
         let top  = 0;
         let left = 0;
@@ -53,7 +53,6 @@ const Tooltip = ( { children, content, position = 'top' } ) => {
                 break;
         }
 
-        // Keep bubble inside the viewport horizontally.
         const viewportWidth = document.documentElement.clientWidth;
         if ( left < 8 ) {
             left = 8;

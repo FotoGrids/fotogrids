@@ -31,44 +31,57 @@
  */
 
 export const installPermissionsApi = () => {
-    if (typeof window === 'undefined') return;
+	if (typeof window === 'undefined') return;
 
-    window.FotoGridsAdmin = window.FotoGridsAdmin || {};
-    if (window.FotoGridsAdmin.permissions) return;
+	window.FotoGridsAdmin = window.FotoGridsAdmin || {};
+	if (window.FotoGridsAdmin.permissions) return;
 
-    const namespace = {
-        _matrixOverride: null,
-        _simplePanelOverride: null,
-        _registry: null,
+	const namespace = {
+		_matrixOverride: null,
+		_simplePanelOverride: null,
+		_registry: null,
 
-        registerMatrixOverride(Component) {
-            namespace._matrixOverride = Component || null;
-            document.dispatchEvent(new CustomEvent('fotogrids:admin:permissions:override', {
-                detail: { panel: 'matrix', component: Component || null },
-            }));
-        },
+		registerMatrixOverride(Component) {
+			namespace._matrixOverride = Component || null;
+			document.dispatchEvent(
+				new CustomEvent('fotogrids:admin:permissions:override', {
+					detail: { panel: 'matrix', component: Component || null },
+				}),
+			);
+		},
 
-        registerPanelOverride(panel, Component) {
-            if (panel === 'simple') {
-                namespace._simplePanelOverride = Component || null;
-                document.dispatchEvent(new CustomEvent('fotogrids:admin:permissions:override', {
-                    detail: { panel: 'simple', component: Component || null },
-                }));
-            }
-        },
+		registerPanelOverride(panel, Component) {
+			if (panel === 'simple') {
+				namespace._simplePanelOverride = Component || null;
+				document.dispatchEvent(
+					new CustomEvent('fotogrids:admin:permissions:override', {
+						detail: {
+							panel: 'simple',
+							component: Component || null,
+						},
+					}),
+				);
+			}
+		},
 
-        getRegistry() {
-            return namespace._registry;
-        },
+		getRegistry() {
+			return namespace._registry;
+		},
 
-        on(event, handler) {
-            document.addEventListener(`fotogrids:admin:permissions:${event}`, handler);
-        },
+		on(event, handler) {
+			document.addEventListener(
+				`fotogrids:admin:permissions:${event}`,
+				handler,
+			);
+		},
 
-        off(event, handler) {
-            document.removeEventListener(`fotogrids:admin:permissions:${event}`, handler);
-        },
-    };
+		off(event, handler) {
+			document.removeEventListener(
+				`fotogrids:admin:permissions:${event}`,
+				handler,
+			);
+		},
+	};
 
-    window.FotoGridsAdmin.permissions = namespace;
+	window.FotoGridsAdmin.permissions = namespace;
 };

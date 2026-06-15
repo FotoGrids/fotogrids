@@ -6,17 +6,17 @@ Comprehensive testing setup for the FotoGrids WordPress plugin, covering unit te
 
 ### Core Technologies
 
--   **Jest**: Primary testing framework
--   **React Testing Library**: Component testing utilities
--   **jsdom**: DOM simulation for browser environment
--   **ts-jest**: TypeScript support for Jest
--   **@testing-library/jest-dom**: Additional Jest matchers
+- **Jest**: Primary testing framework
+- **React Testing Library**: Component testing utilities
+- **jsdom**: DOM simulation for browser environment
+- **ts-jest**: TypeScript support for Jest
+- **@testing-library/jest-dom**: Additional Jest matchers
 
 ### WordPress Integration
 
--   **WordPress API Mocks**: Mock WordPress functions and globals
--   **REST API Testing**: Mock WordPress REST API responses
--   **Block Editor Mocks**: Mock Gutenberg block editor components
+- **WordPress API Mocks**: Mock WordPress functions and globals
+- **REST API Testing**: Mock WordPress REST API responses
+- **Block Editor Mocks**: Mock Gutenberg block editor components
 
 ## Project Structure
 
@@ -55,9 +55,9 @@ Test individual components and functions in isolation.
 ```javascript
 // src/tests/unit/helpers.test.js
 describe('Gallery_Repository::get', () => {
-    test('should return gallery when valid', () => {
-        // Test implementation
-    });
+	test('should return gallery when valid', () => {
+		// Test implementation
+	});
 });
 ```
 
@@ -66,10 +66,10 @@ describe('Gallery_Repository::get', () => {
 ```javascript
 // src/tests/unit/components/GallerySelector.test.tsx
 describe('GallerySelector Component', () => {
-    test('renders gallery list', () => {
-        render(<GallerySelector galleries={mockGalleries} />);
-        expect(screen.getByText('Gallery 1')).toBeInTheDocument();
-    });
+	test('renders gallery list', () => {
+		render(<GallerySelector galleries={mockGalleries} />);
+		expect(screen.getByText('Gallery 1')).toBeInTheDocument();
+	});
 });
 ```
 
@@ -82,12 +82,12 @@ Test how different parts work together.
 ```javascript
 // src/tests/integration/rest-api.test.js
 describe('FotoGrids REST API', () => {
-    test('fetches galleries from endpoint', async () => {
-        const galleries = await wp.apiFetch({
-            path: '/fotogrids/v1/galleries',
-        });
-        expect(galleries).toHaveLength(2);
-    });
+	test('fetches galleries from endpoint', async () => {
+		const galleries = await wp.apiFetch({
+			path: '/fotogrids/v1/galleries',
+		});
+		expect(galleries).toHaveLength(2);
+	});
 });
 ```
 
@@ -96,9 +96,9 @@ describe('FotoGrids REST API', () => {
 ```javascript
 // Test block registration and WordPress integration
 describe('Gutenberg Block Integration', () => {
-    test('registers block with correct attributes', () => {
-        // Test block registration
-    });
+	test('registers block with correct attributes', () => {
+		// Test block registration
+	});
 });
 ```
 
@@ -152,20 +152,20 @@ npm test -- --onlyChanged
 
 ```javascript
 module.exports = {
-    testEnvironment: 'jsdom',
-    setupFilesAfterEnv: ['<rootDir>/src/tests/setup/jest.setup.js'],
-    moduleNameMapping: {
-        '^@/(.*)$': '<rootDir>/src/assets/$1',
-    },
-    collectCoverageFrom: ['src/assets/**/*.{js,ts,tsx}', '!src/tests/**/*'],
-    coverageThreshold: {
-        global: {
-            branches: 70,
-            functions: 70,
-            lines: 70,
-            statements: 70,
-        },
-    },
+	testEnvironment: 'jsdom',
+	setupFilesAfterEnv: ['<rootDir>/src/tests/setup/jest.setup.js'],
+	moduleNameMapping: {
+		'^@/(.*)$': '<rootDir>/src/assets/$1',
+	},
+	collectCoverageFrom: ['src/assets/**/*.{js,ts,tsx}', '!src/tests/**/*'],
+	coverageThreshold: {
+		global: {
+			branches: 70,
+			functions: 70,
+			lines: 70,
+			statements: 70,
+		},
+	},
 };
 ```
 
@@ -176,15 +176,15 @@ import '@testing-library/jest-dom';
 
 // Mock WordPress globals
 global.wp = {
-    apiFetch: jest.fn(),
-    i18n: { __: jest.fn(text => text) },
+	apiFetch: jest.fn(),
+	i18n: { __: jest.fn(text => text) },
 };
 
 // Mock browser APIs
 global.IntersectionObserver = class IntersectionObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+	observe() {}
+	unobserve() {}
+	disconnect() {}
 };
 ```
 
@@ -195,9 +195,9 @@ global.IntersectionObserver = class IntersectionObserver {
 ```javascript
 // Mock WordPress database functions
 global.wpdb = {
-    prepare: jest.fn(),
-    get_results: jest.fn(),
-    get_var: jest.fn(),
+	prepare: jest.fn(),
+	get_results: jest.fn(),
+	get_var: jest.fn(),
 };
 
 // Mock WordPress post functions
@@ -210,15 +210,15 @@ global.get_post_meta = jest.fn();
 ```javascript
 // Mock Gutenberg components
 jest.mock('@wordpress/components', () => ({
-    Button: ({ children, onClick }) => (
-        <button onClick={onClick}>{children}</button>
-    ),
-    Placeholder: ({ children, label }) => (
-        <div data-testid='placeholder'>
-            <div>{label}</div>
-            {children}
-        </div>
-    ),
+	Button: ({ children, onClick }) => (
+		<button onClick={onClick}>{children}</button>
+	),
+	Placeholder: ({ children, label }) => (
+		<div data-testid='placeholder'>
+			<div>{label}</div>
+			{children}
+		</div>
+	),
 }));
 ```
 
@@ -236,18 +236,18 @@ mockApiFetch.mockResolvedValue([{ id: 1, title: 'Test Gallery' }]);
 
 ```javascript
 export const mockGalleries = [
-    {
-        id: 1,
-        title: 'Test Gallery',
-        item_count: 5,
-        featured_item: 'https://example.com/item.jpg',
-    },
+	{
+		id: 1,
+		title: 'Test Gallery',
+		item_count: 5,
+		featured_item: 'https://example.com/item.jpg',
+	},
 ];
 
 export const createMockGallery = (overrides = {}) => ({
-    id: 1,
-    title: 'Test Gallery',
-    ...overrides,
+	id: 1,
+	title: 'Test Gallery',
+	...overrides,
 });
 ```
 
@@ -256,19 +256,19 @@ export const createMockGallery = (overrides = {}) => ({
 ```javascript
 // Create test data with overrides
 const gallery = createMockGallery({
-    title: 'Custom Gallery',
-    item_count: 10,
+	title: 'Custom Gallery',
+	item_count: 10,
 });
 
 // Setup component with props
 const renderGallerySelector = (props = {}) => {
-    return render(
-        <GallerySelector
-            galleries={mockGalleries}
-            onGallerySelect={jest.fn()}
-            {...props}
-        />,
-    );
+	return render(
+		<GallerySelector
+			galleries={mockGalleries}
+			onGallerySelect={jest.fn()}
+			{...props}
+		/>,
+	);
 };
 ```
 
@@ -278,34 +278,34 @@ const renderGallerySelector = (props = {}) => {
 
 ```javascript
 describe('Component Name', () => {
-    // Test rendering
-    test('renders correctly', () => {
-        render(<Component />);
-        expect(screen.getByRole('button')).toBeInTheDocument();
-    });
+	// Test rendering
+	test('renders correctly', () => {
+		render(<Component />);
+		expect(screen.getByRole('button')).toBeInTheDocument();
+	});
 
-    // Test user interactions
-    test('handles click events', async () => {
-        const user = userEvent.setup();
-        const mockHandler = jest.fn();
+	// Test user interactions
+	test('handles click events', async () => {
+		const user = userEvent.setup();
+		const mockHandler = jest.fn();
 
-        render(<Component onClick={mockHandler} />);
-        await user.click(screen.getByRole('button'));
+		render(<Component onClick={mockHandler} />);
+		await user.click(screen.getByRole('button'));
 
-        expect(mockHandler).toHaveBeenCalledTimes(1);
-    });
+		expect(mockHandler).toHaveBeenCalledTimes(1);
+	});
 
-    // Test props
-    test('accepts custom props', () => {
-        render(<Component title='Custom Title' />);
-        expect(screen.getByText('Custom Title')).toBeInTheDocument();
-    });
+	// Test props
+	test('accepts custom props', () => {
+		render(<Component title='Custom Title' />);
+		expect(screen.getByText('Custom Title')).toBeInTheDocument();
+	});
 
-    // Test edge cases
-    test('handles empty data gracefully', () => {
-        render(<Component data={[]} />);
-        expect(screen.getByText('No data available')).toBeInTheDocument();
-    });
+	// Test edge cases
+	test('handles empty data gracefully', () => {
+		render(<Component data={[]} />);
+		expect(screen.getByText('No data available')).toBeInTheDocument();
+	});
 });
 ```
 
@@ -313,16 +313,16 @@ describe('Component Name', () => {
 
 ```javascript
 test('loads data asynchronously', async () => {
-    mockApiFetch.mockResolvedValue(mockGalleries);
+	mockApiFetch.mockResolvedValue(mockGalleries);
 
-    render(<AsyncComponent />);
+	render(<AsyncComponent />);
 
-    // Wait for loading to complete
-    await waitFor(() => {
-        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
+	// Wait for loading to complete
+	await waitFor(() => {
+		expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+	});
 
-    expect(screen.getByText('Test Gallery')).toBeInTheDocument();
+	expect(screen.getByText('Test Gallery')).toBeInTheDocument();
 });
 ```
 
@@ -330,14 +330,14 @@ test('loads data asynchronously', async () => {
 
 ```javascript
 test('handles API errors', async () => {
-    const mockError = new Error('API Error');
-    mockApiFetch.mockRejectedValue(mockError);
+	const mockError = new Error('API Error');
+	mockApiFetch.mockRejectedValue(mockError);
 
-    render(<Component />);
+	render(<Component />);
 
-    await waitFor(() => {
-        expect(screen.getByText('Error loading data')).toBeInTheDocument();
-    });
+	await waitFor(() => {
+		expect(screen.getByText('Error loading data')).toBeInTheDocument();
+	});
 });
 ```
 
@@ -345,10 +345,10 @@ test('handles API errors', async () => {
 
 ### Coverage Thresholds
 
--   **Lines**: 70% minimum
--   **Functions**: 70% minimum
--   **Branches**: 70% minimum
--   **Statements**: 70% minimum
+- **Lines**: 70% minimum
+- **Functions**: 70% minimum
+- **Branches**: 70% minimum
+- **Statements**: 70% minimum
 
 ### Coverage Reports
 
@@ -365,11 +365,11 @@ open coverage/lcov-report/index.html
 ```javascript
 // Exclude from coverage
 collectCoverageFrom: [
-    'src/assets/**/*.{js,ts,tsx}',
-    '!src/assets/**/*.d.ts',
-    '!src/assets/**/index.{js,ts}',
-    '!src/assets/**/*.stories.{js,ts,tsx}',
-    '!src/tests/**/*',
+	'src/assets/**/*.{js,ts,tsx}',
+	'!src/assets/**/*.d.ts',
+	'!src/assets/**/index.{js,ts}',
+	'!src/assets/**/*.stories.{js,ts,tsx}',
+	'!src/tests/**/*',
 ];
 ```
 
@@ -431,11 +431,11 @@ jobs:
 
 ```json
 {
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run lint && npm run test:ci"
-        }
-    }
+	"husky": {
+		"hooks": {
+			"pre-commit": "npm run lint && npm run test:ci"
+		}
+	}
 }
 ```
 
@@ -455,14 +455,14 @@ npm test -- --testNamePattern="specific test" --verbose
 
 ```javascript
 test('debug test', () => {
-    render(<Component />);
+	render(<Component />);
 
-    // Debug rendered output
-    screen.debug();
+	// Debug rendered output
+	screen.debug();
 
-    // Debug specific element
-    const button = screen.getByRole('button');
-    console.log(button.outerHTML);
+	// Debug specific element
+	const button = screen.getByRole('button');
+	console.log(button.outerHTML);
 });
 ```
 
@@ -471,16 +471,16 @@ test('debug test', () => {
 ```json
 // .vscode/launch.json
 {
-    "configurations": [
-        {
-            "name": "Debug Jest Tests",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
-            "args": ["--runInBand"],
-            "console": "integratedTerminal"
-        }
-    ]
+	"configurations": [
+		{
+			"name": "Debug Jest Tests",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/node_modules/.bin/jest",
+			"args": ["--runInBand"],
+			"console": "integratedTerminal"
+		}
+	]
 }
 ```
 

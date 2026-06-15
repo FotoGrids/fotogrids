@@ -9,11 +9,7 @@
  * Sizes follow the button_size setting (small / medium / large).
  * Styles follow the button_style setting (icons_only / labels_only / icons_and_labels).
  *
- * Replaces the inline FotoGridsSharing.injectStyles() block from the
- * legacy frontend monolith — no JS-injected CSS anywhere.
- *
- * Theming
- * -------
+ * Theming.
  * Every numeric value is a CSS custom property declared on
  * .fotogrids-share-bar so a parent surface (the lightbox, the view-page
  * footer, a site-level theme) can override individual tokens without
@@ -117,7 +113,7 @@
     height:  var(--fg-sb-icon-size);
 }
 
-/* ----- Sizes ------------------------------------------------------------ */
+/* Sizes */
 
 .fotogrids-share-bar--small .fotogrids-share-bar__icon {
     width:  var(--fg-sb-icon-size-small);
@@ -137,14 +133,14 @@
     font-size: var(--fg-sb-btn-font-size-large);
 }
 
-/* ----- Button styles --------------------------------------------------- */
+/* Button styles */
 
 .fotogrids-share-bar--labels_only .fotogrids-share-bar__btn {
     padding-left:  var(--fg-sb-labels-only-padding-x);
     padding-right: var(--fg-sb-labels-only-padding-x);
 }
 
-/* ----- Thumbnail overlay context --------------------------------------- */
+/* Thumbnail overlay context */
 
 .fg-item {
     position: relative;
@@ -176,8 +172,8 @@
     opacity: 1;
 }
 
-/* ----- Layout modifiers (caller-driven) -------------------------------- */
 /*
+ * Layout modifiers (caller-driven).
  * Layout is selected by the caller via the renderShareBar(config, ctx,
  * { layout: 'grid' | 'row' }) option, which adds one of these modifiers.
  *
@@ -194,8 +190,8 @@
     grid-template-columns: 1fr 1fr;
 }
 
-/* ----- Lightbox-popover (inside the interactive tooltip) ---------------- */
 /*
+ * Lightbox-popover (inside the interactive tooltip).
  * The share grid lives inside fg-tooltip in interactive mode. Compact
  * layout: 3 icons per row, no gap between buttons (each button has its
  * own padding), and the buttons get their own colour treatment to read
@@ -220,8 +216,8 @@
     background: rgba(255, 255, 255, 0.16);
 }
 
-/* ----- Copy-link click feedback ---------------------------------------- */
 /*
+ * Copy-link click feedback.
  * Short-lived visual confirmation after a copy-link click. The tooltip
  * label change handles screen readers / hover-feedback in non-popover
  * contexts; this provides a visual signal for users inside the

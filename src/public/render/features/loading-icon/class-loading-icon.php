@@ -82,10 +82,6 @@ final class Loading_Icon implements Feature {
 	 */
 	private static array $icon_names_seen = array();
 
-	// -------------------------------------------------------------------------
-	// Feature contract
-	// -------------------------------------------------------------------------
-
 	public function id(): string {
 		return 'fotogrids/loading-icon';
 	}
@@ -293,10 +289,6 @@ final class Loading_Icon implements Feature {
 			)
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Resolves the icon name from settings, falling back to the default.

@@ -34,10 +34,6 @@ class Embed_Data {
 		'video_vimeo'   => 'https://vimeo.com/api/oembed.json?url=%s',
 	);
 
-	// -------------------------------------------------------------------------
-	// resolve-embed
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Resolve an embed URL to its oEmbed metadata.
 	 *
@@ -80,7 +76,6 @@ class Embed_Data {
 			);
 		}
 
-		// Fetch oEmbed metadata.
 		[ $title, $thumbnail_url ] = self::fetch_oembed_meta( $url, $source );
 
 		// YouTube fallback thumbnail - constructible without any API call.
@@ -97,10 +92,6 @@ class Embed_Data {
 			)
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// embed (create embed item)
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Create an embed item in a gallery.
@@ -127,7 +118,6 @@ class Embed_Data {
 			$embed_settings = array();
 		}
 
-		// Validate gallery exists and belongs to this post type.
 		if ( ! $gallery_id ) {
 			return new \WP_Error(
 				'embed_gallery_missing',
@@ -256,10 +246,6 @@ class Embed_Data {
 		return $out;
 	}
 
-	// -------------------------------------------------------------------------
-	// update (edit virtual embed item)
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Update an existing virtual embed item.
 	 *
@@ -366,10 +352,6 @@ class Embed_Data {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// delete (remove embed item)
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Delete an embed item by its fotogrids_embed post ID.
 	 *
@@ -423,10 +405,6 @@ class Embed_Data {
 			)
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// Helpers
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Fetch title + thumbnail from a platform oEmbed endpoint.
@@ -577,7 +555,6 @@ class Embed_Data {
 
 		foreach ( $string_keys as $key ) {
 			if ( isset( $raw[ $key ] ) && is_string( $raw[ $key ] ) ) {
-				// Controls color - validate it's a hex colour.
 				$value = sanitize_text_field( $raw[ $key ] );
 				if ( preg_match( '/^#[0-9a-fA-F]{3,6}$/', $value ) ) {
 					$out[ $key ] = $value;

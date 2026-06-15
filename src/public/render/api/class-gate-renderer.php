@@ -66,10 +66,6 @@ final class Gate_Renderer {
 	 */
 	private const SHARED_CSS_PATH = 'gates/gate-lock.css';
 
-	// -------------------------------------------------------------------------
-	// Public API
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Returns the Asset_Decl for the shared gate CSS.
 	 *
@@ -176,10 +172,6 @@ final class Gate_Renderer {
 			$card->body_html
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// Internals
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Resolves a responsive spacing value to a CSS length string (e.g. "10px").

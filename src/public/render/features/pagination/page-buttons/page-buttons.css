@@ -114,8 +114,8 @@
  * The ellipsis sits inside the same .fg-pagination__number-item wrapper
  * as the numbered buttons and renders as a disabled .fg-pagination__btn
  * so it inherits the exact same height, padding, font-size and vertical
- * rhythm as the chips it sits between. We just remove the interactive
- * affordances (hover/focus rings, pointer events) so it reads as a gap
+ * rhythm as the chips it sits between. The interactive affordances
+ * (hover/focus rings, pointer events) are removed so it reads as a gap
  * indicator, not a clickable target.
  */
 .fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis {

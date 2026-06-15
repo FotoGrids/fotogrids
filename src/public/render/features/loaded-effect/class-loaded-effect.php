@@ -59,10 +59,6 @@ final class Loaded_Effect implements Feature {
 		'blur',
 	);
 
-	// -------------------------------------------------------------------------
-	// Feature contract
-	// -------------------------------------------------------------------------
-
 	public function id(): string {
 		return 'fotogrids/loaded-effect';
 	}
@@ -171,10 +167,6 @@ final class Loaded_Effect implements Feature {
 
 		return new Module_Assets( css: $css_assets );
 	}
-
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Resolves and validates the effect ID from settings.

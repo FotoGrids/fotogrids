@@ -2,81 +2,81 @@
 @use '../sizes.scss' as *;
 
 .fotogrids-setting-group {
-    position: relative;    
+	position: relative;
 
-    &:not(&--chromeless) {
-        border: ui-size(border-width, base) solid ui-color(border, primary);
-        border-radius: ui-size(border-radius, base);
-    }
+	&:not(&--chromeless) {
+		border: ui-size(border-width, base) solid ui-color(border, primary);
+		border-radius: ui-size(border-radius, base);
+	}
 
-    &__label {
-        position: absolute;
-        top: calc(-#{ui-size(font-size, md)} / 2);
-        left: ui-size(spacing, xl);
-        background-color: ui-color(background, primary);
-        padding: 0 ui-size(padding, sm);
-        font-size: ui-size(font-size, sm);
-        color: ui-color(text, tertiary);
-        line-height: ui-size(line-height, tight);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+	&__label {
+		position: absolute;
+		top: calc(-#{ui-size(font-size, md)} / 2);
+		left: ui-size(spacing, xl);
+		background-color: ui-color(background, primary);
+		padding: 0 ui-size(padding, sm);
+		font-size: ui-size(font-size, sm);
+		color: ui-color(text, tertiary);
+		line-height: ui-size(line-height, tight);
+		margin: 0;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
 
-    &:not(&--chromeless) &__content {
-        padding: ui-size(padding, xl);
-        padding-top: calc( ui-size(padding, xl) + (ui-size(padding,base) / 2));    
-    }
+	&:not(&--chromeless) &__content {
+		padding: ui-size(padding, xl);
+		padding-top: calc(ui-size(padding, xl) + (ui-size(padding, base) / 2));
+	}
 
-    &__content {
+	&__content {
 		display: flex;
 		flex-direction: column;
 		gap: ui-size(padding, 2xl);
-    }
-    
-    &--disabled {
-        .fotogrids-setting-group__label .fotogrids-pro-badge,
-        .fotogrids-setting-group__content {
-            opacity: 0.5;
-        }
-    }
-    
-    &--error {
-        border-color: ui-color(border, error);
-        background-color: ui-color(status, error-bg);
-        
-        .fotogrids-setting-group__label {
-            color: ui-color(status, error-text);
-            background-color: ui-color(status, error-bg);
-        }
-    }
-    
-    .fotogrids-setting-group {
-        margin: ui-size(margin, md) 0 0;        
-    }
+	}
+
+	&--disabled {
+		.fotogrids-setting-group__label .fotogrids-pro-badge,
+		.fotogrids-setting-group__content {
+			opacity: 0.5;
+		}
+	}
+
+	&--error {
+		border-color: ui-color(border, error);
+		background-color: ui-color(status, error-bg);
+
+		.fotogrids-setting-group__label {
+			color: ui-color(status, error-text);
+			background-color: ui-color(status, error-bg);
+		}
+	}
+
+	.fotogrids-setting-group {
+		margin: ui-size(margin, md) 0 0;
+	}
 }
 
 .fotogrids-settings-sbs {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 24px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 24px;
 }
 
 @media (max-width: 768px) {
-    .fotogrids-setting-group {
-        margin: ui-size(margin, md) 0;
-        
-        &__content {
-            padding: ui-size(padding, md);
-            padding-top: ui-size(padding, lg);
-        }
-        
-        &__label {
-            font-size: ui-size(font-size, xs);
-            left: ui-size(spacing, sm);
-            padding: 0 ui-size(padding, xs);
-        }
-    }
+	.fotogrids-setting-group {
+		margin: ui-size(margin, md) 0;
+
+		&__content {
+			padding: ui-size(padding, md);
+			padding-top: ui-size(padding, lg);
+		}
+
+		&__label {
+			font-size: ui-size(font-size, xs);
+			left: ui-size(spacing, sm);
+			padding: 0 ui-size(padding, xs);
+		}
+	}
 }

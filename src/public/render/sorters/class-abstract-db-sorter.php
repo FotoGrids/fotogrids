@@ -48,10 +48,7 @@ abstract class Abstract_Db_Sorter {
     // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
     // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-	// -------------------------------------------------------------------------
-	// Shared interface stubs - concrete sorters only need to override what
-	// differs (id, origin, supports, sort).
-	// -------------------------------------------------------------------------
+	// Concrete sorters only override what differs (id, origin, supports, sort).
 
 	public function replaces(): ?string {
 		return null;
@@ -64,10 +61,6 @@ abstract class Abstract_Db_Sorter {
 	public function assets( Render_Context $render_context ): Module_Assets { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		return new Module_Assets();
 	}
-
-	// -------------------------------------------------------------------------
-	// Batch DB helpers
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Batch-fetch sort columns from wp_posts for the given attachment IDs.

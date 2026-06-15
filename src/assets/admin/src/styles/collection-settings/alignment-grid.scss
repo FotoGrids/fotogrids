@@ -1,18 +1,18 @@
 .fg-button-group__buttons.fotogrids-alignment-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 4px;
-    width: fit-content;
-    max-width: 100%;
-    margin-top: 12px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: 4px;
+	width: fit-content;
+	max-width: 100%;
+	margin-top: 12px;
 
-    .fg-button-group__button {
-        padding: 7px;
+	.fg-button-group__button {
+		padding: 7px;
 
-        svg {
-            width: 24px;
-            height: 24px;
-        }
-    }
+		svg {
+			width: 24px;
+			height: 24px;
+		}
+	}
 }

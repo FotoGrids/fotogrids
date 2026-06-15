@@ -16,9 +16,6 @@ const TRANSITION_DURATION_MS = {
     slow:   450,
 };
 
-/* =========================================================================
- * Index state machine
- * ========================================================================= */
 
 /**
  * Tracks the active index of a finite collection with optional loop
@@ -97,9 +94,6 @@ export function createIndexState( opts ) {
     };
 }
 
-/* =========================================================================
- * Transition duration resolver
- * ========================================================================= */
 
 /**
  * Resolve the symbolic transition duration name to a millisecond count.
@@ -120,9 +114,6 @@ export function resolveTransitionDurationMs( name, customMs ) {
     return 300;
 }
 
-/* =========================================================================
- * Visibility classes
- * ========================================================================= */
 
 /**
  * Maps the chrome-visibility setting value to a CSS class string the
@@ -141,9 +132,6 @@ export function resolveVisibilityClasses( visibility ) {
     }
 }
 
-/* =========================================================================
- * Scroll-to with custom duration
- * ========================================================================= */
 
 /**
  * Animate an element's scrollLeft to `targetLeft` over `durationMs`.
@@ -198,9 +186,6 @@ export function scrollToDuration( el, targetLeft, durationMs, opts ) {
 
 const easeOutQuad = ( t ) => t * ( 2 - t );
 
-/* =========================================================================
- * Autoplay timer
- * ========================================================================= */
 
 /**
  * Interval-based ticker for carousel autoplay. Pauses on hover, on
@@ -308,9 +293,6 @@ export function createAutoplay( opts ) {
     };
 }
 
-/* =========================================================================
- * Swipe detector
- * ========================================================================= */
 
 /**
  * Touch-only swipe detector. Calls `onSwipe('left'|'right'|'up'|'down')`
@@ -376,9 +358,6 @@ export function createSwipeDetector( el, opts ) {
     };
 }
 
-/* =========================================================================
- * Keyboard nav
- * ========================================================================= */
 
 /**
  * Wires arrow keys (and optionally Home/End) on the supplied element.
@@ -435,9 +414,6 @@ export function createKeyboardNav( el, opts ) {
     return () => document.removeEventListener( 'keydown', onKeyDown );
 }
 
-/* =========================================================================
- * Intersection-based pauser
- * ========================================================================= */
 
 /**
  * Wraps an IntersectionObserver so callers can run setup/teardown when
@@ -470,9 +446,6 @@ export function createIntersectionPauser( opts ) {
     return () => observer.disconnect();
 }
 
-/* =========================================================================
- * Pointer drag-to-scroll
- * ========================================================================= */
 
 /**
  * Mouse / pen / pointer drag-to-scroll on a horizontally-scrollable
@@ -580,9 +553,6 @@ export function createPointerDrag( el, opts ) {
     };
 }
 
-/* =========================================================================
- * Chrome renderers
- * ========================================================================= */
 
 /**
  * Render previous/next arrow buttons inside `container`. Returns the

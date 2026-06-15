@@ -1,13 +1,7 @@
-/* ==========================================================================
-   FotoGrids - Gate Lock Screen (shared)
+/* Gate Lock Screen (shared).
    Structural styles shared by all gate modules: ghost grid, overlay, card
    chrome, icon, title, and description. Gate-specific interactive elements
-   (forms, inputs, links, spinners) are styled in each gate's own CSS file.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   Outer wrapper
-   -------------------------------------------------------------------------- */
+   (forms, inputs, links, spinners) are styled in each gate's own CSS file. */
 
 .fotogrids-gate {
     position: relative;
@@ -16,9 +10,7 @@
     user-select: none;
 }
 
-/* --------------------------------------------------------------------------
-   Ghost grid
-   -------------------------------------------------------------------------- */
+/* Ghost grid */
 
 .fotogrids-gate .fg-ghost-grid {
     display: grid;
@@ -34,9 +26,7 @@
     background: #e8e8e8;
 }
 
-/* --------------------------------------------------------------------------
-   Overlay
-   -------------------------------------------------------------------------- */
+/* Overlay */
 
 .fotogrids-gate .fg-gate-overlay {
     position: absolute;
@@ -49,9 +39,7 @@
     box-sizing: border-box;
 }
 
-/* --------------------------------------------------------------------------
-   Card chrome
-   -------------------------------------------------------------------------- */
+/* Card chrome */
 
 .fotogrids-gate .fg-gate-card {
     background: rgba(255, 255, 255, 0.92);
@@ -71,10 +59,6 @@
         padding: 24px 18px;
     }
 }
-
-/* --------------------------------------------------------------------------
-   Icon
-   -------------------------------------------------------------------------- */
 
 .fotogrids-gate .fg-gate-icon {
     display: flex;
@@ -97,10 +81,6 @@
     stroke-linecap: round;
     stroke-linejoin: round;
 }
-
-/* --------------------------------------------------------------------------
-   Title and description
-   -------------------------------------------------------------------------- */
 
 .fotogrids-gate .fg-gate-title {
     font-size: 1rem;

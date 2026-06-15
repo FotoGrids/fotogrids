@@ -6,12 +6,9 @@ const { __ } = wp.i18n;
 /**
  * Step 3 — Setup mode (Easy vs Advanced).
  *
- * Inspired by Rank Math's "Easy / Advanced" picker. Two cards,
- * radio-style. The pick is persisted immediately to
- * `fotogrids_settings_mode` via the shared AJAX setting endpoint and
- * surfaced through `window.fotogridsAdmin.settingsMode`. The actual
- * UI effect (which fields to collapse / hide when "easy") is planned
- * in `wizard-complexity-mode-plan.md` and not wired in this phase.
+ * The pick is persisted immediately to `fotogrids_settings_mode` via the
+ * shared AJAX setting endpoint and surfaced through
+ * `window.fotogridsAdmin.settingsMode`.
  */
 // Each mode's description is modelled as two paragraphs so it renders
 // with a real line break between the lead-in and the supporting copy.

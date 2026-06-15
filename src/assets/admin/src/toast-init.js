@@ -10,53 +10,52 @@ import ToastContainer from './components/toast/ToastContainer';
 import toastManager from './toast-manager';
 
 function initializeToasts() {
-    if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage) {
-        return;
-    }
+	if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage) {
+		return;
+	}
 
-    let container = document.getElementById('fotogrids-toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'fotogrids-toast-container';
-        document.body.appendChild(container);
-    }
+	let container = document.getElementById('fotogrids-toast-container');
+	if (!container) {
+		container = document.createElement('div');
+		container.id = 'fotogrids-toast-container';
+		document.body.appendChild(container);
+	}
 
-    if (container._reactRootContainer) {
-        return;
-    }
+	if (container._reactRootContainer) {
+		return;
+	}
 
-    function ToastApp() {
-        const [toasts, setToasts] = useState([]);
+	function ToastApp() {
+		const [toasts, setToasts] = useState([]);
 
-        useEffect(() => {
-            const unsubscribe = toastManager.subscribe((newToasts) => {
-                setToasts(newToasts);
-            });
+		useEffect(() => {
+			const unsubscribe = toastManager.subscribe(newToasts => {
+				setToasts(newToasts);
+			});
 
-            toastManager.notify();
+			toastManager.notify();
 
-            return unsubscribe;
-        }, []);
+			return unsubscribe;
+		}, []);
 
-        const handleDismiss = React.useCallback((id) => {
-            toastManager.remove(id);
-        }, []);
+		const handleDismiss = React.useCallback(id => {
+			toastManager.remove(id);
+		}, []);
 
-        return <ToastContainer toasts={toasts} onDismiss={handleDismiss} />;
-    }
+		return <ToastContainer toasts={toasts} onDismiss={handleDismiss} />;
+	}
 
-    try {
-        const root = createRoot(container);
-        container._reactRootContainer = root;
-        root.render(React.createElement(ToastApp));
-    } catch (error) {
-        console.error('FotoGrids: Error initializing toast system:', error);
-    }
+	try {
+		const root = createRoot(container);
+		container._reactRootContainer = root;
+		root.render(React.createElement(ToastApp));
+	} catch (error) {
+		console.error('FotoGrids: Error initializing toast system:', error);
+	}
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeToasts);
+	document.addEventListener('DOMContentLoaded', initializeToasts);
 } else {
-    setTimeout(initializeToasts, 0);
+	setTimeout(initializeToasts, 0);
 }
-

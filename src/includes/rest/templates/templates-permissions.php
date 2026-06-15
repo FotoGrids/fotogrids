@@ -89,11 +89,9 @@ class Templates_Permissions {
 			return false;
 		}
 
-		// Check if template belongs to current user (for user templates)
 		$user_templates = get_user_meta( get_current_user_id(), 'fotogrids_user_templates', true );
 		$user_templates = $user_templates ? json_decode( $user_templates, true ) : array();
 
-		// Check if template exists in user templates
 		foreach ( $user_templates as $template ) {
 			if ( isset( $template['id'] ) && $template['id'] === $template_id ) {
 				return true;

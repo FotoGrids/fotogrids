@@ -4,23 +4,24 @@ const subscribers = new Set();
 const stack = [];
 
 const notify = () => {
-    subscribers.forEach((cb) => cb([...stack]));
+	subscribers.forEach(cb => cb([...stack]));
 };
 
-const push = (id) => {
-    stack.push(id);
-    notify();
+const push = id => {
+	stack.push(id);
+	notify();
 };
 
-const remove = (id) => {
-    const idx = stack.indexOf(id);
-    if (idx !== -1) {
-        stack.splice(idx, 1);
-        notify();
-    }
+const remove = id => {
+	const idx = stack.indexOf(id);
+	if (idx !== -1) {
+		stack.splice(idx, 1);
+		notify();
+	}
 };
 
-export const getTopModalId = () => (stack.length ? stack[stack.length - 1] : null);
+export const getTopModalId = () =>
+	stack.length ? stack[stack.length - 1] : null;
 
 export const getStackDepth = () => stack.length;
 
@@ -29,25 +30,25 @@ export const getStackDepth = () => stack.length;
  * Returns the modal's depth position (0-indexed) for z-index ramping.
  */
 export const useModalStack = (id, active) => {
-    const [depth, setDepth] = useState(0);
+	const [depth, setDepth] = useState(0);
 
-    useEffect(() => {
-        if (!active) return undefined;
+	useEffect(() => {
+		if (!active) return undefined;
 
-        push(id);
+		push(id);
 
-        const updateDepth = (snapshot) => {
-            const idx = snapshot.indexOf(id);
-            setDepth(idx === -1 ? 0 : idx);
-        };
-        subscribers.add(updateDepth);
-        updateDepth(stack);
+		const updateDepth = snapshot => {
+			const idx = snapshot.indexOf(id);
+			setDepth(idx === -1 ? 0 : idx);
+		};
+		subscribers.add(updateDepth);
+		updateDepth(stack);
 
-        return () => {
-            subscribers.delete(updateDepth);
-            remove(id);
-        };
-    }, [id, active]);
+		return () => {
+			subscribers.delete(updateDepth);
+			remove(id);
+		};
+	}, [id, active]);
 
-    return depth;
+	return depth;
 };

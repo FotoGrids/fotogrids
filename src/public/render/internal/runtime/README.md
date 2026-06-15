@@ -16,10 +16,10 @@ once, and the runtime does the per-collection dispatch.
 Every public-facing wrapper carries the umbrella class
 `fotogrids-collection`. Exactly one discriminator class lives alongside it:
 
-| Wrapper kind | Classes on the outer `<div>` |
-|---|---|
-| Gallery | `fotogrids-collection fotogrids-gallery` |
-| Album   | `fotogrids-collection fotogrids-album` |
+| Wrapper kind | Classes on the outer `<div>`             |
+| ------------ | ---------------------------------------- |
+| Gallery      | `fotogrids-collection fotogrids-gallery` |
+| Album        | `fotogrids-collection fotogrids-album`   |
 
 - `.fotogrids-collection` means "this is a FotoGrids wrapper of some kind."
 - `.fotogrids-gallery` means "and it's specifically a gallery."
@@ -38,22 +38,22 @@ The runtime exposes `window.FotoGrids` with these surfaces:
 // at DOMContentLoaded AND for every gallery the MutationObserver picks
 // up later (album-ajax loads, password-gate unlocks, third-party DOM
 // injection). Lower priority runs first.
-window.FotoGrids.onGallery((galleryElement) => {
-    // wire your gallery-only feature here
+window.FotoGrids.onGallery(galleryElement => {
+	// wire your gallery-only feature here
 }, 10);
 
 // Subscribe to album initialization. Fires ONLY for album wrappers
 // (.fotogrids-collection.fotogrids-album). Same replay-on-late-subscribe
 // semantics as onGallery.
-window.FotoGrids.onAlbum((albumElement) => {
-    // wire your album-only feature here
+window.FotoGrids.onAlbum(albumElement => {
+	// wire your album-only feature here
 }, 10);
 
 // Subscribe to collection initialization. Fires for BOTH galleries and
 // albums. Use this only when a module genuinely needs to run against
 // both kinds. Most modules want onGallery or onAlbum instead.
-window.FotoGrids.onCollection((collectionElement) => {
-    // wire your collection-wide feature here
+window.FotoGrids.onCollection(collectionElement => {
+	// wire your collection-wide feature here
 }, 10);
 
 // Returns the current list of collection instances. Each record has
@@ -71,20 +71,20 @@ window.FotoGrids.version;
 
 ## Picking the right subscription
 
-| Module scope | Use |
-|---|---|
-| Only makes sense on galleries (Lightbox, Stats, Lazy_Load, Loading_Icon, Loaded_Effect, Sharing, Captions, Filter_Ui, Password_Gate, pagination, Deep_Linking) | `onGallery` |
-| Only makes sense on albums (Album_To_Gallery_Ajax, click-behaviour decorators on album tiles) | `onAlbum` |
+| Module scope                                                                                                                                                          | Use            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| Only makes sense on galleries (Lightbox, Stats, Lazy_Load, Loading_Icon, Loaded_Effect, Sharing, Captions, Filter_Ui, Password_Gate, pagination, Deep_Linking)        | `onGallery`    |
+| Only makes sense on albums (Album_To_Gallery_Ajax, click-behaviour decorators on album tiles)                                                                         | `onAlbum`      |
 | Genuinely needs both (rare — Collection_Header is gallery-only because its current job is "show breadcrumbs back to the parent album"; the AJAX module is album-only) | `onCollection` |
 
 ## Events
 
 The runtime dispatches two custom events on `document`. Both bubble.
 
-| Event | When | `event.detail` |
-|---|---|---|
-| `fotogrids:gallery_inserted` | A MutationObserver saw a `.fotogrids-collection` added to the DOM. Fired *before* the runtime initializes it. | `{ galleryElement, galleryId, kind }` |
-| `fotogrids:gallery_initialized` | The runtime has fully initialized a collection and run every matching callback queue against it. | `{ galleryElement, galleryId, kind, instance }` |
+| Event                           | When                                                                                                          | `event.detail`                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `fotogrids:gallery_inserted`    | A MutationObserver saw a `.fotogrids-collection` added to the DOM. Fired _before_ the runtime initializes it. | `{ galleryElement, galleryId, kind }`           |
+| `fotogrids:gallery_initialized` | The runtime has fully initialized a collection and run every matching callback queue against it.              | `{ galleryElement, galleryId, kind, instance }` |
 
 The runtime uses `MutationObserver` once (on `document.body`) and dispatches
 these events. **Feature modules must not run their own DOM observers** — they
@@ -96,31 +96,34 @@ the same callback fires for static and dynamically-inserted collections.
 ```js
 // public/render/decorators/sharing/sharing.js  (illustrative)
 (function () {
-    'use strict';
+	'use strict';
 
-    function attach(galleryElement) {
-        // module's per-gallery logic
-    }
+	function attach(galleryElement) {
+		// module's per-gallery logic
+	}
 
-    function init() {
-        if (!window.FotoGrids || typeof window.FotoGrids.onGallery !== 'function') {
-            // runtime not loaded — should never happen if PHP declared
-            // the dependency correctly, but degrade gracefully.
-            return;
-        }
-        window.FotoGrids.onGallery(attach, 10);
+	function init() {
+		if (
+			!window.FotoGrids ||
+			typeof window.FotoGrids.onGallery !== 'function'
+		) {
+			// runtime not loaded — should never happen if PHP declared
+			// the dependency correctly, but degrade gracefully.
+			return;
+		}
+		window.FotoGrids.onGallery(attach, 10);
 
-        // Expose any cross-module API your module offers.
-        window.FotoGrids.modules.sharing = {
-            renderShareBar: renderShareBar,
-        };
-    }
+		// Expose any cross-module API your module offers.
+		window.FotoGrids.modules.sharing = {
+			renderShareBar: renderShareBar,
+		};
+	}
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
 })();
 ```
 

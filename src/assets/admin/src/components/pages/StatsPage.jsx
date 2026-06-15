@@ -95,7 +95,6 @@ const StatsPage = () => {
     const viewsChartInst   = useRef( null );
     const popularChartInst = useRef( null );
 
-    // ── destroy charts on unmount only ───────────────────────────────────────
     useEffect( () => {
         return () => {
             viewsChartInst.current?.destroy();
@@ -105,7 +104,6 @@ const StatsPage = () => {
         };
     }, [] );
 
-    // ── views chart: create on first data arrival, update on subsequent ──────
     // Depends on `loading` so it fires as soon as the load cycle completes.
     useEffect( () => {
         if ( loading ) return;
@@ -147,7 +145,6 @@ const StatsPage = () => {
         }
     }, [ loading, viewsData ] );
 
-    // ── popular galleries chart: same pattern ────────────────────────────────
     useEffect( () => {
         if ( loading ) return;
         if ( typeof Chart === 'undefined' ) return;
@@ -181,7 +178,6 @@ const StatsPage = () => {
         }
     }, [ loading, popularGalleries ] );
 
-    // ── load all stats in one coordinated batch ───────────────────────────────
     useEffect( () => {
         let cancelled = false;
 

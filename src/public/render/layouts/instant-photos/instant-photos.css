@@ -72,7 +72,7 @@
    pre-counter-rotated in PHP so the light source stays world-up
    regardless of tile rotation.
 
-   We stack two shadows for more realistic depth:
+   Two shadows are stacked for more realistic depth:
    - Contact layer (first): half the offset and blur of the base value,
      darker alpha. Reads as the card touching the surface beneath.
    - Ambient layer (second): the full base offset and blur, softer
@@ -99,7 +99,7 @@
    its individual tilt angle. Order matters: translate first then rotate
    means the CSS matrix applies rotate first then translate, so the
    translate vector is in the post-rotation (world) space - exactly what
-   we pre-counter-rotated for in PHP.
+   the PHP pre-counter-rotation accounts for.
 
    The shadow uses the --fg-elev-shadow-* vars (which include the lift
    distance baked in) so the shadow stays anchored beneath the original
@@ -127,7 +127,7 @@
 
 /* Caption styling - always below, centered. The font family is filtered
    to a handwritten subset by Layout_Instant_Photos via the typography
-   font_families filter; we don't hard-code a family here so user choice
+   font_families filter; no family is hard-coded here so user choice
    from that filtered list still wins. */
 [data-fg-layout="instant-photos"] .fg-item.fg-instant-photo .fg-caption {
     display: block;
@@ -148,7 +148,7 @@
     margin-top: 0.25em;
 }
 
-/* ===== Hover behaviour ===== */
+/* Hover behaviour */
 
 /* "Straighten" - rotate toward 0deg. Elevation amplifies the lift on
    hover; non-elevated tiles only rotate. */
@@ -210,7 +210,7 @@
             rgba(0, 0, 0, 0.16);
 }
 
-/* ===== Sticker ===== */
+/* Sticker */
 
 [data-fg-layout="instant-photos"] .fg-item.fg-instant-photo--stickered::before {
     content: "";

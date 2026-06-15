@@ -145,15 +145,11 @@
     }
 
     /**
-     * Resolve the items container we should append/replace inside. The
-     * layout module's root has the structural class (e.g. .fg-layout-grid)
-     * — pagination doesn't know which layout is active, so we find it via
-     * a stable role hook the layout modules emit.
-     *
-     * TODO (PHP side): every layout should write a
-     * `data-fg-items-root="true"` attribute on its root element so the
-     * JS doesn't have to guess. Until then, fall back to the wrapper's
-     * first non-chrome child.
+     * Resolve the items container to append/replace inside. The layout
+     * module's root has the structural class (e.g. .fg-layout-grid) —
+     * pagination doesn't know which layout is active, so it looks for a
+     * `data-fg-items-root="true"` attribute on the root, falling back to
+     * the wrapper's first non-chrome child when no layout emits it.
      *
      * @param {Element} galleryEl
      * @returns {Element|null}
@@ -224,11 +220,6 @@
     /**
      * Fetch a page from the server. Resolves with { html, css, page,
      * totalPages, pageSize, hasMore } or rejects.
-     *
-     * TODO: read the REST URL and nonce from the same global the
-     * Album_To_Gallery_Ajax decorator uses (data-fg-render-url +
-     * data-fg-render-nonce on a per-gallery element, OR a wp_localize
-     * global). Decide which is cleaner once we wire the PHP side.
      *
      * @param {Element} galleryEl
      * @param {number}  page
@@ -404,9 +395,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Filter-view cache
-    // -------------------------------------------------------------------------
 
     /**
      * Read the canonical fingerprint of the currently-active filter map
@@ -602,10 +590,6 @@
         } );
     }
 
-    // -------------------------------------------------------------------------
-    // Public API
-    // -------------------------------------------------------------------------
-
     /**
      * Public state accessor.
      *
@@ -650,8 +634,6 @@
                 return { page: payload.page, hasMore: payload.has_more };
             } )
             .catch( function ( err ) {
-                // TODO: surface to the status region (role=status) so
-                // screen readers announce the failure. For now, log.
                 /* eslint-disable-next-line no-console */
                 console.warn( '[fotogrids] pagination failed:', err );
                 throw err;

@@ -24,8 +24,6 @@ class Register_Admin_Routes {
 	 */
 	public static function register() {
 
-		// Album management routes
-
 		// Add galleries to album: POST /admin/albums/{id}/galleries
 		register_rest_route(
 			'fotogrids/v1',
@@ -116,8 +114,6 @@ class Register_Admin_Routes {
 				),
 			)
 		);
-
-		// Gallery management routes
 
 		// Add albums to gallery: POST /admin/galleries/{id}/albums
 		register_rest_route(

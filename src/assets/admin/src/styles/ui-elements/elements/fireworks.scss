@@ -5,91 +5,92 @@
 }
 
 .fotogrids-fireworks {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  width: 0;
-  aspect-ratio: 1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle,white 0.4vmin,#0000 0) 50% 00%,
-    radial-gradient(circle,white 0.6vmin,#0000 0) 00% 50%,
-    radial-gradient(circle,white 1vmin,#0000 0) 50% 99%,
-    radial-gradient(circle,white 0.4vmin,#0000 0) 99% 50%,
-    radial-gradient(circle,white 0.6vmin,#0000 0) 80% 90%,
-    radial-gradient(circle,white 1vmin,#0000 0) 95% 90%,
-    radial-gradient(circle,white 1vmin,#0000 0) 10% 60%,
-    radial-gradient(circle,white 0.4vmin,#0000 0) 31% 80%,
-    radial-gradient(circle,white 0.6vmin,#0000 0) 80% 10%,
-    radial-gradient(circle,white 0.4vmin,#0000 0) 90% 23%,
-    radial-gradient(circle,white 0.6vmin,#0000 0) 45% 20%,
-    radial-gradient(circle,white 1vmin,#0000 0) 13% 24%;
-  background-size:
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start),
-    var(--fg-fw-size-start) var(--fg-fw-size-start);
-  background-repeat: no-repeat;
-  animation: fotoGridsFWBlastCollapse 5s linear infinite;
+	position: absolute;
+	z-index: 1;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 0;
+	aspect-ratio: 1;
+	pointer-events: none;
+	background:
+		radial-gradient(circle, white 0.4vmin, #0000 0) 50% 00%,
+		radial-gradient(circle, white 0.6vmin, #0000 0) 00% 50%,
+		radial-gradient(circle, white 1vmin, #0000 0) 50% 99%,
+		radial-gradient(circle, white 0.4vmin, #0000 0) 99% 50%,
+		radial-gradient(circle, white 0.6vmin, #0000 0) 80% 90%,
+		radial-gradient(circle, white 1vmin, #0000 0) 95% 90%,
+		radial-gradient(circle, white 1vmin, #0000 0) 10% 60%,
+		radial-gradient(circle, white 0.4vmin, #0000 0) 31% 80%,
+		radial-gradient(circle, white 0.6vmin, #0000 0) 80% 10%,
+		radial-gradient(circle, white 0.4vmin, #0000 0) 90% 23%,
+		radial-gradient(circle, white 0.6vmin, #0000 0) 45% 20%,
+		radial-gradient(circle, white 1vmin, #0000 0) 13% 24%;
+	background-size:
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start),
+		var(--fg-fw-size-start) var(--fg-fw-size-start);
+	background-repeat: no-repeat;
+	animation: fotoGridsFWBlastCollapse 5s linear infinite;
 }
 
-@keyframes fotoGridsFWBlastCollapse{
-   0% {
-     width: 0;
-     background-size:
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start),
-       var(--fg-fw-size-start) var(--fg-fw-size-start);
-   }
-   15% {
-     width: 130%;
-     background-size:
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid),
-       var(--fg-fw-size-mid) var(--fg-fw-size-mid);
-   }
-   30%, 100% {
-     width: 160%;
-     background-size:
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end),
-       var(--fg-fw-size-end) var(--fg-fw-size-end);
-   }
+@keyframes fotoGridsFWBlastCollapse {
+	0% {
+		width: 0;
+		background-size:
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start),
+			var(--fg-fw-size-start) var(--fg-fw-size-start);
+	}
+	15% {
+		width: 130%;
+		background-size:
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid),
+			var(--fg-fw-size-mid) var(--fg-fw-size-mid);
+	}
+	30%,
+	100% {
+		width: 160%;
+		background-size:
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end),
+			var(--fg-fw-size-end) var(--fg-fw-size-end);
+	}
 }

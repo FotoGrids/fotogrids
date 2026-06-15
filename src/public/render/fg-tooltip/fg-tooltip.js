@@ -78,9 +78,6 @@ let interactiveKeydown = null;
  */
 let interactiveSwapTimer = null;
 
-// ---------------------------------------------------------------------------
-// Tooltip element
-// ---------------------------------------------------------------------------
 
 /**
  * Returns the singleton tooltip element, creating it on first call.
@@ -119,9 +116,6 @@ function getTooltipEl( host ) {
     return tooltipEl;
 }
 
-// ---------------------------------------------------------------------------
-// Positioning
-// ---------------------------------------------------------------------------
 
 /**
  * Position the tooltip relative to a host element.
@@ -202,7 +196,6 @@ function position( host ) {
         arrowY = Math.max( ARROW_INSET, Math.min( arrowY, th - ARROW_INSET ) );
     }
 
-    // Use fixed positioning (relative to viewport).
     el.style.position = 'fixed';
     el.style.top      = `${Math.round( top )}px`;
     el.style.left     = `${Math.round( left )}px`;
@@ -219,13 +212,9 @@ function position( host ) {
         el.style.removeProperty( '--fg-tt-arrow-x' );
     }
 
-    // Data attribute for the entrance animation direction.
     el.dataset.dir = dir;
 }
 
-// ---------------------------------------------------------------------------
-// Show / hide
-// ---------------------------------------------------------------------------
 
 function showImmediately( host, label ) {
     // Interactive mode owns the tooltip exclusively — refuse to overwrite
@@ -331,20 +320,10 @@ function scheduleHide() {
     hideTimer = setTimeout( hideImmediately, HIDE_DELAY_MS );
 }
 
-// ---------------------------------------------------------------------------
-// Interactive mode
-// ---------------------------------------------------------------------------
-//
-// The tooltip can switch from its default "text label, mouseleave hides"
-// behaviour into an interactive popover that holds arbitrary DOM. While
-// interactive:
-//   • pointer-events are enabled so child controls receive clicks
-//   • mouseleave does NOT auto-hide
-//   • dismissal is via outside-click, Escape, or programmatic close
-//   • scroll/resize reposition rather than dismiss
-//
-// Use cases: a small share grid in the lightbox toolbar, future quick-pick
-// menus, anywhere the visual of "tooltip with content" beats "modal panel".
+// Interactive mode: the tooltip becomes a popover holding arbitrary DOM.
+// While interactive, pointer-events are enabled so child controls receive
+// clicks, mouseleave does NOT auto-hide, dismissal is via outside-click /
+// Escape / programmatic close, and scroll/resize reposition rather than dismiss.
 
 /**
  * Open the tooltip in interactive mode against `host`, with `contentEl`
@@ -404,7 +383,6 @@ function showInteractive( host, contentEl, opts ) {
     const wasVisible = el.classList.contains( 'fg-f-tooltip--visible' );
 
     const finishOpen = () => {
-        // Swap content.
         el.textContent = '';
         // Wrap the supplied content in a fade-controllable inner so the
         // outer container (which carries the arrow + chrome) stays put
@@ -530,9 +508,6 @@ function teardownInteractive() {
     interactiveMode = false;
 }
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
 
 /**
  * Bind tooltip behaviour to an element.

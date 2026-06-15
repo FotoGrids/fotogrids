@@ -85,11 +85,9 @@ const TemplatesPage = () => {
             });
 
             if (response.success && response.template) {
-                // Template downloaded, could show success message
                 if (window.fotogridsToast) {
                     window.fotogridsToast.success(__('Template downloaded successfully.', 'fotogrids'));
                 }
-                // Reload templates to show newly downloaded template
                 loadTemplates();
             } else {
                 throw new Error(response.message || __('Failed to download template.', 'fotogrids'));

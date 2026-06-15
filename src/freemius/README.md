@@ -1,21 +1,20 @@
-Freemius WordPress SDK
-======================
+# Freemius WordPress SDK
 
 Welcome to the official repository for the Freemius SDK! Adding the SDK to your WordPress plugin, theme, or add-ons, enables all the benefits that come with using the [Freemius platform](https://freemius.com) such as:
 
-* [Software Licensing](https://freemius.com/wordpress/software-licensing/)
-* [Secure Checkout](https://freemius.com/wordpress/checkout/)
-* [Subscriptions](https://freemius.com/wordpress/recurring-payments-subscriptions/)
-* [Automatic Updates](https://freemius.com/wordpress/automatic-software-updates/)
-* [Seamless EU VAT](https://freemius.com/wordpress/collecting-eu-vat-europe/)
-* [Cart Abandonment Recovery](https://freemius.com/wordpress/cart-abandonment-recovery/)
-* [Affiliate Platform](https://freemius.com/wordpress/affiliate-platform/)
-* [Analytics & Usage Tracking](https://freemius.com/wordpress/insights/)
-* [User Dashboard](https://freemius.com/wordpress/user-dashboard/)
+- [Software Licensing](https://freemius.com/wordpress/software-licensing/)
+- [Secure Checkout](https://freemius.com/wordpress/checkout/)
+- [Subscriptions](https://freemius.com/wordpress/recurring-payments-subscriptions/)
+- [Automatic Updates](https://freemius.com/wordpress/automatic-software-updates/)
+- [Seamless EU VAT](https://freemius.com/wordpress/collecting-eu-vat-europe/)
+- [Cart Abandonment Recovery](https://freemius.com/wordpress/cart-abandonment-recovery/)
+- [Affiliate Platform](https://freemius.com/wordpress/affiliate-platform/)
+- [Analytics & Usage Tracking](https://freemius.com/wordpress/insights/)
+- [User Dashboard](https://freemius.com/wordpress/user-dashboard/)
 
-* [Monetization](https://freemius.com/wordpress/)
-* [Analytics](https://freemius.com/wordpress/insights/)
-* [More...](https://freemius.com/wordpress/features-comparison/)
+- [Monetization](https://freemius.com/wordpress/)
+- [Analytics](https://freemius.com/wordpress/insights/)
+- [More...](https://freemius.com/wordpress/features-comparison/)
 
 Freemius truly empowers developers to create prosperous subscription-based businesses.
 
@@ -25,12 +24,12 @@ If you're a WordPress plugin or theme developer and are interested in monetizing
 
 https://dashboard.freemius.com/register/
 
-Once you have your account setup and are familiar with how it all works you're ready to begin [integrating Freemius](https://freemius.com/help/documentation/wordpress-sdk/integrating-freemius-sdk/) into your WordPress product 
+Once you have your account setup and are familiar with how it all works you're ready to begin [integrating Freemius](https://freemius.com/help/documentation/wordpress-sdk/integrating-freemius-sdk/) into your WordPress product
 
 You can see some of the existing WordPress.org plugins & themes that are already utilizing the power of Freemius here:
 
-* https://profiles.wordpress.org/freemius/#content-plugins
-* https://includewp.com/freemius/#focus
+- https://profiles.wordpress.org/freemius/#content-plugins
+- https://includewp.com/freemius/#focus
 
 ## Code Documentation
 
@@ -132,9 +131,9 @@ Add logic which will only be available in your premium plugin version:
 <?php
     // This "if" block will be auto removed from the Free version.
     if ( my_prefix_fs()->is__premium_only() ) {
-    
+
         // ... premium only logic ...
-        
+
     }
 ?>
 ```
@@ -232,10 +231,12 @@ Add logic for specified paid plan:
 ```
 
 ## Excluding files and folders from the free plugin version
-There are [two ways](https://freemius.com/help/documentation/wordpress-sdk/software-licensing/#excluding_files_and_folders_from_the_free_plugin_version) to exclude files from your free version. 
 
-1. Add `__premium_only` just before the file extension. For example, functions__premium_only.php will be included only in the premium plugin version. This works for all types of files, not only PHP.
+There are [two ways](https://freemius.com/help/documentation/wordpress-sdk/software-licensing/#excluding_files_and_folders_from_the_free_plugin_version) to exclude files from your free version.
+
+1. Add `__premium_only` just before the file extension. For example, functions\_\_premium_only.php will be included only in the premium plugin version. This works for all types of files, not only PHP.
 2. Add `@fs_premium_only` a special meta tag to the plugin's main PHP file header. Example:
+
 ```php
 <?php
 	/**
@@ -255,31 +256,37 @@ There are [two ways](https://freemius.com/help/documentation/wordpress-sdk/softw
 	if ( ! defined( 'ABSPATH' ) ) {
 		exit;
 	}
-    
+
     // ... my code ...
 ?>
 ```
+
 In the example plugin header above, the file `/lib/functions.php` and the directory `/premium-files/` will be removed from the free plugin version.
 
 ## Hooks: Actions and Filters
+
 Similar to WordPress’ filters and actions hooks, the Freemius WordPress SDK provides a [collection of filters and actions](https://freemius.com/help/documentation/wordpress-sdk/filters-actions-hooks/) that enable you to customize and extend its functionality in your WordPress plugins or themes.
 
 ## WordPress.org Compliance
+
 Based on [WordPress.org Guidelines](https://wordpress.org/plugins/about/guidelines/) you are not allowed to submit a plugin that has premium code in it:
+
 > All code hosted by WordPress.org servers must be free and fully-functional. If you want to sell advanced features for a plugin (such as a "pro" version), then you must sell and serve that code from your own site, we will not host it on our servers.
 
 Therefore, if you want to deploy your free plugin's version to WordPress.org, make sure you wrap all your premium code with `if ( my_prefix_fs()->{{ method }}__premium_only() )` or use [some of the other methods](https://freemius.com/help/documentation/wordpress-sdk/software-licensing/) provided by the SDK to exclude premium features & files from the free version.
 
 ## Deployment
-Zip your Freemius product’s root folder and [upload it in the Deployment section](https://freemius.com/help/documentation/selling-with-freemius/deployment/) in the *Freemius Developer's Dashboard*. 
-The plugin/theme will automatically be scanned and processed by a custom-developed *PHP Processor* which will auto-generate two versions of your plugin:
+
+Zip your Freemius product’s root folder and [upload it in the Deployment section](https://freemius.com/help/documentation/selling-with-freemius/deployment/) in the _Freemius Developer's Dashboard_.
+The plugin/theme will automatically be scanned and processed by a custom-developed _PHP Processor_ which will auto-generate two versions of your plugin:
 
 1. **Premium version**: Identical to your uploaded version, including all code (except your `secret_key`). Will be enabled for download ONLY for your paying or in trial customers.
-2. **Free version**: The code stripped from all your paid features (based on the logic added wrapped in `{ method }__premium_only()`). 
+2. **Free version**: The code stripped from all your paid features (based on the logic added wrapped in `{ method }__premium_only()`).
 
 The free version is the one that you should give your users to download. Therefore, download the free generated version and upload to your site. Or, if your plugin was WordPress.org compliant and you made sure to exclude all your premium code with the different provided techniques, you can deploy the downloaded free version to the .org repo.
 
 ## License
+
 Copyright (c) Freemius®, Inc.
 
 Licensed under the GNU general public license (version 3).

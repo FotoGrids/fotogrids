@@ -1,32 +1,31 @@
 .fotogrids-external-url-manager {
-    &--no-permission,
-    &--error {
-        .fotogrids-permission-notice,
-        .fotogrids-error-notice {
-            padding: 20px;
-            background: #fff2cd;
-            border: 1px solid #dba617;
-            border-radius: 4px;
+	&--no-permission,
+	&--error {
+		.fotogrids-permission-notice,
+		.fotogrids-error-notice {
+			padding: 20px;
+			background: #fff2cd;
+			border: 1px solid #dba617;
+			border-radius: 4px;
 
-            p {
-                margin: 0;
-                color: #8a6914;
-                font-weight: 500;
-            }
-        }
+			p {
+				margin: 0;
+				color: #8a6914;
+				font-weight: 500;
+			}
+		}
 
-        .fotogrids-error-notice {
-            background: #fcf0f1;
-            border-color: #d63638;
+		.fotogrids-error-notice {
+			background: #fcf0f1;
+			border-color: #d63638;
 
-            p {
-                color: #8a2424;
-            }
+			p {
+				color: #8a2424;
+			}
 
-            .button {
-                margin-top: 10px;
-            }
-        }
-    }
+			.button {
+				margin-top: 10px;
+			}
+		}
+	}
 }
-

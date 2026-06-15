@@ -83,7 +83,6 @@ const TabPeople = ({
         ? (window.fotogridsSettings?.detectedFaces || [])
         : [];
 
-    // Filter out faces that are already tagged on this item.
     const taggedIds = new Set((metadata?.people || []).map((p) => p.id));
     const pendingFaces = detectedFaces.filter((f) => f.id == null || !taggedIds.has(f.id));
 
@@ -94,10 +93,9 @@ const TabPeople = ({
         upgradeText: strings.upgradeToPro,
     } : null;
 
-    // Handle "Add new…" from unknown face chip: focus the text input.
     const handleAddNewFromFace = () => {
         setMetadataInput((prev) => ({ ...prev, people: '' }));
-        // Attempt to focus the input after state flush.
+        // Focus the input after the state flush.
         setTimeout(() => {
             const input = document.querySelector('.fotogrids-tab-panel .fotogrids-input');
             if (input) input.focus();

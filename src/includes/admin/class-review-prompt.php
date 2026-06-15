@@ -50,12 +50,10 @@ class Review_Prompt {
 			return false;
 		}
 
-		// Check if we're on a FotoGrids admin page
 		if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
 			return false;
 		}
 
-		// Check if user has already clicked review link for this version
 		$user_id = get_current_user_id();
 		if ( ! $user_id ) {
 			return false;
@@ -67,12 +65,11 @@ class Review_Prompt {
 			true
 		);
 
-		// If never clicked, show the prompt
 		if ( empty( $last_review_version ) ) {
 			return true;
 		}
 
-		// If plugin version is newer than last review version, show again
+		// Re-show when the plugin version is newer than the last reviewed version.
 		return version_compare(
 			FOTOGRIDS_VERSION,
 			$last_review_version,

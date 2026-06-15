@@ -24,7 +24,6 @@ class Register_Gallery_Routes {
 	 * @return void
 	 */
 	public static function register() {
-		// Single gallery endpoint
 		register_rest_route(
 			'fotogrids/v1',
 			'/gallery/(?P<id>\d+)',
@@ -369,7 +368,6 @@ class Register_Gallery_Routes {
 			)
 		);
 
-		// Galleries list endpoint (for Gutenberg block)
 		register_rest_route(
 			'fotogrids/v1',
 			'/galleries',
@@ -396,7 +394,6 @@ class Register_Gallery_Routes {
 			)
 		);
 
-		// Gallery items endpoint (for Gutenberg block)
 		register_rest_route(
 			'fotogrids/v1',
 			'/galleries/(?P<id>\d+)/items',

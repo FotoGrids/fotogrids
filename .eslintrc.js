@@ -43,7 +43,7 @@ module.exports = {
         'react-hooks/exhaustive-deps': 'warn',
 
         // General rules
-        'indent': ['error', 4],
+        'indent': ['error', 'tab'],
         'quotes': ['error', 'single'],
         'semi': ['error', 'always'],
         'comma-dangle': ['error', 'always-multiline'],

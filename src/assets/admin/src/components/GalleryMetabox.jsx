@@ -22,7 +22,6 @@ const GalleryMetabox = ({
     strings = {}
 }) => {
 
-    // Add safety check
     if (!React || !useState || !useEffect || !useCallback) {
         console.error('React hooks not available');
         return React.createElement('div', {}, 'React hooks not available');
@@ -51,7 +50,6 @@ const GalleryMetabox = ({
     const handleReorderItemsRef = useRef(null);
     const State = window.FotoGridsCollectionState;
 
-    // Initialize items from props with safety check
     useEffect(() => {
         if (Array.isArray(galleryItems)) {
             // Ensure `featured` property exists for all items. The bootstrap
@@ -65,7 +63,6 @@ const GalleryMetabox = ({
 
             setItems(itemsWithFeatured);
 
-            // Initialize state manager with item IDs
             if (State) {
                 const itemIds = itemsWithFeatured.map(item => String(item.id)).filter(Boolean);
                 State.items.initItems(itemIds);
@@ -73,7 +70,6 @@ const GalleryMetabox = ({
         }
     }, [galleryItems]);
 
-    // Initialize sortable functionality using HTML5 drag and drop
     useEffect(() => {
         const gridElement = document.getElementById('fotogrids-items-grid');
 
@@ -122,7 +118,6 @@ const GalleryMetabox = ({
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', draggedElement.getAttribute('data-id'));
 
-            // Create placeholder
             placeholder = createPlaceholder();
             draggedElement.parentNode.insertBefore(placeholder, draggedElement.nextSibling);
         };
@@ -156,12 +151,10 @@ const GalleryMetabox = ({
                 return;
             }
 
-            // Remove placeholder if it exists
             if (placeholder && placeholder.parentNode) {
                 placeholder.parentNode.removeChild(placeholder);
             }
 
-            // Insert placeholder at the correct position
             if (draggedIndex < targetIndex) {
                 gridElement.insertBefore(placeholder, targetItem.nextSibling);
             } else {
@@ -203,7 +196,6 @@ const GalleryMetabox = ({
                 }
             }
 
-            // Get the new order from the DOM after moving
             const itemElements = Array.from(gridElement.querySelectorAll('.fotogrids-item-item'));
             const newOrder = itemElements.map(item => item.getAttribute('data-id'));
 
@@ -212,7 +204,6 @@ const GalleryMetabox = ({
             // drop can suppress dragend on some browsers.
             clearDraggingState();
 
-            // Update order using ref - this will update state and trigger re-render
             if (handleReorderItemsRef.current && newOrder.length > 0) {
                 handleReorderItemsRef.current(newOrder);
             }
@@ -220,7 +211,6 @@ const GalleryMetabox = ({
             return false;
         };
 
-        // Add drag event listeners to all items
         const itemElements = gridElement.querySelectorAll('.fotogrids-item-item');
         itemElements.forEach(item => {
             item.addEventListener('dragstart', handleDragStart);
@@ -229,7 +219,6 @@ const GalleryMetabox = ({
             item.addEventListener('drop', handleDrop);
         });
 
-        // Also add dragover and drop to the container to allow dropping anywhere
         const handleContainerDragOver = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -269,7 +258,6 @@ const GalleryMetabox = ({
         gridElement.addEventListener('dragover', handleContainerDragOver);
         gridElement.addEventListener('drop', handleContainerDrop);
 
-        // Cleanup function
         return () => {
             itemElements.forEach(item => {
                 item.removeEventListener('dragstart', handleDragStart);
@@ -280,7 +268,7 @@ const GalleryMetabox = ({
             gridElement.removeEventListener('dragover', handleContainerDragOver);
             gridElement.removeEventListener('drop', handleContainerDrop);
         };
-    }, [items, strings]); // Re-initialize when items change
+    }, [items, strings]);
 
     // Save the gallery's featured item via REST. Pass null to clear.
     const saveFeaturedItem = useCallback(async (itemId) => {
@@ -305,7 +293,6 @@ const GalleryMetabox = ({
         }
     }, [strings]);
 
-    // Handle media uploader
     const openMediaUploader = useCallback(() => {
         if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
             alert(strings.mediaNotAvailable);
@@ -335,7 +322,6 @@ const GalleryMetabox = ({
                 featured: false,
             }));
 
-            // Add new items, avoiding duplicates
             setItems(prevItems => {
                 const existingIds = new Set(prevItems.map(img => img.id));
                 const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
@@ -468,7 +454,6 @@ const GalleryMetabox = ({
         }
     }, [saveFeaturedItem, deleteEmbedItem]);
 
-    // Clear all items
     const closeClearAllModal = useCallback(() => {
         setShowClearAllModal(false);
         setClearAllConfirmValue('');
@@ -490,8 +475,6 @@ const GalleryMetabox = ({
         }
     }, [saveFeaturedItem]);
 
-    // Handle item reordering.
-    //
     // The reorder is treated as a regular gallery change: it updates the
     // shared state manager (which marks `items` as unsaved) and dispatches
     // the `fotogrids:setting_changed` event so ajax-save.js's autosave
@@ -505,7 +488,6 @@ const GalleryMetabox = ({
     // (`fotogrids_save_collection` AJAX action) via the hidden
     // `fotogrids_gallery_items[]` inputs rendered for each item below.
     const handleReorderItems = useCallback((newOrder) => {
-        // Reorder items in state to match new order using functional update
         setItems(prevItems => {
             const reorderedItems = newOrder.map(id =>
                 prevItems.find(item => item.id.toString() === id.toString())
@@ -529,18 +511,13 @@ const GalleryMetabox = ({
         }));
     }, []);
 
-    // Update ref when handleReorderItems changes
     useEffect(() => {
         handleReorderItemsRef.current = handleReorderItems;
     }, [handleReorderItems]);
 
-    // Open item edit modal
-    // Load item data function (shared by openItemModal and navigateItem)
+    // Shared by openItemModal and navigateItem.
     const loadItemData = useCallback(async (itemId) => {
         setLoading(true);
-
-        // Add delay to see loading state (for debugging)
-        // await new Promise(resolve => setTimeout(resolve, 10000));
 
         try {
             const formData = new FormData();
@@ -588,7 +565,6 @@ const GalleryMetabox = ({
         await loadItemData(itemId);
     }, [items, loadItemData]);
 
-    // Navigate between items in modal
     const navigateItem = useCallback(async (direction) => {
         const currentIndex = items.findIndex(img => img.id === currentItemId);
         let nextIndex;
@@ -605,7 +581,6 @@ const GalleryMetabox = ({
         }
     }, [items, currentItemId, loadItemData]);
 
-    // Handle tab switching
     const handleTabSwitch = useCallback((tabId) => {
         setActiveTab(tabId);
         setShowAddDropdown(false);
@@ -614,7 +589,6 @@ const GalleryMetabox = ({
         }
     }, [uiState]);
 
-    // Handle add dropdown
     const handleAddOption = useCallback((action) => {
         setShowAddDropdown(false);
 
@@ -632,8 +606,6 @@ const GalleryMetabox = ({
             case 'video_embed':
                 setShowVideoEmbedModal(true);
                 break;
-            default:
-                console.log('Unknown action:', action);
         }
     }, [openMediaUploader]);
 

@@ -228,9 +228,6 @@ const FileSummary = ( { file, summary } ) => {
     const chips = EXPORT_TYPES
         .filter( ( { key } ) => counts[ key ] > 0 );
 
-    console.log( 'counts', counts );
-    console.log( 'chips', chips );
-
     return (
         <div className="fg-ie-summary">
             <div className="fg-ie-summary__file">
@@ -401,9 +398,6 @@ const ImportPanel = ( { onOperationStart, onOperationEnd } ) => {
                     { availableTypes.map( ( { key, label, description, conflict } ) => {
                         const count   = counts[ key ];
                         const checked = include.has( key );
-
-                        console.log( 'key', key );
-                        console.log( 'count', count );
 
                         const showCount = typeof count === 'number' && count > 0;
                         const title   = (

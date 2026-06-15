@@ -1,539 +1,503 @@
-/**
- * License Page Styles
- */
-
-body[class*="fotogrids_page_fotogrids-license"] {
-    .fotogrids-admin-blocks-grid {
-        grid-template-columns: repeat(2, minmax(320px, 440px));
-
-        @media (max-width: 782px) {
-            grid-template-columns: 1fr;
-        }
-
-        .fotogrids-admin-block-card {
-            &.fg-abc-license {
-                .fotogrids-license-card-content {
-                    padding: 6px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 16px;
-                }
-
-                .fotogrids-license-card-title {
-                    font-family: 'Poppins', sans-serif;
-                    font-size: 24px;
-                    font-weight: 600;
-                    color: var(--fg-blue);
-                    margin: 0;
-
-                    &.fg-license-card-title-pro {
-                        color: var(--fg-yellow);
-                    }
-                }
-
-                .fotogrids-license-card-subtitle {
-                    font-size: 13px;
-                    color: var(--fg-text-tertiary);
-                    margin: -8px 0 0 0;
-                }
-
-                .fotogrids-license-activate-form {
-                    margin-top: 8px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 24px;
-
-                    form {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 8px;
-                    }
-
-                    .fotogrids-license-input {
-                        width: 100%;
-                        padding: 12px 16px;
-                        margin: 0;
-                        font-size: 14px;
-                        border: 1px solid var(--fg-border-primary);
-                        border-radius: 4px;
-                        transition: border-color 0.2s ease;
-
-                        &:focus {
-                            outline: none;
-                            border-color: var(--fg-blue);
-                            box-shadow: 0 0 0 1px var(--fg-blue);
-                        }
-
-                        &:disabled {
-                            background: #f6f7f7;
-                            cursor: not-allowed;
-                        }
-                    }
-
-                    .fg-button {
-                        font-size: 13px;
-                        padding: 11px 16px;
-                    }
-                }
-
-                .fotogrids-license-no-key {
-                    opacity: 1;
-                    color: var(--fg-text-secondary);
-                }
-
-                .fotogrids-license-card-details {
-                    margin-top: 8px;
-
-                    .fotogrids-license-detail-row {
-                        display: flex;
-                        flex-wrap: wrap;
-                        justify-content: space-between;
-                        align-items: center;
-                        gap: 8px;
-                        padding: 12px 0;
-                        border-bottom: 1px solid var(--fg-border-primary);
-
-                        &:last-child {
-                            border-bottom: none;
-                        }
-
-                        .fotogrids-license-detail-label {
-                            font-size: 11px;
-                            font-weight: 600;
-                            letter-spacing: 0.1px;
-                            text-transform: uppercase;
-                            color: var(--fg-text-tertiary);
-                        }
-
-                        .fotogrids-license-detail-value {
-                            font-size: 13px;
-                            font-weight: 600;
-                            color: var(--fg-text-primary);
-                        }
-
-                        .fotogrids-license-detail-value--key {
-                            flex: 0 0 100%;
-                            display: inline-flex;
-                            align-items: stretch;
-                            gap: 4px;
-                            background: var(--fg-background-secondary);
-                            box-shadow: 0 0 0 4px var(--fg-background-secondary);
-                            border-radius: 4px;
-                            font-size: 13px;
-                            font-weight: 400;
-
-                            code {
-                                flex: 1;
-                                display: inline-flex;
-                                align-items: center;
-                                background: transparent;
-                                color: var(--fg-text-primary);
-                            }
-
-                            button {
-                                opacity: 0;
-                                transition: opacity 0.2s ease;
-                            }
-
-                            &:hover {
-                                button {
-                                    opacity: 1;
-                                }
-                            }
-                        }
-                    }
-
-                    .fotogrids-license-actions {
-                        margin-top: 16px;
-
-                        .button {
-                            width: 100%;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    .fotogrids-license-page {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-
-        .fotogrids-license-loading {
-            text-align: center;
-            padding: 60px 20px;
-
-            .spinner {
-                float: none;
-                margin: 0 auto 20px;
-            }
-
-            p {
-                margin: 0;
-                color: #646970;
-            }
-        }
-
-        .fotogrids-license-notice {
-            margin: 0 0 24px;
-            padding: 12px 16px;
-            border-left: 4px solid;
-            background: #fff;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-
-            &.fotogrids-license-error {
-                border-left-color: #d63638;
-                background: #fcf0f1;
-            }
-
-            &.fotogrids-license-success {
-                border-left-color: #00a32a;
-                background: #f0f6fc;
-            }
-
-            p {
-                margin: 0;
-            }
-
-            .notice-dismiss {
-                float: right;
-                padding: 0;
-                margin: 0;
-                border: none;
-                background: none;
-                cursor: pointer;
-                color: #50575e;
-
-                &:hover {
-                    color: var(--fg-text-primary);
-                }
-            }
-        }
-
-        .fotogrids-license-upgrade-block {
-            background: linear-gradient(135deg, #3c46f0 0%, #5b67f3 100%);
-            border-radius: 12px;
-            padding: 60px 40px;
-            color: #fff;
-            text-align: center;
-            box-shadow: 0 8px 24px rgba(60, 70, 240, 0.2);
-
-            .fotogrids-license-upgrade-header {
-                margin-bottom: 48px;
-
-                h2 {
-                    font-size: 42px;
-                    font-weight: 700;
-                    margin: 0 0 16px;
-                    color: #fff;
-                    line-height: 1.2;
-                }
-
-                .fotogrids-license-upgrade-subtitle {
-                    font-size: 20px;
-                    margin: 0;
-                    opacity: 0.95;
-                    font-weight: 400;
-                }
-            }
-
-            .fotogrids-license-upgrade-features {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 32px;
-                margin-bottom: 48px;
-                text-align: left;
-
-                .fotogrids-license-feature {
-                    display: flex;
-                    gap: 20px;
-                    align-items: flex-start;
-
-                    .fotogrids-license-feature-icon {
-                        font-size: 36px;
-                        line-height: 1;
-                        flex-shrink: 0;
-                    }
-
-                    h3 {
-                        font-size: 20px;
-                        font-weight: 600;
-                        margin: 0 0 8px;
-                        color: #fff;
-                    }
-
-                    p {
-                        font-size: 16px;
-                        margin: 0;
-                        opacity: 0.9;
-                        line-height: 1.5;
-                    }
-                }
-            }
-
-            .fotogrids-license-upgrade-cta {
-                .fotogrids-license-upgrade-button {
-                    display: inline-block;
-                    padding: 18px 48px;
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: #3c46f0;
-                    background: #fff;
-                    border: none;
-                    border-radius: 8px;
-                    text-decoration: none;
-                    transition: all 0.2s ease;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-                    &:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-                        color: #3c46f0;
-                    }
-
-                    &:active {
-                        transform: translateY(0);
-                    }
-                }
-
-                .fotogrids-license-upgrade-note {
-                    margin: 16px 0 0;
-                    font-size: 14px;
-                    opacity: 0.85;
-                }
-            }
-        }
-
-        .fotogrids-license-details {
-            background: #fff;
-            border: 1px solid #dcdcde;
-            border-radius: 8px;
-            padding: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .fotogrids-license-activate {
-            max-width: 600px;
-            margin: 0 auto;
-
-            h2 {
-                font-size: 28px;
-                font-weight: 600;
-                margin: 0 0 12px;
-                color: var(--fg-text-primary);
-            }
-
-            .fotogrids-license-activate-description {
-                font-size: 16px;
-                color: #646970;
-                margin: 0 0 32px;
-                line-height: 1.6;
-            }
-
-            .fotogrids-license-activate-form {
-                .fotogrids-license-input-group {
-                    margin-bottom: 24px;
-
-                    label {
-                        display: block;
-                        font-weight: 600;
-                        margin-bottom: 8px;
-                        color: var(--fg-text-primary);
-                        font-size: 14px;
-                    }
-
-                    .fotogrids-license-input {
-                        width: 100%;
-                        padding: 12px 16px;
-                        font-size: 16px;
-                        border: 2px solid #dcdcde;
-                        border-radius: 6px;
-                        transition: border-color 0.2s ease;
-
-                        &:focus {
-                            outline: none;
-                            border-color: #3c46f0;
-                            box-shadow: 0 0 0 3px rgba(60, 70, 240, 0.1);
-                        }
-
-                        &:disabled {
-                            background: #f6f7f7;
-                            cursor: not-allowed;
-                        }
-                    }
-
-                    .fotogrids-license-help {
-                        margin: 8px 0 0;
-                        font-size: 13px;
-                        color: #646970;
-                    }
-                }
-            }
-        }
-
-        .fotogrids-license-info {
-            .fotogrids-license-status-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 32px;
-                padding-bottom: 24px;
-                border-bottom: 2px solid #f0f0f1;
-
-                h2 {
-                    font-size: 28px;
-                    font-weight: 600;
-                    margin: 0;
-                    color: var(--fg-text-primary);
-                }
-
-                .fotogrids-license-badge {
-                    padding: 8px 16px;
-                    border-radius: 20px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-
-                    &.fotogrids-license-badge-valid {
-                        background: #00a32a;
-                        color: #fff;
-                    }
-
-                    &.fotogrids-license-badge-invalid {
-                        background: #d63638;
-                        color: #fff;
-                    }
-                }
-            }
-
-            .fotogrids-license-details-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 24px;
-                margin-bottom: 32px;
-
-                .fotogrids-license-detail-item {
-                    &.fotogrids-license-detail-full {
-                        grid-column: 1 / -1;
-                    }
-
-                    label {
-                        display: block;
-                        font-weight: 600;
-                        margin-bottom: 8px;
-                        color: #646970;
-                        font-size: 13px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                    }
-
-                    .fotogrids-license-key-display {
-                        font-family: 'Courier New', monospace;
-                        font-size: 16px;
-                        color: var(--fg-text-primary);
-                        padding: 8px 12px;
-                        background: #f6f7f7;
-                        border-radius: 4px;
-                    }
-
-                    .fotogrids-license-expires {
-                        font-size: 16px;
-                        color: var(--fg-text-primary);
-                        font-weight: 500;
-                    }
-
-                    .fotogrids-license-features-list {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 8px;
-                        margin-top: 8px;
-
-                        .fotogrids-license-feature-tag {
-                            display: inline-block;
-                            padding: 6px 12px;
-                            background: #f0f6fc;
-                            color: var(--fg-text-primary);
-                            border-radius: 4px;
-                            font-size: 13px;
-                            font-weight: 500;
-                        }
-                    }
-                }
-            }
-
-            .fotogrids-license-actions {
-                display: flex;
-                gap: 12px;
-                padding-top: 24px;
-                border-top: 1px solid #f0f0f1;
-            }
-        }
-
-        .fotogrids-license-button {
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-            }
-
-            &.fotogrids-license-button-primary {
-                background: #3c46f0;
-                color: #fff;
-
-                &:hover:not(:disabled) {
-                    background: #2e37d1;
-                }
-            }
-
-            &.fotogrids-license-button-secondary {
-                background: #f6f7f7;
-                color: var(--fg-text-primary);
-
-                &:hover:not(:disabled) {
-                    background: #e5e5e5;
-                }
-            }
-        }
-    }
+body[class*='fotogrids_page_fotogrids-license'] {
+	.fotogrids-admin-blocks-grid {
+		grid-template-columns: repeat(2, minmax(320px, 440px));
+
+		@media (max-width: 782px) {
+			grid-template-columns: 1fr;
+		}
+
+		.fotogrids-admin-block-card {
+			&.fg-abc-license {
+				.fotogrids-license-card-content {
+					padding: 6px;
+					display: flex;
+					flex-direction: column;
+					gap: 16px;
+				}
+
+				.fotogrids-license-card-title {
+					font-family: 'Poppins', sans-serif;
+					font-size: 24px;
+					font-weight: 600;
+					color: var(--fg-blue);
+					margin: 0;
+
+					&.fg-license-card-title-pro {
+						color: var(--fg-yellow);
+					}
+				}
+
+				.fotogrids-license-card-subtitle {
+					font-size: 13px;
+					color: var(--fg-text-tertiary);
+					margin: -8px 0 0 0;
+				}
+
+				.fotogrids-license-activate-form {
+					margin-top: 8px;
+					display: flex;
+					flex-direction: column;
+					gap: 24px;
+
+					form {
+						display: flex;
+						flex-direction: column;
+						gap: 8px;
+					}
+
+					.fotogrids-license-input {
+						width: 100%;
+						padding: 12px 16px;
+						margin: 0;
+						font-size: 14px;
+						border: 1px solid var(--fg-border-primary);
+						border-radius: 4px;
+						transition: border-color 0.2s ease;
+
+						&:focus {
+							outline: none;
+							border-color: var(--fg-blue);
+							box-shadow: 0 0 0 1px var(--fg-blue);
+						}
+
+						&:disabled {
+							background: #f6f7f7;
+							cursor: not-allowed;
+						}
+					}
+
+					.fg-button {
+						font-size: 13px;
+						padding: 11px 16px;
+					}
+				}
+
+				.fotogrids-license-no-key {
+					opacity: 1;
+					color: var(--fg-text-secondary);
+				}
+
+				.fotogrids-license-card-details {
+					margin-top: 8px;
+
+					.fotogrids-license-detail-row {
+						display: flex;
+						flex-wrap: wrap;
+						justify-content: space-between;
+						align-items: center;
+						gap: 8px;
+						padding: 12px 0;
+						border-bottom: 1px solid var(--fg-border-primary);
+
+						&:last-child {
+							border-bottom: none;
+						}
+
+						.fotogrids-license-detail-label {
+							font-size: 11px;
+							font-weight: 600;
+							letter-spacing: 0.1px;
+							text-transform: uppercase;
+							color: var(--fg-text-tertiary);
+						}
+
+						.fotogrids-license-detail-value {
+							font-size: 13px;
+							font-weight: 600;
+							color: var(--fg-text-primary);
+						}
+
+						.fotogrids-license-detail-value--key {
+							flex: 0 0 100%;
+							display: inline-flex;
+							align-items: stretch;
+							gap: 4px;
+							background: var(--fg-background-secondary);
+							box-shadow: 0 0 0 4px var(--fg-background-secondary);
+							border-radius: 4px;
+							font-size: 13px;
+							font-weight: 400;
+
+							code {
+								flex: 1;
+								display: inline-flex;
+								align-items: center;
+								background: transparent;
+								color: var(--fg-text-primary);
+							}
+
+							button {
+								opacity: 0;
+								transition: opacity 0.2s ease;
+							}
+
+							&:hover {
+								button {
+									opacity: 1;
+								}
+							}
+						}
+					}
+
+					.fotogrids-license-actions {
+						margin-top: 16px;
+
+						.button {
+							width: 100%;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.fotogrids-license-page {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 20px;
+
+		.fotogrids-license-loading {
+			text-align: center;
+			padding: 60px 20px;
+
+			.spinner {
+				float: none;
+				margin: 0 auto 20px;
+			}
+
+			p {
+				margin: 0;
+				color: #646970;
+			}
+		}
+
+		.fotogrids-license-notice {
+			margin: 0 0 24px;
+			padding: 12px 16px;
+			border-left: 4px solid;
+			background: #fff;
+			box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+
+			&.fotogrids-license-error {
+				border-left-color: #d63638;
+				background: #fcf0f1;
+			}
+
+			&.fotogrids-license-success {
+				border-left-color: #00a32a;
+				background: #f0f6fc;
+			}
+
+			p {
+				margin: 0;
+			}
+
+			.notice-dismiss {
+				float: right;
+				padding: 0;
+				margin: 0;
+				border: none;
+				background: none;
+				cursor: pointer;
+				color: #50575e;
+
+				&:hover {
+					color: var(--fg-text-primary);
+				}
+			}
+		}
+
+		.fotogrids-license-upgrade-block {
+			background: linear-gradient(135deg, #3c46f0 0%, #5b67f3 100%);
+			border-radius: 12px;
+			padding: 60px 40px;
+			color: #fff;
+			text-align: center;
+			box-shadow: 0 8px 24px rgba(60, 70, 240, 0.2);
+
+			.fotogrids-license-upgrade-header {
+				margin-bottom: 48px;
+
+				h2 {
+					font-size: 42px;
+					font-weight: 700;
+					margin: 0 0 16px;
+					color: #fff;
+					line-height: 1.2;
+				}
+
+				.fotogrids-license-upgrade-subtitle {
+					font-size: 20px;
+					margin: 0;
+					opacity: 0.95;
+					font-weight: 400;
+				}
+			}
+
+			.fotogrids-license-upgrade-features {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 32px;
+				margin-bottom: 48px;
+				text-align: left;
+
+				.fotogrids-license-feature {
+					display: flex;
+					gap: 20px;
+					align-items: flex-start;
+
+					.fotogrids-license-feature-icon {
+						font-size: 36px;
+						line-height: 1;
+						flex-shrink: 0;
+					}
+
+					h3 {
+						font-size: 20px;
+						font-weight: 600;
+						margin: 0 0 8px;
+						color: #fff;
+					}
+
+					p {
+						font-size: 16px;
+						margin: 0;
+						opacity: 0.9;
+						line-height: 1.5;
+					}
+				}
+			}
+
+			.fotogrids-license-upgrade-cta {
+				.fotogrids-license-upgrade-button {
+					display: inline-block;
+					padding: 18px 48px;
+					font-size: 18px;
+					font-weight: 600;
+					color: #3c46f0;
+					background: #fff;
+					border: none;
+					border-radius: 8px;
+					text-decoration: none;
+					transition: all 0.2s ease;
+					box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+					&:hover {
+						transform: translateY(-2px);
+						box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+						color: #3c46f0;
+					}
+
+					&:active {
+						transform: translateY(0);
+					}
+				}
+
+				.fotogrids-license-upgrade-note {
+					margin: 16px 0 0;
+					font-size: 14px;
+					opacity: 0.85;
+				}
+			}
+		}
+
+		.fotogrids-license-details {
+			background: #fff;
+			border: 1px solid #dcdcde;
+			border-radius: 8px;
+			padding: 32px;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		}
+
+		.fotogrids-license-activate {
+			max-width: 600px;
+			margin: 0 auto;
+
+			h2 {
+				font-size: 28px;
+				font-weight: 600;
+				margin: 0 0 12px;
+				color: var(--fg-text-primary);
+			}
+
+			.fotogrids-license-activate-description {
+				font-size: 16px;
+				color: #646970;
+				margin: 0 0 32px;
+				line-height: 1.6;
+			}
+
+			.fotogrids-license-activate-form {
+				.fotogrids-license-input-group {
+					margin-bottom: 24px;
+
+					label {
+						display: block;
+						font-weight: 600;
+						margin-bottom: 8px;
+						color: var(--fg-text-primary);
+						font-size: 14px;
+					}
+
+					.fotogrids-license-input {
+						width: 100%;
+						padding: 12px 16px;
+						font-size: 16px;
+						border: 2px solid #dcdcde;
+						border-radius: 6px;
+						transition: border-color 0.2s ease;
+
+						&:focus {
+							outline: none;
+							border-color: #3c46f0;
+							box-shadow: 0 0 0 3px rgba(60, 70, 240, 0.1);
+						}
+
+						&:disabled {
+							background: #f6f7f7;
+							cursor: not-allowed;
+						}
+					}
+
+					.fotogrids-license-help {
+						margin: 8px 0 0;
+						font-size: 13px;
+						color: #646970;
+					}
+				}
+			}
+		}
+
+		.fotogrids-license-info {
+			.fotogrids-license-status-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 32px;
+				padding-bottom: 24px;
+				border-bottom: 2px solid #f0f0f1;
+
+				h2 {
+					font-size: 28px;
+					font-weight: 600;
+					margin: 0;
+					color: var(--fg-text-primary);
+				}
+
+				.fotogrids-license-badge {
+					padding: 8px 16px;
+					border-radius: 20px;
+					font-size: 13px;
+					font-weight: 600;
+					text-transform: uppercase;
+					letter-spacing: 0.5px;
+
+					&.fotogrids-license-badge-valid {
+						background: #00a32a;
+						color: #fff;
+					}
+
+					&.fotogrids-license-badge-invalid {
+						background: #d63638;
+						color: #fff;
+					}
+				}
+			}
+
+			.fotogrids-license-details-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 24px;
+				margin-bottom: 32px;
+
+				.fotogrids-license-detail-item {
+					&.fotogrids-license-detail-full {
+						grid-column: 1 / -1;
+					}
+
+					label {
+						display: block;
+						font-weight: 600;
+						margin-bottom: 8px;
+						color: #646970;
+						font-size: 13px;
+						text-transform: uppercase;
+						letter-spacing: 0.5px;
+					}
+
+					.fotogrids-license-key-display {
+						font-family: 'Courier New', monospace;
+						font-size: 16px;
+						color: var(--fg-text-primary);
+						padding: 8px 12px;
+						background: #f6f7f7;
+						border-radius: 4px;
+					}
+
+					.fotogrids-license-expires {
+						font-size: 16px;
+						color: var(--fg-text-primary);
+						font-weight: 500;
+					}
+
+					.fotogrids-license-features-list {
+						display: flex;
+						flex-wrap: wrap;
+						gap: 8px;
+						margin-top: 8px;
+
+						.fotogrids-license-feature-tag {
+							display: inline-block;
+							padding: 6px 12px;
+							background: #f0f6fc;
+							color: var(--fg-text-primary);
+							border-radius: 4px;
+							font-size: 13px;
+							font-weight: 500;
+						}
+					}
+				}
+			}
+
+			.fotogrids-license-actions {
+				display: flex;
+				gap: 12px;
+				padding-top: 24px;
+				border-top: 1px solid #f0f0f1;
+			}
+		}
+
+		.fotogrids-license-button {
+			padding: 10px 20px;
+			font-size: 14px;
+			font-weight: 600;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.2s ease;
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+
+			&.fotogrids-license-button-primary {
+				background: #3c46f0;
+				color: #fff;
+
+				&:hover:not(:disabled) {
+					background: #2e37d1;
+				}
+			}
+
+			&.fotogrids-license-button-secondary {
+				background: #f6f7f7;
+				color: var(--fg-text-primary);
+
+				&:hover:not(:disabled) {
+					background: #e5e5e5;
+				}
+			}
+		}
+	}
 }
-
-// @media (max-width: 782px) {
-//     .fotogrids-license-page {
-//         padding: 12px;
-
-//         .fotogrids-license-upgrade-block {
-//             padding: 40px 24px;
-
-//             .fotogrids-license-upgrade-header h2 {
-//                 font-size: 32px;
-//             }
-
-//             .fotogrids-license-upgrade-features {
-//                 grid-template-columns: 1fr;
-//                 gap: 24px;
-//             }
-//         }
-
-//         .fotogrids-license-details {
-//             padding: 24px 16px;
-//         }
-
-//         .fotogrids-license-actions {
-//             flex-direction: column;
-
-//             .fotogrids-license-button {
-//                 width: 100%;
-//             }
-//         }
-//     }
-// }
-

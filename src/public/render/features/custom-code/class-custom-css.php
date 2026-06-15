@@ -127,10 +127,6 @@ final class Custom_Css implements Feature {
 		return new Module_Assets();
 	}
 
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Extracts and sanitizes the raw CSS string from render settings.
 	 *

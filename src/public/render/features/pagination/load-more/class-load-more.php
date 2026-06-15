@@ -145,10 +145,6 @@ final class Load_More implements Feature {
 		);
 	}
 
-	// -------------------------------------------------------------------------
-	// Setting resolution
-	// -------------------------------------------------------------------------
-
 	private function resolve_button_text( Render_Context $render_context ): string {
 		$raw = $render_context->settings['load_more_button_text'] ?? '';
 		$raw = is_string( $raw ) ? trim( $raw ) : '';

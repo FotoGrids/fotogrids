@@ -1,5 +1,4 @@
-// =============================================================================
-// FotoGrids - Filter UI
+// Filter UI
 //
 // CSS variables (set via style_vars() in Filter_Ui PHP class, or defaulted
 // here). All colours, sizes, and spacing are driven by CSS variables - the
@@ -13,15 +12,10 @@
 //
 // Item visibility:
 //   .fg-is-filtered-out         JS-applied class on hidden items
-// =============================================================================
 
-// -----------------------------------------------------------------------------
-// Default CSS variable values
-//
+// Default CSS variable values.
 // Per-gallery overrides are written into the fg-style <style> block by
 // Filter_Ui::style_vars() on the gallery wrapper, which takes priority.
-// -----------------------------------------------------------------------------
-
 .fotogrids-collection.fotogrids-gallery {
     --fg-filter-base-size:        8px;
     --fg-filter-accent-color:     #3c46f0;
@@ -112,15 +106,13 @@
     --fg-filter-item-transition:  200ms ease;
 }
 
-// -----------------------------------------------------------------------------
-// Gallery wrapper layout when filtering is active
+// Gallery wrapper layout when filtering is active.
 //
 // Top position (default): wrapper becomes a flex column so the filter bar
 // sits above the layout grid with a gap between them - no margin on the bar.
 //
 // Sidebar position: wrapper becomes a flex row so the filter bar sits
 // alongside the layout grid. data-fg-filter-sidebar-side controls order.
-// -----------------------------------------------------------------------------
 
 // Top position
 [data-fg-filter-ui="true"][data-fg-filter-position="top"] {
@@ -204,10 +196,7 @@
     }
 }
 
-// -----------------------------------------------------------------------------
 // Filter bar wrapper
-// -----------------------------------------------------------------------------
-
 .fotogrids-filters {
     display:       flex;
     flex-wrap:     wrap;
@@ -225,8 +214,7 @@
     flex-wrap:      nowrap;
 }
 
-// -----------------------------------------------------------------------------
-// Inner wrapper around the reset button + filter groups
+// Inner wrapper around the reset button + filter groups.
 //
 // Top position    → row, so reset sits to the left/right of the groups.
 // Sidebar position → column, so reset stacks with the groups vertically.
@@ -234,8 +222,6 @@
 // data-fg-filter-reset-position swaps the reset's flex order:
 //   start (default) → reset comes first.
 //   end             → reset moves to the far edge via order: 99.
-// -----------------------------------------------------------------------------
-
 .fg-filter__wrapper {
     display:    flex;
     flex-wrap:  wrap;
@@ -263,10 +249,7 @@
     }
 }
 
-// -----------------------------------------------------------------------------
-// "All" reset button  (present in all styles)
-// -----------------------------------------------------------------------------
-
+// "All" reset button (present in all styles)
 .fg-filter-all {
     display:         inline-flex;
     align-items:     center;
@@ -307,15 +290,12 @@
     }
 }
 
-// -----------------------------------------------------------------------------
-// "Filters" toggle button  (rendered when filter_display_mode === "toggle")
+// "Filters" toggle button (rendered when filter_display_mode === "toggle").
 //
 // The toggle button is the first child of .fotogrids-filters. When the bar
 // carries data-fg-filter-collapsed="true", every sibling is hidden but the
 // toggle button remains visible. Clicking the toggle removes the collapsed
 // attribute; the chevron rotates to indicate the current state.
-// -----------------------------------------------------------------------------
-
 .fg-filter-toggle {
     display:         inline-flex;
     align-items:     center;
@@ -363,10 +343,7 @@
     }
 }
 
-// -----------------------------------------------------------------------------
 // Filter group
-// -----------------------------------------------------------------------------
-
 .fg-filter-group {
     display:    flex;
     flex-wrap:  wrap;
@@ -374,10 +351,7 @@
     gap:        var(--fg-filter-gap);
 }
 
-// -----------------------------------------------------------------------------
-// Button style  (.fotogrids-filters.fg-filters--buttons)
-// -----------------------------------------------------------------------------
-
+// Button style (.fotogrids-filters.fg-filters--buttons)
 .fg-filters--buttons .fg-filter-btn {
     display:         inline-flex;
     align-items:     center;
@@ -451,13 +425,9 @@
     gap:        var(--fg-filter-gap);
 }
 
-// -----------------------------------------------------------------------------
-// Dropdown style  (.fotogrids-filters.fg-filters--dropdowns)
-//
+// Dropdown style (.fotogrids-filters.fg-filters--dropdowns).
 // Custom-built dropdowns: a button trigger + a popover list.
 // No native <select> - fully styled and accessible.
-// -----------------------------------------------------------------------------
-
 .fg-filters--dropdowns .fg-filter-group {
     flex-direction: row;
     align-items:    center;
@@ -612,13 +582,9 @@
     color:      var(--fg-filter-count-active-color);
 }
 
-// -----------------------------------------------------------------------------
-// Checkbox style  (.fotogrids-filters.fg-filters--checkboxes)
-//
+// Checkbox style (.fotogrids-filters.fg-filters--checkboxes).
 // Fully custom checkboxes: native <input type="checkbox"> is visually hidden,
 // a CSS-drawn box is shown via the ::before pseudo-element on the label.
-// -----------------------------------------------------------------------------
-
 .fg-filters--checkboxes .fg-filter-fieldset {
     border:     none;
     margin:     0;
@@ -755,14 +721,11 @@
     color:      var(--fg-filter-count-active-color);
 }
 
-// -----------------------------------------------------------------------------
-// Hidden items
+// Hidden items.
 //
 // Class-based hide (not style.display) so CSS transitions work and the layout
 // engine can be notified. Transitions use opacity + scale for a smooth effect.
 // pointer-events:none prevents hover/click while the item is fading out.
-// -----------------------------------------------------------------------------
-
 .fotogrids-collection.fotogrids-gallery .fg-item.fg-is-filtered-out {
     display:         none; // remove from flow; keeps layout clean without JS reflow
 }

@@ -114,11 +114,10 @@
     aspect-ratio: auto;
 }
 
-/* ----------------------------------------------------------------------
-   Aspect ratio "None". The wrapper carries data-fg-natural-ratio="1" and
+/* Aspect ratio "None". The wrapper carries data-fg-natural-ratio="1" and
    --fg-item-aspect-ratio is not stamped. The image must show whole — no
-   crop, no stretch — so we drop the fixed item box (aspect-ratio: auto)
-   and switch object-fit to contain.
+   crop, no stretch — so the fixed item box is dropped (aspect-ratio: auto)
+   and object-fit switches to contain.
 
    Height contract for "None":
    - Fixed mode: the stage takes --fg-height-fixed (the existing fixed-mode
@@ -129,8 +128,7 @@
      stage/track follow that variable and the height transition animates the
      frame up/down between images of different heights. Before JS measures
      (or with motion reduced) the frame falls back to the max so nothing is
-     clipped.
-   ---------------------------------------------------------------------- */
+     clipped. */
 
 [data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item {
     aspect-ratio: auto;
@@ -205,12 +203,10 @@
     object-fit: var( --fg-item-fit, cover );
 }
 
-/* ----------------------------------------------------------------------
-   Transitions. JS sets data-fg-transition on the wrapper and stamps the
+/* Transitions. JS sets data-fg-transition on the wrapper and stamps the
    resolved duration on --fg-viewer-duration (ms). Default state: every
    non-active item hidden; active item shown. Each mode overrides how the
-   show/hide animates.
-   ---------------------------------------------------------------------- */
+   show/hide animates. */
 
 [data-fg-viewer="1"] .fg-viewer-track .fg-item {
     opacity: 0;
@@ -296,12 +292,10 @@
     }
 }
 
-/* ----------------------------------------------------------------------
-   Control bar — sits BELOW the image (not overlaid). A light-grey strip
+/* Control bar — sits BELOW the image (not overlaid). A light-grey strip
    with the prev arrow on the inline-start side, the next arrow on the
    inline-end side, and the counter centred between them. The bar colour is
-   a CSS variable so it can be themed/overridden.
-   ---------------------------------------------------------------------- */
+   a CSS variable so it can be themed/overridden. */
 
 [data-fg-viewer="1"] .fg-viewer-bar {
     display: flex;

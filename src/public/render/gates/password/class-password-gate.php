@@ -45,10 +45,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Password_Gate implements Gate {
 
-	// -------------------------------------------------------------------------
-	// Gate identity
-	// -------------------------------------------------------------------------
-
 	public function id(): string {
 		return 'fotogrids/password';
 	}
@@ -60,10 +56,6 @@ final class Password_Gate implements Gate {
 	public function extends_id(): ?string {
 		return null;
 	}
-
-	// -------------------------------------------------------------------------
-	// Gate lifecycle
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Returns true when password protection is active for this gallery.
@@ -164,10 +156,6 @@ final class Password_Gate implements Gate {
 			)
 		);
 	}
-
-	// -------------------------------------------------------------------------
-	// HTML rendering
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Builds the lock screen HTML via Gate_Renderer.

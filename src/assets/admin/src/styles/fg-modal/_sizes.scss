@@ -1,40 +1,40 @@
 .fg-modal--size-sm .fg-modal__dialog {
-    --fg-modal-width: 480px;
-    --fg-modal-height: auto;
+	--fg-modal-width: 480px;
+	--fg-modal-height: auto;
 }
 
 .fg-modal--size-md .fg-modal__dialog {
-    --fg-modal-width: 720px;
-    --fg-modal-height: auto;
+	--fg-modal-width: 720px;
+	--fg-modal-height: auto;
 }
 
 .fg-modal--size--ml .fg-modal__dialog {
-    --fg-modal-width: 920px;
-    --fg-modal-height: 480px;
+	--fg-modal-width: 920px;
+	--fg-modal-height: 480px;
 }
 
 .fg-modal--size-lg .fg-modal__dialog {
-    --fg-modal-width: 1024px;
-    --fg-modal-height: 90vh;
+	--fg-modal-width: 1024px;
+	--fg-modal-height: 90vh;
 }
 
 .fg-modal--size-xl .fg-modal__dialog {
-    --fg-modal-width: 1280px;
-    --fg-modal-height: 90vh;
+	--fg-modal-width: 1280px;
+	--fg-modal-height: 90vh;
 }
 
 .fg-modal--size-cover .fg-modal__dialog {
-    --fg-modal-width: calc(100vw - 32px);
-    --fg-modal-height: calc(100vh - 32px);
-    --fg-modal-max-width: calc(100vw - 32px);
-    --fg-modal-max-height: calc(100vh - 32px);
-    --fg-modal-radius: 12px;
+	--fg-modal-width: calc(100vw - 32px);
+	--fg-modal-height: calc(100vh - 32px);
+	--fg-modal-max-width: calc(100vw - 32px);
+	--fg-modal-max-height: calc(100vh - 32px);
+	--fg-modal-radius: 12px;
 }
 
 .fg-modal--size-full .fg-modal__dialog {
-    --fg-modal-width: 100vw;
-    --fg-modal-height: 100vh;
-    --fg-modal-max-width: 100vw;
-    --fg-modal-max-height: 100vh;
-    --fg-modal-radius: 0;
+	--fg-modal-width: 100vw;
+	--fg-modal-height: 100vh;
+	--fg-modal-max-width: 100vw;
+	--fg-modal-max-height: 100vh;
+	--fg-modal-radius: 0;
 }

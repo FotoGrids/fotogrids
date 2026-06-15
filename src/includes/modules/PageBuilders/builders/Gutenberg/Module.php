@@ -219,7 +219,6 @@ final class Module {
 			FOTOGRIDS_VERSION
 		);
 
-		// Album block - same bundle pattern.
 		wp_register_script(
 			self::SCRIPT_HANDLE_ALBUM,
 			$base_url . 'album.js',
@@ -235,7 +234,6 @@ final class Module {
 			FOTOGRIDS_VERSION
 		);
 
-		// Both bundles read window.fotogridsPageBuilders for their config.
 		$payload = self::build_localize_payload();
 		wp_localize_script( self::SCRIPT_HANDLE_GALLERY, 'fotogridsPageBuilders', $payload );
 		wp_localize_script( self::SCRIPT_HANDLE_ALBUM, 'fotogridsPageBuilders', $payload );

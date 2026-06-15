@@ -7,91 +7,95 @@
 // safely above wp-admin modals (~9999).
 
 .fg-tooltip-trigger {
-    display: inline-flex;
-    align-items: center;
+	display: inline-flex;
+	align-items: center;
 }
 
 .fg-tooltip {
-    position: absolute;
-    z-index: 99999;
-    pointer-events: none;
+	position: absolute;
+	z-index: 99999;
+	pointer-events: none;
 
-    max-width: 220px;
-    padding: 5px 10px;
-    border-radius: 4px;
+	max-width: 220px;
+	padding: 5px 10px;
+	border-radius: 4px;
 
-    background: var(--fg-background-dark);
-    color: var(--fg-text-inverse);
-    font-size: 12px;
-    line-height: 1.4;
-    font-weight: 400;
-    white-space: normal;
-    text-align: center;
+	background: var(--fg-background-dark);
+	color: var(--fg-text-inverse);
+	font-size: 12px;
+	line-height: 1.4;
+	font-weight: 400;
+	white-space: normal;
+	text-align: center;
 
-    // Fade in - layout is already calculated by the time visible=true.
-    animation: fg-tooltip-fade-in 0.1s ease forwards;
+	// Fade in - layout is already calculated by the time visible=true.
+	animation: fg-tooltip-fade-in 0.1s ease forwards;
 
-    // ── Caret ──────────────────────────────────────────────────────────────
-    &::after {
-        content: '';
-        position: absolute;
-        border: 5px solid transparent;
-    }
+	// Caret
+	&::after {
+		content: '';
+		position: absolute;
+		border: 5px solid transparent;
+	}
 
-    &--top::after {
-        top: 100%;
-        left: 50%;
-        transform: translateX( -50% );
-        border-top-color: var(--fg-background-dark);
-    }
+	&--top::after {
+		top: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		border-top-color: var(--fg-background-dark);
+	}
 
-    &--bottom::after {
-        bottom: 100%;
-        left: 50%;
-        transform: translateX( -50% );
-        border-bottom-color: var(--fg-background-dark);
-    }
+	&--bottom::after {
+		bottom: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		border-bottom-color: var(--fg-background-dark);
+	}
 
-    &--left::after {
-        left: 100%;
-        top: 50%;
-        transform: translateY( -50% );
-        border-left-color: var(--fg-background-dark);
-    }
+	&--left::after {
+		left: 100%;
+		top: 50%;
+		transform: translateY(-50%);
+		border-left-color: var(--fg-background-dark);
+	}
 
-    &--right::after {
-        right: 100%;
-        top: 50%;
-        transform: translateY( -50% );
-        border-right-color: var(--fg-background-dark);
-    }
+	&--right::after {
+		right: 100%;
+		top: 50%;
+		transform: translateY(-50%);
+		border-right-color: var(--fg-background-dark);
+	}
 }
 
 @keyframes fg-tooltip-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
 
-// ── Pro badge (lock icon trigger) ──────────────────────────────────────────
+// Pro badge (lock icon trigger)
 
 .fg-pro-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
+	width: 16px;
+	height: 16px;
+	border-radius: 3px;
 
-    background: var(--fg-yellow);
-    color: var(--fg-text-inverse);
-    cursor: help;
-    flex-shrink: 0;
+	background: var(--fg-yellow);
+	color: var(--fg-text-inverse);
+	cursor: help;
+	flex-shrink: 0;
 
-    margin-inline-start: 4px;
+	margin-inline-start: 4px;
 
-    &__lock-icon {
-        display: block;
-        flex-shrink: 0;
-    }
+	&__lock-icon {
+		display: block;
+		flex-shrink: 0;
+	}
 }

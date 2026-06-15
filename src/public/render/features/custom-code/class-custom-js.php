@@ -200,10 +200,6 @@ final class Custom_Js implements Feature {
 		return new Module_Assets();
 	}
 
-	// -------------------------------------------------------------------------
-	// Private helpers
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Extracts and sanitizes the raw JS string from render settings.
 	 *
