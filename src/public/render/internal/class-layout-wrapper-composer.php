@@ -239,7 +239,7 @@ final class Layout_Wrapper_Composer {
 			'data-fg-columns-mode' => $mode,
 		);
 
-		if ( Columns_Mode::FIXED->value === $mode ) {
+		if ( Columns_Mode::FIXED === $mode ) {
 			$style_vars['--fg-cols'] = new Responsive_Var(
 				desktop: self::resolve_column_count( $responsive_columns, 'desktop', $default_columns ),
 				tablet:  self::resolve_column_count( $responsive_columns, 'tablet', $default_columns ),

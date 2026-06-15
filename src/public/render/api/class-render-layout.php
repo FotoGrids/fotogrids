@@ -24,7 +24,7 @@ final class Render_Layout {
 	 */
 	public function __construct(
 		public readonly string $layout_id,
-		public readonly Columns_Mode $columns_mode,
+		public readonly string $columns_mode,
 		public readonly array $responsive_columns,
 		public readonly array $responsive_spacing,
 		public readonly array $columns_auto_range,

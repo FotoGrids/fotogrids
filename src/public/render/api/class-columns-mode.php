@@ -8,30 +8,28 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Supported edit-time field states.
+ * Column mode values used by layout modules.
  *
  * @package FotoGrids\Render\Api
  * @since   1.0.0
  */
-final class Field_State {
-	const TEASER   = 'teaser';
-	const LOCKED   = 'locked';
-	const EDITABLE = 'editable';
+final class Columns_Mode {
+	const FIXED = 'fixed';
+	const AUTO  = 'auto';
 
 	/**
-	 * All valid field-state values.
+	 * All valid column-mode values.
 	 *
 	 * @since 1.0.0
 	 * @var array<int,string>
 	 */
 	const ALL = array(
-		self::TEASER,
-		self::LOCKED,
-		self::EDITABLE,
+		self::FIXED,
+		self::AUTO,
 	);
 
 	/**
-	 * Whether the given value is a valid field state.
+	 * Whether the given value is a valid column mode.
 	 *
 	 * @since 1.0.0
 	 * @param mixed $value Candidate value.

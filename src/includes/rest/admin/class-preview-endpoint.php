@@ -75,7 +75,7 @@ final class Preview_Endpoint {
 				'settings' => array_merge(
 					$render_context->settings,
 					array(
-						'_preview_source'     => Request_Source::PREVIEW_UNSAVED->value,
+						'_preview_source'     => Request_Source::PREVIEW_UNSAVED,
 						'_show_render_errors' => current_user_can( 'edit_posts' ),
 					)
 				),

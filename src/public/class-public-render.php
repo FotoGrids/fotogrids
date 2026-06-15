@@ -162,7 +162,7 @@ class Public_Render {
 				settings_overlay: $settings_overlay,
 				collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
 				item_overrides: array(),
-				source: $source instanceof Request_Source ? $source : Request_Source::PREVIEW_UNSAVED,
+				source: Request_Source::is_valid( $source ) ? $source : Request_Source::PREVIEW_UNSAVED,
 				simulate_state: null
 			);
 		} else {
@@ -178,7 +178,7 @@ class Public_Render {
 				gallery_id: (int) $gallery_id,
 				render_settings: $render_settings,
 				collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
-				source: $source instanceof Request_Source ? $source : Request_Source::SHORTCODE,
+				source: Request_Source::is_valid( $source ) ? $source : Request_Source::SHORTCODE,
 				album_id: absint( $atts['album_id'] ?? 0 ) ?: null,
 				meta_overrides: $effective_meta_overrides
 			);
@@ -232,7 +232,7 @@ class Public_Render {
 	 *                                             can override).
 	 * @return string Rendered HTML (or empty string when the gallery cannot be rendered).
 	 */
-	public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), Request_Source $source = Request_Source::ALBUM_AJAX ): string {
+	public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), string $source = Request_Source::ALBUM_AJAX ): string {
 		$gallery = \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id );
 		if ( ! $gallery || 'publish' !== $gallery->post_status ) {
 			return '';
@@ -342,16 +342,16 @@ class Public_Render {
 		}
 
 		$source = Request_Source::SHORTCODE;
-		if ( Request_Source::BLOCK->value === $atts['_source'] ) {
+		if ( Request_Source::BLOCK === $atts['_source'] ) {
 			$source = Request_Source::BLOCK;
 		}
-		if ( Request_Source::ELEMENTOR->value === $atts['_source'] ) {
+		if ( Request_Source::ELEMENTOR === $atts['_source'] ) {
 			$source = Request_Source::ELEMENTOR;
 		}
-		if ( Request_Source::DIVI->value === $atts['_source'] ) {
+		if ( Request_Source::DIVI === $atts['_source'] ) {
 			$source = Request_Source::DIVI;
 		}
-		if ( Request_Source::ALBUM_AJAX->value === $atts['_source'] ) {
+		if ( Request_Source::ALBUM_AJAX === $atts['_source'] ) {
 			$source = Request_Source::ALBUM_AJAX;
 		}
 		if ( absint( $atts['album_id'] ) > 0 ) {

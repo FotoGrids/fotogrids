@@ -155,7 +155,7 @@ final class Preview_Renderer {
 	 * @param Request_Source $source
 	 * @return Render_Context
 	 */
-	private static function flip_to_preview_context( Render_Context $context, Request_Source $source ): Render_Context {
+	private static function flip_to_preview_context( Render_Context $context, string $source ): Render_Context {
 		$preview_meta = $context->meta->with(
 			array(
 				'is_preview' => true,

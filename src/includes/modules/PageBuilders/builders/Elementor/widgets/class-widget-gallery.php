@@ -228,7 +228,7 @@ class Widget_Gallery extends Widget_Base {
 
 		$shortcode_args = array(
 			'id'      => $gallery_id,
-			'_source' => Request_Source::ELEMENTOR->value,
+			'_source' => Request_Source::ELEMENTOR,
 		);
 		echo \FotoGrids\Public_Render::gallery_shortcode( $shortcode_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}

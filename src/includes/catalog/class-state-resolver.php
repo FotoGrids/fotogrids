@@ -29,7 +29,7 @@ final class State_Resolver {
 		string $field_id,
 		?string $option_value = null,
 		?string $simulate_state = null
-	): Field_State {
+	): string {
 		$entry = Catalog::get( $field_id );
 		if ( null === $entry ) {
 			self::debug_log_resolution( $field_id, $option_value, 'unknown', Field_State::TEASER, 'missing_catalog_entry' );
@@ -85,7 +85,7 @@ final class State_Resolver {
 	 * @param   string $simulate_state Simulated state token.
 	 * @return  Field_State
 	 */
-	private static function resolve_for_simulated_state( string $required_tier, string $simulate_state ): Field_State {
+	private static function resolve_for_simulated_state( string $required_tier, string $simulate_state ): string {
 		if ( 'free' === $required_tier ) {
 			return Field_State::EDITABLE;
 		}
@@ -134,7 +134,7 @@ final class State_Resolver {
 		string $field_id,
 		?string $option_value,
 		string $required_tier,
-		Field_State $state,
+		string $state,
 		string $reason
 	): void {
 		// Cheap gate first so non-debug requests never touch the dedup table.

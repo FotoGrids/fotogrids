@@ -120,7 +120,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 		return \FotoGrids\Public_Render::gallery_shortcode(
 			array(
 				'id'      => $gallery_id,
-				'_source' => Request_Source::DIVI->value,
+				'_source' => Request_Source::DIVI,
 			)
 		);
 	}

@@ -24,7 +24,29 @@ if ( ! defined( 'WPINC' ) ) {
  * @package FotoGrids\Render\Api
  * @since   1.0.0
  */
-enum Collection_Kind: string {
-	case GALLERY = 'gallery';
-	case ALBUM   = 'album';
+final class Collection_Kind {
+	const GALLERY = 'gallery';
+	const ALBUM   = 'album';
+
+	/**
+	 * All valid collection-kind values.
+	 *
+	 * @since 1.0.0
+	 * @var array<int,string>
+	 */
+	const ALL = array(
+		self::GALLERY,
+		self::ALBUM,
+	);
+
+	/**
+	 * Whether the given value is a valid collection kind.
+	 *
+	 * @since 1.0.0
+	 * @param mixed $value Candidate value.
+	 * @return bool
+	 */
+	public static function is_valid( $value ): bool {
+		return in_array( $value, self::ALL, true );
+	}
 }

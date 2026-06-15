@@ -93,7 +93,7 @@ class Album_Module implements \ET\Builder\Framework\DependencyManagement\Interfa
 		return \FotoGrids\Public_Render::album_shortcode(
 			array(
 				'id'      => $album_id,
-				'_source' => Request_Source::DIVI->value,
+				'_source' => Request_Source::DIVI,
 			)
 		);
 	}

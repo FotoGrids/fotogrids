@@ -177,7 +177,7 @@ final class Preview_Data {
 	 */
 	private static function flip_to_preview_context(
 		\FotoGrids\Render\Api\Render_Context $context,
-		\FotoGrids\Render\Api\Request_Source $source
+		string $source
 	): \FotoGrids\Render\Api\Render_Context {
 		$preview_meta = $context->meta->with(
 			array(

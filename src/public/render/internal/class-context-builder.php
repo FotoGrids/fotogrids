@@ -64,7 +64,7 @@ final class Context_Builder {
 		int $gallery_id,
 		array $render_settings = array(),
 		array $collection_item_ids = array(),
-		Request_Source $source = Request_Source::SHORTCODE,
+		string $source = Request_Source::SHORTCODE,
 		?int $album_id = null,
 		array $meta_overrides = array()
 	): Render_Context {
@@ -294,7 +294,7 @@ final class Context_Builder {
 		array $settings_overlay = array(),
 		array $collection_item_ids = array(),
 		array $item_overrides = array(),
-		Request_Source $source = Request_Source::PREVIEW_UNSAVED,
+		string $source = Request_Source::PREVIEW_UNSAVED,
 		?string $simulate_state = null
 	): Render_Context {
 		$render_settings            = array_replace_recursive( $base_settings, $settings_overlay );
@@ -356,7 +356,7 @@ final class Context_Builder {
 		int $album_id,
 		array $render_settings = array(),
 		array $child_gallery_ids = array(),
-		Request_Source $source = Request_Source::SHORTCODE
+		string $source = Request_Source::SHORTCODE
 	): Render_Context {
 		$render_settings = self::coerce_layout_settings( $render_settings );
 
@@ -526,7 +526,7 @@ final class Context_Builder {
 	private function build_layout( array $render_settings ): Render_Layout {
 		$layout_id          = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : 'grid';
 		$columns_mode_value = is_string( $render_settings['columns_mode'] ?? null ) ? $render_settings['columns_mode'] : 'fixed';
-		$columns_mode       = Columns_Mode::AUTO->value === $columns_mode_value ? Columns_Mode::AUTO : Columns_Mode::FIXED;
+		$columns_mode       = Columns_Mode::AUTO === $columns_mode_value ? Columns_Mode::AUTO : Columns_Mode::FIXED;
 
 		return new Render_Layout(
 			layout_id: $layout_id,
