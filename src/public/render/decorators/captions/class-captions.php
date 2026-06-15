@@ -290,11 +290,14 @@ final class Captions implements Decorator {
 	 * @return string                     'flex-start', 'center', or 'flex-end'.
 	 */
 	private function vertical_alignment_to_flex( string $vertical_alignment ): string {
-		return match ( $vertical_alignment ) {
-			'top'    => 'flex-start',
-			'middle' => 'center',
-			default  => 'flex-end',
-		};
+		switch ( $vertical_alignment ) {
+			case 'top':
+				return 'flex-start';
+			case 'middle':
+				return 'center';
+			default:
+				return 'flex-end';
+		}
 	}
 
 	/**

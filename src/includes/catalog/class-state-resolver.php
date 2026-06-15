@@ -90,12 +90,17 @@ final class State_Resolver {
 			return Field_State::EDITABLE;
 		}
 
-		return match ( $simulate_state ) {
-			'ok' => Field_State::EDITABLE,
-			'expired' => Field_State::LOCKED,
-			'password_required', 'unauthorized' => Field_State::TEASER,
-			default => Field_State::TEASER,
-		};
+		switch ( $simulate_state ) {
+			case 'ok':
+				return Field_State::EDITABLE;
+			case 'expired':
+				return Field_State::LOCKED;
+			case 'password_required':
+			case 'unauthorized':
+				return Field_State::TEASER;
+			default:
+				return Field_State::TEASER;
+		}
 	}
 
 	/**

@@ -53,10 +53,13 @@ final class Responsive_Var {
 	 * @return string
 	 */
 	public function for_breakpoint( string $breakpoint ): string {
-		return match ( $breakpoint ) {
-			'mobile'  => '' !== $this->mobile ? $this->mobile : $this->for_breakpoint( 'tablet' ),
-			'tablet'  => '' !== $this->tablet ? $this->tablet : $this->desktop,
-			default   => $this->desktop,
-		};
+		switch ( $breakpoint ) {
+			case 'mobile':
+				return '' !== $this->mobile ? $this->mobile : $this->for_breakpoint( 'tablet' );
+			case 'tablet':
+				return '' !== $this->tablet ? $this->tablet : $this->desktop;
+			default:
+				return $this->desktop;
+		}
 	}
 }
