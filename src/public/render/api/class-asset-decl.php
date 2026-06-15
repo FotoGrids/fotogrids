@@ -15,13 +15,23 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Asset_Decl {
 
+	public string $path;
+	public array $deps;
+	public bool $in_footer;
+	public ?string $plugin_origin;
+
 	/**
 	 * @param array<int, string> $deps Asset dependency handles.
 	 */
 	public function __construct(
-		public readonly string $path,
-		public readonly array $deps = array(),
-		public readonly bool $in_footer = false,
-		public readonly ?string $plugin_origin = null,
-	) {}
+		string $path,
+		array $deps = array(),
+		bool $in_footer = false,
+		?string $plugin_origin = null
+	) {
+		$this->path = $path;
+		$this->deps = $deps;
+		$this->in_footer = $in_footer;
+		$this->plugin_origin = $plugin_origin;
+	}
 }

@@ -32,13 +32,19 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Context_Builder {
 
+	private Instance_Id_Factory $instance_id_factory;
+	private mixed $items_loader;
+
 	/**
 	 * @param callable|null $items_loader Callback for item hydration.
 	 */
 	public function __construct(
-		private readonly Instance_Id_Factory $instance_id_factory,
-		private readonly mixed $items_loader = null,
-	) {}
+		Instance_Id_Factory $instance_id_factory,
+		mixed $items_loader = null
+	) {
+		$this->instance_id_factory = $instance_id_factory;
+		$this->items_loader = $items_loader;
+	}
 
 	/**
 	 * Creates a context for public rendering.

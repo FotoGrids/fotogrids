@@ -15,6 +15,27 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Meta {
 
+	public int $gallery_id;
+	public ?int $album_id;
+	public string $instance_id;
+	public string $source;
+	public bool $is_preview;
+	public string $mode;
+	public int $schema_version;
+	public string $collection_kind;
+	public ?int $requested_page;
+	public ?int $requested_per_page;
+	public ?string $breakpoint;
+	public ?string $partial;
+	public ?int $total_item_count;
+	public array $active_filters;
+	public ?int $random_seed;
+	public bool $view_page;
+	public bool $is_ajax_swap;
+	public ?int $container_width;
+	public ?int $pagination_page_size;
+	public ?int $pagination_total_pages;
+
 	/**
 	 * @since   1.0.0
 	 * @param   int             $gallery_id Gallery identifier. Zero when rendering an album-as-collection.
@@ -40,27 +61,48 @@ final class Render_Meta {
 	 * @return  void
 	 */
 	public function __construct(
-		public readonly int $gallery_id,
-		public readonly ?int $album_id,
-		public readonly string $instance_id,
-		public readonly string $source,
-		public readonly bool $is_preview,
-		public readonly string $mode,
-		public readonly int $schema_version = 2,
-		public readonly string $collection_kind = Collection_Kind::GALLERY,
-		public readonly ?int $requested_page = null,
-		public readonly ?int $requested_per_page = null,
-		public readonly ?string $breakpoint = null,
-		public readonly ?string $partial = null,
-		public readonly ?int $total_item_count = null,
-		public readonly array $active_filters = array(),
-		public readonly ?int $random_seed = null,
-		public readonly bool $view_page = false,
-		public readonly bool $is_ajax_swap = false,
-		public readonly ?int $container_width = null,
-		public readonly ?int $pagination_page_size = null,
-		public readonly ?int $pagination_total_pages = null,
-	) {}
+		int $gallery_id,
+		?int $album_id,
+		string $instance_id,
+		string $source,
+		bool $is_preview,
+		string $mode,
+		int $schema_version = 2,
+		string $collection_kind = Collection_Kind::GALLERY,
+		?int $requested_page = null,
+		?int $requested_per_page = null,
+		?string $breakpoint = null,
+		?string $partial = null,
+		?int $total_item_count = null,
+		array $active_filters = array(),
+		?int $random_seed = null,
+		bool $view_page = false,
+		bool $is_ajax_swap = false,
+		?int $container_width = null,
+		?int $pagination_page_size = null,
+		?int $pagination_total_pages = null
+	) {
+		$this->gallery_id = $gallery_id;
+		$this->album_id = $album_id;
+		$this->instance_id = $instance_id;
+		$this->source = $source;
+		$this->is_preview = $is_preview;
+		$this->mode = $mode;
+		$this->schema_version = $schema_version;
+		$this->collection_kind = $collection_kind;
+		$this->requested_page = $requested_page;
+		$this->requested_per_page = $requested_per_page;
+		$this->breakpoint = $breakpoint;
+		$this->partial = $partial;
+		$this->total_item_count = $total_item_count;
+		$this->active_filters = $active_filters;
+		$this->random_seed = $random_seed;
+		$this->view_page = $view_page;
+		$this->is_ajax_swap = $is_ajax_swap;
+		$this->container_width = $container_width;
+		$this->pagination_page_size = $pagination_page_size;
+		$this->pagination_total_pages = $pagination_total_pages;
+	}
 
 	/**
 	 * Returns a new Render_Meta with the given fields overridden.

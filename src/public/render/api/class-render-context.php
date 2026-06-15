@@ -15,6 +15,14 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Context {
 
+	public Render_Meta $meta;
+	public Render_Layout $layout;
+	public Render_Behavior $behavior;
+	public array $settings;
+	public array $items;
+	public array $warnings;
+	public ?int $via_album_id;
+
 	/**
 	 * @param array<string, mixed> $settings Render settings map.
 	 * @param array<int, Item_View> $items Collection items.
@@ -27,14 +35,22 @@ final class Render_Context {
 	 *                               contains this gallery).
 	 */
 	public function __construct(
-		public readonly Render_Meta $meta,
-		public readonly Render_Layout $layout,
-		public readonly Render_Behavior $behavior,
-		public readonly array $settings,
-		public readonly array $items,
-		public readonly array $warnings = array(),
-		public readonly ?int $via_album_id = null,
-	) {}
+		Render_Meta $meta,
+		Render_Layout $layout,
+		Render_Behavior $behavior,
+		array $settings,
+		array $items,
+		array $warnings = array(),
+		?int $via_album_id = null
+	) {
+		$this->meta = $meta;
+		$this->layout = $layout;
+		$this->behavior = $behavior;
+		$this->settings = $settings;
+		$this->items = $items;
+		$this->warnings = $warnings;
+		$this->via_album_id = $via_album_id;
+	}
 
 	/**
 	 * Returns a cloned context with selected fields replaced.

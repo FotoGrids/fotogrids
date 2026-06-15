@@ -15,6 +15,35 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_View {
 
+	public int $id;
+	public string $thumb_url;
+	public string $full_url;
+	public string $alt;
+	public string $title;
+	public string $caption;
+	public string $description;
+	public string $caption_title;
+	public string $caption_description;
+	public ?int $width;
+	public ?int $height;
+	public array $meta;
+	public array $classes;
+	public array $data_attrs;
+	public array $style;
+	public array $thumb_overlays;
+	public array $lightbox_overlays;
+	public array $wrappers;
+	public array $figure_wrappers;
+	public string $thumb_size;
+	public ?int $full_width;
+	public ?int $full_height;
+	public string $item_type;
+	public string $poster_url;
+	public string $video_src;
+	public string $embed_provider;
+	public string $embed_id;
+	public array $embed_settings;
+
 	/**
 	 * @param array<string, mixed> $meta Per-item metadata values.
 	 * @param array<int, string> $classes Item classes.
@@ -26,76 +55,76 @@ final class Item_View {
 	 * @param array<int, Item_Wrapper> $figure_wrappers Wrappers applied around the entire figure contents (media + caption).
 	 */
 	public function __construct(
-		public readonly int $id,
-		public readonly string $thumb_url,
-		public readonly string $full_url,
-		public readonly string $alt,
-		public readonly string $title,
+		int $id,
+		string $thumb_url,
+		string $full_url,
+		string $alt,
+		string $title,
 		/** Raw attachment post_excerpt - source of truth for caption_title/caption_description resolution. */
-		public readonly string $caption,
+		string $caption,
 		/** Raw attachment post_content. Available as a caption source (item_description). */
-		public readonly string $description,
+		string $description,
 		/**
 		 * Resolved caption title text after applying caption_hide_title and
 		 * caption_title_source settings.  Empty string when the title is hidden
 		 * or the resolved source field is blank.  Set by Context_Builder.
 		 */
-		public readonly string $caption_title = '',
+		string $caption_title = '',
 		/**
 		 * Resolved caption description text after applying caption_hide_description
 		 * and caption_description_source settings.  Empty string when hidden or blank.
 		 * Set by Context_Builder.
 		 */
-		public readonly string $caption_description = '',
-		public readonly ?int $width = null,
-		public readonly ?int $height = null,
-		public readonly array $meta = array(),
-		public readonly array $classes = array(),
-		public readonly array $data_attrs = array(),
-		public readonly array $style = array(),
-		public readonly array $thumb_overlays = array(),
-		public readonly array $lightbox_overlays = array(),
-		public readonly array $wrappers = array(),
-		public readonly array $figure_wrappers = array(),
+		string $caption_description = '',
+		?int $width = null,
+		?int $height = null,
+		array $meta = array(),
+		array $classes = array(),
+		array $data_attrs = array(),
+		array $style = array(),
+		array $thumb_overlays = array(),
+		array $lightbox_overlays = array(),
+		array $wrappers = array(),
+		array $figure_wrappers = array(),
 		/**
 		 * The resolved WP size slug used for the thumbnail.
 		 * Passed to wp_get_attachment_image_srcset() in Item_Renderer so srcset
 		 * matches the actual displayed size rather than hardcoding 'large'.
 		 */
-		public readonly string $thumb_size = 'large',
+		string $thumb_size = 'large',
 		/**
 		 * Intrinsic dimensions of full_url. Distinct from width/height which
 		 * describe thumb_url's intrinsic dimensions.
 		 */
-		public readonly ?int $full_width = null,
-		public readonly ?int $full_height = null,
+		?int $full_width = null,
+		?int $full_height = null,
 		/**
 		 * Item kind. 'image' for attachments that resolve to an image, or one
 		 * of the video identifiers ('video_file', 'video_youtube',
 		 * 'video_vimeo'). Drives the video render branch in Item_Renderer and
 		 * the playback routing in the frontend modules.
 		 */
-		public readonly string $item_type = 'image',
+		string $item_type = 'image',
 		/**
 		 * Poster image URL shown in the gallery grid for video items. Resolved
 		 * through the poster chain (custom → WP poster → oEmbed → extracted
 		 * frame → placeholder). Empty for image items, which use thumb_url.
 		 */
-		public readonly string $poster_url = '',
+		string $poster_url = '',
 		/**
 		 * Direct media URL for a Media Library video file (video_file items).
 		 * Empty for images and for embed items, which carry embed_id instead.
 		 */
-		public readonly string $video_src = '',
+		string $video_src = '',
 		/**
 		 * Embed provider slug for embed items ('youtube' | 'vimeo'). Empty for
 		 * images and file videos.
 		 */
-		public readonly string $embed_provider = '',
+		string $embed_provider = '',
 		/**
 		 * Platform video ID for embed items. Empty for images and file videos.
 		 */
-		public readonly string $embed_id = '',
+		string $embed_id = '',
 		/**
 		 * Per-item embed playback settings (autoplay, mute, loop, controls,
 		 * start/end, etc.) as stored in fotogrids_item_meta.custom_data. Empty
@@ -103,8 +132,37 @@ final class Item_View {
 		 *
 		 * @var array<string, mixed>
 		 */
-		public readonly array $embed_settings = array(),
-	) {}
+		array $embed_settings = array()
+	) {
+		$this->id = $id;
+		$this->thumb_url = $thumb_url;
+		$this->full_url = $full_url;
+		$this->alt = $alt;
+		$this->title = $title;
+		$this->caption = $caption;
+		$this->description = $description;
+		$this->caption_title = $caption_title;
+		$this->caption_description = $caption_description;
+		$this->width = $width;
+		$this->height = $height;
+		$this->meta = $meta;
+		$this->classes = $classes;
+		$this->data_attrs = $data_attrs;
+		$this->style = $style;
+		$this->thumb_overlays = $thumb_overlays;
+		$this->lightbox_overlays = $lightbox_overlays;
+		$this->wrappers = $wrappers;
+		$this->figure_wrappers = $figure_wrappers;
+		$this->thumb_size = $thumb_size;
+		$this->full_width = $full_width;
+		$this->full_height = $full_height;
+		$this->item_type = $item_type;
+		$this->poster_url = $poster_url;
+		$this->video_src = $video_src;
+		$this->embed_provider = $embed_provider;
+		$this->embed_id = $embed_id;
+		$this->embed_settings = $embed_settings;
+	}
 
 	/**
 	 * Returns a cloned item with selected fields replaced.

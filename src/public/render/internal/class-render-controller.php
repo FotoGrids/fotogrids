@@ -20,12 +20,22 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Controller {
 
+	private Style_Var_Builder $style_var_builder;
+	private Asset_Resolver $asset_resolver;
+	private Item_Renderer $item_renderer;
+	private Breakpoint_Config $breakpoints;
+
 	public function __construct(
-		private readonly Style_Var_Builder $style_var_builder,
-		private readonly Asset_Resolver $asset_resolver,
-		private readonly Item_Renderer $item_renderer,
-		private readonly Breakpoint_Config $breakpoints,
-	) {}
+		Style_Var_Builder $style_var_builder,
+		Asset_Resolver $asset_resolver,
+		Item_Renderer $item_renderer,
+		Breakpoint_Config $breakpoints
+	) {
+		$this->style_var_builder = $style_var_builder;
+		$this->asset_resolver = $asset_resolver;
+		$this->item_renderer = $item_renderer;
+		$this->breakpoints = $breakpoints;
+	}
 
 	/**
 	 * Returns a request-scoped render controller instance.

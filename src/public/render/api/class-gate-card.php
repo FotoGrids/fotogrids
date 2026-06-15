@@ -20,6 +20,14 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Gate_Card {
 
+	public string $title;
+	public string $description;
+	public string $body_html;
+	public string $aria_label;
+	public string $icon_svg;
+	public string $extra_class;
+	public array $data_attrs;
+
 	/**
 	 * @param string               $title         Heading shown inside the card.
 	 * @param string               $description   Sub-heading / instruction text.
@@ -37,12 +45,20 @@ final class Gate_Card {
 	 *                                            Keys must include the 'data-' prefix.
 	 */
 	public function __construct(
-		public readonly string $title,
-		public readonly string $description,
-		public readonly string $body_html,
-		public readonly string $aria_label,
-		public readonly string $icon_svg = '',
-		public readonly string $extra_class = '',
-		public readonly array $data_attrs = array(),
-	) {}
+		string $title,
+		string $description,
+		string $body_html,
+		string $aria_label,
+		string $icon_svg = '',
+		string $extra_class = '',
+		array $data_attrs = array()
+	) {
+		$this->title = $title;
+		$this->description = $description;
+		$this->body_html = $body_html;
+		$this->aria_label = $aria_label;
+		$this->icon_svg = $icon_svg;
+		$this->extra_class = $extra_class;
+		$this->data_attrs = $data_attrs;
+	}
 }

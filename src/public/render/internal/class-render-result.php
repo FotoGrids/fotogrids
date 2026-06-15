@@ -15,15 +15,25 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Result {
 
+	public string $html;
+	public string $instance_id;
+	public array $active_modules;
+	public int $http_status;
+
 	/**
 	 * @param array<string, array<int, string>> $active_modules Active module IDs by category.
 	 */
 	public function __construct(
-		public readonly string $html,
-		public readonly string $instance_id,
-		public readonly array $active_modules,
-		public readonly int $http_status,
-	) {}
+		string $html,
+		string $instance_id,
+		array $active_modules,
+		int $http_status
+	) {
+		$this->html = $html;
+		$this->instance_id = $instance_id;
+		$this->active_modules = $active_modules;
+		$this->http_status = $http_status;
+	}
 
 	/**
 	 * Returns a cloned render result with replacement HTML.
