@@ -70,6 +70,14 @@ namespace FotoGrids {
             return self::$status_data;
         }
     }
+
+    final class Debug_Log {
+        public static function should_log( string $channel ): bool {
+            return false;
+        }
+
+        public static function write( string $channel, string $message ): void {}
+    }
 }
 
 namespace FotoGrids\Catalog {
