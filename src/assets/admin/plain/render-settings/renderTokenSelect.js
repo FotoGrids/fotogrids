@@ -23,7 +23,7 @@ const TokenSelectComponent = ({
 
 	// The setting stores JSON: ["caption","exif",...] or legacy comma-string;
 	// normalise to a plain JS array internally.
-	const parseValue = raw => {
+	const parseValue = (raw) => {
 		if (Array.isArray(raw)) {
 			return raw;
 		}
@@ -38,13 +38,13 @@ const TokenSelectComponent = ({
 		if (typeof raw === 'string' && raw.trim().length > 0) {
 			return raw
 				.split(',')
-				.map(s => s.trim())
+				.map((s) => s.trim())
 				.filter(Boolean);
 		}
 		return [];
 	};
 
-	const serializeValue = arr => JSON.stringify(arr);
+	const serializeValue = (arr) => JSON.stringify(arr);
 
 	// Options - filter isGlobalDefault in defaults mode (same as button_group),
 	// then drop any option whose per-option `condition` evaluates false against
@@ -52,9 +52,9 @@ const TokenSelectComponent = ({
 	// that only make sense when another setting is on (e.g. an "Embedded"
 	// placement that requires AJAX navigation to be on).
 	const baseOptions = isDefaultsMode
-		? (setting.options || []).filter(o => !o.isGlobalDefault)
+		? (setting.options || []).filter((o) => !o.isGlobalDefault)
 		: setting.options || [];
-	const allOptions = baseOptions.filter(option => {
+	const allOptions = baseOptions.filter((option) => {
 		if (!option || !option.condition) return true;
 		if (typeof isOptionVisible !== 'function') return true;
 		return isOptionVisible(option);
@@ -64,7 +64,7 @@ const TokenSelectComponent = ({
 	const keepOpen = setting.keep_open === true;
 
 	const [selectedValues, setSelectedValues] = useState(() =>
-		parseValue(currentValue),
+		parseValue(currentValue)
 	);
 	const [isOpen, setIsOpen] = useState(false);
 	const [dropdownPosition, setDropdownPosition] = useState(null);
@@ -84,13 +84,13 @@ const TokenSelectComponent = ({
 	// not remove without re-enabling the gating setting) a chip whose option
 	// is no longer in the dropdown.
 	useEffect(() => {
-		const visibleValues = new Set(allOptions.map(o => o.value));
-		const pruned = selectedValues.filter(v => visibleValues.has(v));
+		const visibleValues = new Set(allOptions.map((o) => o.value));
+		const pruned = selectedValues.filter((v) => visibleValues.has(v));
 		if (pruned.length !== selectedValues.length) {
 			setSelectedValues(pruned);
 			updateSetting(setting.key, serializeValue(pruned));
 		}
-	}, [allOptions.map(o => o.value).join('|')]);
+	}, [allOptions.map((o) => o.value).join('|')]);
 
 	const settingState =
 		typeof getFieldState === 'function'
@@ -100,7 +100,7 @@ const TokenSelectComponent = ({
 	const ProBadge =
 		window.FotoGridsTooltip && window.FotoGridsTooltip.ProBadge;
 
-	const resolveOptionState = optionValue => {
+	const resolveOptionState = (optionValue) => {
 		if (typeof getOptionState === 'function') {
 			return getOptionState(setting.key, optionValue);
 		}
@@ -131,15 +131,15 @@ const TokenSelectComponent = ({
 				: 'top';
 		const maxHeight = Math.max(
 			120,
-			placement === 'bottom' ? availableBelow : availableAbove,
+			placement === 'bottom' ? availableBelow : availableAbove
 		);
 		const width = Math.min(
 			Math.max(triggerRect.width, 200),
-			viewportWidth - sidePadding * 2,
+			viewportWidth - sidePadding * 2
 		);
 		const left = Math.min(
 			Math.max(sidePadding, triggerRect.left),
-			Math.max(sidePadding, viewportWidth - width - sidePadding),
+			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
 		// For top placement we anchor at the trigger's top edge and use
 		// transform: translateY(-100%) in the dropdown style so the gap
@@ -170,14 +170,14 @@ const TokenSelectComponent = ({
 	useEffect(() => {
 		if (!isOpen) return;
 
-		const handlePointerDown = e => {
+		const handlePointerDown = (e) => {
 			const inTrigger =
 				triggerRef.current && triggerRef.current.contains(e.target);
 			const inDropdown =
 				dropdownRef.current && dropdownRef.current.contains(e.target);
 			if (!inTrigger && !inDropdown) setIsOpen(false);
 		};
-		const handleEscape = e => {
+		const handleEscape = (e) => {
 			if (e.key === 'Escape') setIsOpen(false);
 		};
 
@@ -190,23 +190,23 @@ const TokenSelectComponent = ({
 	}, [isOpen]);
 
 	const commit = useCallback(
-		nextValues => {
+		(nextValues) => {
 			setSelectedValues(nextValues);
 			updateSetting(setting.key, serializeValue(nextValues));
 		},
-		[setting.key, updateSetting],
+		[setting.key, updateSetting]
 	);
 
 	const toggleOption = useCallback(
-		value => {
+		(value) => {
 			if (isDisabled) return;
 
-			setSelectedValues(prev => {
+			setSelectedValues((prev) => {
 				const idx = prev.indexOf(value);
 				const next =
 					idx === -1
 						? [...prev, value]
-						: prev.filter(v => v !== value);
+						: prev.filter((v) => v !== value);
 
 				updateSetting(setting.key, serializeValue(next));
 				return next;
@@ -214,19 +214,19 @@ const TokenSelectComponent = ({
 
 			if (!keepOpen) setIsOpen(false);
 		},
-		[isDisabled, keepOpen, setting.key, updateSetting],
+		[isDisabled, keepOpen, setting.key, updateSetting]
 	);
 
 	const removeToken = useCallback(
-		value => {
+		(value) => {
 			if (isDisabled) return;
-			setSelectedValues(prev => {
-				const next = prev.filter(v => v !== value);
+			setSelectedValues((prev) => {
+				const next = prev.filter((v) => v !== value);
 				updateSetting(setting.key, serializeValue(next));
 				return next;
 			});
 		},
-		[isDisabled, setting.key, updateSetting],
+		[isDisabled, setting.key, updateSetting]
 	);
 
 	const handleDragStart = (e, index) => {
@@ -254,7 +254,7 @@ const TokenSelectComponent = ({
 		setDragOverIndex(slot);
 	};
 
-	const handleDragLeave = e => {
+	const handleDragLeave = (e) => {
 		// Only clear if we're truly leaving the tokens container
 		if (!e.currentTarget.contains(e.relatedTarget)) {
 			setDragOverIndex(null);
@@ -282,7 +282,7 @@ const TokenSelectComponent = ({
 		// No-op: dropping in the slot immediately before or after itself
 		if (insertAt === srcIndex || insertAt === srcIndex + 1) return;
 
-		setSelectedValues(prev => {
+		setSelectedValues((prev) => {
 			const next = [...prev];
 			const [moved] = next.splice(srcIndex, 1);
 			// Adjust insertion point for the shift caused by removal
@@ -303,11 +303,11 @@ const TokenSelectComponent = ({
 	};
 
 	const optionByValue = {};
-	allOptions.forEach(o => {
+	allOptions.forEach((o) => {
 		optionByValue[o.value] = o;
 	});
 
-	const renderInsertionMarker = slotIndex => {
+	const renderInsertionMarker = (slotIndex) => {
 		if (
 			!sortable ||
 			dragOverIndex !== slotIndex ||
@@ -337,9 +337,9 @@ const TokenSelectComponent = ({
 
 		if (sortable && !isDisabled) {
 			tokenProps.draggable = true;
-			tokenProps.onDragStart = e => handleDragStart(e, index);
-			tokenProps.onDragOver = e => handleDragOver(e, index);
-			tokenProps.onDrop = e => handleDrop(e, index);
+			tokenProps.onDragStart = (e) => handleDragStart(e, index);
+			tokenProps.onDragOver = (e) => handleDragOver(e, index);
+			tokenProps.onDrop = (e) => handleDrop(e, index);
 			tokenProps.onDragEnd = handleDragEnd;
 		}
 
@@ -358,7 +358,7 @@ const TokenSelectComponent = ({
 								className: 'fotogrids-token-select__token-drag',
 								'aria-hidden': 'true',
 							},
-							renderIcon('move'),
+							renderIcon('move')
 						),
 					h(
 						'span',
@@ -366,7 +366,7 @@ const TokenSelectComponent = ({
 							key: 'label',
 							className: 'fotogrids-token-select__token-label',
 						},
-						label,
+						label
 					),
 					!isDisabled &&
 						h(
@@ -377,19 +377,19 @@ const TokenSelectComponent = ({
 								className:
 									'fotogrids-token-select__token-remove',
 								'aria-label': `${__('Remove', 'fotogrids')} ${label}`,
-								onClick: e => {
+								onClick: (e) => {
 									e.stopPropagation();
 									removeToken(value);
 								},
 							},
-							renderIcon('x'),
+							renderIcon('x')
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 		];
 	};
 
-	const renderDropdownOption = option => {
+	const renderDropdownOption = (option) => {
 		const isSelected = selectedValues.includes(option.value);
 		const optionState = resolveOptionState(option.value);
 		const isLocked = optionState !== 'editable';
@@ -419,7 +419,7 @@ const TokenSelectComponent = ({
 						className: 'fotogrids-token-select__option-check',
 						'aria-hidden': 'true',
 					},
-					isSelected ? renderIcon('check_square') : null,
+					isSelected ? renderIcon('check_square') : null
 				),
 				h(
 					'span',
@@ -427,7 +427,7 @@ const TokenSelectComponent = ({
 						key: 'label',
 						className: 'fotogrids-token-select__option-label',
 					},
-					option.label,
+					option.label
 				),
 				isLocked &&
 					ProBadge &&
@@ -436,7 +436,7 @@ const TokenSelectComponent = ({
 						tier: option.tier_required,
 						state: optionState,
 					}),
-			].filter(Boolean),
+			].filter(Boolean)
 		);
 	};
 
@@ -469,8 +469,8 @@ const TokenSelectComponent = ({
 							role: 'listbox',
 							'aria-multiselectable': 'true',
 						},
-						allOptions.map(renderDropdownOption),
-					),
+						allOptions.map(renderDropdownOption)
+					)
 				)
 			: null;
 
@@ -509,7 +509,7 @@ const TokenSelectComponent = ({
 								tier: setting.tier_required,
 								state: settingState,
 							}),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 
 			h(
@@ -522,14 +522,14 @@ const TokenSelectComponent = ({
 					tabIndex: isDisabled ? -1 : 0,
 					'aria-expanded': isOpen,
 					'aria-haspopup': 'listbox',
-					onClick: () => !isDisabled && setIsOpen(s => !s),
-					onKeyDown: e => {
+					onClick: () => !isDisabled && setIsOpen((s) => !s),
+					onKeyDown: (e) => {
 						if (
 							!isDisabled &&
 							(e.key === 'Enter' || e.key === ' ')
 						) {
 							e.preventDefault();
-							setIsOpen(s => !s);
+							setIsOpen((s) => !s);
 						}
 					},
 				},
@@ -546,12 +546,12 @@ const TokenSelectComponent = ({
 								},
 								[
 									...selectedValues.flatMap((v, i) =>
-										renderToken(v, i),
+										renderToken(v, i)
 									),
 									renderInsertionMarker(
-										selectedValues.length,
+										selectedValues.length
 									),
-								].filter(Boolean),
+								].filter(Boolean)
 							)
 						: h(
 								'span',
@@ -561,7 +561,7 @@ const TokenSelectComponent = ({
 										'fotogrids-token-select__placeholder',
 								},
 								setting.placeholder ||
-									__('Select items…', 'fotogrids'),
+									__('Select items…', 'fotogrids')
 							),
 
 					h(
@@ -571,9 +571,9 @@ const TokenSelectComponent = ({
 							className: 'fotogrids-token-select__caret',
 							'aria-hidden': 'true',
 						},
-						renderIcon('chevron_down'),
+						renderIcon('chevron_down')
 					),
-				],
+				]
 			),
 
 			setting.description &&
@@ -583,11 +583,11 @@ const TokenSelectComponent = ({
 						key: 'description',
 						className: 'fotogrids-setting__description',
 					},
-					setting.description,
+					setting.description
 				),
 
 			portal,
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };
 
@@ -595,7 +595,7 @@ window.FotoGridsRenderSettings.renderTokenSelect = (
 	setting,
 	currentValue,
 	isDisabled,
-	context,
+	context
 ) => {
 	const { createElement: h } = wp.element;
 	return h(TokenSelectComponent, {

@@ -13,9 +13,9 @@ function injectShortcodeCellIcons() {
 		return;
 	}
 	const placeholders = document.querySelectorAll(
-		'td.column-fotogrids_shortcode .fotogrids-icon[data-icon]',
+		'td.column-fotogrids_shortcode .fotogrids-icon[data-icon]'
 	);
-	placeholders.forEach(el => {
+	placeholders.forEach((el) => {
 		const name = el.getAttribute('data-icon');
 		const svg = window.FotoGridsIcons[name];
 		if (svg) {

@@ -4,11 +4,11 @@ window.FotoGridsRenderSettings.renderPromo = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ __ },
+	{ __ }
 ) => {
 	const { createElement: h } = wp.element;
 
-	const handleUpgradeClick = e => {
+	const handleUpgradeClick = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -27,7 +27,7 @@ window.FotoGridsRenderSettings.renderPromo = (
 		});
 	}
 
-	const handleLearnMoreClick = learnMorePath => e => {
+	const handleLearnMoreClick = (learnMorePath) => (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 		window.open(`https://go.fotogrids.com/${learnMorePath}`, '_blank');
@@ -44,7 +44,7 @@ window.FotoGridsRenderSettings.renderPromo = (
 				{
 					className: 'fotogrids-pro-badge',
 				},
-				__('PRO', 'fotogrids'),
+				__('PRO', 'fotogrids')
 			),
 			h(
 				'div',
@@ -69,7 +69,7 @@ window.FotoGridsRenderSettings.renderPromo = (
 										className:
 											'fotogrids-settings_pro-message__subtitle',
 									},
-									message.subtitle,
+									message.subtitle
 								),
 							h('span', {
 								className:
@@ -82,9 +82,9 @@ window.FotoGridsRenderSettings.renderPromo = (
 											: ''),
 								},
 							}),
-						].filter(Boolean),
+						].filter(Boolean)
 					);
-				}),
+				})
 			),
 			h(
 				'button',
@@ -94,8 +94,8 @@ window.FotoGridsRenderSettings.renderPromo = (
 						'fg-button fg-button--variant-primary fg-button--size-sm',
 					onClick: handleUpgradeClick,
 				},
-				__('Upgrade Now', 'fotogrids'),
+				__('Upgrade Now', 'fotogrids')
 			),
-		],
+		]
 	);
 };

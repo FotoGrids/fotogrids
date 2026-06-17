@@ -22,7 +22,7 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, __ },
+	{ updateSetting, getFieldState, __ }
 ) => {
 	const { createElement: h, useState, useEffect, useRef } = wp.element;
 	const settingState =
@@ -49,7 +49,7 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 			let active = true;
 			setLoading(true);
 			wp.apiFetch({ path: `/wp/v2/media/${attachmentId}` })
-				.then(media => {
+				.then((media) => {
 					if (!active) return;
 					const url =
 						media?.media_details?.sizes?.medium?.source_url ||
@@ -131,7 +131,7 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 								opacity: 0.7,
 							},
 						},
-						__('Loading preview…', 'fotogrids'),
+						__('Loading preview…', 'fotogrids')
 					),
 				h(
 					'div',
@@ -151,7 +151,7 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 								onClick: openPicker,
 								disabled: isDisabled,
 							},
-							chooseLabel,
+							chooseLabel
 						),
 						attachmentId > 0 &&
 							h(
@@ -164,11 +164,11 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 									onClick: clear,
 									disabled: isDisabled,
 								},
-								__('Remove', 'fotogrids'),
+								__('Remove', 'fotogrids')
 							),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
-			].filter(Boolean),
+			].filter(Boolean)
 		);
 	};
 
@@ -192,9 +192,9 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 									key: 'badge',
 									className: 'fotogrids-pro-badge',
 								},
-								settingBadgeText,
+								settingBadgeText
 							),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 			h(ImagePicker, { key: 'picker' }),
 			setting.description &&
@@ -204,8 +204,8 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 						key: 'description',
 						className: 'fotogrids-setting__description',
 					},
-					setting.description,
+					setting.description
 				),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };

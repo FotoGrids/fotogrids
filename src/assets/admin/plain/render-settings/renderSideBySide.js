@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderSideBySide = (
 	setting,
 	currentValue,
 	isDisabled,
-	context,
+	context
 ) => {
 	const { createElement: h } = wp.element;
 	const { renderSetting } = context;
@@ -18,8 +18,8 @@ window.FotoGridsRenderSettings.renderSideBySide = (
 		{
 			className: 'fotogrids-settings-sbs',
 		},
-		setting.settings.map(subSetting => {
+		setting.settings.map((subSetting) => {
 			return renderSetting(subSetting, isDisabled);
-		}),
+		})
 	);
 };

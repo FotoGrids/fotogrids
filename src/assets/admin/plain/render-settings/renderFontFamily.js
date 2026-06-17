@@ -62,7 +62,7 @@ const getFontFamilyCache = () => {
 	return window.FotoGridsFontFamilyCache;
 };
 
-const updateFontFamilyDebugState = patch => {
+const updateFontFamilyDebugState = (patch) => {
 	window.FotoGridsFontFamilyDebug = {
 		...(window.FotoGridsFontFamilyDebug || {}),
 		...patch,
@@ -190,12 +190,12 @@ const ensureGoogleFontsPreconnect = () => {
 	cache.preconnected = true;
 };
 
-const buildGoogleFontsStylesheetUrl = fontFamilies => {
+const buildGoogleFontsStylesheetUrl = (fontFamilies) => {
 	const params = fontFamilies
-		.map(family => {
+		.map((family) => {
 			const encodedFamily = encodeURIComponent(family).replace(
 				/%20/g,
-				'+',
+				'+'
 			);
 			return `family=${encodedFamily}:wght@400`;
 		})
@@ -204,7 +204,7 @@ const buildGoogleFontsStylesheetUrl = fontFamilies => {
 	return `https://fonts.googleapis.com/css2?${params}&display=swap`;
 };
 
-const preloadGoogleFontPreviews = fontFamilies => {
+const preloadGoogleFontPreviews = (fontFamilies) => {
 	if (!Array.isArray(fontFamilies) || fontFamilies.length === 0) {
 		return;
 	}
@@ -217,7 +217,7 @@ const preloadGoogleFontPreviews = fontFamilies => {
 	}
 
 	const sanitizedFamilies = fontFamilies.filter(
-		family => typeof family === 'string' && family.trim() !== '',
+		(family) => typeof family === 'string' && family.trim() !== ''
 	);
 
 	updateFontFamilyDebugState({
@@ -227,7 +227,7 @@ const preloadGoogleFontPreviews = fontFamilies => {
 	});
 
 	chunkArray(sanitizedFamilies, FOTOGRIDS_GOOGLE_PREVIEW_BATCH_SIZE).forEach(
-		batch => {
+		(batch) => {
 			const batchKey = batch.join('|').toLowerCase();
 			if (cache.previewBatches[batchKey]) {
 				return;
@@ -246,7 +246,7 @@ const preloadGoogleFontPreviews = fontFamilies => {
 				previewCachedBatchCount: Object.keys(cache.previewBatches)
 					.length,
 			});
-		},
+		}
 	);
 };
 
@@ -263,7 +263,7 @@ const FontFamilyComponent = ({
 
 	const defaultOptionValue = Object.prototype.hasOwnProperty.call(
 		setting || {},
-		'default_option_value',
+		'default_option_value'
 	)
 		? setting.default_option_value
 		: 'default';
@@ -278,7 +278,7 @@ const FontFamilyComponent = ({
 	const [googleFonts, setGoogleFonts] = useState([]);
 	const [googleFontsStatus, setGoogleFontsStatus] = useState('idle');
 	const [googleVisibleCount, setGoogleVisibleCount] = useState(
-		FOTOGRIDS_GOOGLE_RENDER_BATCH_SIZE,
+		FOTOGRIDS_GOOGLE_RENDER_BATCH_SIZE
 	);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -290,18 +290,18 @@ const FontFamilyComponent = ({
 		let isMounted = true;
 
 		fetchGoogleFontsFamilies()
-			.then(families => {
+			.then((families) => {
 				if (!isMounted) {
 					return;
 				}
 
 				setGoogleFonts(
-					families.map(family => ({
+					families.map((family) => ({
 						label: family,
 						value: family,
 						fontFamily: `"${family}", sans-serif`,
 						source: 'google',
-					})),
+					}))
 				);
 				setGoogleFontsStatus('ready');
 				updateFontFamilyDebugState({
@@ -315,12 +315,12 @@ const FontFamilyComponent = ({
 				}
 
 				setGoogleFonts(
-					FOTOGRIDS_GOOGLE_FONTS_FALLBACK.map(family => ({
+					FOTOGRIDS_GOOGLE_FONTS_FALLBACK.map((family) => ({
 						label: family,
 						value: family,
 						fontFamily: `"${family}", sans-serif`,
 						source: 'google',
-					})),
+					}))
 				);
 				setGoogleFontsStatus('fallback');
 				updateFontFamilyDebugState({
@@ -347,8 +347,8 @@ const FontFamilyComponent = ({
 			return FOTOGRIDS_SYSTEM_FONT_OPTIONS;
 		}
 
-		return FOTOGRIDS_SYSTEM_FONT_OPTIONS.filter(font =>
-			font.label.toLowerCase().includes(normalizedSearchTerm),
+		return FOTOGRIDS_SYSTEM_FONT_OPTIONS.filter((font) =>
+			font.label.toLowerCase().includes(normalizedSearchTerm)
 		);
 	}, [normalizedSearchTerm]);
 
@@ -357,14 +357,14 @@ const FontFamilyComponent = ({
 			return googleFonts;
 		}
 
-		return googleFonts.filter(font =>
-			font.label.toLowerCase().includes(normalizedSearchTerm),
+		return googleFonts.filter((font) =>
+			font.label.toLowerCase().includes(normalizedSearchTerm)
 		);
 	}, [googleFonts, normalizedSearchTerm]);
 
 	const visibleGoogleOptions = useMemo(
 		() => filteredGoogleOptions.slice(0, googleVisibleCount),
-		[filteredGoogleOptions, googleVisibleCount],
+		[filteredGoogleOptions, googleVisibleCount]
 	);
 
 	const selectedOption = useMemo(() => {
@@ -373,14 +373,14 @@ const FontFamilyComponent = ({
 		}
 
 		const systemMatch = FOTOGRIDS_SYSTEM_FONT_OPTIONS.find(
-			font => font.value === resolvedValue,
+			(font) => font.value === resolvedValue
 		);
 		if (systemMatch) {
 			return systemMatch;
 		}
 
 		const googleMatch = googleFonts.find(
-			font => font.value === resolvedValue,
+			(font) => font.value === resolvedValue
 		);
 		if (googleMatch) {
 			return googleMatch;
@@ -399,7 +399,9 @@ const FontFamilyComponent = ({
 			return;
 		}
 
-		preloadGoogleFontPreviews(visibleGoogleOptions.map(font => font.value));
+		preloadGoogleFontPreviews(
+			visibleGoogleOptions.map((font) => font.value)
+		);
 	}, [isDropdownOpen, visibleGoogleOptions]);
 
 	useEffect(() => {
@@ -413,7 +415,7 @@ const FontFamilyComponent = ({
 	const canLoadMoreGoogleFonts =
 		visibleGoogleOptions.length < filteredGoogleOptions.length;
 
-	const handleDropdownScroll = event => {
+	const handleDropdownScroll = (event) => {
 		const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
 		const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
@@ -433,19 +435,19 @@ const FontFamilyComponent = ({
 
 		if (distanceToBottom < 40) {
 			setGoogleVisibleCount(
-				previousCount =>
-					previousCount + FOTOGRIDS_GOOGLE_RENDER_BATCH_SIZE,
+				(previousCount) =>
+					previousCount + FOTOGRIDS_GOOGLE_RENDER_BATCH_SIZE
 			);
 		}
 	};
 
 	const googleStatus =
 		googleFontsStatus === 'loading'
-			? __('Loading Google Fonts...', 'fotogrids')
+			? __('Loading Google Fonts…', 'fotogrids')
 			: googleFontsStatus === 'fallback'
 				? __(
 						'Showing popular Google Fonts while full list is unavailable.',
-						'fotogrids',
+						'fotogrids'
 					)
 				: normalizedSearchTerm &&
 					  filteredSystemOptions.length === 0 &&
@@ -478,9 +480,9 @@ const FontFamilyComponent = ({
 		__,
 		searchEnabled: true,
 		searchTerm,
-		onSearchTermChange: nextTerm => setSearchTerm(nextTerm),
-		searchPlaceholder: __('Search fonts...', 'fotogrids'),
-		onSelect: nextValue => updateSetting(setting.key, nextValue),
+		onSearchTermChange: (nextTerm) => setSearchTerm(nextTerm),
+		searchPlaceholder: __('Search fonts…', 'fotogrids'),
+		onSelect: (nextValue) => updateSetting(setting.key, nextValue),
 		onOpen: () => {
 			setIsDropdownOpen(true);
 			updateFontFamilyDebugState({
@@ -498,7 +500,7 @@ const FontFamilyComponent = ({
 			setSearchTerm('');
 		},
 		onDropdownScroll: handleDropdownScroll,
-		getOptionStyle: option =>
+		getOptionStyle: (option) =>
 			option?.fontFamily ? { fontFamily: option.fontFamily } : undefined,
 		rootClassName: 'fotogrids-font-family',
 		maxDropdownHeight: 400,
@@ -509,7 +511,7 @@ window.FotoGridsRenderSettings.renderFontFamily = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, renderIcon, __ },
+	{ updateSetting, getFieldState, renderIcon, __ }
 ) => {
 	return wp.element.createElement(FontFamilyComponent, {
 		setting,

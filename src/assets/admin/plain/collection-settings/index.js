@@ -19,7 +19,7 @@ window.FotoGridsSettings = window.FotoGridsSettings || {};
  */
 const loadSettingsGroups = async (
 	postType = 'gallery',
-	isDefaultsMode = false,
+	isDefaultsMode = false
 ) => {
 	const normalizedPostType =
 		postType === 'fotogrids_gallery'
@@ -51,7 +51,7 @@ const loadSettingsGroups = async (
 
 		if (!response.ok) {
 			console.warn(
-				`FotoGrids: Failed to load assembled catalog (${response.status})`,
+				`FotoGrids: Failed to load assembled catalog (${response.status})`
 			);
 			return {};
 		}
@@ -60,8 +60,8 @@ const loadSettingsGroups = async (
 		const groups = payload?.groups || {};
 
 		if (Array.isArray(payload?.warnings) && payload.warnings.length > 0) {
-			payload.warnings.forEach(warning =>
-				console.warn(`FotoGrids: ${warning}`),
+			payload.warnings.forEach((warning) =>
+				console.warn(`FotoGrids: ${warning}`)
 			);
 		}
 
@@ -78,7 +78,7 @@ const loadSettingsGroups = async (
  * need their saved values respected at render time - the assembler just tags
  * them, and the UI layer drops them here.
  */
-const filterHidden = groups => {
+const filterHidden = (groups) => {
 	const filtered = {};
 
 	Object.entries(groups).forEach(([tabId, tabNode]) => {
@@ -93,14 +93,14 @@ const filterHidden = groups => {
 					if (subTabNode?.hidden) return;
 					filteredSubTabs[subTabId] =
 						filterHiddenSettings(subTabNode);
-				},
+				}
 			);
 			clonedTab.subTabs = filteredSubTabs;
 		}
 
 		if (Array.isArray(clonedTab.settings)) {
 			clonedTab.settings = clonedTab.settings.filter(
-				setting => !setting?.hidden,
+				(setting) => !setting?.hidden
 			);
 		}
 
@@ -110,11 +110,11 @@ const filterHidden = groups => {
 	return filtered;
 };
 
-const filterHiddenSettings = subTabNode => {
+const filterHiddenSettings = (subTabNode) => {
 	if (!Array.isArray(subTabNode?.settings)) return subTabNode;
 	return {
 		...subTabNode,
-		settings: subTabNode.settings.filter(setting => !setting?.hidden),
+		settings: subTabNode.settings.filter((setting) => !setting?.hidden),
 	};
 };
 

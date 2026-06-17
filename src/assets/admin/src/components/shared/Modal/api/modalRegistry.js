@@ -4,7 +4,7 @@ let nextId = 1;
 
 const notify = () => {
 	const snapshot = entries.slice();
-	subscribers.forEach(cb => cb(snapshot));
+	subscribers.forEach((cb) => cb(snapshot));
 };
 
 const makeId = () => `fg-modal-imperative-${nextId++}`;
@@ -25,13 +25,13 @@ export const modalRegistry = {
 		return {
 			id,
 			close: () => modalRegistry.close(id),
-			update: next => modalRegistry.update(id, next),
+			update: (next) => modalRegistry.update(id, next),
 		};
 	},
 
 	update(id, next = {}) {
 		let changed = false;
-		entries = entries.map(entry => {
+		entries = entries.map((entry) => {
 			if (entry.id !== id) return entry;
 			changed = true;
 			return { ...entry, options: { ...entry.options, ...next } };
@@ -41,7 +41,7 @@ export const modalRegistry = {
 
 	close(id) {
 		const before = entries.length;
-		entries = entries.filter(entry => entry.id !== id);
+		entries = entries.filter((entry) => entry.id !== id);
 		if (entries.length !== before) notify();
 	},
 

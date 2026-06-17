@@ -177,7 +177,7 @@ import '@testing-library/jest-dom';
 // Mock WordPress globals
 global.wp = {
 	apiFetch: jest.fn(),
-	i18n: { __: jest.fn(text => text) },
+	i18n: { __: jest.fn((text) => text) },
 };
 
 // Mock browser APIs
@@ -214,7 +214,7 @@ jest.mock('@wordpress/components', () => ({
 		<button onClick={onClick}>{children}</button>
 	),
 	Placeholder: ({ children, label }) => (
-		<div data-testid='placeholder'>
+		<div data-testid="placeholder">
 			<div>{label}</div>
 			{children}
 		</div>
@@ -267,7 +267,7 @@ const renderGallerySelector = (props = {}) => {
 			galleries={mockGalleries}
 			onGallerySelect={jest.fn()}
 			{...props}
-		/>,
+		/>
 	);
 };
 ```
@@ -297,7 +297,7 @@ describe('Component Name', () => {
 
 	// Test props
 	test('accepts custom props', () => {
-		render(<Component title='Custom Title' />);
+		render(<Component title="Custom Title" />);
 		expect(screen.getByText('Custom Title')).toBeInTheDocument();
 	});
 

@@ -15,8 +15,8 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 
 <Modal
 	isOpen={open}
-	onClose={reason => setOpen(false)}
-	size='md' // 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full'
+	onClose={(reason) => setOpen(false)}
+	size="md" // 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full'
 	hasSidebar={false}
 	sidebarCollapsible={false}
 	sidebarInitiallyCollapsed={false}
@@ -24,19 +24,19 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 	closeOnEsc={true}
 	preventClose={saving} // when true, esc/overlay/close-button all no-op
 	initialFocusRef={null}
-	type='my-thing' // free-form string emitted in events
+	type="my-thing" // free-form string emitted in events
 >
 	<Modal.Header>
 		<Modal.HeaderTitle>Edit item</Modal.HeaderTitle>
 		<Modal.HeaderActions>
-			<Button variant='primary'>Save</Button>
+			<Button variant="primary">Save</Button>
 		</Modal.HeaderActions>
 	</Modal.Header>
 
 	{/* Optional fixed band below the header - search, sort, filters,
         breadcrumbs. Stays visible while the body scrolls. */}
 	<Modal.SubHeader>
-		<input type='search' placeholder='Search…' />
+		<input type="search" placeholder="Search…" />
 		<select>...</select>
 	</Modal.SubHeader>
 
@@ -44,23 +44,23 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 		<Modal.Sidebar>...preview pane...</Modal.Sidebar>
 		<Modal.Main>
 			<Modal.Tabs tabs={TABS} activeId={tab} onChange={setTab} />
-			<Modal.TabsPanel id='details' activeId={tab}>
+			<Modal.TabsPanel id="details" activeId={tab}>
 				...
 			</Modal.TabsPanel>
 		</Modal.Main>
 	</Modal.Body>
 
 	<Modal.Footer>
-		<Button variant='secondary' onClick={close}>
+		<Button variant="secondary" onClick={close}>
 			Cancel
 		</Button>
-		<Button variant='primary' onClick={save}>
+		<Button variant="primary" onClick={save}>
 			Save
 		</Button>
 	</Modal.Footer>
 
-	<Modal.Nav direction='prev' onClick={prev} />
-	<Modal.Nav direction='next' onClick={next} />
+	<Modal.Nav direction="prev" onClick={prev} />
+	<Modal.Nav direction="next" onClick={next} />
 </Modal>;
 ```
 
@@ -208,7 +208,7 @@ All events fire on `document` with the prefix `fotogrids:admin:modal:`. Listen w
 | `tab-changed` | `{ modalId, fromTab, toTab }` (only when `Modal.Tabs emitEvents` is set)                                         |
 
 ```js
-window.FotoGridsAdmin.modal.on('opened', e => {
+window.FotoGridsAdmin.modal.on('opened', (e) => {
 	console.log('modal opened:', e.detail);
 });
 ```

@@ -207,17 +207,17 @@ Templates dispatch custom events for integration:
 
 ```javascript
 // Gallery initialized
-document.addEventListener('fotogrids:gallery:init', e => {
+document.addEventListener('fotogrids:gallery:init', (e) => {
 	console.log('Gallery initialized:', e.detail.galleryId);
 });
 
 // Layout calculated
-document.addEventListener('fotogrids:layout:calculated', e => {
+document.addEventListener('fotogrids:layout:calculated', (e) => {
 	console.log('Layout calculated:', e.detail.layout);
 });
 
 // Item loaded
-document.addEventListener('fotogrids:item:loaded', e => {
+document.addEventListener('fotogrids:item:loaded', (e) => {
 	console.log('Item loaded:', e.detail.itemId);
 });
 ```

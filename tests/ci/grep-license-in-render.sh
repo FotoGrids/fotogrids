@@ -7,11 +7,15 @@ plugin_root="$(cd "${script_dir}/../.." && pwd)"
 free_render_dir="${plugin_root}/src/public/render"
 pro_render_dir="${plugin_root}/../Pro/src/public/render"
 
+scan_dirs=()
+[[ -d "${free_render_dir}" ]] && scan_dirs+=( "${free_render_dir}" )
+[[ -d "${pro_render_dir}" ]] && scan_dirs+=( "${pro_render_dir}" )
+
 violations="$(
-    rg --line-number --no-heading --color=never --glob '*.php' \
+    grep --recursive --line-number --include='*.php' --extended-regexp \
         'License_Manager|License_Provider' \
-        "${free_render_dir}" "${pro_render_dir}" \
-    | rg --line-number --no-heading --color=never -v '@phpstan-ignore' \
+        "${scan_dirs[@]}" \
+    | grep --invert-match '@phpstan-ignore' \
     || true
 )"
 

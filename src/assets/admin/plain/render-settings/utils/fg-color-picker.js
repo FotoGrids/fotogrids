@@ -82,8 +82,8 @@ function rgbToHsv(r, g, b) {
 	const min = Math.min(r, g, b);
 	const d = max - min;
 	let h = 0,
-		s = 0,
-		v = max;
+		s = 0;
+	const v = max;
 	if (d !== 0) {
 		s = d / max;
 		switch (max) {
@@ -114,7 +114,7 @@ function rgbToHex(r, g, b) {
 	return (
 		'#' +
 		[r, g, b]
-			.map(n => n.toString(16).padStart(2, '0'))
+			.map((n) => n.toString(16).padStart(2, '0'))
 			.join('')
 			.toUpperCase()
 	);
@@ -158,7 +158,7 @@ function parseCssColor(str) {
 	}
 
 	const rgbMatch = s.match(
-		/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/,
+		/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/
 	);
 	if (rgbMatch) {
 		const r = clamp(+rgbMatch[1], 0, 255);
@@ -169,7 +169,7 @@ function parseCssColor(str) {
 	}
 
 	const hslMatch = s.match(
-		/hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)/,
+		/hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)/
 	);
 	if (hslMatch) {
 		const h = clamp(+hslMatch[1], 0, 360);
@@ -200,7 +200,7 @@ function el(tag, attrs, ...children) {
 	for (const child of children) {
 		if (child == null) continue;
 		node.appendChild(
-			typeof child === 'string' ? document.createTextNode(child) : child,
+			typeof child === 'string' ? document.createTextNode(child) : child
 		);
 	}
 	return node;
@@ -258,7 +258,7 @@ window.FGColorPicker.create = function (options) {
 		{ class: 'fg-cp__canvas-wrap' },
 		canvasChecker,
 		canvas,
-		handleEl,
+		handleEl
 	);
 
 	function drawCanvas() {
@@ -310,7 +310,7 @@ window.FGColorPicker.create = function (options) {
 	function startCanvasDrag(e) {
 		if (disabled) return;
 		onCanvasDrag(e);
-		const move = ev => onCanvasDrag(ev);
+		const move = (ev) => onCanvasDrag(ev);
 		const up = () => {
 			window.removeEventListener('mousemove', move);
 			window.removeEventListener('mouseup', up);
@@ -361,7 +361,7 @@ window.FGColorPicker.create = function (options) {
 		'div',
 		{ class: 'fg-cp__alpha-wrap' },
 		alphaTrack,
-		alphaSlider,
+		alphaSlider
 	);
 
 	alphaSlider.addEventListener('input', () => {
@@ -393,7 +393,7 @@ window.FGColorPicker.create = function (options) {
 		return el(
 			'div',
 			{ class: 'fg-cp__format-switcher' },
-			...formats.map(f =>
+			...formats.map((f) =>
 				el(
 					'button',
 					{
@@ -406,18 +406,18 @@ window.FGColorPicker.create = function (options) {
 							format = f;
 							formatSwitcherEl
 								.querySelectorAll('.fg-cp__format-btn')
-								.forEach(btn => {
+								.forEach((btn) => {
 									btn.classList.toggle(
 										'fg-cp__format-btn--active',
-										btn.textContent === format,
+										btn.textContent === format
 									);
 								});
 							syncTextInput();
 						},
 					},
-					f,
-				),
-			),
+					f
+				)
+			)
 		);
 	}
 
@@ -426,7 +426,7 @@ window.FGColorPicker.create = function (options) {
 		'div',
 		{ class: 'fg-cp__text-row' },
 		textInput,
-		formatSwitcherEl,
+		formatSwitcherEl
 	);
 
 	textInput.addEventListener('change', () => {
@@ -479,7 +479,7 @@ window.FGColorPicker.create = function (options) {
 		'div',
 		{ class: 'fg-cp__title-bar' },
 		el('span', { class: 'fg-cp__title' }, 'Color Picker'),
-		buttonSlot,
+		buttonSlot
 	);
 
 	const root = el(
@@ -491,7 +491,7 @@ window.FGColorPicker.create = function (options) {
 		titleBar,
 		canvasWrap,
 		el('div', { class: 'fg-cp__sliders' }, hueSlider, alphaWrap),
-		textRow,
+		textRow
 	);
 
 	drawCanvas();

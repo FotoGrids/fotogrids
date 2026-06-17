@@ -1,5 +1,5 @@
-@use 'sass:meta';
-@use 'sass:map';
+@use "sass:meta";
+@use "sass:map";
 
 // FotoGrids Brand Colors
 $fotogrids-colors-blue: #3c46f0;
@@ -52,7 +52,7 @@ $fotogrids-ui-colors: (
 			warning: #fff9e5,
 			warning-hover: #fff2c4,
 			interactive: $fotogrids-colors-gainsboro,
-			'silver': $fotogrids-colors-silver,
+			"silver": $fotogrids-colors-silver,
 		),
 
 	// Border Colors
@@ -267,9 +267,9 @@ $fotogrids-ui-colors: (
 	--fg-grey: #{$fotogrids-colors-grey-06};
 
 	@each $category, $colors in $fotogrids-ui-colors {
-		@if meta.type-of($colors) == 'map' {
+		@if meta.type-of($colors) == "map" {
 			@each $shade, $color in $colors {
-				@if meta.type-of($color) == 'map' {
+				@if meta.type-of($color) == "map" {
 					@each $subkey, $subvalue in $color {
 						--fg-#{$category}-#{$shade}-#{$subkey}: #{$subvalue};
 					}

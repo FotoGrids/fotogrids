@@ -1,4 +1,4 @@
-@use '../colors.scss' as *;
+@use "../colors.scss" as *;
 
 .fg-modal__tabs {
 	display: flex;
@@ -51,7 +51,7 @@
 			color: var(--fg-text-primary);
 
 			&::after {
-				content: '';
+				content: "";
 				position: absolute;
 				bottom: -1px;
 				left: 0;

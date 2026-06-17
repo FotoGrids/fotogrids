@@ -2,7 +2,7 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 window.FotoGridsRenderSettings.renderConditionalMessage = (
 	setting,
-	currentValue,
+	currentValue
 ) => {
 	if (!setting.conditionalMessage) return null;
 
@@ -23,7 +23,7 @@ window.FotoGridsRenderSettings.renderConditionalMessage = (
 			{
 				className: 'description',
 			},
-			message,
-		),
+			message
+		)
 	);
 };

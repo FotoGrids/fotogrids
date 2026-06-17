@@ -11,7 +11,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 		isDefaultsMode,
 		getOptionState,
 		__,
-	},
+	}
 ) => {
 	const renderAdditionalContent = (selectedOption, options, currentValue) => {
 		if (!selectedOption || selectedOption.value === 'custom') {
@@ -24,7 +24,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 				React.createElement(
 					'strong',
 					null,
-					__('Image Size:', 'fotogrids'),
+					__('Image Size:', 'fotogrids')
 				),
 				` ${selectedOption.width}x${selectedOption.height}`,
 			]);
@@ -33,7 +33,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 				React.createElement(
 					'strong',
 					null,
-					__('Image Size:', 'fotogrids'),
+					__('Image Size:', 'fotogrids')
 				),
 				` ${__('Original', 'fotogrids')}`,
 			]);
@@ -47,7 +47,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 						React.createElement(
 							'strong',
 							null,
-							__('Crop:', 'fotogrids'),
+							__('Crop:', 'fotogrids')
 						),
 						` ${selectedOption.crop ? __('Yes', 'fotogrids') : __('No', 'fotogrids')}`,
 					])
@@ -64,7 +64,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 				cropText &&
 					React.createElement('span', { key: 'separator' }, '. '),
 				cropText,
-			].filter(Boolean),
+			].filter(Boolean)
 		);
 	};
 
@@ -80,6 +80,6 @@ window.FotoGridsRenderSettings.renderImageSize = (
 			getOptionState,
 			__,
 			renderAdditionalContent,
-		},
+		}
 	);
 };

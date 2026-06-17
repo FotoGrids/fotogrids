@@ -1,15 +1,15 @@
-@use './colors.scss' as *;
-@use './sizes.scss' as *;
-@use './pro.scss' as *;
-@use './collection-settings/pro-tab.scss' as *;
-@use './collection-settings/layout-options.scss' as *;
-@use './collection-settings/hover-effects.scss' as *;
-@use './collection-settings/button-group.scss' as *;
-@use './collection-settings/alignment-grid.scss' as *;
-@use './collection-settings/color-picker.scss' as *;
-@use './collection-settings/lightbox-subtabs.scss' as *;
-@use './collection-settings/external-url-manager.scss' as *;
-@use './collection-settings/permissions-manager.scss' as *;
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
+@use "./pro.scss" as *;
+@use "./collection-settings/pro-tab.scss" as *;
+@use "./collection-settings/layout-options.scss" as *;
+@use "./collection-settings/hover-effects.scss" as *;
+@use "./collection-settings/button-group.scss" as *;
+@use "./collection-settings/alignment-grid.scss" as *;
+@use "./collection-settings/color-picker.scss" as *;
+@use "./collection-settings/lightbox-subtabs.scss" as *;
+@use "./collection-settings/external-url-manager.scss" as *;
+@use "./collection-settings/permissions-manager.scss" as *;
 
 .fotogrids-defaults-tab {
 	display: flex;
@@ -165,7 +165,7 @@ $settings-sidebar-width: 200px;
 
 		&:before,
 		&:after {
-			content: '';
+			content: "";
 			position: absolute;
 			top: 0;
 			height: 100%;
@@ -369,7 +369,7 @@ $settings-sidebar-width: 200px;
 				display: inline-flex;
 				align-items: center;
 
-				.fotogrids-range-slider[type='range']:disabled {
+				.fotogrids-range-slider[type="range"]:disabled {
 					&::-webkit-slider-thumb {
 						width: 0;
 						height: 0;

@@ -78,7 +78,7 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getOptionState, renderIcon, __, settings = {} },
+	{ updateSetting, getOptionState, renderIcon, __, settings = {} }
 ) => {
 	const { createElement: h } = wp.element;
 	const options = Array.isArray(setting.options) ? setting.options : [];
@@ -94,7 +94,7 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 	const captionPlacement = settings.caption_placement || 'overlay';
 	const captionAlignment = settings.caption_alignment || 'center';
 
-	const isSettingOn = key => {
+	const isSettingOn = (key) => {
 		const value = settings[key];
 		return value === true || value === '1' || value === 1;
 	};
@@ -103,7 +103,7 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 		isSettingOn('caption_hide_title') &&
 		isSettingOn('caption_hide_description');
 
-	const icon = name =>
+	const icon = (name) =>
 		typeof renderIcon === 'function' ? renderIcon(name) : null;
 
 	const renderTag = (key, iconName, label, broken) =>
@@ -116,13 +116,13 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 					? {
 							'data-fg-tooltip': __(
 								'This effect reveals the caption. Turn on a caption title or description for it to work.',
-								'fotogrids',
+								'fotogrids'
 							),
 							'data-fg-tooltip-dir': 'above',
 						}
 					: {}),
 			},
-			[icon(iconName), h('span', { key: 'l' }, label)].filter(Boolean),
+			[icon(iconName), h('span', { key: 'l' }, label)].filter(Boolean)
 		);
 
 	// `isEditable` is false for Pro teaser / locked options; those never show the
@@ -143,8 +143,8 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 					'image',
 					isTile ? 'layout' : 'image',
 					isTile ? __('Tile', 'fotogrids') : __('Image', 'fotogrids'),
-					false,
-				),
+					false
+				)
 			);
 		}
 		if (animatesCaption) {
@@ -153,18 +153,18 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 					'caption',
 					'text',
 					__('Caption', 'fotogrids'),
-					isEditable && option.requires_caption && captionHidden,
-				),
+					isEditable && option.requires_caption && captionHidden
+				)
 			);
 		}
 		return tags;
 	};
 
-	const activeConflicts = option => {
+	const activeConflicts = (option) => {
 		if (!Array.isArray(option.conflicts_css)) {
 			return [];
 		}
-		return option.conflicts_css.filter(property => {
+		return option.conflicts_css.filter((property) => {
 			const flag = SETTING_FLAGS_FOR_PROPERTY[property];
 			return flag ? isSettingOn(flag) : false;
 		});
@@ -181,17 +181,17 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 				h(
 					'span',
 					{ className: 'fg-caption-title', key: 'title' },
-					demoImage.title,
+					demoImage.title
 				),
 				h(
 					'span',
 					{ className: 'fg-caption-description', key: 'desc' },
-					demoImage.description,
+					demoImage.description
 				),
 			]),
 		]);
 
-	const renderCard = option => {
+	const renderCard = (option) => {
 		const isActive = currentValue === option.value;
 		const optionState =
 			typeof getOptionState === 'function'
@@ -252,12 +252,12 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 											loading: 'lazy',
 											key: 'img',
 										}),
-									]),
+									])
 								),
 								renderPreviewCaption(),
-							],
-						),
-					),
+							]
+						)
+					)
 				),
 				h(
 					'div',
@@ -284,9 +284,9 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 										},
 										optionState === 'locked'
 											? __('Locked', 'fotogrids')
-											: __('Pro', 'fotogrids'),
+											: __('Pro', 'fotogrids')
 									),
-							].filter(Boolean),
+							].filter(Boolean)
 						),
 						h(
 							'p',
@@ -305,22 +305,22 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 													'fotogrids-hover-effect-option__animates-label',
 												key: 'label',
 											},
-											__('Animates:', 'fotogrids'),
+											__('Animates:', 'fotogrids')
 										),
 										...animatesTags(
 											option,
-											optionState === 'editable',
+											optionState === 'editable'
 										),
-									],
+									]
 						),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
-			],
+			]
 		);
 	};
 
 	const conflictNotice = () => {
-		const active = options.find(option => option.value === currentValue);
+		const active = options.find((option) => option.value === currentValue);
 		if (!active) {
 			return null;
 		}
@@ -329,7 +329,7 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 			return null;
 		}
 		const names = conflicts
-			.map(property => CSS_PROPERTY_LABELS[property] || property)
+			.map((property) => CSS_PROPERTY_LABELS[property] || property)
 			.join(', ');
 
 		return h(
@@ -340,8 +340,8 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 			},
 			__(
 				'This effect controls the same styling on hover as your active setting: ',
-				'fotogrids',
-			) + names,
+				'fotogrids'
+			) + names
 		);
 	};
 
@@ -358,7 +358,7 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 			h(
 				'label',
 				{ className: 'fotogrids-setting__label', key: 'label' },
-				h('span', { key: 'label-text' }, setting.label),
+				h('span', { key: 'label-text' }, setting.label)
 			),
 			h(
 				'div',
@@ -370,9 +370,9 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 							settings.hover_cursor_icon || 'pointer',
 					},
 				},
-				options.map(renderCard),
+				options.map(renderCard)
 			),
 			conflictNotice(),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };

@@ -14,10 +14,10 @@
 
 	function initAjaxSave() {
 		const isGallery = document.body.classList.contains(
-			'post-type-fotogrids_gallery',
+			'post-type-fotogrids_gallery'
 		);
 		const isAlbum = document.body.classList.contains(
-			'post-type-fotogrids_album',
+			'post-type-fotogrids_album'
 		);
 		if ((!isGallery && !isAlbum) || !document.getElementById('post')) {
 			return;
@@ -35,10 +35,10 @@
 			const itemsGrid = document.getElementById('fotogrids-items-grid');
 			if (itemsGrid && State) {
 				const itemElements = itemsGrid.querySelectorAll(
-					'.fotogrids-item-item',
+					'.fotogrids-item-item'
 				);
 				const itemIds = Array.from(itemElements)
-					.map(el => el.getAttribute('data-id'))
+					.map((el) => el.getAttribute('data-id'))
 					.filter(Boolean);
 				State.items.initItems(itemIds);
 			}
@@ -61,7 +61,7 @@
                         ${strings.youHaveUnsavedChanges}
                     </div>
                 </div>
-            `,
+            `
 			);
 		}
 	}
@@ -76,7 +76,7 @@
 				function (e) {
 					// Only intercept if this is an update (not initial publish)
 					const action = document.getElementById(
-						'original_post_status',
+						'original_post_status'
 					)?.value;
 					if (action && action !== 'auto-draft') {
 						e.preventDefault();
@@ -89,7 +89,7 @@
 						return false;
 					}
 				},
-				true,
+				true
 			); // Use capture phase
 		}
 
@@ -99,7 +99,7 @@
 				function (e) {
 					// Only intercept if this is an update (not initial publish)
 					const action = document.getElementById(
-						'original_post_status',
+						'original_post_status'
 					)?.value;
 					if (action && action !== 'auto-draft') {
 						const savePostInput =
@@ -112,7 +112,7 @@
 						}
 					}
 				},
-				true,
+				true
 			); // Use capture phase to intercept early
 		}
 
@@ -138,11 +138,11 @@
                         <span class="ab-label">${strings.quickSave}</span>
                     </a>
                 </li>
-            `,
+            `
 			);
 
 			const quickSaveButton = document.getElementById(
-				'fotogrids-quick-save',
+				'fotogrids-quick-save'
 			);
 			if (quickSaveButton) {
 				quickSaveButton.addEventListener('click', function (e) {
@@ -167,7 +167,7 @@
 	function hasValidationErrors() {
 		const validationErrors = window.FotoGridsValidationErrors || {};
 		return Object.values(validationErrors).some(
-			errorInfo => errorInfo && errorInfo.hasErrors,
+			(errorInfo) => errorInfo && errorInfo.hasErrors
 		);
 	}
 
@@ -248,12 +248,12 @@
 		// Only disable native WP form controls - exclude the React-managed settings
 		// panel so focused inputs don't lose focus and React's disabled props aren't clobbered.
 		const settingsPanel = document.getElementById(
-			'fotogrids-collection-settings-root',
+			'fotogrids-collection-settings-root'
 		);
 		const formElements = Array.from(
-			form.querySelectorAll('input, textarea, select, button'),
-		).filter(el => !settingsPanel || !settingsPanel.contains(el));
-		formElements.forEach(element => (element.disabled = true));
+			form.querySelectorAll('input, textarea, select, button')
+		).filter((el) => !settingsPanel || !settingsPanel.contains(el));
+		formElements.forEach((element) => (element.disabled = true));
 
 		const formData = new FormData(form);
 		formData.append('action', 'fotogrids_save_collection');
@@ -268,9 +268,9 @@
 
 		const gallerySettings = {};
 		const galleryInputs = document.querySelectorAll(
-			'input[name^="fotogrids_"]',
+			'input[name^="fotogrids_"]'
 		);
-		galleryInputs.forEach(input => {
+		galleryInputs.forEach((input) => {
 			const name = input.getAttribute('name');
 			const value = input.value;
 			// Always include fotogrids_ inputs - even empty ones. Empty string is a
@@ -286,7 +286,7 @@
 		});
 
 		const formFields = {};
-		for (let [key, value] of formData.entries()) {
+		for (const [key, value] of formData.entries()) {
 			if (key.startsWith('fotogrids_')) {
 				formFields[key] = value;
 			}
@@ -296,13 +296,13 @@
 			method: 'POST',
 			body: formData,
 		})
-			.then(response => {
+			.then((response) => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
 				}
 				return response.json();
 			})
-			.then(result => {
+			.then((result) => {
 				if (result.success) {
 					handleSaveSuccess(result.data);
 				} else {
@@ -312,7 +312,7 @@
 					handleSaveError(errorMessage);
 				}
 			})
-			.catch(error => {
+			.catch((error) => {
 				console.error('Save error:', error);
 				const errorMessage = error.message
 					? error.message
@@ -320,7 +320,7 @@
 				handleSaveError(errorMessage);
 			})
 			.finally(() => {
-				formElements.forEach(element => (element.disabled = false));
+				formElements.forEach((element) => (element.disabled = false));
 			});
 	}
 
@@ -363,7 +363,7 @@
 		updateLastSavedTime();
 
 		document.dispatchEvent(
-			new CustomEvent('fotogrids:collection_saved', { detail: data }),
+			new CustomEvent('fotogrids:collection_saved', { detail: data })
 		);
 	}
 
@@ -372,7 +372,7 @@
 
 		const getAutosaveSetting = () => {
 			const galleryAutosaveInput = document.querySelector(
-				'input[name="fotogrids_autosave"]',
+				'input[name="fotogrids_autosave"]'
 			);
 			if (galleryAutosaveInput) {
 				return (
@@ -382,7 +382,7 @@
 			}
 
 			const defaultsAutosaveInput = document.querySelector(
-				'input[name="fotogrids_gallery_defaults[autosave]"]',
+				'input[name="fotogrids_gallery_defaults[autosave]"]'
 			);
 			if (defaultsAutosaveInput) {
 				return (
@@ -400,10 +400,10 @@
 
 		State.autosave.set(getAutosaveSetting());
 
-		document.addEventListener('change', e => {
+		document.addEventListener('change', (e) => {
 			if (
 				e.target.matches(
-					'input[name="fotogrids_autosave"], input[name="fotogrids_gallery_defaults[autosave]"]',
+					'input[name="fotogrids_autosave"], input[name="fotogrids_gallery_defaults[autosave]"]'
 				)
 			) {
 				const enabled =
@@ -429,18 +429,18 @@
 		const form = document.getElementById('post');
 		if (form) {
 			const settingsPanel = document.getElementById(
-				'fotogrids-collection-settings-root',
+				'fotogrids-collection-settings-root'
 			);
 			const formElements = Array.from(
-				form.querySelectorAll('input, textarea, select, button'),
-			).filter(el => !settingsPanel || !settingsPanel.contains(el));
-			formElements.forEach(element => (element.disabled = false));
+				form.querySelectorAll('input, textarea, select, button')
+			).filter((el) => !settingsPanel || !settingsPanel.contains(el));
+			formElements.forEach((element) => (element.disabled = false));
 		}
 
 		document.dispatchEvent(
 			new CustomEvent('fotogrids:gallery_save_error', {
 				detail: errorMessage,
-			}),
+			})
 		);
 	}
 
@@ -449,19 +449,19 @@
 		const timeString = now.toLocaleTimeString();
 
 		let lastSaved = document.querySelector(
-			'.misc-pub-fg-last-saved .timestamp',
+			'.misc-pub-fg-last-saved .timestamp'
 		);
 		if (!lastSaved) {
 			const miscActions = document.querySelector(
-				'#misc-publishing-actions',
+				'#misc-publishing-actions'
 			);
 			if (miscActions) {
 				miscActions.insertAdjacentHTML(
 					'beforeend',
-					`<div class="misc-pub-section misc-pub-fg-last-saved"> ${strings.lastSaved}: <span class="timestamp"></span></div>`,
+					`<div class="misc-pub-section misc-pub-fg-last-saved"> ${strings.lastSaved}: <span class="timestamp"></span></div>`
 				);
 				lastSaved = document.querySelector(
-					'.misc-pub-fg-last-saved .timestamp',
+					'.misc-pub-fg-last-saved .timestamp'
 				);
 			}
 		}
@@ -479,7 +479,7 @@
 		const shouldShow = hasChanges && !autosaveEnabled;
 
 		const unsavedChanges = document.getElementById(
-			'fotogrids-unsaved-changes',
+			'fotogrids-unsaved-changes'
 		);
 		if (unsavedChanges) {
 			unsavedChanges.style.display = shouldShow ? 'block' : 'none';
@@ -516,7 +516,7 @@
 		const updateInitialState = () => {
 			const formData = new FormData(form);
 			initialFormState = {};
-			for (let [key, value] of formData.entries()) {
+			for (const [key, value] of formData.entries()) {
 				if (
 					key.startsWith('fotogrids_') ||
 					key === 'post_title' ||
@@ -535,7 +535,7 @@
 			}
 		};
 
-		const handleNativeFormChange = e => {
+		const handleNativeFormChange = (e) => {
 			const target = e.target;
 			const name = target.getAttribute('name') || '';
 
@@ -549,7 +549,7 @@
 
 		document.addEventListener(
 			'fotogrids:setting_changed',
-			handleFormChange,
+			handleFormChange
 		);
 
 		document.addEventListener('fotogrids:collection_saved', () => {
@@ -558,7 +558,7 @@
 	}
 
 	function initBeforeUnloadWarning() {
-		window.addEventListener('beforeunload', e => {
+		window.addEventListener('beforeunload', (e) => {
 			if (
 				State &&
 				State.unsavedChanges.has() &&
@@ -573,8 +573,8 @@
 
 	window.FotoGridsAjaxSave = {
 		save: saveCollectionAjax,
-		showUnsavedChanges: showUnsavedChanges,
-		hideUnsavedChanges: hideUnsavedChanges,
-		updateLastSavedTime: updateLastSavedTime,
+		showUnsavedChanges,
+		hideUnsavedChanges,
+		updateLastSavedTime,
 	};
 })();

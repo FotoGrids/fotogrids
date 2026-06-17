@@ -23,7 +23,7 @@ const FIELD_STATE = {
 	TEASER: 'teaser',
 };
 
-const isFreeTier = config => {
+const isFreeTier = (config) => {
 	if (!config || typeof config !== 'object') {
 		return true;
 	}
@@ -39,7 +39,7 @@ const isFreeTier = config => {
 	return true;
 };
 
-const withLegacyFreeFlag = config => {
+const withLegacyFreeFlag = (config) => {
 	if (!config || typeof config !== 'object') {
 		return config;
 	}
@@ -64,14 +64,14 @@ const resolveFieldStateValue = (
 	setting,
 	currentValue,
 	fieldStates,
-	fieldStatesByOption,
+	fieldStatesByOption
 ) => {
 	if (!setting || !setting.key) {
 		return FIELD_STATE.EDITABLE;
 	}
 
 	const usesOwnFieldState = FIELD_LEVEL_OWN_STATE_TYPES.includes(
-		setting.type,
+		setting.type
 	);
 
 	const optionStateKey = `${setting.key}.${currentValue}`;
@@ -95,7 +95,7 @@ const useFieldState = (
 	setting,
 	currentValue,
 	fieldStates,
-	fieldStatesByOption,
+	fieldStatesByOption
 ) => {
 	return useMemo(
 		() =>
@@ -103,9 +103,9 @@ const useFieldState = (
 				setting,
 				currentValue,
 				fieldStates,
-				fieldStatesByOption,
+				fieldStatesByOption
 			),
-		[setting?.key, currentValue, fieldStates, fieldStatesByOption],
+		[setting?.key, currentValue, fieldStates, fieldStatesByOption]
 	);
 };
 
@@ -113,7 +113,7 @@ const TeaserBadge = ({ __ }) => {
 	return h(
 		'span',
 		{ className: 'fotogrids-pro-badge' },
-		__('Pro', 'fotogrids'),
+		__('Pro', 'fotogrids')
 	);
 };
 
@@ -121,7 +121,7 @@ const LockedBanner = ({ __ }) => {
 	return h(
 		'div',
 		{ className: 'fotogrids-settings-locked-banner' },
-		__('Locked: renew your license to edit this setting.', 'fotogrids'),
+		__('Locked: renew your license to edit this setting.', 'fotogrids')
 	);
 };
 
@@ -137,7 +137,7 @@ const FieldGate = ({
 		setting,
 		currentValue,
 		fieldStates,
-		fieldStatesByOption,
+		fieldStatesByOption
 	);
 	const isTeaser = state === FIELD_STATE.TEASER;
 	const isLocked = state === FIELD_STATE.LOCKED;
@@ -147,7 +147,7 @@ const FieldGate = ({
 		{
 			className: `fotogrids-field-gate ${isTeaser ? 'fotogrids-field-gate--teaser' : ''} ${isLocked ? 'fotogrids-field-gate--locked' : ''}`,
 		},
-		[children, isLocked && h(LockedBanner, { __ })].filter(Boolean),
+		[children, isLocked && h(LockedBanner, { __ })].filter(Boolean)
 	);
 };
 
@@ -173,31 +173,31 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 		translated.label = __(translated.label, 'fotogrids');
 		translated.label = replacePostTypePlaceholders(
 			translated.label,
-			normalizedPostType,
+			normalizedPostType
 		);
 	}
 
 	if (translated.settings) {
-		translated.settings = translated.settings.map(setting => {
+		translated.settings = translated.settings.map((setting) => {
 			let translatedSetting = withLegacyFreeFlag({ ...setting });
 
 			if (translatedSetting.label) {
 				translatedSetting.label = __(
 					translatedSetting.label,
-					'fotogrids',
+					'fotogrids'
 				);
 			}
 
 			if (translatedSetting.description) {
 				translatedSetting.description = __(
 					translatedSetting.description,
-					'fotogrids',
+					'fotogrids'
 				);
 			}
 
 			if (translatedSetting.options) {
 				translatedSetting.options = translatedSetting.options.map(
-					option =>
+					(option) =>
 						withLegacyFreeFlag({
 							...option,
 							label: option.label
@@ -206,30 +206,30 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 							description: option.description
 								? __(option.description, 'fotogrids')
 								: option.description,
-						}),
+						})
 				);
 			}
 
 			if (translatedSetting.conditionalMessage?.message) {
 				translatedSetting.conditionalMessage.message = __(
 					translatedSetting.conditionalMessage.message,
-					'fotogrids',
+					'fotogrids'
 				);
 			}
 
 			if (translatedSetting.subTabs) {
-				Object.keys(translatedSetting.subTabs).forEach(subTabKey => {
+				Object.keys(translatedSetting.subTabs).forEach((subTabKey) => {
 					const subTab = translatedSetting.subTabs[subTabKey];
 					subTab.label = __(subTab.label, 'fotogrids');
 					if (subTab.settings) {
-						subTab.settings = subTab.settings.map(subSetting => {
+						subTab.settings = subTab.settings.map((subSetting) => {
 							const translatedSubSetting = translateSettingsGroup(
 								{ settings: [subSetting] },
-								normalizedPostType,
+								normalizedPostType
 							).settings[0];
 							return processSettingPlaceholders(
 								translatedSubSetting,
-								normalizedPostType,
+								normalizedPostType
 							);
 						});
 					}
@@ -238,7 +238,7 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 
 			translatedSetting = processSettingPlaceholders(
 				translatedSetting,
-				normalizedPostType,
+				normalizedPostType
 			);
 
 			return translatedSetting;
@@ -247,7 +247,7 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 
 	if (translated.subTabs) {
 		const processedSubTabs = {};
-		Object.keys(translated.subTabs).forEach(subTabKey => {
+		Object.keys(translated.subTabs).forEach((subTabKey) => {
 			const subTab = { ...translated.subTabs[subTabKey] };
 
 			if (subTab.postTypes && Array.isArray(subTab.postTypes)) {
@@ -260,18 +260,18 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 				subTab.label = __(subTab.label, 'fotogrids');
 				subTab.label = replacePostTypePlaceholders(
 					subTab.label,
-					normalizedPostType,
+					normalizedPostType
 				);
 			}
 			if (subTab.settings && Array.isArray(subTab.settings)) {
-				subTab.settings = subTab.settings.map(subSetting => {
+				subTab.settings = subTab.settings.map((subSetting) => {
 					const translatedSubSetting = translateSettingsGroup(
 						{ settings: [subSetting] },
-						normalizedPostType,
+						normalizedPostType
 					).settings[0];
 					return processSettingPlaceholders(
 						translatedSubSetting,
-						normalizedPostType,
+						normalizedPostType
 					);
 				});
 			}
@@ -283,7 +283,7 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 	return translated;
 };
 
-const renderIcon = iconName => {
+const renderIcon = (iconName) => {
 	const icons = window.FotoGridsIcons || {};
 	const iconSvg = icons[iconName];
 
@@ -327,17 +327,17 @@ function CollectionSettings() {
 		return uiState.getValue({ key: 'subtabs', fallback: {} });
 	});
 	const [settings, setSettings] = useState(
-		window.fotogridsSettings?.settings || {},
+		window.fotogridsSettings?.settings || {}
 	);
 	const [saving, setSaving] = useState(false);
 	const [activeDevice, setActiveDevice] = useState('desktop');
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
 	const [validationErrors, setValidationErrors] = useState({});
 	const [fieldStates, setFieldStates] = useState(
-		window.fotogridsCatalog?.field_states || {},
+		window.fotogridsCatalog?.field_states || {}
 	);
 	const [fieldStatesByOption, setFieldStatesByOption] = useState(
-		window.fotogridsCatalog?.field_states_by_option || {},
+		window.fotogridsCatalog?.field_states_by_option || {}
 	);
 
 	const [itemData, setItemData] = useState({});
@@ -349,14 +349,12 @@ function CollectionSettings() {
 	const [bulkUrl, setBulkUrl] = useState('');
 	const [bulkTarget, setBulkTarget] = useState('global');
 	const [autosaveValue, setAutosaveValue] = useState(
-		window.fotogridsAdmin?.autosave || false,
+		window.fotogridsAdmin?.autosave || false
 	);
 	// The wizard's step 3 writes the same fotogrids_settings_mode option this
 	// Segmented control mirrors, so users can flip modes without reopening it.
 	const [settingsMode, setSettingsMode] = useState(
-		window.fotogridsAdmin?.settingsMode === 'advanced'
-			? 'advanced'
-			: 'easy',
+		window.fotogridsAdmin?.settingsMode === 'advanced' ? 'advanced' : 'easy'
 	);
 	const State = window.FotoGridsCollectionState;
 
@@ -371,7 +369,7 @@ function CollectionSettings() {
 	};
 
 	const setActiveSubTabForContext = (contextKey, subTabId) => {
-		setActiveSubTabs(prev => {
+		setActiveSubTabs((prev) => {
 			const updated = { ...prev, [contextKey]: subTabId };
 			if (uiState) {
 				uiState.setValue({ key: 'subtabs', value: updated });
@@ -406,7 +404,7 @@ function CollectionSettings() {
 	}, [activeTab]);
 
 	const switchTab = useCallback(
-		tabId => {
+		(tabId) => {
 			if (typeof tabId !== 'string' || tabId === '') return;
 			if (!SETTINGS_GROUPS[tabId]) return;
 			setActiveTab(tabId);
@@ -418,7 +416,7 @@ function CollectionSettings() {
 				});
 			}
 		},
-		[uiState],
+		[uiState]
 	);
 
 	useEffect(() => {
@@ -441,19 +439,19 @@ function CollectionSettings() {
 			const rawSettings =
 				await window.FotoGridsSettings.loadSettingsGroups(
 					postType,
-					isDefaultsMode,
+					isDefaultsMode
 				);
 			SETTINGS_GROUPS = {};
 
-			Object.keys(rawSettings).forEach(key => {
+			Object.keys(rawSettings).forEach((key) => {
 				SETTINGS_GROUPS[key] = translateSettingsGroup(
 					rawSettings[key],
-					normalizedPostType,
+					normalizedPostType
 				);
 			});
 		} else {
 			console.warn(
-				'FotoGrids: Settings loader not available, SETTINGS_GROUPS will be empty',
+				'FotoGrids: Settings loader not available, SETTINGS_GROUPS will be empty'
 			);
 		}
 		setSettingsLoaded(true);
@@ -523,7 +521,7 @@ function CollectionSettings() {
 			} catch (error) {
 				console.warn(
 					'FotoGrids: failed to refresh catalog field states.',
-					error,
+					error
 				);
 			}
 		};
@@ -535,18 +533,18 @@ function CollectionSettings() {
 		return () =>
 			window.removeEventListener(
 				'fotogrids:license_changed',
-				refreshHandler,
+				refreshHandler
 			);
 	}, []);
 
 	useEffect(() => {
 		if (!settingsLoaded) return;
 
-		setActiveSubTabs(prev => {
+		setActiveSubTabs((prev) => {
 			const updated = { ...prev };
 			let hasChanges = false;
 
-			Object.values(SETTINGS_GROUPS).forEach(group => {
+			Object.values(SETTINGS_GROUPS).forEach((group) => {
 				if (group.subTabs && Object.keys(group.subTabs).length > 0) {
 					const firstSubTabId = Object.keys(group.subTabs)[0];
 
@@ -561,16 +559,16 @@ function CollectionSettings() {
 				}
 			});
 
-			Object.values(SETTINGS_GROUPS).forEach(group => {
+			Object.values(SETTINGS_GROUPS).forEach((group) => {
 				if (group.settings) {
-					group.settings.forEach(setting => {
+					group.settings.forEach((setting) => {
 						if (
 							setting.type === 'setting_subtabs' &&
 							setting.subTabs &&
 							Object.keys(setting.subTabs).length > 0
 						) {
 							const firstSubTabId = Object.keys(
-								setting.subTabs,
+								setting.subTabs
 							)[0];
 
 							if (
@@ -593,7 +591,7 @@ function CollectionSettings() {
 	useLayoutEffect(() => {
 		if (!settingsLoaded) return;
 
-		setActiveSubTabs(prev => {
+		setActiveSubTabs((prev) => {
 			const updated = { ...prev };
 			let hasChanges = false;
 
@@ -615,14 +613,14 @@ function CollectionSettings() {
 				}
 
 				if (activeGroup.settings) {
-					activeGroup.settings.forEach(setting => {
+					activeGroup.settings.forEach((setting) => {
 						if (
 							setting.type === 'setting_subtabs' &&
 							setting.subTabs &&
 							Object.keys(setting.subTabs).length > 0
 						) {
 							const firstSubTabId = Object.keys(
-								setting.subTabs,
+								setting.subTabs
 							)[0];
 							if (
 								updated[setting.key] === undefined ||
@@ -665,7 +663,7 @@ function CollectionSettings() {
 			State.autosave.set(currentValue);
 		}
 
-		const handleAutosaveChange = e => {
+		const handleAutosaveChange = (e) => {
 			if (e.target.name === 'fotogrids_autosave') {
 				const newValue = e.target.checked;
 				setAutosaveValue(newValue);
@@ -676,14 +674,14 @@ function CollectionSettings() {
 		};
 
 		const autosaveInput = document.querySelector(
-			'input[name="fotogrids_autosave"]',
+			'input[name="fotogrids_autosave"]'
 		);
 		if (autosaveInput) {
 			autosaveInput.addEventListener('change', handleAutosaveChange);
 			return () => {
 				autosaveInput.removeEventListener(
 					'change',
-					handleAutosaveChange,
+					handleAutosaveChange
 				);
 			};
 		}
@@ -697,14 +695,14 @@ function CollectionSettings() {
 			const formData = new FormData();
 			formData.append('action', 'fotogrids_get_item_urls');
 			formData.append('nonce', window.fotogridsSettings?.nonce || '');
-			galleryItems.forEach(id => formData.append('item_ids[]', id));
+			galleryItems.forEach((id) => formData.append('item_ids[]', id));
 
 			const response = await fetch(
 				window.fotogridsSettings?.ajaxUrl || window.ajaxurl,
 				{
 					method: 'POST',
 					body: formData,
-				},
+				}
 			);
 
 			const result = await response.json();
@@ -713,7 +711,7 @@ function CollectionSettings() {
 				setItemData(result.data);
 			} else {
 				throw new Error(
-					result.data || __('Failed to load item data', 'fotogrids'),
+					result.data || __('Failed to load item data', 'fotogrids')
 				);
 			}
 		} catch (err) {
@@ -725,7 +723,7 @@ function CollectionSettings() {
 
 	const updateItemUrl = async (itemId, url, target = null) => {
 		try {
-			setSavingItems(prev => ({ ...prev, [itemId]: true }));
+			setSavingItems((prev) => ({ ...prev, [itemId]: true }));
 
 			const formData = new FormData();
 			formData.append('action', 'fotogrids_update_item_url');
@@ -741,17 +739,17 @@ function CollectionSettings() {
 				{
 					method: 'POST',
 					body: formData,
-				},
+				}
 			);
 
 			const result = await response.json();
 
 			if (result.success) {
-				setItemData(prev => ({
+				setItemData((prev) => ({
 					...prev,
 					[itemId]: {
 						...prev[itemId],
-						url: url,
+						url,
 						target:
 							target !== null
 								? target
@@ -760,13 +758,13 @@ function CollectionSettings() {
 				}));
 			} else {
 				throw new Error(
-					result.data || __('Failed to save URL', 'fotogrids'),
+					result.data || __('Failed to save URL', 'fotogrids')
 				);
 			}
 		} catch (err) {
 			console.error('FotoGrids: Error updating item URL:', err);
 		} finally {
-			setSavingItems(prev => ({ ...prev, [itemId]: false }));
+			setSavingItems((prev) => ({ ...prev, [itemId]: false }));
 		}
 	};
 
@@ -778,7 +776,7 @@ function CollectionSettings() {
 			formData.append('action', 'fotogrids_bulk_update_item_urls');
 			formData.append('nonce', window.fotogridsSettings?.nonce || '');
 			formData.append('bulk_action', action);
-			galleryItems.forEach(id => formData.append('item_ids[]', id));
+			galleryItems.forEach((id) => formData.append('item_ids[]', id));
 			formData.append('url', url);
 			formData.append('target', target);
 
@@ -787,7 +785,7 @@ function CollectionSettings() {
 				{
 					method: 'POST',
 					body: formData,
-				},
+				}
 			);
 
 			const result = await response.json();
@@ -796,7 +794,7 @@ function CollectionSettings() {
 				await loadItemData();
 			} else {
 				throw new Error(
-					result.data || __('Bulk action failed', 'fotogrids'),
+					result.data || __('Bulk action failed', 'fotogrids')
 				);
 			}
 		} catch (err) {
@@ -804,7 +802,7 @@ function CollectionSettings() {
 		}
 	};
 
-	const validateUrl = url => {
+	const validateUrl = (url) => {
 		if (!url.trim()) return { valid: true, message: '' };
 
 		try {
@@ -816,7 +814,7 @@ function CollectionSettings() {
 					valid: false,
 					message: __(
 						'Invalid protocol. Use http, https, mailto, or tel.',
-						'fotogrids',
+						'fotogrids'
 					),
 				};
 			}
@@ -830,7 +828,7 @@ function CollectionSettings() {
 		}
 	};
 
-	const openBulkModal = action => {
+	const openBulkModal = (action) => {
 		setBulkAction(action);
 		setBulkUrl('');
 		setBulkTarget('global');
@@ -859,7 +857,7 @@ function CollectionSettings() {
 	};
 
 	const updateSetting = (key, value) => {
-		setSettings(prev => ({
+		setSettings((prev) => ({
 			...prev,
 			[key]: value,
 		}));
@@ -874,7 +872,7 @@ function CollectionSettings() {
 		try {
 			const settingDef = findSettingByKey(key);
 			const selectedOption = Array.isArray(settingDef?.options)
-				? settingDef.options.find(o => o && o.value === value)
+				? settingDef.options.find((o) => o && o.value === value)
 				: null;
 			const targetTab = selectedOption?.on_change?.switch_tab;
 			if (typeof targetTab === 'string' && targetTab !== '') {
@@ -888,7 +886,7 @@ function CollectionSettings() {
 	// Updates React state only - does not persist to the form or trigger autosave.
 	// Use for UI-only state that lives inside a value object (e.g. _linked flag).
 	const updateSettingStateOnly = (key, value) => {
-		setSettings(prev => ({
+		setSettings((prev) => ({
 			...prev,
 			[key]: value,
 		}));
@@ -901,7 +899,7 @@ function CollectionSettings() {
 			if (isDefaultsMode) {
 				// In defaults mode, save to form inputs for WordPress Settings API
 				const form = document.querySelector(
-					'form[action="options.php"]',
+					'form[action="options.php"]'
 				);
 				if (!form) {
 					console.warn('FotoGrids: Settings form not found');
@@ -909,7 +907,7 @@ function CollectionSettings() {
 				}
 
 				let input = form.querySelector(
-					`input[name="fotogrids_gallery_defaults[${key}]"]`,
+					`input[name="fotogrids_gallery_defaults[${key}]"]`
 				);
 
 				if (!input) {
@@ -930,13 +928,13 @@ function CollectionSettings() {
 					{
 						bubbles: true,
 						detail: { key, value, input },
-					},
+					}
 				);
 				input.dispatchEvent(customEvent);
 			} else {
 				// In gallery mode, save to post meta inputs
 				let input = document.querySelector(
-					`input[name="fotogrids_${key}"]`,
+					`input[name="fotogrids_${key}"]`
 				);
 
 				if (!input) {
@@ -962,7 +960,7 @@ function CollectionSettings() {
 					{
 						bubbles: true,
 						detail: { key, value, input },
-					},
+					}
 				);
 				input.dispatchEvent(customEvent);
 
@@ -999,7 +997,7 @@ function CollectionSettings() {
 	 * @param {Object} setting
 	 * @returns {boolean}
 	 */
-	const shouldDisplaySetting = setting => {
+	const shouldDisplaySetting = (setting) => {
 		// Filter by postType if specified
 		if (setting.postTypes && Array.isArray(setting.postTypes)) {
 			if (!setting.postTypes.includes(normalizedPostType)) {
@@ -1025,7 +1023,7 @@ function CollectionSettings() {
 			const globalState = window.fotogridsSettings?.[source] || {};
 			const { dependsOn, values } = setting.condition_global;
 
-			const readGlobal = path =>
+			const readGlobal = (path) =>
 				String(path)
 					.split('.')
 					.reduce(
@@ -1033,13 +1031,13 @@ function CollectionSettings() {
 							acc && typeof acc === 'object'
 								? acc[part]
 								: undefined,
-						globalState,
+						globalState
 					);
 
 			const matches = (actual, expected) => {
 				const list = Array.isArray(expected) ? expected : [expected];
 				return list.some(
-					v =>
+					(v) =>
 						v === actual ||
 						(v === true &&
 							(actual === true ||
@@ -1049,13 +1047,13 @@ function CollectionSettings() {
 							(actual === false ||
 								actual === '0' ||
 								actual === 0 ||
-								actual === undefined)),
+								actual === undefined))
 				);
 			};
 
 			if (Array.isArray(dependsOn)) {
 				const ok = dependsOn.every((dep, i) =>
-					matches(readGlobal(dep), values[i]),
+					matches(readGlobal(dep), values[i])
 				);
 				if (!ok) return false;
 			} else if (dependsOn) {
@@ -1079,7 +1077,7 @@ function CollectionSettings() {
 			if (
 				Object.prototype.hasOwnProperty.call(
 					setting,
-					'depends_on_value',
+					'depends_on_value'
 				)
 			) {
 				return parentValue === setting.depends_on_value;
@@ -1094,13 +1092,13 @@ function CollectionSettings() {
 		// any / all composite predicates. Allow nesting so we can express OR/AND
 		// trees on top of the leaf dependsOn predicate. Each child is itself a
 		// condition node (any | all | dependsOn+values).
-		const evaluateCondition = condition => {
+		const evaluateCondition = (condition) => {
 			if (!condition || typeof condition !== 'object') return true;
 			if (Array.isArray(condition.any)) {
-				return condition.any.some(child => evaluateCondition(child));
+				return condition.any.some((child) => evaluateCondition(child));
 			}
 			if (Array.isArray(condition.all)) {
-				return condition.all.every(child => evaluateCondition(child));
+				return condition.all.every((child) => evaluateCondition(child));
 			}
 			// Leaf predicate: reuse shouldDisplaySetting via a synthetic setting.
 			return shouldDisplaySetting({ condition });
@@ -1155,7 +1153,7 @@ function CollectionSettings() {
 					}
 					if (!Array.isArray(storedArray)) return false;
 					return Array.isArray(expectedValues)
-						? expectedValues.some(v => storedArray.includes(v))
+						? expectedValues.some((v) => storedArray.includes(v))
 						: storedArray.includes(expectedValues);
 				}
 
@@ -1172,7 +1170,7 @@ function CollectionSettings() {
 					const threshold = Number(
 						Array.isArray(expectedValues)
 							? expectedValues[0]
-							: expectedValues,
+							: expectedValues
 					);
 					return (
 						!Number.isNaN(num) &&
@@ -1185,75 +1183,73 @@ function CollectionSettings() {
 					? expectedValues.includes(currentValue)
 					: expectedValues === currentValue;
 			});
-		} else {
-			const dependentValue = settings[dependsOn];
-			const conditionOperator =
-				setting.condition?.condition_operator || null;
-
-			const dependentSetting = findSettingByKey(dependsOn);
-			if (dependentSetting && !shouldDisplaySetting(dependentSetting)) {
-				return false;
-			}
-
-			// array_includes: the stored value is a JSON array; check that it
-			// contains at least one of the listed values. Used by token_select
-			// fields where multiple options can be active simultaneously.
-			if (conditionOperator === 'array_includes') {
-				let storedArray = dependentValue;
-				if (typeof storedArray === 'string') {
-					try {
-						storedArray = JSON.parse(storedArray);
-					} catch {
-						storedArray = [];
-					}
-				}
-				if (!Array.isArray(storedArray)) return false;
-				return Array.isArray(values)
-					? values.some(v => storedArray.includes(v))
-					: storedArray.includes(values);
-			}
-
-			// not_in: passes when the dependent value is NOT in the listed values.
-			// Useful for hiding settings on a specific layout (or any other discrete
-			// value) without enumerating every other layout explicitly.
-			if (conditionOperator === 'not_in') {
-				return Array.isArray(values)
-					? !values.includes(dependentValue)
-					: values !== dependentValue;
-			}
-
-			// numeric_gt: passes when the dependent value (number) is strictly
-			// greater than the expected number. Lets a setting depend on another
-			// setting's magnitude (e.g. show only when max_rotation > 0).
-			if (conditionOperator === 'numeric_gt') {
-				const num = Number(dependentValue);
-				const threshold = Number(
-					Array.isArray(values) ? values[0] : values,
-				);
-				return (
-					!Number.isNaN(num) &&
-					!Number.isNaN(threshold) &&
-					num > threshold
-				);
-			}
-
-			if (
-				(dependentValue === undefined || dependentValue === null) &&
-				Array.isArray(values)
-			) {
-				if (
-					values.includes(false) ||
-					values.includes('0') ||
-					values.includes(0)
-				) {
-					return true;
-				}
-			}
-
-			return Array.isArray(values)
-				? values.includes(dependentValue)
-				: values === dependentValue;
 		}
+		const dependentValue = settings[dependsOn];
+		const conditionOperator = setting.condition?.condition_operator || null;
+
+		const dependentSetting = findSettingByKey(dependsOn);
+		if (dependentSetting && !shouldDisplaySetting(dependentSetting)) {
+			return false;
+		}
+
+		// array_includes: the stored value is a JSON array; check that it
+		// contains at least one of the listed values. Used by token_select
+		// fields where multiple options can be active simultaneously.
+		if (conditionOperator === 'array_includes') {
+			let storedArray = dependentValue;
+			if (typeof storedArray === 'string') {
+				try {
+					storedArray = JSON.parse(storedArray);
+				} catch {
+					storedArray = [];
+				}
+			}
+			if (!Array.isArray(storedArray)) return false;
+			return Array.isArray(values)
+				? values.some((v) => storedArray.includes(v))
+				: storedArray.includes(values);
+		}
+
+		// not_in: passes when the dependent value is NOT in the listed values.
+		// Useful for hiding settings on a specific layout (or any other discrete
+		// value) without enumerating every other layout explicitly.
+		if (conditionOperator === 'not_in') {
+			return Array.isArray(values)
+				? !values.includes(dependentValue)
+				: values !== dependentValue;
+		}
+
+		// numeric_gt: passes when the dependent value (number) is strictly
+		// greater than the expected number. Lets a setting depend on another
+		// setting's magnitude (e.g. show only when max_rotation > 0).
+		if (conditionOperator === 'numeric_gt') {
+			const num = Number(dependentValue);
+			const threshold = Number(
+				Array.isArray(values) ? values[0] : values
+			);
+			return (
+				!Number.isNaN(num) &&
+				!Number.isNaN(threshold) &&
+				num > threshold
+			);
+		}
+
+		if (
+			(dependentValue === undefined || dependentValue === null) &&
+			Array.isArray(values)
+		) {
+			if (
+				values.includes(false) ||
+				values.includes('0') ||
+				values.includes(0)
+			) {
+				return true;
+			}
+		}
+
+		return Array.isArray(values)
+			? values.includes(dependentValue)
+			: values === dependentValue;
 	};
 
 	/**
@@ -1272,7 +1268,7 @@ function CollectionSettings() {
 	 * @param {Object|undefined} predicate
 	 * @returns {boolean}
 	 */
-	const evaluateVisibleWhen = predicate => {
+	const evaluateVisibleWhen = (predicate) => {
 		if (!predicate || typeof predicate !== 'object') return true;
 
 		const watchedKey = predicate.setting;
@@ -1302,7 +1298,7 @@ function CollectionSettings() {
 	 *  - `group.visible_when` (from a placement) is evaluated against settings.
 	 *  - Legacy `group.condition.dependsOn` + `values` is still honored.
 	 */
-	const shouldDisplayTab = group => {
+	const shouldDisplayTab = (group) => {
 		if (group?.hidden) return false;
 
 		if (group?.visible_when && !evaluateVisibleWhen(group.visible_when)) {
@@ -1321,7 +1317,7 @@ function CollectionSettings() {
 					: 'globalSharing';
 			const globalState = window.fotogridsSettings?.[source] || {};
 			const { dependsOn, values } = group.condition_global;
-			const readGlobal = path =>
+			const readGlobal = (path) =>
 				String(path)
 					.split('.')
 					.reduce(
@@ -1329,12 +1325,12 @@ function CollectionSettings() {
 							acc && typeof acc === 'object'
 								? acc[part]
 								: undefined,
-						globalState,
+						globalState
 					);
 			const matches = (actual, expected) => {
 				const list = Array.isArray(expected) ? expected : [expected];
 				return list.some(
-					v =>
+					(v) =>
 						v === actual ||
 						(v === true &&
 							(actual === true ||
@@ -1344,7 +1340,7 @@ function CollectionSettings() {
 							(actual === false ||
 								actual === '0' ||
 								actual === 0 ||
-								actual === undefined)),
+								actual === undefined))
 				);
 			};
 			if (typeof dependsOn === 'string' && dependsOn !== '') {
@@ -1360,7 +1356,7 @@ function CollectionSettings() {
 		return shouldDisplaySetting({ condition: group.condition });
 	};
 
-	const findSettingByKey = key => {
+	const findSettingByKey = (key) => {
 		for (const groupId in SETTINGS_GROUPS) {
 			const group = SETTINGS_GROUPS[groupId];
 
@@ -1372,7 +1368,7 @@ function CollectionSettings() {
 						for (const subTabId in setting.subTabs) {
 							const subTab = setting.subTabs[subTabId];
 							const subSetting = subTab.settings.find(
-								s => s.key === key,
+								(s) => s.key === key
 							);
 							if (subSetting) return subSetting;
 						}
@@ -1383,7 +1379,7 @@ function CollectionSettings() {
 			if (group.subTabs) {
 				for (const subTabId in group.subTabs) {
 					const subTab = group.subTabs[subTabId];
-					const setting = subTab.settings.find(s => s.key === key);
+					const setting = subTab.settings.find((s) => s.key === key);
 					if (setting) return setting;
 				}
 			}
@@ -1391,7 +1387,7 @@ function CollectionSettings() {
 		return null;
 	};
 
-	const renderSetting = setting => {
+	const renderSetting = (setting) => {
 		// Drop hidden nodes (set by a `hide` placement) and sections whose
 		// group-level `visible_when` predicate evaluates false.
 		if (setting?.hidden) {
@@ -1414,7 +1410,7 @@ function CollectionSettings() {
 			setting,
 			currentValue,
 			fieldStates,
-			fieldStatesByOption,
+			fieldStatesByOption
 		);
 		const isDisabledByGate = fieldState !== FIELD_STATE.EDITABLE;
 
@@ -1451,7 +1447,7 @@ function CollectionSettings() {
 				.reduce(
 					(acc, part) =>
 						acc && typeof acc === 'object' ? acc[part] : undefined,
-					globalState,
+					globalState
 				);
 			// token_select expects an array of active values; the global networks
 			// map is an object keyed by network. Convert truthy keys to an array.
@@ -1462,10 +1458,10 @@ function CollectionSettings() {
 				typeof inherited === 'object'
 			) {
 				inherited = Object.keys(inherited).filter(
-					k =>
+					(k) =>
 						inherited[k] === true ||
 						inherited[k] === '1' ||
-						inherited[k] === 1,
+						inherited[k] === 1
 				);
 			}
 			if (inherited !== undefined) {
@@ -1483,28 +1479,28 @@ function CollectionSettings() {
 				pseudoSetting,
 				fieldValue,
 				fieldStates,
-				fieldStatesByOption,
+				fieldStatesByOption
 			);
 		};
 
 		const settingProps = {
 			label: setting.label,
 			value: currentValue,
-			onChange: value => updateSetting(setting.key, value),
+			onChange: (value) => updateSetting(setting.key, value),
 			disabled: isDisabled,
 		};
 
 		let control;
 
 		switch (setting.type) {
-			case 'select':
+			case 'select': {
 				// Filter out options with isGlobalDefault: true when in defaults mode
 				const selectOptionsRaw = isDefaultsMode
 					? (setting.options || []).filter(
-							option => !option.isGlobalDefault,
+							(option) => !option.isGlobalDefault
 						)
 					: setting.options || [];
-				const selectOptions = selectOptionsRaw.map(option => {
+				const selectOptions = selectOptionsRaw.map((option) => {
 					const optionValue = option?.value;
 					if (typeof optionValue !== 'string') {
 						return option;
@@ -1514,7 +1510,7 @@ function CollectionSettings() {
 						{ key: setting.key },
 						optionValue,
 						fieldStates,
-						fieldStatesByOption,
+						fieldStatesByOption
 					);
 
 					if (optionState === FIELD_STATE.EDITABLE) {
@@ -1536,6 +1532,7 @@ function CollectionSettings() {
 					options: selectOptions,
 				});
 				break;
+			}
 
 			case 'text_input':
 				control = window.FotoGridsRenderSettings?.renderTextInput(
@@ -1546,7 +1543,7 @@ function CollectionSettings() {
 						updateSetting,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1560,7 +1557,7 @@ function CollectionSettings() {
 						getFieldState,
 						renderIcon,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1574,7 +1571,7 @@ function CollectionSettings() {
 						getFieldState,
 						renderIcon,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1587,7 +1584,7 @@ function CollectionSettings() {
 						updateSetting,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1600,7 +1597,7 @@ function CollectionSettings() {
 						updateSetting,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1617,7 +1614,7 @@ function CollectionSettings() {
 						renderIcon,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1632,7 +1629,7 @@ function CollectionSettings() {
 						getFieldState,
 						getOptionState: getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1649,7 +1646,7 @@ function CollectionSettings() {
 							getOptionState: getFieldState,
 							__,
 							settings,
-						},
+						}
 					);
 				break;
 
@@ -1664,9 +1661,10 @@ function CollectionSettings() {
 						getFieldState,
 						isDefaultsMode,
 						getOptionState: getFieldState,
-						isOptionVisible: option => shouldDisplaySetting(option),
+						isOptionVisible: (option) =>
+							shouldDisplaySetting(option),
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1684,9 +1682,10 @@ function CollectionSettings() {
 						// Per-option `condition` evaluation. The token_select renderer
 						// uses this to hide dropdown options whose own `condition`
 						// (relative to the current settings map) does not pass.
-						isOptionVisible: option => shouldDisplaySetting(option),
+						isOptionVisible: (option) =>
+							shouldDisplaySetting(option),
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1702,7 +1701,7 @@ function CollectionSettings() {
 						isDefaultsMode,
 						getOptionState: getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1719,7 +1718,7 @@ function CollectionSettings() {
 							isDefaultsMode,
 							getOptionState: getFieldState,
 							__,
-						},
+						}
 					);
 				break;
 
@@ -1735,7 +1734,7 @@ function CollectionSettings() {
 						isDefaultsMode,
 						getOptionState: getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1748,7 +1747,7 @@ function CollectionSettings() {
 						updateSetting,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1761,33 +1760,34 @@ function CollectionSettings() {
 						updateSetting,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
-			case 'setting_subtabs':
+			case 'setting_subtabs': {
 				const settingContextKey = setting.key;
 				const currentActiveSubTab = getActiveSubTab(
 					settingContextKey,
-					setting.subTabs ? Object.keys(setting.subTabs)[0] : null,
+					setting.subTabs ? Object.keys(setting.subTabs)[0] : null
 				);
 				control = window.FotoGridsRenderSettings?.renderSettingSubTabs(
 					setting,
 					isDisabled,
 					{
 						activeSubTab: currentActiveSubTab,
-						setActiveSubTab: subTabId =>
+						setActiveSubTab: (subTabId) =>
 							setActiveSubTabForContext(
 								settingContextKey,
-								subTabId,
+								subTabId
 							),
 						renderIcon,
 						renderSetting,
 						shouldDisplaySetting,
 						__,
-					},
+					}
 				);
 				break;
+			}
 
 			case 'external_url_manager':
 				if (isDefaultsMode) {
@@ -1812,7 +1812,7 @@ function CollectionSettings() {
 							renderIcon,
 							updateSetting,
 							__,
-						},
+						}
 					);
 				break;
 
@@ -1825,7 +1825,7 @@ function CollectionSettings() {
 						renderSetting,
 						getFieldState,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1837,7 +1837,7 @@ function CollectionSettings() {
 					{
 						renderSetting,
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1849,7 +1849,7 @@ function CollectionSettings() {
 						updateSetting(setting.key, value);
 
 						if (errorInfo && typeof errorInfo === 'object') {
-							setValidationErrors(prev => {
+							setValidationErrors((prev) => {
 								const newErrors = {
 									...prev,
 									[setting.key]: errorInfo,
@@ -1860,7 +1860,7 @@ function CollectionSettings() {
 								return newErrors;
 							});
 						} else {
-							setValidationErrors(prev => {
+							setValidationErrors((prev) => {
 								const newErrors = { ...prev };
 								delete newErrors[setting.key];
 
@@ -1873,7 +1873,7 @@ function CollectionSettings() {
 					[],
 					isDisabled,
 					getFieldState,
-					__,
+					__
 				);
 				break;
 
@@ -1898,7 +1898,7 @@ function CollectionSettings() {
 							'',
 						passwordIsSet:
 							!!window.fotogridsSettings?.passwordIsSet,
-					},
+					}
 				);
 				break;
 
@@ -1918,7 +1918,7 @@ function CollectionSettings() {
 							window.fotogridsSettings?.restNonce ||
 							window.wpApiSettings?.nonce ||
 							'',
-					},
+					}
 				);
 				break;
 
@@ -1938,7 +1938,7 @@ function CollectionSettings() {
 							window.fotogridsSettings?.restNonce ||
 							window.wpApiSettings?.nonce ||
 							'',
-					},
+					}
 				);
 				break;
 
@@ -1949,7 +1949,7 @@ function CollectionSettings() {
 					isDisabled,
 					{
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1960,7 +1960,7 @@ function CollectionSettings() {
 					isDisabled,
 					{
 						__,
-					},
+					}
 				);
 				break;
 
@@ -1984,7 +1984,7 @@ function CollectionSettings() {
 				fieldStatesByOption,
 				__,
 			},
-			control,
+			control
 		);
 
 		return h(
@@ -1997,9 +1997,9 @@ function CollectionSettings() {
 				gatedControl,
 				window.FotoGridsRenderSettings?.renderConditionalMessage(
 					setting,
-					currentValue,
+					currentValue
 				),
-			].filter(Boolean),
+			].filter(Boolean)
 		);
 	};
 
@@ -2010,18 +2010,18 @@ function CollectionSettings() {
 
 		const helpTextTemplate = __(
 			'Need help? Check out our <a>documentation</a>',
-			'fotogrids',
+			'fotogrids'
 		);
 		const helpText = helpTextTemplate.replace(
 			'<a>',
-			`<a href="${documentationUrl}" target="_blank" class="fotogrids-settings-docs-strip__link">`,
+			`<a href="${documentationUrl}" target="_blank" class="fotogrids-settings-docs-strip__link">`
 		);
 
 		// Save the new "Easy" / "Advanced" mode to the
 		// fotogrids_settings_mode option via the shared AJAX endpoint
 		// and mirror it into the localized globals so other components
 		// that re-render later see the new value.
-		const handleModeChange = nextMode => {
+		const handleModeChange = (nextMode) => {
 			if (nextMode !== 'easy' && nextMode !== 'advanced') return;
 			if (nextMode === settingsMode) return;
 
@@ -2038,15 +2038,15 @@ function CollectionSettings() {
 				method: 'POST',
 				body: formData,
 			})
-				.then(response => {
+				.then((response) => {
 					if (!response.ok) {
 						throw new Error(
-							`HTTP error! status: ${response.status}`,
+							`HTTP error! status: ${response.status}`
 						);
 					}
 					return response.json();
 				})
-				.then(data => {
+				.then((data) => {
 					if (data.success) {
 						if (window.fotogridsAdmin) {
 							window.fotogridsAdmin.settingsMode = nextMode;
@@ -2058,27 +2058,27 @@ function CollectionSettings() {
 								data.data?.message ||
 									__(
 										'Failed to update setup mode',
-										'fotogrids',
-									),
+										'fotogrids'
+									)
 							);
 						}
 					}
 				})
-				.catch(error => {
+				.catch((error) => {
 					setSettingsMode(previousMode);
 					console.error(
 						'FotoGrids: Error updating settings_mode:',
-						error,
+						error
 					);
 					if (window.fotogridsToast) {
 						window.fotogridsToast.error(
-							__('Failed to update setup mode', 'fotogrids'),
+							__('Failed to update setup mode', 'fotogrids')
 						);
 					}
 				});
 		};
 
-		const handleAutosaveToggle = e => {
+		const handleAutosaveToggle = (e) => {
 			e.preventDefault();
 			const newValue = !autosaveValue;
 			setAutosaveValue(newValue);
@@ -2093,15 +2093,15 @@ function CollectionSettings() {
 				method: 'POST',
 				body: formData,
 			})
-				.then(response => {
+				.then((response) => {
 					if (!response.ok) {
 						throw new Error(
-							`HTTP error! status: ${response.status}`,
+							`HTTP error! status: ${response.status}`
 						);
 					}
 					return response.json();
 				})
-				.then(data => {
+				.then((data) => {
 					if (data.success) {
 						const savedValue =
 							data.data?.value !== undefined
@@ -2111,7 +2111,7 @@ function CollectionSettings() {
 							setAutosaveValue(!newValue);
 							const errorMessage = __(
 								'Failed to save autosave setting - value mismatch',
-								'fotogrids',
+								'fotogrids'
 							);
 							if (window.fotogridsToast) {
 								window.fotogridsToast.error(errorMessage);
@@ -2129,7 +2129,7 @@ function CollectionSettings() {
 							window.fotogridsToast.success(
 								savedValue
 									? __('Autosave enabled', 'fotogrids')
-									: __('Autosave disabled', 'fotogrids'),
+									: __('Autosave disabled', 'fotogrids')
 							);
 						}
 					} else {
@@ -2138,22 +2138,22 @@ function CollectionSettings() {
 							data.data?.message ||
 							__(
 								'Failed to update autosave setting',
-								'fotogrids',
+								'fotogrids'
 							);
 						if (window.fotogridsToast) {
 							window.fotogridsToast.error(errorMessage);
 						}
 					}
 				})
-				.catch(error => {
+				.catch((error) => {
 					setAutosaveValue(!newValue);
 					const errorMessage = __(
 						'Failed to update autosave setting',
-						'fotogrids',
+						'fotogrids'
 					);
 					console.error(
 						'FotoGrids: Error updating autosave setting:',
-						error,
+						error
 					);
 					if (window.fotogridsToast) {
 						window.fotogridsToast.error(errorMessage);
@@ -2189,25 +2189,25 @@ function CollectionSettings() {
 										normalizedPostType === 'album'
 											? __(
 													'Configure Album defaults',
-													'fotogrids',
+													'fotogrids'
 												)
 											: __(
 													'Configure Gallery defaults',
-													'fotogrids',
+													'fotogrids'
 												),
 									'data-fg-tooltip':
 										normalizedPostType === 'album'
 											? __(
 													'Configure Album defaults',
-													'fotogrids',
+													'fotogrids'
 												)
 											: __(
 													'Configure Gallery defaults',
-													'fotogrids',
+													'fotogrids'
 												),
 									'data-fg-tooltip-dir': 'below',
 								},
-								__('Defaults', 'fotogrids'),
+								__('Defaults', 'fotogrids')
 							),
 						// Per-button tooltips, bottom-anchored. The *selected*
 						// option gets no tooltip (hovering it has nothing to
@@ -2232,21 +2232,21 @@ function CollectionSettings() {
 										role: 'radiogroup',
 										'aria-label': __(
 											'Setup mode',
-											'fotogrids',
+											'fotogrids'
 										),
 									},
-									['easy', 'advanced'].map(m => {
+									['easy', 'advanced'].map((m) => {
 										const isActive = settingsMode === m;
 										const tooltip = isActive
 											? null
 											: m === 'advanced'
 												? __(
 														'Switch to Advanced for fine-grained controls',
-														'fotogrids',
+														'fotogrids'
 													)
 												: __(
 														'Switch to Easy to show only the essential controls',
-														'fotogrids',
+														'fotogrids'
 													);
 
 										// The key embeds the active state so React
@@ -2293,13 +2293,13 @@ function CollectionSettings() {
 													? __('Easy', 'fotogrids')
 													: __(
 															'Advanced',
-															'fotogrids',
-														),
-											),
+															'fotogrids'
+														)
+											)
 										);
-									}),
+									})
 								),
-							],
+							]
 						),
 						h(
 							'div',
@@ -2314,7 +2314,7 @@ function CollectionSettings() {
 										className:
 											'fotogrids-settings-docs-strip__autosave-label',
 									},
-									__('Autosave', 'fotogrids'),
+									__('Autosave', 'fotogrids')
 								),
 								h(
 									'button',
@@ -2324,7 +2324,7 @@ function CollectionSettings() {
 										onClick: handleAutosaveToggle,
 										title: __(
 											'Toggle autosave',
-											'fotogrids',
+											'fotogrids'
 										),
 										'aria-checked': autosaveValue,
 										role: 'switch',
@@ -2338,17 +2338,17 @@ function CollectionSettings() {
 											className:
 												'fotogrids-toggle__thumb',
 										}),
-									],
+									]
 								),
-							],
+							]
 						),
-					],
+					]
 				),
-			],
+			]
 		);
 	};
 
-	const renderTabContent = groupId => {
+	const renderTabContent = (groupId) => {
 		const group = SETTINGS_GROUPS[groupId];
 		if (!group) return null;
 
@@ -2358,7 +2358,7 @@ function CollectionSettings() {
 			const allSettings = group.settings || [];
 
 			if (group.subTabs) {
-				Object.values(group.subTabs).forEach(subTab => {
+				Object.values(group.subTabs).forEach((subTab) => {
 					allSettings.push(...subTab.settings);
 				});
 			}
@@ -2387,7 +2387,7 @@ function CollectionSettings() {
 											className:
 												'fotogrids-pro-tab--header--icon',
 										},
-										renderIcon(group.icon),
+										renderIcon(group.icon)
 									),
 									h('h3', {}, group.label),
 									h(
@@ -2404,11 +2404,11 @@ function CollectionSettings() {
 											h(
 												'span',
 												{},
-												__('Pro', 'fotogrids'),
+												__('Pro', 'fotogrids')
 											),
-										],
+										]
 									),
-								],
+								]
 							),
 							h(
 								'div',
@@ -2425,13 +2425,13 @@ function CollectionSettings() {
 										group.description ||
 											__(
 												'Unlock these powerful features:',
-												'fotogrids',
-											),
+												'fotogrids'
+											)
 									),
 									h(
 										'ul',
 										{},
-										allSettings.map(setting =>
+										allSettings.map((setting) =>
 											h(
 												'li',
 												{
@@ -2447,8 +2447,8 @@ function CollectionSettings() {
 																'fotogrids-pro-tab--feature--icon',
 														},
 														renderIcon(
-															'check_circle',
-														),
+															'check_circle'
+														)
 													),
 													h(
 														'div',
@@ -2464,7 +2464,7 @@ function CollectionSettings() {
 																		className:
 																			'fotogrids-pro-tab--feature--title',
 																	},
-																	setting.title,
+																	setting.title
 																),
 															h(
 																'p',
@@ -2473,15 +2473,15 @@ function CollectionSettings() {
 																		'fotogrids-pro-tab--feature--description',
 																},
 																setting.description ||
-																	setting.label,
+																	setting.label
 															),
-														],
+														]
 													),
-												],
-											),
-										),
+												]
+											)
+										)
 									),
-								],
+								]
 							),
 							h(
 								'div',
@@ -2502,12 +2502,12 @@ function CollectionSettings() {
 												if (upgradeUrl) {
 													window.open(
 														upgradeUrl,
-														'_blank',
+														'_blank'
 													);
 												}
 											},
 										},
-										__('Upgrade to Pro', 'fotogrids'),
+										__('Upgrade to Pro', 'fotogrids')
 									),
 									h(
 										'button',
@@ -2518,17 +2518,17 @@ function CollectionSettings() {
 											onClick: () => {
 												window.open(
 													`https://go.fotogrids.com/feature-${group.id}`,
-													'_blank',
+													'_blank'
 												);
 											},
 										},
-										__('Learn more', 'fotogrids'),
+										__('Learn more', 'fotogrids')
 									),
-								],
+								]
 							),
-						],
+						]
 					),
-				],
+				]
 			);
 		}
 
@@ -2541,8 +2541,8 @@ function CollectionSettings() {
 			// the live settings map so it disappears/reappears as the user
 			// changes related fields.
 			const availableSubTabs = Object.values(group.subTabs)
-				.filter(subTab => !subTab?.hidden)
-				.filter(subTab => evaluateVisibleWhen(subTab?.visible_when));
+				.filter((subTab) => !subTab?.hidden)
+				.filter((subTab) => evaluateVisibleWhen(subTab?.visible_when));
 
 			if (availableSubTabs.length === 0) {
 				return h(
@@ -2557,10 +2557,10 @@ function CollectionSettings() {
 								className: 'fotogrids-settings-group__content',
 							},
 							(group.settings || [])
-								.filter(s => !s?.hidden)
-								.map(renderSetting),
+								.filter((s) => !s?.hidden)
+								.map(renderSetting)
 						),
-					],
+					]
 				);
 			}
 
@@ -2578,15 +2578,15 @@ function CollectionSettings() {
 								className: 'fotogrids-settings-group__content',
 							},
 							(singleSubTab.settings || [])
-								.filter(s => !s?.hidden)
-								.map(s =>
+								.filter((s) => !s?.hidden)
+								.map((s) =>
 									renderSetting({
 										...s,
 										__chromeWhenContext: 'single_subtab',
-									}),
-								),
+									})
+								)
 						),
-					],
+					]
 				);
 			}
 
@@ -2594,7 +2594,7 @@ function CollectionSettings() {
 			// otherwise fall back to the first available one.
 			const previouslyActive = getActiveSubTab(groupContextKey, null);
 			const previouslyActiveStillVisible = availableSubTabs.some(
-				s => s.id === previouslyActive,
+				(s) => s.id === previouslyActive
 			);
 			const currentActiveSubTab = previouslyActiveStillVisible
 				? previouslyActive
@@ -2612,19 +2612,19 @@ function CollectionSettings() {
 						{
 							className: 'fotogrids-subtabs-nav',
 						},
-						availableSubTabs.map(subTab =>
+						availableSubTabs.map((subTab) =>
 							h(
 								'button',
 								{
 									key: subTab.id,
 									type: 'button',
 									className: `fotogrids-subtab ${currentActiveSubTab === subTab.id ? 'fg-is-active' : ''}`,
-									onClick: e => {
+									onClick: (e) => {
 										e.preventDefault();
 										e.stopPropagation();
 										setActiveSubTabForContext(
 											groupContextKey,
-											subTab.id,
+											subTab.id
 										);
 									},
 								},
@@ -2634,7 +2634,7 @@ function CollectionSettings() {
 										{
 											className: 'fotogrids-subtab__icon',
 										},
-										renderIcon(subTab.icon),
+										renderIcon(subTab.icon)
 									),
 									h(
 										'span',
@@ -2642,11 +2642,11 @@ function CollectionSettings() {
 											className:
 												'fotogrids-subtab__label',
 										},
-										subTab.label,
+										subTab.label
 									),
-								],
-							),
-						),
+								]
+							)
+						)
 					),
 
 					h(
@@ -2665,23 +2665,23 @@ function CollectionSettings() {
 									group.subTabs[currentActiveSubTab]
 										?.settings || []
 								)
-									.filter(s => !s?.hidden)
-									.map(s =>
+									.filter((s) => !s?.hidden)
+									.map((s) =>
 										renderSetting({
 											...s,
 											__chromeWhenContext: 'multi_subtab',
-										}),
-									) || [],
+										})
+									) || []
 							),
-						],
+						]
 					),
-				],
+				]
 			);
 		}
 
 		const visibleSettings = (group.settings || [])
-			.filter(s => !s?.hidden)
-			.filter(s => evaluateVisibleWhen(s?.visible_when));
+			.filter((s) => !s?.hidden)
+			.filter((s) => evaluateVisibleWhen(s?.visible_when));
 
 		return [
 			renderDocumentationStrip(),
@@ -2696,9 +2696,9 @@ function CollectionSettings() {
 						{
 							className: 'fotogrids-settings-group__content',
 						},
-						visibleSettings.map(renderSetting),
+						visibleSettings.map(renderSetting)
 					),
-				],
+				]
 			),
 		].filter(Boolean);
 	};
@@ -2778,10 +2778,10 @@ function CollectionSettings() {
 					h(
 						'span',
 						{ className: 'fotogrids-loading-screen__label' },
-						'Loading settings...',
+						'Loading settings...'
 					),
 				]),
-			],
+			]
 		);
 	}
 
@@ -2805,15 +2805,15 @@ function CollectionSettings() {
 							className: 'fotogrids-settings-tabs',
 						},
 						Object.values(SETTINGS_GROUPS)
-							.filter(group => shouldDisplayTab(group))
-							.map(group =>
+							.filter((group) => shouldDisplayTab(group))
+							.map((group) =>
 								h(
 									'button',
 									{
 										key: group.id,
 										type: 'button',
 										className: `fotogrids-settings-tab ${activeTab === group.id ? 'fg-is-active' : ''} ${!isFreeTier(group) && !isProActive ? 'is-pro' : ''}`,
-										onClick: e => {
+										onClick: (e) => {
 											e.preventDefault();
 											e.stopPropagation();
 											setActiveTab(group.id);
@@ -2833,7 +2833,7 @@ function CollectionSettings() {
 												className:
 													'fotogrids-settings-tab__icon',
 											},
-											renderIcon(group.icon),
+											renderIcon(group.icon)
 										),
 										h(
 											'span',
@@ -2841,7 +2841,7 @@ function CollectionSettings() {
 												className:
 													'fotogrids-settings-tab__label',
 											},
-											group.label,
+											group.label
 										),
 										!isFreeTier(group) &&
 											!isProActive &&
@@ -2866,14 +2866,14 @@ function CollectionSettings() {
 													h('path', {
 														fill: 'currentColor',
 														d: 'M11 7V5a3 3 0 0 0-6 0v2H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1ZM6 5a2 2 0 1 1 4 0v2H6V5Z',
-													}),
-												),
+													})
+												)
 											),
-									],
-								),
-							),
+									]
+								)
+							)
 					),
-				],
+				]
 			),
 
 			h(
@@ -2887,7 +2887,7 @@ function CollectionSettings() {
 					return Array.isArray(tabContent)
 						? tabContent
 						: [tabContent];
-				})(),
+				})()
 			),
 
 			window.FotoGridsRenderSettings?.renderBulkModal({
@@ -2902,7 +2902,7 @@ function CollectionSettings() {
 				executeBulkAction,
 				__,
 			}),
-		],
+		]
 	);
 }
 
@@ -2914,7 +2914,7 @@ function ReadonlyNotice() {
 		'div',
 		{ className: 'fotogrids-readonly-notice', role: 'note' },
 		h('strong', null, 'Read-only'),
-		h('span', null, ' - ' + notice),
+		h('span', null, ' - ' + notice)
 	);
 }
 
@@ -2933,14 +2933,14 @@ function ReadonlyWrapper(props) {
 				disabled: true,
 				'aria-disabled': 'true',
 			},
-			props.children,
-		),
+			props.children
+		)
 	);
 }
 
 function initializeCollectionSettings() {
 	const container = document.getElementById(
-		'fotogrids-collection-settings-root',
+		'fotogrids-collection-settings-root'
 	);
 
 	if (container && window.wp && window.wp.element) {

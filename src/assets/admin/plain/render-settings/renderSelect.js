@@ -46,7 +46,7 @@ const RenderSelectComponent = ({
 
 	const [dropdownPosition, setDropdownPosition] = useState(null);
 	const listboxIdRef = useRef(
-		`fotogrids-select-${Math.random().toString(36).slice(2, 10)}`,
+		`fotogrids-select-${Math.random().toString(36).slice(2, 10)}`
 	);
 	const listboxId = listboxIdRef.current;
 
@@ -94,7 +94,7 @@ const RenderSelectComponent = ({
 				: 'top';
 		const maxHeight = Math.max(
 			120,
-			placement === 'bottom' ? availableBelow : availableAbove,
+			placement === 'bottom' ? availableBelow : availableAbove
 		);
 		const resolvedMaxHeight =
 			typeof maxDropdownHeight === 'number' && maxDropdownHeight > 0
@@ -103,12 +103,12 @@ const RenderSelectComponent = ({
 
 		const width = Math.min(
 			Math.max(triggerRect.width, 180),
-			viewportWidth - sidePadding * 2,
+			viewportWidth - sidePadding * 2
 		);
 
 		const left = Math.min(
 			Math.max(sidePadding, triggerRect.left),
-			Math.max(sidePadding, viewportWidth - width - sidePadding),
+			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
 
 		// For top placement we anchor at the trigger's top edge and use
@@ -152,7 +152,7 @@ const RenderSelectComponent = ({
 			return undefined;
 		}
 
-		const handlePointerDown = event => {
+		const handlePointerDown = (event) => {
 			const clickedInsideTrigger =
 				triggerRef.current && triggerRef.current.contains(event.target);
 			const clickedInsideDropdown =
@@ -164,7 +164,7 @@ const RenderSelectComponent = ({
 			}
 		};
 
-		const handleEscape = event => {
+		const handleEscape = (event) => {
 			if (event.key === 'Escape') {
 				closeDropdown();
 			}
@@ -202,7 +202,7 @@ const RenderSelectComponent = ({
 			return;
 		}
 
-		setIsOpen(previousState => !previousState);
+		setIsOpen((previousState) => !previousState);
 	};
 
 	const renderOption = (option, optionKeyPrefix) => {
@@ -239,7 +239,7 @@ const RenderSelectComponent = ({
 			},
 			typeof renderOptionLabel === 'function'
 				? renderOptionLabel(option, isSelected)
-				: option.label,
+				: option.label
 		);
 	};
 
@@ -284,20 +284,21 @@ const RenderSelectComponent = ({
 										'fotogrids-input fotogrids-render-select__search-input',
 									placeholder:
 										searchPlaceholder ||
-										__('Search...', 'fotogrids'),
+										__('Search…', 'fotogrids'),
 									value: searchTerm,
-									onChange: event => {
+									onChange: (event) => {
 										if (
 											typeof onSearchTermChange ===
 											'function'
 										) {
 											onSearchTermChange(
-												event.target.value,
+												event.target.value
 											);
 										}
 									},
-									onKeyDown: event => event.stopPropagation(),
-								}),
+									onKeyDown: (event) =>
+										event.stopPropagation(),
+								})
 							),
 						h(
 							'div',
@@ -313,8 +314,8 @@ const RenderSelectComponent = ({
 								onScroll: onDropdownScroll,
 							},
 							[
-								...topOptions.map(option =>
-									renderOption(option, 'top'),
+								...topOptions.map((option) =>
+									renderOption(option, 'top')
 								),
 								...groups.map((group, groupIndex) =>
 									h(
@@ -334,15 +335,15 @@ const RenderSelectComponent = ({
 														className:
 															'fotogrids-render-select__group-label',
 													},
-													group.label,
+													group.label
 												),
 											...(Array.isArray(group.options)
-												? group.options.map(option =>
+												? group.options.map((option) =>
 														renderOption(
 															option,
 															group.id ||
-																`group-${groupIndex}`,
-														),
+																`group-${groupIndex}`
+														)
 													)
 												: []),
 											group.status &&
@@ -352,14 +353,14 @@ const RenderSelectComponent = ({
 														className:
 															'fotogrids-render-select__status',
 													},
-													group.status,
+													group.status
 												),
-										],
-									),
+										]
+									)
 								),
-							],
+							]
 						),
-					],
+					]
 				)
 			: null;
 
@@ -396,9 +397,9 @@ const RenderSelectComponent = ({
 									className: 'fotogrids-pro-badge',
 									key: 'pro-badge',
 								},
-								settingBadgeText,
+								settingBadgeText
 							),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 			h(
 				'button',
@@ -427,7 +428,7 @@ const RenderSelectComponent = ({
 								? getOptionStyle(selectedOption, true)
 								: undefined,
 					},
-					selectedOption?.label || '',
+					selectedOption?.label || ''
 				),
 				h(
 					'span',
@@ -435,8 +436,8 @@ const RenderSelectComponent = ({
 						className: 'fotogrids-render-select__caret',
 						'aria-hidden': 'true',
 					},
-					renderIcon('chevron_down'),
-				),
+					renderIcon('chevron_down')
+				)
 			),
 			setting.description &&
 				h(
@@ -445,13 +446,13 @@ const RenderSelectComponent = ({
 						className: 'fotogrids-setting__description',
 						key: 'description',
 					},
-					setting.description,
+					setting.description
 				),
 			portalElement,
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };
 
-window.FotoGridsRenderSettings.renderSelect = config => {
+window.FotoGridsRenderSettings.renderSelect = (config) => {
 	return wp.element.createElement(RenderSelectComponent, config);
 };

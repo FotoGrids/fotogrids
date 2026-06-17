@@ -38,21 +38,21 @@ The runtime exposes `window.FotoGrids` with these surfaces:
 // at DOMContentLoaded AND for every gallery the MutationObserver picks
 // up later (album-ajax loads, password-gate unlocks, third-party DOM
 // injection). Lower priority runs first.
-window.FotoGrids.onGallery(galleryElement => {
+window.FotoGrids.onGallery((galleryElement) => {
 	// wire your gallery-only feature here
 }, 10);
 
 // Subscribe to album initialization. Fires ONLY for album wrappers
 // (.fotogrids-collection.fotogrids-album). Same replay-on-late-subscribe
 // semantics as onGallery.
-window.FotoGrids.onAlbum(albumElement => {
+window.FotoGrids.onAlbum((albumElement) => {
 	// wire your album-only feature here
 }, 10);
 
 // Subscribe to collection initialization. Fires for BOTH galleries and
 // albums. Use this only when a module genuinely needs to run against
 // both kinds. Most modules want onGallery or onAlbum instead.
-window.FotoGrids.onCollection(collectionElement => {
+window.FotoGrids.onCollection((collectionElement) => {
 	// wire your collection-wide feature here
 }, 10);
 

@@ -93,17 +93,17 @@
 		let galleries;
 		if (link.galleryId) {
 			galleries = document.querySelectorAll(
-				`.fotogrids-collection.fotogrids-gallery[data-fg-gallery-id="${link.galleryId}"]`,
+				`.fotogrids-collection.fotogrids-gallery[data-fg-gallery-id="${link.galleryId}"]`
 			);
 		} else {
 			galleries = document.querySelectorAll(
-				'.fotogrids-collection.fotogrids-gallery',
+				'.fotogrids-collection.fotogrids-gallery'
 			);
 		}
 
 		for (const galleryEl of galleries) {
 			const itemEl = galleryEl.querySelector(
-				`[data-fg-item-id="${link.itemId}"]`,
+				`[data-fg-item-id="${link.itemId}"]`
 			);
 			if (itemEl) {
 				const figure = itemEl.closest('.fg-item') || itemEl;
@@ -133,7 +133,7 @@
 			itemEl.classList.add('fg-deep-link-highlight');
 			setTimeout(
 				() => itemEl.classList.remove('fg-deep-link-highlight'),
-				2200,
+				2200
 			);
 		};
 
@@ -174,7 +174,7 @@
 				}
 			}
 			const triggers = Array.from(
-				target.galleryEl.querySelectorAll('[data-fg-lightbox-trigger]'),
+				target.galleryEl.querySelectorAll('[data-fg-lightbox-trigger]')
 			);
 			const index = triggers.indexOf(target.trigger);
 			const instance = lb || new window.FotoGridsLightbox();
@@ -198,7 +198,7 @@
 			detail.galleryEl ||
 			(item && item.triggerEl
 				? item.triggerEl.closest(
-						'.fotogrids-collection.fotogrids-gallery',
+						'.fotogrids-collection.fotogrids-gallery'
 					)
 				: null);
 		const itemId = item && item.id ? item.id : null;
@@ -229,7 +229,7 @@
 		document.addEventListener('fotogrids:lightbox:open', syncUrlToLightbox);
 		document.addEventListener(
 			'fotogrids:lightbox:navigate',
-			syncUrlToLightbox,
+			syncUrlToLightbox
 		);
 		document.addEventListener('fotogrids:lightbox:close', clearDeepLink);
 

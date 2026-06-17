@@ -39,7 +39,7 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 		});
 
 		apiFetch({ path: `/${restBase}/${entitySlug}?${params}` })
-			.then(res => {
+			.then((res) => {
 				if (!mountedRef.current) return;
 				setTopItems(Array.isArray(res.items) ? res.items : []);
 				setTotal(Number(res.total) || 0);

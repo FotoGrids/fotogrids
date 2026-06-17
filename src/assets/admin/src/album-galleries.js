@@ -4,7 +4,7 @@ import AlbumGalleries from './components/AlbumGalleries.jsx';
 
 function initializeAlbumGalleries() {
 	const albumGalleriesRoot = document.getElementById(
-		'fotogrids-album-galleries-root',
+		'fotogrids-album-galleries-root'
 	);
 
 	if (albumGalleriesRoot && window.fotogridsAlbumGalleries) {

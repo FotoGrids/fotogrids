@@ -27,7 +27,7 @@ export async function persistSetting(setting, value) {
 	if (!ajaxUrl || !nonce) {
 		// eslint-disable-next-line no-console
 		console.warn(
-			'FotoGrids: missing ajax url / nonce; persistSetting noop',
+			'FotoGrids: missing ajax url / nonce; persistSetting noop'
 		);
 		return { ok: false };
 	}
@@ -38,7 +38,7 @@ export async function persistSetting(setting, value) {
 	body.append('setting', setting);
 	body.append(
 		'value',
-		typeof value === 'boolean' ? (value ? '1' : '0') : String(value),
+		typeof value === 'boolean' ? (value ? '1' : '0') : String(value)
 	);
 
 	try {
@@ -46,7 +46,7 @@ export async function persistSetting(setting, value) {
 		if (!res.ok) {
 			// eslint-disable-next-line no-console
 			console.warn(
-				`FotoGrids: persistSetting ${setting} HTTP ${res.status}`,
+				`FotoGrids: persistSetting ${setting} HTTP ${res.status}`
 			);
 			return { ok: false };
 		}

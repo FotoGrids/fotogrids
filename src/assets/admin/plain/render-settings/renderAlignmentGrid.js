@@ -15,10 +15,10 @@ window.FotoGridsRenderSettings.renderAlignmentGrid = (
 		isDefaultsMode,
 		getOptionState,
 		__,
-	},
+	}
 ) => {
 	const filteredOptions = isDefaultsMode
-		? (setting.options || []).filter(option => !option.isGlobalDefault)
+		? (setting.options || []).filter((option) => !option.isGlobalDefault)
 		: setting.options || [];
 
 	const gridOrder = [
@@ -34,11 +34,11 @@ window.FotoGridsRenderSettings.renderAlignmentGrid = (
 	];
 
 	const optionsMap = {};
-	filteredOptions.forEach(option => {
+	filteredOptions.forEach((option) => {
 		optionsMap[option.value] = option;
 	});
 
-	const orderedOptions = gridOrder.map(value => optionsMap[value] || null);
+	const orderedOptions = gridOrder.map((value) => optionsMap[value] || null);
 
 	const modifiedSetting = {
 		...setting,
@@ -57,6 +57,6 @@ window.FotoGridsRenderSettings.renderAlignmentGrid = (
 			getOptionState,
 			__,
 			buttonsClassName: 'fotogrids-alignment-grid',
-		},
+		}
 	);
 };

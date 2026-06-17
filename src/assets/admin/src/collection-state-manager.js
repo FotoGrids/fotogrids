@@ -17,10 +17,10 @@
 			 * Set items
 			 * @param {Array} itemIds - Array of item IDs
 			 */
-			setItems: function (itemIds) {
+			setItems(itemIds) {
 				if (!Array.isArray(itemIds)) {
 					console.warn(
-						'FotoGridsCollectionState: setItems expects an array',
+						'FotoGridsCollectionState: setItems expects an array'
 					);
 					return;
 				}
@@ -32,10 +32,10 @@
 			 * Initialize items (sets both current and initial state)
 			 * @param {Array} itemIds - Array of item IDs
 			 */
-			initItems: function (itemIds) {
+			initItems(itemIds) {
 				if (!Array.isArray(itemIds)) {
 					console.warn(
-						'FotoGridsCollectionState: initItems expects an array',
+						'FotoGridsCollectionState: initItems expects an array'
 					);
 					return;
 				}
@@ -48,7 +48,7 @@
 			 * Add item
 			 * @param {string|number} itemId - Item ID to add
 			 */
-			addItem: function (itemId) {
+			addItem(itemId) {
 				if (!this.ids.includes(itemId)) {
 					this.ids.push(itemId);
 					window.FotoGridsCollectionState._notifyListeners('items');
@@ -59,7 +59,7 @@
 			 * Remove item
 			 * @param {string|number} itemId - Item ID to remove
 			 */
-			removeItem: function (itemId) {
+			removeItem(itemId) {
 				const index = this.ids.indexOf(itemId);
 				if (index > -1) {
 					this.ids.splice(index, 1);
@@ -71,10 +71,10 @@
 			 * Reorder items
 			 * @param {Array} itemIds - New order of item IDs
 			 */
-			reorderItems: function (itemIds) {
+			reorderItems(itemIds) {
 				if (!Array.isArray(itemIds)) {
 					console.warn(
-						'FotoGridsCollectionState: reorderItems expects an array',
+						'FotoGridsCollectionState: reorderItems expects an array'
 					);
 					return;
 				}
@@ -86,21 +86,21 @@
 			 * Check if items have changed
 			 * @returns {boolean}
 			 */
-			hasChanged: function () {
+			hasChanged() {
 				if (this.ids.length !== this.initialIds.length) {
 					return true;
 				}
 				return this.ids.some(
-					(id, index) => id !== this.initialIds[index],
+					(id, index) => id !== this.initialIds[index]
 				);
 			},
 
-			reset: function () {
+			reset() {
 				this.ids = [...this.initialIds];
 				window.FotoGridsCollectionState._notifyListeners('items');
 			},
 
-			save: function () {
+			save() {
 				this.initialIds = [...this.ids];
 				window.FotoGridsCollectionState._notifyListeners('items');
 			},
@@ -119,13 +119,13 @@
 			 * @param {boolean} hasChanges - Whether there are unsaved changes
 			 * @param {string} source - Source of the change ('items', 'form', 'settings')
 			 */
-			set: function (hasChanges, source) {
+			set(hasChanges, source) {
 				this.hasChanges = hasChanges;
 				if (source) {
 					this.sources[source] = hasChanges;
 				}
 				window.FotoGridsCollectionState._notifyListeners(
-					'unsavedChanges',
+					'unsavedChanges'
 				);
 			},
 
@@ -133,17 +133,17 @@
 			 * Mark changes from a specific source
 			 * @param {string} source - Source of the change
 			 */
-			markChanged: function (source) {
+			markChanged(source) {
 				this.hasChanges = true;
 				if (source) {
 					this.sources[source] = true;
 				}
 				window.FotoGridsCollectionState._notifyListeners(
-					'unsavedChanges',
+					'unsavedChanges'
 				);
 			},
 
-			clear: function () {
+			clear() {
 				this.hasChanges = false;
 				this.sources = {
 					items: false,
@@ -151,7 +151,7 @@
 					settings: false,
 				};
 				window.FotoGridsCollectionState._notifyListeners(
-					'unsavedChanges',
+					'unsavedChanges'
 				);
 			},
 
@@ -159,7 +159,7 @@
 			 * Check if there are unsaved changes
 			 * @returns {boolean}
 			 */
-			has: function () {
+			has() {
 				return this.hasChanges;
 			},
 		},
@@ -169,12 +169,12 @@
 			interval: null,
 			delay: 2000,
 
-			enable: function () {
+			enable() {
 				this.enabled = true;
 				window.FotoGridsCollectionState._notifyListeners('autosave');
 			},
 
-			disable: function () {
+			disable() {
 				this.enabled = false;
 				if (this.interval) {
 					clearTimeout(this.interval);
@@ -187,7 +187,7 @@
 			 * Set autosave state
 			 * @param {boolean} enabled - Whether autosave is enabled
 			 */
-			set: function (enabled) {
+			set(enabled) {
 				if (enabled) {
 					this.enable();
 				} else {
@@ -199,7 +199,7 @@
 			 * Trigger autosave (debounced)
 			 * @param {Function} saveCallback - Callback function to execute save
 			 */
-			trigger: function (saveCallback) {
+			trigger(saveCallback) {
 				if (!this.enabled || typeof saveCallback !== 'function') {
 					return;
 				}
@@ -232,7 +232,7 @@
 		 * @param {string} event - Event name ('items', 'unsavedChanges', 'autosave')
 		 * @param {Function} callback - Callback function
 		 */
-		on: function (event, callback) {
+		on(event, callback) {
 			if (this._listeners[event] && typeof callback === 'function') {
 				this._listeners[event].push(callback);
 			}
@@ -243,7 +243,7 @@
 		 * @param {string} event - Event name
 		 * @param {Function} callback - Callback function to remove
 		 */
-		off: function (event, callback) {
+		off(event, callback) {
 			if (this._listeners[event]) {
 				const index = this._listeners[event].indexOf(callback);
 				if (index > -1) {
@@ -256,15 +256,15 @@
 		 * Notify listeners of state change
 		 * @private
 		 */
-		_notifyListeners: function (event) {
+		_notifyListeners(event) {
 			if (this._listeners[event]) {
-				this._listeners[event].forEach(callback => {
+				this._listeners[event].forEach((callback) => {
 					try {
 						callback();
 					} catch (error) {
 						console.error(
 							'FotoGridsCollectionState: Listener error',
-							error,
+							error
 						);
 					}
 				});

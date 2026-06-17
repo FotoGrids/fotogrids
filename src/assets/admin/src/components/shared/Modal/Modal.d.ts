@@ -259,11 +259,11 @@ export interface FotoGridsAdminModalApi {
 
 	on: <K extends ModalEventName>(
 		event: K,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	) => () => void;
 	off: <K extends ModalEventName>(
 		event: K,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	) => void;
 	emit: (event: ModalEventName, detail?: Record<string, unknown>) => void;
 
@@ -293,15 +293,15 @@ declare module '@fotogrids/admin/fg-modal' {
 
 	export function emit(
 		event: ModalEventName,
-		detail?: Record<string, unknown>,
+		detail?: Record<string, unknown>
 	): void;
 	export function on(
 		event: ModalEventName,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	): () => void;
 	export function off(
 		event: ModalEventName,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	): void;
 }
 

@@ -118,7 +118,7 @@
 	 */
 	function buildStorageKey(ns, key) {
 		return ['fg:ui', ns.area, ns.entityType, String(ns.entityId), key].join(
-			':',
+			':'
 		);
 	}
 

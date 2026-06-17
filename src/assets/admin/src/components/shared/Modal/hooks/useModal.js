@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { modalRegistry } from '../api/modalRegistry';
 
 const buildConfirm =
-	variant =>
+	(variant) =>
 	(opts = {}) =>
-		new Promise(resolve => {
+		new Promise((resolve) => {
 			const handle = modalRegistry.open({
 				type: 'confirm',
 				variant,
@@ -15,7 +15,7 @@ const buildConfirm =
 					}
 					resolve(true);
 				},
-				onClose: reason => {
+				onClose: (reason) => {
 					opts.onClose?.(reason);
 					if (reason !== 'confirm') resolve(false);
 				},
@@ -25,20 +25,20 @@ const buildConfirm =
 		});
 
 const buildPrompt =
-	variant =>
+	(variant) =>
 	(opts = {}) =>
-		new Promise(resolve => {
+		new Promise((resolve) => {
 			modalRegistry.open({
 				type: 'prompt',
 				variant,
 				...opts,
-				onSubmit: async value => {
+				onSubmit: async (value) => {
 					if (typeof opts.onSubmit === 'function') {
 						await opts.onSubmit(value);
 					}
 					resolve(value);
 				},
-				onClose: reason => {
+				onClose: (reason) => {
 					opts.onClose?.(reason);
 					if (reason !== 'confirm') resolve(null);
 				},
@@ -46,14 +46,14 @@ const buildPrompt =
 		});
 
 const buildAlert =
-	variant =>
+	(variant) =>
 	(opts = {}) =>
-		new Promise(resolve => {
+		new Promise((resolve) => {
 			modalRegistry.open({
 				type: 'alert',
 				variant,
 				...opts,
-				onClose: reason => {
+				onClose: (reason) => {
 					opts.onClose?.(reason);
 					resolve();
 				},
@@ -73,8 +73,8 @@ export const useModal = () =>
 		const alert = buildAlert('info');
 
 		return {
-			open: opts => modalRegistry.open(opts),
-			close: id => (id ? modalRegistry.close(id) : null),
+			open: (opts) => modalRegistry.open(opts),
+			close: (id) => (id ? modalRegistry.close(id) : null),
 			closeAll: () => modalRegistry.closeAll(),
 
 			confirm,

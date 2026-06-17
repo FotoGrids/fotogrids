@@ -4,9 +4,9 @@ import { useModal } from '../hooks/useModal';
 import { useModalContext } from '../hooks/useModalContext';
 
 const wrapConfirm =
-	variant =>
+	(variant) =>
 	(opts = {}) =>
-		new Promise(resolve => {
+		new Promise((resolve) => {
 			modalRegistry.open({
 				type: 'confirm',
 				variant,
@@ -17,7 +17,7 @@ const wrapConfirm =
 					}
 					resolve(true);
 				},
-				onClose: reason => {
+				onClose: (reason) => {
 					opts.onClose?.(reason);
 					if (reason !== 'confirm') resolve(false);
 				},
@@ -25,20 +25,20 @@ const wrapConfirm =
 		});
 
 const wrapPrompt =
-	variant =>
+	(variant) =>
 	(opts = {}) =>
-		new Promise(resolve => {
+		new Promise((resolve) => {
 			modalRegistry.open({
 				type: 'prompt',
 				variant,
 				...opts,
-				onSubmit: async value => {
+				onSubmit: async (value) => {
 					if (typeof opts.onSubmit === 'function') {
 						await opts.onSubmit(value);
 					}
 					resolve(value);
 				},
-				onClose: reason => {
+				onClose: (reason) => {
 					opts.onClose?.(reason);
 					if (reason !== 'confirm') resolve(null);
 				},
@@ -46,14 +46,14 @@ const wrapPrompt =
 		});
 
 const wrapAlert =
-	variant =>
+	(variant) =>
 	(opts = {}) =>
-		new Promise(resolve => {
+		new Promise((resolve) => {
 			modalRegistry.open({
 				type: 'alert',
 				variant,
 				...opts,
-				onClose: reason => {
+				onClose: (reason) => {
 					opts.onClose?.(reason);
 					resolve();
 				},
@@ -88,8 +88,8 @@ export const installPublicApi = () => {
 	if (window.FotoGridsAdmin.modal) return;
 
 	window.FotoGridsAdmin.modal = {
-		open: opts => modalRegistry.open(opts),
-		close: id => modalRegistry.close(id),
+		open: (opts) => modalRegistry.open(opts),
+		close: (id) => modalRegistry.close(id),
 		closeAll: () => modalRegistry.closeAll(),
 
 		confirm: wrapConfirm('question'),

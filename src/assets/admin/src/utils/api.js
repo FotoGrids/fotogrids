@@ -25,7 +25,7 @@ export const fetchGalleries = (searchTerm = '') => {
 			path: `/fotogrids/v1/admin/galleries?${params.toString()}`,
 			method: 'GET',
 		})
-		.catch(error => {
+		.catch((error) => {
 			console.error('Error fetching galleries:', error);
 			return { galleries: [] };
 		});
@@ -47,7 +47,7 @@ export const fetchAlbums = (searchTerm = '') => {
 			path: `/fotogrids/v1/admin/albums?${params.toString()}`,
 			method: 'GET',
 		})
-		.catch(error => {
+		.catch((error) => {
 			console.error('Error fetching albums:', error);
 			return { albums: [] };
 		});
@@ -56,7 +56,7 @@ export const fetchAlbums = (searchTerm = '') => {
 /**
  * Save gallery via API
  */
-export const saveGallery = gallery => {
+export const saveGallery = (gallery) => {
 	if (!isApiAvailable()) {
 		return Promise.reject(new Error('API not available'));
 	}
@@ -68,8 +68,8 @@ export const saveGallery = gallery => {
 		: `/fotogrids/v1/admin/galleries/${gallery.id}`;
 
 	return wp.apiFetch({
-		path: path,
-		method: method,
+		path,
+		method,
 		data: {
 			title: gallery.title,
 			status: gallery.status || 'draft',
@@ -85,7 +85,7 @@ export const saveGallery = gallery => {
 /**
  * Delete gallery via API
  */
-export const deleteGallery = galleryId => {
+export const deleteGallery = (galleryId) => {
 	if (!isApiAvailable()) {
 		return Promise.reject(new Error('API not available'));
 	}
@@ -99,7 +99,7 @@ export const deleteGallery = galleryId => {
 /**
  * Save album via API
  */
-export const saveAlbum = album => {
+export const saveAlbum = (album) => {
 	if (!isApiAvailable()) {
 		return Promise.reject(new Error('API not available'));
 	}
@@ -111,8 +111,8 @@ export const saveAlbum = album => {
 		: `/fotogrids/v1/admin/albums/${album.id}`;
 
 	return wp.apiFetch({
-		path: path,
-		method: method,
+		path,
+		method,
 		data: {
 			title: album.title,
 			status: album.status || 'draft',
@@ -125,7 +125,7 @@ export const saveAlbum = album => {
 /**
  * Delete album via API
  */
-export const deleteAlbum = albumId => {
+export const deleteAlbum = (albumId) => {
 	if (!isApiAvailable()) {
 		return Promise.reject(new Error('API not available'));
 	}
@@ -173,7 +173,7 @@ export const fetchDashboardStats = () => {
 			path: '/fotogrids/v1/admin/stats/overview',
 			method: 'GET',
 		})
-		.catch(error => {
+		.catch((error) => {
 			console.error('Error fetching dashboard stats:', error);
 			return {
 				galleries: 0,

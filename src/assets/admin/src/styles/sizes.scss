@@ -1,5 +1,5 @@
-@use 'sass:meta';
-@use 'sass:map';
+@use "sass:meta";
+@use "sass:map";
 
 // FotoGrids Base Size Variables
 $base-padding: 8px;
@@ -401,7 +401,7 @@ $fotogrids-ui-sizes: (
 
 	// Generate CSS custom properties from the UI sizes map
 	@each $category, $sizes in $fotogrids-ui-sizes {
-		@if meta.type-of($sizes) == 'map' {
+		@if meta.type-of($sizes) == "map" {
 			@each $size, $value in $sizes {
 				--fotogrids-#{$category}-#{$size}: #{$value};
 			}

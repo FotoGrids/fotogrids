@@ -20,24 +20,24 @@ const AlbumAssignment = () => {
 	// Derive available albums during render - avoids useEffect sync and two-phase updates
 	// that were causing removeChild errors when item moved from available to assigned
 	const availableAlbums = useMemo(() => {
-		const assignedAlbumIds = assignedAlbums.map(album =>
-			parseInt(album.ID),
+		const assignedAlbumIds = assignedAlbums.map((album) =>
+			parseInt(album.ID)
 		);
 		return allAlbums.filter(
-			album => !assignedAlbumIds.includes(parseInt(album.id)),
+			(album) => !assignedAlbumIds.includes(parseInt(album.id))
 		);
 	}, [allAlbums, assignedAlbums]);
 
 	const filteredAlbums = useMemo(() => {
 		if (!searchTerm) return availableAlbums;
-		return availableAlbums.filter(album =>
-			album.title.toLowerCase().includes(searchTerm.toLowerCase()),
+		return availableAlbums.filter((album) =>
+			album.title.toLowerCase().includes(searchTerm.toLowerCase())
 		);
 	}, [searchTerm, availableAlbums]);
 
-	const handleAlbumToggle = async albumId => {
+	const handleAlbumToggle = async (albumId) => {
 		const isCurrentlyAssigned = assignedAlbums.some(
-			album => parseInt(album.ID) === parseInt(albumId),
+			(album) => parseInt(album.ID) === parseInt(albumId)
 		);
 
 		setSaving(true);
@@ -51,24 +51,24 @@ const AlbumAssignment = () => {
 						'X-WP-Nonce': config.nonce,
 					},
 				});
-				setAssignedAlbums(prev =>
+				setAssignedAlbums((prev) =>
 					prev.filter(
-						album => parseInt(album.ID) !== parseInt(albumId),
-					),
+						(album) => parseInt(album.ID) !== parseInt(albumId)
+					)
 				);
 
-				setAllAlbums(prev =>
-					prev.map(album =>
+				setAllAlbums((prev) =>
+					prev.map((album) =>
 						parseInt(album.id) === parseInt(albumId)
 							? {
 									...album,
 									gallery_count: Math.max(
 										0,
-										(album.gallery_count || 0) - 1,
+										(album.gallery_count || 0) - 1
 									),
 								}
-							: album,
-					),
+							: album
+					)
 				);
 			} else {
 				const requestData = { album_ids: [parseInt(albumId)] };
@@ -78,12 +78,12 @@ const AlbumAssignment = () => {
 					data: requestData,
 				});
 				const albumToAdd = allAlbums.find(
-					album => parseInt(album.id) === parseInt(albumId),
+					(album) => parseInt(album.id) === parseInt(albumId)
 				);
 				if (albumToAdd) {
 					const updatedGalleryCount =
 						(albumToAdd.gallery_count || 0) + 1;
-					setAssignedAlbums(prev => [
+					setAssignedAlbums((prev) => [
 						...prev,
 						{
 							ID: albumToAdd.id,
@@ -95,15 +95,15 @@ const AlbumAssignment = () => {
 						},
 					]);
 
-					setAllAlbums(prev =>
-						prev.map(album =>
+					setAllAlbums((prev) =>
+						prev.map((album) =>
 							parseInt(album.id) === parseInt(albumId)
 								? {
 										...album,
 										gallery_count: updatedGalleryCount,
 									}
-								: album,
-						),
+								: album
+						)
 					);
 				}
 			}
@@ -118,7 +118,7 @@ const AlbumAssignment = () => {
 			if (window.fotogridsToast) {
 				window.fotogridsToast.error(
 					err.message || 'Failed to update album assignment',
-					3000,
+					3000
 				);
 			}
 		} finally {
@@ -138,7 +138,7 @@ const AlbumAssignment = () => {
 		return React.createElement(
 			'div',
 			{ className: 'fotogrids-error' },
-			React.createElement('p', null, 'Configuration not loaded'),
+			React.createElement('p', null, 'Configuration not loaded')
 		);
 	}
 
@@ -153,13 +153,13 @@ const AlbumAssignment = () => {
 				null,
 				assignedAlbums.length === 0
 					? `${config.strings.notAssignedTo} ${config.strings.albums}`
-					: `${config.strings.assignedTo} ${assignedAlbums.length} ${config.strings.albums}`,
+					: `${config.strings.assignedTo} ${assignedAlbums.length} ${config.strings.albums}`
 			),
 			assignedAlbums.length > 0 &&
 				React.createElement(
 					'div',
 					{ className: 'fotogrids-assigned-list' },
-					getAssignedAlbumsData().map(album =>
+					getAssignedAlbumsData().map((album) =>
 						React.createElement(
 							'div',
 							{
@@ -180,7 +180,7 @@ const AlbumAssignment = () => {
 											className:
 												'fotogrids-assigned-album-thumb',
 										})
-									: null,
+									: null
 							),
 							React.createElement(
 								'div',
@@ -195,7 +195,7 @@ const AlbumAssignment = () => {
 										className:
 											'fotogrids-assigned-album-title',
 									},
-									album.post_title,
+									album.post_title
 								),
 								React.createElement(
 									'div',
@@ -203,8 +203,8 @@ const AlbumAssignment = () => {
 										className:
 											'fotogrids-assigned-album-meta',
 									},
-									`${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`,
-								),
+									`${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`
+								)
 							),
 							React.createElement(
 								'button',
@@ -220,13 +220,13 @@ const AlbumAssignment = () => {
 								React.createElement('span', {
 									className: 'fotogrids-icon',
 									dangerouslySetInnerHTML: {
-										__html: FotoGridsIcons['x'] || '',
+										__html: FotoGridsIcons.x || '',
 									},
-								}),
-							),
-						),
-					),
-				),
+								})
+							)
+						)
+					)
+				)
 		),
 
 		availableAlbums.length > 0 &&
@@ -239,17 +239,17 @@ const AlbumAssignment = () => {
 					React.createElement('div', {
 						className: 'fotogrids-search-icon',
 						dangerouslySetInnerHTML: {
-							__html: FotoGridsIcons['search_md'] || '',
+							__html: FotoGridsIcons.search_md || '',
 						},
 					}),
 					React.createElement('input', {
 						type: 'text',
 						placeholder: config.strings.searchPlaceholder,
 						value: searchTerm,
-						onChange: e => setSearchTerm(e.target.value),
+						onChange: (e) => setSearchTerm(e.target.value),
 						className: 'fotogrids-search-input',
-					}),
-				),
+					})
+				)
 			),
 
 		React.createElement(
@@ -262,12 +262,12 @@ const AlbumAssignment = () => {
 						assignedAlbums.length > 0 &&
 							availableAlbums.length === 0
 							? config.strings.noMoreAlbumsFound
-							: config.strings.noAvailableAlbumsFound,
+							: config.strings.noAvailableAlbumsFound
 					)
 				: React.createElement(
 						'div',
 						{ className: 'fotogrids-albums' },
-						filteredAlbums.map(album =>
+						filteredAlbums.map((album) =>
 							React.createElement(
 								'div',
 								{
@@ -287,7 +287,7 @@ const AlbumAssignment = () => {
 												className:
 													'fotogrids-album-thumb',
 											})
-										: null,
+										: null
 								),
 								React.createElement(
 									'div',
@@ -298,13 +298,13 @@ const AlbumAssignment = () => {
 									React.createElement(
 										'div',
 										{ className: 'fotogrids-album-title' },
-										album.title,
+										album.title
 									),
 									React.createElement(
 										'div',
 										{ className: 'fotogrids-album-meta' },
-										`${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`,
-									),
+										`${album.gallery_count || 0} galleries • ${album.status_display || 'Draft'}`
+									)
 								),
 								React.createElement(
 									'button',
@@ -321,14 +321,13 @@ const AlbumAssignment = () => {
 									React.createElement('span', {
 										className: 'fotogrids-icon',
 										dangerouslySetInnerHTML: {
-											__html:
-												FotoGridsIcons['plus'] || '',
+											__html: FotoGridsIcons.plus || '',
 										},
-									}),
-								),
-							),
-						),
-					),
+									})
+								)
+							)
+						)
+					)
 		),
 
 		React.createElement(
@@ -345,12 +344,12 @@ const AlbumAssignment = () => {
 				React.createElement('span', {
 					className: 'fotogrids-icon',
 					dangerouslySetInnerHTML: {
-						__html: FotoGridsIcons['plus_square'] || '',
+						__html: FotoGridsIcons.plus_square || '',
 					},
 				}),
-				` ${config.strings.createNewAlbum}`,
-			),
-		),
+				` ${config.strings.createNewAlbum}`
+			)
+		)
 	);
 };
 

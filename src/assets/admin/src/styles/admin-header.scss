@@ -26,7 +26,7 @@
 			position: relative;
 
 			&::after {
-				content: '';
+				content: "";
 				position: absolute;
 				bottom: -1px;
 				left: 0;
@@ -59,7 +59,7 @@
 		flex-shrink: 0;
 
 		&:before {
-			content: '\f335';
+			content: "\f335";
 			font-family: dashicons;
 			font-size: 16px;
 			color: white;
@@ -220,7 +220,7 @@
 	border-bottom: 1px solid #c3c4c7;
 
 	h1.fotogrids-heading-inline {
-		font-family: 'Poppins', sans-serif;
+		font-family: "Poppins", sans-serif;
 		font-weight: 600;
 		margin: 0;
 		padding: 0;
@@ -252,7 +252,7 @@
 	padding: 12px 20px 20px;
 }
 
-body[class*='fotogrids_page_fotogrids-dashboard'] {
+body[class*="fotogrids_page_fotogrids-dashboard"] {
 	#fotogrids-header {
 		border-bottom: 0;
 		padding: 32px 32px 16px;
@@ -265,7 +265,7 @@ body[class*='fotogrids_page_fotogrids-dashboard'] {
 
 	#wpcontent {
 		&::before {
-			content: '';
+			content: "";
 			position: absolute;
 			width: 720px;
 			height: 240px;

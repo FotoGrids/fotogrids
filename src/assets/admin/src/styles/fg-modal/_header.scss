@@ -1,4 +1,4 @@
-@use '../colors.scss' as *;
+@use "../colors.scss" as *;
 
 .fg-modal {
 	$modal: &;
@@ -27,7 +27,7 @@
 		&--size-sm {
 			padding: 8px 16px;
 
-			&[class*='has-close-button'] {
+			&[class*="has-close-button"] {
 				padding-inline-end: 8px;
 			}
 		}
@@ -137,7 +137,7 @@
 		#{$modal}__header {
 			padding: 12px;
 
-			&[class*='has-close-button'] {
+			&[class*="has-close-button"] {
 				padding-inline-end: 12px;
 			}
 

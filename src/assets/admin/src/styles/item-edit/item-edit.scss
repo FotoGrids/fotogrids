@@ -1,5 +1,5 @@
-@use '../colors.scss' as *;
-@use '../sizes.scss' as *;
+@use "../colors.scss" as *;
+@use "../sizes.scss" as *;
 
 .fotogrids-tags-section,
 .fotogrids-people-section,
@@ -59,7 +59,7 @@
 			width: 18px;
 		}
 
-		input[type='text'] {
+		input[type="text"] {
 			width: 100%;
 			height: 40px;
 			padding-inline-start: 36px;
@@ -334,7 +334,7 @@
 	gap: 8px;
 	margin-bottom: 16px;
 
-	input[type='text'] {
+	input[type="text"] {
 		flex: 1;
 		padding: 8px 12px;
 		border: 1px solid var(--fg-border-dark);
@@ -356,7 +356,7 @@
 .fotogrids-location-input {
 	flex-direction: column;
 
-	input[type='text'] {
+	input[type="text"] {
 		margin-bottom: 8px;
 	}
 }
@@ -364,7 +364,7 @@
 .fotogrids-people-input {
 	flex-wrap: wrap;
 
-	input[type='text'] {
+	input[type="text"] {
 		min-width: 200px;
 	}
 }
@@ -475,7 +475,7 @@
 				color: #333;
 			}
 
-			input[type='url'],
+			input[type="url"],
 			select {
 				width: 100%;
 				padding: 8px 12px;
@@ -745,7 +745,7 @@
 	.fotogrids-people-input {
 		flex-direction: column;
 
-		input[type='text'] {
+		input[type="text"] {
 			min-width: auto;
 		}
 	}

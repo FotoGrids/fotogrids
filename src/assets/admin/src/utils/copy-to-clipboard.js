@@ -80,16 +80,16 @@ export function showErrorToast(message) {
  */
 export function attachCopyButtons({ selector, getText, onSuccess, onError }) {
 	const buttons = document.querySelectorAll(selector);
-	const getCopyText = getText || (el => el.dataset.shortcode || '');
+	const getCopyText = getText || ((el) => el.dataset.shortcode || '');
 
-	buttons.forEach(button => {
-		button.addEventListener('click', async e => {
+	buttons.forEach((button) => {
+		button.addEventListener('click', async (e) => {
 			e.preventDefault();
 			const text = getCopyText(button);
 			if (!text) {
 				if (typeof console !== 'undefined' && console.warn) {
 					console.warn(
-						'FotoGrids: No shortcode found on copy button',
+						'FotoGrids: No shortcode found on copy button'
 					);
 				}
 				return;

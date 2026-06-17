@@ -30,7 +30,7 @@ const ToolsComponents = {
 	register(id, component) {
 		if (!id || !component) {
 			console.warn(
-				'FotoGridsToolsComponents.register: id and component are required.',
+				'FotoGridsToolsComponents.register: id and component are required.'
 			);
 			return;
 		}
@@ -42,7 +42,7 @@ const ToolsComponents = {
 		window.dispatchEvent(
 			new CustomEvent('fotogrids:tool-component-registered', {
 				detail: { id },
-			}),
+			})
 		);
 	},
 

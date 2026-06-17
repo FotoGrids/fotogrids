@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, renderIcon, getFieldState, getOptionState, __ },
+	{ updateSetting, renderIcon, getFieldState, getOptionState, __ }
 ) => {
 	const { createElement: h } = wp.element;
 	const settingState =
@@ -37,9 +37,9 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 								className: 'fotogrids-pro-badge',
 								key: 'pro-badge',
 							},
-							settingBadgeText,
+							settingBadgeText
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 
 			h(
@@ -47,7 +47,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 				{
 					className: 'fotogrids-layout-grid',
 				},
-				setting.options.map(option => {
+				setting.options.map((option) => {
 					const isActive = currentValue === option.value;
 					const optionState =
 						typeof getOptionState === 'function'
@@ -87,9 +87,9 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 											className:
 												'fotogrids-layout-option__icon',
 										},
-										renderIcon(option.icon),
+										renderIcon(option.icon)
 									),
-								],
+								]
 							),
 
 							h(
@@ -104,7 +104,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 											className:
 												'fotogrids-layout-option__name',
 										},
-										option.label,
+										option.label
 									),
 									h(
 										'p',
@@ -112,9 +112,9 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 											className:
 												'fotogrids-layout-option__description',
 										},
-										option.description,
+										option.description
 									),
-								],
+								]
 							),
 
 							(isProOption || isLockedOption) &&
@@ -126,12 +126,12 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 									},
 									isLockedOption
 										? __('Locked', 'fotogrids')
-										: __('Pro', 'fotogrids'),
+										: __('Pro', 'fotogrids')
 								),
-						],
+						]
 					);
-				}),
+				})
 			),
-		],
+		]
 	);
 };

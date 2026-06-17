@@ -13,12 +13,12 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 		isOptionVisible,
 		__,
 		buttonsClassName = '',
-	},
+	}
 ) => {
 	const { createElement: h } = wp.element;
 
 	const baseOptions = isDefaultsMode
-		? (setting.options || []).filter(option => !option.isGlobalDefault)
+		? (setting.options || []).filter((option) => !option.isGlobalDefault)
 		: setting.options || [];
 
 	// Per-option `condition` evaluation. Lets an option opt out of the
@@ -27,7 +27,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 	// wraps the same shouldDisplaySetting() the field-level conditions use.
 	const filteredOptions =
 		typeof isOptionVisible === 'function'
-			? baseOptions.filter(option => !option || isOptionVisible(option))
+			? baseOptions.filter((option) => !option || isOptionVisible(option))
 			: baseOptions;
 	const settingState =
 		typeof getFieldState === 'function'
@@ -72,7 +72,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 								tier: setting.tier_required,
 								state: settingState,
 							}),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 			h(
 				'div',
@@ -118,7 +118,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 									{
 										className: 'fg-button-icon',
 									},
-									renderIcon(option.icon),
+									renderIcon(option.icon)
 								),
 							option.label &&
 								h(
@@ -134,7 +134,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 												{
 													className: 'fg-button-unit',
 												},
-												` (${option.value}${option.unit})`,
+												` (${option.value}${option.unit})`
 											),
 										option.note &&
 											h(
@@ -142,9 +142,9 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 												{
 													className: 'fg-button-note',
 												},
-												` (${option.note})`,
+												` (${option.note})`
 											),
-									].filter(Boolean),
+									].filter(Boolean)
 								),
 							isPro &&
 								ProBadge &&
@@ -153,15 +153,15 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 									tier: option.tier_required,
 									state: optionState,
 								}),
-						],
+						]
 					);
-				}),
+				})
 			),
 			setting.description &&
 				h('div', {
 					className: 'fotogrids-setting__description',
 					dangerouslySetInnerHTML: { __html: setting.description },
 				}),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };

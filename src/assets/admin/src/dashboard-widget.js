@@ -48,7 +48,7 @@
 			if (!Array.isArray(news)) {
 				console.error(
 					'News is still not an array after processing:',
-					news,
+					news
 				);
 				container.innerHTML =
 					'<div class="fotogrids-dw-empty">' +
@@ -66,7 +66,7 @@
 			}
 
 			let html = '';
-			news.forEach(item => {
+			news.forEach((item) => {
 				html += `
                     <div class="fotogrids-dw-news-item">
                         <div class="fotogrids-dw-news-item-title">

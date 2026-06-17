@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderToggle = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, __ },
+	{ updateSetting, getFieldState, __ }
 ) => {
 	const { createElement: h } = wp.element;
 
@@ -50,9 +50,9 @@ window.FotoGridsRenderSettings.renderToggle = (
 							h('span', {
 								className: 'fotogrids-toggle__thumb',
 							}),
-						],
+						]
 					),
-				],
+				]
 			),
 			h(
 				'label',
@@ -68,15 +68,15 @@ window.FotoGridsRenderSettings.renderToggle = (
 								className: 'fotogrids-pro-badge',
 								key: 'pro-badge',
 							},
-							settingBadgeText,
+							settingBadgeText
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 			setting.description &&
 				h('div', {
 					className: 'fotogrids-setting__description',
 					dangerouslySetInnerHTML: { __html: setting.description },
 				}),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };

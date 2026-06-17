@@ -1,5 +1,5 @@
-@use '../colors' as *;
-@use '../sizes' as *;
+@use "../colors" as *;
+@use "../sizes" as *;
 
 .fotogrids-codearea-group {
 	&.has-error {
@@ -20,7 +20,7 @@
 		border: ui-size(border-width, base) solid ui-color(input, border);
 		border-radius: ui-size(border-radius, input);
 		font-family:
-			'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro',
+			"Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro",
 			monospace;
 		font-size: ui-size(font-size, input-base);
 		line-height: ui-size(line-height, input);
@@ -270,7 +270,7 @@
 		}
 
 		&::before {
-			content: '';
+			content: "";
 			background: currentColor;
 			display: inline-block;
 			width: 5px;
@@ -307,7 +307,7 @@
 		border: 1px solid var(--fg-yellow);
 		border-radius: 3px;
 		padding: 0 3px;
-		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+		font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
 		font-size: ui-size(font-size, xs);
 		font-weight: 600;
 		font-style: normal;

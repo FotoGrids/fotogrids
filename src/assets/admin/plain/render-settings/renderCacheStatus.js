@@ -85,8 +85,8 @@ const CacheStatusComponent = ({
 					window.fotogridsToast.error(
 						__(
 							'Could not clear the cache. Please try again.',
-							'fotogrids',
-						),
+							'fotogrids'
+						)
 					);
 				}
 				return;
@@ -95,7 +95,7 @@ const CacheStatusComponent = ({
 			setFlushState('done');
 			if (window.fotogridsToast) {
 				window.fotogridsToast.success(
-					__('Cache cleared.', 'fotogrids'),
+					__('Cache cleared.', 'fotogrids')
 				);
 			}
 			await fetchStatus();
@@ -105,14 +105,14 @@ const CacheStatusComponent = ({
 				window.fotogridsToast.error(
 					__(
 						'Could not clear the cache. Please try again.',
-						'fotogrids',
-					),
+						'fotogrids'
+					)
 				);
 			}
 		}
 	};
 
-	const formatDate = isoString => {
+	const formatDate = (isoString) => {
 		if (!isoString) return __('-', 'fotogrids');
 		try {
 			return new Date(isoString).toLocaleString();
@@ -131,7 +131,7 @@ const CacheStatusComponent = ({
 			{
 				className: `${baseClass}__loading`,
 			},
-			__('Loading cache status…', 'fotogrids'),
+			__('Loading cache status…', 'fotogrids')
 		);
 	} else if (loadState === 'error') {
 		body = React.createElement(
@@ -139,7 +139,7 @@ const CacheStatusComponent = ({
 			{
 				className: `${baseClass}__error`,
 			},
-			__('Could not load cache status.', 'fotogrids'),
+			__('Could not load cache status.', 'fotogrids')
 		);
 	} else if (!isCached) {
 		body = React.createElement(
@@ -147,7 +147,7 @@ const CacheStatusComponent = ({
 			{
 				className: `${baseClass}__empty`,
 			},
-			__('No cache exists for this gallery yet.', 'fotogrids'),
+			__('No cache exists for this gallery yet.', 'fotogrids')
 		);
 	} else {
 		const meta = status.meta || {};
@@ -164,7 +164,7 @@ const CacheStatusComponent = ({
 						key: 'label',
 						className: `${baseClass}__meta__label`,
 					},
-					__('Cached at', 'fotogrids'),
+					__('Cached at', 'fotogrids')
 				),
 				React.createElement(
 					'span',
@@ -172,7 +172,7 @@ const CacheStatusComponent = ({
 						key: 'value',
 						className: `${baseClass}__meta__value`,
 					},
-					formatDate(meta.cached_at),
+					formatDate(meta.cached_at)
 				),
 				React.createElement(
 					'span',
@@ -180,7 +180,7 @@ const CacheStatusComponent = ({
 						key: 'label',
 						className: `${baseClass}__meta__label`,
 					},
-					__('Expires at', 'fotogrids'),
+					__('Expires at', 'fotogrids')
 				),
 				React.createElement(
 					'span',
@@ -188,9 +188,9 @@ const CacheStatusComponent = ({
 						key: 'value',
 						className: `${baseClass}__meta__value`,
 					},
-					formatDate(meta.expires_at),
+					formatDate(meta.expires_at)
 				),
-			],
+			]
 		);
 	}
 
@@ -214,7 +214,7 @@ const CacheStatusComponent = ({
 								key: 'label',
 								className: 'fotogrids-setting__label',
 							},
-							setting.label,
+							setting.label
 						),
 					React.createElement(
 						'div',
@@ -222,9 +222,9 @@ const CacheStatusComponent = ({
 							key: 'body',
 							className: `${baseClass}__body`,
 						},
-						body,
+						body
 					),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 
 			React.createElement(
@@ -248,11 +248,11 @@ const CacheStatusComponent = ({
 							},
 							flushState === 'loading'
 								? __('Clearing…', 'fotogrids')
-								: __('Clear Cache', 'fotogrids'),
+								: __('Clear Cache', 'fotogrids')
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };
 
@@ -262,7 +262,7 @@ window.FotoGridsRenderSettings.renderCacheStatus = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ __, postId, restUrl, restNonce },
+	{ __, postId, restUrl, restNonce }
 ) => {
 	return React.createElement(CacheStatusComponent, {
 		setting,

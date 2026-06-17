@@ -41,7 +41,7 @@ class ToastManager {
 		this.listeners.push(callback);
 		return () => {
 			this.listeners = this.listeners.filter(
-				listener => listener !== callback,
+				(listener) => listener !== callback
 			);
 		};
 	}
@@ -50,7 +50,7 @@ class ToastManager {
 	 * Notify all listeners of toast changes
 	 */
 	notify() {
-		this.listeners.forEach(callback => callback([...this.toasts]));
+		this.listeners.forEach((callback) => callback([...this.toasts]));
 	}
 
 	/**
@@ -89,7 +89,7 @@ class ToastManager {
 	 * @param {string} id - Toast ID
 	 */
 	remove(id) {
-		const index = this.toasts.findIndex(toast => toast.id === id);
+		const index = this.toasts.findIndex((toast) => toast.id === id);
 		if (index !== -1) {
 			this.toasts.splice(index, 1);
 			this.notify();

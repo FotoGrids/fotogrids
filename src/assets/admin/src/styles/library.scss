@@ -19,7 +19,7 @@
 	overflow: hidden;
 
 	&::before {
-		content: '';
+		content: "";
 		width: 4px;
 		background: var(--fg-blue);
 	}
@@ -54,7 +54,7 @@
 	}
 
 	&__value {
-		font-family: 'Poppins', sans-serif;
+		font-family: "Poppins", sans-serif;
 		font-size: 40px;
 		font-weight: 600;
 		color: var(--fg-text-primary);
@@ -301,7 +301,7 @@
 			color: var(--fg-text-secondary);
 			transition: transform 0.15s ease;
 
-			&[data-fg-order='asc'] {
+			&[data-fg-order="asc"] {
 				transform: rotate(180deg);
 			}
 

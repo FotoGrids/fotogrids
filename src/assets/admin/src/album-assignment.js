@@ -4,7 +4,7 @@ import AlbumAssignment from './components/AlbumAssignment.js';
 
 function initializeAlbumAssignment() {
 	const albumAssignmentRoot = document.getElementById(
-		'fotogrids-gallery-albums-root',
+		'fotogrids-gallery-albums-root'
 	);
 
 	if (!albumAssignmentRoot || !window.fotogridsAlbumAssignment) {

@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderGroup = (
 	setting,
 	currentValue,
 	isDisabled,
-	context,
+	context
 ) => {
 	const { createElement: h } = wp.element;
 	const { renderSetting, getFieldState, __ } = context;
@@ -25,7 +25,7 @@ window.FotoGridsRenderSettings.renderGroup = (
 				className:
 					'fotogrids-setting-group fotogrids-setting-group--error',
 			},
-			'Invalid group settings',
+			'Invalid group settings'
 		);
 	}
 
@@ -36,7 +36,7 @@ window.FotoGridsRenderSettings.renderGroup = (
 		(chromeWhen === 'single_subtab' &&
 			chromeWhenContext === 'single_subtab');
 
-	const childSettings = setting.settings.map(subSetting => {
+	const childSettings = setting.settings.map((subSetting) => {
 		const annotated = chromeWhenContext
 			? { ...subSetting, __chromeWhenContext: chromeWhenContext }
 			: subSetting;
@@ -55,9 +55,9 @@ window.FotoGridsRenderSettings.renderGroup = (
 					{
 						className: 'fotogrids-setting-group__content',
 					},
-					childSettings,
+					childSettings
 				),
-			],
+			]
 		);
 	}
 
@@ -81,9 +81,9 @@ window.FotoGridsRenderSettings.renderGroup = (
 								className: 'fotogrids-pro-badge',
 								key: 'pro-badge',
 							},
-							settingBadgeText,
+							settingBadgeText
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 
 			h(
@@ -91,8 +91,8 @@ window.FotoGridsRenderSettings.renderGroup = (
 				{
 					className: 'fotogrids-setting-group__content',
 				},
-				childSettings,
+				childSettings
 			),
-		],
+		]
 	);
 };

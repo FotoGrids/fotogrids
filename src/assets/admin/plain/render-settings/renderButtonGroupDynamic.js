@@ -17,7 +17,7 @@ const ButtonGroupDynamicComponent = ({
 		if (
 			setting.append_option &&
 			!initialOptions.find(
-				opt => opt.value === setting.append_option.value,
+				(opt) => opt.value === setting.append_option.value
 			)
 		) {
 			initialOptions = [...initialOptions, setting.append_option];
@@ -48,12 +48,12 @@ const ButtonGroupDynamicComponent = ({
 						setting.exclude_values.length > 0
 					) {
 						fetchedOptions = fetchedOptions.filter(
-							option =>
-								!setting.exclude_values.includes(option.value),
+							(option) =>
+								!setting.exclude_values.includes(option.value)
 						);
 					}
 
-					fetchedOptions = fetchedOptions.map(option => {
+					fetchedOptions = fetchedOptions.map((option) => {
 						if (option.width && option.height) {
 							option.note = `${option.width}x${option.height}`;
 						} else if (option.value === 'full') {
@@ -65,7 +65,7 @@ const ButtonGroupDynamicComponent = ({
 					if (
 						setting.append_option &&
 						!fetchedOptions.find(
-							opt => opt.value === setting.append_option.value,
+							(opt) => opt.value === setting.append_option.value
 						)
 					) {
 						fetchedOptions.push(setting.append_option);
@@ -74,14 +74,14 @@ const ButtonGroupDynamicComponent = ({
 					setOptions(fetchedOptions);
 				} else {
 					console.warn(
-						'FotoGrids: Failed to fetch dynamic options, using fallback',
+						'FotoGrids: Failed to fetch dynamic options, using fallback'
 					);
 					let fallbackOptions = setting.fallback_options || [];
 
 					if (
 						setting.append_option &&
 						!fallbackOptions.find(
-							opt => opt.value === setting.append_option.value,
+							(opt) => opt.value === setting.append_option.value
 						)
 					) {
 						fallbackOptions = [
@@ -95,14 +95,14 @@ const ButtonGroupDynamicComponent = ({
 			} catch (error) {
 				console.warn(
 					'FotoGrids: Error fetching dynamic options:',
-					error,
+					error
 				);
 				let fallbackOptions = setting.fallback_options || [];
 
 				if (
 					setting.append_option &&
 					!fallbackOptions.find(
-						opt => opt.value === setting.append_option.value,
+						(opt) => opt.value === setting.append_option.value
 					)
 				) {
 					fallbackOptions = [
@@ -150,7 +150,7 @@ const ButtonGroupDynamicComponent = ({
 								tier: setting.tier_required,
 								state: settingState,
 							}),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 				React.createElement(
 					'div',
@@ -158,18 +158,18 @@ const ButtonGroupDynamicComponent = ({
 						key: 'buttons',
 						className: 'fg-button-group__buttons',
 					},
-					__('Loading options...', 'fotogrids'),
+					__('Loading options…', 'fotogrids')
 				),
-			],
+			]
 		);
 	}
 
-	const selectedOption = options.find(opt => opt.value === currentValue);
+	const selectedOption = options.find((opt) => opt.value === currentValue);
 
 	const modifiedSetting = {
 		...setting,
 		options: isDefaultsMode
-			? options.filter(option => !option.isGlobalDefault)
+			? options.filter((option) => !option.isGlobalDefault)
 			: options,
 	};
 
@@ -186,7 +186,7 @@ const ButtonGroupDynamicComponent = ({
 			isDefaultsMode,
 			getOptionState,
 			__,
-		},
+		}
 	);
 
 	return h(
@@ -200,7 +200,7 @@ const ButtonGroupDynamicComponent = ({
 			typeof renderAdditionalContent === 'function'
 				? renderAdditionalContent(selectedOption, options, currentValue)
 				: null,
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };
 
@@ -216,7 +216,7 @@ window.FotoGridsRenderSettings.renderButtonGroupDynamic = (
 		getOptionState,
 		__,
 		renderAdditionalContent,
-	},
+	}
 ) => {
 	return React.createElement(ButtonGroupDynamicComponent, {
 		setting,

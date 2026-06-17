@@ -51,7 +51,7 @@ function initializeGalleryMetabox() {
 		}
 
 		const container = document.getElementById(
-			'fotogrids-gallery-metabox-root',
+			'fotogrids-gallery-metabox-root'
 		);
 
 		if (!container) {
@@ -72,7 +72,7 @@ function initializeGalleryMetabox() {
 		root.render(React.createElement(GalleryMetabox, props));
 	} catch (error) {
 		const container = document.getElementById(
-			'fotogrids-gallery-metabox-root',
+			'fotogrids-gallery-metabox-root'
 		);
 		if (container) {
 			container.innerHTML =
@@ -104,6 +104,6 @@ safeInitialize();
 
 window.FotoGridsMetabox = {
 	init: initializeGalleryMetabox,
-	initializeIcons: initializeIcons,
-	initializeCopyButtons: initializeCopyButtons,
+	initializeIcons,
+	initializeCopyButtons,
 };

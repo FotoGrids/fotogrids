@@ -1,5 +1,5 @@
-@use '../colors.scss' as *;
-@use '../sizes.scss' as *;
+@use "../colors.scss" as *;
+@use "../sizes.scss" as *;
 
 @mixin fg-button-base() {
 	display: inline-flex;
@@ -212,7 +212,7 @@
 	position: relative;
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		bottom: -2px;
 		left: 0;
@@ -395,7 +395,7 @@
 	}
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 50%;
 		left: 50%;
@@ -468,7 +468,7 @@
 	cursor: pointer;
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		bottom: -2px;
 		left: 0;

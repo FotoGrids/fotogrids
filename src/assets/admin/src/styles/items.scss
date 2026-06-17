@@ -1,6 +1,6 @@
-@use 'save-button' as *;
-@use './colors.scss' as *;
-@use './sizes.scss' as *;
+@use "save-button" as *;
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
 
 #fotogrids-items-grid {
 	display: grid;
@@ -30,7 +30,7 @@
 			cursor: move;
 		}
 
-		&[draggable='true'] {
+		&[draggable="true"] {
 			cursor: grab;
 		}
 

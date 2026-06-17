@@ -40,7 +40,7 @@
 
 	&-heading {
 		margin: 0 0 10px;
-		font-family: 'Poppins', sans-serif;
+		font-family: "Poppins", sans-serif;
 		font-size: 40px;
 		line-height: 1.2;
 		letter-spacing: -0.02em;
@@ -71,7 +71,7 @@
 		}
 
 		.fotogrids-setup__step-subhead {
-			font-family: 'Poppins', sans-serif;
+			font-family: "Poppins", sans-serif;
 			font-size: 16px;
 			font-weight: 400;
 			margin: 0;
@@ -121,32 +121,32 @@
 		animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 		animation-fill-mode: both;
 
-		&[data-rect='top'],
-		&[data-rect='mid'],
-		&[data-rect='bl'] {
+		&[data-rect="top"],
+		&[data-rect="mid"],
+		&[data-rect="bl"] {
 			transform-origin: left center;
 			animation-name: fg-setup-hero-rect-grow-x;
 		}
 
-		&[data-rect='bm'],
-		&[data-rect='right'] {
+		&[data-rect="bm"],
+		&[data-rect="right"] {
 			transform-origin: center bottom;
 			animation-name: fg-setup-hero-rect-grow-y;
 		}
 
-		&[data-rect='top'] {
+		&[data-rect="top"] {
 			animation-delay: 0.05s;
 		}
-		&[data-rect='mid'] {
+		&[data-rect="mid"] {
 			animation-delay: 0.3s;
 		}
-		&[data-rect='bl'] {
+		&[data-rect="bl"] {
 			animation-delay: 0.55s;
 		}
-		&[data-rect='bm'] {
+		&[data-rect="bm"] {
 			animation-delay: 0.8s;
 		}
-		&[data-rect='right'] {
+		&[data-rect="right"] {
 			animation-delay: 1.05s;
 		}
 	}
@@ -237,7 +237,7 @@
 	}
 
 	.fotogrids-setup-telemetry-modal__item-title {
-		font-family: 'Poppins', sans-serif;
+		font-family: "Poppins", sans-serif;
 		font-size: 14px;
 		font-weight: 600;
 		line-height: 32px;
@@ -307,22 +307,22 @@
 		background-color 0.15s ease,
 		box-shadow 0.15s ease;
 
-	&[data-persona='developer'] {
+	&[data-persona="developer"] {
 		--fg-persona-color: var(--fg-blue);
 	}
-	&[data-persona='photographer'] {
+	&[data-persona="photographer"] {
 		--fg-persona-color: var(--fg-yellow);
 	}
-	&[data-persona='personal'] {
+	&[data-persona="personal"] {
 		--fg-persona-color: var(--fg-red);
 	}
-	&[data-persona='agency'] {
+	&[data-persona="agency"] {
 		--fg-persona-color: var(--fg-green);
 	}
-	&[data-persona='business'] {
+	&[data-persona="business"] {
 		--fg-persona-color: var(--fg-grey);
 	}
-	&[data-persona='shop'] {
+	&[data-persona="shop"] {
 		--fg-persona-color: var(--fg-teal);
 	}
 
@@ -377,7 +377,7 @@
 	}
 
 	&-title {
-		font-family: 'Poppins', sans-serif;
+		font-family: "Poppins", sans-serif;
 		font-size: 15px;
 		font-weight: 600;
 		line-height: 1.2;
@@ -533,7 +533,7 @@
 		}
 
 		&-title {
-			font-family: 'Poppins', sans-serif;
+			font-family: "Poppins", sans-serif;
 			font-size: 16px;
 			font-weight: 600;
 			line-height: 1.2;

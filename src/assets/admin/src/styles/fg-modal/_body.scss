@@ -30,7 +30,7 @@
 		}
 	}
 
-	&__header[class*='--no-divider'] + &__body {
+	&__header[class*="--no-divider"] + &__body {
 		padding-top: 0;
 	}
 }
