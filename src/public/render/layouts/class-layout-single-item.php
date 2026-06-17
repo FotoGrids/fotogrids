@@ -93,9 +93,9 @@ final class Layout_Single_Item implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'        => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-single-item' => new Asset_Decl( path: 'layouts/single-item/single-item.css' ),
+			array(
+				'fotogrids-render-base'        => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-single-item' => new Asset_Decl( 'layouts/single-item/single-item.css' ),
 			)
 		);
 	}

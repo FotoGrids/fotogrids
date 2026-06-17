@@ -89,7 +89,7 @@ const renderEntry = (entry) => {
 /**
  * Single global host for imperatively-opened modals. Mounted once at body
  * level by the admin's global init script. Subscribes to the modal registry
- * and renders every active entry in order — stacking is handled by Modal's
+ * and renders every active entry in order - stacking is handled by Modal's
  * own useModalStack hook.
  */
 const ModalRoot = () => {

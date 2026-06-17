@@ -1,5 +1,5 @@
 /*
- * FotoGrids — Pagination: endless scroll (per-method overrides).
+ * FotoGrids - Pagination: endless scroll (per-method overrides).
  *
  * The sentinel is invisible. The visible spinner uses the same loading
  * icon SVG configured for the gallery's items (the .fg-pagination__loader

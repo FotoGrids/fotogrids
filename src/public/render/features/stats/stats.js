@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Stats
+ * FotoGrids - Stats
  *
  * Fires view and share pings to the REST API.
  *
@@ -14,10 +14,10 @@
  *   Share: listens for the document-level `fotogrids:share` event
  *          (dispatched by the Sharing module when a user shares an
  *          item) and fires the share ping. Sharing itself never calls
- *          fetch — the Stats module is the only place that talks to
+ *          fetch - the Stats module is the only place that talks to
  *          the REST API.
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -43,7 +43,7 @@
     }
 
     /**
-     * Fire-and-forget POST. Network errors are swallowed — stats failure
+     * Fire-and-forget POST. Network errors are swallowed - stats failure
      * must never affect gallery functionality.
      *
      * @param {string} url
@@ -71,7 +71,7 @@
      * runtime's onGallery callback.
      *
      * The config carries the explicit objectType ('gallery' or 'album')
-     * and objectId — written by the Stats feature module's PHP based on
+     * and objectId - written by the Stats feature module's PHP based on
      * the render's collection_kind. Album wrappers ping with the album's
      * post ID, not the gallery_id (which is 0 on album renders).
      *
@@ -100,7 +100,7 @@
      *
      * We pick the first stats-enabled gallery on the page for the
      * REST URL/nonce. The share's object_id is the item, not the
-     * gallery — but the nonce belongs to the request, not the gallery,
+     * gallery - but the nonce belongs to the request, not the gallery,
      * so any gallery's nonce works.
      *
      * @param {CustomEvent} e

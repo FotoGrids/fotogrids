@@ -61,13 +61,13 @@ final class Preview_Endpoint {
 		$base_settings   = \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $gallery_id );
 		$context_builder = Context_Builder::for_preview();
 		$render_context  = $context_builder->build_for_preview(
-			gallery_id: $gallery_id,
-			base_settings: is_array( $base_settings ) ? $base_settings : array(),
-			settings_overlay: $validated_payload['settings'],
-			collection_item_ids: $item_order,
-			item_overrides: $validated_payload['item_overrides'],
-			source: Request_Source::PREVIEW_UNSAVED,
-			simulate_state: $validated_payload['simulate_state']
+			$gallery_id,
+			is_array( $base_settings ) ? $base_settings : array(),
+			$validated_payload['settings'],
+			$item_order,
+			$validated_payload['item_overrides'],
+			Request_Source::PREVIEW_UNSAVED,
+			$validated_payload['simulate_state']
 		);
 
 		$render_context = $render_context->with(
@@ -75,7 +75,7 @@ final class Preview_Endpoint {
 				'settings' => array_merge(
 					$render_context->settings,
 					array(
-						'_preview_source'     => Request_Source::PREVIEW_UNSAVED->value,
+						'_preview_source'     => Request_Source::PREVIEW_UNSAVED,
 						'_show_render_errors' => current_user_can( 'edit_posts' ),
 					)
 				),
@@ -190,7 +190,7 @@ final class Preview_Endpoint {
 		// Topologically sort by deps so a script's dependencies are loaded
 		// before it on the client. The Asset_Resolver collects in module
 		// declaration order (decorators before features), which can put
-		// dependent scripts ahead of their deps — most importantly
+		// dependent scripts ahead of their deps - most importantly
 		// fotogrids-runtime, which every other module's JS declares as a
 		// dep and which lives in the always-on Runtime_Bootstrap feature.
 		// The client loads scripts with script.async = false and awaits
@@ -204,7 +204,7 @@ final class Preview_Endpoint {
 	 *
 	 * Deps not present in the local record map (e.g. WordPress core deps
 	 * like 'jquery' that aren't enqueued through Asset_Resolver) are
-	 * ignored — they're either already on the page or the script doesn't
+	 * ignored - they're either already on the page or the script doesn't
 	 * actually need them on the preview surface.
 	 *
 	 * @since   1.0.0
@@ -221,7 +221,7 @@ final class Preview_Endpoint {
 				return;
 			}
 			if ( isset( $visiting[ $handle ] ) ) {
-				// Dependency cycle — treat as already visited so we don't loop forever.
+				// Dependency cycle - treat as already visited so we don't loop forever.
 				return;
 			}
 			$visiting[ $handle ] = true;

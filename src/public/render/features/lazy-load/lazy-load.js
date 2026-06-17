@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Lazy Load
+ * FotoGrids - Lazy Load
  *
  * IntersectionObserver enhancement layer for lazy-loaded images.
  *
@@ -7,7 +7,7 @@
  *   • Native lazy: <img loading="lazy"> already handled by the browser; we
  *     only add a .fotogrids-lazy-loaded class on settle so CSS can fade
  *     the image in.
- *   • data-src lazy: <img data-src="..."> with no src yet — the IO swaps
+ *   • data-src lazy: <img data-src="..."> with no src yet - the IO swaps
  *     data-src → src when the image enters the viewport.
  *
  * Active when the gallery wrapper carries data-fg-lazy="1" (written by
@@ -17,7 +17,7 @@
  * `fotogrids:items_inserted` events on each gallery so newly-paginated
  * items are wired up the same way.
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -99,7 +99,7 @@
                     state.dataSrc.observe( img );
                 } );
             } else {
-                // No IO — load everything immediately.
+                // No IO - load everything immediately.
                 nativeLazyImages.forEach( ( img ) => {
                     img.classList.add( 'fotogrids-lazy-loaded' );
                 } );

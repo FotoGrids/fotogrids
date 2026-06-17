@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   2. Otherwise, fall back to the canonical relationship table. If the
  *      gallery belongs to *exactly one* album, that album becomes the
  *      breadcrumb parent (also drives Google's BreadcrumbList rich result
- *      on direct visits — see Breadcrumb_Schema).
+ *      on direct visits - see Breadcrumb_Schema).
  *
  *   3. If the gallery belongs to zero or two-plus albums, there is no
  *      single parent to point back to. Returns null. Collection_Header's
@@ -113,19 +113,19 @@ final class Breadcrumb_Resolver {
 			return null;
 		}
 
-		// Branch 1 — visit context wins when it points at a real parent.
+		// Branch 1 - visit context wins when it points at a real parent.
 		if ( null !== $via_album_id && $via_album_id > 0 && in_array( $via_album_id, $album_ids, true ) ) {
 			return $via_album_id;
 		}
 
-		// Branch 2 — single-album fallback. Includes direct visits where
+		// Branch 2 - single-album fallback. Includes direct visits where
 		// ?fg_via is absent, and the case where it's set but doesn't
 		// actually contain the gallery (treat as no hint).
 		if ( count( $album_ids ) === 1 ) {
 			return $album_ids[0];
 		}
 
-		// Branch 3 — ambiguous (2+ albums): nothing to render.
+		// Branch 3 - ambiguous (2+ albums): nothing to render.
 		return null;
 	}
 

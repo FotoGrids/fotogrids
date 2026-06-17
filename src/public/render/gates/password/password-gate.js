@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Password Gate (client)
+ * FotoGrids - Password Gate (client)
  *
  * Owns the lock-screen submit handler. Binds to every .fg-lock-form on
  * the page, intercepts submit, POSTs to the unlock REST endpoint, and:
@@ -9,14 +9,14 @@
  *     stylesheets are present before its HTML is inserted), then swaps
  *     the lock wrapper for the rendered gallery HTML. The runtime's
  *     MutationObserver picks the inserted gallery up and runs every
- *     onGallery() callback against it — no manual gallery init here.
+ *     onGallery() callback against it - no manual gallery init here.
  *   • on failure: shows the inline error and clears the input.
  *
  * Also binds dynamically inserted forms via FotoGrids.onGallery()'s
  * MutationObserver path (we hook the same observer indirectly through
  * a delegated submit listener on document).
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -82,7 +82,7 @@
      *
      * On a normal page load the render pipeline enqueues this via wp_footer,
      * but the unlock render happens in a separate REST request whose footer
-     * never reaches this already-loaded page — so a gallery whose captions use
+     * never reaches this already-loaded page - so a gallery whose captions use
      * a custom Google Font would render unstyled. The unlock response carries
      * the combined fonts URL; we add the <link> once, keyed by a fixed id so
      * repeat unlocks on the same page don't duplicate it.
@@ -108,15 +108,15 @@
     /**
      * Ask the browser to save the just-used gallery password.
      *
-     * The form submits via fetch() and swaps the DOM in place — it never
-     * navigates — so browsers won't fire their native "save password?"
+     * The form submits via fetch() and swaps the DOM in place - it never
+     * navigates - so browsers won't fire their native "save password?"
      * prompt on their own. The Credential Management API lets us nudge it
      * explicitly after a successful unlock. The credential is keyed on the
      * per-gallery username (the hidden .fg-lock-user field) so the browser
      * scopes the saved password to THIS gallery rather than the whole site.
      *
      * Best-effort only: unsupported browsers, insecure (non-HTTPS) origins,
-     * and user refusals all fail silently — unlocking already succeeded.
+     * and user refusals all fail silently - unlocking already succeeded.
      *
      * @param {HTMLFormElement} form
      */
@@ -134,7 +134,7 @@
     }
 
     /**
-     * Wire up a single lock form. Idempotent — repeat calls on the
+     * Wire up a single lock form. Idempotent - repeat calls on the
      * same form are no-ops.
      *
      * @param {HTMLFormElement} form
@@ -166,7 +166,7 @@
 
         const galleryId = parseInt( form.dataset.galleryId || '0', 10 );
         const unlockUrl = form.dataset.unlockUrl || '';
-        // The lock form carries its own nonce in data-nonce — we don't
+        // The lock form carries its own nonce in data-nonce - we don't
         // rely on a global settings object here.
         const nonce    = form.dataset.nonce || '';
         const password = input ? input.value : '';
@@ -254,7 +254,7 @@
                 if ( errorEl ) errorEl.classList.add( 'is-visible' );
             } )
             .then( function () {
-                // finally — restore form state
+                // finally - restore form state
                 if ( card ) card.classList.remove( 'is-loading' );
                 if ( submitBtn ) submitBtn.disabled = false;
             } );
@@ -274,7 +274,7 @@
     function init() {
         bindAll();
 
-        // Catch lock forms inserted after the initial pass — we don't
+        // Catch lock forms inserted after the initial pass - we don't
         // run our own MutationObserver (per the runtime contract); a
         // delegated submit listener achieves the same with no observer.
         document.addEventListener( 'submit', function ( e ) {

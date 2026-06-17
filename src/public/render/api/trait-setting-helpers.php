@@ -38,7 +38,7 @@ trait Setting_Helpers {
 	 * @param  mixed $raw Raw setting value.
 	 * @return bool
 	 */
-	protected function setting_to_bool( mixed $raw ): bool {
+	protected function setting_to_bool( $raw ): bool {
 		return true === $raw || 1 === $raw || '1' === $raw;
 	}
 
@@ -53,7 +53,7 @@ trait Setting_Helpers {
 	 * @param  string $default_unit Unit to append when none is stored (e.g. 'px').
 	 * @return string               CSS value string, e.g. '10px', or '' when absent.
 	 */
-	protected function normalize_unit_value( mixed $raw, string $default_unit ): string {
+	protected function normalize_unit_value( $raw, string $default_unit ): string {
 		if ( null === $raw || '' === $raw ) {
 			return '';
 		}
@@ -79,7 +79,7 @@ trait Setting_Helpers {
 	 * @param  string $fallback       Value to return when the breakpoint is absent/empty.
 	 * @return string
 	 */
-	protected function resolve_responsive_value( mixed $raw_responsive, string $breakpoint, string $default_unit, string $fallback = '' ): string {
+	protected function resolve_responsive_value( $raw_responsive, string $breakpoint, string $default_unit, string $fallback = '' ): string {
 		if ( ! is_array( $raw_responsive ) ) {
 			return $fallback;
 		}
@@ -110,7 +110,7 @@ trait Setting_Helpers {
 	 * @param  string $default_unit   Unit to append when none is stored.
 	 * @return string                 CSS shorthand, e.g. '10px 4px 4px 4px', or ''.
 	 */
-	protected function resolve_four_sided_value( mixed $raw_responsive, string $breakpoint, string $default_unit ): string {
+	protected function resolve_four_sided_value( $raw_responsive, string $breakpoint, string $default_unit ): string {
 		if ( ! is_array( $raw_responsive ) ) {
 			return '';
 		}
@@ -142,7 +142,7 @@ trait Setting_Helpers {
 	 * @param  mixed $device_value The per-breakpoint value (one level below the breakpoint key).
 	 * @return bool
 	 */
-	protected function breakpoint_has_value( mixed $device_value ): bool {
+	protected function breakpoint_has_value( $device_value ): bool {
 		if ( null === $device_value || '' === $device_value || 0 === $device_value ) {
 			return false;
 		}
@@ -170,7 +170,7 @@ trait Setting_Helpers {
 	 * @param  string $fallback Value to return when nothing usable is found.
 	 * @return string
 	 */
-	protected function setting_scalar( mixed $raw, string $fallback ): string {
+	protected function setting_scalar( $raw, string $fallback ): string {
 		if ( is_array( $raw ) ) {
 			$first = reset( $raw );
 			if ( is_string( $first ) && '' !== $first ) {

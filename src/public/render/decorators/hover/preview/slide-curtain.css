@@ -1,0 +1,30 @@
+/* An opaque curtain slides up from the bottom edge to cover the image, and the
+   caption rides on it. Unlike Caption Rise (text rises over a fading tint), the
+   solid panel itself travels, fully wiping the image. */
+
+.fotogrids-collection[data-fg-hover='slide-curtain'] .fg-item {
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='slide-curtain'] .fg-caption-bg {
+	background: var(--fg-caption-overlay-bg, rgba(0, 0, 0, 0.82));
+	transform: translateY(100%);
+	transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fotogrids-collection[data-fg-hover='slide-curtain'] .fg-caption-content {
+	opacity: 0;
+	transition: opacity 0.3s ease 0.15s;
+}
+
+.fotogrids-collection[data-fg-hover='slide-curtain']
+	.fg-item:hover
+	.fg-caption-bg {
+	transform: translateY(0);
+}
+
+.fotogrids-collection[data-fg-hover='slide-curtain']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+}

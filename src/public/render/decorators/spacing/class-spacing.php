@@ -16,7 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Applies wrapper-level margin and padding to the gallery/album element.
  *
- * Reads two responsive four-sided settings — `margin` and `padding` — declared
+ * Reads two responsive four-sided settings - `margin` and `padding` - declared
  * in `collection-settings/layout.json`, and emits them as the `--fg-margin` and
  * `--fg-padding` CSS custom properties scoped to the gallery wrapper.
  *
@@ -72,17 +72,17 @@ final class Spacing implements Decorator {
 
 		if ( $this->has_any_value( $margin ) ) {
 			$vars['--fg-margin'] = new Responsive_Var(
-				desktop: $this->resolve_four_sided_value( $margin, 'desktop', 'px' ),
-				tablet:  $this->resolve_four_sided_value( $margin, 'tablet', 'px' ),
-				mobile:  $this->resolve_four_sided_value( $margin, 'mobile', 'px' ),
+				$this->resolve_four_sided_value( $margin, 'desktop', 'px' ),
+				$this->resolve_four_sided_value( $margin, 'tablet', 'px' ),
+				$this->resolve_four_sided_value( $margin, 'mobile', 'px' ),
 			);
 		}
 
 		if ( $this->has_any_value( $padding ) ) {
 			$vars['--fg-padding'] = new Responsive_Var(
-				desktop: $this->resolve_four_sided_value( $padding, 'desktop', 'px' ),
-				tablet:  $this->resolve_four_sided_value( $padding, 'tablet', 'px' ),
-				mobile:  $this->resolve_four_sided_value( $padding, 'mobile', 'px' ),
+				$this->resolve_four_sided_value( $padding, 'desktop', 'px' ),
+				$this->resolve_four_sided_value( $padding, 'tablet', 'px' ),
+				$this->resolve_four_sided_value( $padding, 'mobile', 'px' ),
 			);
 		}
 
@@ -100,7 +100,7 @@ final class Spacing implements Decorator {
 	 * @param mixed $responsive Raw responsive setting value.
 	 * @return bool
 	 */
-	private function has_any_value( mixed $responsive ): bool {
+	private function has_any_value( $responsive ): bool {
 		if ( ! is_array( $responsive ) ) {
 			return false;
 		}

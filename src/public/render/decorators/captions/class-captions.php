@@ -69,7 +69,7 @@ final class Captions implements Decorator {
 	 * True when the active layout is Image Viewer. That layout renders only
 	 * the caption title (in its control bar) and hides Caption Placement,
 	 * Distance from Media, Alignment, Item Description, and Limit Title Length
-	 * in the admin — so the decorator must ignore those settings entirely and
+	 * in the admin - so the decorator must ignore those settings entirely and
 	 * emit only the title styling variables.
 	 *
 	 * @since 1.0.0
@@ -82,7 +82,7 @@ final class Captions implements Decorator {
 		$settings = $render_context->settings;
 
 		// Image Viewer only renders the caption title (in its control bar).
-		// Emit just the title styling variables — colour, font, and size —
+		// Emit just the title styling variables - colour, font, and size -
 		// and ignore placement, alignment, gap, overlay, description, and the
 		// title line-clamp, all of which are hidden for this layout.
 		if ( $this->is_image_viewer( $render_context ) ) {
@@ -130,19 +130,19 @@ final class Captions implements Decorator {
 			'--fg-caption-align'           => $caption_alignment,
 			'--fg-caption-media-align'     => $media_align,
 			'--fg-caption-gap'             => new Responsive_Var(
-				desktop: $gap_desktop,
-				tablet:  $gap_tablet,
-				mobile:  $gap_mobile,
+				$gap_desktop,
+				$gap_tablet,
+				$gap_mobile,
 			),
 			'--fg-caption-title-font-size' => new Responsive_Var(
-				desktop: $this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
-				tablet:  $this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
-				mobile:  $this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
+				$this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
+				$this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
+				$this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
 			),
 			'--fg-caption-desc-font-size'  => new Responsive_Var(
-				desktop: $this->resolve_responsive_value( $desc_font_size, 'desktop', 'px', '14px' ),
-				tablet:  $this->resolve_responsive_value( $desc_font_size, 'tablet', 'px', '12px' ),
-				mobile:  $this->resolve_responsive_value( $desc_font_size, 'mobile', 'px', '12px' ),
+				$this->resolve_responsive_value( $desc_font_size, 'desktop', 'px', '14px' ),
+				$this->resolve_responsive_value( $desc_font_size, 'tablet', 'px', '12px' ),
+				$this->resolve_responsive_value( $desc_font_size, 'mobile', 'px', '12px' ),
 			),
 		);
 
@@ -173,9 +173,9 @@ final class Captions implements Decorator {
 		if ( 'lines' === $title_limit_mode ) {
 			$title_lines                      = $settings['caption_max_title_lines'] ?? array();
 			$vars['--fg-caption-title-lines'] = new Responsive_Var(
-				desktop: $this->responsive_line_count( $title_lines, 'desktop', 1 ),
-				tablet:  $this->responsive_line_count( $title_lines, 'tablet', 1 ),
-				mobile:  $this->responsive_line_count( $title_lines, 'mobile', 1 ),
+				$this->responsive_line_count( $title_lines, 'desktop', 1 ),
+				$this->responsive_line_count( $title_lines, 'tablet', 1 ),
+				$this->responsive_line_count( $title_lines, 'mobile', 1 ),
 			);
 		}
 
@@ -183,9 +183,9 @@ final class Captions implements Decorator {
 		if ( 'lines' === $desc_limit_mode ) {
 			$desc_lines                      = $settings['caption_max_desc_lines'] ?? array();
 			$vars['--fg-caption-desc-lines'] = new Responsive_Var(
-				desktop: $this->responsive_line_count( $desc_lines, 'desktop', 2 ),
-				tablet:  $this->responsive_line_count( $desc_lines, 'tablet', 2 ),
-				mobile:  $this->responsive_line_count( $desc_lines, 'mobile', 2 ),
+				$this->responsive_line_count( $desc_lines, 'desktop', 2 ),
+				$this->responsive_line_count( $desc_lines, 'tablet', 2 ),
+				$this->responsive_line_count( $desc_lines, 'mobile', 2 ),
 			);
 		}
 
@@ -206,8 +206,8 @@ final class Captions implements Decorator {
 
 	/**
 	 * Title-only style variables for the Image Viewer layout. Produces the
-	 * title colour, font family/weight, and responsive font size — the same
-	 * values the per-item caption would use — so the layout can style the
+	 * title colour, font family/weight, and responsive font size - the same
+	 * values the per-item caption would use - so the layout can style the
 	 * title it renders in its control bar. No placement, alignment, gap,
 	 * overlay, description, or line-clamp variables are emitted.
 	 *
@@ -220,9 +220,9 @@ final class Captions implements Decorator {
 
 		$vars = array(
 			'--fg-caption-title-font-size' => new Responsive_Var(
-				desktop: $this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
-				tablet:  $this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
-				mobile:  $this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
+				$this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
+				$this->resolve_responsive_value( $title_font_size, 'tablet', 'px', '16px' ),
+				$this->resolve_responsive_value( $title_font_size, 'mobile', 'px', '14px' ),
 			),
 		);
 
@@ -247,9 +247,9 @@ final class Captions implements Decorator {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-captions' => new Asset_Decl(
-					path: 'decorators/captions/captions.css'
+					'decorators/captions/captions.css'
 				),
 			)
 		);
@@ -269,7 +269,7 @@ final class Captions implements Decorator {
 	 * @param  int    $default        Fallback line count.
 	 * @return string                 Plain integer string, e.g. '1', '2'.
 	 */
-	private function responsive_line_count( mixed $raw_responsive, string $breakpoint, int $default_value ): string {
+	private function responsive_line_count( $raw_responsive, string $breakpoint, int $default_value ): string {
 		if ( ! is_array( $raw_responsive ) ) {
 			return (string) $default_value;
 		}
@@ -290,11 +290,14 @@ final class Captions implements Decorator {
 	 * @return string                     'flex-start', 'center', or 'flex-end'.
 	 */
 	private function vertical_alignment_to_flex( string $vertical_alignment ): string {
-		return match ( $vertical_alignment ) {
-			'top'    => 'flex-start',
-			'middle' => 'center',
-			default  => 'flex-end',
-		};
+		switch ( $vertical_alignment ) {
+			case 'top':
+				return 'flex-start';
+			case 'middle':
+				return 'center';
+			default:
+				return 'flex-end';
+		}
 	}
 
 	/**
@@ -307,7 +310,7 @@ final class Captions implements Decorator {
 	 * @param  int   $default_pct Fallback percentage if $raw is not numeric.
 	 * @return float              Multiplier in the range 0.0-1.0.
 	 */
-	private function resolve_opacity_pct( mixed $raw, int $default_pct ): float {
+	private function resolve_opacity_pct( $raw, int $default_pct ): float {
 		$pct = is_numeric( $raw ) ? (float) $raw : (float) $default_pct;
 		if ( $pct < 0 ) {
 			$pct = 0;

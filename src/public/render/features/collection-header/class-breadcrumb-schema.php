@@ -14,18 +14,18 @@ if ( ! defined( 'WPINC' ) ) {
  * trail and returns it as a ready-to-emit `<script type="application/ld+json">`
  * string.
  *
- * Called from Collection_Header::html_appendix() — so the schema is only
+ * Called from Collection_Header::html_appendix() - so the schema is only
  * built when the visible header is being built. The schema mirrors the
  * visible breadcrumb exactly: parent album, then current gallery.
  *
  * Gates:
  *   - The album's per-collection `navigation_emit_breadcrumb_schema`
- *     toggle (default true) — flip off when an SEO plugin already emits.
- *   - The `is_ajax_swap` meta flag — never emit on Album → Gallery
+ *     toggle (default true) - flip off when an SEO plugin already emits.
+ *   - The `is_ajax_swap` meta flag - never emit on Album → Gallery
  *     AJAX swaps. The page URL hasn't changed; emitting schema for the
  *     swapped-in gallery would describe content that doesn't match the
  *     canonical URL Google crawled.
- *   - The `fotogrids/breadcrumb/should_emit_schema` filter — final
+ *   - The `fotogrids/breadcrumb/should_emit_schema` filter - final
  *     opt-out used by Pro SEO integrations.
  *
  * @package FotoGrids\Render\Features\Collection_Header
@@ -60,7 +60,7 @@ final class Breadcrumb_Schema {
 
 		/**
 		 * Final opt-out for the BreadcrumbList JSON-LD. Return false to
-		 * suppress emission — used by Pro / third-party SEO plugin
+		 * suppress emission - used by Pro / third-party SEO plugin
 		 * integrations that emit their own BreadcrumbList for the same
 		 * URL and don't want a duplicate from FotoGrids.
 		 *
@@ -85,7 +85,7 @@ final class Breadcrumb_Schema {
 		$gallery_permalink = (string) get_permalink( $gallery_post );
 		if ( '' === $album_permalink ) {
 			// Without a URL for the album, the BreadcrumbList lacks the
-			// back-link Google needs — skip rather than emit a partial one.
+			// back-link Google needs - skip rather than emit a partial one.
 			return '';
 		}
 
@@ -107,7 +107,7 @@ final class Breadcrumb_Schema {
 					'position' => 2,
 					'name'     => '' !== $gallery_title ? $gallery_title : __( 'Gallery', 'fotogrids' ),
 					// The final item intentionally omits `item` per
-					// Google's BreadcrumbList guidance — it's the current
+					// Google's BreadcrumbList guidance - it's the current
 					// page and adding the URL is discouraged.
 				),
 			),
@@ -127,7 +127,7 @@ final class Breadcrumb_Schema {
 			return '';
 		}
 
-		// Inline script. Output is JSON, no need for esc_js() — the
+		// Inline script. Output is JSON, no need for esc_js() - the
 		// surrounding type="application/ld+json" tells the browser to
 		// parse it as data, not JavaScript.
 		return '<script type="application/ld+json" class="fg-breadcrumb-schema">' . $json . '</script>';

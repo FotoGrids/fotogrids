@@ -82,7 +82,7 @@ const GalleryMetabox = ({
         let draggedIndex = -1;
 
         // All visual state for the dragging item and the placeholder lives in
-        // CSS — see `.fotogrids-dragging` and `.fotogrids-item-placeholder`
+        // CSS - see `.fotogrids-dragging` and `.fotogrids-item-placeholder`
         // in items.scss. Do NOT set inline styles here: when React re-renders
         // after a successful drop, it reuses DOM nodes by key and any
         // JS-applied inline `style.*` will outlive the drag (e.g. opacity
@@ -172,7 +172,7 @@ const GalleryMetabox = ({
 
             // Move the dragged element to wherever the placeholder currently
             // sits. The placeholder is kept in sync with the cursor by
-            // handleDragOver, so this is the authoritative drop position —
+            // handleDragOver, so this is the authoritative drop position -
             // we deliberately do NOT recompute from draggedIndex / targetIndex
             // because those snapshots get out of sync as the DOM mutates.
             if (placeholder && placeholder.parentNode === gridElement) {
@@ -236,7 +236,7 @@ const GalleryMetabox = ({
             // If the placeholder is in the DOM, drop the dragged element where
             // the placeholder is. This is the path that fires when the user
             // releases the mouse with the cursor over the placeholder itself
-            // (rather than over another .fotogrids-item-item) — without this,
+            // (rather than over another .fotogrids-item-item) - without this,
             // the item-level `drop` handler never runs and the reorder is lost.
             if (placeholder && placeholder.parentNode === gridElement) {
                 gridElement.insertBefore(draggedElement, placeholder);
@@ -376,7 +376,7 @@ const GalleryMetabox = ({
     }, []);
 
     // Click the star: if not featured, make this item the featured one.
-    // If already featured, clear (so there's a real "remove" affordance —
+    // If already featured, clear (so there's a real "remove" affordance -
     // the runtime resolver then falls back to first-valid-item).
     const setFeatured = useCallback(async (itemId) => {
         let nextItemId = null;
@@ -421,7 +421,7 @@ const GalleryMetabox = ({
         }
     }, [strings]);
 
-    // Remove item. We never auto-promote a different item to featured —
+    // Remove item. We never auto-promote a different item to featured -
     // the runtime resolver handles that fallback. We just clear the
     // explicit featured choice when the user removes the featured item.
     const removeItem = useCallback((itemId) => {
@@ -484,7 +484,7 @@ const GalleryMetabox = ({
     // saveCollectionAjax() fires and produces the usual save toast.
     //
     // We deliberately don't hit the legacy `wp_ajax_fotogrids_reorder_gallery_items`
-    // endpoint anymore — order is persisted by the standard save pipeline
+    // endpoint anymore - order is persisted by the standard save pipeline
     // (`fotogrids_save_collection` AJAX action) via the hidden
     // `fotogrids_gallery_items[]` inputs rendered for each item below.
     const handleReorderItems = useCallback((newOrder) => {
@@ -493,7 +493,7 @@ const GalleryMetabox = ({
                 prevItems.find(item => item.id.toString() === id.toString())
             ).filter(Boolean);
 
-            // Update state manager — this fires the 'items' listener which
+            // Update state manager - this fires the 'items' listener which
             // in turn sets `unsavedChanges.sources.items = true`.
             if (State) {
                 const itemIds = reorderedItems.map(item => String(item.id)).filter(Boolean);

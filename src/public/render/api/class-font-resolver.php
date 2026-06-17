@@ -120,7 +120,7 @@ final class Font_Resolver {
 	 * @param  Render_Context|null $render Render context, passed to filter callbacks.
 	 * @return string  CSS value string, or '' to skip emitting the variable.
 	 */
-	public function resolve_font_family( mixed $raw, ?Render_Context $render = null ): string {
+	public function resolve_font_family( $raw, ?Render_Context $render = null ): string {
 		$normalized = $this->normalize_scalar( $raw );
 
 		// Let Pro / 3rd parties intercept before default resolution.
@@ -159,7 +159,7 @@ final class Font_Resolver {
 	 * @param  Render_Context|null $render Render context, passed to filter callbacks.
 	 * @return string  CSS value string ('400', '700', etc.), or '' to skip emitting.
 	 */
-	public function resolve_font_weight( mixed $raw, ?Render_Context $render = null ): string {
+	public function resolve_font_weight( $raw, ?Render_Context $render = null ): string {
 		$normalized = $this->normalize_scalar( $raw );
 
 		// Let Pro / 3rd parties intercept before default resolution.
@@ -186,7 +186,7 @@ final class Font_Resolver {
 	 *
 	 *   1. `wp_enqueue_scripts` priority 20. The cleanest option (stylesheet
 	 *      goes into wp_head, no FOUT) but only catches fonts collected
-	 *      from sources that resolve BEFORE `the_content` runs — primarily
+	 *      from sources that resolve BEFORE `the_content` runs - primarily
 	 *      View Page renders that go through a template hook before
 	 *      wp_head, and admin previews.
 	 *   2. `wp_footer` priority 1. Catches fonts collected during normal
@@ -210,10 +210,10 @@ final class Font_Resolver {
 
 		$this->enqueue_hook_registered = true;
 
-		// First pass — best case, lands in wp_head.
+		// First pass - best case, lands in wp_head.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_google_fonts' ), 20 );
 
-		// Footer pass — catches fonts collected during the_content
+		// Footer pass - catches fonts collected during the_content
 		// rendering (the common case for shortcodes / blocks).
 		add_action( 'wp_footer', array( $this, 'print_google_fonts_footer' ), 1 );
 		add_action( 'wp_print_footer_scripts', array( $this, 'print_google_fonts_footer' ), 1 );
@@ -224,7 +224,7 @@ final class Font_Resolver {
 	 *
 	 * Called automatically via the wp_enqueue_scripts hook registered in
 	 * register_enqueue_hook(). Skips silently when no Google Fonts have been
-	 * collected yet (the common case — the_content hasn't run at this point
+	 * collected yet (the common case - the_content hasn't run at this point
 	 * for shortcodes/blocks; see print_google_fonts_footer() for the second
 	 * pass that handles that case).
 	 *
@@ -264,7 +264,7 @@ final class Font_Resolver {
 	 * enqueue pipeline is closed by the time wp_footer runs.
 	 *
 	 * Idempotent across both wp_footer and wp_print_footer_scripts (whichever
-	 * fires first wins — the second call returns early).
+	 * fires first wins - the second call returns early).
 	 *
 	 * @since  1.0.0
 	 * @return void
@@ -304,7 +304,7 @@ final class Font_Resolver {
 	 * mark the stylesheet as printed and does not touch WordPress enqueue/footer
 	 * hooks. It exists for REST flows (gallery unlock, album-to-gallery AJAX)
 	 * that render a gallery in a separate request whose wp_footer never reaches
-	 * the visitor's already-loaded page — those handlers read this URL and
+	 * the visitor's already-loaded page - those handlers read this URL and
 	 * return it in the JSON response so the client can inject the <link>
 	 * itself. See Gallery_Data::unlock_gallery() / render_gallery().
 	 *
@@ -363,7 +363,7 @@ final class Font_Resolver {
 	 * @param  mixed $raw Raw setting value.
 	 * @return string
 	 */
-	private function normalize_scalar( mixed $raw ): string {
+	private function normalize_scalar( $raw ): string {
 		if ( null === $raw || '' === $raw || 'default' === $raw ) {
 			return '';
 		}

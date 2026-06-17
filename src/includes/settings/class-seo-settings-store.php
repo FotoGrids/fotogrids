@@ -1,6 +1,6 @@
 <?php
 /**
- * SEO settings store — plugin-wide defaults plus per-collection overrides.
+ * SEO settings store - plugin-wide defaults plus per-collection overrides.
  *
  * @package FotoGrids\Settings
  * @since   1.0.0
@@ -37,10 +37,10 @@ final class SEO_Settings_Store {
 	/**
 	 * Allowed values for the `og_image_source` per-collection setting.
 	 *
-	 * - 'featured' — use the Featured Item (gallery) / Featured Gallery
+	 * - 'featured' - use the Featured Item (gallery) / Featured Gallery
 	 *   (album) cover, as resolved by
 	 *   `Cover_Resolver::for_collection()`.
-	 * - 'custom'   — use the per-collection custom image (`og_image_custom`).
+	 * - 'custom'   - use the per-collection custom image (`og_image_custom`).
 	 *
 	 * @var string[]
 	 */

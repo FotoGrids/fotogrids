@@ -76,7 +76,7 @@ final class Tags_Filter_Decorator implements Decorator {
 	 * @since  1.0.0
 	 */
 	public function supports( Render_Context $render_context ): bool {
-		// Albums filter galleries, not attachments — tag metadata
+		// Albums filter galleries, not attachments - tag metadata
 		// doesn't apply.
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
 			return false;

@@ -527,7 +527,7 @@
                                 },
                                 "hover": {
                                     "id": "hover",
-                                    "label": "Mouseover",
+                                    "label": "Hover",
                                     "icon": "hover",
                                     "settings": [
                                         {
@@ -758,7 +758,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -943,7 +943,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -1128,7 +1128,7 @@
                                 },
                                 "hover": {
                                     "id": "hover",
-                                    "label": "Mouseover",
+                                    "label": "Hover",
                                     "icon": "hover",
                                     "settings": [
                                         {
@@ -1155,7 +1155,7 @@
                                             "key": "filter_cb_hover_checkmark_color",
                                             "type": "color",
                                             "label": "Checkmark",
-                                            "description": "Rendered semi-transparently on mouseover to preview the checked state",
+                                            "description": "Rendered semi-transparently on hover to preview the checked state",
                                             "default": "rgba(60, 70, 240, 0.3)",
                                             "tier_required": "free",
                                             "render_when_unlicensed": true,
@@ -1274,7 +1274,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {

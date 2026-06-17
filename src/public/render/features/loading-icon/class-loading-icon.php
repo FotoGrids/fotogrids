@@ -150,7 +150,7 @@ final class Loading_Icon implements Feature {
 	 *     by footer time, img.complete was already true, so loading-icon.js
 	 *     called markLoaded() immediately, which cancelled the animation
 	 *     before it ever became visible. Starting animations here closes
-	 *     that window — the animation is already running at the moment
+	 *     that window - the animation is already running at the moment
 	 *     loading-icon.js wires its load listener.
 	 *
 	 *     If window.fotogridsLoadingIcons isn't defined yet (footer global
@@ -185,7 +185,7 @@ final class Loading_Icon implements Feature {
 		//     inside it. We MUST therefore avoid those characters and we
 		//     MUST NOT interpolate JS source that contains them (the icon
 		//     animate functions DO contain `&&` and `<`, so they cannot
-		//     appear here — they live in the footer global instead, which
+		//     appear here - they live in the footer global instead, which
 		//     ships via wp_add_inline_script and bypasses the_content).
 		//
 		//  2. Even with the global not yet defined, the script still does
@@ -198,7 +198,7 @@ final class Loading_Icon implements Feature {
 		//
 		// Banned characters below: & (and any operator built from it: &&,
 		// &amp;), < and > (other than the script tag bracket itself).
-		// `||` and `|` are safe — pipes are not HTML-special.
+		// `||` and `|` are safe - pipes are not HTML-special.
 		return '<script>'
 			. '(function(id){'
 			. 'if(!window.fgLoaderHandles){window.fgLoaderHandles=new WeakMap();}'
@@ -274,17 +274,18 @@ final class Loading_Icon implements Feature {
 		$this->maybe_schedule_footer_global();
 
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-loading-icon' => new Asset_Decl(
-					path:      '../../assets/css/loading-icon-styles.css',
-					in_footer: false,
+					'../../assets/css/loading-icon-styles.css',
+					array(),
+					false,
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-loading-icon' => new Asset_Decl(
-					path:      '../../assets/js/loading-icon.js',
-					deps:      array(),
-					in_footer: true,
+					'../../assets/js/loading-icon.js',
+					array(),
+					true,
 				),
 			)
 		);
@@ -385,7 +386,7 @@ final class Loading_Icon implements Feature {
 
 		self::$footer_scheduled = true;
 
-		// Footer drain — defensive fallback for any gallery whose
+		// Footer drain - defensive fallback for any gallery whose
 		// per-gallery inline script bailed (e.g. unexpected DOM state).
 		// On a healthy page this is a no-op because every item already
 		// has handles set via the inline runner. Skips already-cached
@@ -400,7 +401,7 @@ final class Loading_Icon implements Feature {
 		//      first frame, which queues image load events behind the
 		//      backlog and visibly batches every gallery's reveals.
 		//   2. The same blocking loop is why initial loader animations
-		//      don't visibly run — the browser never gets a paint
+		//      don't visibly run - the browser never gets a paint
 		//      between animate() and the loading-icon.js wireGallery
 		//      cancel pass for already-cached images.
 		// We process up to FG_DRAIN_BATCH items per animation frame so
@@ -410,7 +411,7 @@ final class Loading_Icon implements Feature {
 			. 'var q=window.fgAnimQueue||[];'
 			. 'if(!window.fgLoaderHandles)window.fgLoaderHandles=new WeakMap();'
 			. 'var pending=[];'
-			// Collect every (gallery, item, icon) tuple to process — cheap
+			// Collect every (gallery, item, icon) tuple to process - cheap
 			// pass, no animate() calls yet.
 			. 'for(var i=0;i<q.length;i++){'
 			. 'var g=document.getElementById(q[i]);'
@@ -454,7 +455,7 @@ final class Loading_Icon implements Feature {
 			. '}'
 			. '})();';
 
-		// Defensive footer drain — catches any galleries whose per-gallery
+		// Defensive footer drain - catches any galleries whose per-gallery
 		// inline script bailed (e.g. unexpected DOM/JS state). On a healthy
 		// page this is a no-op because all items already have handles set.
 		//

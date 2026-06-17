@@ -243,12 +243,12 @@
 		align-items: center;
 		justify-content: center;
 
-		&[class*='fgg-stack-'] {
+		&[class*="fgg-stack-"] {
 			border: 2px solid #fff;
 			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 		}
 
-		&:not([class*='fgg-stack-']) {
+		&:not([class*="fgg-stack-"]) {
 			transform: translate(-50%, -50%);
 			z-index: 1;
 			background-color: rgba(0, 0, 0, 0.05);
@@ -356,7 +356,7 @@
 }
 
 .fotogrids-gallery-item {
-	&[draggable='true'] {
+	&[draggable="true"] {
 		cursor: move;
 
 		&:active .fotogrids-gallery-item__content {

@@ -89,14 +89,17 @@ final class Item_Renderer {
 
 		$caption_html = '';
 		if ( ! $suppress_caption && ( '' !== $item_view->caption_title || '' !== $item_view->caption_description ) ) {
-			$inner = '';
+			$content = '';
 			if ( '' !== $item_view->caption_title ) {
-				$inner .= '<span class="fg-caption-title">' . esc_html( $item_view->caption_title ) . '</span>';
+				$content .= '<span class="fg-caption-title">' . esc_html( $item_view->caption_title ) . '</span>';
 			}
 			if ( '' !== $item_view->caption_description ) {
-				$inner .= '<span class="fg-caption-description">' . esc_html( $item_view->caption_description ) . '</span>';
+				$content .= '<span class="fg-caption-description">' . esc_html( $item_view->caption_description ) . '</span>';
 			}
-			$caption_html = '<figcaption class="fg-caption">' . $inner . '</figcaption>';
+			$caption_html = '<figcaption class="fg-caption">'
+				. '<span class="fg-caption-bg" aria-hidden="true"></span>'
+				. '<span class="fg-caption-content">' . $content . '</span>'
+				. '</figcaption>';
 		}
 
 		// figure_wrappers enclose both the media block and the caption, so the

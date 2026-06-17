@@ -1,7 +1,7 @@
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
-	props,
+	props
 ) {
 	if (typeof React === 'undefined') {
 		const { createElement: h } = wp.element;
@@ -13,16 +13,16 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 				disabled: props.disabled,
 				className: props.className || 'fotogrids-units-select',
 			},
-			(props.options || []).map(option =>
+			(props.options || []).map((option) =>
 				h(
 					'option',
 					{
 						key: option.value,
 						value: option.value,
 					},
-					option.label || option.value,
-				),
-			),
+					option.label || option.value
+				)
+			)
 		);
 	}
 
@@ -30,13 +30,19 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 
 	const { value, onChange, options, disabled, className = '' } = props;
 
+	/*
+	 * React availability is constant for the lifetime of the page, so the
+	 * early fallback above never changes the hook call order between renders.
+	 * The rule cannot prove this, so it is disabled for this hook block only.
+	 */
+	/* eslint-disable react-hooks/rules-of-hooks */
 	const [isOpen, setIsOpen] = useState(false);
 	const [openDirection, setOpenDirection] = useState('down');
 	const containerRef = useRef(null);
 	const selectRef = useRef(null);
 
 	useEffect(() => {
-		const handleClickOutside = event => {
+		const handleClickOutside = (event) => {
 			if (
 				containerRef.current &&
 				!containerRef.current.contains(event.target)
@@ -66,8 +72,9 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
 	}, [isOpen, options.length]);
+	/* eslint-enable react-hooks/rules-of-hooks */
 
-	const handleSelect = optionValue => {
+	const handleSelect = (optionValue) => {
 		if (onChange && !disabled) {
 			onChange({ target: { value: optionValue } });
 			setIsOpen(false);
@@ -75,7 +82,7 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 	};
 
 	const selectedOption =
-		options.find(opt => opt.value === value) || options[0];
+		options.find((opt) => opt.value === value) || options[0];
 
 	return createElement(
 		'div',
@@ -93,7 +100,7 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 					type: 'button',
 					className: 'fotogrids-unit-select__button',
 					onClick: () => !disabled && setIsOpen(!isOpen),
-					disabled: disabled,
+					disabled,
 					'aria-expanded': isOpen,
 					'aria-haspopup': 'listbox',
 				},
@@ -104,17 +111,16 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 							key: 'value',
 							className: 'fotogrids-unit-select__value',
 						},
-						selectedOption.label || selectedOption.value,
+						selectedOption.label || selectedOption.value
 					),
 					createElement('span', {
 						key: 'arrow',
 						className: 'fotogrids-unit-select__arrow',
 						dangerouslySetInnerHTML: {
-							__html:
-								window.FotoGridsIcons?.['chevron_down'] || '▼',
+							__html: window.FotoGridsIcons?.chevron_down || '▼',
 						},
 					}),
-				],
+				]
 			),
 			isOpen &&
 				createElement(
@@ -135,10 +141,10 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 								role: 'option',
 								'aria-selected': option.value === value,
 							},
-							option.label || option.value,
-						),
-					),
+							option.label || option.value
+						)
+					)
 				),
-		],
+		]
 	);
 };

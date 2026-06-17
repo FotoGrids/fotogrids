@@ -113,7 +113,7 @@ class Renderer {
 		//      compatible behaviour with collections that pre-date the SEO tab
 		//   2. the SEO tab's per-collection `fotogrids_noindex` toggle (true
 		//      forces noindex; false alone does NOT override a draft preview)
-		//   3. draft preview always wins — never index unsaved work
+		//   3. draft preview always wins - never index unsaved work
 		//   4. the `fotogrids/view/robots` filter for code-level overrides
 		$noindex = ! empty( $this->settings['noindex'] )
 			|| empty( $this->settings['index'] )
@@ -160,7 +160,7 @@ class Renderer {
 		 * This is the catch-all string filter that runs after every granular
 		 * filter (og/title, og/description, og/image, og/url, og/type,
 		 * og/enabled, view/robots, view/canonical). Prefer the granular
-		 * filters for targeted changes — this one is for sites that need to
+		 * filters for targeted changes - this one is for sites that need to
 		 * rewrite or completely replace the markup.
 		 *
 		 * @since 1.0.0
@@ -395,7 +395,7 @@ class Renderer {
 	 *
 	 * Layered fallback: post excerpt → trimmed post content → auto-built
 	 * count summary (e.g. "24 photos in 'Tuscany 2024'"). The site tagline
-	 * is intentionally NOT in the chain — it would put the same generic
+	 * is intentionally NOT in the chain - it would put the same generic
 	 * string on every gallery and actively hurt link previews.
 	 *
 	 * @since 1.0.0
@@ -694,7 +694,7 @@ class Renderer {
 	 * Both code paths emit a [data-fg-share-footer] container with a JSON
 	 * sharing config. The Sharing module's attachFooterBars() handler
 	 * (public/render/decorators/sharing/sharing.js) picks the container
-	 * up and renders the buttons from the config — no view-specific JS.
+	 * up and renders the buttons from the config - no view-specific JS.
 	 *
 	 * When sharing is enabled for the collection and the view_page
 	 * placement applies, the full resolved network set is used. Otherwise
@@ -720,7 +720,7 @@ class Renderer {
 			);
 		} else {
 			// Copy-link-only fallback. Same payload shape so the Sharing
-			// module renders this just like any other share bar — just
+			// module renders this just like any other share bar - just
 			// with a single network active.
 			$config = array(
 				'enabled'      => true,
@@ -785,7 +785,7 @@ class Renderer {
 			true
 		);
 
-		// Deep-linking is essential on the view page — the URL might
+		// Deep-linking is essential on the view page - the URL might
 		// carry ?fg-item={id} which we resolve into a lightbox open.
 		wp_enqueue_script(
 			'fotogrids-deep-linking',
@@ -795,7 +795,7 @@ class Renderer {
 			true
 		);
 
-		// Sharing module — needed unconditionally because the View Page
+		// Sharing module - needed unconditionally because the View Page
 		// footer always shows at least a copy-link button via the
 		// Sharing module's attachFooterBars() (see share_html()). The
 		// Sharing_Decorator's render-pipeline assets() only enqueues
@@ -847,7 +847,7 @@ class Renderer {
 		$sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
 
 		// window.fotogrids carries only the sharing-related deep-link
-		// settings — same shape as the public render path.
+		// settings - same shape as the public render path.
 		wp_localize_script(
 			'fotogrids-runtime',
 			'fotogrids',

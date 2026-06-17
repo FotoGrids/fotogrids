@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Shared layout helpers.
+ * FotoGrids - Shared layout helpers.
  *
  * Pure ES module imported by the per-layout JS bundles (justified, masonry,
  * any future JS-positioned layout). Exports primitives for reading
@@ -7,7 +7,7 @@
  * `createLayoutAttach` factory that wires up the standard set of
  * per-collection events every JS layout needs to subscribe to.
  *
- * No imports — pure helpers, no DOM mutation outside of the explicit
+ * No imports - pure helpers, no DOM mutation outside of the explicit
  * `revealItems` helper. Consumers own their own per-item positioning.
  */
 

@@ -1,0 +1,63 @@
+/* Letterbox bars slide in top and bottom; the caption rises by exactly the bar
+   height (shared --fg-cinematic-bar, a fixed length so the bar and the caption
+   shift match) so it ends up resting just above the lower bar. */
+
+.fotogrids-collection[data-fg-hover='cinematic-bars'] {
+	--fg-cinematic-bar: 28px;
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars'] .fg-item-media {
+	position: relative;
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars'] .fg-item-media::before,
+.fotogrids-collection[data-fg-hover='cinematic-bars'] .fg-item-media::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 0;
+	background: #000;
+	transition: height 0.3s ease;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars'] .fg-item-media::before {
+	top: 0;
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars'] .fg-item-media::after {
+	bottom: 0;
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars']
+	.fg-item:hover
+	.fg-item-media::before,
+.fotogrids-collection[data-fg-hover='cinematic-bars']
+	.fg-item:hover
+	.fg-item-media::after {
+	height: var(--fg-cinematic-bar);
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars'] .fg-caption-content {
+	opacity: 0;
+	transition:
+		opacity 0.3s ease 0.1s,
+		transform 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='cinematic-bars']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+}
+
+/* Overlay only: the caption sits over the media, so raise it by the bar height
+   to clear the lower bar. In top/bottom placements the caption is outside the
+   media and needs no shift. */
+.fotogrids-collection[data-fg-hover='cinematic-bars'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-content {
+	transform: translateY(calc(var(--fg-cinematic-bar) * -1));
+}

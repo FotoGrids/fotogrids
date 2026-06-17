@@ -49,7 +49,7 @@ final class Sharing_Decorator implements Decorator {
 	 * Opts out of album-as-collection renders. The item-level share
 	 * placements (thumbnail, lightbox) don't apply to album thumbnails
 	 * (which navigate into a gallery, not into a lightbox), and the
-	 * view_footer placement is rendered by the View Page shell — not by
+	 * view_footer placement is rendered by the View Page shell - not by
 	 * the gallery wrapper inside it.
 	 *
 	 * @since 1.0.0
@@ -113,38 +113,40 @@ final class Sharing_Decorator implements Decorator {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				// fg-tooltip first so its handle is registered before any
 				// module that depends on it (sharing's share-bar buttons
 				// bind tooltips via window.FgTooltip).
 				'fotogrids-fg-tooltip' => new Asset_Decl(
-					path:      '../../assets/css/fg-tooltip.css',
-					in_footer: false,
+					'../../assets/css/fg-tooltip.css',
+					array(),
+					false,
 				),
 				'fotogrids-sharing'    => new Asset_Decl(
-					path:      'decorators/sharing/sharing.css',
-					in_footer: false,
+					'decorators/sharing/sharing.css',
+					array(),
+					false,
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-fg-tooltip'   => new Asset_Decl(
-					path:      '../../assets/js/fg-tooltip.js',
-					deps:      array(),
-					in_footer: true,
+					'../../assets/js/fg-tooltip.js',
+					array(),
+					true,
 				),
-				// deep-linking only makes sense when sharing is active —
+				// deep-linking only makes sense when sharing is active -
 				// it interprets ?fg-item / #fg-<g>-<i> URLs that come
 				// from shared links. The View Page enqueues it directly
 				// because those URLs arrive there even with sharing off.
 				'fotogrids-deep-linking' => new Asset_Decl(
-					path:      '../../assets/js/deep-linking.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/deep-linking.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 				'fotogrids-sharing'      => new Asset_Decl(
-					path:      '../../assets/js/sharing.js',
-					deps:      array( 'fotogrids-runtime', 'fotogrids-fg-tooltip' ),
-					in_footer: true,
+					'../../assets/js/sharing.js',
+					array( 'fotogrids-runtime', 'fotogrids-fg-tooltip' ),
+					true,
 				),
 			),
 		);

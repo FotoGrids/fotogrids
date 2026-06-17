@@ -39,6 +39,12 @@ scripts/waapi-compare.html
 ehthumbs.db
 Thumbs.db
 
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+
 # Logs
 logs
 *.log
@@ -54,6 +60,12 @@ logs
 .cache/
 .npm/
 .yarn/
+
+# PHP tooling caches (regenerated on each run)
+.phpunit.result.cache
+.phpunit.cache/
+.phpcs.cache
+.php-cs-fixer.cache
 
 # Temporary files
 *.tmp

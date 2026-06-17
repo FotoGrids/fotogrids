@@ -22,7 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Minimal v1 widget — picks a published album by ID and delegates to
+ * Minimal v1 widget - picks a published album by ID and delegates to
  * Public_Render::album_shortcode(). Mirrors Widget_Gallery exactly except
  * for the post type queried.
  *
@@ -31,7 +31,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Widget_Album extends Widget_Base {
 
 	/**
-	 * Tell Elementor this widget's HTML is dynamic — see
+	 * Tell Elementor this widget's HTML is dynamic - see
 	 * {@see Widget_Gallery::$_has_template_content} for the full reason.
 	 *
 	 * @var bool
@@ -109,7 +109,7 @@ class Widget_Album extends Widget_Base {
 
 		$this->end_controls_section();
 
-		// Preview section — editor-only toggles, see Widget_Gallery for
+		// Preview section - editor-only toggles, see Widget_Gallery for
 		// the full reasoning. Same control names and defaults for parity.
 		$this->start_controls_section(
 			'fotogrids_preview',

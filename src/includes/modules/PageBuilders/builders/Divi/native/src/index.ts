@@ -39,7 +39,7 @@ const withOptions = (
       item.component.props.options = options;
     }
   } catch (e) {
-    // non-fatal — leave options empty if shape differs
+    // non-fatal - leave options empty if shape differs
   }
   return moduleDef;
 };
@@ -67,7 +67,7 @@ const register = (): void => {
 // The module-library store fires this action once it's ready to accept
 // registrations. If the store is already initialised by the time this
 // bundle runs, the action has already fired, so we also attempt an
-// immediate registration — `register()` is idempotent, so at most one of
+// immediate registration - `register()` is idempotent, so at most one of
 // the two paths actually registers.
 addAction('divi.moduleLibrary.registerModuleLibraryStore.after', 'fotogrids', register);
 register();

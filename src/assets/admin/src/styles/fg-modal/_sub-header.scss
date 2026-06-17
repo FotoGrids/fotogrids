@@ -1,8 +1,8 @@
-@use '../colors.scss' as *;
+@use "../colors.scss" as *;
 
 /**
  * Optional fixed band beneath the header. Mirrors the header's
- * structural traits — never shrinks, bottom-divider by default — but
+ * structural traits - never shrinks, bottom-divider by default - but
  * leaves the inner content layout entirely to the consumer. Two
  * common patterns:
  *

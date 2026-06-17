@@ -157,13 +157,13 @@ class Public_Render {
 		$context_builder = $is_preview ? Context_Builder::for_preview() : Context_Builder::for_public();
 		if ( $is_preview ) {
 			$render_context = $context_builder->build_for_preview(
-				gallery_id: (int) $gallery_id,
-				base_settings: is_array( $settings ) ? $settings : array(),
-				settings_overlay: $settings_overlay,
-				collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
-				item_overrides: array(),
-				source: $source instanceof Request_Source ? $source : Request_Source::PREVIEW_UNSAVED,
-				simulate_state: null
+				(int) $gallery_id,
+				is_array( $settings ) ? $settings : array(),
+				$settings_overlay,
+				is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
+				array(),
+				Request_Source::is_valid( $source ) ? $source : Request_Source::PREVIEW_UNSAVED,
+				null
 			);
 		} else {
 			$render_settings          = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
@@ -175,12 +175,12 @@ class Public_Render {
 				$effective_meta_overrides['view_page'] = true;
 			}
 			$render_context = $context_builder->build_for_public(
-				gallery_id: (int) $gallery_id,
-				render_settings: $render_settings,
-				collection_item_ids: is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
-				source: $source instanceof Request_Source ? $source : Request_Source::SHORTCODE,
-				album_id: absint( $atts['album_id'] ?? 0 ) ?: null,
-				meta_overrides: $effective_meta_overrides
+				(int) $gallery_id,
+				$render_settings,
+				is_array( $item_ids ) ? array_map( 'absint', $item_ids ) : array(),
+				Request_Source::is_valid( $source ) ? $source : Request_Source::SHORTCODE,
+				absint( $atts['album_id'] ?? 0 ) ?: null,
+				$effective_meta_overrides
 			);
 		}
 
@@ -216,8 +216,8 @@ class Public_Render {
 	 *
 	 * Used by the /fotogrids/v1/gallery/render REST endpoint. Unlike the
 	 * shortcode path, this bypasses caching (per-(gallery, page, breakpoint)
-	 * cache keys are a v2 concern — see PLAN.md §8.5) and never re-enters
-	 * the shortcode atts parser. Returns the raw rendered HTML — the REST
+	 * cache keys are a v2 concern - see PLAN.md §8.5) and never re-enters
+	 * the shortcode atts parser. Returns the raw rendered HTML - the REST
 	 * handler still owns the CSS-handle map and the pagination metadata
 	 * envelope.
 	 *
@@ -232,7 +232,7 @@ class Public_Render {
 	 *                                             can override).
 	 * @return string Rendered HTML (or empty string when the gallery cannot be rendered).
 	 */
-	public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), Request_Source $source = Request_Source::ALBUM_AJAX ): string {
+	public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), string $source = Request_Source::ALBUM_AJAX ): string {
 		$gallery = \FotoGrids\Galleries\Gallery_Repository::get( $gallery_id );
 		if ( ! $gallery || 'publish' !== $gallery->post_status ) {
 			return '';
@@ -244,7 +244,7 @@ class Public_Render {
 			return '';
 		}
 
-		// Synthetic atts mirroring what the shortcode produces — the
+		// Synthetic atts mirroring what the shortcode produces - the
 		// pipeline reads a small subset and the rest are inert.
 		$atts = array(
 			'id'       => $gallery_id,
@@ -342,16 +342,16 @@ class Public_Render {
 		}
 
 		$source = Request_Source::SHORTCODE;
-		if ( Request_Source::BLOCK->value === $atts['_source'] ) {
+		if ( Request_Source::BLOCK === $atts['_source'] ) {
 			$source = Request_Source::BLOCK;
 		}
-		if ( Request_Source::ELEMENTOR->value === $atts['_source'] ) {
+		if ( Request_Source::ELEMENTOR === $atts['_source'] ) {
 			$source = Request_Source::ELEMENTOR;
 		}
-		if ( Request_Source::DIVI->value === $atts['_source'] ) {
+		if ( Request_Source::DIVI === $atts['_source'] ) {
 			$source = Request_Source::DIVI;
 		}
-		if ( Request_Source::ALBUM_AJAX->value === $atts['_source'] ) {
+		if ( Request_Source::ALBUM_AJAX === $atts['_source'] ) {
 			$source = Request_Source::ALBUM_AJAX;
 		}
 		if ( absint( $atts['album_id'] ) > 0 ) {
@@ -456,9 +456,9 @@ class Public_Render {
 		}
 
 		$context = Context_Builder::for_public()->build_for_album(
-			album_id:          $album_id,
-			render_settings:   $album_settings,
-			child_gallery_ids: $child_gallery_ids,
+			$album_id,
+			$album_settings,
+			$child_gallery_ids,
 		);
 
 		$result = Render_Controller::factory()->render( $context );
@@ -473,11 +473,11 @@ class Public_Render {
 	 * the render pipeline (Asset_Resolver). The only assets enqueued here
 	 * are:
 	 *
-	 *   • fg-tooltip JS/CSS — still globally enqueued because multiple
+	 *   • fg-tooltip JS/CSS - still globally enqueued because multiple
 	 *     modules (sharing, filter UI, lightbox) bind tooltips and
 	 *     fg-tooltip is not yet wrapped as a render module dependency.
 	 *     Task 15 of the refactor will move this.
-	 *   • fotogrids-errors.css — tiny always-on stylesheet for the
+	 *   • fotogrids-errors.css - tiny always-on stylesheet for the
 	 *     `.fotogrids-error` block. Lives outside the render pipeline
 	 *     because error markup can be emitted before any layout module
 	 *     runs (e.g. "gallery not found"), so collection-base.css is
@@ -642,13 +642,13 @@ class Public_Render {
 
 		$render_settings = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
 		$render_context  = Context_Builder::for_preview()->build_for_preview(
-			gallery_id: 0,
-			base_settings: $render_settings,
-			settings_overlay: array(),
-			collection_item_ids: array(),
-			item_overrides: array(),
-			source: Request_Source::TEMPLATE_PREVIEW,
-			simulate_state: null
+			0,
+			$render_settings,
+			array(),
+			array(),
+			array(),
+			Request_Source::TEMPLATE_PREVIEW,
+			null
 		);
 
 		$render_context = $render_context->with(
@@ -680,14 +680,18 @@ class Public_Render {
 			}
 
 			$item_views[] = new Item_View(
-				id: $item_id,
-				thumb_url: (string) ( $item['medium'] ?? $item['thumb'] ?? $item['full'] ?? '' ),
-				full_url: (string) ( $item['full'] ?? $item['medium'] ?? '' ),
-				alt: (string) ( $item['alt'] ?? '' ),
-				title: (string) ( $item['title'] ?? '' ),
-				caption: (string) ( $item['caption'] ?? '' ),
-				description: (string) ( $item['description'] ?? '' ),
-				meta: array()
+				$item_id,
+				(string) ( $item['medium'] ?? $item['thumb'] ?? $item['full'] ?? '' ),
+				(string) ( $item['full'] ?? $item['medium'] ?? '' ),
+				(string) ( $item['alt'] ?? '' ),
+				(string) ( $item['title'] ?? '' ),
+				(string) ( $item['caption'] ?? '' ),
+				(string) ( $item['description'] ?? '' ),
+				'',
+				'',
+				null,
+				null,
+				array()
 			);
 		}
 
@@ -695,7 +699,7 @@ class Public_Render {
 	}
 
 
-	// render_album() removed — album rendering now goes through the
+	// render_album() removed - album rendering now goes through the
 	// standard Render_Controller pipeline. See album_shortcode() above.
 
 	/**

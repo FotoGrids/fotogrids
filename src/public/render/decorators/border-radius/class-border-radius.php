@@ -68,9 +68,9 @@ final class Border_Radius implements Decorator {
 
 		return array(
 			'--fg-radius' => new Responsive_Var(
-				desktop: $this->resolve_four_sided_value( $border_radius, 'desktop', 'px' ),
-				tablet:  $this->resolve_four_sided_value( $border_radius, 'tablet', 'px' ),
-				mobile:  $this->resolve_four_sided_value( $border_radius, 'mobile', 'px' ),
+				$this->resolve_four_sided_value( $border_radius, 'desktop', 'px' ),
+				$this->resolve_four_sided_value( $border_radius, 'tablet', 'px' ),
+				$this->resolve_four_sided_value( $border_radius, 'mobile', 'px' ),
 			),
 		);
 	}

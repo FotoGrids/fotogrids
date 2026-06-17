@@ -289,7 +289,7 @@
                         {
                             "key": "hover_cursor_icon",
                             "type": "button_group",
-                            "label": "Hover Cursor Icon",
+                            "label": "Cursor Style",
                             "options": [
                                 {
                                     "label": "Default",
@@ -329,360 +329,50 @@
                             "visible_when_uninstalled": true
                         },
                         {
+                            "key": "hover_effect_info",
+                            "type": "info_block",
+                            "subtitle": "Hover effects and your styling",
+                            "message": "Some hover effects animate the image, border, or shadow on hover. When an effect controls one of these, it takes over that property on hover - so a Hover Image Filter, Border, or Shadow you set under Styling may not apply while that effect is active.",
+                            "icon": "bulb",
+                            "full_width": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
                             "key": "hover_effect",
                             "type": "hover_effects_grid",
                             "label": "Hover Effect",
                             "default": "none",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "hover_affect_others",
+                            "type": "button_group",
+                            "label": "Other Items on Hover",
+                            "help": "When one item is hovered, apply a subtle effect to the rest of the gallery to make the hovered item stand out.",
                             "options": [
                                 {
-                                    "value": "slide-up",
-                                    "label": "Slide Up",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
+                                    "label": "None",
+                                    "value": "none",
                                     "tier_required": "free"
                                 },
                                 {
-                                    "value": "fade-both",
-                                    "label": "Fade Both",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "free"
+                                    "label": "Fade",
+                                    "value": "fade",
+                                    "tier_required": "pro_starter"
                                 },
                                 {
-                                    "value": "slide-left",
-                                    "label": "Slide Left",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "scale",
-                                    "label": "Scale",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "rotate",
-                                    "label": "Rotate",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "slide-right",
-                                    "label": "Slide Right",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "bounce",
-                                    "label": "Bounce",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "slide-down",
-                                    "label": "Slide Down",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "opacity",
-                                    "label": "Opacity",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "blur",
                                     "label": "Blur",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "slide-diagonal",
-                                    "label": "Slide Diagonal",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "pulse",
-                                    "label": "Pulse",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "free"
-                                },
-                                {
-                                    "value": "zoom",
-                                    "label": "Zoom",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "flip",
-                                    "label": "Flip",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "3d",
-                                    "label": "3D Transform",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "gradient",
-                                    "label": "Gradient",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "shine",
-                                    "label": "Shine",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "morph",
-                                    "label": "Morph",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "glitch",
-                                    "label": "Glitch",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "ripple",
-                                    "label": "Ripple",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "shadow",
-                                    "label": "Shadow Expand",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "border",
-                                    "label": "Border Animate",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "glow",
-                                    "label": "Glow",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "split",
-                                    "label": "Split Reveal",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "reveal",
-                                    "label": "Reveal",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "slide-rotate",
-                                    "label": "Slide Rotate",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "elastic",
-                                    "label": "Elastic",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "wobble",
-                                    "label": "Wobble",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "shake",
-                                    "label": "Shake",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "spin",
-                                    "label": "Spin",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "flash",
-                                    "label": "Flash",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "wave",
-                                    "label": "Wave",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "spiral",
-                                    "label": "Spiral",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "matrix",
-                                    "label": "Matrix",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "neon",
-                                    "label": "Neon Glow",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "social": true
-                                    },
-                                    "tier_required": "pro_starter"
-                                },
-                                {
-                                    "value": "hologram",
-                                    "label": "Hologram",
-                                    "capabilities": {
-                                        "title": true,
-                                        "description": true,
-                                        "button": true
-                                    },
+                                    "value": "blur",
                                     "tier_required": "pro_starter"
                                 }
                             ],
+                            "default": "none",
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",

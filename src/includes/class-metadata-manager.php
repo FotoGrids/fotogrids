@@ -37,7 +37,7 @@ class Metadata_Manager {
 	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
 	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
 	 *    name in this class is built as `$wpdb->prefix . 'fotogrids_*'`
-	 *    (a trusted, hardcoded literal — WP placeholders cannot bind table
+	 *    (a trusted, hardcoded literal - WP placeholders cannot bind table
 	 *    identifiers). All user-supplied *values* are passed through
 	 *    $wpdb->prepare(); where SQL is assembled incrementally the prepare
 	 *    call is a separate statement from the get_*()/query() call, which

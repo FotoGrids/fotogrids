@@ -16,9 +16,9 @@ if ( ! defined( 'WPINC' ) ) {
  * Composes three single-purpose classes that together own the gallery /
  * album edit screens:
  *
- *   - Metabox_Registrar         — UI shells, render functions, asset enqueue
- *   - Item_Ajax_Endpoints       — per-item `wp_ajax_*` endpoints
- *   - Collection_Save_Pipeline  — `save_post` + `wp_ajax_fotogrids_save_collection`
+ *   - Metabox_Registrar         - UI shells, render functions, asset enqueue
+ *   - Item_Ajax_Endpoints       - per-item `wp_ajax_*` endpoints
+ *   - Collection_Save_Pipeline  - `save_post` + `wp_ajax_fotogrids_save_collection`
  *
  * Runs in 'admin' and 'rest' contexts but not 'frontend': the save and AJAX
  * paths fire from admin and REST (Gutenberg's `save_post`), never from a

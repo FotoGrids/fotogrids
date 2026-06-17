@@ -15,8 +15,8 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Renders the per-gallery navigation chrome — back-to-album button and
- * breadcrumb trail — inside the gallery wrapper, above .fotogrids-filters.
+ * Renders the per-gallery navigation chrome - back-to-album button and
+ * breadcrumb trail - inside the gallery wrapper, above .fotogrids-filters.
  *
  * Behaviour matrix:
  *
@@ -119,7 +119,7 @@ final class Collection_Header implements Feature {
 		$album_title     = (string) get_the_title( $album_post );
 		$album_permalink = (string) get_permalink( $album_post );
 		if ( '' === $album_permalink ) {
-			// No public URL for the album — no useful back link.
+			// No public URL for the album - no useful back link.
 			return '';
 		}
 
@@ -199,21 +199,21 @@ final class Collection_Header implements Feature {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-collection-header' => new Asset_Decl(
-					path: 'features/collection-header/collection-header.css',
+					'features/collection-header/collection-header.css',
 				),
 			),
-			js: array(
+			array(
 				// Tiny behaviour bundle whose only job is to make the
 				// in-place "Back" button restore the AJAX-swapped album
 				// wrapper instead of navigating. Declares the runtime
 				// as a dep so onGallery() is callable and
 				// FotoGrids.modules.albumAjax is reachable.
 				'fotogrids-collection-header' => new Asset_Decl(
-					path:      '../../assets/js/collection-header.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/collection-header.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);
@@ -263,7 +263,7 @@ final class Collection_Header implements Feature {
 		$show_back_setting            = (bool) ( $album_settings['navigation_show_back_button'] ?? false );
 		$show_on_direct_visit_setting = (bool) ( $album_settings['navigation_show_breadcrumbs_on_direct_visit'] ?? false );
 
-		// A "direct visit" is one without a visit-context hint — the
+		// A "direct visit" is one without a visit-context hint - the
 		// visitor landed on the gallery's permalink (or had it embedded
 		// somewhere) without coming through ?fg_via or an AJAX swap.
 		// Breadcrumb_Resolver still produced a parent album via the
@@ -276,7 +276,7 @@ final class Collection_Header implements Feature {
 		}
 
 		// Resolve the current placement against the album's per-placement
-		// breadcrumb gate. The setting is a list — ['view_pages', 'embedded'].
+		// breadcrumb gate. The setting is a list - ['view_pages', 'embedded'].
 		$placements_raw = $album_settings['navigation_breadcrumbs_placements'] ?? array( 'view_pages', 'embedded' );
 		if ( is_string( $placements_raw ) && '' !== $placements_raw && '[' === $placements_raw[0] ) {
 			$decoded        = json_decode( $placements_raw, true );
@@ -353,7 +353,7 @@ final class Collection_Header implements Feature {
 
 	/**
 	 * Render the back button. When $show_album_name is true the label reads
-	 * "Back to {Album Title}"; when false it's just "Back" — useful for long
+	 * "Back to {Album Title}"; when false it's just "Back" - useful for long
 	 * album titles or tight layouts.
 	 *
 	 * @since 1.0.0
@@ -370,8 +370,8 @@ final class Collection_Header implements Feature {
 			$label = __( 'Back', 'fotogrids' );
 		}
 
-		// Inline back-arrow SVG. Matches the separator style — currentColor,
-		// 1.5 stroke, rounded join — so theming carries through.
+		// Inline back-arrow SVG. Matches the separator style - currentColor,
+		// 1.5 stroke, rounded join - so theming carries through.
 		$back_icon = '<svg class="fg-back-button__icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 8H4"/><path d="M7 5l-3 3 3 3"/></svg>';
 
 		return '<a class="fg-back-button" href="' . esc_url( $album_permalink ) . '">'

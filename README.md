@@ -1,9 +1,9 @@
-# FotoGrids (Free) — Developer Guide
+# FotoGrids (Free) - Developer Guide
 
 FotoGrids is a modern WordPress gallery and slider plugin built around the
 WordPress Media Library. This repository holds the **Free** plugin. The Pro
 plugin lives in a sibling repository and extends Free purely through WordPress
-hooks — it never imports Free's classes directly.
+hooks - it never imports Free's classes directly.
 
 This README covers local development of the Free plugin. For the full
 architecture reference (PHP bootstrap, database layer, the render pipeline,
@@ -14,7 +14,7 @@ root.
 
 | Tool      | Version           |
 | --------- | ----------------- |
-| PHP       | 8.0+              |
+| PHP       | 7.4+              |
 | WordPress | 6.1+ (tested 6.8) |
 | Node.js   | 18+               |
 | npm       | 8+                |
@@ -35,7 +35,7 @@ tasks below) to test.
 
 ```
 Plugin/
-├── src/                  Source — edit here
+├── src/                  Source - edit here
 │   ├── fotogrids.php      Main plugin file (bootstrap, constants, hooks)
 │   ├── config/           Module registry, loading-icon catalogues
 │   ├── includes/         PHP classes (REST, settings, modules, tools, render helpers)
@@ -45,7 +45,7 @@ Plugin/
 │   └── tests/            Jest unit + integration tests
 ├── tests/                PHP integration tests + CI guard scripts
 ├── scripts/              Build helpers (loading icons, JSON↔YAML)
-├── dist/                 Build output — generated, never edited, git-ignored
+├── dist/                 Build output - generated, never edited, git-ignored
 ├── webpack.config.js     Build configuration
 ├── package.json
 └── CLAUDE.md             Full developer/architecture reference
@@ -105,7 +105,7 @@ required) and the CI guard scripts under `tests/ci/`. Both are wired into
 
 ## Architecture at a glance
 
-- **Backend**: PHP 8.0+, explicit `require_once` bootstrap (no autoloader or
+- **Backend**: PHP 7.4+, explicit `require_once` bootstrap (no autoloader or
   service container), custom database tables, REST API under `fotogrids/v1`.
 - **Admin UI**: React 18 (mostly `.jsx`, some `.tsx`) using
   `@wordpress/components`, mounted into PHP-rendered containers. No SPA router,

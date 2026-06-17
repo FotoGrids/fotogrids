@@ -202,7 +202,7 @@ final class Image_Filters implements Decorator {
 	 * @param  mixed $raw
 	 * @return array<int, string>  Validated, ordered list of CSS filter names.
 	 */
-	private function decode_filter_types( mixed $raw ): array {
+	private function decode_filter_types( $raw ): array {
 		if ( is_string( $raw ) ) {
 			// Try JSON first; fall back to treating it as a single legacy value.
 			$decoded = json_decode( $raw, true );
@@ -261,9 +261,9 @@ final class Image_Filters implements Decorator {
 		}
 
 		return new Responsive_Var(
-			desktop: $per_bp['desktop'],
-			tablet:  $per_bp['tablet'],
-			mobile:  $per_bp['mobile'],
+			$per_bp['desktop'],
+			$per_bp['tablet'],
+			$per_bp['mobile'],
 		);
 	}
 }

@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderRange = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, __ },
+	{ updateSetting, getFieldState, __ }
 ) => {
 	const { createElement: h } = wp.element;
 
@@ -37,21 +37,21 @@ window.FotoGridsRenderSettings.renderRange = (
 				: (setting.default ?? 0);
 	}
 
-	const updateValue = newValue => {
+	const updateValue = (newValue) => {
 		if (hasUnits) {
 			updateSetting(setting.key, {
 				value: newValue,
-				unit: unit,
+				unit,
 			});
 		} else {
 			updateSetting(setting.key, newValue);
 		}
 	};
 
-	const updateUnit = newUnit => {
+	const updateUnit = (newUnit) => {
 		if (hasUnits) {
 			updateSetting(setting.key, {
-				value: value,
+				value,
 				unit: newUnit,
 			});
 		}
@@ -76,7 +76,7 @@ window.FotoGridsRenderSettings.renderRange = (
 							{
 								className: 'fotogrids-setting__unit',
 							},
-							` (${setting.unit})`,
+							` (${setting.unit})`
 						),
 					showSettingBadge &&
 						h(
@@ -85,9 +85,9 @@ window.FotoGridsRenderSettings.renderRange = (
 								className: 'fotogrids-pro-badge',
 								key: 'pro-badge',
 							},
-							settingBadgeText,
+							settingBadgeText
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 
 			h(
@@ -100,8 +100,8 @@ window.FotoGridsRenderSettings.renderRange = (
 						type: 'range',
 						min: setting.min,
 						max: setting.max,
-						value: value,
-						onChange: e =>
+						value,
+						onChange: (e) =>
 							!isDisabled &&
 							updateValue(parseInt(e.target.value)),
 						disabled: isDisabled,
@@ -117,14 +117,14 @@ window.FotoGridsRenderSettings.renderRange = (
 								type: 'number',
 								min: setting.min,
 								max: setting.max,
-								value: value,
-								onChange: e => {
+								value,
+								onChange: (e) => {
 									const v = parseInt(e.target.value);
 									!isDisabled &&
 										updateValue(
 											Number.isFinite(v)
 												? v
-												: (setting.default ?? 0),
+												: (setting.default ?? 0)
 										);
 								},
 								disabled: isDisabled,
@@ -139,45 +139,45 @@ window.FotoGridsRenderSettings.renderRange = (
 												.CustomUnitSelect,
 											{
 												value: unit,
-												onChange: e =>
+												onChange: (e) =>
 													!isDisabled &&
 													updateUnit(e.target.value),
 												disabled: isDisabled,
 												className:
 													'fotogrids-units-select',
 												options: setting.units.map(
-													unitOption => ({
+													(unitOption) => ({
 														value: unitOption,
 														label: unitOption,
-													}),
+													})
 												),
-											},
+											}
 										)
 									: h(
 											'select',
 											{
 												value: unit,
-												onChange: e =>
+												onChange: (e) =>
 													!isDisabled &&
 													updateUnit(e.target.value),
 												disabled: isDisabled,
 												className:
 													'fotogrids-units-select',
 											},
-											setting.units.map(unitOption =>
+											setting.units.map((unitOption) =>
 												h(
 													'option',
 													{
 														key: unitOption,
 														value: unitOption,
 													},
-													unitOption,
-												),
-											),
+													unitOption
+												)
+											)
 										)),
-						].filter(Boolean),
+						].filter(Boolean)
 					),
-				],
+				]
 			),
 
 			setting.description &&
@@ -186,8 +186,8 @@ window.FotoGridsRenderSettings.renderRange = (
 					{
 						className: 'fotogrids-setting__description',
 					},
-					setting.description,
+					setting.description
 				),
-		],
+		]
 	);
 };

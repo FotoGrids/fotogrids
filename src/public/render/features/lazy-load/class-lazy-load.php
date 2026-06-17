@@ -93,11 +93,12 @@ final class Lazy_Load implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			js: array(
+			array(),
+			array(
 				'fotogrids-lazy-load' => new Asset_Decl(
-					path:      '../../assets/js/lazy-load.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/lazy-load.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

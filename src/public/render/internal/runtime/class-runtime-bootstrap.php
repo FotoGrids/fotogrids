@@ -91,11 +91,12 @@ final class Runtime_Bootstrap implements Feature {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			js: array(
+			array(),
+			array(
 				'fotogrids-runtime' => new Asset_Decl(
-					path:      '../../assets/js/fotogrids-runtime.js',
-					deps:      array(),
-					in_footer: true,
+					'../../assets/js/fotogrids-runtime.js',
+					array(),
+					true,
 				),
 			),
 		);

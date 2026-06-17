@@ -127,7 +127,7 @@ interface Layout {
 	 * Whether preferred_thumbnail_size() is mandatory for this layout.
 	 *
 	 * When TRUE, the layout's preferred size overrides an explicit
-	 * user-picked thumbnail_size as well as the default — the layout cannot
+	 * user-picked thumbnail_size as well as the default - the layout cannot
 	 * lay out correctly with any other size. Justified and Masonry return
 	 * TRUE; every other layout returns FALSE and keeps the soft-preference
 	 * behaviour (only applied when thumbnail_size is on its default).
@@ -149,7 +149,7 @@ interface Layout {
 	 *
 	 * Contract:
 	 *  - Missing keys default to TRUE (permissive). A layout that returns
-	 *    `[]` opts into every capability — the historical default for
+	 *    `[]` opts into every capability - the historical default for
 	 *    Grid, Masonry, Justified.
 	 *  - Returning `[ 'paginates' => false ]` opts out of pagination chrome
 	 *    being rendered around this layout (used by Single Item, which
@@ -159,8 +159,8 @@ interface Layout {
 	 *
 	 * Known capability keys (extend this list as new cross-cutting
 	 * features need to ask):
-	 *  - paginates : bool — Pagination modules should render chrome.
-	 *  - filters   : bool — Filter_Ui should render the filter bar.
+	 *  - paginates : bool - Pagination modules should render chrome.
+	 *  - filters   : bool - Filter_Ui should render the filter bar.
 	 *
 	 * @since   1.0.0
 	 * @return  array<string, bool>

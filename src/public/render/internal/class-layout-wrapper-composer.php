@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * layout module contributes its own wrapper_data_attrs / style_vars,
  * and merges the composer's output on top. That puts layout-supplied
  * values FIRST (so an unusual layout can pre-set its own --fg-cols and
- * the composer's merge will overwrite it — last-write wins) and
+ * the composer's merge will overwrite it - last-write wins) and
  * composer-supplied values SECOND.
  *
  * Capability-driven: each adapter only runs when the active layout
@@ -233,17 +233,17 @@ final class Layout_Wrapper_Composer {
 		$default_columns    = is_array( $defaults['columns'] ?? null ) ? $defaults['columns'] : array();
 		$default_auto_range = is_array( $defaults['columns_auto_range'] ?? null ) ? $defaults['columns_auto_range'] : array();
 
-		$mode               = $render_context->layout->columns_mode->value;
+		$mode               = $render_context->layout->columns_mode;
 		$style_vars         = array();
 		$wrapper_data_attrs = array(
 			'data-fg-columns-mode' => $mode,
 		);
 
-		if ( Columns_Mode::FIXED->value === $mode ) {
+		if ( Columns_Mode::FIXED === $mode ) {
 			$style_vars['--fg-cols'] = new Responsive_Var(
-				desktop: self::resolve_column_count( $responsive_columns, 'desktop', $default_columns ),
-				tablet:  self::resolve_column_count( $responsive_columns, 'tablet', $default_columns ),
-				mobile:  self::resolve_column_count( $responsive_columns, 'mobile', $default_columns ),
+				self::resolve_column_count( $responsive_columns, 'desktop', $default_columns ),
+				self::resolve_column_count( $responsive_columns, 'tablet', $default_columns ),
+				self::resolve_column_count( $responsive_columns, 'mobile', $default_columns ),
 			);
 
 			return array(
@@ -268,14 +268,14 @@ final class Layout_Wrapper_Composer {
 		);
 
 		$style_vars['--fg-col-min'] = new Responsive_Var(
-			desktop: $desktop_auto['min'],
-			tablet:  $tablet_auto['min'],
-			mobile:  $mobile_auto['min'],
+			$desktop_auto['min'],
+			$tablet_auto['min'],
+			$mobile_auto['min'],
 		);
 		$style_vars['--fg-col-max'] = new Responsive_Var(
-			desktop: $desktop_auto['max'],
-			tablet:  $tablet_auto['max'],
-			mobile:  $mobile_auto['max'],
+			$desktop_auto['max'],
+			$tablet_auto['max'],
+			$mobile_auto['max'],
 		);
 
 		return array(
@@ -305,9 +305,9 @@ final class Layout_Wrapper_Composer {
 		return array(
 			'style_vars' => array(
 				'--fg-gap' => new Responsive_Var(
-					desktop: self::resolve_spacing_value( $responsive_spacing, 'desktop', $default_spacing ),
-					tablet:  self::resolve_spacing_value( $responsive_spacing, 'tablet', $default_spacing ),
-					mobile:  self::resolve_spacing_value( $responsive_spacing, 'mobile', $default_spacing ),
+					self::resolve_spacing_value( $responsive_spacing, 'desktop', $default_spacing ),
+					self::resolve_spacing_value( $responsive_spacing, 'tablet', $default_spacing ),
+					self::resolve_spacing_value( $responsive_spacing, 'mobile', $default_spacing ),
 				),
 			),
 		);
@@ -365,7 +365,7 @@ final class Layout_Wrapper_Composer {
 		Shared helpers
 		===================================================================== */
 
-	private static function to_unit_value( mixed $raw_value, string $default_unit ): string {
+	private static function to_unit_value( $raw_value, string $default_unit ): string {
 		if ( null === $raw_value || '' === $raw_value ) {
 			return '';
 		}

@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Justified Layout
+ * FotoGrids - Justified Layout
  *
  * Row-packer for the justified layout. Reads the per-row target height
  * from CSS variable `--fg-justified-row-height` (resolved at runtime

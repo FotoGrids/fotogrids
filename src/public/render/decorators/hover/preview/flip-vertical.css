@@ -1,0 +1,64 @@
+/* Two-sided card flip on the X axis using backface-visibility.
+
+   Overlay caption: the media is the front face and the caption is the back
+   face (pre-rotated, solid grey backdrop), so the card flips to reveal the
+   caption.
+
+   Top/bottom caption: the caption sits outside the media and stays put. A
+   pseudo-element on the media is the back face, and only the media (+ its
+   ::after) flip. */
+
+.fotogrids-collection[data-fg-hover='flip-vertical'] .fg-item {
+	perspective: 1000px;
+}
+
+.fotogrids-collection[data-fg-hover='flip-vertical'] .fg-item-media {
+	position: relative;
+	transform-style: preserve-3d;
+	transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	backface-visibility: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='flip-vertical']
+	.fg-item:hover
+	.fg-item-media {
+	transform: rotateX(180deg);
+}
+
+/* --- Overlay: caption is the back face --- */
+.fotogrids-collection[data-fg-hover='flip-vertical'][data-fg-caption='overlay']
+	.fg-caption {
+	transform: rotateX(-180deg);
+	backface-visibility: hidden;
+	transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fotogrids-collection[data-fg-hover='flip-vertical'][data-fg-caption='overlay']
+	.fg-caption-bg {
+	background: #777777;
+}
+
+.fotogrids-collection[data-fg-hover='flip-vertical'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption {
+	transform: rotateX(0deg);
+}
+
+/* --- Top/bottom: the media spins a full circle and lands back in place; the
+   caption stays put. backface-visibility is cleared so the image stays visible
+   through the whole spin (no back face involved). --- */
+.fotogrids-collection[data-fg-hover='flip-vertical']:not(
+		[data-fg-caption='overlay']
+	)
+	.fg-item-media {
+	backface-visibility: visible;
+	transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fotogrids-collection[data-fg-hover='flip-vertical']:not(
+		[data-fg-caption='overlay']
+	)
+	.fg-item:hover
+	.fg-item-media {
+	transform: rotateX(180deg);
+}

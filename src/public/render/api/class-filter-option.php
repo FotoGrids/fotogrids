@@ -15,6 +15,10 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Filter_Option {
 
+	public string $value;
+	public string $label;
+	public int $count;
+
 	/**
 	 * @param string $value Machine-readable value (e.g. tag slug). Used in
 	 *                      data-fg-* attributes and JS token matching. Must be
@@ -24,8 +28,12 @@ final class Filter_Option {
 	 * @param int    $count Number of items carrying this option value.
 	 */
 	public function __construct(
-		public readonly string $value,
-		public readonly string $label,
-		public readonly int $count,
-	) {}
+		string $value,
+		string $label,
+		int $count
+	) {
+		$this->value = $value;
+		$this->label = $label;
+		$this->count = $count;
+	}
 }

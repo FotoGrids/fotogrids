@@ -1,13 +1,13 @@
 /**
- * FotoGrids — Shared carousel helpers.
+ * FotoGrids - Shared carousel helpers.
  *
  * Pure primitives used by carousel-style layouts (Slider, Image Viewer).
- * Each helper is independent — no helper imports another, no global state,
+ * Each helper is independent - no helper imports another, no global state,
  * no DOM mutation outside of the explicit render* helpers.
  *
  * Consumers compose these into a layout's frontend behaviour. None of
  * these helpers know about FotoGrids-specific data attributes or
- * settings — they take primitive inputs and return primitive APIs.
+ * settings - they take primitive inputs and return primitive APIs.
  */
 
 const TRANSITION_DURATION_MS = {
@@ -453,7 +453,7 @@ export function createIntersectionPauser( opts ) {
  * pointermove updates scrollLeft by the delta. On pointerup/cancel,
  * releases capture and lets native scroll-snap settle.
  *
- * Touch events are deliberately NOT intercepted — native touch scroll +
+ * Touch events are deliberately NOT intercepted - native touch scroll +
  * scroll-snap handle them better than JS ever could.
  *
  * @param {Element} el The scrollable container (carousel viewport).

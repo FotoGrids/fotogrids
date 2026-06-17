@@ -26,6 +26,10 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Breakpoint_Config {
 
+	public int $tablet_max_width;
+	public int $mobile_max_width;
+	public bool $detect_by_browser;
+
 	/**
 	 * @since 1.0.0
 	 * @param int  $tablet_max_width  Viewport width (px) at which the tablet
@@ -38,10 +42,14 @@ final class Breakpoint_Config {
 	 *                                carried forward for future use.
 	 */
 	public function __construct(
-		public readonly int $tablet_max_width,
-		public readonly int $mobile_max_width,
-		public readonly bool $detect_by_browser = false,
-	) {}
+		int $tablet_max_width,
+		int $mobile_max_width,
+		bool $detect_by_browser = false
+	) {
+		$this->tablet_max_width  = $tablet_max_width;
+		$this->mobile_max_width  = $mobile_max_width;
+		$this->detect_by_browser = $detect_by_browser;
+	}
 
 	/**
 	 * Builds a Breakpoint_Config from the stored fotogrids_general_settings,
@@ -65,9 +73,9 @@ final class Breakpoint_Config {
 		}
 
 		$config = new self(
-			tablet_max_width:  $tablet,
-			mobile_max_width:  $mobile,
-			detect_by_browser: $by_browser,
+			$tablet,
+			$mobile,
+			$by_browser,
 		);
 
 		/**

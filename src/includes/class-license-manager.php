@@ -482,7 +482,7 @@ class License_Manager {
 	/**
 	 * Whether the FotoGrids Pro plugin is loaded on this site.
 	 *
-	 * Constant-only check — does NOT validate license state. Use can_use()
+	 * Constant-only check - does NOT validate license state. Use can_use()
 	 * or on_plan() when you need to know whether a specific Pro feature
 	 * is actually enabled for the current site / user.
 	 *

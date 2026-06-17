@@ -461,7 +461,7 @@ final class Image_Size_Manager {
 	 * @param  string $alignment
 	 * @return bool|array{string, string}
 	 */
-	public static function build_crop_param( bool $crop, string $alignment ): bool|array {
+	public static function build_crop_param( bool $crop, string $alignment ) {
 		if ( ! $crop ) {
 			return false;
 		}

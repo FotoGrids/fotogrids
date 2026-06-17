@@ -32,9 +32,9 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Three responsibilities, in three public static methods:
  *
- *   `normalize_incoming()` — raw POST → PHP value
- *   `decode_stored()`      — post-meta → PHP value
- *   `persist()`            — PHP value → post-meta write
+ *   `normalize_incoming()` - raw POST → PHP value
+ *   `decode_stored()`      - post-meta → PHP value
+ *   `persist()`            - PHP value → post-meta write
  *
  * Plus one helper, `catalog_field_type()`, that resolves a setting key's
  * control type via the catalog so persist/normalize can branch on
@@ -49,7 +49,7 @@ final class Setting_Value_Codec {
 	 *
 	 * @since 1.0.0
 	 * @param mixed  $raw_value     Raw value from the request (string or array).
-	 * @param mixed  $default_value Default value shape — drives type coercion.
+	 * @param mixed  $default_value Default value shape - drives type coercion.
 	 * @param string $field_type    Catalog field control type, e.g. 'codearea'.
 	 * @return mixed
 	 */
@@ -95,7 +95,7 @@ final class Setting_Value_Codec {
 
 		// password_input fields pass through as-is (sanitize_text_field would
 		// strip special characters valid in passwords). The value is encrypted
-		// — not stored as plain text — by `persist()`.
+		// - not stored as plain text - by `persist()`.
 		if ( 'password_input' === $field_type ) {
 			return (string) $raw_value;
 		}
@@ -123,7 +123,7 @@ final class Setting_Value_Codec {
 	 *
 	 * @since 1.0.0
 	 * @param mixed $stored_value   Value as returned by `get_post_meta()`.
-	 * @param mixed $default_value  Default value shape — drives type coercion.
+	 * @param mixed $default_value  Default value shape - drives type coercion.
 	 * @return mixed
 	 */
 	public static function decode_stored( $stored_value, $default_value ) {
@@ -173,7 +173,7 @@ final class Setting_Value_Codec {
 	 * @param int    $post_id       Post ID.
 	 * @param string $post_meta_key Full meta key (e.g. `fotogrids_layout`).
 	 * @param mixed  $setting_value Already-normalised value.
-	 * @param mixed  $default_value Default value shape — drives serialisation.
+	 * @param mixed  $default_value Default value shape - drives serialisation.
 	 * @param string $field_type    Catalog field control type, e.g. 'codearea'.
 	 * @return void
 	 */
@@ -193,7 +193,7 @@ final class Setting_Value_Codec {
 			return;
 		}
 
-		// codearea fields contain raw CSS/JS — see normalize_incoming for the
+		// codearea fields contain raw CSS/JS - see normalize_incoming for the
 		// rationale.
 		if ( 'codearea' === $field_type ) {
 			update_post_meta( $post_id, $post_meta_key, Code_Field::sanitize( (string) $setting_value ) );
@@ -202,12 +202,12 @@ final class Setting_Value_Codec {
 
 		// password_input fields are encrypted before storage so the raw
 		// password is never written to the DB in plain text. An empty value
-		// means "clear the password" — we delete the meta key so
+		// means "clear the password" - we delete the meta key so
 		// password_is_set returns false.
 		//
 		// Guard: if the incoming value is already an encrypted blob (i.e. the
 		// browser echoed back the ciphertext that was loaded into the field
-		// on page load), skip re-encryption — just leave the stored value
+		// on page load), skip re-encryption - just leave the stored value
 		// as-is. Re-encrypting on every save causes the blob to grow
 		// exponentially and eventually exhausts PHP's memory limit.
 		if ( 'password_input' === $field_type ) {
@@ -215,7 +215,7 @@ final class Setting_Value_Codec {
 			if ( '' === $plaintext ) {
 				delete_post_meta( $post_id, $post_meta_key );
 			} elseif ( Password_Crypto::is_encrypted( $plaintext ) ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedElseif -- Intentional no-op: already-encrypted values are deliberately left unchanged (see comment).
-				// Already encrypted — stored value unchanged; do nothing.
+				// Already encrypted - stored value unchanged; do nothing.
 			} else {
 				$encrypted = Password_Crypto::encrypt( $plaintext );
 				if ( '' !== $encrypted ) {

@@ -2,7 +2,7 @@
  * Elementor editor styles for the FotoGrids gallery/album picker
  * control and the React modal portal.
  *
- * Naming is `.fg-pb-elementor-picker*` — keeps it out of the way of
+ * Naming is `.fg-pb-elementor-picker*` - keeps it out of the way of
  * the Gutenberg picker styles (which live under `.fg-pb-picker*`
  * shared between contexts) and scopes the Elementor sidebar tuning
  * so it doesn't leak to the wp-admin block editor.
@@ -76,7 +76,7 @@
     }
 }
 
-/* Select2 row template — used in both dropdown options and the
+/* Select2 row template - used in both dropdown options and the
    closed selection chip. Layout is tight enough for Elementor's
    ~300px panel but keeps thumbnail + title + meta + status pill
    visible at once. */

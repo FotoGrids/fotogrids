@@ -949,7 +949,7 @@
 // Share bar inside the info panel.
 // The share bar (a fotogrids-share-bar element) lives inside the 'share'
 // info block. Its colour treatment must inherit from the info panel's
-// theme tokens — NOT from sharing.css's neutral defaults — so the bar
+// theme tokens - NOT from sharing.css's neutral defaults - so the bar
 // reads correctly against whatever info-block background the user has
 // configured (boxed/divided/plain × dark/light theme overrides).
 //
@@ -966,11 +966,11 @@
 /* Thumbnail strip */
 
 // The thumb strip is a two-element structure:
-//   .fg-lb-thumbs        — the scrollable viewport (also a flex container)
-//   .fg-lb-thumbs__track — the flex track that holds the thumb buttons
+//   .fg-lb-thumbs        - the scrollable viewport (also a flex container)
+//   .fg-lb-thumbs__track - the flex track that holds the thumb buttons
 //
 // Both are flex containers. The outer one's `justify-content: center`
-// (the natural flex behaviour) does NOT play well with overflow — when
+// (the natural flex behaviour) does NOT play well with overflow - when
 // content overflows, the leftmost items spill out of reach. The fix
 // is `margin: auto` on the inner track:
 //
@@ -981,7 +981,7 @@
 //    the viewport edge and scrolls freely in BOTH directions.
 //
 // This is the canonical flexbox idiom for "center if it fits, scroll if
-// it doesn't" — works the same on every modern browser.
+// it doesn't" - works the same on every modern browser.
 
 .fg-lb-thumbs {
     flex-shrink: 0;
@@ -1001,7 +1001,7 @@
 .fg-lb-thumbs__track {
     display:     flex;
     gap:         var(--fg-lb-thumb-spacing);
-    flex-shrink: 0;        // never let the track shrink — content drives its size
+    flex-shrink: 0;        // never let the track shrink - content drives its size
 }
 
 .fg-lb-thumbs--bottom,

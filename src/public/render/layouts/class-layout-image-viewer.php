@@ -94,7 +94,7 @@ final class Layout_Image_Viewer implements Layout {
 		$s = $render_context->settings;
 
 		// Image Viewer chrome is a single control bar (arrows + centred
-		// counter) beneath the image — no bullets, no thumbnail strip — so
+		// counter) beneath the image - no bullets, no thumbnail strip - so
 		// only the attributes the bar JS reads are stamped here.
 		$attrs = array(
 			'data-fg-height-mode'                => self::sanitize_choice(
@@ -124,7 +124,7 @@ final class Layout_Image_Viewer implements Layout {
 		);
 
 		// Arrows always show in this layout (the bar is the only chrome), so
-		// the icon SVGs are stamped unconditionally — the Show Arrows toggle
+		// the icon SVGs are stamped unconditionally - the Show Arrows toggle
 		// is hidden for Image Viewer in the admin.
 		$icon_name                       = self::sanitize_choice(
 			$s['layout_arrow_icon'] ?? 'chevron',
@@ -146,14 +146,14 @@ final class Layout_Image_Viewer implements Layout {
 
 		return array(
 			'--fg-height-fixed'    => new Responsive_Var(
-				desktop: self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
-				tablet:  self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
-				mobile:  self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
+				self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
+				self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
+				self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
 			),
 			'--fg-height-max'      => new Responsive_Var(
-				desktop: self::height_max_value( $height_max, 'desktop' ),
-				tablet:  self::height_max_value( $height_max, 'tablet' ),
-				mobile:  self::height_max_value( $height_max, 'mobile' ),
+				self::height_max_value( $height_max, 'desktop' ),
+				self::height_max_value( $height_max, 'tablet' ),
+				self::height_max_value( $height_max, 'mobile' ),
 			),
 			'--fg-arrow-size'      => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
 			'--fg-arrow-distance'  => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
@@ -165,15 +165,15 @@ final class Layout_Image_Viewer implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'         => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-image-viewer' => new Asset_Decl( path: 'layouts/image-viewer/image-viewer.css' ),
+			array(
+				'fotogrids-render-base'         => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-image-viewer' => new Asset_Decl( 'layouts/image-viewer/image-viewer.css' ),
 			),
-			js: array(
+			array(
 				'fotogrids-layout-image-viewer' => new Asset_Decl(
-					path:      '../../assets/js/layout-image-viewer.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/layout-image-viewer.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);
@@ -186,7 +186,7 @@ final class Layout_Image_Viewer implements Layout {
 	/**
 	 * Image Viewer shows one large image at a time, never a cropped grid
 	 * thumbnail. The Thumbnail Size setting is hidden for this layout in the
-	 * admin, so the preferred full-image size is mandatory here — it must
+	 * admin, so the preferred full-image size is mandatory here - it must
 	 * override any stale saved thumbnail_size value too. This guarantees the
 	 * hidden setting can never apply at the frontend.
 	 */
@@ -208,7 +208,7 @@ final class Layout_Image_Viewer implements Layout {
 
 	/**
 	 * Resolve a per-breakpoint max-height to a CSS value. Zero means
-	 * "no explicit maximum" — defer to the baseline 100vh cap so items
+	 * "no explicit maximum" - defer to the baseline 100vh cap so items
 	 * never grow taller than the viewport.
 	 *
 	 * @param array<string, mixed> $bucket
@@ -249,7 +249,7 @@ final class Layout_Image_Viewer implements Layout {
 	 * @param string $default_unit
 	 * @return string
 	 */
-	private static function resolve_unit( mixed $raw, int $fallback, string $default_unit ): string {
+	private static function resolve_unit( $raw, int $fallback, string $default_unit ): string {
 		if ( is_array( $raw ) ) {
 			$value = $raw['value'] ?? null;
 			$unit  = $raw['unit'] ?? $default_unit;

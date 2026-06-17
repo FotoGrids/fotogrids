@@ -307,7 +307,7 @@ const TemplatesMetabox = () => {
             <div className="fotogrids-templates-metabox--readonly">
                 <div className="fotogrids-readonly-notice" role="note">
                     <strong>{__('Read-only', 'fotogrids')}</strong>
-                    <span> — {unauthorisedNotice}</span>
+                    <span> - {unauthorisedNotice}</span>
                 </div>
                 <fieldset
                     className="fotogrids-templates-metabox__fieldset"

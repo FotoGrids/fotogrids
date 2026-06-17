@@ -1,0 +1,31 @@
+/* Pendulum swing: the tile rocks from a top hinge and settles, like a hanging
+   sign catching a gust, rather than tilting to a static angle. */
+
+.fotogrids-collection[data-fg-hover='swing'] .fg-item {
+	transform-origin: top center;
+}
+
+.fotogrids-collection[data-fg-hover='swing'] .fg-item:hover {
+	animation: fg-hover-swing 0.9s ease-out;
+}
+
+@keyframes fg-hover-swing {
+	0% {
+		transform: rotate(0deg);
+	}
+	20% {
+		transform: rotate(7deg);
+	}
+	45% {
+		transform: rotate(-5deg);
+	}
+	65% {
+		transform: rotate(3deg);
+	}
+	82% {
+		transform: rotate(-1.5deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}

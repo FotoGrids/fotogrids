@@ -1,4 +1,4 @@
-# Bundled Freemius SDK — third-party vendored code.
+# Bundled Freemius SDK - third-party vendored code.
 # Do not normalise line endings, do not apply our coding-standard reformatting,
 # and treat as vendored (collapsed in diffs, excluded from language stats).
 # The SDK ships with CRLF line endings; -text preserves them byte-for-byte so

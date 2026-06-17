@@ -1,5 +1,5 @@
 /*
- * FotoGrids — Sharing
+ * FotoGrids - Sharing
  *
  * Styles for the share bar in every placement it can appear:
  *   • thumbnail overlay  (inside .fg-item, hover-revealed)
@@ -18,7 +18,7 @@
  *   Layout
  *     --fg-sb-gap                 Spacing between buttons in the bar
  *     --fg-sb-btn-radius          Button corner radius
- *     --fg-sb-btn-padding         Button padding (medium size — default)
+ *     --fg-sb-btn-padding         Button padding (medium size - default)
  *     --fg-sb-btn-font-size       Button label font size (medium size)
  *     --fg-sb-icon-size           Icon dimensions (medium size)
  *     --fg-sb-labels-only-padding-x  Extra horizontal padding for labels-only
@@ -46,7 +46,7 @@
  */
 
 .fotogrids-share-bar {
-    /* Tokens — override at any parent to retheme. */
+    /* Tokens - override at any parent to retheme. */
     --fg-sb-gap:                    6px;
     --fg-sb-btn-gap:                8px;
     --fg-sb-btn-radius:             6px;
@@ -178,7 +178,7 @@
  * { layout: 'grid' | 'row' }) option, which adds one of these modifiers.
  *
  *   --row     Flex row (the base layout already does this; no extra rules).
- *   --grid    Two-column grid — used inside the lightbox info panel and
+ *   --grid    Two-column grid - used inside the lightbox info panel and
  *             anywhere a balanced 2-up cluster reads better than a row.
  *
  * Context modifiers (--footer, --lightbox, --thumbnail, --lightbox-popover)

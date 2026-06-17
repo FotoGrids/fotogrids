@@ -46,7 +46,7 @@ export const installPermissionsApi = () => {
 			document.dispatchEvent(
 				new CustomEvent('fotogrids:admin:permissions:override', {
 					detail: { panel: 'matrix', component: Component || null },
-				}),
+				})
 			);
 		},
 
@@ -59,7 +59,7 @@ export const installPermissionsApi = () => {
 							panel: 'simple',
 							component: Component || null,
 						},
-					}),
+					})
 				);
 			}
 		},
@@ -71,14 +71,14 @@ export const installPermissionsApi = () => {
 		on(event, handler) {
 			document.addEventListener(
 				`fotogrids:admin:permissions:${event}`,
-				handler,
+				handler
 			);
 		},
 
 		off(event, handler) {
 			document.removeEventListener(
 				`fotogrids:admin:permissions:${event}`,
-				handler,
+				handler
 			);
 		},
 	};

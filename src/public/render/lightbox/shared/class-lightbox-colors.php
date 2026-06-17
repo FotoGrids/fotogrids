@@ -16,13 +16,13 @@ if ( ! defined( 'WPINC' ) ) {
  * variable block.
  *
  * Used by:
- *   - Classic Lightbox (Lightbox\Classic\Lightbox) — the full overlay.
- *   - LightboxGrid (Lightbox\Grid\Lightbox_Grid) — reuses the toolbar /
+ *   - Classic Lightbox (Lightbox\Classic\Lightbox) - the full overlay.
+ *   - LightboxGrid (Lightbox\Grid\Lightbox_Grid) - reuses the toolbar /
  *     backdrop colours so its chrome matches the gallery's lightbox theme.
  *
  * Only the always-present colour keys live here. Colours that depend on a
- * non-colour setting (info-block background/divider — gated on
- * info_blocks_style; image shadow — gated on img_shadow_enabled) stay in
+ * non-colour setting (info-block background/divider - gated on
+ * info_blocks_style; image shadow - gated on img_shadow_enabled) stay in
  * the classic Lightbox because they are coupled to other behaviour.
  *
  * @package FotoGrids\Render\Lightbox\Shared
@@ -31,7 +31,7 @@ if ( ! defined( 'WPINC' ) ) {
 final class Lightbox_Colors {
 
 	/**
-	 * Dark theme colour defaults. All values are rgba() — no hex literals.
+	 * Dark theme colour defaults. All values are rgba() - no hex literals.
 	 *
 	 * @var array<string, string>
 	 */
@@ -190,7 +190,7 @@ final class Lightbox_Colors {
 	 * Resolve the full data-fg-lb-* colour attribute map.
 	 *
 	 * Note: the conditional colours (info-block bg/divider, image shadow)
-	 * are NOT included here — they depend on non-colour settings and stay
+	 * are NOT included here - they depend on non-colour settings and stay
 	 * in the classic Lightbox. Callers that only need chrome colours (e.g.
 	 * LightboxGrid) can read just the keys they want.
 	 *
@@ -222,7 +222,7 @@ final class Lightbox_Colors {
 	 * @param string $default Fallback colour string.
 	 * @return string
 	 */
-	public static function safe_color( mixed $value, string $default_value ): string {
+	public static function safe_color( $value, string $default_value ): string {
 		if ( ! is_string( $value ) ) {
 			return $default_value;
 		}

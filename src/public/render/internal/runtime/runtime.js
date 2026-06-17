@@ -3,14 +3,14 @@
  *
  * The minimum amount of JavaScript that must be present on any page
  * rendering a FotoGrids gallery or album. It does NOT implement any
- * feature — no filters, no lightbox, no sharing, no masonry, no stats,
+ * feature - no filters, no lightbox, no sharing, no masonry, no stats,
  * no password gate. Its sole job is to discover collection elements
  * (galleries and albums) and announce them so the per-feature modules
  * can attach to each one.
  *
  * See README.md in this directory for the full contract.
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -33,7 +33,7 @@
 
     /**
      * Monotonic counter used as a tiebreaker when two callbacks share
-     * a priority — preserves registration order within a priority bucket.
+     * a priority - preserves registration order within a priority bucket.
      *
      * @type {number}
      */
@@ -122,7 +122,7 @@
      * it, runs the matching callback queues against it, then dispatches
      * fotogrids:gallery_initialized.
      *
-     * Safe to call multiple times on the same element — second and later
+     * Safe to call multiple times on the same element - second and later
      * calls are no-ops.
      *
      * @param {Element} collectionElement
@@ -165,7 +165,7 @@
 
     /**
      * Finds every collection element in the document and initializes each
-     * one. Idempotent — initializeCollection() guards against double init.
+     * one. Idempotent - initializeCollection() guards against double init.
      */
     function initializeAllCollections() {
         const elements = document.querySelectorAll( '.fotogrids-collection' );
@@ -176,7 +176,7 @@
 
     /**
      * Installs the runtime's single MutationObserver. Feature modules MUST
-     * NOT install their own — they subscribe via FotoGrids.onGallery(),
+     * NOT install their own - they subscribe via FotoGrids.onGallery(),
      * onAlbum() or onCollection() and the same callback fires for static
      * and dynamic collections.
      */
@@ -256,7 +256,7 @@
             const pri = ( typeof priority === 'number' && isFinite( priority ) ) ? priority : 10;
             insertCallback( queueName, cb, pri );
 
-            // Late subscriber — replay against already-initialized instances
+            // Late subscriber - replay against already-initialized instances
             // whose kind matches this queue.
             if ( instances.length === 0 ) {
                 return;
@@ -285,7 +285,7 @@
          * Subscribe to per-gallery initialization. Fires ONLY for gallery
          * wrappers (`.fotogrids-collection.fotogrids-gallery`).
          *
-         * Fires once per gallery — for every gallery present at
+         * Fires once per gallery - for every gallery present at
          * DOMContentLoaded AND for every gallery the MutationObserver
          * picks up later. If subscribed AFTER galleries are already
          * initialized, the callback is invoked against every existing
@@ -312,7 +312,7 @@
 
         /**
          * Subscribe to per-collection initialization. Fires for BOTH
-         * galleries and albums — any element matching
+         * galleries and albums - any element matching
          * `.fotogrids-collection`. Use this only when a module genuinely
          * needs to run against both kinds; most modules want onGallery or
          * onAlbum instead.

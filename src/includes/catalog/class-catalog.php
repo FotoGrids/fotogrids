@@ -61,7 +61,35 @@ final class Catalog {
 	public static function get( string $field_id ): ?array {
 		self::init();
 
-		return self::$entries[ $field_id ] ?? null;
+		$entry = self::$entries[ $field_id ] ?? null;
+
+		if ( 'hover_effect' === $field_id && null !== $entry ) {
+			$entry['options'] = self::hover_effect_options();
+		}
+
+		return $entry;
+	}
+
+	/**
+	 * Builds the hover_effect options map (value => option) from the registry,
+	 * the single source of truth for hover effects and their tiers.
+	 *
+	 * @since   1.0.0
+	 * @return  array<string, array<string, mixed>>
+	 */
+	private static function hover_effect_options(): array {
+		if ( ! class_exists( \FotoGrids\Render\Internal\Hover_Effect_Registry::class ) ) {
+			return array();
+		}
+
+		$options = array();
+		foreach ( \FotoGrids\Render\Internal\Hover_Effect_Registry::as_options() as $option ) {
+			if ( isset( $option['value'] ) ) {
+				$options[ $option['value'] ] = $option;
+			}
+		}
+
+		return $options;
 	}
 
 	/**
@@ -73,7 +101,13 @@ final class Catalog {
 	public static function all(): array {
 		self::init();
 
-		return self::$entries;
+		$entries = self::$entries;
+
+		if ( isset( $entries['hover_effect'] ) ) {
+			$entries['hover_effect']['options'] = self::hover_effect_options();
+		}
+
+		return $entries;
 	}
 
 	/**

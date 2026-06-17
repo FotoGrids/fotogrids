@@ -276,6 +276,7 @@ class Collection_Defaults {
 			),
 			'hover_effects'                               => false,
 			'hover_effect'                                => 'none',
+			'hover_affect_others'                         => 'none',
 			'loading_icon'                                => '12-dots',
 			'loading_icon_color'                          => 'rgba(0, 0, 0, 0.2)',
 			'loaded_effect'                               => 'fade',

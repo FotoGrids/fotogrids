@@ -1,14 +1,14 @@
-@use '../colors.scss' as *;
-@use '../sizes.scss' as *;
+@use "../colors.scss" as *;
+@use "../sizes.scss" as *;
 
 .fotogrids-select {
 	position: relative;
 
 	// When a consumer sets the `--fotogrids-select-width` custom property
 	// (via the JS `width` prop or directly in CSS), the wrapper takes that
-	// exact width. No fallback — without the variable, the component sizes
+	// exact width. No fallback - without the variable, the component sizes
 	// to its container as usual.
-	&[style*='--fotogrids-select-width'] {
+	&[style*="--fotogrids-select-width"] {
 		width: var(--fotogrids-select-width);
 	}
 
@@ -214,7 +214,7 @@
 		border-bottom: 1px solid var(--fg-border-secondary);
 	}
 
-	&__search-input.fotogrids-input[type='text'] {
+	&__search-input.fotogrids-input[type="text"] {
 		height: 36px;
 		padding: 0 10px 2px;
 		margin: 0;

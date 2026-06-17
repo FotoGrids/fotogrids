@@ -64,7 +64,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -239,7 +239,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -460,7 +460,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -903,7 +903,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -1156,7 +1156,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -1278,7 +1278,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {
@@ -1665,7 +1665,7 @@
                                         },
                                         "hover": {
                                             "id": "hover",
-                                            "label": "Mouseover",
+                                            "label": "Hover",
                                             "icon": "hover",
                                             "settings": [
                                                 {

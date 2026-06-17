@@ -69,18 +69,18 @@ final class Shadow implements Decorator {
 
 		return array(
 			'--fg-shadow' => new Responsive_Var(
-				desktop: $this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'desktop' ),
-				tablet:  $this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'tablet' ),
-				mobile:  $this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'mobile' ),
+				$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'desktop' ),
+				$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'tablet' ),
+				$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'mobile' ),
 			),
 		);
 	}
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-decorator-shadow' => new Asset_Decl(
-					path: 'decorators/shadow/shadow.css'
+					'decorators/shadow/shadow.css'
 				),
 			)
 		);
@@ -98,10 +98,10 @@ final class Shadow implements Decorator {
 	 * @return string          CSS box-shadow value.
 	 */
 	private function build_shadow(
-		mixed $offset_x,
-		mixed $offset_y,
-		mixed $blur,
-		mixed $spread,
+		$offset_x,
+		$offset_y,
+		$blur,
+		$spread,
 		string $color,
 		string $bp
 	): string {

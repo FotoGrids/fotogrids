@@ -46,7 +46,7 @@ final class Lightbox_Decorator implements Decorator {
 	}
 
 	public function supports( Render_Context $render_context ): bool {
-		// The lightbox is for opening individual attachments — it never
+		// The lightbox is for opening individual attachments - it never
 		// applies to album-as-collection renders, whose items ARE
 		// galleries (and therefore have their own click-behaviour
 		// decorator, e.g. Album_To_View_Page or Album_To_Gallery_Ajax).
@@ -104,8 +104,8 @@ final class Lightbox_Decorator implements Decorator {
 			$wrapper_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $wrapper_attrs, $render_context );
 
 			$trigger_wrapper = new Item_Wrapper(
-				tag:   'a',
-				attrs: $wrapper_attrs,
+				'a',
+				$wrapper_attrs,
 			);
 
 			$decorated[] = $item_view->with(

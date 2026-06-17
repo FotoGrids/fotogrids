@@ -1,5 +1,5 @@
-@use './colors.scss' as *;
-@use './sizes.scss' as *;
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
 
 #fotogrids_gallery_shortcode,
 #fotogrids_album_shortcode {
@@ -26,7 +26,7 @@
 
 	.fotogrids-shortcode-input {
 		flex: 1;
-		font-family: 'Courier New', Courier, monospace;
+		font-family: "Courier New", Courier, monospace;
 		font-size: 12px;
 		line-height: 38px;
 		padding: 0 8px;

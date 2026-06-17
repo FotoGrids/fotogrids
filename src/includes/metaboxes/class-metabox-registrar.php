@@ -230,7 +230,7 @@ final class Metabox_Registrar {
 		// Source of truth for the cover image is WP's native post thumbnail.
 		// The runtime resolver (`Cover_Resolver::for_gallery()`) falls back to
 		// the first valid item when nothing is explicitly set, so we don't
-		// seed `_thumbnail_id` here — the UI shows a "no item is explicitly
+		// seed `_thumbnail_id` here - the UI shows a "no item is explicitly
 		// featured" state until the user clicks a star.
 		$featured_item_id = (int) get_post_thumbnail_id( $post->ID );
 

@@ -1,5 +1,5 @@
 /**
- * SearchBar — shared, FotoGrids-branded search input.
+ * SearchBar - shared, FotoGrids-branded search input.
  *
  * Designed as a drop-in replacement for @wordpress/components SearchControl:
  * same prop surface (value, onChange, placeholder, label, help,

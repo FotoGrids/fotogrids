@@ -1,13 +1,13 @@
 /**
  * Lightbox Mini.
  *
- * A minimal, general-purpose overlay — backdrop, a centred stage, and a close
- * button — into which any caller can drop a single content node (a video
+ * A minimal, general-purpose overlay - backdrop, a centred stage, and a close
+ * button - into which any caller can drop a single content node (a video
  * player, an image, an iframe, etc.). It owns no content-specific logic; the
  * caller builds the node and hands it to open().
  *
  * Exposed as window.FotoGrids.modules.lightboxMini.{ open, close }.
- *   open(contentNode, options) — options:
+ *   open(contentNode, options) - options:
  *     { label, closeButton, clickOutsideToClose, styleVars }
  *   close()
  */
@@ -40,10 +40,10 @@
      *
      * @param {HTMLElement} contentNode The node to display (player, img, etc.).
      * @param {Object}      [options]   Options:
-     *   label               — accessible dialog label.
-     *   closeButton         — show the close button (default true).
-     *   clickOutsideToClose — close when the backdrop is clicked (default true).
-     *   styleVars           — map of CSS custom properties set on the overlay
+     *   label               - accessible dialog label.
+     *   closeButton         - show the close button (default true).
+     *   clickOutsideToClose - close when the backdrop is clicked (default true).
+     *   styleVars           - map of CSS custom properties set on the overlay
      *                         (e.g. { '--fg-lb-mini-padding': '24px' }).
      */
     function open(contentNode, options) {

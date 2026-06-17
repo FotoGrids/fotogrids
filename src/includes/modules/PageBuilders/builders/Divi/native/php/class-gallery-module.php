@@ -1,6 +1,6 @@
 <?php
 /**
- * Native Divi 5 — FotoGrids Gallery module (PHP render side).
+ * Native Divi 5 - FotoGrids Gallery module (PHP render side).
  *
  * @package FotoGrids\Modules\PageBuilders\Builders\Divi\Native
  * @since   1.0.0
@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
  * The render callback resolves the picked gallery ID from the block
  * attributes and delegates to the existing shortcode pipeline
  * (`Public_Render::gallery_shortcode()`) stamped `Request_Source::DIVI`.
- * Every decorator / feature / layout module therefore works unchanged —
+ * Every decorator / feature / layout module therefore works unchanged -
  * the native Divi module is just another front door onto the same render
  * path used by shortcodes, Gutenberg and Elementor.
  *
@@ -37,7 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
  * ever required when Divi 5 is active (guarded by the parent Module's
  * `is_active()`), and we don't want a hard compile-time dependency on a
  * Divi interface that wouldn't exist on a non-Divi site. See the parent
- * `Module::register_native_modules()` — it only requires this file when
+ * `Module::register_native_modules()` - it only requires this file when
  * the Divi 5 framework is present.
  *
  * @since 1.0.0
@@ -85,7 +85,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 		};
 
 		// Divi calls load() from FrontEnd/Admin construction, which runs
-		// synchronously inside `et_setup_builder_5` on `init:0` — Divi 5
+		// synchronously inside `et_setup_builder_5` on `init:0` - Divi 5
 		// (and ModuleRegistration) is fully loaded at this point. So we
 		// register immediately rather than deferring to a nested `init`
 		// callback (which would be re-entrant and fragile).
@@ -99,7 +99,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 	 * @param array       $attrs    Block attributes saved by the VB.
 	 * @param string      $content  Block inner content (unused).
 	 * @param \WP_Block   $block    Parsed block instance.
-	 * @param mixed       $elements Divi ModuleElements instance (unused — we
+	 * @param mixed       $elements Divi ModuleElements instance (unused - we
 	 *                              delegate the whole render to the shortcode
 	 *                              pipeline rather than composing Divi
 	 *                              elements).
@@ -120,7 +120,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 		return \FotoGrids\Public_Render::gallery_shortcode(
 			array(
 				'id'      => $gallery_id,
-				'_source' => Request_Source::DIVI->value,
+				'_source' => Request_Source::DIVI,
 			)
 		);
 	}

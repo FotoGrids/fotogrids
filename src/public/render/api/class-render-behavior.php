@@ -15,6 +15,11 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Behavior {
 
+	public string $click_behavior;
+	public string $pagination_type;
+	public string $pagination_method;
+	public ?string $hover_effect;
+
 	/**
 	 * @since   1.0.0
 	 * @param   string      $click_behavior Click interaction mode.
@@ -24,9 +29,14 @@ final class Render_Behavior {
 	 * @return  void
 	 */
 	public function __construct(
-		public readonly string $click_behavior,
-		public readonly string $pagination_type,
-		public readonly string $pagination_method,
-		public readonly ?string $hover_effect,
-	) {}
+		string $click_behavior,
+		string $pagination_type,
+		string $pagination_method,
+		?string $hover_effect
+	) {
+		$this->click_behavior    = $click_behavior;
+		$this->pagination_type   = $pagination_type;
+		$this->pagination_method = $pagination_method;
+		$this->hover_effect      = $hover_effect;
+	}
 }

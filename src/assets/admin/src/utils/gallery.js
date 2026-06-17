@@ -6,7 +6,7 @@ import { addItemsToGallery } from './api';
 /**
  * Create a gallery from image IDs
  */
-export const createGalleryFromImages = async imageIds => {
+export const createGalleryFromImages = async (imageIds) => {
 	if (!imageIds || imageIds.length === 0) return null;
 
 	try {
@@ -38,8 +38,8 @@ export const createGalleryFromImages = async imageIds => {
 		throw new Error(
 			__(
 				'Images uploaded but failed to create gallery. You can manually create a gallery.',
-				'fotogrids',
-			),
+				'fotogrids'
+			)
 		);
 	}
 };

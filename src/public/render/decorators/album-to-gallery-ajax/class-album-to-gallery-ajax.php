@@ -113,8 +113,8 @@ final class Album_To_Gallery_Ajax implements Decorator {
 			$trigger_attrs = (array) Hooks::apply_filter( Filters_Render::ANCHOR_ATTRS_SUFFIX, $trigger_attrs, $render_context );
 
 			$figure_wrapper = new Item_Wrapper(
-				tag:   'a',
-				attrs: $trigger_attrs,
+				'a',
+				$trigger_attrs,
 			);
 
 			$decorated[] = $item_view->with(
@@ -145,39 +145,39 @@ final class Album_To_Gallery_Ajax implements Decorator {
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-album-to-gallery-ajax' => new Asset_Decl(
-					path: 'decorators/album-to-gallery-ajax/album-to-gallery-ajax.css',
+					'decorators/album-to-gallery-ajax/album-to-gallery-ajax.css',
 				),
 				// Pre-enqueue the collection-header CSS too. The AJAX-swapped
 				// gallery will carry the back button / breadcrumb chrome, and
 				// the swap response only injects *missing* CSS handles into the
-				// host page — but the JS bundle that wires the Back button is
+				// host page - but the JS bundle that wires the Back button is
 				// never injected by the swap flow (the REST response carries
 				// CSS URLs but not JS). Loading both up-front, on any page that
 				// can do an AJAX swap, guarantees the chrome's CSS and JS are
 				// already present when the swapped content lands.
 				'fotogrids-collection-header'     => new Asset_Decl(
-					path: 'features/collection-header/collection-header.css',
+					'features/collection-header/collection-header.css',
 				),
 			),
-			js: array(
+			array(
 				'fotogrids-album-to-gallery-ajax' => new Asset_Decl(
-					path:      '../../assets/js/album-to-gallery-ajax.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/album-to-gallery-ajax.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 				// See CSS note above. The Collection_Header feature only
 				// becomes active *inside* the swapped-in gallery render, so
-				// its own assets() is never called on the host page — yet
+				// its own assets() is never called on the host page - yet
 				// the Back button it emits needs collection-header.js to
 				// intercept clicks. Declaring it here means any page that
 				// can swap an album → gallery already has the Back button
 				// wiring loaded and ready.
 				'fotogrids-collection-header'     => new Asset_Decl(
-					path:      '../../assets/js/collection-header.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/collection-header.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

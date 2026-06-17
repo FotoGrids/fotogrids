@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderColorPicker = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, __ },
+	{ updateSetting, getFieldState, __ }
 ) => {
 	const {
 		createElement: h,
@@ -99,7 +99,7 @@ function AlphaColorPicker({
 			? popoverRef.current.getBoundingClientRect().width
 			: fallbackWidth;
 		// Only used to decide above-vs-below placement. The actual vertical
-		// anchor below does NOT depend on this — we anchor at the trigger top
+		// anchor below does NOT depend on this - we anchor at the trigger top
 		// and use transform: translateY(-100%) so the gap is always exactly
 		// desiredMargin regardless of the popover's rendered height.
 		const measuredHeight = popoverRef.current
@@ -108,11 +108,11 @@ function AlphaColorPicker({
 
 		const width = Math.min(
 			Math.max(measuredWidth, triggerRect.width),
-			Math.max(0, viewportWidth - sidePadding * 2),
+			Math.max(0, viewportWidth - sidePadding * 2)
 		);
 		const left = Math.min(
 			Math.max(sidePadding, triggerRect.left),
-			Math.max(sidePadding, viewportWidth - width - sidePadding),
+			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
 
 		const spaceBelow =
@@ -131,7 +131,7 @@ function AlphaColorPicker({
 			placement,
 		};
 
-		setPopoverPosition(previousPosition => {
+		setPopoverPosition((previousPosition) => {
 			if (
 				previousPosition &&
 				previousPosition.top === nextPosition.top &&
@@ -152,7 +152,7 @@ function AlphaColorPicker({
 		const instance = window.FGColorPicker.create({
 			value,
 			disabled: isDisabled,
-			onChange: cssStr => {
+			onChange: (cssStr) => {
 				internalChange.current = true;
 				updateSetting(setting.key, cssStr);
 				internalChange.current = false;
@@ -177,7 +177,7 @@ function AlphaColorPicker({
 			pickerRef.current.destroy();
 			pickerRef.current = null;
 		},
-		[],
+		[]
 	);
 
 	// Sync picker value when the upstream value changes - but NOT when the
@@ -192,7 +192,7 @@ function AlphaColorPicker({
 	useEffect(() => {
 		if (!open) return;
 
-		const handleClick = e => {
+		const handleClick = (e) => {
 			const clickedInsideTrigger =
 				wrapRef.current && wrapRef.current.contains(e.target);
 			const clickedInsidePopover =
@@ -202,7 +202,7 @@ function AlphaColorPicker({
 				setOpen(false);
 			}
 		};
-		const handleKey = e => {
+		const handleKey = (e) => {
 			if (e.key === 'Escape') setOpen(false);
 		};
 		const handleLayoutShift = () => {
@@ -227,7 +227,7 @@ function AlphaColorPicker({
 	const [focused, setFocused] = useState(false);
 
 	const toggleOpen = useCallback(() => {
-		if (!isDisabled) setOpen(o => !o);
+		if (!isDisabled) setOpen((o) => !o);
 	}, [isDisabled]);
 
 	const inputClassName = [
@@ -256,9 +256,9 @@ function AlphaColorPicker({
 								className: 'fotogrids-pro-badge',
 								key: 'pro-badge',
 							},
-							settingBadgeText,
+							settingBadgeText
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 			h('div', { className: inputClassName, ref: triggerRef }, [
 				h(
@@ -282,7 +282,7 @@ function AlphaColorPicker({
 							className: 'fotogrids-color-swatch__fill',
 							style: { background: value },
 						}),
-					],
+					]
 				),
 
 				h('input', {
@@ -320,7 +320,7 @@ function AlphaColorPicker({
 											: undefined,
 								},
 							}),
-							document.body,
+							document.body
 						)
 					: h('div', {
 							className:
@@ -336,7 +336,7 @@ function AlphaColorPicker({
 										: undefined,
 							},
 						})),
-		],
+		]
 	);
 }
 

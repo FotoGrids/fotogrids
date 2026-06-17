@@ -155,17 +155,17 @@ final class Loaded_Effect implements Feature {
 
 		$css_assets = array(
 			'fotogrids-loaded-effect-base' => new Asset_Decl(
-				path: 'features/loaded-effect/effects/base.css',
+				'features/loaded-effect/effects/base.css',
 			),
 		);
 
 		if ( 'none' !== $effect ) {
 			$css_assets[ 'fotogrids-loaded-effect-' . $effect ] = new Asset_Decl(
-				path: 'features/loaded-effect/effects/' . $effect . '.css',
+				'features/loaded-effect/effects/' . $effect . '.css',
 			);
 		}
 
-		return new Module_Assets( css: $css_assets );
+		return new Module_Assets( $css_assets );
 	}
 
 	/**

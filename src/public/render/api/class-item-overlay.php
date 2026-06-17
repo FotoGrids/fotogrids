@@ -15,12 +15,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_Overlay {
 
+	public string $html;
+	public string $position_class;
+	public array $extra_classes;
+
 	/**
 	 * @param array<int, string> $extra_classes Additional classes for overlay node.
 	 */
 	public function __construct(
-		public readonly string $html,
-		public readonly string $position_class,
-		public readonly array $extra_classes = array(),
-	) {}
+		string $html,
+		string $position_class,
+		array $extra_classes = array()
+	) {
+		$this->html           = $html;
+		$this->position_class = $position_class;
+		$this->extra_classes  = $extra_classes;
+	}
 }

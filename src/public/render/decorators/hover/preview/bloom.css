@@ -1,0 +1,6 @@
+.fotogrids-collection[data-fg-hover='bloom'] .fg-item-media img {
+	transition: filter 0.3s ease;
+}
+.fotogrids-collection[data-fg-hover='bloom'] .fg-item:hover .fg-item-media img {
+	filter: brightness(1.15) contrast(1.1);
+}

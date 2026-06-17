@@ -19,7 +19,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Stamps `data-fg-sequence-index` on every gallery item, giving each
  * visible `.fg-item` its position within the FULL filtered+sorted
- * sequence — not its position on the current page.
+ * sequence - not its position on the current page.
  *
  * Consumed by the lightbox: when a user clicks an item, the lightbox
  * reads `dataset.fgSequenceIndex` to know which slide of the gallery
@@ -27,7 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
  * clicked item is "item #2 of the visible 8", when really it might be
  * "item #18 of the filtered 49".
  *
- * Always active for galleries (skipped for albums — sequence indices
+ * Always active for galleries (skipped for albums - sequence indices
  * for albums-of-galleries aren't well-defined here).
  *
  * @package FotoGrids\Render\Decorators\Sequence_Index
@@ -87,8 +87,8 @@ final class Sequence_Index_Decorator implements Decorator {
 				$index = $index_by_id[ $item->id ] ?? null;
 				if ( null === $index ) {
 					// Item isn't in the filtered sequence (shouldn't
-					// happen — filtering ran upstream in Context_Builder
-					// — but be defensive).
+					// happen - filtering ran upstream in Context_Builder
+					// - but be defensive).
 					return $item;
 				}
 				return $item->with(

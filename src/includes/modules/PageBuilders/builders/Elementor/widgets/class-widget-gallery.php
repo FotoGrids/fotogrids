@@ -34,7 +34,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Widget_Gallery extends Widget_Base {
 
 	/**
-	 * Tell Elementor this widget's HTML is dynamic — do NOT cache it into
+	 * Tell Elementor this widget's HTML is dynamic - do NOT cache it into
 	 * the template-content store and serve the cached copy on later page
 	 * loads. Our render is the entry point that populates Asset_Resolver
 	 * with the per-render CSS/JS handles, so it must run on every request
@@ -121,7 +121,7 @@ class Widget_Gallery extends Widget_Base {
 		$this->end_controls_section();
 
 		// ---------------------------------------------------------------------
-		// Preview section — editor-only toggles. These affect only how the
+		// Preview section - editor-only toggles. These affect only how the
 		// gallery looks INSIDE Elementor's editor preview; the published page
 		// is never affected. Persisted as widget settings under the canonical
 		// {@see Preview_Options::ATTR_*} keys so the same names work across
@@ -192,7 +192,7 @@ class Widget_Gallery extends Widget_Base {
 		// Editor & preview iframe go through the shared preview renderer
 		// so the click-behavior / pagination toggles take effect. The
 		// public frontend stays on the shortcode path for cache
-		// friendliness — Preview_Options is editor-only by design.
+		// friendliness - Preview_Options is editor-only by design.
 		if ( self::is_editor_render() ) {
 			// Empty gallery → skip the layout pipeline (which would
 			// emit an empty scaffold plus several CSS/JS asset enqueues)
@@ -228,7 +228,7 @@ class Widget_Gallery extends Widget_Base {
 
 		$shortcode_args = array(
 			'id'      => $gallery_id,
-			'_source' => Request_Source::ELEMENTOR->value,
+			'_source' => Request_Source::ELEMENTOR,
 		);
 		echo \FotoGrids\Public_Render::gallery_shortcode( $shortcode_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}

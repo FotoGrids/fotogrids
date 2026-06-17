@@ -10,7 +10,7 @@
  * via window.FotoGridsRenderSettings.
  *
  * Wrapped in an IIFE so the internal `const` declarations don't pollute the
- * shared script-tag global scope — every script in this folder loads as a
+ * shared script-tag global scope - every script in this folder loads as a
  * plain <script>, so a top-level `const` here would collide with the same
  * name declared in collection-settings.js.
  *
@@ -65,7 +65,7 @@
 			/\{postType(?:\.([^}]+))?\}/g,
 			(match, propertyPath) => {
 				return getPostTypeValue(normalizedPostType, propertyPath || '');
-			},
+			}
 		);
 	};
 
@@ -90,21 +90,21 @@
 		if (processed.label) {
 			processed.label = replacePostTypePlaceholders(
 				processed.label,
-				normalizedPostType,
+				normalizedPostType
 			);
 		}
 
 		if (processed.description) {
 			processed.description = replacePostTypePlaceholders(
 				processed.description,
-				normalizedPostType,
+				normalizedPostType
 			);
 		}
 
 		if (processed.hint) {
 			processed.hint = replacePostTypePlaceholders(
 				processed.hint,
-				normalizedPostType,
+				normalizedPostType
 			);
 		}
 
@@ -113,55 +113,55 @@
 				...processed.hint_link,
 				label: replacePostTypePlaceholders(
 					processed.hint_link.label,
-					normalizedPostType,
+					normalizedPostType
 				),
 			};
 		}
 
 		// info_block top-level strings: subtitle, message, button_label.
-		// (button_url is intentionally not substituted — it's a URL, not user-visible copy.)
+		// (button_url is intentionally not substituted - it's a URL, not user-visible copy.)
 		if (processed.subtitle) {
 			processed.subtitle = replacePostTypePlaceholders(
 				processed.subtitle,
-				normalizedPostType,
+				normalizedPostType
 			);
 		}
 
 		if (processed.message) {
 			processed.message = replacePostTypePlaceholders(
 				processed.message,
-				normalizedPostType,
+				normalizedPostType
 			);
 		}
 
 		if (processed.button_label) {
 			processed.button_label = replacePostTypePlaceholders(
 				processed.button_label,
-				normalizedPostType,
+				normalizedPostType
 			);
 		}
 
 		if (processed.options && Array.isArray(processed.options)) {
 			processed.options = processed.options
-				.filter(option => {
+				.filter((option) => {
 					if (option.postTypes && Array.isArray(option.postTypes)) {
 						return option.postTypes.includes(normalizedPostType);
 					}
 					return true;
 				})
-				.map(option => {
+				.map((option) => {
 					const processedOption = { ...option };
 					if (processedOption.label) {
 						processedOption.label = replacePostTypePlaceholders(
 							processedOption.label,
-							normalizedPostType,
+							normalizedPostType
 						);
 					}
 					if (processedOption.description) {
 						processedOption.description =
 							replacePostTypePlaceholders(
 								processedOption.description,
-								normalizedPostType,
+								normalizedPostType
 							);
 					}
 					return processedOption;
@@ -173,24 +173,24 @@
 				...processed.conditionalMessage,
 				message: replacePostTypePlaceholders(
 					processed.conditionalMessage.message,
-					normalizedPostType,
+					normalizedPostType
 				),
 			};
 		}
 
 		if (processed.messages && Array.isArray(processed.messages)) {
-			processed.messages = processed.messages.map(msg => {
+			processed.messages = processed.messages.map((msg) => {
 				const processedMsg = { ...msg };
 				if (processedMsg.subtitle) {
 					processedMsg.subtitle = replacePostTypePlaceholders(
 						processedMsg.subtitle,
-						normalizedPostType,
+						normalizedPostType
 					);
 				}
 				if (processedMsg.message) {
 					processedMsg.message = replacePostTypePlaceholders(
 						processedMsg.message,
-						normalizedPostType,
+						normalizedPostType
 					);
 				}
 				return processedMsg;
@@ -198,14 +198,14 @@
 		}
 
 		if (processed.settings && Array.isArray(processed.settings)) {
-			processed.settings = processed.settings.map(subSetting =>
-				processSettingPlaceholders(subSetting, normalizedPostType),
+			processed.settings = processed.settings.map((subSetting) =>
+				processSettingPlaceholders(subSetting, normalizedPostType)
 			);
 		}
 
 		if (processed.subTabs) {
 			const processedSubTabs = {};
-			Object.keys(processed.subTabs).forEach(subTabKey => {
+			Object.keys(processed.subTabs).forEach((subTabKey) => {
 				const subTab = { ...processed.subTabs[subTabKey] };
 
 				if (subTab.postTypes && Array.isArray(subTab.postTypes)) {
@@ -217,15 +217,15 @@
 				if (subTab.label) {
 					subTab.label = replacePostTypePlaceholders(
 						subTab.label,
-						normalizedPostType,
+						normalizedPostType
 					);
 				}
 				if (subTab.settings && Array.isArray(subTab.settings)) {
-					subTab.settings = subTab.settings.map(subSetting =>
+					subTab.settings = subTab.settings.map((subSetting) =>
 						processSettingPlaceholders(
 							subSetting,
-							normalizedPostType,
-						),
+							normalizedPostType
+						)
 					);
 				}
 				processedSubTabs[subTabKey] = subTab;

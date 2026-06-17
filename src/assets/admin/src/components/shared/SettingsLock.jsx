@@ -49,7 +49,7 @@ const SettingsLock = ({ cap, children, title, message, className = '' }) => {
                 <Icon name="lock" className="fg-settings-lock__icon" />
                 <div className="fg-settings-lock__text">
                     <strong>
-                        {title || __('Locked — administrator only', 'fotogrids')}
+                        {title || __('Locked - administrator only', 'fotogrids')}
                     </strong>
                     <span>
                         {message || __(

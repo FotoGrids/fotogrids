@@ -32,9 +32,9 @@ if ( ! defined( 'WPINC' ) ) {
  *   - pages_button_icon             (none | chevron | chevron_double | arrow
  *                                    | arrow_narrow | arrow_square
  *                                    | arrow_circle | arrow_circle_broken
- *                                    | arrow_block) — mirrors lightbox_arrow_icon
+ *                                    | arrow_block) - mirrors lightbox_arrow_icon
  *   - pages_show_numbers            (bool)
- *   - pages_truncate                (bool — when true, JS runs the
+ *   - pages_truncate                (bool - when true, JS runs the
  *                                    boundary+siblings windowing algorithm
  *                                    with hardcoded sibling counts emitted
  *                                    via --fg-pagination-siblings; when
@@ -142,7 +142,7 @@ final class Page_Buttons implements Feature {
 	 * (max-visible). PHP renders the initial state for page 1.
 	 *
 	 * Uses html_appendix (NOT html_after) so the bar lives INSIDE the
-	 * gallery wrapper — see Load_More for the same reasoning.
+	 * gallery wrapper - see Load_More for the same reasoning.
 	 *
 	 * @since 1.0.0
 	 */
@@ -194,16 +194,16 @@ final class Page_Buttons implements Feature {
 	}
 
 	public function style_vars( Render_Context $render_context ): array {
-		// Start from the shared trait — currently emits
+		// Start from the shared trait - currently emits
 		// `--fg-pagination-distance` (margin above the bar).
 		$vars = $this->common_style_vars( $render_context );
 
-		// When truncation is off we render the full list — no sibling var needed.
+		// When truncation is off we render the full list - no sibling var needed.
 		if ( ! (bool) ( $render_context->settings['pages_truncate'] ?? true ) ) {
 			return $vars;
 		}
 
-		// Sibling count is hardcoded — the user only chooses truncate on/off.
+		// Sibling count is hardcoded - the user only chooses truncate on/off.
 		// Two on desktop/tablet matches the long-form Bootstrap/Material/GitHub
 		// pattern; one on mobile keeps the bar to ~5 chips + 2 ellipses at the
 		// worst case (current in the middle). Boundaries (first + last) are
@@ -212,11 +212,11 @@ final class Page_Buttons implements Feature {
 		//   - mobile:         1 + 1 + (2*1 + 1) + 1 + 1 = 7 slots worst case
 		//
 		// The Responsive_Var flows the mobile value through whatever
-		// mobile_breakpoint the user has configured — see Breakpoint_Config.
+		// mobile_breakpoint the user has configured - see Breakpoint_Config.
 		$vars['--fg-pagination-siblings'] = new Responsive_Var(
-			desktop: '2',
-			tablet:  '2',
-			mobile:  '1',
+			'2',
+			'2',
+			'1',
 		);
 
 		return $vars;
@@ -226,22 +226,23 @@ final class Page_Buttons implements Feature {
 		$common = $this->common_assets();
 
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				$common->css,
 				array(
 					'fotogrids-pagination-page-buttons' => new Asset_Decl(
-						path:      'features/pagination/page-buttons/page-buttons.css',
-						in_footer: false,
+						'features/pagination/page-buttons/page-buttons.css',
+						array(),
+						false,
 					),
 				)
 			),
-			js: array_merge(
+			array_merge(
 				$common->js,
 				array(
 					'fotogrids-pagination-page-buttons' => new Asset_Decl(
-						path:      '../../assets/js/page-buttons.js',
-						deps:      array( 'fotogrids-pagination-core' ),
-						in_footer: true,
+						'../../assets/js/page-buttons.js',
+						array( 'fotogrids-pagination-core' ),
+						true,
 					),
 				)
 			)
@@ -315,7 +316,7 @@ final class Page_Buttons implements Feature {
 	 *
 	 * SVG pairs come from the lightbox feature's arrow-icons.json so the
 	 * arrow styles offered for pagination match the lightbox 1:1. The SVGs
-	 * are already oriented per side (prev/next) — no CSS flip needed.
+	 * are already oriented per side (prev/next) - no CSS flip needed.
 	 *
 	 * The raw SVG markup is wrapped in a span carrying the class +
 	 * data-fg-icon attribute so CSS can size/style icons consistently. We
@@ -324,7 +325,7 @@ final class Page_Buttons implements Feature {
 	 *
 	 * @since 1.0.0
 	 * @param string $icon  One of self::ALLOWED_ICONS.
-	 * @param string $side  'prev' | 'next' — picks the correctly oriented SVG.
+	 * @param string $side  'prev' | 'next' - picks the correctly oriented SVG.
 	 */
 	private function render_icon( string $icon, string $side ): string {
 		if ( 'none' === $icon ) {
@@ -344,7 +345,7 @@ final class Page_Buttons implements Feature {
 
 		// The SVG is wrapped so the page-buttons.css selector targets a stable
 		// hook (`.fg-pagination__icon`) regardless of which arrow style is in
-		// use. The raw markup is trusted — it comes from a plugin-owned JSON
+		// use. The raw markup is trusted - it comes from a plugin-owned JSON
 		// file, not from user input.
 		return sprintf(
 			'<span class="fg-pagination__icon fg-pagination__icon--%s" data-fg-icon="%s" aria-hidden="true">%s</span>',

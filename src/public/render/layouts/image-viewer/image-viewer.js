@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Image Viewer Layout
+ * FotoGrids - Image Viewer Layout
  *
  * One image at a time on a stacked stage. Unlike the Slider (a scrolling
  * strip), Image Viewer keeps every item absolutely stacked and toggles
@@ -9,7 +9,7 @@
  * Chrome: a single control bar beneath the image (NOT overlaid). The bar
  * holds the prev arrow on the inline-start side, the next arrow on the
  * inline-end side, and the counter centred between them. This layout never
- * renders bullets or a thumbnail strip — only the bar.
+ * renders bullets or a thumbnail strip - only the bar.
  *
  * Reuses the shared carousel-helpers index state + autoplay/keyboard/swipe.
  */
@@ -89,7 +89,7 @@ function setup( collectionEl ) {
         collectionEl.getAttribute( 'data-fg-natural-ratio' ) === '1' &&
         collectionEl.getAttribute( 'data-fg-height-mode' ) === 'auto';
 
-    /* Mutable state — chrome rebuilds replace these. */
+    /* Mutable state - chrome rebuilds replace these. */
     let items       = visibleItems( trackEl );
     let total       = 0;
     let indexState  = null;
@@ -165,7 +165,7 @@ function setup( collectionEl ) {
         const mediaEl = measureMediaEl( item );
         if ( ! mediaEl ) return;
 
-        // If the image hasn't loaded yet its natural size is 0 — defer the
+        // If the image hasn't loaded yet its natural size is 0 - defer the
         // measure until it loads so we don't stamp a collapsed height. A
         // deferred first measure still lands without animation.
         if ( mediaEl.tagName === 'IMG' && ! mediaEl.complete ) {
@@ -220,7 +220,7 @@ function setup( collectionEl ) {
 
     /* Resolve the height ceiling (the smaller of the configured max-height and
        the viewport cap) to a pixel number. --fg-height-max defaults to 100vh
-       when the user set no max, so both inputs can be vh — getComputedStyle on
+       when the user set no max, so both inputs can be vh - getComputedStyle on
        a probe element converts whatever units to px for us. */
     const resolveHeightCapPx = () => {
         const cs = getComputedStyle( collectionEl );
@@ -252,7 +252,7 @@ function setup( collectionEl ) {
 
     /* Build the control bar beneath the image: prev arrow (inline-start),
        counter (centre), next arrow (inline-end). Always rendered for this
-       layout — no bullets, no thumbnails. */
+       layout - no bullets, no thumbnails. */
     const buildBar = () => {
         const bar = document.createElement( 'div' );
         bar.className = 'fg-viewer-bar';
@@ -389,7 +389,7 @@ function setup( collectionEl ) {
 
     /* Re-fit the frame to the active image when the track width changes
        (responsive reflow, sidebar toggle, orientation change). Re-fits are
-       instant (no slide) — a width change isn't a navigation. The first
+       instant (no slide) - a width change isn't a navigation. The first
        ResizeObserver callback fires immediately on observe(), which also
        covers the case where the track had no width at initial measure. */
     if ( autoHeightFit && typeof ResizeObserver !== 'undefined' ) {
@@ -397,7 +397,7 @@ function setup( collectionEl ) {
         ro.observe( trackEl );
     }
 
-    /* Keyboard nav — both axes so up/down works for vertical transitions. */
+    /* Keyboard nav - both axes so up/down works for vertical transitions. */
 
     collectionEl.setAttribute( 'tabindex', '0' );
     createKeyboardNav( collectionEl, {
@@ -408,7 +408,7 @@ function setup( collectionEl ) {
         onEnd:  () => { if ( indexState ) indexState.goTo( indexState.total() - 1 ); },
     } );
 
-    /* Touch swipe — direction matches the transition axis. Horizontal /
+    /* Touch swipe - direction matches the transition axis. Horizontal /
        fade respond to left/right; vertical responds to up/down. */
 
     {
@@ -428,7 +428,7 @@ function setup( collectionEl ) {
         } );
     }
 
-    /* Filter changes — rebuild chrome against the new visible-items set. */
+    /* Filter changes - rebuild chrome against the new visible-items set. */
 
     collectionEl.addEventListener( 'fotogrids:filters_changed', () => {
         buildChrome();

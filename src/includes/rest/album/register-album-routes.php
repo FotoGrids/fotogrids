@@ -45,7 +45,7 @@ class Register_Album_Routes {
 			)
 		);
 
-		// Featured gallery endpoint — sets or clears the album's featured gallery.
+		// Featured gallery endpoint - sets or clears the album's featured gallery.
 		register_rest_route(
 			'fotogrids/v1',
 			'/album/(?P<id>\d+)/featured-gallery',

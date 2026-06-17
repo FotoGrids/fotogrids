@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * per-render CSS/JS during `Render_Controller::render()`, so callers
  * that emit HTML inline get their styles automatically (gated by the
  * `Filters_Render::SHOULD_INLINE_ASSETS` filter for editor contexts).
- * Callers that need the asset map serialised — i.e. the REST handler —
+ * Callers that need the asset map serialised - i.e. the REST handler -
  * call `Asset_Resolver::instance()->get_*` themselves.
  *
  * @since 1.0.0
@@ -68,10 +68,10 @@ final class Preview_Renderer {
 		}
 
 		$context = Context_Builder::for_preview()->build_for_public(
-			gallery_id:          $gallery_id,
-			render_settings:     $render_settings,
-			collection_item_ids: $item_ids,
-			source:              Request_Source::PREVIEW_SAVED
+			$gallery_id,
+			$render_settings,
+			$item_ids,
+			Request_Source::PREVIEW_SAVED
 		);
 
 		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED );
@@ -125,10 +125,10 @@ final class Preview_Renderer {
 		}
 
 		$context = Context_Builder::for_preview()->build_for_album(
-			album_id:          $album_id,
-			render_settings:   $album_settings,
-			child_gallery_ids: $child_ids,
-			source:            Request_Source::PREVIEW_SAVED
+			$album_id,
+			$album_settings,
+			$child_ids,
+			Request_Source::PREVIEW_SAVED
 		);
 
 		$context = self::flip_to_preview_context( $context, Request_Source::PREVIEW_SAVED );
@@ -146,7 +146,7 @@ final class Preview_Renderer {
 	 * settings markers merged in.
 	 *
 	 * Mirrors {@see \FotoGrids\Modules\PageBuilders\REST\Preview_Data::flip_to_preview_context}
-	 * — duplicated rather than imported because that class lives behind
+	 * - duplicated rather than imported because that class lives behind
 	 * the REST autoload boundary and we want this renderer usable from
 	 * `init`-time widget code that runs before REST is bootstrapped.
 	 *
@@ -155,7 +155,7 @@ final class Preview_Renderer {
 	 * @param Request_Source $source
 	 * @return Render_Context
 	 */
-	private static function flip_to_preview_context( Render_Context $context, Request_Source $source ): Render_Context {
+	private static function flip_to_preview_context( Render_Context $context, string $source ): Render_Context {
 		$preview_meta = $context->meta->with(
 			array(
 				'is_preview' => true,
@@ -166,19 +166,19 @@ final class Preview_Renderer {
 		$preview_settings = array_merge(
 			$context->settings,
 			array(
-				'_preview_source'     => $source->value,
+				'_preview_source'     => $source,
 				'_show_render_errors' => current_user_can( 'edit_posts' ),
 			)
 		);
 
 		return new Render_Context(
-			meta:         $preview_meta,
-			layout:       $context->layout,
-			behavior:     $context->behavior,
-			settings:     $preview_settings,
-			items:        $context->items,
-			warnings:     $context->warnings,
-			via_album_id: $context->via_album_id,
+			$preview_meta,
+			$context->layout,
+			$context->behavior,
+			$preview_settings,
+			$context->items,
+			$context->warnings,
+			$context->via_album_id,
 		);
 	}
 
@@ -224,7 +224,7 @@ final class Preview_Renderer {
 			);
 		}
 
-		// Inline, scoped styles — keeps the empty-state self-contained so
+		// Inline, scoped styles - keeps the empty-state self-contained so
 		// it works in the page-builder preview iframe (which doesn't
 		// enqueue the editor stylesheet) and in any future host. Browsers
 		// dedupe duplicate <style> blocks effectively; the cost is

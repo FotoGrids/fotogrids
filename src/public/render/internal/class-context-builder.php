@@ -32,13 +32,22 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Context_Builder {
 
+	private Instance_Id_Factory $instance_id_factory;
+	/**
+	 * @var callable|null
+	 */
+	private $items_loader;
+
 	/**
 	 * @param callable|null $items_loader Callback for item hydration.
 	 */
 	public function __construct(
-		private readonly Instance_Id_Factory $instance_id_factory,
-		private readonly mixed $items_loader = null,
-	) {}
+		Instance_Id_Factory $instance_id_factory,
+		$items_loader = null
+	) {
+		$this->instance_id_factory = $instance_id_factory;
+		$this->items_loader        = $items_loader;
+	}
 
 	/**
 	 * Creates a context for public rendering.
@@ -64,7 +73,7 @@ final class Context_Builder {
 		int $gallery_id,
 		array $render_settings = array(),
 		array $collection_item_ids = array(),
-		Request_Source $source = Request_Source::SHORTCODE,
+		string $source = Request_Source::SHORTCODE,
 		?int $album_id = null,
 		array $meta_overrides = array()
 	): Render_Context {
@@ -98,24 +107,26 @@ final class Context_Builder {
 		$view_page = ! empty( $meta_overrides['view_page'] );
 
 		$render_meta = new Render_Meta(
-			gallery_id:         $gallery_id,
-			album_id:           $album_id,
-			instance_id:        $this->instance_id_factory->generate( $gallery_id ),
-			source:             $source,
-			is_preview:         false,
-			mode:               Render_Mode::INITIAL,
-			schema_version:     2,
-			requested_page:     isset( $meta_overrides['requested_page'] ) ? (int) $meta_overrides['requested_page'] : null,
-			requested_per_page: isset( $meta_overrides['requested_per_page'] ) ? (int) $meta_overrides['requested_per_page'] : null,
-			breakpoint:         isset( $meta_overrides['breakpoint'] ) ? (string) $meta_overrides['breakpoint'] : null,
-			partial:            isset( $meta_overrides['partial'] ) ? (string) $meta_overrides['partial'] : null,
-			active_filters:     isset( $meta_overrides['active_filters'] ) && is_array( $meta_overrides['active_filters'] )
+			$gallery_id,
+			$album_id,
+			$this->instance_id_factory->generate( $gallery_id ),
+			$source,
+			false,
+			Render_Mode::INITIAL,
+			2,
+			Collection_Kind::GALLERY,
+			isset( $meta_overrides['requested_page'] ) ? (int) $meta_overrides['requested_page'] : null,
+			isset( $meta_overrides['requested_per_page'] ) ? (int) $meta_overrides['requested_per_page'] : null,
+			isset( $meta_overrides['breakpoint'] ) ? (string) $meta_overrides['breakpoint'] : null,
+			isset( $meta_overrides['partial'] ) ? (string) $meta_overrides['partial'] : null,
+			null,
+			isset( $meta_overrides['active_filters'] ) && is_array( $meta_overrides['active_filters'] )
 									? $meta_overrides['active_filters']
 									: array(),
-			random_seed:        $random_seed,
-			view_page:          $view_page,
-			is_ajax_swap:       $is_ajax_swap,
-			container_width:    isset( $meta_overrides['container_width'] ) && (int) $meta_overrides['container_width'] > 0
+			$random_seed,
+			$view_page,
+			$is_ajax_swap,
+			isset( $meta_overrides['container_width'] ) && (int) $meta_overrides['container_width'] > 0
 									? (int) $meta_overrides['container_width']
 									: null,
 		);
@@ -147,13 +158,13 @@ final class Context_Builder {
 		// can call supports() on each registered sorter. The sorter receives this
 		// same context so it can read settings, gallery_id, is_preview, etc.
 		$sort_context = new Render_Context(
-			meta: $render_meta,
-			layout: $this->build_layout( $render_settings ),
-			behavior: $this->build_behavior( $render_settings ),
-			settings: $render_settings,
-			items: array(),
-			warnings: array(),
-			via_album_id: $via_album_id,
+			$render_meta,
+			$this->build_layout( $render_settings ),
+			$this->build_behavior( $render_settings ),
+			$render_settings,
+			array(),
+			array(),
+			$via_album_id,
 		);
 
 		$raw_ids    = array_map( 'absint', $collection_item_ids );
@@ -185,20 +196,20 @@ final class Context_Builder {
 		// item must pass every source that has active values.
 		//
 		// Only applies when active_filters is non-empty (REST pagination
-		// requests with filter state) — initial shortcode renders never
+		// requests with filter state) - initial shortcode renders never
 		// pass active_filters, so the client-side filter UI keeps full
 		// control of which items are visually shown on page 1.
 		if ( ! empty( $render_meta->active_filters ) && Collection_Kind::GALLERY === $render_meta->collection_kind ) {
 			// Rebuild context so filter sources see the sorted + loaded
 			// items (needed by their supports() checks).
 			$filter_context = new Render_Context(
-				meta:     $render_meta,
-				layout:   $sort_context->layout,
-				behavior: $sort_context->behavior,
-				settings: $render_settings,
-				items:    $loaded_items,
-				warnings: array(),
-				via_album_id: $via_album_id,
+				$render_meta,
+				$sort_context->layout,
+				$sort_context->behavior,
+				$render_settings,
+				$loaded_items,
+				array(),
+				$via_album_id,
 			);
 
 			$loaded_items = $this->apply_server_filters( $loaded_items, $render_meta->active_filters, $filter_context );
@@ -218,7 +229,7 @@ final class Context_Builder {
 		// already established) and after caption resolution + filtering (so
 		// the slice contains fully-prepared Item_Views from the filtered set).
 		// Layouts that opt out via the `paginates` capability (slider,
-		// image-viewer) skip slicing entirely — their own navigation walks
+		// image-viewer) skip slicing entirely - their own navigation walks
 		// the full item list.
 		$paginates_capability = Layout_Capabilities::supports( $sort_context, 'paginates' );
 		if ( ( $render_settings['pagination_type'] ?? 'show_all' ) === 'paginated'
@@ -266,13 +277,13 @@ final class Context_Builder {
 		}
 
 		return new Render_Context(
-			meta: $render_meta,
-			layout: $sort_context->layout,
-			behavior: $sort_context->behavior,
-			settings: $render_settings,
-			items: $loaded_items,
-			warnings: array(),
-			via_album_id: $via_album_id,
+			$render_meta,
+			$sort_context->layout,
+			$sort_context->behavior,
+			$render_settings,
+			$loaded_items,
+			array(),
+			$via_album_id,
 		);
 	}
 
@@ -294,7 +305,7 @@ final class Context_Builder {
 		array $settings_overlay = array(),
 		array $collection_item_ids = array(),
 		array $item_overrides = array(),
-		Request_Source $source = Request_Source::PREVIEW_UNSAVED,
+		string $source = Request_Source::PREVIEW_UNSAVED,
 		?string $simulate_state = null
 	): Render_Context {
 		$render_settings            = array_replace_recursive( $base_settings, $settings_overlay );
@@ -313,20 +324,20 @@ final class Context_Builder {
 		}
 
 		return new Render_Context(
-			meta: new Render_Meta(
-				gallery_id: $gallery_id,
-				album_id: null,
-				instance_id: $this->instance_id_factory->generate( $gallery_id ),
-				source: $source,
-				is_preview: true,
-				mode: Render_Mode::AJAX,
-				schema_version: 2
+			new Render_Meta(
+				$gallery_id,
+				null,
+				$this->instance_id_factory->generate( $gallery_id ),
+				$source,
+				true,
+				Render_Mode::AJAX,
+				2
 			),
-			layout: $this->build_layout( $render_settings ),
-			behavior: $this->build_behavior( $render_settings ),
-			settings: $render_settings,
-			items: $collection_items,
-			warnings: $warnings
+			$this->build_layout( $render_settings ),
+			$this->build_behavior( $render_settings ),
+			$render_settings,
+			$collection_items,
+			$warnings
 		);
 	}
 
@@ -356,23 +367,23 @@ final class Context_Builder {
 		int $album_id,
 		array $render_settings = array(),
 		array $child_gallery_ids = array(),
-		Request_Source $source = Request_Source::SHORTCODE
+		string $source = Request_Source::SHORTCODE
 	): Render_Context {
 		$render_settings = self::coerce_layout_settings( $render_settings );
 
 		$render_meta = new Render_Meta(
-			// gallery_id is intentionally 0 — the render's primary identity
+			// gallery_id is intentionally 0 - the render's primary identity
 			// is the album. instance_id_factory needs SOMETHING unique to
 			// build an instance ID off; we feed it the album_id so the IDs
 			// are stable per-album.
-			gallery_id:      0,
-			album_id:        $album_id,
-			instance_id:     $this->instance_id_factory->generate( $album_id ),
-			source:          $source,
-			is_preview:      false,
-			mode:            Render_Mode::INITIAL,
-			schema_version:  2,
-			collection_kind: Collection_Kind::ALBUM,
+			0,
+			$album_id,
+			$this->instance_id_factory->generate( $album_id ),
+			$source,
+			false,
+			Render_Mode::INITIAL,
+			2,
+			Collection_Kind::ALBUM,
 		);
 
 		[ $thumb_size ] = $this->resolve_size_settings( $render_settings );
@@ -383,17 +394,17 @@ final class Context_Builder {
 		$loaded_items = Album_Item_Loader::load( $child_gallery_ids, $thumb_size );
 		// Captions decorator picks up caption_title / caption_description
 		// from the Item_View. For albums we always pass the gallery title
-		// through as caption_title — call resolve_captions to handle the
+		// through as caption_title - call resolve_captions to handle the
 		// normal caption_hide_title / source resolution logic too.
 		$loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
 
 		return new Render_Context(
-			meta:     $render_meta,
-			layout:   $this->build_layout( $render_settings ),
-			behavior: $this->build_behavior( $render_settings ),
-			settings: $render_settings,
-			items:    $loaded_items,
-			warnings: array()
+			$render_meta,
+			$this->build_layout( $render_settings ),
+			$this->build_behavior( $render_settings ),
+			$render_settings,
+			$loaded_items,
+			array()
 		);
 	}
 
@@ -526,17 +537,17 @@ final class Context_Builder {
 	private function build_layout( array $render_settings ): Render_Layout {
 		$layout_id          = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : 'grid';
 		$columns_mode_value = is_string( $render_settings['columns_mode'] ?? null ) ? $render_settings['columns_mode'] : 'fixed';
-		$columns_mode       = Columns_Mode::AUTO->value === $columns_mode_value ? Columns_Mode::AUTO : Columns_Mode::FIXED;
+		$columns_mode       = Columns_Mode::AUTO === $columns_mode_value ? Columns_Mode::AUTO : Columns_Mode::FIXED;
 
 		return new Render_Layout(
-			layout_id: $layout_id,
-			columns_mode: $columns_mode,
-			responsive_columns: is_array( $render_settings['columns'] ?? null ) ? $render_settings['columns'] : array(
+			$layout_id,
+			$columns_mode,
+			is_array( $render_settings['columns'] ?? null ) ? $render_settings['columns'] : array(
 				'desktop' => 4,
 				'tablet'  => 3,
 				'mobile'  => 1,
 			),
-			responsive_spacing: is_array( $render_settings['item_spacing'] ?? null ) ? $render_settings['item_spacing'] : array(
+			is_array( $render_settings['item_spacing'] ?? null ) ? $render_settings['item_spacing'] : array(
 				'desktop' => array(
 					'value' => 10,
 					'unit'  => 'px',
@@ -550,9 +561,9 @@ final class Context_Builder {
 					'unit'  => 'px',
 				),
 			),
-			columns_auto_range: is_array( $render_settings['columns_auto_range'] ?? null ) ? $render_settings['columns_auto_range'] : array(),
-			item_aspect_ratio: $this->resolve_item_aspect_ratio( $render_settings ),
-			item_object_fit: $this->resolve_item_object_fit( $render_settings ),
+			is_array( $render_settings['columns_auto_range'] ?? null ) ? $render_settings['columns_auto_range'] : array(),
+			$this->resolve_item_aspect_ratio( $render_settings ),
+			$this->resolve_item_object_fit( $render_settings ),
 		);
 	}
 
@@ -626,10 +637,10 @@ final class Context_Builder {
 	private function build_behavior( array $render_settings ): Render_Behavior {
 		return new Render_Behavior(
 			// Admin saves as 'item_click_behavior'; fall back to legacy 'click_behavior' key.
-			click_behavior: is_string( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ?? null ) ? ( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ) : 'lightbox',
-			pagination_type: is_string( $render_settings['pagination_type'] ?? null ) ? $render_settings['pagination_type'] : 'show_all',
-			pagination_method: is_string( $render_settings['pagination_method'] ?? null ) ? $render_settings['pagination_method'] : 'load_more',
-			hover_effect: is_string( $render_settings['hover_effect'] ?? null ) ? $render_settings['hover_effect'] : null
+			is_string( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ?? null ) ? ( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ) : 'lightbox',
+			is_string( $render_settings['pagination_type'] ?? null ) ? $render_settings['pagination_type'] : 'show_all',
+			is_string( $render_settings['pagination_method'] ?? null ) ? $render_settings['pagination_method'] : 'load_more',
+			is_string( $render_settings['hover_effect'] ?? null ) ? $render_settings['hover_effect'] : null
 		);
 	}
 
@@ -663,18 +674,31 @@ final class Context_Builder {
 		);
 
 		return new Item_View(
-			id: $attachment_id,
-			thumb_url: $poster_url,
-			full_url: $poster_url,
-			alt: (string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
-			title: (string) $attachment_post->post_title,
-			caption: (string) $attachment_post->post_excerpt,
-			description: (string) $attachment_post->post_content,
-			meta: $link_meta,
-			thumb_size: $thumb_size,
-			item_type: Video_Item_Helpers::TYPE_FILE,
-			poster_url: $poster_url,
-			video_src: (string) ( wp_get_attachment_url( $attachment_id ) ?: '' ),
+			$attachment_id,
+			$poster_url,
+			$poster_url,
+			(string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+			(string) $attachment_post->post_title,
+			(string) $attachment_post->post_excerpt,
+			(string) $attachment_post->post_content,
+			'',
+			'',
+			null,
+			null,
+			$link_meta,
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			$thumb_size,
+			null,
+			null,
+			Video_Item_Helpers::TYPE_FILE,
+			$poster_url,
+			(string) ( wp_get_attachment_url( $attachment_id ) ?: '' ),
 		);
 	}
 
@@ -706,19 +730,34 @@ final class Context_Builder {
 		$settings = is_array( $embed['settings'] ?? null ) ? $embed['settings'] : array();
 
 		return new Item_View(
-			id: $embed_id,
-			thumb_url: $poster,
-			full_url: $poster,
-			alt: $caption,
-			title: $caption,
-			caption: $caption,
-			description: '',
-			poster_url: $poster,
-			thumb_size: $thumb_size,
-			item_type: $item_type,
-			embed_provider: Video_Item_Helpers::provider_for_type( $item_type ),
-			embed_id: (string) $embed['video_id'],
-			embed_settings: $settings,
+			$embed_id,
+			$poster,
+			$poster,
+			$caption,
+			$caption,
+			$caption,
+			'',
+			'',
+			'',
+			null,
+			null,
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			array(),
+			$thumb_size,
+			null,
+			null,
+			$item_type,
+			$poster,
+			'',
+			Video_Item_Helpers::provider_for_type( $item_type ),
+			(string) $embed['video_id'],
+			$settings,
 		);
 	}
 
@@ -838,19 +877,28 @@ final class Context_Builder {
 				$full_h   = is_array( $full_src ) && isset( $full_src[2] ) ? (int) $full_src[2] : null;
 
 				$loaded_items[] = new Item_View(
-					id: $attachment_id,
-					thumb_url: $thumb_url,
-					full_url: $full_url,
-					alt: (string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
-					title: (string) $attachment_post->post_title,
-					caption: (string) $attachment_post->post_excerpt,
-					description: (string) $attachment_post->post_content,
-					width: ( null !== $thumb_w && $thumb_w > 0 ) ? $thumb_w : null,
-					height: ( null !== $thumb_h && $thumb_h > 0 ) ? $thumb_h : null,
-					meta: $link_meta,
-					thumb_size: $resolved_thumb,
-					full_width: ( null !== $full_w && $full_w > 0 ) ? $full_w : null,
-					full_height: ( null !== $full_h && $full_h > 0 ) ? $full_h : null,
+					$attachment_id,
+					$thumb_url,
+					$full_url,
+					(string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+					(string) $attachment_post->post_title,
+					(string) $attachment_post->post_excerpt,
+					(string) $attachment_post->post_content,
+					'',
+					'',
+					( null !== $thumb_w && $thumb_w > 0 ) ? $thumb_w : null,
+					( null !== $thumb_h && $thumb_h > 0 ) ? $thumb_h : null,
+					$link_meta,
+					array(),
+					array(),
+					array(),
+					array(),
+					array(),
+					array(),
+					array(),
+					$resolved_thumb,
+					( null !== $full_w && $full_w > 0 ) ? $full_w : null,
+					( null !== $full_h && $full_h > 0 ) ? $full_h : null,
 				);
 			}
 
@@ -988,7 +1036,7 @@ final class Context_Builder {
 		}
 
 		// A mandatory preference (Justified, Masonry) overrides even an
-		// explicit user-picked size — those layouts cannot render with an
+		// explicit user-picked size - those layouts cannot render with an
 		// arbitrary cropped derivative. A soft preference only applies when
 		// the user has left thumbnail_size on its default, so explicit
 		// choices still win for layouts that can honour them.
@@ -1011,22 +1059,22 @@ final class Context_Builder {
 	 */
 	private function build_minimal_context( array $render_settings ): Render_Context {
 		$meta = new Render_Meta(
-			gallery_id:     0,
-			album_id:       null,
-			instance_id:    'shell',
-			source:         Request_Source::SHORTCODE,
-			is_preview:     false,
-			mode:           Render_Mode::INITIAL,
-			schema_version: 2,
+			0,
+			null,
+			'shell',
+			Request_Source::SHORTCODE,
+			false,
+			Render_Mode::INITIAL,
+			2,
 		);
 
 		return new Render_Context(
-			meta:     $meta,
-			layout:   $this->build_layout( $render_settings ),
-			behavior: $this->build_behavior( $render_settings ),
-			settings: $render_settings,
-			items:    array(),
-			warnings: array(),
+			$meta,
+			$this->build_layout( $render_settings ),
+			$this->build_behavior( $render_settings ),
+			$render_settings,
+			array(),
+			array(),
 		);
 	}
 

@@ -18,7 +18,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 		renderIcon,
 		updateSetting,
 		__,
-	},
+	}
 ) => {
 	const { createElement: h } = wp.element;
 
@@ -43,12 +43,12 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 							{},
 							__(
 								'You do not have permission to edit item URLs. The "edit_posts" capability is required.',
-								'fotogrids',
-							),
+								'fotogrids'
+							)
 						),
-					],
+					]
 				),
-			],
+			]
 		);
 	}
 
@@ -69,14 +69,14 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 						h('div', {
 							className: 'fotogrids-bulk-actions__skeleton',
 						}),
-					],
+					]
 				),
 				h(
 					'div',
 					{
 						className: 'fotogrids-item-url-grid',
 					},
-					galleryItems.map(itemId =>
+					galleryItems.map((itemId) =>
 						h(
 							'div',
 							{
@@ -104,13 +104,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											className:
 												'fotogrids-item-url-item__target-field',
 										}),
-									],
+									]
 								),
-							],
-						),
-					),
+							]
+						)
+					)
 				),
-			],
+			]
 		);
 	}
 
@@ -136,11 +136,11 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 								onClick: loadItemData,
 								className: 'button',
 							},
-							__('Retry', 'fotogrids'),
+							__('Retry', 'fotogrids')
 						),
-					],
+					]
 				),
-			],
+			]
 		);
 	}
 
@@ -174,7 +174,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											className:
 												'fotogrids-setting__label',
 										},
-										__('Default Link Target', 'fotogrids'),
+										__('Default Link Target', 'fotogrids')
 									),
 									h(
 										'div',
@@ -186,7 +186,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											{
 												label: __(
 													'Same Tab',
-													'fotogrids',
+													'fotogrids'
 												),
 												value: '_self',
 												icon: 'check_square',
@@ -194,12 +194,12 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											{
 												label: __(
 													'New Tab',
-													'fotogrids',
+													'fotogrids'
 												),
 												value: '_blank',
 												icon: 'plus_square',
 											},
-										].map(option =>
+										].map((option) =>
 											h(
 												'button',
 												{
@@ -210,7 +210,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 														!isDisabled &&
 														updateSetting(
 															'external_link_target',
-															option.value,
+															option.value
 														),
 													disabled: isDisabled,
 													title: option.label || '',
@@ -224,8 +224,8 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																	'fg-button-icon',
 															},
 															renderIcon(
-																option.icon,
-															),
+																option.icon
+															)
 														),
 													option.label &&
 														h(
@@ -234,15 +234,15 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																className:
 																	'fg-button-label',
 															},
-															option.label,
+															option.label
 														),
-												],
-											),
-										),
+												]
+											)
+										)
 									),
-								],
+								]
 							),
-						],
+						]
 					),
 					h(
 						'div',
@@ -255,7 +255,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 								{
 									className: 'fotogrids-setting__label',
 								},
-								__('Bulk Actions', 'fotogrids'),
+								__('Bulk Actions', 'fotogrids')
 							),
 							h(
 								'div',
@@ -272,7 +272,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											onClick: () =>
 												openBulkModal('apply_to_all'),
 										},
-										__('Apply URL to All', 'fotogrids'),
+										__('Apply URL to All', 'fotogrids')
 									),
 									h(
 										'button',
@@ -283,13 +283,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											onClick: () =>
 												openBulkModal('clear_all'),
 										},
-										__('Clear All URLs', 'fotogrids'),
+										__('Clear All URLs', 'fotogrids')
 									),
-								],
+								]
 							),
-						],
+						]
 					),
-				],
+				]
 			),
 
 			h(
@@ -297,7 +297,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 				{
 					className: 'fotogrids-item-url-grid',
 				},
-				galleryItems.map(itemId => {
+				galleryItems.map((itemId) => {
 					const data = itemData[itemId] || {};
 					const currentUrl = data.url || '';
 					const currentTarget = data.target || 'global';
@@ -347,10 +347,10 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 														strokeWidth: '2',
 														strokeLinecap: 'round',
 														strokeLinejoin: 'round',
-													}),
-												),
+													})
+												)
 											),
-								],
+								]
 							),
 
 							h(
@@ -373,7 +373,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 													className:
 														'fotogrids-item-url-item__label',
 												},
-												__('Link', 'fotogrids'),
+												__('Link', 'fotogrids')
 											),
 											h(
 												'div',
@@ -389,16 +389,16 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															currentUrl,
 														placeholder: __(
 															'External URL',
-															'fotogrids',
+															'fotogrids'
 														),
 														className:
 															'fotogrids-input',
-														onBlur: e => {
+														onBlur: (e) => {
 															const newUrl =
 																e.target.value;
 															const validation =
 																validateUrl(
-																	newUrl,
+																	newUrl
 																);
 
 															if (
@@ -424,7 +424,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															if (
 																validationEl &&
 																validationEl.classList.contains(
-																	'fotogrids-url-validation',
+																	'fotogrids-url-validation'
 																)
 															) {
 																if (
@@ -448,7 +448,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															) {
 																updateItemUrl(
 																	itemId,
-																	newUrl,
+																	newUrl
 																);
 															}
 														},
@@ -471,13 +471,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																	'fotogrids-saving-indicator',
 															},
 															__(
-																'Saving...',
-																'fotogrids',
-															),
+																'Saving…',
+																'fotogrids'
+															)
 														),
-												],
+												]
 											),
-										],
+										]
 									),
 
 									h(
@@ -493,7 +493,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 													className:
 														'fotogrids-item-url-item__label',
 												},
-												__('Target', 'fotogrids'),
+												__('Target', 'fotogrids')
 											),
 											h(
 												'div',
@@ -511,7 +511,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																updateItemUrl(
 																	itemId,
 																	currentUrl,
-																	'global',
+																	'global'
 																),
 															disabled:
 																isDisabled ||
@@ -526,8 +526,8 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																},
 																__(
 																	'Default',
-																	'fotogrids',
-																),
+																	'fotogrids'
+																)
 															),
 															h(
 																'span',
@@ -539,14 +539,14 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																	'_self'
 																	? __(
 																			'Same Tab',
-																			'fotogrids',
+																			'fotogrids'
 																		)
 																	: __(
 																			'New Tab',
-																			'fotogrids',
-																		),
+																			'fotogrids'
+																		)
 															),
-														],
+														]
 													),
 													h(
 														'button',
@@ -557,7 +557,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																updateItemUrl(
 																	itemId,
 																	currentUrl,
-																	'_self',
+																	'_self'
 																),
 															disabled:
 																isDisabled ||
@@ -571,8 +571,8 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																		'fotogrids-target-button__icon',
 																},
 																renderIcon(
-																	'check_square',
-																),
+																	'check_square'
+																)
 															),
 															h(
 																'span',
@@ -582,10 +582,10 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																},
 																__(
 																	'Same Tab',
-																	'fotogrids',
-																),
+																	'fotogrids'
+																)
 															),
-														],
+														]
 													),
 													h(
 														'button',
@@ -596,7 +596,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																updateItemUrl(
 																	itemId,
 																	currentUrl,
-																	'_blank',
+																	'_blank'
 																),
 															disabled:
 																isDisabled ||
@@ -610,8 +610,8 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																		'fotogrids-target-button__icon',
 																},
 																renderIcon(
-																	'plus_square',
-																),
+																	'plus_square'
+																)
 															),
 															h(
 																'span',
@@ -621,21 +621,21 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 																},
 																__(
 																	'New Tab',
-																	'fotogrids',
-																),
+																	'fotogrids'
+																)
 															),
-														],
+														]
 													),
-												],
+												]
 											),
-										],
+										]
 									),
-								],
+								]
 							),
-						],
+						]
 					);
-				}),
+				})
 			),
-		],
+		]
 	);
 };

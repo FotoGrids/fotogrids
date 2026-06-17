@@ -1,0 +1,19 @@
+/* The tile presses into the screen: it tilts back on its top edge and recedes
+   in perspective while darkening, reading as a real 3D push rather than a
+   simple shrink. */
+
+.fotogrids-collection[data-fg-hover='push-3d'] .fg-item {
+	perspective: 600px;
+}
+
+.fotogrids-collection[data-fg-hover='push-3d'] .fg-item-media {
+	transform-origin: center top;
+	transition:
+		transform 0.3s ease,
+		filter 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='push-3d'] .fg-item:hover .fg-item-media {
+	transform: rotateX(14deg) translateZ(-40px);
+	filter: brightness(0.82);
+}

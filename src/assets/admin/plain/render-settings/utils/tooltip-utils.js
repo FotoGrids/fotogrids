@@ -42,7 +42,7 @@
 			h('path', {
 				fill: 'currentColor',
 				d: 'M11 7V5a3 3 0 0 0-6 0v2H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-1ZM6 5a2 2 0 1 1 4 0v2H6V5Z',
-			}),
+			})
 		);
 	}
 
@@ -142,9 +142,9 @@
 								style: { top, left },
 								role: 'tooltip',
 							},
-							content,
+							content
 						),
-						document.body,
+						document.body
 					)
 				: null;
 
@@ -159,9 +159,9 @@
 						onMouseEnter: this.show,
 						onMouseLeave: this.hide,
 					},
-					children,
+					children
 				),
-				bubble,
+				bubble
 			);
 		}
 	}
@@ -192,8 +192,8 @@
 					className: 'fg-pro-badge',
 					'aria-label': content,
 				},
-				h(LockIcon),
-			),
+				h(LockIcon)
+			)
 		);
 	}
 

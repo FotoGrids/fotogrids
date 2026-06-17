@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Divi sub-module of Page Builders — native Divi 5 implementation.
+ * Divi sub-module of Page Builders - native Divi 5 implementation.
  *
  * Ships two native Divi 5 modules (gallery + album) built on Divi 5's
  * module API: a TypeScript/React Visual Builder bundle plus a PHP render
@@ -32,7 +32,7 @@ if ( ! defined( 'WPINC' ) ) {
  * The render callback delegates to the existing shortcode pipeline
  * (`Public_Render::gallery_shortcode()` / `album_shortcode()`) stamped
  * with `Request_Source::DIVI`, so every decorator / feature / layout
- * module works inside Divi with no further glue — identical in spirit to
+ * module works inside Divi with no further glue - identical in spirit to
  * the Elementor and Gutenberg sub-modules.
  *
  * Block names (Divi 5 modules are WP blocks under the hood):
@@ -41,7 +41,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Activation gates on Divi 5's module framework being present
  * (`ET\Builder\Packages\ModuleLibrary\ModuleRegistration`). Divi 4-only
- * sites get nothing — by design; the legacy fallback was intentionally
+ * sites get nothing - by design; the legacy fallback was intentionally
  * dropped.
  *
  * This sub-module does not register itself with `Module_Registry`. The
@@ -124,18 +124,18 @@ final class Module {
 		// registration) are NOT attached here. Divi fires the dependency
 		// tree from `et_setup_builder_5` on `init` priority 0, and this
 		// `init()` runs from Module_Registry::boot() on `init` priority 5
-		// — five levels too late, so an `add_action` here would miss the
+		// - five levels too late, so an `add_action` here would miss the
 		// dispatch entirely and the modules would never register. Those
 		// hooks are attached in {@see boot_early()}, called from the
 		// plugin bootstrap on `plugins_loaded` (before `init`). See the
 		// wiring in fotogrids.php.
 
-		// The render-pipeline filters below DO belong here — they fire
+		// The render-pipeline filters below DO belong here - they fire
 		// later in the request (during a gallery render), well after
 		// `init`, so `init:5` registration is in time.
 
 		// The module's frontend stylesheet (layout chrome for the rendered
-		// gallery wrapper) ships on every page — cheap, and the gallery's
+		// gallery wrapper) ships on every page - cheap, and the gallery's
 		// own per-render CSS is owned by Asset_Resolver as usual.
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_frontend_style' ) );
 
@@ -160,11 +160,11 @@ final class Module {
 	 *
 	 * Divi fires `divi_module_library_modules_dependency_tree` from
 	 * `et_setup_builder_5` on `init` priority 0. To be on that bus, our
-	 * listener must be registered before `init` runs at all — hence this
+	 * listener must be registered before `init` runs at all - hence this
 	 * method is called from the plugin bootstrap on `plugins_loaded`,
 	 * NOT from the `init:5` module dispatch.
 	 *
-	 * Safe to call unconditionally — exits early when Divi 5 isn't present.
+	 * Safe to call unconditionally - exits early when Divi 5 isn't present.
 	 * Idempotent enough for a single bootstrap call.
 	 *
 	 * @since 1.0.0
@@ -175,7 +175,7 @@ final class Module {
 		// BEFORE the Divi *theme* loads its builder framework (themes load
 		// on `after_setup_theme`, and Divi boots Divi 5 from
 		// `et_setup_builder_5` on `init` priority 0). So we must NOT gate
-		// on `is_active()` here — `ModuleRegistration` / `ET_Builder_Element`
+		// on `is_active()` here - `ModuleRegistration` / `ET_Builder_Element`
 		// don't exist yet and the check would always fail.
 		//
 		// Instead we attach the hooks unconditionally. They're harmless
@@ -183,7 +183,7 @@ final class Module {
 		// only ever fires if Divi 5 is present, and `register_vb_package`
 		// self-guards on the Divi classes/functions. The Divi-presence
 		// check happens INSIDE the callbacks, which run at `init:0` and
-		// later — by which point Divi has loaded.
+		// later - by which point Divi has loaded.
 
 		// Native modules' PHP render side. The dependency-tree action is
 		// Divi-only, so attaching its listener is a no-op when Divi isn't
@@ -195,7 +195,7 @@ final class Module {
 
 		// Visual Builder bundle registration (canonical D5 mechanism).
 		//
-		// CRITICAL timing: register on `et_fb_framework_loaded` — the SAME
+		// CRITICAL timing: register on `et_fb_framework_loaded` - the SAME
 		// hook Divi uses for its own package registrations
 		// (`PackageBuildManager::register_divi_package_builds`). This fires
 		// BEFORE `PackageBuildManager::enqueue_scripts` captures the
@@ -203,7 +203,7 @@ final class Module {
 		// `divi_visual_builder_assets_before_enqueue_scripts` hook fires
 		// from *inside* enqueue_scripts and proved too late for the script
 		// (the style happened to survive by ordering luck, the script did
-		// not — confirmed via enqueue-state diagnostics). Self-guards on
+		// not - confirmed via enqueue-state diagnostics). Self-guards on
 		// Divi's PackageBuildManager + VB-active checks.
 		add_action( 'et_fb_framework_loaded', array( self::class, 'register_vb_package' ) );
 		// Fallback: also attach to the before-enqueue hook in case
@@ -236,7 +236,7 @@ final class Module {
 		if ( ! function_exists( 'et_core_is_fb_enabled' ) || ! et_core_is_fb_enabled() ) {
 			return;
 		}
-		// App window only — the module library + registration store live in the
+		// App window only - the module library + registration store live in the
 		// app window, not the top window. Read-only detection of Divi's own
 		// ?app_window marker on an editor request; no state change, so nonce
 		// verification does not apply.
@@ -340,7 +340,7 @@ final class Module {
 					// in this Divi version (the example repo's
 					// `divi-vendor-wp-hooks` does not exist here, and an
 					// unregistered dep makes WordPress silently DROP the
-					// script — which is exactly why the bundle never
+					// script - which is exactly why the bundle never
 					// loaded). Verified against PackageBuildManager's
 					// registered handle list.
 					'deps'               => array(
@@ -397,7 +397,7 @@ final class Module {
 
 	/**
 	 * Build the `window.fotogridsPbDivi` payload the VB `edit`
-	 * components read — REST base + nonce for the preview / picker
+	 * components read - REST base + nonce for the preview / picker
 	 * endpoints, and edit/create deep links. Mirrors the Elementor
 	 * sub-module's payload shape so the shared PickerModal component
 	 * works identically across hosts.

@@ -1,0 +1,151 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+# Cancel superseded runs on the same ref so PRs don't pile up runners.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # JavaScript / TypeScript style + types.
+  # Mirrors the local `npm run lint` and `npm run type-check` scripts.
+  # ---------------------------------------------------------------------------
+  js-lint:
+    name: JS lint + type-check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: TypeScript type-check
+        run: npm run type-check
+
+  # ---------------------------------------------------------------------------
+  # Jest unit + integration tests with coverage (threshold lives in jest.config.js).
+  # Also runs the render CI guards and the standalone PHP integration scripts,
+  # which is exactly what `npm run test:ci` does locally.
+  # FOTOGRIDS_REQUIRE_PHP_TESTS forces the PHP integration step to fail (rather
+  # than skip) if php is unavailable - the runner has php, so it must run.
+  # ---------------------------------------------------------------------------
+  js-test:
+    name: Jest tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test suite (guards + PHP integration + Jest coverage)
+        env:
+          FOTOGRIDS_REQUIRE_PHP_TESTS: '1'
+        run: npm run test:ci
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage
+          path: coverage/
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # PHPUnit: WordPress-independent unit tests across the supported PHP range.
+  # The current suite is isolated (no WP harness, no DB). When DB-backed WP
+  # tests are added, give them their own job with a MySQL service container.
+  # ---------------------------------------------------------------------------
+  phpunit:
+    name: PHPUnit (${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.4', '8.1', '8.3' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ matrix.php }}-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run PHPUnit
+        run: composer test:php
+
+  # ---------------------------------------------------------------------------
+  # Build verification: a clean webpack production build must succeed.
+  # Catches broken imports, missing entries, and SCSS errors that lint cannot.
+  # Uploads the built dist/ so a reviewer can inspect the actual artifact.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build (webpack)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7

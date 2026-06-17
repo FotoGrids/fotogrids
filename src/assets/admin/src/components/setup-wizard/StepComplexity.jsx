@@ -4,7 +4,7 @@ import { persistSetting } from './persist-setting';
 const { __ } = wp.i18n;
 
 /**
- * Step 3 — Setup mode (Easy vs Advanced).
+ * Step 3 - Setup mode (Easy vs Advanced).
  *
  * The pick is persisted immediately to `fotogrids_settings_mode` via the
  * shared AJAX setting endpoint and surfaced through

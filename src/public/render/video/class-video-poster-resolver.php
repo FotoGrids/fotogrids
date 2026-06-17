@@ -21,12 +21,12 @@ if ( ! defined( 'WPINC' ) ) {
  * poster) for a video item, walking a priority chain so there is always
  * something to show:
  *
- *   1. Custom poster — poster_id (attachment) or poster_url stored in the
+ *   1. Custom poster - poster_id (attachment) or poster_url stored in the
  *      item's custom_data. Set by the admin.
  *   2. File video: WordPress's native attachment poster (the video's featured
  *      image / "Video Thumbnail").
  *   3. Embed: the oEmbed thumbnail captured at create time (custom_data).
- *   4. Empty string — the renderer falls back to a CSS placeholder tile.
+ *   4. Empty string - the renderer falls back to a CSS placeholder tile.
  *
  * Frame extraction from the video file is intentionally not performed here; it
  * is an opportunistic, host-dependent upload-time concern. The resolver only

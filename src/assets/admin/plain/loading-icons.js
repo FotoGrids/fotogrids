@@ -5,7 +5,7 @@
  * duplicate IDs when multiple loaders are on the page (e.g. React: useId(), vanilla: randomId()).
  */
 
-let FotoGridsLoadingIcons = {};
+const FotoGridsLoadingIcons = {};
 
 /**
  * Returns SVG markup for a loading icon with optional unique instance id.
@@ -15,8 +15,7 @@ let FotoGridsLoadingIcons = {};
  * @returns {string} SVG string.
  */
 function getLoadingIconSvg(key, instanceId) {
-	var svg =
-		FotoGridsLoadingIcons[key] || FotoGridsLoadingIcons['spinner'] || '';
+	let svg = FotoGridsLoadingIcons[key] || FotoGridsLoadingIcons.spinner || '';
 	if (instanceId && svg) {
 		svg = svg.replace(/__FG_ID__/g, instanceId);
 	}
@@ -51,7 +50,7 @@ function mergeLoadingIcons() {
 		const maxAttempts = 50;
 
 		while (!baseUrl && attempts < maxAttempts) {
-			await new Promise(resolve => setTimeout(resolve, 100));
+			await new Promise((resolve) => setTimeout(resolve, 100));
 			baseUrl = window.fotogridsAdmin?.pluginUrl || '';
 			attempts++;
 		}
@@ -59,14 +58,14 @@ function mergeLoadingIcons() {
 
 	if (!baseUrl) {
 		console.warn(
-			'FotoGrids: Plugin URL not available, cannot load config/loading-icons-smil.json',
+			'FotoGrids: Plugin URL not available, cannot load config/loading-icons-smil.json'
 		);
 		return;
 	}
 
 	try {
 		const response = await fetch(
-			`${baseUrl}config/loading-icons-smil.json`,
+			`${baseUrl}config/loading-icons-smil.json`
 		);
 		if (response.ok) {
 			const data = await response.json();
@@ -82,13 +81,13 @@ function mergeLoadingIcons() {
 			mergeLoadingIcons();
 		} else {
 			console.warn(
-				'FotoGrids: Could not load config/loading-icons-smil.json, using empty object',
+				'FotoGrids: Could not load config/loading-icons-smil.json, using empty object'
 			);
 		}
 	} catch (error) {
 		console.warn(
 			'FotoGrids: Error loading config/loading-icons-smil.json:',
-			error,
+			error
 		);
 	}
 })();
@@ -97,7 +96,7 @@ if (typeof window !== 'undefined') {
 	if (typeof window.FotoGridsIcons !== 'undefined') {
 		setTimeout(mergeLoadingIcons, 200);
 	} else {
-		var checkInterval = setInterval(function () {
+		const checkInterval = setInterval(function () {
 			if (
 				typeof window.FotoGridsIcons !== 'undefined' &&
 				Object.keys(FotoGridsLoadingIcons).length > 0

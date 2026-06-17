@@ -3,10 +3,10 @@
  *
  * Two styles, driven by data-fg-zoom-style on the gallery wrapper:
  *
- *   inline  — a magnifier lens is painted over the media box using the
+ *   inline  - a magnifier lens is painted over the media box using the
  *             full-size image as its background. On hover the lens fades in
  *             and pans across the full image on mousemove, revealing detail.
- *   popover — the image opens in the shared Lightbox Mini overlay, on hover
+ *   popover - the image opens in the shared Lightbox Mini overlay, on hover
  *             (after the configured delay) or on click, per data-fg-zoom-mode.
  *
  * Both styles read the full-size source from data-fg-zoom-full (resolved from

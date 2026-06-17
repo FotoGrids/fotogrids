@@ -11,10 +11,10 @@
 /* Picker modal.
  *
  * The picker uses the standard Modal compound layout:
- *   Modal.Header       — title + close
- *   Modal.SubHeader    — search + sort (this `.fg-pb-picker__toolbar`)
- *   Modal.Body         — scrolling list (this `.fg-pb-picker__list`)
- *   Modal.Footer       — cancel + create-new
+ *   Modal.Header       - title + close
+ *   Modal.SubHeader    - search + sort (this `.fg-pb-picker__toolbar`)
+ *   Modal.Body         - scrolling list (this `.fg-pb-picker__list`)
+ *   Modal.Footer       - cancel + create-new
  *
  * Modal owns the modal height (`size="lg"` → 90vh), the body's overflow,
  * and the header/sub-header/footer dividers. The rules below only style
@@ -27,11 +27,11 @@
         display: flex;
         gap: 12px;
         align-items: flex-end;
-    
+
         .components-search-control {
             flex: 1;
         }
-    
+
         .components-select-control {
             min-width: 180px;
         }
@@ -114,7 +114,7 @@
         overflow: hidden;
         border: 4px solid var(--fg-background-primary);
         box-shadow: 0 1px 0 0 var(--fg-border-light);
-    
+
         img {
             width: 100%;
             height: 100%;
@@ -132,11 +132,11 @@
             font-weight: 600;
             font-size: 18px;
             letter-spacing: 1px;
-        
+
             .fotogrids-icon {
                 width: 32px;
                 height: 32px;
-        
+
                 svg {
                     width: 100%;
                     height: 100%;
@@ -222,7 +222,7 @@
         transition: opacity .15s ease;
         pointer-events: none;
         z-index: 2;
-    
+
         .fg-button:disabled {
             background: var(--fg-green);
             color: var(--fg-button-primary-text);

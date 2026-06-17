@@ -30,7 +30,7 @@ class Gallery_Album_Relations {
 	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
 	 *    Security.DirectDB.UnescapedDBParameter: the interpolated
 	 *    $table_name is `$wpdb->prefix . 'fotogrids_gallery_albums'` (a
-	 *    trusted literal — WP placeholders cannot bind table identifiers),
+	 *    trusted literal - WP placeholders cannot bind table identifiers),
 	 *    and ORDER BY clauses are built from a fixed allowlist. All
 	 *    user-supplied *values* are passed through $wpdb->prepare(), which
 	 *    on the flagged lines is a separate statement from the get_*() call.

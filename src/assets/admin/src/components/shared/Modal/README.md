@@ -8,15 +8,15 @@ This contract is consumed by both Free and Pro, and is intended to be stable for
 
 ## React components
 
-### `<Modal>` — the root
+### `<Modal>` - the root
 
 ```jsx
 import { Modal } from '@/admin/src/components/shared/Modal';
 
 <Modal
 	isOpen={open}
-	onClose={reason => setOpen(false)}
-	size='md' // 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full'
+	onClose={(reason) => setOpen(false)}
+	size="md" // 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full'
 	hasSidebar={false}
 	sidebarCollapsible={false}
 	sidebarInitiallyCollapsed={false}
@@ -24,19 +24,19 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 	closeOnEsc={true}
 	preventClose={saving} // when true, esc/overlay/close-button all no-op
 	initialFocusRef={null}
-	type='my-thing' // free-form string emitted in events
+	type="my-thing" // free-form string emitted in events
 >
 	<Modal.Header>
 		<Modal.HeaderTitle>Edit item</Modal.HeaderTitle>
 		<Modal.HeaderActions>
-			<Button variant='primary'>Save</Button>
+			<Button variant="primary">Save</Button>
 		</Modal.HeaderActions>
 	</Modal.Header>
 
-	{/* Optional fixed band below the header — search, sort, filters,
+	{/* Optional fixed band below the header - search, sort, filters,
         breadcrumbs. Stays visible while the body scrolls. */}
 	<Modal.SubHeader>
-		<input type='search' placeholder='Search…' />
+		<input type="search" placeholder="Search…" />
 		<select>...</select>
 	</Modal.SubHeader>
 
@@ -44,23 +44,23 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 		<Modal.Sidebar>...preview pane...</Modal.Sidebar>
 		<Modal.Main>
 			<Modal.Tabs tabs={TABS} activeId={tab} onChange={setTab} />
-			<Modal.TabsPanel id='details' activeId={tab}>
+			<Modal.TabsPanel id="details" activeId={tab}>
 				...
 			</Modal.TabsPanel>
 		</Modal.Main>
 	</Modal.Body>
 
 	<Modal.Footer>
-		<Button variant='secondary' onClick={close}>
+		<Button variant="secondary" onClick={close}>
 			Cancel
 		</Button>
-		<Button variant='primary' onClick={save}>
+		<Button variant="primary" onClick={save}>
 			Save
 		</Button>
 	</Modal.Footer>
 
-	<Modal.Nav direction='prev' onClick={prev} />
-	<Modal.Nav direction='next' onClick={next} />
+	<Modal.Nav direction="prev" onClick={prev} />
+	<Modal.Nav direction="next" onClick={next} />
 </Modal>;
 ```
 
@@ -77,18 +77,18 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 
 #### Sub-component reference
 
-- `Modal.Header` — flex row with leading zone (title + logo), trailing zone (actions + close). Detects `Modal.HeaderActions` children by their `__fgModalHeaderZone` static and routes them to trailing.
-- `Modal.HeaderTitle` — props: `level` (1/2/3, default 2), `as` (override tag).
-- `Modal.HeaderLogo` — small (20px) leading icon.
-- `Modal.HeaderActions` — children render in the trailing zone next to close. A divider is auto-inserted between actions and close.
-- `Modal.HeaderClose` — rendered automatically by `Modal.Header` unless `closeButton={false}`. Calls context's `requestClose('close-button')`.
-- `Modal.Body` — scroll container. With `hasSidebar`, switches to flex row layout. Props: `padding`, `scroll`.
-- `Modal.Sidebar` — 280px left pane. Renders the collapse toggle when the modal's `sidebarCollapsible` is true.
-- `Modal.Main` — the right pane.
-- `Modal.Tabs` — props: `tabs` (array of `{ id, label, badge?, disabled? }`), `activeId`, `onChange`, `disabled`, `emitEvents` (fires `tab-changed` event).
-- `Modal.TabsPanel` — props: `id`, `activeId`. Renders children only when `id === activeId`.
-- `Modal.Footer` — props: `align` (`right` | `left` | `between`), `divider`.
-- `Modal.Nav` — props: `direction` (`prev` | `next`), `onClick`, `disabled`, `ariaLabel`. Rendered as overlay sibling, not inside the dialog.
+- `Modal.Header` - flex row with leading zone (title + logo), trailing zone (actions + close). Detects `Modal.HeaderActions` children by their `__fgModalHeaderZone` static and routes them to trailing.
+- `Modal.HeaderTitle` - props: `level` (1/2/3, default 2), `as` (override tag).
+- `Modal.HeaderLogo` - small (20px) leading icon.
+- `Modal.HeaderActions` - children render in the trailing zone next to close. A divider is auto-inserted between actions and close.
+- `Modal.HeaderClose` - rendered automatically by `Modal.Header` unless `closeButton={false}`. Calls context's `requestClose('close-button')`.
+- `Modal.Body` - scroll container. With `hasSidebar`, switches to flex row layout. Props: `padding`, `scroll`.
+- `Modal.Sidebar` - 280px left pane. Renders the collapse toggle when the modal's `sidebarCollapsible` is true.
+- `Modal.Main` - the right pane.
+- `Modal.Tabs` - props: `tabs` (array of `{ id, label, badge?, disabled? }`), `activeId`, `onChange`, `disabled`, `emitEvents` (fires `tab-changed` event).
+- `Modal.TabsPanel` - props: `id`, `activeId`. Renders children only when `id === activeId`.
+- `Modal.Footer` - props: `align` (`right` | `left` | `between`), `divider`.
+- `Modal.Nav` - props: `direction` (`prev` | `next`), `onClick`, `disabled`, `ariaLabel`. Rendered as overlay sibling, not inside the dialog.
 
 ### Wrappers
 
@@ -203,12 +203,12 @@ All events fire on `document` with the prefix `fotogrids:admin:modal:`. Listen w
 | Event         | Detail                                                                                                           |
 | ------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `opened`      | `{ id, type, size }`                                                                                             |
-| `closed`      | `{ id, type, reason }` — reason: `overlay` \| `esc` \| `close-button` \| `confirm` \| `cancel` \| `programmatic` |
+| `closed`      | `{ id, type, reason }` - reason: `overlay` \| `esc` \| `close-button` \| `confirm` \| `cancel` \| `programmatic` |
 | `confirmed`   | `{ id, type, variant }`                                                                                          |
 | `tab-changed` | `{ modalId, fromTab, toTab }` (only when `Modal.Tabs emitEvents` is set)                                         |
 
 ```js
-window.FotoGridsAdmin.modal.on('opened', e => {
+window.FotoGridsAdmin.modal.on('opened', (e) => {
 	console.log('modal opened:', e.detail);
 });
 ```
@@ -252,6 +252,6 @@ window.FotoGridsAdmin.registerItemEditTab({
 ## CSS rules
 
 - Modal shell styles live in `styles/fg-modal/`. **Don't override them.** If you need a one-off width, add a custom class via the `className` prop and write a scoped rule in your modal's own SCSS.
-- The shell exposes CSS variables on `.fg-modal__dialog`: `--fg-modal-width`, `--fg-modal-height`, `--fg-modal-max-width`, `--fg-modal-max-height`, `--fg-modal-radius`. Override these from your custom class — never via `style={{ ... }}` inline.
+- The shell exposes CSS variables on `.fg-modal__dialog`: `--fg-modal-width`, `--fg-modal-height`, `--fg-modal-max-width`, `--fg-modal-max-height`, `--fg-modal-radius`. Override these from your custom class - never via `style={{ ... }}` inline.
 
-> **Note on naming.** The JSX surface uses unprefixed names (`Modal`, `Confirm`, `Prompt`, `Alert`, `useModal`). The CSS class namespace remains `.fg-modal` and the global imperative API remains `window.FotoGridsAdmin.modal` — these are stable cross-surface contracts and were intentionally not renamed.
+> **Note on naming.** The JSX surface uses unprefixed names (`Modal`, `Confirm`, `Prompt`, `Alert`, `useModal`). The CSS class namespace remains `.fg-modal` and the global imperative API remains `window.FotoGridsAdmin.modal` - these are stable cross-surface contracts and were intentionally not renamed.

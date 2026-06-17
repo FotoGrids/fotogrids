@@ -1,11 +1,11 @@
-/* Image Viewer — one image at a time on a stacked stage.
+/* Image Viewer - one image at a time on a stacked stage.
 
    The stage stacks every item absolutely; only the active item is shown.
    image-viewer.js toggles .fg-is-active on the active item and
    .fg-is-leaving on the outgoing one so the transition mode (fade /
    horizontal / vertical / none) can animate the swap. Chrome is a single
    control bar beneath the image (.fg-viewer-bar) holding the prev/next
-   arrows and a centred counter — no bullets, no thumbnail strip. */
+   arrows and a centred counter - no bullets, no thumbnail strip. */
 
 [data-fg-layout="image-viewer"] {
     /* Stage height contract. The PHP layout always emits --fg-height-max
@@ -49,7 +49,7 @@
     position: relative;
 }
 
-/* Stage — positioning frame. Owns the height contract and clips the
+/* Stage - positioning frame. Owns the height contract and clips the
    sliding transitions. */
 
 [data-fg-viewer="1"] .fg-viewer-stage {
@@ -68,7 +68,7 @@
     height: min( var( --fg-height-fixed, 500px ), var( --fg-viewer-height-cap, 100vh ) );
 }
 
-/* Track — the relative box the absolutely-positioned items stack inside.
+/* Track - the relative box the absolutely-positioned items stack inside.
    In auto height mode the track sizes to the active item; in fixed mode
    it fills the stage. */
 
@@ -115,8 +115,8 @@
 }
 
 /* Aspect ratio "None". The wrapper carries data-fg-natural-ratio="1" and
-   --fg-item-aspect-ratio is not stamped. The image must show whole — no
-   crop, no stretch — so the fixed item box is dropped (aspect-ratio: auto)
+   --fg-item-aspect-ratio is not stamped. The image must show whole - no
+   crop, no stretch - so the fixed item box is dropped (aspect-ratio: auto)
    and object-fit switches to contain.
 
    Height contract for "None":
@@ -228,14 +228,14 @@
         visibility 0s linear 0s;
 }
 
-/* None — instant swap, no animation. */
+/* None - instant swap, no animation. */
 
 [data-fg-layout="image-viewer"][data-fg-transition="none"] .fg-viewer-track .fg-item,
 [data-fg-layout="image-viewer"][data-fg-transition="none"] .fg-viewer-track .fg-item.fg-is-active {
     transition: none;
 }
 
-/* Horizontal — the outgoing item slides out left, the incoming slides in
+/* Horizontal - the outgoing item slides out left, the incoming slides in
    from the right. data-fg-dir tells us travel direction (next/prev). */
 
 [data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item {
@@ -260,7 +260,7 @@
     transform: translateX( 100% );
 }
 
-/* Vertical — same as horizontal on the Y axis. */
+/* Vertical - same as horizontal on the Y axis. */
 
 [data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item {
     transform: translateY( 100% );
@@ -292,7 +292,7 @@
     }
 }
 
-/* Control bar — sits BELOW the image (not overlaid). A light-grey strip
+/* Control bar - sits BELOW the image (not overlaid). A light-grey strip
    with the prev arrow on the inline-start side, the next arrow on the
    inline-end side, and the counter centred between them. The bar colour is
    a CSS variable so it can be themed/overridden. */
@@ -340,7 +340,7 @@
     height: var( --fg-viewer-arrow-icon-size );
 }
 
-/* Centre group — counter + caption title, kept centred between the arrows.
+/* Centre group - counter + caption title, kept centred between the arrows.
    The group absorbs the space between the arrows; the title inside it
    truncates so the group never pushes the next arrow off the bar. */
 [data-fg-viewer="1"] .fg-viewer-bar-centre {
@@ -367,7 +367,7 @@
     display: none;
 }
 
-/* Caption title — sits to the right of the counter, absorbs the remaining
+/* Caption title - sits to the right of the counter, absorbs the remaining
    centre width, and truncates with an ellipsis when it overflows. The title
    styling variables are emitted by the Captions decorator (title colour,
    font family/weight, and the desktop font size). */
@@ -385,7 +385,7 @@
     user-select: none;
 }
 
-/* No title on the active item — collapse so the counter stays centred. */
+/* No title on the active item - collapse so the counter stays centred. */
 [data-fg-viewer="1"] .fg-viewer-title--empty {
     display: none;
 }

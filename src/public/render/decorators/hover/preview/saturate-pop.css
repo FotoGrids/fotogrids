@@ -1,0 +1,10 @@
+.fotogrids-collection[data-fg-hover='saturate-pop'] .fg-item-media img {
+	filter: saturate(0.4) contrast(0.95);
+	transition: filter 0.3s ease;
+}
+.fotogrids-collection[data-fg-hover='saturate-pop']
+	.fg-item:hover
+	.fg-item-media
+	img {
+	filter: saturate(1.4) contrast(1.05);
+}

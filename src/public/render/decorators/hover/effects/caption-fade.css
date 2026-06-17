@@ -1,0 +1,10 @@
+/* Caption hidden at rest, fades in on hover. Works for every placement. */
+
+.fotogrids-collection[data-fg-hover='caption-fade'] .fg-caption {
+	opacity: 0;
+	transition-property: opacity;
+}
+
+.fotogrids-collection[data-fg-hover='caption-fade'] .fg-item:hover .fg-caption {
+	opacity: 1;
+}

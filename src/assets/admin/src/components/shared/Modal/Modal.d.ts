@@ -1,10 +1,10 @@
 /**
- * FotoGrids Admin Modal — public API types.
+ * FotoGrids Admin Modal - public API types.
  *
  * Pro and 3rd-party plugins consume the modal system either through
  * `window.FotoGridsAdmin.modal` (imperative) or by importing the React
  * components from this module. These types describe the stable public
- * contract — treat changes here as breaking.
+ * contract - treat changes here as breaking.
  */
 
 import type { ComponentType, ReactNode, MutableRefObject } from 'react';
@@ -259,11 +259,11 @@ export interface FotoGridsAdminModalApi {
 
 	on: <K extends ModalEventName>(
 		event: K,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	) => () => void;
 	off: <K extends ModalEventName>(
 		event: K,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	) => void;
 	emit: (event: ModalEventName, detail?: Record<string, unknown>) => void;
 
@@ -293,15 +293,15 @@ declare module '@fotogrids/admin/fg-modal' {
 
 	export function emit(
 		event: ModalEventName,
-		detail?: Record<string, unknown>,
+		detail?: Record<string, unknown>
 	): void;
 	export function on(
 		event: ModalEventName,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	): () => void;
 	export function off(
 		event: ModalEventName,
-		handler: (e: CustomEvent) => void,
+		handler: (e: CustomEvent) => void
 	): void;
 }
 

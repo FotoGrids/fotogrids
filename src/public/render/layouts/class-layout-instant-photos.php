@@ -149,9 +149,9 @@ final class Layout_Instant_Photos implements Layout {
 		// existing direction.
 		$vars = array(
 			'--fg-frame-thickness' => new Responsive_Var(
-				desktop: $desktop . 'px',
-				tablet:  $tablet . 'px',
-				mobile:  $mobile . 'px',
+				$desktop . 'px',
+				$tablet . 'px',
+				$mobile . 'px',
 			),
 			'--fg-hover-boost'     => (string) self::HOVER_BOOST_DEG,
 		);
@@ -174,12 +174,12 @@ final class Layout_Instant_Photos implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-render-base'           => new Asset_Decl(
-					path: 'base/collection-base.css'
+					'base/collection-base.css'
 				),
 				'fotogrids-layout-instant-photos' => new Asset_Decl(
-					path: 'layouts/instant-photos/instant-photos.css'
+					'layouts/instant-photos/instant-photos.css'
 				),
 			)
 		);
@@ -350,7 +350,7 @@ final class Layout_Instant_Photos implements Layout {
 	 * setting. We hand the per-device values straight through to CSS so
 	 * the active value is selected by the existing responsive plumbing,
 	 * but for randomisation we have to pick one bucket on the PHP side.
-	 * Desktop is the widest range and the most visible — use it.
+	 * Desktop is the widest range and the most visible - use it.
 	 *
 	 * @since   1.0.0
 	 */

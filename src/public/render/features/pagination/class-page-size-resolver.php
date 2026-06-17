@@ -12,8 +12,8 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Static helper for pagination math.
  *
- * Lives as a class (not a trait) so non-module callers — most importantly
- * Context_Builder — can use the same logic without having to `use` the
+ * Lives as a class (not a trait) so non-module callers - most importantly
+ * Context_Builder - can use the same logic without having to `use` the
  * Pagination_Common trait. The trait delegates to this class for the math
  * so the module classes and the builder agree.
  *
@@ -43,7 +43,7 @@ final class Page_Size_Resolver {
 			return 24;
 		}
 
-		// Flat int — saved by older settings (or by show_all default).
+		// Flat int - saved by older settings (or by show_all default).
 		if ( is_numeric( $raw ) ) {
 			return max( 1, (int) $raw );
 		}
@@ -103,7 +103,7 @@ final class Page_Size_Resolver {
 	}
 
 	/**
-	 * Whether we should actually slice — guards against "total <= page_size"
+	 * Whether we should actually slice - guards against "total <= page_size"
 	 * which would render the same as show_all but with chrome glued on.
 	 *
 	 * @since 1.0.0

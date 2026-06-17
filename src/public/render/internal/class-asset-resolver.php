@@ -183,7 +183,7 @@ final class Asset_Resolver {
 
 		// Default: inline-print whenever wp_head / admin_head has already
 		// fired (the classic "shortcode rendered in the_content past wp_head"
-		// case — styles would otherwise never reach the page). Page-builder
+		// case - styles would otherwise never reach the page). Page-builder
 		// sub-modules can opt their preview / partial-render contexts in
 		// unconditionally via the SHOULD_INLINE_ASSETS filter.
 		$default_inline = did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0;

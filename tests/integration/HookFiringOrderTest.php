@@ -54,9 +54,9 @@ use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Hooks;
 use FotoGrids\Render\Internal\Hook_Spy;
 
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-columns-mode.php';
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-render-mode.php';
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-request-source.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-columns-mode.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-mode.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-request-source.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-meta.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-layout.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-behavior.php';

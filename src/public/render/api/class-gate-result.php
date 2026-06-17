@@ -15,6 +15,10 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Gate_Result {
 
+	public bool $passed;
+	public string $blocked_html;
+	public int $http_status;
+
 	/**
 	 * @since   1.0.0
 	 * @param   bool   $passed Whether gate passed.
@@ -23,10 +27,14 @@ final class Gate_Result {
 	 * @return  void
 	 */
 	private function __construct(
-		public readonly bool $passed,
-		public readonly string $blocked_html,
-		public readonly int $http_status,
-	) {}
+		bool $passed,
+		string $blocked_html,
+		int $http_status
+	) {
+		$this->passed       = $passed;
+		$this->blocked_html = $blocked_html;
+		$this->http_status  = $http_status;
+	}
 
 	/**
 	 * Returns a passing gate result.

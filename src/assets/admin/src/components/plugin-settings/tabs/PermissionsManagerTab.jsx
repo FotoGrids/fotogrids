@@ -172,7 +172,7 @@ const PermissionsManagerTab = () => {
 
     if (!registry) return null;
 
-    // Panel 1: Capability Settings — logical, lowest-role dropdowns.
+    // Panel 1: Capability Settings - logical, lowest-role dropdowns.
     const renderSimplePanel = () => {
         if (overridePanelOne) {
             const C = overridePanelOne;
@@ -250,7 +250,7 @@ const PermissionsManagerTab = () => {
         );
     };
 
-    // Panel 2: Permissions Manager matrix — Free readonly, Pro override.
+    // Panel 2: Permissions Manager matrix - Free readonly, Pro override.
     const renderMatrixPanel = () => {
         if (overrideMatrix) {
             const C = overrideMatrix;

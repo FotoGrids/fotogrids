@@ -13,7 +13,7 @@ import { persistSetting } from '../setup-wizard/persist-setting';
 const { __ } = wp.i18n;
 
 /**
- * SetupWizardPage — first-run wizard rendered as a page-less full-screen
+ * SetupWizardPage - first-run wizard rendered as a page-less full-screen
  * Modal. Opens over whichever admin page the user is on, gated on a URL
  * query param (?fotogrids_setup_step=N).
  *
@@ -76,7 +76,7 @@ const SetupWizardPage = () => {
         : null;
     const [ persona, setPersona ] = useState( initialPersona || null );
 
-    // Persist immediately on pick — the user's last click wins. We
+    // Persist immediately on pick - the user's last click wins. We
     // wrap the raw setter so the step component stays presentational.
     const handlePersonaPick = ( id ) => {
         setPersona( id );
@@ -145,7 +145,7 @@ const SetupWizardPage = () => {
         return <StepComponent />;
     } )();
 
-    // Progress bar fill — 0% before any step, 100% on the final step.
+    // Progress bar fill - 0% before any step, 100% on the final step.
     // Steps are 1-indexed; with N steps the visual fill points are
     // 1/N .. N/N. We expose it as a CSS var so the SCSS can drive any
     // transition it wants.
@@ -162,7 +162,7 @@ const SetupWizardPage = () => {
             closeOnEsc
         >
             {/* Progress bar absolutely positioned against the top of the
-              * dialog. Transparent rail, blue fill — width driven by a CSS
+              * dialog. Transparent rail, blue fill - width driven by a CSS
               * variable so the existing CSS handles the transition. */}
             <div
                 className="fotogrids-setup__progress"
@@ -189,7 +189,7 @@ const SetupWizardPage = () => {
                 </div>
             </Modal.Body>
 
-            {/* Footer is hidden on step 1 entirely — the welcome step
+            {/* Footer is hidden on step 1 entirely - the welcome step
               * owns its own primary / secondary buttons. From step 2
               * onward it slides up from the bottom (CSS handles the
               * transform on mount). Step 5 hides the primary button

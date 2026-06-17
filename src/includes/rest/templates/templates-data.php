@@ -505,7 +505,7 @@ class Templates_Data {
 			$gallery_html = '<div class="fotogrids-error">' . __( 'Failed to generate gallery preview.', 'fotogrids' ) . '</div>';
 		}
 
-		// TEMPORARY DIAGNOSTIC — remove before release.
+		// TEMPORARY DIAGNOSTIC - remove before release.
 		// Hit the preview URL with &fg_debug=1 (requires WP_DEBUG) to dump what
 		// the render pipeline collected vs. what the standalone HTML page links.
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $request->get_param( 'fg_debug' ) ) {

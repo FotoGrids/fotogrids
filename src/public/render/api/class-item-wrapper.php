@@ -15,11 +15,17 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_Wrapper {
 
+	public string $tag;
+	public array $attrs;
+
 	/**
 	 * @param array<string, string> $attrs Wrapper attributes.
 	 */
 	public function __construct(
-		public readonly string $tag,
-		public readonly array $attrs,
-	) {}
+		string $tag,
+		array $attrs
+	) {
+		$this->tag   = $tag;
+		$this->attrs = $attrs;
+	}
 }

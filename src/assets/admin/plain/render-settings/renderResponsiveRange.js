@@ -12,7 +12,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		renderIcon,
 		getFieldState,
 		__,
-	},
+	}
 ) => {
 	const { createElement: h } = wp.element;
 
@@ -42,22 +42,22 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		// _linked is a UI-only flag held in React state; it's never persisted.
 		// On first render after a reload, currentValue._linked is undefined, so we
 		// derive linked-state from the data: if any device has unequal sides,
-		// the user must have unlinked at some point — show as unlinked.
+		// the user must have unlinked at some point - show as unlinked.
 		const sideValueFor = (deviceValue, side) => {
 			if (!deviceValue || typeof deviceValue !== 'object')
 				return undefined;
 			const sv = deviceValue[side];
 			return sv && typeof sv === 'object' ? sv.value : sv;
 		};
-		const deviceHasEqualSides = deviceValue => {
+		const deviceHasEqualSides = (deviceValue) => {
 			if (!deviceValue || typeof deviceValue !== 'object') return true;
 			const first = sideValueFor(deviceValue, 'top');
-			return sides.every(s => sideValueFor(deviceValue, s) === first);
+			return sides.every((s) => sideValueFor(deviceValue, s) === first);
 		};
 		const allDevicesEqual = () => {
 			if (!currentValue || typeof currentValue !== 'object') return true;
-			return ['desktop', 'tablet', 'mobile'].every(d =>
-				deviceHasEqualSides(currentValue[d]),
+			return ['desktop', 'tablet', 'mobile'].every((d) =>
+				deviceHasEqualSides(currentValue[d])
 			);
 		};
 
@@ -102,9 +102,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		) {
 			// Normalize each device: ensure all four sides exist (ignore _linked and other meta keys)
 			responsiveValue = {};
-			['desktop', 'tablet', 'mobile'].forEach(device => {
+			['desktop', 'tablet', 'mobile'].forEach((device) => {
 				const dv = currentValue[device];
-				if (dv && typeof dv === 'object' && sides.every(s => s in dv)) {
+				if (
+					dv &&
+					typeof dv === 'object' &&
+					sides.every((s) => s in dv)
+				) {
 					responsiveValue[device] = dv;
 				} else {
 					responsiveValue[device] = buildDefaultSideValue(device, dv);
@@ -112,7 +116,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 			});
 		} else {
 			responsiveValue = {};
-			['desktop', 'tablet', 'mobile'].forEach(device => {
+			['desktop', 'tablet', 'mobile'].forEach((device) => {
 				responsiveValue[device] = buildDefaultSideValue(device, null);
 			});
 		}
@@ -127,7 +131,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 			return dv ?? setting.responsive[device].default;
 		};
 
-		const getDeviceUnit = device => {
+		const getDeviceUnit = (device) => {
 			if (!hasUnits) return null;
 			const dv = responsiveValue[device].top;
 			return (
@@ -138,7 +142,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 
 		// _linked is UI-only - never included in updateSetting payloads, only in updateSettingStateOnly.
 		const withLinked = (val, linked) => ({ ...val, _linked: linked });
-		const withoutLinked = val => {
+		const withoutLinked = (val) => {
 			const { _linked, ...rest } = val;
 			return rest;
 		};
@@ -186,7 +190,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		const updateUnit = (device, unit) => {
 			if (!hasUnits) return;
 			const newDeviceValue = {};
-			sides.forEach(side => {
+			sides.forEach((side) => {
 				newDeviceValue[side] = {
 					value: getSideValue(device, side),
 					unit,
@@ -202,7 +206,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				// Unlinking - UI only, no save
 				stateOnly(
 					setting.key,
-					withLinked({ ...responsiveValue }, false),
+					withLinked({ ...responsiveValue }, false)
 				);
 			} else {
 				// Linking - collapse all sides to top value (data save), flip flag (state only)
@@ -250,7 +254,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				icon: 'responsive_mobile',
 			},
 		];
-		const activeDeviceData = devices.find(d => d.key === activeDevice);
+		const activeDeviceData = devices.find((d) => d.key === activeDevice);
 		const currentUnit = getDeviceUnit(activeDevice);
 
 		const linkedTopValue = getSideValue(activeDevice, 'top');
@@ -276,7 +280,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									className: 'fotogrids-setting__unit',
 									key: 'unit',
 								},
-								` (${setting.unit})`,
+								` (${setting.unit})`
 							),
 						showSettingBadge &&
 							h(
@@ -285,14 +289,14 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									className: 'fotogrids-pro-badge',
 									key: 'pro-badge',
 								},
-								settingBadgeText,
+								settingBadgeText
 							),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 				h(
 					'span',
 					{ className: 'fotogrids-responsive-setting__device-icon' },
-					renderIcon(activeDeviceData.icon),
+					renderIcon(activeDeviceData.icon)
 				),
 			]),
 
@@ -312,16 +316,16 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								min: setting.responsive[activeDevice].min,
 								max: setting.responsive[activeDevice].max,
 								value: linkedTopValue,
-								onChange: e =>
+								onChange: (e) =>
 									!isDisabled &&
 									updateAllSides(
 										activeDevice,
-										parseInt(e.target.value),
+										parseInt(e.target.value)
 									),
 								disabled: isDisabled || !isLinked,
 								className: 'fotogrids-range-slider',
 							}),
-						],
+						]
 					),
 
 					h(
@@ -353,15 +357,15 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												].max,
 												value: getSideValue(
 													activeDevice,
-													side,
+													side
 												),
-												onChange: e => {
+												onChange: (e) => {
 													if (isDisabled) return;
 													const _v = parseInt(
-														e.target.value,
+														e.target.value
 													);
 													const val = Number.isFinite(
-														_v,
+														_v
 													)
 														? _v
 														: setting.responsive[
@@ -370,12 +374,12 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													isLinked
 														? updateAllSides(
 																activeDevice,
-																val,
+																val
 															)
 														: updateSide(
 																activeDevice,
 																side,
-																val,
+																val
 															);
 												},
 												disabled: isDisabled,
@@ -388,23 +392,23 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													className:
 														'fotogrids-fourside-label',
 												},
-												label,
+												label
 											),
-										],
-									),
-								),
+										]
+									)
+								)
 							),
 							hasUnits &&
 								renderUnitSelect(
 									h,
 									currentUnit,
-									unit =>
+									(unit) =>
 										!isDisabled &&
 										updateUnit(activeDevice, unit),
 									isDisabled,
-									setting,
+									setting
 								),
-						].filter(Boolean),
+						].filter(Boolean)
 					),
 
 					h(
@@ -412,7 +416,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						{
 							type: 'button',
 							className: `fotogrids-fourside-link-btn${isLinked ? ' fg-is-active' : ''}`,
-							onClick: e => {
+							onClick: (e) => {
 								e.preventDefault();
 								e.stopPropagation();
 								!isDisabled && handleLinkToggle();
@@ -422,20 +426,20 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								? __('Unlink values', 'fotogrids')
 								: __('Link values', 'fotogrids'),
 						},
-						renderIcon('link'),
+						renderIcon('link')
 					),
 
 					h(
 						'div',
 						{ className: 'fotogrids-responsive-setting__devices' },
-						devices.map(device =>
+						devices.map((device) =>
 							h(
 								'button',
 								{
 									key: device.key,
 									type: 'button',
 									className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
-									onClick: e => {
+									onClick: (e) => {
 										e.preventDefault();
 										e.stopPropagation();
 										setActiveDevice(device.key);
@@ -443,11 +447,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									disabled: isDisabled,
 									title: device.label,
 								},
-								renderIcon(device.icon),
-							),
-						),
+								renderIcon(device.icon)
+							)
+						)
 					),
-				],
+				]
 			),
 
 			setting.description &&
@@ -456,7 +460,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 					{
 						className: 'fotogrids-setting__description',
 					},
-					setting.description,
+					setting.description
 				),
 		]);
 	}
@@ -468,51 +472,46 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		!Array.isArray(currentValue)
 	) {
 		responsiveValue = currentValue;
+	} else if (isMinMaxMode) {
+		responsiveValue = {
+			desktop: defaultResponsive.desktop || {
+				min:
+					setting.responsive.desktop.defaultMin ||
+					setting.responsive.desktop.min,
+				max:
+					setting.responsive.desktop.defaultMax ||
+					setting.responsive.desktop.max,
+			},
+			tablet: defaultResponsive.tablet || {
+				min:
+					setting.responsive.tablet.defaultMin ||
+					setting.responsive.tablet.min,
+				max:
+					setting.responsive.tablet.defaultMax ||
+					setting.responsive.tablet.max,
+			},
+			mobile: defaultResponsive.mobile || {
+				min:
+					setting.responsive.mobile.defaultMin ||
+					setting.responsive.mobile.min,
+				max:
+					setting.responsive.mobile.defaultMax ||
+					setting.responsive.mobile.max,
+			},
+		};
 	} else {
-		if (isMinMaxMode) {
-			responsiveValue = {
-				desktop: defaultResponsive.desktop || {
-					min:
-						setting.responsive.desktop.defaultMin ||
-						setting.responsive.desktop.min,
-					max:
-						setting.responsive.desktop.defaultMax ||
-						setting.responsive.desktop.max,
-				},
-				tablet: defaultResponsive.tablet || {
-					min:
-						setting.responsive.tablet.defaultMin ||
-						setting.responsive.tablet.min,
-					max:
-						setting.responsive.tablet.defaultMax ||
-						setting.responsive.tablet.max,
-				},
-				mobile: defaultResponsive.mobile || {
-					min:
-						setting.responsive.mobile.defaultMin ||
-						setting.responsive.mobile.min,
-					max:
-						setting.responsive.mobile.defaultMax ||
-						setting.responsive.mobile.max,
-				},
-			};
-		} else {
-			responsiveValue = {
-				desktop:
-					defaultResponsive.desktop ||
-					setting.responsive.desktop.default,
-				tablet:
-					defaultResponsive.tablet ||
-					setting.responsive.tablet.default,
-				mobile:
-					defaultResponsive.mobile ||
-					setting.responsive.mobile.default,
-			};
-		}
+		responsiveValue = {
+			desktop:
+				defaultResponsive.desktop || setting.responsive.desktop.default,
+			tablet:
+				defaultResponsive.tablet || setting.responsive.tablet.default,
+			mobile:
+				defaultResponsive.mobile || setting.responsive.mobile.default,
+		};
 	}
 
 	if (hasUnits) {
-		['desktop', 'tablet', 'mobile'].forEach(device => {
+		['desktop', 'tablet', 'mobile'].forEach((device) => {
 			if (isMinMaxMode) {
 				if (
 					!responsiveValue[device] ||
@@ -572,26 +571,24 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						};
 					}
 				}
-			} else {
-				if (
-					!responsiveValue[device] ||
-					typeof responsiveValue[device] !== 'object' ||
-					responsiveValue[device].value === undefined
-				) {
-					const defaultValue =
-						defaultResponsive[device] ||
-						setting.responsive[device].default;
-					responsiveValue[device] = {
-						value:
-							typeof defaultValue === 'object'
-								? defaultValue.value || defaultValue
-								: defaultValue,
-						unit:
-							typeof defaultValue === 'object'
-								? defaultValue.unit || setting.units[0]
-								: setting.units[0],
-					};
-				}
+			} else if (
+				!responsiveValue[device] ||
+				typeof responsiveValue[device] !== 'object' ||
+				responsiveValue[device].value === undefined
+			) {
+				const defaultValue =
+					defaultResponsive[device] ||
+					setting.responsive[device].default;
+				responsiveValue[device] = {
+					value:
+						typeof defaultValue === 'object'
+							? defaultValue.value || defaultValue
+							: defaultValue,
+					unit:
+						typeof defaultValue === 'object'
+							? defaultValue.unit || setting.units[0]
+							: setting.units[0],
+				};
 			}
 		});
 	}
@@ -604,7 +601,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 					[device]: {
 						...responsiveValue[device],
 						[type]: {
-							value: value,
+							value,
 							unit:
 								responsiveValue[device][type].unit ||
 								setting.units[0],
@@ -622,23 +619,21 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				};
 				updateSetting(setting.key, newValue);
 			}
+		} else if (hasUnits) {
+			const newValue = {
+				...responsiveValue,
+				[device]: {
+					value,
+					unit: responsiveValue[device].unit || setting.units[0],
+				},
+			};
+			updateSetting(setting.key, newValue);
 		} else {
-			if (hasUnits) {
-				const newValue = {
-					...responsiveValue,
-					[device]: {
-						value: value,
-						unit: responsiveValue[device].unit || setting.units[0],
-					},
-				};
-				updateSetting(setting.key, newValue);
-			} else {
-				const newValue = {
-					...responsiveValue,
-					[device]: value,
-				};
-				updateSetting(setting.key, newValue);
-			}
+			const newValue = {
+				...responsiveValue,
+				[device]: value,
+			};
+			updateSetting(setting.key, newValue);
 		}
 	};
 
@@ -655,7 +650,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								responsiveValue[device].min.value !== null
 									? responsiveValue[device].min.value
 									: setting.responsive[device].defaultMin,
-							unit: unit,
+							unit,
 						},
 						max: {
 							value:
@@ -664,7 +659,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								responsiveValue[device].max.value !== null
 									? responsiveValue[device].max.value
 									: setting.responsive[device].defaultMax,
-							unit: unit,
+							unit,
 						},
 					},
 				};
@@ -678,7 +673,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 							responsiveValue[device].value !== null
 								? responsiveValue[device].value
 								: setting.responsive[device].default,
-						unit: unit,
+						unit,
 					},
 				};
 				updateSetting(setting.key, newValue);
@@ -704,7 +699,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		},
 	];
 
-	const activeDeviceData = devices.find(d => d.key === activeDevice);
+	const activeDeviceData = devices.find((d) => d.key === activeDevice);
 	const currentDeviceData = responsiveValue[activeDevice];
 
 	if (isMinMaxMode) {
@@ -768,9 +763,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 											className: 'fotogrids-pro-badge',
 											key: 'pro-badge',
 										},
-										settingBadgeText,
+										settingBadgeText
 									),
-							].filter(Boolean),
+							].filter(Boolean)
 						),
 						h(
 							'span',
@@ -778,9 +773,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								className:
 									'fotogrids-responsive-setting__device-icon',
 							},
-							renderIcon(activeDeviceData.icon),
+							renderIcon(activeDeviceData.icon)
 						),
-					],
+					]
 				),
 
 				h(
@@ -824,9 +819,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												min: minMin,
 												max: maxMax,
 												value: currentMinValue,
-												onChange: e => {
+												onChange: (e) => {
 													const newMin = parseInt(
-														e.target.value,
+														e.target.value
 													);
 													if (
 														newMin <=
@@ -836,7 +831,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 															updateResponsiveValue(
 																activeDevice,
 																newMin,
-																'min',
+																'min'
 															);
 													}
 												},
@@ -849,9 +844,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												min: minMin,
 												max: maxMax,
 												value: currentMaxValue,
-												onChange: e => {
+												onChange: (e) => {
 													const newMax = parseInt(
-														e.target.value,
+														e.target.value
 													);
 													if (
 														newMax >=
@@ -861,7 +856,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 															updateResponsiveValue(
 																activeDevice,
 																newMax,
-																'max',
+																'max'
 															);
 													}
 												},
@@ -869,9 +864,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												className:
 													'fotogrids-range-slider fotogrids-range-slider-max',
 											}),
-										],
+										]
 									),
-								],
+								]
 							);
 						})(),
 
@@ -895,7 +890,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												className:
 													'fotogrids-responsive-minmax-range__label',
 											},
-											__('Min', 'fotogrids'),
+											__('Min', 'fotogrids')
 										),
 										h(
 											'div',
@@ -909,9 +904,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													min: minMin,
 													max: currentMaxValue,
 													value: currentMinValue,
-													onChange: e => {
+													onChange: (e) => {
 														const _vm = parseInt(
-															e.target.value,
+															e.target.value
 														);
 														const newMin =
 															Number.isFinite(_vm)
@@ -925,7 +920,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 																updateResponsiveValue(
 																	activeDevice,
 																	newMin,
-																	'min',
+																	'min'
 																);
 														}
 													},
@@ -933,9 +928,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													className:
 														'fotogrids-range-number-input',
 												}),
-											],
+											]
 										),
-									],
+									]
 								),
 								h(
 									'div',
@@ -950,7 +945,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												className:
 													'fotogrids-responsive-minmax-range__label',
 											},
-											__('Max', 'fotogrids'),
+											__('Max', 'fotogrids')
 										),
 										h(
 											'div',
@@ -964,9 +959,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													min: currentMinValue,
 													max: maxMax,
 													value: currentMaxValue,
-													onChange: e => {
+													onChange: (e) => {
 														const _vx = parseInt(
-															e.target.value,
+															e.target.value
 														);
 														const newMax =
 															Number.isFinite(_vx)
@@ -980,7 +975,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 																updateResponsiveValue(
 																	activeDevice,
 																	newMax,
-																	'max',
+																	'max'
 																);
 														}
 													},
@@ -988,9 +983,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													className:
 														'fotogrids-range-number-input',
 												}),
-											],
+											]
 										),
-									],
+									]
 								),
 								hasUnits &&
 									h(
@@ -1013,12 +1008,12 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 																currentMaxUnit ||
 																setting
 																	.units[0],
-															onChange: e =>
+															onChange: (e) =>
 																!isDisabled &&
 																updateResponsiveUnit(
 																	activeDevice,
 																	e.target
-																		.value,
+																		.value
 																),
 															disabled:
 																isDisabled,
@@ -1026,12 +1021,14 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 																'fotogrids-units-select',
 															options:
 																setting.units.map(
-																	unitOption => ({
+																	(
+																		unitOption
+																	) => ({
 																		value: unitOption,
 																		label: unitOption,
-																	}),
+																	})
 																),
-														},
+														}
 													)
 												: h(
 														'select',
@@ -1041,12 +1038,12 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 																currentMaxUnit ||
 																setting
 																	.units[0],
-															onChange: e =>
+															onChange: (e) =>
 																!isDisabled &&
 																updateResponsiveUnit(
 																	activeDevice,
 																	e.target
-																		.value,
+																		.value
 																),
 															disabled:
 																isDisabled,
@@ -1054,20 +1051,20 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 																'fotogrids-units-select',
 														},
 														setting.units.map(
-															unitOption =>
+															(unitOption) =>
 																h(
 																	'option',
 																	{
 																		key: unitOption,
 																		value: unitOption,
 																	},
-																	unitOption,
-																),
-														),
+																	unitOption
+																)
+														)
 													),
-										],
+										]
 									),
-							].filter(Boolean),
+							].filter(Boolean)
 						),
 						h(
 							'div',
@@ -1075,14 +1072,14 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								className:
 									'fotogrids-responsive-setting__devices',
 							},
-							devices.map(device =>
+							devices.map((device) =>
 								h(
 									'button',
 									{
 										key: device.key,
 										type: 'button',
 										className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
-										onClick: e => {
+										onClick: (e) => {
 											e.preventDefault();
 											e.stopPropagation();
 											setActiveDevice(device.key);
@@ -1090,11 +1087,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										disabled: isDisabled,
 										title: device.label,
 									},
-									renderIcon(device.icon),
-								),
-							),
+									renderIcon(device.icon)
+								)
+							)
 						),
-					],
+					]
 				),
 
 				setting.description &&
@@ -1103,9 +1100,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						{
 							className: 'fotogrids-setting__description',
 						},
-						setting.description,
+						setting.description
 					),
-			],
+			]
 		);
 	}
 
@@ -1145,7 +1142,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									{
 										className: 'fotogrids-setting__unit',
 									},
-									` (${setting.unit})`,
+									` (${setting.unit})`
 								),
 							showSettingBadge &&
 								h(
@@ -1154,9 +1151,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										className: 'fotogrids-pro-badge',
 										key: 'pro-badge',
 									},
-									settingBadgeText,
+									settingBadgeText
 								),
-						].filter(Boolean),
+						].filter(Boolean)
 					),
 					h(
 						'span',
@@ -1164,9 +1161,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 							className:
 								'fotogrids-responsive-setting__device-icon',
 						},
-						renderIcon(activeDeviceData.icon),
+						renderIcon(activeDeviceData.icon)
 					),
-				],
+				]
 			),
 
 			h(
@@ -1186,16 +1183,16 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								min: setting.responsive[activeDevice].min,
 								max: setting.responsive[activeDevice].max,
 								value: currentDeviceValue,
-								onChange: e =>
+								onChange: (e) =>
 									!isDisabled &&
 									updateResponsiveValue(
 										activeDevice,
-										parseInt(e.target.value),
+										parseInt(e.target.value)
 									),
 								disabled: isDisabled,
 								className: 'fotogrids-range-slider',
 							}),
-						],
+						]
 					),
 
 					h(
@@ -1209,7 +1206,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								min: setting.responsive[activeDevice].min,
 								max: setting.responsive[activeDevice].max,
 								value: currentDeviceValue,
-								onChange: e => {
+								onChange: (e) => {
 									const v = parseInt(e.target.value);
 									!isDisabled &&
 										updateResponsiveValue(
@@ -1218,7 +1215,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												? v
 												: setting.responsive[
 														activeDevice
-													].default,
+													].default
 										);
 								},
 								disabled: isDisabled,
@@ -1233,49 +1230,49 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												.CustomUnitSelect,
 											{
 												value: currentDeviceUnit,
-												onChange: e =>
+												onChange: (e) =>
 													!isDisabled &&
 													updateResponsiveUnit(
 														activeDevice,
-														e.target.value,
+														e.target.value
 													),
 												disabled: isDisabled,
 												className:
 													'fotogrids-units-select',
 												options: setting.units.map(
-													unitOption => ({
+													(unitOption) => ({
 														value: unitOption,
 														label: unitOption,
-													}),
+													})
 												),
-											},
+											}
 										)
 									: h(
 											'select',
 											{
 												value: currentDeviceUnit,
-												onChange: e =>
+												onChange: (e) =>
 													!isDisabled &&
 													updateResponsiveUnit(
 														activeDevice,
-														e.target.value,
+														e.target.value
 													),
 												disabled: isDisabled,
 												className:
 													'fotogrids-units-select',
 											},
-											setting.units.map(unitOption =>
+											setting.units.map((unitOption) =>
 												h(
 													'option',
 													{
 														key: unitOption,
 														value: unitOption,
 													},
-													unitOption,
-												),
-											),
+													unitOption
+												)
+											)
 										)),
-						].filter(Boolean),
+						].filter(Boolean)
 					),
 
 					h(
@@ -1283,14 +1280,14 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						{
 							className: 'fotogrids-responsive-setting__devices',
 						},
-						devices.map(device =>
+						devices.map((device) =>
 							h(
 								'button',
 								{
 									key: device.key,
 									type: 'button',
 									className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
-									onClick: e => {
+									onClick: (e) => {
 										e.preventDefault();
 										e.stopPropagation();
 										setActiveDevice(device.key);
@@ -1298,11 +1295,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									disabled: isDisabled,
 									title: device.label,
 								},
-								renderIcon(device.icon),
-							),
-						),
+								renderIcon(device.icon)
+							)
+						)
 					),
-				],
+				]
 			),
 
 			setting.description &&
@@ -1311,9 +1308,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 					{
 						className: 'fotogrids-setting__description',
 					},
-					setting.description,
+					setting.description
 				),
-		],
+		]
 	);
 };
 
@@ -1323,19 +1320,19 @@ function renderUnitSelect(h, currentUnit, onChange, isDisabled, setting) {
 		typeof React !== 'undefined'
 		? React.createElement(window.FotoGridsRenderSettings.CustomUnitSelect, {
 				value: currentUnit,
-				onChange: e => onChange(e.target.value),
+				onChange: (e) => onChange(e.target.value),
 				disabled: isDisabled,
 				className: 'fotogrids-units-select',
-				options: setting.units.map(u => ({ value: u, label: u })),
+				options: setting.units.map((u) => ({ value: u, label: u })),
 			})
 		: h(
 				'select',
 				{
 					value: currentUnit,
-					onChange: e => onChange(e.target.value),
+					onChange: (e) => onChange(e.target.value),
 					disabled: isDisabled,
 					className: 'fotogrids-units-select',
 				},
-				setting.units.map(u => h('option', { key: u, value: u }, u)),
+				setting.units.map((u) => h('option', { key: u, value: u }, u))
 			);
 }

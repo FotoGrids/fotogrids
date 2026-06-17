@@ -3,14 +3,14 @@
 
 	document.addEventListener('DOMContentLoaded', function () {
 		const dismissButtons = document.querySelectorAll(
-			'.fotogrids-dismiss-button',
+			'.fotogrids-dismiss-button'
 		);
 		dismissButtons.forEach(function (button) {
 			button.addEventListener('click', function (e) {
 				e.preventDefault();
 
 				const container = button.closest(
-					'.fotogrids-dismiss-container',
+					'.fotogrids-dismiss-container'
 				);
 				const section = button.getAttribute('data-section');
 

@@ -2,15 +2,15 @@
     position: relative;
 }
 
-/* Container — wraps viewport, bullets, thumbnails. Reserve-space padding
+/* Container - wraps viewport, bullets, thumbnails. Reserve-space padding
    lands here so it doesn't fight the outer collection padding setting. */
 
 [data-fg-carousel="1"] .fg-carousel-container {
     position: relative;
 }
 
-/* Viewport — positioning frame for chrome (arrows, counter) that
-   overlays the visible image. Does NOT scroll or clip — the inner
+/* Viewport - positioning frame for chrome (arrows, counter) that
+   overlays the visible image. Does NOT scroll or clip - the inner
    track-wrapper owns scroll behaviour. Keeping these separate lets
    chrome render above the viewport without being clipped by overflow. */
 
@@ -27,7 +27,7 @@
     height: min( var( --fg-height-fixed, 500px ), 100vh );
 }
 
-/* Track wrapper — the scrolling region. Owns overflow, scroll-snap,
+/* Track wrapper - the scrolling region. Owns overflow, scroll-snap,
    and the container-query context used by item width math. Sizes to
    its content (item height) in auto mode; stretches to viewport in
    fixed mode. */
@@ -56,7 +56,7 @@
     height: 100%;
 }
 
-/* Track — the inline-flex strip whose total width exceeds the viewport. */
+/* Track - the inline-flex strip whose total width exceeds the viewport. */
 
 [data-fg-carousel="1"] .fg-carousel-track {
     display: flex;
@@ -119,7 +119,7 @@
     aspect-ratio: auto;
 }
 
-/* Arrows — inside viewport so they overlay the visible image, not the
+/* Arrows - inside viewport so they overlay the visible image, not the
    scrollable track behind it. */
 
 [data-fg-carousel="1"] .fg-carousel-viewport .fg-carousel-arrows {
@@ -135,7 +135,7 @@
     z-index: 2;
 }
 
-/* Arrow position offsets — drive left/right of the .fg-carousel-arrows
+/* Arrow position offsets - drive left/right of the .fg-carousel-arrows
    container so individual arrows naturally sit at the edges via flex. */
 
 [data-fg-layout="slider"][data-fg-arrows-location="inset"] .fg-carousel-arrows {
@@ -153,7 +153,7 @@
     right: calc( -1 * ( var( --fg-arrow-size, 40px ) + var( --fg-arrow-distance, 8px ) ) );
 }
 
-/* Reserve space — shrink the carousel-container inward so outset/overlap
+/* Reserve space - shrink the carousel-container inward so outset/overlap
    arrows sit outside the viewport instead of clipping the next page
    element. Padding here is on the .fg-carousel-container only so it
    doesn't override the collection's own padding setting. */
@@ -197,7 +197,7 @@
     height: 60%;
 }
 
-/* Bullets — sibling of viewport inside the container. */
+/* Bullets - sibling of viewport inside the container. */
 
 [data-fg-carousel="1"] .fg-carousel-bullets {
     display: flex;
@@ -254,7 +254,7 @@
     outline: none;
 }
 
-/* Counter — inside viewport, top-right corner overlay. */
+/* Counter - inside viewport, top-right corner overlay. */
 
 [data-fg-carousel="1"] .fg-carousel-viewport .fg-carousel-counter {
     position: absolute;
@@ -269,7 +269,7 @@
     pointer-events: none;
 }
 
-/* Visibility — hover-show / hover-hide / always. JS adds the class via
+/* Visibility - hover-show / hover-hide / always. JS adds the class via
    resolveVisibilityClasses; CSS toggles based on container hover. */
 
 .fg-chrome--always { opacity: 1; }
@@ -292,7 +292,7 @@
     opacity: 0;
 }
 
-/* Thumbnail strip — sibling of viewport inside the container. */
+/* Thumbnail strip - sibling of viewport inside the container. */
 
 [data-fg-carousel="1"] .fg-carousel-thumbs {
     display: flex;
@@ -344,7 +344,7 @@
 [data-fg-layout="slider"][data-fg-thumbs-size="normal"] { --fg-thumb-size-px: 60px; }
 [data-fg-layout="slider"][data-fg-thumbs-size="large"]  { --fg-thumb-size-px: 90px; }
 
-/* Vertical thumb layouts — container becomes flex so thumb strip can
+/* Vertical thumb layouts - container becomes flex so thumb strip can
    sit alongside viewport. */
 
 [data-fg-layout="slider"][data-fg-thumbs-location="left"] .fg-carousel-container,

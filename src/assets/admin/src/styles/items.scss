@@ -1,6 +1,6 @@
-@use 'save-button' as *;
-@use './colors.scss' as *;
-@use './sizes.scss' as *;
+@use "save-button" as *;
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
 
 #fotogrids-items-grid {
 	display: grid;
@@ -30,7 +30,7 @@
 			cursor: move;
 		}
 
-		&[draggable='true'] {
+		&[draggable="true"] {
 			cursor: grab;
 		}
 
@@ -148,7 +148,7 @@
 
 	// When this item is the gallery's featured item, surface the star at
 	// rest (no hover needed). The button stays clickable so the user can
-	// clear the featured choice — clicking sends `item_id: null` which
+	// clear the featured choice - clicking sends `item_id: null` which
 	// hands the cover-resolver back the responsibility of picking one.
 	.fotogrids-item-featured.is-featured {
 		opacity: 1;

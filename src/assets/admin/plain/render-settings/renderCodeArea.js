@@ -56,10 +56,11 @@ function buildSelectorHighlightPlugin() {
 				const builder = new RangeSetBuilder();
 				for (const { from, to } of view.visibleRanges) {
 					const text = view.state.doc.sliceString(from, to);
-					let pos = 0;
-					while (true) {
-						const idx = text.indexOf(TOKEN, pos);
-						if (idx === -1) break;
+					for (
+						let idx = text.indexOf(TOKEN, 0);
+						idx !== -1;
+						idx = text.indexOf(TOKEN, idx + TOKEN_LEN)
+					) {
 						// Only highlight when SELECTOR is a standalone word:
 						// not preceded/followed by a letter, digit, or underscore.
 						const absFrom = from + idx;
@@ -73,13 +74,12 @@ function buildSelectorHighlightPlugin() {
 						if (!wordChar.test(before) && !wordChar.test(after)) {
 							builder.add(absFrom, absTo, tokenMark);
 						}
-						pos = idx + TOKEN_LEN;
 					}
 				}
 				return builder.finish();
 			}
 		},
-		{ decorations: v => v.decorations },
+		{ decorations: (v) => v.decorations }
 	);
 }
 
@@ -139,14 +139,14 @@ const CodeAreaComponent = ({
 
 			window.addEventListener(
 				'fotogridsCodeMirrorReady',
-				handleCodeMirrorReady,
+				handleCodeMirrorReady
 			);
 
 			const checkCodeMirror = () => {
 				if (window.FotoGridsCodeMirror) {
 					window.removeEventListener(
 						'fotogridsCodeMirrorReady',
-						handleCodeMirrorReady,
+						handleCodeMirrorReady
 					);
 					initializeEditor();
 				} else {
@@ -159,7 +159,7 @@ const CodeAreaComponent = ({
 			return () => {
 				window.removeEventListener(
 					'fotogridsCodeMirrorReady',
-					handleCodeMirrorReady,
+					handleCodeMirrorReady
 				);
 			};
 		}
@@ -220,7 +220,7 @@ const CodeAreaComponent = ({
 								: 'var(--fg-border-focus)',
 						},
 					}),
-					EditorView.updateListener.of(update => {
+					EditorView.updateListener.of((update) => {
 						if (update.docChanged) {
 							const newValue = update.state.doc.toString();
 							const errors = validateCode(newValue, language);
@@ -287,9 +287,9 @@ const CodeAreaComponent = ({
 									className: 'fotogrids-pro-badge',
 									key: 'pro-badge',
 								},
-								settingBadgeText,
+								settingBadgeText
 							),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 
 			description &&
@@ -299,7 +299,7 @@ const CodeAreaComponent = ({
 						key: 'description',
 						className: 'fotogrids-setting-description',
 					},
-					description,
+					description
 				),
 
 			React.createElement('div', {
@@ -316,7 +316,7 @@ const CodeAreaComponent = ({
 						key: 'hint',
 						className: 'fotogrids-codearea-hint',
 					},
-					parseHintString(hint),
+					parseHintString(hint)
 				),
 
 			setting.hint_link &&
@@ -351,7 +351,7 @@ const CodeAreaComponent = ({
 							key: 'hint-link',
 							className: 'fotogrids-codearea-hint-link',
 						},
-						React.createElement('a', anchorProps, linkLabel),
+						React.createElement('a', anchorProps, linkLabel)
 					);
 				})(),
 
@@ -372,8 +372,8 @@ const CodeAreaComponent = ({
 							},
 							window.wp?.i18n?.__(
 								'Contains errors',
-								'fotogrids',
-							) || 'Contains errors',
+								'fotogrids'
+							) || 'Contains errors'
 						),
 
 						React.createElement(
@@ -382,7 +382,7 @@ const CodeAreaComponent = ({
 								key: 'error-count',
 								className: 'fotogrids-error-count',
 							},
-							validationErrors.length,
+							validationErrors.length
 						),
 
 						React.createElement('span', {
@@ -390,11 +390,10 @@ const CodeAreaComponent = ({
 							className: 'fotogrids-error-chevron',
 							dangerouslySetInnerHTML: {
 								__html:
-									window.FotoGridsIcons?.['chevron_down'] ||
-									'▼',
+									window.FotoGridsIcons?.chevron_down || '▼',
 							},
 						}),
-					],
+					]
 				),
 
 			hasError &&
@@ -412,11 +411,11 @@ const CodeAreaComponent = ({
 								key: index,
 								className: 'fotogrids-error-item',
 							},
-							error,
-						),
-					),
+							error
+						)
+					)
 				),
-		],
+		]
 	);
 };
 
@@ -427,7 +426,7 @@ const renderCodeArea = (
 	errors = [],
 	isDisabled,
 	getFieldState,
-	__,
+	__
 ) => {
 	return React.createElement(CodeAreaComponent, {
 		setting,
@@ -454,9 +453,9 @@ const validateCode = (code, language) => {
 	}
 };
 
-const validateCSS = css => {
+const validateCSS = (css) => {
 	const errors = [];
-	const __ = window.wp?.i18n?.__ || (text => text);
+	const __ = window.wp?.i18n?.__ || ((text) => text);
 
 	const openBraces = (css.match(/\{/g) || []).length;
 	const closeBraces = (css.match(/\}/g) || []).length;
@@ -488,8 +487,8 @@ const validateCSS = css => {
 			errors.push(
 				__('Missing semicolon on line %d', 'fotogrids').replace(
 					'%d',
-					index + 1,
-				),
+					index + 1
+				)
 			);
 		}
 	});
@@ -501,9 +500,9 @@ const validateCSS = css => {
 	return errors;
 };
 
-const validateJavaScript = js => {
+const validateJavaScript = (js) => {
 	const errors = [];
-	const __ = window.wp?.i18n?.__ || (text => text);
+	const __ = window.wp?.i18n?.__ || ((text) => text);
 
 	if (js.includes('function') && !js.includes(')')) {
 		errors.push(__('Missing closing parenthesis in function', 'fotogrids'));
@@ -527,8 +526,8 @@ const validateJavaScript = js => {
 		errors.push(
 			__('JavaScript syntax error: %s', 'fotogrids').replace(
 				'%s',
-				e.message,
-			),
+				e.message
+			)
 		);
 	}
 

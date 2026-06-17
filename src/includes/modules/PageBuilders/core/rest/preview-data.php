@@ -141,10 +141,10 @@ final class Preview_Data {
 		}
 
 		$render_context = Context_Builder::for_preview()->build_for_public(
-			gallery_id:          $gallery_id,
-			render_settings:     $render_settings,
-			collection_item_ids: $item_ids,
-			source:              Request_Source::PREVIEW_SAVED
+			$gallery_id,
+			$render_settings,
+			$item_ids,
+			Request_Source::PREVIEW_SAVED
 		);
 
 		$render_context = self::flip_to_preview_context(
@@ -177,7 +177,7 @@ final class Preview_Data {
 	 */
 	private static function flip_to_preview_context(
 		\FotoGrids\Render\Api\Render_Context $context,
-		\FotoGrids\Render\Api\Request_Source $source
+		string $source
 	): \FotoGrids\Render\Api\Render_Context {
 		$preview_meta = $context->meta->with(
 			array(
@@ -189,19 +189,19 @@ final class Preview_Data {
 		$preview_settings = array_merge(
 			$context->settings,
 			array(
-				'_preview_source'     => $source->value,
+				'_preview_source'     => $source,
 				'_show_render_errors' => current_user_can( 'edit_posts' ),
 			)
 		);
 
 		return new \FotoGrids\Render\Api\Render_Context(
-			meta:         $preview_meta,
-			layout:       $context->layout,
-			behavior:     $context->behavior,
-			settings:     $preview_settings,
-			items:        $context->items,
-			warnings:     $context->warnings,
-			via_album_id: $context->via_album_id,
+			$preview_meta,
+			$context->layout,
+			$context->behavior,
+			$preview_settings,
+			$context->items,
+			$context->warnings,
+			$context->via_album_id,
 		);
 	}
 
@@ -293,10 +293,10 @@ final class Preview_Data {
 		// Flip is_preview on the meta so the password gate (and other
 		// preview-aware modules) take the admin path.
 		$render_context = Context_Builder::for_preview()->build_for_album(
-			album_id:          $album_id,
-			render_settings:   $album_settings,
-			child_gallery_ids: $child_gallery_ids,
-			source:            Request_Source::PREVIEW_SAVED
+			$album_id,
+			$album_settings,
+			$child_gallery_ids,
+			Request_Source::PREVIEW_SAVED
 		);
 
 		$render_context = self::flip_to_preview_context(
@@ -563,8 +563,8 @@ final class Preview_Data {
 	/**
 	 * Resolve a localized, human-readable label for a post status.
 	 *
-	 * Uses {@see get_post_status_object()} so any registered status —
-	 * including custom ones — gets the registrant's intended label.
+	 * Uses {@see get_post_status_object()} so any registered status -
+	 * including custom ones - gets the registrant's intended label.
 	 * Falls back to the raw slug if WordPress doesn't know the status.
 	 *
 	 * @since 1.0.0

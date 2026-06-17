@@ -24,7 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
  * item when none is set. The grid shows the next N items (4 / 6 / 9),
  * skipping the featured one so it is not repeated.
  *
- * EVERY item — the featured image and each grid tile — is rendered through
+ * EVERY item - the featured image and each grid tile - is rendered through
  * Item_Renderer as a normal decorated .fg-item, so they all run the
  * gallery's own click behaviour (lightbox, link, etc.). There is NO
  * navigation chrome: clicking a grid tile does not change the featured
@@ -82,12 +82,12 @@ final class Layout_Featured_Item implements Layout {
 		$grid_count   = self::grid_count( $render_context );
 		$featured_idx = $this->resolve_featured_index( $render_context, $items );
 
-		// Featured image — rendered decorated so it runs the gallery's click
+		// Featured image - rendered decorated so it runs the gallery's click
 		// behaviour like any other item. It's shown large (roughly half the
 		// layout width), so swap its displayed source to the full-size
 		// derivative; the small grid thumbnail would otherwise be upscaled
 		// and look pixelated. Grid tiles keep the small thumb. Image items
-		// only — videos resolve their own poster.
+		// only - videos resolve their own poster.
 		$featured_view = $items[ $featured_idx ];
 		if ( 'image' === $featured_view->item_type && '' !== $featured_view->full_url ) {
 			$featured_view = $featured_view->with(
@@ -115,7 +115,7 @@ final class Layout_Featured_Item implements Layout {
 			++$shown;
 		}
 
-		// Show all button — only when there are more items than shown inline.
+		// Show all button - only when there are more items than shown inline.
 		$show_all_html = '';
 		if ( Lightbox_Grid::should_show_all( $render_context ) ) {
 			$show_all_html = $this->render_show_all_button( $render_context );
@@ -221,8 +221,8 @@ final class Layout_Featured_Item implements Layout {
 		// Lightbox spans the FULL gallery. Featured Item only renders the
 		// featured image + N grid tiles inline, but opening the lightbox from
 		// any of them must walk every item. We stamp the lightbox-extended
-		// markers directly here — unconditionally on click=lightbox, ignoring
-		// the lightbox_scope setting — because for this layout "single" scope
+		// markers directly here - unconditionally on click=lightbox, ignoring
+		// the lightbox_scope setting - because for this layout "single" scope
 		// would otherwise trap the lightbox in the tiny inline subset. The
 		// lightbox JS reads data-fg-lightbox-extended + data-fg-total-items
 		// and lazy-fetches the rest via the render URL.
@@ -286,9 +286,9 @@ final class Layout_Featured_Item implements Layout {
 		$pad_mobile  = $this->resolve_four_sided_value( $pad, 'mobile', 'px' );
 		if ( '' !== $pad_desktop || '' !== $pad_tablet || '' !== $pad_mobile ) {
 			$vars['--fg-show-all-padding'] = new Responsive_Var(
-				desktop: $pad_desktop,
-				tablet:  $pad_tablet,
-				mobile:  $pad_mobile,
+				$pad_desktop,
+				$pad_tablet,
+				$pad_mobile,
 			);
 		}
 		$offset = $s['featured_show_all_offset'] ?? null;
@@ -323,7 +323,7 @@ final class Layout_Featured_Item implements Layout {
 			$vars['--fg-show-all-font-weight'] = $font_weight;
 		}
 
-		// Font size — responsive_range (px/em/rem). Resolved via the shared
+		// Font size - responsive_range (px/em/rem). Resolved via the shared
 		// Setting_Helpers trait so it handles both the plain-number default
 		// shape and the {value, unit} shape the UI stores.
 		$font_size  = self::maybe_decode_array( $s['featured_show_all_font_size'] ?? null );
@@ -332,9 +332,9 @@ final class Layout_Featured_Item implements Layout {
 		$fs_mobile  = $this->resolve_responsive_value( $font_size, 'mobile', 'px' );
 		if ( '' !== $fs_desktop || '' !== $fs_tablet || '' !== $fs_mobile ) {
 			$vars['--fg-show-all-font-size'] = new Responsive_Var(
-				desktop: $fs_desktop,
-				tablet:  $fs_tablet,
-				mobile:  $fs_mobile,
+				$fs_desktop,
+				$fs_tablet,
+				$fs_mobile,
 			);
 		}
 
@@ -343,9 +343,9 @@ final class Layout_Featured_Item implements Layout {
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'          => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-featured-item' => new Asset_Decl( path: 'layouts/featured-item/featured-item.css' ),
+			array(
+				'fotogrids-render-base'          => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-featured-item' => new Asset_Decl( 'layouts/featured-item/featured-item.css' ),
 			)
 		);
 	}

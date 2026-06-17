@@ -90,7 +90,7 @@
      * Callers that want already-complete images to be revealed progressively
      * (initial-load pass) pass `deferImmediate: true`, which schedules the
      * markLoaded call onto its own animation frame. Per-item callers (the
-     * MutationObserver path for paginated arrivals) pass nothing — images
+     * MutationObserver path for paginated arrivals) pass nothing - images
      * inserted dynamically aren't complete yet, and even when they cache-hit
      * they're spaced out across separate insertions, so deferring would just
      * add latency.
@@ -135,7 +135,7 @@
         img.addEventListener( 'error', onSettle );
 
         // Race guard: the image can finish loading in the window between the
-        // img.complete check above and addEventListener here — its load event
+        // img.complete check above and addEventListener here - its load event
         // then fires with no listener attached and is lost forever, leaving
         // the item stuck in data-fg-media-state="loading". This is easy to hit
         // on pages where other work (lazy-load wiring, the image-zoom lens's
@@ -148,7 +148,7 @@
     }
 
     /**
-     * Wires all images inside a collection container (gallery or album —
+     * Wires all images inside a collection container (gallery or album -
      * both render <figure data-fg-media-state="loading"> items whose
      * state needs flipping to "loaded" once the image arrives).
      *
@@ -181,7 +181,7 @@
             return;
         }
 
-        // Initial pass — stagger across animation frames so the browser
+        // Initial pass - stagger across animation frames so the browser
         // paints the loader animation at least once per item and reveals
         // images progressively as their markLoaded mutation lands.
         let i = 0;
@@ -289,7 +289,7 @@
     // Wire galleries at several points and let idempotency sort it out.
     //
     // The script is enqueued in_footer:true, so USUALLY the gallery markup
-    // is already parsed and queryable when this evaluates — so we call
+    // is already parsed and queryable when this evaluates - so we call
     // init() synchronously, which also avoids waiting on DOMContentLoaded
     // (that event doesn't fire until every in-flight <img> settles, which on
     // a cold cache batches all reveals into one late paint).

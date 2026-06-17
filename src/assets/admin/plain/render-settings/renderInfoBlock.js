@@ -23,7 +23,7 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ __ },
+	{ __ }
 ) => {
 	const { createElement: h } = wp.element;
 
@@ -39,7 +39,7 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 			window.fotogridsSettings?.[setting.button_url_key]) ||
 		null;
 
-	const handleButtonClick = e => {
+	const handleButtonClick = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
 		if (buttonUrl) {
@@ -79,7 +79,7 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 									}
 								: {}),
 						},
-						iconSvg ? undefined : icon,
+						iconSvg ? undefined : icon
 					)
 				: null,
 			h(
@@ -103,7 +103,7 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 											key: 'subtitle',
 											className: `${baseClass}__subtitle`,
 										},
-										subtitle,
+										subtitle
 									)
 								: null,
 							h('span', {
@@ -111,7 +111,7 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 								className: `${baseClass}__text`,
 								dangerouslySetInnerHTML: { __html: message },
 							}),
-						].filter(Boolean),
+						].filter(Boolean)
 					),
 					buttonLabel && buttonUrl
 						? h(
@@ -123,11 +123,11 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 										'fg-button fg-button--variant-primary fg-button--size-sm',
 									onClick: handleButtonClick,
 								},
-								buttonLabel,
+								buttonLabel
 							)
 						: null,
-				].filter(Boolean),
+				].filter(Boolean)
 			),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };

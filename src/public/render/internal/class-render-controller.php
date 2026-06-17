@@ -20,12 +20,22 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Controller {
 
+	private Style_Var_Builder $style_var_builder;
+	private Asset_Resolver $asset_resolver;
+	private Item_Renderer $item_renderer;
+	private Breakpoint_Config $breakpoints;
+
 	public function __construct(
-		private readonly Style_Var_Builder $style_var_builder,
-		private readonly Asset_Resolver $asset_resolver,
-		private readonly Item_Renderer $item_renderer,
-		private readonly Breakpoint_Config $breakpoints,
-	) {}
+		Style_Var_Builder $style_var_builder,
+		Asset_Resolver $asset_resolver,
+		Item_Renderer $item_renderer,
+		Breakpoint_Config $breakpoints
+	) {
+		$this->style_var_builder = $style_var_builder;
+		$this->asset_resolver    = $asset_resolver;
+		$this->item_renderer     = $item_renderer;
+		$this->breakpoints       = $breakpoints;
+	}
 
 	/**
 	 * Returns a request-scoped render controller instance.
@@ -41,10 +51,10 @@ final class Render_Controller {
 
 		if ( null === $instance ) {
 			$instance = new self(
-				style_var_builder: new Style_Var_Builder(),
-				asset_resolver:    Asset_Resolver::instance(),
-				item_renderer:     new Item_Renderer(),
-				breakpoints:       Breakpoint_Config::from_settings(),
+				new Style_Var_Builder(),
+				Asset_Resolver::instance(),
+				new Item_Renderer(),
+				Breakpoint_Config::from_settings(),
 			);
 		}
 
@@ -81,10 +91,10 @@ final class Render_Controller {
 				if ( ! $gate_result->passed ) {
 					$this->asset_resolver->flush();
 					$render_result = new Render_Result(
-						html:           $gate_result->blocked_html,
-						instance_id:    $render->meta->instance_id,
-						active_modules: $active_modules,
-						http_status:    $gate_result->http_status,
+						$gate_result->blocked_html,
+						$render->meta->instance_id,
+						$active_modules,
+						$gate_result->http_status,
 					);
 					Hooks::fire_action( 'after_render', $render, $render_result );
 
@@ -113,11 +123,11 @@ final class Render_Controller {
 				$show_inline_error = ! empty( $render->settings['_show_render_errors'] );
 				$this->asset_resolver->flush();
 				return Render_Result::error(
-					message:           sprintf( "No layout supports id '%s'", $render->layout->layout_id ),
-					gallery_id:        $render->meta->gallery_id,
-					instance_id:       $render->meta->instance_id,
-					show_inline_error: $show_inline_error,
-					http_status:       500
+					sprintf( "No layout supports id '%s'", $render->layout->layout_id ),
+					$render->meta->gallery_id,
+					$render->meta->instance_id,
+					$show_inline_error,
+					500
 				);
 			}
 
@@ -142,16 +152,16 @@ final class Render_Controller {
 			// Partial 'items_only' short-circuit. Used by the REST
 			// /gallery/render endpoint for pagination requests where the
 			// client only needs the new items to append/replace into an
-			// existing gallery wrapper — no wrapper, no chrome, no
+			// existing gallery wrapper - no wrapper, no chrome, no
 			// sidecars, no <style> block. The collected CSS asset URLs are
 			// still returned via Asset_Resolver so the client can inject
 			// any missing stylesheets, mirroring the album-AJAX flow.
 			if ( 'items_only' === $render->meta->partial ) {
 				$render_result = new Render_Result(
-					html:           $layout_inner_html,
-					instance_id:    $render->meta->instance_id,
-					active_modules: $active_modules,
-					http_status:    200,
+					$layout_inner_html,
+					$render->meta->instance_id,
+					$active_modules,
+					200,
 				);
 				Hooks::fire_action( 'after_render', $render, $render_result );
 				$this->asset_resolver->flush();
@@ -202,18 +212,18 @@ final class Render_Controller {
 			}
 
 			$wrapper_html = $this->build_wrapper(
-				render:             $render,
-				layout_css_classes: $layout_css_classes,
-				wrapper_data_attrs: $wrapper_data_attrs,
-				css_variables:      $css_variables,
-				inner_html:         $feature_before_html . $layout_body_html,
+				$render,
+				$layout_css_classes,
+				$wrapper_data_attrs,
+				$css_variables,
+				$feature_before_html . $layout_body_html,
 			);
 
 			$render_result = new Render_Result(
-				html:           $wrapper_html . $feature_after_html . $sidecar_html,
-				instance_id:    $render->meta->instance_id,
-				active_modules: $active_modules,
-				http_status:    200,
+				$wrapper_html . $feature_after_html . $sidecar_html,
+				$render->meta->instance_id,
+				$active_modules,
+				200,
 			);
 
 			$filtered_html = Hooks::apply_filter( 'final_html', $render_result->html, $render );
@@ -227,11 +237,11 @@ final class Render_Controller {
 			$show_inline_error = ! empty( $render->settings['_show_render_errors'] );
 			$this->asset_resolver->flush();
 			return Render_Result::error(
-				message:           $throwable->getMessage(),
-				gallery_id:        $render->meta->gallery_id,
-				instance_id:       $render->meta->instance_id,
-				show_inline_error: $show_inline_error,
-				http_status:       500
+				$throwable->getMessage(),
+				$render->meta->gallery_id,
+				$render->meta->instance_id,
+				$show_inline_error,
+				500
 			);
 		} finally {
 			\FotoGrids\Watermark\Watermark_Render_Filter::end();
@@ -310,9 +320,9 @@ final class Render_Controller {
 		}
 
 		$inline_style = $this->style_var_builder->build_style_element(
-			css_variables: $css_variables,
-			instance_id:   $render->meta->instance_id,
-			breakpoints:   $this->breakpoints,
+			$css_variables,
+			$render->meta->instance_id,
+			$this->breakpoints,
 		);
 
 		return sprintf(

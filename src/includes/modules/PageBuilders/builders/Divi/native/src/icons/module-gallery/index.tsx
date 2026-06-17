@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 
-// FotoGrids brand gallery icon — multi-colour 3x3 grid, drawn on a 16x16
+// FotoGrids brand gallery icon - multi-colour 3x3 grid, drawn on a 16x16
 // grid (Divi forces viewBox="0 0 16 16" and ignores our export). Returns
 // inner elements only; Divi supplies the <svg> wrapper.
 export const name    = 'fotogrids/module-gallery';

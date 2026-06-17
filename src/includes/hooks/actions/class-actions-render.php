@@ -35,4 +35,12 @@ final class Actions_Render {
 	 * @param \FotoGrids\Render\Api\Render_Context $render Render context.
 	 */
 	public const LATE_ASSETS = 'fotogrids/render/late_assets';
+
+	/**
+	 * Fires once during plugin boot so plugins can register hover-effect
+	 * descriptors with the Hover_Effect_Registry.
+	 *
+	 * @since 1.0.0
+	 */
+	public const REGISTER_HOVER_EFFECTS = 'fotogrids/render/register_hover_effects';
 }

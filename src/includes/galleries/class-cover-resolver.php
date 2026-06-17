@@ -86,7 +86,7 @@ final class Cover_Resolver {
 	 * `fotogrids_gallery_items`, that ID wins. Otherwise the first image
 	 * attachment is returned.
 	 *
-	 * This returns an attachment ID only — for callers that need a raw
+	 * This returns an attachment ID only - for callers that need a raw
 	 * attachment (e.g. attachment-meta consumers). Video and embed covers do
 	 * not have an attachment, so they are skipped here; use
 	 * `descriptor_for_gallery()` / `url_for_collection()` when a poster URL is

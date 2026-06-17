@@ -1,4 +1,4 @@
-@use './colors.scss' as *;
+@use "./colors.scss" as *;
 
 .fotogrids-save-status {
 	margin: 10px 0;
@@ -52,7 +52,7 @@
 
 .misc-pub-fg-last-saved {
 	&:before {
-		content: '\f15e';
+		content: "\f15e";
 		color: var(--fg-text-tertiary);
 		font: normal 20px / 1 dashicons;
 		display: inline-block;

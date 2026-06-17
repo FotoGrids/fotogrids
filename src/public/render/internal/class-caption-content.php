@@ -19,14 +19,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Caption_Content {
 
+	public string $title;
+	public string $description;
+
 	/**
 	 * @param string $title       Resolved title text (empty when hidden).
 	 * @param string $description Resolved description text (empty when hidden).
 	 */
 	public function __construct(
-		public readonly string $title,
-		public readonly string $description,
-	) {}
+		string $title,
+		string $description
+	) {
+		$this->title       = $title;
+		$this->description = $description;
+	}
 
 	/**
 	 * Returns true when both title and description are empty.

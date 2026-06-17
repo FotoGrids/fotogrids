@@ -181,7 +181,7 @@ final class Module {
 			'wp-i18n',
 			'wp-api-fetch',
 			'wp-hooks',
-			// `window.FotoGridsIcons` payload — required by the shared
+			// `window.FotoGridsIcons` payload - required by the shared
 			// <Icon /> component, which Button uses for icon-only and
 			// leading-icon variants. Registered once by the parent
 			// PageBuilders module on every enqueue cycle.
@@ -193,7 +193,7 @@ final class Module {
 		// declare it as a dep below so WordPress dedupes the handle.
 		// The aggregated `fotogrids-fg-shared` stylesheet is a hard dep
 		// because PickerModal / Button / FormField are used inside
-		// the picker — without it the picker has no chrome. Registered
+		// the picker - without it the picker has no chrome. Registered
 		// once by the parent PageBuilders module; the dep chain ensures
 		// it ships exactly once per editor page regardless of which /
 		// how many blocks load.

@@ -30,7 +30,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Free's whitelist covers the four core fields (camera, aperture,
  * shutter_speed, iso). Pro extends with lens, focal_length, date_taken,
- * copyright, orientation, flash, white_balance, exposure_mode — gated by the
+ * copyright, orientation, flash, white_balance, exposure_mode - gated by the
  * `fotogrids/features/pro/is_active` filter.
  *
  * @since 1.0.0

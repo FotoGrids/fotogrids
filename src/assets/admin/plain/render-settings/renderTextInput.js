@@ -4,7 +4,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, __ },
+	{ updateSetting, getFieldState, __ }
 ) => {
 	const { createElement: h } = wp.element;
 	const settingState =
@@ -38,9 +38,9 @@ window.FotoGridsRenderSettings.renderTextInput = (
 									className: 'fotogrids-pro-badge',
 									key: 'pro-badge',
 								},
-								settingBadgeText,
+								settingBadgeText
 							),
-					].filter(Boolean),
+					].filter(Boolean)
 				),
 			setting.multiline
 				? h('textarea', {
@@ -48,7 +48,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 						value: currentValue || setting.default || '',
 						placeholder: setting.placeholder || '',
 						rows: setting.rows || 3,
-						onChange: e =>
+						onChange: (e) =>
 							!isDisabled &&
 							updateSetting(setting.key, e.target.value),
 						disabled: isDisabled,
@@ -58,7 +58,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 						className: 'fotogrids-input',
 						value: currentValue || setting.default || '',
 						placeholder: setting.placeholder || '',
-						onChange: e =>
+						onChange: (e) =>
 							!isDisabled &&
 							updateSetting(setting.key, e.target.value),
 						disabled: isDisabled,
@@ -69,8 +69,8 @@ window.FotoGridsRenderSettings.renderTextInput = (
 					{
 						className: 'fotogrids-setting__description',
 					},
-					setting.description,
+					setting.description
 				),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };

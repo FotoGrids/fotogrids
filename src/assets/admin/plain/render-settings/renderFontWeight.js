@@ -25,7 +25,7 @@ const FontWeightComponent = ({
 
 	const defaultOptionValue = Object.prototype.hasOwnProperty.call(
 		setting || {},
-		'default_option_value',
+		'default_option_value'
 	)
 		? setting.default_option_value
 		: 'default';
@@ -48,7 +48,7 @@ const FontWeightComponent = ({
 		}
 
 		const match = FOTOGRIDS_FONT_WEIGHT_OPTIONS.find(
-			opt => opt.value === resolvedValue,
+			(opt) => opt.value === resolvedValue
 		);
 		if (match) {
 			return match;
@@ -71,8 +71,8 @@ const FontWeightComponent = ({
 		renderIcon,
 		__,
 		searchEnabled: false,
-		onSelect: nextValue => updateSetting(setting.key, nextValue),
-		getOptionStyle: option =>
+		onSelect: (nextValue) => updateSetting(setting.key, nextValue),
+		getOptionStyle: (option) =>
 			option?.fontWeight ? { fontWeight: option.fontWeight } : undefined,
 		rootClassName: 'fotogrids-font-weight',
 	});
@@ -82,7 +82,7 @@ window.FotoGridsRenderSettings.renderFontWeight = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ updateSetting, getFieldState, renderIcon, __ },
+	{ updateSetting, getFieldState, renderIcon, __ }
 ) => {
 	return wp.element.createElement(FontWeightComponent, {
 		setting,

@@ -130,7 +130,7 @@ trait Pagination_Common {
 		$current     = (int) ( $render_context->meta->requested_page ?? 1 );
 
 		// The REST URL + nonce for the JS to fetch additional pages.
-		// Mirrors how Album_To_Gallery_Ajax wires its <a> triggers — same
+		// Mirrors how Album_To_Gallery_Ajax wires its <a> triggers - same
 		// endpoint, same nonce action ('wp_rest'). Written on the gallery
 		// wrapper itself so pagination-core.js can read it via
 		// `galleryEl.dataset.fgRenderUrl` / `dataset.fgRenderNonce`.
@@ -144,7 +144,7 @@ trait Pagination_Common {
 			// sequence. Used by the lightbox to size its sparse slide
 			// cache correctly without estimating from
 			// total_pages * page_size (which over-counts when the last
-			// page is partial — a 49-item gallery with page_size=8
+			// page is partial - a 49-item gallery with page_size=8
 			// would estimate 56).
 			'data-fg-total-items'        => (string) $total,
 			'data-fg-pagination-preload' => $this->preload_enabled( $render_context ) ? 'true' : 'false',
@@ -152,7 +152,7 @@ trait Pagination_Common {
 			'data-fg-render-nonce'       => esc_attr( wp_create_nonce( 'wp_rest' ) ),
 		);
 
-		// Random sort seed — pagination-core.js sends this back with
+		// Random sort seed - pagination-core.js sends this back with
 		// every paginated request so paginated/filtered draws share the
 		// same shuffle permutation. Only emitted when sort is random;
 		// otherwise it's irrelevant and bloats the attribute list.
@@ -170,12 +170,12 @@ trait Pagination_Common {
 	 *
 	 * Covers two concerns, both shared across all three pagination methods:
 	 *
-	 *  1. `--fg-pagination-distance` — margin above the pagination bar,
+	 *  1. `--fg-pagination-distance` - margin above the pagination bar,
 	 *     driven by `pagination_distance_from_items`. Falls back to the
 	 *     original `calc(var(--fg-pagination-base-size) * 2)` in
 	 *     pagination.css when absent.
 	 *
-	 *  2. `--fg-pagination-button-*` — the Styling subtab inside
+	 *  2. `--fg-pagination-button-*` - the Styling subtab inside
 	 *     `pagination_buttons_subtabs`. The same JSON tab now drives both
 	 *     the Load More button and the Page Buttons chips, so the
 	 *     resolved vars live on the trait and both method modules
@@ -200,9 +200,9 @@ trait Pagination_Common {
 
 		if ( '' !== $distance_desktop || '' !== $distance_tablet || '' !== $distance_mobile ) {
 			$vars['--fg-pagination-distance'] = new Responsive_Var(
-				desktop: $distance_desktop,
-				tablet:  $distance_tablet,
-				mobile:  $distance_mobile,
+				$distance_desktop,
+				$distance_tablet,
+				$distance_mobile,
 			);
 		}
 
@@ -235,9 +235,9 @@ trait Pagination_Common {
 		$fs_mobile  = $this->resolve_responsive_value( $font_size, 'mobile', 'px' );
 		if ( '' !== $fs_desktop || '' !== $fs_tablet || '' !== $fs_mobile ) {
 			$vars['--fg-pagination-button-font-size'] = new Responsive_Var(
-				desktop: $fs_desktop,
-				tablet:  $fs_tablet,
-				mobile:  $fs_mobile,
+				$fs_desktop,
+				$fs_tablet,
+				$fs_mobile,
 			);
 		}
 
@@ -249,14 +249,14 @@ trait Pagination_Common {
 
 		// ---- Mouseover state ----
 		// Border WIDTH is unified across regular + hover + active (one
-		// `pagination_button_border_width` setting drives all three) —
+		// `pagination_button_border_width` setting drives all three) -
 		// only the colours diverge per state.
 		$this->add_color_var( $vars, '--fg-pagination-button-hover-bg', $s['pagination_button_hover_bg'] ?? null );
 		$this->add_color_var( $vars, '--fg-pagination-button-hover-color', $s['pagination_button_hover_color'] ?? null );
 		$this->add_color_var( $vars, '--fg-pagination-button-hover-border-color', $s['pagination_button_hover_border_color'] ?? null );
 
 		// ---- Active (current-page) state ----
-		// Only meaningful for Page Buttons' numbered chips — Load More
+		// Only meaningful for Page Buttons' numbered chips - Load More
 		// never has an active state. The CSS-side rule scopes to
 		// `.fg-pagination--pages .fg-pagination__btn.fg-is-active`, so
 		// emitting these vars on every method is harmless: load-more
@@ -276,7 +276,7 @@ trait Pagination_Common {
 	 * @param  string                               $key   CSS variable name.
 	 * @param  mixed                                $value Raw setting value.
 	 */
-	private function add_color_var( array &$vars, string $key, mixed $value ): void {
+	private function add_color_var( array &$vars, string $key, $value ): void {
 		if ( is_string( $value ) && '' !== $value ) {
 			$vars[ $key ] = $value;
 		}
@@ -292,7 +292,7 @@ trait Pagination_Common {
 	 * @param  string                               $key   CSS variable name.
 	 * @param  mixed                                $value Raw setting value.
 	 */
-	private function add_px_var( array &$vars, string $key, mixed $value ): void {
+	private function add_px_var( array &$vars, string $key, $value ): void {
 		if ( null === $value || '' === $value ) {
 			return;
 		}
@@ -312,7 +312,7 @@ trait Pagination_Common {
 	 * on top.
 	 *
 	 * The shared CSS (pagination.css) holds the base button look, the
-	 * sr-only status region, and the loading/disabled states — all three
+	 * sr-only status region, and the loading/disabled states - all three
 	 * method modules pull it in automatically. See pagination.css for the
 	 * full list of selectors and theming hooks.
 	 *
@@ -320,17 +320,18 @@ trait Pagination_Common {
 	 */
 	protected function common_assets(): Module_Assets {
 		return new Module_Assets(
-			css: array(
+			array(
 				'fotogrids-pagination' => new Asset_Decl(
-					path:      'features/pagination/pagination.css',
-					in_footer: false,
+					'features/pagination/pagination.css',
+					array(),
+					false,
 				),
 			),
-			js:  array(
+			array(
 				'fotogrids-pagination-core' => new Asset_Decl(
-					path:      '../../assets/js/pagination-core.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/pagination-core.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);

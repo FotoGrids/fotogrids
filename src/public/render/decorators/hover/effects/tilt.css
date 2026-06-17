@@ -1,8 +1,10 @@
-[data-fg-hover="tilt"] .fg-item-media {
-    transition: transform 220ms ease;
-    transform-origin: center center;
+/* Frame effect: the whole tile leans toward the viewer. Caption rides with it. */
+
+.fotogrids-collection[data-fg-hover='tilt'] .fg-item {
+	transition-property: transform;
+	transform-origin: center center;
 }
 
-[data-fg-hover="tilt"] .fg-item:hover .fg-item-media {
-    transform: rotate(-1.5deg) scale(1.02);
+.fotogrids-collection[data-fg-hover='tilt'] .fg-item:hover {
+	transform: perspective(800px) rotate(var(--fg-hover-tilt-angle)) scale(1.02);
 }

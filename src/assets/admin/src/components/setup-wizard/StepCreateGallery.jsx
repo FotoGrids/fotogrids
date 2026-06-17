@@ -4,11 +4,11 @@ import Icon from '../shared/Icon';
 const { __ } = wp.i18n;
 
 /**
- * Step 5 — Create your first gallery.
+ * Step 5 - Create your first gallery.
  *
  * Two equal-weight *action* cards: clicking either one closes the wizard
  * and navigates the user to the matching surface. There is no selection
- * state — each card *is* the action.
+ * state - each card *is* the action.
  *
  * Props
  * ─────

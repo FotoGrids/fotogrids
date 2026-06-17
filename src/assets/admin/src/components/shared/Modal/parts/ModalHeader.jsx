@@ -2,7 +2,7 @@ import React from 'react';
 import ModalHeaderClose from './ModalHeaderClose';
 
 /**
- * Header layout has three zones — leading (logo + title), trailing actions,
+ * Header layout has three zones - leading (logo + title), trailing actions,
  * and the close button. Consumers nest children directly; this component
  * inspects the children's `__zone` static to route each one to the right
  * slot, falling back to the leading zone for plain elements.

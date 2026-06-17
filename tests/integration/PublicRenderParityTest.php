@@ -49,9 +49,9 @@ use FotoGrids\Render\Internal\Item_Renderer;
 use FotoGrids\Render\Internal\Module_Registry;
 use FotoGrids\Render\Internal\Render_Controller;
 
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-columns-mode.php';
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-render-mode.php';
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-request-source.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-columns-mode.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-mode.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-request-source.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-item-view.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-module-assets.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-meta.php';

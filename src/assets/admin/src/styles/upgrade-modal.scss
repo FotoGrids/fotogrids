@@ -3,7 +3,7 @@
  *
  * The dialog shell (overlay, backdrop, dialog frame, close button) lives in
  * styles/fg-modal/. This file styles only the carousel content rendered
- * inside the Modal body — image pane, text pane, action buttons,
+ * inside the Modal body - image pane, text pane, action buttons,
  * bullet pager, and the slide transitions.
  */
 
@@ -29,7 +29,7 @@
 	overflow: hidden;
 
 	&::before {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		left: -100%;
@@ -47,7 +47,7 @@
 	}
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		right: -100%;

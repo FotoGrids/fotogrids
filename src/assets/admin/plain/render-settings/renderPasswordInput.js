@@ -108,13 +108,13 @@ const PasswordInputComponent = ({
 		// If the user has already typed something, or no saved password exists,
 		// just toggle visibility locally - nothing to fetch.
 		if (hasUserTyped || !passwordIsSet) {
-			setShowPassword(prev => !prev);
+			setShowPassword((prev) => !prev);
 			return;
 		}
 
 		// If we already fetched the password, toggle visibility locally.
 		if (revealState === 'done') {
-			setShowPassword(prev => !prev);
+			setShowPassword((prev) => !prev);
 			return;
 		}
 
@@ -154,7 +154,7 @@ const PasswordInputComponent = ({
 
 	// When the user types, mark that they've actively edited the field so we
 	// never fall back to the reveal-on-eye-click path for subsequent toggles.
-	const handleChange = newValue => {
+	const handleChange = (newValue) => {
 		if (!isDisabled) {
 			userHasTypedRef.current = true;
 			onChange(newValue);
@@ -190,7 +190,7 @@ const PasswordInputComponent = ({
 	// current on every render; refresh() updates an already-visible tooltip
 	// after the label flips on toggle.
 	const toggleRef = React.useCallback(
-		node => {
+		(node) => {
 			if (node && window.FgTooltip) {
 				if (node.dataset.fgTooltipBound !== '1') {
 					window.FgTooltip.bind(node);
@@ -199,7 +199,7 @@ const PasswordInputComponent = ({
 				}
 			}
 		},
-		[toggleLabel],
+		[toggleLabel]
 	);
 
 	// Inline message shown when permission is denied.
@@ -212,8 +212,8 @@ const PasswordInputComponent = ({
 			},
 			__(
 				"You don't have permission to view saved passwords.",
-				'fotogrids',
-			),
+				'fotogrids'
+			)
 		);
 	} else if (revealState === 'error') {
 		revealMessage = React.createElement(
@@ -223,8 +223,8 @@ const PasswordInputComponent = ({
 			},
 			__(
 				'Could not retrieve the saved password. Please try again.',
-				'fotogrids',
-			),
+				'fotogrids'
+			)
 		);
 	}
 
@@ -249,9 +249,9 @@ const PasswordInputComponent = ({
 								className: 'fotogrids-pro-badge',
 								key: 'pro-badge',
 							},
-							settingBadgeText,
+							settingBadgeText
 						),
-				].filter(Boolean),
+				].filter(Boolean)
 			),
 
 			React.createElement(
@@ -265,7 +265,7 @@ const PasswordInputComponent = ({
 						key: 'input',
 						type: showPassword ? 'text' : 'password',
 						value: displayValue,
-						onChange: e => handleChange(e.target.value),
+						onChange: (e) => handleChange(e.target.value),
 						disabled: isDisabled,
 						className: 'fotogrids-input',
 						placeholder,
@@ -283,9 +283,9 @@ const PasswordInputComponent = ({
 							'aria-label': toggleLabel,
 							'data-fg-tooltip': toggleLabel,
 						},
-						iconElement,
+						iconElement
 					),
-				],
+				]
 			),
 
 			revealMessage &&
@@ -294,9 +294,9 @@ const PasswordInputComponent = ({
 					{
 						key: 'reveal-message',
 					},
-					revealMessage,
+					revealMessage
 				),
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };
 
@@ -315,12 +315,12 @@ window.FotoGridsRenderSettings.renderPasswordInput = (
 		restUrl,
 		restNonce,
 		passwordIsSet,
-	},
+	}
 ) => {
 	return React.createElement(PasswordInputComponent, {
 		setting,
 		value: currentValue,
-		onChange: value => updateSetting(setting.key, value),
+		onChange: (value) => updateSetting(setting.key, value),
 		isDisabled,
 		getFieldState,
 		renderIcon,

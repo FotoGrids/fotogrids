@@ -1,18 +1,18 @@
 /**
- * FotoGrids — Pagination core (shared registry).
+ * FotoGrids - Pagination core (shared registry).
  *
  * Exposes `window.FotoGrids.modules.pagination` with:
- *   - state(galleryEl)            — { page, totalPages, pageSize, hasMore }
+ *   - state(galleryEl)            - { page, totalPages, pageSize, hasMore }
  *   - goToPage(galleryEl, page, opts)
  *   - prefetch(galleryEl, page)
- *   - onChange(galleryEl, cb)     — subscribe to page changes
+ *   - onChange(galleryEl, cb)     - subscribe to page changes
  *
  * The three per-method JS files (endless-scroll, load-more, page-buttons)
- * each import nothing — they just read `FotoGrids.modules.pagination` and
+ * each import nothing - they just read `FotoGrids.modules.pagination` and
  * wire their own UI to it. Cross-method coordination (e.g. preload_next_page)
  * lives in this file.
  *
- * No imports — standalone vanilla JS compiled by webpack as an entry.
+ * No imports - standalone vanilla JS compiled by webpack as an entry.
  */
 
 ( function () {
@@ -37,7 +37,7 @@
      *     hasMore:    Boolean, // mirrors page < totalPages
      *   }
      *
-     * Lives in JS memory only — cleared on page navigation/refresh.
+     * Lives in JS memory only - cleared on page navigation/refresh.
      * Per [[user feedback]]: per-page-load cache, no localStorage.
      *
      * @type {WeakMap<Element, Map<string, object>>}
@@ -59,7 +59,7 @@
      * superseded this one, its DOM/cache write is dropped.
      *
      * Without this, rapid filter toggles produce overlapping in-flight
-     * fetches whose responses can interleave — the later-arriving response
+     * fetches whose responses can interleave - the later-arriving response
      * for an earlier filter wins, painting stale items AND poisoning the
      * cache slot of whichever filter is "active" at apply time. That's
      * the source of the "sometimes correct, sometimes wrong" totalPages
@@ -82,12 +82,12 @@
     /**
      * Filter-handling strategy.
      *
-     *   'server' (default) — every filter change goes through a server
+     *   'server' (default) - every filter change goes through a server
      *                        fetch. The server's total_pages is the only
      *                        thing that ever writes data-fg-page-total.
      *                        Single source of truth, no cache poisoning
      *                        possible.
-     *   'cache'            — original behaviour: snapshot every paint into
+     *   'cache'            - original behaviour: snapshot every paint into
      *                        a per-fingerprint cache, restore from cache
      *                        on filter revisits, fall back to server fetch
      *                        on cache miss. Kept as a fallback so we can
@@ -110,7 +110,7 @@
 
     /**
      * Reads pagination state off the gallery wrapper's data-fg-* attributes.
-     * Always returns a fresh object — never the stored one, callers should
+     * Always returns a fresh object - never the stored one, callers should
      * not mutate it.
      *
      * @param {Element} galleryEl
@@ -146,7 +146,7 @@
 
     /**
      * Resolve the items container to append/replace inside. The layout
-     * module's root has the structural class (e.g. .fg-layout-grid) —
+     * module's root has the structural class (e.g. .fg-layout-grid) -
      * pagination doesn't know which layout is active, so it looks for a
      * `data-fg-items-root="true"` attribute on the root, falling back to
      * the wrapper's first non-chrome child when no layout emits it.
@@ -249,7 +249,7 @@
             ? window.FotoGrids.modules.filters.getActive( galleryEl )
             : {};
 
-        // Random sort seed — only present when default_sort_order is
+        // Random sort seed - only present when default_sort_order is
         // 'random'. Sending it back unchanged on every paginated request
         // is what keeps the shuffle stable across pages. The server
         // ignores zero/missing.
@@ -304,7 +304,7 @@
         // Parse the response. The layout module wraps items in a root
         // element (e.g. <div class="fg-grid-track" data-fg-items-root>),
         // and "items_only" returns that whole wrapper. We must unwrap
-        // it before appending — otherwise we'd nest a second
+        // it before appending - otherwise we'd nest a second
         // .fg-grid-track inside the existing one.
         const template = document.createElement( 'template' );
         template.innerHTML = payload.html;
@@ -345,7 +345,7 @@
         // Snapshot the current view into the filter-view cache so a
         // future filter toggle that returns to this state can paint
         // instantly from cache. Use the fingerprint captured at FETCH
-        // time — not whatever activeFingerprint holds now — so an
+        // time - not whatever activeFingerprint holds now - so an
         // earlier-arriving response can't be filed under a later
         // filter's slot.
         //
@@ -401,7 +401,7 @@
      * for this gallery. Delegates to FotoGrids.modules.filters.fingerprint
      * so filter-ui.js is the single source of truth.
      *
-     * Returns '' (empty fingerprint) when filters module isn't loaded —
+     * Returns '' (empty fingerprint) when filters module isn't loaded -
      * e.g. galleries without filtering enabled. That fingerprint just
      * means "no filter".
      *
@@ -454,7 +454,7 @@
      * Same as snapshotCurrentView but writes under a caller-supplied
      * fingerprint instead of the currently-active one. Used by applyPage
      * so the snapshot key is the fingerprint that was active when the
-     * fetch was kicked off — guaranteeing the cache slot reflects what
+     * fetch was kicked off - guaranteeing the cache slot reflects what
      * the server actually returned.
      *
      * @param {Element} galleryEl
@@ -474,7 +474,7 @@
 
     /**
      * Restore a cached view into the gallery. Used when the user toggles
-     * back to a filter state they've already seen — no fetch, instant
+     * back to a filter state they've already seen - no fetch, instant
      * paint.
      *
      * @param {Element} galleryEl
@@ -524,7 +524,7 @@
      *
      * Behaviour:
      *   1. Capture the current view under the PREVIOUS fingerprint (this
-     *      already happened on the last applyPage call — but if items
+     *      already happened on the last applyPage call - but if items
      *      were inserted by another path since then, refresh).
      *   2. Compute new fingerprint.
      *   3. If new fingerprint is in cache → restore from cache, resolve
@@ -544,7 +544,7 @@
 
         // Server-authoritative strategy: skip the cache entirely. The
         // server's total_pages becomes the only writer of
-        // data-fg-page-total — no cache slot can carry stale state
+        // data-fg-page-total - no cache slot can carry stale state
         // because nothing reads the cache. The fingerprint+token race
         // guard inside goToPage stays active as defence-in-depth, but
         // is no longer load-bearing.
@@ -555,7 +555,7 @@
             } );
         }
 
-        // 'cache' strategy — original behaviour.
+        // 'cache' strategy - original behaviour.
         //
         // DO NOT snapshot here. By the time this fires, filter-ui has
         // already mutated the DOM (added fg-is-filtered-out classes to
@@ -576,11 +576,11 @@
             return Promise.resolve( { page: restored.page, hasMore: restored.hasMore, fromCache: true } );
         }
 
-        // Cache miss — set the active fingerprint to the new value so
+        // Cache miss - set the active fingerprint to the new value so
         // the post-fetch snapshot (taken by applyPage) lands in the
         // right cache slot. We also pass the captured fingerprint
         // into goToPage so its snapshot is keyed against the exact
-        // filter state that was active when the fetch was issued —
+        // filter state that was active when the fetch was issued -
         // robust against another swapToFilterState firing while this
         // fetch is in flight.
         activeFingerprint.set( galleryEl, newFp );
@@ -612,8 +612,8 @@
 
         // Capture the filter fingerprint and a fresh request token at the
         // moment we kick the fetch off. If a later goToPage/swapToFilterState
-        // bumps the token before this response lands, we drop the result —
-        // both the DOM write and the cache snapshot — so the late response
+        // bumps the token before this response lands, we drop the result -
+        // both the DOM write and the cache snapshot - so the late response
         // can't poison a newer filter's view.
         const capturedFp    = ( opts && typeof opts.fingerprint === 'string' )
             ? opts.fingerprint
@@ -627,7 +627,7 @@
                 if ( ! isCurrentToken( galleryEl, capturedToken ) ) {
                     // Superseded by a newer request. Surface the payload
                     // so awaiting callers still resolve, but don't touch
-                    // the DOM or cache — the newer request owns those.
+                    // the DOM or cache - the newer request owns those.
                     return { page: payload.page, hasMore: payload.has_more, stale: true };
                 }
                 applyPage( galleryEl, payload, mode, capturedFp );
@@ -707,7 +707,7 @@
 
     function init() {
         if ( ! expose() ) {
-            // Runtime not yet attached — wait for it.
+            // Runtime not yet attached - wait for it.
             document.addEventListener( 'fotogrids:ready', expose, { once: true } );
             return;
         }

@@ -112,7 +112,7 @@ final class Load_More implements Feature {
 	}
 
 	public function style_vars( Render_Context $render_context ): array {
-		// All styling vars live on the trait now — both Load More and
+		// All styling vars live on the trait now - both Load More and
 		// Page Buttons share the same `pagination_buttons_subtabs` →
 		// Styling tab in pagination.json, so the resolution sits in
 		// Pagination_Common::common_style_vars().
@@ -123,22 +123,23 @@ final class Load_More implements Feature {
 		$common = $this->common_assets();
 
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				$common->css,
 				array(
 					'fotogrids-pagination-load-more' => new Asset_Decl(
-						path:      'features/pagination/load-more/load-more.css',
-						in_footer: false,
+						'features/pagination/load-more/load-more.css',
+						array(),
+						false,
 					),
 				)
 			),
-			js: array_merge(
+			array_merge(
 				$common->js,
 				array(
 					'fotogrids-pagination-load-more' => new Asset_Decl(
-						path:      '../../assets/js/load-more.js',
-						deps:      array( 'fotogrids-pagination-core' ),
-						in_footer: true,
+						'../../assets/js/load-more.js',
+						array( 'fotogrids-pagination-core' ),
+						true,
 					),
 				)
 			)

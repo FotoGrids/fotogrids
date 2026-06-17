@@ -130,7 +130,7 @@ final class Justified_Packer {
 	}
 
 	/**
-	 * Compute the natural (unstretched) row width — the width the row would
+	 * Compute the natural (unstretched) row width - the width the row would
 	 * take if every item rendered at the target height. Used to measure
 	 * how full the last row is against the container.
 	 *

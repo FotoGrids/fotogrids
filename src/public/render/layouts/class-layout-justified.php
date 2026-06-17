@@ -120,24 +120,24 @@ final class Layout_Justified implements Layout {
 
 		return array(
 			'--fg-justified-row-height' => new Responsive_Var(
-				desktop: $desktop . 'px',
-				tablet:  $tablet . 'px',
-				mobile:  $mobile . 'px',
+				$desktop . 'px',
+				$tablet . 'px',
+				$mobile . 'px',
 			),
 		);
 	}
 
 	public function assets( Render_Context $render_context ): Module_Assets {
 		return new Module_Assets(
-			css: array(
-				'fotogrids-render-base'      => new Asset_Decl( path: 'base/collection-base.css' ),
-				'fotogrids-layout-justified' => new Asset_Decl( path: 'layouts/justified/justified.css' ),
+			array(
+				'fotogrids-render-base'      => new Asset_Decl( 'base/collection-base.css' ),
+				'fotogrids-layout-justified' => new Asset_Decl( 'layouts/justified/justified.css' ),
 			),
-			js: array(
+			array(
 				'fotogrids-layout-justified' => new Asset_Decl(
-					path:      '../../assets/js/layout-justified.js',
-					deps:      array( 'fotogrids-runtime' ),
-					in_footer: true,
+					'../../assets/js/layout-justified.js',
+					array( 'fotogrids-runtime' ),
+					true,
 				),
 			)
 		);
@@ -151,7 +151,7 @@ final class Layout_Justified implements Layout {
 	 * Justified packs items at a fixed row height with variable widths, so
 	 * it requires the proportional fotogrids_justified derivative. A cropped
 	 * or square user-picked size would force every tile to the same aspect
-	 * ratio and defeat the layout — the preference is mandatory.
+	 * ratio and defeat the layout - the preference is mandatory.
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.

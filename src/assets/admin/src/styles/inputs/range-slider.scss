@@ -1,7 +1,7 @@
-@use '../colors.scss' as *;
-@use '../sizes.scss' as *;
+@use "../colors.scss" as *;
+@use "../sizes.scss" as *;
 
-input[type='number'].fotogrids-range-number-input {
+input[type="number"].fotogrids-range-number-input {
 	width: 60px;
 	padding: 6px 8px;
 	margin: 0;
@@ -62,7 +62,7 @@ input[type='number'].fotogrids-range-number-input {
 		}
 	}
 
-	&[type='range']:disabled {
+	&[type="range"]:disabled {
 		background: var(--fg-border-primary);
 		opacity: 0.5;
 		cursor: default;
@@ -183,7 +183,7 @@ input[type='number'].fotogrids-range-number-input {
 @-moz-document url-prefix() {
 	.fotogrids-dual-range-wrapper {
 		&::before {
-			content: '';
+			content: "";
 			position: absolute;
 			left: 0;
 			right: 0;
@@ -196,7 +196,7 @@ input[type='number'].fotogrids-range-number-input {
 		}
 
 		&::after {
-			content: '';
+			content: "";
 			position: absolute;
 			left: var(--min-percent, 0%);
 			right: calc(100% - var(--max-percent, 100%));

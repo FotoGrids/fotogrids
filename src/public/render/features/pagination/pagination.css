@@ -1,5 +1,5 @@
 /*
- * FotoGrids — Pagination shared base.
+ * FotoGrids - Pagination shared base.
  *
  * Loaded by every pagination method module (load-more, page-buttons,
  * endless-scroll) via Pagination_Common::common_assets(). Holds:
@@ -10,14 +10,14 @@
  *                                      the same custom property on a
  *                                      descendant scope (e.g. load-more's
  *                                      roomier padding)
- *  - .fg-pagination__btn               base button look — load-more's button
+ *  - .fg-pagination__btn               base button look - load-more's button
  *                                      and page-buttons' prev/next/number
  *                                      buttons both carry this class
- *  - .fg-pagination__btn:hover         hover state — shared
- *  - .fg-pagination__btn:disabled      disabled state — shared
- *  - .fg-pagination__btn.fg-is-loading "loading" state — shared (load-more
+ *  - .fg-pagination__btn:hover         hover state - shared
+ *  - .fg-pagination__btn:disabled      disabled state - shared
+ *  - .fg-pagination__btn.fg-is-loading "loading" state - shared (load-more
  *                                      adds this during async fetch)
- *  - .fg-pagination__status            sr-only live region — used by all
+ *  - .fg-pagination__status            sr-only live region - used by all
  *                                      three methods
  *
  * Per-method specifics (wrapper layout, alignment classes, the active-page

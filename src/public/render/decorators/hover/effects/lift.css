@@ -1,0 +1,18 @@
+/* The whole tile rises; the soft shadow hugs the media (not the caption block)
+   so it reads correctly whether the caption is overlaid or stacked below. */
+
+.fotogrids-collection[data-fg-hover='lift'] .fg-item {
+	transition-property: transform;
+}
+
+.fotogrids-collection[data-fg-hover='lift'] .fg-item-media {
+	transition-property: box-shadow;
+}
+
+.fotogrids-collection[data-fg-hover='lift'] .fg-item:hover {
+	transform: translateY(var(--fg-hover-lift-distance)) scale(1.01);
+}
+
+.fotogrids-collection[data-fg-hover='lift'] .fg-item:hover .fg-item-media {
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}

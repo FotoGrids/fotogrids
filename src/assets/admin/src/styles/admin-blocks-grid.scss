@@ -1,4 +1,4 @@
-@use 'colors' as *;
+@use "colors" as *;
 
 .fotogrids-admin-blocks-grid {
 	display: grid;
@@ -40,7 +40,7 @@
 		}
 
 		h3 {
-			font-family: 'Poppins', sans-serif;
+			font-family: "Poppins", sans-serif;
 			margin: 24px 0 8px;
 			font-size: 18px;
 			font-weight: 600;
@@ -61,7 +61,7 @@
 		}
 
 		.fg-button {
-			font-family: 'Poppins', sans-serif;
+			font-family: "Poppins", sans-serif;
 		}
 
 		.fotogrids-admin-block-card-header {
@@ -90,7 +90,7 @@
 				}
 
 				&:before {
-					content: '';
+					content: "";
 					position: absolute;
 					width: 100%;
 					height: 100%;
@@ -334,7 +334,7 @@
 						}
 
 						&:before {
-							content: '';
+							content: "";
 							position: absolute;
 							width: 100%;
 							height: 100%;
@@ -344,7 +344,7 @@
 						}
 					}
 
-					&[data-icon-color='blue'] {
+					&[data-icon-color="blue"] {
 						.fotogrids-admin-block-card-icon {
 							background: rgba($fotogrids-colors-blue, 0.1);
 							color: $fotogrids-colors-blue;
@@ -357,7 +357,7 @@
 						}
 					}
 
-					&[data-icon-color='yellow'] {
+					&[data-icon-color="yellow"] {
 						.fotogrids-admin-block-card-icon {
 							background: rgba($fotogrids-colors-yellow, 0.1);
 							color: $fotogrids-colors-yellow;
@@ -370,7 +370,7 @@
 						}
 					}
 
-					&[data-icon-color='red'] {
+					&[data-icon-color="red"] {
 						.fotogrids-admin-block-card-icon {
 							background: rgba($fotogrids-colors-red, 0.1);
 							color: $fotogrids-colors-red;
@@ -383,7 +383,7 @@
 						}
 					}
 
-					&[data-icon-color='green'] {
+					&[data-icon-color="green"] {
 						.fotogrids-admin-block-card-icon {
 							background: rgba($fotogrids-colors-green, 0.1);
 							color: $fotogrids-colors-green;

@@ -28,7 +28,7 @@ declare module '@wordpress/blocks' {
 
 	export function registerBlockType(
 		name: string,
-		config: BlockConfiguration,
+		config: BlockConfiguration
 	): void;
 }
 
@@ -129,12 +129,12 @@ declare module '@wordpress/i18n' {
 	export function _x<T = string>(
 		text: T,
 		context: string,
-		domain?: string,
+		domain?: string
 	): T;
 	export function _n(
 		single: string,
 		plural: string,
 		number: number,
-		domain?: string,
+		domain?: string
 	): string;
 }

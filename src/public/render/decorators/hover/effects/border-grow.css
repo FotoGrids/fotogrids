@@ -1,9 +1,0 @@
-[data-fg-hover="border-grow"] .fg-item {
-    border: 1px solid transparent;
-    transition: border-color 220ms ease, transform 220ms ease;
-}
-
-[data-fg-hover="border-grow"] .fg-item:hover {
-    border-color: rgba(0, 0, 0, 0.45);
-    transform: translateY(-2px);
-}

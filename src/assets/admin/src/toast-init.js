@@ -29,7 +29,7 @@ function initializeToasts() {
 		const [toasts, setToasts] = useState([]);
 
 		useEffect(() => {
-			const unsubscribe = toastManager.subscribe(newToasts => {
+			const unsubscribe = toastManager.subscribe((newToasts) => {
 				setToasts(newToasts);
 			});
 
@@ -38,7 +38,7 @@ function initializeToasts() {
 			return unsubscribe;
 		}, []);
 
-		const handleDismiss = React.useCallback(id => {
+		const handleDismiss = React.useCallback((id) => {
 			toastManager.remove(id);
 		}, []);
 

@@ -23,13 +23,13 @@ if ( ! defined( 'WPINC' ) ) {
  * Both Context_Builder (which feeds the visible grid render) and
  * Lightbox_Slides_Data (which feeds the lightbox slide cache) route
  * through this so the sequence the user clicks in the grid matches the
- * sequence they navigate in the lightbox — exactly.
+ * sequence they navigate in the lightbox - exactly.
  *
  * The sequence is the ordered list of attachment IDs after:
  *   1. Sorter applied (Random, Date, Title, Filename, Manual, Pro sorters).
  *   2. Server-side filters applied (Tags, People, Location, Pro sources).
  *
- * Pagination slicing is NOT applied here — callers slice the result
+ * Pagination slicing is NOT applied here - callers slice the result
  * themselves with whatever (offset, limit) they need.
  *
  * @package FotoGrids\Render\Internal
@@ -72,7 +72,7 @@ final class Gallery_Item_Sequence {
 	}
 
 	/**
-	 * Returns the count of the filtered+sorted sequence — the number of
+	 * Returns the count of the filtered+sorted sequence - the number of
 	 * items the lightbox should advertise as `total`, and the count
 	 * `/gallery/render` reports as `total_pages * page_size`-roof.
 	 *
@@ -118,7 +118,7 @@ final class Gallery_Item_Sequence {
 	/**
 	 * Builds a Render_Context shell suitable for sorter + filter_source
 	 * supports() / sort() / matches() calls. Items are stub Item_Views with
-	 * only the id field populated — none of the predicates we run need
+	 * only the id field populated - none of the predicates we run need
 	 * image URLs or captions.
 	 *
 	 * @param array<int, int>                    $ids
@@ -134,54 +134,63 @@ final class Gallery_Item_Sequence {
 		$stub_items = array_map(
 			static function ( int $id ): Item_View {
 				return new Item_View(
-					id:          $id,
-					thumb_url:   '',
-					full_url:    '',
-					alt:         '',
-					title:       '',
-					caption:     '',
-					description: '',
-					meta:        array(),
+					$id,
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					'',
+					null,
+					null,
+					array(),
 				);
 			},
 			$ids
 		);
 
 		$meta = new Render_Meta(
-			gallery_id:      $gallery_id,
-			album_id:        null,
-			instance_id:     'fg-' . $gallery_id . '-seq',
-			source:          Request_Source::SHORTCODE,
-			is_preview:      false,
-			mode:            Render_Mode::INITIAL,
-			schema_version:  2,
-			collection_kind: Collection_Kind::GALLERY,
-			random_seed:     $random_seed,
-			active_filters:  $active_filters,
+			$gallery_id,
+			null,
+			'fg-' . $gallery_id . '-seq',
+			Request_Source::SHORTCODE,
+			false,
+			Render_Mode::INITIAL,
+			2,
+			Collection_Kind::GALLERY,
+			null,
+			null,
+			null,
+			null,
+			null,
+			$active_filters,
+			$random_seed,
 		);
 
 		$layout = new Render_Layout(
-			layout_id:          is_string( $settings['layout'] ?? null ) ? $settings['layout'] : 'grid',
-			columns_mode:       Columns_Mode::FIXED,
-			responsive_columns: array(),
-			responsive_spacing: array(),
-			columns_auto_range: array()
+			is_string( $settings['layout'] ?? null ) ? $settings['layout'] : 'grid',
+			Columns_Mode::FIXED,
+			array(),
+			array(),
+			array()
 		);
 
 		$behavior = new Render_Behavior(
-			click_behavior:    is_string( $settings['item_click_behavior'] ?? null ) ? $settings['item_click_behavior'] : 'lightbox',
-			pagination_type:   is_string( $settings['pagination_type'] ?? null ) ? $settings['pagination_type'] : 'show_all',
-			pagination_method: is_string( $settings['pagination_method'] ?? null ) ? $settings['pagination_method'] : 'load_more',
-			hover_effect:      null
+			is_string( $settings['item_click_behavior'] ?? null ) ? $settings['item_click_behavior'] : 'lightbox',
+			is_string( $settings['pagination_type'] ?? null ) ? $settings['pagination_type'] : 'show_all',
+			is_string( $settings['pagination_method'] ?? null ) ? $settings['pagination_method'] : 'load_more',
+			null
 		);
 
 		return new Render_Context(
-			meta:     $meta,
-			layout:   $layout,
-			behavior: $behavior,
-			settings: $settings,
-			items:    $stub_items,
-			warnings: array()
+			$meta,
+			$layout,
+			$behavior,
+			$settings,
+			$stub_items,
+			array()
 		);
 	}
 

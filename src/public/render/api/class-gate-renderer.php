@@ -78,7 +78,7 @@ final class Gate_Renderer {
 	public static function shared_asset_decl(): array {
 		return array(
 			self::SHARED_CSS_HANDLE => new Asset_Decl(
-				path: self::SHARED_CSS_PATH
+				self::SHARED_CSS_PATH
 			),
 		);
 	}
@@ -182,7 +182,7 @@ final class Gate_Renderer {
 	 * @param  mixed $spacing Spacing setting for one breakpoint.
 	 * @return string
 	 */
-	private static function resolve_gap( mixed $spacing ): string {
+	private static function resolve_gap( $spacing ): string {
 		if ( is_array( $spacing ) ) {
 			$value = $spacing['value'] ?? '';
 			$unit  = $spacing['unit'] ?? 'px';

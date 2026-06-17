@@ -30,12 +30,12 @@ class Post_Types {
 	 * is a first-class field (read by `get_post_thumbnail_id()` from REST
 	 * handlers, statistics, OG, etc.), but the user-facing way to choose
 	 * the cover is the in-metabox "Featured Item" star picker on each
-	 * gallery item — not the generic media-library Featured Image picker.
+	 * gallery item - not the generic media-library Featured Image picker.
 	 * Showing both pickers would confuse users.
 	 *
 	 * Albums don't declare 'thumbnail' support (their cover is resolved
 	 * at runtime from the chosen child gallery), so this is a no-op for
-	 * them — included for safety in case that ever changes.
+	 * them - included for safety in case that ever changes.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -114,11 +114,11 @@ class Post_Types {
 			'hierarchical'          => false,
 			'menu_position'         => null,
 			'menu_icon'             => 'dashicons-format-gallery',
-			// 'title'    — gallery name shown in lists and as the page <title>.
-			// 'thumbnail' — backs the Featured Item picker via WP-native
+			// 'title'    - gallery name shown in lists and as the page <title>.
+			// 'thumbnail' - backs the Featured Item picker via WP-native
 			//               `_thumbnail_id`. The native Featured Image
 			//               metabox is hidden in `hide_featured_image_metabox()`.
-			// 'excerpt'  — backs the `og:description` fallback chain. The
+			// 'excerpt'  - backs the `og:description` fallback chain. The
 			//               native Excerpt metabox renders below the title
 			//               unless the user has hidden it via Screen Options.
 			'supports'              => array( 'title', 'thumbnail', 'excerpt' ),
@@ -183,9 +183,9 @@ class Post_Types {
 			'hierarchical'          => false,
 			'menu_position'         => null,
 			'menu_icon'             => 'dashicons-album',
-			// 'title'   — album name shown in lists and as the page <title>.
-			// 'excerpt' — backs the `og:description` fallback chain for albums.
-			// Albums intentionally do NOT declare 'thumbnail' support — the
+			// 'title'   - album name shown in lists and as the page <title>.
+			// 'excerpt' - backs the `og:description` fallback chain for albums.
+			// Albums intentionally do NOT declare 'thumbnail' support - the
 			// album cover is resolved at runtime from the Featured Gallery
 			// (see `Cover_Resolver::for_album()`), not stored
 			// as a native `_thumbnail_id` on the album post.
@@ -207,7 +207,7 @@ class Post_Types {
 	 * globally unique, so there is no collision), which lets them participate
 	 * in manual ordering and sorting exactly like attachments.
 	 *
-	 * The type has no admin UI of its own — embeds are created, edited, and
+	 * The type has no admin UI of its own - embeds are created, edited, and
 	 * deleted entirely through the gallery items metabox. It declares 'title'
 	 * (the caption) and 'thumbnail' (the custom poster via _thumbnail_id).
 	 *
@@ -232,15 +232,15 @@ class Post_Types {
 			// gallery items REST endpoints, which already gate on
 			// `manage_fotogrids`. The CPT itself uses standard 'post'
 			// capabilities (which admins and editors already hold) so embed
-			// posts can be written without remapping caps — remapping primitive
+			// posts can be written without remapping caps - remapping primitive
 			// caps to `manage_fotogrids` interferes with map_meta_cap when that
 			// capability is itself checked.
 			'capability_type'     => 'post',
 			'map_meta_cap'        => true,
 			'has_archive'         => false,
 			'hierarchical'        => false,
-			// 'title'     — the embed caption.
-			// 'thumbnail' — backs the custom poster via WP-native _thumbnail_id.
+			// 'title'     - the embed caption.
+			// 'thumbnail' - backs the custom poster via WP-native _thumbnail_id.
 			'supports'            => array( 'title', 'thumbnail' ),
 			'show_in_rest'        => false,
 		);

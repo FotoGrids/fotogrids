@@ -69,7 +69,7 @@ final class Endless_Scroll implements Feature {
 	 * screen-reader announcements; the visible spinner is purely CSS.
 	 *
 	 * Uses html_appendix (NOT html_after) so the sentinel lives INSIDE
-	 * the gallery wrapper — see Load_More for the same reasoning.
+	 * the gallery wrapper - see Load_More for the same reasoning.
 	 *
 	 * @since 1.0.0
 	 */
@@ -104,7 +104,7 @@ final class Endless_Scroll implements Feature {
 
 	public function style_vars( Render_Context $render_context ): array {
 		// Inherits `--fg-pagination-distance` (margin above the bar) from
-		// the shared trait. No endless-scroll-specific theming in v1 — the
+		// the shared trait. No endless-scroll-specific theming in v1 - the
 		// spinner uses the gallery's existing --fg-color-primary if
 		// defined; otherwise falls back to currentColor in the CSS.
 		return $this->common_style_vars( $render_context );
@@ -115,22 +115,23 @@ final class Endless_Scroll implements Feature {
 
 		// Merge per-method CSS + JS on top of the shared pagination-core JS.
 		return new Module_Assets(
-			css: array_merge(
+			array_merge(
 				$common->css,
 				array(
 					'fotogrids-pagination-endless-scroll' => new Asset_Decl(
-						path:      'features/pagination/endless-scroll/endless-scroll.css',
-						in_footer: false,
+						'features/pagination/endless-scroll/endless-scroll.css',
+						array(),
+						false,
 					),
 				)
 			),
-			js: array_merge(
+			array_merge(
 				$common->js,
 				array(
 					'fotogrids-pagination-endless-scroll' => new Asset_Decl(
-						path:      '../../assets/js/endless-scroll.js',
-						deps:      array( 'fotogrids-pagination-core' ),
-						in_footer: true,
+						'../../assets/js/endless-scroll.js',
+						array( 'fotogrids-pagination-core' ),
+						true,
 					),
 				)
 			)

@@ -18,7 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
  * + `fotogrids_tags` joined by `metadata_type` / `tags.type`.
  *
  * All three core sources (Tags, People, Location) share the same query
- * shape and predicate logic — only the metadata_type discriminator,
+ * shape and predicate logic - only the metadata_type discriminator,
  * arg key, label, and item data attribute differ. Subclasses just
  * declare those constants; everything else lives here.
  *
@@ -163,9 +163,9 @@ abstract class Metadata_Filter_Source implements Filter_Source {
 		$options = array();
 		foreach ( $rows as $row ) {
 			$options[] = new Filter_Option(
-				value: (string) $row['slug'],
-				label: (string) $row['name'],
-				count: (int) $row['item_count'],
+				(string) $row['slug'],
+				(string) $row['name'],
+				(int) $row['item_count'],
 			);
 		}
 		return $options;

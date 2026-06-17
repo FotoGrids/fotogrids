@@ -1,5 +1,5 @@
-@use './colors.scss' as *;
-@use './sizes.scss' as *;
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
 
 @keyframes fg-shimmer {
 	0% {
@@ -185,7 +185,7 @@
 
 	&__value {
 		display: block;
-		font-family: 'Poppins', sans-serif;
+		font-family: "Poppins", sans-serif;
 		font-size: 24px;
 		font-weight: 600;
 		color: #fff;

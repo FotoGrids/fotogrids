@@ -74,7 +74,7 @@ final class Gallery_Repository {
 	 * Get a gallery's resolved settings (defaults merged with saved post meta).
 	 *
 	 * Adds a synthetic `_password_encrypted` key with the raw ciphertext from
-	 * `fotogrids_password` post meta — the Password gate calls
+	 * `fotogrids_password` post meta - the Password gate calls
 	 * `Password_Crypto::verify()` against this. The public `password` key in
 	 * the returned array is always `''` so the ciphertext never leaks into
 	 * REST responses or the public JS bundle.
@@ -269,7 +269,7 @@ final class Gallery_Repository {
 		global $wpdb;
 		$table = $wpdb->prefix . 'fotogrids_item_meta';
 
-		// Bulk SELECT — one round-trip for all attachments in the gallery.
+		// Bulk SELECT - one round-trip for all attachments in the gallery.
 		$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
 		$rows         = $wpdb->get_results(
 			$wpdb->prepare(

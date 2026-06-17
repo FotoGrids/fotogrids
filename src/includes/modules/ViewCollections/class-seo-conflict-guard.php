@@ -65,7 +65,7 @@ class SEO_Conflict_Guard {
 
 		// When the site owner has chosen to defer to their SEO plugin on view
 		// pages, the renderer already short-circuits OG emission. In that
-		// mode we MUST NOT suppress the SEO plugin's output — that's the
+		// mode we MUST NOT suppress the SEO plugin's output - that's the
 		// whole point of deferring. The conflict guard only makes sense when
 		// FotoGrids is the one emitting OG.
 		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $post->ID );

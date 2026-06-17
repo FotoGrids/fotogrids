@@ -40,7 +40,7 @@ final class Catalog_REST_Endpoint {
 		$field_states_by_option = array();
 
 		foreach ( Catalog::all() as $field_id => $entry ) {
-			$field_states[ $field_id ] = State_Resolver::resolve( $field_id, null, $simulate_state )->value;
+			$field_states[ $field_id ] = State_Resolver::resolve( $field_id, null, $simulate_state );
 
 			$options = $entry['options'] ?? null;
 			if ( ! is_array( $options ) ) {
@@ -53,7 +53,7 @@ final class Catalog_REST_Endpoint {
 					$field_id,
 					$option_value_key,
 					$simulate_state
-				)->value;
+				);
 			}
 		}
 

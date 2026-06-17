@@ -45,7 +45,7 @@ const PluginSettingsPage = () => {
         { id: 'getting_started', label: __('Getting Started', 'fotogrids') }
     ];
 
-    // URL builder for the wizard launcher tab — adds the setup-step param
+    // URL builder for the wizard launcher tab - adds the setup-step param
     // to the current URL so the wizard opens *over* the Settings page,
     // no navigation. We don't strip the existing tab / subtab params so
     // closing the wizard returns the user to the tab they were on.

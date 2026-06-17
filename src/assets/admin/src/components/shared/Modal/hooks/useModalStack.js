@@ -4,15 +4,15 @@ const subscribers = new Set();
 const stack = [];
 
 const notify = () => {
-	subscribers.forEach(cb => cb([...stack]));
+	subscribers.forEach((cb) => cb([...stack]));
 };
 
-const push = id => {
+const push = (id) => {
 	stack.push(id);
 	notify();
 };
 
-const remove = id => {
+const remove = (id) => {
 	const idx = stack.indexOf(id);
 	if (idx !== -1) {
 		stack.splice(idx, 1);
@@ -37,7 +37,7 @@ export const useModalStack = (id, active) => {
 
 		push(id);
 
-		const updateDepth = snapshot => {
+		const updateDepth = (snapshot) => {
 			const idx = snapshot.indexOf(id);
 			setDepth(idx === -1 ? 0 : idx);
 		};

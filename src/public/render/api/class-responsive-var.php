@@ -24,6 +24,10 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Responsive_Var {
 
+	public string $desktop;
+	public string $tablet;
+	public string $mobile;
+
 	/**
 	 * @since 1.0.0
 	 * @param string $desktop Value for the desktop breakpoint (always set).
@@ -31,10 +35,14 @@ final class Responsive_Var {
 	 * @param string $mobile  Value for the mobile breakpoint (falls back to tablet if empty).
 	 */
 	public function __construct(
-		public readonly string $desktop,
-		public readonly string $tablet = '',
-		public readonly string $mobile = '',
-	) {}
+		string $desktop,
+		string $tablet = '',
+		string $mobile = ''
+	) {
+		$this->desktop = $desktop;
+		$this->tablet  = $tablet;
+		$this->mobile  = $mobile;
+	}
 
 	/**
 	 * Returns the effective value for a given breakpoint, cascading upward
@@ -45,10 +53,13 @@ final class Responsive_Var {
 	 * @return string
 	 */
 	public function for_breakpoint( string $breakpoint ): string {
-		return match ( $breakpoint ) {
-			'mobile'  => '' !== $this->mobile ? $this->mobile : $this->for_breakpoint( 'tablet' ),
-			'tablet'  => '' !== $this->tablet ? $this->tablet : $this->desktop,
-			default   => $this->desktop,
-		};
+		switch ( $breakpoint ) {
+			case 'mobile':
+				return '' !== $this->mobile ? $this->mobile : $this->for_breakpoint( 'tablet' );
+			case 'tablet':
+				return '' !== $this->tablet ? $this->tablet : $this->desktop;
+			default:
+				return $this->desktop;
+		}
 	}
 }

@@ -30,7 +30,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 		[
 			h('div', {
 				className: 'fotogrids-modal__overlay',
-				onClick: e => {
+				onClick: (e) => {
 					if (e.target === e.currentTarget) {
 						closeBulkModal();
 					}
@@ -54,7 +54,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 								{},
 								bulkAction === 'apply_to_all'
 									? __('Apply URL to All Items', 'fotogrids')
-									: __('Clear All URLs', 'fotogrids'),
+									: __('Clear All URLs', 'fotogrids')
 							),
 							h(
 								'button',
@@ -63,9 +63,9 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 									className: 'fotogrids-modal__close',
 									onClick: closeBulkModal,
 								},
-								'×',
+								'×'
 							),
-						],
+						]
 					),
 
 					h(
@@ -98,23 +98,23 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 															},
 															__(
 																'URL to apply to all items',
-																'fotogrids',
-															),
+																'fotogrids'
+															)
 														),
 														h('input', {
 															type: 'url',
 															value: bulkUrl,
 															placeholder: __(
 																'Enter URL (e.g., https://example.com)',
-																'fotogrids',
+																'fotogrids'
 															),
 															className: `fotogrids-modal__input ${!validation.valid ? 'fotogrids-modal__input--invalid' : validation.valid && bulkUrl ? 'fotogrids-modal__input--valid' : ''}`,
-															onChange: e =>
+															onChange: (e) =>
 																setBulkUrl(
 																	e.target
-																		.value,
+																		.value
 																),
-															onKeyDown: e => {
+															onKeyDown: (e) => {
 																if (
 																	e.key ===
 																		'Enter' &&
@@ -130,9 +130,9 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																{
 																	className: `fotogrids-modal__validation ${validation.valid ? 'fotogrids-modal__validation--valid' : 'fotogrids-modal__validation--invalid'}`,
 																},
-																validation.message,
+																validation.message
 															),
-													],
+													]
 												),
 
 												h(
@@ -150,17 +150,17 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 															},
 															__(
 																'Link Target',
-																'fotogrids',
-															),
+																'fotogrids'
+															)
 														),
 														h(
 															'select',
 															{
 																value: bulkTarget,
-																onChange: e =>
+																onChange: (e) =>
 																	setBulkTarget(
 																		e.target
-																			.value,
+																			.value
 																	),
 																className:
 																	'fotogrids-modal__select',
@@ -173,8 +173,8 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																	},
 																	__(
 																		'Global Default',
-																		'fotogrids',
-																	),
+																		'fotogrids'
+																	)
 																),
 																h(
 																	'option',
@@ -183,8 +183,8 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																	},
 																	__(
 																		'Same Tab',
-																		'fotogrids',
-																	),
+																		'fotogrids'
+																	)
 																),
 																h(
 																	'option',
@@ -193,12 +193,12 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																	},
 																	__(
 																		'New Tab',
-																		'fotogrids',
-																	),
+																		'fotogrids'
+																	)
 																),
-															],
+															]
 														),
-													],
+													]
 												),
 											]
 										: [
@@ -207,13 +207,13 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 													{},
 													__(
 														'Are you sure you want to clear all URLs? This action cannot be undone.',
-														'fotogrids',
-													),
+														'fotogrids'
+													)
 												),
 											],
-								],
+								]
 							),
-						],
+						]
 					),
 
 					h(
@@ -230,7 +230,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 										'fg-button fg-button--variant-secondary',
 									onClick: closeBulkModal,
 								},
-								__('Cancel', 'fotogrids'),
+								__('Cancel', 'fotogrids')
 							),
 							h(
 								'button',
@@ -242,12 +242,12 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 								},
 								bulkAction === 'apply_to_all'
 									? __('Apply to All', 'fotogrids')
-									: __('Clear All', 'fotogrids'),
+									: __('Clear All', 'fotogrids')
 							),
-						],
+						]
 					),
-				],
+				]
 			),
-		],
+		]
 	);
 };

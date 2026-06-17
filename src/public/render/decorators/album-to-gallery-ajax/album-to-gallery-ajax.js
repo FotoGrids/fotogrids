@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Album → Gallery (AJAX swap)
+ * FotoGrids - Album → Gallery (AJAX swap)
  *
  * Intercepts clicks on [data-fg-album-ajax-trigger] (an <a> wrapping each
  * album item). On click:
@@ -11,15 +11,15 @@
  *      password-gate unlock pattern).
  *   4. Swap the album wrapper's contents for the rendered gallery HTML.
  *   5. The runtime's MutationObserver picks up the inserted gallery and
- *      fires every onGallery callback against it — no manual init here.
+ *      fires every onGallery callback against it - no manual init here.
  *
  * Graceful degradation:
- *   • middle-click / ctrl-click / cmd-click — let the browser handle it
+ *   • middle-click / ctrl-click / cmd-click - let the browser handle it
  *     natively (the <a> has a real href to the gallery's view page).
- *   • no JS / JS error — the <a> navigates to the view page.
- *   • REST 404 / non-200 — fall back to navigation (window.location).
+ *   • no JS / JS error - the <a> navigates to the view page.
+ *   • REST 404 / non-200 - fall back to navigation (window.location).
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -43,10 +43,10 @@
      * We deliberately use a WeakSet here instead of a `data-` attribute
      * (which used to be the idempotence guard). When restoreAlbum() replays
      * the original innerHTML, the browser parses a brand-new tree of <a>
-     * elements — the old triggers (with their listeners) are gone. The
+     * elements - the old triggers (with their listeners) are gone. The
      * `data-fg-album-ajax-bound` attribute survived the round-trip in the
      * serialised HTML, so on a second click the trigger LOOKED bound, but
-     * actually had no listener — falling through to native nav.
+     * actually had no listener - falling through to native nav.
      *
      * WeakSet identity is per live Element, so freshly parsed nodes never
      * appear to be "already bound" and bindTrigger() always wires them up.
@@ -82,7 +82,7 @@
     /**
      * Inject <script> tags for any JS handles the render pipeline declared
      * that aren't already in the document. Necessary because the host
-     * album page only enqueues the modules its OWN render needed — but a
+     * album page only enqueues the modules its OWN render needed - but a
      * swapped-in gallery may need extra modules (lightbox.js, direct-link,
      * external-link, sharing, lazy-load, stats, loading-icon, filter-ui,
      * deep-linking, pagination layouts, etc.) that weren't enqueued
@@ -92,7 +92,7 @@
      *
      * @param {Record<string, {src: string, in_footer: boolean}>} jsData
      *     handle → {src, in_footer} map. The in_footer flag is informative
-     *     only — script tags are appended async to <head> either way; the
+     *     only - script tags are appended async to <head> either way; the
      *     browser fetches them in parallel and executes them in load order
      *     (good enough for our modules since their init is idempotent).
      */
@@ -123,7 +123,7 @@
      *
      * The render pipeline normally enqueues this via wp_footer, but this AJAX
      * render happens in a separate REST request whose footer never reaches the
-     * already-loaded album page — so a gallery whose captions use a custom
+     * already-loaded album page - so a gallery whose captions use a custom
      * Google Font would render unstyled after the swap. The render response
      * carries the combined fonts URL; we add the <link> once, keyed by the
      * standard id so we never duplicate a sheet the page already has.
@@ -155,13 +155,13 @@
     }
 
     /**
-     * Handle a trigger click — perform the AJAX swap.
+     * Handle a trigger click - perform the AJAX swap.
      *
      * @param {Element} trigger  The <a> element with data-fg-album-ajax-trigger.
      * @param {Event}   event
      */
     function handleTriggerClick( trigger, event ) {
-        // Honour modifier clicks — middle/ctrl/cmd/shift = native navigation.
+        // Honour modifier clicks - middle/ctrl/cmd/shift = native navigation.
         if ( event.defaultPrevented ) return;
         if ( event.button !== 0 ) return;
         if ( event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ) return;
@@ -218,7 +218,7 @@
                 // Stash the album's original HTML before the swap so the
                 // in-place Back button (rendered inside the swapped-in
                 // gallery by Collection_Header) can restore it. Don't
-                // overwrite an existing snapshot — successive drill-downs
+                // overwrite an existing snapshot - successive drill-downs
                 // (album → gallery A → back → gallery B) should all
                 // restore to the *original* album, not to gallery A.
                 if ( ! originalHtmlByAlbum.has( albumEl ) ) {
@@ -242,7 +242,7 @@
             } )
             .catch( function () {
                 // Whatever went wrong, navigate to the gallery's view page
-                // — that's the URL the <a> would have used by default.
+                // - that's the URL the <a> would have used by default.
                 let href = trigger.getAttribute( 'href' );
                 if ( href && href !== '#' ) {
                     window.location.href = href;
@@ -254,7 +254,7 @@
     }
 
     /**
-     * Wire a single trigger. Idempotent — re-binding a trigger is a no-op.
+     * Wire a single trigger. Idempotent - re-binding a trigger is a no-op.
      *
      * @param {Element} trigger
      */
@@ -300,7 +300,7 @@
         albumEl.innerHTML = original;
 
         // The runtime's MutationObserver fires on .fotogrids-collection
-        // *insertions*, but here the album wrapper itself wasn't replaced —
+        // *insertions*, but here the album wrapper itself wasn't replaced -
         // only its descendants. The runtime never re-runs onAlbum for
         // this wrapper, so the restored trigger <a>s never get a listener
         // through the normal path. Re-bind them explicitly so the user can

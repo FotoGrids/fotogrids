@@ -313,7 +313,7 @@ final class Filters_View {
 	 *
 	 * Fired as `fotogrids/view/integrated/<key>` where `<key>` is the toggle
 	 * key (e.g. `show_post_title`, `show_excerpt`). This constant documents
-	 * the prefix only — the dispatch site composes the key dynamically.
+	 * the prefix only - the dispatch site composes the key dynamically.
 	 *
 	 * @since 1.0.0
 	 * @param bool     $value Default toggle value.

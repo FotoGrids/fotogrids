@@ -35,12 +35,12 @@ class Import_Export_Data {
 	 *
 	 *  - DirectDatabaseQuery.NoCaching: this tool runs on explicit admin
 	 *    action (export/import), not on any render or request hot path, so
-	 *    object caching is a non-goal here — not deferred debt.
+	 *    object caching is a non-goal here - not deferred debt.
 	 *
 	 *  - PreparedSQL.InterpolatedNotPrepared /
 	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
 	 *    name is built as `$wpdb->prefix . 'fotogrids_*'` (a trusted,
-	 *    hardcoded literal — WP placeholders cannot bind table identifiers).
+	 *    hardcoded literal - WP placeholders cannot bind table identifiers).
 	 *    All user-supplied *values* are passed through $wpdb->prepare().
 	 * ---------------------------------------------------------------------
 	 */

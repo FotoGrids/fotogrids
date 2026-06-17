@@ -27,7 +27,7 @@ class Admin_Data {
 	 *    explicit navigation, not a render hot path; caching is a non-goal.
 	 *  - PreparedSQL.InterpolatedNotPrepared /
 	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal — WP
+	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal - WP
 	 *    placeholders cannot bind table identifiers). All user-supplied
 	 *    *values* are passed through $wpdb->prepare().
 	 * ---------------------------------------------------------------------

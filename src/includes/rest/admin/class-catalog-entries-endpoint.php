@@ -5,6 +5,7 @@ namespace FotoGrids\REST\Admin;
 
 use FotoGrids\Catalog\Catalog;
 use FotoGrids\Catalog\Catalog_Assembler;
+use FotoGrids\Render\Internal\Hover_Effect_Registry;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -48,6 +49,7 @@ final class Catalog_Entries_Endpoint {
 		$assembly_result = $assembler->assemble( $raw_files );
 
 		$tree = self::filter_tree_by_post_type( $assembly_result['tree'], $post_type );
+		self::inject_hover_effect_options( $tree );
 
 		return rest_ensure_response(
 			array(
@@ -84,5 +86,60 @@ final class Catalog_Entries_Endpoint {
 		}
 
 		return $filtered;
+	}
+
+	/**
+	 * Replaces the `hover_effect` field's options with the registry's effects so
+	 * the grid renders from the single source of truth (Free, Pro, third-party).
+	 *
+	 * @since   1.0.0
+	 * @param   array<string, array<string, mixed>> $tree Assembled tree (by reference).
+	 * @return  void
+	 */
+	private static function inject_hover_effect_options( array &$tree ): void {
+		if ( ! class_exists( Hover_Effect_Registry::class ) ) {
+			return;
+		}
+
+		$options = Hover_Effect_Registry::as_options();
+		if ( array() === $options ) {
+			return;
+		}
+
+		self::walk_settings(
+			$tree,
+			static function ( array &$setting ) use ( $options ): void {
+				if ( isset( $setting['key'] ) && 'hover_effect' === $setting['key'] ) {
+					$setting['options'] = $options;
+				}
+			}
+		);
+	}
+
+	/**
+	 * Depth-first visit of every setting node in the tree, mutating in place.
+	 *
+	 * @since   1.0.0
+	 * @param   array<string, mixed>                     $nodes  Nodes to walk (by reference).
+	 * @param   callable(array<string, mixed> &$setting): void $visit Visitor.
+	 * @return  void
+	 */
+	private static function walk_settings( array &$nodes, callable $visit ): void {
+		foreach ( $nodes as &$node ) {
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+
+			if ( isset( $node['key'] ) ) {
+				$visit( $node );
+			}
+
+			foreach ( array( 'settings', 'subTabs' ) as $child_key ) {
+				if ( isset( $node[ $child_key ] ) && is_array( $node[ $child_key ] ) ) {
+					self::walk_settings( $node[ $child_key ], $visit );
+				}
+			}
+		}
+		unset( $node );
 	}
 }

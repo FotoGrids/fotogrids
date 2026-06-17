@@ -4,7 +4,7 @@ let lockCount = 0;
 let originalOverflow = '';
 let originalPaddingRight = '';
 
-export const useBodyScrollLock = active => {
+export const useBodyScrollLock = (active) => {
 	useEffect(() => {
 		if (!active) return undefined;
 

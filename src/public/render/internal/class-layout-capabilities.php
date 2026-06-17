@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  *   - Resolves the active layout via Module_Registry::active_modules().
  *   - Reads the layout's capabilities() map.
- *   - Treats missing keys as TRUE (permissive default — layouts that
+ *   - Treats missing keys as TRUE (permissive default - layouts that
  *     return [] opt into every capability, which is what Grid / Masonry
  *     / Justified want).
  *
@@ -37,7 +37,7 @@ final class Layout_Capabilities {
 	/**
 	 * Does the active layout support the named capability?
 	 *
-	 * Returns true if no layout is active (defensive default — keeps the
+	 * Returns true if no layout is active (defensive default - keeps the
 	 * pipeline behaving the same way it did before capabilities existed).
 	 *
 	 * @since   1.0.0
@@ -60,7 +60,7 @@ final class Layout_Capabilities {
 
 	/**
 	 * Returns the resolved capabilities map for an explicitly-known
-	 * layout module (skips Module_Registry lookup — used by the wrapper
+	 * layout module (skips Module_Registry lookup - used by the wrapper
 	 * composer which has already selected the active layout).
 	 *
 	 * Applies the `fotogrids/render/layout/capabilities` filter so the
@@ -107,7 +107,7 @@ final class Layout_Capabilities {
 	 *   ): array<string, bool>
 	 *
 	 * Callbacks must return an array; a non-array return value is
-	 * discarded and the original layout map is used (defensive — we
+	 * discarded and the original layout map is used (defensive - we
 	 * never want a misbehaving hook to silently break pagination).
 	 *
 	 * @since   1.0.0

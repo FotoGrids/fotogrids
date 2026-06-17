@@ -186,7 +186,7 @@ const PickerModal = ({
     // `isOpen` is false. Hosts conditionally mount PickerModal today
     // (Gutenberg gates on `pickerOpen`, Elementor mounts the React root
     // only on browse-click) and tear it down via `onClose`, so
-    // isOpen={true} here matches existing semantics — when the host
+    // isOpen={true} here matches existing semantics - when the host
     // wants the modal gone, it stops rendering us.
     //
     // The Header auto-renders its own close button (Modal.Header

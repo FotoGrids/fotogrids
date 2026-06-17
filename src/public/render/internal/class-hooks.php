@@ -27,7 +27,7 @@ final class Hooks {
 	 * @param   mixed          ...$extra Additional arguments.
 	 * @return  void
 	 */
-	public static function fire_action( string $hook_name, Render_Context $render, mixed ...$extra ): void {
+	public static function fire_action( string $hook_name, Render_Context $render, ...$extra ): void {
 		[ $collection_type, $collection_id ] = self::collection_scope( $render );
 		$hook_arguments                      = array_merge( $extra, array( $render ) );
 
@@ -45,7 +45,7 @@ final class Hooks {
 	 * @param   Render_Context $render Render context.
 	 * @return  mixed
 	 */
-	public static function apply_filter( string $hook_name, mixed $value, Render_Context $render ): mixed {
+	public static function apply_filter( string $hook_name, $value, Render_Context $render ) {
 		[ $collection_type, $collection_id ] = self::collection_scope( $render );
 
 		$value = apply_filters( 'fotogrids/render/' . $hook_name, $value, $render );

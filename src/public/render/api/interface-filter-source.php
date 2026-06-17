@@ -134,7 +134,7 @@ interface Filter_Source {
 	 * selected for this source (OR within source).
 	 *
 	 * Used for server-side filtering when pagination interleaves with active
-	 * filters — the server has to know which items belong on each filtered
+	 * filters - the server has to know which items belong on each filtered
 	 * page so the client can request "page N of the filtered set" without
 	 * ever pulling non-matching items over the wire.
 	 *

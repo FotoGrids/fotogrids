@@ -49,6 +49,9 @@ class Admin_Init {
 			\FotoGrids\Admin\Upgrade_Modal_Integration::init();
 		}
 
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-deactivation-feedback.php';
+		\FotoGrids\Admin\Deactivation_Feedback::init();
+
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-header.php';
 
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-dashboard-widget.php';
@@ -683,7 +686,7 @@ class Admin_Init {
 		if ( in_array( $setting, $string_settings, true ) ) {
 			$allowed_values = self::allowed_values_for_string_setting( $setting );
 
-			// An empty value is "clear the persona" — accepted; anything
+			// An empty value is "clear the persona" - accepted; anything
 			// else has to come from the allowlist for the setting.
 			if ( '' !== $value && ! in_array( $value, $allowed_values, true ) ) {
 				wp_send_json_error( array( 'message' => __( 'Invalid value', 'fotogrids' ) ) );
@@ -691,7 +694,7 @@ class Admin_Init {
 
 			$result = update_option( $setting, $value, true );
 			// update_option returns false when the new value matches the
-			// existing one — that's still success from the caller's POV.
+			// existing one - that's still success from the caller's POV.
 			if ( $result || (string) get_option( $setting, '' ) === $value ) {
 				wp_send_json_success( array( 'value' => $value ) );
 			}
@@ -1314,7 +1317,7 @@ class Admin_Init {
 				});
 
 				// Disable the unused (hidden) select on submit so only one
-				// album_id field is sent — the one tied to the row the user
+				// album_id field is sent - the one tied to the row the user
 				// actually used to submit.
 				var postsFilter = document.getElementById('posts-filter');
 				if (!postsFilter) {

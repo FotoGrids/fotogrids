@@ -15,6 +15,27 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Render_Meta {
 
+	public int $gallery_id;
+	public ?int $album_id;
+	public string $instance_id;
+	public string $source;
+	public bool $is_preview;
+	public string $mode;
+	public int $schema_version;
+	public string $collection_kind;
+	public ?int $requested_page;
+	public ?int $requested_per_page;
+	public ?string $breakpoint;
+	public ?string $partial;
+	public ?int $total_item_count;
+	public array $active_filters;
+	public ?int $random_seed;
+	public bool $view_page;
+	public bool $is_ajax_swap;
+	public ?int $container_width;
+	public ?int $pagination_page_size;
+	public ?int $pagination_total_pages;
+
 	/**
 	 * @since   1.0.0
 	 * @param   int             $gallery_id Gallery identifier. Zero when rendering an album-as-collection.
@@ -29,7 +50,7 @@ final class Render_Meta {
 	 * @param   int|null        $requested_per_page Caller-supplied items_per_page override (pagination REST requests). Null = use saved setting.
 	 * @param   string|null     $breakpoint Active breakpoint hint from the caller ('desktop' | 'tablet' | 'mobile'). Null = unknown.
 	 * @param   string|null     $partial Partial-render hint. 'items_only' = return only the layout's inner HTML (no wrapper, no chrome). Null = full render.
-	 * @param   int|null        $total_item_count Total item count BEFORE pagination slicing — set by Context_Builder so pagination chrome can emit data-fg-page-total correctly. Null = unknown.
+	 * @param   int|null        $total_item_count Total item count BEFORE pagination slicing - set by Context_Builder so pagination chrome can emit data-fg-page-total correctly. Null = unknown.
 	 * @param   array<string, array<int, string>> $active_filters Selected filter values per source arg key (e.g. ['tags' => ['nature', 'sky']]). Empty array = no filter.
 	 * @param   int|null        $random_seed Seed for deterministic random sorting. Set on initial render and sent back by the client on paginated requests so each page draws from the same shuffle. Null = unseeded (initial paint with no inherited seed).
 	 * @param   bool            $view_page True when rendered on a standalone Gallery/Album View Page (ViewCollections renderer); false on embedded shortcode/block renders. Read by Collection_Header to gate the 'view_pages' breadcrumb placement.
@@ -40,27 +61,48 @@ final class Render_Meta {
 	 * @return  void
 	 */
 	public function __construct(
-		public readonly int $gallery_id,
-		public readonly ?int $album_id,
-		public readonly string $instance_id,
-		public readonly Request_Source $source,
-		public readonly bool $is_preview,
-		public readonly Render_Mode $mode,
-		public readonly int $schema_version = 2,
-		public readonly Collection_Kind $collection_kind = Collection_Kind::GALLERY,
-		public readonly ?int $requested_page = null,
-		public readonly ?int $requested_per_page = null,
-		public readonly ?string $breakpoint = null,
-		public readonly ?string $partial = null,
-		public readonly ?int $total_item_count = null,
-		public readonly array $active_filters = array(),
-		public readonly ?int $random_seed = null,
-		public readonly bool $view_page = false,
-		public readonly bool $is_ajax_swap = false,
-		public readonly ?int $container_width = null,
-		public readonly ?int $pagination_page_size = null,
-		public readonly ?int $pagination_total_pages = null,
-	) {}
+		int $gallery_id,
+		?int $album_id,
+		string $instance_id,
+		string $source,
+		bool $is_preview,
+		string $mode,
+		int $schema_version = 2,
+		string $collection_kind = Collection_Kind::GALLERY,
+		?int $requested_page = null,
+		?int $requested_per_page = null,
+		?string $breakpoint = null,
+		?string $partial = null,
+		?int $total_item_count = null,
+		array $active_filters = array(),
+		?int $random_seed = null,
+		bool $view_page = false,
+		bool $is_ajax_swap = false,
+		?int $container_width = null,
+		?int $pagination_page_size = null,
+		?int $pagination_total_pages = null
+	) {
+		$this->gallery_id             = $gallery_id;
+		$this->album_id               = $album_id;
+		$this->instance_id            = $instance_id;
+		$this->source                 = $source;
+		$this->is_preview             = $is_preview;
+		$this->mode                   = $mode;
+		$this->schema_version         = $schema_version;
+		$this->collection_kind        = $collection_kind;
+		$this->requested_page         = $requested_page;
+		$this->requested_per_page     = $requested_per_page;
+		$this->breakpoint             = $breakpoint;
+		$this->partial                = $partial;
+		$this->total_item_count       = $total_item_count;
+		$this->active_filters         = $active_filters;
+		$this->random_seed            = $random_seed;
+		$this->view_page              = $view_page;
+		$this->is_ajax_swap           = $is_ajax_swap;
+		$this->container_width        = $container_width;
+		$this->pagination_page_size   = $pagination_page_size;
+		$this->pagination_total_pages = $pagination_total_pages;
+	}
 
 	/**
 	 * Returns a new Render_Meta with the given fields overridden.
@@ -75,26 +117,26 @@ final class Render_Meta {
 	 */
 	public function with( array $changes ): self {
 		return new self(
-			gallery_id:         array_key_exists( 'gallery_id', $changes ) ? $changes['gallery_id'] : $this->gallery_id,
-			album_id:           array_key_exists( 'album_id', $changes ) ? $changes['album_id'] : $this->album_id,
-			instance_id:        array_key_exists( 'instance_id', $changes ) ? $changes['instance_id'] : $this->instance_id,
-			source:             array_key_exists( 'source', $changes ) ? $changes['source'] : $this->source,
-			is_preview:         array_key_exists( 'is_preview', $changes ) ? $changes['is_preview'] : $this->is_preview,
-			mode:               array_key_exists( 'mode', $changes ) ? $changes['mode'] : $this->mode,
-			schema_version:     array_key_exists( 'schema_version', $changes ) ? $changes['schema_version'] : $this->schema_version,
-			collection_kind:    array_key_exists( 'collection_kind', $changes ) ? $changes['collection_kind'] : $this->collection_kind,
-			requested_page:     array_key_exists( 'requested_page', $changes ) ? $changes['requested_page'] : $this->requested_page,
-			requested_per_page: array_key_exists( 'requested_per_page', $changes ) ? $changes['requested_per_page'] : $this->requested_per_page,
-			breakpoint:         array_key_exists( 'breakpoint', $changes ) ? $changes['breakpoint'] : $this->breakpoint,
-			partial:            array_key_exists( 'partial', $changes ) ? $changes['partial'] : $this->partial,
-			total_item_count:   array_key_exists( 'total_item_count', $changes ) ? $changes['total_item_count'] : $this->total_item_count,
-			active_filters:     array_key_exists( 'active_filters', $changes ) ? $changes['active_filters'] : $this->active_filters,
-			random_seed:        array_key_exists( 'random_seed', $changes ) ? $changes['random_seed'] : $this->random_seed,
-			view_page:          array_key_exists( 'view_page', $changes ) ? $changes['view_page'] : $this->view_page,
-			is_ajax_swap:           array_key_exists( 'is_ajax_swap', $changes ) ? $changes['is_ajax_swap'] : $this->is_ajax_swap,
-			container_width:        array_key_exists( 'container_width', $changes ) ? $changes['container_width'] : $this->container_width,
-			pagination_page_size:   array_key_exists( 'pagination_page_size', $changes ) ? $changes['pagination_page_size'] : $this->pagination_page_size,
-			pagination_total_pages: array_key_exists( 'pagination_total_pages', $changes ) ? $changes['pagination_total_pages'] : $this->pagination_total_pages,
+			array_key_exists( 'gallery_id', $changes ) ? $changes['gallery_id'] : $this->gallery_id,
+			array_key_exists( 'album_id', $changes ) ? $changes['album_id'] : $this->album_id,
+			array_key_exists( 'instance_id', $changes ) ? $changes['instance_id'] : $this->instance_id,
+			array_key_exists( 'source', $changes ) ? $changes['source'] : $this->source,
+			array_key_exists( 'is_preview', $changes ) ? $changes['is_preview'] : $this->is_preview,
+			array_key_exists( 'mode', $changes ) ? $changes['mode'] : $this->mode,
+			array_key_exists( 'schema_version', $changes ) ? $changes['schema_version'] : $this->schema_version,
+			array_key_exists( 'collection_kind', $changes ) ? $changes['collection_kind'] : $this->collection_kind,
+			array_key_exists( 'requested_page', $changes ) ? $changes['requested_page'] : $this->requested_page,
+			array_key_exists( 'requested_per_page', $changes ) ? $changes['requested_per_page'] : $this->requested_per_page,
+			array_key_exists( 'breakpoint', $changes ) ? $changes['breakpoint'] : $this->breakpoint,
+			array_key_exists( 'partial', $changes ) ? $changes['partial'] : $this->partial,
+			array_key_exists( 'total_item_count', $changes ) ? $changes['total_item_count'] : $this->total_item_count,
+			array_key_exists( 'active_filters', $changes ) ? $changes['active_filters'] : $this->active_filters,
+			array_key_exists( 'random_seed', $changes ) ? $changes['random_seed'] : $this->random_seed,
+			array_key_exists( 'view_page', $changes ) ? $changes['view_page'] : $this->view_page,
+			array_key_exists( 'is_ajax_swap', $changes ) ? $changes['is_ajax_swap'] : $this->is_ajax_swap,
+			array_key_exists( 'container_width', $changes ) ? $changes['container_width'] : $this->container_width,
+			array_key_exists( 'pagination_page_size', $changes ) ? $changes['pagination_page_size'] : $this->pagination_page_size,
+			array_key_exists( 'pagination_total_pages', $changes ) ? $changes['pagination_total_pages'] : $this->pagination_total_pages,
 		);
 	}
 }

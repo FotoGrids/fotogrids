@@ -50,7 +50,7 @@ const WatermarkStatusComponent = ({
 		try {
 			const response = await request(
 				`admin/watermark/status?gallery_id=${postId}`,
-				'GET',
+				'GET'
 			);
 			if (!response.ok) {
 				setLoadState('error');
@@ -69,7 +69,7 @@ const WatermarkStatusComponent = ({
 		}
 	}, [postId]);
 
-	const regenerate = async ids => {
+	const regenerate = async (ids) => {
 		if (isDisabled || running || !Array.isArray(ids) || ids.length === 0)
 			return;
 
@@ -97,7 +97,7 @@ const WatermarkStatusComponent = ({
 		setRunning(false);
 		if (window.fotogridsToast) {
 			window.fotogridsToast.success(
-				__('Watermarks updated for this gallery.', 'fotogrids'),
+				__('Watermarks updated for this gallery.', 'fotogrids')
 			);
 		}
 	};
@@ -118,19 +118,19 @@ const WatermarkStatusComponent = ({
 	}
 
 	const items = Array.isArray(status?.items) ? status.items : [];
-	const missingItems = items.filter(it => it.state !== 'current');
+	const missingItems = items.filter((it) => it.state !== 'current');
 
 	const title = wp.i18n.sprintf(
 		/* translators: 1: pending count, 2: total count. */
 		__(
 			'%1$d of %2$d items in this gallery aren’t watermarked',
-			'fotogrids',
+			'fotogrids'
 		),
 		pending,
-		total,
+		total
 	);
 
-	const stateLabel = state =>
+	const stateLabel = (state) =>
 		state === 'stale'
 			? __('out of date', 'fotogrids')
 			: __('missing', 'fotogrids');
@@ -141,11 +141,11 @@ const WatermarkStatusComponent = ({
 			key: 'toggle',
 			type: 'button',
 			className: `fg-button fg-button--variant-secondary fg-button--size-sm ${baseClass}__list-toggle`,
-			onClick: () => setShowList(v => !v),
+			onClick: () => setShowList((v) => !v),
 		},
 		showList
 			? __('Hide items', 'fotogrids')
-			: __('Show missing items', 'fotogrids'),
+			: __('Show missing items', 'fotogrids')
 	);
 
 	const list =
@@ -156,7 +156,7 @@ const WatermarkStatusComponent = ({
 				key: 'list',
 				className: `${baseClass}__list`,
 			},
-			missingItems.map(it =>
+			missingItems.map((it) =>
 				h(
 					'li',
 					{
@@ -170,7 +170,7 @@ const WatermarkStatusComponent = ({
 								key: 'name',
 								className: `${baseClass}__item-name`,
 							},
-							it.filename || `#${it.attachment_id}`,
+							it.filename || `#${it.attachment_id}`
 						),
 						h(
 							'span',
@@ -178,11 +178,11 @@ const WatermarkStatusComponent = ({
 								key: 'state',
 								className: `${baseClass}__item-state ${baseClass}__item-state--${it.state}`,
 							},
-							stateLabel(it.state),
+							stateLabel(it.state)
 						),
-					],
-				),
-			),
+					]
+				)
+			)
 		);
 
 	return h(
@@ -194,7 +194,7 @@ const WatermarkStatusComponent = ({
 					h(
 						'div',
 						{ key: 'title', className: `${baseClass}__title` },
-						title,
+						title
 					),
 					h(
 						'div',
@@ -203,15 +203,15 @@ const WatermarkStatusComponent = ({
 							? wp.i18n.sprintf(
 									__(
 										'Regenerating… %1$d of %2$d',
-										'fotogrids',
+										'fotogrids'
 									),
 									progress.done,
-									progress.total,
+									progress.total
 								)
 							: __(
 									'The site watermark is on for this gallery, but these images still serve clean copies.',
-									'fotogrids',
-								),
+									'fotogrids'
+								)
 					),
 				]),
 				h(
@@ -230,14 +230,14 @@ const WatermarkStatusComponent = ({
 							},
 							running
 								? __('Regenerating…', 'fotogrids')
-								: __('Regenerate this gallery', 'fotogrids'),
+								: __('Regenerate this gallery', 'fotogrids')
 						),
 						missingItems.length > 0 && listToggle,
-					],
+					]
 				),
 			]),
 			list,
-		].filter(Boolean),
+		].filter(Boolean)
 	);
 };
 
@@ -247,7 +247,7 @@ window.FotoGridsRenderSettings.renderWatermarkStatus = (
 	setting,
 	currentValue,
 	isDisabled,
-	{ __, postId, restUrl, restNonce },
+	{ __, postId, restUrl, restNonce }
 ) => {
 	return React.createElement(WatermarkStatusComponent, {
 		setting,

@@ -18,11 +18,11 @@ if ( ! defined( 'WPINC' ) ) {
  * Single source of truth for the two editor-only preview toggles every
  * page-builder host exposes:
  *
- *   - `click_behavior` — when false, item click handlers are
+ *   - `click_behavior` - when false, item click handlers are
  *     neutralised in the editor preview (so users can keep clicking
  *     items to select the widget instead of triggering the lightbox
  *     or a real link). Default: `false`.
- *   - `pagination` — when false, pagination chrome still renders so
+ *   - `pagination` - when false, pagination chrome still renders so
  *     the layout matches the published page, but the host swallows
  *     pagination-button clicks via a capture-phase listener so all
  *     items remain visible during editing. Default: `false`.
@@ -36,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Default change history: pagination flipped from `true` to `false` on
  * 2026-06-04 because in practice users want to see all items while
- * editing — pagination chrome that hides items behind a "next" button
+ * editing - pagination chrome that hides items behind a "next" button
  * makes it harder to verify the gallery's contents at a glance.
  *
  * @since 1.0.0

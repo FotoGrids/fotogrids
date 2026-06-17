@@ -29,11 +29,11 @@ if ( ! defined( 'WPINC' ) ) {
  * `template_redirect`.
  *
  * Five behavioural toggles ride the same class:
- *   - integrated_show_title_block      — emit our <h1>+count strip above the gallery
- *   - integrated_hide_featured_image   — suppress the theme's post-thumbnail render
- *   - integrated_allow_comments        — opt-in comments support
- *   - integrated_include_in_archives   — opt-in author/date archive inclusion
- *   - integrated_post_navigation       — opt-in previous/next post navigation
+ *   - integrated_show_title_block      - emit our <h1>+count strip above the gallery
+ *   - integrated_hide_featured_image   - suppress the theme's post-thumbnail render
+ *   - integrated_allow_comments        - opt-in comments support
+ *   - integrated_include_in_archives   - opt-in author/date archive inclusion
+ *   - integrated_post_navigation       - opt-in previous/next post navigation
  *
  * Each toggle has a `fotogrids/view/integrated/{key}` filter for programmatic
  * override (used by Pro and 3rd-party plugins).
@@ -168,7 +168,7 @@ class Integrated_Renderer {
 		 * @param bool          $value Resolved from `fotogrids_view_settings`.
 		 * @param \WP_Post|null $post  Current post when known.
 		 */
-		return (bool) apply_filters( 'fotogrids/view/integrated/' . $key, $value, $post ); // dynamic key — see Filters_View::INTEGRATED_KEY
+		return (bool) apply_filters( 'fotogrids/view/integrated/' . $key, $value, $post ); // dynamic key - see Filters_View::INTEGRATED_KEY
 	}
 
 	/**

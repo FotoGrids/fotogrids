@@ -1,0 +1,22 @@
+/* Desaturated at rest, full colour on hover. Composes with the image-filter
+   setting via the shared --fg-hover-filter chain when that decorator is active;
+   applies standalone otherwise. */
+
+.fotogrids-collection[data-fg-hover='grayscale'] {
+	--fg-hover-filter: grayscale(1);
+	--fg-hover-filter-hover: grayscale(0);
+}
+
+.fotogrids-collection[data-fg-hover='grayscale']:not([data-fg-filter])
+	.fg-item-media
+	img {
+	filter: grayscale(1);
+	transition: filter var(--fg-hover-duration) var(--fg-hover-ease);
+}
+
+.fotogrids-collection[data-fg-hover='grayscale']:not([data-fg-filter])
+	.fg-item:hover
+	.fg-item-media
+	img {
+	filter: grayscale(0);
+}

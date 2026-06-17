@@ -52,7 +52,7 @@ final class Edit_Gate {
 				$filtered_settings[ $field_id ] = $existing_value;
 				$gated_fields[]                 = array(
 					'field'  => $field_id,
-					'reason' => $field_state->value,
+					'reason' => $field_state,
 				);
 				continue;
 			}
@@ -63,7 +63,7 @@ final class Edit_Gate {
 					$filtered_settings[ $field_id ] = $existing_value;
 					$gated_fields[]                 = array(
 						'field'  => $field_id,
-						'reason' => $option_state->value,
+						'reason' => $option_state,
 						'option' => $new_value,
 					);
 					continue;

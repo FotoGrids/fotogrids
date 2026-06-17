@@ -15,12 +15,18 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Module_Assets {
 
+	public array $css;
+	public array $js;
+
 	/**
 	 * @param array<string, Asset_Decl> $css CSS asset declarations.
 	 * @param array<string, Asset_Decl> $js JS asset declarations.
 	 */
 	public function __construct(
-		public readonly array $css = array(),
-		public readonly array $js = array(),
-	) {}
+		array $css = array(),
+		array $js = array()
+	) {
+		$this->css = $css;
+		$this->js  = $js;
+	}
 }

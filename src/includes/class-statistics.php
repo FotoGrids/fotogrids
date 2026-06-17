@@ -29,7 +29,7 @@ class Statistics {
 	 *    counter would be counterproductive, so it is an intentional non-goal.
 	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
 	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal — WP
+	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal - WP
 	 *    placeholders cannot bind table identifiers). All user-supplied
 	 *    *values* are passed through $wpdb->prepare(); where SQL is built
 	 *    incrementally the prepare call is a separate statement from the
