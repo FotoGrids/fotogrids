@@ -23,9 +23,9 @@ root.
 ## Getting started
 
 ```bash
-npm install        # JS/TS toolchain and build deps
-composer install   # PHP_CodeSniffer, WPCS, PHPUnit
-composer setup-hooks   # enable the pre-commit PHP lint hook (once per clone)
+npm install          # JS/TS toolchain and build deps
+composer install     # PHP_CodeSniffer, WPCS, PHPUnit
+composer setup-hooks # enable the pre-commit PHP lint hook (once per clone)
 npm run dev
 ```
 
@@ -43,7 +43,7 @@ compatible with the CI matrix.
 ```
 Plugin/
 ├── src/                  Source - edit here
-│   ├── fotogrids.php      Main plugin file (bootstrap, constants, hooks)
+│   ├── fotogrids.php     Main plugin file (bootstrap, constants, hooks)
 │   ├── config/           Module registry, loading-icon catalogues
 │   ├── includes/         PHP classes (REST, settings, modules, tools, render helpers)
 │   ├── assets/           React/TS admin UI, SCSS, plain-JS entrypoints
