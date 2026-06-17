@@ -47,7 +47,7 @@
     "@wordpress/blocks": "^12.0.0",
     "@wordpress/components": "^25.0.0",
     "@wordpress/data": "^9.0.0",
-    "@wordpress/element": "^5.0.0",
+    "@wordpress/element": "^8.0.1",
     "@wordpress/i18n": "^4.0.0",
     "chart.js": "^4.5.0",
     "codemirror": "^6.0.1",
