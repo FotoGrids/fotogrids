@@ -1,14 +1,22 @@
 name: CodeQL
 
+# CodeQL upload requires GitHub code scanning, which is only available on
+# public repositories or with GitHub Advanced Security. While this repo is
+# private without GHAS, the job is set to manual-only (workflow_dispatch) so it
+# does not run on push/PR and cannot report a failing required check.
+#
+# TO RE-ENABLE when the repo is public (or GHAS is on): restore the triggers
+# below and enable code scanning (Settings -> Advanced Security -> Code
+# scanning -> Set up -> Advanced).
+#
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+#   schedule:
+#     - cron: '0 6 * * 1'   # Weekly full scan, Mondays 06:00 UTC.
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  schedule:
-    # Weekly full scan, Mondays 06:00 UTC, to catch newly-published advisories
-    # against code that hasn't changed.
-    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 jobs:
   analyze:
