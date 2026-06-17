@@ -18,11 +18,14 @@ root.
 | WordPress | 6.1+ (tested 6.8) |
 | Node.js   | 18+               |
 | npm       | 8+                |
+| Composer  | 2+                |
 
 ## Getting started
 
 ```bash
-npm install
+npm install        # JS/TS toolchain and build deps
+composer install   # PHP_CodeSniffer, WPCS, PHPUnit
+composer setup-hooks   # enable the pre-commit PHP lint hook (once per clone)
 npm run dev
 ```
 
@@ -30,6 +33,10 @@ npm run dev
 `webpack --watch` together. Webpack writes a complete, installable plugin into
 `dist/`. Point your local WordPress install at that folder (or use the zip
 tasks below) to test.
+
+`composer.json` pins the platform PHP to 7.4 so the lock file always resolves
+against the supported floor; run `composer update` on any machine and it stays
+compatible with the CI matrix.
 
 ## Project layout
 
@@ -74,7 +81,7 @@ The build output in `dist/` is produced entirely by webpack (including the
 | `npm run zip:prod` | Production build, zipped to `fotogrids-v<version>.zip` |
 | `npm run release`  | `clean` + `build` + `zip:prod`                         |
 
-### Quality
+### Quality (JS/TS)
 
 | Command              | Description                       |
 | -------------------- | --------------------------------- |
@@ -82,6 +89,22 @@ The build output in `dist/` is produced entirely by webpack (including the
 | `npm run lint:fix`   | ESLint with autofix               |
 | `npm run format`     | Prettier over assets and Markdown |
 | `npm run type-check` | `tsc --noEmit`                    |
+
+ESLint extends the WordPress preset (`@wordpress/eslint-plugin`) and enforces
+formatting through Prettier (the `wp-prettier` fork, for WordPress-style
+paren spacing). Run `npm run format` before committing JS/TS.
+
+### Quality (PHP)
+
+| Command                | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `composer lint`        | PHP_CodeSniffer (WordPress standards) over `src/` |
+| `composer lint:fix`    | `phpcbf` autofix for mechanical violations        |
+| `composer lint:compat` | PHP 7.4+ compatibility check                      |
+| `composer test:php`    | PHPUnit (WordPress-independent unit suite)        |
+
+PHPCS runs in the pre-commit hook (`composer setup-hooks`) and in CI. After
+editing any PHP under `src/`, run `composer lint` before committing.
 
 ### Tests
 
@@ -119,6 +142,22 @@ required) and the CI guard scripts under `tests/ci/`. Both are wired into
 See `CLAUDE.md` for the authoritative detail on all of the above, including the
 render pipeline stages, the `data-fg-*` attribute convention, and the list of
 extension hooks.
+
+## Continuous integration
+
+GitHub Actions run on every pull request and on push to `main`
+(`.github/workflows/`):
+
+| Workflow       | Checks                                                           |
+| -------------- | ---------------------------------------------------------------- |
+| `lint.yml`     | `php -l` syntax matrix (7.4/8.1/8.3) + PHP_CodeSniffer           |
+| `ci.yml`       | ESLint + `tsc`; `npm run test:ci`; PHPUnit matrix; webpack build |
+| `e2e.yml`      | Playwright smoke test against a `wp-env` WordPress site          |
+| `security.yml` | `npm audit` + `composer audit`                                   |
+| `codeql.yml`   | CodeQL security-and-quality scan (JavaScript/TypeScript)         |
+
+Lockfiles (`package-lock.json`, `composer.lock`) must be committed in sync, or
+`npm ci` / `composer install` fail in CI.
 
 ## License
 
