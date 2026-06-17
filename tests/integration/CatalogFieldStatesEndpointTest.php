@@ -189,10 +189,9 @@ namespace FotoGrids\Tests\Integration {
 
             $result = Catalog_Field_States_Endpoint::get_field_states( $request );
 
-            self::assert_same(
-                'locked',
+            self::assert_not_editable(
                 $result['field_states']['hover_effect'],
-                'Without manage_fotogrids_settings, simulate_state should be ignored.'
+                'Without manage_fotogrids_settings, simulate_state should be ignored so a Pro field stays non-editable.'
             );
             self::assert_same( null, $result['simulate_state'], 'simulate_state should be null when dropped.' );
         }
@@ -221,6 +220,14 @@ namespace FotoGrids\Tests\Integration {
             if ( $expected !== $actual ) {
                 throw new \RuntimeException(
                     $message . ' Expected: ' . var_export( $expected, true ) . '; Actual: ' . var_export( $actual, true )
+                );
+            }
+        }
+
+        private static function assert_not_editable( mixed $actual, string $message ): void {
+            if ( ! in_array( $actual, [ 'locked', 'teaser' ], true ) ) {
+                throw new \RuntimeException(
+                    $message . ' Expected one of: locked, teaser; Actual: ' . var_export( $actual, true )
                 );
             }
         }

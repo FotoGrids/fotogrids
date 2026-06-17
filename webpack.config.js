@@ -5,7 +5,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = !isProduction;
 
 const ENTRY_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx', '.scss'];
 
@@ -197,6 +196,8 @@ const mainConfig = {
         'toast-init': './src/assets/admin/src/toast-init.js',
         'shortcode-column-init': './src/assets/admin/src/shortcode-column-init.js',
         'ui-state-manager': './src/assets/admin/src/utils/ui-state-manager.js',
+        'deactivation-feedback': './src/assets/admin/src/deactivation/deactivation-feedback.js',
+        'fg-modal-styles': './src/assets/admin/src/styles/fg-modal-standalone.scss',
         // Per-tool and per-module entries are discovered automatically from the
         // filesystem. The routing for these chunks lives in the output.filename
         // and MiniCssExtractPlugin.filename callbacks below.
@@ -334,17 +335,17 @@ const mainConfig = {
                         // The native Divi 5 bundle's BUILD-ARTIFACT dirs
                         // (build/, styles/, modules-json/) are written into
                         // dist/ exclusively by the `divi-native` config's
-                        // afterEmit mirror — including their index.php silence
+                        // afterEmit mirror - including their index.php silence
                         // files. Excluding them here guarantees a SINGLE writer
                         // to those dist dirs. Two writers targeting the same
                         // native/build dir is what broke the build: the copy
                         // collided with the mirror's rmSync/cpSync, webpack
                         // exited non-zero, and the dist sync to the live plugin
-                        // never completed — leaving stale frontend JS (items
+                        // never completed - leaving stale frontend JS (items
                         // stuck in data-fg-media-state="loading") and 404s on
                         // the native bundle. The native PHP render classes
                         // (native/php/*.php) and native/index.php are NOT
-                        // excluded — those still ship via this pattern.
+                        // excluded - those still ship via this pattern.
                         ignore: [
                             '**/Divi/native/build/**',
                             '**/Divi/native/styles/**',
@@ -397,7 +398,7 @@ const mainConfig = {
                     // whitespace collapsed) before it lands in dist/. The
                     // committed src/config copy is left untouched and readable.
                     // Identifiers are preserved (no mangle/compress) so the
-                    // emitted JS stays one safe step from the source — the only
+                    // emitted JS stays one safe step from the source - the only
                     // change is comment/whitespace removal.
                     async transform(content, absoluteFilename) {
                         if (
@@ -453,7 +454,7 @@ const mainConfig = {
                 // webpack config (see the second config in this array's
                 // export). Keeping it out of the `main` config means a
                 // native-side issue can never interfere with the front-end
-                // build — see the long note on `diviNativeConfig` for why
+                // build - see the long note on `diviNativeConfig` for why
                 // that isolation matters (stuck `data-fg-media-state` bug).
                 {
                     from: 'src/fotogrids.php',
@@ -605,7 +606,7 @@ const mainConfig = {
                         // .php and .scss are excluded because webpack handles them (PHP via
                         // the php copy patterns above; SCSS via MiniCssExtractPlugin).
                         // fg-tooltip.js and runtime.js are also excluded because they're
-                        // webpack entry points — the built output lands in assets/js/.
+                        // webpack entry points - the built output lands in assets/js/.
                         ignore: [
                             '**/*.php',
                             '**/*.scss',
@@ -710,12 +711,13 @@ const mainConfig = {
             // Exclude bundles loaded standalone by WordPress (no awareness of
             // sibling chunk files): metabox, per-tool, per-module, per-layout,
             // and global-modal-init. Splitting them causes a silent runtime
-            // failure — the dynamic import for the split-out chunk file fails
+            // failure - the dynamic import for the split-out chunk file fails
             // because WP never enqueued it, and webpack's __webpack_require__.O
             // defers the entry indefinitely with no console error.
             chunks: (chunk) =>
                 chunk.name !== 'metabox' &&
                 chunk.name !== 'global-modal-init' &&
+                chunk.name !== 'deactivation-feedback' &&
                 !chunk.name?.startsWith('tool-') &&
                 !chunk.name?.startsWith('module-') &&
                 !chunk.name?.startsWith('layout-'),
@@ -726,6 +728,7 @@ const mainConfig = {
                     chunks: (chunk) =>
                         chunk.name !== 'metabox' &&
                         chunk.name !== 'global-modal-init' &&
+                        chunk.name !== 'deactivation-feedback' &&
                         !chunk.name?.startsWith('tool-') &&
                         !chunk.name?.startsWith('module-') &&
                         !chunk.name?.startsWith('layout-'),
@@ -735,7 +738,6 @@ const mainConfig = {
     },
     devtool: isProduction ? 'source-map' : 'eval-source-map',
     mode: isProduction ? 'production' : 'development',
-    watch: isDevelopment,
     watchOptions: {
         ignored: /node_modules/,
         poll: 1000,
@@ -746,13 +748,13 @@ const mainConfig = {
  * Native Divi 5 module bundle.
  *
  * The native module package (PageBuilders/builders/Divi/native/) is built
- * as part of the plugin's own `npm run dev` / `npm run build` — there is no
+ * as part of the plugin's own `npm run dev` / `npm run build` - there is no
  * separate build step. Its VB bundle is fundamentally different from every
  * other entry: it consumes Divi's own runtime (`@divi/*`), React, and a
  * couple of WordPress packages off the `window.divi` / `vendor` / `wp`
  * globals that Divi enqueues in the Visual Builder, so all of those are
  * webpack `externals` and never bundled. Because they're externals, the
- * `@divi/*` type packages are only needed for type-checking — we transpile
+ * `@divi/*` type packages are only needed for type-checking - we transpile
  * with `transpileOnly` and skip them at build time.
  *
  * Output lands directly in the package's committed artifact dirs under
@@ -760,11 +762,11 @@ const mainConfig = {
  * mirrors those into `dist/`.
  *
  * IMPORTANT: this config is intentionally INDEPENDENT of the `main` config
- * — there is no `dependencies: ['divi-native']` coupling. webpack-cli runs
+ * - there is no `dependencies: ['divi-native']` coupling. webpack-cli runs
  * a multi-config array as a multi-compiler, and if one config errors the
  * whole run is treated as failed; with a dependency link, a failure (or
  * even a transient dist permission error) in this native config would leave
- * the main config's frontend bundles UNWRITTEN/STALE — which manifested as
+ * the main config's frontend bundles UNWRITTEN/STALE - which manifested as
  * gallery items stuck in `data-fg-media-state="loading"` because the
  * loading-icon JS never refreshed. Keeping the two configs decoupled means
  * a native-side problem can never break the front-end build. The dist
@@ -956,7 +958,6 @@ const diviNativeConfig = {
     },
     devtool: isProduction ? false : 'source-map',
     mode: isProduction ? 'production' : 'development',
-    watch: isDevelopment,
     watchOptions: {
         ignored: /node_modules/,
         poll: 1000,
