@@ -197,7 +197,7 @@ use FotoGrids\REST\Admin\Preview_Endpoint_Test_Doubles;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Render_Controller;
 
-require_once dirname( __DIR__, 2 ) . '/src/public/render/api/enum-request-source.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-request-source.php';
 require_once dirname( __DIR__, 2 ) . '/src/includes/rest/admin/class-preview-request-validator.php';
 require_once dirname( __DIR__, 2 ) . '/src/includes/rest/admin/class-preview-endpoint.php';
 
