@@ -17,12 +17,53 @@ namespace {
         }
     }
 
+    /**
+     * @implements \ArrayAccess<string, mixed>
+     */
+    final class WP_REST_Response implements \ArrayAccess {
+        /**
+         * @param array<string, mixed> $data
+         */
+        public function __construct( private array $data = [] ) {}
+
+        /**
+         * @return array<string, mixed>
+         */
+        public function get_data(): array {
+            return $this->data;
+        }
+
+        public function offsetExists( mixed $offset ): bool {
+            return isset( $this->data[ $offset ] );
+        }
+
+        public function offsetGet( mixed $offset ): mixed {
+            return $this->data[ $offset ] ?? null;
+        }
+
+        public function offsetSet( mixed $offset, mixed $value ): void {
+            if ( null === $offset ) {
+                $this->data[] = $value;
+            } else {
+                $this->data[ $offset ] = $value;
+            }
+        }
+
+        public function offsetUnset( mixed $offset ): void {
+            unset( $this->data[ $offset ] );
+        }
+    }
+
     function sanitize_text_field( string $value ): string {
         return trim( $value );
     }
 
-    function rest_ensure_response( mixed $value ): mixed {
-        return $value;
+    function rest_ensure_response( mixed $value ): \WP_REST_Response {
+        if ( $value instanceof \WP_REST_Response ) {
+            return $value;
+        }
+
+        return new \WP_REST_Response( is_array( $value ) ? $value : [ $value ] );
     }
 
     /**
