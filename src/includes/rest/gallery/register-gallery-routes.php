@@ -100,7 +100,7 @@ class Register_Gallery_Routes {
 			)
 		);
 
-		// Gallery render endpoint — returns the rendered HTML and the
+		// Gallery render endpoint - returns the rendered HTML and the
 		// CSS-handle map for a gallery. Two distinct callers:
 		//   1. Album_To_Gallery_Ajax (full render, no page param → server
 		//      renders page 1 with the full wrapper).
@@ -219,7 +219,7 @@ class Register_Gallery_Routes {
 			)
 		);
 
-		// Lightbox slides endpoint — returns flat slide metadata
+		// Lightbox slides endpoint - returns flat slide metadata
 		// (no HTML) for a range of items in the gallery's filtered +
 		// sorted sequence. Used by the lightbox to lazy-fetch slides
 		// beyond the currently-loaded page. Same filter/seed semantics
@@ -292,7 +292,7 @@ class Register_Gallery_Routes {
 			)
 		);
 
-		// Featured item endpoint — sets or clears `_thumbnail_id` for the gallery.
+		// Featured item endpoint - sets or clears `_thumbnail_id` for the gallery.
 		register_rest_route(
 			'fotogrids/v1',
 			'/gallery/(?P<id>\d+)/featured-item',

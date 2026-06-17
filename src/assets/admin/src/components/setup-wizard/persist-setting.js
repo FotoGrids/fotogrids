@@ -1,5 +1,5 @@
 /**
- * persist-setting.js — tiny shared wrapper for the wizard's "save
+ * persist-setting.js - tiny shared wrapper for the wizard's "save
  * immediately on interaction" pattern.
  *
  * The wizard's step components use the existing
@@ -10,7 +10,7 @@
  * deliberately thin:
  *
  *   • Build the POST body.
- *   • Fire-and-forget the request (no spinner — by design).
+ *   • Fire-and-forget the request (no spinner - by design).
  *   • If the server reports a value mismatch or an error, log a
  *     warning. We don't surface it as a toast: the steps are advisory
  *     defaults, not destructive operations.

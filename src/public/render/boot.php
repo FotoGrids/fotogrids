@@ -69,6 +69,7 @@ add_action(
 	'wp_loaded',
 	static function (): void {
 		do_action( Actions_Render::REGISTER_MODULES );
+		do_action( Actions_Render::REGISTER_HOVER_EFFECTS );
 	},
 	5
 );
@@ -137,13 +138,13 @@ add_action(
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Stats\Stats::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Css::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Js::class );
-		// Inline video playback — active when video_playback_mode is "inline".
+		// Inline video playback - active when video_playback_mode is "inline".
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Inline::class );
-		// Minimal video lightbox — active when video_playback_mode is "lightbox"
+		// Minimal video lightbox - active when video_playback_mode is "lightbox"
 		// but the gallery's click behaviour is not the full lightbox.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Lightbox_Mini::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Lightbox\Classic\Lightbox::class );
-		// LightboxGrid — the "show all" overlay for the Featured Item layout.
+		// LightboxGrid - the "show all" overlay for the Featured Item layout.
 		// Active only when that layout overflows its inline display.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Lightbox\Grid\Lightbox_Grid::class );
 		// Filter sources must be registered before Filter_UI so the feature can
@@ -164,11 +165,11 @@ add_action(
 		// Collection Header (back-to-album button + breadcrumbs) MUST be
 		// registered before Filter_Ui so its html_before output renders
 		// above .fotogrids-filters inside the gallery wrapper. The feature
-		// gates itself via Breadcrumb_Resolver — never active on album
+		// gates itself via Breadcrumb_Resolver - never active on album
 		// renders or galleries with zero / multiple parent albums.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Collection_Header\Collection_Header::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Filters\Features\Ui\Filter_Ui::class );
-		// Pagination — three mutually exclusive sibling modules, all gated
+		// Pagination - three mutually exclusive sibling modules, all gated
 		// on pagination_type === 'paginated' and the appropriate
 		// pagination_method. Order between them doesn't matter
 		// (supports() is mutually exclusive); registered after Filter_Ui
@@ -176,6 +177,19 @@ add_action(
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Endless_Scroll\Endless_Scroll::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Load_More\Load_More::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Page_Buttons\Page_Buttons::class );
+	},
+	10
+);
+
+add_action(
+	Actions_Render::REGISTER_HOVER_EFFECTS,
+	static function (): void {
+		if ( class_exists( \FotoGrids\Render\Decorators\Hover\Hover_Effects_Catalog::class ) ) {
+			\FotoGrids\Render\Decorators\Hover\Hover_Effects_Catalog::register();
+		}
+		if ( class_exists( \FotoGrids\Render\Decorators\Hover\Hover_Effects_Teasers::class ) ) {
+			\FotoGrids\Render\Decorators\Hover\Hover_Effects_Teasers::register();
+		}
 	},
 	10
 );

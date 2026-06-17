@@ -32,7 +32,7 @@ if ( ! defined( 'WPINC' ) ) {
  * works automatically inside Elementor.
  *
  * Activation gates on whether Elementor is loaded. The sub-module is safe
- * to require unconditionally — init() exits early if Elementor isn't present.
+ * to require unconditionally - init() exits early if Elementor isn't present.
  *
  * This sub-module does not register itself with `Module_Registry`. The
  * parent PageBuilders module owns the registry slot and dispatches `init()`
@@ -124,7 +124,7 @@ final class Module {
 		add_action( 'elementor/widgets/register', array( self::class, 'register_widgets' ) );
 
 		// Register the custom Marionette control views (rich Select2 +
-		// Browse-all modal trigger) — fires inside the editor only.
+		// Browse-all modal trigger) - fires inside the editor only.
 		add_action( 'elementor/controls/register', array( self::class, 'register_controls' ) );
 
 		// Enqueue the editor bundle whenever Elementor's editor chrome
@@ -135,20 +135,20 @@ final class Module {
 		// Opt every Elementor-built page that contains a FotoGrids widget
 		// into the page-global asset bootstrap (runtime localize +
 		// errors stylesheet). Without this hook Public_Render's
-		// `has_fotogrids_content()` would miss us — Elementor stores its
+		// `has_fotogrids_content()` would miss us - Elementor stores its
 		// widget tree in post meta, not post_content.
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_elementor' ), 10, 2 );
 
 		// Suppress Elementor's global lightbox over FotoGrids anchors.
 		// Elementor scans every `<a>` whose href looks like an image and
-		// hijacks the click — we need to stamp `data-elementor-open-lightbox="no"`
+		// hijacks the click - we need to stamp `data-elementor-open-lightbox="no"`
 		// on the anchor itself (ancestor opt-out doesn't cascade into
 		// arbitrary widget HTML). The renderer doesn't know about
 		// Elementor; this filter is the decoupling point.
 		add_filter( Filters_Render::ANCHOR_ATTRS, array( self::class, 'disable_elementor_lightbox' ), 10, 2 );
 
 		// Inside Elementor's preview iframe neither `wp_head` nor
-		// `wp_footer` fire in the normal way — Elementor's preview pipeline
+		// `wp_footer` fire in the normal way - Elementor's preview pipeline
 		// owns the chrome. Force the renderer to emit its CSS+JS inline
 		// immediately so widget HTML and its assets reach the iframe
 		// together. The renderer doesn't know about Elementor; it just
@@ -260,7 +260,7 @@ final class Module {
 				'wp-element',
 				'wp-components',
 				'wp-i18n',
-				// `window.FotoGridsIcons` payload — see the Gutenberg
+				// `window.FotoGridsIcons` payload - see the Gutenberg
 				// sub-module for the full rationale; Button uses the
 				// shared <Icon /> component which reads from this
 				// global.
@@ -276,7 +276,7 @@ final class Module {
 			array(
 				'elementor-editor',
 				'wp-components',
-				// Aggregated shared-component stylesheet — Modal,
+				// Aggregated shared-component stylesheet - Modal,
 				// Button, Checkbox, FormField, Icon. Registered once
 				// by the parent PageBuilders module so the same CSS
 				// ships to the Gutenberg block editor too.
@@ -317,7 +317,7 @@ final class Module {
 
 	/**
 	 * Resolve current user's license state (matches the Gutenberg
-	 * sub-module's helper — duplicated rather than imported because
+	 * sub-module's helper - duplicated rather than imported because
 	 * cross-builder dependencies should go through hooks, not direct
 	 * static calls).
 	 *
@@ -365,9 +365,9 @@ final class Module {
 	 * Opt the renderer into inline-emitting CSS+JS whenever the current
 	 * request is an Elementor preview iframe load. Two detection paths:
 	 *
-	 *   1. `?elementor-preview=…` query var — the iframe URL Elementor
+	 *   1. `?elementor-preview=…` query var - the iframe URL Elementor
 	 *      uses to load the preview document.
-	 *   2. `Plugin::$instance->preview->is_preview_mode()` — Elementor's
+	 *   2. `Plugin::$instance->preview->is_preview_mode()` - Elementor's
 	 *      own canonical check, available once Elementor has booted.
 	 *
 	 * Either is sufficient; we OR them so the earliest-firing path still

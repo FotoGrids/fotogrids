@@ -1,6 +1,6 @@
 <?php
 /**
- * Native Divi 5 — shared collection-options helper.
+ * Native Divi 5 - shared collection-options helper.
  *
  * @package FotoGrids\Modules\PageBuilders\Builders\Divi\Native
  * @since   1.0.0
@@ -38,7 +38,7 @@ final class Collection_Options {
 	 * the live page.
 	 *
 	 * Divi's `divi/select` field expects options as a map of
-	 * `value => array{ label: string }` — NOT a flat `value => label`
+	 * `value => array{ label: string }` - NOT a flat `value => label`
 	 * map. Each option value points to an object with a `label` key.
 	 *
 	 * @since 1.0.0
@@ -51,7 +51,7 @@ final class Collection_Options {
 		$posts = get_posts(
 			array(
 				'post_type'        => $post_type,
-				// Include non-published collections too — an editor placing
+				// Include non-published collections too - an editor placing
 				// a module may reference a draft/scheduled gallery they're
 				// still preparing. Non-published entries carry a status
 				// suffix below so it's clear they won't render on the live
@@ -67,8 +67,8 @@ final class Collection_Options {
 		$options = array(
 			'' => array(
 				'label' => 'album' === $kind
-					? esc_html__( '— Select an album —', 'fotogrids' )
-					: esc_html__( '— Select a gallery —', 'fotogrids' ),
+					? esc_html__( '- Select an album -', 'fotogrids' )
+					: esc_html__( '- Select a gallery -', 'fotogrids' ),
 			),
 		);
 

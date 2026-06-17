@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Without a persistent object cache, wp_cache_* is per-request only, so this
  * still safely de-duplicates repeated reads within a single request.
  *
- * Compose this (do not extend it) from a domain cache class — see
+ * Compose this (do not extend it) from a domain cache class - see
  * Metadata_Cache for the canonical example.
  *
  * @package FotoGrids\Cache
@@ -69,7 +69,7 @@ class Object_Cache {
 	 *
 	 * The callback's return value is cached as-is. If you need to avoid caching
 	 * a particular result (e.g. a transient error), don't use remember() for
-	 * that path — call get()/set() directly.
+	 * that path - call get()/set() directly.
 	 *
 	 * @since 1.0.0
 	 * @param string   $key      Logical key (will be namespaced internally).

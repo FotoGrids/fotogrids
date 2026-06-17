@@ -151,7 +151,7 @@ final class Layout_Justified implements Layout {
 	 * Justified packs items at a fixed row height with variable widths, so
 	 * it requires the proportional fotogrids_justified derivative. A cropped
 	 * or square user-picked size would force every tile to the same aspect
-	 * ratio and defeat the layout — the preference is mandatory.
+	 * ratio and defeat the layout - the preference is mandatory.
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.

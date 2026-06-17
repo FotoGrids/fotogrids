@@ -1,0 +1,24 @@
+/* Parallax: the media tilts in 3D and pushes toward the viewer while the
+   caption content shifts in plain 2D at a different rate. Only the media enters
+   the 3D context, so an overlay caption never 3D-clips or disappears. */
+
+.fotogrids-collection[data-fg-hover='parallax-tilt'] .fg-item-media {
+	transition: transform 0.35s ease;
+	transform-origin: center center;
+}
+
+.fotogrids-collection[data-fg-hover='parallax-tilt'] .fg-caption-content {
+	transition: transform 0.35s ease;
+}
+
+.fotogrids-collection[data-fg-hover='parallax-tilt']
+	.fg-item:hover
+	.fg-item-media {
+	transform: perspective(800px) rotateX(8deg) rotateY(-8deg) scale(1.04);
+}
+
+.fotogrids-collection[data-fg-hover='parallax-tilt']
+	.fg-item:hover
+	.fg-caption-content {
+	transform: translate(-4px, -6px);
+}

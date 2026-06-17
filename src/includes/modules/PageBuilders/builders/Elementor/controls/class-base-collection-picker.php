@@ -45,7 +45,7 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
 	 * Returns a scalar (empty string) rather than an array because
 	 * Elementor's `Controls_Manager::add_control_to_stack` does
 	 * `array_merge( $control_default_value, $control_data['default'] )`
-	 * when the control's default is an array — and our widgets pass a
+	 * when the control's default is an array - and our widgets pass a
 	 * scalar (the post ID) for `default`. Mismatched shapes fatal there.
 	 * The "kind" doesn't need to live in the value; it's a property of
 	 * the control type itself, exposed via {@see get_default_settings()}

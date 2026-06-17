@@ -18,6 +18,9 @@
     "test:ci": "npm run test:ci:render-guards && npm run test:ci:php-integration && jest --ci --coverage --watchAll=false",
     "test:ci:render-guards": "bash tests/ci/run-render-guards.sh",
     "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh",
+    "test:e2e": "playwright test",
+    "env:start": "wp-env start",
+    "env:stop": "wp-env stop",
     "zip:dev": "npm run build:dev && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-dev.zip && zip -r ../fotogrids-dev.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
     "zip:prod": "npm run build && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-v$npm_package_version.zip && zip -r ../fotogrids-v$npm_package_version.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
     "release": "npm run clean && npm run build && npm run zip:prod",
@@ -52,6 +55,8 @@
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@wordpress/env": "^10.0.0",
     "@babel/core": "^7.22.0",
     "@babel/preset-env": "^7.22.0",
     "@babel/preset-react": "^7.22.0",

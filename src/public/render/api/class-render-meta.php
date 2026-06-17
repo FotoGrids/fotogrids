@@ -50,7 +50,7 @@ final class Render_Meta {
 	 * @param   int|null        $requested_per_page Caller-supplied items_per_page override (pagination REST requests). Null = use saved setting.
 	 * @param   string|null     $breakpoint Active breakpoint hint from the caller ('desktop' | 'tablet' | 'mobile'). Null = unknown.
 	 * @param   string|null     $partial Partial-render hint. 'items_only' = return only the layout's inner HTML (no wrapper, no chrome). Null = full render.
-	 * @param   int|null        $total_item_count Total item count BEFORE pagination slicing — set by Context_Builder so pagination chrome can emit data-fg-page-total correctly. Null = unknown.
+	 * @param   int|null        $total_item_count Total item count BEFORE pagination slicing - set by Context_Builder so pagination chrome can emit data-fg-page-total correctly. Null = unknown.
 	 * @param   array<string, array<int, string>> $active_filters Selected filter values per source arg key (e.g. ['tags' => ['nature', 'sky']]). Empty array = no filter.
 	 * @param   int|null        $random_seed Seed for deterministic random sorting. Set on initial render and sent back by the client on paginated requests so each page draws from the same shuffle. Null = unseeded (initial paint with no inherited seed).
 	 * @param   bool            $view_page True when rendered on a standalone Gallery/Album View Page (ViewCollections renderer); false on embedded shortcode/block renders. Read by Collection_Header to gate the 'view_pages' breadcrumb placement.

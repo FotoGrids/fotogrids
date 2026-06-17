@@ -1,7 +1,0 @@
-[data-fg-hover="zoom-soft"] .fg-item-media {
-    transition: transform 250ms ease;
-}
-
-[data-fg-hover="zoom-soft"] .fg-item:hover .fg-item-media {
-    transform: scale(1.03);
-}

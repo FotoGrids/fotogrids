@@ -1,6 +1,6 @@
 <?php
 /**
- * Native Divi 5 — FotoGrids Album module (PHP render side).
+ * Native Divi 5 - FotoGrids Album module (PHP render side).
  *
  * @package FotoGrids\Modules\PageBuilders\Builders\Divi\Native
  * @since   1.0.0
@@ -63,7 +63,7 @@ class Album_Module implements \ET\Builder\Framework\DependencyManagement\Interfa
 			);
 		};
 
-		// See Gallery_Module::load() — Divi calls this synchronously inside
+		// See Gallery_Module::load() - Divi calls this synchronously inside
 		// its `init:0` bootstrap, so register immediately.
 		$register();
 	}

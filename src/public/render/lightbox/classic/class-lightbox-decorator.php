@@ -46,7 +46,7 @@ final class Lightbox_Decorator implements Decorator {
 	}
 
 	public function supports( Render_Context $render_context ): bool {
-		// The lightbox is for opening individual attachments — it never
+		// The lightbox is for opening individual attachments - it never
 		// applies to album-as-collection renders, whose items ARE
 		// galleries (and therefore have their own click-behaviour
 		// decorator, e.g. Album_To_View_Page or Album_To_Gallery_Ajax).

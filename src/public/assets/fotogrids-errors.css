@@ -2,7 +2,7 @@
  * FotoGrids error message styles.
  *
  * Always-on stylesheet (enqueued by Public_Render::enqueue_frontend_scripts)
- * because error markup can be emitted before the render pipeline runs — e.g.
+ * because error markup can be emitted before the render pipeline runs - e.g.
  * "gallery not found", "not published", "no items". Those short-circuit before
  * any layout module runs, so collection-base.css is never enqueued for them.
  *

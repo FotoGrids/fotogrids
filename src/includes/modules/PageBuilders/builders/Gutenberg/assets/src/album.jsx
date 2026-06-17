@@ -40,8 +40,8 @@ const LayoutModePanel = ({ layoutMode, editUrl }) => {
         return null;
     }
     const labels = {
-        integrated: __('Integrated — galleries open inline on this page.', 'fotogrids'),
-        standalone: __('Standalone — galleries open in their own View Page.', 'fotogrids'),
+        integrated: __('Integrated - galleries open inline on this page.', 'fotogrids'),
+        standalone: __('Standalone - galleries open in their own View Page.', 'fotogrids'),
     };
     const text = labels[layoutMode] || sprintf(
         /* translators: %s: layout mode identifier */

@@ -129,7 +129,7 @@ final class Settings_Localizer {
 	 * to the in-memory PHP shape that the JS payload expects.
 	 *
 	 * Mirrors the legacy `Admin_Helpers::get_collection_settings_localized_data`
-	 * behaviour exactly — including the "boolean stored as string '1' / '0'"
+	 * behaviour exactly - including the "boolean stored as string '1' / '0'"
 	 * quirk that the JS toggle's `=== '1'` check depends on.
 	 *
 	 * @param array $defaults    Defaults array (drives the key list + type coercion).
@@ -174,7 +174,7 @@ final class Settings_Localizer {
 			$saved_value = get_post_meta( $post_id, 'fotogrids_' . $key, true );
 
 			// The `password` field is stored encrypted. Never send the
-			// ciphertext to the browser — the eye-button reveal is done via
+			// ciphertext to the browser - the eye-button reveal is done via
 			// a dedicated permission-gated REST call instead.
 			if ( 'password' === $key ) {
 				$settings[ $key ] = '';
@@ -199,7 +199,7 @@ final class Settings_Localizer {
 					// Array values (e.g. token_select, responsive objects).
 					$settings[ $key ] = $decoded;
 				} elseif ( json_last_error() === JSON_ERROR_NONE && null !== $decoded ) {
-					// Scalar JSON values (e.g. numeric strings "2", "16") —
+					// Scalar JSON values (e.g. numeric strings "2", "16") -
 					// use the decoded scalar so the JS side receives the
 					// correct type (integer, not string) for
 					// strict-equality comparisons in button_group renders.

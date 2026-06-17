@@ -44,7 +44,7 @@ final class Collection_Save_Pipeline {
 	}
 
 	/**
-	 * `save_post` handler — only fires for FotoGrids galleries with the
+	 * `save_post` handler - only fires for FotoGrids galleries with the
 	 * metabox nonce present.
 	 *
 	 * @since 1.0.0
@@ -180,7 +180,7 @@ final class Collection_Save_Pipeline {
 	 * @return array{settings: array<string,mixed>, gated: array<int,array<string,mixed>>, skipped_for_permissions?: string[]}
 	 */
 	private static function persist_settings_with_gate( int $post_id, array $request_data ): array {
-		// Use gallery defaults as the iteration source — they are a superset
+		// Use gallery defaults as the iteration source - they are a superset
 		// of album defaults for setting keys. This mirrors the legacy
 		// behaviour of Meta_Boxes::save_collection_settings_with_gate.
 		$defaults = Collection_Defaults::resolve_gallery();
@@ -209,7 +209,7 @@ final class Collection_Save_Pipeline {
 		// Permission gate: every key in $incoming is a Collection Settings
 		// value (settings, not content). If the user lacks the per-CPT
 		// settings cap, drop them all and report the skipped keys (Option A
-		// behaviour — silent skip, surfaced to caller).
+		// behaviour - silent skip, surfaced to caller).
 		$post_type    = get_post_type( $post_id ) ?: 'fotogrids_gallery';
 		$settings_cap = Permission_Gate::settings_cap_for( $post_type );
 		$skipped      = array();

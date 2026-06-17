@@ -199,7 +199,7 @@ const AlbumGalleries = () => {
     };
 
     // Set or clear the album's featured gallery. Passing null clears the
-    // explicit choice — the runtime resolver then falls back to the first
+    // explicit choice - the runtime resolver then falls back to the first
     // child gallery with a resolvable cover.
     const handleSetFeaturedGallery = async (galleryId) => {
         const wasFeatured = featuredGalleryId === galleryId;
@@ -260,7 +260,7 @@ const AlbumGalleries = () => {
             }
 
             // If the removed gallery was the explicit featured choice, drop
-            // it locally — server-side the cover resolver will fall back to
+            // it locally - server-side the cover resolver will fall back to
             // the next valid child the next time it's read. We don't fire
             // the REST clear endpoint because the post meta still pointing
             // at a now-unassigned gallery is harmless (resolver ignores it).

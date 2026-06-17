@@ -67,6 +67,7 @@
     border-radius: var(--fg-radius, 0);
     overflow: hidden;
     box-sizing: border-box;
+    line-height: 0;
 }
 
 .fotogrids-collection .fg-item-media picture,
@@ -210,12 +211,14 @@
     box-sizing: border-box;
 }
 
-/* Thumbnail image filters - only applied when the decorator is active. */
+/* Thumbnail image filters - only applied when the decorator is active.
+   --fg-hover-filter lets a hover-effect module append to the filter chain so
+   image-filter settings and filter-based hover effects compose. */
 .fotogrids-collection[data-fg-filter] .fg-item-media img {
-    filter: var(--fg-thumb-filter-regular);
+    filter: var(--fg-thumb-filter-regular) var(--fg-hover-filter);
     transition: filter 0.25s ease;
 }
 
 .fotogrids-collection[data-fg-filter] .fg-item:hover .fg-item-media img {
-    filter: var(--fg-thumb-filter-hover);
+    filter: var(--fg-thumb-filter-hover) var(--fg-hover-filter-hover, var(--fg-hover-filter));
 }

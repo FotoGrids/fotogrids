@@ -69,7 +69,7 @@ final class Captions implements Decorator {
 	 * True when the active layout is Image Viewer. That layout renders only
 	 * the caption title (in its control bar) and hides Caption Placement,
 	 * Distance from Media, Alignment, Item Description, and Limit Title Length
-	 * in the admin — so the decorator must ignore those settings entirely and
+	 * in the admin - so the decorator must ignore those settings entirely and
 	 * emit only the title styling variables.
 	 *
 	 * @since 1.0.0
@@ -82,7 +82,7 @@ final class Captions implements Decorator {
 		$settings = $render_context->settings;
 
 		// Image Viewer only renders the caption title (in its control bar).
-		// Emit just the title styling variables — colour, font, and size —
+		// Emit just the title styling variables - colour, font, and size -
 		// and ignore placement, alignment, gap, overlay, description, and the
 		// title line-clamp, all of which are hidden for this layout.
 		if ( $this->is_image_viewer( $render_context ) ) {
@@ -206,8 +206,8 @@ final class Captions implements Decorator {
 
 	/**
 	 * Title-only style variables for the Image Viewer layout. Produces the
-	 * title colour, font family/weight, and responsive font size — the same
-	 * values the per-item caption would use — so the layout can style the
+	 * title colour, font family/weight, and responsive font size - the same
+	 * values the per-item caption would use - so the layout can style the
 	 * title it renders in its control bar. No placement, alignment, gap,
 	 * overlay, description, or line-clamp variables are emitted.
 	 *
@@ -269,7 +269,7 @@ final class Captions implements Decorator {
 	 * @param  int    $default        Fallback line count.
 	 * @return string                 Plain integer string, e.g. '1', '2'.
 	 */
-	private function responsive_line_count( mixed $raw_responsive, string $breakpoint, int $default_value ): string {
+	private function responsive_line_count( $raw_responsive, string $breakpoint, int $default_value ): string {
 		if ( ! is_array( $raw_responsive ) ) {
 			return (string) $default_value;
 		}
@@ -310,7 +310,7 @@ final class Captions implements Decorator {
 	 * @param  int   $default_pct Fallback percentage if $raw is not numeric.
 	 * @return float              Multiplier in the range 0.0-1.0.
 	 */
-	private function resolve_opacity_pct( mixed $raw, int $default_pct ): float {
+	private function resolve_opacity_pct( $raw, int $default_pct ): float {
 		$pct = is_numeric( $raw ) ? (float) $raw : (float) $default_pct;
 		if ( $pct < 0 ) {
 			$pct = 0;

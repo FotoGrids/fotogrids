@@ -1,5 +1,5 @@
 /*
- * FotoGrids — Pagination: page buttons (per-method overrides).
+ * FotoGrids - Pagination: page buttons (per-method overrides).
  *
  * Base button styling (.fg-pagination__btn + states), the sr-only status
  * region, and the disabled/loading states all live in the shared
@@ -52,7 +52,7 @@
 .fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-stretch { justify-content: space-between; }
 
 /*
- * Active (current) page chip. Only numbered buttons use this state —
+ * Active (current) page chip. Only numbered buttons use this state -
  * load-more never has an active state because there's only one button.
  *
  * The three colour tokens come from the Active subtab in the Styling
@@ -68,7 +68,7 @@
 
 /*
  * Numbered-chips track. Equal-width columns sized to whichever chip is
- * widest — picked because the page numbers vary in digit count (1 vs 10
+ * widest - picked because the page numbers vary in digit count (1 vs 10
  * vs 999) and the ellipsis sits in the same row, so a flex layout would
  * give visibly uneven gaps.
  *
@@ -76,7 +76,7 @@
  * available width equally across N columns. By setting the container to
  * width:max-content the "available width" becomes exactly N × widest-
  * child, so each 1fr column resolves to the widest child's natural size
- * — no stretching to fill the parent, no manual N-computation, and no
+ * - no stretching to fill the parent, no manual N-computation, and no
  * repeat(auto-fit,…) which requires a minmax() track size.
  *
  * .fg-is-trimmed <li>s use display:none and so don't count as grid

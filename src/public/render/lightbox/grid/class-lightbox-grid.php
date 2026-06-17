@@ -19,12 +19,12 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * A distinct lightbox variant: instead of a slideshow (arrows / dots /
  * thumbnails / info panel), it shows ALL of the gallery's items in a
- * scrollable, Airbnb-style grid — one full-width image, then a row of two
+ * scrollable, Airbnb-style grid - one full-width image, then a row of two
  * side-by-side, repeating. Its only chrome is a toolbar: a Back/close
  * button on the inline-start side and a Share button (when sharing is
  * enabled) on the inline-end side.
  *
- * It is opened by the Featured Item layout's auto "Show all" button — it
+ * It is opened by the Featured Item layout's auto "Show all" button - it
  * never opens by clicking an item. Clicking an item INSIDE the grid runs
  * the gallery's own click behaviour (lightbox / link / etc.), the same as
  * clicking an item on the page.
@@ -153,7 +153,7 @@ final class Lightbox_Grid implements Feature {
 		// Share config (only when sharing is enabled for the gallery). The
 		// Sharing decorator already stamps data-fg-sharing on the wrapper
 		// when sharing is on; the grid JS reads that same attribute, so we
-		// don't duplicate it here — we only need to know whether to show the
+		// don't duplicate it here - we only need to know whether to show the
 		// toolbar share button, which the JS derives from data-fg-sharing.
 
 		return $attrs;
@@ -164,7 +164,7 @@ final class Lightbox_Grid implements Feature {
 	}
 
 	/**
-	 * LightboxGrid client assets — the overlay JS + CSS.
+	 * LightboxGrid client assets - the overlay JS + CSS.
 	 *
 	 * @since 1.0.0
 	 * @param Render_Context $render_context Render context.

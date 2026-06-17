@@ -860,12 +860,12 @@
                                     "label": "Pause On",
                                     "options": [
                                         {
-                                            "label": "Full Image Mouseover",
+                                            "label": "Full Image Hover",
                                             "value": "image_hover",
                                             "tier_required": "free"
                                         },
                                         {
-                                            "label": "Thumbnail Mouseover",
+                                            "label": "Thumbnail Hover",
                                             "value": "thumbnail_hover",
                                             "tier_required": "free"
                                         }

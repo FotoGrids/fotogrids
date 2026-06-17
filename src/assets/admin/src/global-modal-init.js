@@ -6,7 +6,7 @@
  *   2. Exposes the public modal API at window.FotoGridsAdmin.modal.
  *   3. Conditionally mounts the Pro upgrade modal for non-Pro users.
  *
- * Enqueued from PHP on every admin page that loads FotoGrids assets — see
+ * Enqueued from PHP on every admin page that loads FotoGrids assets - see
  * includes/admin/class-upgrade-modal-integration.php.
  */
 

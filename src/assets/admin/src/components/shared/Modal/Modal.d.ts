@@ -1,10 +1,10 @@
 /**
- * FotoGrids Admin Modal — public API types.
+ * FotoGrids Admin Modal - public API types.
  *
  * Pro and 3rd-party plugins consume the modal system either through
  * `window.FotoGridsAdmin.modal` (imperative) or by importing the React
  * components from this module. These types describe the stable public
- * contract — treat changes here as breaking.
+ * contract - treat changes here as breaking.
  */
 
 import type { ComponentType, ReactNode, MutableRefObject } from 'react';

@@ -32,7 +32,7 @@ const CONTROL_VIEW_PARENT = window.elementor && window.elementor.modules
 
 /**
  * Fetch the full picker payload for a given kind. Cached for the life
- * of the editor session — invalidated only when the modal triggers a
+ * of the editor session - invalidated only when the modal triggers a
  * selection (we re-fetch on next open so newly created items appear).
  */
 const cache = { gallery: null, album: null };
@@ -450,7 +450,7 @@ function isAllowedEmptyStateMessage(event) {
     if (!event || typeof event.data !== 'object' || event.data === null) return false;
     if (event.data.type !== 'fg-pb-empty-state:open') return false;
     if (typeof event.data.url !== 'string') return false;
-    // Same-origin only — the preview iframe shares the editor's origin.
+    // Same-origin only - the preview iframe shares the editor's origin.
     try {
         const url = new URL(event.data.url, window.location.origin);
         return url.origin === window.location.origin;

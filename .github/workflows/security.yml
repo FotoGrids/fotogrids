@@ -1,0 +1,62 @@
+name: Security audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  schedule:
+    # Daily, so advisories published after a PR merges still surface quickly.
+    - cron: '0 7 * * *'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # npm advisories. Fails on high+ severity in production dependencies.
+  # Dev-only advisories are reported but do not block (they don't ship to users).
+  # ---------------------------------------------------------------------------
+  npm-audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies (high+)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit all dependencies (report only)
+        if: always()
+        run: npm audit || true
+
+  # ---------------------------------------------------------------------------
+  # Composer advisories against the locked PHP dependencies.
+  # ---------------------------------------------------------------------------
+  composer-audit:
+    name: composer audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Composer audit
+        run: composer audit

@@ -64,7 +64,7 @@ class Lightbox_Slides_Data {
 
 		// Resolve the full filtered + sorted sequence. Random seed = 0
 		// (the param default for "no seed") becomes null so the sorter
-		// can generate its own — but in practice every gallery on the
+		// can generate its own - but in practice every gallery on the
 		// page already has a seed stamped on the wrapper, so a paginated
 		// client will send a real seed.
 		$sequence = \FotoGrids\Render\Internal\Gallery_Item_Sequence::resolve(

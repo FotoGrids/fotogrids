@@ -174,7 +174,7 @@ final class Snap_Resolver {
 
 	/**
 	 * Walks the whole row list and resolves every page boundary at once.
-	 * Returns boundaries as offset/page_size records — total_pages is the
+	 * Returns boundaries as offset/page_size records - total_pages is the
 	 * length of the returned array.
 	 *
 	 * @since  1.0.0
@@ -357,7 +357,7 @@ final class Snap_Resolver {
 	}
 
 	/**
-	 * Find the candidate index closest to the target page size — used to
+	 * Find the candidate index closest to the target page size - used to
 	 * gauge the "natural" trailing-row fill for auto-direction resolution.
 	 *
 	 * @since  1.0.0

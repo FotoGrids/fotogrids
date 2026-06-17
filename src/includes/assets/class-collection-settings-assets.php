@@ -99,6 +99,7 @@ final class Collection_Settings_Assets {
 		}
 
 		self::enqueue_fg_tooltip();
+		self::enqueue_hover_effect_previews();
 
 		if ( $enqueue_codemirror ) {
 			wp_enqueue_script(
@@ -135,7 +136,49 @@ final class Collection_Settings_Assets {
 	}
 
 	/**
-	 * fg-tooltip — the shared lightweight tooltip used on the frontend.
+	 * Enqueues the hover-effect base CSS plus every registered effect's preview
+	 * CSS so the hover-effect grid cards animate using the real effect rules.
+	 * Preview CSS for Pro teasers ships in Free, so cards animate before Pro is
+	 * installed.
+	 *
+	 * @since  1.0.0
+	 * @return void
+	 */
+	private static function enqueue_hover_effect_previews(): void {
+		if ( ! class_exists( \FotoGrids\Render\Internal\Hover_Effect_Registry::class ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'fotogrids-hover-base',
+			FOTOGRIDS_PLUGIN_URL . 'public/render/decorators/hover/base.css',
+			array(),
+			FOTOGRIDS_VERSION
+		);
+
+		wp_enqueue_style(
+			'fotogrids-hover-preview-chrome',
+			FOTOGRIDS_PLUGIN_URL . 'public/render/decorators/hover/preview-chrome.css',
+			array( 'fotogrids-hover-base' ),
+			FOTOGRIDS_VERSION
+		);
+
+		foreach ( \FotoGrids\Render\Internal\Hover_Effect_Registry::all() as $effect ) {
+			if ( null === $effect->preview_css_path || '' === $effect->preview_css_path ) {
+				continue;
+			}
+
+			wp_enqueue_style(
+				'fotogrids-hover-preview-' . $effect->id,
+				FOTOGRIDS_PLUGIN_URL . $effect->preview_css_path,
+				array( 'fotogrids-hover-base' ),
+				FOTOGRIDS_VERSION
+			);
+		}
+	}
+
+	/**
+	 * fg-tooltip - the shared lightweight tooltip used on the frontend.
 	 * Reused inside wp-admin (shortcode metabox copy button, docs strip
 	 * links) so tooltip styling matches the public surface. Picks up any
 	 * element with [data-fg-tooltip] on DOMContentLoaded.
@@ -170,7 +213,7 @@ final class Collection_Settings_Assets {
 			true
 		);
 
-		// Post-type placeholder helpers — single source of truth for
+		// Post-type placeholder helpers - single source of truth for
 		// {postType} replacement, used by collection-settings.js (translation
 		// pass) and any render helper that reads raw placeholder strings
 		// (e.g. renderCodeArea hints).

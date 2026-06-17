@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * FotoGrids brand icon — the 5-rect mark as a self-contained SVG
+ * FotoGrids brand icon - the 5-rect mark as a self-contained SVG
  * component. Distinct from the runtime-driven `<Icon name="…">`
  * (a sibling in this directory) which renders any icon from the
  * `window.FotoGridsIcons` payload; `FotoGridsIcon` is specifically the
@@ -14,20 +14,20 @@ import React from 'react';
  *
  * Props
  * ----
- * - size:    number | string — applied to both width and height. Number
+ * - size:    number | string - applied to both width and height. Number
  *                              becomes a `px` value; string is passed
  *                              through verbatim (so `'2em'`, `'100%'`,
  *                              etc. all work). Defaults to 20.
- * - variant: 'full' | 'mono' — `full` uses the canonical brand colours
+ * - variant: 'full' | 'mono' - `full` uses the canonical brand colours
  *                              (the orange / red / yellow / dark / blue
  *                              mix); `mono` makes every rect use
  *                              `currentColor` so the surrounding text
  *                              colour drives tone. Use mono for
  *                              greyscale UI, white-on-dark surfaces,
- *                              accessibility printouts, etc. — set
+ *                              accessibility printouts, etc. - set
  *                              `color: …` on the parent and the logo
  *                              follows. Defaults to `full`.
- * - className — passed through to the root `<svg>`. Useful for surface-
+ * - className - passed through to the root `<svg>`. Useful for surface-
  *               specific positional tweaks (margin, flex-shrink, …)
  *               without redefining sizing.
  *

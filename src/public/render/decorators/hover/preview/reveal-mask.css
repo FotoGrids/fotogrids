@@ -1,0 +1,24 @@
+/* The overlay background fades in while the caption text is unmasked
+   left-to-right with a clip-path wipe. */
+
+.fotogrids-collection[data-fg-hover='reveal-mask'] .fg-caption-bg {
+	opacity: 0;
+	transition: opacity 0.35s ease;
+}
+
+.fotogrids-collection[data-fg-hover='reveal-mask'] .fg-caption-content {
+	clip-path: inset(0 100% 0 0);
+	transition: clip-path 0.4s ease;
+}
+
+.fotogrids-collection[data-fg-hover='reveal-mask']
+	.fg-item:hover
+	.fg-caption-bg {
+	opacity: 1;
+}
+
+.fotogrids-collection[data-fg-hover='reveal-mask']
+	.fg-item:hover
+	.fg-caption-content {
+	clip-path: inset(0 0 0 0);
+}

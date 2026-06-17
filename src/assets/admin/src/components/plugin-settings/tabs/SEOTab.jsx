@@ -152,7 +152,7 @@ const SEOTab = () => {
                         label={__('Defer', 'fotogrids')}
                         checked={settings.defer_to_seo_plugins}
                         onChange={(v) => update('defer_to_seo_plugins', v)}
-                        description={__('Off by default — FotoGrids owns the meta on view pages and automatically silences the other plugins to prevent duplicates.', 'fotogrids')}
+                        description={__('Off by default - FotoGrids owns the meta on view pages and automatically silences the other plugins to prevent duplicates.', 'fotogrids')}
                     />
                 </PanelRow>
                 <PanelRow

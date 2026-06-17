@@ -33,14 +33,17 @@ if ( ! defined( 'WPINC' ) ) {
 final class Context_Builder {
 
 	private Instance_Id_Factory $instance_id_factory;
-	private mixed $items_loader;
+	/**
+	 * @var callable|null
+	 */
+	private $items_loader;
 
 	/**
 	 * @param callable|null $items_loader Callback for item hydration.
 	 */
 	public function __construct(
 		Instance_Id_Factory $instance_id_factory,
-		mixed $items_loader = null
+		$items_loader = null
 	) {
 		$this->instance_id_factory = $instance_id_factory;
 		$this->items_loader        = $items_loader;
@@ -193,7 +196,7 @@ final class Context_Builder {
 		// item must pass every source that has active values.
 		//
 		// Only applies when active_filters is non-empty (REST pagination
-		// requests with filter state) — initial shortcode renders never
+		// requests with filter state) - initial shortcode renders never
 		// pass active_filters, so the client-side filter UI keeps full
 		// control of which items are visually shown on page 1.
 		if ( ! empty( $render_meta->active_filters ) && Collection_Kind::GALLERY === $render_meta->collection_kind ) {
@@ -226,7 +229,7 @@ final class Context_Builder {
 		// already established) and after caption resolution + filtering (so
 		// the slice contains fully-prepared Item_Views from the filtered set).
 		// Layouts that opt out via the `paginates` capability (slider,
-		// image-viewer) skip slicing entirely — their own navigation walks
+		// image-viewer) skip slicing entirely - their own navigation walks
 		// the full item list.
 		$paginates_capability = Layout_Capabilities::supports( $sort_context, 'paginates' );
 		if ( ( $render_settings['pagination_type'] ?? 'show_all' ) === 'paginated'
@@ -369,7 +372,7 @@ final class Context_Builder {
 		$render_settings = self::coerce_layout_settings( $render_settings );
 
 		$render_meta = new Render_Meta(
-			// gallery_id is intentionally 0 — the render's primary identity
+			// gallery_id is intentionally 0 - the render's primary identity
 			// is the album. instance_id_factory needs SOMETHING unique to
 			// build an instance ID off; we feed it the album_id so the IDs
 			// are stable per-album.
@@ -391,7 +394,7 @@ final class Context_Builder {
 		$loaded_items = Album_Item_Loader::load( $child_gallery_ids, $thumb_size );
 		// Captions decorator picks up caption_title / caption_description
 		// from the Item_View. For albums we always pass the gallery title
-		// through as caption_title — call resolve_captions to handle the
+		// through as caption_title - call resolve_captions to handle the
 		// normal caption_hide_title / source resolution logic too.
 		$loaded_items = $this->resolve_captions( $loaded_items, $render_settings );
 
@@ -1033,7 +1036,7 @@ final class Context_Builder {
 		}
 
 		// A mandatory preference (Justified, Masonry) overrides even an
-		// explicit user-picked size — those layouts cannot render with an
+		// explicit user-picked size - those layouts cannot render with an
 		// arbitrary cropped derivative. A soft preference only applies when
 		// the user has left thumbnail_size on its default, so explicit
 		// choices still win for layouts that can honour them.

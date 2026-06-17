@@ -1,0 +1,29 @@
+/* The overlay background fades in while the caption content opens out from the
+   centre like a pair of doors (scaleX from a thin sliver to full width). */
+
+.fotogrids-collection[data-fg-hover='split-doors'] .fg-caption-bg {
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='split-doors'] .fg-caption-content {
+	opacity: 0;
+	transform: scaleX(0.2);
+	transform-origin: center center;
+	transition:
+		opacity 0.3s ease,
+		transform 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='split-doors']
+	.fg-item:hover
+	.fg-caption-bg {
+	opacity: 1;
+}
+
+.fotogrids-collection[data-fg-hover='split-doors']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+	transform: scaleX(1);
+}

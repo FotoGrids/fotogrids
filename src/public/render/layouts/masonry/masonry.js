@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Masonry Layout
+ * FotoGrids - Masonry Layout
  *
  * JS-positioned masonry. The track is position:relative; items are
  * position:absolute. Column count comes from --fg-cols (fixed mode) or
@@ -98,7 +98,7 @@ function placeRowMajor( items, columnLefts, columnWidths, gap ) {
 
 /**
  * Place items column-by-column (column-major). Distributes items evenly
- * — items 0..k-1 in column 0, k..2k-1 in column 1, etc. — where k is
+ * - items 0..k-1 in column 0, k..2k-1 in column 1, etc. - where k is
  * ceil(N/cols).
  *
  * @param {HTMLElement[]} items
@@ -178,7 +178,7 @@ function layout( trackEl ) {
     for ( let c = 0; c < columnHeights.length; c++ ) {
         if ( columnHeights[ c ] > maxHeight ) maxHeight = columnHeights[ c ];
     }
-    // Each column counted a trailing gap after the last item — subtract one.
+    // Each column counted a trailing gap after the last item - subtract one.
     if ( maxHeight > 0 ) maxHeight -= gap;
     trackEl.style.height = Math.round( maxHeight ) + 'px';
 

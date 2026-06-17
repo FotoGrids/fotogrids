@@ -20,12 +20,12 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Six `wp_ajax_*` endpoints driving the per-item edit + bulk-URL UI.
  *
- *   fotogrids_get_item_data           — read item data for the edit modal
- *   fotogrids_save_item_data          — write item data back
- *   fotogrids_get_item_urls           — read external_url / link_target for many items
- *   fotogrids_update_item_url         — write external_url for one item
- *   fotogrids_bulk_update_item_urls   — bulk apply/clear external_url
- *   fotogrids_reorder_gallery_items   — drag-reorder a gallery's items
+ *   fotogrids_get_item_data           - read item data for the edit modal
+ *   fotogrids_save_item_data          - write item data back
+ *   fotogrids_get_item_urls           - read external_url / link_target for many items
+ *   fotogrids_update_item_url         - write external_url for one item
+ *   fotogrids_bulk_update_item_urls   - bulk apply/clear external_url
+ *   fotogrids_reorder_gallery_items   - drag-reorder a gallery's items
  *
  * Eventually candidates to move to REST routes under `includes/rest/items/`;
  * see the refactor plan for that follow-up.
@@ -261,7 +261,7 @@ final class Item_Ajax_Endpoints {
 			'attachment_id' => $item_id,
 			'gallery_id'    => 0, // Global item data (not gallery-specific)
 			'credit'        => $credit,
-			// Note: the `location` VARCHAR column is deprecated — structured
+			// Note: the `location` VARCHAR column is deprecated - structured
 			// location data is stored in fotogrids_item_metadata via the
 			// metadata REST endpoint. Do not write to it here.
 			'external_url'  => $external_url,

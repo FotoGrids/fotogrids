@@ -182,7 +182,7 @@ final class Gate_Renderer {
 	 * @param  mixed $spacing Spacing setting for one breakpoint.
 	 * @return string
 	 */
-	private static function resolve_gap( mixed $spacing ): string {
+	private static function resolve_gap( $spacing ): string {
 		if ( is_array( $spacing ) ) {
 			$value = $spacing['value'] ?? '';
 			$unit  = $spacing['unit'] ?? 'px';

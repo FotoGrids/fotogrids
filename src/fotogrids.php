@@ -45,7 +45,6 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-metadata-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-fotogrids-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-gallery-album-relations.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-metadata-manager.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-hover-effects-css.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/interface-license-provider.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-null-license-provider.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/licensing/class-local-license-provider.php';

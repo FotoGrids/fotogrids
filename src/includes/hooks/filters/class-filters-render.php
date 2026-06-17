@@ -2,7 +2,7 @@
 /**
  * Render-pipeline filter hooks (non-variant; the flat/typed/scoped variants
  * dispatched through {@see \FotoGrids\Render\Internal\Hooks} are not declared
- * here — see that helper for the suffix list).
+ * here - see that helper for the suffix list).
  *
  * @package FotoGrids\Hooks
  * @since   1.0.0
@@ -115,9 +115,9 @@ final class Filters_Render {
 	 * HTML attribute map for every `<a>` an item-wrapping decorator emits
 	 * (Lightbox, Direct_Link, External_Link, Album_To_View_Page,
 	 * Album_To_Gallery_Ajax). Lets host environments (page-builder
-	 * sub-modules, themes) inject or remove attributes — e.g. to suppress
+	 * sub-modules, themes) inject or remove attributes - e.g. to suppress
 	 * a host builder's global lightbox that would otherwise hijack clicks
-	 * on our anchors — without the renderer needing to know which host is
+	 * on our anchors - without the renderer needing to know which host is
 	 * mounting it. Dispatched through {@see \FotoGrids\Render\Internal\Hooks::apply_filter}
 	 * so flat/typed/scoped variants are available; call sites pass the
 	 * {@see ANCHOR_ATTRS_SUFFIX} bare suffix.
@@ -144,7 +144,7 @@ final class Filters_Render {
 	 *
 	 * Default is `true` when WordPress has already passed `wp_head` /
 	 * `admin_head` at flush time (the classic "shortcode rendered inside
-	 * the_content after wp_head") — in that case the styles need to be
+	 * the_content after wp_head") - in that case the styles need to be
 	 * inlined or they'd never appear. Hosts that render galleries outside
 	 * the normal page lifecycle (page-builder editor previews, custom
 	 * REST/AJAX surfaces that emit HTML without `wp_footer`) hook this

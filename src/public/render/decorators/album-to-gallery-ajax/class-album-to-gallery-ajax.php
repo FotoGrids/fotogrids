@@ -152,7 +152,7 @@ final class Album_To_Gallery_Ajax implements Decorator {
 				// Pre-enqueue the collection-header CSS too. The AJAX-swapped
 				// gallery will carry the back button / breadcrumb chrome, and
 				// the swap response only injects *missing* CSS handles into the
-				// host page — but the JS bundle that wires the Back button is
+				// host page - but the JS bundle that wires the Back button is
 				// never injected by the swap flow (the REST response carries
 				// CSS URLs but not JS). Loading both up-front, on any page that
 				// can do an AJAX swap, guarantees the chrome's CSS and JS are
@@ -169,7 +169,7 @@ final class Album_To_Gallery_Ajax implements Decorator {
 				),
 				// See CSS note above. The Collection_Header feature only
 				// becomes active *inside* the swapped-in gallery render, so
-				// its own assets() is never called on the host page — yet
+				// its own assets() is never called on the host page - yet
 				// the Back button it emits needs collection-header.js to
 				// intercept clicks. Declaring it here means any page that
 				// can swap an album → gallery already has the Back button

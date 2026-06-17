@@ -57,7 +57,7 @@ final class Random_Sorter implements Sorter {
 	 *
 	 * Why deterministic? Because pagination + filtering rebuild the
 	 * Render_Context per request. With a non-seeded shuffle, page 2
-	 * would draw from a different random permutation than page 1 — items
+	 * would draw from a different random permutation than page 1 - items
 	 * that appeared on page 1 could reappear on page 2, and others would
 	 * never show up. The seed travels with every paginated request (set
 	 * once on the initial render, sent back by the client thereafter)
@@ -78,13 +78,13 @@ final class Random_Sorter implements Sorter {
 
 		$seed = $render_context->meta->random_seed;
 		if ( null === $seed ) {
-			// No seed inherited — fall back to a non-deterministic shuffle.
+			// No seed inherited - fall back to a non-deterministic shuffle.
 			shuffle( $shuffled );
 			return $shuffled;
 		}
 
 		// Seed once and consume mt_rand() values. mt_srand resets the
-		// global PHP Mersenne Twister state — fine here because the
+		// global PHP Mersenne Twister state - fine here because the
 		// renderer runs synchronously per request.
         // phpcs:ignore WordPress.WP.AlternativeFunctions.rand_seeding_mt_srand -- Deterministic, seed-reproducible shuffle is required so a gallery renders the same order across requests/pagination; wp_rand() is non-seedable by design.
 		mt_srand( (int) $seed );

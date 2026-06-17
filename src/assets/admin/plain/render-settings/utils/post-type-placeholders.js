@@ -10,7 +10,7 @@
  * via window.FotoGridsRenderSettings.
  *
  * Wrapped in an IIFE so the internal `const` declarations don't pollute the
- * shared script-tag global scope — every script in this folder loads as a
+ * shared script-tag global scope - every script in this folder loads as a
  * plain <script>, so a top-level `const` here would collide with the same
  * name declared in collection-settings.js.
  *
@@ -119,7 +119,7 @@
 		}
 
 		// info_block top-level strings: subtitle, message, button_label.
-		// (button_url is intentionally not substituted — it's a URL, not user-visible copy.)
+		// (button_url is intentionally not substituted - it's a URL, not user-visible copy.)
 		if (processed.subtitle) {
 			processed.subtitle = replacePostTypePlaceholders(
 				processed.subtitle,

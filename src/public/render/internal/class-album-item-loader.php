@@ -64,7 +64,7 @@ final class Album_Item_Loader {
 			$thumb = self::resolve_thumbnail( $gallery_id, $thumb_size );
 			if ( '' === $thumb['url'] ) {
 				// A gallery with no featured image and no items at all gets
-				// skipped — there is literally nothing to show for it.
+				// skipped - there is literally nothing to show for it.
 				continue;
 			}
 

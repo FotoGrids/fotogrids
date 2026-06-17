@@ -626,7 +626,7 @@ final class Lightbox implements Feature {
 	 * @param   string $default Fallback colour string.
 	 * @return  string
 	 */
-	private function safe_color( mixed $value, string $default_value ): string {
+	private function safe_color( $value, string $default_value ): string {
 		if ( ! is_string( $value ) ) {
 			return $default_value;
 		}

@@ -230,7 +230,7 @@ final class Layout_Slider implements Layout {
 
 	/**
 	 * Resolve a per-breakpoint max-height to a CSS value. Zero means
-	 * "no explicit maximum" — defer to the baseline 100vh cap so items
+	 * "no explicit maximum" - defer to the baseline 100vh cap so items
 	 * never grow taller than the viewport.
 	 *
 	 * @param array<string, mixed> $bucket
@@ -271,7 +271,7 @@ final class Layout_Slider implements Layout {
 	 * @param string $default_unit
 	 * @return string
 	 */
-	private static function resolve_unit( mixed $raw, int $fallback, string $default_unit ): string {
+	private static function resolve_unit( $raw, int $fallback, string $default_unit ): string {
 		if ( is_array( $raw ) ) {
 			$value = $raw['value'] ?? null;
 			$unit  = $raw['unit'] ?? $default_unit;

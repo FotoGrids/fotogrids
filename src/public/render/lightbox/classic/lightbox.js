@@ -331,7 +331,7 @@ function buildVimeoEmbedSrc( embedId, settings, forceAutoplay ) {
 }
 
 /**
- * Legacy collector — kept for non-paginated galleries where the DOM
+ * Legacy collector - kept for non-paginated galleries where the DOM
  * holds the complete slide deck. Returns an array of slides, in DOM
  * order. For paginated galleries the lightbox uses a sparse-cache
  * model (see FotoGridsLightbox.open) and only seeds the cache via
@@ -345,7 +345,7 @@ function collectItems( galleryEl ) {
 
 /**
  * Turn a slide dict returned by /gallery/lightbox/slides into the
- * shape the lightbox internals expect — same field names as
+ * shape the lightbox internals expect - same field names as
  * buildSlideFromTrigger.
  *
  * The triggerEl + figureEl are intentionally absent (we don't have a
@@ -387,11 +387,11 @@ function buildSlideFromApi( apiSlide ) {
  * Whether the lightbox needs to consult the lightbox-slides REST
  * endpoint for items beyond what's in the DOM. True in two cases:
  *
- *  1. The gallery is paginated (data-fg-paginated) — the visible page
+ *  1. The gallery is paginated (data-fg-paginated) - the visible page
  *     is a subset of the gallery and the lightbox must lazy-fetch the
  *     rest as the user navigates.
  *  2. The gallery uses Single Item layout with lightbox scope "gallery"
- *     (data-fg-lightbox-extended) — only one item is in the DOM but
+ *     (data-fg-lightbox-extended) - only one item is in the DOM but
  *     the user can still navigate the full gallery in the lightbox.
  *
  * Both attributes use the same downstream sparse-cache + REST flow,
@@ -608,7 +608,7 @@ const FGLB_ZOOM_MIN  = 1;     // Never zoom below 1× (fully zoomed-out)
 // below this threshold, open() bulk-fetches the entire sequence's
 // slide metadata in one request. Beyond this we fall back to
 // lookahead-only fetching around the current index. 200 items × ~500
-// bytes/slide = ~100 KB upfront — small enough to be a non-issue,
+// bytes/slide = ~100 KB upfront - small enough to be a non-issue,
 // large enough to cover virtually every real-world gallery.
 const FGLB_PRELOAD_ALL_THRESHOLD = 200;
 
@@ -895,7 +895,7 @@ class FotoGridsLightbox {
         // Native <dialog> dispatches its own 'close' event when the user
         // presses Escape (the browser handles Escape natively under
         // showModal). Without this listener, our close() method never
-        // runs on ESC — so our custom fotogrids:lightbox:close event
+        // runs on ESC - so our custom fotogrids:lightbox:close event
         // never fires, and deep-linking (which listens for it) never
         // gets the cue to clear the URL. The _closeInProgress flag
         // guards against the reentrancy that would otherwise occur
@@ -1142,7 +1142,7 @@ class FotoGridsLightbox {
     // -----------------------------------------------------------------
 
     /**
-     * Lookahead radius — how many slides on either side of the current
+     * Lookahead radius - how many slides on either side of the current
      * index to keep loaded. Sourced from the lightbox_preload_slides
      * setting (Pro Starter). Defaults to 2 if unset.
      *
@@ -1198,7 +1198,7 @@ class FotoGridsLightbox {
         while ( cursor <= end ) {
             const gap = this._findGap( cursor, end - cursor + 1 );
             if ( ! gap ) {
-                // No gap starting at cursor — advance past any filled
+                // No gap starting at cursor - advance past any filled
                 // slot.
                 cursor++;
                 continue;
@@ -1265,14 +1265,14 @@ class FotoGridsLightbox {
             .then( ( data ) => {
                 if ( ! data || ! Array.isArray( data.slides ) ) return;
 
-                // The server's `total` is authoritative — fix our
+                // The server's `total` is authoritative - fix our
                 // sparse array length if our wrapper estimate was off.
                 if ( typeof data.total === 'number' && data.total !== this._total ) {
                     if ( data.total > this._total ) {
                         // Grow the array; older indices stay null.
                         this.items.length = data.total;
                     } else {
-                        // Shrink — truncate.
+                        // Shrink - truncate.
                         this.items.length = data.total;
                     }
                     this._total = data.total;
@@ -1295,7 +1295,7 @@ class FotoGridsLightbox {
                 }
                 this._refreshChrome();
             } )
-            .catch( () => { /* silent — manual nav still works on cache miss */ } )
+            .catch( () => { /* silent - manual nav still works on cache miss */ } )
             .then( () => {
                 this._inFlightFetches.delete( key );
             } );
@@ -1306,7 +1306,7 @@ class FotoGridsLightbox {
 
     /**
      * Re-render the bits of chrome whose contents depend on the total
-     * count or the slide at the current index — counter, dots, thumbs.
+     * count or the slide at the current index - counter, dots, thumbs.
      * Called after a fetch resolves so newly-arrived data shows up.
      */
     _refreshChrome() {
@@ -1984,7 +1984,7 @@ class FotoGridsLightbox {
 
             if ( thumbSrc ) {
                 const img    = document.createElement( 'img' );
-                // Empty slot in the sparse cache — render a placeholder
+                // Empty slot in the sparse cache - render a placeholder
                 // <img> so the strip's layout stays stable. _refreshChrome
                 // re-renders the strip once fetches resolve, filling in
                 // the real thumbSrc.
@@ -1994,7 +1994,7 @@ class FotoGridsLightbox {
                 img.decoding = 'async';
                 btn.appendChild( img );
             } else if ( isVideo ) {
-                // Video with no resolvable poster — show the styled placeholder
+                // Video with no resolvable poster - show the styled placeholder
                 // instead of a broken image.
                 const ph = document.createElement( 'span' );
                 ph.className = 'fg-lb-thumb-placeholder';
@@ -2054,7 +2054,7 @@ class FotoGridsLightbox {
 
         dlg.setAttribute( 'aria-label', `Item ${index + 1} of ${this._total}` );
 
-        // Slide not yet loaded — show the lightbox spinner, update
+        // Slide not yet loaded - show the lightbox spinner, update
         // chrome to reflect the new index, and bail. Once the fetch
         // resolves and populates this.items[index], _fetchSlideRange's
         // success path re-invokes _showItem.
@@ -2410,7 +2410,7 @@ class FotoGridsLightbox {
      * Toggle the lightbox toolbar share popover.
      *
      * Visually this is the fg-tooltip element switched into interactive
-     * mode — same chrome (rounded pill, arrow), positioned above the share
+     * mode - same chrome (rounded pill, arrow), positioned above the share
      * toolbar button, but with the share grid inside instead of plain text.
      * Dismissal: click outside, Escape, or click the share button again
      * (showInteractive handles toggle for us).
@@ -2423,7 +2423,7 @@ class FotoGridsLightbox {
             return;
         }
 
-        // Smaller everything inside the tooltip — the toolbar popover should
+        // Smaller everything inside the tooltip - the toolbar popover should
         // feel proportional to the toolbar button, not the full-size view
         // page footer bar.
         const bar = this._buildLightboxShareBar( this.items[ this.index ] || {}, {
@@ -2445,7 +2445,7 @@ class FotoGridsLightbox {
         const s = this.settings;
         if ( s.infoPanel === 'never' ) return;
 
-        // No item yet (sparse slide cache still fetching) — clear and
+        // No item yet (sparse slide cache still fetching) - clear and
         // leave empty. We'll be invoked again when the slide arrives.
         if ( ! item ) {
             infoEl.innerHTML = '';
@@ -2477,7 +2477,7 @@ class FotoGridsLightbox {
             if ( blockId === 'caption' ) {
                 // Caption is immediate. Description (if enabled) fills in
                 // when REST resolves. We deliberately do NOT render a
-                // skeleton placeholder for description — when the fetch
+                // skeleton placeholder for description - when the fetch
                 // is fast, the skeleton flash reads as a layout glitch.
                 // _fillInfoBlocksFromData creates the description <p>
                 // from scratch if needed.
@@ -2523,7 +2523,7 @@ class FotoGridsLightbox {
                 continue;
 
             } else if ( restBlocks.has( blockId ) ) {
-                // REST-fetched block — render nothing until data arrives.
+                // REST-fetched block - render nothing until data arrives.
                 // The empty container stays in the DOM (with data-fg-lb-block)
                 // so _fillInfoBlocksFromData can find it by selector,
                 // but it has no visible children so users don't see a
@@ -2600,7 +2600,7 @@ class FotoGridsLightbox {
                 const captionBlockEl = infoEl.querySelector( '[data-fg-lb-block="caption"]' );
                 const desc = ( data.description || '' ).trim();
                 if ( captionBlockEl ) {
-                    // Merged path — caption block already in DOM (has a
+                    // Merged path - caption block already in DOM (has a
                     // caption); append the description <p> to it when
                     // there's a description, otherwise leave the block
                     // alone (caption-only is fine).
@@ -2614,7 +2614,7 @@ class FotoGridsLightbox {
                         target.textContent = desc;
                     }
                 } else {
-                    // Standalone path — no caption block exists. We
+                    // Standalone path - no caption block exists. We
                     // never pre-render an empty description placeholder
                     // any more (avoid skeleton flash), so if description
                     // arrives, create the block fresh and append.

@@ -1,8 +1,0 @@
-[data-fg-hover="shadow-lift"] .fg-item-media {
-    transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-[data-fg-hover="shadow-lift"] .fg-item:hover .fg-item-media {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
-}

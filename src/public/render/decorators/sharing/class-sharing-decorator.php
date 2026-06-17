@@ -49,7 +49,7 @@ final class Sharing_Decorator implements Decorator {
 	 * Opts out of album-as-collection renders. The item-level share
 	 * placements (thumbnail, lightbox) don't apply to album thumbnails
 	 * (which navigate into a gallery, not into a lightbox), and the
-	 * view_footer placement is rendered by the View Page shell — not by
+	 * view_footer placement is rendered by the View Page shell - not by
 	 * the gallery wrapper inside it.
 	 *
 	 * @since 1.0.0
@@ -134,7 +134,7 @@ final class Sharing_Decorator implements Decorator {
 					array(),
 					true,
 				),
-				// deep-linking only makes sense when sharing is active —
+				// deep-linking only makes sense when sharing is active -
 				// it interprets ?fg-item / #fg-<g>-<i> URLs that come
 				// from shared links. The View Page enqueues it directly
 				// because those URLs arrive there even with sharing off.

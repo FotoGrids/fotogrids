@@ -83,7 +83,7 @@ final class Stats implements Feature {
 	 * Writes the per-collection stats config onto the wrapper element.
 	 *
 	 * Includes the explicit object_type/object_id so the JS doesn't have
-	 * to figure out whether this is an album or a gallery — it just reads
+	 * to figure out whether this is an album or a gallery - it just reads
 	 * the values and POSTs them. The object_id is the *album's* post ID
 	 * on album renders, the gallery's post ID on gallery renders.
 	 *
@@ -111,7 +111,7 @@ final class Stats implements Feature {
 	}
 
 	/**
-	 * Stats client JS — fires view and share pings to the REST API.
+	 * Stats client JS - fires view and share pings to the REST API.
 	 *
 	 * @since 1.0.0
 	 * @param Render_Context $render_context Render context.

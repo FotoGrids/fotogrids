@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * per-render CSS/JS during `Render_Controller::render()`, so callers
  * that emit HTML inline get their styles automatically (gated by the
  * `Filters_Render::SHOULD_INLINE_ASSETS` filter for editor contexts).
- * Callers that need the asset map serialised — i.e. the REST handler —
+ * Callers that need the asset map serialised - i.e. the REST handler -
  * call `Asset_Resolver::instance()->get_*` themselves.
  *
  * @since 1.0.0
@@ -146,7 +146,7 @@ final class Preview_Renderer {
 	 * settings markers merged in.
 	 *
 	 * Mirrors {@see \FotoGrids\Modules\PageBuilders\REST\Preview_Data::flip_to_preview_context}
-	 * — duplicated rather than imported because that class lives behind
+	 * - duplicated rather than imported because that class lives behind
 	 * the REST autoload boundary and we want this renderer usable from
 	 * `init`-time widget code that runs before REST is bootstrapped.
 	 *
@@ -224,7 +224,7 @@ final class Preview_Renderer {
 			);
 		}
 
-		// Inline, scoped styles — keeps the empty-state self-contained so
+		// Inline, scoped styles - keeps the empty-state self-contained so
 		// it works in the page-builder preview iframe (which doesn't
 		// enqueue the editor stylesheet) and in any future host. Browsers
 		// dedupe duplicate <style> blocks effectively; the cost is

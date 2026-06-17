@@ -1,7 +1,7 @@
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
 /**
- * Image picker — stores an attachment ID, opens wp.media to choose, and
+ * Image picker - stores an attachment ID, opens wp.media to choose, and
  * shows a thumbnail preview of the current selection.
  *
  * Setting shape:

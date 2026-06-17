@@ -40,14 +40,14 @@ const TELEMETRY_PERMISSIONS = [
 ];
 
 /**
- * Step 1 — Welcome.
+ * Step 1 - Welcome.
  *
  * Front door for the wizard. Sets the tone, captures the anonymous-stats
  * opt-in inline, and owns its own primary / secondary buttons (Start
  * Setup / Skip for Now). The shared shell footer is hidden on this step;
  * the buttons here drive forward / close.
  *
- * The opt-in toggle saves immediately on flip — it writes the
+ * The opt-in toggle saves immediately on flip - it writes the
  * fotogrids_share_statistics option and mirrors the choice to Freemius's
  * tracking opt-in/out. Reading the current value from
  * window.fotogridsAdmin.shareStatistics on mount keeps the wizard in
@@ -69,7 +69,7 @@ const StepWelcome = ( { onStart, onSkip } ) => {
     const [ showInfo, setShowInfo ] = useState( false );
 
     const handleTelemetryToggle = ( next ) => {
-        // Optimistic flip — the request is fire-and-forget. If the save
+        // Optimistic flip - the request is fire-and-forget. If the save
         // is refused we log a warning but don't roll the UI back; the
         // user's last interaction is the source of truth.
         setOptedIn( next );

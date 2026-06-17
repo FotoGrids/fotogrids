@@ -23,17 +23,17 @@ if ( ! defined( 'WPINC' ) ) {
  * and the lightbox slide builder all share one representation.
  *
  * Post fields:
- *   post_title    — caption
- *   post_type     — fotogrids_embed
- *   _thumbnail_id — custom poster attachment (WP-native)
+ *   post_title    - caption
+ *   post_type     - fotogrids_embed
+ *   _thumbnail_id - custom poster attachment (WP-native)
  *
  * Post meta:
- *   fotogrids_embed_item_type     — video_youtube | video_vimeo
- *   fotogrids_embed_video_id      — platform video ID
- *   fotogrids_embed_url           — full embed URL
- *   fotogrids_embed_thumbnail_url — resolved oEmbed thumbnail
- *   fotogrids_embed_poster_url    — custom poster URL (when no poster_id)
- *   fotogrids_embed_settings      — JSON playback settings
+ *   fotogrids_embed_item_type     - video_youtube | video_vimeo
+ *   fotogrids_embed_video_id      - platform video ID
+ *   fotogrids_embed_url           - full embed URL
+ *   fotogrids_embed_thumbnail_url - resolved oEmbed thumbnail
+ *   fotogrids_embed_poster_url    - custom poster URL (when no poster_id)
+ *   fotogrids_embed_settings      - JSON playback settings
  *
  * @since 1.1.0
  */

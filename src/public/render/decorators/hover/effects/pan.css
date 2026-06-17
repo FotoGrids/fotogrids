@@ -1,0 +1,12 @@
+/* Ken Burns: slow zoom and diagonal drift on the image, with a longer duration
+   than the base scaffold for the cinematic timing. */
+
+.fotogrids-collection[data-fg-hover='pan'] .fg-item-media img {
+	transition-property: opacity, transform !important;
+	transition-duration: 0.35s, 2s !important;
+	transform-origin: center center;
+}
+
+.fotogrids-collection[data-fg-hover='pan'] .fg-item:hover .fg-item-media img {
+	transform: scale(1.12) translate(-3%, -3%);
+}

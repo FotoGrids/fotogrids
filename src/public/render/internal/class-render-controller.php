@@ -152,7 +152,7 @@ final class Render_Controller {
 			// Partial 'items_only' short-circuit. Used by the REST
 			// /gallery/render endpoint for pagination requests where the
 			// client only needs the new items to append/replace into an
-			// existing gallery wrapper — no wrapper, no chrome, no
+			// existing gallery wrapper - no wrapper, no chrome, no
 			// sidecars, no <style> block. The collected CSS asset URLs are
 			// still returned via Asset_Resolver so the client can inject
 			// any missing stylesheets, mirroring the album-AJAX flow.

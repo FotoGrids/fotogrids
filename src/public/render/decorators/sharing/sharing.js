@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Sharing
+ * FotoGrids - Sharing
  *
  * Owns:
  *   • the per-thumbnail share bar (when 'thumbnail' placement is active)
@@ -20,7 +20,7 @@
  *   window.FotoGrids.modules.sharing.renderShareBar(config, context)
  *   window.FotoGridsSharing.renderShareBar(config, context)    // legacy
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -164,7 +164,7 @@
      * Copy a string to the clipboard. Returns a Promise that resolves to
      * true on success, false on failure.
      *
-     * Tries the modern Clipboard API first — it's the only path that
+     * Tries the modern Clipboard API first - it's the only path that
      * works in cross-origin iframes and is the future-proof option. But
      * the modern API requires a secure context (HTTPS or localhost); on
      * a plain HTTP dev environment `navigator.clipboard` is undefined.
@@ -179,7 +179,7 @@
      * @returns {Promise<boolean>}
      */
     function copyToClipboard( text ) {
-        // Modern path — only present in secure contexts.
+        // Modern path - only present in secure contexts.
         if ( navigator.clipboard && typeof navigator.clipboard.writeText === 'function' ) {
             return navigator.clipboard.writeText( text )
                 .then( function () { return true; } )
@@ -234,7 +234,7 @@
         // Preserve focus and selection so we can restore them after the copy.
         // execCommand('copy') reads from window.getSelection(), so we focus
         // the textarea, select its contents, copy, then restore. The focus
-        // restoration is critical — without it the share button's blur
+        // restoration is critical - without it the share button's blur
         // handler fires and hides its tooltip just after the click.
         const previouslyFocused = document.activeElement;
         const previousSelection = document.getSelection
@@ -335,7 +335,7 @@
      * context. Reused by the lightbox toolbar, the thumbnail decorator
      * and the view-page footer.
      *
-     * @param {Object} config             Resolved sharing — { networks, button_style, button_size }.
+     * @param {Object} config             Resolved sharing - { networks, button_style, button_size }.
      * @param {Object} context            { id, fullUrl, caption, galleryId, galleryEl }.
      * @param {Object} [options]          Optional layout overrides.
      * @param {string} [options.layout]   'grid' | 'row'. 'grid' adds a 2-column grid
@@ -430,7 +430,7 @@
                     // Tooltip feedback depends on whether the copy
                     // actually landed in the clipboard. We default to
                     // the failure message and flip to success on
-                    // resolution — that way a stuck/unresolved Promise
+                    // resolution - that way a stuck/unresolved Promise
                     // doesn't lie to the user.
                     const successLabel = __( 'Link copied' );
                     const failureLabel = __( 'Copy failed' );
@@ -438,7 +438,7 @@
 
                     const showFeedback = function ( label, kind ) {
                         // FgTooltip.refresh() reads aria-label first, then
-                        // title. Update both — without aria-label being
+                        // title. Update both - without aria-label being
                         // up-to-date, refresh() shows the stale label and
                         // the next mouseenter snaps back too.
                         btn.dataset.fgTooltip = label;
@@ -458,7 +458,7 @@
                         } else if ( kind === 'failure' ) {
                             btn.classList.add( 'fotogrids-share-bar__btn--copy-failed' );
                         }
-                        // Note: don't call .bind() again — each bind()
+                        // Note: don't call .bind() again - each bind()
                         // adds a fresh set of event listeners on the
                         // same host, leaking handlers across clicks.
                     };

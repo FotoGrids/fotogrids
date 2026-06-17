@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Pagination: load-more.
+ * FotoGrids - Pagination: load-more.
  *
  * Subscribes to FotoGrids.onGallery. For each gallery whose
  * data-fg-pagination-method === 'load_more', it:
@@ -10,7 +10,7 @@
  *   3. Hides the button when hasMore becomes false (via the
  *      .fg-pagination--exhausted class).
  *
- * No imports — standalone vanilla JS compiled by webpack as an entry.
+ * No imports - standalone vanilla JS compiled by webpack as an entry.
  */
 
 ( function () {

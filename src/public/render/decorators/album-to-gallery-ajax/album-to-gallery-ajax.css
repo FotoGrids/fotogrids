@@ -1,5 +1,5 @@
 /*
- * FotoGrids — Album → Gallery (AJAX swap) loading state.
+ * FotoGrids - Album → Gallery (AJAX swap) loading state.
  *
  * While the AJAX fetch is in flight, the album wrapper carries
  * .fotogrids-album--is-loading. Fading and disabling pointer events

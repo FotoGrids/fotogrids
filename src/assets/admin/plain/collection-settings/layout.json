@@ -473,7 +473,7 @@
                                                 },
                                                 "hover": {
                                                     "id": "hover",
-                                                    "label": "Mouseover",
+                                                    "label": "Hover",
                                                     "icon": "hover",
                                                     "settings": [
                                                         {
@@ -753,7 +753,7 @@
                 {
                     "key": "instant_photo_hover_action",
                     "type": "button_group",
-                    "label": "Action on Mouseover",
+                    "label": "Action on Hover",
                     "description": "How each item reacts when the visitor hovers over it.",
                     "options": [
                         {
@@ -829,7 +829,7 @@
                         {
                             "key": "instant_photo_sticker_hide_on_hover",
                             "type": "toggle",
-                            "label": "Hide on Mouseover",
+                            "label": "Hide on Hover",
                             "description": "Fade the sticker out when the visitor hovers over the item.",
                             "default": false,
                             "condition": {

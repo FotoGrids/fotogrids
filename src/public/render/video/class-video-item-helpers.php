@@ -80,7 +80,7 @@ final class Video_Item_Helpers {
 	 * Resolve the item_type for a Media Library attachment from its mime type.
 	 *
 	 * Returns TYPE_FILE for video/* attachments, otherwise 'image'. Embed
-	 * items never pass through here — their item_type is stored explicitly.
+	 * items never pass through here - their item_type is stored explicitly.
 	 *
 	 * @since 1.1.0
 	 * @param int $attachment_id The attachment post ID.
@@ -114,7 +114,7 @@ final class Video_Item_Helpers {
 	 *
 	 * Uses the privacy-enhanced host (youtube-nocookie / player.vimeo) when
 	 * privacy_mode is set. Player query parameters are derived from the
-	 * per-item embed settings. The returned URL is not yet escaped — callers
+	 * per-item embed settings. The returned URL is not yet escaped - callers
 	 * escape on output.
 	 *
 	 * @since 1.1.0

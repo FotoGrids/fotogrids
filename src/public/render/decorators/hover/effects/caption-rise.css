@@ -1,0 +1,68 @@
+/* Caption slides into place and fades in. For top/bottom placements the whole
+   caption block rises into its spot. For overlay placement the tinted
+   background only fades (its edge never visibly moves) while the content carries
+   the vertical motion. Top-anchored overlays descend instead so the motion
+   reads right. */
+
+.fotogrids-collection[data-fg-hover='caption-rise'] .fg-item {
+	overflow: hidden;
+}
+
+/* Top / bottom: move the whole caption block. */
+.fotogrids-collection[data-fg-hover='caption-rise']:not(
+		[data-fg-caption='overlay']
+	)
+	.fg-caption {
+	opacity: 0;
+	transform: translateY(var(--fg-hover-caption-shift));
+	transition-property: opacity, transform;
+}
+
+.fotogrids-collection[data-fg-hover='caption-rise']:not(
+		[data-fg-caption='overlay']
+	)
+	.fg-item:hover
+	.fg-caption {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='top']
+	.fg-caption {
+	transform: translateY(calc(var(--fg-hover-caption-shift) * -1));
+}
+
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='top']
+	.fg-item:hover
+	.fg-caption {
+	transform: translateY(0);
+}
+
+/* Overlay: fade the background, move the content. */
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='overlay']
+	.fg-caption-bg {
+	opacity: 0;
+	transition-property: opacity;
+}
+
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='overlay']
+	.fg-caption-content {
+	opacity: 0;
+	transform: translateY(var(--fg-hover-caption-shift));
+	transition-property: opacity, transform;
+}
+
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-bg,
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+}
+
+.fotogrids-collection[data-fg-hover='caption-rise'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-content {
+	transform: translateY(0);
+}

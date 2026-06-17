@@ -1,0 +1,10 @@
+.fotogrids-collection[data-fg-hover='duotone'] .fg-item-media img {
+	filter: grayscale(1) contrast(1.1) sepia(0.4) hue-rotate(160deg);
+	transition: filter 0.3s ease;
+}
+.fotogrids-collection[data-fg-hover='duotone']
+	.fg-item:hover
+	.fg-item-media
+	img {
+	filter: none;
+}

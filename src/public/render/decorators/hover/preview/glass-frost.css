@@ -1,0 +1,62 @@
+/* A frosted-glass pane slides up and its blur deepens as it settles, with a
+   bright top edge to read as a real sheet of glass.
+   - Overlay caption: the glass is the caption's own content layer (over media).
+   - Top/bottom caption: the caption sits outside the media, so the glass is a
+     pane laid over the media via a pseudo-element. */
+
+.fotogrids-collection[data-fg-hover='glass-frost'] .fg-item-media {
+	position: relative;
+	overflow: hidden;
+}
+
+/* Overlay placement: frost the caption content (it already covers the media). */
+.fotogrids-collection[data-fg-hover='glass-frost'][data-fg-caption='overlay']
+	.fg-caption-content {
+	background: rgba(255, 255, 255, 0.12);
+	backdrop-filter: blur(0);
+	border-top: 1px solid rgba(255, 255, 255, 0.5);
+	transform: translateY(40%);
+	opacity: 0;
+	transition:
+		transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.3s ease,
+		backdrop-filter 0.4s ease;
+}
+
+.fotogrids-collection[data-fg-hover='glass-frost'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+	transform: translateY(0);
+	backdrop-filter: blur(8px) saturate(1.2);
+}
+
+/* Top/bottom placement: lay a frosted pane over the media itself. */
+.fotogrids-collection[data-fg-hover='glass-frost']:not(
+		[data-fg-caption='overlay']
+	)
+	.fg-item-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.12);
+	backdrop-filter: blur(0);
+	border-top: 1px solid rgba(255, 255, 255, 0.5);
+	transform: translateY(40%);
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.3s ease,
+		backdrop-filter 0.4s ease;
+}
+
+.fotogrids-collection[data-fg-hover='glass-frost']:not(
+		[data-fg-caption='overlay']
+	)
+	.fg-item:hover
+	.fg-item-media::after {
+	opacity: 1;
+	transform: translateY(0);
+	backdrop-filter: blur(8px) saturate(1.2);
+}

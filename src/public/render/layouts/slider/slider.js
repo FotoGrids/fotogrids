@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Slider Layout
+ * FotoGrids - Slider Layout
  *
  * Horizontal scroll-snap slider. CSS owns layout (track flex + per-item
  * scroll-snap-align). JS owns chrome (arrows, bullets, counter,
@@ -77,7 +77,7 @@ function readItemsPerView( collectionEl ) {
 
 /**
  * Compute the page count. With items per view N and total T, the slider
- * has ceil(T / N) pages — each next() advances by one viewport-width.
+ * has ceil(T / N) pages - each next() advances by one viewport-width.
  */
 function pageCount( total, itemsPerView ) {
     if ( total <= 0 || itemsPerView <= 0 ) return 0;
@@ -148,7 +148,7 @@ function setup( collectionEl ) {
             settings.transitionDurationCustom
         );
 
-    /* Mutable state — chrome rebuilds replace these. */
+    /* Mutable state - chrome rebuilds replace these. */
     let items       = visibleItems( trackEl );
     let total       = 0;
     let indexState  = null;
@@ -271,7 +271,7 @@ function setup( collectionEl ) {
         }, 16 );
     }, { passive: true } );
 
-    /* Keyboard nav — attached once; reads current indexState dynamically. */
+    /* Keyboard nav - attached once; reads current indexState dynamically. */
 
     collectionEl.setAttribute( 'tabindex', '0' );
     createKeyboardNav( collectionEl, {
@@ -295,7 +295,7 @@ function setup( collectionEl ) {
 
     revealAllItems( trackEl );
 
-    /* Resize — items per view may change at breakpoint. */
+    /* Resize - items per view may change at breakpoint. */
 
     let resizeTimer = 0;
     let lastItemsPerView = readItemsPerView( collectionEl );
@@ -320,7 +320,7 @@ function setup( collectionEl ) {
         window.addEventListener( 'resize', onResize );
     }
 
-    /* Filter changes — rebuild chrome against the new visible-items set. */
+    /* Filter changes - rebuild chrome against the new visible-items set. */
 
     collectionEl.addEventListener( 'fotogrids:filters_changed', () => {
         buildChrome();

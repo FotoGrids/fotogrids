@@ -1,0 +1,32 @@
+/* Media zoom. With an overlay caption the whole item scales so the caption
+   stays pinned to the image; otherwise only the media scales. */
+
+.fotogrids-collection[data-fg-hover='zoom'] .fg-item-media {
+	transition-property: transform;
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='zoom'] .fg-item:hover {
+	z-index: 1;
+}
+
+.fotogrids-collection[data-fg-hover='zoom'] .fg-item:hover .fg-item-media {
+	transform: scale(var(--fg-hover-zoom-scale));
+}
+
+.fotogrids-collection[data-fg-hover='zoom'][data-fg-caption='overlay']
+	.fg-item {
+	transition-property: transform;
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='zoom'][data-fg-caption='overlay']
+	.fg-item:hover {
+	transform: scale(var(--fg-hover-zoom-scale));
+}
+
+.fotogrids-collection[data-fg-hover='zoom'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-item-media {
+	transform: none;
+}

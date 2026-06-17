@@ -1,0 +1,47 @@
+/* Combo: the item zooms while the caption rises in. The overlay darken is
+   supplied by the caption overlay hover-opacity setting, so this effect only
+   drives the zoom and the caption reveal. Falls back to a plain media zoom when
+   there is no caption. */
+
+.fotogrids-collection[data-fg-hover='spotlight'] .fg-item-media {
+	transition-property: transform;
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='spotlight'] .fg-item:hover .fg-item-media {
+	transform: scale(var(--fg-hover-zoom-scale-soft));
+}
+
+.fotogrids-collection[data-fg-hover='spotlight'][data-fg-caption='overlay']
+	.fg-item {
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='spotlight'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-item-media {
+	transform: scale(var(--fg-hover-zoom-scale));
+}
+
+.fotogrids-collection[data-fg-hover='spotlight'] .fg-caption-title,
+.fotogrids-collection[data-fg-hover='spotlight'] .fg-caption-description {
+	opacity: 0;
+	transform: translateY(var(--fg-hover-caption-shift));
+	transition-property: opacity, transform;
+	transition-duration: var(--fg-hover-duration);
+	transition-timing-function: var(--fg-hover-ease);
+}
+
+.fotogrids-collection[data-fg-hover='spotlight'] .fg-caption-description {
+	transition-delay: 60ms;
+}
+
+.fotogrids-collection[data-fg-hover='spotlight']
+	.fg-item:hover
+	.fg-caption-title,
+.fotogrids-collection[data-fg-hover='spotlight']
+	.fg-item:hover
+	.fg-caption-description {
+	opacity: 1;
+	transform: translateY(0);
+}

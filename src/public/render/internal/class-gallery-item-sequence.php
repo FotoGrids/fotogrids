@@ -23,13 +23,13 @@ if ( ! defined( 'WPINC' ) ) {
  * Both Context_Builder (which feeds the visible grid render) and
  * Lightbox_Slides_Data (which feeds the lightbox slide cache) route
  * through this so the sequence the user clicks in the grid matches the
- * sequence they navigate in the lightbox — exactly.
+ * sequence they navigate in the lightbox - exactly.
  *
  * The sequence is the ordered list of attachment IDs after:
  *   1. Sorter applied (Random, Date, Title, Filename, Manual, Pro sorters).
  *   2. Server-side filters applied (Tags, People, Location, Pro sources).
  *
- * Pagination slicing is NOT applied here — callers slice the result
+ * Pagination slicing is NOT applied here - callers slice the result
  * themselves with whatever (offset, limit) they need.
  *
  * @package FotoGrids\Render\Internal
@@ -72,7 +72,7 @@ final class Gallery_Item_Sequence {
 	}
 
 	/**
-	 * Returns the count of the filtered+sorted sequence — the number of
+	 * Returns the count of the filtered+sorted sequence - the number of
 	 * items the lightbox should advertise as `total`, and the count
 	 * `/gallery/render` reports as `total_pages * page_size`-roof.
 	 *
@@ -118,7 +118,7 @@ final class Gallery_Item_Sequence {
 	/**
 	 * Builds a Render_Context shell suitable for sorter + filter_source
 	 * supports() / sort() / matches() calls. Items are stub Item_Views with
-	 * only the id field populated — none of the predicates we run need
+	 * only the id field populated - none of the predicates we run need
 	 * image URLs or captions.
 	 *
 	 * @param array<int, int>                    $ids

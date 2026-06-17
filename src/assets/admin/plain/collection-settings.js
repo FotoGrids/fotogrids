@@ -54,6 +54,12 @@ const withLegacyFreeFlag = config => {
 	};
 };
 
+// Grid pickers expose every tier as a selectable option, each with its own
+// per-option state. Their field-level state must come from the field's own
+// tier, not the selected option's - otherwise picking a Pro option would gate
+// the entire control. Per-option gating still happens on each card.
+const FIELD_LEVEL_OWN_STATE_TYPES = ['hover_effects_grid', 'layout_grid'];
+
 const resolveFieldStateValue = (
 	setting,
 	currentValue,
@@ -64,8 +70,13 @@ const resolveFieldStateValue = (
 		return FIELD_STATE.EDITABLE;
 	}
 
+	const usesOwnFieldState = FIELD_LEVEL_OWN_STATE_TYPES.includes(
+		setting.type,
+	);
+
 	const optionStateKey = `${setting.key}.${currentValue}`;
 	if (
+		!usesOwnFieldState &&
 		typeof currentValue === 'string' &&
 		fieldStatesByOption &&
 		fieldStatesByOption[optionStateKey]
@@ -2203,7 +2214,7 @@ function CollectionSettings() {
 						// suggest); the unselected option gets the persuasive
 						// copy describing what flipping the control will do.
 						// No need to dynamically refresh the tooltip text on
-						// mode change — the active button is unmounted by
+						// mode change - the active button is unmounted by
 						// React and the newly-inactive one is freshly bound on
 						// the next FgTooltip.init() pass.
 						h(
@@ -2245,7 +2256,7 @@ function CollectionSettings() {
 										// time, and there's no public `unbind()`.
 										// Without a remount the previously-bound (now-
 										// active) button keeps showing its old tooltip
-										// — even after we strip the data-attributes,
+										// - even after we strip the data-attributes,
 										// because the listeners and the captured
 										// closure still reference the original copy.
 										// Forcing a remount drops the old listeners
@@ -2903,7 +2914,7 @@ function ReadonlyNotice() {
 		'div',
 		{ className: 'fotogrids-readonly-notice', role: 'note' },
 		h('strong', null, 'Read-only'),
-		h('span', null, ' — ' + notice),
+		h('span', null, ' - ' + notice),
 	);
 }
 

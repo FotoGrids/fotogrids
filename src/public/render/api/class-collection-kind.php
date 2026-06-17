@@ -10,10 +10,10 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Identifies what kind of collection is being rendered.
  *
- * GALLERY — a normal gallery of attachments. The default; every render
+ * GALLERY - a normal gallery of attachments. The default; every render
  * before the album refactor was implicitly this.
  *
- * ALBUM — an album rendering its child galleries as items. The "items"
+ * ALBUM - an album rendering its child galleries as items. The "items"
  * in the render context are gallery summaries, not attachments. The
  * same Grid / Justified / Masonry layouts apply; the same Captions /
  * Border / Shadow / Hover decorators apply. Click-behaviour decorators

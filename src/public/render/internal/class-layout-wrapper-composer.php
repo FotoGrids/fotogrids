@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * layout module contributes its own wrapper_data_attrs / style_vars,
  * and merges the composer's output on top. That puts layout-supplied
  * values FIRST (so an unusual layout can pre-set its own --fg-cols and
- * the composer's merge will overwrite it — last-write wins) and
+ * the composer's merge will overwrite it - last-write wins) and
  * composer-supplied values SECOND.
  *
  * Capability-driven: each adapter only runs when the active layout
@@ -365,7 +365,7 @@ final class Layout_Wrapper_Composer {
 		Shared helpers
 		===================================================================== */
 
-	private static function to_unit_value( mixed $raw_value, string $default_unit ): string {
+	private static function to_unit_value( $raw_value, string $default_unit ): string {
 		if ( null === $raw_value || '' === $raw_value ) {
 			return '';
 		}

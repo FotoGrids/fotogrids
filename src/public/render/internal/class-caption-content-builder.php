@@ -109,7 +109,7 @@ final class Caption_Content_Builder {
 	 * @param  string $default Fallback when value is absent or unrecognised.
 	 * @return string
 	 */
-	private function scalar_source( mixed $raw, string $default_value ): string {
+	private function scalar_source( $raw, string $default_value ): string {
 		if ( is_array( $raw ) ) {
 			$raw = $raw[0] ?? null;
 		}
@@ -129,7 +129,7 @@ final class Caption_Content_Builder {
 	 * @param  mixed $raw Raw setting value.
 	 * @return string
 	 */
-	private function scalar_limit( mixed $raw ): string {
+	private function scalar_limit( $raw ): string {
 		if ( is_array( $raw ) ) {
 			$raw = $raw[0] ?? null;
 		}
@@ -151,7 +151,7 @@ final class Caption_Content_Builder {
 	 * @param  int   $default Fallback when value is absent.
 	 * @return int
 	 */
-	private function responsive_int( mixed $raw, int $default_value ): int {
+	private function responsive_int( $raw, int $default_value ): int {
 		if ( is_array( $raw ) ) {
 			$raw = $raw['desktop'] ?? ( reset( $raw ) ?: null );
 		}

@@ -49,12 +49,12 @@
     // Arrow.
     // CSS-triangle-via-borders: a zero-size box with three transparent
     // borders and one coloured border. No rotated square, so the arrow has
-    // no overlap with the tooltip body — which means transparent --fg-tt-bg
+    // no overlap with the tooltip body - which means transparent --fg-tt-bg
     // values render cleanly instead of doubling up where the square meets
     // the tooltip.
     //
     // Direction is set by JS via data-dir on the tooltip element (see
-    // fg-tooltip.js position()). Default direction is "above" — the
+    // fg-tooltip.js position()). Default direction is "above" - the
     // tooltip sits above the host, arrow drops down from the bottom.
     // Arrow position along the cross-axis. JS sets --fg-tt-arrow-x (for
     // above/below) or --fg-tt-arrow-y (for left/right) in pixels measured
@@ -133,7 +133,7 @@
         user-select:    auto;
         white-space:    normal;
         padding:        8px;
-        // Don't animate via translate — interactive popovers feel
+        // Don't animate via translate - interactive popovers feel
         // jittery if they slide in. Just opacity-fade.
         transform:      none !important;
     }
@@ -176,7 +176,7 @@
 .fg-f-tooltip.fg-f-tooltip--swapping {
     // textContent is what's currently inside (the "Sharing" label).
     // Plain text doesn't have a wrapper, so it fades via the parent's
-    // color transition — visually equivalent.
+    // color transition - visually equivalent.
     color: transparent;
     transition:
         color      var(--fg-tt-duration) ease,

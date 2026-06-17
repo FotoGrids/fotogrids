@@ -113,7 +113,7 @@ final class Layout_Masonry implements Layout {
 	 * Masonry stacks items at a fixed column width with variable heights, so
 	 * it requires the proportional fotogrids_masonry derivative. A cropped
 	 * or square user-picked size would flatten the column rhythm and defeat
-	 * the layout — the preference is mandatory.
+	 * the layout - the preference is mandatory.
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.

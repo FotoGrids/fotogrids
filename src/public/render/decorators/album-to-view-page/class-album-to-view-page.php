@@ -65,7 +65,7 @@ final class Album_To_View_Page implements Decorator {
 	/**
 	 * Wrap each item's figure (media + caption) in an <a> linking to the
 	 * child gallery's permalink. The gallery's View Page is just its
-	 * permalink — the ViewCollections module flips fotogrids_gallery to
+	 * permalink - the ViewCollections module flips fotogrids_gallery to
 	 * publicly_queryable on init.
 	 *
 	 * @since 1.0.0
@@ -130,7 +130,7 @@ final class Album_To_View_Page implements Decorator {
 	}
 
 	public function assets( Render_Context $render_context ): Module_Assets {
-		// No JS — the <a> navigates natively. CSS rules for albums live in
+		// No JS - the <a> navigates natively. CSS rules for albums live in
 		// the layout/decorator stylesheets already loaded for the gallery
 		// class.
 		return new Module_Assets();

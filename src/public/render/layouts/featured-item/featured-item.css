@@ -1,4 +1,4 @@
-/* Featured Item (Airbnb-style) — one big featured image beside a compact
+/* Featured Item (Airbnb-style) - one big featured image beside a compact
    grid of items. No navigation: every tile is a normal decorated item that
    runs the gallery's click behaviour. An auto "Show all" button overlays
    the whole layout when there are more items than fit inline.
@@ -76,7 +76,7 @@
     grid-template-columns: repeat( var( --fg-featured-grid-cols ), minmax( 0, 1fr ) );
     /* minmax(0, 1fr) rows: their min-content contribution is 0, so the grid
        never reports an intrinsic height taller than the featured column.
-       That makes the FEATURED image the row-height authority — the grid
+       That makes the FEATURED image the row-height authority - the grid
        stretches to match it (align-items:stretch on the container) and
        divides that height across its rows, rather than the grid's own
        content dictating the layout height. */
@@ -121,7 +121,7 @@
     }
 }
 
-/* Show all button — overlays the whole layout in a chosen corner.
+/* Show all button - overlays the whole layout in a chosen corner.
    Styling is driven by CSS vars the layout stamps on the wrapper. */
 
 [data-fg-layout="featured-item"] .fg-featured-show-all {
@@ -179,7 +179,7 @@
     right: var( --fg-show-all-offset );
 }
 
-/* Mobile — stack featured on top, grid below, full width. Applies for
+/* Mobile - stack featured on top, grid below, full width. Applies for
    both side values. */
 
 @media ( max-width: 600px ) {

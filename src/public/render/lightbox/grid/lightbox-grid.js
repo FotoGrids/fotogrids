@@ -1,5 +1,5 @@
 /**
- * FotoGrids — LightboxGrid
+ * FotoGrids - LightboxGrid
  *
  * A "show all" overlay distinct from the classic Lightbox slideshow: a
  * scrollable, Airbnb-style grid of every item (one full-width image, then
@@ -104,11 +104,11 @@ function slideFromItem( it ) {
  * Open the LightboxGrid overlay.
  *
  * @param {object} config
- *   items      — array of { id, full, thumb, alt, title, caption, video }.
- *   galleryEl  — the originating gallery wrapper (for colour vars + click replay).
- *   clickMode  — the gallery's click behaviour ('lightbox' | 'direct' | ...).
- *   sharing    — parsed data-fg-sharing payload or null.
- *   label      — accessible dialog label.
+ *   items      - array of { id, full, thumb, alt, title, caption, video }.
+ *   galleryEl  - the originating gallery wrapper (for colour vars + click replay).
+ *   clickMode  - the gallery's click behaviour ('lightbox' | 'direct' | ...).
+ *   sharing    - parsed data-fg-sharing payload or null.
+ *   label      - accessible dialog label.
  */
 function open( config ) {
     const items = Array.isArray( config.items ) ? config.items : [];
@@ -171,7 +171,7 @@ function open( config ) {
             const bar = sharingMod.renderShareBar(
                 config.sharing,
                 {
-                    // No single item context — share the gallery's page URL.
+                    // No single item context - share the gallery's page URL.
                     id:        '',
                     fullUrl:   window.location.href,
                     caption:   '',

@@ -4,7 +4,7 @@ import Icon from '../shared/Icon';
 const { __ } = wp.i18n;
 
 /**
- * Step 2 — "What best describes you?"
+ * Step 2 - "What best describes you?"
  *
  * Six persona cards, exactly one selectable at a time. Required: the
  * shell disables Continue until `picked` is non-null. State is owned by

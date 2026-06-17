@@ -1,7 +1,0 @@
-[data-fg-hover="slide-up"] .fg-item-media {
-    transition: transform 220ms ease;
-}
-
-[data-fg-hover="slide-up"] .fg-item:hover .fg-item-media {
-    transform: translateY(-6px);
-}

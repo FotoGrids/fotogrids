@@ -42,7 +42,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		// _linked is a UI-only flag held in React state; it's never persisted.
 		// On first render after a reload, currentValue._linked is undefined, so we
 		// derive linked-state from the data: if any device has unequal sides,
-		// the user must have unlinked at some point — show as unlinked.
+		// the user must have unlinked at some point - show as unlinked.
 		const sideValueFor = (deviceValue, side) => {
 			if (!deviceValue || typeof deviceValue !== 'object')
 				return undefined;

@@ -98,10 +98,10 @@ final class Shadow implements Decorator {
 	 * @return string          CSS box-shadow value.
 	 */
 	private function build_shadow(
-		mixed $offset_x,
-		mixed $offset_y,
-		mixed $blur,
-		mixed $spread,
+		$offset_x,
+		$offset_y,
+		$blur,
+		$spread,
 		string $color,
 		string $bp
 	): string {

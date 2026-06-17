@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Hydrates an attachment ID into a slide dict for the lightbox.
  *
- * The lightbox runs in pure JS once the slide data is in hand — no
+ * The lightbox runs in pure JS once the slide data is in hand - no
  * server round-trip per pane. This class is the single place where an
  * attachment's WP metadata + FotoGrids item meta + EXIF + tag joins
  * resolve into the flat dict the lightbox JS expects.
@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  *     navigate-into-uncached-range).
  *
  * Future Pro hooks may add more fields (people, location, GPS) by
- * extending the returned array via a filter — but Free defines the
+ * extending the returned array via a filter - but Free defines the
  * canonical contract here.
  *
  * @package FotoGrids\Render\Lightbox\Shared
@@ -75,7 +75,7 @@ final class Lightbox_Slide_Builder {
 		$link_meta                            = self::batch_load_link_meta( $ids );
 		$tag_map                              = self::batch_load_tag_slugs( $ids, 'tag' );
 
-		// Pro-tier metadata — present only if subscriber Pro filter
+		// Pro-tier metadata - present only if subscriber Pro filter
 		// sources are active; harmless to query in Free since the table
 		// exists. The lightbox UI gates display via settings.
 		$people_map   = self::batch_load_tag_slugs( $ids, 'person' );
@@ -375,7 +375,7 @@ final class Lightbox_Slide_Builder {
 	/**
 	 * Load EXIF for an attachment, scoped to the fields the gallery
 	 * wants to display. Reads from WordPress's attachment metadata
-	 * (post_mime_type=image/*) — no extra table.
+	 * (post_mime_type=image/*) - no extra table.
 	 *
 	 * @return array<string, mixed>
 	 */

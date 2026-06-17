@@ -50,7 +50,7 @@ const PickerCard = ({
 
     const titleId = `fg-pb-pc-title-${item.id}`;
 
-    // Already-selected cards must not re-trigger selection — clicking the
+    // Already-selected cards must not re-trigger selection - clicking the
     // overlay is a no-op once `selected` is true.
     const onClick = () => {
         if (!selectable || selected) {
@@ -60,7 +60,7 @@ const PickerCard = ({
     };
 
     // Modified date appears when present; if `created_at` matches it (within
-    // a few seconds — the post is fresh and was never re-saved) we show
+    // a few seconds - the post is fresh and was never re-saved) we show
     // "Created at:" instead.
     const dateLabel = (() => {
         if (!item.updated_at) return null;

@@ -26,7 +26,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Active when a gallery plays videos in a lightbox (video_playback_mode =
  * lightbox) but the gallery's item click behaviour is NOT the full lightbox.
  * In that case the full lightbox module is not on the page, so video items get
- * this minimal overlay instead — just the player and a close button, no info
+ * this minimal overlay instead - just the player and a close button, no info
  * panel, toolbar, or thumbnails.
  *
  * When click behaviour IS lightbox, videos play inside the full lightbox and

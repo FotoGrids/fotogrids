@@ -49,7 +49,7 @@ function renderComponent(containerId, Component) {
 }
 
 /**
- * The Setup Wizard is page-less — it opens as a full-screen modal over
+ * The Setup Wizard is page-less - it opens as a full-screen modal over
  * whichever admin page the user is currently on, gated on a URL query
  * param (?fotogrids_setup_step=N). This ensures a body-portal mount
  * point exists for the React tree to render into, then renders the
@@ -79,7 +79,7 @@ function initializeAdminPages() {
 	renderComponent('fotogrids-tools-page', ToolsPage);
 	renderComponent('fotogrids-library-page', LibraryPage);
 
-	// Always mount the wizard — it self-gates on the query param so it
+	// Always mount the wizard - it self-gates on the query param so it
 	// renders an empty tree when not active. Mounting unconditionally
 	// means opening / closing the wizard is just a URL update, never a
 	// full React remount.

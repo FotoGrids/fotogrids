@@ -75,7 +75,7 @@ window.FotoGrids.version;
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
 | Only makes sense on galleries (Lightbox, Stats, Lazy_Load, Loading_Icon, Loaded_Effect, Sharing, Captions, Filter_Ui, Password_Gate, pagination, Deep_Linking)        | `onGallery`    |
 | Only makes sense on albums (Album_To_Gallery_Ajax, click-behaviour decorators on album tiles)                                                                         | `onAlbum`      |
-| Genuinely needs both (rare — Collection_Header is gallery-only because its current job is "show breadcrumbs back to the parent album"; the AJAX module is album-only) | `onCollection` |
+| Genuinely needs both (rare - Collection_Header is gallery-only because its current job is "show breadcrumbs back to the parent album"; the AJAX module is album-only) | `onCollection` |
 
 ## Events
 
@@ -87,7 +87,7 @@ The runtime dispatches two custom events on `document`. Both bubble.
 | `fotogrids:gallery_initialized` | The runtime has fully initialized a collection and run every matching callback queue against it.              | `{ galleryElement, galleryId, kind, instance }` |
 
 The runtime uses `MutationObserver` once (on `document.body`) and dispatches
-these events. **Feature modules must not run their own DOM observers** — they
+these events. **Feature modules must not run their own DOM observers** - they
 just call `FotoGrids.onGallery(cb)` / `onAlbum(cb)` / `onCollection(cb)` and
 the same callback fires for static and dynamically-inserted collections.
 
@@ -107,7 +107,7 @@ the same callback fires for static and dynamically-inserted collections.
 			!window.FotoGrids ||
 			typeof window.FotoGrids.onGallery !== 'function'
 		) {
-			// runtime not loaded — should never happen if PHP declared
+			// runtime not loaded - should never happen if PHP declared
 			// the dependency correctly, but degrade gracefully.
 			return;
 		}

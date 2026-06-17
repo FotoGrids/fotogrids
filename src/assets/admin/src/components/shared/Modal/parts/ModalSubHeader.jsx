@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * ModalSubHeader — optional fixed band beneath the header.
+ * ModalSubHeader - optional fixed band beneath the header.
  *
  * Use for chrome that needs to stay visible while the body scrolls but
  * doesn't belong in the header itself: search inputs, filter pills,
@@ -15,12 +15,12 @@ import React from 'react';
  *
  * Props
  * ----
- * - divider:    bool   — draw the bottom border (default true). Set
+ * - divider:    bool   - draw the bottom border (default true). Set
  *                       false when the body has its own leading
  *                       affordance (e.g. tabs) and a second divider
  *                       would be visual noise.
- * - className:  string — extra classes merged onto the root.
- * - children    — arbitrary content. No layout assumptions; consumers
+ * - className:  string - extra classes merged onto the root.
+ * - children    - arbitrary content. No layout assumptions; consumers
  *                 own the inner flex / grid.
  *
  * @since 1.0.0

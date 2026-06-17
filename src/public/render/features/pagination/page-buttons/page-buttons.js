@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Pagination: page buttons.
+ * FotoGrids - Pagination: page buttons.
  *
  * Subscribes to FotoGrids.onGallery. For each gallery whose
  * data-fg-pagination-method === 'pages', it:
@@ -12,7 +12,7 @@
  *      siblings truncation driven by data-fg-pages-truncate and the
  *      --fg-pagination-siblings CSS var (per-breakpoint).
  *
- * No imports — standalone vanilla JS compiled by webpack as an entry.
+ * No imports - standalone vanilla JS compiled by webpack as an entry.
  */
 
 ( function () {
@@ -31,7 +31,7 @@
         // Reconcile the rendered chip list with the current totalPages.
         // PHP renders 1..N chips for the unfiltered count; once a filter
         // is applied the server returns a new totalPages reflecting the
-        // filtered set, and the chip list must match — otherwise we
+        // filtered set, and the chip list must match - otherwise we
         // either leave stale chips for pages that no longer exist or
         // are missing chips for newly-reachable pages.
         rebuildChips( nav, s.totalPages );
@@ -73,8 +73,8 @@
      * totalPages, so we add or remove chips to match before any
      * active-state / truncation pass runs.
      *
-     * Mirrors the PHP markup in Page_Buttons::render_number_buttons() —
-     * same element + class structure, same data attrs — so styling and
+     * Mirrors the PHP markup in Page_Buttons::render_number_buttons() -
+     * same element + class structure, same data attrs - so styling and
      * the click delegation in attach() keep working unchanged. Ellipsis
      * chips (.fg-pagination__ellipsis-item) are excluded so they get
      * cleared and rebuilt by applyTruncation() on the same pass.
@@ -87,7 +87,7 @@
         if ( ! list ) return;
         if ( ! totalPages || totalPages < 1 ) totalPages = 1;
 
-        // Drop any ellipsis chips first — applyTruncation() will rebuild
+        // Drop any ellipsis chips first - applyTruncation() will rebuild
         // them after rebuildChips() finishes. Leaving them in would
         // confuse the index walk below.
         list.querySelectorAll( '.fg-pagination__ellipsis-item' ).forEach( function ( el ) {
@@ -124,7 +124,7 @@
      * Apply page-bar truncation (boundary + siblings + ellipses).
      *
      * When the wrapper's data-fg-pages-truncate is "0" we keep every page
-     * button visible — bail fast after clearing any leftover ellipses /
+     * button visible - bail fast after clearing any leftover ellipses /
      * trim flags from a previous sync.
      *
      * When truncation is on, the visible set is:
@@ -153,7 +153,7 @@
         // Clear any ellipsis chips inserted on a previous sync so we can
         // rebuild them cleanly against the new current page / total. The
         // marker class .fg-pagination__ellipsis-item only sits on chips
-        // we created at runtime — PHP never emits it — so this is safe.
+        // we created at runtime - PHP never emits it - so this is safe.
         list.querySelectorAll( '.fg-pagination__ellipsis-item' ).forEach( function ( el ) {
             el.remove();
         } );
@@ -190,7 +190,7 @@
         //   1 + ellipsis + siblings + current + siblings + ellipsis + last
         // = 5 + 2*siblings chips, plus the two ellipsis slots.
         // If the gallery has fewer pages than that, truncation can't
-        // actually save space — show everything.
+        // actually save space - show everything.
         const minTotalForTruncation = 5 + 2 * siblings;
         if ( total <= minTotalForTruncation ) {
             showAll();

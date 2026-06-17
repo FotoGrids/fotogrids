@@ -1,12 +1,12 @@
 /**
- * fg-shared — single aggregator stylesheet for every shared FG
+ * fg-shared - single aggregator stylesheet for every shared FG
  * component used outside the FotoGrids admin pages.
  *
  * Built as its own webpack entry (`fg-shared-styles`) so page-builder
  * editors (Gutenberg, Elementor, future Divi / Bricks) can enqueue
  * one stylesheet handle and get the entire shared component library.
  * The FotoGrids admin bundle (`admin.scss`) keeps its own per-partial
- * @use chain — same partials, different aggregator.
+ * @use chain - same partials, different aggregator.
  *
  * Adding a new shared component: drop the SCSS in the matching
  * folder, then add an `@use` line below. No webpack config changes,

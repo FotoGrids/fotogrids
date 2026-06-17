@@ -112,7 +112,7 @@ final class Load_More implements Feature {
 	}
 
 	public function style_vars( Render_Context $render_context ): array {
-		// All styling vars live on the trait now — both Load More and
+		// All styling vars live on the trait now - both Load More and
 		// Page Buttons share the same `pagination_buttons_subtabs` →
 		// Styling tab in pagination.json, so the resolution sits in
 		// Pagination_Common::common_style_vars().

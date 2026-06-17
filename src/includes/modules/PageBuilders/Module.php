@@ -47,14 +47,14 @@ class Module extends Abstract_Module {
 	 *
 	 * Registered by this module once on `init` (and again
 	 * defensively on every enqueue hook a builder editor might fire
-	 * on) so every builder sub-module that uses FG components — the
+	 * on) so every builder sub-module that uses FG components - the
 	 * Gutenberg block editor, the Elementor editor, future Divi /
-	 * Bricks — declares ONE style dep and gets the whole library.
+	 * Bricks - declares ONE style dep and gets the whole library.
 	 *
 	 * Adding a new shared component: drop its SCSS in the matching
 	 * `styles/fg-foo/` folder, add an `@use` line to
 	 * `fg-shared/fg-shared.scss`, and the page-builder editors pick
-	 * it up automatically — no PHP edit, no per-host enqueue dep.
+	 * it up automatically - no PHP edit, no per-host enqueue dep.
 	 *
 	 * @var string
 	 */
@@ -138,12 +138,12 @@ class Module extends Abstract_Module {
 		require_once __DIR__ . '/builders/Gutenberg/Module.php';
 		Builders\Gutenberg\Module::init();
 
-		// Elementor sub-module — no-ops internally when Elementor isn't
+		// Elementor sub-module - no-ops internally when Elementor isn't
 		// loaded, so safe to require unconditionally.
 		require_once __DIR__ . '/builders/Elementor/Module.php';
 		Builders\Elementor\Module::init();
 
-		// Divi sub-module — no-ops internally when Divi isn't loaded, so
+		// Divi sub-module - no-ops internally when Divi isn't loaded, so
 		// safe to require unconditionally. Registers its modules on
 		// `et_builder_ready` once Divi's framework is up.
 		require_once __DIR__ . '/builders/Divi/Module.php';
@@ -153,7 +153,7 @@ class Module extends Abstract_Module {
 	/**
 	 * Register the shared-component stylesheet + icons JS payload.
 	 *
-	 * Both halves are idempotent — each registration is guarded by
+	 * Both halves are idempotent - each registration is guarded by
 	 * `wp_*_is( ..., 'registered' )` so repeat hook firings are
 	 * no-ops. The two halves live in one callback because they're
 	 * always wanted together: every shared FG component except the
@@ -163,7 +163,7 @@ class Module extends Abstract_Module {
 	 * @return void
 	 */
 	public function register_shared_assets(): void {
-		// CSS — Modal + Button + Checkbox + FormField + Icon base rules.
+		// CSS - Modal + Button + Checkbox + FormField + Icon base rules.
 		if ( ! wp_style_is( self::FG_SHARED_STYLE_HANDLE, 'registered' ) ) {
 			wp_register_style(
 				self::FG_SHARED_STYLE_HANDLE,
@@ -173,7 +173,7 @@ class Module extends Abstract_Module {
 			);
 		}
 
-		// JS — `window.FotoGridsIcons` payload + its loading-icons
+		// JS - `window.FotoGridsIcons` payload + its loading-icons
 		// dependency. Same handles class-admin-init uses for FotoGrids
 		// admin pages; re-registered here so they're available in
 		// builder editor contexts too. `wp_register_script` with an

@@ -5,7 +5,7 @@ import Icon from '../shared/Icon';
 const { __ } = wp.i18n;
 
 /**
- * Step 4 — License activation.
+ * Step 4 - License activation.
  *
  * This is the wizard's License page tab. It does exactly what
  * /admin.php?page=fotogrids-license does, just inline: the user pastes
@@ -16,7 +16,7 @@ const { __ } = wp.i18n;
  * the site already has Pro active, we skip the key form entirely and
  * show a "Pro is active here" confirmation.
  *
- * Free users see a soft "See plans" link at the bottom — no signing in,
+ * Free users see a soft "See plans" link at the bottom - no signing in,
  * no account framing. The full account-connection flow lives in a
  * separate planned doc; this is the inline-key MVP that ships with the
  * wizard.
@@ -44,7 +44,7 @@ const StepAccount = () => {
                 if ( ! cancelled ) setStatus( res );
             } )
             .catch( ( err ) => {
-                // Status fetch failed — fall through to the key-entry
+                // Status fetch failed - fall through to the key-entry
                 // form so the user still has a way to activate. We don't
                 // bubble the fetch error to the UI because it's not
                 // actionable here.

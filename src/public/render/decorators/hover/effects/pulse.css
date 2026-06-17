@@ -1,9 +1,0 @@
-[data-fg-hover="pulse"] .fg-item:hover .fg-item-media {
-    animation: fg-hover-pulse 520ms ease;
-}
-
-@keyframes fg-hover-pulse {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}

@@ -10,7 +10,8 @@
         "squizlabs/php_codesniffer": "^3.10",
         "wp-coding-standards/wpcs": "^3.1",
         "phpcompatibility/phpcompatibility-wp": "^2.1",
-        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpunit/phpunit": "^9.6"
     },
     "config": {
         "allow-plugins": {
@@ -22,6 +23,7 @@
         "lint:summary": "phpcs --standard=src/phpcs.xml --report=summary",
         "lint:fix": "phpcbf --standard=src/phpcs.xml",
         "lint:compat": "phpcs --standard=PHPCompatibilityWP --runtime-set testVersion 7.4- --extensions=php --ignore=*/freemius/*,*/dist/*,*/node_modules/*,*/vendor/* src",
+        "test:php": "phpunit --configuration phpunit.xml",
         "setup-hooks": "git config core.hooksPath .githooks && echo \"Git hooks installed (core.hooksPath -> .githooks).\""
     },
     "scripts-descriptions": {
@@ -29,6 +31,7 @@
         "lint:summary": "Run phpcs with a per-file summary report.",
         "lint:fix": "Auto-fix what PHP Code Beautifier can fix in place.",
         "lint:compat": "Check PHP 7.4+ compatibility of src/ with PHPCompatibilityWP.",
+        "test:php": "Run the PHPUnit suite (configuration in phpunit.xml).",
         "setup-hooks": "Point git at the committed .githooks/ directory (run once per clone)."
     }
 }

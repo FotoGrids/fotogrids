@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Filters used by the Page Builders module and its per-builder
  * sub-modules (Gutenberg, Elementor, Divi, Bricks, …).
  *
- * Each builder sub-module hooks these from its own boot file — Free's
+ * Each builder sub-module hooks these from its own boot file - Free's
  * core never knows about a specific builder.
  */
 final class Filters_Page_Builders {

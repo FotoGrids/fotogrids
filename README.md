@@ -1,9 +1,9 @@
-# FotoGrids (Free) — Developer Guide
+# FotoGrids (Free) - Developer Guide
 
 FotoGrids is a modern WordPress gallery and slider plugin built around the
 WordPress Media Library. This repository holds the **Free** plugin. The Pro
 plugin lives in a sibling repository and extends Free purely through WordPress
-hooks — it never imports Free's classes directly.
+hooks - it never imports Free's classes directly.
 
 This README covers local development of the Free plugin. For the full
 architecture reference (PHP bootstrap, database layer, the render pipeline,
@@ -35,7 +35,7 @@ tasks below) to test.
 
 ```
 Plugin/
-├── src/                  Source — edit here
+├── src/                  Source - edit here
 │   ├── fotogrids.php      Main plugin file (bootstrap, constants, hooks)
 │   ├── config/           Module registry, loading-icon catalogues
 │   ├── includes/         PHP classes (REST, settings, modules, tools, render helpers)
@@ -45,7 +45,7 @@ Plugin/
 │   └── tests/            Jest unit + integration tests
 ├── tests/                PHP integration tests + CI guard scripts
 ├── scripts/              Build helpers (loading icons, JSON↔YAML)
-├── dist/                 Build output — generated, never edited, git-ignored
+├── dist/                 Build output - generated, never edited, git-ignored
 ├── webpack.config.js     Build configuration
 ├── package.json
 └── CLAUDE.md             Full developer/architecture reference

@@ -46,7 +46,7 @@ let hideTimer   = null;
 let activeHost  = null;
 
 /**
- * True when the tooltip is in interactive mode — pointer-events enabled,
+ * True when the tooltip is in interactive mode - pointer-events enabled,
  * mouseleave does NOT auto-hide, dismissal happens via outside-click or
  * Escape. Set by showInteractive(); cleared by hideImmediately().
  *
@@ -100,7 +100,7 @@ function getTooltipEl( host ) {
         tooltipEl.setAttribute( 'aria-hidden', 'true' );
 
         // Hide on scroll / resize so stale positions don't linger.
-        // Interactive mode opts out — see hideOnScrollOrResize().
+        // Interactive mode opts out - see hideOnScrollOrResize().
         window.addEventListener( 'scroll',  hideOnScrollOrResize, { passive: true, capture: true } );
         window.addEventListener( 'resize',  hideOnScrollOrResize, { passive: true } );
     }
@@ -217,7 +217,7 @@ function position( host ) {
 
 
 function showImmediately( host, label ) {
-    // Interactive mode owns the tooltip exclusively — refuse to overwrite
+    // Interactive mode owns the tooltip exclusively - refuse to overwrite
     // its content with a text label. Otherwise, when a popover hosts
     // child elements that have their own text tooltips bound (e.g. the
     // share-bar buttons inside the lightbox share popover), entering one
@@ -236,13 +236,13 @@ function showImmediately( host, label ) {
 }
 
 /**
- * Internal hide — actually closes the tooltip. Does NOT check
+ * Internal hide - actually closes the tooltip. Does NOT check
  * interactive mode; reserved for dismissal paths that have already
  * decided to close (outside-click handler, Escape handler, explicit
  * hideInteractive call).
  *
  * The public `hideImmediately` short-circuits when interactive mode is
- * open — see below.
+ * open - see below.
  */
 function reallyHide() {
     if ( ! tooltipEl ) return;
@@ -273,7 +273,7 @@ function reallyHide() {
 /**
  * Public hide entry point.
  *
- * If interactive mode is open we refuse to close — interactive popovers
+ * If interactive mode is open we refuse to close - interactive popovers
  * own the tooltip exclusively and dismiss only via outside-click,
  * Escape, or programmatic hideInteractive(). Without this guard, any
  * surface that wires its own mouseleave→hide chain (the lightbox
@@ -287,7 +287,7 @@ function hideImmediately() {
 
 /**
  * Scroll/resize hide handler. Interactive popovers must NOT close on
- * scroll — the user might scroll inside the tooltip itself or the
+ * scroll - the user might scroll inside the tooltip itself or the
  * surrounding lightbox / dialog. We reposition instead when interactive.
  */
 function hideOnScrollOrResize() {
@@ -305,7 +305,7 @@ function hideOnScrollOrResize() {
 function scheduleShow( host, label ) {
     // Suspend hover-driven shows while an interactive popover is open.
     // showImmediately itself short-circuits when interactiveMode is true,
-    // but scheduling a deferred show is also wasteful — bail early.
+    // but scheduling a deferred show is also wasteful - bail early.
     if ( interactiveMode ) return;
     clearTimeout( hideTimer );
     clearTimeout( showTimer );
@@ -330,7 +330,7 @@ function scheduleHide() {
  * as the inner DOM. Replaces any existing tooltip content.
  *
  * If the tooltip is already interactive for the same host (toggle case),
- * closes it instead — letting the caller bind a single button to a
+ * closes it instead - letting the caller bind a single button to a
  * toggle action.
  *
  * @param {HTMLElement} host       The anchor element.
@@ -344,7 +344,7 @@ function showInteractive( host, contentEl, opts ) {
 
     // Toggle: a second showInteractive call on the same host closes it.
     // Use reallyHide (bypassing the interactiveMode guard on hideImmediately)
-    // since we want to actually close — we're the dismissal authority here.
+    // since we want to actually close - we're the dismissal authority here.
     if ( interactiveMode && activeHost === host ) {
         reallyHide();
         return false;
@@ -427,7 +427,7 @@ function showInteractive( host, contentEl, opts ) {
             el.classList.remove( 'fg-f-tooltip--swapping' );
             // If something closed the popover during the morph window
             // (toggle re-click, programmatic hideInteractive, ...) we
-            // skip finishOpen — the popover is gone.
+            // skip finishOpen - the popover is gone.
             if ( ! interactiveMode || activeHost !== host ) return;
             finishOpen();
         }, SWAP_MS );
@@ -457,8 +457,8 @@ function setupInteractiveDismissal() {
     interactiveOutsideClick = ( e ) => {
         if ( ! tooltipEl || ! activeHost ) return;
         const target = e.target;
-        if ( tooltipEl.contains( target ) ) return; // click inside popover — ignore
-        if ( activeHost.contains( target ) ) return; // click on host — ignore (host toggles)
+        if ( tooltipEl.contains( target ) ) return; // click inside popover - ignore
+        if ( activeHost.contains( target ) ) return; // click on host - ignore (host toggles)
         reallyHide();
     };
 
@@ -479,7 +479,7 @@ function setupInteractiveDismissal() {
     };
 
     // Delay the outside-click install until after the current event
-    // finishes — otherwise the click that opened the popover would also
+    // finishes - otherwise the click that opened the popover would also
     // immediately close it. Capture phase for both so we beat any
     // surface-level handlers (e.g. the lightbox's own Escape-closes-me
     // keydown listener).
@@ -597,7 +597,7 @@ window.FgTooltip = {
     refresh,
     showImmediately,
     hideImmediately,
-    // Interactive mode — the tooltip becomes a popover-like surface
+    // Interactive mode - the tooltip becomes a popover-like surface
     // hosting arbitrary DOM (e.g. the lightbox toolbar's share grid).
     // See the "Interactive mode" section above.
     showInteractive,

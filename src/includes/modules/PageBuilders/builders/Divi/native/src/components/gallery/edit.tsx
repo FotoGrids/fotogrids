@@ -12,11 +12,11 @@ import { FotoGridsGalleryEditProps } from './types';
 import { ModuleStyles } from './styles';
 import { ModuleScriptData } from './module-script-data';
 import { moduleClassnames } from './module-classnames';
-// Shared preview asset wiring — the SAME helper the Gutenberg LivePreview
+// Shared preview asset wiring - the SAME helper the Gutenberg LivePreview
 // and admin metabox preview use. Wires CSS handles + sequences JS +
 // merges localize into window.fotogrids + injects HTML (running inline
 // kickoff scripts), all into the container's owner document/window.
-// @ts-ignore — plain JS module, no types.
+// @ts-ignore - plain JS module, no types.
 import { applyPreviewResponse } from '../../lib/preview-asset-wiring';
 
 declare global {

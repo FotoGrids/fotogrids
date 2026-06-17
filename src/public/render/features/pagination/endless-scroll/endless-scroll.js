@@ -1,5 +1,5 @@
 /**
- * FotoGrids — Pagination: endless scroll.
+ * FotoGrids - Pagination: endless scroll.
  *
  * Subscribes to FotoGrids.onGallery. For each gallery whose
  * data-fg-pagination-method === 'endless_scroll', it:
@@ -10,7 +10,7 @@
  *      'append' }).
  *   3. Disconnects the observer when hasMore becomes false.
  *
- * No imports — standalone vanilla JS compiled by webpack as an entry.
+ * No imports - standalone vanilla JS compiled by webpack as an entry.
  */
 
 ( function () {
@@ -101,7 +101,7 @@
         // enough to push the sentinel out of the 200px rootMargin).
         //
         // We re-observe on the next scroll event. That makes each user
-        // scroll gesture trigger at most one page load — the canonical
+        // scroll gesture trigger at most one page load - the canonical
         // "infinite scroll" behaviour.
         //
         // inFlight guards against rare double-fires during the fetch

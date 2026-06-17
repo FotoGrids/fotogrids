@@ -1,5 +1,5 @@
 /*
- * FotoGrids — Collection Header (back button + breadcrumb trail)
+ * FotoGrids - Collection Header (back button + breadcrumb trail)
  *
  * Stylesheet for the .fg-collection-header block emitted by the
  * Collection_Header feature module. Sits inside the gallery wrapper,
@@ -8,7 +8,7 @@
  * Theming-friendly defaults:
  *   - Uses `currentColor` so themes can recolour just by setting `color:`
  *     on the parent.
- *   - No background, no padding by default — sits as text-like chrome.
+ *   - No background, no padding by default - sits as text-like chrome.
  *   - No hard-coded font; inherits from the surrounding content.
  *   - Wraps cleanly on narrow viewports.
  */
@@ -50,10 +50,6 @@
 
 .fg-back-button__icon {
     flex: 0 0 auto;
-}
-
-.fg-back-button__label {
-    /* No own styles — inherits font / colour from the parent button. */
 }
 
 /* Breadcrumb trail */

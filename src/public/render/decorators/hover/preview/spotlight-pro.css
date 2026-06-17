@@ -1,0 +1,55 @@
+/* A circular spotlight blooms over the image (darkened surroundings, bright
+   centre) while the media zooms and the caption reveals - a richer, staged
+   version of the free Spotlight. */
+
+.fotogrids-collection[data-fg-hover='spotlight-pro'] .fg-item-media {
+	overflow: hidden;
+	position: relative;
+	transition: transform 0.35s ease;
+}
+
+.fotogrids-collection[data-fg-hover='spotlight-pro'] .fg-item-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+		circle at 50% 40%,
+		transparent 0%,
+		transparent 25%,
+		rgba(0, 0, 0, 0.55) 75%
+	);
+	opacity: 0;
+	transform: scale(1.4);
+	transition:
+		opacity 0.35s ease,
+		transform 0.45s ease;
+	pointer-events: none;
+}
+
+.fotogrids-collection[data-fg-hover='spotlight-pro'] .fg-caption-content {
+	opacity: 0;
+	transform: translateY(8px);
+	transition:
+		opacity 0.3s ease 0.1s,
+		transform 0.3s ease 0.1s;
+}
+
+.fotogrids-collection[data-fg-hover='spotlight-pro']
+	.fg-item:hover
+	.fg-item-media {
+	transform: scale(1.06);
+}
+
+.fotogrids-collection[data-fg-hover='spotlight-pro']
+	.fg-item:hover
+	.fg-item-media::after {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.fotogrids-collection[data-fg-hover='spotlight-pro']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+	transform: translateY(0);
+}

@@ -21,7 +21,7 @@
 declare(strict_types=1);
 
 // ---------------------------------------------------------------------------
-// Bootstrap. We deliberately do NOT load WordPress — we only need the Hooks
+// Bootstrap. We deliberately do NOT load WordPress - we only need the Hooks
 // class files which are self-contained constant bags.
 // ---------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ foreach ( get_declared_classes() as $fqcn ) {
     }
     $is_pro = str_starts_with( $fqcn, 'FotoGrids_Pro\\' );
     $heading = sprintf(
-        '%s — %s',
+        '%s - %s',
         $is_pro ? 'Pro' : 'Free',
         match ( $family ) {
             'action'   => 'Actions',
@@ -113,8 +113,8 @@ foreach ( get_declared_classes() as $fqcn ) {
 
 // Stable ordering: Free first, then Pro; within each, Actions → Filters → JS.
 $heading_order = [
-    'Free — Actions', 'Free — Filters', 'Free — JavaScript Events',
-    'Pro — Actions',  'Pro — Filters',  'Pro — JavaScript Events',
+    'Free - Actions', 'Free - Filters', 'Free - JavaScript Events',
+    'Pro - Actions',  'Pro - Filters',  'Pro - JavaScript Events',
 ];
 uksort(
     $groups,
@@ -145,9 +145,9 @@ $lines[] = 'is declared as a constant on one of the small category classes under
 $lines[] = '`FotoGrids\\Hooks\\` (or `FotoGrids_Pro\\Hooks\\`). This page is generated';
 $lines[] = 'directly from those classes so it can never drift from the code.';
 $lines[] = '';
-$lines[] = '* **Actions** — fired with `do_action( Actions_<Category>::CONSTANT, ... )`.';
-$lines[] = '* **Filters** — invoked with `apply_filters( Filters_<Category>::CONSTANT, $value, ... )`.';
-$lines[] = '* **JavaScript Events** — dispatched on `document` (or the gallery element) via `CustomEvent`. Listen with `addEventListener`.';
+$lines[] = '* **Actions** - fired with `do_action( Actions_<Category>::CONSTANT, ... )`.';
+$lines[] = '* **Filters** - invoked with `apply_filters( Filters_<Category>::CONSTANT, $value, ... )`.';
+$lines[] = '* **JavaScript Events** - dispatched on `document` (or the gallery element) via `CustomEvent`. Listen with `addEventListener`.';
 $lines[] = '';
 
 // Table of contents.
@@ -176,11 +176,11 @@ foreach ( $groups as $heading => $list ) {
 
         $lines[] = sprintf( '### `%s`', $short );
         $lines[] = '';
-        $lines[] = sprintf( '_FQCN: `%s` — %d hooks._', $row['class'], count( $rows ) );
+        $lines[] = sprintf( '_FQCN: `%s` - %d hooks._', $row['class'], count( $rows ) );
         $lines[] = '';
 
         if ( $rows === [] ) {
-            $lines[] = '_(none yet — placeholder class for forward-compatibility.)_';
+            $lines[] = '_(none yet - placeholder class for forward-compatibility.)_';
             $lines[] = '';
             continue;
         }

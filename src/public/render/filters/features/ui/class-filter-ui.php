@@ -80,7 +80,7 @@ final class Filter_Ui implements Feature {
 	public function supports( Render_Context $render_context ): bool {
 		// Filters operate on attachment-level metadata (tags, people,
 		// locations on the items inside a gallery). Album items are
-		// galleries, not attachments — none of the filter sources have
+		// galleries, not attachments - none of the filter sources have
 		// anything to filter by.
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
 			return false;
@@ -778,7 +778,7 @@ final class Filter_Ui implements Feature {
 	 * @param  string                $key   Variable name (including -- prefix).
 	 * @param  mixed                 $value Raw setting value.
 	 */
-	private function maybe_add_var( array &$vars, string $key, mixed $value ): void {
+	private function maybe_add_var( array &$vars, string $key, $value ): void {
 		if ( is_string( $value ) && '' !== $value ) {
 			$vars[ $key ] = $value;
 		}
@@ -799,7 +799,7 @@ final class Filter_Ui implements Feature {
 	 * @param  string $unit  Default unit to append (e.g. 'px', 'rem', 'em').
 	 * @return string|null
 	 */
-	private function unit_val( mixed $value, string $unit ): ?string {
+	private function unit_val( $value, string $unit ): ?string {
 		if ( null === $value || '' === $value ) {
 			return null;
 		}

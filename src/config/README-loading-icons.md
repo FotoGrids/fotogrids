@@ -1,7 +1,7 @@
 # Loading Icons
 
-- **Source (editable):** `loading-icons.yaml` — multiline YAML, one key per icon. SVG strings already contain the `__FG_ID__` placeholder in every `id=` and in SMIL `begin=` / `url(#...)` references; the build does not inject them.
-- **Runtime:** `loading-icons.json` — generated from the YAML source by the icons build (YAML → JSON only). Shipped to `dist` via webpack.
+- **Source (editable):** `loading-icons.yaml` - multiline YAML, one key per icon. SVG strings already contain the `__FG_ID__` placeholder in every `id=` and in SMIL `begin=` / `url(#...)` references; the build does not inject them.
+- **Runtime:** `loading-icons.json` - generated from the YAML source by the icons build (YAML → JSON only). Shipped to `dist` via webpack.
 
 ## Build
 

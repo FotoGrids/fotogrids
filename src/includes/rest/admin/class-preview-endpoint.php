@@ -190,7 +190,7 @@ final class Preview_Endpoint {
 		// Topologically sort by deps so a script's dependencies are loaded
 		// before it on the client. The Asset_Resolver collects in module
 		// declaration order (decorators before features), which can put
-		// dependent scripts ahead of their deps — most importantly
+		// dependent scripts ahead of their deps - most importantly
 		// fotogrids-runtime, which every other module's JS declares as a
 		// dep and which lives in the always-on Runtime_Bootstrap feature.
 		// The client loads scripts with script.async = false and awaits
@@ -204,7 +204,7 @@ final class Preview_Endpoint {
 	 *
 	 * Deps not present in the local record map (e.g. WordPress core deps
 	 * like 'jquery' that aren't enqueued through Asset_Resolver) are
-	 * ignored — they're either already on the page or the script doesn't
+	 * ignored - they're either already on the page or the script doesn't
 	 * actually need them on the preview surface.
 	 *
 	 * @since   1.0.0
@@ -221,7 +221,7 @@ final class Preview_Endpoint {
 				return;
 			}
 			if ( isset( $visiting[ $handle ] ) ) {
-				// Dependency cycle — treat as already visited so we don't loop forever.
+				// Dependency cycle - treat as already visited so we don't loop forever.
 				return;
 			}
 			$visiting[ $handle ] = true;

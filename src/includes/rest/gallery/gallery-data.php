@@ -463,7 +463,7 @@ class Gallery_Data {
 	/**
 	 * Counts how many items in a gallery survive the given filters.
 	 *
-	 * Thin wrapper over Gallery_Item_Sequence::count() — the canonical
+	 * Thin wrapper over Gallery_Item_Sequence::count() - the canonical
 	 * counter that the renderer, the count-filtered-items helper, and
 	 * the lightbox slides endpoint all share.
 	 *

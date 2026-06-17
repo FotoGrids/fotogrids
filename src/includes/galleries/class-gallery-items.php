@@ -60,7 +60,7 @@ final class Gallery_Items {
 	 * the resolved EXIF + caption / description / location data.
 	 *
 	 * Seeds the FotoGrids alt (`_wp_attachment_item_alt`) from the WP Media
-	 * Library alt (`_wp_attachment_image_alt`) on first add — items added
+	 * Library alt (`_wp_attachment_image_alt`) on first add - items added
 	 * before the user has touched the FotoGrids item editor still render with
 	 * the alt the user already typed in the Media Library, rather than
 	 * silently falling back to the title.

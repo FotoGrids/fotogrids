@@ -99,7 +99,7 @@ function AlphaColorPicker({
 			? popoverRef.current.getBoundingClientRect().width
 			: fallbackWidth;
 		// Only used to decide above-vs-below placement. The actual vertical
-		// anchor below does NOT depend on this — we anchor at the trigger top
+		// anchor below does NOT depend on this - we anchor at the trigger top
 		// and use transform: translateY(-100%) so the gap is always exactly
 		// desiredMargin regardless of the popover's rendered height.
 		const measuredHeight = popoverRef.current

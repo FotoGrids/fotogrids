@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# FotoGrids pre-commit hook — runs PHP_CodeSniffer on staged PHP files only.
+# FotoGrids pre-commit hook - runs PHP_CodeSniffer on staged PHP files only.
 #
 # Blocks the commit if any staged .php file fails the project ruleset
 # (src/phpcs.xml). Scoped to staged files so it stays fast and only gates

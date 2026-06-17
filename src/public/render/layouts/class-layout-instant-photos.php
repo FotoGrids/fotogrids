@@ -350,7 +350,7 @@ final class Layout_Instant_Photos implements Layout {
 	 * setting. We hand the per-device values straight through to CSS so
 	 * the active value is selected by the existing responsive plumbing,
 	 * but for randomisation we have to pick one bucket on the PHP side.
-	 * Desktop is the widest range and the most visible — use it.
+	 * Desktop is the widest range and the most visible - use it.
 	 *
 	 * @since   1.0.0
 	 */

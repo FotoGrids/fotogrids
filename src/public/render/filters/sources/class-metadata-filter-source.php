@@ -18,7 +18,7 @@ if ( ! defined( 'WPINC' ) ) {
  * + `fotogrids_tags` joined by `metadata_type` / `tags.type`.
  *
  * All three core sources (Tags, People, Location) share the same query
- * shape and predicate logic — only the metadata_type discriminator,
+ * shape and predicate logic - only the metadata_type discriminator,
  * arg key, label, and item data attribute differ. Subclasses just
  * declare those constants; everything else lives here.
  *

@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 
-// FotoGrids brand album icon — multi-colour 2x2 grid, drawn on a 16x16
+// FotoGrids brand album icon - multi-colour 2x2 grid, drawn on a 16x16
 // grid because Divi forces its icon wrapper to viewBox="0 0 16 16" (it
 // ignores our exported viewBox). Returns inner elements only.
 export const name    = 'fotogrids/module-album';

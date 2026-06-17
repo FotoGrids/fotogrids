@@ -216,8 +216,8 @@ class Public_Render {
 	 *
 	 * Used by the /fotogrids/v1/gallery/render REST endpoint. Unlike the
 	 * shortcode path, this bypasses caching (per-(gallery, page, breakpoint)
-	 * cache keys are a v2 concern — see PLAN.md §8.5) and never re-enters
-	 * the shortcode atts parser. Returns the raw rendered HTML — the REST
+	 * cache keys are a v2 concern - see PLAN.md §8.5) and never re-enters
+	 * the shortcode atts parser. Returns the raw rendered HTML - the REST
 	 * handler still owns the CSS-handle map and the pagination metadata
 	 * envelope.
 	 *
@@ -244,7 +244,7 @@ class Public_Render {
 			return '';
 		}
 
-		// Synthetic atts mirroring what the shortcode produces — the
+		// Synthetic atts mirroring what the shortcode produces - the
 		// pipeline reads a small subset and the rest are inert.
 		$atts = array(
 			'id'       => $gallery_id,
@@ -473,11 +473,11 @@ class Public_Render {
 	 * the render pipeline (Asset_Resolver). The only assets enqueued here
 	 * are:
 	 *
-	 *   • fg-tooltip JS/CSS — still globally enqueued because multiple
+	 *   • fg-tooltip JS/CSS - still globally enqueued because multiple
 	 *     modules (sharing, filter UI, lightbox) bind tooltips and
 	 *     fg-tooltip is not yet wrapped as a render module dependency.
 	 *     Task 15 of the refactor will move this.
-	 *   • fotogrids-errors.css — tiny always-on stylesheet for the
+	 *   • fotogrids-errors.css - tiny always-on stylesheet for the
 	 *     `.fotogrids-error` block. Lives outside the render pipeline
 	 *     because error markup can be emitted before any layout module
 	 *     runs (e.g. "gallery not found"), so collection-base.css is
@@ -699,7 +699,7 @@ class Public_Render {
 	}
 
 
-	// render_album() removed — album rendering now goes through the
+	// render_album() removed - album rendering now goes through the
 	// standard Render_Controller pipeline. See album_shortcode() above.
 
 	/**

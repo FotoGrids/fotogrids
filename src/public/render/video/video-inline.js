@@ -149,7 +149,7 @@
     }
 
     /**
-     * Replace the poster with the player. Idempotent — a tile that is already
+     * Replace the poster with the player. Idempotent - a tile that is already
      * playing is left untouched.
      *
      * @param {HTMLElement} el

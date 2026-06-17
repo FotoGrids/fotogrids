@@ -11,7 +11,7 @@ jobs:
   #
   # `php -l` is a real parser, so this is the authoritative check for whether
   # the code is syntactically valid on a given PHP version. The lowest version
-  # in the matrix is the effective floor — if the plugin declares support for a
+  # in the matrix is the effective floor - if the plugin declares support for a
   # PHP version, that version must be green here.
   #
   # The declared floor is PHP 7.4, so the 7.4 leg must stay green: any 8.x-only
@@ -40,7 +40,7 @@ jobs:
       - name: Lint all source PHP (php -l)
         id: phplint
         run: |
-          # Exclude build output, deps, and the bundled Freemius SDK — same as phpcs.xml.
+          # Exclude build output, deps, and the bundled Freemius SDK - same as phpcs.xml.
           files=$(find src -name '*.php' \
             -not -path '*/vendor/*' \
             -not -path '*/dist/*' \
@@ -49,7 +49,7 @@ jobs:
 
           report="php-syntax-${{ matrix.php }}.txt"
           {
-            echo "PHP syntax report — PHP ${{ matrix.php }}"
+            echo "PHP syntax report - PHP ${{ matrix.php }}"
             echo "Generated: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             echo "PHP: $(php -r 'echo PHP_VERSION;')"
             echo "Files checked: $(echo "$files" | wc -l | tr -d ' ')"

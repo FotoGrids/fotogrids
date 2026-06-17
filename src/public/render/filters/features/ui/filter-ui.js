@@ -1,18 +1,18 @@
 /**
- * FotoGrids — Filter UI
+ * FotoGrids - Filter UI
  *
  * Owns the entire client-side filter behaviour for galleries that include
  * a .fotogrids-filters bar. Three styles supported: buttons (default),
  * dropdowns, checkboxes. AND across sources, OR within a source.
  *
- * Subscribes to FotoGrids.onGallery — runs once per gallery and idles if
+ * Subscribes to FotoGrids.onGallery - runs once per gallery and idles if
  * the gallery has no filter bar.
  *
  * Replaces the monolithic FotoGridsGallery.initializeFilters() (+ all the
  * private _initFilter*, _applyFilters, _recalculateCounts, _syncFilterUI
  * methods) from frontend/src/index.js.
  *
- * No imports — standalone vanilla JS compiled by webpack.
+ * No imports - standalone vanilla JS compiled by webpack.
  */
 
 ( function () {
@@ -380,7 +380,7 @@
         // filter option with the count of items in the FULL gallery
         // that carry that value (see Metadata_Filter_Source::get_options).
         // Recomputing here would shift the numbers based on whatever is
-        // currently visible — and with pagination, "currently visible"
+        // currently visible - and with pagination, "currently visible"
         // is just page 1, so counts would degrade as filters interact.
         // Stable counts give users a reliable picture of how many items
         // each filter would yield.
@@ -473,7 +473,7 @@
         const filterContainer = galleryEl.querySelector( '.fotogrids-filters' );
         if ( ! filterContainer ) return;
 
-        // Idempotent — the runtime calls every onGallery callback once per
+        // Idempotent - the runtime calls every onGallery callback once per
         // gallery, but defensive against duplicate calls (third-party code).
         if ( filterContainer.dataset.fgFiltersReady === 'true' ) return;
         filterContainer.dataset.fgFiltersReady = 'true';
@@ -510,7 +510,7 @@
             const currentFp  = fingerprintActive( currentMap );
 
             if ( currentFp === lastFingerprint ) {
-                // No actual change — likely a benign re-paint (e.g. user
+                // No actual change - likely a benign re-paint (e.g. user
                 // clicked "All" while already cleared, or re-selected
                 // an already-active value). Skip notifications.
                 return;
@@ -535,7 +535,7 @@
      * checks ("did anything actually change?") and as a cache key in
      * pagination's filter-view cache.
      *
-     * Sorts keys, sorts values within each key — so { tags: ['b','a'] }
+     * Sorts keys, sorts values within each key - so { tags: ['b','a'] }
      * and { tags: ['a','b'] } produce the same fingerprint.
      *
      * @param {Object.<string,string[]>} map

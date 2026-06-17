@@ -563,8 +563,8 @@ final class Preview_Data {
 	/**
 	 * Resolve a localized, human-readable label for a post status.
 	 *
-	 * Uses {@see get_post_status_object()} so any registered status —
-	 * including custom ones — gets the registrant's intended label.
+	 * Uses {@see get_post_status_object()} so any registered status -
+	 * including custom ones - gets the registrant's intended label.
 	 * Falls back to the raw slug if WordPress doesn't know the status.
 	 *
 	 * @since 1.0.0
