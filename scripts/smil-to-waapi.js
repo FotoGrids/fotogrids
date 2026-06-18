@@ -43,9 +43,11 @@
 
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
-const yaml = require('js-yaml');
+const fs       = require('fs');
+const path     = require('path');
+const yaml     = require('js-yaml');
+const prettier = require('prettier');
+const { ESLint } = require('eslint');
 
 // ---------------------------------------------------------------------------
 // Paths
@@ -799,7 +801,7 @@ function convertIcon(name, svg) {
 // Main
 // ---------------------------------------------------------------------------
 
-function main() {
+async function main() {
     // Load YAML
     const yamlContent = fs.readFileSync(YAML_PATH, 'utf8');
     const icons       = yaml.load(yamlContent);
@@ -1044,7 +1046,21 @@ function main() {
     jsLines.push(``);
     jsLines.push(`} )( window );`);
 
-    fs.writeFileSync(OUT_JS, jsLines.join('\n'), 'utf8');
+    const jsSource = jsLines.join('\n');
+
+    // Apply ESLint autofixes (no-var, object-shorthand, etc.) so the generated
+    // file satisfies the same rules as hand-written source.
+    const eslint      = new ESLint( { fix: true, cwd: ROOT } );
+    const lintResults = await eslint.lintText( jsSource, { filePath: OUT_JS } );
+    const jsFixed     = lintResults[ 0 ]?.output ?? jsSource;
+
+    // Final pass through Prettier so formatting matches the project config.
+    const prettierConfig = ( await prettier.resolveConfig( OUT_JS ) ) || {};
+    const jsFormatted    = await prettier.format( jsFixed, {
+        ...prettierConfig,
+        filepath: OUT_JS,
+    } );
+    fs.writeFileSync(OUT_JS, jsFormatted, 'utf8');
     console.log('smil-to-waapi: wrote', OUT_JS);
 
     // ----- Write WAAPI JSON -----
@@ -1216,4 +1232,7 @@ ${htmlRows}
     console.log(`\nOpen scripts/waapi-compare.html in Chrome to review.`);
 }
 
-main();
+main().catch( ( error ) => {
+    console.error( error );
+    process.exit( 1 );
+} );
