@@ -42,6 +42,14 @@ namespace FotoGrids {
             return self::$status_data;
         }
     }
+
+    final class Debug_Log {
+        public static function should_log( string $channel ): bool {
+            return false;
+        }
+
+        public static function write( string $channel, string $message ): void {}
+    }
 }
 
 namespace FotoGrids\Catalog {
@@ -60,7 +68,7 @@ namespace FotoGrids\Catalog {
     }
 }
 
-namespace FotoGrids\Tests\Integration;
+namespace FotoGrids\Tests\Integration {
 
 use FotoGrids\Catalog\Catalog;
 use FotoGrids\Catalog\State_Resolver;
@@ -213,4 +221,5 @@ final class LicenseStateMatrixTest {
 if ( PHP_SAPI === 'cli' && basename( __FILE__ ) === basename( (string) ( $_SERVER['SCRIPT_FILENAME'] ?? '' ) ) ) {
     LicenseStateMatrixTest::run();
     fwrite( STDOUT, "LicenseStateMatrixTest passed\n" );
+}
 }

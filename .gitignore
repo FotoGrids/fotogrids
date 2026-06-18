@@ -13,6 +13,9 @@ dist/
 # Development builds
 build/
 
+# Test coverage output
+/coverage/
+
 # Compiled assets
 *.map
 

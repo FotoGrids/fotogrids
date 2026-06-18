@@ -28,6 +28,55 @@ namespace {
             }
         }
     }
+
+    // Global-namespace stub: string callbacks such as array_map( 'absint', ... )
+    // resolve in the global namespace, not the caller's namespace.
+    if ( ! function_exists( 'absint' ) ) {
+        function absint( mixed $value ): int {
+            return abs( (int) $value );
+        }
+    }
+
+    if ( ! function_exists( 'esc_url_raw' ) ) {
+        function esc_url_raw( string $url ): string {
+            return $url;
+        }
+    }
+
+    if ( ! function_exists( 'rest_url' ) ) {
+        function rest_url( string $path = '' ): string {
+            return 'https://example.com/wp-json/' . ltrim( $path, '/' );
+        }
+    }
+
+    if ( ! function_exists( 'wp_create_nonce' ) ) {
+        function wp_create_nonce( string $action = '' ): string {
+            unset( $action );
+            return 'test-nonce';
+        }
+    }
+
+    if ( ! function_exists( 'do_action' ) ) {
+        function do_action( string $hook_name, mixed ...$args ): void {
+            unset( $hook_name, $args );
+        }
+    }
+
+    if ( ! function_exists( 'wp_scripts' ) ) {
+        function wp_scripts(): object {
+            return new class() {
+                /**
+                 * @var array<string, object>
+                 */
+                public array $registered = [];
+
+                public function get_data( string $handle, string $key ): mixed {
+                    unset( $handle, $key );
+                    return false;
+                }
+            };
+        }
+    }
 }
 
 namespace FotoGrids\Render\Internal {
@@ -111,6 +160,52 @@ namespace FotoGrids\Render\Internal {
             ];
         }
     }
+
+    final class Asset_Resolver {
+        private static ?self $instance = null;
+
+        public static function instance(): self {
+            if ( self::$instance === null ) {
+                self::$instance = new self();
+            }
+
+            return self::$instance;
+        }
+
+        /**
+         * @return array<string, string>
+         */
+        public function get_css_asset_urls(): array {
+            return [];
+        }
+
+        /**
+         * @return array<string, mixed>
+         */
+        public function get_js_asset_data(): array {
+            return [];
+        }
+    }
+}
+
+namespace FotoGrids\Hooks {
+    final class Actions_Render {
+        public const LATE_ASSETS = 'fotogrids/render/late_assets';
+    }
+}
+
+namespace FotoGrids\Settings {
+    final class Sharing_Settings_Store {
+        /**
+         * @return array<string, mixed>
+         */
+        public static function get(): array {
+            return [
+                'deep_linking_enabled'  => false,
+                'embedded_share_target' => '',
+            ];
+        }
+    }
 }
 
 namespace FotoGrids\REST\Admin {
@@ -153,22 +248,6 @@ namespace FotoGrids\REST\Admin {
         return Preview_Endpoint_Test_Doubles::$post;
     }
 
-    /**
-     * @return array<int, int>
-     */
-    function fotogrids_get_gallery_item_ids( int $gallery_id ): array {
-        unset( $gallery_id );
-        return Preview_Endpoint_Test_Doubles::$gallery_item_ids;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    function fotogrids_get_gallery_settings( int $gallery_id ): array {
-        unset( $gallery_id );
-        return Preview_Endpoint_Test_Doubles::$gallery_settings;
-    }
-
     function current_user_can( string $capability ): bool {
         if ( $capability === 'manage_fotogrids_settings' ) {
             return Preview_Endpoint_Test_Doubles::$can_manage_settings;
@@ -190,7 +269,30 @@ namespace FotoGrids\REST\Admin {
     }
 }
 
-namespace FotoGrids\Tests\Integration;
+namespace FotoGrids\Galleries {
+
+    use FotoGrids\REST\Admin\Preview_Endpoint_Test_Doubles;
+
+    final class Gallery_Repository {
+        /**
+         * @return array<int, int>
+         */
+        public static function get_item_ids( int $gallery_id ): array {
+            unset( $gallery_id );
+            return Preview_Endpoint_Test_Doubles::$gallery_item_ids;
+        }
+
+        /**
+         * @return array<string, mixed>
+         */
+        public static function get_settings( int $gallery_id ): array {
+            unset( $gallery_id );
+            return Preview_Endpoint_Test_Doubles::$gallery_settings;
+        }
+    }
+}
+
+namespace FotoGrids\Tests\Integration {
 
 use FotoGrids\REST\Admin\Preview_Endpoint;
 use FotoGrids\REST\Admin\Preview_Endpoint_Test_Doubles;
@@ -332,4 +434,5 @@ final class PreviewEndpointTest {
 if ( PHP_SAPI === 'cli' && basename( __FILE__ ) === basename( (string) ( $_SERVER['SCRIPT_FILENAME'] ?? '' ) ) ) {
     PreviewEndpointTest::run();
     fwrite( STDOUT, "PreviewEndpointTest passed\n" );
+}
 }

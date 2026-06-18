@@ -1,6 +1,184 @@
 <?php
 declare(strict_types=1);
 
+namespace {
+    // Some shipped files guard on WPINC, others on ABSPATH; define both so
+    // requiring them under the CLI test harness does not silently exit.
+    if ( ! defined( 'WPINC' ) ) {
+        define( 'WPINC', 'wp-includes' );
+    }
+    if ( ! defined( 'ABSPATH' ) ) {
+        define( 'ABSPATH', '/tmp/wp/' );
+    }
+    if ( ! defined( 'FOTOGRIDS_PLUGIN_DIR' ) ) {
+        define( 'FOTOGRIDS_PLUGIN_DIR', dirname( __DIR__, 1 ) . '/src/' );
+    }
+    if ( ! defined( 'FOTOGRIDS_PLUGIN_URL' ) ) {
+        define( 'FOTOGRIDS_PLUGIN_URL', 'https://example.com/wp-content/plugins/fotogrids/' );
+    }
+    if ( ! defined( 'FOTOGRIDS_VERSION' ) ) {
+        define( 'FOTOGRIDS_VERSION', '1.0.0' );
+    }
+
+    // Global WordPress-function stubs. Unqualified calls from any namespace in
+    // the render pipeline fall back to the global namespace, so these cover the
+    // pipeline regardless of which namespace makes the call.
+    if ( ! function_exists( 'get_option' ) ) {
+        function get_option( string $option, mixed $default_value = false ): mixed {
+            unset( $option );
+            return $default_value;
+        }
+    }
+    if ( ! function_exists( 'apply_filters' ) ) {
+        function apply_filters( string $hook_name, mixed $value, mixed ...$args ): mixed {
+            unset( $hook_name, $args );
+            return $value;
+        }
+    }
+    if ( ! function_exists( 'do_action' ) ) {
+        function do_action( string $hook_name, mixed ...$args ): void {
+            unset( $hook_name, $args );
+        }
+    }
+    if ( ! function_exists( 'esc_attr' ) ) {
+        function esc_attr( mixed $value ): string {
+            return (string) $value;
+        }
+    }
+    if ( ! function_exists( 'esc_html' ) ) {
+        function esc_html( mixed $value ): string {
+            return (string) $value;
+        }
+    }
+    if ( ! function_exists( 'esc_url' ) ) {
+        function esc_url( mixed $value ): string {
+            return (string) $value;
+        }
+    }
+    if ( ! function_exists( 'absint' ) ) {
+        function absint( mixed $value ): int {
+            return abs( (int) $value );
+        }
+    }
+    if ( ! function_exists( 'wp_json_encode' ) ) {
+        function wp_json_encode( mixed $value, int $flags = 0, int $depth = 512 ): string|false {
+            return json_encode( $value, $flags, $depth );
+        }
+    }
+    if ( ! function_exists( 'wp_register_script' ) ) {
+        function wp_register_script(): bool {
+            return true;
+        }
+    }
+    if ( ! function_exists( 'wp_enqueue_script' ) ) {
+        function wp_enqueue_script(): void {}
+    }
+    if ( ! function_exists( 'wp_enqueue_style' ) ) {
+        function wp_enqueue_style(): void {}
+    }
+    if ( ! function_exists( 'wp_parse_args' ) ) {
+        /**
+         * @param array<string, mixed>|object|string $args
+         * @param array<string, mixed>               $defaults
+         * @return array<string, mixed>
+         */
+        function wp_parse_args( mixed $args, array $defaults = array() ): array {
+            if ( is_object( $args ) ) {
+                $args = get_object_vars( $args );
+            }
+            if ( ! is_array( $args ) ) {
+                parse_str( (string) $args, $args );
+            }
+            return array_merge( $defaults, $args );
+        }
+    }
+    if ( ! function_exists( 'sanitize_text_field' ) ) {
+        function sanitize_text_field( string $value ): string {
+            return trim( $value );
+        }
+    }
+    if ( ! function_exists( 'sanitize_key' ) ) {
+        function sanitize_key( string $key ): string {
+            return strtolower( preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $key ) ) ?? '' );
+        }
+    }
+    if ( ! function_exists( 'wp_kses_post' ) ) {
+        function wp_kses_post( string $value ): string {
+            return $value;
+        }
+    }
+    if ( ! function_exists( 'wp_unslash' ) ) {
+        function wp_unslash( mixed $value ): mixed {
+            return $value;
+        }
+    }
+    if ( ! function_exists( 'is_admin' ) ) {
+        function is_admin(): bool {
+            return false;
+        }
+    }
+    if ( ! function_exists( 'did_action' ) ) {
+        function did_action( string $hook_name ): int {
+            unset( $hook_name );
+            return 0;
+        }
+    }
+    if ( ! function_exists( 'doing_action' ) ) {
+        function doing_action( ?string $hook_name = null ): bool {
+            unset( $hook_name );
+            return false;
+        }
+    }
+    if ( ! function_exists( 'add_filter' ) ) {
+        function add_filter(): bool {
+            return true;
+        }
+    }
+    if ( ! function_exists( 'add_action' ) ) {
+        function add_action(): bool {
+            return true;
+        }
+    }
+    if ( ! function_exists( 'remove_filter' ) ) {
+        function remove_filter(): bool {
+            return true;
+        }
+    }
+    if ( ! function_exists( 'wp_get_attachment_image_srcset' ) ) {
+        function wp_get_attachment_image_srcset(): string|false {
+            return false;
+        }
+    }
+    if ( ! function_exists( 'wp_get_attachment_image_sizes' ) ) {
+        function wp_get_attachment_image_sizes(): string|false {
+            return false;
+        }
+    }
+    if ( ! function_exists( 'wp_get_attachment_image_url' ) ) {
+        function wp_get_attachment_image_url(): string|false {
+            return false;
+        }
+    }
+    if ( ! function_exists( 'esc_attr__' ) ) {
+        function esc_attr__( string $text, string $domain = '' ): string {
+            unset( $domain );
+            return $text;
+        }
+    }
+    if ( ! function_exists( 'esc_html__' ) ) {
+        function esc_html__( string $text, string $domain = '' ): string {
+            unset( $domain );
+            return $text;
+        }
+    }
+    if ( ! function_exists( '__' ) ) {
+        function __( string $text, string $domain = '' ): string {
+            unset( $domain );
+            return $text;
+        }
+    }
+}
+
 namespace FotoGrids\Render\Internal {
     if ( ! defined( 'WPINC' ) ) {
         define( 'WPINC', 'wp-includes' );
@@ -33,7 +211,7 @@ namespace FotoGrids\Render\Internal {
     }
 }
 
-namespace FotoGrids\Tests\Integration;
+namespace FotoGrids\Tests\Integration {
 
 use FotoGrids\Render\Api\Columns_Mode;
 use FotoGrids\Render\Api\Item_View;
@@ -52,6 +230,7 @@ use FotoGrids\Render\Internal\Render_Controller;
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-columns-mode.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-mode.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-request-source.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-collection-kind.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-item-view.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-module-assets.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-meta.php';
@@ -70,6 +249,17 @@ require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-asset-re
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-item-renderer.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-module-registry.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-render-controller.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-breakpoint-config.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/hooks/filters/class-filters-render.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/watermark/class-watermark-render-filter.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/settings/class-watermark-settings-store.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/hooks/filters/class-filters-watermark.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/class-debug-log.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-layout-wrapper-composer.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-layout-capabilities.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-responsive-var.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/video/class-video-item-helpers.php';
+require_once dirname( __DIR__, 2 ) . '/src/includes/assets/class-loading-icon-library.php';
 
 /**
  * Layout stub used for public render parity checks.
@@ -115,7 +305,7 @@ final class Parity_Layout_Module implements Layout {
         return [ 'fg-layout-grid' ];
     }
 
-    public function structural_data_attrs( Render_Context $render_context ): array {
+    public function wrapper_data_attrs( Render_Context $render_context ): array {
         unset( $render_context );
         return [ 'data-layout' => 'grid' ];
     }
@@ -128,6 +318,23 @@ final class Parity_Layout_Module implements Layout {
     public function assets( Render_Context $render_context ): Module_Assets {
         unset( $render_context );
         return new Module_Assets();
+    }
+
+    public function preferred_thumbnail_size( Render_Context $render_context ): ?string {
+        unset( $render_context );
+        return null;
+    }
+
+    public function requires_thumbnail_size( Render_Context $render_context ): bool {
+        unset( $render_context );
+        return false;
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    public function capabilities(): array {
+        return [];
     }
 }
 
@@ -150,8 +357,9 @@ final class PublicRenderParityTest {
 
         $render_result = Render_Controller::factory()->render( self::make_context( true ) );
 
-        self::assert_contains( 'class="fg-layout-grid fotogrids-gallery"', $render_result->html, 'Wrapper should include fotogrids-gallery class.' );
-        self::assert_contains( 'data-gallery-id="321"', $render_result->html, 'Wrapper should expose gallery ID as data attribute.' );
+        self::assert_contains( 'fotogrids-gallery', $render_result->html, 'Wrapper should include fotogrids-gallery class.' );
+        self::assert_contains( 'fg-layout-grid', $render_result->html, 'Wrapper should include the layout structural class.' );
+        self::assert_contains( 'data-fg-gallery-id="321"', $render_result->html, 'Wrapper should expose gallery ID via the data-fg-* attribute convention.' );
     }
 
     private static function test_render_output_emits_scoped_vars_style_tag(): void {
@@ -185,6 +393,7 @@ final class PublicRenderParityTest {
                 alt: 'Item alt',
                 title: 'Item title',
                 caption: 'Item caption',
+                description: 'Item description',
                 width: 800,
                 height: 600
             );
@@ -211,7 +420,6 @@ final class PublicRenderParityTest {
                 click_behavior: 'lightbox',
                 pagination_type: 'show_all',
                 pagination_method: 'load_more',
-                captions_enabled: true,
                 hover_effect: null
             ),
             settings: $show_error ? [ '_show_render_errors' => true ] : [],
@@ -244,4 +452,5 @@ final class PublicRenderParityTest {
 if ( PHP_SAPI === 'cli' && basename( __FILE__ ) === basename( (string) ( $_SERVER['SCRIPT_FILENAME'] ?? '' ) ) ) {
     PublicRenderParityTest::run();
     fwrite( STDOUT, "PublicRenderParityTest passed\n" );
+}
 }

@@ -57,6 +57,7 @@ use FotoGrids\Render\Internal\Hook_Spy;
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-columns-mode.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-mode.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-request-source.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-collection-kind.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-meta.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-layout.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-render-behavior.php';
@@ -132,7 +133,7 @@ final class HookFiringOrderTest {
         );
     }
 
-    private static function make_render_context( Request_Source $source, int $gallery_id, ?int $album_id ): Render_Context {
+    private static function make_render_context( string $source, int $gallery_id, ?int $album_id ): Render_Context {
         return new Render_Context(
             meta: new Render_Meta(
                 gallery_id: $gallery_id,
@@ -154,7 +155,6 @@ final class HookFiringOrderTest {
                 click_behavior: 'lightbox',
                 pagination_type: 'show_all',
                 pagination_method: 'load_more',
-                captions_enabled: true,
                 hover_effect: null
             ),
             settings: [],
