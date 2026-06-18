@@ -5,8 +5,10 @@
  */
 
 import React, { useState } from 'react';
-import { Button, RadioControl, TextareaControl } from '@wordpress/components';
 import { Modal } from '../components/shared/Modal';
+import { Button } from '../components/shared/Button';
+import RadioGroup from '../components/shared/RadioGroup';
+import Textarea from '../components/shared/Textarea';
 
 const MAX_DETAIL_LENGTH = 128;
 
@@ -16,21 +18,28 @@ const MAX_DETAIL_LENGTH = 128;
  * @param {Function} props.onSubmit  Called with the selected reason + details.
  * @param {Function} props.onSkip    Called when the user skips feedback.
  * @param {Function} props.onCancel  Called when the user cancels.
+ * @param {Function} props.onClose   Called when the user dismisses via the header close button.
  * @return {JSX.Element} The composed modal content.
  */
-export default function ReasonsForm({ settings, onSubmit, onSkip, onCancel }) {
+export default function ReasonsForm({
+	settings,
+	onSubmit,
+	onSkip,
+	onCancel,
+	onClose,
+}) {
 	const { reasons, i18n } = settings;
 	const [selectedId, setSelectedId] = useState(null);
 	const [details, setDetails] = useState('');
 	const [busy, setBusy] = useState(false);
 
-	const options = reasons.map(reason => ({
+	const options = reasons.map((reason) => ({
 		label: reason.text,
 		value: String(reason.id),
 	}));
 
 	const selectedReason = reasons.find(
-		reason => String(reason.id) === selectedId
+		(reason) => String(reason.id) === selectedId
 	);
 	const placeholder = selectedReason ? selectedReason.placeholder : '';
 
@@ -46,8 +55,17 @@ export default function ReasonsForm({ settings, onSubmit, onSkip, onCancel }) {
 
 	return (
 		<>
-			<Modal.Header>
+			<Modal.Header compact closeButton={false}>
+				<Modal.HeaderLogo />
 				<Modal.HeaderTitle>{i18n.title}</Modal.HeaderTitle>
+				<Modal.HeaderActions>
+					<Modal.HeaderClose
+						onClick={(event) => {
+							event.preventDefault();
+							if (!busy && onClose) onClose();
+						}}
+					/>
+				</Modal.HeaderActions>
 			</Modal.Header>
 
 			<Modal.Body>
@@ -56,17 +74,18 @@ export default function ReasonsForm({ settings, onSubmit, onSkip, onCancel }) {
 						{i18n.intro}
 					</p>
 
-					<RadioControl
+					<RadioGroup
 						selected={selectedId}
 						options={options}
-						onChange={value => {
+						ariaLabel={i18n.title}
+						onChange={(value) => {
 							setSelectedId(value);
 							setDetails('');
 						}}
 					/>
 
 					{placeholder ? (
-						<TextareaControl
+						<Textarea
 							label={i18n.detailsLabel}
 							placeholder={placeholder}
 							value={details}
@@ -77,13 +96,20 @@ export default function ReasonsForm({ settings, onSubmit, onSkip, onCancel }) {
 				</div>
 			</Modal.Body>
 
-			<Modal.Footer align="between">
-				<Button variant="link" onClick={onCancel} disabled={busy}>
+			<Modal.Footer align="between" compact>
+				<Button
+					variant="secondary"
+					style="ghost"
+					size="sm"
+					onClick={onCancel}
+					disabled={busy}
+				>
 					{i18n.cancelLabel}
 				</Button>
 				<div className="fotogrids-deactivation-form__primary-actions">
 					<Button
 						variant="tertiary"
+						size="sm"
 						onClick={onSkip}
 						disabled={busy}
 					>
@@ -91,6 +117,7 @@ export default function ReasonsForm({ settings, onSubmit, onSkip, onCancel }) {
 					</Button>
 					<Button
 						variant="primary"
+						size="sm"
 						onClick={handleSubmit}
 						busy={busy}
 						disabled={busy || !selectedId}

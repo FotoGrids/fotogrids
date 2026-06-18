@@ -99,6 +99,17 @@ class Deactivation_Feedback {
 		if ( wp_script_is( 'fotogrids-global-modal', 'registered' ) ) {
 			$deps[] = 'fotogrids-global-modal';
 		}
+		if ( wp_script_is( \FotoGrids\Modules\PageBuilders\Module::FG_ICONS_SCRIPT_HANDLE, 'registered' ) ) {
+			$deps[] = \FotoGrids\Modules\PageBuilders\Module::FG_ICONS_SCRIPT_HANDLE;
+
+			wp_localize_script(
+				\FotoGrids\Modules\PageBuilders\Module::FG_LOADING_ICONS_SCRIPT_HANDLE,
+				'fotogridsAdmin',
+				array(
+					'pluginUrl' => FOTOGRIDS_PLUGIN_URL,
+				)
+			);
+		}
 
 		wp_enqueue_script(
 			'fotogrids-deactivation-feedback',
@@ -108,14 +119,16 @@ class Deactivation_Feedback {
 			true
 		);
 
-		// The full FotoGrids admin stylesheet only loads on FotoGrids screens,
-		// so the modal styles are enqueued standalone here for the Plugins page.
-		wp_enqueue_style(
-			'fotogrids-fg-modal',
-			FOTOGRIDS_PLUGIN_URL . 'assets/css/fg-modal-styles.css',
-			array( 'wp-components' ),
-			FOTOGRIDS_VERSION
-		);
+		if ( wp_style_is( \FotoGrids\Modules\PageBuilders\Module::FG_SHARED_STYLE_HANDLE, 'registered' ) ) {
+			wp_enqueue_style( \FotoGrids\Modules\PageBuilders\Module::FG_SHARED_STYLE_HANDLE );
+		} else {
+			wp_enqueue_style(
+				'fotogrids-fg-modal',
+				FOTOGRIDS_PLUGIN_URL . 'assets/css/fg-modal-styles.css',
+				array( 'wp-components' ),
+				FOTOGRIDS_VERSION
+			);
+		}
 
 		wp_set_script_translations( 'fotogrids-deactivation-feedback', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 
@@ -127,11 +140,13 @@ class Deactivation_Feedback {
 				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 				'action'         => $fs->get_ajax_action( self::FREEMIUS_TAG ),
 				'security'       => $fs->get_ajax_security( self::FREEMIUS_TAG ),
+				'moduleId'       => $fs->get_id(),
 				'snoozePeriod'   => self::SNOOZE_PERIOD,
+				'debug'          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'reasons'        => self::reasons(),
 				'i18n'           => array(
 					'title'        => __( 'Quick question before you go', 'fotogrids' ),
-					'intro'        => __( 'If you have a moment, please let us know why you are deactivating FotoGrids. It helps us improve.', 'fotogrids' ),
+					'intro'        => __( 'If you have a moment, please let us know what made you deactivate FotoGrids. It helps us understand what to improve next.', 'fotogrids' ),
 					'submitLabel'  => __( 'Submit & Deactivate', 'fotogrids' ),
 					'skipLabel'    => __( 'Skip & Deactivate', 'fotogrids' ),
 					'cancelLabel'  => __( 'Cancel', 'fotogrids' ),

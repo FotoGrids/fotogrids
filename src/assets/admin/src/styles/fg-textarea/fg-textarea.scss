@@ -1,0 +1,71 @@
+@use "../colors.scss" as *;
+
+.fg-textarea {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	&__label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	&__required {
+		color: var(--fg-text-error);
+		font-weight: 700;
+	}
+
+	&__control {
+		width: 100%;
+		min-height: 80px;
+		margin: 0;
+		padding: 8px 12px;
+		border: 1px solid var(--fg-border-dark);
+		border-radius: 4px;
+		font-size: 14px;
+		font-family: inherit;
+		line-height: 1.5;
+		resize: vertical;
+		box-sizing: border-box;
+
+		&:focus {
+			border-color: var(--fg-blue);
+			outline: none;
+			box-shadow: none;
+		}
+
+		&:disabled {
+			background-color: #f6f7f7;
+			color: var(--fg-text-tertiary);
+			cursor: not-allowed;
+			opacity: 0.7;
+		}
+	}
+
+	&__description {
+		margin: 0;
+		font-size: 12px;
+		color: var(--fg-text-secondary);
+		line-height: 1.4;
+	}
+
+	&__error {
+		margin: 0;
+		font-size: 12px;
+		color: var(--fg-text-error);
+		line-height: 1.4;
+	}
+
+	&--has-error &__control {
+		border-color: var(--fg-text-error);
+
+		&:focus {
+			border-color: var(--fg-text-error);
+			box-shadow: 0 0 0 1px var(--fg-text-error);
+		}
+	}
+}

@@ -11,7 +11,7 @@ import React from 'react';
 import ReasonsForm from './ReasonsForm.jsx';
 
 const SETTINGS_KEY = 'fotogridsDeactivation';
-const POST_TIMEOUT_MS = 1500;
+const POST_TIMEOUT_MS = 4000;
 
 function getSettings() {
 	return window[SETTINGS_KEY] || null;
@@ -71,6 +71,7 @@ function submitToFreemius(settings, reason) {
 	const body = new URLSearchParams();
 	body.set('action', settings.action);
 	body.set('security', settings.security);
+	body.set('module_id', settings.moduleId);
 	body.set('reason_id', reason.id);
 	body.set('reason_info', reason.details || '');
 	if (reason.snooze) {
@@ -87,7 +88,32 @@ function submitToFreemius(settings, reason) {
 		body: body.toString(),
 		signal: controller.signal,
 	})
-		.catch(() => {})
+		.then(async (response) => {
+			// The Freemius handler echoes '1' and exits on success. Anything
+			// else (400 nonce failure, empty body from a rejected reason_id) is
+			// surfaced only under WP_DEBUG so the flow stays silent in
+			// production but is observable while developing.
+			if (settings.debug) {
+				const text = await response.text();
+				if (!response.ok || text.trim() !== '1') {
+					// eslint-disable-next-line no-console
+					console.warn(
+						'[FotoGrids] Deactivation feedback not accepted:',
+						response.status,
+						JSON.stringify(text)
+					);
+				}
+			}
+		})
+		.catch((error) => {
+			if (settings.debug && error.name !== 'AbortError') {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'[FotoGrids] Deactivation feedback failed:',
+					error
+				);
+			}
+		})
 		.finally(() => clearTimeout(timer));
 }
 
@@ -104,8 +130,8 @@ function openModal(settings, link) {
 
 	const handle = api.open({
 		type: 'custom',
-		size: 'md',
-		closeOnOverlay: false,
+		size: 'sm',
+		closeOnOverlay: true,
 		render: ({ close }) =>
 			React.createElement(ReasonsForm, {
 				settings,
@@ -119,6 +145,11 @@ function openModal(settings, link) {
 					navigate(link.href);
 				},
 				onCancel: () => close('cancel'),
+				// ReasonsForm is rendered inside a separate bundle's Modal, so
+				// its own Modal context provider isn't in the tree and the
+				// built-in context-driven close is a no-op. Pass the real close
+				// from ModalRoot and wire the header X to it explicitly.
+				onClose: () => close('close-button'),
 			}),
 	});
 
