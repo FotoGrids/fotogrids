@@ -273,6 +273,10 @@
 		color: var(--fg-text-secondary);
 		line-height: 1.5;
 		max-width: 64ch;
+
+		&--long {
+			max-width: 100%;
+		}
 	}
 
 	&__action {

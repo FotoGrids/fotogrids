@@ -465,10 +465,6 @@ const mainConfig = {
                     to: 'readme.txt',
                 },
                 {
-                    from: 'src/phpcs.xml',
-                    to: 'phpcs.xml',
-                },
-                {
                     from: 'src/license.txt',
                     to: 'license.txt',
                 },
@@ -736,7 +732,7 @@ const mainConfig = {
             },
         },
     },
-    devtool: isProduction ? 'source-map' : 'eval-source-map',
+    devtool: isProduction ? false : 'eval-source-map',
     mode: isProduction ? 'production' : 'development',
     watchOptions: {
         ignored: /node_modules/,

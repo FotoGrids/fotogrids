@@ -1,6 +1,5 @@
 === FotoGrids - Photo Gallery, Albums, Lightbox, Masonry, Slider & Portfolio ===
 Contributors: FotoGrids
-Donate link: https://go.fotogrids.com/donate
 Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.1
 Tested up to: 7.0
@@ -193,13 +192,42 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 = 1.0.0 =
 The only WordPress gallery plugin you'll ever need. Eight layouts, video, an immersive lightbox, albums, templates, and built-in statistics - beautiful by default.
 
+== External Services ==
+
+FotoGrids connects to a few external services. What each one does, when it runs, and what it sends is listed below.
+
+1. Freemius
+
+This plugin uses Freemius to handle activation, license management for FotoGrids Pro, and optional usage analytics. On activation you are shown an opt-in screen and can skip it. If you opt in, Freemius collects information such as your site URL, WordPress and PHP versions, active theme and plugins, and your administrator email. If you skip, this data is not sent. This service runs on plugin activation and when checking for updates or validating a license.
+
+Freemius terms of service: https://freemius.com/terms/
+Freemius privacy policy: https://freemius.com/privacy/
+
+2. FotoGrids usage statistics (optional, off by default)
+
+If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes your site URL, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
+
+FotoGrids privacy policy: https://go.fotogrids.com/privacy/
+
+3. Google Fonts metadata
+
+When you open the FotoGrids settings where you choose a font, the plugin requests the public Google Fonts metadata list (https://fonts.google.com/metadata/fonts) to populate the font picker. This request is made from your server (not your visitors' browsers), is cached, and sends no personal data. It runs only in wp-admin when the font picker is loaded.
+
+Google privacy policy: https://policies.google.com/privacy
+Google Fonts FAQ: https://developers.google.com/fonts/faq/privacy
+
+4. YouTube and Vimeo oEmbed
+
+When you add a YouTube or Vimeo video to a gallery, FotoGrids calls the relevant provider's public oEmbed endpoint to fetch the video's title and thumbnail. The video URL you entered is sent to that provider. This runs only when you add or resolve a video embed in the editor.
+
+YouTube/Google privacy policy: https://policies.google.com/privacy
+Vimeo privacy policy: https://vimeo.com/privacy
+
 == Privacy Policy ==
 
-FotoGrids respects your privacy:
-
-* It does not collect personal data without consent.
-* Gallery statistics are stored locally in your own WordPress database.
-* No data is sent to external servers, except for Pro license validation.
-* It is built to support GDPR and other privacy requirements.
+* Gallery statistics (views and shares) are stored locally in your own WordPress database.
+* No personal data is collected or sent to FotoGrids without your consent. The "Share anonymous statistics" setting is off by default.
+* External services are listed in the "External Services" section above, along with what each one sends and when.
+* FotoGrids is built to support GDPR and other privacy requirements.
 
 For more details, see our [Privacy Policy](https://go.fotogrids.com/privacy/).

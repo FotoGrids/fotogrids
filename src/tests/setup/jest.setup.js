@@ -1,12 +1,15 @@
 /**
  * Jest Setup File
- * 
+ *
  * Global test setup and configuration
  */
 
 import '@testing-library/jest-dom';
 
-// Mock WordPress globals
+global.React = require('react');
+
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
 global.wp = {
     element: require('@wordpress/element'),
     components: require('@wordpress/components'),
@@ -31,13 +34,11 @@ global.wp = {
     }
 };
 
-// Mock WordPress API settings
 global.wpApiSettings = {
     root: 'https://example.com/wp-json/',
     nonce: 'test-nonce'
 };
 
-// Mock FotoGrids globals
 global.fotogrids = {
     restUrl: 'https://example.com/wp-json/fotogrids/v1/',
     nonce: 'test-nonce',
@@ -48,21 +49,60 @@ global.fotogrids = {
     }
 };
 
-// Mock console methods in tests
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
+// React dev-mode "key" warnings come from label/badge child arrays in the
+// plain render-settings helpers. They are non-breaking reconciliation hints,
+// not test failures, so they are filtered here to keep the suite output clean.
+// NOTE: act(...) warnings are intentionally NOT filtered - those can indicate
+// real timing bugs and should stay visible.
+// React logs warnings via printf-style args: console.error(template, ...subs)
+// where the component name lands in a later arg (e.g. 'update to %s', 'Root').
+// Join everything to a single string before matching so both the template and
+// its substitutions are visible to the filters below.
+const joinArgs = (args) =>
+    args.map((a) => (typeof a === 'string' ? a : '')).join(' ');
+
+// React dev-mode "key" warnings come from label/badge child arrays in the
+// plain render-settings helpers. They are non-breaking reconciliation hints,
+// not test failures, so they are filtered here to keep the suite output clean.
+const isReactKeyWarning = (text) =>
+    text.includes('unique "key" prop') ||
+    text.includes('Each child in a list should have a unique');
+
+// A handful of admin entry modules bootstrap themselves by calling
+// createRoot().render() inside their own setTimeout(0) (toast-init,
+// album-assignment, album-galleries). When a test exercises that bootstrap the
+// resulting render is owned by the module's timer, not the test, so React emits
+// a "not wrapped in act(...)" warning that no amount of test-side flushing can
+// remove. Suppress ONLY those specific component updates so genuine act
+// warnings elsewhere stay visible.
+const TIMER_BOOTSTRAP_COMPONENTS = [
+    'ToastApp',
+    'AlbumAssignment',
+    'AlbumGalleries',
+    'Root',
+];
+const isTimerBootstrapActWarning = (text) =>
+    text.includes('was not wrapped in act') &&
+    TIMER_BOOTSTRAP_COMPONENTS.some((name) => text.includes(name));
+
 beforeAll(() => {
     console.error = (...args) => {
-        if (
-            typeof args[0] === 'string' &&
-            args[0].includes('Warning: ReactDOM.render is deprecated')
-        ) {
+        const text = joinArgs(args);
+        if (text.includes('Warning: ReactDOM.render is deprecated')) {
+            return;
+        }
+        if (isReactKeyWarning(text)) {
+            return;
+        }
+        if (isTimerBootstrapActWarning(text)) {
             return;
         }
         originalConsoleError.call(console, ...args);
     };
-    
+
     console.warn = (...args) => {
         if (
             typeof args[0] === 'string' &&
@@ -82,7 +122,11 @@ afterAll(() => {
     console.warn = originalConsoleWarn;
 });
 
-// Mock IntersectionObserver
+// jsdom has no scrollIntoView - provide a no-op so modules that call it work.
+if (!window.HTMLElement.prototype.scrollIntoView) {
+    window.HTMLElement.prototype.scrollIntoView = function () {};
+}
+
 global.IntersectionObserver = class IntersectionObserver {
     constructor() {}
     observe() {}
@@ -90,7 +134,6 @@ global.IntersectionObserver = class IntersectionObserver {
     disconnect() {}
 };
 
-// Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
     constructor() {}
     observe() {}
@@ -98,7 +141,6 @@ global.ResizeObserver = class ResizeObserver {
     disconnect() {}
 };
 
-// Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: jest.fn().mockImplementation(query => ({
@@ -113,7 +155,6 @@ Object.defineProperty(window, 'matchMedia', {
     })),
 });
 
-// Mock window.getComputedStyle
 Object.defineProperty(window, 'getComputedStyle', {
     value: () => ({
         getPropertyValue: () => '',
@@ -122,7 +163,6 @@ Object.defineProperty(window, 'getComputedStyle', {
     })
 });
 
-// Mock fetch
 global.fetch = jest.fn(() =>
     Promise.resolve({
         ok: true,
@@ -130,7 +170,6 @@ global.fetch = jest.fn(() =>
     })
 );
 
-// Setup test utilities
 export const createMockGallery = (overrides = {}) => ({
     id: 1,
     title: 'Test Gallery',

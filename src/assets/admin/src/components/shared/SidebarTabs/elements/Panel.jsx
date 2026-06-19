@@ -30,6 +30,7 @@ const Panel = ({
     noBody = false,
     noBodyPadding = false,
     equalBodyPadding = false,
+    longDescription = false,
     bare = false,
     className = '',
     children,
@@ -61,7 +62,7 @@ const Panel = ({
                             <TitleTag className={`${baseClass}__title ${baseClass}__title--${safeTitleTag}`}>{title}</TitleTag>
                         )}
                         {description && (
-                            <p className={`${baseClass}__description`}>{description}</p>
+                            <p className={`${baseClass}__description ${longDescription ? `${baseClass}__description--long` : ''}`}>{description}</p>
                         )}
                     </div>
                     {action && (

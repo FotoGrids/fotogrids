@@ -10,16 +10,14 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Migration Tool
  *
- * Brings galleries created in other WordPress gallery plugins (Envira,
- * Modula, NextGEN, and WordPress core [gallery] / block galleries) into
- * FotoGrids.
+ * Brings galleries created in WordPress core ([gallery] shortcodes and
+ * gallery blocks) and in other gallery/slider plugins into FotoGrids.
  *
- * SCAFFOLD STATE: this first pass registers the tool and ships the admin
- * UI chrome only - a source-plugin picker with no functional import behind
- * it. No REST routes are registered yet; init() is intentionally a no-op.
- * See Plugin/docs/migration-tool-plan.md for the full design.
+ * The WordPress core source imports for real; competitor gallery and slider
+ * plugins are registered for discoverability and report whether their data is
+ * present, but their import readers are not implemented yet.
  *
- * REST routes (planned, NOT yet registered):
+ * REST routes:
  *   GET  /fotogrids/v1/admin/tools/migration/sources
  *   GET  /fotogrids/v1/admin/tools/migration/scan
  *   POST /fotogrids/v1/admin/tools/migration/import
@@ -50,26 +48,32 @@ class Migration_Tool extends Abstract_Tool {
 	}
 
 	/**
+	 * {@inheritdoc}
+	 *
 	 * Grouped with Import / Export - both are data-movement tools.
+	 *
+	 * @since 1.0.0
 	 */
 	public function get_group(): string {
 		return 'data';
 	}
 
 	/**
+	 * {@inheritdoc}
+	 *
 	 * Custom capability so the Permissions Manager can expose per-tool
 	 * access control independently of the global manage_fotogrids gate.
-	 * Harvested automatically from the registry - no activator wiring needed.
+	 *
+	 * @since 1.0.0
 	 */
 	public function get_capability(): string {
 		return 'fotogrids_migration';
 	}
 
 	/**
-	 * Available = true so the tool renders its own React component (the
-	 * source picker) rather than the registry's generic "coming soon"
-	 * screen. The component itself communicates that import is not yet
-	 * functional. Flip the per-source actions on as each reader lands.
+	 * {@inheritdoc}
+	 *
+	 * @since 1.0.0
 	 */
 	public function is_available(): bool {
 		return true;
@@ -93,11 +97,134 @@ class Migration_Tool extends Abstract_Tool {
 	}
 
 	/**
-	 * No-op for now. REST routes will be registered here once the
-	 * sources/ readers and the import writer are implemented. See the
-	 * planned route list in this class's docblock.
+	 * {@inheritdoc}
+	 *
+	 * Loads and registers the migration sources, then registers the
+	 * tool's REST routes.
+	 *
+	 * @since 1.0.0
 	 */
 	public function init(): void {
-		// Intentionally empty - scaffold stage, no REST routes yet.
+		$this->load_sources();
+
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/tools/migration/sources',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( Migration_Data::class, 'sources' ),
+				'permission_callback' => array( $this, 'check_permission' ),
+			)
+		);
+
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/tools/migration/scan',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( Migration_Data::class, 'scan' ),
+				'permission_callback' => array( $this, 'check_permission' ),
+				'args'                => array(
+					'source' => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/tools/migration/import',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( Migration_Data::class, 'import' ),
+				'permission_callback' => array( $this, 'check_permission' ),
+				'args'                => array(
+					'source'   => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'refs'     => array(
+						'type'     => 'array',
+						'items'    => array( 'type' => 'string' ),
+						'required' => true,
+					),
+					'conflict' => array(
+						'type'    => 'string',
+						'enum'    => array( 'skip', 'duplicate' ),
+						'default' => 'skip',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/tools/migration/log',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( Migration_Data::class, 'log' ),
+				'permission_callback' => array( $this, 'check_permission' ),
+			)
+		);
+	}
+
+	/**
+	 * Require the source layer and register every source.
+	 *
+	 * Registration order is the order the cards appear in the picker:
+	 * WordPress core first, then gallery plugins, then slider plugins.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	private function load_sources(): void {
+		$dir = __DIR__ . '/sources/';
+
+		require_once $dir . 'interface-source.php';
+		require_once $dir . 'class-abstract-source.php';
+		require_once $dir . 'class-source-registry.php';
+		require_once $dir . 'class-gallery-writer.php';
+		require_once $dir . 'class-wp-core-source.php';
+		require_once $dir . 'class-nextgen-source.php';
+		require_once $dir . 'class-envira-source.php';
+		require_once $dir . 'class-foogallery-source.php';
+		require_once $dir . 'class-modula-source.php';
+		require_once $dir . 'class-tenweb-photo-gallery-source.php';
+		require_once $dir . 'class-meow-gallery-source.php';
+		require_once $dir . 'class-visual-portfolio-source.php';
+		require_once $dir . 'class-responsive-lightbox-source.php';
+		require_once $dir . 'class-robo-gallery-source.php';
+		require_once $dir . 'class-bestwebsoft-gallery-source.php';
+		require_once $dir . 'class-slider-revolution-source.php';
+		require_once $dir . 'class-layerslider-source.php';
+		require_once $dir . 'class-smart-slider-source.php';
+		require_once $dir . 'class-metaslider-source.php';
+		require_once __DIR__ . '/class-migration-data.php';
+
+		$ns = 'FotoGrids\\Tools\\Migration\\Sources\\';
+
+		$sources = array(
+			$ns . 'WP_Core_Source',
+			$ns . 'NextGen_Source',
+			$ns . 'Envira_Source',
+			$ns . 'FooGallery_Source',
+			$ns . 'Modula_Source',
+			$ns . 'TenWeb_Photo_Gallery_Source',
+			$ns . 'Meow_Gallery_Source',
+			$ns . 'Visual_Portfolio_Source',
+			$ns . 'Responsive_Lightbox_Source',
+			$ns . 'Robo_Gallery_Source',
+			$ns . 'BestWebSoft_Gallery_Source',
+			$ns . 'Slider_Revolution_Source',
+			$ns . 'LayerSlider_Source',
+			$ns . 'Smart_Slider_Source',
+			$ns . 'MetaSlider_Source',
+		);
+
+		foreach ( $sources as $class ) {
+			Sources\Source_Registry::register( new $class() );
+		}
 	}
 }

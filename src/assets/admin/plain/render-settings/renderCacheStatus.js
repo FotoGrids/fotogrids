@@ -161,7 +161,7 @@ const CacheStatusComponent = ({
 				React.createElement(
 					'span',
 					{
-						key: 'label',
+						key: 'cached-label',
 						className: `${baseClass}__meta__label`,
 					},
 					__('Cached at', 'fotogrids')
@@ -169,7 +169,7 @@ const CacheStatusComponent = ({
 				React.createElement(
 					'span',
 					{
-						key: 'value',
+						key: 'cached-value',
 						className: `${baseClass}__meta__value`,
 					},
 					formatDate(meta.cached_at)
@@ -177,7 +177,7 @@ const CacheStatusComponent = ({
 				React.createElement(
 					'span',
 					{
-						key: 'label',
+						key: 'expires-label',
 						className: `${baseClass}__meta__label`,
 					},
 					__('Expires at', 'fotogrids')
@@ -185,7 +185,7 @@ const CacheStatusComponent = ({
 				React.createElement(
 					'span',
 					{
-						key: 'value',
+						key: 'expires-value',
 						className: `${baseClass}__meta__value`,
 					},
 					formatDate(meta.expires_at)

@@ -246,7 +246,7 @@ function AlphaColorPicker({
 		[
 			h(
 				'label',
-				{ className: 'fotogrids-setting__label' },
+				{ className: 'fotogrids-setting__label', key: 'label' },
 				[
 					setting.label,
 					showSettingBadge &&
@@ -260,7 +260,7 @@ function AlphaColorPicker({
 						),
 				].filter(Boolean)
 			),
-			h('div', { className: inputClassName, ref: triggerRef }, [
+			h('div', { className: inputClassName, ref: triggerRef, key: 'control' }, [
 				h(
 					'button',
 					{
@@ -320,9 +320,11 @@ function AlphaColorPicker({
 											: undefined,
 								},
 							}),
-							document.body
+							document.body,
+							'popover'
 						)
 					: h('div', {
+							key: 'popover',
 							className:
 								'fotogrids-color-popover fotogrids-color-popover--open',
 							ref: popoverRef,
