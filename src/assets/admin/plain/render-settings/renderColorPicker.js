@@ -260,47 +260,53 @@ function AlphaColorPicker({
 						),
 				].filter(Boolean)
 			),
-			h('div', { className: inputClassName, ref: triggerRef, key: 'control' }, [
-				h(
-					'button',
-					{
-						type: 'button',
-						className:
-							'fotogrids-color-swatch' +
-							(isDisabled
-								? ' fotogrids-color-swatch--disabled'
-								: ''),
-						onClick: toggleOpen,
-						onFocus: () => setFocused(true),
-						onBlur: () => setFocused(false),
-						disabled: isDisabled,
-						'aria-label': __('Pick color', 'fotogrids'),
-						'aria-expanded': open ? 'true' : 'false',
-					},
-					[
-						h('span', {
-							className: 'fotogrids-color-swatch__fill',
-							style: { background: value },
-						}),
-					]
-				),
+			h(
+				'div',
+				{ className: inputClassName, ref: triggerRef, key: 'control' },
+				[
+					h(
+						'button',
+						{
+							type: 'button',
+							className:
+								'fotogrids-color-swatch' +
+								(isDisabled
+									? ' fotogrids-color-swatch--disabled'
+									: ''),
+							onClick: toggleOpen,
+							onFocus: () => setFocused(true),
+							onBlur: () => setFocused(false),
+							disabled: isDisabled,
+							'aria-label': __('Pick color', 'fotogrids'),
+							'aria-expanded': open ? 'true' : 'false',
+						},
+						[
+							h('span', {
+								className: 'fotogrids-color-swatch__fill',
+								style: { background: value },
+							}),
+						]
+					),
 
-				h('input', {
-					type: 'text',
-					className: 'fotogrids-color-text',
-					value,
-					readOnly: true,
-					disabled: isDisabled,
-					placeholder: setting.default || '#000000',
-					onClick: toggleOpen,
-					onFocus: () => {
-						setFocused(true);
-						toggleOpen();
-					},
-					onBlur: () => setFocused(false),
-					style: { cursor: isDisabled ? 'not-allowed' : 'pointer' },
-				}),
-			]),
+					h('input', {
+						type: 'text',
+						className: 'fotogrids-color-text',
+						value,
+						readOnly: true,
+						disabled: isDisabled,
+						placeholder: setting.default || '#000000',
+						onClick: toggleOpen,
+						onFocus: () => {
+							setFocused(true);
+							toggleOpen();
+						},
+						onBlur: () => setFocused(false),
+						style: {
+							cursor: isDisabled ? 'not-allowed' : 'pointer',
+						},
+					}),
+				]
+			),
 
 			open &&
 				popoverPosition &&
