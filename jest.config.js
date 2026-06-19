@@ -49,6 +49,9 @@ module.exports = {
         '!src/assets/**/index.{js,ts}',
         '!src/assets/**/*.stories.{js,ts,tsx}',
         '!src/assets/admin/plain/icons.js',
+        '!src/assets/**/vendor/**',
+        '!src/assets/**/*.min.js',
+        '!src/assets/**/*.umd.js',
         '!src/tests/**/*'
     ],
 
