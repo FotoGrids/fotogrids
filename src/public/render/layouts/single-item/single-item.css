@@ -13,3 +13,153 @@
     min-width: 0;
     width: 100%;
 }
+
+/* Animate Images (auto progress). The full set renders stacked: the active
+   item sits in normal flow and gives the track its height; the rest are
+   absolutely positioned on top and cross-fade. */
+
+[data-fg-si-auto-progress="1"] .fg-single-item-track {
+    position: relative;
+}
+
+[data-fg-si-auto-progress="1"] .fg-single-item-track > .fg-item {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--fg-si-fade-duration, 600ms) ease;
+}
+
+[data-fg-si-auto-progress="1"] .fg-single-item-track > .fg-item.fg-is-active {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+[data-fg-si-auto-progress="1"] .fg-single-item-track > .fg-item.fg-is-leaving {
+    z-index: 0;
+}
+
+[data-fg-si-auto-progress="1"] .fg-single-item-track > .fg-item.fg-item-hidden {
+    opacity: 0;
+}
+
+/* Progress indicator - a fill bar pinned to one edge, or a circular spinner.
+   The fill/spin duration is the per-slide delay, stamped on
+   --fg-si-progress-duration by the JS. */
+
+.fg-si-progress {
+    --fg-si-color-progress: var(--fg-colors-blue, rgba(60, 70, 240, 1));
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.fg-si-progress--bar.fg-si-progress--top,
+.fg-si-progress--bar.fg-si-progress--bottom {
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.fg-si-progress--bar.fg-si-progress--top {
+    top: 0;
+}
+
+.fg-si-progress--bar.fg-si-progress--bottom {
+    bottom: 0;
+}
+
+.fg-si-progress--bar.fg-si-progress--left,
+.fg-si-progress--bar.fg-si-progress--right {
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.fg-si-progress--bar.fg-si-progress--left {
+    left: 0;
+}
+
+.fg-si-progress--bar.fg-si-progress--right {
+    right: 0;
+}
+
+.fg-si-progress-fill {
+    width: 100%;
+    height: 100%;
+    background: var(--fg-si-color-progress);
+}
+
+.fg-si-progress--top .fg-si-progress-fill,
+.fg-si-progress--bottom .fg-si-progress-fill {
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.fg-si-progress--left .fg-si-progress-fill,
+.fg-si-progress--right .fg-si-progress-fill {
+    transform: scaleY(0);
+    transform-origin: center top;
+}
+
+.fg-si-progress--run.fg-si-progress--top .fg-si-progress-fill,
+.fg-si-progress--run.fg-si-progress--bottom .fg-si-progress-fill {
+    animation: fg-si-fill-x var(--fg-si-progress-duration, 5000ms) linear forwards;
+}
+
+.fg-si-progress--run.fg-si-progress--left .fg-si-progress-fill,
+.fg-si-progress--run.fg-si-progress--right .fg-si-progress-fill {
+    animation: fg-si-fill-y var(--fg-si-progress-duration, 5000ms) linear forwards;
+}
+
+.fg-si-progress--spinner {
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+}
+
+.fg-si-progress-ring {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+    border-top-color: var(--fg-si-color-progress);
+    border-radius: 50%;
+}
+
+.fg-si-progress--run .fg-si-progress-ring {
+    animation: fg-si-spin var(--fg-si-progress-duration, 5000ms) linear infinite;
+}
+
+.fg-si-progress--paused .fg-si-progress-fill,
+.fg-si-progress--paused .fg-si-progress-ring {
+    animation-play-state: paused;
+}
+
+@keyframes fg-si-fill-x {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+
+@keyframes fg-si-fill-y {
+    from { transform: scaleY(0); }
+    to   { transform: scaleY(1); }
+}
+
+@keyframes fg-si-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-fg-si-auto-progress="1"] .fg-single-item-track > .fg-item {
+        transition: none;
+    }
+
+    .fg-si-progress-fill,
+    .fg-si-progress-ring {
+        animation: none;
+    }
+}

@@ -8,7 +8,7 @@ use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
-use FotoGrids\Render\Lightbox\Shared\Lightbox_Colors;
+use FotoGrids\Render\Api\Setting_Helpers;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -32,10 +32,8 @@ if ( ! defined( 'WPINC' ) ) {
  * This feature is responsible for:
  *   1. Declaring the LightboxGrid JS + CSS assets (loaded only when active).
  *   2. Stamping the overlay config on the wrapper: the full item list
- *      (data-fg-grid-items), the lightbox colour palette (reused from the
- *      shared Lightbox_Colors helper so the chrome matches the gallery's
- *      lightbox theme), and the gallery's click behaviour so grid tiles
- *      can replay it.
+ *      (data-fg-grid-items), the dark / light theme (data-fg-lb-theme), and
+ *      the gallery's click behaviour so grid tiles can replay it.
  *
  * Activation is per-render: active only on Featured Item galleries that
  * have more items than the layout shows inline (so a Show all button is
@@ -45,6 +43,8 @@ if ( ! defined( 'WPINC' ) ) {
  * @since   1.0.0
  */
 final class Lightbox_Grid implements Feature {
+
+	use Setting_Helpers;
 
 	public function id(): string {
 		return 'fotogrids/lightbox-grid';
@@ -75,10 +75,17 @@ final class Lightbox_Grid implements Feature {
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
 			return false;
 		}
-		if ( 'featured-item' !== $render_context->layout->layout_id ) {
-			return false;
+
+		// Featured Item always uses the grid: the auto "Show all" button (when
+		// the gallery overflows its inline display) and clicking any inline
+		// item both open it.
+		if ( 'featured-item' === $render_context->layout->layout_id ) {
+			return true;
 		}
-		return self::should_show_all( $render_context );
+
+		// On the variant-eligible layouts the grid is the chosen click target:
+		// clicking any item opens the grid overlay.
+		return 'grid' === $render_context->behavior->lightbox_variant;
 	}
 
 	/**
@@ -126,17 +133,20 @@ final class Lightbox_Grid implements Feature {
 				: $item_view->thumb_url;
 
 			$items[] = array(
-				'id'      => $item_view->id,
-				'full'    => '' !== $item_view->full_url ? $item_view->full_url : $item_view->thumb_url,
-				'thumb'   => $thumb,
-				'alt'     => $item_view->alt,
-				'title'   => $item_view->title,
-				'caption' => '' !== $item_view->caption_title ? $item_view->caption_title : $item_view->caption,
-				'video'   => $is_video,
-				'w'       => $item_view->full_width ?? $item_view->width,
-				'h'       => $item_view->full_height ?? $item_view->height,
+				'id'          => $item_view->id,
+				'full'        => '' !== $item_view->full_url ? $item_view->full_url : $item_view->thumb_url,
+				'thumb'       => $thumb,
+				'alt'         => $item_view->alt,
+				'title'       => $item_view->title,
+				'caption'     => '' !== $item_view->caption_title ? $item_view->caption_title : $item_view->caption,
+				'description' => $item_view->description ?? '',
+				'video'       => $is_video,
+				'w'           => $item_view->full_width ?? $item_view->width,
+				'h'           => $item_view->full_height ?? $item_view->height,
 			);
 		}
+
+		$is_featured = 'featured-item' === $render_context->layout->layout_id;
 
 		$attrs = array(
 			'data-fg-grid-items' => wp_json_encode( $items ),
@@ -144,17 +154,114 @@ final class Lightbox_Grid implements Feature {
 			'data-fg-grid-click' => (string) $render_context->behavior->click_behavior,
 		);
 
-		// Reuse the lightbox colour palette for the overlay chrome so it
-		// matches the gallery's lightbox theme. Only the toolbar / backdrop
-		// colours are needed, but stamping the full set is cheap and keeps
-		// the JS simple.
-		$attrs = array_merge( $attrs, Lightbox_Colors::attrs( $render_context->settings ) );
+		// On Featured Item the grid opens from the "Show all" button; on the
+		// variant-eligible layouts clicking any item opens the grid directly.
+		if ( ! $is_featured ) {
+			$attrs['data-fg-grid-open-on-item'] = '1';
+		}
+
+		// Captions use the shared lightweight-lightbox caption settings (mini +
+		// grid share these keys). Caption Location decides whether captions show
+		// in the grid tiles, the full-size view, or both.
+		if ( ! empty( $render_context->settings['lightbox_lite_caption_show'] ) ) {
+			$location = $render_context->settings['lightbox_lite_caption_location'] ?? array( 'grid', 'full' );
+			if ( is_string( $location ) ) {
+				$decoded  = json_decode( $location, true );
+				$location = is_array( $decoded ) ? $decoded : array( 'grid', 'full' );
+			}
+			if ( ! is_array( $location ) ) {
+				$location = array( 'grid', 'full' );
+			}
+
+			$source                               = is_string( $render_context->settings['lightbox_lite_caption_source'] ?? null )
+				? $render_context->settings['lightbox_lite_caption_source']
+				: 'caption';
+			$attrs['data-fg-grid-caption-source'] = $source;
+
+			if ( in_array( 'grid', $location, true ) ) {
+				$attrs['data-fg-grid-captions'] = '1';
+			}
+			if ( in_array( 'full', $location, true ) ) {
+				$attrs['data-fg-grid-full-captions'] = '1';
+			}
+		}
+
+		// Aspect ratio for grid tiles (empty = the layout's own ratio handling).
+		$aspect = is_string( $render_context->settings['lightbox_grid_aspect_ratio'] ?? null )
+			? $render_context->settings['lightbox_grid_aspect_ratio']
+			: '';
+		if ( '' !== $aspect ) {
+			$attrs['data-fg-grid-aspect'] = $aspect;
+		}
+
+		// Max content width per breakpoint (the overlay renders outside the
+		// wrapper, so the JS applies these rather than inheriting a CSS var).
+		$max_raw                            = $render_context->settings['lightbox_grid_max_width'] ?? null;
+		$attrs['data-fg-grid-maxw-desktop'] = $this->resolve_responsive_value( $max_raw, 'desktop', 'vw', '60vw' );
+		$attrs['data-fg-grid-maxw-tablet']  = $this->resolve_responsive_value( $max_raw, 'tablet', 'vw', '80vw' );
+		$attrs['data-fg-grid-maxw-mobile']  = $this->resolve_responsive_value( $max_raw, 'mobile', 'vw', '90vw' );
+
+		// The grid carries its own dark / light theme. The overlay CSS assigns
+		// the chrome colours from this attribute.
+		$attrs['data-fg-lb-theme'] = is_string( $render_context->settings['lightbox_grid_theme'] ?? null )
+			&& 'light' === $render_context->settings['lightbox_grid_theme']
+			? 'light'
+			: 'dark';
+
+		// Optional per-state custom toolbar button colours, overriding the theme
+		// palette. The overlay renders outside the wrapper, so these are passed
+		// as attributes and the JS re-applies them as inline custom properties.
+		foreach ( $this->custom_button_color_attrs( $render_context ) as $attr => $value ) {
+			$attrs[ $attr ] = $value;
+		}
 
 		// Share config (only when sharing is enabled for the gallery). The
 		// Sharing decorator already stamps data-fg-sharing on the wrapper
 		// when sharing is on; the grid JS reads that same attribute, so we
 		// don't duplicate it here - we only need to know whether to show the
 		// toolbar share button, which the JS derives from data-fg-sharing.
+
+		return $attrs;
+	}
+
+	/**
+	 * Per-state custom toolbar button colours, as overlay data attributes.
+	 *
+	 * Returns an empty array unless the Custom Button Colors toggle is on.
+	 * Each set colour is emitted as a data-fg-grid-btn-* attribute; the grid
+	 * JS reads these and writes the matching inline custom properties onto the
+	 * overlay, where they override the theme palette.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return array<string, string>
+	 */
+	private function custom_button_color_attrs( Render_Context $render_context ): array {
+		$settings = $render_context->settings;
+
+		if ( ! $this->setting_to_bool( $settings['lightbox_grid_custom_btn_colors'] ?? null ) ) {
+			return array();
+		}
+
+		$map = array(
+			'lightbox_grid_btn_bg'                 => 'data-fg-grid-btn-bg',
+			'lightbox_grid_btn_color'              => 'data-fg-grid-btn-color',
+			'lightbox_grid_btn_border_color'       => 'data-fg-grid-btn-border-color',
+			'lightbox_grid_btn_hover_bg'           => 'data-fg-grid-btn-hover-bg',
+			'lightbox_grid_btn_hover_color'        => 'data-fg-grid-btn-hover-color',
+			'lightbox_grid_btn_hover_border_color' => 'data-fg-grid-btn-hover-border-color',
+			'lightbox_grid_btn_focus_bg'           => 'data-fg-grid-btn-focus-bg',
+			'lightbox_grid_btn_focus_color'        => 'data-fg-grid-btn-focus-color',
+			'lightbox_grid_btn_focus_border_color' => 'data-fg-grid-btn-focus-border-color',
+		);
+
+		$attrs = array();
+		foreach ( $map as $key => $attr ) {
+			$value = $settings[ $key ] ?? null;
+			if ( is_string( $value ) && '' !== $value ) {
+				$attrs[ $attr ] = $value;
+			}
+		}
 
 		return $attrs;
 	}

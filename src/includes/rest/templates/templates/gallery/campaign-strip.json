@@ -21,8 +21,7 @@
       "mobile": 0
     },
     "captions": true,
-    "cta_overlays": true,
-    "autoplay": true,
-    "autoplay_speed": 5000
+    "layout_autoplay": true,
+    "layout_autoplay_delay": 5000
   }
 }

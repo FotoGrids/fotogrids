@@ -21,13 +21,11 @@ class Templates_Data {
 	 *
 	 * @since 1.0.0
 	 * @param string $category Optional category filter ('gallery' or 'album')
-	 * @param bool $include_pro Whether to include Pro templates
 	 * @return array Array of template data
 	 */
-	private static function load_predefined_templates( $category = null, $include_pro = true ) {
+	private static function load_predefined_templates( $category = null ) {
 		$templates_dir = rtrim( FOTOGRIDS_PLUGIN_DIR, '/' ) . '/includes/rest/templates/templates/';
 		$templates     = array();
-		$is_pro        = \FotoGrids\License_Manager::has_pro();
 
 		$categories = array( 'gallery', 'album' );
 		foreach ( $categories as $cat ) {
@@ -63,19 +61,25 @@ class Templates_Data {
 				$template['isUserTemplate'] = false;
 				$template['category']       = $cat;
 
-				if ( isset( $template['type'] ) && 'pro' === $template['type'] ) {
-					if ( ! $include_pro || ! $is_pro ) {
-						$templates[] = $template;
-					} else {
-						$templates[] = $template;
-					}
-				} else {
-					$templates[] = $template;
-				}
+				$templates[] = $template;
 			}
 		}
 
 		return $templates;
+	}
+
+	/**
+	 * Public accessor for the bundled on-disk templates.
+	 *
+	 * Used as the offline fallback by Templates_Catalog when the remote library
+	 * service is unreachable and nothing is cached.
+	 *
+	 * @since 1.1.0
+	 * @param string|null $category Optional category filter.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function load_bundled_templates( $category = null ) {
+		return self::load_predefined_templates( $category );
 	}
 
 	/**
@@ -90,11 +94,26 @@ class Templates_Data {
 	 */
 	public static function get_templates( $request ) {
 		$category = $request->get_param( 'category' ); // 'gallery' or 'album'
-		$is_pro   = \FotoGrids\License_Manager::has_pro();
+		$refresh  = (bool) $request->get_param( 'refresh' );
 
-		$predefined_templates = self::load_predefined_templates( $category, true );
+		// Predefined templates come from the library service (cached), falling
+		// back to the bundled set when the service is unreachable.
+		$predefined_templates = Templates_Catalog::get_templates( $refresh );
 		$user_templates       = self::get_user_templates();
 		$templates            = array_merge( $predefined_templates, $user_templates );
+
+		// When the library hides Pro, drop Pro templates entirely so they can't
+		// be listed, previewed, or applied. User templates are never Pro.
+		$flags = Templates_Catalog::get_flags();
+		if ( empty( $flags['show_pro'] ) ) {
+			$templates = array_filter(
+				$templates,
+				static function ( $template ) {
+					$type = isset( $template['type'] ) ? $template['type'] : 'free';
+					return 'pro' !== $type;
+				}
+			);
+		}
 
 		if ( $category ) {
 			$templates = array_filter(
@@ -105,7 +124,8 @@ class Templates_Data {
 			);
 		}
 
-		// Pre-defined templates first, then user templates; ties broken by name.
+		// Pre-defined templates first, then user templates. Within pre-defined,
+		// Free templates come before Pro. Remaining ties broken by order, then name.
 		usort(
 			$templates,
 			function ( $a, $b ) {
@@ -117,6 +137,13 @@ class Templates_Data {
 				}
 				if ( ! $a_is_predefined && $b_is_predefined ) {
 					return 1;
+				}
+
+				// Free (and user) templates sort ahead of Pro templates.
+				$a_is_pro = isset( $a['type'] ) && 'pro' === $a['type'];
+				$b_is_pro = isset( $b['type'] ) && 'pro' === $b['type'];
+				if ( $a_is_pro !== $b_is_pro ) {
+					return $a_is_pro ? 1 : -1;
 				}
 
 				$a_order = isset( $a['order'] ) ? (int) $a['order'] : 999;
@@ -134,7 +161,98 @@ class Templates_Data {
 
 		$templates = array_values( $templates );
 
-		return rest_ensure_response( array( 'templates' => $templates ) );
+		foreach ( $templates as $index => $template ) {
+			$templates[ $index ]['preview_handler'] = self::resolve_preview_handler( $template );
+			$templates[ $index ]['can_apply']       = self::resolve_can_apply( $template );
+		}
+
+		return rest_ensure_response(
+			array(
+				'templates' => $templates,
+				'library'   => Templates_Catalog::get_meta(),
+			)
+		);
+	}
+
+	/**
+	 * Decide whether a template can be applied on this site.
+	 *
+	 * Free and user templates are always appliable. Pro templates require an
+	 * active Pro license. Exposed on the REST payload so the admin UI shows the
+	 * Apply control only where applying would actually succeed.
+	 *
+	 * @since 1.1.0
+	 * @param array $template Template data.
+	 * @return bool
+	 */
+	private static function resolve_can_apply( $template ) {
+		$type   = isset( $template['type'] ) ? $template['type'] : 'free';
+		$is_pro = 'free' !== $type && 'user' !== $type;
+
+		$can_apply = ! $is_pro || \FotoGrids\License_Manager::has_pro();
+
+		return (bool) apply_filters( \FotoGrids\Hooks\Filters_Templates::CAN_APPLY, $can_apply, $template );
+	}
+
+	/**
+	 * Sanitize a CSS colour for the preview background.
+	 *
+	 * Accepts hex (#rgb, #rrggbb, #rrggbbaa) and rgb()/rgba() values, since the
+	 * shared colour picker is alpha-aware. Returns an empty string for anything
+	 * else so the caller can fall back to a default.
+	 *
+	 * @since 1.1.0
+	 * @param string $value Raw colour value.
+	 * @return string Sanitized colour, or empty string when invalid.
+	 */
+	public static function sanitize_css_color( $value ) {
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		$value = trim( $value );
+
+		if ( preg_match( '/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value ) ) {
+			return $value;
+		}
+
+		if ( preg_match( '/^rgba?\(\s*[0-9.,%\s\/]+\)$/', $value ) ) {
+			return $value;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Resolve the preview-button handler for a template.
+	 *
+	 * Catalog templates (free and pro) preview by iframing their live demo page
+	 * on the library service. User-saved templates and any template without a
+	 * preview URL fall back to a local in-admin render. When Pro is installed,
+	 * the Templates module hooks the filter to flip Pro templates to local.
+	 *
+	 * @since 1.1.0
+	 * @param array $template Template data.
+	 * @return array{mode: string, url: string}
+	 */
+	private static function resolve_preview_handler( $template ) {
+		$is_user     = ! empty( $template['isUserTemplate'] ) || ( isset( $template['type'] ) && 'user' === $template['type'] );
+		$preview_url = isset( $template['preview_url'] ) ? (string) $template['preview_url'] : '';
+
+		if ( ! $is_user && '' !== $preview_url ) {
+			$handler = array(
+				'mode' => 'iframe',
+				'url'  => esc_url_raw( $preview_url ),
+			);
+		} else {
+			// User templates and catalog entries with no demo page render locally.
+			$handler = array(
+				'mode' => 'local',
+				'url'  => '',
+			);
+		}
+
+		return apply_filters( \FotoGrids\Hooks\Filters_Templates::PREVIEW_HANDLER, $handler, $template );
 	}
 
 	/**
@@ -188,38 +306,6 @@ class Templates_Data {
 				'success'  => true,
 				'message'  => __( 'Template saved successfully.', 'fotogrids' ),
 				'template' => $template,
-			)
-		);
-	}
-
-	/**
-	 * Download template from FotoGrids server
-	 *
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Template data or error
-	 */
-	public static function download_template( $request ) {
-		$template_id = $request->get_param( 'id' );
-		$is_pro      = \FotoGrids\License_Manager::has_pro();
-
-		if ( ! $template_id ) {
-			return new \WP_Error( 'missing_template_id', __( 'Template ID is required.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		if ( ! $is_pro ) {
-			return new \WP_Error( 'pro_required', __( 'Pro license required to download this template.', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
-		// TODO: Implement actual download from FotoGrids server (API call with license verification).
-		return rest_ensure_response(
-			array(
-				'success'  => true,
-				'message'  => __( 'Template downloaded successfully.', 'fotogrids' ),
-				'template' => array(
-					'id'   => $template_id,
-					'name' => __( 'Downloaded Template', 'fotogrids' ),
-					'type' => 'pro',
-				),
 			)
 		);
 	}
@@ -457,9 +543,21 @@ class Templates_Data {
 
 		// Layout falls back to the template ID when settings omit it.
 		$layout = isset( $settings['layout'] ) ? $settings['layout'] : $template_id;
-		if ( ! in_array( $layout, array( 'grid', 'masonry', 'justified', 'slider', 'carousel', 'video' ), true ) ) {
+		if ( ! in_array( $layout, array( 'grid', 'masonry', 'justified', 'slider', 'single-item', 'image-viewer', 'featured-item', 'instant-photos', 'carousel', 'video' ), true ) ) {
 			$layout = 'grid';
 		}
+
+		// Natural-height layouts pack on each image's own proportions; the
+		// gallery default aspect ratio (4/3) would crop every item to the same
+		// height and flatten the layout. Clear it unless the template sets one.
+		$natural_height_layouts = array( 'masonry', 'justified', 'instant-photos' );
+		if ( in_array( $layout, $natural_height_layouts, true ) && ! isset( $settings['layout_item_aspect_ratio'] ) ) {
+			$final_settings['layout_item_aspect_ratio'] = 'none';
+		}
+
+		// A preview shows the whole demo set on one screen; pagination would
+		// hide most of it behind a load-more control.
+		$final_settings['pagination_type'] = 'show_all';
 
 		$columns = isset( $settings['columns'] ) ? $settings['columns'] : array(
 			'desktop' => 3,
@@ -474,7 +572,8 @@ class Templates_Data {
 			);
 		}
 
-		$preview_items = self::get_template_preview_items();
+		$image_tags    = isset( $template['image_tags'] ) && is_array( $template['image_tags'] ) ? $template['image_tags'] : array();
+		$preview_items = self::get_template_preview_items( $image_tags, $layout );
 
 		if ( ! class_exists( '\FotoGrids\Public_Render' ) ) {
 			require_once FOTOGRIDS_PLUGIN_DIR . 'public/class-public-render.php';
@@ -488,6 +587,9 @@ class Templates_Data {
 				'mobile'  => 5,
 			);
 
+		// Pass only lazy=false (a preview shows all images at once). Lightbox and
+		// captions come from the template's own settings so the preview reflects
+		// what the template actually does.
 		$gallery_html = \FotoGrids\Public_Render::render_template_preview(
 			$preview_items,
 			$layout,
@@ -495,9 +597,7 @@ class Templates_Data {
 			$spacing,
 			$final_settings,
 			array(
-				'lazy'     => 'false',
-				'lightbox' => 'false',
-				'captions' => 'true',
+				'lazy' => 'false',
 			)
 		);
 
@@ -505,38 +605,19 @@ class Templates_Data {
 			$gallery_html = '<div class="fotogrids-error">' . __( 'Failed to generate gallery preview.', 'fotogrids' ) . '</div>';
 		}
 
-		// TEMPORARY DIAGNOSTIC - remove before release.
-		// Hit the preview URL with &fg_debug=1 (requires WP_DEBUG) to dump what
-		// the render pipeline collected vs. what the standalone HTML page links.
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $request->get_param( 'fg_debug' ) ) {
-			$css_urls = array();
-			$js_data  = array();
-			if ( class_exists( '\FotoGrids\Render\Internal\Asset_Resolver' ) ) {
-				$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
-				$css_urls = $resolver->get_css_asset_urls();
-				$js_data  = $resolver->get_js_asset_data();
-			}
-			$diag     = array(
-				'template_id'         => $template_id,
-				'resolved_layout'     => $layout,
-				'settings_layout'     => $settings['layout'] ?? '(none)',
-				'final_columns'       => $columns,
-				'collected_css_urls'  => $css_urls,
-				'collected_js_data'   => $js_data,
-				'legacy_css_checked'  => $template_css_url,
-				'legacy_css_exists'   => $template_css_exists,
-				'gallery_html_length' => strlen( $gallery_html ),
-				'gallery_html_head'   => substr( $gallery_html, 0, 600 ),
-			);
-			$response = new \WP_REST_Response( $diag );
-			$response->set_status( 200 );
-			return $response;
+		// The render pipeline enqueues per-layout and per-module CSS/JS through
+		// Asset_Resolver. On a REST request wp_head never fires, so those handles
+		// are not printed anywhere; read them back and inline them into this
+		// self-contained preview document.
+		$collected_css = array();
+		$collected_js  = array();
+		if ( class_exists( '\FotoGrids\Render\Internal\Asset_Resolver' ) ) {
+			$resolver      = \FotoGrids\Render\Internal\Asset_Resolver::instance();
+			$collected_css = $resolver->get_css_asset_urls();
+			$collected_js  = $resolver->get_js_asset_data();
 		}
 
-		$frontend_css_url        = FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids.css';
-		$template_css_url        = FOTOGRIDS_PLUGIN_DIR . 'public/assets/templates/' . $layout . '.css';
-		$template_css_exists     = file_exists( $template_css_url );
-		$template_css_url_public = $template_css_exists ? FOTOGRIDS_PLUGIN_URL . 'public/assets/templates/' . $layout . '.css' : '';
+		$frontend_css_url = FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids.css';
 
 		$html  = '<!DOCTYPE html>' . "\n";
 		$html .= '<html>' . "\n";
@@ -547,24 +628,18 @@ class Templates_Data {
         // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- This is a self-contained preview document returned by a REST endpoint, not the WP frontend; there is no wp_head to enqueue into.
 		$html .= '    <link rel="stylesheet" href="' . esc_url( $frontend_css_url ) . '?ver=' . FOTOGRIDS_VERSION . '">' . "\n";
 
-		if ( $template_css_exists ) {
+		foreach ( $collected_css as $css_url ) {
             // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet -- Self-contained preview document; see note above.
-			$html .= '    <link rel="stylesheet" href="' . esc_url( $template_css_url_public ) . '?ver=' . FOTOGRIDS_VERSION . '">' . "\n";
+			$html .= '    <link rel="stylesheet" href="' . esc_url( $css_url ) . '">' . "\n";
 		}
 
 		$preview_background = $request->get_param( 'preview_background' ) ?: 'light';
-		$preview_width      = $request->get_param( 'preview_width' ) ?: 'full';
-
-		$bg_color = '#f5f5f5';
+		$bg_color           = '#f5f5f5';
 		if ( 'dark' === $preview_background ) {
 			$bg_color = '#1a1a1a';
 		} elseif ( 'custom' === $preview_background ) {
-			$bg_color = '#0066cc';
-		}
-
-		$max_width = 'none';
-		if ( 'custom' === $preview_width ) {
-			$max_width = '1000px';
+			$custom_bg = $request->get_param( 'preview_bg_color' );
+			$bg_color  = is_string( $custom_bg ) && '' !== $custom_bg ? $custom_bg : '#0066cc';
 		}
 
 		$html .= '    <style>' . "\n";
@@ -577,9 +652,6 @@ class Templates_Data {
 		$html .= '        }' . "\n";
 		$html .= '        body {' . "\n";
 		$html .= '            margin: 0 auto;' . "\n";
-		if ( 'none' !== $max_width ) {
-			$html .= '            max-width: ' . esc_attr( $max_width ) . ';' . "\n";
-		}
 		$html .= '        }' . "\n";
 		$html .= '        .fotogrids-collection {' . "\n";
 		$html .= '            max-width: 100%;' . "\n";
@@ -595,6 +667,20 @@ class Templates_Data {
 		$html .= '</head>' . "\n";
 		$html .= '<body>' . "\n";
 		$html .= '    ' . $gallery_html . "\n";
+
+		if ( ! empty( $collected_js ) ) {
+			$html .= '    <script>window.fotogrids = window.fotogrids || { deep_linking_enabled: false, embedded_share_target: "" };</script>' . "\n";
+		}
+
+		foreach ( $collected_js as $js ) {
+			$src = isset( $js['src'] ) ? $js['src'] : '';
+			if ( '' === $src ) {
+				continue;
+			}
+            // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript -- Self-contained preview document returned by a REST endpoint; no wp_footer to enqueue into.
+			$html .= '    <script src="' . esc_url( $src ) . '"></script>' . "\n";
+		}
+
 		$html .= '</body>' . "\n";
 		$html .= '</html>';
 
@@ -622,9 +708,17 @@ class Templates_Data {
 			}
 		}
 
-		$predefined = self::load_predefined_templates( $category, true );
+		// When the library hides Pro, a Pro template must not be resolvable by id
+		// either - this closes the preview/apply path, not just the listing.
+		$flags         = Templates_Catalog::get_flags();
+		$pro_is_hidden = empty( $flags['show_pro'] );
+
+		$predefined = self::load_predefined_templates( $category );
 		foreach ( $predefined as $template ) {
 			if ( isset( $template['id'] ) && $template['id'] === $template_id ) {
+				if ( $pro_is_hidden && isset( $template['type'] ) && 'pro' === $template['type'] ) {
+					return null;
+				}
 				return $template;
 			}
 		}
@@ -633,94 +727,21 @@ class Templates_Data {
 	}
 
 	/**
-	 * Get template preview items with real demo images
+	 * Get template preview items for the local render.
 	 *
-	 * Uses actual demo images from template-demo folder with format fallback (avif -> jpg)
-	 * Reads from manifest.json if available, otherwise auto-discovers images
+	 * Real template previews are served by the cloud library (iframed). The local
+	 * render only runs for the narrow cases that have no remote demo page - a
+	 * user-saved template, or a Pro in-admin render - so it uses neutral icon
+	 * placeholders rather than bundling demo photos for a rarely-hit path.
 	 *
-	 * @return array Array of item data formatted for gallery rendering
+	 * @since 1.0.0
+	 * @param array  $image_tags Unused (kept for signature compatibility).
+	 * @param string $layout     Unused (kept for signature compatibility).
+	 * @return array Array of item data formatted for gallery rendering.
 	 */
-	private static function get_template_preview_items() {
-		$plugin_dir = rtrim( FOTOGRIDS_PLUGIN_DIR, '/' ) . '/';
-		$plugin_url = rtrim( FOTOGRIDS_PLUGIN_URL, '/' ) . '/';
-
-		$demo_dir      = $plugin_dir . 'public/assets/template-demo/';
-		$demo_url      = $plugin_url . 'public/assets/template-demo/';
-		$manifest_path = $demo_dir . 'manifest.json';
-
-		$manifest = null;
-		if ( file_exists( $manifest_path ) ) {
-			$manifest_content = file_get_contents( $manifest_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a bundled local plugin file (not a remote URL); WP_Filesystem is unnecessary here.
-			$manifest         = json_decode( $manifest_content, true );
-			if ( json_last_error() !== JSON_ERROR_NONE ) {
-				$manifest = null;
-			}
-		}
-
-		$items = array();
-		for ( $i = 1; $i <= 35; $i++ ) {
-			$image_num = sprintf( '%02d', $i );
-			$base_name = 'fotogrids-tp-' . $image_num;
-
-			$avif_path = $demo_dir . 'avif/' . $base_name . '.avif';
-			$jpg_path  = $demo_dir . 'jpg/' . $base_name . '.jpg';
-
-			$avif_exists = file_exists( $avif_path );
-			$jpg_exists  = file_exists( $jpg_path );
-
-			if ( ! $avif_exists && ! $jpg_exists ) {
-				continue;
-			}
-
-			$title   = null;
-			$alt     = null;
-			$caption = null;
-
-			if ( $manifest && isset( $manifest['images'] ) ) {
-				foreach ( $manifest['images'] as $manifest_image ) {
-					if ( isset( $manifest_image['id'] ) && $manifest_image['id'] === $base_name ) {
-						$title   = isset( $manifest_image['title'] ) ? $manifest_image['title'] : null;
-						$alt     = isset( $manifest_image['alt'] ) ? $manifest_image['alt'] : null;
-						$caption = isset( $manifest_image['caption'] ) ? $manifest_image['caption'] : null;
-						break;
-					}
-				}
-			}
-
-			if ( ! $title ) {
-				/* translators: %d: demo image number. */
-				$title = sprintf( __( 'Demo Image %d', 'fotogrids' ), $i );
-			}
-			if ( ! $alt ) {
-				/* translators: %d: demo image number. */
-				$alt = sprintf( __( 'Template preview demo image %d', 'fotogrids' ), $i );
-			}
-			if ( ! $caption ) {
-				$caption = sprintf( __( 'This is how your gallery will look with this template', 'fotogrids' ) );
-			}
-
-			$avif_url = $demo_url . 'avif/' . $base_name . '.avif';
-			$jpg_url  = $demo_url . 'jpg/' . $base_name . '.jpg';
-
-			$image_url = $avif_exists ? $avif_url : $jpg_url;
-
-			$items[] = array(
-				'id'      => $i,
-				'title'   => $title,
-				'alt'     => $alt,
-				'caption' => $caption,
-				'medium'  => $image_url,
-				'full'    => $image_url,
-				'avif'    => $avif_exists ? $avif_url : null,
-				'jpg'     => $jpg_exists ? $jpg_url : null,
-			);
-		}
-
-		if ( empty( $items ) ) {
-			return self::get_template_preview_items_fallback();
-		}
-
-		return $items;
+	private static function get_template_preview_items( $image_tags = array(), $layout = 'masonry' ) {
+		unset( $image_tags, $layout );
+		return self::get_template_preview_items_fallback();
 	}
 
 	/**

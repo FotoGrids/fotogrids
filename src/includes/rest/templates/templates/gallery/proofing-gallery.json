@@ -20,9 +20,9 @@
       "tablet": 6,
       "mobile": 4
     },
-    "password_protected": true,
-    "watermark_enabled": true,
-    "right_click_protection": true,
-    "lightbox": true
+    "password_protect": true,
+    "watermark_apply_to_collection": true,
+    "disable_right_click": true,
+    "item_click_behavior": "lightbox"
   }
 }

@@ -5,25 +5,7 @@
   "type": "pro",
   "category": "gallery",
   "subcategory": "photography",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 21,
-  "settings": {
-    "layout": "justified",
-    "target_row_height": {
-      "desktop": 400,
-      "tablet": 300,
-      "mobile": 200
-    },
-    "item_spacing": {
-      "desktop": 12,
-      "tablet": 10,
-      "mobile": 6
-    },
-    "hover_effect": "slow_zoom",
-    "password_protected": true,
-    "watermark_enabled": true,
-    "right_click_protection": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

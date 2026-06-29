@@ -7,6 +7,7 @@ use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Filter_Option;
+use FotoGrids\Render\Api\Font_Resolver;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Responsive_Var;
@@ -335,6 +336,23 @@ final class Filter_Ui implements Feature {
 			);
 		}
 
+		// Button typography family/weight/style resolve through Font_Resolver.
+		$btn_resolver    = Font_Resolver::instance();
+		$btn_font_family = $btn_resolver->resolve_font_family( $s['filter_btn_font_family'] ?? null, $render_context );
+		if ( '' !== $btn_font_family ) {
+			$vars['--fg-filter-btn-font-family'] = $btn_font_family;
+		}
+		$btn_font_weight = $btn_resolver->resolve_font_weight( $s['filter_btn_font_weight'] ?? null, $render_context );
+		if ( '' !== $btn_font_weight ) {
+			$vars['--fg-filter-btn-font-weight'] = $btn_font_weight;
+		}
+		$btn_font_style = $btn_resolver->resolve_font_style( $s['filter_btn_font_style'] ?? null, $render_context );
+		if ( '' !== $btn_font_style ) {
+			$vars['--fg-filter-btn-font-style'] = $btn_font_style;
+		}
+
+		$this->add_text_spacing_vars( $vars, '--fg-filter-btn', $s, 'filter_btn_' );
+
 		// ---- Button colors + borders ----
 		// Each state (regular / hover / active) carries its own border colour
 		// and width; the SCSS composes them into the final `border` shorthand.
@@ -346,12 +364,10 @@ final class Filter_Ui implements Feature {
 		$this->maybe_add_var( $vars, '--fg-filter-btn-hover-bg', $s['filter_btn_hover_bg'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-btn-hover-color', $s['filter_btn_hover_color'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-btn-hover-border-color', $s['filter_btn_hover_border_color'] ?? null );
-		$this->maybe_add_var( $vars, '--fg-filter-btn-hover-border-width', $this->unit_val( $s['filter_btn_hover_border_width'] ?? null, 'px' ) );
 
 		$this->maybe_add_var( $vars, '--fg-filter-btn-active-bg', $s['filter_btn_active_bg'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-btn-active-color', $s['filter_btn_active_color'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-btn-active-border-color', $s['filter_btn_active_border_color'] ?? null );
-		$this->maybe_add_var( $vars, '--fg-filter-btn-active-border-width', $this->unit_val( $s['filter_btn_active_border_width'] ?? null, 'px' ) );
 
 		// ---- Dropdown trigger ----
 		// Padding is responsive four-sided, mirroring filter_btn_padding.
@@ -384,9 +400,40 @@ final class Filter_Ui implements Feature {
 		$this->maybe_add_var( $vars, '--fg-filter-select-open-color', $s['filter_select_open_color'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-select-open-border-color', $s['filter_select_open_border_color'] ?? null );
 
+		// Shared dropdown typography drives BOTH the trigger and the popover
+		// option rows. Family/weight/style resolve through Font_Resolver so
+		// theme stacks become real CSS; font_size is responsive_range.
+		$dropdown_resolver    = Font_Resolver::instance();
+		$dropdown_font_family = $dropdown_resolver->resolve_font_family( $s['filter_dropdown_font_family'] ?? null, $render_context );
+		if ( '' !== $dropdown_font_family ) {
+			$vars['--fg-filter-dropdown-font-family'] = $dropdown_font_family;
+		}
+		$dropdown_font_weight = $dropdown_resolver->resolve_font_weight( $s['filter_dropdown_font_weight'] ?? null, $render_context );
+		if ( '' !== $dropdown_font_weight ) {
+			$vars['--fg-filter-dropdown-font-weight'] = $dropdown_font_weight;
+		}
+		$dropdown_font_style = $dropdown_resolver->resolve_font_style( $s['filter_dropdown_font_style'] ?? null, $render_context );
+		if ( '' !== $dropdown_font_style ) {
+			$vars['--fg-filter-dropdown-font-style'] = $dropdown_font_style;
+		}
+		$dropdown_font_size  = $s['filter_dropdown_font_size'] ?? null;
+		$dropdown_fs_desktop = $this->resolve_responsive_value( $dropdown_font_size, 'desktop', 'px' );
+		$dropdown_fs_tablet  = $this->resolve_responsive_value( $dropdown_font_size, 'tablet', 'px' );
+		$dropdown_fs_mobile  = $this->resolve_responsive_value( $dropdown_font_size, 'mobile', 'px' );
+		if ( '' !== $dropdown_fs_desktop || '' !== $dropdown_fs_tablet || '' !== $dropdown_fs_mobile ) {
+			$vars['--fg-filter-dropdown-font-size'] = new Responsive_Var(
+				$dropdown_fs_desktop,
+				$dropdown_fs_tablet,
+				$dropdown_fs_mobile,
+			);
+		}
+
+		$this->add_text_spacing_vars( $vars, '--fg-filter-dropdown', $s, 'filter_dropdown_' );
+
 		// ---- Dropdown popover ----
 		// Shared chrome on the popover panel: radius, border, separator
 		// colour. Per-option-state vars only carry bg + text colour.
+		$this->maybe_add_var( $vars, '--fg-filter-dropdown-list-bg', $s['filter_dropdown_list_bg'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-dropdown-list-radius', $this->unit_val( $s['filter_dropdown_list_radius'] ?? null, 'px' ) );
 		$this->maybe_add_var( $vars, '--fg-filter-dropdown-list-border-color', $s['filter_dropdown_list_border_color'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-dropdown-list-border-width', $this->unit_val( $s['filter_dropdown_list_border_width'] ?? null, 'px' ) );
@@ -406,6 +453,34 @@ final class Filter_Ui implements Feature {
 		$this->maybe_add_var( $vars, '--fg-filter-cb-size', $this->unit_val( $s['filter_cb_size'] ?? null, 'px' ) );
 		$this->maybe_add_var( $vars, '--fg-filter-cb-radius', $this->unit_val( $s['filter_cb_radius'] ?? null, 'px' ) );
 		$this->maybe_add_var( $vars, '--fg-filter-cb-gap', $this->unit_val( $s['filter_cb_gap'] ?? null, 'px' ) );
+
+		// ---- Checkbox label typography ----
+		$cb_resolver    = Font_Resolver::instance();
+		$cb_font_family = $cb_resolver->resolve_font_family( $s['filter_cb_font_family'] ?? null, $render_context );
+		if ( '' !== $cb_font_family ) {
+			$vars['--fg-filter-cb-font-family'] = $cb_font_family;
+		}
+		$cb_font_weight = $cb_resolver->resolve_font_weight( $s['filter_cb_font_weight'] ?? null, $render_context );
+		if ( '' !== $cb_font_weight ) {
+			$vars['--fg-filter-cb-font-weight'] = $cb_font_weight;
+		}
+		$cb_font_style = $cb_resolver->resolve_font_style( $s['filter_cb_font_style'] ?? null, $render_context );
+		if ( '' !== $cb_font_style ) {
+			$vars['--fg-filter-cb-font-style'] = $cb_font_style;
+		}
+		$cb_font_size  = $s['filter_cb_font_size'] ?? null;
+		$cb_fs_desktop = $this->resolve_responsive_value( $cb_font_size, 'desktop', 'px' );
+		$cb_fs_tablet  = $this->resolve_responsive_value( $cb_font_size, 'tablet', 'px' );
+		$cb_fs_mobile  = $this->resolve_responsive_value( $cb_font_size, 'mobile', 'px' );
+		if ( '' !== $cb_fs_desktop || '' !== $cb_fs_tablet || '' !== $cb_fs_mobile ) {
+			$vars['--fg-filter-cb-font-size'] = new Responsive_Var(
+				$cb_fs_desktop,
+				$cb_fs_tablet,
+				$cb_fs_mobile,
+			);
+		}
+
+		$this->add_text_spacing_vars( $vars, '--fg-filter-cb', $s, 'filter_cb_' );
 
 		// ---- Checkbox colors ----
 		// Shared border width + per-state checkbox colours. The SCSS

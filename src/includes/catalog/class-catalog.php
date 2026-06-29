@@ -127,6 +127,22 @@ final class Catalog {
 	}
 
 	/**
+	 * Returns the cluster fallback defaults collected while expanding partial
+	 * `use` nodes during catalog load.
+	 *
+	 * Consumed by Collection_Defaults as the lowest default layer, beneath the
+	 * hand-authored PHP defaults which remain authoritative.
+	 *
+	 * @since   1.0.0
+	 * @return  array<string, mixed>
+	 */
+	public static function cluster_defaults(): array {
+		self::init();
+
+		return Catalog_Partial_Expander::cluster_defaults();
+	}
+
+	/**
 	 * Resets loaded state for tests.
 	 *
 	 * @since   1.0.0
@@ -152,6 +168,8 @@ final class Catalog {
 			$free_catalog_dir . 'styling.json',
 			$free_catalog_dir . 'interactions.json',
 			$free_catalog_dir . 'lightbox.json',
+			$free_catalog_dir . 'lightbox-mini.json',
+			$free_catalog_dir . 'lightbox-grid.json',
 			$free_catalog_dir . 'captions.json',
 			$free_catalog_dir . 'pagination.json',
 			$free_catalog_dir . 'sorting.json',
@@ -221,6 +239,8 @@ final class Catalog {
 			self::dev_log( sprintf( 'Catalog file invalid JSON: %s', $json_file_path ) );
 			return;
 		}
+
+		$decoded_json = Catalog_Partial_Expander::expand_file( $decoded_json );
 
 		$decoded_json['origin'] = self::infer_origin_from_path( $json_file_path );
 		self::$raw_files[]      = $decoded_json;

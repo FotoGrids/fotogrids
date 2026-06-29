@@ -422,6 +422,10 @@ class Register_Admin_Routes {
 							'type'    => 'boolean',
 							'default' => false,
 						),
+						'marketing_allowed'        => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
 						'custom_js_allow_dynamic_execution' => array(
 							'type'    => 'boolean',
 							'default' => false,
@@ -571,10 +575,7 @@ class Register_Admin_Routes {
 			)
 		);
 
-		// Note: the old /admin/galleries/{id}/preview route was removed when
-		// the PageBuilders module took over preview rendering. The metabox
-		// and every other host now use POST /preview/gallery/{id}, which
-		// delegates to the same Preview_Endpoint internally.
+		// Preview rendering lives at POST /preview/gallery/{id} (Preview_Endpoint).
 
 		// Get catalog field states: GET /admin/catalog/field-states
 		register_rest_route(

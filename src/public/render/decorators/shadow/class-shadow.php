@@ -61,18 +61,31 @@ final class Shadow implements Decorator {
 	public function style_vars( Render_Context $render_context ): array {
 		$settings = $render_context->settings;
 
-		$offset_x = $settings['shadow_offset_x'] ?? array();
-		$offset_y = $settings['shadow_offset_y'] ?? array();
-		$blur     = $settings['shadow_blur'] ?? array();
-		$spread   = $settings['shadow_spread'] ?? array();
-		$color    = $this->setting_scalar( $settings['shadow_color'] ?? null, 'rgba(0,0,0,0.5)' );
-
 		return array(
-			'--fg-shadow' => new Responsive_Var(
-				$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'desktop' ),
-				$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'tablet' ),
-				$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'mobile' ),
-			),
+			'--fg-shadow'         => $this->state_shadow_var( $settings, '' ),
+			'--fg-shadow-hover'   => $this->state_shadow_var( $settings, 'hover_' ),
+			'--fg-shadow-loading' => $this->state_shadow_var( $settings, 'loading_' ),
+		);
+	}
+
+	/**
+	 * Builds the responsive box-shadow variable for one state.
+	 *
+	 * @param array<string, mixed> $settings Settings map.
+	 * @param string               $infix    State key infix ('', 'hover_', 'loading_').
+	 * @return Responsive_Var
+	 */
+	private function state_shadow_var( array $settings, string $infix ): Responsive_Var {
+		$offset_x = $settings[ "shadow_{$infix}offset_x" ] ?? array();
+		$offset_y = $settings[ "shadow_{$infix}offset_y" ] ?? array();
+		$blur     = $settings[ "shadow_{$infix}blur" ] ?? array();
+		$spread   = $settings[ "shadow_{$infix}spread" ] ?? array();
+		$color    = $this->setting_scalar( $settings[ "shadow_{$infix}color" ] ?? null, 'rgba(0,0,0,0.5)' );
+
+		return new Responsive_Var(
+			$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'desktop' ),
+			$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'tablet' ),
+			$this->build_shadow( $offset_x, $offset_y, $blur, $spread, $color, 'mobile' ),
 		);
 	}
 

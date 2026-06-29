@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-The only WordPress gallery plugin you'll ever need. Eight layouts, video, an immersive lightbox, albums, templates, SEO, and built-in analytics - beautiful by default.
+The only WordPress gallery plugin you'll ever need. Eight beautiful layouts, video, immersive lightbox, albums, templates, SEO, analytics & much more.
 
 == Description ==
 
@@ -24,7 +24,7 @@ No artificial limits. No dark patterns. No fake urgency timers. Just the best ga
 
 = Every layout your photos deserve =
 
-Most gallery plugins give you one or two layouts for free and lock the rest behind a paywall. FotoGrids ships **eight fully responsive layouts in the free version**, each crafted to make your images look their absolute best:
+Most gallery plugins give you one or two layouts for free and lock the rest behind a paywall. FotoGrids ships **eight fully responsive layouts in the free version**, each crafted to make your images look their absolute best on every device:
 
 * **Grid** - evenly spaced items in straight rows and columns - the classic, predictable, clean look.
 * **Masonry** - Pinterest-style columns that fit items snugly without cropping. Ideal for editorial layouts.
@@ -128,7 +128,7 @@ The free version is powerful on its own. **Pro layers on the layouts, analytics,
 
 = Is FotoGrids really free? =
 
-Yes, and it stays useful on its own. The free version includes unlimited galleries and albums, eight layouts, video support, the full lightbox with social sharing, sorting and filtering, EXIF details, templates, statistics, lazy loading, and Gutenberg blocks - with no artificial limits. FotoGrids Pro adds four more layouts, e-commerce, SEO tools, and more when you need them.
+Yes, and it stays extremely useful on its own. The free version includes unlimited galleries and albums, eight layouts, video support, the full lightbox with social sharing, sorting and filtering, EXIF details, templates, statistics, lazy loading, and Gutenberg blocks - with no artificial limits. FotoGrids Pro adds four more layouts, e-commerce, SEO tools, and more when you need them.
 
 = Do I need to know how to code? =
 

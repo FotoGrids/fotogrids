@@ -25,18 +25,18 @@
 
 /*
  * Load-more uses a roomier default padding than page-buttons - it's a
- * single hero CTA, not a numbered-page chip. The shared
- * --fg-pagination-btn-padding variable picks this up via the
- * `.fg-pagination__load-more` scope override.
+ * single hero CTA, not a numbered-page chip. The user's
+ * `pagination_button_padding` setting (emitted as
+ * --fg-pagination-button-padding) wins when set; otherwise the roomier
+ * load-more default applies.
  *
  * All other button theming (font, bg, text, border colours, hover state)
  * is shared with the Page Buttons method now - those vars are declared
  * on `.fg-pagination` in pagination.css and resolve from the unified
- * `pagination_button_*` settings in the Styling subtab. No load-more-
- * specific overrides needed here beyond the padding bump.
+ * `pagination_button_*` settings in the Styling subtab.
  */
 .fotogrids-collection.fotogrids-gallery .fg-pagination__load-more {
-    --fg-pagination-btn-padding: calc(var(--fg-pagination-base-size) * 2) calc(var(--fg-pagination-base-size) * 3);
+    --fg-pagination-btn-padding: var(--fg-pagination-button-padding, calc(var(--fg-pagination-base-size) * 2) calc(var(--fg-pagination-base-size) * 3));
 }
 
 .fotogrids-collection.fotogrids-gallery .fg-pagination--full-width .fg-pagination__load-more {

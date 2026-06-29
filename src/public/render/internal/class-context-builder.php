@@ -170,16 +170,17 @@ final class Context_Builder {
 		$raw_ids    = array_map( 'absint', $collection_item_ids );
 		$sorted_ids = $this->apply_sorter( $raw_ids, $sort_context );
 
-		// Single Item layout: only one item ever renders, picked by the
-		// active sorter (so random sorter naturally gives a different image
-		// per request, manual gives the first, etc). The slice happens
-		// upstream of load_items so we only do attachment hydration for the
-		// one item we're going to render. The full sorted-ID count is
-		// captured separately below and stamped into Render_Meta so the
+		// Single Item layout renders one item picked by the active sorter
+		// (random gives a different image per request, manual gives the
+		// first, etc). When Animate Images is on it renders the full sorted
+		// set instead so the layout's JS can cycle through them, so the
+		// one-item slice is skipped in that case. The full sorted-ID count
+		// is captured below and stamped into Render_Meta so the
 		// lightbox-extended path knows the real gallery size.
 		$is_single_item         = ( $render_settings['layout'] ?? '' ) === 'single-item';
+		$single_item_animates   = $is_single_item && ! empty( $render_settings['single_item_auto_progress'] );
 		$single_item_full_count = $is_single_item ? count( $sorted_ids ) : null;
-		if ( $is_single_item ) {
+		if ( $is_single_item && ! $single_item_animates ) {
 			$sorted_ids = array_slice( $sorted_ids, 0, 1 );
 		}
 
@@ -218,63 +219,20 @@ final class Context_Builder {
 		// Record the total BEFORE pagination slicing (but AFTER filtering)
 		// so chrome modules emit data-fg-page-total against the filtered set.
 		//
-		// For Single Item layout, $loaded_items has length 1 because we
-		// sliced the sorted-ID list upstream. The lightbox-extended path
-		// still needs to know the real gallery size, so we substitute the
-		// pre-slice count captured before load_items().
+		// For Single Item layout without Animate Images, $loaded_items has
+		// length 1 because the sorted-ID list was sliced upstream. The
+		// lightbox-extended path still needs the real gallery size, so the
+		// pre-slice count captured before load_items() is substituted.
 		$total_item_count = $single_item_full_count ?? count( $loaded_items );
 		$render_meta      = $render_meta->with( array( 'total_item_count' => $total_item_count ) );
 
-		// Pagination slicing. Runs after sorter selection (canonical order
-		// already established) and after caption resolution + filtering (so
-		// the slice contains fully-prepared Item_Views from the filtered set).
-		// Layouts that opt out via the `paginates` capability (slider,
-		// image-viewer) skip slicing entirely - their own navigation walks
-		// the full item list.
-		$paginates_capability = Layout_Capabilities::supports( $sort_context, 'paginates' );
-		if ( ( $render_settings['pagination_type'] ?? 'show_all' ) === 'paginated'
-			&& Collection_Kind::GALLERY === $render_meta->collection_kind
-			&& $paginates_capability
-		) {
-			$per_page_override = $render_meta->requested_per_page;
-			$page_size         = null !== $per_page_override && $per_page_override > 0
-				? $per_page_override
-				: Page_Size_Resolver::resolve_page_size( $render_settings, $sort_context );
-			$page              = max( 1, (int) ( $render_meta->requested_page ?? 1 ) );
-
-			if ( self::is_snap_pagination_active( $render_settings ) && Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
-				$snap         = self::resolve_justified_snap(
-					$loaded_items,
-					$page_size,
-					$page,
-					$render_settings,
-					$render_meta
-				);
-				$loaded_items = array_slice( $loaded_items, $snap['offset'], $snap['page_size'] );
-				$render_meta  = $render_meta->with(
-					array(
-						'pagination_page_size'   => $snap['page_size'],
-						'pagination_total_pages' => $snap['total_pages'],
-					)
-				);
-			} elseif ( Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
-				$offset       = ( $page - 1 ) * $page_size;
-				$loaded_items = array_slice( $loaded_items, $offset, $page_size );
-				$render_meta  = $render_meta->with(
-					array(
-						'pagination_page_size'   => $page_size,
-						'pagination_total_pages' => (int) ceil( $total_item_count / $page_size ),
-					)
-				);
-			} else {
-				$render_meta = $render_meta->with(
-					array(
-						'pagination_page_size'   => $page_size,
-						'pagination_total_pages' => 1,
-					)
-				);
-			}
-		}
+		[ $loaded_items, $render_meta ] = $this->apply_pagination_slice(
+			$loaded_items,
+			$render_settings,
+			$render_meta,
+			$sort_context,
+			$total_item_count
+		);
 
 		return new Render_Context(
 			$render_meta,
@@ -285,6 +243,82 @@ final class Context_Builder {
 			array(),
 			$via_album_id,
 		);
+	}
+
+	/**
+	 * Slices a loaded item list down to the requested page and stamps the
+	 * resolved page size + total page count onto the render meta.
+	 *
+	 * Runs after sorter selection (canonical order already established) and
+	 * after caption resolution + filtering, so the slice contains
+	 * fully-prepared Item_Views from the filtered set. Layouts that opt out
+	 * via the `paginates` capability (slider, image-viewer) skip slicing
+	 * entirely - their own navigation walks the full item list. The item
+	 * list and meta are returned unchanged when pagination is not active.
+	 *
+	 * @since 1.0.0
+	 * @param array<int, mixed>    $loaded_items     Fully-prepared Item_Views.
+	 * @param array<string, mixed> $render_settings  Resolved settings.
+	 * @param Render_Meta          $render_meta      Current render meta.
+	 * @param Render_Context       $context          Context used for capability + page-size resolution.
+	 * @param int                  $total_item_count Item count before slicing.
+	 * @return array{0: array<int, mixed>, 1: Render_Meta}
+	 */
+	private function apply_pagination_slice(
+		array $loaded_items,
+		array $render_settings,
+		Render_Meta $render_meta,
+		Render_Context $context,
+		int $total_item_count
+	): array {
+		$paginates_capability = Layout_Capabilities::supports( $context, 'paginates' );
+		if ( ( $render_settings['pagination_type'] ?? 'show_all' ) !== 'paginated'
+			|| Collection_Kind::GALLERY !== $render_meta->collection_kind
+			|| ! $paginates_capability
+		) {
+			return array( $loaded_items, $render_meta );
+		}
+
+		$per_page_override = $render_meta->requested_per_page;
+		$page_size         = null !== $per_page_override && $per_page_override > 0
+			? $per_page_override
+			: Page_Size_Resolver::resolve_page_size( $render_settings, $context );
+		$page              = max( 1, (int) ( $render_meta->requested_page ?? 1 ) );
+
+		if ( self::is_snap_pagination_active( $render_settings ) && Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
+			$snap         = self::resolve_justified_snap(
+				$loaded_items,
+				$page_size,
+				$page,
+				$render_settings,
+				$render_meta
+			);
+			$loaded_items = array_slice( $loaded_items, $snap['offset'], $snap['page_size'] );
+			$render_meta  = $render_meta->with(
+				array(
+					'pagination_page_size'   => $snap['page_size'],
+					'pagination_total_pages' => $snap['total_pages'],
+				)
+			);
+		} elseif ( Page_Size_Resolver::should_paginate( $total_item_count, $page_size ) ) {
+			$offset       = ( $page - 1 ) * $page_size;
+			$loaded_items = array_slice( $loaded_items, $offset, $page_size );
+			$render_meta  = $render_meta->with(
+				array(
+					'pagination_page_size'   => $page_size,
+					'pagination_total_pages' => (int) ceil( $total_item_count / $page_size ),
+				)
+			);
+		} else {
+			$render_meta = $render_meta->with(
+				array(
+					'pagination_page_size'   => $page_size,
+					'pagination_total_pages' => 1,
+				)
+			);
+		}
+
+		return array( $loaded_items, $render_meta );
 	}
 
 	/**
@@ -323,18 +357,40 @@ final class Context_Builder {
 			$warnings[] = sprintf( 'Unsupported simulate_state: %s', $simulate_state );
 		}
 
-		return new Render_Context(
-			new Render_Meta(
-				$gallery_id,
-				null,
-				$this->instance_id_factory->generate( $gallery_id ),
-				$source,
-				true,
-				Render_Mode::AJAX,
-				2
-			),
+		$render_meta = new Render_Meta(
+			$gallery_id,
+			null,
+			$this->instance_id_factory->generate( $gallery_id ),
+			$source,
+			true,
+			Render_Mode::AJAX,
+			2
+		);
+
+		$total_item_count = count( $collection_items );
+		$render_meta      = $render_meta->with( array( 'total_item_count' => $total_item_count ) );
+
+		$preview_context = new Render_Context(
+			$render_meta,
 			$this->build_layout( $render_settings ),
 			$this->build_behavior( $render_settings ),
+			$render_settings,
+			$collection_items,
+			$warnings
+		);
+
+		[ $collection_items, $render_meta ] = $this->apply_pagination_slice(
+			$collection_items,
+			$render_settings,
+			$render_meta,
+			$preview_context,
+			$total_item_count
+		);
+
+		return new Render_Context(
+			$render_meta,
+			$preview_context->layout,
+			$preview_context->behavior,
 			$render_settings,
 			$collection_items,
 			$warnings
@@ -635,13 +691,62 @@ final class Context_Builder {
 	 * @return  Render_Behavior
 	 */
 	private function build_behavior( array $render_settings ): Render_Behavior {
+		// Admin saves as 'item_click_behavior'; fall back to legacy 'click_behavior' key.
+		$click_behavior = is_string( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ?? null )
+			? ( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] )
+			: 'lightbox';
+
 		return new Render_Behavior(
-			// Admin saves as 'item_click_behavior'; fall back to legacy 'click_behavior' key.
-			is_string( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ?? null ) ? ( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ) : 'lightbox',
+			$click_behavior,
 			is_string( $render_settings['pagination_type'] ?? null ) ? $render_settings['pagination_type'] : 'show_all',
 			is_string( $render_settings['pagination_method'] ?? null ) ? $render_settings['pagination_method'] : 'load_more',
-			is_string( $render_settings['hover_effect'] ?? null ) ? $render_settings['hover_effect'] : null
+			is_string( $render_settings['hover_effect'] ?? null ) ? $render_settings['hover_effect'] : null,
+			self::resolve_lightbox_variant( $render_settings, $click_behavior )
 		);
+	}
+
+	/**
+	 * Resolves the effective lightbox variant for a render.
+	 *
+	 * The admin offers a Full / Mini / Grid choice only on the layouts where it
+	 * applies; everywhere else the variant collapses to a single answer:
+	 *   - Featured Item always uses the grid overlay.
+	 *   - On the variant-eligible layouts, the saved `lightbox_variant` applies.
+	 *   - Any other layout (or a non-lightbox click behaviour) is 'full'.
+	 *
+	 * @since   1.0.0
+	 * @param   array<string, mixed> $render_settings Render settings.
+	 * @param   string               $click_behavior  Resolved click behaviour.
+	 * @return  string 'full' | 'mini' | 'grid'.
+	 */
+	private static function resolve_lightbox_variant( array $render_settings, string $click_behavior ): string {
+		$layout = is_string( $render_settings['layout'] ?? null ) ? $render_settings['layout'] : '';
+
+		if ( 'featured-item' === $layout ) {
+			return 'grid';
+		}
+
+		// Layouts that offer the Full / Mini selector.
+		$selector_layouts = array( 'grid', 'masonry', 'justified', 'image-viewer', 'single-item', 'slider', 'instant-photos' );
+		if ( 'lightbox' !== $click_behavior || ! in_array( $layout, $selector_layouts, true ) ) {
+			return 'full';
+		}
+
+		$variant = is_string( $render_settings['lightbox_variant'] ?? null ) ? $render_settings['lightbox_variant'] : 'full';
+		if ( ! in_array( $variant, array( 'full', 'mini', 'grid' ), true ) ) {
+			return 'full';
+		}
+
+		// The grid overlay is only offered on grid-capable layouts; Instant
+		// Photos falls back to full if grid was somehow stored.
+		if ( 'grid' === $variant ) {
+			$grid_layouts = array( 'grid', 'masonry', 'justified', 'image-viewer', 'single-item', 'slider' );
+			if ( ! in_array( $layout, $grid_layouts, true ) ) {
+				return 'full';
+			}
+		}
+
+		return $variant;
 	}
 
 	/**
@@ -924,6 +1029,22 @@ final class Context_Builder {
 	 * @param  array<string, mixed>   $render_settings Gallery render settings.
 	 * @return array<int, Item_View>
 	 */
+	/**
+	 * Public entry point to resolve captions on externally-supplied items.
+	 *
+	 * Used by the template-preview path, which builds its own Item_Views from a
+	 * bundled demo set rather than the media library, so they go through the same
+	 * caption resolution as real items.
+	 *
+	 * @since  1.1.0
+	 * @param  array<int, Item_View> $items           Item views.
+	 * @param  array<string, mixed>  $render_settings Render settings.
+	 * @return array<int, Item_View>
+	 */
+	public function resolve_captions_for( array $items, array $render_settings ): array {
+		return $this->resolve_captions( $items, $render_settings );
+	}
+
 	private function resolve_captions( array $items, array $render_settings ): array {
 		// Image Viewer renders only the caption title, in its control bar, and
 		// hides Item Description and Limit Title Length in the admin. Neutralise

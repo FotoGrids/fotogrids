@@ -64,6 +64,136 @@ final class Metabox_Registrar {
 	public static function init(): void {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'register_metaboxes' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+
+		// Runs after every other plugin's add_meta_boxes registration (incl.
+		// SEO plugins that register their box into normal/high). Physically
+		// moves the FotoGrids boxes to the front of the normal/high bucket,
+		// which do_meta_boxes() renders before any other priority bucket.
+		add_action( 'add_meta_boxes', array( __CLASS__, 'force_metabox_priority' ), 9999 );
+
+		// do_meta_boxes() renders a user's saved drag order in the `sorted`
+		// slot, which sits between `high` and the rest and would otherwise pull
+		// boxes out of `high` and reorder them - defeating the rewrite above.
+		// Disable the saved order on the FotoGrids screens so the forced
+		// `high`-bucket order governs.
+		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+			add_filter(
+				"get_user_option_meta-box-order_{$post_type}",
+				'__return_empty_array'
+			);
+		}
+	}
+
+	/**
+	 * Reorder the global metabox store so the FotoGrids boxes lead both the
+	 * `normal` and `side` contexts on the gallery / album edit screens.
+	 *
+	 * The `meta-box-order` user-option only orders boxes *within* a priority
+	 * bucket, so a third-party box registered into `high` can still render
+	 * above ours. This runs at a late `add_meta_boxes` priority and rewrites
+	 * `$wp_meta_boxes` directly: every FotoGrids box in a context is collected,
+	 * promoted into the `high` bucket, and placed ahead of all other `high`
+	 * boxes. Other boxes keep their original bucket and relative order.
+	 *
+	 * @since  1.0.0
+	 * @param  \WP_Post|string $post_or_type The post object or post-type slug
+	 *                                       WordPress passes to add_meta_boxes.
+	 * @return void
+	 */
+	public static function force_metabox_priority( $post_or_type ): void {
+		$screen = $post_or_type instanceof \WP_Post ? $post_or_type->post_type : (string) $post_or_type;
+
+		if ( ! in_array( $screen, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+			return;
+		}
+
+		$normal_lead = 'fotogrids_album' === $screen ? 'fotogrids_album_galleries' : 'fotogrids_gallery_items';
+
+		self::pin_context_to_top(
+			$screen,
+			'normal',
+			array( $normal_lead, 'fotogrids_collection_settings' )
+		);
+
+		self::pin_context_to_top(
+			$screen,
+			'side',
+			array( 'fotogrids_gallery_shortcode', 'fotogrids_album_shortcode', 'fotogrids_gallery_albums' )
+		);
+	}
+
+	/**
+	 * Move every FotoGrids box in one context to the front of its `high`
+	 * bucket, in the given lead order, leaving third-party boxes in place.
+	 *
+	 * @since  1.0.0
+	 * @param  string   $screen   Post-type screen id.
+	 * @param  string   $context  Metabox context ('normal' | 'side').
+	 * @param  string[] $lead_ids FotoGrids box ids in the order they should
+	 *                            lead. Ids absent from this screen are ignored;
+	 *                            any FotoGrids box not listed follows them.
+	 * @return void
+	 */
+	private static function pin_context_to_top( string $screen, string $context, array $lead_ids ): void {
+		global $wp_meta_boxes;
+
+		if ( empty( $wp_meta_boxes[ $screen ][ $context ] ) || ! is_array( $wp_meta_boxes[ $screen ][ $context ] ) ) {
+			return;
+		}
+
+		$ours   = array();
+		$others = array();
+
+		foreach ( $wp_meta_boxes[ $screen ][ $context ] as $bucket => $boxes ) {
+			if ( ! is_array( $boxes ) ) {
+				continue;
+			}
+			foreach ( $boxes as $box_id => $box ) {
+				if ( strpos( (string) $box_id, 'fotogrids_' ) === 0 ) {
+					$ours[ $box_id ] = $box;
+				} else {
+					$others[ $box_id ] = array(
+						'bucket' => $bucket,
+						'box'    => $box,
+					);
+				}
+			}
+		}
+
+		if ( empty( $ours ) ) {
+			return;
+		}
+
+		$ordered_ours = array();
+		foreach ( $lead_ids as $box_id ) {
+			if ( isset( $ours[ $box_id ] ) ) {
+				$ordered_ours[ $box_id ] = $ours[ $box_id ];
+				unset( $ours[ $box_id ] );
+			}
+		}
+		// Any remaining FotoGrids boxes (e.g. a Pro module box) follow, ahead
+		// of third-party boxes.
+		foreach ( $ours as $box_id => $box ) {
+			$ordered_ours[ $box_id ] = $box;
+		}
+
+		$rebuilt = array(
+			'high'    => array(),
+			'core'    => array(),
+			'default' => array(),
+			'low'     => array(),
+		);
+
+		foreach ( $ordered_ours as $box_id => $box ) {
+			$rebuilt['high'][ $box_id ] = $box;
+		}
+
+		foreach ( $others as $box_id => $entry ) {
+			$bucket                        = isset( $rebuilt[ $entry['bucket'] ] ) ? $entry['bucket'] : 'default';
+			$rebuilt[ $bucket ][ $box_id ] = $entry['box'];
+		}
+
+		$wp_meta_boxes[ $screen ][ $context ] = array_filter( $rebuilt ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional metabox-order override on FotoGrids edit screens.
 	}
 
 	/**
@@ -111,7 +241,7 @@ final class Metabox_Registrar {
 				array( __CLASS__, 'render_collection_settings' ),
 				$post_type,
 				'normal',
-				'default'
+				'high'
 			);
 		}
 
@@ -147,6 +277,25 @@ final class Metabox_Registrar {
 
 		wp_enqueue_media();
 		wp_enqueue_script( 'jquery-ui-sortable' );
+
+		wp_enqueue_script(
+			'fotogrids-featured-image-picker',
+			FOTOGRIDS_PLUGIN_URL . 'assets/js/featured-image-picker.js',
+			array(),
+			FOTOGRIDS_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'fotogrids-featured-image-picker',
+			'fotogridsFeaturedImage',
+			array(
+				'frameTitle'  => __( 'Featured / Share Image', 'fotogrids' ),
+				'frameButton' => __( 'Use this image', 'fotogrids' ),
+				'set'         => __( 'Set featured image', 'fotogrids' ),
+				'replace'     => __( 'Replace image', 'fotogrids' ),
+			)
+		);
 
 		wp_enqueue_script( 'wp-element' );
 		wp_enqueue_script( 'wp-components' );
@@ -594,7 +743,7 @@ final class Metabox_Registrar {
 			'mediaNotAvailable'                   => __( 'WordPress media library is not available. Please refresh the page.', 'fotogrids' ),
 			'loading'                             => __( 'Loading...', 'fotogrids' ),
 			'errorLoadingItem'                    => __( 'Error loading item data', 'fotogrids' ),
-			'errorSaving'                         => __( 'Error saving item data', 'fotogrids' ),
+			'errorSaving'                         => __( 'Error saving item data. Please try again', 'fotogrids' ),
 			'itemSavedSuccessfully'               => __( 'Item saved successfully!', 'fotogrids' ),
 			'unsavedChangesConfirm'               => __( 'You have unsaved changes. Are you sure you want to close without saving?', 'fotogrids' ),
 			'unsavedChangesNavigate'              => __( 'You have unsaved changes. Are you sure you want to navigate away without saving?', 'fotogrids' ),

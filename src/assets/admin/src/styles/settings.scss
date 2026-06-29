@@ -361,7 +361,20 @@ $settings-sidebar-width: 200px;
 		align-items: center;
 		gap: 12px;
 
-		&--four-sided {
+		// no_range mode: the slider is omitted, so the number input takes the
+		// space the slider would have occupied and stretches to fill the row.
+		&--no-range {
+			.fotogrids-responsive-setting__input {
+				flex: 1;
+			}
+
+			.fotogrids-range-number-input {
+				flex: 1;
+				width: auto;
+			}
+		}
+
+		&--four-sided, &--two-sided {
 			align-items: flex-start;
 
 			.fotogrids-responsive-setting__range {
@@ -881,6 +894,19 @@ body.rtl {
 
 	&__text {
 		color: var(--fg-text-secondary);
+	}
+
+	&--danger {
+		border-color: var(--fg-red);
+		background: rgba(220, 38, 38, 0.06);
+
+		.fotogrids-settings_info-block__icon.fotogrids-icon {
+			background-color: rgba(220, 38, 38, 0.1);
+
+			svg {
+				color: var(--fg-red);
+			}
+		}
 	}
 }
 

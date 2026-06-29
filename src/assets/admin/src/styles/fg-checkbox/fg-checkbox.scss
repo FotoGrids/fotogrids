@@ -54,18 +54,22 @@ $fg-checkbox-border: 1.5px;
 	height: $fg-checkbox-size-md;
 }
 
-.fg-checkbox__input {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	opacity: 0;
-	cursor: inherit;
+input[type="checkbox"].fg-checkbox__input {
+	&, &:disabled {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		opacity: 0;
+		border: none;
+		background: none;
+		cursor: inherit;
 
-	// Keep the native input on top so it owns click/focus.
-	z-index: 1;
+		// Keep the native input on top so it owns click/focus.
+		z-index: 1;
+	}
 }
 
 .fg-checkbox__box {

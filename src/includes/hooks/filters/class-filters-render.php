@@ -50,6 +50,16 @@ final class Filters_Render {
 	public const FONT_RESOLVE_WEIGHT = 'fotogrids/render/font/resolve_weight';
 
 	/**
+	 * Resolved font style used for a render.
+	 *
+	 * @since 1.0.0
+	 * @param string                               $filtered   Default empty.
+	 * @param string                               $normalized Normalised request value.
+	 * @param \FotoGrids\Render\Api\Render_Context $render     Render context.
+	 */
+	public const FONT_RESOLVE_STYLE = 'fotogrids/render/font/resolve_style';
+
+	/**
 	 * Assumed viewport width used by the Justified layout snap resolver when
 	 * the real viewport width is unavailable server-side.
 	 *

@@ -11,11 +11,10 @@
  */
 
 const TRANSITION_DURATION_MS = {
-    fast:   150,
-    normal: 300,
-    slow:   450,
+    fast:   200,
+    normal: 600,
+    slow:   1200,
 };
-
 
 /**
  * Tracks the active index of a finite collection with optional loop
@@ -140,26 +139,43 @@ export function resolveVisibilityClasses( visibility ) {
  * Honours prefers-reduced-motion by jumping immediately when the user
  * has the OS setting enabled.
  *
+ * Calls opts.onComplete only when the animation finishes naturally; a
+ * cancel (the returned function) does NOT fire it.
+ *
  * @param {Element} el
  * @param {number} targetLeft
  * @param {number} durationMs
- * @param {{ easing?: (t: number) => number }} [opts]
+ * @param {{ easing?: (t: number) => number, onComplete?: () => void }} [opts]
  * @return {() => void} Cancel.
  */
 export function scrollToDuration( el, targetLeft, durationMs, opts ) {
     if ( ! el ) return () => {};
+
+    const onComplete = ( opts && typeof opts.onComplete === 'function' ) ? opts.onComplete : null;
 
     const reduceMotion = window.matchMedia
         && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
     if ( reduceMotion || durationMs <= 0 ) {
         el.scrollLeft = targetLeft;
+        if ( onComplete ) onComplete();
         return () => {};
     }
 
     const startLeft = el.scrollLeft;
     const delta     = targetLeft - startLeft;
-    if ( delta === 0 ) return () => {};
+    if ( delta === 0 ) {
+        if ( onComplete ) onComplete();
+        return () => {};
+    }
+
+    // A mandatory scroll-snap container re-snaps to the nearest snap point on
+    // every scrollLeft assignment, which collapses this per-frame animation
+    // into an instant jump. Suspend snapping for the duration of the animation
+    // and restore the inline value (which may be empty) when it ends.
+    const prevSnapType = el.style.scrollSnapType;
+    el.style.scrollSnapType = 'none';
+    const restoreSnap = () => { el.style.scrollSnapType = prevSnapType; };
 
     const easing = ( opts && opts.easing ) || easeOutQuad;
     const startTs = performance.now();
@@ -173,6 +189,9 @@ export function scrollToDuration( el, targetLeft, durationMs, opts ) {
         el.scrollLeft = startLeft + delta * easing( t );
         if ( t < 1 ) {
             frameId = requestAnimationFrame( step );
+        } else {
+            restoreSnap();
+            if ( onComplete ) onComplete();
         }
     };
 
@@ -181,10 +200,47 @@ export function scrollToDuration( el, targetLeft, durationMs, opts ) {
     return () => {
         cancelled = true;
         cancelAnimationFrame( frameId );
+        restoreSnap();
     };
 }
 
 const easeOutQuad = ( t ) => t * ( 2 - t );
+
+/**
+ * Easing definitions keyed by the setting value the layouts emit on
+ * data-fg-easing. Each entry pairs a CSS timing-function string (for
+ * layouts that animate in CSS) with a JS easing function on the unit
+ * interval (for layouts that animate scrollLeft in JS).
+ */
+const EASINGS = {
+    ease:        { css: 'ease',        fn: ( t ) => t * t * ( 3 - 2 * t ) },
+    linear:      { css: 'linear',      fn: ( t ) => t },
+    ease_in:     { css: 'ease-in',     fn: ( t ) => t * t },
+    ease_out:    { css: 'ease-out',    fn: ( t ) => t * ( 2 - t ) },
+    ease_in_out: { css: 'ease-in-out', fn: ( t ) => ( t < 0.5 ? 2 * t * t : -1 + ( 4 - 2 * t ) * t ) },
+};
+
+/**
+ * Resolve a data-fg-easing value to a CSS timing-function string.
+ * Falls back to 'ease' for unknown names.
+ *
+ * @param {string} name
+ * @return {string}
+ */
+export function resolveEasingCss( name ) {
+    return ( name in EASINGS ) ? EASINGS[ name ].css : EASINGS.ease.css;
+}
+
+/**
+ * Resolve a data-fg-easing value to a JS easing function on [0, 1].
+ * Falls back to the 'ease' curve for unknown names.
+ *
+ * @param {string} name
+ * @return {(t: number) => number}
+ */
+export function resolveEasingFn( name ) {
+    return ( name in EASINGS ) ? EASINGS[ name ].fn : EASINGS.ease.fn;
+}
 
 
 /**

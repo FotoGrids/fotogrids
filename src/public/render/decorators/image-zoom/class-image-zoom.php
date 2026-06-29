@@ -122,8 +122,18 @@ final class Image_Zoom implements Decorator {
 			$settings = $render_context->settings;
 
 			$attrs['data-fg-zoom-mode']          = $this->zoom_mode( $render_context );
-			$attrs['data-fg-zoom-close-button']  = $this->setting_to_bool( $settings['interactions_zoom_popover_close_button'] ?? true ) ? '1' : '0';
-			$attrs['data-fg-zoom-click-outside'] = $this->setting_to_bool( $settings['interactions_zoom_popover_click_outside_to_close'] ?? true ) ? '1' : '0';
+			$attrs['data-fg-zoom-close-button']  = $this->setting_to_bool( $settings['lightbox_mini_show_close'] ?? true ) ? '1' : '0';
+			$attrs['data-fg-zoom-click-outside'] = '1';
+
+			// The mini overlay reads these to resolve the backdrop colour + blur
+			// in CSS rather than from inline styles.
+			$attrs['data-fg-mini-theme'] = is_string( $settings['lightbox_mini_theme'] ?? null ) && 'light' === $settings['lightbox_mini_theme']
+				? 'light'
+				: 'dark';
+			$attrs['data-fg-mini-blur']  = is_string( $settings['lightbox_mini_overlay_blur'] ?? null )
+				&& in_array( $settings['lightbox_mini_overlay_blur'], array( 'light', 'strong', 'none' ), true )
+				? $settings['lightbox_mini_overlay_blur']
+				: 'light';
 		}
 
 		return $attrs;
@@ -147,9 +157,9 @@ final class Image_Zoom implements Decorator {
 			return $vars;
 		}
 
-		$vars['--fg-lb-mini-backdrop']      = $this->setting_scalar( $settings['interactions_zoom_popover_bg'] ?? null, 'rgba(0, 0, 0, 0.2)' );
-		$vars['--fg-lb-mini-backdrop-blur'] = $this->setting_scalar( $settings['interactions_zoom_popover_bg_blur'] ?? null, '8' ) . 'px';
-		$vars['--fg-lb-mini-padding']       = $this->setting_scalar( $settings['interactions_zoom_popover_padding'] ?? null, '24' ) . 'px';
+		// Backdrop colour + blur are resolved in CSS from the theme / blur
+		// data attributes (see wrapper_data_attrs); padding stays a CSS var.
+		$vars['--fg-lb-mini-padding'] = $this->padding_px( $settings['lightbox_mini_padding'] ?? null ) . 'px';
 
 		return $vars;
 	}
@@ -217,5 +227,26 @@ final class Image_Zoom implements Decorator {
 	private function zoom_mode( Render_Context $render_context ): string {
 		$mode = $this->setting_scalar( $render_context->settings['interactions_zoom_mode'] ?? null, 'hover' );
 		return 'click' === $mode ? 'click' : 'hover';
+	}
+
+	/**
+	 * Resolve the desktop padding value from the shared mini responsive padding
+	 * setting.
+	 *
+	 * @since   1.0.0
+	 * @param   mixed $padding Saved responsive padding value.
+	 * @return  string Pixel value (no unit).
+	 */
+	private function padding_px( $padding ): string {
+		if ( is_array( $padding ) ) {
+			$desktop = $padding['desktop'] ?? null;
+			if ( is_array( $desktop ) && isset( $desktop['value'] ) ) {
+				return (string) (int) $desktop['value'];
+			}
+			if ( is_numeric( $desktop ) ) {
+				return (string) (int) $desktop;
+			}
+		}
+		return '24';
 	}
 }

@@ -20,8 +20,14 @@
       "tablet": 10,
       "mobile": 6
     },
-    "hover_effect": "soft_fade",
+    "hover_effect": "zoom",
     "captions": true,
-    "lightbox": true
+    "item_click_behavior": "lightbox",
+    "caption_placement": "overlay",
+    "caption_title_source": "title",
+    "border_radius": 8,
+    "shadow_enabled": true,
+    "shadow_blur": 18,
+    "shadow_color": "rgba(0,0,0,0.12)"
   }
 }

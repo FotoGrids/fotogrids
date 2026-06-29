@@ -26,7 +26,6 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Capabilities:
  *   - enforces_item_box : --fg-item-aspect-ratio + --fg-item-fit
- *   - uses_item_spacing : --fg-gap
  *   - paginates         : false (carousel IS the navigation)
  *   - filters           : true (filter UI still applies)
  *
@@ -108,6 +107,11 @@ final class Layout_Slider implements Layout {
 				'normal'
 			),
 			'data-fg-transition-duration-custom' => (string) max( 0, (int) ( $s['layout_transition_duration_custom'] ?? 300 ) ),
+			'data-fg-easing'                     => self::sanitize_choice(
+				$s['layout_easing'] ?? 'ease_in_out',
+				array( 'ease', 'linear', 'ease_in', 'ease_out', 'ease_in_out' ),
+				'ease_in_out'
+			),
 			'data-fg-show-arrows'                => ! empty( $s['layout_show_arrows'] ) ? '1' : '0',
 			'data-fg-arrows-location'            => self::sanitize_choice(
 				$s['layout_arrows_location'] ?? 'inset',
@@ -121,6 +125,11 @@ final class Layout_Slider implements Layout {
 				'always'
 			),
 			'data-fg-hide-arrows-at-ends'        => ! empty( $s['layout_hide_arrows_at_ends'] ) ? '1' : '0',
+			'data-fg-arrows-at-ends-mode'        => self::sanitize_choice(
+				$s['layout_arrows_at_ends_mode'] ?? 'hide',
+				array( 'hide', 'dim' ),
+				'hide'
+			),
 			'data-fg-show-bullets'               => ! empty( $s['layout_show_bullets'] ) ? '1' : '0',
 			'data-fg-bullets-location'           => self::sanitize_choice(
 				$s['layout_bullets_location'] ?? 'bottom',
@@ -131,6 +140,11 @@ final class Layout_Slider implements Layout {
 				$s['layout_bullets_visibility'] ?? 'always',
 				array( 'always', 'hover_show', 'hover_hide' ),
 				'always'
+			),
+			'data-fg-bullets-align'              => self::sanitize_choice(
+				$s['layout_bullet_align'] ?? 'center',
+				array( 'center', 'stretch' ),
+				'center'
 			),
 			'data-fg-thumbs-show'                => ! empty( $s['layout_thumbnails_show'] ) ? '1' : '0',
 			'data-fg-thumbs-location'            => self::sanitize_choice(
@@ -169,27 +183,54 @@ final class Layout_Slider implements Layout {
 		$height_max     = is_array( $s['layout_height_max'] ?? null ) ? $s['layout_height_max'] : array();
 
 		$vars = array(
-			'--fg-items-per-view'  => new Responsive_Var(
+			'--fg-items-per-view'       => new Responsive_Var(
 				self::resolve_int( $items_per_view, 'desktop', 3 ),
 				self::resolve_int( $items_per_view, 'tablet', 2 ),
 				self::resolve_int( $items_per_view, 'mobile', 1 ),
 			),
-			'--fg-height-fixed'    => new Responsive_Var(
+			'--fg-height-fixed'         => new Responsive_Var(
 				self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
 				self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
 				self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
 			),
-			'--fg-height-max'      => new Responsive_Var(
+			'--fg-height-max'           => new Responsive_Var(
 				self::height_max_value( $height_max, 'desktop' ),
 				self::height_max_value( $height_max, 'tablet' ),
 				self::height_max_value( $height_max, 'mobile' ),
 			),
-			'--fg-arrow-size'      => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
-			'--fg-arrow-distance'  => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
-			'--fg-bullet-size'     => self::resolve_unit( $s['layout_bullet_size'] ?? null, 10, 'px' ),
-			'--fg-bullet-distance' => self::resolve_unit( $s['layout_bullet_distance'] ?? null, 8, 'px' ),
-			'--fg-bullets-spacing' => self::resolve_unit( $s['layout_bullets_spacing'] ?? null, 8, 'px' ),
+			'--fg-arrow-size'           => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
+			'--fg-arrow-distance'       => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
+			'--fg-arrow-bg'             => self::resolve_color( $s['layout_arrow_bg'] ?? null, 'rgba(0, 0, 0, 0.45)' ),
+			'--fg-arrow-border'         => self::resolve_color( $s['layout_arrow_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-arrow-color'          => self::resolve_color( $s['layout_arrow_arrow_color'] ?? null, 'rgba(255, 255, 255, 1)' ),
+			'--fg-arrow-bg-hover'       => self::resolve_color( $s['layout_arrow_hover_bg'] ?? null, 'rgba(0, 0, 0, 0.75)' ),
+			'--fg-arrow-border-hover'   => self::resolve_color( $s['layout_arrow_hover_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-arrow-color-hover'    => self::resolve_color( $s['layout_arrow_hover_arrow_color'] ?? null, 'rgba(255, 255, 255, 1)' ),
+			'--fg-arrow-bg-active'      => self::resolve_color( $s['layout_arrow_active_bg'] ?? null, 'rgba(0, 0, 0, 0.75)' ),
+			'--fg-arrow-border-active'  => self::resolve_color( $s['layout_arrow_active_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-arrow-color-active'   => self::resolve_color( $s['layout_arrow_active_arrow_color'] ?? null, 'rgba(255, 255, 255, 1)' ),
+			'--fg-arrow-bg-focus'       => self::resolve_color( $s['layout_arrow_focus_bg'] ?? null, 'rgba(0, 0, 0, 0.75)' ),
+			'--fg-arrow-border-focus'   => self::resolve_color( $s['layout_arrow_focus_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-arrow-color-focus'    => self::resolve_color( $s['layout_arrow_focus_arrow_color'] ?? null, 'rgba(255, 255, 255, 1)' ),
+			'--fg-bullet-width'         => self::resolve_side( $s['layout_bullet_size'] ?? null, 'width', 10, 'px' ),
+			'--fg-bullet-height'        => self::resolve_side( $s['layout_bullet_size'] ?? null, 'height', 10, 'px' ),
+			'--fg-bullet-radius'        => self::resolve_unit( $s['layout_bullet_radius'] ?? null, 4, 'px' ),
+			'--fg-bullet-border-width'  => self::resolve_unit( $s['layout_bullet_border_width'] ?? null, 2, 'px' ),
+			'--fg-bullet-distance'      => self::resolve_unit( $s['layout_bullet_distance'] ?? null, 8, 'px' ),
+			'--fg-bullet-spacing'       => self::resolve_unit( $s['layout_bullet_spacing'] ?? null, 8, 'px' ),
+			'--fg-bullet-bg'            => self::resolve_color( $s['layout_bullet_bg'] ?? null, 'rgba(0, 0, 0, 0.4)' ),
+			'--fg-bullet-border'        => self::resolve_color( $s['layout_bullet_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-bullet-bg-hover'      => self::resolve_color( $s['layout_bullet_hover_bg'] ?? null, 'rgba(0, 0, 0, 0.7)' ),
+			'--fg-bullet-border-hover'  => self::resolve_color( $s['layout_bullet_hover_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-bullet-bg-active'     => self::resolve_color( $s['layout_bullet_active_bg'] ?? null, 'var(--fg-colors-blue, #3c46f0)' ),
+			'--fg-bullet-border-active' => self::resolve_color( $s['layout_bullet_active_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-bullet-bg-focus'      => self::resolve_color( $s['layout_bullet_focus_bg'] ?? null, 'var(--fg-colors-blue, #3c46f0)' ),
+			'--fg-bullet-border-focus'  => self::resolve_color( $s['layout_bullet_focus_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
 		);
+
+		$vars['--fg-bullets-justify'] = ( 'stretch' === self::sanitize_choice( $s['layout_bullet_align'] ?? 'center', array( 'center', 'stretch' ), 'center' ) )
+			? 'stretch'
+			: 'center';
 
 		return $vars;
 	}
@@ -221,7 +262,6 @@ final class Layout_Slider implements Layout {
 	public function capabilities(): array {
 		return array(
 			'enforces_item_box'  => true,
-			'uses_item_spacing'  => true,
 			'paginates'          => false,
 			'filters'            => true,
 			'pointer_navigation' => true,
@@ -284,6 +324,34 @@ final class Layout_Slider implements Layout {
 			return ( (int) $raw ) . $default_unit;
 		}
 		return $fallback . $default_unit;
+	}
+
+	/**
+	 * Resolve one side (width / height) of a two-sided size value to a CSS
+	 * length. The value persists as { width: { value, unit }, height: {...} }.
+	 *
+	 * @param mixed  $raw          Two-sided size value.
+	 * @param string $side         'width' | 'height'.
+	 * @param int    $fallback     Numeric fallback.
+	 * @param string $default_unit Unit when none stored.
+	 * @return string
+	 */
+	private static function resolve_side( $raw, string $side, int $fallback, string $default_unit ): string {
+		if ( is_array( $raw ) && isset( $raw[ $side ] ) ) {
+			return self::resolve_unit( $raw[ $side ], $fallback, $default_unit );
+		}
+		return $fallback . $default_unit;
+	}
+
+	/**
+	 * Return a stored colour string when present, else the given fallback.
+	 *
+	 * @param mixed  $value           Raw setting value.
+	 * @param string $default_value   Fallback colour string.
+	 * @return string
+	 */
+	private static function resolve_color( $value, string $default_value ): string {
+		return ( is_string( $value ) && '' !== trim( $value ) ) ? trim( $value ) : $default_value;
 	}
 
 	/**

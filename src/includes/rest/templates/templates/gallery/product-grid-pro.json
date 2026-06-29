@@ -5,26 +5,7 @@
   "type": "pro",
   "category": "gallery",
   "subcategory": "products",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 43,
-  "settings": {
-    "layout": "grid",
-    "columns": {
-      "desktop": 4,
-      "tablet": 3,
-      "mobile": 2
-    },
-    "item_spacing": {
-      "desktop": 12,
-      "tablet": 10,
-      "mobile": 6
-    },
-    "hover_effect": "slow_zoom",
-    "cta_overlays": true,
-    "woocommerce_handoff": true,
-    "product_gallery": true,
-    "extended_analytics": true,
-    "lightbox": false
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

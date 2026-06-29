@@ -64,14 +64,18 @@
     --fg-pagination-btn-border-color: var(--fg-pagination-button-border-color, currentColor);
     --fg-pagination-btn-bg: var(--fg-pagination-button-bg, transparent);
     --fg-pagination-btn-color: var(--fg-pagination-button-color, inherit);
-    --fg-pagination-btn-padding: calc(var(--fg-pagination-base-size) * 1.5) calc(var(--fg-pagination-base-size) * 2);
-    --fg-pagination-btn-radius: calc(var(--fg-pagination-base-size) / 2);
+    --fg-pagination-btn-padding: var(--fg-pagination-button-padding, calc(var(--fg-pagination-base-size) * 1.5) calc(var(--fg-pagination-base-size) * 2));
+    --fg-pagination-btn-radius: var(--fg-pagination-button-radius, calc(var(--fg-pagination-base-size) / 2));
+    --fg-pagination-btn-box-shadow: var(--fg-pagination-button-box-shadow, none);
     --fg-pagination-btn-hover-bg: var(--fg-pagination-button-hover-bg, rgba(60, 70, 240, 0.05));
     --fg-pagination-btn-hover-color: var(--fg-pagination-button-hover-color, var(--fg-colors-blue));
     --fg-pagination-btn-hover-border-color: var(--fg-pagination-button-hover-border-color, var(--fg-pagination-btn-border-color));
     --fg-pagination-btn-active-bg: var(--fg-pagination-button-active-bg, var(--fg-colors-blue));
     --fg-pagination-btn-active-color: var(--fg-pagination-button-active-color, var(--fg-colors-white));
     --fg-pagination-btn-active-border-color: var(--fg-pagination-button-active-border-color, var(--fg-colors-blue));
+    --fg-pagination-btn-focus-bg: var(--fg-pagination-button-focus-bg, var(--fg-pagination-btn-hover-bg));
+    --fg-pagination-btn-focus-color: var(--fg-pagination-button-focus-color, var(--fg-pagination-btn-hover-color));
+    --fg-pagination-btn-focus-border-color: var(--fg-pagination-button-focus-border-color, var(--fg-pagination-btn-hover-border-color));
     --fg-pagination-btn-gap: var(--fg-pagination-base-size);
     --fg-pagination-btn-min-width: calc(var(--fg-pagination-base-size) * 3);
     --fg-pagination-btn-transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -79,10 +83,12 @@
     --fg-pagination-btn-loading-opacity: 0.6;
     --fg-pagination-btn-font-family: var(--fg-pagination-button-font-family, inherit);
     --fg-pagination-btn-font-size: var(--fg-pagination-button-font-size, calc(var(--fg-pagination-base-size) * 1.75));
-    --fg-pagination-btn-font-style: normal;
+    --fg-pagination-btn-font-style: var(--fg-pagination-button-font-style, normal);
     --fg-pagination-btn-font-variant: normal;
     --fg-pagination-btn-font-weight: var(--fg-pagination-button-font-weight, 500);
-    --fg-pagination-btn-line-height: 1;
+    --fg-pagination-btn-line-height: var(--fg-pagination-button-line-height, 1);
+    --fg-pagination-btn-letter-spacing: var(--fg-pagination-button-letter-spacing, normal);
+    --fg-pagination-btn-word-spacing: var(--fg-pagination-button-word-spacing, normal);
     --fg-pagination-btn-text-transform: none;
 
     /*
@@ -103,12 +109,15 @@
     color: var( --fg-pagination-btn-color );
     padding: var( --fg-pagination-btn-padding );
     border-radius: var( --fg-pagination-btn-radius );
+    box-shadow: var( --fg-pagination-btn-box-shadow );
     font-family: var( --fg-pagination-btn-font-family );
     font-size: var( --fg-pagination-btn-font-size );
     font-style: var( --fg-pagination-btn-font-style );
     font-variant: var( --fg-pagination-btn-font-variant );
     font-weight: var( --fg-pagination-btn-font-weight );
     line-height: var( --fg-pagination-btn-line-height );
+    letter-spacing: var( --fg-pagination-btn-letter-spacing );
+    word-spacing: var( --fg-pagination-btn-word-spacing );
     text-transform: var( --fg-pagination-btn-text-transform );
     cursor: pointer;
     display: inline-flex;
@@ -123,6 +132,12 @@
     background: var( --fg-pagination-btn-hover-bg );
     color: var( --fg-pagination-btn-hover-color );
     border-color: var( --fg-pagination-btn-hover-border-color );
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn:focus-visible:not( :disabled ):not( .fg-is-loading ):not( .fg-is-active ) {
+    background: var( --fg-pagination-btn-focus-bg );
+    color: var( --fg-pagination-btn-focus-color );
+    border-color: var( --fg-pagination-btn-focus-border-color );
 }
 
 .fotogrids-collection.fotogrids-gallery .fg-pagination__btn:disabled {

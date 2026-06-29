@@ -1,0 +1,115 @@
+{
+	"partial": "lightbox-mini",
+	"inline_defaults": true,
+	"layout": [
+		"show_close",
+		"show_arrows",
+		"show_bullets",
+		"padding",
+		"show_overlay",
+		"overlay_blur",
+		"show_border",
+		"show_shadow",
+		"show_radius",
+		"theme"
+	],
+	"field_defaults": {
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"show_close": {
+			"type": "toggle",
+			"label": "Show Close Button",
+			"default": true
+		},
+		"show_arrows": {
+			"type": "toggle",
+			"label": "Show Navigation Arrows",
+			"default": false
+		},
+		"show_bullets": {
+			"type": "toggle",
+			"label": "Show Bullets",
+			"default": false
+		},
+		"padding": {
+			"type": "responsive_range",
+			"label": "Padding",
+			"description": "Breathing room between the image and the viewport edges.",
+			"units": ["px", "em", "rem", "%"],
+			"responsive": {
+				"desktop": { "min": 0, "max": 120, "default": 24 },
+				"tablet": { "min": 0, "max": 120, "default": 24 },
+				"mobile": { "min": 0, "max": 120, "default": 24 }
+			}
+		},
+		"show_overlay": {
+			"type": "toggle",
+			"label": "Show Background Overlay",
+			"default": true
+		},
+		"overlay_blur": {
+			"type": "button_group",
+			"label": "Background Blur Intensity",
+			"options": [
+				{
+					"label": "Light",
+					"value": "light",
+					"tier_required": "free"
+				},
+				{
+					"label": "Strong",
+					"value": "strong",
+					"tier_required": "free"
+				},
+				{
+					"label": "None",
+					"value": "none",
+					"tier_required": "free"
+				}
+			],
+			"default": "light",
+			"condition": {
+				"dependsOn": "{{key_prefix}}show_overlay",
+				"values": [true, "1"]
+			}
+		},
+		"show_border": {
+			"type": "toggle",
+			"label": "Add Border",
+			"default": true
+		},
+		"show_shadow": {
+			"type": "toggle",
+			"label": "Add Shadow",
+			"default": true
+		},
+		"show_radius": {
+			"type": "toggle",
+			"label": "Add Corner Radius",
+			"default": true
+		},
+		"theme": {
+			"type": "button_group",
+			"label": "Theme",
+			"options": [
+				{
+					"label": "Dark",
+					"value": "dark",
+					"icon": "theme_dark",
+					"tier_required": "free"
+				},
+				{
+					"label": "Light",
+					"value": "light",
+					"icon": "theme_light",
+					"tier_required": "free"
+				}
+			],
+			"default": "dark"
+		}
+	}
+}

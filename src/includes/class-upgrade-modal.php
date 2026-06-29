@@ -158,8 +158,8 @@ class Upgrade_Modal {
 	 */
 	public static function get_urls() {
 		return array(
-			'upgrade'    => 'https://go.fotogrids.com/upgrade/?utm_source=plugin&utm_medium=upgrade-modal&utm_campaign=upgrade',
-			'comparison' => 'https://go.fotogrids.com/free-vs-pro/?utm_source=plugin&utm_medium=upgrade-modal&utm_campaign=comparison',
+			'upgrade'    => Links::go( 'upgrade', 'upgrade-modal', 'upgrade' ),
+			'comparison' => Links::go( 'free-vs-pro', 'upgrade-modal', 'comparison' ),
 		);
 	}
 

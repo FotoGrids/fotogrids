@@ -120,6 +120,10 @@ class Lightbox_Data {
 			// EXIF Copyright field - stored under the key 'copyright' by TabEXIF.
 			// If exif is missing or the copyright key is absent, return empty - no fallback.
 			$credit = ( is_array( $exif ) && isset( $exif['copyright'] ) ) ? (string) $exif['copyright'] : '';
+		} elseif ( 'xmp' === $credit_source ) {
+			// XMP rights - read from the embedded XMP packet. wp_read_image_metadata
+			// does not parse XMP, so the file is read directly.
+			$credit = self::read_xmp_credit( $item_id );
 		} else {
 			$credit = $custom_meta ? ( $custom_meta->credit ?? '' ) : '';
 			$credit = $credit ? $credit : '';
@@ -182,6 +186,57 @@ class Lightbox_Data {
 				'location'    => $location,
 			)
 		);
+	}
+
+	/**
+	 * Resolve a credit string from an attachment's embedded XMP packet.
+	 *
+	 * Reads the raw file, extracts the XMP packet, and returns the first
+	 * available of dc:rights, photoshop:Credit, dc:creator. Returns an empty
+	 * string when the file is unreadable or carries no XMP rights data.
+	 *
+	 * @since 1.0.0
+	 * @param int $item_id Attachment ID.
+	 * @return string
+	 */
+	private static function read_xmp_credit( int $item_id ): string {
+		$file_path = get_attached_file( $item_id );
+		if ( ! $file_path || ! file_exists( $file_path ) ) {
+			return '';
+		}
+
+		$contents = (string) @file_get_contents( $file_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( '' === $contents ) {
+			return '';
+		}
+
+		$start = strpos( $contents, '<x:xmpmeta' );
+		$end   = strpos( $contents, '</x:xmpmeta>' );
+		if ( false === $start || false === $end || $end <= $start ) {
+			return '';
+		}
+		$packet = substr( $contents, $start, ( $end - $start ) + strlen( '</x:xmpmeta>' ) );
+
+		$patterns = array(
+			'#<dc:rights>.*?<rdf:li[^>]*>(.*?)</rdf:li>#s',
+			'/photoshop:Credit="([^"]+)"/',
+			'#<dc:creator>.*?<rdf:li[^>]*>(.*?)</rdf:li>#s',
+		);
+		foreach ( $patterns as $pattern ) {
+			if ( preg_match( $pattern, $packet, $m ) ) {
+				$value = trim( html_entity_decode( wp_strip_all_tags( $m[1] ), ENT_QUOTES, 'UTF-8' ) );
+				// Strip a leading BCP-47 default-language marker that some
+				// writers embed in the element text rather than the xml:lang
+				// attribute.
+				$value = (string) preg_replace( '/^x-default\s+/', '', $value );
+				$value = trim( $value );
+				if ( '' !== $value ) {
+					return sanitize_text_field( $value );
+				}
+			}
+		}
+
+		return '';
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

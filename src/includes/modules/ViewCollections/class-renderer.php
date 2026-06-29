@@ -10,6 +10,10 @@ namespace FotoGrids\Modules\ViewCollections;
 
 use FotoGrids\Hooks\Actions_View;
 use FotoGrids\Hooks\Filters_View;
+use FotoGrids\Render\Api\Breakpoint_Config;
+use FotoGrids\Render\Api\Responsive_Var;
+use FotoGrids\Render\Api\Setting_Helpers;
+use FotoGrids\Render\Internal\Style_Var_Builder;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -25,6 +29,16 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 1.0.0
  */
 class Renderer {
+
+	use Setting_Helpers;
+
+	/**
+	 * The id stamped on the view page <body> so its CSS-variable style block
+	 * can be scoped to a single selector.
+	 *
+	 * @var string
+	 */
+	const BODY_ID = 'fotogrids-view';
 
 	/**
 	 * The collection being rendered.
@@ -249,7 +263,10 @@ class Renderer {
 				? $seo['og_description_override']
 				: $this->collection_description();
 
-			// Image: custom > featured > plugin-wide fallback.
+			// Image: explicit per-collection custom image wins; otherwise the
+			// collection cover, which itself resolves the Featured / Share Image
+			// first, then the in-gallery Featured Item / featured child gallery,
+			// then the first item; finally the plugin-wide fallback.
 			$image_id = 0;
 			if ( 'custom' === $seo['og_image_source'] && $seo['og_image_custom_id'] > 0 ) {
 				$image_id = (int) $seo['og_image_custom_id'];
@@ -593,12 +610,78 @@ class Renderer {
 		$classes = (array) apply_filters( Filters_View::BODY_CLASSES, $classes, $this->post );
 		$classes = array_map( 'sanitize_html_class', $classes );
 
-		$accent     = $this->settings['accent_color'] ?? '#3c46f0';
-		$max_width  = absint( $this->settings['max_width'] ?? 1200 );
-		$style_vars = sprintf( '--fg-view-accent:%s;--fg-view-max-width:%dpx;', $accent, $max_width );
+		return 'id="' . esc_attr( self::BODY_ID ) . '"'
+			. ' class="' . esc_attr( implode( ' ', $classes ) ) . '"';
+	}
 
-		return 'class="' . esc_attr( implode( ' ', $classes ) ) . '"'
-			. ' style="' . esc_attr( $style_vars ) . '"';
+	/**
+	 * Scoped CSS-variable <style> block for the view page body.
+	 *
+	 * Emitted as the first child of <body> so the accent, max width, and
+	 * background custom properties are scoped to #fotogrids-view rather than
+	 * stamped on the body as an inline style attribute. The max width is a
+	 * responsive range, so it is carried as a Responsive_Var and
+	 * Style_Var_Builder emits one @media block per configured breakpoint.
+	 *
+	 * @since  1.0.0
+	 * @return string The full <style> element, or '' when no variables apply.
+	 */
+	public function body_style_element(): string {
+		$vars = array();
+
+		$accent = (string) ( $this->settings['accent_color'] ?? '#3c46f0' );
+		if ( '' !== $accent ) {
+			$vars['--fg-view-accent'] = $accent;
+		}
+
+		$collection = $this->collection_settings();
+		if ( $this->setting_to_bool( $collection['view_page_override_defaults'] ?? false ) ) {
+			$raw_max_width = $collection['view_page_max_width'] ?? array();
+			$desktop       = $this->resolve_responsive_value( $raw_max_width, 'desktop', 'vw' );
+			$tablet        = $this->resolve_responsive_value( $raw_max_width, 'tablet', 'vw' );
+			$mobile        = $this->resolve_responsive_value( $raw_max_width, 'mobile', 'vw' );
+
+			if ( '' !== $desktop || '' !== $tablet || '' !== $mobile ) {
+				$vars['--fg-view-max-width'] = new Responsive_Var( $desktop, $tablet, $mobile );
+			}
+
+			$background_color = isset( $collection['view_page_background_color'] )
+				? (string) $collection['view_page_background_color']
+				: '';
+			if ( '' !== $background_color ) {
+				$vars['--fg-view-bg'] = $background_color;
+			}
+		}
+
+		if ( empty( $vars ) ) {
+			return '';
+		}
+
+		$builder = new Style_Var_Builder();
+
+		return $builder->build_style_element(
+			$vars,
+			self::BODY_ID,
+			Breakpoint_Config::from_settings()
+		);
+	}
+
+	/**
+	 * Resolved per-collection collection settings for this view page.
+	 *
+	 * Reads the saved gallery or album settings (keyed by the collection
+	 * settings registry) so view-page-specific values such as max width and
+	 * background colour can be applied per collection.
+	 *
+	 * @since 1.0.0
+	 * @return array<string,mixed>
+	 */
+	private function collection_settings(): array {
+		if ( $this->is_album() ) {
+			return \FotoGrids\Albums\Album_Repository::get_settings( (int) $this->post->ID );
+		}
+
+		return \FotoGrids\Galleries\Gallery_Repository::get_settings( (int) $this->post->ID );
 	}
 
 	/**
@@ -618,6 +701,25 @@ class Renderer {
 		 * @param \WP_Post $post
 		 */
 		return (bool) apply_filters( Filters_View::SHOW_HEADER, $show, $this->post );
+	}
+
+	/**
+	 * Whether the page footer (sharing + credit) should be shown.
+	 *
+	 * @since 1.0.0
+	 * @return bool
+	 */
+	public function shows_footer(): bool {
+		$show = ! empty( $this->settings['show_footer'] );
+
+		/**
+		 * Filter whether the view page footer is shown.
+		 *
+		 * @since 1.0.0
+		 * @param bool     $show
+		 * @param \WP_Post $post
+		 */
+		return (bool) apply_filters( Filters_View::SHOW_FOOTER, $show, $this->post );
 	}
 
 	/**

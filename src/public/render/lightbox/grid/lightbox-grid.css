@@ -1,30 +1,85 @@
 /* LightboxGrid - a scrollable, Airbnb-style "show all" overlay.
 
-   Chrome is just a toolbar (Back inline-start, Share inline-end) over a
-   scrollable content grid: one full-width image, then a row of two
-   side-by-side, repeating. Colours come from the gallery's lightbox theme
-   via --fg-lb-* custom properties the JS sets on the overlay root from the
-   stamped data-fg-lb-* attributes. */
+   Chrome is a toolbar (Back inline-start, Share inline-end) over a scrollable
+   content grid: one full-width image, then a row of two side-by-side,
+   repeating. Clicking a tile morphs it to a centred full-size preview.
 
+   The colour palette is selected by the [data-fg-lb-theme] attribute the JS
+   sets on the overlay; per-gallery sizing (max width, tile aspect) arrives via
+   a scoped <style> block. No per-element inline styles. */
+
+/* Tunables */
+.fg-lb-grid {
+    --fg-lb-grid-gap: 12px;
+    --fg-lb-grid-max-width: 60vw;
+    --fg-lb-grid-aspect: 16 / 9;
+    --fg-lb-grid-aspect-pair: 4 / 3;
+    --fg-lb-grid-radius: 8px;
+    --fg-lb-grid-fade: 0.25s;
+    --fg-lb-grid-morph: 0.34s;
+    --fg-lb-grid-morph-ease: cubic-bezier( 0.22, 0.61, 0.36, 1 );
+    --fg-lb-grid-swap: 0.16s;
+    --fg-lb-grid-toolbar-h: 56px;
+}
+
+/* Theme palettes */
+.fg-lb-grid[data-fg-lb-theme="dark"] {
+    --fg-lb-bg: rgba( 0, 0, 0, 0.82 );
+    --fg-lb-toolbar-bg: rgba( 0, 0, 0, 0 );
+    --fg-lb-toolbar-btn-color: rgba( 255, 255, 255, 0.7 );
+    --fg-lb-toolbar-btn-hover: rgba( 255, 255, 255, 1 );
+    --fg-lb-toolbar-btn-active-bg: rgba( 255, 255, 255, 0.15 );
+    --fg-lb-info-text: rgba( 255, 255, 255, 0.85 );
+    --fg-lb-nav-bg: rgba( 0, 0, 0, 0 );
+    --fg-lb-nav-bg-hover: rgba( 255, 255, 255, 0.15 );
+    --fg-lb-nav-color: rgba( 255, 255, 255, 1 );
+}
+
+.fg-lb-grid[data-fg-lb-theme="light"] {
+    --fg-lb-bg: rgba( 255, 255, 255, 0.88 );
+    --fg-lb-toolbar-bg: rgba( 255, 255, 255, 0 );
+    --fg-lb-toolbar-btn-color: rgba( 0, 0, 0, 0.6 );
+    --fg-lb-toolbar-btn-hover: rgba( 0, 0, 0, 0.9 );
+    --fg-lb-toolbar-btn-active-bg: rgba( 0, 0, 0, 0.1 );
+    --fg-lb-info-text: rgba( 0, 0, 0, 0.8 );
+    --fg-lb-nav-bg: rgba( 255, 255, 255, 0.75 );
+    --fg-lb-nav-bg-hover: rgba( 0, 0, 0, 0.1 );
+    --fg-lb-nav-color: rgba( 0, 0, 0, 0.9 );
+}
+
+/* Overlay */
 .fg-lb-grid {
     position: fixed;
     inset: 0;
     z-index: 100000;
     display: flex;
     flex-direction: column;
-    background: var( --fg-lb-bg, rgba( 0, 0, 0, 0.92 ) );
-    color: var( --fg-lb-info-text, rgba( 255, 255, 255, 0.85 ) );
+    background: var( --fg-lb-bg );
+    color: var( --fg-lb-info-text );
+    opacity: 0;
+    transition: opacity var( --fg-lb-grid-fade ) ease;
+
+    /* Light blur of whatever sits behind the overlay. */
+    -webkit-backdrop-filter: blur( 6px );
+    backdrop-filter: blur( 6px );
 }
 
+.fg-lb-grid.fg-is-open {
+    opacity: 1;
+}
+
+/* Toolbar */
 .fg-lb-grid-toolbar {
+    position: relative;
+    z-index: 2;
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    min-height: var( --fg-lb-grid-toolbar-h );
     padding: 10px 16px;
-    background: var( --fg-lb-toolbar-bg, rgba( 0, 0, 0, 0.35 ) );
-    backdrop-filter: blur( 6px );
+    background: var( --fg-lb-toolbar-bg );
 }
 
 .fg-lb-grid-toolbar-start,
@@ -32,6 +87,54 @@
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+/* The Back zone fades out while an image is zoomed. */
+.fg-lb-grid-toolbar-start {
+    transition: opacity 0.2s ease;
+}
+
+.fg-lb-grid.fg-is-zooming .fg-lb-grid-toolbar-start {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.fg-lb-grid-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid var( --fg-lb-toolbar-btn-border-color, transparent );
+    border-radius: 6px;
+    background: var( --fg-lb-toolbar-btn-bg, transparent );
+    color: var( --fg-lb-toolbar-btn-color );
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.fg-lb-grid-btn:hover {
+    color: var( --fg-lb-toolbar-btn-hover );
+    background: var( --fg-lb-toolbar-btn-hover-bg, var( --fg-lb-toolbar-btn-active-bg ) );
+    border-color: var( --fg-lb-toolbar-btn-hover-border-color, var( --fg-lb-toolbar-btn-border-color, transparent ) );
+    outline: none;
+    box-shadow: none;
+}
+
+.fg-lb-grid-btn:focus,
+.fg-lb-grid-btn:focus-visible {
+    color: var( --fg-lb-toolbar-btn-focus-color, var( --fg-lb-toolbar-btn-hover ) );
+    background: var( --fg-lb-toolbar-btn-focus-bg, var( --fg-lb-toolbar-btn-active-bg ) );
+    border-color: var( --fg-lb-toolbar-btn-focus-border-color, var( --fg-lb-toolbar-btn-border-color, transparent ) );
+    outline: none;
+    box-shadow: none;
+}
+
+.fg-lb-grid-btn > svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
 }
 
 .fg-lb-grid-share-wrap {
@@ -45,60 +148,106 @@
     z-index: 2;
     padding: 12px;
     border-radius: 8px;
-    background: var( --fg-lb-toolbar-bg, rgba( 0, 0, 0, 0.85 ) );
+    background: var( --fg-lb-toolbar-bg );
     box-shadow: 0 8px 24px rgba( 0, 0, 0, 0.4 );
 }
 
-.fg-lb-grid-btn {
-    display: inline-flex;
+/* Toolbar chrome swap: Share (grid) vs counter + close (zoom). Both chromes
+   occupy the same inline-end slot and cross-fade so neither snaps. */
+.fg-lb-grid-toolbar-end {
+    position: relative;
+}
+
+.fg-lb-grid-chrome {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: var( --fg-lb-toolbar-btn-color, rgba( 255, 255, 255, 0.7 ) );
+    gap: 8px;
+}
+
+.fg-lb-grid-chrome--zoom {
+    position: absolute;
+    inset-inline-end: 0;
+    top: 50%;
+    transform: translateY( -50% );
+    opacity: 0;
+    visibility: hidden;
+    /* Slight delay so the counter + close ease in after Share fades out. */
+    transition: opacity 0.2s ease 0.12s, visibility 0s linear 0.32s;
+}
+
+.fg-lb-grid-chrome--grid {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.18s ease;
+}
+
+/* Entering zoom: Share fades out, counter + close fade in (delayed). */
+.fg-lb-grid.fg-is-zooming:not( .fg-is-closing ) .fg-lb-grid-chrome--grid {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.16s ease, visibility 0s linear 0.16s;
+}
+
+.fg-lb-grid.fg-is-zooming:not( .fg-is-closing ) .fg-lb-grid-chrome--zoom {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease 0.12s, visibility 0s;
+}
+
+.fg-lb-grid-counter {
     font-size: 14px;
     line-height: 1;
-    cursor: pointer;
-    transition: color 0.15s ease, background-color 0.15s ease;
+    color: var( --fg-lb-info-text );
+    white-space: nowrap;
 }
 
-.fg-lb-grid-btn:hover,
-.fg-lb-grid-btn:focus-visible {
-    color: var( --fg-lb-toolbar-btn-hover, rgba( 255, 255, 255, 1 ) );
-    background: var( --fg-lb-toolbar-btn-active-bg, rgba( 255, 255, 255, 0.15 ) );
-    outline: none;
+.fg-lb-grid-zoom-close {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
 }
 
-.fg-lb-grid-btn > svg {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 auto;
+.fg-lb-grid-zoom-close > svg {
+    width: 20px;
+    height: 20px;
 }
 
+/* Grid content */
 .fg-lb-grid-content {
     flex: 1 1 auto;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     padding: 16px;
+    transition: opacity var( --fg-lb-grid-fade ) ease;
+}
+
+/* The grid stays laid out while zoomed (so the morph-close can measure the
+   target tile) but is hidden. */
+.fg-lb-grid.fg-is-zooming .fg-lb-grid-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* While closing, the grid fades back in beneath the morphing clip. */
+.fg-lb-grid.fg-is-closing .fg-lb-grid-content {
+    opacity: 1;
+    pointer-events: none;
 }
 
 .fg-lb-grid-inner {
-    max-width: 1040px;
+    max-width: var( --fg-lb-grid-max-width );
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: var( --fg-lb-grid-gap, 12px );
+    gap: var( --fg-lb-grid-gap );
 }
-
-/* A "row" is either one full-width tile or a 2-up pair. The JS groups
-   tiles into rows; CSS just lays each row out. */
 
 .fg-lb-grid-row {
     display: grid;
-    gap: var( --fg-lb-grid-gap, 12px );
+    gap: var( --fg-lb-grid-gap );
 }
 
 .fg-lb-grid-row--single {
@@ -109,46 +258,92 @@
     grid-template-columns: 1fr 1fr;
 }
 
+/* Tiles */
 .fg-lb-grid-tile {
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     margin: 0;
     padding: 0;
-    border: 0;
     background: none;
+    background-color: transparent;
+    box-shadow: none;
+    border: 0;
     cursor: pointer;
+}
+
+.fg-lb-grid-tile:hover,
+.fg-lb-grid-tile:focus,
+.fg-lb-grid-tile:focus-visible {
+    background: none;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: none;
+}
+
+.fg-lb-grid-tile:focus,
+.fg-lb-grid-tile:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+/* The media frame owns the aspect ratio, rounding, and clipping. The image
+   fills it (cover) and scales on hover within the frame. */
+.fg-lb-grid-tile-media {
+    display: block;
+    position: relative;
+    width: 100%;
+    aspect-ratio: var( --fg-lb-grid-aspect );
+    border-radius: var( --fg-lb-grid-radius );
     overflow: hidden;
-    border-radius: 8px;
 }
 
-.fg-lb-grid-row--single .fg-lb-grid-tile {
-    aspect-ratio: 16 / 9;
+.fg-lb-grid-tile--pair .fg-lb-grid-tile-media {
+    aspect-ratio: var( --fg-lb-grid-aspect-pair );
 }
 
-.fg-lb-grid-row--pair .fg-lb-grid-tile {
-    aspect-ratio: 4 / 3;
-}
-
-.fg-lb-grid-tile img {
+.fg-lb-grid-tile-media img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.25s ease;
+    transition: transform 0.3s ease;
 }
 
-.fg-lb-grid-tile:hover img,
-.fg-lb-grid-tile:focus-visible img {
-    transform: scale( 1.03 );
+.fg-lb-grid-tile:hover .fg-lb-grid-tile-media img {
+    transform: scale( 1.05 );
 }
 
-.fg-lb-grid-tile:focus-visible {
-    outline: 2px solid var( --fg-lb-toolbar-btn-hover, #fff );
-    outline-offset: 2px;
+/* While an image is zoomed, the originating tile's image is hidden so it does
+   not show through behind the morphing clip box. */
+.fg-lb-grid-tile.fg-is-source .fg-lb-grid-tile-media img {
+    opacity: 0;
 }
 
-.fg-lb-grid-tile--video::after {
+/* Captions render below the image, on a single line. Big (single) tiles centre
+   their caption; half-width (pair) tiles align to the inline start. */
+.fg-lb-grid-tile-caption {
+    padding: 12px 2px 14px;
+    font-size: 13px;
+    line-height: 1.3;
+    color: var( --fg-lb-info-text );
+    pointer-events: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.fg-lb-grid-tile--single .fg-lb-grid-tile-caption {
+    text-align: center;
+}
+
+.fg-lb-grid-tile--pair .fg-lb-grid-tile-caption {
+    text-align: start;
+}
+
+.fg-lb-grid-tile--video .fg-lb-grid-tile-media::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -161,26 +356,164 @@
     transform: translate( -40%, -50% );
     filter: drop-shadow( 0 0 3px rgba( 0, 0, 0, 0.6 ) );
     pointer-events: none;
+    z-index: 1;
 }
 
+/* Zoom (shared-element morph).
+ *
+ * The clip box is the morphing element: it animates from the clicked tile's
+ * exact rect to the centred full-preview rect. The image inside fills it
+ * (cover) throughout, so the thumbnail shows cropped and the full view shows
+ * uncropped without any per-axis stretch.                                  */
+
+.fg-lb-grid-stage {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.fg-lb-grid.fg-is-zooming .fg-lb-grid-stage {
+    display: flex;
+}
+
+.fg-lb-grid-zoom-figure {
+    position: static;
+    pointer-events: auto;
+}
+
+/* The clip is the morphing element: the JS sets its fixed box (left / top /
+   width / height) and transitions those, so the cover image inside re-crops
+   smoothly from the tile to the full preview with no per-axis stretch. */
+.fg-lb-grid-zoom-clip {
+    position: fixed;
+    overflow: hidden;
+    border-radius: var( --fg-lb-grid-radius );
+}
+
+.fg-lb-grid-zoom-clip img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity var( --fg-lb-grid-swap ) ease;
+}
+
+.fg-lb-grid-zoom-figure.fg-is-swapping .fg-lb-grid-zoom-clip img,
+.fg-lb-grid-zoom-figure.fg-is-swapping .fg-lb-grid-zoom-caption {
+    opacity: 0;
+}
+
+/* Full-image captions render below the image, always centred. The JS pins the
+   caption under the clip's full box. On swap, the new caption fades in and
+   rises 4px, slightly after the image. */
+.fg-lb-grid-zoom-caption {
+    position: fixed;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    color: var( --fg-lb-info-text );
+    opacity: 1;
+    transform: translateY( 0 );
+    transition: opacity var( --fg-lb-grid-swap ) ease 0.08s,
+        transform var( --fg-lb-grid-swap ) ease 0.08s;
+}
+
+.fg-lb-grid-zoom-figure.fg-is-swapping .fg-lb-grid-zoom-caption {
+    transform: translateY( 4px );
+    transition: opacity var( --fg-lb-grid-swap ) ease,
+        transform 0s;
+}
+
+/* Prev / next arrows */
+.fg-lb-grid-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY( -50% );
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var( --fg-lb-nav-color );
+    background: var( --fg-lb-nav-bg );
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease 0.05s, background-color 0.15s ease;
+}
+
+.fg-lb-grid.fg-is-zooming .fg-lb-grid-nav {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Arrows fade out as the image returns to the grid. */
+.fg-lb-grid.fg-is-closing .fg-lb-grid-nav {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+}
+
+.fg-lb-grid-nav:hover {
+    background: var( --fg-lb-nav-bg-hover );
+}
+
+.fg-lb-grid-nav:focus,
+.fg-lb-grid-nav:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.fg-lb-grid-nav > svg {
+    width: 24px;
+    height: 24px;
+}
+
+.fg-lb-grid-prev {
+    inset-inline-start: 16px;
+}
+
+.fg-lb-grid-next {
+    inset-inline-end: 16px;
+}
+
+/* Responsive */
 @media ( max-width: 600px ) {
     .fg-lb-grid-row--pair {
         grid-template-columns: 1fr;
     }
 
-    .fg-lb-grid-row--single .fg-lb-grid-tile,
-    .fg-lb-grid-row--pair .fg-lb-grid-tile {
-        aspect-ratio: 4 / 3;
+    .fg-lb-grid-tile--pair .fg-lb-grid-tile-media {
+        aspect-ratio: var( --fg-lb-grid-aspect );
+    }
+
+    .fg-lb-grid-nav {
+        width: 38px;
+        height: 38px;
     }
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-    .fg-lb-grid-tile img {
+    .fg-lb-grid,
+    .fg-lb-grid-content,
+    .fg-lb-grid-tile-media img,
+    .fg-lb-grid-zoom-clip,
+    .fg-lb-grid-zoom-clip img,
+    .fg-lb-grid-zoom-caption {
         transition: none;
     }
 
-    .fg-lb-grid-tile:hover img,
-    .fg-lb-grid-tile:focus-visible img {
+    .fg-lb-grid-tile:hover .fg-lb-grid-tile-media img {
         transform: none;
     }
 }

@@ -74,13 +74,17 @@ final class Endless_Scroll implements Feature {
 	 * @since 1.0.0
 	 */
 	public function html_appendix( Render_Context $render_context ): string {
-		// Use the same loading icon configured for the gallery's items
-		// so the endless-scroll spinner matches the visual identity of
-		// the gallery instead of being a generic CSS circle.
-		$icon_name = $render_context->settings['loading_icon'] ?? 'spinner';
-		$icon_name = is_string( $icon_name ) && '' !== $icon_name ? $icon_name : 'spinner';
-		$svg       = class_exists( '\FotoGrids\Assets\Loading_Icon_Library' )
-			? \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, '' )
+		// Use the same loading icon configured under Effects > Loading Effects
+		// so the end-of-list loader matches the gallery's item loaders. Default
+		// mirrors Loading_Icon::DEFAULT_ICON.
+		$icon_name = $render_context->settings['loading_icon'] ?? '';
+		$icon_name = is_string( $icon_name ) && '' !== $icon_name ? $icon_name : '12-dots';
+
+		// Unique suffix so gradient / clipPath IDs in the SVG don't collide
+		// with the gallery's per-item loaders (which replace __FG_ID__ too).
+		$instance_id = 'fges' . $render_context->meta->instance_id;
+		$svg         = class_exists( '\FotoGrids\Assets\Loading_Icon_Library' )
+			? \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, $instance_id )
 			: '';
 
 		return sprintf(

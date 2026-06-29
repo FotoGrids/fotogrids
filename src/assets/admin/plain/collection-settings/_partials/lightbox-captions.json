@@ -1,0 +1,49 @@
+{
+	"partial": "lightbox-captions",
+	"inline_defaults": true,
+	"layout": [
+		"show",
+		"source"
+	],
+	"field_defaults": {
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"show": {
+			"type": "toggle",
+			"label": "Show Captions",
+			"description": "Display a caption below the image.",
+			"default": false
+		},
+		"source": {
+			"type": "button_group",
+			"label": "Caption Source",
+			"description": "Which field to use for the caption text.",
+			"options": [
+				{
+					"label": "Caption",
+					"value": "caption",
+					"tier_required": "free"
+				},
+				{
+					"label": "Title",
+					"value": "title",
+					"tier_required": "free"
+				},
+				{
+					"label": "Description",
+					"value": "description",
+					"tier_required": "free"
+				}
+			],
+			"default": "caption",
+			"condition": {
+				"dependsOn": "{{key_prefix}}show",
+				"values": [true, "1"]
+			}
+		}
+	}
+}

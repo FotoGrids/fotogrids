@@ -99,6 +99,74 @@ describe('renderResponsiveRange (simple per-device value)', () => {
 	});
 });
 
+describe('renderResponsiveRange (no_range, decimals)', () => {
+	const PER_DEVICE = { min: 0, max: 5, step: 0.1, default: 1.2 };
+	const SETTING = {
+		key: 'caption_title_line_height',
+		label: 'Line Height',
+		no_range: true,
+		allow_decimals: true,
+		units: ['em', 'px', 'rem'],
+		responsive: {
+			desktop: PER_DEVICE,
+			tablet: PER_DEVICE,
+			mobile: PER_DEVICE,
+		},
+	};
+
+	it('hides the slider and adds the no-range modifier', () => {
+		const { container } = renderElement(
+			build(
+				SETTING,
+				{ desktop: { value: 1.2, unit: 'em' } },
+				false
+			)
+		);
+		expect(container.querySelector('input[type="range"]')).toBeNull();
+		expect(
+			container.querySelector(
+				'.fotogrids-responsive-setting__controls--no-range'
+			)
+		).not.toBeNull();
+	});
+
+	it('shows the decimal value in the number input', () => {
+		const { container } = renderElement(
+			build(SETTING, { desktop: { value: 1.2, unit: 'em' } }, false)
+		);
+		expect(container.querySelector('input[type="number"]').value).toBe(
+			'1.2'
+		);
+	});
+
+	it('falls back to the per-device default when no value and no seeded default exist', () => {
+		// Regression: with no saved value and no window.fotogridsSettings.defaults
+		// entry, defaultResponsive falls back to setting.responsive, whose
+		// per-device entries are config objects ({min, max, default}). The input
+		// must show the scalar default (1.2), never render empty.
+		const { container } = renderElement(build(SETTING, undefined, false));
+		expect(container.querySelector('input[type="number"]').value).toBe(
+			'1.2'
+		);
+	});
+
+	it('preserves a decimal value entered in the number input', () => {
+		const updateSetting = jest.fn();
+		const { container } = renderElement(
+			build(SETTING, { desktop: { value: 1.2, unit: 'em' } }, false, {
+				updateSetting,
+			})
+		);
+		changeValue(container.querySelector('input[type="number"]'), '1.5');
+		expect(updateSetting).toHaveBeenCalledWith(
+			'caption_title_line_height',
+			expect.objectContaining({
+				desktop: expect.objectContaining({ value: 1.5 }),
+			})
+		);
+	});
+});
+
 describe('renderResponsiveRange (four-sided)', () => {
 	const PER_DEVICE = { min: 0, max: 100, default: 0 };
 	const SETTING = {

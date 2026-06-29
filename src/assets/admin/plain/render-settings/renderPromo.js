@@ -27,10 +27,18 @@ window.FotoGridsRenderSettings.renderPromo = (
 		});
 	}
 
+	const buildLearnMoreUrl = (learnMorePath) => {
+		const template = window.fotogridsSettings?.proLinkTemplate || '';
+		return template.replace('{{path}}', encodeURIComponent(learnMorePath));
+	};
+
 	const handleLearnMoreClick = (learnMorePath) => (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		window.open(`https://go.fotogrids.com/${learnMorePath}`, '_blank');
+		const url = buildLearnMoreUrl(learnMorePath);
+		if (url) {
+			window.open(url, '_blank');
+		}
 	};
 
 	return h(
@@ -78,7 +86,7 @@ window.FotoGridsRenderSettings.renderPromo = (
 									__html:
 										messageText +
 										(hasLearnMore
-											? ` <a href="https://go.fotogrids.com/${message.learn_more}" target="_blank" rel="noopener noreferrer" class="fotogrids-settings_pro-message__learn-more">${__('Learn more', 'fotogrids')}</a>`
+											? ` <a href="${buildLearnMoreUrl(message.learn_more)}" target="_blank" rel="noopener noreferrer" class="fotogrids-settings_pro-message__learn-more">${__('Learn more', 'fotogrids')}</a>`
 											: ''),
 								},
 							}),

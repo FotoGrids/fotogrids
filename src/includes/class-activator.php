@@ -29,6 +29,8 @@ class Activator {
 	 * @since 1.0.0
 	 */
 	public static function activate() {
+		$is_fresh_install = self::is_fresh_install();
+
 		self::create_tables();
 
 		Post_Types::register_cpts();
@@ -56,6 +58,13 @@ class Activator {
 		// are platform, not modules. This is how a (Pro) module ships its own
 		// table creation with the feature instead of editing this activator.
 		self::run_module_lifecycle( 'on_activate' );
+
+		// Flag a one-time redirect to the setup wizard on the next admin page
+		// load, but only on a fresh install so updates / reactivations don't
+		// hijack the screen. Consumed in Admin_Init::maybe_activation_redirect().
+		if ( $is_fresh_install ) {
+			set_transient( 'fotogrids_activation_redirect', 1, 30 );
+		}
 	}
 
 	/**
@@ -332,7 +341,7 @@ class Activator {
 	 * added to Core_Permissions or to a module's harvester so existing installs
 	 * receive them via Activator::maybe_resync_capabilities.
 	 */
-	private const CAPS_VERSION = '1.1';
+	private const CAPS_VERSION = '1.2';
 
 	/**
 	 * Add plugin capabilities to WordPress roles.

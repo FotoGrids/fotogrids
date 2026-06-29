@@ -311,8 +311,28 @@ final class Layout_Featured_Item implements Layout {
 			$vars['--fg-show-all-hover-border-color'] = $hover_border;
 		}
 
-		// Typography. Family/weight go through Font_Resolver so theme system
-		// stacks resolve to real CSS (same approach as captions / pagination).
+		// Focus state (empty = inherit hover via the CSS var fallback chain).
+		$focus_bg     = self::safe_color( $s['featured_show_all_focus_bg'] ?? null );
+		$focus_text   = self::safe_color( $s['featured_show_all_focus_text'] ?? null );
+		$focus_border = self::safe_color( $s['featured_show_all_focus_border_color'] ?? null );
+		if ( '' !== $focus_bg ) {
+			$vars['--fg-show-all-focus-bg'] = $focus_bg;
+		}
+		if ( '' !== $focus_text ) {
+			$vars['--fg-show-all-focus-text'] = $focus_text;
+		}
+		if ( '' !== $focus_border ) {
+			$vars['--fg-show-all-focus-border-color'] = $focus_border;
+		}
+
+		// Box shadow (empty = none).
+		$box_shadow = $s['featured_show_all_box_shadow'] ?? null;
+		if ( is_string( $box_shadow ) && '' !== $box_shadow ) {
+			$vars['--fg-show-all-box-shadow'] = $box_shadow;
+		}
+
+		// Typography. Family/weight/style go through Font_Resolver so theme
+		// system stacks resolve to real CSS (same approach as captions / pagination).
 		$resolver    = Font_Resolver::instance();
 		$font_family = $resolver->resolve_font_family( $s['featured_show_all_font_family'] ?? null, $render_context );
 		if ( '' !== $font_family ) {
@@ -321,6 +341,10 @@ final class Layout_Featured_Item implements Layout {
 		$font_weight = $resolver->resolve_font_weight( $s['featured_show_all_font_weight'] ?? null, $render_context );
 		if ( '' !== $font_weight ) {
 			$vars['--fg-show-all-font-weight'] = $font_weight;
+		}
+		$font_style = $resolver->resolve_font_style( $s['featured_show_all_font_style'] ?? null, $render_context );
+		if ( '' !== $font_style ) {
+			$vars['--fg-show-all-font-style'] = $font_style;
 		}
 
 		// Font size - responsive_range (px/em/rem). Resolved via the shared
@@ -337,6 +361,13 @@ final class Layout_Featured_Item implements Layout {
 				$fs_mobile,
 			);
 		}
+
+		$spacing_settings = array();
+		foreach ( array_keys( $this->text_spacing_fields() ) as $field ) {
+			$key                      = 'featured_show_all_' . $field;
+			$spacing_settings[ $key ] = self::maybe_decode_array( $s[ $key ] ?? null );
+		}
+		$this->add_text_spacing_vars( $vars, '--fg-show-all', $spacing_settings, 'featured_show_all_' );
 
 		return $vars;
 	}

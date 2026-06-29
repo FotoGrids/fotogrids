@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Resolves font-family and font-weight setting values into CSS strings.
+ * Resolves font-family, font-weight, and font-style setting values into CSS strings.
  *
  * Acts as the single authoritative translator between raw admin setting values
  * ('Poppins', '700', 'default') and the CSS strings emitted as inline custom
@@ -174,6 +174,41 @@ final class Font_Resolver {
 
 		// Accept numeric weight strings only ('100'–'900').
 		if ( preg_match( '/^[1-9]00$/', $normalized ) ) {
+			return $normalized;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Resolves a raw font-style setting value to a CSS string.
+	 *
+	 * Returns '' when the value is 'default', null, or empty.
+	 *
+	 * The resolved value is passed through the filter
+	 * 'fotogrids/render/font/resolve_style' so Pro and 3rd parties can
+	 * override the result.
+	 *
+	 * @since  1.0.0
+	 * @param  mixed               $raw    Raw setting value from the settings array.
+	 * @param  Render_Context|null $render Render context, passed to filter callbacks.
+	 * @return string  CSS value string ('normal' or 'italic'), or '' to skip emitting.
+	 */
+	public function resolve_font_style( $raw, ?Render_Context $render = null ): string {
+		$normalized = $this->normalize_scalar( $raw );
+
+		// Let Pro / 3rd parties intercept before default resolution.
+		$filtered = (string) apply_filters( Filters_Render::FONT_RESOLVE_STYLE, '', $normalized, $render );
+		if ( '' !== $filtered ) {
+			return $filtered;
+		}
+
+		if ( '' === $normalized ) {
+			return '';
+		}
+
+		// Accept the two supported CSS font-style keywords only.
+		if ( 'normal' === $normalized || 'italic' === $normalized ) {
 			return $normalized;
 		}
 

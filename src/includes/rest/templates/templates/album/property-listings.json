@@ -21,7 +21,7 @@
       "mobile": 6
     },
     "captions": true,
-    "watermark_enabled": true,
-    "lightbox": true
+    "watermark_apply_to_collection": true,
+    "item_click_behavior": "lightbox"
   }
 }

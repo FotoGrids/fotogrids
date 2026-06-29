@@ -126,6 +126,7 @@ final class Plugin_Settings_Store {
 				'0' === $share_raw ||
 				0 === $share_raw
 			),
+			'marketing_allowed'                 => (bool) get_option( 'fotogrids_marketing_allowed', false ),
 			'custom_js_allow_dynamic_execution' => (bool) get_option( 'fotogrids_custom_js_allow_dynamic_execution', false ),
 			// UI: "delete on uninstall" - persisted as the inverse "preserve" flag.
 			'delete_data_on_uninstall'          => ! (bool) get_option( 'fotogrids_preserve_data_on_uninstall', false ),
@@ -145,7 +146,14 @@ final class Plugin_Settings_Store {
 		// share_statistics has a Freemius side-effect; route through the
 		// shared helper so this REST path and the wizard's AJAX path
 		// both stay in sync (option + Freemius opt-in/out).
-		self::apply_share_statistics_consent( self::truthy( $input['share_statistics'] ?? false ) );
+		$share_on = self::truthy( $input['share_statistics'] ?? false );
+		self::apply_share_statistics_consent( $share_on );
+
+		// Marketing consent only applies when usage data sharing is on;
+		// when it is off, apply_share_statistics_consent already revoked it.
+		if ( $share_on ) {
+			self::apply_marketing_consent( self::truthy( $input['marketing_allowed'] ?? false ) );
+		}
 
 		update_option( 'fotogrids_custom_js_allow_dynamic_execution', self::truthy( $input['custom_js_allow_dynamic_execution'] ?? false ) );
 
@@ -157,19 +165,16 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
-	 * Apply the user's "share anonymous statistics" choice.
+	 * Apply the user's usage-data sharing choice.
 	 *
 	 * Writes the local `fotogrids_share_statistics` option as a real bool
-	 * and mirrors the change to Freemius's per-site tracking permissions
-	 * via the FS_Permission_Manager. Both the Settings tab REST path and
-	 * the wizard's AJAX path call this so the option and Freemius state
-	 * can't drift out of sync.
-	 *
-	 * The earlier (broken) version assumed `Freemius::allow_tracking()` /
-	 * `stop_tracking()` methods existed; they don't. The real API is
-	 * `FS_Permission_Manager::update_site_tracking( $bool )` which
-	 * flips the underlying per-permission storage that
-	 * `Freemius::is_tracking_allowed()` reads.
+	 * and mirrors the change into Freemius. On first opt-in, when the site
+	 * is still anonymous and has no install, `opt_in()` registers it and
+	 * starts sending data; afterwards the choice toggles the per-site
+	 * tracking permission via `FS_Permission_Manager::update_site_tracking()`,
+	 * which is what `Freemius::is_tracking_allowed()` reads. Both the
+	 * Settings tab REST path and the wizard's path call this so the option
+	 * and Freemius state can't drift out of sync.
 	 *
 	 * @since 1.0.0
 	 * @param bool $opted_in
@@ -187,7 +192,28 @@ final class Plugin_Settings_Store {
 			$fs = freemius( 'fotogrids' );
 			if ( $fs instanceof \Freemius ) {
 				try {
-					if ( class_exists( 'FS_Permission_Manager' ) ) {
+					if ( $opted_in && method_exists( $fs, 'is_registered' ) && ! $fs->is_registered() ) {
+						// Under anonymous_mode no Freemius install exists yet, so
+						// flipping a tracking permission has nothing to act on.
+						// opt_in() registers the site and starts sending data.
+						// is_marketing_allowed is false: this consent covers
+						// diagnostics only, never promotional email. redirect is
+						// false because this runs in a REST/AJAX request.
+						$identity = self::current_user_identity();
+						$fs->opt_in(
+							$identity['email'],
+							$identity['first'],
+							$identity['last'],
+							false,
+							false,
+							false,
+							false,
+							false,
+							array(),
+							false
+						);
+						$fs_after = self::probe_freemius_state();
+					} elseif ( class_exists( 'FS_Permission_Manager' ) ) {
 						$pm = \FS_Permission_Manager::instance( $fs );
 						if ( $pm && method_exists( $pm, 'update_site_tracking' ) ) {
 							$pm->update_site_tracking( $opted_in );
@@ -222,6 +248,12 @@ final class Plugin_Settings_Store {
 				self::dump( $fs_after['install_exists'] ?? null )
 			)
 		);
+
+		// Marketing consent depends on usage-data sharing; revoke it when
+		// sharing is turned off so the two states can't contradict.
+		if ( ! $opted_in ) {
+			self::apply_marketing_consent( false );
+		}
 
 		return $opted_in;
 	}
@@ -295,6 +327,95 @@ final class Plugin_Settings_Store {
 			return (string) $v;
 		}
 		return wp_json_encode( $v );
+	}
+
+	/**
+	 * Apply the user's promotional-email (marketing) consent.
+	 *
+	 * Separate from usage-data sharing: this maps to Freemius's per-user
+	 * `is_marketing_allowed` flag and governs promotional email only. It
+	 * is only meaningful once the site is registered, which happens when
+	 * usage-data sharing is enabled. If consent is granted while the site
+	 * is somehow still anonymous, `opt_in()` registers it with marketing
+	 * granted. The local option is the source of truth for the toggle;
+	 * the Freemius flag is mirrored on change only.
+	 *
+	 * @since  1.0.0
+	 * @param  bool $allowed
+	 * @return bool The applied state.
+	 */
+	public static function apply_marketing_consent( bool $allowed ): bool {
+		$before = (bool) get_option( 'fotogrids_marketing_allowed', false );
+		update_option( 'fotogrids_marketing_allowed', $allowed );
+
+		// Idempotent: nothing changed, so skip the Freemius API round-trip.
+		if ( $before === $allowed ) {
+			return $allowed;
+		}
+
+		if ( ! function_exists( 'freemius' ) ) {
+			return $allowed;
+		}
+
+		$fs = freemius( 'fotogrids' );
+		if ( ! ( $fs instanceof \Freemius ) ) {
+			return $allowed;
+		}
+
+		try {
+			if ( method_exists( $fs, 'is_registered' ) && $fs->is_registered() ) {
+				// Per-plugin user PUT - the same call the SDK's own GDPR
+				// opt-in notice makes to set the marketing flag.
+				$fs->get_api_user_scope()->call(
+					'?plugin_id=' . $fs->get_id(),
+					'put',
+					array( 'is_marketing_allowed' => $allowed )
+				);
+			} elseif ( $allowed ) {
+				// No install yet: register and grant marketing together.
+				$identity = self::current_user_identity();
+				$fs->opt_in(
+					$identity['email'],
+					$identity['first'],
+					$identity['last'],
+					false,
+					false,
+					false,
+					false,
+					true,
+					array(),
+					false
+				);
+			}
+		} catch ( \Throwable $e ) {
+			\FotoGrids\Debug_Log::write( 'license', 'apply_marketing_consent: ' . $e->getMessage() );
+		}
+
+		return $allowed;
+	}
+
+	/**
+	 * Current WordPress user's identity for a Freemius opt-in.
+	 *
+	 * @since  1.0.0
+	 * @return array{email:string,first:string,last:string}
+	 */
+	private static function current_user_identity(): array {
+		$user = wp_get_current_user();
+
+		if ( ! ( $user instanceof \WP_User ) || 0 === (int) $user->ID ) {
+			return array(
+				'email' => '',
+				'first' => '',
+				'last'  => '',
+			);
+		}
+
+		return array(
+			'email' => (string) $user->user_email,
+			'first' => (string) $user->user_firstname,
+			'last'  => (string) $user->user_lastname,
+		);
 	}
 
 	// ---------------------------------------------------------------------

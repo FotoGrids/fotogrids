@@ -239,6 +239,15 @@ final class Filters_View {
 	public const SHOW_HEADER = 'fotogrids/view/show_header';
 
 	/**
+	 * Whether to render the view page footer region.
+	 *
+	 * @since 1.0.0
+	 * @param bool     $show Default true.
+	 * @param \WP_Post $post Post being viewed.
+	 */
+	public const SHOW_FOOTER = 'fotogrids/view/show_footer';
+
+	/**
 	 * Header HTML on the view page.
 	 *
 	 * @since 1.0.0

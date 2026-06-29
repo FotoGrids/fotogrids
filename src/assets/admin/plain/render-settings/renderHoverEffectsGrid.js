@@ -1,43 +1,31 @@
 window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
 
-const TEMPLATE_DEMO_TOTAL = 35;
-
-const TEMPLATE_DEMO_CAPTIONS = [
-	['Machu Picchu at dawn', 'Sunrise over the lost city of the Incas.'],
-	['Moraine Lake', 'Turquoise water below the Rockies.'],
-	['Mesa Arch sunrise', 'First light bursts beneath the arch.'],
-	['Hidden jungle falls', 'A cascade into an emerald pool.'],
-	['Mount Fuji in autumn', 'Red maples frame the sacred peak.'],
-	['Aurora over the fjord', 'Green light dancing above the snow.'],
-	['Lady Liberty at sunset', 'Standing tall over New York Harbor.'],
-	['Reynisfjara black sand', 'Waves break against basalt columns.'],
-	['Salar de Uyuni', 'The sky mirrored on the salt flats.'],
-	['Inside the ice cave', 'A meltwater stream beneath blue ice.'],
-	['Sunburst on the lake', 'Light spills through the alpine pines.'],
-	['Milky Way over Everest', 'Stars above the high Himalaya.'],
-	['Angkor Wat at sunrise', 'Lotus blooms before the ancient towers.'],
-	['Lofoten under the lights', 'Aurora over a snowbound village.'],
-	['Taj Mahal at dusk', 'Marble glowing in the evening calm.'],
-	['Horseshoe Bend', 'The river carves a perfect curve.'],
-	['Monastery in the mist', 'Perched on the cliffs of Meteora.'],
-	['Eiffel Tower at sunset', 'Spring blooms along the gardens.'],
-	['Fuji winter morning', 'A still reflection over frosted reeds.'],
-	['Patagonia at first light', 'Wildflowers below the granite peaks.'],
-	['Great Wall at sunrise', 'The wall winds into misty hills.'],
-	['The Colosseum aglow', 'Roman arches lit by the setting sun.'],
-	['Santorini blue domes', 'Whitewashed Oia above the Aegean.'],
-	['Dunes at golden hour', 'Wind-carved ridges in the desert.'],
-	['Glacier lagoon', 'Icebergs drift under a moody sky.'],
-	['Amalfi Coast sunset', 'Cliffside houses above the sea.'],
-	['Kirkjufell in winter', 'Falls and frost beneath the peak.'],
-	['Tre Cime at sunset', 'Alpine blooms below the Dolomites.'],
-	['Neuschwanstein Castle', 'A fairytale castle in the Bavarian Alps.'],
-	['Pyramids of Giza', 'A camel rests as the sun sets.'],
-	['Milford Sound', 'Waterfalls into a mirrored fjord.'],
-	['The Matterhorn at dawn', 'First light reflected in the tarn.'],
-	['Petra through the Siq', 'The Treasury revealed by lantern light.'],
-	['Chichén Itzá', 'El Castillo under a bright Yucatán sky.'],
-	['Golden Gate in the fog', 'The bridge rises above a sea of cloud.'],
+const HOVER_DEMO_IMAGES = [
+	{
+		id: 'hover-demo-1',
+		title: 'Canyon road',
+		description: 'A winding road through red-rock cliffs.',
+	},
+	{
+		id: 'hover-demo-2',
+		title: 'Jungle waterfall',
+		description: 'A cascade into a misty rainforest pool.',
+	},
+	{
+		id: 'hover-demo-3',
+		title: 'Palm leaf',
+		description: 'Sunlight through a single palm frond.',
+	},
+	{
+		id: 'hover-demo-4',
+		title: 'Night camp',
+		description: 'A lit tent under an alpine starfield.',
+	},
+	{
+		id: 'hover-demo-5',
+		title: 'Breaking wave',
+		description: 'Clear water curling onto a calm shore.',
+	},
 ];
 
 const getTemplateDemoImage = (() => {
@@ -48,15 +36,8 @@ const getTemplateDemoImage = (() => {
 			return picked;
 		}
 
-		const index = Math.floor(Math.random() * TEMPLATE_DEMO_TOTAL);
-		const paddedNumber = String(index + 1).padStart(2, '0');
-		const [title, description] = TEMPLATE_DEMO_CAPTIONS[index];
-
-		picked = {
-			id: `fotogrids-tp-${paddedNumber}`,
-			title,
-			description,
-		};
+		const index = Math.floor(Math.random() * HOVER_DEMO_IMAGES.length);
+		picked = HOVER_DEMO_IMAGES[index];
 
 		return picked;
 	};
@@ -87,8 +68,8 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 	const pluginUrl = window.fotogridsAdmin?.pluginUrl || '';
 
 	const templateImage = {
-		avif: `${pluginUrl}public/assets/template-demo/avif/${demoImage.id}.avif`,
-		jpg: `${pluginUrl}public/assets/template-demo/jpg/${demoImage.id}.jpg`,
+		avif: `${pluginUrl}public/assets/hover-demo/${demoImage.id}.webp`,
+		jpg: `${pluginUrl}public/assets/hover-demo/${demoImage.id}.jpg`,
 	};
 
 	const captionPlacement = settings.caption_placement || 'overlay';
@@ -243,8 +224,8 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 									h('picture', {}, [
 										h('source', {
 											srcSet: templateImage.avif,
-											type: 'image/avif',
-											key: 'avif',
+											type: 'image/webp',
+											key: 'webp',
 										}),
 										h('img', {
 											src: templateImage.jpg,

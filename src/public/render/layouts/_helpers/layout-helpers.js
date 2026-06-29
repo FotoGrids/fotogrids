@@ -277,6 +277,15 @@ export function createLayoutAttach( opts ) {
 
         waitForDimensions( items ).then( () => {
             runLayoutAndReveal( trackEl );
+
+            // Flowing (below / top) captions contribute to item height and their
+            // size isn't final until web fonts load. Re-run once fonts are ready
+            // so those layouts settle exactly. layout() is idempotent.
+            if ( document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function' ) {
+                document.fonts.ready.then( () => {
+                    scheduleLayout( trackEl );
+                } );
+            }
         } );
 
         if ( typeof window.ResizeObserver === 'function' ) {

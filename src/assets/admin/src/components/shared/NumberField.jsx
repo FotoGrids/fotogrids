@@ -40,13 +40,15 @@ const NumberField = ({
         onChange(raw);
     };
 
+    const baseClass = 'fotogrids-number-field';
+
     return (
-        <div className={`fotogrids-number-field ${className}`.trim()}>
-            <div className="fotogrids-number-field__input-wrap">
+        <div className={`${baseClass} ${className}`.trim()}>
+            <div className={`${baseClass}__input-wrap ${unit ? 'fg-has-unit' : ''}`}>
                 <input
                     id={id}
                     type="number"
-                    className="fotogrids-number-field__input"
+                    className={`${baseClass}__input`}
                     value={value}
                     min={min}
                     max={max}
@@ -54,9 +56,9 @@ const NumberField = ({
                     disabled={disabled}
                     onChange={handleChange}
                 />
-                {unit && <span className="fotogrids-number-field__unit">{unit}</span>}
+                {unit && <span className={`${baseClass}__unit`}>{unit}</span>}
             </div>
-            {help && <p className="fotogrids-number-field__help">{help}</p>}
+            {help && <p className={`${baseClass}__help`}>{help}</p>}
         </div>
     );
 };

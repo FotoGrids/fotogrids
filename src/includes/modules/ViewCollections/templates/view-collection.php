@@ -50,6 +50,8 @@ $fg_view->track_view();
 </head>
 <body <?php echo $fg_view->body_attrs(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php
+	echo $fg_view->body_style_element(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
 	/**
 	 * Fires immediately inside the body, before the shell.
 	 *
@@ -103,6 +105,7 @@ $fg_view->track_view();
 		?>
 	</main>
 
+	<?php if ( $fg_view->shows_footer() ) : ?>
 	<footer class="fotogrids-view__footer">
 		<?php
 		echo $fg_view->share_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -117,6 +120,7 @@ $fg_view->track_view();
 		do_action( Actions_View::FOOTER, $fg_post );
 		?>
 	</footer>
+	<?php endif; ?>
 
 	<?php
 	/**

@@ -387,74 +387,8 @@
                                             "icon": "image",
                                             "settings": [
                                                 {
-                                                    "key": "shadow_color",
-                                                    "type": "color",
-                                                    "label": "Shadow Color",
-                                                    "default": "rgba(0,0,0,0.5)",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_offset_x",
-                                                    "type": "responsive_range",
-                                                    "label": "Horizontal Offset",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -50, "max": 50, "default": 0 },
-                                                        "tablet":  { "min": -50, "max": 50, "default": 0 },
-                                                        "mobile":  { "min": -50, "max": 50, "default": 0 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_offset_y",
-                                                    "type": "responsive_range",
-                                                    "label": "Vertical Offset",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -50, "max": 50, "default": 4 },
-                                                        "tablet":  { "min": -50, "max": 50, "default": 4 },
-                                                        "mobile":  { "min": -50, "max": 50, "default": 4 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_blur",
-                                                    "type": "responsive_range",
-                                                    "label": "Blur",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 50, "default": 10 },
-                                                        "tablet":  { "min": 0, "max": 50, "default": 10 },
-                                                        "mobile":  { "min": 0, "max": 50, "default": 10 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_spread",
-                                                    "type": "responsive_range",
-                                                    "label": "Spread",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -20, "max": 20, "default": 0 },
-                                                        "tablet":  { "min": -20, "max": 20, "default": 0 },
-                                                        "mobile":  { "min": -20, "max": 20, "default": 0 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
+                                                    "use": "shadow",
+                                                    "key_prefix": "shadow_"
                                                 }
                                             ]
                                         },
@@ -464,74 +398,8 @@
                                             "icon": "hover",
                                             "settings": [
                                                 {
-                                                    "key": "shadow_hover_color",
-                                                    "type": "color",
-                                                    "label": "Shadow Color",
-                                                    "default": "rgba(0,0,0,0.5)",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_hover_offset_x",
-                                                    "type": "responsive_range",
-                                                    "label": "Horizontal Offset",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -50, "max": 50, "default": 0 },
-                                                        "tablet":  { "min": -50, "max": 50, "default": 0 },
-                                                        "mobile":  { "min": -50, "max": 50, "default": 0 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_hover_offset_y",
-                                                    "type": "responsive_range",
-                                                    "label": "Vertical Offset",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -50, "max": 50, "default": 4 },
-                                                        "tablet":  { "min": -50, "max": 50, "default": 4 },
-                                                        "mobile":  { "min": -50, "max": 50, "default": 4 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_hover_blur",
-                                                    "type": "responsive_range",
-                                                    "label": "Blur",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 50, "default": 10 },
-                                                        "tablet":  { "min": 0, "max": 50, "default": 10 },
-                                                        "mobile":  { "min": 0, "max": 50, "default": 10 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_hover_spread",
-                                                    "type": "responsive_range",
-                                                    "label": "Spread",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -20, "max": 20, "default": 0 },
-                                                        "tablet":  { "min": -20, "max": 20, "default": 0 },
-                                                        "mobile":  { "min": -20, "max": 20, "default": 0 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
+                                                    "use": "shadow",
+                                                    "key_prefix": "shadow_hover_"
                                                 }
                                             ]
                                         },
@@ -541,74 +409,8 @@
                                             "icon": "loading",
                                             "settings": [
                                                 {
-                                                    "key": "shadow_loading_color",
-                                                    "type": "color",
-                                                    "label": "Shadow Color",
-                                                    "default": "rgba(0,0,0,0.5)",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_loading_offset_x",
-                                                    "type": "responsive_range",
-                                                    "label": "Horizontal Offset",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -50, "max": 50, "default": 0 },
-                                                        "tablet":  { "min": -50, "max": 50, "default": 0 },
-                                                        "mobile":  { "min": -50, "max": 50, "default": 0 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_loading_offset_y",
-                                                    "type": "responsive_range",
-                                                    "label": "Vertical Offset",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -50, "max": 50, "default": 4 },
-                                                        "tablet":  { "min": -50, "max": 50, "default": 4 },
-                                                        "mobile":  { "min": -50, "max": 50, "default": 4 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_loading_blur",
-                                                    "type": "responsive_range",
-                                                    "label": "Blur",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 50, "default": 10 },
-                                                        "tablet":  { "min": 0, "max": 50, "default": 10 },
-                                                        "mobile":  { "min": 0, "max": 50, "default": 10 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "shadow_loading_spread",
-                                                    "type": "responsive_range",
-                                                    "label": "Spread",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": -20, "max": 20, "default": 0 },
-                                                        "tablet":  { "min": -20, "max": 20, "default": 0 },
-                                                        "mobile":  { "min": -20, "max": 20, "default": 0 }
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
+                                                    "use": "shadow",
+                                                    "key_prefix": "shadow_loading_"
                                                 }
                                             ]
                                         }
@@ -720,184 +522,9 @@
                                             "icon": "image",
                                             "settings": [
                                                 {
-                                                    "key": "thumbnail_filter_amount_grayscale",
-                                                    "type": "responsive_range",
-                                                    "label": "Grayscale Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 50 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 50 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["grayscale"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_sepia",
-                                                    "type": "responsive_range",
-                                                    "label": "Sepia Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 50 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 50 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["sepia"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_blur",
-                                                    "type": "responsive_range",
-                                                    "label": "Blur Amount",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 20, "default": 5 },
-                                                        "tablet":  { "min": 0, "max": 20, "default": 5 },
-                                                        "mobile":  { "min": 0, "max": 20, "default": 5 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["blur"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_brightness",
-                                                    "type": "responsive_range",
-                                                    "label": "Brightness Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 200, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 200, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 200, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["brightness"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_contrast",
-                                                    "type": "responsive_range",
-                                                    "label": "Contrast Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 200, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 200, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 200, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["contrast"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_saturate",
-                                                    "type": "responsive_range",
-                                                    "label": "Saturation Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 200, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 200, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 200, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["saturate"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_invert",
-                                                    "type": "responsive_range",
-                                                    "label": "Invert Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["invert"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_opacity",
-                                                    "type": "responsive_range",
-                                                    "label": "Opacity Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["opacity"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_amount_hue_rotate",
-                                                    "type": "responsive_range",
-                                                    "label": "Hue Rotation",
-                                                    "unit": "deg",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 360, "default": 0 },
-                                                        "tablet":  { "min": 0, "max": 360, "default": 0 },
-                                                        "mobile":  { "min": 0, "max": 360, "default": 0 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["hue-rotate"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
+                                                    "use": "image-filter",
+                                                    "key_prefix": "thumbnail_filter_amount_",
+                                                    "params": { "filter_type_key": "thumbnail_filter_type" }
                                                 }
                                             ]
                                         },
@@ -907,184 +534,9 @@
                                             "icon": "hover",
                                             "settings": [
                                                 {
-                                                    "key": "thumbnail_filter_hover_amount_grayscale",
-                                                    "type": "responsive_range",
-                                                    "label": "Grayscale Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 50 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 50 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["grayscale"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_sepia",
-                                                    "type": "responsive_range",
-                                                    "label": "Sepia Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 50 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 50 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 50 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["sepia"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_blur",
-                                                    "type": "responsive_range",
-                                                    "label": "Blur Amount",
-                                                    "unit": "px",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 20, "default": 5 },
-                                                        "tablet":  { "min": 0, "max": 20, "default": 5 },
-                                                        "mobile":  { "min": 0, "max": 20, "default": 5 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["blur"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_brightness",
-                                                    "type": "responsive_range",
-                                                    "label": "Brightness Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 200, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 200, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 200, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["brightness"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_contrast",
-                                                    "type": "responsive_range",
-                                                    "label": "Contrast Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 200, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 200, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 200, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["contrast"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_saturate",
-                                                    "type": "responsive_range",
-                                                    "label": "Saturation Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 200, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 200, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 200, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["saturate"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_invert",
-                                                    "type": "responsive_range",
-                                                    "label": "Invert Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["invert"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_opacity",
-                                                    "type": "responsive_range",
-                                                    "label": "Opacity Amount",
-                                                    "unit": "%",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 100, "default": 100 },
-                                                        "tablet":  { "min": 0, "max": 100, "default": 100 },
-                                                        "mobile":  { "min": 0, "max": 100, "default": 100 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["opacity"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "thumbnail_filter_hover_amount_hue_rotate",
-                                                    "type": "responsive_range",
-                                                    "label": "Hue Rotation",
-                                                    "unit": "deg",
-                                                    "responsive": {
-                                                        "desktop": { "min": 0, "max": 360, "default": 0 },
-                                                        "tablet":  { "min": 0, "max": 360, "default": 0 },
-                                                        "mobile":  { "min": 0, "max": 360, "default": 0 }
-                                                    },
-                                                    "condition": {
-                                                        "dependsOn": "thumbnail_filter_type",
-                                                        "values": ["hue-rotate"],
-                                                        "condition_operator": "array_includes"
-                                                    },
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
+                                                    "use": "image-filter",
+                                                    "key_prefix": "thumbnail_filter_hover_amount_",
+                                                    "params": { "filter_type_key": "thumbnail_filter_type" }
                                                 }
                                             ]
                                         }
@@ -1111,9 +563,186 @@
                     ],
                     "settings": [
                         {
+                            "key": "viewer_stage_group",
+                            "type": "setting_group",
+                            "label": "Viewer Stage",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"]
+                            },
+                            "settings": [
+                                {
+                                    "type": "side_by_side",
+                                    "settings": [
+                                        {
+                                            "key": "viewer_stage_bg_color",
+                                            "type": "color",
+                                            "label": "Background Color",
+                                            "default": "rgba(0,0,0,0.1)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "viewer_stage_radius",
+                                            "type": "range",
+                                            "label": "Border Radius",
+                                            "unit": "px",
+                                            "min": 0,
+                                            "max": 50,
+                                            "default": 6,
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "side_by_side",
+                                    "settings": [
+                                        {
+                                            "key": "viewer_stage_border_color",
+                                            "type": "color",
+                                            "label": "Border Color",
+                                            "default": "rgba(0,0,0,0.15)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "viewer_stage_border_width",
+                                            "type": "range",
+                                            "label": "Border Width",
+                                            "unit": "px",
+                                            "min": 0,
+                                            "max": 10,
+                                            "default": 0,
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "viewer_bar_gap",
+                            "type": "range",
+                            "label": "Distance between Stage and Bar",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 60,
+                            "default": 12,
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "viewer_bar_group",
+                            "type": "setting_group",
+                            "label": "Viewer Bar",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"]
+                            },
+                            "settings": [
+                                {
+                                    "type": "side_by_side",
+                                    "settings": [
+                                        {
+                                            "key": "viewer_bar_bg_color",
+                                            "type": "color",
+                                            "label": "Background Color",
+                                            "default": "rgba(0,0,0,0.1)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "viewer_bar_radius",
+                                            "type": "range",
+                                            "label": "Border Radius",
+                                            "unit": "px",
+                                            "min": 0,
+                                            "max": 50,
+                                            "default": 6,
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "side_by_side",
+                                    "settings": [
+                                        {
+                                            "key": "viewer_bar_border_color",
+                                            "type": "color",
+                                            "label": "Border Color",
+                                            "default": "rgba(0,0,0,0.15)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "viewer_bar_border_width",
+                                            "type": "range",
+                                            "label": "Border Width",
+                                            "unit": "px",
+                                            "min": 0,
+                                            "max": 10,
+                                            "default": 0,
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "viewer_bar_padding",
+                                    "type": "range",
+                                    "label": "Padding",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 60,
+                                    "default": 8,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
                             "key": "full_image_background_group",
                             "type": "setting_group",
                             "label": "Background",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
                             "settings": [
                                 {
                                     "key": "full_image_background_enabled",
@@ -1204,6 +833,11 @@
                             "key": "full_image_border_group",
                             "type": "setting_group",
                             "label": "Border",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
                             "settings": [
                                 {
                                     "key": "full_image_border_enabled",

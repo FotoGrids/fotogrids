@@ -11,6 +11,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		setActiveDevice,
 		renderIcon,
 		getFieldState,
+		siblingValueOf,
 		__,
 	}
 ) => {
@@ -22,6 +23,11 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		setting.units.length > 0;
 	const isMinMaxMode = setting.minMax === true;
 	const isFourSided = setting.four_sided === true;
+	const isTwoSided = setting.two_sided === true;
+	// no_range hides the slider and lets the number input stretch to fill the
+	// row - for settings (line height, letter/word spacing) where a slider adds
+	// no value but the rest of the responsive_range wiring is still wanted.
+	const noRange = setting.no_range === true;
 	const settingState =
 		typeof getFieldState === 'function'
 			? getFieldState(setting.key, currentValue)
@@ -35,6 +41,17 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 	const defaults = window.fotogridsSettings?.defaults || {};
 	const defaultResponsive =
 		defaults[setting.key] || (isMinMaxMode ? {} : setting.responsive);
+
+	if (isTwoSided) {
+		return renderTwoSided(setting, currentValue, isDisabled, {
+			updateSetting,
+			updateSettingStateOnly,
+			renderIcon,
+			getFieldState,
+			siblingValueOf,
+			__,
+		});
+	}
 
 	if (isFourSided) {
 		const sides = ['top', 'right', 'bottom', 'left'];
@@ -577,17 +594,28 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				responsiveValue[device].value === undefined
 			) {
 				const defaultValue =
-					defaultResponsive[device] ||
+					defaultResponsive[device] ??
 					setting.responsive[device].default;
+				// defaultValue may be a stored {value, unit}, a config object
+				// ({min, max, default}) when no saved/seeded default exists, or
+				// a plain scalar. Pull the scalar out of each shape so a config
+				// object never lands in the input as the value (which renders
+				// the field empty).
+				let resolvedValue = defaultValue;
+				let resolvedUnit = setting.units[0];
+				if (defaultValue && typeof defaultValue === 'object') {
+					if (defaultValue.value !== undefined) {
+						resolvedValue = defaultValue.value;
+						resolvedUnit = defaultValue.unit || setting.units[0];
+					} else if (defaultValue.default !== undefined) {
+						resolvedValue = defaultValue.default;
+					} else {
+						resolvedValue = setting.responsive[device].default;
+					}
+				}
 				responsiveValue[device] = {
-					value:
-						typeof defaultValue === 'object'
-							? defaultValue.value || defaultValue
-							: defaultValue,
-					unit:
-						typeof defaultValue === 'object'
-							? defaultValue.unit || setting.units[0]
-							: setting.units[0],
+					value: resolvedValue,
+					unit: resolvedUnit,
 				};
 			}
 		});
@@ -732,8 +760,6 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		const minRange = setting.responsive[activeDevice].min || 0;
 		const maxRange = setting.responsive[activeDevice].max || 1000;
 		const minMin = setting.responsive[activeDevice].minMin || minRange;
-		const minMax = setting.responsive[activeDevice].minMax || maxRange;
-		const maxMin = setting.responsive[activeDevice].maxMin || minRange;
 		const maxMax = setting.responsive[activeDevice].maxMax || maxRange;
 
 		return h(
@@ -1091,7 +1117,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								)
 							)
 						),
-					]
+					].filter(Boolean)
 				),
 
 				setting.description &&
@@ -1116,6 +1142,16 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 	const currentDeviceUnit = hasUnits
 		? currentDeviceData?.unit || setting.units[0]
 		: null;
+
+	// Per-device step (defaults to 1). A fractional step - or an explicit
+	// allow_decimals flag - switches parsing to parseFloat so values like
+	// 1.2em are preserved instead of being truncated to 1.
+	const activeStep =
+		setting.responsive[activeDevice].step ?? setting.step ?? 1;
+	const allowDecimals =
+		setting.allow_decimals === true || Number(activeStep) % 1 !== 0;
+	const parseValue = (raw) =>
+		allowDecimals ? parseFloat(raw) : parseInt(raw, 10);
 
 	return h(
 		'div',
@@ -1169,31 +1205,34 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 			h(
 				'div',
 				{
-					className: 'fotogrids-responsive-setting__controls',
+					className: `fotogrids-responsive-setting__controls${noRange ? ' fotogrids-responsive-setting__controls--no-range' : ''}`,
 				},
 				[
-					h(
-						'div',
-						{
-							className: 'fotogrids-responsive-setting__range',
-						},
-						[
-							h('input', {
-								type: 'range',
-								min: setting.responsive[activeDevice].min,
-								max: setting.responsive[activeDevice].max,
-								value: currentDeviceValue,
-								onChange: (e) =>
-									!isDisabled &&
-									updateResponsiveValue(
-										activeDevice,
-										parseInt(e.target.value)
-									),
-								disabled: isDisabled,
-								className: 'fotogrids-range-slider',
-							}),
-						]
-					),
+					!noRange &&
+						h(
+							'div',
+							{
+								className:
+									'fotogrids-responsive-setting__range',
+							},
+							[
+								h('input', {
+									type: 'range',
+									min: setting.responsive[activeDevice].min,
+									max: setting.responsive[activeDevice].max,
+									step: activeStep,
+									value: currentDeviceValue,
+									onChange: (e) =>
+										!isDisabled &&
+										updateResponsiveValue(
+											activeDevice,
+											parseValue(e.target.value)
+										),
+									disabled: isDisabled,
+									className: 'fotogrids-range-slider',
+								}),
+							]
+						),
 
 					h(
 						'div',
@@ -1205,9 +1244,10 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								type: 'number',
 								min: setting.responsive[activeDevice].min,
 								max: setting.responsive[activeDevice].max,
+								step: activeStep,
 								value: currentDeviceValue,
 								onChange: (e) => {
-									const v = parseInt(e.target.value);
+									const v = parseValue(e.target.value);
 									!isDisabled &&
 										updateResponsiveValue(
 											activeDevice,
@@ -1313,6 +1353,277 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		]
 	);
 };
+
+// Two-sided (width / height) range. Non-responsive; values persist as
+// { width: { value, unit }, height: { value, unit } }. `_linked` is a UI-only
+// flag held in React state and never persisted - mirrors the four-sided field.
+function renderTwoSided(setting, currentValue, isDisabled, ctx) {
+	const { createElement: h } = wp.element;
+	const {
+		updateSetting,
+		updateSettingStateOnly,
+		renderIcon,
+		getFieldState,
+		siblingValueOf,
+		__,
+	} = ctx;
+
+	const sides = ['width', 'height'];
+	const unit = Array.isArray(setting.units) ? setting.units[0] : 'px';
+	const range = setting.responsive?.desktop || {
+		min: 0,
+		max: 100,
+		default: 10,
+	};
+	const sideLabels = setting.side_labels || {
+		width: __('Width', 'fotogrids'),
+		height: __('Height', 'fotogrids'),
+	};
+
+	const stateOnly =
+		typeof updateSettingStateOnly === 'function'
+			? updateSettingStateOnly
+			: updateSetting;
+
+	const settingState =
+		typeof getFieldState === 'function'
+			? getFieldState(setting.key, currentValue)
+			: 'editable';
+	const showSettingBadge = settingState !== 'editable';
+	const settingBadgeText =
+		settingState === 'locked'
+			? __('Locked', 'fotogrids')
+			: __('Pro', 'fotogrids');
+
+	const sideValue = (val, side) => {
+		const sv = val && typeof val === 'object' ? val[side] : undefined;
+		if (sv && typeof sv === 'object') {
+			return sv.value ?? range.default;
+		}
+		return sv ?? range.default;
+	};
+
+	const normalized = {
+		width:
+			currentValue && typeof currentValue === 'object'
+				? sideValue(currentValue, 'width')
+				: range.default,
+		height:
+			currentValue && typeof currentValue === 'object'
+				? sideValue(currentValue, 'height')
+				: range.default,
+	};
+
+	const linkedRaw = currentValue?._linked;
+	const isLinked =
+		linkedRaw === undefined
+			? normalized.width === normalized.height
+			: linkedRaw !== false && linkedRaw !== '0' && linkedRaw !== 0;
+
+	const widthDisabledByStretch = (() => {
+		const gate = setting.disable_width_when;
+		if (!gate || !gate.dependsOn) {
+			return false;
+		}
+		const depVal =
+			typeof siblingValueOf === 'function'
+				? siblingValueOf(gate.dependsOn)
+				: undefined;
+		const wanted = Array.isArray(gate.values) ? gate.values : [gate.values];
+		return wanted.some((v) => String(v) === String(depVal));
+	})();
+
+	const buildValue = (width, height) => ({
+		width: { value: width, unit },
+		height: { value: height, unit },
+	});
+	const withLinked = (val, linked) => ({ ...val, _linked: linked });
+	const withoutLinked = (val) => {
+		const { _linked, ...rest } = val;
+		return rest;
+	};
+
+	const commit = (width, height, linked) => {
+		const val = buildValue(width, height);
+		updateSetting(setting.key, withoutLinked(val));
+		stateOnly(setting.key, withLinked(val, linked));
+	};
+
+	const updateSide = (side, value) => {
+		if (isLinked) {
+			commit(value, value, true);
+			return;
+		}
+		const next = { ...normalized, [side]: value };
+		commit(next.width, next.height, false);
+	};
+
+	const updateLinkedSlider = (value) => commit(value, value, true);
+
+	const handleLinkToggle = () => {
+		if (isLinked) {
+			stateOnly(
+				setting.key,
+				withLinked(
+					buildValue(normalized.width, normalized.height),
+					false
+				)
+			);
+		} else {
+			commit(normalized.width, normalized.width, true);
+		}
+	};
+
+	const sliderValue = isLinked ? normalized.width : normalized.width;
+
+	return h(
+		'div',
+		{ className: 'fotogrids-responsive-setting' },
+		[
+			h('div', { className: 'fotogrids-responsive-setting__header' }, [
+				h(
+					'label',
+					{ className: 'fotogrids-setting__label' },
+					[
+						setting.label,
+						showSettingBadge &&
+							h(
+								'span',
+								{
+									className: 'fotogrids-pro-badge',
+									key: 'pro-badge',
+								},
+								settingBadgeText
+							),
+					].filter(Boolean)
+				),
+			]),
+
+			h(
+				'div',
+				{
+					className:
+						'fotogrids-responsive-setting__controls fotogrids-responsive-setting__controls--two-sided',
+				},
+				[
+					h(
+						'div',
+						{ className: 'fotogrids-responsive-setting__range' },
+						[
+							h('input', {
+								type: 'range',
+								min: range.min,
+								max: range.max,
+								value: sliderValue,
+								onChange: (e) =>
+									!isDisabled &&
+									updateLinkedSlider(
+										parseInt(e.target.value, 10)
+									),
+								disabled: isDisabled || !isLinked,
+								className: 'fotogrids-range-slider',
+							}),
+						]
+					),
+
+					h(
+						'div',
+						{ className: 'fotogrids-responsive-setting__input' },
+						[
+							h(
+								'div',
+								{
+									key: 'two-inputs',
+									className: 'fotogrids-fourside-inputs',
+								},
+								sides.map((side) =>
+									h(
+										'div',
+										{
+											key: side,
+											className:
+												'fotogrids-fourside-input-group',
+										},
+										[
+											h('input', {
+												type: 'number',
+												min: range.min,
+												max: range.max,
+												value: normalized[side],
+												onChange: (e) => {
+													if (isDisabled) return;
+													const parsed = parseInt(
+														e.target.value,
+														10
+													);
+													updateSide(
+														side,
+														Number.isFinite(parsed)
+															? parsed
+															: range.default
+													);
+												},
+												disabled:
+													isDisabled ||
+													(side === 'width' &&
+														widthDisabledByStretch),
+												className:
+													'fotogrids-range-number-input',
+											}),
+											h(
+												'span',
+												{
+													className:
+														'fotogrids-fourside-label',
+												},
+												sideLabels[side]
+											),
+										]
+									)
+								)
+							),
+						]
+					),
+
+					h(
+						'button',
+						{
+							type: 'button',
+							className: `fotogrids-fourside-link-btn${isLinked ? ' fg-is-active' : ''}`,
+							onClick: (e) => {
+								e.preventDefault();
+								e.stopPropagation();
+								!isDisabled && handleLinkToggle();
+							},
+							disabled: isDisabled,
+							title: isLinked
+								? __('Unlink values', 'fotogrids')
+								: __('Link values', 'fotogrids'),
+						},
+						renderIcon('link')
+					),
+				]
+			),
+
+			widthDisabledByStretch &&
+				h(
+					'p',
+					{ className: 'fotogrids-setting__description' },
+					__(
+						'Width follows the track while alignment is Stretch.',
+						'fotogrids'
+					)
+				),
+
+			setting.description &&
+				h(
+					'p',
+					{ className: 'fotogrids-setting__description' },
+					setting.description
+				),
+		].filter(Boolean)
+	);
+}
 
 // Unit selector shared between linked and unlinked four-sided UI.
 function renderUnitSelect(h, currentUnit, onChange, isDisabled, setting) {

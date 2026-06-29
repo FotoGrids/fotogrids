@@ -83,22 +83,13 @@ function buildSelectorHighlightPlugin() {
 	);
 }
 
-const CodeAreaComponent = ({
-	setting,
-	value,
-	onChange,
-	errors = [],
-	isDisabled,
-	getFieldState,
-	__,
-}) => {
+const CodeAreaComponent = ({ setting, value, onChange, getFieldState, __ }) => {
 	const {
 		key,
 		label,
 		description,
 		hint,
 		language = 'css',
-		placeholder = '',
 		disabled = false,
 	} = setting;
 
@@ -485,6 +476,7 @@ const validateCSS = (css) => {
 			!trimmed.endsWith(',')
 		) {
 			errors.push(
+				// translators: %d: line number where the semicolon is missing.
 				__('Missing semicolon on line %d', 'fotogrids').replace(
 					'%d',
 					index + 1
@@ -524,6 +516,7 @@ const validateJavaScript = (js) => {
 		new Function(js);
 	} catch (e) {
 		errors.push(
+			// translators: %s: JavaScript engine error message.
 			__('JavaScript syntax error: %s', 'fotogrids').replace(
 				'%s',
 				e.message

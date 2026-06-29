@@ -81,10 +81,11 @@ final class Cover_Resolver {
 	/**
 	 * Resolve the cover-image attachment ID for a gallery.
 	 *
-	 * Reads the gallery's `_thumbnail_id`. If it still points to an image
-	 * attachment that exists AND is still in the gallery's
-	 * `fotogrids_gallery_items`, that ID wins. Otherwise the first image
-	 * attachment is returned.
+	 * The custom Featured / Share Image (`fotogrids_featured_image_id`) wins
+	 * when set, even if it is not in the gallery. Otherwise reads the gallery's
+	 * `_thumbnail_id`: if it still points to an image attachment that exists AND
+	 * is still in the gallery's `fotogrids_gallery_items`, that ID wins.
+	 * Otherwise the first image attachment is returned.
 	 *
 	 * This returns an attachment ID only - for callers that need a raw
 	 * attachment (e.g. attachment-meta consumers). Video and embed covers do
@@ -99,6 +100,11 @@ final class Cover_Resolver {
 	public static function for_gallery( int $gallery_id ): int {
 		if ( $gallery_id <= 0 ) {
 			return 0;
+		}
+
+		$featured = self::featured_image_id( $gallery_id );
+		if ( $featured > 0 ) {
+			return $featured;
 		}
 
 		$item_ids = self::gallery_item_ids( $gallery_id );
@@ -152,6 +158,18 @@ final class Cover_Resolver {
 
 		if ( $gallery_id <= 0 ) {
 			return $none;
+		}
+
+		$featured = self::featured_image_id( $gallery_id );
+		if ( $featured > 0 ) {
+			$url = (string) ( wp_get_attachment_image_url( $featured, $size ) ?: '' );
+			if ( '' !== $url ) {
+				return array(
+					'kind' => 'attachment',
+					'id'   => $featured,
+					'url'  => $url,
+				);
+			}
 		}
 
 		$item_ids = self::gallery_item_ids( $gallery_id );
@@ -266,10 +284,11 @@ final class Cover_Resolver {
 	/**
 	 * Resolve the cover-image attachment ID for an album.
 	 *
-	 * Reads `fotogrids_featured_gallery`. If it still names a gallery that
-	 * exists AND is still a child of this album AND that gallery has a
-	 * resolvable cover, that wins. Otherwise the first child gallery with
-	 * a resolvable cover is returned.
+	 * The album's custom Featured / Share Image (`fotogrids_featured_image_id`)
+	 * wins when set. Otherwise reads `fotogrids_featured_gallery`: if it still
+	 * names a gallery that exists AND is still a child of this album AND that
+	 * gallery has a resolvable cover, that wins. Otherwise the first child
+	 * gallery with a resolvable cover is returned.
 	 *
 	 * @since 1.0.0
 	 * @param int $album_id Album post ID.
@@ -278,6 +297,11 @@ final class Cover_Resolver {
 	public static function for_album( int $album_id ): int {
 		if ( $album_id <= 0 ) {
 			return 0;
+		}
+
+		$featured = self::featured_image_id( $album_id );
+		if ( $featured > 0 ) {
+			return $featured;
 		}
 
 		$galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id );
@@ -381,6 +405,18 @@ final class Cover_Resolver {
 			return $none;
 		}
 
+		$featured = self::featured_image_id( $album_id );
+		if ( $featured > 0 ) {
+			$url = (string) ( wp_get_attachment_image_url( $featured, $size ) ?: '' );
+			if ( '' !== $url ) {
+				return array(
+					'kind' => 'attachment',
+					'id'   => $featured,
+					'url'  => $url,
+				);
+			}
+		}
+
 		$galleries = Gallery_Album_Relations::get_galleries_for_album( $album_id );
 		if ( empty( $galleries ) ) {
 			return $none;
@@ -423,6 +459,35 @@ final class Cover_Resolver {
 	 */
 	private static function gallery_item_ids( int $gallery_id ): array {
 		return Gallery_Repository::get_item_ids( $gallery_id );
+	}
+
+	/**
+	 * Read the custom Featured / Share Image attachment ID for a collection.
+	 *
+	 * Returns the `fotogrids_featured_image_id` post-meta value only when it
+	 * still points at an existing image attachment. This image is chosen via
+	 * the Featured / Share Image metabox and need not belong to the gallery,
+	 * so it is validated as an image rather than against the item list. It is
+	 * the top tier of every resolution chain in this class.
+	 *
+	 * @since 1.0.0
+	 * @param int $post_id Gallery or album post ID.
+	 * @return int Attachment ID, or 0 when none is set or it no longer resolves.
+	 */
+	private static function featured_image_id( int $post_id ): int {
+		$attachment_id = (int) get_post_meta( $post_id, \FotoGrids\Post_Types::FEATURED_IMAGE_META_KEY, true );
+		if ( $attachment_id <= 0 ) {
+			return 0;
+		}
+
+		$attachment = get_post( $attachment_id );
+		if ( $attachment
+			&& 'attachment' === $attachment->post_type
+			&& wp_attachment_is_image( $attachment_id ) ) {
+			return $attachment_id;
+		}
+
+		return 0;
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

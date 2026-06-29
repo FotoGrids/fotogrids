@@ -437,207 +437,28 @@
                     "icon": "styling",
                     "settings": [
                         {
-                            "type": "side_by_side",
-                            "settings": [
-                                {
-                                    "key": "pagination_button_font_family",
-                                    "type": "font_family",
-                                    "label": "Font Family",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "pagination_button_font_weight",
-                                    "type": "font_weight",
-                                    "label": "Font Weight",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
+                            "use": "button-styling",
+                            "key_prefix": "pagination_button_",
+                            "states": ["regular", "hover", "focus", "active"],
+                            "composed": {
+                                "typography": {
+                                    "overrides": {
+                                        "font_size": {
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 32, "default": 14 },
+                                                "tablet": { "min": 8, "max": 28, "default": 14 },
+                                                "mobile": { "min": 8, "max": 24, "default": 13 }
+                                            }
+                                        }
+                                    }
                                 }
-                            ]
-                        },
-                        {
-                            "key": "pagination_button_font_size",
-                            "type": "responsive_range",
-                            "label": "Font Size",
-                            "units": [ "px", "em", "rem" ],
-                            "responsive": {
-                                "desktop": { "min": 8, "max": 32, "default": 14 },
-                                "tablet":  { "min": 8, "max": 28, "default": 14 },
-                                "mobile":  { "min": 8, "max": 24, "default": 13 }
                             },
-                            "tier_required": "free",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
-                        },
-                        {
-                            "key": "pagination_button_border_width",
-                            "type": "range",
-                            "label": "Border Width",
-                            "unit": "px",
-                            "min": 0,
-                            "max": 10,
-                            "default": 1,
-                            "tier_required": "free",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
-                        },
-                        {
-                            "key": "pagination_button_state_subtabs",
-                            "type": "setting_subtabs",
-                            "label": "Button States",
-                            "subTabs": {
-                                "regular": {
-                                    "id": "regular",
-                                    "label": "Regular",
-                                    "icon": "square",
-                                    "settings": [
-                                        {
-                                            "type": "side_by_side",
-                                            "settings": [
-                                                {
-                                                    "key": "pagination_button_bg",
-                                                    "type": "color",
-                                                    "label": "Background Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "pagination_button_color",
-                                                    "type": "color",
-                                                    "label": "Text Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "pagination_button_border_color",
-                                                    "type": "color",
-                                                    "label": "Border Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                }        
-                                            ]
-                                        }
-                                    ]
-                                },
-                                "hover": {
-                                    "id": "hover",
-                                    "label": "Hover",
-                                    "icon": "hover",
-                                    "settings": [
-                                        {
-                                            "type": "side_by_side",
-                                            "settings": [
-                                                {
-                                                    "key": "pagination_button_hover_bg",
-                                                    "type": "color",
-                                                    "label": "Background Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "pagination_button_hover_color",
-                                                    "type": "color",
-                                                    "label": "Text Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "pagination_button_hover_border_color",
-                                                    "type": "color",
-                                                    "label": "Border Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                }        
-                                            ]
-                                        }
-                                    ]
-                                },
+                            "state_conditions": {
                                 "active": {
-                                    "id": "active",
-                                    "label": "Active",
-                                    "icon": "check_square",
-                                    "condition": {
-                                        "dependsOn": [
-                                            "pagination_method",
-                                            "pages_show_numbers"
-                                        ],
-                                        "values": [
-                                            [
-                                                "pages"
-                                            ],
-                                            [
-                                                true,
-                                                "1"
-                                            ]
-                                        ]
-                                    },
-                                    "settings": [
-                                        {
-                                            "type": "side_by_side",
-                                            "settings": [
-                                                {
-                                                    "key": "pagination_button_active_bg",
-                                                    "type": "color",
-                                                    "label": "Background Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "pagination_button_active_color",
-                                                    "type": "color",
-                                                    "label": "Text Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "pagination_button_active_border_color",
-                                                    "type": "color",
-                                                    "label": "Border Color",
-                                                    "default": "",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                }        
-                                            ]
-                                        }
-                                    ]
+                                    "dependsOn": ["pagination_method", "pages_show_numbers"],
+                                    "values": [["pages"], [true, "1"]]
                                 }
-                            },
-                            "tier_required": "free",
-                            "render_when_unlicensed": true,
-                            "setting_lives_in": "free",
-                            "visible_when_uninstalled": true
+                            }
                         }
                     ]
                 }

@@ -21,6 +21,7 @@ const DEFAULTS = {
     theme: 'light',
     max_width: 1200,
     show_header: true,
+    show_footer: true,
 
     // Integrated-mode toggles.
     integrated_show_title_block: false,
@@ -262,6 +263,16 @@ const ViewPagesTab = () => {
                         <Toggle
                             checked={settings.show_header}
                             onChange={(v) => update('show_header', v)}
+                        />
+                    </PanelRow>
+
+                    <PanelRow
+                        title={__('Show page footer', 'fotogrids')}
+                        description={__('Display the sharing controls and footer credit at the bottom of the view page.', 'fotogrids')}
+                    >
+                        <Toggle
+                            checked={settings.show_footer}
+                            onChange={(v) => update('show_footer', v)}
                         />
                     </PanelRow>
                 </SettingsPanel>

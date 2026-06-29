@@ -46,6 +46,7 @@ final class View_Settings_Store {
 			'theme'                          => 'light',
 			'max_width'                      => 1200,
 			'show_header'                    => true,
+			'show_footer'                    => true,
 
 			// Integrated-mode toggles. Only consulted when
 			// layout_mode === 'integrated'. Each has a paired
@@ -131,6 +132,7 @@ final class View_Settings_Store {
 			'theme'                          => $theme,
 			'max_width'                      => $max_width,
 			'show_header'                    => self::truthy( $input['show_header'] ?? $defaults['show_header'] ),
+			'show_footer'                    => self::truthy( $input['show_footer'] ?? $defaults['show_footer'] ),
 
 			'integrated_show_title_block'    => self::truthy( $input['integrated_show_title_block'] ?? $defaults['integrated_show_title_block'] ),
 			'integrated_hide_featured_image' => self::truthy( $input['integrated_hide_featured_image'] ?? $defaults['integrated_hide_featured_image'] ),

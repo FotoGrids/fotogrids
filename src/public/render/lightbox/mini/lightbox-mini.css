@@ -1,4 +1,10 @@
+/* The padding is a free-form length set per gallery via --fg-lb-mini-padding;
+   the backdrop colour and blur are selected by the data attributes below. */
 .fg-lb-mini {
+    --fg-lb-mini-padding: 0px;
+    --fg-lb-mini-backdrop: rgba(0, 0, 0, 0.6);
+    --fg-lb-mini-backdrop-blur: 0px;
+
     position: fixed;
     inset: 0;
     z-index: 999999;
@@ -7,11 +13,33 @@
     justify-content: center;
 }
 
+/* Backdrop theme. */
+.fg-lb-mini[data-fg-mini-theme="dark"] {
+    --fg-lb-mini-backdrop: rgba(0, 0, 0, 0.2);
+}
+
+.fg-lb-mini[data-fg-mini-theme="light"] {
+    --fg-lb-mini-backdrop: rgba(255, 255, 255, 0.2);
+}
+
+/* Backdrop blur level. */
+.fg-lb-mini[data-fg-mini-blur="light"] {
+    --fg-lb-mini-backdrop-blur: 6px;
+}
+
+.fg-lb-mini[data-fg-mini-blur="strong"] {
+    --fg-lb-mini-backdrop-blur: 16px;
+}
+
+.fg-lb-mini[data-fg-mini-blur="none"] {
+    --fg-lb-mini-backdrop-blur: 0px;
+}
+
 .fg-lb-mini-backdrop {
     position: absolute;
     inset: 0;
-    background: var(--fg-lb-mini-backdrop, rgba(0, 0, 0, 0.9));
-    backdrop-filter: blur(var(--fg-lb-mini-backdrop-blur, 0px));
+    background: var(--fg-lb-mini-backdrop);
+    backdrop-filter: blur(var(--fg-lb-mini-backdrop-blur));
 }
 
 .fg-lb-mini-stage {

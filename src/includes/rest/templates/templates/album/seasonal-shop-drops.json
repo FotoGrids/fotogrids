@@ -5,26 +5,7 @@
   "type": "pro",
   "category": "album",
   "subcategory": "products",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 16,
-  "settings": {
-    "layout": "masonry",
-    "columns": {
-      "desktop": 3,
-      "tablet": 2,
-      "mobile": 1
-    },
-    "item_spacing": {
-      "desktop": 10,
-      "tablet": 8,
-      "mobile": 5
-    },
-    "hover_effect": "slow_zoom",
-    "cta_overlays": true,
-    "woocommerce_handoff": true,
-    "filter_enabled": true,
-    "extended_analytics": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

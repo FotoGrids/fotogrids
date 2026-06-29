@@ -26,9 +26,16 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 		);
 	}
 
-	const { createElement, useState, useEffect, useRef } = React;
+	const { createElement, useState, useEffect, useRef, useCallback } = React;
+	const createPortal =
+		(wp.element && wp.element.createPortal) ||
+		(window.ReactDOM && window.ReactDOM.createPortal);
 
 	const { value, onChange, options, disabled, className = '' } = props;
+
+	// Estimated dropdown height for the up/down decision: each option is 40px
+	// tall plus the container's 8px of border/padding.
+	const dropdownHeight = options.length * 40 + 8;
 
 	/*
 	 * React availability is constant for the lifetime of the page, so the
@@ -37,41 +44,75 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 	 */
 	/* eslint-disable react-hooks/rules-of-hooks */
 	const [isOpen, setIsOpen] = useState(false);
-	const [openDirection, setOpenDirection] = useState('down');
+	// Viewport-relative placement for the portalled dropdown. The dropdown is
+	// rendered into document.body with position:fixed, so it escapes any
+	// overflow:hidden ancestor (e.g. the settings sub-tab panel) that would
+	// otherwise clip it. Coordinates are derived from the trigger button's
+	// bounding rect and refreshed while open.
+	const [placement, setPlacement] = useState({
+		top: 0,
+		left: 0,
+		width: 0,
+		direction: 'down',
+	});
 	const containerRef = useRef(null);
 	const selectRef = useRef(null);
+	const dropdownRef = useRef(null);
+
+	const computePlacement = useCallback(() => {
+		const button = selectRef.current;
+		if (!button) return;
+
+		const rect = button.getBoundingClientRect();
+		const spaceBelow = window.innerHeight - rect.bottom;
+		const spaceAbove = rect.top;
+		const direction =
+			spaceBelow < dropdownHeight && spaceAbove > spaceBelow
+				? 'up'
+				: 'down';
+
+		setPlacement({
+			top: direction === 'up' ? rect.top : rect.bottom,
+			left: rect.left,
+			width: rect.width,
+			direction,
+		});
+	}, [dropdownHeight]);
 
 	useEffect(() => {
+		if (!isOpen) return undefined;
+
+		// A click inside either the trigger or the (portalled) dropdown is
+		// "inside"; the dropdown is no longer a DOM descendant of the trigger
+		// once portalled, so it must be checked explicitly.
 		const handleClickOutside = (event) => {
-			if (
+			const inTrigger =
 				containerRef.current &&
-				!containerRef.current.contains(event.target)
-			) {
+				containerRef.current.contains(event.target);
+			const inDropdown =
+				dropdownRef.current &&
+				dropdownRef.current.contains(event.target);
+			if (!inTrigger && !inDropdown) {
 				setIsOpen(false);
 			}
 		};
 
-		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside);
+		// Fixed coordinates are computed once per open, so any scroll (capture:
+		// true catches the inner settings-panel scroll, not just window) or
+		// resize must refresh both the position and the up/down direction.
+		const handleReposition = () => computePlacement();
 
-			if (containerRef.current) {
-				const rect = containerRef.current.getBoundingClientRect();
-				const spaceBelow = window.innerHeight - rect.bottom;
-				const spaceAbove = rect.top;
-				const dropdownHeight = options.length * 40 + 8;
-
-				if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-					setOpenDirection('up');
-				} else {
-					setOpenDirection('down');
-				}
-			}
-		}
+		computePlacement();
+		document.addEventListener('mousedown', handleClickOutside);
+		window.addEventListener('scroll', handleReposition, true);
+		window.addEventListener('resize', handleReposition);
 
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
+			window.removeEventListener('scroll', handleReposition, true);
+			window.removeEventListener('resize', handleReposition);
 		};
-	}, [isOpen, options.length]);
+	}, [isOpen, computePlacement]);
 	/* eslint-enable react-hooks/rules-of-hooks */
 
 	const handleSelect = (optionValue) => {
@@ -84,11 +125,52 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 	const selectedOption =
 		options.find((opt) => opt.value === value) || options[0];
 
+	const dropdownStyle = {
+		position: 'fixed',
+		left: `${placement.left}px`,
+		width: `${placement.width}px`,
+	};
+	if (placement.direction === 'up') {
+		// Anchor the bottom edge above the trigger so the list grows upward.
+		dropdownStyle.bottom = `${window.innerHeight - placement.top + 4}px`;
+	} else {
+		dropdownStyle.top = `${placement.top + 4}px`;
+	}
+
+	const dropdown =
+		isOpen &&
+		createPortal(
+			createElement(
+				'div',
+				{
+					ref: dropdownRef,
+					className: `fotogrids-unit-select__dropdown fotogrids-unit-select__dropdown--${placement.direction}`,
+					role: 'listbox',
+					style: dropdownStyle,
+				},
+				options.map((option, index) =>
+					createElement(
+						'button',
+						{
+							key: option.value || index,
+							type: 'button',
+							className: `fotogrids-unit-select__option ${option.value === value ? 'fg-is-selected' : ''}`,
+							onClick: () => handleSelect(option.value),
+							role: 'option',
+							'aria-selected': option.value === value,
+						},
+						option.label || option.value
+					)
+				)
+			),
+			document.body
+		);
+
 	return createElement(
 		'div',
 		{
 			ref: containerRef,
-			className: `fotogrids-unit-select ${className} ${isOpen ? 'fg-is-open' : ''} ${openDirection === 'up' ? 'fg-opens-up' : 'fg-opens-down'}`,
+			className: `fotogrids-unit-select ${className} ${isOpen ? 'fg-is-open' : ''} ${placement.direction === 'up' ? 'fg-opens-up' : 'fg-opens-down'}`,
 			style: { position: 'relative' },
 		},
 		[
@@ -122,29 +204,7 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 					}),
 				]
 			),
-			isOpen &&
-				createElement(
-					'div',
-					{
-						key: 'dropdown',
-						className: `fotogrids-unit-select__dropdown fotogrids-unit-select__dropdown--${openDirection}`,
-						role: 'listbox',
-					},
-					options.map((option, index) =>
-						createElement(
-							'button',
-							{
-								key: option.value || index,
-								type: 'button',
-								className: `fotogrids-unit-select__option ${option.value === value ? 'fg-is-selected' : ''}`,
-								onClick: () => handleSelect(option.value),
-								role: 'option',
-								'aria-selected': option.value === value,
-							},
-							option.label || option.value
-						)
-					)
-				),
+			dropdown,
 		]
 	);
 };

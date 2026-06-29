@@ -101,15 +101,6 @@ function rgbToHsv(r, g, b) {
 	return { h: h * 360, s, v };
 }
 
-function hexToRgb(hex) {
-	let h = hex.replace('#', '');
-	if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
-	if (h.length === 8) h = h.slice(0, 6);
-	if (h.length !== 6) return null;
-	const n = parseInt(h, 16);
-	return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
-}
-
 function rgbToHex(r, g, b) {
 	return (
 		'#' +

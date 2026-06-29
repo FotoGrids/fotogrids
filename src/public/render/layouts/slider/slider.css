@@ -1,12 +1,12 @@
 [data-fg-layout="slider"] {
-    position: relative;
+	position: relative;
 }
 
 /* Container - wraps viewport, bullets, thumbnails. Reserve-space padding
    lands here so it doesn't fight the outer collection padding setting. */
 
 [data-fg-carousel="1"] .fg-carousel-container {
-    position: relative;
+	position: relative;
 }
 
 /* Viewport - positioning frame for chrome (arrows, counter) that
@@ -15,16 +15,16 @@
    chrome render above the viewport without being clipped by overflow. */
 
 [data-fg-carousel="1"] .fg-carousel-viewport {
-    position: relative;
-    max-height: 100vh;
+	position: relative;
+	max-height: 100vh;
 }
 
 [data-fg-layout="slider"][data-fg-height-mode="auto"] .fg-carousel-viewport {
-    max-height: var( --fg-height-max, 100vh );
+	max-height: var(--fg-height-max, 100vh);
 }
 
 [data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-viewport {
-    height: min( var( --fg-height-fixed, 500px ), 100vh );
+	height: min(var(--fg-height-fixed, 500px), 100vh);
 }
 
 /* Track wrapper - the scrolling region. Owns overflow, scroll-snap,
@@ -33,39 +33,45 @@
    fixed mode. */
 
 [data-fg-carousel="1"] .fg-carousel-track-wrapper {
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    container-type: inline-size;
-    container-name: fg-carousel-track-wrapper;
-    max-height: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	container-type: inline-size;
+	container-name: fg-carousel-track-wrapper;
+	max-height: 100%;
 }
 
 [data-fg-carousel="1"] .fg-carousel-track-wrapper::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
-[data-fg-layout="slider"][data-fg-height-mode="auto"] .fg-carousel-track-wrapper {
-    max-height: var( --fg-height-max, 100vh );
+[data-fg-layout="slider"][data-fg-height-mode="auto"]
+	.fg-carousel-track-wrapper {
+	max-height: var(--fg-height-max, 100vh);
 }
 
-[data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track-wrapper {
-    height: 100%;
+[data-fg-layout="slider"][data-fg-height-mode="fixed"]
+	.fg-carousel-track-wrapper {
+	height: 100%;
 }
 
 /* Track - the inline-flex strip whose total width exceeds the viewport. */
 
+/* No inter-slide gap: the Slider has no Item Spacing control, and the
+   arrow/bullet scroll math advances by exactly one viewport width per
+   page. A non-zero gap would desync that math from the real scroll
+   distance, drifting the snap target by one gap per page. */
 [data-fg-carousel="1"] .fg-carousel-track {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: var(--fg-gap, 10px);
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0;
 }
 
 [data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track {
-    height: 100%;
+	height: 100%;
 }
 
 /* Each item: width derived from --fg-items-per-view so the track
@@ -79,28 +85,32 @@
    left-aligned and the remaining width stays empty. */
 
 [data-fg-layout="slider"] .fg-carousel-track .fg-item {
-    flex: 0 0 calc(
-        ( 100cqw - ( var(--fg-items-per-view, 3) - 1 ) * var(--fg-gap, 10px) )
-        / var(--fg-items-per-view, 3)
-    );
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    min-width: 0;
+	flex: 0 0 calc(100cqw / var(--fg-items-per-view, 3));
+	scroll-snap-align: start;
+	scroll-snap-stop: always;
+	min-width: 0;
 }
 
-[data-fg-layout="slider"][data-fg-height-mode="auto"] .fg-carousel-track .fg-item {
-    aspect-ratio: var( --fg-item-aspect-ratio, 4 / 3 );
-    height: auto;
+[data-fg-layout="slider"][data-fg-height-mode="auto"]
+	.fg-carousel-track
+	.fg-item {
+	aspect-ratio: var(--fg-item-aspect-ratio, 4 / 3);
+	height: auto;
 }
 
-[data-fg-layout="slider"][data-fg-height-mode="auto"] .fg-carousel-track .fg-item .fg-item-media {
-    height: 100%;
-    aspect-ratio: auto;
+[data-fg-layout="slider"][data-fg-height-mode="auto"]
+	.fg-carousel-track
+	.fg-item
+	.fg-item-media {
+	height: 100%;
+	aspect-ratio: auto;
 }
 
-[data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track .fg-item {
-    height: 100%;
-    aspect-ratio: auto;
+[data-fg-layout="slider"][data-fg-height-mode="fixed"]
+	.fg-carousel-track
+	.fg-item {
+	height: 100%;
+	aspect-ratio: auto;
 }
 
 /* The image fills the item box and honours the Item Fit setting
@@ -109,48 +119,57 @@
 
 [data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media picture,
 [data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media img {
-    width: 100%;
-    height: 100%;
-    object-fit: var( --fg-item-fit, cover );
+	width: 100%;
+	height: 100%;
+	object-fit: var(--fg-item-fit, cover);
 }
 
-[data-fg-layout="slider"][data-fg-height-mode="fixed"] .fg-carousel-track .fg-item .fg-item-media {
-    height: 100%;
-    aspect-ratio: auto;
+[data-fg-layout="slider"][data-fg-height-mode="fixed"]
+	.fg-carousel-track
+	.fg-item
+	.fg-item-media {
+	height: 100%;
+	aspect-ratio: auto;
 }
 
 /* Arrows - inside viewport so they overlay the visible image, not the
    scrollable track behind it. */
 
 [data-fg-carousel="1"] .fg-carousel-viewport .fg-carousel-arrows {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    pointer-events: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 2;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	pointer-events: none;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	z-index: 2;
 }
 
 /* Arrow position offsets - drive left/right of the .fg-carousel-arrows
    container so individual arrows naturally sit at the edges via flex. */
 
 [data-fg-layout="slider"][data-fg-arrows-location="inset"] .fg-carousel-arrows {
-    left:  var( --fg-arrow-distance, 8px );
-    right: var( --fg-arrow-distance, 8px );
+	left: var(--fg-arrow-distance, 8px);
+	right: var(--fg-arrow-distance, 8px);
 }
 
-[data-fg-layout="slider"][data-fg-arrows-location="overlap"] .fg-carousel-arrows {
-    left:  calc( -1 * var( --fg-arrow-size, 40px ) / 2 );
-    right: calc( -1 * var( --fg-arrow-size, 40px ) / 2 );
+[data-fg-layout="slider"][data-fg-arrows-location="overlap"]
+	.fg-carousel-arrows {
+	left: calc(-1 * var(--fg-arrow-size, 40px) / 2);
+	right: calc(-1 * var(--fg-arrow-size, 40px) / 2);
 }
 
-[data-fg-layout="slider"][data-fg-arrows-location="outset"] .fg-carousel-arrows {
-    left:  calc( -1 * ( var( --fg-arrow-size, 40px ) + var( --fg-arrow-distance, 8px ) ) );
-    right: calc( -1 * ( var( --fg-arrow-size, 40px ) + var( --fg-arrow-distance, 8px ) ) );
+[data-fg-layout="slider"][data-fg-arrows-location="outset"]
+	.fg-carousel-arrows {
+	left: calc(
+		-1 * (var(--fg-arrow-size, 40px) + var(--fg-arrow-distance, 8px))
+	);
+	right: calc(
+		-1 * (var(--fg-arrow-size, 40px) + var(--fg-arrow-distance, 8px))
+	);
 }
 
 /* Reserve space - shrink the carousel-container inward so outset/overlap
@@ -158,246 +177,310 @@
    element. Padding here is on the .fg-carousel-container only so it
    doesn't override the collection's own padding setting. */
 
-[data-fg-layout="slider"][data-fg-arrows-reserve-space="1"][data-fg-arrows-location="overlap"] .fg-carousel-container {
-    padding-left:  calc( var( --fg-arrow-size, 40px ) / 2 );
-    padding-right: calc( var( --fg-arrow-size, 40px ) / 2 );
+[data-fg-layout="slider"][data-fg-arrows-reserve-space="1"][data-fg-arrows-location="overlap"]
+	.fg-carousel-container {
+	padding-left: calc(var(--fg-arrow-size, 40px) / 2);
+	padding-right: calc(var(--fg-arrow-size, 40px) / 2);
 }
 
-[data-fg-layout="slider"][data-fg-arrows-reserve-space="1"][data-fg-arrows-location="outset"] .fg-carousel-container {
-    padding-left:  calc( var( --fg-arrow-size, 40px ) + var( --fg-arrow-distance, 8px ) );
-    padding-right: calc( var( --fg-arrow-size, 40px ) + var( --fg-arrow-distance, 8px ) );
+[data-fg-layout="slider"][data-fg-arrows-reserve-space="1"][data-fg-arrows-location="outset"]
+	.fg-carousel-container {
+	padding-left: calc(
+		var(--fg-arrow-size, 40px) + var(--fg-arrow-distance, 8px)
+	);
+	padding-right: calc(
+		var(--fg-arrow-size, 40px) + var(--fg-arrow-distance, 8px)
+	);
 }
 
 [data-fg-carousel="1"] .fg-carousel-arrow {
-    pointer-events: auto;
-    width:  var(--fg-arrow-size, 40px);
-    height: var(--fg-arrow-size, 40px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.45);
-    color: #fff;
-    border: 0;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
+	pointer-events: auto;
+	width: var(--fg-arrow-size, 40px);
+	height: var(--fg-arrow-size, 40px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--fg-arrow-bg, rgba(0, 0, 0, 0.45));
+	color: var(--fg-arrow-color, #fff);
+	border: 1px solid var(--fg-arrow-border, transparent);
+	border-radius: 50%;
+	padding: 0;
+	cursor: pointer;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease,
+		color 0.15s ease;
 }
 
 [data-fg-carousel="1"] .fg-carousel-arrow:hover {
-    background: rgba(0, 0, 0, 0.75);
+	background: var(--fg-arrow-bg-hover, rgba(0, 0, 0, 0.75));
+	border-color: var(--fg-arrow-border-hover, transparent);
+	color: var(--fg-arrow-color-hover, #fff);
+}
+
+[data-fg-carousel="1"] .fg-carousel-arrow:active {
+	background: var(--fg-arrow-bg-active, rgba(0, 0, 0, 0.75));
+	border-color: var(--fg-arrow-border-active, transparent);
+	color: var(--fg-arrow-color-active, #fff);
+}
+
+[data-fg-carousel="1"] .fg-carousel-arrow:focus-visible {
+	background: var(--fg-arrow-bg-focus, rgba(0, 0, 0, 0.75));
+	border-color: var(--fg-arrow-border-focus, transparent);
+	color: var(--fg-arrow-color-focus, #fff);
 }
 
 [data-fg-carousel="1"] .fg-carousel-arrow[disabled] {
-    opacity: 0.3;
-    pointer-events: none;
+	opacity: 0.3;
+	pointer-events: none;
+}
+
+[data-fg-carousel="1"] .fg-carousel-arrow--at-end-hidden {
+	visibility: hidden;
 }
 
 [data-fg-carousel="1"] .fg-carousel-arrow > svg {
-    width: 60%;
-    height: 60%;
+	width: 60%;
+	height: 60%;
 }
 
 /* Bullets - sibling of viewport inside the container. */
 
 [data-fg-carousel="1"] .fg-carousel-bullets {
-    display: flex;
-    justify-content: center;
-    gap: var( --fg-bullets-spacing, 8px );
-    z-index: 2;
+	display: flex;
+	justify-content: var(--fg-bullets-justify, center);
+	gap: var(--fg-bullet-spacing, 8px);
+	z-index: 2;
+}
+
+[data-fg-bullets-align="stretch"] [data-fg-carousel="1"] .fg-carousel-bullet {
+	flex: 1 1 0;
+	width: auto;
 }
 
 [data-fg-layout="slider"][data-fg-bullets-location="top"] .fg-carousel-bullets {
-    order: -1;
-    margin-bottom: var( --fg-bullet-distance, 8px );
+	order: -1;
+	margin-bottom: var(--fg-bullet-distance, 8px);
 }
 
-[data-fg-layout="slider"][data-fg-bullets-location="bottom"] .fg-carousel-bullets {
-    margin-top: var( --fg-bullet-distance, 8px );
+[data-fg-layout="slider"][data-fg-bullets-location="bottom"]
+	.fg-carousel-bullets {
+	margin-top: var(--fg-bullet-distance, 8px);
 }
 
-[data-fg-layout="slider"][data-fg-bullets-location="overlay_top"] .fg-carousel-bullets,
-[data-fg-layout="slider"][data-fg-bullets-location="overlay_bottom"] .fg-carousel-bullets {
-    position: absolute;
-    left: 0;
-    right: 0;
-    padding: 0 12px;
+[data-fg-layout="slider"][data-fg-bullets-location="overlay_top"]
+	.fg-carousel-bullets,
+[data-fg-layout="slider"][data-fg-bullets-location="overlay_bottom"]
+	.fg-carousel-bullets {
+	position: absolute;
+	left: 0;
+	right: 0;
+	padding: 0 12px;
 }
 
-[data-fg-layout="slider"][data-fg-bullets-location="overlay_top"] .fg-carousel-bullets {
-    top: var( --fg-bullet-distance, 8px );
+[data-fg-layout="slider"][data-fg-bullets-location="overlay_top"]
+	.fg-carousel-bullets {
+	top: var(--fg-bullet-distance, 8px);
 }
 
-[data-fg-layout="slider"][data-fg-bullets-location="overlay_bottom"] .fg-carousel-bullets {
-    bottom: var( --fg-bullet-distance, 8px );
+[data-fg-layout="slider"][data-fg-bullets-location="overlay_bottom"]
+	.fg-carousel-bullets {
+	bottom: var(--fg-bullet-distance, 8px);
 }
 
 [data-fg-carousel="1"] .fg-carousel-bullet {
-    width:  var(--fg-bullet-size, 10px);
-    height: var(--fg-bullet-size, 10px);
-    padding: 0;
-    border: 0;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
+	width: var(--fg-bullet-width, 10px);
+	height: var(--fg-bullet-height, 10px);
+	padding: 0;
+	border: var(--fg-bullet-border-width, 2px) solid
+		var(--fg-bullet-border, rgba(0, 0, 0, 0));
+	background: var(--fg-bullet-bg, rgba(0, 0, 0, 0.4));
+	border-radius: var(--fg-bullet-radius, 4px);
+	cursor: pointer;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease;
 }
 
 [data-fg-carousel="1"] .fg-carousel-bullet.fg-is-active {
-    background: var(--fg-colors-blue, #3c46f0);
+	background: var(--fg-bullet-bg-active, var(--fg-colors-blue, #3c46f0));
+	border-color: var(--fg-bullet-border-active, rgba(0, 0, 0, 0));
 }
 
 [data-fg-carousel="1"] .fg-carousel-bullet:hover {
-    background: rgba(0, 0, 0, 0.7);
+	background: var(--fg-bullet-bg-hover, rgba(0, 0, 0, 0.7));
+	border-color: var(--fg-bullet-border-hover, rgba(0, 0, 0, 0));
 }
 
 [data-fg-carousel="1"] .fg-carousel-bullet:focus {
-    outline: none;
+	outline: none;
+}
+
+[data-fg-carousel="1"] .fg-carousel-bullet:focus-visible {
+	background: var(--fg-bullet-bg-focus, var(--fg-colors-blue, #3c46f0));
+	border-color: var(--fg-bullet-border-focus, rgba(0, 0, 0, 0));
 }
 
 /* Counter - inside viewport, top-right corner overlay. */
 
 [data-fg-carousel="1"] .fg-carousel-viewport .fg-carousel-counter {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    padding: 4px 10px;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    font-size: 12px;
-    border-radius: 4px;
-    z-index: 2;
-    pointer-events: none;
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	padding: 4px 10px;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	font-size: 12px;
+	border-radius: 4px;
+	z-index: 2;
+	pointer-events: none;
 }
 
 /* Visibility - hover-show / hover-hide / always. JS adds the class via
    resolveVisibilityClasses; CSS toggles based on container hover. */
 
-.fg-chrome--always { opacity: 1; }
+.fg-chrome--always {
+	opacity: 1;
+}
 
 .fg-chrome--hover-show {
-    opacity: 0;
-    transition: opacity 0.2s ease;
+	opacity: 0;
+	transition: opacity 0.2s ease;
 }
 
 [data-fg-carousel="1"] .fg-carousel-container:hover .fg-chrome--hover-show {
-    opacity: 1;
+	opacity: 1;
 }
 
 .fg-chrome--hover-hide {
-    opacity: 1;
-    transition: opacity 0.2s ease;
+	opacity: 1;
+	transition: opacity 0.2s ease;
 }
 
 [data-fg-carousel="1"] .fg-carousel-container:hover .fg-chrome--hover-hide {
-    opacity: 0;
+	opacity: 0;
 }
 
 /* Thumbnail strip - sibling of viewport inside the container. */
 
 [data-fg-carousel="1"] .fg-carousel-thumbs {
-    display: flex;
-    gap: var(--fg-thumbs-spacing, 5px);
-    overflow-x: auto;
-    overflow-y: hidden;
-    margin-top: 12px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+	display: flex;
+	gap: var(--fg-thumbs-spacing, 5px);
+	overflow-x: auto;
+	overflow-y: hidden;
+	margin-top: 12px;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
 }
 
 [data-fg-layout="slider"][data-fg-thumbs-location="top"] .fg-carousel-thumbs {
-    margin-top: 0;
-    margin-bottom: 12px;
-    order: -2;
+	margin-top: 0;
+	margin-bottom: 12px;
+	order: -2;
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb {
-    flex: 0 0 auto;
-    padding: 0;
-    border: 2px solid transparent;
-    background: none;
-    cursor: pointer;
-    transition: border-color 0.15s ease, opacity 0.15s ease;
-    opacity: 0.6;
+	flex: 0 0 auto;
+	padding: 0;
+	border: 2px solid transparent;
+	background: none;
+	cursor: pointer;
+	transition:
+		border-color 0.15s ease,
+		opacity 0.15s ease;
+	opacity: 0.6;
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb.fg-is-active {
-    border-color: var(--fg-colors-blue, #3c46f0);
-    opacity: 1;
+	border-color: var(--fg-colors-blue, #3c46f0);
+	opacity: 1;
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb:focus {
-    outline: none;
+	outline: none;
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb img {
-    display: block;
-    width:  var(--fg-thumb-size-px, 60px);
-    height: var(--fg-thumb-size-px, 60px);
-    object-fit: cover;
+	display: block;
+	width: var(--fg-thumb-size-px, 60px);
+	height: var(--fg-thumb-size-px, 60px);
+	object-fit: cover;
 }
 
-[data-fg-layout="slider"][data-fg-thumbs-size="small"]  { --fg-thumb-size-px: 40px; }
-[data-fg-layout="slider"][data-fg-thumbs-size="normal"] { --fg-thumb-size-px: 60px; }
-[data-fg-layout="slider"][data-fg-thumbs-size="large"]  { --fg-thumb-size-px: 90px; }
+[data-fg-layout="slider"][data-fg-thumbs-size="small"] {
+	--fg-thumb-size-px: 40px;
+}
+[data-fg-layout="slider"][data-fg-thumbs-size="normal"] {
+	--fg-thumb-size-px: 60px;
+}
+[data-fg-layout="slider"][data-fg-thumbs-size="large"] {
+	--fg-thumb-size-px: 90px;
+}
 
 /* Vertical thumb layouts - container becomes flex so thumb strip can
    sit alongside viewport. */
 
-[data-fg-layout="slider"][data-fg-thumbs-location="left"] .fg-carousel-container,
-[data-fg-layout="slider"][data-fg-thumbs-location="right"] .fg-carousel-container {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
+[data-fg-layout="slider"][data-fg-thumbs-location="left"]
+	.fg-carousel-container,
+[data-fg-layout="slider"][data-fg-thumbs-location="right"]
+	.fg-carousel-container {
+	display: flex;
+	align-items: stretch;
+	gap: 12px;
 }
 
 [data-fg-layout="slider"][data-fg-thumbs-location="left"] .fg-carousel-thumbs,
 [data-fg-layout="slider"][data-fg-thumbs-location="right"] .fg-carousel-thumbs {
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-    margin: 0;
-    flex: 0 0 auto;
+	flex-direction: column;
+	overflow-x: hidden;
+	overflow-y: auto;
+	margin: 0;
+	flex: 0 0 auto;
 }
 
 [data-fg-layout="slider"][data-fg-thumbs-location="right"] .fg-carousel-thumbs {
-    order: 2;
+	order: 2;
 }
 
 [data-fg-layout="slider"][data-fg-thumbs-location="left"] .fg-carousel-thumbs {
-    order: -1;
+	order: -1;
 }
 
 /* Video thumbnails. Posterless videos get a placeholder fill; every video
    thumb carries a small play badge so it reads as a video at a glance. */
 
 [data-fg-carousel="1"] .fg-carousel-thumb-placeholder {
-    display: block;
-    width:  var(--fg-thumb-size-px, 60px);
-    height: var(--fg-thumb-size-px, 60px);
-    background-color: #1d2327;
-    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+	display: block;
+	width: var(--fg-thumb-size-px, 60px);
+	height: var(--fg-thumb-size-px, 60px);
+	background-color: #1d2327;
+	background-image: radial-gradient(
+		circle at center,
+		rgba(255, 255, 255, 0.08),
+		transparent 70%
+	);
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb--video {
-    position: relative;
+	position: relative;
 }
 
 [data-fg-carousel="1"] .fg-carousel-thumb-badge {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 5px 0 5px 8px;
-    border-color: transparent transparent transparent #fff;
-    transform: translate(-40%, -50%);
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
-    pointer-events: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 5px 0 5px 8px;
+	border-color: transparent transparent transparent #fff;
+	transform: translate(-40%, -50%);
+	filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+	pointer-events: none;
 }
 
 /* Video items inside the slider. The .fg-video wrapper fills the item box
@@ -405,10 +488,14 @@
    height instead of collapsing. */
 
 [data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media .fg-video {
-    height: 100%;
+	height: 100%;
 }
 
-[data-fg-layout="slider"] .fg-carousel-track .fg-item .fg-item-media .fg-video-poster {
-    height: 100%;
-    object-fit: var(--fg-item-fit, cover);
+[data-fg-layout="slider"]
+	.fg-carousel-track
+	.fg-item
+	.fg-item-media
+	.fg-video-poster {
+	height: 100%;
+	object-fit: var(--fg-item-fit, cover);
 }

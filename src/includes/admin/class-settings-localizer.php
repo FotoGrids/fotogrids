@@ -12,6 +12,7 @@ namespace FotoGrids\Admin;
 
 use FotoGrids\Collection_Defaults;
 use FotoGrids\License_Manager;
+use FotoGrids\Links;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Settings\SEO_Settings_Store;
 use FotoGrids\Settings\Sharing_Settings_Store;
@@ -268,8 +269,9 @@ final class Settings_Localizer {
 			'canEditPosts'     => current_user_can( 'edit_posts' ),
 			'defaultsUrl'      => admin_url( 'admin.php?page=fotogrids-settings&tab=defaults&subtab=' . $fg_post_type ),
 			'documentationUrl' => 'album' === $fg_post_type
-				? 'https://go.fotogrids.com/docs/albums'
-				: 'https://go.fotogrids.com/docs/galleries',
+				? Links::go( 'docs/albums', 'collection-settings', 'docs' )
+				: Links::go( 'docs/galleries', 'collection-settings', 'docs' ),
+			'proLinkTemplate'  => Links::go( '{{path}}', 'collection-settings', 'feature' ),
 			'toolsUrl'         => admin_url( 'admin.php?page=fotogrids-tools' ),
 			'strings'          => array(
 				'layout'   => __( 'Layout', 'fotogrids' ),

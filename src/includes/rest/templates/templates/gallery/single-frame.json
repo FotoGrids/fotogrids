@@ -1,0 +1,20 @@
+{
+  "id": "single-frame",
+  "name": "Single Frame",
+  "description": "A minimal one-up viewer with a soft border. Lets a single image breathe - ideal for fine-art prints.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "showcase",
+  "order": 27,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "single-item",
+    "captions": true,
+    "caption_placement": "overlay",
+    "border_enabled": true,
+    "border_width": 1,
+    "border_color": "#e5e5e5",
+    "item_click_behavior": "lightbox"
+  }
+}

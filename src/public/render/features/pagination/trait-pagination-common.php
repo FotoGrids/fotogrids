@@ -227,6 +227,14 @@ trait Pagination_Common {
 			$vars['--fg-pagination-button-font-weight'] = $font_weight;
 		}
 
+		$font_style = $resolver->resolve_font_style(
+			$s['pagination_button_font_style'] ?? null,
+			$render_context
+		);
+		if ( '' !== $font_style ) {
+			$vars['--fg-pagination-button-font-style'] = $font_style;
+		}
+
 		// `pagination_button_font_size` is a responsive_range with per-side
 		// units (px / em / rem).
 		$font_size  = $s['pagination_button_font_size'] ?? null;
@@ -240,6 +248,8 @@ trait Pagination_Common {
 				$fs_mobile,
 			);
 		}
+
+		$this->add_text_spacing_vars( $vars, '--fg-pagination-button', $s, 'pagination_button_' );
 
 		// ---- Regular state ----
 		$this->add_color_var( $vars, '--fg-pagination-button-bg', $s['pagination_button_bg'] ?? null );
@@ -264,6 +274,33 @@ trait Pagination_Common {
 		$this->add_color_var( $vars, '--fg-pagination-button-active-bg', $s['pagination_button_active_bg'] ?? null );
 		$this->add_color_var( $vars, '--fg-pagination-button-active-color', $s['pagination_button_active_color'] ?? null );
 		$this->add_color_var( $vars, '--fg-pagination-button-active-border-color', $s['pagination_button_active_border_color'] ?? null );
+
+		// ---- Focus state ----
+		$this->add_color_var( $vars, '--fg-pagination-button-focus-bg', $s['pagination_button_focus_bg'] ?? null );
+		$this->add_color_var( $vars, '--fg-pagination-button-focus-color', $s['pagination_button_focus_color'] ?? null );
+		$this->add_color_var( $vars, '--fg-pagination-button-focus-border-color', $s['pagination_button_focus_border_color'] ?? null );
+
+		// ---- Border radius ----
+		$this->add_px_var( $vars, '--fg-pagination-button-radius', $s['pagination_button_radius'] ?? null );
+
+		// ---- Padding (responsive four-sided "T R B L" shorthand) ----
+		$padding         = $s['pagination_button_padding'] ?? null;
+		$padding_desktop = $this->resolve_four_sided_value( $padding, 'desktop', 'px' );
+		$padding_tablet  = $this->resolve_four_sided_value( $padding, 'tablet', 'px' );
+		$padding_mobile  = $this->resolve_four_sided_value( $padding, 'mobile', 'px' );
+		if ( '' !== $padding_desktop || '' !== $padding_tablet || '' !== $padding_mobile ) {
+			$vars['--fg-pagination-button-padding'] = new Responsive_Var(
+				$padding_desktop,
+				$padding_tablet,
+				$padding_mobile,
+			);
+		}
+
+		// ---- Box shadow (empty = none) ----
+		$box_shadow = $s['pagination_button_box_shadow'] ?? null;
+		if ( is_string( $box_shadow ) && '' !== $box_shadow ) {
+			$vars['--fg-pagination-button-box-shadow'] = $box_shadow;
+		}
 
 		return $vars;
 	}

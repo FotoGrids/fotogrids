@@ -20,9 +20,12 @@
       "tablet": 10,
       "mobile": 6
     },
-    "sort_by": "date_asc",
     "captions": true,
-    "captions_position": "below",
-    "lightbox": true
+    "caption_placement": "bottom",
+    "default_sort_order": "date",
+    "date_sort_direction": "asc",
+    "item_click_behavior": "lightbox",
+    "hover_effect": "lift",
+    "border_radius": 6
   }
 }

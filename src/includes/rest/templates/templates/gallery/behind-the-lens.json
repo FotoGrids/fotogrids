@@ -5,22 +5,7 @@
   "type": "pro",
   "category": "gallery",
   "subcategory": "photography",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 24,
-  "settings": {
-    "layout": "video",
-    "columns": {
-      "desktop": 3,
-      "tablet": 2,
-      "mobile": 1
-    },
-    "item_spacing": {
-      "desktop": 10,
-      "tablet": 8,
-      "mobile": 5
-    },
-    "captions": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

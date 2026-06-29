@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run icons:build && concurrently -n yaml,webpack \"node scripts/watch-loading-icons.js\" \"cross-env NODE_ENV=development webpack --watch\"",
-    "build": "npm run icons:build && cross-env NODE_ENV=production webpack",
-    "build:dev": "cross-env NODE_ENV=development webpack",
+    "build": "npm run icons:build && cross-env NODE_ENV=production webpack && npm run clean:dsstore",
+    "build:dev": "cross-env NODE_ENV=development webpack && npm run clean:dsstore",
     "clean": "rm -rf dist",
+    "clean:dsstore": "find dist -name .DS_Store -delete 2>/dev/null || true",
     "lint": "eslint src/assets --ext .js,.ts,.tsx",
     "lint:fix": "eslint src/assets --ext .js,.ts,.tsx --fix",
     "format": "prettier --write 'src/assets/**/*.{js,ts,tsx,scss,css}' '**/*.md'",

@@ -5,25 +5,7 @@
   "type": "pro",
   "category": "gallery",
   "subcategory": "general",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 36,
-  "settings": {
-    "layout": "justified",
-    "target_row_height": {
-      "desktop": 240,
-      "tablet": 200,
-      "mobile": 160
-    },
-    "item_spacing": {
-      "desktop": 10,
-      "tablet": 8,
-      "mobile": 5
-    },
-    "image_seo": true,
-    "ai_alt_text": true,
-    "structured_data": true,
-    "open_graph": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

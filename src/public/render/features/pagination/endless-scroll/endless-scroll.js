@@ -32,7 +32,7 @@
         if ( loaderEl.dataset.fgLoaderAnimRunning === '1' ) return;
         const icons = window.fotogridsLoadingIcons;
         if ( ! icons ) return;
-        const iconName = loaderEl.dataset.fgLoadingIcon || 'spinner';
+        const iconName = loaderEl.dataset.fgLoadingIcon || '12-dots';
         const icon = icons[ iconName ] || icons[ Object.keys( icons )[ 0 ] ];
         if ( ! icon || typeof icon.animate !== 'function' ) return;
         const svg = loaderEl.querySelector( 'svg' );
@@ -78,19 +78,17 @@
             && window.FotoGrids.modules.pagination;
         if ( ! pagination ) return;
 
-        // Mirror the gallery's per-item loader behaviour: spinner animates
-        // while .fotogrids-gallery--is-paginating is on, cancels when off.
-        // We observe the wrapper's class attribute so we don't have to
-        // bake start/stop calls into pagination-core.
-        if ( loaderEl && 'MutationObserver' in window ) {
-            const classObserver = new MutationObserver( function () {
-                if ( gEl.classList.contains( 'fotogrids-gallery--is-paginating' ) ) {
-                    startLoaderAnimation( loaderEl );
-                } else {
-                    stopLoaderAnimation( loaderEl );
-                }
-            } );
-            classObserver.observe( gEl, { attributes: true, attributeFilter: [ 'class' ] } );
+        // Start/stop the loader animation explicitly around each fetch. A
+        // class-watching MutationObserver coalesces the add+remove of
+        // .fotogrids-gallery--is-paginating on fast responses, so the
+        // animation could miss its start. Driving it from the fetch
+        // lifecycle is deterministic.
+        function startLoader() {
+            if ( loaderEl ) startLoaderAnimation( loaderEl );
+        }
+
+        function stopLoader() {
+            if ( loaderEl ) stopLoaderAnimation( loaderEl );
         }
 
         // Pacing model: one page per scroll gesture.
@@ -139,6 +137,7 @@
                 // Stop observing while we fetch. Re-observation happens
                 // on the next scroll event (one page per gesture).
                 deactivateObserver();
+                startLoader();
 
                 pagination
                     .goToPage( gEl, s.page + 1, { mode: 'append' } )
@@ -148,7 +147,10 @@
                         }
                     } )
                     .catch( function () { /* surfaced inside goToPage */ } )
-                    .then( function () { inFlight = false; } );
+                    .then( function () {
+                        inFlight = false;
+                        stopLoader();
+                    } );
             } );
         }, {
             // 200px lead-in so the next page starts loading just before
@@ -179,6 +181,7 @@
         gEl.addEventListener( 'fotogrids:filters_changed', function () {
             inFlight = true;
             deactivateObserver();
+            startLoader();
             pagination
                 .swapToFilterState( gEl )
                 .then( function ( result ) {
@@ -190,7 +193,10 @@
                     }
                 } )
                 .catch( function () { /* surfaced inside goToPage */ } )
-                .then( function () { inFlight = false; } );
+                .then( function () {
+                    inFlight = false;
+                    stopLoader();
+                } );
         } );
     }
 

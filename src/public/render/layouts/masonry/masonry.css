@@ -39,10 +39,29 @@
     column-gap: 0;
 }
 
+/* The item stays a flex column so the caption keeps the flex `gap` that
+   provides Caption Distance from Media; only its positioning changes. The
+   transition-property is pinned to non-geometry properties: when a hover
+   effect is active its base stylesheet sets a transition duration on
+   .fg-item, and with the default transition-property of `all` the JS-driven
+   width/top/left changes would animate, corrupting the layout measurements
+   (the item never settles at its target width before it is measured). */
 [data-fg-layout="masonry"][data-fg-masonry-positioned="1"] .fg-masonry-track .fg-item {
     position: absolute;
+    display: flex;
+    flex-direction: column;
     margin: 0;
     break-inside: auto;
     -webkit-column-break-inside: auto;
     page-break-inside: auto;
+    transition-property: opacity, transform, filter, box-shadow, background-color, color;
+}
+
+/* The JS sets an explicit pixel width on the absolutely-positioned item; the
+   anchor and media must fill it so the image scales to the column width
+   instead of rendering at its natural size (which would make every item far
+   too tall and break the column packing). */
+[data-fg-layout="masonry"][data-fg-masonry-positioned="1"] .fg-masonry-track .fg-item > a {
+    display: block;
+    width: 100%;
 }

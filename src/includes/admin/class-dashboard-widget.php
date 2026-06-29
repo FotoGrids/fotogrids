@@ -123,9 +123,9 @@ class Dashboard_Widget {
 		$version            = FOTOGRIDS_VERSION;
 		$create_gallery_url = admin_url( 'post-new.php?post_type=fotogrids_gallery' );
 		$dashboard_url      = admin_url( 'admin.php?page=fotogrids-dashboard' );
-		$docs_url           = 'https://go.fotogrids.com/docs/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=dashboard_widget&utm_content=docs&utm_locale=' . get_locale();
+		$docs_url           = \FotoGrids\Links::go( 'docs', 'dashboard-widget', 'docs' );
 		$support_url        = 'https://wordpress.org/support/plugin/fotogrids/';
-		$upgrade_url        = 'https://go.fotogrids.com/upgrade/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=dashboard_widget&utm_content=upgrade&utm_locale=' . get_locale();
+		$upgrade_url        = \FotoGrids\Links::go( 'upgrade', 'dashboard-widget', 'upgrade' );
 
 		$stats           = self::get_stats();
 		$recently_edited = self::get_recently_edited();

@@ -178,6 +178,9 @@
 	border: 1px solid var(--fg-border-primary);
 	border-radius: 10px;
 	color: var(--fg-text-primary);
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
 
 	.fotogrids-setting__label {
 		cursor: pointer;

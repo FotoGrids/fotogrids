@@ -6,13 +6,14 @@ import { FormField } from '../shared/FormField';
 const { __ } = wp.i18n;
 
 const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
-    const [targetType, setTargetType] = useState('gallery');
+    const targetType = template?.category === 'album' ? 'album' : 'gallery';
     const [targetId, setTargetId] = useState('');
     const [targets, setTargets] = useState([]);
     const [loading, setLoading] = useState(false);
     const [applying, setApplying] = useState(false);
 
     useEffect(() => {
+        setTargetId('');
         loadTargets();
     }, [targetType]);
 
@@ -65,8 +66,8 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
                 path: `/fotogrids/v1/templates/${template.id}/apply`,
                 method: 'POST',
                 data: {
-                    target_id: parseInt(targetId),
-                    target_type: targetType,
+                    post_id: parseInt(targetId),
+                    post_type: targetType,
                 },
             });
 
@@ -108,22 +109,11 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
             </Modal.Header>
 
             <Modal.Body>
-                <p>{__('Select a target to apply the template to:', 'fotogrids')}</p>
-
-                <FormField label={__('Target Type', 'fotogrids')} htmlFor="apply-target-type" layout="column">
-                    <select
-                        id="apply-target-type"
-                        value={targetType}
-                        onChange={(e) => {
-                            setTargetType(e.target.value);
-                            setTargetId('');
-                        }}
-                        disabled={applying || loading}
-                    >
-                        <option value="gallery">{__('Gallery', 'fotogrids')}</option>
-                        <option value="album">{__('Album', 'fotogrids')}</option>
-                    </select>
-                </FormField>
+                <p>
+                    {targetType === 'album'
+                        ? __('Select an album to apply this template to:', 'fotogrids')
+                        : __('Select a gallery to apply this template to:', 'fotogrids')}
+                </p>
 
                 <FormField
                     label={targetType === 'gallery' ? __('Select Gallery', 'fotogrids') : __('Select Album', 'fotogrids')}

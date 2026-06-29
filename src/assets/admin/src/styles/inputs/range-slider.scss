@@ -320,27 +320,25 @@ input[type="number"].fotogrids-range-number-input {
 		transform: translateY(-2px) rotate(180deg);
 	}
 
+	// Rendered through a portal into <body> with position:fixed and explicit
+	// top/bottom/left/width supplied inline from the trigger's bounding rect,
+	// so it escapes any overflow:hidden ancestor (e.g. the settings sub-tab
+	// panel). Placement offsets are set inline by JS; only appearance and the
+	// open animation live here.
 	&__dropdown {
-		position: absolute;
-		left: 0;
-		right: 0;
-		min-width: 100%;
 		background: white;
 		border: 1px solid var(--fg-border-primary);
 		border-radius: 4px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-		z-index: 1000;
-		overflow: hidden;
+		z-index: 100000;
 		max-height: 200px;
 		overflow-y: auto;
 
 		&--down {
-			top: calc(100% + 4px);
 			animation: slideDown 0.2s ease;
 		}
 
 		&--up {
-			bottom: calc(100% + 4px);
 			animation: slideUp 0.2s ease;
 		}
 	}

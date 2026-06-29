@@ -339,185 +339,32 @@
                                     "icon": "styling",
                                     "settings": [
                                         {
-                                            "type": "side_by_side",
-                                            "settings": [
-                                                {
-                                                    "key": "featured_show_all_font_family",
-                                                    "type": "font_family",
-                                                    "label": "Font Family",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "featured_show_all_font_weight",
-                                                    "type": "font_weight",
-                                                    "label": "Font Weight",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "key": "featured_show_all_font_size",
-                                            "type": "responsive_range",
-                                            "label": "Font Size",
-                                            "units": [ "px", "em", "rem" ],
-                                            "responsive": {
-                                                "desktop": { "min": 8, "max": 32, "default": 12 },
-                                                "tablet":  { "min": 8, "max": 28, "default": 12 },
-                                                "mobile":  { "min": 8, "max": 24, "default": 12 }
-                                            },
-                                            "tier_required": "free",
-                                            "render_when_unlicensed": true,
-                                            "setting_lives_in": "free",
-                                            "visible_when_uninstalled": true
-                                        },
-                                        {
-                                            "type": "side_by_side",
-                                            "settings": [
-                                                {
-                                                    "key": "featured_show_all_radius",
-                                                    "type": "range",
-                                                    "label": "Border Radius",
-                                                    "min": 0,
-                                                    "max": 40,
-                                                    "step": 1,
-                                                    "default": 4,
-                                                    "unit": "px",
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                },
-                                                {
-                                                    "key": "featured_show_all_border_width",
-                                                    "type": "range",
-                                                    "label": "Border Width",
-                                                    "unit": "px",
-                                                    "min": 0,
-                                                    "max": 10,
-                                                    "default": 0,
-                                                    "tier_required": "free",
-                                                    "render_when_unlicensed": true,
-                                                    "setting_lives_in": "free",
-                                                    "visible_when_uninstalled": true
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "key": "featured_show_all_padding",
-                                            "type": "responsive_range",
-                                            "label": "Padding",
-                                            "unit": "px",
-                                            "four_sided": true,
-                                            "responsive": {
-                                                "desktop": { "min": 0, "max": 48, "default": 8 },
-                                                "tablet":  { "min": 0, "max": 48, "default": 8 },
-                                                "mobile":  { "min": 0, "max": 48, "default": 8 }
-                                            },
-                                            "tier_required": "free",
-                                            "render_when_unlicensed": true,
-                                            "setting_lives_in": "free",
-                                            "visible_when_uninstalled": true
-                                        },
-                                        {
-                                            "key": "featured_show_all_state_subtabs",
-                                            "type": "setting_subtabs",
-                                            "label": "Button States",
-                                            "subTabs": {
-                                                "regular": {
-                                                    "id": "regular",
-                                                    "label": "Regular",
-                                                    "icon": "square",
-                                                    "settings": [
-                                                        {
-                                                            "type": "side_by_side",
-                                                            "settings": [
-                                                                {
-                                                                    "key": "featured_show_all_bg",
-                                                                    "type": "color",
-                                                                    "label": "Background Color",
-                                                                    "default": "rgba(255, 255, 255, 0.8)",
-                                                                    "tier_required": "free",
-                                                                    "render_when_unlicensed": true,
-                                                                    "setting_lives_in": "free",
-                                                                    "visible_when_uninstalled": true
-                                                                },
-                                                                {
-                                                                    "key": "featured_show_all_text",
-                                                                    "type": "color",
-                                                                    "label": "Text Color",
-                                                                    "default": "rgba(0, 0, 0, 1)",
-                                                                    "tier_required": "free",
-                                                                    "render_when_unlicensed": true,
-                                                                    "setting_lives_in": "free",
-                                                                    "visible_when_uninstalled": true
-                                                                },
-                                                                {
-                                                                    "key": "featured_show_all_border_color",
-                                                                    "type": "color",
-                                                                    "label": "Border Color",
-                                                                    "default": "rgba(255, 255, 255, 0)",
-                                                                    "tier_required": "free",
-                                                                    "render_when_unlicensed": true,
-                                                                    "setting_lives_in": "free",
-                                                                    "visible_when_uninstalled": true
-                                                                }
-                                                            ]
+                                            "use": "button-styling",
+                                            "key_prefix": "featured_show_all_",
+                                            "states": ["regular", "hover", "focus"],
+                                            "key_map": { "color": "text" },
+                                            "composed": {
+                                                "typography": {
+                                                    "overrides": {
+                                                        "font_size": {
+                                                            "responsive": {
+                                                                "desktop": { "min": 8, "max": 32, "default": 12 },
+                                                                "tablet": { "min": 8, "max": 28, "default": 12 },
+                                                                "mobile": { "min": 8, "max": 24, "default": 12 }
+                                                            }
                                                         }
-                                                    ]
-                                                },
-                                                "hover": {
-                                                    "id": "hover",
-                                                    "label": "Hover",
-                                                    "icon": "hover",
-                                                    "settings": [
-                                                        {
-                                                            "type": "side_by_side",
-                                                            "settings": [
-                                                                {
-                                                                    "key": "featured_show_all_hover_bg",
-                                                                    "type": "color",
-                                                                    "label": "Background Color",
-                                                                    "default": "rgba(255, 255, 255, 1)",
-                                                                    "tier_required": "free",
-                                                                    "render_when_unlicensed": true,
-                                                                    "setting_lives_in": "free",
-                                                                    "visible_when_uninstalled": true
-                                                                },
-                                                                {
-                                                                    "key": "featured_show_all_hover_text",
-                                                                    "type": "color",
-                                                                    "label": "Text Color",
-                                                                    "default": "rgba(0, 0, 0, 1)",
-                                                                    "tier_required": "free",
-                                                                    "render_when_unlicensed": true,
-                                                                    "setting_lives_in": "free",
-                                                                    "visible_when_uninstalled": true
-                                                                },
-                                                                {
-                                                                    "key": "featured_show_all_hover_border_color",
-                                                                    "type": "color",
-                                                                    "label": "Border Color",
-                                                                    "default": "rgba(255, 255, 255, 1)",
-                                                                    "tier_required": "free",
-                                                                    "render_when_unlicensed": true,
-                                                                    "setting_lives_in": "free",
-                                                                    "visible_when_uninstalled": true
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
+                                                    }
                                                 }
                                             },
-                                            "tier_required": "free",
-                                            "render_when_unlicensed": true,
-                                            "setting_lives_in": "free",
-                                            "visible_when_uninstalled": true
+                                            "overrides": {
+                                                "radius": { "max": 40, "step": 1, "default": 4 },
+                                                "border_width": { "default": 0 },
+                                                "padding": { "responsive": {
+                                                    "desktop": { "min": 0, "max": 48, "default": 8 },
+                                                    "tablet": { "min": 0, "max": 48, "default": 8 },
+                                                    "mobile": { "min": 0, "max": 48, "default": 8 }
+                                                } }
+                                            }
                                         }
                                     ]
                                 }
@@ -536,85 +383,24 @@
             "visible_when_uninstalled": true
         },
         {
-            "key": "layout_item_aspect_ratio",
-            "type": "button_group",
-            "label": "Item Aspect Ratio",
-            "description": "Shape of each item. Choose \"None\" to keep the image's original aspect ratio (only available for the Single Item layout).",
-            "bigIcons": true,
-            "sameWidth": true,
-            "options": [
-                {
-                    "label": "None",
-                    "value": "none",
-                    "icon": "aspect_ratio_custom",
+            "use": "aspect-ratio",
+            "key_prefix": "layout_item_aspect_",
+            "overrides": {
+                "ratio": {
+                    "description": "Shape of each item. Choose \"None\" to keep the image's original aspect ratio (only available for the Single Item layout).",
                     "condition": {
                         "dependsOn": "layout",
                         "values": [
+                            "grid",
                             "single-item",
                             "image-viewer",
-                            "slider"
+                            "featured-item",
+                            "slider",
+                            "instant-photos"
                         ]
-                    },
-                    "tier_required": "free"
-                },
-                {
-                    "label": "1:1",
-                    "value": "1/1",
-                    "icon": "aspect_ratio_1_1",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "4:3",
-                    "value": "4/3",
-                    "icon": "aspect_ratio_4_3",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "3:2",
-                    "value": "3/2",
-                    "icon": "aspect_ratio_3_2",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "16:9",
-                    "value": "16/9",
-                    "icon": "aspect_ratio_16_9",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "3:4",
-                    "value": "3/4",
-                    "icon": "aspect_ratio_3_4",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "2:3",
-                    "value": "2/3",
-                    "icon": "aspect_ratio_2_3",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Custom",
-                    "value": "custom",
-                    "icon": "aspect_ratio_custom",
-                    "tier_required": "free"
+                    }
                 }
-            ],
-            "default": "4/3",
-            "condition": {
-                "dependsOn": "layout",
-                "values": [
-                    "grid",
-                    "single-item",
-                    "image-viewer",
-                    "featured-item",
-                    "slider"
-                ]
-            },
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
+            }
         },
         {
             "key": "layout_item_object_fit",
@@ -665,47 +451,6 @@
                     }
                 ]
             },
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "layout_item_aspect_ratio_custom",
-            "type": "setting_group",
-            "label": "Custom Ratio",
-            "condition": {
-                "dependsOn": "layout_item_aspect_ratio",
-                "values": [
-                    "custom"
-                ]
-            },
-            "settings": [
-                {
-                    "key": "layout_item_aspect_ratio_w",
-                    "type": "range",
-                    "label": "Width",
-                    "min": 1,
-                    "max": 50,
-                    "default": 4,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "layout_item_aspect_ratio_h",
-                    "type": "range",
-                    "label": "Height",
-                    "min": 1,
-                    "max": 50,
-                    "default": 3,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                }
-            ],
             "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
@@ -1178,6 +923,35 @@
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",
                     "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "single_item_auto_progress_group",
+            "type": "setting_group",
+            "label": "Animate Images",
+            "condition": {
+                "dependsOn": "layout",
+                "values": [
+                    "single-item"
+                ]
+            },
+            "settings": [
+                {
+                    "use": "auto-progress",
+                    "key_prefix": "single_item_",
+                    "exclude": [
+                        "auto_progress_style",
+                        "auto_progress_bar_location",
+                        "auto_progress_pause_on",
+                        "auto_progress_pause_on_hover",
+                        "auto_progress_stop_on_interaction",
+                        "auto_progress_show_controls"
+                    ]
                 }
             ],
             "tier_required": "free",

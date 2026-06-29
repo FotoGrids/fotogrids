@@ -5,24 +5,7 @@
   "type": "pro",
   "category": "gallery",
   "subcategory": "editorial",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 32,
-  "settings": {
-    "layout": "grid",
-    "columns": {
-      "desktop": 4,
-      "tablet": 3,
-      "mobile": 2
-    },
-    "item_spacing": {
-      "desktop": 16,
-      "tablet": 12,
-      "mobile": 8
-    },
-    "hover_effect": "caption_slide_in",
-    "captions": true,
-    "captions_position": "hover",
-    "lightbox": false
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

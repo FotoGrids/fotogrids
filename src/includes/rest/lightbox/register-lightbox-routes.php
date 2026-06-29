@@ -39,7 +39,7 @@ class Register_Lightbox_Routes {
 							'required'          => false,
 							'type'              => 'string',
 							'default'           => 'item_meta',
-							'enum'              => array( 'item_meta', 'exif' ),
+							'enum'              => array( 'item_meta', 'exif', 'xmp' ),
 							'sanitize_callback' => 'sanitize_key',
 							'description'       => __( 'Where to resolve the credit field from.', 'fotogrids' ),
 						),

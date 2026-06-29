@@ -117,7 +117,26 @@
         if (!player) {
             return;
         }
-        mini.open(player, { label: 'Video' });
+
+        const galleryEl = triggerEl.closest('.fotogrids-gallery');
+        const styleVars = {};
+        const dataAttrs = {};
+        if (galleryEl) {
+            const padding = getComputedStyle(galleryEl).getPropertyValue('--fg-lb-mini-padding').trim();
+            if (padding) {
+                styleVars['--fg-lb-mini-padding'] = padding;
+            }
+            const theme = galleryEl.getAttribute('data-fg-mini-theme');
+            const blur = galleryEl.getAttribute('data-fg-mini-blur');
+            if (theme) {
+                dataAttrs['data-fg-mini-theme'] = theme;
+            }
+            if (blur) {
+                dataAttrs['data-fg-mini-blur'] = blur;
+            }
+        }
+
+        mini.open(player, { label: 'Video', styleVars: styleVars, dataAttrs: dataAttrs });
     }
 
     function attach(galleryElement) {

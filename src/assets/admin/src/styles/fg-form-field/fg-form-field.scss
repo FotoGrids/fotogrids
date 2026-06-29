@@ -64,6 +64,10 @@
 			}
 		}
 
+		.fg-has-unit input[type="number"] {
+			padding-inline-end: 40px;
+		}
+
 		textarea {
 			resize: vertical;
 			min-height: 80px;

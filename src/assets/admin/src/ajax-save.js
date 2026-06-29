@@ -97,19 +97,29 @@
 			form.addEventListener(
 				'submit',
 				function (e) {
-					// Only intercept if this is an update (not initial publish)
+					// Identify which button triggered the submit. `e.submitter`
+					// is the clicked control; fall back to the focused element.
+					const submitter =
+						e.submitter || form.ownerDocument.activeElement || null;
+
+					const isSaveDraft = submitter && submitter.name === 'save';
 					const action = document.getElementById(
 						'original_post_status'
 					)?.value;
-					if (action && action !== 'auto-draft') {
-						const savePostInput =
-							document.querySelector('input[name="save"]');
-						if (savePostInput) {
-							e.preventDefault();
-							e.stopImmediatePropagation();
-							saveCollectionAjax();
-							return false;
-						}
+
+					// Never intercept Publish / Update / Schedule - those must
+					// reach WordPress so the post status actually changes.
+					if (submitter && submitter.id === 'publish') {
+						return;
+					}
+
+					// Only AJAX-intercept an explicit Save Draft on an already
+					// saved post. The Save Draft control posts name="save".
+					if (isSaveDraft && action && action !== 'auto-draft') {
+						e.preventDefault();
+						e.stopImmediatePropagation();
+						saveCollectionAjax();
+						return false;
 					}
 				},
 				true
@@ -274,14 +284,23 @@
 			const name = input.getAttribute('name');
 			const value = input.value;
 			// Always include fotogrids_ inputs - even empty ones. Empty string is a
-			// valid save-intent (e.g. the user cleared a codearea field). The
-			// `value !== ''` guard used to be here but it silently swallowed clears:
+			// valid save-intent (e.g. the user cleared a codearea field).
 			// FormData skips disabled inputs (they are disabled above to prevent
 			// native WP submission), so this loop is the only path for these
 			// dynamically-created hidden inputs to reach the server.
 			if (name) {
 				gallerySettings[name] = value;
 				formData.append(name, value);
+			}
+		});
+
+		// Native WordPress fields are disabled above to suppress native form
+		// submission, so FormData skipped them. Re-add the ones the AJAX save
+		// handler persists: title and slug.
+		['post_title', 'post_name'].forEach((fieldName) => {
+			const field = form.querySelector(`[name="${fieldName}"]`);
+			if (field) {
+				formData.append(fieldName, field.value);
 			}
 		});
 
@@ -539,13 +558,19 @@
 			const target = e.target;
 			const name = target.getAttribute('name') || '';
 
-			if (name.startsWith('fotogrids_') || name === 'post_title') {
+			if (
+				name.startsWith('fotogrids_') ||
+				name === 'post_title' ||
+				name === 'post_name'
+			) {
 				handleFormChange();
 			}
 		};
 
 		form.addEventListener('change', handleNativeFormChange);
 		form.addEventListener('input', handleNativeFormChange);
+
+		bindSlugChangeTracking(handleFormChange);
 
 		document.addEventListener(
 			'fotogrids:setting_changed',
@@ -554,6 +579,22 @@
 
 		document.addEventListener('fotogrids:collection_saved', () => {
 			updateInitialState();
+		});
+	}
+
+	function bindSlugChangeTracking(onChange) {
+		const slugBox = document.getElementById('edit-slug-box');
+		if (!slugBox) {
+			return;
+		}
+
+		// WordPress's inline slug editor writes the new value into the hidden
+		// #post_name input when its OK button is clicked, without firing a
+		// change event on the field. Listen on the OK button instead.
+		slugBox.addEventListener('click', (e) => {
+			if (e.target.closest('#edit-slug-buttons .save')) {
+				setTimeout(onChange, 0);
+			}
 		});
 	}
 

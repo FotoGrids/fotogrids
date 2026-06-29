@@ -13,6 +13,7 @@ const { __ } = wp.i18n;
 const DEFAULTS = {
     autosave: false,
     share_statistics: false,
+    marketing_allowed: false,
     custom_js_allow_dynamic_execution: false,
     delete_data_on_uninstall: false,
 };
@@ -29,6 +30,7 @@ const AdvancedTab = () => {
     const initial = {
         autosave: seed.autosave === true,
         share_statistics: seed.shareStatistics === true,
+        marketing_allowed: seed.marketingAllowed === true,
         custom_js_allow_dynamic_execution: seed.customJsAllowDynamicExecution === true,
         delete_data_on_uninstall: DEFAULTS.delete_data_on_uninstall,
     };
@@ -46,6 +48,7 @@ const AdvancedTab = () => {
                 const s = {
                     autosave: data.settings.autosave === true,
                     share_statistics: data.settings.share_statistics === true,
+                    marketing_allowed: data.settings.marketing_allowed === true,
                     custom_js_allow_dynamic_execution: data.settings.custom_js_allow_dynamic_execution === true,
                     delete_data_on_uninstall: data.settings.delete_data_on_uninstall === true,
                 };
@@ -79,6 +82,7 @@ const AdvancedTab = () => {
                 ? {
                     autosave: result.settings.autosave === true,
                     share_statistics: result.settings.share_statistics === true,
+                    marketing_allowed: result.settings.marketing_allowed === true,
                     custom_js_allow_dynamic_execution: result.settings.custom_js_allow_dynamic_execution === true,
                     delete_data_on_uninstall: result.settings.delete_data_on_uninstall === true,
                 }
@@ -123,16 +127,41 @@ const AdvancedTab = () => {
                 description={__('Decide what FotoGrids shares about plugin usage.', 'fotogrids')}
             >
                 <PanelRow
-                    title={__('Anonymous usage stats', 'fotogrids')}
-                    description={__('Helps us spot bugs and decide which features to invest in. No personal data is collected.', 'fotogrids')}
+                    title={__('Usage data', 'fotogrids')}
+                    description={__('Helps us spot bugs and decide what to build next. Shares your name, email, site, and plugin details - never your images, image URLs, or visitor data.', 'fotogrids')}
                 >
                     <Toggle
                         id="fotogrids_share_statistics"
                         checked={settings.share_statistics}
-                        onChange={(v) => update('share_statistics', v)}
-                        label={__('Share anonymous usage data', 'fotogrids')}
+                        onChange={(v) =>
+                            setSettings((prev) => {
+                                setStatus(null);
+                                return {
+                                    ...prev,
+                                    share_statistics: v,
+                                    // Marketing consent can't outlive usage-data
+                                    // sharing - clear it when sharing is turned off.
+                                    marketing_allowed: v ? prev.marketing_allowed : false,
+                                };
+                            })
+                        }
+                        label={__('Share usage data', 'fotogrids')}
                     />
                 </PanelRow>
+
+                {settings.share_statistics && (
+                    <PanelRow
+                        title={__('Product emails', 'fotogrids')}
+                        description={__('Occasional FotoGrids news and offers, sent to your account email. Separate from usage data - off unless enabled.', 'fotogrids')}
+                    >
+                        <Toggle
+                            id="fotogrids_marketing_allowed"
+                            checked={settings.marketing_allowed}
+                            onChange={(v) => update('marketing_allowed', v)}
+                            label={__('Email me FotoGrids news and offers', 'fotogrids')}
+                        />
+                    </PanelRow>
+                )}
             </SettingsPanel>
 
             <SettingsPanel

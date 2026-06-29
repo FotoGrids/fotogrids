@@ -62,14 +62,12 @@ const PreviewOptionsToolbar = ({
                     </div>
                     <ToggleControl
                         label={__('Make items clickable', 'fotogrids')}
-                        // help={__('Disable this to make item clicks select the block in the editor instead of opening the configured gallery action, such as a lightbox or link. This only affects the editor preview.', 'fotogrids')}
                         help={__('When disabled, item clicks select the block in the editor instead of opening the gallery action. Published pages are not affected.', 'fotogrids')}
                         checked={!!clickBehavior}
                         onChange={onChangeClickBehavior}
                     />
                     <ToggleControl
                         label={__('Enable pagination controls', 'fotogrids')}
-                        // help={__('Disable this to keep pagination controls visible but inactive in the editor, allowing all pages to be previewed at once. This only affects the editor preview.', 'fotogrids')}
                         help={__('When disabled, pagination controls stay visible but inactive in the editor. Published pages are not affected.', 'fotogrids')}
                         checked={!!pagination}
                         onChange={onChangePagination}

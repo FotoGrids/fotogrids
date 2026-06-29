@@ -146,6 +146,7 @@ const mainConfig = {
     entry: {
         'admin': './src/assets/admin/src/index.js',
         'metabox': './src/assets/admin/src/metabox.js',
+        'featured-image-picker': './src/assets/admin/src/featured-image-picker.js',
         'fotogrids-runtime': './src/public/render/internal/runtime/runtime.js',
         'deep-linking': './src/assets/frontend/src/deep-linking.js',
         'fg-tooltip': './src/public/render/fg-tooltip/fg-tooltip.js',
@@ -163,11 +164,13 @@ const mainConfig = {
         'layout-masonry': './src/public/render/layouts/masonry/masonry.js',
         'layout-slider': './src/public/render/layouts/slider/slider.js',
         'layout-image-viewer': './src/public/render/layouts/image-viewer/image-viewer.js',
+        'layout-single-item': './src/public/render/layouts/single-item/single-item.js',
         'stats': './src/public/render/features/stats/stats.js',
         'video-inline': './src/public/render/video/video-inline.js',
         'video-lightbox-mini': './src/public/render/video/video-lightbox-mini.js',
         'lightbox-mini': './src/public/render/lightbox/mini/lightbox-mini.js',
         'lightbox-grid': './src/public/render/lightbox/grid/lightbox-grid.js',
+        'lightbox-mini-viewer': './src/public/render/lightbox/mini-viewer/lightbox-mini-viewer.js',
         'album-to-gallery-ajax': './src/public/render/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
         'collection-header': './src/public/render/features/collection-header/collection-header.js',
         'pagination-core': './src/public/render/features/pagination/pagination-core.js',
@@ -347,6 +350,7 @@ const mainConfig = {
                         // (native/php/*.php) and native/index.php are NOT
                         // excluded - those still ship via this pattern.
                         ignore: [
+                            '**/.DS_Store',
                             '**/Divi/native/build/**',
                             '**/Divi/native/styles/**',
                             '**/Divi/native/modules-json/**',
@@ -362,6 +366,9 @@ const mainConfig = {
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');
+                    },
+                    globOptions: {
+                        ignore: ['**/.DS_Store'],
                     },
                 },
                 {
@@ -485,6 +492,7 @@ const mainConfig = {
                     },
                     globOptions: {
                         ignore: [
+                            '**/.DS_Store',
                             '**/*.php',
                             // Pricing page is disabled in our Freemius config
                             // ('pricing' => false), so its React widget (~488KB)
@@ -604,6 +612,7 @@ const mainConfig = {
                         // fg-tooltip.js and runtime.js are also excluded because they're
                         // webpack entry points - the built output lands in assets/js/.
                         ignore: [
+                            '**/.DS_Store',
                             '**/*.php',
                             '**/*.scss',
                             '**/*.md',
@@ -617,6 +626,7 @@ const mainConfig = {
                             '**/layouts/masonry/masonry.js',
                             '**/layouts/slider/slider.js',
                             '**/layouts/image-viewer/image-viewer.js',
+                            '**/layouts/single-item/single-item.js',
                             '**/layouts/_helpers/**',
                             '**/features/stats/stats.js',
                             '**/video/video-inline.js',
@@ -624,6 +634,7 @@ const mainConfig = {
                             '**/lightbox/mini/lightbox-mini.js',
                             '**/lightbox/classic/lightbox.js',
                             '**/lightbox/grid/lightbox-grid.js',
+                            '**/lightbox/mini-viewer/lightbox-mini-viewer.js',
                             '**/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
                             '**/features/collection-header/collection-header.js',
                             '**/features/pagination/pagination-core.js',
@@ -637,6 +648,9 @@ const mainConfig = {
                     from: 'src/languages/**/*',
                     to: 'languages/[name][ext]',
                     noErrorOnMissing: true,
+                    globOptions: {
+                        ignore: ['**/.DS_Store'],
+                    },
                 },
             ],
         }),
@@ -712,6 +726,7 @@ const mainConfig = {
             // defers the entry indefinitely with no console error.
             chunks: (chunk) =>
                 chunk.name !== 'metabox' &&
+                chunk.name !== 'featured-image-picker' &&
                 chunk.name !== 'global-modal-init' &&
                 chunk.name !== 'deactivation-feedback' &&
                 !chunk.name?.startsWith('tool-') &&
@@ -723,6 +738,7 @@ const mainConfig = {
                     name: 'vendors',
                     chunks: (chunk) =>
                         chunk.name !== 'metabox' &&
+                        chunk.name !== 'featured-image-picker' &&
                         chunk.name !== 'global-modal-init' &&
                         chunk.name !== 'deactivation-feedback' &&
                         !chunk.name?.startsWith('tool-') &&

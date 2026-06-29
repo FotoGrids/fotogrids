@@ -20,6 +20,8 @@ class Admin_Init {
 		add_action( 'admin_menu', array( __CLASS__, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_scripts' ) );
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
+		add_action( 'admin_init', array( __CLASS__, 'maybe_activation_redirect' ), 1 );
+		add_action( 'admin_init', array( __CLASS__, 'maybe_upgrade_redirect' ), 1 );
 
 		// Allow wp_safe_redirect() to reach the external hosts FotoGrids links
 		// out to (review page, upgrade/marketing). Keeps redirects on the
@@ -27,6 +29,7 @@ class Admin_Init {
 		add_filter( 'allowed_redirect_hosts', array( __CLASS__, 'allowed_redirect_hosts' ) );
 
 		add_action( 'admin_head', array( __CLASS__, 'suppress_admin_notices' ) );
+		add_action( 'admin_head', array( __CLASS__, 'print_notice_suppression_css' ), 999 );
 		add_action( 'admin_head', array( __CLASS__, 'fix_menu_highlighting' ) );
 
 		if ( ! \FotoGrids\License_Manager::has_pro() ) {
@@ -289,6 +292,7 @@ class Admin_Init {
 				'viewSettings'                  => \FotoGrids\Settings\View_Settings_Store::get(),
 				'currentUser'                   => wp_get_current_user(),
 				'shareStatistics'               => self::resolve_share_statistics_state(),
+				'marketingAllowed'              => (bool) get_option( 'fotogrids_marketing_allowed', false ),
 				'autosave'                      => (bool) get_option( 'fotogrids_autosave', '0' ),
 				'settingsMode'                  => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
 				'userPersona'                   => (string) get_option( 'fotogrids_user_persona', '' ),
@@ -352,6 +356,29 @@ class Admin_Init {
 					'perPage'     => 50,
 					'canManage'   => current_user_can( 'manage_fotogrids_library' )
 						|| current_user_can( 'manage_fotogrids' ),
+				)
+			);
+		}
+
+		if ( 'fotogrids_page_fotogrids-templates' === $hook || strpos( $hook, 'fotogrids-templates' ) !== false ) {
+			// The Template Overview groups a template's settings into the same
+			// admin tabs as the gallery editor by reading the assembled catalog.
+			// The Templates page doesn't load the full settings panel, so it only
+			// needs the lightweight catalog loader plus its REST config.
+			wp_enqueue_script(
+				'fotogrids-settings-loader',
+				FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/collection-settings/index.js',
+				array(),
+				FOTOGRIDS_VERSION,
+				true
+			);
+
+			wp_localize_script(
+				'fotogrids-settings-loader',
+				'fotogridsSettings',
+				array(
+					'restUrl'   => rest_url( 'fotogrids/v1/' ),
+					'restNonce' => wp_create_nonce( 'wp_rest' ),
 				)
 			);
 		}
@@ -672,6 +699,7 @@ class Admin_Init {
 			'fotogrids_auto_clear_cache',
 			'fotogrids_enable_statistics',
 			'fotogrids_share_statistics',
+			'fotogrids_marketing_allowed',
 		);
 		$string_settings  = array(
 			'fotogrids_user_persona',
@@ -715,6 +743,14 @@ class Admin_Init {
 			// keep the original `'1'` / `'0'` storage.
 			if ( 'fotogrids_share_statistics' === $setting ) {
 				$applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_share_statistics_consent( $sanitized_bool );
+				wp_send_json_success( array( 'value' => $applied ) );
+			}
+
+			// Promotional-email consent. Separate Freemius side-effect
+			// (per-user is_marketing_allowed) and a distinct, affirmative
+			// opt-in - never inherited from the usage-data toggle.
+			if ( 'fotogrids_marketing_allowed' === $setting ) {
+				$applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_marketing_consent( $sanitized_bool );
 				wp_send_json_success( array( 'value' => $applied ) );
 			}
 
@@ -781,7 +817,7 @@ class Admin_Init {
 	}
 
 	/**
-	 * Resolve the current "share anonymous statistics" state from the local option.
+	 * Resolve the current usage-data sharing state from the local option.
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -947,10 +983,33 @@ class Admin_Init {
 	}
 
 	/**
-	 * Upgrade redirect - redirects to external upgrade URL
+	 * Redirect the Upgrade submenu page to the external upgrade URL.
+	 *
+	 * Runs on admin_init before any page output is sent. The submenu page
+	 * callback fires during page rendering, after the admin header has already
+	 * been output, so wp_safe_redirect() cannot send headers from there.
+	 *
+	 * @since 1.0.0
+	 */
+	public static function maybe_upgrade_redirect() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading the admin page slug to route a menu redirect, no state change.
+		if ( ! isset( $_GET['page'] ) || 'fotogrids-upgrade' !== $_GET['page'] ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_fotogrids' ) ) {
+			return;
+		}
+
+		wp_safe_redirect( Links::go( 'upgrade', 'plugins-screen', 'upgrade' ) );
+		exit;
+	}
+
+	/**
+	 * Upgrade redirect - submenu page callback fallback.
 	 */
 	public static function upgrade_redirect() {
-		wp_safe_redirect( 'https://go.fotogrids.com/upgrade' );
+		wp_safe_redirect( Links::go( 'upgrade', 'plugins-screen', 'upgrade' ) );
 		exit;
 	}
 
@@ -1367,8 +1426,48 @@ class Admin_Init {
 	}
 
 	/**
-	 * Suppress admin notices on FotoGrids pages
-	 * Removes all admin notices except FotoGrids' own notices
+	 * Redirect to the setup wizard once, after a fresh activation.
+	 *
+	 * Consumes the one-time transient set by {@see \FotoGrids\Activator}. Skips
+	 * bulk plugin activation and network-admin activation so it does not hijack
+	 * the screen when several plugins are activated together. The wizard opens
+	 * over the dashboard, gated on the ?fotogrids_setup_step query param.
+	 *
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public static function maybe_activation_redirect() {
+		if ( ! get_transient( 'fotogrids_activation_redirect' ) ) {
+			return;
+		}
+
+		delete_transient( 'fotogrids_activation_redirect' );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading WP's own bulk-activate flag, no state change.
+		if ( isset( $_GET['activate-multi'] ) || is_network_admin() ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_fotogrids' ) ) {
+			return;
+		}
+
+		wp_safe_redirect(
+			admin_url( 'admin.php?page=fotogrids-dashboard&fotogrids_setup_step=1' )
+		);
+		exit;
+	}
+
+	/**
+	 * Suppress admin notices on FotoGrids pages.
+	 *
+	 * Unhooks every callback on the notice actions except FotoGrids' own, so
+	 * third-party and WordPress-core notices do not render on FotoGrids
+	 * screens. Notices injected outside these hooks are handled by the CSS
+	 * backstop in {@see self::print_notice_suppression_css()}.
+	 *
+	 * @since 1.0.0
+	 * @return void
 	 */
 	public static function suppress_admin_notices() {
 		if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
@@ -1377,14 +1476,21 @@ class Admin_Init {
 
 		global $wp_filter;
 
-		foreach ( array( 'admin_notices', 'all_admin_notices', 'network_admin_notices' ) as $action ) {
+		$actions = array(
+			'admin_notices',
+			'all_admin_notices',
+			'network_admin_notices',
+			'user_admin_notices',
+		);
+
+		foreach ( $actions as $action ) {
 			if ( empty( $wp_filter[ $action ] ) ) {
 				continue;
 			}
 
 			foreach ( $wp_filter[ $action ]->callbacks as $priority => $callbacks ) {
 				foreach ( $callbacks as $key => $callback ) {
-					if ( self::is_suppressible_notice_callback( $callback ) ) {
+					if ( ! self::is_fotogrids_notice_callback( $callback ) ) {
 						unset( $wp_filter[ $action ]->callbacks[ $priority ][ $key ] );
 					}
 				}
@@ -1393,45 +1499,71 @@ class Admin_Init {
 	}
 
 	/**
-	 * Whether an admin_notices callback is one we want to suppress on
-	 * FotoGrids admin pages. Targets third-party / vendor SDK notices
-	 * (Freemius, generic "rate us" prompts) and leaves WordPress-core
-	 * messages intact.
+	 * Whether a notice callback belongs to FotoGrids itself.
+	 *
+	 * Used to keep FotoGrids' own notices while every other notice callback is
+	 * removed on FotoGrids admin pages.
 	 *
 	 * @since  1.0.0
 	 * @param  array $callback A WP filter/action callback registration.
 	 * @return bool
 	 */
-	private static function is_suppressible_notice_callback( array $callback ): bool {
+	private static function is_fotogrids_notice_callback( array $callback ): bool {
 		$func = $callback['function'] ?? null;
 		if ( ! $func ) {
 			return false;
 		}
 
-		if ( is_array( $func ) && isset( $func[1] ) ) {
-			$method = (string) $func[1];
-
-			if ( in_array(
-				$method,
-				array(
-					'_admin_notices_hook',
-					'_maybe_add_gdpr_optin_ajax_handler',
-				),
-				true
-			) ) {
-				return true;
-			}
-
-			if ( is_object( $func[0] ) && stripos( get_class( $func[0] ), 'Freemius' ) !== false ) {
-				return true;
-			}
+		if ( is_array( $func ) && isset( $func[0] ) ) {
+			$class = is_object( $func[0] ) ? get_class( $func[0] ) : (string) $func[0];
+			return stripos( $class, 'FotoGrids' ) !== false;
 		}
 
-		if ( is_string( $func ) && stripos( $func, 'freemius' ) !== false ) {
-			return true;
+		if ( $func instanceof \Closure ) {
+			return false;
+		}
+
+		if ( is_string( $func ) ) {
+			return stripos( $func, 'fotogrids' ) !== false;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Print CSS that hides notices injected outside the standard notice hooks.
+	 *
+	 * Backstop for {@see self::suppress_admin_notices()}: some plugins print
+	 * notices via footer scripts or their own markup rather than the
+	 * `admin_notices` action, so unhooking callbacks alone cannot remove them.
+	 * FotoGrids' own notices are scoped under the FotoGrids page wrappers and
+	 * are left visible.
+	 *
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public static function print_notice_suppression_css() {
+		if ( ! \FotoGrids\Admin\Admin_Screen::is_fotogrids() ) {
+			return;
+		}
+
+		echo '<style id="fotogrids-suppress-notices">'
+			. '#wpbody-content > .notice,'
+			. '#wpbody-content > .update-nag,'
+			. '#wpbody-content > .updated,'
+			. '#wpbody-content > .error,'
+			. '#wpbody-content > .e-notice,'
+			. '#wpbody-content > div[class*="-notice"],'
+			. '#wpbody-content > .wpnotice-wrapper,'
+			. '.fotogrids-page-header > .notice,'
+			. '.fotogrids-page-header > .e-notice,'
+			. '.fotogrids-page-header > .wpnotice-wrapper,'
+			. '.fotogrids-page-header > div[class*="-notice"]'
+			. '{display:none !important;}'
+			. '#wpbody-content > .notice.fotogrids-notice,'
+			. '#wpbody-content > .notice[class*="fotogrids"]'
+			. '{display:block !important;}'
+			. '</style>';
 	}
 
 	/**
@@ -1471,11 +1603,13 @@ class Admin_Init {
 			font-weight: 600;
 			line-height: 1.5;
 			transition: all 0.2s ease;
+			cursor: pointer;
 		}
 
 		#adminmenu .wp-submenu a[href*="fotogrids-upgrade"]:hover,
 		#adminmenu .wp-submenu a[href*="fotogrids-upgrade"]:active,
 		#adminmenu .wp-submenu a[href*="fotogrids-upgrade"]:focus {
+			color: #ffffff !important;
 			background-color: #4f5af3;
 			box-shadow: none;
 		}

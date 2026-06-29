@@ -1,0 +1,223 @@
+{
+    "id": "lightbox-grid",
+    "label": "Lightbox",
+    "icon": "click_lightbox",
+    "postTypes": [
+        "gallery"
+    ],
+    "placement": {
+        "mode": "insert_tab",
+        "after": "lightbox-mini"
+    },
+    "condition": {
+        "any": [
+            {
+                "dependsOn": "layout",
+                "values": ["featured-item"]
+            },
+            {
+                "all": [
+                    {
+                        "dependsOn": "item_click_behavior",
+                        "values": ["lightbox"]
+                    },
+                    {
+                        "dependsOn": "lightbox_variant",
+                        "values": ["grid"]
+                    },
+                    {
+                        "dependsOn": "layout",
+                        "values": [
+                            "grid",
+                            "masonry",
+                            "justified",
+                            "image-viewer",
+                            "single-item",
+                            "slider"
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "settings": [
+        {
+            "key": "lightbox_grid_section",
+            "type": "setting_subtabs",
+            "subTabs": {
+                "styling": {
+                    "id": "styling",
+                    "label": "Styling",
+                    "icon": "styling",
+                    "settings": [
+                        {
+                            "key": "lightbox_grid_theme",
+                            "type": "button_group",
+                            "label": "Theme",
+                            "options": [
+                                {
+                                    "label": "Dark",
+                                    "value": "dark",
+                                    "icon": "theme_dark",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Light",
+                                    "value": "light",
+                                    "icon": "theme_light",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "dark",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_grid_custom_btn_colors",
+                            "type": "toggle",
+                            "label": "Custom Button Colors",
+                            "description": "Override the theme's button colors with your own.",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_grid_buttons_group",
+                            "type": "setting_group",
+                            "label": "Button Colors",
+                            "condition": {
+                                "dependsOn": "lightbox_grid_custom_btn_colors",
+                                "values": [true, "1"]
+                            },
+                            "settings": [
+                                {
+                                    "use": "button-styling",
+                                    "key_prefix": "lightbox_grid_btn_",
+                                    "include": ["states"],
+                                    "states": ["regular", "hover", "focus"]
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_grid_max_width",
+                            "type": "responsive_range",
+                            "label": "Max Content Width",
+                            "description": "Cap the width of the grid content area.",
+                            "units": ["vw", "px", "%"],
+                            "responsive": {
+                                "desktop": { "min": 20, "max": 100, "default": 60 },
+                                "tablet": { "min": 20, "max": 100, "default": 80 },
+                                "mobile": { "min": 20, "max": 100, "default": 90 }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "use": "aspect-ratio",
+                            "key_prefix": "lightbox_grid_aspect_",
+                            "exclude": ["ratio_w", "ratio_h"],
+                            "overrides": {
+                                "ratio": {
+                                    "label": "Grid Item Aspect Ratio",
+                                    "description": "Shape of each grid tile.",
+                                    "options": [
+                                        {
+                                            "label": "1:1",
+                                            "value": "1/1",
+                                            "icon": "aspect_ratio_1_1",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "4:3",
+                                            "value": "4/3",
+                                            "icon": "aspect_ratio_4_3",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "3:2",
+                                            "value": "3/2",
+                                            "icon": "aspect_ratio_3_2",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "16:9",
+                                            "value": "16/9",
+                                            "icon": "aspect_ratio_16_9",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "3:4",
+                                            "value": "3/4",
+                                            "icon": "aspect_ratio_3_4",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "2:3",
+                                            "value": "2/3",
+                                            "icon": "aspect_ratio_2_3",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "4/3"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "captions": {
+                    "id": "captions",
+                    "label": "Captions",
+                    "icon": "align_center",
+                    "settings": [
+                        {
+                            "use": "lightbox-captions",
+                            "key_prefix": "lightbox_lite_caption_"
+                        },
+                        {
+                            "key": "lightbox_lite_caption_location",
+                            "type": "token_select",
+                            "label": "Caption Location",
+                            "description": "Where captions appear: in the grid tiles, in the full-size image view, or both.",
+                            "options": [
+                                {
+                                    "label": "Grid",
+                                    "value": "grid",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Full Image",
+                                    "value": "full",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": ["grid", "full"],
+                            "condition": {
+                                "dependsOn": "lightbox_lite_caption_show",
+                                "values": [true, "1"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

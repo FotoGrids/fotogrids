@@ -17,10 +17,51 @@ class Post_Types {
 	 */
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register_cpts' ) );
+		add_action( 'init', array( __CLASS__, 'register_meta' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
 		add_action( 'add_meta_boxes', array( __CLASS__, 'hide_featured_image_metabox' ), 99 );
+		add_action( 'save_post_fotogrids_gallery', array( __CLASS__, 'save_featured_image' ), 10, 2 );
+		add_action( 'save_post_fotogrids_album', array( __CLASS__, 'save_featured_image' ), 10, 2 );
 
 		add_filter( 'use_block_editor_for_post_type', array( __CLASS__, 'disable_gutenberg' ), 10, 2 );
+	}
+
+	/**
+	 * Meta key holding the collection's custom Featured / Share Image.
+	 *
+	 * An attachment ID chosen through the Featured / Share Image metabox. The
+	 * image need not be part of the gallery, which is why it cannot share
+	 * `_thumbnail_id` (that slot backs the in-gallery "Featured Item" star
+	 * picker and is validated against the gallery's item list). When set, it
+	 * is the top tier of `Cover_Resolver`'s resolution chain.
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	const FEATURED_IMAGE_META_KEY = 'fotogrids_featured_image_id';
+
+	/**
+	 * Register the custom Featured / Share Image meta on both collection CPTs.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public static function register_meta() {
+		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+			register_post_meta(
+				$post_type,
+				self::FEATURED_IMAGE_META_KEY,
+				array(
+					'type'              => 'integer',
+					'single'            => true,
+					'show_in_rest'      => true,
+					'sanitize_callback' => 'absint',
+					'auth_callback'     => static function ( $allowed, $meta_key, $post_id ) {
+						return current_user_can( 'manage_fotogrids', $post_id );
+					},
+				)
+			);
+		}
 	}
 
 	/**
@@ -290,8 +331,111 @@ class Post_Types {
 			'normal',
 			'high'
 		);
+
+		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+			add_meta_box(
+				'fotogrids_featured_image',
+				__( 'Featured / Share Image', 'fotogrids' ),
+				array( __CLASS__, 'featured_image_meta_box' ),
+				$post_type,
+				'side',
+				'low'
+			);
+		}
 	}
 
+	/**
+	 * Featured / Share Image metabox callback.
+	 *
+	 * A media-library picker that writes `fotogrids_featured_image_id`. This is
+	 * the collection-level cover and default social-share image; it may point
+	 * at any attachment, including one that is not in the gallery. When unset,
+	 * `Cover_Resolver` falls back to the in-gallery Featured Item (or the album's
+	 * featured child gallery) and finally the first item.
+	 *
+	 * @since 1.0.0
+	 * @param \WP_Post $post Current collection post.
+	 * @return void
+	 */
+	public static function featured_image_meta_box( $post ) {
+		wp_nonce_field( 'fotogrids_featured_image', 'fotogrids_featured_image_nonce' );
+
+		$attachment_id = (int) get_post_meta( $post->ID, self::FEATURED_IMAGE_META_KEY, true );
+		$thumb_url     = $attachment_id > 0 ? (string) wp_get_attachment_image_url( $attachment_id, 'medium' ) : '';
+		$has_image     = '' !== $thumb_url;
+
+		$is_album    = 'fotogrids_album' === $post->post_type;
+		$description = $is_album
+			? __( 'Used as the album cover and social-share image. If left empty, FotoGrids uses the featured gallery’s cover, then the first available image.', 'fotogrids' )
+			: __( 'Used as the gallery cover and social-share image. If left empty, FotoGrids uses the featured item, then the first image in the gallery.', 'fotogrids' );
+		?>
+		<div class="fotogrids-featured-image" data-fg-featured-image>
+			<div class="fotogrids-featured-image__preview"<?php echo $has_image ? '' : ' hidden'; ?> data-fg-featured-image-preview>
+				<?php if ( $has_image ) : ?>
+					<img src="<?php echo esc_url( $thumb_url ); ?>" alt="" />
+				<?php endif; ?>
+			</div>
+			<input type="hidden"
+				name="fotogrids_featured_image_id"
+				value="<?php echo esc_attr( (string) ( $attachment_id > 0 ? $attachment_id : '' ) ); ?>"
+				data-fg-featured-image-input />
+			<p class="fotogrids-featured-image__actions">
+				<button type="button" class="button fotogrids-featured-image__set" data-fg-featured-image-set>
+					<?php echo $has_image ? esc_html__( 'Replace image', 'fotogrids' ) : esc_html__( 'Set featured image', 'fotogrids' ); ?>
+				</button>
+				<button type="button" class="button-link fotogrids-featured-image__remove"<?php echo $has_image ? '' : ' hidden'; ?> data-fg-featured-image-remove>
+					<?php esc_html_e( 'Remove', 'fotogrids' ); ?>
+				</button>
+			</p>
+			<p class="description"><?php echo esc_html( $description ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Persist the Featured / Share Image attachment ID.
+	 *
+	 * @since 1.0.0
+	 * @param int      $post_id Post ID being saved.
+	 * @param \WP_Post $post    Post object being saved.
+	 * @return void
+	 */
+	public static function save_featured_image( $post_id, $post ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by the save_post_{type} hook contract; $post intentionally unused.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if ( ! isset( $_POST['fotogrids_featured_image_nonce'] )
+			|| ! wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['fotogrids_featured_image_nonce'] ) ),
+				'fotogrids_featured_image'
+			)
+		) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_fotogrids', $post_id ) ) {
+			return;
+		}
+
+		$raw           = isset( $_POST['fotogrids_featured_image_id'] )
+			? absint( wp_unslash( $_POST['fotogrids_featured_image_id'] ) )
+			: 0;
+		$attachment_id = 0;
+
+		if ( $raw > 0 ) {
+			$attachment = get_post( $raw );
+			if ( $attachment && 'attachment' === $attachment->post_type && wp_attachment_is_image( $raw ) ) {
+				$attachment_id = $raw;
+			}
+		}
+
+		if ( $attachment_id > 0 ) {
+			update_post_meta( $post_id, self::FEATURED_IMAGE_META_KEY, $attachment_id );
+		} else {
+			delete_post_meta( $post_id, self::FEATURED_IMAGE_META_KEY );
+		}
+	}
 
 	/**
 	 * Shared shortcode meta box callback

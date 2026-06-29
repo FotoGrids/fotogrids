@@ -20,9 +20,11 @@
       "tablet": 8,
       "mobile": 5
     },
-    "exif_display": true,
-    "exif_on_hover": true,
+    "display_exif": true,
     "captions": true,
-    "lightbox": true
+    "item_click_behavior": "lightbox",
+    "hover_effect": "frame",
+    "caption_placement": "bottom",
+    "caption_description_source": "caption"
   }
 }

@@ -13,7 +13,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 		__,
 	}
 ) => {
-	const renderAdditionalContent = (selectedOption, options, currentValue) => {
+	const renderAdditionalContent = (selectedOption) => {
 		if (!selectedOption || selectedOption.value === 'custom') {
 			return null;
 		}

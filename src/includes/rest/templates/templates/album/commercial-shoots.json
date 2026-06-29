@@ -5,25 +5,7 @@
   "type": "pro",
   "category": "album",
   "subcategory": "photography",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 13,
-  "settings": {
-    "layout": "justified",
-    "target_row_height": {
-      "desktop": 280,
-      "tablet": 220,
-      "mobile": 160
-    },
-    "item_spacing": {
-      "desktop": 8,
-      "tablet": 6,
-      "mobile": 4
-    },
-    "watermark_enabled": true,
-    "right_click_protection": true,
-    "download_tokens": true,
-    "password_protected": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

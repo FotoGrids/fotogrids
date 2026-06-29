@@ -120,9 +120,18 @@
             rgba(0, 0, 0, 0.14);
 }
 
-/* The image keeps its enforced aspect-ratio box (from enforces_item_box). */
+/* The media box takes the chosen --fg-item-aspect-ratio. Item Fit is always
+   Cover here, so object-fit is hardcoded and --fg-item-fit is not consumed. */
 [data-fg-layout="instant-photos"] .fg-item.fg-instant-photo .fg-item-media {
+    aspect-ratio: var(--fg-item-aspect-ratio, 4 / 3);
     background: #f4f4f4; /* subtle grey behind images that are still loading */
+}
+
+[data-fg-layout="instant-photos"] .fg-item.fg-instant-photo .fg-item-media picture,
+[data-fg-layout="instant-photos"] .fg-item.fg-instant-photo .fg-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Caption styling - always below, centered. The font family is filtered

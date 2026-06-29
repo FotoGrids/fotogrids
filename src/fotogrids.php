@@ -5,7 +5,7 @@
  * Description: The most robust and beautiful WordPress gallery plugin. Create stunning photo galleries and albums with drag-and-drop ease, modern responsive layouts, powerful lightbox, and detailed analytics. Perfect for photographers, artists, and businesses.
  * Version: 1.0.0
  * Author: FotoGrids
- * Author URI: https://www.fotogrids.com
+ * Author URI: https://www.fotogrids.com/about/
  * Text Domain: fotogrids
  * Domain Path: /languages
  * Requires at least: 6.1
@@ -34,6 +34,7 @@ foreach ( array( 'actions', 'filters', 'js-events' ) as $fotogrids_hooks_group )
 }
 unset( $fotogrids_hooks_group, $fotogrids_hooks_file );
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-svg.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-links.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-activator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-deactivator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
@@ -64,6 +65,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-password-crypto.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-screen.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-settings-localizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-debug-log.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-partial-expander.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-state-resolver.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-assembler.php';
@@ -275,7 +277,7 @@ add_filter(
 		if ( \FotoGrids\License_Manager::has_pro() ) {
 			return $links;
 		}
-		$pro_link  = '<a href="https://go.fotogrids.com/pro"
+		$pro_link  = '<a href="' . esc_url( \FotoGrids\Links::go( 'pro', 'plugins-screen', 'pro' ) ) . '"
             target="_blank"
             style="font-weight:600;color:#3c46f0;">'
 			. __( 'Get FotoGrids Pro', 'fotogrids' ) .
@@ -301,7 +303,7 @@ add_filter(
 		if ( plugin_basename( __FILE__ ) !== $file ) {
 			return $links;
 		}
-		$links[] = '<a href="https://go.fotogrids.com/help"
+		$links[] = '<a href="' . esc_url( \FotoGrids\Links::go( 'help', 'plugin-row-meta', 'help' ) ) . '"
             target="_blank">'
 			. __( 'Help Center', 'fotogrids' ) .
 			'</a>';

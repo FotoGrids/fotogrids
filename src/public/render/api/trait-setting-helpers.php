@@ -162,6 +162,56 @@ trait Setting_Helpers {
 	}
 
 	/**
+	 * The typography-partial text-spacing fields and how they map to CSS.
+	 *
+	 * Each entry is field id => [ css property suffix, default unit ]. The
+	 * default unit is only used as a fallback when a stored value carries no
+	 * unit of its own. Shared by every module that consumes the typography
+	 * partial so the field set stays in one place.
+	 *
+	 * @since  1.0.0
+	 * @return array<string, array{0:string,1:string}>
+	 */
+	protected function text_spacing_fields(): array {
+		return array(
+			'line_height'    => array( 'line-height', 'em' ),
+			'letter_spacing' => array( 'letter-spacing', 'em' ),
+			'word_spacing'   => array( 'word-spacing', 'em' ),
+		);
+	}
+
+	/**
+	 * Emit responsive line-height, letter-spacing, and word-spacing CSS custom
+	 * properties for one typography target.
+	 *
+	 * Reads the responsive_range settings the typography partial stamps under
+	 * the given key prefix and appends one Responsive_Var per field that has at
+	 * least one breakpoint set. Fields left untouched are skipped so the CSS
+	 * fallback applies.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, mixed> $vars       Variable map to append to (by reference).
+	 * @param  string               $var_prefix CSS var prefix, e.g. '--fg-caption-title'.
+	 * @param  array<string, mixed> $settings   Render settings array.
+	 * @param  string               $key_prefix Setting key prefix, e.g. 'caption_title_'.
+	 * @return void
+	 */
+	protected function add_text_spacing_vars( array &$vars, string $var_prefix, array $settings, string $key_prefix ): void {
+		foreach ( $this->text_spacing_fields() as $field => $spec ) {
+			list( $css_name, $default_unit ) = $spec;
+
+			$raw     = $settings[ $key_prefix . $field ] ?? null;
+			$desktop = $this->resolve_responsive_value( $raw, 'desktop', $default_unit );
+			$tablet  = $this->resolve_responsive_value( $raw, 'tablet', $default_unit );
+			$mobile  = $this->resolve_responsive_value( $raw, 'mobile', $default_unit );
+
+			if ( '' !== $desktop || '' !== $tablet || '' !== $mobile ) {
+				$vars[ $var_prefix . '-' . $css_name ] = new Responsive_Var( $desktop, $tablet, $mobile );
+			}
+		}
+	}
+
+	/**
 	 * Read the first scalar from a setting that may be stored as a responsive
 	 * array or a plain string (e.g. caption_placement, border_style).
 	 *

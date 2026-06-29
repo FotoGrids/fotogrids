@@ -65,8 +65,13 @@ function AlphaColorPicker({
 	createPortal,
 	__,
 }) {
-	const defaultValue = setting.default || '#000000';
-	const value = currentValue || defaultValue;
+	const hasDefault = isCompleteColor(setting.default);
+	const isUnset = !isCompleteColor(currentValue) && !hasDefault;
+	const value = isCompleteColor(currentValue)
+		? currentValue
+		: hasDefault
+			? setting.default
+			: 'rgba(0, 0, 0, 0)';
 
 	const [open, setOpen] = useState(false);
 	const [popoverPosition, setPopoverPosition] = useState(null);
@@ -282,8 +287,14 @@ function AlphaColorPicker({
 						},
 						[
 							h('span', {
-								className: 'fotogrids-color-swatch__fill',
-								style: { background: value },
+								className:
+									'fotogrids-color-swatch__fill' +
+									(isUnset
+										? ' fotogrids-color-swatch__fill--unset'
+										: ''),
+								style: isUnset
+									? undefined
+									: { background: value },
 							}),
 						]
 					),
@@ -291,10 +302,12 @@ function AlphaColorPicker({
 					h('input', {
 						type: 'text',
 						className: 'fotogrids-color-text',
-						value,
+						value: isUnset ? '' : value,
 						readOnly: true,
 						disabled: isDisabled,
-						placeholder: setting.default || '#000000',
+						placeholder: hasDefault
+							? setting.default
+							: __('Default', 'fotogrids'),
 						onClick: toggleOpen,
 						onFocus: () => {
 							setFocused(true);

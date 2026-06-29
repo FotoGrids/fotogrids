@@ -66,6 +66,54 @@ function resolveColumnCount( collectionEl, containerWidth, gap ) {
  * @param {number} gap
  * @return {number[]} columnHeights after placement.
  */
+/**
+ * Compute the height an item occupies at a given column width.
+ *
+ * The media height is derived from the image's intrinsic aspect ratio (natural
+ * dimensions, or the width/height attributes) scaled to the column width, which
+ * is stable and available immediately even before the image has loaded.
+ *
+ * Flowing (non-overlay) captions add their measured height on top. The caption
+ * is measured from the DOM, so the item must already be sized to its column
+ * width before this runs (see the two-pass layout in `layout`): a flowing
+ * caption's height depends on the width it wraps at and on percentage padding,
+ * both of which resolve against the item's final width.
+ *
+ * @param {HTMLElement} item        The gallery item.
+ * @param {number}      columnWidth The width the item is being laid out at.
+ * @return {number}
+ */
+function measureItemHeight( item, columnWidth ) {
+    const img = item.querySelector( 'img' );
+    let height;
+
+    const ratioW = img ? ( img.naturalWidth || parseFloat( img.getAttribute( 'width' ) ) ) : 0;
+    const ratioH = img ? ( img.naturalHeight || parseFloat( img.getAttribute( 'height' ) ) ) : 0;
+
+    if ( img && ratioW > 0 && ratioH > 0 ) {
+        height = columnWidth * ( ratioH / ratioW );
+    } else {
+        // No usable intrinsic ratio (e.g. a non-image item) - fall back to the
+        // media box, which by this pass is sized to the column width.
+        const media = item.querySelector( '.fg-item-media' );
+        height = media ? media.getBoundingClientRect().height : item.getBoundingClientRect().height;
+    }
+
+    // Flowing (non-overlay) captions add to the item's real height: the flex
+    // gap between media and caption (the Caption Distance from Media setting,
+    // applied as `gap` on the flex item) plus the caption box, whose measured
+    // height already includes its own padding.
+    const caption = item.querySelector( '.fg-caption' );
+    if ( caption && window.getComputedStyle( caption ).position !== 'absolute' ) {
+        const gapHost    = caption.parentElement || item;
+        const captionGap = parseFloat( window.getComputedStyle( gapHost ).rowGap );
+        height += isNaN( captionGap ) ? 0 : captionGap;
+        height += caption.getBoundingClientRect().height;
+    }
+
+    return height;
+}
+
 function placeRowMajor( items, columnLefts, columnWidths, gap ) {
     const columnHeights = new Array( columnLefts.length ).fill( 0 );
 
@@ -81,14 +129,11 @@ function placeRowMajor( items, columnLefts, columnWidths, gap ) {
             }
         }
 
-        item.style.width = columnWidths[ shortestCol ] + 'px';
-        // Force a reflow so the next read picks up the new width.
-        // eslint-disable-next-line no-unused-expressions
-        item.offsetHeight;
-
-        const itemHeight = item.getBoundingClientRect().height;
-        item.style.left = columnLefts[ shortestCol ] + 'px';
-        item.style.top  = Math.round( shortestHeight ) + 'px';
+        // Items are already sized to their column width (pass 1 in `layout`),
+        // so the caption box and media measure at their final width here.
+        const itemHeight = measureItemHeight( item, columnWidths[ shortestCol ] );
+        item.style.left  = columnLefts[ shortestCol ] + 'px';
+        item.style.top   = Math.round( shortestHeight ) + 'px';
 
         columnHeights[ shortestCol ] = shortestHeight + itemHeight + gap;
     }
@@ -116,14 +161,11 @@ function placeColumnMajor( items, columnLefts, columnWidths, gap ) {
         const col = Math.min( cols - 1, Math.floor( i / itemsPerCol ) );
         const item = items[ i ];
 
-        item.style.width = columnWidths[ col ] + 'px';
-        // Force a reflow so the next read picks up the new width.
-        // eslint-disable-next-line no-unused-expressions
-        item.offsetHeight;
-
-        const itemHeight = item.getBoundingClientRect().height;
-        item.style.left = columnLefts[ col ] + 'px';
-        item.style.top  = Math.round( columnHeights[ col ] ) + 'px';
+        // Items are already sized to their column width (pass 1 in `layout`),
+        // so the caption box and media measure at their final width here.
+        const itemHeight = measureItemHeight( item, columnWidths[ col ] );
+        item.style.left  = columnLefts[ col ] + 'px';
+        item.style.top   = Math.round( columnHeights[ col ] ) + 'px';
 
         columnHeights[ col ] = columnHeights[ col ] + itemHeight + gap;
     }
@@ -152,10 +194,8 @@ function layout( trackEl ) {
     const columnCount = resolveColumnCount( collectionEl, containerWidth, gap );
     const order       = readOrder( collectionEl );
 
-    // Switch the wrapper into positioned mode BEFORE measuring so each
-    // item is already position:absolute and getBoundingClientRect returns
-    // the item's natural height at the assigned column width rather than
-    // the CSS-multicol height.
+    // Switch the wrapper into positioned mode so items become position:absolute
+    // and the track is a relative container for the JS-computed top/left.
     collectionEl.setAttribute( 'data-fg-masonry-positioned', '1' );
 
     const totalGap       = Math.max( 0, columnCount - 1 ) * gap;
@@ -170,6 +210,19 @@ function layout( trackEl ) {
         runningLeft += columnWidths[ c ] + gap;
     }
 
+    // Pass 1: size every item to its column width. All masonry columns share
+    // the same width (give or take a sub-pixel rounding difference), so the
+    // first column's width is representative. Reading clientWidth afterwards
+    // forces a single synchronous reflow so that pass 2's caption measurement
+    // (which depends on the wrapped width and on percentage padding) reads the
+    // item at its final size rather than its pre-sized width.
+    const sizingWidth = columnWidths[ 0 ];
+    for ( let i = 0; i < items.length; i++ ) {
+        items[ i ].style.width = sizingWidth + 'px';
+    }
+    void trackEl.clientWidth;
+
+    // Pass 2: measure each item at its applied width and position it.
     const columnHeights = order === 'column'
         ? placeColumnMajor( items, columnLefts, columnWidths, gap )
         : placeRowMajor( items, columnLefts, columnWidths, gap );

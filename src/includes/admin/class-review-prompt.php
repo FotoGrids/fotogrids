@@ -18,7 +18,7 @@ class Review_Prompt {
 	 * Initialize the review prompt
 	 */
 	public static function init() {
-		add_filter( 'admin_footer_text', array( __CLASS__, 'admin_footer_review' ) );
+		add_filter( 'admin_footer_text', array( __CLASS__, 'admin_footer_review' ), 99 );
 		add_action( 'admin_init', array( __CLASS__, 'handle_review_click' ) );
 
 		// Schedule statistics sending if enabled

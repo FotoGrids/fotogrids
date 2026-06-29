@@ -47,6 +47,6 @@
     overflow: visible;
 }
 
-.fotogrids-gallery--is-paginating .fg-pagination__loader {
+.fotogrids-collection.fotogrids-gallery.fotogrids-gallery--is-paginating .fg-pagination__loader {
     opacity: 1;
 }

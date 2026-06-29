@@ -71,7 +71,7 @@ class Admin_Header {
 					esc_html__( 'To unlock more features consider %s with up to 40%% off.', 'fotogrids' ),
 					sprintf(
 						'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-						esc_url( 'https://go.fotogrids.com/upgrade/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=notice-bar&utm_content=Upgrade%20to%20FotoGrids%20Pro&utm_locale=' . get_locale() ),
+						esc_url( \FotoGrids\Links::go( 'upgrade', 'notice-bar', 'upgrade' ) ),
 						esc_html__( 'upgrading to PRO', 'fotogrids' )
 					)
 				);
@@ -96,7 +96,7 @@ class Admin_Header {
 				<?php \FotoGrids\Svg::render( $logo_svg ); ?>
 			</div>
 			<div class="fotogrids-links">
-				<a href="<?php echo esc_url( 'https://go.fotogrids.com/docs/?utm_campaign=liteplugin&utm_source=WordPress&utm_medium=header_links&utm_content=about_docs&utm_locale=' . get_locale() ); ?>" target="_blank" rel="noopener noreferrer" class="fotogrids-link fotogrids-link-docs">
+				<a href="<?php echo esc_url( \FotoGrids\Links::go( 'docs', 'header', 'docs' ) ); ?>" target="_blank" rel="noopener noreferrer" class="fotogrids-link fotogrids-link-docs">
 					<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path d="M20 9.5V6.8C20 5.11984 20 4.27976 19.673 3.63803C19.3854 3.07354 18.9265 2.6146 18.362 2.32698C17.7202 2 16.8802 2 15.2 2H8.8C7.11984 2 6.27976 2 5.63803 2.32698C5.07354 2.6146 4.6146 3.07354 4.32698 3.63803C4 4.27976 4 5.11984 4 6.8V17.2C4 18.8802 4 19.7202 4.32698 20.362C4.6146 20.9265 5.07354 21.3854 5.63803 21.673C6.27976 22 7.11984 22 8.8 22H14M14 11H8M10 15H8M16 7H8M16.5 15.0022C16.6762 14.5014 17.024 14.079 17.4817 13.81C17.9395 13.5409 18.4777 13.4426 19.001 13.5324C19.5243 13.6221 19.999 13.8942 20.3409 14.3004C20.6829 14.7066 20.87 15.2207 20.8692 15.7517C20.8692 17.2506 18.6209 18 18.6209 18M18.6499 21H18.6599" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 					</svg>

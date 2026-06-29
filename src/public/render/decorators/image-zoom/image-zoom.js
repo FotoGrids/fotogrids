@@ -39,13 +39,26 @@
     function readStyleVars(galleryElement) {
         const styles = getComputedStyle(galleryElement);
         const vars = {};
-        ['--fg-lb-mini-backdrop', '--fg-lb-mini-backdrop-blur', '--fg-lb-mini-padding'].forEach(function (name) {
-            const value = styles.getPropertyValue(name).trim();
-            if (value) {
-                vars[name] = value;
-            }
-        });
+        // Only padding is a free-form length; the backdrop colour + blur are
+        // selected in CSS from the data attributes below.
+        const padding = styles.getPropertyValue('--fg-lb-mini-padding').trim();
+        if (padding) {
+            vars['--fg-lb-mini-padding'] = padding;
+        }
         return vars;
+    }
+
+    function readDataAttrs(galleryElement) {
+        const attrs = {};
+        const theme = galleryElement.getAttribute('data-fg-mini-theme');
+        const blur = galleryElement.getAttribute('data-fg-mini-blur');
+        if (theme) {
+            attrs['data-fg-mini-theme'] = theme;
+        }
+        if (blur) {
+            attrs['data-fg-mini-blur'] = blur;
+        }
+        return attrs;
     }
 
     function openPopover(galleryElement, itemElement) {
@@ -64,6 +77,7 @@
             closeButton: galleryElement.getAttribute('data-fg-zoom-close-button') !== '0',
             clickOutsideToClose: galleryElement.getAttribute('data-fg-zoom-click-outside') !== '0',
             styleVars: readStyleVars(galleryElement),
+            dataAttrs: readDataAttrs(galleryElement),
         });
     }
 

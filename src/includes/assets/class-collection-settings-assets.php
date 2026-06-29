@@ -50,6 +50,7 @@ final class Collection_Settings_Assets {
 		'renderSelect',
 		'renderFontFamily',
 		'renderFontWeight',
+		'renderFontStyle',
 		'renderSideBySide',
 		'renderToggle',
 		'renderConditionalMessage',
@@ -271,7 +272,7 @@ final class Collection_Settings_Assets {
 			$dependencies[] = 'fotogrids-render-custom-unit-select';
 		}
 
-		if ( in_array( $function_name, array( 'renderFontFamily', 'renderFontWeight' ), true ) ) {
+		if ( in_array( $function_name, array( 'renderFontFamily', 'renderFontWeight', 'renderFontStyle' ), true ) ) {
 			$dependencies[] = 'fotogrids-render-select';
 		}
 

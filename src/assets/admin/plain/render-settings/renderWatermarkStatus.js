@@ -20,7 +20,6 @@
  * restNonce  - wp_rest nonce
  */
 const WatermarkStatusComponent = ({
-	setting,
 	isDisabled,
 	__,
 	postId,
@@ -201,6 +200,7 @@ const WatermarkStatusComponent = ({
 						{ key: 'desc', className: `${baseClass}__desc` },
 						running
 							? wp.i18n.sprintf(
+									// translators: %1$d: number of items processed; %2$d: total number of items.
 									__(
 										'Regenerating… %1$d of %2$d',
 										'fotogrids'

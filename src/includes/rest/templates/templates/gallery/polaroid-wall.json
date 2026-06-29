@@ -1,0 +1,29 @@
+{
+  "id": "polaroid-wall",
+  "name": "Polaroid Wall",
+  "description": "Scattered instant-photo frames with a gentle tilt. Playful and personal - perfect for events and behind-the-scenes.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "creative",
+  "order": 25,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "instant-photos",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 18,
+      "tablet": 14,
+      "mobile": 10
+    },
+    "instant_photo_elevation": true,
+    "instant_photo_hover_action": "straighten",
+    "captions": true,
+    "caption_title_source": "title",
+    "item_click_behavior": "lightbox"
+  }
+}

@@ -34,18 +34,43 @@ if ( ! defined( 'WPINC' ) ) {
  * Colour attributes (all themes - JS reads these to build the per-gallery <style> block):
  *   data-fg-lb-bg                        rgba - backdrop background
  *   data-fg-lb-toolbar-bg                rgba - toolbar background
- *   data-fg-lb-toolbar-btn-color         rgba - toolbar icon colour
- *   data-fg-lb-toolbar-btn-hover         rgba - toolbar icon hover colour
- *   data-fg-lb-toolbar-btn-active-bg     rgba - active toggle button background
- *   data-fg-lb-arrow-bg                  rgba - nav arrow button background
- *   data-fg-lb-arrow-bg-hover            rgba - nav arrow button hover background
- *   data-fg-lb-arrow-hover-color         rgba - nav arrow icon hover colour
- *   data-fg-lb-bullet-color              rgba - dot fill colour
- *   data-fg-lb-bullet-hover-color        rgba - dot hover colour
- *   data-fg-lb-bullet-active-color       rgba - active dot colour
+ *   data-fg-lb-toolbar-btn-bg            rgba - toolbar button background (regular)
+ *   data-fg-lb-toolbar-btn-border        rgba - toolbar button border (regular)
+ *   data-fg-lb-toolbar-btn-color         rgba - toolbar icon colour (regular)
+ *   data-fg-lb-toolbar-btn-bg-hover      rgba - toolbar button background (hover)
+ *   data-fg-lb-toolbar-btn-border-hover  rgba - toolbar button border (hover)
+ *   data-fg-lb-toolbar-btn-hover         rgba - toolbar icon colour (hover)
+ *   data-fg-lb-toolbar-btn-bg-active     rgba - toolbar button background (active toggle)
+ *   data-fg-lb-toolbar-btn-border-active rgba - toolbar button border (active toggle)
+ *   data-fg-lb-toolbar-btn-active-color  rgba - toolbar icon colour (active toggle)
+ *   data-fg-lb-toolbar-btn-bg-focus      rgba - toolbar button background (focus)
+ *   data-fg-lb-toolbar-btn-border-focus  rgba - toolbar button border (focus)
+ *   data-fg-lb-toolbar-btn-focus-color   rgba - toolbar icon colour (focus)
+ *   data-fg-lb-arrow-bg                  rgba - nav arrow button background (regular)
+ *   data-fg-lb-arrow-border              rgba - nav arrow button border (regular)
+ *   data-fg-lb-arrow-color               rgba - nav arrow icon colour (regular)
+ *   data-fg-lb-arrow-bg-hover            rgba - nav arrow button background (hover)
+ *   data-fg-lb-arrow-border-hover        rgba - nav arrow button border (hover)
+ *   data-fg-lb-arrow-hover-color         rgba - nav arrow icon colour (hover)
+ *   data-fg-lb-arrow-bg-active           rgba - nav arrow button background (active)
+ *   data-fg-lb-arrow-border-active       rgba - nav arrow button border (active)
+ *   data-fg-lb-arrow-active-color        rgba - nav arrow icon colour (active)
+ *   data-fg-lb-arrow-bg-focus            rgba - nav arrow button background (focus)
+ *   data-fg-lb-arrow-border-focus        rgba - nav arrow button border (focus)
+ *   data-fg-lb-arrow-focus-color         rgba - nav arrow icon colour (focus)
+ *   data-fg-lb-bullet-bg                 rgba - dot background (regular)
+ *   data-fg-lb-bullet-border             rgba - dot border (regular)
+ *   data-fg-lb-bullet-hover-bg           rgba - dot background (hover)
+ *   data-fg-lb-bullet-hover-border       rgba - dot border (hover)
+ *   data-fg-lb-bullet-active-bg          rgba - dot background (active)
+ *   data-fg-lb-bullet-active-border      rgba - dot border (active)
+ *   data-fg-lb-bullet-focus-bg           rgba - dot background (focus)
+ *   data-fg-lb-bullet-focus-border       rgba - dot border (focus)
  *   data-fg-lb-thumbs-bg                 rgba - thumbnail strip background
- *   data-fg-lb-thumb-border-color        rgba - thumbnail hover border
- *   data-fg-lb-thumb-active-color        rgba - active thumbnail border
+ *   data-fg-lb-thumb-border-color        rgba - thumbnail border (regular)
+ *   data-fg-lb-thumb-hover-border-color  rgba - thumbnail border (hover)
+ *   data-fg-lb-thumb-active-color        rgba - thumbnail border (active)
+ *   data-fg-lb-thumb-focus-border-color  rgba - thumbnail border (focus)
  *   data-fg-lb-info-bg                   rgba - info panel (sidebar/overlay) background
  *   data-fg-lb-info-block-bg             rgba - individual info block card background
  *   data-fg-lb-info-text                 rgba - info panel caption text
@@ -65,15 +90,18 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-arrow-size            = "40"                   (px, integer string)
  *   data-fg-lb-show-dots             = "1" | omitted
  *   data-fg-lb-show-counter                                    (present = show "1 / N" counter in toolbar-start)
- *   data-fg-lb-dot-style             = "fill" | "stroke" | "square" | "square_stroke"
- *   data-fg-lb-dot-size              = "12"                  (px integer; absent = 12 default)
- *   data-fg-lb-dots-spacing          = "8px"
+ *   data-fg-lb-bullet-width          = "12px"                 (absent = 12px default)
+ *   data-fg-lb-bullet-height         = "12px"                 (absent = 12px default)
+ *   data-fg-lb-bullet-radius         = "50%"                  (absent = 50% default)
+ *   data-fg-lb-bullet-border-width   = "2px"                  (absent = 2px default)
+ *   data-fg-lb-bullet-spacing        = "8px"
  *   data-fg-lb-thumbnail-location    = "none" | "bottom" | "top" | "left" | "right"
  *   data-fg-lb-thumbnail-size        = "small" | "normal" | "large"
  *   data-fg-lb-overlay-blur          = "2"                    (px integer; 0 = none)
  *   data-fg-lb-preload-slides        = "2"                    (integer; slides to preload ahead and behind; absent = 2)
- *   data-fg-lb-info-panel            = "on_click" | "never"   (absent = "always" default)
- *   data-fg-lb-info-location         = "left" | "bottom"      (absent = "right" default; omitted when info-panel=never)
+ *   data-fg-lb-info-panel            = "off"                  (present = info panel disabled; absent = enabled)
+ *   data-fg-lb-info-default          = "closed"               (present = panel starts collapsed; absent = open)
+ *   data-fg-lb-info-location         = "left" | "bottom"      (absent = "right" default; omitted when info panel disabled)
  *   data-fg-lb-no-backdrop-close                              (present = disabled; absent = enabled)
  *   data-fg-lb-no-loop                                        (present = no-loop; absent = loop enabled)
  *   data-fg-lb-hide-arrows-at-ends                            (present = hide at first/last; absent = always show)
@@ -120,7 +148,7 @@ final class Lightbox implements Feature {
 
 	use Setting_Helpers;
 
-	private const DEFAULT_INFO_BLOCKS = array( 'caption', 'description', 'file_info', 'exif', 'share', 'credit', 'tags', 'people', 'location' );
+	private const DEFAULT_INFO_BLOCKS = array( 'title', 'caption', 'description', 'file_info', 'exif', 'share', 'credit', 'tags', 'people', 'location' );
 
 	/** @var array<string, array{prev: string, next: string}>|null */
 	private static ?array $arrow_icons_cache = null;
@@ -178,7 +206,11 @@ final class Lightbox implements Feature {
 			return false;
 		}
 
-		return 'lightbox' === $render_context->behavior->click_behavior;
+		if ( 'lightbox' !== $render_context->behavior->click_behavior ) {
+			return false;
+		}
+
+		return 'full' === $render_context->behavior->lightbox_variant;
 	}
 
 	/**
@@ -336,31 +368,29 @@ final class Lightbox implements Feature {
 		if ( $this->setting_to_bool( $s['lightbox_show_dots'] ?? false ) ) {
 			$attrs['data-fg-lb-show-dots'] = '1';
 
-			$dot_style = is_string( $s['lightbox_dot_style'] ?? null ) ? (string) $s['lightbox_dot_style'] : 'fill';
-			if ( 'fill' !== $dot_style ) {
-				$attrs['data-fg-lb-dot-style'] = $dot_style;
+			$size_raw   = is_array( $s['lightbox_bullet_size'] ?? null ) ? $s['lightbox_bullet_size'] : array();
+			$dot_width  = $this->normalize_unit_value( $size_raw['width'] ?? null, 'px' );
+			$dot_height = $this->normalize_unit_value( $size_raw['height'] ?? null, 'px' );
+			if ( '' !== $dot_width ) {
+				$attrs['data-fg-lb-bullet-width'] = $dot_width;
+			}
+			if ( '' !== $dot_height ) {
+				$attrs['data-fg-lb-bullet-height'] = $dot_height;
 			}
 
-			$dot_size = absint( $s['lightbox_dot_size'] ?? 12 );
-			if ( 12 !== $dot_size ) {
-				$attrs['data-fg-lb-dot-size'] = (string) $dot_size;
+			$dot_radius = $this->normalize_unit_value( $s['lightbox_bullet_radius'] ?? null, 'px' );
+			if ( '' !== $dot_radius ) {
+				$attrs['data-fg-lb-bullet-radius'] = $dot_radius;
 			}
 
-			$dot_color = $this->safe_color( $s['lightbox_dot_color'] ?? null, '#ffffff' );
-			if ( '#ffffff' !== $dot_color ) {
-				$attrs['data-fg-lb-dot-color'] = $dot_color;
+			$dot_border = $this->normalize_unit_value( $s['lightbox_bullet_border_width'] ?? null, 'px' );
+			if ( '' !== $dot_border ) {
+				$attrs['data-fg-lb-bullet-border-width'] = $dot_border;
 			}
 
-			$dot_active_color = $this->safe_color( $s['lightbox_active_dot_color'] ?? null, '#007cba' );
-			if ( '#007cba' !== $dot_active_color ) {
-				$attrs['data-fg-lb-dot-active-color'] = $dot_active_color;
-			}
-
-			// dots spacing - stored as { value, unit } object or plain string
-			$spacing_raw = $s['lightbox_dots_spacing'] ?? null;
-			$spacing     = $this->normalize_unit_value( $spacing_raw, 'px' );
+			$spacing = $this->normalize_unit_value( $s['lightbox_bullet_spacing'] ?? null, 'px' );
 			if ( '' !== $spacing && '8px' !== $spacing ) {
-				$attrs['data-fg-lb-dots-spacing'] = $spacing;
+				$attrs['data-fg-lb-bullet-spacing'] = $spacing;
 			}
 		}
 
@@ -379,14 +409,20 @@ final class Lightbox implements Feature {
 			$attrs['data-fg-lb-preload-slides'] = (string) $preload_slides;
 		}
 
-		// Info panel visibility
-		$info_panel = is_string( $s['lightbox_info_panel'] ?? null ) ? (string) $s['lightbox_info_panel'] : 'always';
-		if ( 'always' !== $info_panel ) {
-			$attrs['data-fg-lb-info-panel'] = $info_panel;
+		// Info panel visibility - enabled by default; emit absence-marker only when disabled.
+		$info_panel_enabled = $this->setting_to_bool( $s['lightbox_info_panel_enabled'] ?? true );
+		if ( ! $info_panel_enabled ) {
+			$attrs['data-fg-lb-info-panel'] = 'off';
 		}
 
-		// Info panel location (only relevant when panel is shown)
-		if ( 'never' !== $info_panel ) {
+		if ( $info_panel_enabled ) {
+			// Default panel state - open by default; emit attribute only when collapsed.
+			$info_default_state = is_string( $s['lightbox_info_panel_default_state'] ?? null ) ? (string) $s['lightbox_info_panel_default_state'] : 'open';
+			if ( 'closed' === $info_default_state ) {
+				$attrs['data-fg-lb-info-default'] = 'closed';
+			}
+
+			// Info panel location (only relevant when panel is shown).
 			$info_location = is_string( $s['lightbox_info_panel_location'] ?? null ) ? (string) $s['lightbox_info_panel_location'] : 'right';
 			if ( 'right' !== $info_location ) {
 				$attrs['data-fg-lb-info-location'] = $info_location;
@@ -463,21 +499,21 @@ final class Lightbox implements Feature {
 			}
 		}
 
-		// Info panel blocks - token_select stored as array.
-		// Always emit so JS always has an explicit ordered list to render.
-		if ( 'never' !== $info_panel ) {
-			$info_blocks_raw   = $s['lightbox_info_blocks'] ?? self::DEFAULT_INFO_BLOCKS;
-			$info_blocks_raw   = is_array( $info_blocks_raw ) ? $info_blocks_raw : array();
-			$info_blocks_clean = array_values( array_filter( array_map( 'strval', $info_blocks_raw ) ) );
-			if ( ! empty( $info_blocks_clean ) ) {
-				$attrs['data-fg-lb-info-blocks'] = implode( ' ', $info_blocks_clean );
-			}
+		// Info panel blocks - token_select stored as array. The attribute is
+		// always emitted (even empty) so JS can distinguish an explicit empty
+		// selection from an absent attribute. An empty selection means the
+		// panel is not rendered.
+		if ( $info_panel_enabled ) {
+			$info_blocks_raw                 = $s['lightbox_info_blocks'] ?? self::DEFAULT_INFO_BLOCKS;
+			$info_blocks_raw                 = is_array( $info_blocks_raw ) ? $info_blocks_raw : array();
+			$info_blocks_clean               = array_values( array_filter( array_map( 'strval', $info_blocks_raw ) ) );
+			$attrs['data-fg-lb-info-blocks'] = implode( ' ', $info_blocks_clean );
 
 			// Credit source - only relevant when credit block is enabled.
 			if ( in_array( 'credit', $info_blocks_clean, true ) ) {
 				$credit_source = is_string( $s['lightbox_credit_source'] ?? null ) ? (string) $s['lightbox_credit_source'] : 'item_meta';
-				if ( 'exif' === $credit_source ) {
-					$attrs['data-fg-lb-credit-source'] = 'exif';
+				if ( in_array( $credit_source, array( 'exif', 'xmp' ), true ) ) {
+					$attrs['data-fg-lb-credit-source'] = $credit_source;
 				}
 			}
 

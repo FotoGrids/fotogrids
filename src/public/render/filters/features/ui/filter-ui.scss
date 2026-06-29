@@ -71,6 +71,9 @@
     --fg-filter-btn-padding:      var(--fg-filter-base-size);
     --fg-filter-btn-radius:       4px;
     --fg-filter-btn-font-size:    var(--fg-filter-font-size);
+    --fg-filter-btn-font-family:  inherit;
+    --fg-filter-btn-font-weight:  normal;
+    --fg-filter-btn-font-style:   normal;
     --fg-filter-btn-bg:                  rgba(0, 0, 0, 0);
     --fg-filter-btn-color:               rgba(0, 0, 0, 1);
     --fg-filter-btn-border-color:        rgba(0, 0, 0, 1);
@@ -78,11 +81,9 @@
     --fg-filter-btn-hover-bg:            rgba(60, 70, 240, 0.05);
     --fg-filter-btn-hover-color:         rgba(60, 70, 240, 1);
     --fg-filter-btn-hover-border-color:  rgba(60, 70, 240, 1);
-    --fg-filter-btn-hover-border-width:  1px;
     --fg-filter-btn-active-bg:           rgba(60, 70, 240, 1);
     --fg-filter-btn-active-color:        rgba(255, 255, 255, 1);
     --fg-filter-btn-active-border-color: rgba(60, 70, 240, 1);
-    --fg-filter-btn-active-border-width: 1px;
     // Custom dropdown vars
     --fg-filter-select-padding:              6px;
     --fg-filter-select-radius:               4px;
@@ -257,6 +258,12 @@
     padding:         var(--fg-filter-btn-padding);
     border-radius:   var(--fg-filter-btn-radius);
     font-size:       var(--fg-filter-btn-font-size);
+    font-family:     var(--fg-filter-btn-font-family, inherit);
+    font-weight:     var(--fg-filter-btn-font-weight, normal);
+    font-style:      var(--fg-filter-btn-font-style, normal);
+    line-height:     var(--fg-filter-btn-line-height, normal);
+    letter-spacing:  var(--fg-filter-btn-letter-spacing, normal);
+    word-spacing:    var(--fg-filter-btn-word-spacing, normal);
     background:      var(--fg-filter-btn-bg);
     color:           var(--fg-filter-btn-color);
     border:          var(--fg-filter-btn-border-width) solid var(--fg-filter-btn-border-color);
@@ -273,7 +280,6 @@
         background:   var(--fg-filter-btn-hover-bg);
         color:        var(--fg-filter-btn-hover-color);
         border-color: var(--fg-filter-btn-hover-border-color);
-        border-width: var(--fg-filter-btn-hover-border-width);
     }
 
     &:focus-visible {
@@ -286,7 +292,6 @@
         background:   var(--fg-filter-btn-active-bg);
         color:        var(--fg-filter-btn-active-color);
         border-color: var(--fg-filter-btn-active-border-color);
-        border-width: var(--fg-filter-btn-active-border-width);
     }
 }
 
@@ -303,6 +308,12 @@
     padding:         var(--fg-filter-btn-padding);
     border-radius:   var(--fg-filter-btn-radius);
     font-size:       var(--fg-filter-btn-font-size);
+    font-family:     var(--fg-filter-btn-font-family, inherit);
+    font-weight:     var(--fg-filter-btn-font-weight, normal);
+    font-style:      var(--fg-filter-btn-font-style, normal);
+    line-height:     var(--fg-filter-btn-line-height, normal);
+    letter-spacing:  var(--fg-filter-btn-letter-spacing, normal);
+    word-spacing:    var(--fg-filter-btn-word-spacing, normal);
     background:      var(--fg-filter-btn-bg);
     color:           var(--fg-filter-btn-color);
     border:          var(--fg-filter-btn-border-width) solid var(--fg-filter-btn-border-color);
@@ -319,7 +330,6 @@
         background:   var(--fg-filter-btn-hover-bg);
         color:        var(--fg-filter-btn-hover-color);
         border-color: var(--fg-filter-btn-hover-border-color);
-        border-width: var(--fg-filter-btn-hover-border-width);
     }
 
     &:focus-visible {
@@ -360,6 +370,12 @@
     padding:         var(--fg-filter-btn-padding);
     border-radius:   var(--fg-filter-btn-radius);
     font-size:       var(--fg-filter-btn-font-size);
+    font-family:     var(--fg-filter-btn-font-family, inherit);
+    font-weight:     var(--fg-filter-btn-font-weight, normal);
+    font-style:      var(--fg-filter-btn-font-style, normal);
+    line-height:     var(--fg-filter-btn-line-height, normal);
+    letter-spacing:  var(--fg-filter-btn-letter-spacing, normal);
+    word-spacing:    var(--fg-filter-btn-word-spacing, normal);
     background:      var(--fg-filter-btn-bg);
     color:           var(--fg-filter-btn-color);
     border:          var(--fg-filter-btn-border-width) solid var(--fg-filter-btn-border-color);
@@ -376,7 +392,6 @@
         background:   var(--fg-filter-btn-hover-bg);
         color:        var(--fg-filter-btn-hover-color);
         border-color: var(--fg-filter-btn-hover-border-color);
-        border-width: var(--fg-filter-btn-hover-border-width);
     }
 
     &:focus-visible {
@@ -389,7 +404,6 @@
         background:   var(--fg-filter-btn-active-bg);
         color:        var(--fg-filter-btn-active-color);
         border-color: var(--fg-filter-btn-active-border-color);
-        border-width: var(--fg-filter-btn-active-border-width);
     }
 }
 
@@ -451,7 +465,13 @@
     background:      var(--fg-filter-select-bg);
     color:           var(--fg-filter-select-color);
     border:          var(--fg-filter-select-border-width) solid var(--fg-filter-select-border-color);
-    font-size:       var(--fg-filter-btn-font-size);
+    font-family:     var(--fg-filter-dropdown-font-family, inherit);
+    font-size:       var(--fg-filter-dropdown-font-size, var(--fg-filter-btn-font-size));
+    font-weight:     var(--fg-filter-dropdown-font-weight, normal);
+    font-style:      var(--fg-filter-dropdown-font-style, normal);
+    line-height:     var(--fg-filter-dropdown-line-height, normal);
+    letter-spacing:  var(--fg-filter-dropdown-letter-spacing, normal);
+    word-spacing:    var(--fg-filter-dropdown-word-spacing, normal);
     cursor:          pointer;
     transition:      background var(--fg-filter-transition),
                      color      var(--fg-filter-transition),
@@ -505,7 +525,7 @@
     left:           0;
     z-index:        100;
     min-width:      100%;
-    background:     var(--fg-filter-dropdown-option-bg);
+    background:     var(--fg-filter-dropdown-list-bg, var(--fg-filter-dropdown-option-bg));
     border:         var(--fg-filter-dropdown-list-border-width) solid var(--fg-filter-dropdown-list-border-color);
     border-radius:  var(--fg-filter-dropdown-list-radius);
     box-shadow:     0 4px 12px color-mix(in srgb, CanvasText 15%, transparent);
@@ -531,7 +551,10 @@
     justify-content: space-between;
     gap:            8px;
     padding:        6px 14px;
-    font-size:      var(--fg-filter-btn-font-size);
+    font-family:    var(--fg-filter-dropdown-font-family, inherit);
+    font-size:      var(--fg-filter-dropdown-font-size, var(--fg-filter-btn-font-size));
+    font-weight:    var(--fg-filter-dropdown-font-weight, normal);
+    font-style:     var(--fg-filter-dropdown-font-style, normal);
     cursor:         pointer;
     white-space:    nowrap;
     background:     var(--fg-filter-dropdown-option-bg);
@@ -621,10 +644,15 @@
     display:        flex;
     align-items:    center;
     gap:            var(--fg-filter-cb-gap);
-    font-size:      var(--fg-filter-btn-font-size);
+    font-family:    var(--fg-filter-cb-font-family, inherit);
+    font-size:      var(--fg-filter-cb-font-size, var(--fg-filter-btn-font-size));
+    font-weight:    var(--fg-filter-cb-font-weight, normal);
+    font-style:     var(--fg-filter-cb-font-style, normal);
+    letter-spacing: var(--fg-filter-cb-letter-spacing, normal);
+    word-spacing:   var(--fg-filter-cb-word-spacing, normal);
     cursor:         pointer;
     user-select:    none;
-    line-height:    1.4;
+    line-height:    var(--fg-filter-cb-line-height, 1.4);
 
     // Custom checkbox box, drawn via ::before. Border composes the shared
     // width var with the per-state colour var.

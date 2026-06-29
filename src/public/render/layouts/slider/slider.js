@@ -20,6 +20,7 @@ import {
     renderArrows,
     renderBullets,
     renderCounter,
+    resolveEasingFn,
     resolveTransitionDurationMs,
     resolveVisibilityClasses,
     scrollToDuration,
@@ -52,9 +53,11 @@ function readSettings( collectionEl ) {
         transition:            readString( collectionEl, 'data-fg-transition', 'fade' ),
         transitionDuration:    readString( collectionEl, 'data-fg-transition-duration', 'normal' ),
         transitionDurationCustom: readInt( collectionEl, 'data-fg-transition-duration-custom', 300 ),
+        easing:                readString( collectionEl, 'data-fg-easing', 'ease' ),
         showArrows:            readBool(   collectionEl, 'data-fg-show-arrows' ),
         arrowsVisibility:      readString( collectionEl, 'data-fg-arrows-visibility', 'always' ),
         hideArrowsAtEnds:      readBool(   collectionEl, 'data-fg-hide-arrows-at-ends' ),
+        arrowsAtEndsMode:      readString( collectionEl, 'data-fg-arrows-at-ends-mode', 'hide' ),
         arrowPrevSvg:          readString( collectionEl, 'data-fg-arrow-prev-svg', '' ),
         arrowNextSvg:          readString( collectionEl, 'data-fg-arrow-next-svg', '' ),
         showBullets:           readBool(   collectionEl, 'data-fg-show-bullets' ),
@@ -104,11 +107,13 @@ function maxScrollLeft( scrollerEl ) {
  * @param {Element} scrollerEl
  * @param {number}  page
  * @param {number}  durationMs
+ * @param {(t: number) => number} [easing]
+ * @param {() => void} [onComplete]
  * @return {() => void} Cancel.
  */
-function scrollToPage( scrollerEl, page, durationMs ) {
+function scrollToPage( scrollerEl, page, durationMs, easing, onComplete ) {
     const target = Math.min( page * scrollerEl.clientWidth, maxScrollLeft( scrollerEl ) );
-    return scrollToDuration( scrollerEl, target, durationMs );
+    return scrollToDuration( scrollerEl, target, durationMs, { easing, onComplete } );
 }
 
 /**
@@ -147,6 +152,7 @@ function setup( collectionEl ) {
             settings.transitionDuration,
             settings.transitionDurationCustom
         );
+    const easingFn = resolveEasingFn( settings.easing );
 
     /* Mutable state - chrome rebuilds replace these. */
     let items       = visibleItems( trackEl );
@@ -159,6 +165,7 @@ function setup( collectionEl ) {
     let autoplayApi = null;
     let cancelScroll = () => {};
     let suppressScrollListener = false;
+    let suppressFallbackTimer = 0;
 
     const pauseAutoplayBriefly = () => {
         if ( autoplayApi ) autoplayApi.pause();
@@ -166,16 +173,28 @@ function setup( collectionEl ) {
 
     const goToPage = ( page ) => {
         cancelScroll();
+        // Suppress the native scroll → index sync for the whole animation so an
+        // intermediate scroll position can't yank the index to a half-page and
+        // start a competing scroll. Cleared on natural completion; a re-entrant
+        // goToPage cancels this one (no onComplete fires) and re-arms it. A
+        // safety timer covers the rare case where the rAF completion is missed.
         suppressScrollListener = true;
-        cancelScroll = scrollToPage( trackWrapperEl, page, durationMs );
-        window.setTimeout( () => { suppressScrollListener = false; }, durationMs + 50 );
+        clearTimeout( suppressFallbackTimer );
+        const clearSuppress = () => { suppressScrollListener = false; };
+        cancelScroll = scrollToPage( trackWrapperEl, page, durationMs, easingFn, clearSuppress );
+        suppressFallbackTimer = window.setTimeout( clearSuppress, durationMs + 100 );
     };
 
     const updateArrowDisabled = () => {
         if ( ! arrowsApi || ! indexState ) return;
         if ( settings.hideArrowsAtEnds && ! settings.loop ) {
-            arrowsApi.prev.disabled = ! indexState.hasPrev();
-            arrowsApi.next.disabled = ! indexState.hasNext();
+            const prevInactive = ! indexState.hasPrev();
+            const nextInactive = ! indexState.hasNext();
+            const hide = settings.arrowsAtEndsMode === 'hide';
+            arrowsApi.prev.disabled = prevInactive;
+            arrowsApi.next.disabled = nextInactive;
+            arrowsApi.prev.classList.toggle( 'fg-carousel-arrow--at-end-hidden', hide && prevInactive );
+            arrowsApi.next.classList.toggle( 'fg-carousel-arrow--at-end-hidden', hide && nextInactive );
         }
     };
 

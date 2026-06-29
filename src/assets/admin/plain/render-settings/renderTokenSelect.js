@@ -72,6 +72,7 @@ const TokenSelectComponent = ({
 
 	const triggerRef = useRef(null);
 	const dropdownRef = useRef(null);
+	const tokensRef = useRef(null);
 	const dragSrcIndex = useRef(null);
 	const dragInsertSlot = useRef(null);
 
@@ -237,66 +238,76 @@ const TokenSelectComponent = ({
 		e.dataTransfer.setData('text/plain', String(index));
 	};
 
-	// dragOverIndex represents the insertion slot *before* that index.
-	// Slot 0 = before first token, slot N = after last token.
-	// We compute the slot from which half of the token the cursor is on.
-	const getInsertionSlot = (e, index) => {
-		const rect = e.currentTarget.getBoundingClientRect();
-		const midX = rect.left + rect.width / 2;
-		return e.clientX < midX ? index : index + 1;
+	// Compute the insertion slot from the pointer X against every rendered
+	// token, independent of which element the event fired on. Slot 0 = before
+	// the first token, slot N = after the last. Reading the live token rects
+	// (rather than the event target) keeps drop reliable when the cursor is
+	// over a gap, the insertion marker, or a token child.
+	const getInsertionSlotFromPointer = (clientX) => {
+		const container = tokensRef.current;
+		if (!container) return null;
+		const tokenEls = Array.from(
+			container.querySelectorAll('.fotogrids-token-select__token')
+		);
+		for (let i = 0; i < tokenEls.length; i++) {
+			const rect = tokenEls[i].getBoundingClientRect();
+			if (clientX < rect.left + rect.width / 2) {
+				return i;
+			}
+		}
+		return tokenEls.length;
 	};
 
-	const handleDragOver = (e, index) => {
+	// Apply a reorder and commit. Kept outside any state-updater so the side
+	// effect (updateSetting) is not run during render reconciliation.
+	const commitReorder = (srcIndex, insertAt) => {
+		if (srcIndex === null || insertAt === null) return;
+		// No-op: dropping in the slot immediately before or after itself.
+		if (insertAt === srcIndex || insertAt === srcIndex + 1) return;
+
+		const next = [...selectedValues];
+		const [moved] = next.splice(srcIndex, 1);
+		const adjustedInsert = insertAt > srcIndex ? insertAt - 1 : insertAt;
+		next.splice(adjustedInsert, 0, moved);
+		commit(next);
+	};
+
+	const handleContainerDragOver = (e) => {
+		if (dragSrcIndex.current === null) return;
 		e.preventDefault();
 		e.dataTransfer.dropEffect = 'move';
-		const slot = getInsertionSlot(e, index);
+		const slot = getInsertionSlotFromPointer(e.clientX);
 		dragInsertSlot.current = slot;
 		setDragOverIndex(slot);
 	};
 
+	const handleContainerDrop = (e) => {
+		if (dragSrcIndex.current === null) return;
+		e.preventDefault();
+		const srcIndex = dragSrcIndex.current;
+		const insertAt =
+			dragInsertSlot.current !== null
+				? dragInsertSlot.current
+				: getInsertionSlotFromPointer(e.clientX);
+
+		dragSrcIndex.current = null;
+		dragInsertSlot.current = null;
+		setDragOverIndex(null);
+
+		commitReorder(srcIndex, insertAt);
+	};
+
 	const handleDragLeave = (e) => {
-		// Only clear if we're truly leaving the tokens container
+		// Only clear if we're truly leaving the tokens container.
 		if (!e.currentTarget.contains(e.relatedTarget)) {
 			setDragOverIndex(null);
 			dragInsertSlot.current = null;
 		}
 	};
 
-	const handleDrop = (e, index) => {
-		e.preventDefault();
-		// Read both refs immediately - handleDragEnd may fire synchronously
-		// in some browsers and would clear dragSrcIndex before we use it.
-		const srcIndex = dragSrcIndex.current;
-		// Use the last recorded slot from dragOver; fall back to computing
-		// it from the drop event in case dragOver didn't fire on this target.
-		const insertAt =
-			dragInsertSlot.current !== null
-				? dragInsertSlot.current
-				: getInsertionSlot(e, index);
-
-		dragSrcIndex.current = null;
-		dragInsertSlot.current = null;
-		setDragOverIndex(null);
-
-		if (srcIndex === null) return;
-		// No-op: dropping in the slot immediately before or after itself
-		if (insertAt === srcIndex || insertAt === srcIndex + 1) return;
-
-		setSelectedValues((prev) => {
-			const next = [...prev];
-			const [moved] = next.splice(srcIndex, 1);
-			// Adjust insertion point for the shift caused by removal
-			const adjustedInsert =
-				insertAt > srcIndex ? insertAt - 1 : insertAt;
-			next.splice(adjustedInsert, 0, moved);
-			updateSetting(setting.key, serializeValue(next));
-			return next;
-		});
-	};
-
 	const handleDragEnd = () => {
-		// Fires after drop (or on cancel). Safe to clear here because
-		// handleDrop already captured both refs before this runs.
+		// Fires after drop (or on cancel). The container drop handler has
+		// already captured and cleared the refs by this point.
 		dragSrcIndex.current = null;
 		dragInsertSlot.current = null;
 		setDragOverIndex(null);
@@ -338,8 +349,6 @@ const TokenSelectComponent = ({
 		if (sortable && !isDisabled) {
 			tokenProps.draggable = true;
 			tokenProps.onDragStart = (e) => handleDragStart(e, index);
-			tokenProps.onDragOver = (e) => handleDragOver(e, index);
-			tokenProps.onDrop = (e) => handleDrop(e, index);
 			tokenProps.onDragEnd = handleDragEnd;
 		}
 
@@ -539,7 +548,14 @@ const TokenSelectComponent = ({
 								'div',
 								{
 									key: 'tokens',
+									ref: tokensRef,
 									className: 'fotogrids-token-select__tokens',
+									onDragOver: sortable
+										? handleContainerDragOver
+										: undefined,
+									onDrop: sortable
+										? handleContainerDrop
+										: undefined,
 									onDragLeave: sortable
 										? handleDragLeave
 										: undefined,

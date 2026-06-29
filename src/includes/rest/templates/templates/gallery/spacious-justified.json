@@ -10,7 +10,7 @@
   "order": 5,
   "settings": {
     "layout": "justified",
-    "target_row_height": {
+    "layout_justified_row_height": {
       "desktop": 340,
       "tablet": 260,
       "mobile": 180

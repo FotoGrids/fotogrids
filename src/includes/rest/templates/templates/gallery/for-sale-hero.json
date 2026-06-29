@@ -21,8 +21,7 @@
       "mobile": 0
     },
     "captions": true,
-    "cta_overlays": true,
-    "autoplay": false,
-    "lightbox": true
+    "layout_autoplay": false,
+    "item_click_behavior": "lightbox"
   }
 }

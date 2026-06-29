@@ -13,18 +13,14 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
  *   "key": "...",          // optional - block is not saved
  *   "subtitle": "...",     // optional; bold label rendered above the message
  *   "message": "...",      // required; supports <strong> and <a> tags
- *   "icon": "info_square", // optional; renders a fotogrids-icon before the inner block; defaults to "info_square"
+ *   "icon": "info_square", // optional; renders a fotogrids-icon before the inner block; defaults to the variant icon
+ *   "variant": "info",     // optional; "info" (default) or "danger" (red warning styling)
  *   "full_width": false,   // optional; when true, removes content max-width limit
  *   "button_label": "...", // optional; shows a secondary action button
  *   "button_url": "..."    // required when button_label is set
  * }
  */
-window.FotoGridsRenderSettings.renderInfoBlock = (
-	setting,
-	currentValue,
-	isDisabled,
-	{ __ }
-) => {
+window.FotoGridsRenderSettings.renderInfoBlock = (setting) => {
 	const { createElement: h } = wp.element;
 
 	const subtitle = setting.subtitle || null;
@@ -47,13 +43,16 @@ window.FotoGridsRenderSettings.renderInfoBlock = (
 		}
 	};
 
-	const icon = setting.icon !== undefined ? setting.icon : 'info_square';
+	const variant = setting.variant === 'danger' ? 'danger' : 'info';
+	const defaultIcon = variant === 'danger' ? 'alert_circle' : 'info_square';
+	const icon = setting.icon !== undefined ? setting.icon : defaultIcon;
 	const iconSvg = icon ? window.FotoGridsIcons?.[icon] || null : null;
 
 	const baseClass = 'fotogrids-settings_info-block';
 	const isFullWidth = Boolean(setting.full_width);
 	const rootClassName = [
 		baseClass,
+		`${baseClass}--${variant}`,
 		isFullWidth ? `${baseClass}--full-width` : null,
 	]
 		.filter(Boolean)

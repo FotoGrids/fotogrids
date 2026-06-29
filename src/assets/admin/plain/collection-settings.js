@@ -7,13 +7,7 @@ const {
 	useRef,
 	useCallback,
 } = wp.element;
-const {
-	SelectControl,
-	__experimentalNavigatorProvider: NavigatorProvider,
-	__experimentalNavigatorScreen: NavigatorScreen,
-	__experimentalNavigatorButton: NavigatorButton,
-	__experimentalNavigator: Navigator,
-} = wp.components;
+const { SelectControl } = wp.components;
 const { __ } = wp.i18n;
 
 let SETTINGS_GROUPS = {};
@@ -460,6 +454,48 @@ function CollectionSettings() {
 	useEffect(() => {
 		loadAndTranslateSettings();
 	}, []);
+
+	// Cross-setting conflict: a popover Image Zoom in click mode and an
+	// Item Click Behavior of "lightbox" both bind the item click. Register the
+	// conflict in the shared FotoGridsValidationErrors registry so ajax-save
+	// disables the save button and surfaces the error toast until resolved.
+	useEffect(() => {
+		const conflictKey = 'item_click_zoom_conflict';
+		const isTruthy = (v) => v === true || v === '1' || v === 1;
+		const hasConflict =
+			settings.item_click_behavior === 'lightbox' &&
+			isTruthy(settings.interactions_zoom) &&
+			settings.interactions_zoom_style === 'popover' &&
+			settings.interactions_zoom_mode === 'click';
+
+		setValidationErrors((prev) => {
+			const alreadySet = Boolean(prev[conflictKey]?.hasErrors);
+			if (hasConflict === alreadySet) {
+				return prev;
+			}
+
+			const next = { ...prev };
+			if (hasConflict) {
+				next[conflictKey] = {
+					hasErrors: true,
+					message: __(
+						'Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving.',
+						'fotogrids'
+					),
+				};
+			} else {
+				delete next[conflictKey];
+			}
+
+			window.FotoGridsValidationErrors = next;
+			return next;
+		});
+	}, [
+		settings.item_click_behavior,
+		settings.interactions_zoom,
+		settings.interactions_zoom_style,
+		settings.interactions_zoom_mode,
+	]);
 
 	// Bind fg-tooltip to any [data-fg-tooltip] element rendered by this
 	// component (docs strip "Defaults" link, etc). fg-tooltip auto-inits on
@@ -979,6 +1015,30 @@ function CollectionSettings() {
 		}
 	};
 
+	// Normalise a token_select value to a plain array. The setting stores a
+	// JSON array (["caption",...]) or a legacy comma-separated string; mirrors
+	// renderTokenSelect's parseValue so condition operators agree with the UI.
+	const parseTokenArray = (raw) => {
+		if (Array.isArray(raw)) {
+			return raw;
+		}
+		if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+			try {
+				const parsed = JSON.parse(raw);
+				return Array.isArray(parsed) ? parsed : [];
+			} catch {
+				return [];
+			}
+		}
+		if (typeof raw === 'string' && raw.trim().length > 0) {
+			return raw
+				.split(',')
+				.map((s) => s.trim())
+				.filter(Boolean);
+		}
+		return [];
+	};
+
 	/**
 	 * Decide whether to render a single setting field.
 	 *
@@ -1128,30 +1188,19 @@ function CollectionSettings() {
 					return false;
 				}
 
-				// array_not_empty: passes when the stored JSON array has at least one element.
+				// array_not_empty: passes when the token-select value has at least one element.
 				if (op === 'array_not_empty') {
-					let storedArray = currentValue;
-					if (typeof storedArray === 'string') {
-						try {
-							storedArray = JSON.parse(storedArray);
-						} catch {
-							storedArray = [];
-						}
-					}
-					return Array.isArray(storedArray) && storedArray.length > 0;
+					return parseTokenArray(currentValue).length > 0;
 				}
 
-				// array_includes: passes when the stored JSON array contains any of the expected values.
+				// array_empty: passes when the token-select value has no elements.
+				if (op === 'array_empty') {
+					return parseTokenArray(currentValue).length === 0;
+				}
+
+				// array_includes: passes when the token-select value contains any of the expected values.
 				if (op === 'array_includes') {
-					let storedArray = currentValue;
-					if (typeof storedArray === 'string') {
-						try {
-							storedArray = JSON.parse(storedArray);
-						} catch {
-							storedArray = [];
-						}
-					}
-					if (!Array.isArray(storedArray)) return false;
+					const storedArray = parseTokenArray(currentValue);
 					return Array.isArray(expectedValues)
 						? expectedValues.some((v) => storedArray.includes(v))
 						: storedArray.includes(expectedValues);
@@ -1192,22 +1241,21 @@ function CollectionSettings() {
 			return false;
 		}
 
-		// array_includes: the stored value is a JSON array; check that it
-		// contains at least one of the listed values. Used by token_select
-		// fields where multiple options can be active simultaneously.
+		// array_includes: the stored token-select value (JSON array or legacy
+		// comma-separated string) contains at least one of the listed values.
+		// Used by token_select fields where multiple options can be active.
 		if (conditionOperator === 'array_includes') {
-			let storedArray = dependentValue;
-			if (typeof storedArray === 'string') {
-				try {
-					storedArray = JSON.parse(storedArray);
-				} catch {
-					storedArray = [];
-				}
-			}
-			if (!Array.isArray(storedArray)) return false;
+			const storedArray = parseTokenArray(dependentValue);
 			return Array.isArray(values)
 				? values.some((v) => storedArray.includes(v))
 				: storedArray.includes(values);
+		}
+
+		// array_empty: the stored value is a token-select array (stored as a
+		// JSON array or a legacy comma-separated string); passes when it has no
+		// elements. Used to surface a notice when a token_select is cleared.
+		if (conditionOperator === 'array_empty') {
+			return parseTokenArray(dependentValue).length === 0;
 		}
 
 		// not_in: passes when the dependent value is NOT in the listed values.
@@ -1367,7 +1415,7 @@ function CollectionSettings() {
 					if (setting.subTabs) {
 						for (const subTabId in setting.subTabs) {
 							const subTab = setting.subTabs[subTabId];
-							const subSetting = subTab.settings.find(
+							const subSetting = (subTab?.settings || []).find(
 								(s) => s.key === key
 							);
 							if (subSetting) return subSetting;
@@ -1379,7 +1427,9 @@ function CollectionSettings() {
 			if (group.subTabs) {
 				for (const subTabId in group.subTabs) {
 					const subTab = group.subTabs[subTabId];
-					const setting = subTab.settings.find((s) => s.key === key);
+					const setting = (subTab?.settings || []).find(
+						(s) => s.key === key
+					);
 					if (setting) return setting;
 				}
 			}
@@ -1575,6 +1625,20 @@ function CollectionSettings() {
 				);
 				break;
 
+			case 'font_style':
+				control = window.FotoGridsRenderSettings?.renderFontStyle(
+					setting,
+					currentValue,
+					isDisabled,
+					{
+						updateSetting,
+						getFieldState,
+						renderIcon,
+						__,
+					}
+				);
+				break;
+
 			case 'range':
 				control = window.FotoGridsRenderSettings?.renderRange(
 					setting,
@@ -1601,7 +1665,11 @@ function CollectionSettings() {
 				);
 				break;
 
-			case 'responsive_range':
+			case 'responsive_range': {
+				const siblingValueOf = (key) =>
+					key && typeof settings === 'object'
+						? settings[key]
+						: undefined;
 				control = window.FotoGridsRenderSettings?.renderResponsiveRange(
 					setting,
 					currentValue,
@@ -1613,10 +1681,12 @@ function CollectionSettings() {
 						setActiveDevice,
 						renderIcon,
 						getFieldState,
+						siblingValueOf,
 						__,
 					}
 				);
 				break;
+			}
 
 			case 'layout_grid':
 				control = window.FotoGridsRenderSettings?.renderLayoutGrid(
@@ -2516,10 +2586,18 @@ function CollectionSettings() {
 											className:
 												'fg-button fg-button--variant-secondary',
 											onClick: () => {
-												window.open(
-													`https://go.fotogrids.com/feature-${group.id}`,
-													'_blank'
+												const template =
+													window.fotogridsSettings
+														?.proLinkTemplate || '';
+												const url = template.replace(
+													'{{path}}',
+													encodeURIComponent(
+														`feature-${group.id}`
+													)
 												);
+												if (url) {
+													window.open(url, '_blank');
+												}
 											},
 										},
 										__('Learn more', 'fotogrids')

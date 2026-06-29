@@ -117,6 +117,16 @@
 	&__fill {
 		position: absolute;
 		inset: 0;
+
+		&--unset {
+			background: linear-gradient(
+				to top left,
+				transparent calc(50% - 1px),
+				rgba(220, 53, 69, 0.9) calc(50% - 1px),
+				rgba(220, 53, 69, 0.9) calc(50% + 1px),
+				transparent calc(50% + 1px)
+			);
+		}
 	}
 }
 

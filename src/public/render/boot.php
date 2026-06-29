@@ -60,7 +60,17 @@ spl_autoload_register( 'fotogrids_render_autoload' );
 add_action(
 	'plugins_loaded',
 	static function (): void {
-		Asset_Resolver::register_plugin( 'fotogrids', FOTOGRIDS_PLUGIN_URL, FOTOGRIDS_VERSION );
+		// In debug builds, bust the per-asset cache on every change by versioning
+		// against the render directory's newest file mtime instead of the static
+		// plugin version (which never changes between rebuilds).
+		$version = FOTOGRIDS_VERSION;
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$runtime_js = FOTOGRIDS_PLUGIN_DIR . 'assets/js/layout-masonry.js';
+			if ( file_exists( $runtime_js ) ) {
+				$version = (string) filemtime( $runtime_js );
+			}
+		}
+		Asset_Resolver::register_plugin( 'fotogrids', FOTOGRIDS_PLUGIN_URL, $version );
 	},
 	5
 );
@@ -147,6 +157,9 @@ add_action(
 		// LightboxGrid - the "show all" overlay for the Featured Item layout.
 		// Active only when that layout overflows its inline display.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Lightbox\Grid\Lightbox_Grid::class );
+		// Lightbox Mini viewer - the single-image "mini" lightbox variant on the
+		// variant-eligible layouts.
+		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Lightbox\Mini_Viewer\Lightbox_Mini_Viewer::class );
 		// Filter sources must be registered before Filter_UI so the feature can
 		// call Module_Registry::active_modules('filter_sources', ...) during
 		// supports() and html_before(). Tags decorator runs with decorators so

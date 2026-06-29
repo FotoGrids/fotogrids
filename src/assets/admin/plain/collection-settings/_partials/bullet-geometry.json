@@ -1,0 +1,85 @@
+{
+	"partial": "bullet-geometry",
+	"inline_defaults": true,
+	"layout": [
+		"align",
+		"size",
+		{
+			"wrap": "side_by_side",
+			"fields": ["radius", "border_width"]
+		},
+		"spacing"
+	],
+	"fields": {
+		"align": {
+			"type": "button_group",
+			"label": "Bullet Alignment",
+			"options": [
+				{ "label": "Center", "value": "center", "icon": "bullets_center", "tier_required": "free" },
+				{ "label": "Stretch", "value": "stretch", "icon": "bullets_stretch", "tier_required": "free" }
+			],
+			"default": "center",
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"size": {
+			"type": "responsive_range",
+			"label": "Bullet Size",
+			"two_sided": true,
+			"units": ["px"],
+			"side_labels": { "width": "Width", "height": "Height" },
+			"disable_width_when": { "dependsOn": "{{key_prefix}}align", "values": ["stretch"] },
+			"responsive": {
+				"desktop": { "min": 2, "max": 60, "default": 10 },
+				"tablet": { "min": 2, "max": 60, "default": 10 },
+				"mobile": { "min": 2, "max": 60, "default": 10 }
+			},
+			"default": {
+				"width": { "value": 10, "unit": "px" },
+				"height": { "value": 10, "unit": "px" }
+			},
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"radius": {
+			"type": "range",
+			"label": "Border Radius",
+			"unit": "px",
+			"min": 0,
+			"max": 50,
+			"default": 16,
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"border_width": {
+			"type": "range",
+			"label": "Border Width",
+			"unit": "px",
+			"min": 0,
+			"max": 10,
+			"default": 1,
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"spacing": {
+			"type": "range",
+			"label": "Space Between Bullets",
+			"min": 0,
+			"max": 30,
+			"default": 8,
+			"units": ["px", "em", "rem"],
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		}
+	}
+}

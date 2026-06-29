@@ -40,24 +40,9 @@ class Register_Templates_Routes {
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
 						),
-					),
-				),
-			)
-		);
-
-		// Download template endpoint
-		register_rest_route(
-			'fotogrids/v1',
-			'/templates/(?P<id>[a-zA-Z0-9_-]+)/download',
-			array(
-				array(
-					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => array( '\FotoGrids\REST\Templates\Templates_Data', 'download_template' ),
-					'permission_callback' => array( '\FotoGrids\REST\Templates\Templates_Permissions', 'check_templates_read' ),
-					'args'                => array(
-						'id' => array(
-							'required'          => true,
-							'sanitize_callback' => 'sanitize_text_field',
+						'refresh'  => array(
+							'default'           => false,
+							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
 					),
 				),
@@ -152,15 +137,23 @@ class Register_Templates_Routes {
 					'callback'            => array( '\FotoGrids\REST\Templates\Templates_Data', 'render_template_preview' ),
 					'permission_callback' => '__return_true', // We'll check permissions inside the callback
 					'args'                => array(
-						'template_id' => array(
+						'template_id'        => array(
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
-						'category'    => array(
+						'category'           => array(
 							'default'           => 'gallery',
 							'sanitize_callback' => 'sanitize_text_field',
 						),
-						'_wpnonce'    => array(
+						'preview_background' => array(
+							'default'           => 'light',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'preview_bg_color'   => array(
+							'default'           => '',
+							'sanitize_callback' => array( '\FotoGrids\REST\Templates\Templates_Data', 'sanitize_css_color' ),
+						),
+						'_wpnonce'           => array(
 							'default'           => '',
 							'sanitize_callback' => 'sanitize_text_field',
 						),

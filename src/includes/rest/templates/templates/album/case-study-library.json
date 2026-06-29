@@ -5,24 +5,7 @@
   "type": "pro",
   "category": "album",
   "subcategory": "leads",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 15,
-  "settings": {
-    "layout": "justified",
-    "target_row_height": {
-      "desktop": 280,
-      "tablet": 220,
-      "mobile": 160
-    },
-    "item_spacing": {
-      "desktop": 10,
-      "tablet": 8,
-      "mobile": 5
-    },
-    "cta_overlays": true,
-    "lead_capture_form": true,
-    "extended_analytics": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

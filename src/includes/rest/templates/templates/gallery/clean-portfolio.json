@@ -10,7 +10,7 @@
   "order": 6,
   "settings": {
     "layout": "justified",
-    "target_row_height": {
+    "layout_justified_row_height": {
       "desktop": 280,
       "tablet": 220,
       "mobile": 160
@@ -20,7 +20,10 @@
       "tablet": 6,
       "mobile": 4
     },
-    "hover_effect": "none",
-    "lightbox": true
+    "hover_effect": "spotlight",
+    "item_click_behavior": "lightbox",
+    "captions": true,
+    "caption_placement": "overlay",
+    "caption_title_source": "title"
   }
 }

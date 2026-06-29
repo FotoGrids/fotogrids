@@ -1,0 +1,18 @@
+{
+  "id": "spotlight-single",
+  "name": "Spotlight",
+  "description": "One image at a time, front and centre. A clean single-image viewer for hero shots and featured work.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "showcase",
+  "order": 20,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "single-item",
+    "captions": true,
+    "caption_placement": "bottom",
+    "caption_title_source": "title",
+    "item_click_behavior": "lightbox"
+  }
+}

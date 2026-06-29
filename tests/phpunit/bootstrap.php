@@ -17,3 +17,20 @@ require_once dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 if ( ! defined( 'WPINC' ) ) {
 	define( 'WPINC', 'wp-includes' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress core constant, not plugin-owned.
 }
+
+// Plugin dir, pointing at the real src/ so catalog/partial tests read the
+// shipped JSON files.
+if ( ! defined( 'FOTOGRIDS_PLUGIN_DIR' ) ) {
+	define( 'FOTOGRIDS_PLUGIN_DIR', dirname( __DIR__, 2 ) . '/src/' );
+}
+
+// Minimal WordPress function stubs used by isolated catalog classes.
+if ( ! function_exists( 'trailingslashit' ) ) {
+	/**
+	 * @param string $value Path.
+	 * @return string
+	 */
+	function trailingslashit( $value ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		return rtrim( (string) $value, '/\\' ) . '/';
+	}
+}

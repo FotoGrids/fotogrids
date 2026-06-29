@@ -11,7 +11,6 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 		isDefaultsMode,
 		getOptionState,
 		isOptionVisible,
-		__,
 		buttonsClassName = '',
 	}
 ) => {

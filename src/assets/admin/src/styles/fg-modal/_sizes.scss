@@ -29,6 +29,8 @@
 	--fg-modal-max-width: calc(100vw - 32px);
 	--fg-modal-max-height: calc(100vh - 32px);
 	--fg-modal-radius: 12px;
+
+	overflow: hidden;
 }
 
 .fg-modal--size-full .fg-modal__dialog {

@@ -80,6 +80,7 @@ class Module extends Abstract_Module {
 	public function register_rest_routes(): void {
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/templates/templates-permissions.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/templates/templates-data.php';
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/templates/class-templates-catalog.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/templates/register-templates-routes.php';
 
 		\FotoGrids\REST\Templates\Register_Templates_Routes::register();

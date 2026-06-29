@@ -108,6 +108,23 @@ final class Album_Item_Loader {
 	 * @return array{url: string, width: int|null, height: int|null}
 	 */
 	private static function resolve_thumbnail( int $gallery_id, string $thumb_size ): array {
+		// Custom Featured / Share Image wins when set; it may be an image that
+		// is not in the gallery, so it is read directly rather than from the
+		// item list.
+		if ( class_exists( '\FotoGrids\Post_Types' ) ) {
+			$custom_id = (int) get_post_meta( $gallery_id, \FotoGrids\Post_Types::FEATURED_IMAGE_META_KEY, true );
+			if ( $custom_id > 0 && wp_attachment_is_image( $custom_id ) ) {
+				$src = wp_get_attachment_image_src( $custom_id, $thumb_size );
+				if ( is_array( $src ) && ! empty( $src[0] ) ) {
+					return array(
+						'url'    => (string) $src[0],
+						'width'  => isset( $src[1] ) ? (int) $src[1] : null,
+						'height' => isset( $src[2] ) ? (int) $src[2] : null,
+					);
+				}
+			}
+		}
+
 		$featured_id = (int) get_post_thumbnail_id( $gallery_id );
 		if ( $featured_id > 0 ) {
 			$src = wp_get_attachment_image_src( $featured_id, $thumb_size );

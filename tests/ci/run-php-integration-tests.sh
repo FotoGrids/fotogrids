@@ -22,6 +22,7 @@ tests=(
     "${plugin_root}/tests/integration/PreviewEndpointTest.php"
     "${plugin_root}/tests/integration/PublicRenderParityTest.php"
     "${plugin_root}/tests/integration/LicenseStateMatrixTest.php"
+    "${plugin_root}/tests/integration/TemplateConfigValidityTest.php"
 )
 
 for test_file in "${tests[@]}"; do

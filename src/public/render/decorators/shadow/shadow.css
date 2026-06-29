@@ -3,3 +3,13 @@
     box-shadow: var(--fg-shadow, none);
     transition: box-shadow 0.25s ease;
 }
+
+/* Loading-state shadow (while the item's media is still loading). */
+.fotogrids-collection[data-fg-shadow] .fg-item[data-fg-media-state="loading"] .fg-item-media {
+    box-shadow: var(--fg-shadow-loading, var(--fg-shadow, none));
+}
+
+/* Hover-state shadow (takes precedence over loading on pointer hover). */
+.fotogrids-collection[data-fg-shadow] .fg-item:hover .fg-item-media {
+    box-shadow: var(--fg-shadow-hover, var(--fg-shadow, none));
+}

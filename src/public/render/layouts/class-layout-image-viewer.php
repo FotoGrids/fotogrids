@@ -120,7 +120,17 @@ final class Layout_Image_Viewer implements Layout {
 				'normal'
 			),
 			'data-fg-transition-duration-custom' => (string) max( 0, (int) ( $s['layout_transition_duration_custom'] ?? 300 ) ),
+			'data-fg-easing'                     => self::sanitize_choice(
+				$s['layout_easing'] ?? 'ease_in_out',
+				array( 'ease', 'linear', 'ease_in', 'ease_out', 'ease_in_out' ),
+				'ease_in_out'
+			),
 			'data-fg-hide-arrows-at-ends'        => ! empty( $s['layout_hide_arrows_at_ends'] ) ? '1' : '0',
+			'data-fg-arrows-at-ends-mode'        => self::sanitize_choice(
+				$s['layout_arrows_at_ends_mode'] ?? 'hide',
+				array( 'hide', 'dim' ),
+				'hide'
+			),
 		);
 
 		// Arrows always show in this layout (the bar is the only chrome), so
@@ -144,23 +154,59 @@ final class Layout_Image_Viewer implements Layout {
 		$height_fixed = is_array( $s['layout_height_fixed'] ?? null ) ? $s['layout_height_fixed'] : array();
 		$height_max   = is_array( $s['layout_height_max'] ?? null ) ? $s['layout_height_max'] : array();
 
-		return array(
-			'--fg-height-fixed'    => new Responsive_Var(
+		$vars = array(
+			'--fg-height-fixed'               => new Responsive_Var(
 				self::resolve_int( $height_fixed, 'desktop', 500 ) . 'px',
 				self::resolve_int( $height_fixed, 'tablet', 400 ) . 'px',
 				self::resolve_int( $height_fixed, 'mobile', 300 ) . 'px',
 			),
-			'--fg-height-max'      => new Responsive_Var(
+			'--fg-height-max'                 => new Responsive_Var(
 				self::height_max_value( $height_max, 'desktop' ),
 				self::height_max_value( $height_max, 'tablet' ),
 				self::height_max_value( $height_max, 'mobile' ),
 			),
-			'--fg-arrow-size'      => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
-			'--fg-arrow-distance'  => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
-			'--fg-bullet-size'     => self::resolve_unit( $s['layout_bullet_size'] ?? null, 10, 'px' ),
-			'--fg-bullet-distance' => self::resolve_unit( $s['layout_bullet_distance'] ?? null, 8, 'px' ),
-			'--fg-bullets-spacing' => self::resolve_unit( $s['layout_bullets_spacing'] ?? null, 8, 'px' ),
+			'--fg-arrow-size'                 => self::resolve_unit( $s['layout_arrow_size'] ?? null, 40, 'px' ),
+			'--fg-arrow-distance'             => self::resolve_unit( $s['layout_arrow_distance'] ?? null, 8, 'px' ),
+			'--fg-viewer-arrow-bg'            => self::resolve_color( $s['layout_viewer_arrow_bg'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-viewer-arrow-border'        => self::resolve_color( $s['layout_viewer_arrow_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-viewer-arrow-color'         => self::resolve_color( $s['layout_viewer_arrow_arrow_color'] ?? null, 'rgba(0, 0, 0, 1)' ),
+			'--fg-viewer-arrow-bg-hover'      => self::resolve_color( $s['layout_viewer_arrow_hover_bg'] ?? null, 'rgba(0, 0, 0, 0.08)' ),
+			'--fg-viewer-arrow-border-hover'  => self::resolve_color( $s['layout_viewer_arrow_hover_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-viewer-arrow-color-hover'   => self::resolve_color( $s['layout_viewer_arrow_hover_arrow_color'] ?? null, 'rgba(0, 0, 0, 1)' ),
+			'--fg-viewer-arrow-bg-active'     => self::resolve_color( $s['layout_viewer_arrow_active_bg'] ?? null, 'rgba(0, 0, 0, 0.08)' ),
+			'--fg-viewer-arrow-border-active' => self::resolve_color( $s['layout_viewer_arrow_active_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-viewer-arrow-color-active'  => self::resolve_color( $s['layout_viewer_arrow_active_arrow_color'] ?? null, 'rgba(0, 0, 0, 1)' ),
+			'--fg-viewer-arrow-bg-focus'      => self::resolve_color( $s['layout_viewer_arrow_focus_bg'] ?? null, 'rgba(0, 0, 0, 0.08)' ),
+			'--fg-viewer-arrow-border-focus'  => self::resolve_color( $s['layout_viewer_arrow_focus_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-viewer-arrow-color-focus'   => self::resolve_color( $s['layout_viewer_arrow_focus_arrow_color'] ?? null, 'rgba(0, 0, 0, 1)' ),
+			'--fg-bullet-width'               => self::resolve_side( $s['layout_bullet_size'] ?? null, 'width', 10, 'px' ),
+			'--fg-bullet-height'              => self::resolve_side( $s['layout_bullet_size'] ?? null, 'height', 10, 'px' ),
+			'--fg-bullet-radius'              => self::resolve_unit( $s['layout_bullet_radius'] ?? null, 4, 'px' ),
+			'--fg-bullet-border-width'        => self::resolve_unit( $s['layout_bullet_border_width'] ?? null, 2, 'px' ),
+			'--fg-bullet-distance'            => self::resolve_unit( $s['layout_bullet_distance'] ?? null, 8, 'px' ),
+			'--fg-bullet-spacing'             => self::resolve_unit( $s['layout_bullet_spacing'] ?? null, 8, 'px' ),
+			'--fg-bullets-justify'            => ( 'stretch' === self::sanitize_choice( $s['layout_bullet_align'] ?? 'center', array( 'center', 'stretch' ), 'center' ) ) ? 'stretch' : 'center',
+			'--fg-bullet-bg'                  => self::resolve_color( $s['layout_bullet_bg'] ?? null, 'rgba(0, 0, 0, 0.4)' ),
+			'--fg-bullet-border'              => self::resolve_color( $s['layout_bullet_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-bullet-bg-hover'            => self::resolve_color( $s['layout_bullet_hover_bg'] ?? null, 'rgba(0, 0, 0, 0.7)' ),
+			'--fg-bullet-border-hover'        => self::resolve_color( $s['layout_bullet_hover_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-bullet-bg-active'           => self::resolve_color( $s['layout_bullet_active_bg'] ?? null, 'var(--fg-colors-blue, #3c46f0)' ),
+			'--fg-bullet-border-active'       => self::resolve_color( $s['layout_bullet_active_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-bullet-bg-focus'            => self::resolve_color( $s['layout_bullet_focus_bg'] ?? null, 'var(--fg-colors-blue, #3c46f0)' ),
+			'--fg-bullet-border-focus'        => self::resolve_color( $s['layout_bullet_focus_border_color'] ?? null, 'rgba(0, 0, 0, 0)' ),
+			'--fg-viewer-stage-bg'            => self::resolve_color( $s['viewer_stage_bg_color'] ?? null, 'rgba(0, 0, 0, 0.1)' ),
+			'--fg-viewer-stage-radius'        => self::resolve_unit( $s['viewer_stage_radius'] ?? null, 6, 'px' ),
+			'--fg-viewer-stage-border-width'  => self::resolve_unit( $s['viewer_stage_border_width'] ?? null, 0, 'px' ),
+			'--fg-viewer-stage-border-color'  => self::resolve_color( $s['viewer_stage_border_color'] ?? null, 'rgba(0, 0, 0, 0.15)' ),
+			'--fg-viewer-bar-bg'              => self::resolve_color( $s['viewer_bar_bg_color'] ?? null, 'rgba(0, 0, 0, 0.1)' ),
+			'--fg-viewer-bar-radius'          => self::resolve_unit( $s['viewer_bar_radius'] ?? null, 6, 'px' ),
+			'--fg-viewer-bar-border-width'    => self::resolve_unit( $s['viewer_bar_border_width'] ?? null, 0, 'px' ),
+			'--fg-viewer-bar-border-color'    => self::resolve_color( $s['viewer_bar_border_color'] ?? null, 'rgba(0, 0, 0, 0.15)' ),
+			'--fg-viewer-stage-bar-gap'       => self::resolve_unit( $s['viewer_bar_gap'] ?? null, 12, 'px' ),
+			'--fg-viewer-bar-padding'         => self::resolve_unit( $s['viewer_bar_padding'] ?? null, 8, 'px' ),
 		);
+
+		return $vars;
 	}
 
 	public function assets( Render_Context $render_context ): Module_Assets {
@@ -262,6 +308,34 @@ final class Layout_Image_Viewer implements Layout {
 			return ( (int) $raw ) . $default_unit;
 		}
 		return $fallback . $default_unit;
+	}
+
+	/**
+	 * Resolve one side (width / height) of a two-sided size value to a CSS
+	 * length. The value persists as { width: { value, unit }, height: {...} }.
+	 *
+	 * @param mixed  $raw          Two-sided size value.
+	 * @param string $side         'width' | 'height'.
+	 * @param int    $fallback     Numeric fallback.
+	 * @param string $default_unit Unit when none stored.
+	 * @return string
+	 */
+	private static function resolve_side( $raw, string $side, int $fallback, string $default_unit ): string {
+		if ( is_array( $raw ) && isset( $raw[ $side ] ) ) {
+			return self::resolve_unit( $raw[ $side ], $fallback, $default_unit );
+		}
+		return $fallback . $default_unit;
+	}
+
+	/**
+	 * Return a stored colour string when present, else the given fallback.
+	 *
+	 * @param mixed  $value         Raw setting value.
+	 * @param string $default_value Fallback colour string.
+	 * @return string
+	 */
+	private static function resolve_color( $value, string $default_value ): string {
+		return ( is_string( $value ) && '' !== trim( $value ) ) ? trim( $value ) : $default_value;
 	}
 
 	/**

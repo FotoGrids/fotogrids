@@ -5,7 +5,7 @@
 (function () {
 	'use strict';
 
-	const { restUrl, restNonce, pluginUrl } = window.fotogridsDashboard || {};
+	const { restUrl, restNonce } = window.fotogridsDashboard || {};
 
 	if (!restUrl) {
 		return;

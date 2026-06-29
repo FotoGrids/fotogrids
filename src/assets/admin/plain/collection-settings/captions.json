@@ -4,390 +4,843 @@
     "icon": "align_center",
     "settings": [
         {
-            "key": "caption_type",
-            "type": "button_group",
-            "label": "Caption Type",
-            "condition": {
-                "dependsOn": "layout",
-                "values": ["image-viewer"],
-                "condition_operator": "not_in"
-            },
-            "options": [
-                {
-                    "label": "Default",
-                    "value": "default",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Custom",
-                    "value": "custom",
-                    "tier_required": "pro_starter"
-                }
-            ],
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_type_promotion",
-            "type": "promo",
-            "condition": {
-                "dependsOn": "layout",
-                "values": ["image-viewer"],
-                "condition_operator": "not_in"
-            },
-            "messages": [
-                {
-                    "subtitle": "Advanced custom captions with HTML and dynamic placeholders.",
-                    "message": "Use advanced custom captions with HTML and dynamic placeholders, including integrations with ACF and Pods.",
-                    "learn_more": "feature-captions"
-                }
-            ],
-            "tier_required": "pro_starter",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_placement",
-            "type": "button_group",
-            "label": "Caption Placement",
-            "options": [
-                {
-                    "label": "Overlay",
-                    "value": "overlay",
-                    "icon": "caption_overlay",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Top",
-                    "value": "top",
-                    "icon": "caption_top",
-                    "tier_required": "free"
-                },
-                {
-                    "label": "Bottom",
-                    "value": "bottom",
-                    "icon": "caption_bottom",
-                    "tier_required": "free"
-                }
-            ],
-            "condition": {
-                "dependsOn": "layout",
-                "values": [
-                    "instant-photos",
-                    "image-viewer"
-                ],
-                "condition_operator": "not_in"
-            },
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_overlay_color_group",
-            "type": "setting_group",
-            "label": "Overlay Color",
-            "condition": {
-                "dependsOn": "caption_placement",
-                "values": [
-                    "overlay"
-                ]
-            },
-            "settings": [
-                {
-                    "key": "caption_overlay_color",
-                    "type": "color",
-                    "label": "Choose a color",
-                    "default": "rgba(0, 0, 0, 0.3)",
-                    "isReference": true,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_overlay_opacity_subtabs",
-                    "type": "setting_subtabs",
-                    "subTabs": {
-                        "regular": {
-                            "id": "regular",
-                            "label": "Regular",
-                            "icon": "image",
-                            "settings": [
-                                {
-                                    "key": "caption_overlay_opacity",
-                                    "type": "range",
-                                    "label": "Opacity",
-                                    "min": 0,
-                                    "max": 100,
-                                    "step": 1,
-                                    "default": 100,
-                                    "unit": "%",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                }
-                            ]
-                        },
-                        "hover": {
-                            "id": "hover",
-                            "label": "Hover",
-                            "icon": "hover",
-                            "settings": [
-                                {
-                                    "key": "caption_overlay_hover_opacity",
-                                    "type": "range",
-                                    "label": "Opacity",
-                                    "min": 0,
-                                    "max": 100,
-                                    "step": 1,
-                                    "default": 50,
-                                    "unit": "%",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                }
-                            ]
-                        }
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                }
-            ],
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_gap",
-            "type": "responsive_range",
-            "label": "Caption Distance from Media",
-            "units": [
-                "px",
-                "em",
-                "rem"
-            ],
-            "condition": {
-                "dependsOn": "caption_placement",
-                "values": [
-                    "top",
-                    "bottom"
-                ]
-            },
-            "responsive": {
-                "desktop": {
-                    "min": 0,
-                    "max": 16,
-                    "default": 8
-                },
-                "tablet": {
-                    "min": 0,
-                    "max": 16,
-                    "default": 8
-                },
-                "mobile": {
-                    "min": 0,
-                    "max": 16,
-                    "default": 8
-                }
-            },
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_alignment_group",
-            "type": "setting_group",
-            "label": "Caption Alignment",
-            "condition": {
-                "dependsOn": "layout",
-                "values": ["image-viewer"],
-                "condition_operator": "not_in"
-            },
-            "settings": [
-                {
-                    "key": "caption_alignment",
-                    "type": "button_group",
-                    "label": "Horizontal",
-                    "description": "Change the horizontal alignment of the thumbnail captions.",
-                    "options": [
-                        {
-                            "label": "Left",
-                            "value": "left",
-                            "icon": "align_left",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Center",
-                            "value": "center",
-                            "icon": "align_center",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Right",
-                            "value": "right",
-                            "icon": "align_right",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Justify",
-                            "value": "justify",
-                            "icon": "align_justify",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_vertical_alignment",
-                    "type": "button_group",
-                    "label": "Vertical",
-                    "description": "Change the vertical alignment of the caption inside the overlay.",
-                    "options": [
-                        {
-                            "label": "Top",
-                            "value": "top",
-                            "icon": "grid_dots_top",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Middle",
-                            "value": "middle",
-                            "icon": "grid_dots_vertical_center",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Bottom",
-                            "value": "bottom",
-                            "icon": "grid_dots_bottom",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "condition": {
-                        "dependsOn": "caption_placement",
-                        "values": [
-                            "overlay"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                }
-            ],
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_title_group",
-            "type": "setting_group",
-            "label": "Item Title",
-            "settings": [
-                {
-                    "key": "caption_hide_title",
-                    "type": "toggle",
-                    "label": "Hide title",
-                    "default": false,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_title_source",
-                    "type": "button_group",
-                    "label": "Title Source",
-                    "options": [
-                        {
-                            "label": "Item Title",
-                            "value": "item_title",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Item Caption",
-                            "value": "item_caption",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Item Alt",
-                            "value": "item_alt",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Item Description",
-                            "value": "item_description",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "condition": {
-                        "dependsOn": "caption_hide_title",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "postTypes": [
-                        "gallery"
-                    ],
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_title_color",
-                    "type": "color",
-                    "label": "Title Color",
-                    "isReference": true,
-                    "condition": {
-                        "dependsOn": "caption_hide_title",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "type": "side_by_side",
-                    "condition": {
-                        "dependsOn": "caption_hide_title",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
+            "key": "caption_subtabs",
+            "type": "setting_subtabs",
+            "subTabs": {
+                "general": {
+                    "id": "general",
+                    "label": "General",
+                    "icon": "settings",
                     "settings": [
                         {
-                            "key": "caption_title_font_family",
-                            "type": "font_family",
-                            "label": "Title Font Family",
+                            "key": "caption_type",
+                            "type": "button_group",
+                            "label": "Caption Type",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
+                            "options": [
+                                {
+                                    "label": "Default",
+                                    "value": "default",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Custom",
+                                    "value": "custom",
+                                    "tier_required": "pro_starter"
+                                }
+                            ],
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
                         },
                         {
-                            "key": "caption_title_font_weight",
-                            "type": "font_weight",
-                            "label": "Title Font Weight",
+                            "key": "caption_type_promotion",
+                            "type": "promo",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
+                            "messages": [
+                                {
+                                    "subtitle": "Advanced custom captions with HTML and dynamic placeholders.",
+                                    "message": "Use advanced custom captions with HTML and dynamic placeholders, including integrations with ACF and Pods.",
+                                    "learn_more": "feature-captions"
+                                }
+                            ],
+                            "tier_required": "pro_starter",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_placement",
+                            "type": "button_group",
+                            "label": "Caption Placement",
+                            "options": [
+                                {
+                                    "label": "Overlay",
+                                    "value": "overlay",
+                                    "icon": "caption_overlay",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Top",
+                                    "value": "top",
+                                    "icon": "caption_top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Bottom",
+                                    "value": "bottom",
+                                    "icon": "caption_bottom",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "instant-photos",
+                                    "image-viewer"
+                                ],
+                                "condition_operator": "not_in"
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_visibility",
+                            "type": "button_group",
+                            "label": "Caption Visibility",
+                            "description": "Choose when the caption is shown. Some hover effects manage caption visibility themselves and override this setting.",
+                            "options": [
+                                {
+                                    "label": "Always Visible",
+                                    "value": "always",
+                                    "icon": "eye",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Hide on Hover",
+                                    "value": "hide_on_hover",
+                                    "icon": "hover_alt",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Show on Hover",
+                                    "value": "show_on_hover",
+                                    "icon": "click_alt",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_overlay_color_group",
+                            "type": "setting_group",
+                            "label": "Overlay Color",
+                            "condition": {
+                                "dependsOn": "caption_placement",
+                                "values": [
+                                    "overlay"
+                                ]
+                            },
+                            "settings": [
+                                {
+                                    "key": "caption_overlay_color",
+                                    "type": "color",
+                                    "label": "Choose a color",
+                                    "default": "rgba(0, 0, 0, 0.3)",
+                                    "isReference": true,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_overlay_opacity_subtabs",
+                                    "type": "setting_subtabs",
+                                    "subTabs": {
+                                        "regular": {
+                                            "id": "regular",
+                                            "label": "Regular",
+                                            "icon": "image",
+                                            "settings": [
+                                                {
+                                                    "key": "caption_overlay_opacity",
+                                                    "type": "range",
+                                                    "label": "Opacity",
+                                                    "min": 0,
+                                                    "max": 100,
+                                                    "step": 1,
+                                                    "default": 100,
+                                                    "unit": "%",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        },
+                                        "hover": {
+                                            "id": "hover",
+                                            "label": "Hover",
+                                            "icon": "hover",
+                                            "settings": [
+                                                {
+                                                    "key": "caption_overlay_hover_opacity",
+                                                    "type": "range",
+                                                    "label": "Opacity",
+                                                    "min": 0,
+                                                    "max": 100,
+                                                    "step": 1,
+                                                    "default": 50,
+                                                    "unit": "%",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_gap",
+                            "type": "responsive_range",
+                            "label": "Caption Distance from Media",
+                            "units": [
+                                "px",
+                                "em",
+                                "rem"
+                            ],
+                            "condition": {
+                                "dependsOn": "caption_placement",
+                                "values": [
+                                    "top",
+                                    "bottom"
+                                ]
+                            },
+                            "responsive": {
+                                "desktop": {
+                                    "min": 0,
+                                    "max": 40,
+                                    "default": 8
+                                },
+                                "tablet": {
+                                    "min": 0,
+                                    "max": 40,
+                                    "default": 8
+                                },
+                                "mobile": {
+                                    "min": 0,
+                                    "max": 40,
+                                    "default": 8
+                                }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_alignment_group",
+                            "type": "setting_group",
+                            "label": "Caption Alignment",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
+                            "settings": [
+                                {
+                                    "key": "caption_alignment",
+                                    "type": "button_group",
+                                    "label": "Horizontal",
+                                    "description": "Change the horizontal alignment of the thumbnail captions.",
+                                    "options": [
+                                        {
+                                            "label": "Left",
+                                            "value": "left",
+                                            "icon": "align_left",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Center",
+                                            "value": "center",
+                                            "icon": "align_center",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Right",
+                                            "value": "right",
+                                            "icon": "align_right",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Justify",
+                                            "value": "justify",
+                                            "icon": "align_justify",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_vertical_alignment",
+                                    "type": "button_group",
+                                    "label": "Vertical",
+                                    "description": "Change the vertical alignment of the caption inside the overlay.",
+                                    "options": [
+                                        {
+                                            "label": "Top",
+                                            "value": "top",
+                                            "icon": "grid_dots_top",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Middle",
+                                            "value": "middle",
+                                            "icon": "grid_dots_vertical_center",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Bottom",
+                                            "value": "bottom",
+                                            "icon": "grid_dots_bottom",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "caption_placement",
+                                        "values": [
+                                            "overlay"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_padding",
+                                    "type": "responsive_range",
+                                    "label": "Padding",
+                                    "description": "Padding around the caption text.",
+                                    "units": [
+                                        "px",
+                                        "em",
+                                        "rem",
+                                        "%"
+                                    ],
+                                    "four_sided": true,
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 100, "default": 0 },
+                                        "tablet":  { "min": 0, "max": 100, "default": 0 },
+                                        "mobile":  { "min": 0, "max": 100, "default": 0 }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_title_group",
+                            "type": "setting_group",
+                            "label": "Item Title",
+                            "settings": [
+                                {
+                                    "key": "caption_hide_title",
+                                    "type": "toggle",
+                                    "label": "Hide title",
+                                    "default": false,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_title_source",
+                                    "type": "button_group",
+                                    "label": "Title Source",
+                                    "options": [
+                                        {
+                                            "label": "Item Title",
+                                            "value": "item_title",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Item Caption",
+                                            "value": "item_caption",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Item Alt",
+                                            "value": "item_alt",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Item Description",
+                                            "value": "item_description",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "caption_hide_title",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    "postTypes": [
+                                        "gallery"
+                                    ],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_title_color",
+                                    "type": "color",
+                                    "label": "Title Color",
+                                    "isReference": true,
+                                    "condition": {
+                                        "dependsOn": "caption_hide_title",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_limit_title_length",
+                                    "type": "button_group",
+                                    "label": "Limit Title Length",
+                                    "description": "Limit the length of the title in thumbnails. This will NOT limit the length of captions from within the lightbox.",
+                                    "options": [
+                                        {
+                                            "label": "No",
+                                            "value": "no",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Yes",
+                                            "note": "by character length",
+                                            "value": "characters",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Yes",
+                                            "note": "by lines",
+                                            "value": "lines",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "all": [
+                                            {
+                                                "dependsOn": "caption_hide_title",
+                                                "values": [
+                                                    false,
+                                                    "0"
+                                                ]
+                                            },
+                                            {
+                                                "dependsOn": "layout",
+                                                "values": ["image-viewer"],
+                                                "condition_operator": "not_in"
+                                            }
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_max_title_characters",
+                                    "type": "responsive_range",
+                                    "label": "Max Title Characters",
+                                    "description": "Maximum number of characters to display in the title.",
+                                    "responsive": {
+                                        "desktop": {
+                                            "min": 20,
+                                            "max": 400,
+                                            "default": 200
+                                        },
+                                        "tablet": {
+                                            "min": 20,
+                                            "max": 400,
+                                            "default": 200
+                                        },
+                                        "mobile": {
+                                            "min": 20,
+                                            "max": 400,
+                                            "default": 200
+                                        }
+                                    },
+                                    "unit": "characters",
+                                    "condition": {
+                                        "all": [
+                                            {
+                                                "dependsOn": [
+                                                    "caption_limit_title_length",
+                                                    "caption_hide_title"
+                                                ],
+                                                "values": [
+                                                    [
+                                                        "characters"
+                                                    ],
+                                                    [
+                                                        false,
+                                                        "0"
+                                                    ]
+                                                ]
+                                            },
+                                            {
+                                                "dependsOn": "layout",
+                                                "values": ["image-viewer"],
+                                                "condition_operator": "not_in"
+                                            }
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_max_title_lines",
+                                    "type": "responsive_range",
+                                    "label": "Max Title Lines",
+                                    "description": "A max number of lines of text to display. A value of zero will not apply a limit.",
+                                    "responsive": {
+                                        "desktop": {
+                                            "min": 1,
+                                            "max": 4,
+                                            "default": 1
+                                        },
+                                        "tablet": {
+                                            "min": 1,
+                                            "max": 4,
+                                            "default": 1
+                                        },
+                                        "mobile": {
+                                            "min": 1,
+                                            "max": 4,
+                                            "default": 1
+                                        }
+                                    },
+                                    "unit": "lines",
+                                    "condition": {
+                                        "all": [
+                                            {
+                                                "dependsOn": [
+                                                    "caption_limit_title_length",
+                                                    "caption_hide_title"
+                                                ],
+                                                "values": [
+                                                    [
+                                                        "lines"
+                                                    ],
+                                                    [
+                                                        false,
+                                                        "0"
+                                                    ]
+                                                ]
+                                            },
+                                            {
+                                                "dependsOn": "layout",
+                                                "values": ["image-viewer"],
+                                                "condition_operator": "not_in"
+                                            }
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_description_group",
+                            "type": "setting_group",
+                            "label": "Item Description",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": ["image-viewer"],
+                                "condition_operator": "not_in"
+                            },
+                            "settings": [
+                                {
+                                    "key": "caption_hide_description",
+                                    "type": "toggle",
+                                    "label": "Hide description",
+                                    "default": false,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_description_source",
+                                    "type": "button_group",
+                                    "label": "Description Source",
+                                    "options": [
+                                        {
+                                            "label": "Item Title",
+                                            "value": "item_title",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Item Caption",
+                                            "value": "item_caption",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Item Alt",
+                                            "value": "item_alt",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Item Description",
+                                            "value": "item_description",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "caption_hide_description",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    "postTypes": [
+                                        "gallery"
+                                    ],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_description_color",
+                                    "type": "color",
+                                    "label": "Description Color",
+                                    "isReference": true,
+                                    "condition": {
+                                        "dependsOn": "caption_hide_description",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_limit_description_length",
+                                    "type": "button_group",
+                                    "label": "Limit Description Length",
+                                    "description": "Limit the length of the description in thumbnails.<br>This will NOT limit the length of captions from within the lightbox.",
+                                    "options": [
+                                        {
+                                            "label": "No",
+                                            "value": "no",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Yes",
+                                            "note": "by character length",
+                                            "value": "characters",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Yes",
+                                            "note": "by lines",
+                                            "value": "lines",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "condition": {
+                                        "dependsOn": "caption_hide_description",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_max_desc_characters",
+                                    "type": "responsive_range",
+                                    "label": "Max Description Characters",
+                                    "description": "Maximum number of characters to display in the description.",
+                                    "responsive": {
+                                        "desktop": {
+                                            "min": 20,
+                                            "max": 400,
+                                            "default": 200
+                                        },
+                                        "tablet": {
+                                            "min": 20,
+                                            "max": 400,
+                                            "default": 200
+                                        },
+                                        "mobile": {
+                                            "min": 20,
+                                            "max": 400,
+                                            "default": 200
+                                        }
+                                    },
+                                    "unit": "characters",
+                                    "condition": {
+                                        "dependsOn": [
+                                            "caption_limit_description_length",
+                                            "caption_hide_description"
+                                        ],
+                                        "values": [
+                                            [
+                                                "characters"
+                                            ],
+                                            [
+                                                false,
+                                                "0"
+                                            ]
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "caption_max_desc_lines",
+                                    "type": "responsive_range",
+                                    "label": "Max Description Lines",
+                                    "description": "A max number of lines of text to display. A value of zero will not apply a limit.",
+                                    "responsive": {
+                                        "desktop": {
+                                            "min": 1,
+                                            "max": 4,
+                                            "default": 2
+                                        },
+                                        "tablet": {
+                                            "min": 1,
+                                            "max": 4,
+                                            "default": 2
+                                        },
+                                        "mobile": {
+                                            "min": 1,
+                                            "max": 4,
+                                            "default": 2
+                                        }
+                                    },
+                                    "unit": "lines",
+                                    "condition": {
+                                        "dependsOn": [
+                                            "caption_limit_description_length",
+                                            "caption_hide_description"
+                                        ],
+                                        "values": [
+                                            [
+                                                "lines"
+                                            ],
+                                            [
+                                                false,
+                                                "0"
+                                            ]
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "caption_title_desc_gap",
+                            "type": "responsive_range",
+                            "label": "Distance between Title and Description",
+                            "units": [
+                                "px",
+                                "em",
+                                "rem"
+                            ],
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "caption_hide_title",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "caption_hide_description",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": ["image-viewer"],
+                                        "condition_operator": "not_in"
+                                    }
+                                ]
+                            },
+                            "responsive": {
+                                "desktop": {
+                                    "min": 0,
+                                    "max": 40,
+                                    "default": 8
+                                },
+                                "tablet": {
+                                    "min": 0,
+                                    "max": 40,
+                                    "default": 8
+                                },
+                                "mobile": {
+                                    "min": 0,
+                                    "max": 40,
+                                    "default": 8
+                                }
+                            },
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
@@ -395,70 +848,12 @@
                         }
                     ]
                 },
-                {
-                    "key": "caption_title_font_size",
-                    "type": "responsive_range",
-                    "label": "Title Font Size",
-                    "units": [
-                        "px",
-                        "em",
-                        "rem"
-                    ],
+                "typography": {
+                    "id": "typography",
+                    "label": "Typography",
+                    "icon": "text",
                     "condition": {
-                        "dependsOn": "caption_hide_title",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "responsive": {
-                        "desktop": {
-                            "min": 8,
-                            "max": 72,
-                            "default": 18
-                        },
-                        "tablet": {
-                            "min": 8,
-                            "max": 48,
-                            "default": 16
-                        },
-                        "mobile": {
-                            "min": 8,
-                            "max": 36,
-                            "default": 14
-                        }
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_limit_title_length",
-                    "type": "button_group",
-                    "label": "Limit Title Length",
-                    "description": "Limit the length of the title in thumbnails. This will NOT limit the length of captions from within the lightbox.",
-                    "options": [
-                        {
-                            "label": "No",
-                            "value": "no",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Yes",
-                            "note": "by character length",
-                            "value": "characters",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Yes",
-                            "note": "by lines",
-                            "value": "lines",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "condition": {
-                        "all": [
+                        "any": [
                             {
                                 "dependsOn": "caption_hide_title",
                                 "values": [
@@ -467,396 +862,82 @@
                                 ]
                             },
                             {
-                                "dependsOn": "layout",
-                                "values": ["image-viewer"],
-                                "condition_operator": "not_in"
-                            }
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_max_title_characters",
-                    "type": "responsive_range",
-                    "label": "Max Title Characters",
-                    "description": "Maximum number of characters to display in the title.",
-                    "responsive": {
-                        "desktop": {
-                            "min": 20,
-                            "max": 400,
-                            "default": 200
-                        },
-                        "tablet": {
-                            "min": 20,
-                            "max": 400,
-                            "default": 200
-                        },
-                        "mobile": {
-                            "min": 20,
-                            "max": 400,
-                            "default": 200
-                        }
-                    },
-                    "unit": "characters",
-                    "condition": {
-                        "all": [
-                            {
-                                "dependsOn": [
-                                    "caption_limit_title_length",
-                                    "caption_hide_title"
-                                ],
+                                "dependsOn": "caption_hide_description",
                                 "values": [
-                                    [
-                                        "characters"
-                                    ],
-                                    [
-                                        false,
-                                        "0"
-                                    ]
+                                    false,
+                                    "0"
                                 ]
-                            },
-                            {
-                                "dependsOn": "layout",
-                                "values": ["image-viewer"],
-                                "condition_operator": "not_in"
                             }
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_max_title_lines",
-                    "type": "responsive_range",
-                    "label": "Max Title Lines",
-                    "description": "A max number of lines of text to display. A value of zero will not apply a limit.",
-                    "responsive": {
-                        "desktop": {
-                            "min": 1,
-                            "max": 4,
-                            "default": 1
-                        },
-                        "tablet": {
-                            "min": 1,
-                            "max": 4,
-                            "default": 1
-                        },
-                        "mobile": {
-                            "min": 1,
-                            "max": 4,
-                            "default": 1
-                        }
-                    },
-                    "unit": "lines",
-                    "condition": {
-                        "all": [
-                            {
-                                "dependsOn": [
-                                    "caption_limit_title_length",
-                                    "caption_hide_title"
-                                ],
-                                "values": [
-                                    [
-                                        "lines"
-                                    ],
-                                    [
-                                        false,
-                                        "0"
-                                    ]
-                                ]
-                            },
-                            {
-                                "dependsOn": "layout",
-                                "values": ["image-viewer"],
-                                "condition_operator": "not_in"
-                            }
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                }
-            ],
-            "tier_required": "free",
-            "render_when_unlicensed": true,
-            "setting_lives_in": "free",
-            "visible_when_uninstalled": true
-        },
-        {
-            "key": "caption_description_group",
-            "type": "setting_group",
-            "label": "Item Description",
-            "condition": {
-                "dependsOn": "layout",
-                "values": ["image-viewer"],
-                "condition_operator": "not_in"
-            },
-            "settings": [
-                {
-                    "key": "caption_hide_description",
-                    "type": "toggle",
-                    "label": "Hide description",
-                    "default": false,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_description_source",
-                    "type": "button_group",
-                    "label": "Description Source",
-                    "options": [
-                        {
-                            "label": "Item Title",
-                            "value": "item_title",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Item Caption",
-                            "value": "item_caption",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Item Alt",
-                            "value": "item_alt",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Item Description",
-                            "value": "item_description",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "condition": {
-                        "dependsOn": "caption_hide_description",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "postTypes": [
-                        "gallery"
-                    ],
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_description_color",
-                    "type": "color",
-                    "label": "Description Color",
-                    "isReference": true,
-                    "condition": {
-                        "dependsOn": "caption_hide_description",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "type": "side_by_side",
-                    "condition": {
-                        "dependsOn": "caption_hide_description",
-                        "values": [
-                            false,
-                            "0"
                         ]
                     },
                     "settings": [
                         {
-                            "key": "caption_description_font_family",
-                            "type": "font_family",
-                            "label": "Description Font Family",
+                            "key": "caption_title_typography_group",
+                            "type": "setting_group",
+                            "label": "Item Title",
+                            "condition": {
+                                "dependsOn": "caption_hide_title",
+                                "values": [
+                                    false,
+                                    "0"
+                                ]
+                            },
+                            "settings": [
+                                {
+                                    "use": "typography",
+                                    "key_prefix": "caption_title_",
+                                    "label": "Title"
+                                }
+                            ],
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
                         },
                         {
-                            "key": "caption_description_font_weight",
-                            "type": "font_weight",
-                            "label": "Description Font Weight",
+                            "key": "caption_description_typography_group",
+                            "type": "setting_group",
+                            "label": "Item Description",
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": ["image-viewer"],
+                                        "condition_operator": "not_in"
+                                    },
+                                    {
+                                        "dependsOn": "caption_hide_description",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "settings": [
+                                {
+                                    "use": "typography",
+                                    "key_prefix": "caption_description_",
+                                    "label": "Description",
+                                    "overrides": {
+                                        "font_size": {
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 24, "default": 14 },
+                                                "tablet": { "min": 8, "max": 24, "default": 12 },
+                                                "mobile": { "min": 8, "max": 24, "default": 12 }
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",
                             "visible_when_uninstalled": true
                         }
                     ]
-                },
-                {
-                    "key": "caption_description_font_size",
-                    "type": "responsive_range",
-                    "label": "Description Font Size",
-                    "units": [
-                        "px",
-                        "em",
-                        "rem"
-                    ],
-                    "condition": {
-                        "dependsOn": "caption_hide_description",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "responsive": {
-                        "desktop": {
-                            "min": 8,
-                            "max": 24,
-                            "default": 14
-                        },
-                        "tablet": {
-                            "min": 8,
-                            "max": 24,
-                            "default": 12
-                        },
-                        "mobile": {
-                            "min": 8,
-                            "max": 24,
-                            "default": 12
-                        }
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_limit_description_length",
-                    "type": "button_group",
-                    "label": "Limit Description Length",
-                    "description": "Limit the length of the description in thumbnails.<br>This will NOT limit the length of captions from within the lightbox.",
-                    "options": [
-                        {
-                            "label": "No",
-                            "value": "no",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Yes",
-                            "note": "by character length",
-                            "value": "characters",
-                            "tier_required": "free"
-                        },
-                        {
-                            "label": "Yes",
-                            "note": "by lines",
-                            "value": "lines",
-                            "tier_required": "free"
-                        }
-                    ],
-                    "condition": {
-                        "dependsOn": "caption_hide_description",
-                        "values": [
-                            false,
-                            "0"
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_max_desc_characters",
-                    "type": "responsive_range",
-                    "label": "Max Description Characters",
-                    "description": "Maximum number of characters to display in the description.",
-                    "responsive": {
-                        "desktop": {
-                            "min": 20,
-                            "max": 400,
-                            "default": 200
-                        },
-                        "tablet": {
-                            "min": 20,
-                            "max": 400,
-                            "default": 200
-                        },
-                        "mobile": {
-                            "min": 20,
-                            "max": 400,
-                            "default": 200
-                        }
-                    },
-                    "unit": "characters",
-                    "condition": {
-                        "dependsOn": [
-                            "caption_limit_description_length",
-                            "caption_hide_description"
-                        ],
-                        "values": [
-                            [
-                                "characters"
-                            ],
-                            [
-                                false,
-                                "0"
-                            ]
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "caption_max_desc_lines",
-                    "type": "responsive_range",
-                    "label": "Max Description Lines",
-                    "description": "A max number of lines of text to display. A value of zero will not apply a limit.",
-                    "responsive": {
-                        "desktop": {
-                            "min": 1,
-                            "max": 4,
-                            "default": 2
-                        },
-                        "tablet": {
-                            "min": 1,
-                            "max": 4,
-                            "default": 2
-                        },
-                        "mobile": {
-                            "min": 1,
-                            "max": 4,
-                            "default": 2
-                        }
-                    },
-                    "unit": "lines",
-                    "condition": {
-                        "dependsOn": [
-                            "caption_limit_description_length",
-                            "caption_hide_description"
-                        ],
-                        "values": [
-                            [
-                                "lines"
-                            ],
-                            [
-                                false,
-                                "0"
-                            ]
-                        ]
-                    },
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
                 }
-            ],
+            },
             "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",

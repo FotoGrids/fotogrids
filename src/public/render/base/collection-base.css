@@ -215,10 +215,10 @@
    --fg-hover-filter lets a hover-effect module append to the filter chain so
    image-filter settings and filter-based hover effects compose. */
 .fotogrids-collection[data-fg-filter] .fg-item-media img {
-    filter: var(--fg-thumb-filter-regular) var(--fg-hover-filter);
+    filter: var(--fg-thumb-filter-regular) var(--fg-hover-filter, );
     transition: filter 0.25s ease;
 }
 
 .fotogrids-collection[data-fg-filter] .fg-item:hover .fg-item-media img {
-    filter: var(--fg-thumb-filter-hover) var(--fg-hover-filter-hover, var(--fg-hover-filter));
+    filter: var(--fg-thumb-filter-hover) var(--fg-hover-filter-hover, var(--fg-hover-filter, ));
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Metaboxes;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Post_Types;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Permissions\Permission_Check;
 use FotoGrids\Permissions\Permission_Gate;
@@ -116,6 +117,14 @@ final class Collection_Save_Pipeline {
 			$post_updated            = true;
 		}
 
+		$incoming_slug = isset( $_POST['post_name'] )
+			? sanitize_title( wp_unslash( $_POST['post_name'] ) )
+			: '';
+		if ( '' !== $incoming_slug ) {
+			$post_data['post_name'] = $incoming_slug;
+			$post_updated           = true;
+		}
+
 		if ( isset( $_POST['content'] ) ) {
 			$post_data['post_content'] = wp_kses_post( wp_unslash( $_POST['content'] ) );
 			$post_updated              = true;
@@ -133,10 +142,16 @@ final class Collection_Save_Pipeline {
 			}
 		}
 
-		if ( isset( $_POST['fotogrids_gallery_items'] ) && is_array( $_POST['fotogrids_gallery_items'] ) ) {
-			$gallery_items = array_map( 'intval', $_POST['fotogrids_gallery_items'] );
-			update_post_meta( $post_id, 'fotogrids_gallery_items', wp_json_encode( $gallery_items ) );
+		if ( 'fotogrids_gallery' === $post->post_type ) {
+			if ( isset( $_POST['fotogrids_gallery_items'] ) && is_array( $_POST['fotogrids_gallery_items'] ) ) {
+				$gallery_items = array_map( 'intval', $_POST['fotogrids_gallery_items'] );
+				update_post_meta( $post_id, 'fotogrids_gallery_items', wp_json_encode( $gallery_items ) );
+			} else {
+				delete_post_meta( $post_id, 'fotogrids_gallery_items' );
+			}
 		}
+
+		self::save_featured_image( $post_id, $_POST );
 
 		$gated_result = self::persist_settings_with_gate( (int) $post_id, $_POST );
 
@@ -164,6 +179,45 @@ final class Collection_Save_Pipeline {
 				'skipped_for_permissions' => $gated_result['skipped_for_permissions'] ?? array(),
 			)
 		);
+	}
+
+	/**
+	 * Persist the Featured / Share Image on the AJAX save path.
+	 *
+	 * Mirrors Post_Types::save_featured_image, which only runs on the native
+	 * save_post submit. The metabox nonce and edit_post capability are already
+	 * verified by the caller; this adds the same manage_fotogrids gate the
+	 * native path uses before writing the meta.
+	 *
+	 * @since 1.0.0
+	 * @param int   $post_id       Post being saved.
+	 * @param array $request_data  Raw request payload (nonce already verified by caller).
+	 * @return void
+	 */
+	private static function save_featured_image( int $post_id, array $request_data ): void {
+		if ( ! isset( $request_data['fotogrids_featured_image_id'] ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_fotogrids', $post_id ) ) {
+			return;
+		}
+
+		$raw           = absint( wp_unslash( $request_data['fotogrids_featured_image_id'] ) );
+		$attachment_id = 0;
+
+		if ( $raw > 0 ) {
+			$attachment = get_post( $raw );
+			if ( $attachment && 'attachment' === $attachment->post_type && wp_attachment_is_image( $raw ) ) {
+				$attachment_id = $raw;
+			}
+		}
+
+		if ( $attachment_id > 0 ) {
+			update_post_meta( $post_id, Post_Types::FEATURED_IMAGE_META_KEY, $attachment_id );
+		} else {
+			delete_post_meta( $post_id, Post_Types::FEATURED_IMAGE_META_KEY );
+		}
 	}
 
 	/**

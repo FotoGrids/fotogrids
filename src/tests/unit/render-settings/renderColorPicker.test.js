@@ -68,6 +68,16 @@ describe('renderColorPicker', () => {
 		);
 	});
 
+	it('renders an unset swatch (not black) when value and default are both empty', () => {
+		const { container } = mount(build({ key: 'c' }, '', false));
+		const fill = container.querySelector('.fotogrids-color-swatch__fill');
+		const text = container.querySelector('input.fotogrids-color-text');
+		expect(fill.classList).toContain('fotogrids-color-swatch__fill--unset');
+		expect(fill.style.background).toBe('');
+		expect(text.value).toBe('');
+		expect(text.placeholder).toBe('Default');
+	});
+
 	it('opens a popover with the FGColorPicker widget on swatch click', () => {
 		const { container } = mount(build({ key: 'c' }, '#000000', false));
 		click(container.querySelector('.fotogrids-color-swatch'));

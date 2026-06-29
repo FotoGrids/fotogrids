@@ -5,26 +5,7 @@
   "type": "pro",
   "category": "gallery",
   "subcategory": "real-estate",
-  "preview_image": "",
-  "isUserTemplate": false,
   "order": 39,
-  "settings": {
-    "layout": "grid",
-    "columns": {
-      "desktop": 3,
-      "tablet": 2,
-      "mobile": 1
-    },
-    "item_spacing": {
-      "desktop": 10,
-      "tablet": 8,
-      "mobile": 5
-    },
-    "password_protected": true,
-    "watermark_enabled": true,
-    "right_click_protection": true,
-    "album_expiry_days": 180,
-    "captions": true,
-    "lightbox": true
-  }
+  "isUserTemplate": false,
+  "thumbnail": ""
 }

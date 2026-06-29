@@ -119,7 +119,12 @@ final class Lightbox_Decorator implements Decorator {
 	}
 
 	public function wrapper_data_attrs( Render_Context $render_context ): array {
-		return array();
+		// The trigger anchors are stamped for every lightbox variant; the
+		// variant decides which JS module claims the click (classic overlay,
+		// grid overlay, or mini overlay).
+		return array(
+			'data-fg-lightbox-variant' => $render_context->behavior->lightbox_variant,
+		);
 	}
 
 	public function style_vars( Render_Context $render_context ): array {

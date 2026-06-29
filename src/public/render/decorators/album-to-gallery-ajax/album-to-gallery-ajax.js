@@ -40,10 +40,10 @@
      * Triggers that already have a click listener attached. WeakSet so we
      * don't pin detached DOM in memory.
      *
-     * We deliberately use a WeakSet here instead of a `data-` attribute
-     * (which used to be the idempotence guard). When restoreAlbum() replays
-     * the original innerHTML, the browser parses a brand-new tree of <a>
-     * elements - the old triggers (with their listeners) are gone. The
+     * A WeakSet is used here instead of a `data-` attribute. When
+     * restoreAlbum() replays the original innerHTML, the browser parses a
+     * brand-new tree of <a> elements - the old triggers (with their
+     * listeners) are gone. The
      * `data-fg-album-ajax-bound` attribute survived the round-trip in the
      * serialised HTML, so on a second click the trigger LOOKED bound, but
      * actually had no listener - falling through to native nav.

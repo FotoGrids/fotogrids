@@ -21,8 +21,12 @@
       "mobile": 6
     },
     "captions": true,
-    "captions_position": "below",
-    "watermark_enabled": true,
-    "lightbox": true
+    "caption_placement": "bottom",
+    "watermark_apply_to_collection": true,
+    "item_click_behavior": "lightbox",
+    "hover_effect": "zoom",
+    "border_enabled": true,
+    "border_width": 1,
+    "border_color": "#eeeeee"
   }
 }

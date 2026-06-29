@@ -86,11 +86,6 @@ class Tools_Rest {
 	 * the Modules manifest, and the collection-settings catalog all use the
 	 * same vocabulary and the same logic.
 	 *
-	 * NOTE: this previously called the non-existent License_Manager::instance()
-	 * (License_Manager is all-static), which would have fatalled the manifest
-	 * the moment a non-free tier tool was registered. Fixed by routing through
-	 * Access_State, which uses the correct static License_Manager API.
-	 *
 	 * @param string $tier_required
 	 * @return string 'editable' | 'teaser' | 'locked'
 	 */

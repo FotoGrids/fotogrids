@@ -638,6 +638,9 @@ class Public_Render {
 		if ( isset( $atts['lightbox'] ) ) {
 			$settings_overlay['lightbox'] = 'true' === $atts['lightbox'];
 		}
+		if ( isset( $atts['lazy'] ) ) {
+			$settings_overlay['lazy_load'] = 'true' === $atts['lazy'];
+		}
 		$settings_overlay['_show_render_errors'] = current_user_can( 'edit_posts' );
 
 		$render_settings = array_replace_recursive( is_array( $settings ) ? $settings : array(), $settings_overlay );
@@ -651,9 +654,15 @@ class Public_Render {
 			null
 		);
 
+		$item_views = self::build_template_item_views( is_array( $items ) ? $items : array() );
+		// Run demo items through the same caption resolver as real items so
+		// caption_title / caption_description honour the template's caption
+		// settings (source, hide, length) instead of staying blank.
+		$item_views = Context_Builder::for_preview()->resolve_captions_for( $item_views, $render_settings );
+
 		$render_context = $render_context->with(
 			array(
-				'items' => self::build_template_item_views( is_array( $items ) ? $items : array() ),
+				'items' => $item_views,
 			)
 		);
 
@@ -669,18 +678,21 @@ class Public_Render {
 	private static function build_template_item_views( $items ) {
 		$item_views = array();
 
-		foreach ( $items as $index => $item ) {
+		foreach ( $items as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
 
-			$item_id = absint( $item['id'] ?? 0 );
-			if ( $item_id <= 0 ) {
-				$item_id = $index + 1;
-			}
+			$width       = isset( $item['width'] ) && $item['width'] ? (int) $item['width'] : null;
+			$height      = isset( $item['height'] ) && $item['height'] ? (int) $item['height'] : null;
+			$full_width  = isset( $item['full_width'] ) && $item['full_width'] ? (int) $item['full_width'] : null;
+			$full_height = isset( $item['full_height'] ) && $item['full_height'] ? (int) $item['full_height'] : null;
 
-			$item_views[] = new Item_View(
-				$item_id,
+			// Demo preview items are not media-library attachments. Passing id 0
+			// keeps the item renderer from resolving an attachment srcset off a
+			// colliding ID, which would pull real gallery images into the preview.
+			$item_view = new Item_View(
+				0,
 				(string) ( $item['medium'] ?? $item['thumb'] ?? $item['full'] ?? '' ),
 				(string) ( $item['full'] ?? $item['medium'] ?? '' ),
 				(string) ( $item['alt'] ?? '' ),
@@ -689,9 +701,16 @@ class Public_Render {
 				(string) ( $item['description'] ?? '' ),
 				'',
 				'',
-				null,
-				null,
+				$width,
+				$height,
 				array()
+			);
+
+			$item_views[] = $item_view->with(
+				array(
+					'full_width'  => $full_width,
+					'full_height' => $full_height,
+				)
 			);
 		}
 

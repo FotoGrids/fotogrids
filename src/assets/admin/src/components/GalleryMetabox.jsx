@@ -334,6 +334,10 @@ const GalleryMetabox = ({
 
                 return updatedItems;
             });
+
+            document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
+                detail: { source: 'items-add' },
+            }));
         });
 
         mediaUploader.open();
@@ -373,6 +377,10 @@ const GalleryMetabox = ({
 
             return updatedItems;
         });
+
+        document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
+            detail: { source: 'items-add' },
+        }));
     }, []);
 
     // Click the star: if not featured, make this item the featured one.
@@ -452,6 +460,13 @@ const GalleryMetabox = ({
         if (needsClear) {
             saveFeaturedItem(null);
         }
+
+        // Notify ajax-save.js a setting changed so the removal enters the
+        // standard save pipeline (unsaved-changes badge + autosave debounce),
+        // the same channel handleReorderItems uses.
+        document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
+            detail: { source: 'items-remove' },
+        }));
     }, [saveFeaturedItem, deleteEmbedItem]);
 
     const closeClearAllModal = useCallback(() => {
@@ -473,6 +488,9 @@ const GalleryMetabox = ({
         if (State) {
             State.items.setItems([]);
         }
+        document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
+            detail: { source: 'items-remove-all' },
+        }));
     }, [saveFeaturedItem]);
 
     // The reorder is treated as a regular gallery change: it updates the

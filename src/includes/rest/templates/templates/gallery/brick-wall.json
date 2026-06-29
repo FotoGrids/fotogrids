@@ -20,6 +20,10 @@
       "tablet": 3,
       "mobile": 2
     },
-    "lightbox": true
+    "item_click_behavior": "lightbox",
+    "hover_effect": "tint",
+    "captions": true,
+    "caption_placement": "bottom",
+    "caption_title_source": "title"
   }
 }

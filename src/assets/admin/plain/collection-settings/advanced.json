@@ -91,6 +91,63 @@
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
             "visible_when_uninstalled": true
+        },
+        {
+            "key": "view_page_group",
+            "type": "setting_group",
+            "label": "View Page",
+            "settings": [
+                {
+                    "key": "view_page_override_defaults",
+                    "type": "toggle",
+                    "label": "Override Defaults",
+                    "description": "Apply custom Max Width and Background Color to this {postType.lower}'s view page instead of the site defaults.",
+                    "default": false,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "view_page_max_width",
+                    "type": "responsive_range",
+                    "label": "Max Width",
+                    "description": "Cap the width of the gallery view page content area.",
+                    "units": ["vw", "px", "%"],
+                    "responsive": {
+                        "desktop": { "min": 20, "max": 100, "default": 60 },
+                        "tablet": { "min": 20, "max": 100, "default": 60 },
+                        "mobile": { "min": 20, "max": 100, "default": 60 }
+                    },
+                    "condition": {
+                        "dependsOn": "view_page_override_defaults",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "view_page_background_color",
+                    "type": "color",
+                    "label": "Background Color",
+                    "description": "Background color for the gallery view page.",
+                    "default": "rgba(255, 255, 255, 1)",
+                    "condition": {
+                        "dependsOn": "view_page_override_defaults",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
         }
     ],
     "tier_required": "free"

@@ -11,6 +11,7 @@ const build = (setting) =>
 describe('renderPromo', () => {
 	afterEach(() => {
 		delete window.fotogridsUpgradeModal;
+		delete window.fotogridsSettings;
 	});
 
 	it('renders a PRO badge and Upgrade button', () => {
@@ -44,11 +45,19 @@ describe('renderPromo', () => {
 	});
 
 	it('renders a Learn more link when learn_more is set', () => {
+		window.fotogridsSettings = {
+			proLinkTemplate:
+				'https://go.fotogrids.com/{{path}}?utm_source=plugin&utm_medium=collection-settings&utm_campaign=feature',
+		};
 		const { container } = renderElement(
 			build({ messages: [{ message: 'm', learn_more: 'layouts' }] })
 		);
-		const link = container.querySelector('a.fotogrids-settings_pro-message__learn-more');
+		const link = container.querySelector(
+			'a.fotogrids-settings_pro-message__learn-more'
+		);
 		expect(link.href).toContain('go.fotogrids.com/layouts');
+		expect(link.href).toContain('utm_medium=collection-settings');
+		expect(link.href).toContain('utm_campaign=feature');
 	});
 
 	it('opens the upgrade URL on click when configured', () => {

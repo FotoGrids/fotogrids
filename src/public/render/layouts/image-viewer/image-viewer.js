@@ -24,6 +24,7 @@ import {
     createAutoplay,
     createKeyboardNav,
     createSwipeDetector,
+    resolveEasingCss,
     resolveTransitionDurationMs,
 } from '../_helpers/carousel-helpers.js';
 
@@ -54,7 +55,9 @@ function readSettings( collectionEl ) {
         transition:               readString( collectionEl, 'data-fg-transition', 'fade' ),
         transitionDuration:       readString( collectionEl, 'data-fg-transition-duration', 'normal' ),
         transitionDurationCustom: readInt(    collectionEl, 'data-fg-transition-duration-custom', 300 ),
+        easing:                   readString( collectionEl, 'data-fg-easing', 'ease' ),
         hideArrowsAtEnds:         readBool(   collectionEl, 'data-fg-hide-arrows-at-ends' ),
+        arrowsAtEndsMode:         readString( collectionEl, 'data-fg-arrows-at-ends-mode', 'hide' ),
         arrowPrevSvg:             readString( collectionEl, 'data-fg-arrow-prev-svg', '' ),
         arrowNextSvg:             readString( collectionEl, 'data-fg-arrow-next-svg', '' ),
     };
@@ -80,6 +83,7 @@ function setup( collectionEl ) {
     // auto-height frame animates at the same pace as the image swap.
     collectionEl.style.setProperty( '--fg-viewer-duration', durationMs + 'ms' );
     collectionEl.style.setProperty( '--fg-viewer-height-duration', durationMs + 'ms' );
+    collectionEl.style.setProperty( '--fg-viewer-easing', resolveEasingCss( settings.easing ) );
 
     // Fit-to-image auto height applies only when the aspect ratio is "None"
     // (data-fg-natural-ratio="1") and the height mode is auto. In every other
@@ -110,8 +114,13 @@ function setup( collectionEl ) {
     const updateArrowDisabled = () => {
         if ( ! prevBtn || ! nextBtn || ! indexState ) return;
         if ( settings.hideArrowsAtEnds && ! settings.loop ) {
-            prevBtn.disabled = ! indexState.hasPrev();
-            nextBtn.disabled = ! indexState.hasNext();
+            const prevInactive = ! indexState.hasPrev();
+            const nextInactive = ! indexState.hasNext();
+            const hide = settings.arrowsAtEndsMode === 'hide';
+            prevBtn.disabled = prevInactive;
+            nextBtn.disabled = nextInactive;
+            prevBtn.classList.toggle( 'fg-viewer-arrow--at-end-hidden', hide && prevInactive );
+            nextBtn.classList.toggle( 'fg-viewer-arrow--at-end-hidden', hide && nextInactive );
         }
     };
 
@@ -264,11 +273,12 @@ function setup( collectionEl ) {
         prev.innerHTML = settings.arrowPrevSvg || '&lsaquo;';
         prev.addEventListener( 'click', () => { indexState.prev(); pauseAutoplayBriefly(); } );
 
-        // Centre group holds the counter and the caption title side by side so
+        // Title wrapper holds the counter and the caption title side by side so
         // the pair stays centred between the arrows. The title sits to the
-        // right of the counter and truncates (CSS) when it overflows.
-        const centre = document.createElement( 'div' );
-        centre.className = 'fg-viewer-bar-centre';
+        // right of the counter and truncates (CSS) when it overflows. The
+        // wrapper carries the shared title styling; the counter inherits it.
+        const titleWrapper = document.createElement( 'div' );
+        titleWrapper.className = 'fg-viewer-title-wrapper';
 
         const counter = document.createElement( 'span' );
         counter.className = 'fg-viewer-counter';
@@ -286,11 +296,11 @@ function setup( collectionEl ) {
         next.innerHTML = settings.arrowNextSvg || '&rsaquo;';
         next.addEventListener( 'click', () => { indexState.next(); pauseAutoplayBriefly(); } );
 
-        centre.appendChild( counter );
-        centre.appendChild( title );
+        titleWrapper.appendChild( counter );
+        titleWrapper.appendChild( title );
 
         bar.appendChild( prev );
-        bar.appendChild( centre );
+        bar.appendChild( titleWrapper );
         bar.appendChild( next );
         containerEl.appendChild( bar );
 

@@ -30,10 +30,7 @@
                                     "label": "Open in Lightbox",
                                     "value": "lightbox",
                                     "icon": "click_lightbox",
-                                    "tier_required": "free",
-                                    "on_change": {
-                                        "switch_tab": "lightbox"
-                                    }
+                                    "tier_required": "free"
                                 },
                                 {
                                     "label": "Direct Link to Item",
@@ -48,27 +45,93 @@
                                     "tier_required": "free"
                                 }
                             ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "lightbox_variant",
+                            "type": "button_group",
+                            "label": "Lightbox Style",
+                            "description": "<strong>Full Lightbox:</strong> an immersive viewer with whole-gallery navigation, thumbnails, and an info panel.<br><strong>Lightbox Mini:</strong> a single image in a lightweight overlay with previous / next arrows and a close button.<br><strong>Lightbox Grid:</strong> every image in a scrollable grid with minimal chrome.",
+                            "options": [
+                                {
+                                    "label": "Full Lightbox",
+                                    "value": "full",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Lightbox Mini",
+                                    "value": "mini",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Lightbox Grid",
+                                    "value": "grid",
+                                    "tier_required": "free",
+                                    "condition": {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "grid",
+                                            "masonry",
+                                            "justified",
+                                            "image-viewer",
+                                            "single-item",
+                                            "slider"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "default": "full",
                             "condition": {
-                                "any": [
+                                "all": [
+                                    {
+                                        "dependsOn": "item_click_behavior",
+                                        "values": ["lightbox"]
+                                    },
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "grid",
+                                            "masonry",
+                                            "justified",
+                                            "image-viewer",
+                                            "single-item",
+                                            "slider",
+                                            "instant-photos"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "item_click_zoom_conflict_notice",
+                            "type": "info_block",
+                            "variant": "danger",
+                            "subtitle": "Conflicts with Image Zoom",
+                            "message": "Image Zoom is set to <strong>Popover</strong> in <strong>Click</strong> mode, which also opens on click. Set Item Click Behavior to something other than the lightbox, or change Image Zoom to Hover mode.",
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "item_click_behavior",
+                                        "values": ["lightbox"]
+                                    },
                                     {
                                         "dependsOn": "interactions_zoom",
-                                        "values": [
-                                            false,
-                                            "0",
-                                            0
-                                        ]
+                                        "values": [true, "1"]
                                     },
                                     {
                                         "dependsOn": "interactions_zoom_style",
-                                        "values": [
-                                            "inline"
-                                        ]
+                                        "values": ["popover"]
                                     },
                                     {
                                         "dependsOn": "interactions_zoom_mode",
-                                        "values": [
-                                            "hover"
-                                        ]
+                                        "values": ["click"]
                                     }
                                 ]
                             },
@@ -244,8 +307,39 @@
                             "visible_when_uninstalled": true
                         },
                         {
-                            "key": "interactions_zoom_popover_group",
-                            "type": "setting_group",
+                            "key": "zoom_item_click_conflict_notice",
+                            "type": "info_block",
+                            "variant": "danger",
+                            "subtitle": "Conflicts with Item Click Behavior",
+                            "message": "Item Click Behavior is set to open the lightbox, which also opens on click. Change Image Zoom to <strong>Hover</strong>, or set Item Click Behavior to something other than the lightbox.",
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "item_click_behavior",
+                                        "values": ["lightbox"]
+                                    },
+                                    {
+                                        "dependsOn": "interactions_zoom",
+                                        "values": [true, "1"]
+                                    },
+                                    {
+                                        "dependsOn": "interactions_zoom_style",
+                                        "values": ["popover"]
+                                    },
+                                    {
+                                        "dependsOn": "interactions_zoom_mode",
+                                        "values": ["click"]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "interactions_zoom_popover_subtabs",
+                            "type": "setting_subtabs",
                             "label": "Popover Appearance",
                             "condition": {
                                 "dependsOn": [
@@ -262,79 +356,44 @@
                                     ]
                                 ]
                             },
-                            "settings": [
-                                {
-                                    "key": "interactions_zoom_popover_bg",
-                                    "type": "color",
-                                    "label": "Background Color",
-                                    "default": "rgba(0, 0, 0, 0.2)",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "interactions_zoom_popover_bg_blur",
-                                    "type": "button_group",
-                                    "label": "Background Blur Intensity",
-                                    "options": [
+                            "subTabs": {
+                                "general": {
+                                    "id": "general",
+                                    "label": "General",
+                                    "icon": "settings",
+                                    "settings": [
                                         {
-                                            "label": "Light",
-                                            "value": 8,
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "label": "Strong",
-                                            "value": 24,
-                                            "tier_required": "free"
-                                        },
-                                        {
-                                            "label": "None",
-                                            "value": 0,
-                                            "tier_required": "free"
+                                            "use": "lightbox-mini",
+                                            "key_prefix": "lightbox_mini_",
+                                            "include": [
+                                                "show_close",
+                                                "show_arrows",
+                                                "show_bullets",
+                                                "padding"
+                                            ]
                                         }
-                                    ],
-                                    "default": 8,
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
+                                    ]
                                 },
-                                {
-                                    "key": "interactions_zoom_popover_padding",
-                                    "type": "range",
-                                    "label": "Padding",
-                                    "description": "Breathing room between the image and the viewport edges.",
-                                    "min": 0,
-                                    "max": 80,
-                                    "default": 24,
-                                    "unit": "px",
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "interactions_zoom_popover_close_button",
-                                    "type": "toggle",
-                                    "label": "Show Close Button",
-                                    "default": true,
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
-                                },
-                                {
-                                    "key": "interactions_zoom_popover_click_outside_to_close",
-                                    "type": "toggle",
-                                    "label": "Click Outside to Close",
-                                    "default": true,
-                                    "tier_required": "free",
-                                    "render_when_unlicensed": true,
-                                    "setting_lives_in": "free",
-                                    "visible_when_uninstalled": true
+                                "styling": {
+                                    "id": "styling",
+                                    "label": "Styling",
+                                    "icon": "styling",
+                                    "settings": [
+                                        {
+                                            "use": "lightbox-mini",
+                                            "key_prefix": "lightbox_mini_",
+                                            "include": [
+                                                "show_overlay",
+                                                "overlay_blur",
+                                                "show_border",
+                                                "show_shadow",
+                                                "show_radius",
+                                                "theme"
+                                            ]
+                                        }
+                                    ]
                                 }
-                            ],
+                            },
                             "tier_required": "free",
                             "render_when_unlicensed": true,
                             "setting_lives_in": "free",

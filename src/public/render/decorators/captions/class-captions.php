@@ -6,10 +6,12 @@ namespace FotoGrids\Render\Decorators\Captions;
 use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Decorator;
 use FotoGrids\Render\Api\Font_Resolver;
+use FotoGrids\Render\Api\Hover_Effect;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Api\Setting_Helpers;
+use FotoGrids\Render\Internal\Hover_Effect_Registry;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -60,8 +62,49 @@ final class Captions implements Decorator {
 
 		$caption_placement = $this->setting_scalar( $render_context->settings['caption_placement'] ?? null, 'overlay' );
 
-		return array(
+		$attrs = array(
 			'data-fg-caption' => sanitize_html_class( $caption_placement ),
+		);
+
+		// A hover effect that animates the caption (e.g. caption-fade,
+		// caption-rise) owns the caption's hover behaviour, so the Caption
+		// Visibility setting yields to it and the attribute is not stamped.
+		if ( ! $this->hover_effect_owns_caption( $render_context ) ) {
+			$caption_visibility = $this->setting_scalar( $render_context->settings['caption_visibility'] ?? null, 'always' );
+			if ( 'always' !== $caption_visibility ) {
+				$attrs['data-fg-caption-show'] = sanitize_html_class( $caption_visibility );
+			}
+		}
+
+		return $attrs;
+	}
+
+	/**
+	 * Whether the active hover effect manages caption visibility itself. Such
+	 * effects (animates = caption or both) override the Caption Visibility
+	 * setting, which must not stamp its attribute when one is active.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return bool
+	 */
+	private function hover_effect_owns_caption( Render_Context $render_context ): bool {
+		$effect_id = $render_context->behavior->hover_effect ?? 'none';
+		$effect_id = is_string( $effect_id ) && '' !== $effect_id ? $effect_id : 'none';
+
+		$effect = Hover_Effect_Registry::get( $effect_id );
+		if ( null === $effect ) {
+			return false;
+		}
+
+		if ( in_array( $render_context->layout->layout_id, $effect->hide_on_layouts, true ) ) {
+			return false;
+		}
+
+		return in_array(
+			$effect->animates,
+			array( Hover_Effect::ANIMATES_CAPTION, Hover_Effect::ANIMATES_BOTH ),
+			true
 		);
 	}
 
@@ -104,6 +147,21 @@ final class Captions implements Decorator {
 			$gap_mobile  = $this->resolve_responsive_value( $caption_gap, 'mobile', 'px', $gap_tablet );
 		}
 
+		// Caption Padding applies in every placement. For overlay it pads the
+		// content box inside the tinted layer; for top/bottom it pads the
+		// flowing caption box, which also makes the padded height part of the
+		// item's real height (the masonry packer measures the caption box).
+		$caption_padding = $settings['caption_padding'] ?? array();
+		$padding_desktop = $this->resolve_four_sided_value( $caption_padding, 'desktop', 'rem' );
+		$caption_pad_var = null;
+		if ( '' !== $padding_desktop ) {
+			$caption_pad_var = new Responsive_Var(
+				$padding_desktop,
+				$this->resolve_four_sided_value( $caption_padding, 'tablet', 'rem' ),
+				$this->resolve_four_sided_value( $caption_padding, 'mobile', 'rem' ),
+			);
+		}
+
 		// Vertical alignment + tinted overlay background only apply when the
 		// caption is overlaid on the media. Top/bottom placements stack
 		// vertically with no background, so emitting these vars would just
@@ -126,6 +184,10 @@ final class Captions implements Decorator {
 		$title_font_size = $settings['caption_title_font_size'] ?? array();
 		$desc_font_size  = $settings['caption_description_font_size'] ?? array();
 
+		// Distance between the title and the description, applied only when both
+		// are rendered (the CSS targets the description that follows a title).
+		$title_desc_gap = $settings['caption_title_desc_gap'] ?? array();
+
 		$vars = array(
 			'--fg-caption-align'           => $caption_alignment,
 			'--fg-caption-media-align'     => $media_align,
@@ -133,6 +195,11 @@ final class Captions implements Decorator {
 				$gap_desktop,
 				$gap_tablet,
 				$gap_mobile,
+			),
+			'--fg-caption-title-desc-gap'  => new Responsive_Var(
+				$this->resolve_responsive_value( $title_desc_gap, 'desktop', 'px', '8px' ),
+				$this->resolve_responsive_value( $title_desc_gap, 'tablet', 'px', '8px' ),
+				$this->resolve_responsive_value( $title_desc_gap, 'mobile', 'px', '8px' ),
 			),
 			'--fg-caption-title-font-size' => new Responsive_Var(
 				$this->resolve_responsive_value( $title_font_size, 'desktop', 'px', '18px' ),
@@ -158,6 +225,10 @@ final class Captions implements Decorator {
 
 		if ( '' !== $overlay_align ) {
 			$vars['--fg-caption-overlay-align'] = $overlay_align;
+		}
+		if ( null !== $caption_pad_var ) {
+			$padding_var          = 'overlay' === $caption_placement ? '--fg-caption-overlay-padding' : '--fg-caption-padding';
+			$vars[ $padding_var ] = $caption_pad_var;
 		}
 		if ( '' !== $overlay_bg ) {
 			$vars['--fg-caption-overlay-bg'] = $overlay_bg;
@@ -189,17 +260,40 @@ final class Captions implements Decorator {
 			);
 		}
 
-		$resolver    = Font_Resolver::instance();
-		$font_family = $resolver->resolve_font_family( $settings['caption_title_font_family'] ?? null, $render_context );
-		$font_weight = $resolver->resolve_font_weight( $settings['caption_title_font_weight'] ?? null, $render_context );
+		$resolver         = Font_Resolver::instance();
+		$title_family     = $resolver->resolve_font_family( $settings['caption_title_font_family'] ?? null, $render_context );
+		$title_weight     = $resolver->resolve_font_weight( $settings['caption_title_font_weight'] ?? null, $render_context );
+		$title_style      = $resolver->resolve_font_style( $settings['caption_title_font_style'] ?? null, $render_context );
+		$desc_font_family = $resolver->resolve_font_family( $settings['caption_description_font_family'] ?? null, $render_context );
+		$desc_font_weight = $resolver->resolve_font_weight( $settings['caption_description_font_weight'] ?? null, $render_context );
+		$desc_font_style  = $resolver->resolve_font_style( $settings['caption_description_font_style'] ?? null, $render_context );
 
-		if ( '' !== $font_family ) {
-			$vars['--fg-caption-title-font-family'] = $font_family;
+		if ( '' !== $title_family ) {
+			$vars['--fg-caption-title-font-family'] = $title_family;
 		}
 
-		if ( '' !== $font_weight ) {
-			$vars['--fg-caption-title-font-weight'] = $font_weight;
+		if ( '' !== $title_weight ) {
+			$vars['--fg-caption-title-font-weight'] = $title_weight;
 		}
+
+		if ( '' !== $title_style ) {
+			$vars['--fg-caption-title-font-style'] = $title_style;
+		}
+
+		if ( '' !== $desc_font_family ) {
+			$vars['--fg-caption-desc-font-family'] = $desc_font_family;
+		}
+
+		if ( '' !== $desc_font_weight ) {
+			$vars['--fg-caption-desc-font-weight'] = $desc_font_weight;
+		}
+
+		if ( '' !== $desc_font_style ) {
+			$vars['--fg-caption-desc-font-style'] = $desc_font_style;
+		}
+
+		$this->add_text_spacing_vars( $vars, '--fg-caption-title', $settings, 'caption_title_' );
+		$this->add_text_spacing_vars( $vars, '--fg-caption-desc', $settings, 'caption_description_' );
 
 		return $vars;
 	}
@@ -234,6 +328,7 @@ final class Captions implements Decorator {
 		$resolver    = Font_Resolver::instance();
 		$font_family = $resolver->resolve_font_family( $settings['caption_title_font_family'] ?? null, $render_context );
 		$font_weight = $resolver->resolve_font_weight( $settings['caption_title_font_weight'] ?? null, $render_context );
+		$font_style  = $resolver->resolve_font_style( $settings['caption_title_font_style'] ?? null, $render_context );
 
 		if ( '' !== $font_family ) {
 			$vars['--fg-caption-title-font-family'] = $font_family;
@@ -241,6 +336,11 @@ final class Captions implements Decorator {
 		if ( '' !== $font_weight ) {
 			$vars['--fg-caption-title-font-weight'] = $font_weight;
 		}
+		if ( '' !== $font_style ) {
+			$vars['--fg-caption-title-font-style'] = $font_style;
+		}
+
+		$this->add_text_spacing_vars( $vars, '--fg-caption-title', $settings, 'caption_title_' );
 
 		return $vars;
 	}

@@ -8,7 +8,7 @@
  *
  * Exposed as window.FotoGrids.modules.lightboxMini.{ open, close }.
  *   open(contentNode, options) - options:
- *     { label, closeButton, clickOutsideToClose, styleVars }
+ *     { label, closeButton, clickOutsideToClose, styleVars, dataAttrs }
  *   close()
  */
 (function () {
@@ -45,6 +45,9 @@
      *   clickOutsideToClose - close when the backdrop is clicked (default true).
      *   styleVars           - map of CSS custom properties set on the overlay
      *                         (e.g. { '--fg-lb-mini-padding': '24px' }).
+     *   dataAttrs           - map of data attributes set on the overlay, used
+     *                         to select theme/blur in CSS
+     *                         (e.g. { 'data-fg-mini-theme': 'dark' }).
      */
     function open(contentNode, options) {
         if (!contentNode) {
@@ -67,6 +70,11 @@
         if (opts.styleVars && typeof opts.styleVars === 'object') {
             Object.keys(opts.styleVars).forEach(function (name) {
                 overlay.style.setProperty(name, opts.styleVars[name]);
+            });
+        }
+        if (opts.dataAttrs && typeof opts.dataAttrs === 'object') {
+            Object.keys(opts.dataAttrs).forEach(function (name) {
+                overlay.setAttribute(name, opts.dataAttrs[name]);
             });
         }
 

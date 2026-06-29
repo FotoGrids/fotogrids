@@ -92,12 +92,55 @@ final class Video_Lightbox_Mini implements Feature {
 		return '';
 	}
 
+	/**
+	 * Stamp the mini overlay theme + blur level so the CSS resolves the
+	 * backdrop colour and blur (no inline colour / px from PHP).
+	 *
+	 * @since 1.1.0
+	 * @param Render_Context $render_context Render context.
+	 * @return array<string, string>
+	 */
 	public function wrapper_data_attrs( Render_Context $render_context ): array {
-		return array();
+		$settings = $render_context->settings;
+
+		$theme = is_string( $settings['lightbox_mini_theme'] ?? null ) && 'light' === $settings['lightbox_mini_theme']
+			? 'light'
+			: 'dark';
+
+		$blur = is_string( $settings['lightbox_mini_overlay_blur'] ?? null )
+			&& in_array( $settings['lightbox_mini_overlay_blur'], array( 'light', 'strong', 'none' ), true )
+			? $settings['lightbox_mini_overlay_blur']
+			: 'light';
+
+		return array(
+			'data-fg-mini-theme' => $theme,
+			'data-fg-mini-blur'  => $blur,
+		);
 	}
 
+	/**
+	 * The mini overlay padding is a free-form length, so it stays a CSS
+	 * variable fed from the gallery's responsive padding setting.
+	 *
+	 * @since 1.1.0
+	 * @param Render_Context $render_context Render context.
+	 * @return array<string, string>
+	 */
 	public function style_vars( Render_Context $render_context ): array {
-		return array();
+		$padding_px = '24';
+		$padding    = $render_context->settings['lightbox_mini_padding'] ?? null;
+		if ( is_array( $padding ) ) {
+			$desktop = $padding['desktop'] ?? null;
+			if ( is_array( $desktop ) && isset( $desktop['value'] ) ) {
+				$padding_px = (string) (int) $desktop['value'];
+			} elseif ( is_numeric( $desktop ) ) {
+				$padding_px = (string) (int) $desktop;
+			}
+		}
+
+		return array(
+			'--fg-lb-mini-padding' => $padding_px . 'px',
+		);
 	}
 
 	/**

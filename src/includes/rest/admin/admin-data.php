@@ -609,6 +609,7 @@ class Admin_Data {
 			array(
 				'autosave'                          => $request->get_param( 'autosave' ),
 				'share_statistics'                  => $request->get_param( 'share_statistics' ),
+				'marketing_allowed'                 => $request->get_param( 'marketing_allowed' ),
 				'custom_js_allow_dynamic_execution' => $request->get_param( 'custom_js_allow_dynamic_execution' ),
 				'delete_data_on_uninstall'          => $request->get_param( 'delete_data_on_uninstall' ),
 			)
@@ -1176,9 +1177,6 @@ class Admin_Data {
 			)
 		);
 	}
-
-	// get_gallery_preview() was removed when the PageBuilders module took
-	// over preview rendering. Hosts now use POST /preview/gallery/{id}.
 
 	/**
 	 * Get recently edited galleries and albums

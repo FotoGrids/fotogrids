@@ -83,6 +83,12 @@ class Freemius_Bootstrap {
 			return null;
 		}
 
+		// FotoGrids owns the post-activation experience via its own setup
+		// wizard, so suppress the SDK's own connect-screen redirect on
+		// activation. Combined with anonymous_mode, the FotoGrids dashboard
+		// renders instead of the Freemius opt-in screen.
+		self::$instance->add_filter( 'redirect_on_activation', '__return_false' );
+
 		/**
 		 * Fires after the Freemius SDK instance is ready.
 		 *
@@ -129,7 +135,11 @@ class Freemius_Bootstrap {
 			'has_addons'          => true,
 			'has_paid_plans'      => true,
 			'is_org_compliant'    => true,
-			'anonymous_mode'      => false,
+			// Start sites in anonymous mode so the SDK never overrides the
+			// FotoGrids menu page with its own connect/opt-in screen. The
+			// plugin owns onboarding via its setup wizard; no data reaches
+			// Freemius until a user explicitly opts in.
+			'anonymous_mode'      => true,
 			'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
 			'menu'                => array(
 				'slug'    => 'fotogrids-dashboard',
