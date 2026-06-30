@@ -1,0 +1,55 @@
+/* A quick light flash: the image brightens briefly and settles, with an opaque
+   light streak sweeping across the frame. */
+
+.fotogrids-collection[data-fg-hover='invert-flash'] .fg-item-media {
+	position: relative;
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='invert-flash']
+	.fg-item:hover
+	.fg-item-media
+	img {
+	animation: fg-hover-flash 0.6s ease-out;
+}
+
+.fotogrids-collection[data-fg-hover='invert-flash'] .fg-item-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		120deg,
+		transparent 20%,
+		rgba(255, 255, 255, 0.3) 50%,
+		transparent 80%
+	);
+	transform: translateX(-120%);
+	pointer-events: none;
+}
+
+.fotogrids-collection[data-fg-hover='invert-flash']
+	.fg-item:hover
+	.fg-item-media::after {
+	animation: fg-hover-flash-sweep 0.6s ease-out;
+}
+
+@keyframes fg-hover-flash {
+	0% {
+		filter: brightness(1);
+	}
+	30% {
+		filter: brightness(1.6);
+	}
+	100% {
+		filter: brightness(1);
+	}
+}
+
+@keyframes fg-hover-flash-sweep {
+	0% {
+		transform: translateX(-120%);
+	}
+	100% {
+		transform: translateX(120%);
+	}
+}

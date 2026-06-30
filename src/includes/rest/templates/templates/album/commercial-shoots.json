@@ -1,0 +1,11 @@
+{
+  "id": "commercial-shoots",
+  "name": "Commercial Shoots",
+  "description": "One album per brand or campaign with download tokens, right-click protection, and licence tier pre-set. Built for commercial photographers handing off to clients.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "photography",
+  "order": 13,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

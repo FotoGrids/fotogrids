@@ -1,0 +1,25 @@
+/* A springy bounce: a quick punch up and overshoot, then a slow settle back to
+   the original size. The early keyframes are tightly spaced (snappy rise); the
+   later ones are spread out so the return to scale(1) eases in gently. */
+
+.fotogrids-collection[data-fg-hover='pop'] .fg-item:hover {
+	animation: fg-hover-pop 0.9s ease-in-out both;
+}
+
+@keyframes fg-hover-pop {
+	0% {
+		transform: scale(1);
+	}
+	30% {
+		transform: scale(1.1);
+	}
+	45% {
+		transform: scale(1.03);
+	}
+	60% {
+		transform: scale(1.06);
+	}
+	100% {
+		transform: scale(1);
+	}
+}

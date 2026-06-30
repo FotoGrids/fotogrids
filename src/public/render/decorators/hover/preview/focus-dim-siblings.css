@@ -1,0 +1,23 @@
+/* Preview note: the live effect dims every OTHER item while one is hovered. A
+   single preview card has no siblings, so here the card sits dimmed at rest and
+   pops to full focus on hover to convey the "this one stands out" idea. */
+
+.fotogrids-collection[data-fg-hover='focus-dim-siblings'] .fg-item-media,
+.fotogrids-collection[data-fg-hover='focus-dim-siblings'][data-fg-caption='overlay']
+	.fg-caption-bg {
+	filter: brightness(0.7) saturate(0.6);
+	transform: scale(1);
+	transition:
+		filter 0.3s ease,
+		transform 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='focus-dim-siblings']
+	.fg-item:hover
+	.fg-item-media,
+.fotogrids-collection[data-fg-hover='focus-dim-siblings'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-bg {
+	filter: brightness(1.05) saturate(1.1);
+	transform: scale(1.08);
+}

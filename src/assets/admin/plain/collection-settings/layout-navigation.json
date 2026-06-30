@@ -1,0 +1,1024 @@
+{
+    "id": "layout-navigation",
+    "label": "Navigation",
+    "icon": "transition_horizontal",
+    "postTypes": [
+        "gallery"
+    ],
+    "condition": {
+        "dependsOn": "layout",
+        "values": [
+            "image-viewer",
+            "slider"
+        ]
+    },
+    "settings": [
+        {
+            "key": "layout_navigation_subtabs",
+            "type": "setting_subtabs",
+            "subTabs": {
+                "general": {
+                    "id": "general",
+                    "label": "General",
+                    "icon": "settings",
+                    "settings": [
+                        {
+                            "key": "layout_loop",
+                            "type": "toggle",
+                            "label": "Loop",
+                            "description": "After the last item, return to the first.",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_show_counter",
+                            "type": "toggle",
+                            "label": "Show Counter",
+                            "description": "Show the current position indicator (for example 3 of 12).",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_autoplay_group",
+                            "type": "setting_group",
+                            "label": "Autoplay",
+                            "settings": [
+                                {
+                                    "key": "layout_autoplay",
+                                    "type": "toggle",
+                                    "label": "Enable Autoplay",
+                                    "description": "Automatically advance between items.",
+                                    "default": false,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_autoplay_delay",
+                                    "type": "range",
+                                    "label": "Delay",
+                                    "description": "Time spent on each item before advancing.",
+                                    "min": 1000,
+                                    "max": 10000,
+                                    "step": 250,
+                                    "default": 4000,
+                                    "unit": "ms",
+                                    "condition": {
+                                        "dependsOn": "layout_autoplay",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_autoplay_pause_on_hover",
+                                    "type": "toggle",
+                                    "label": "Pause on Hover",
+                                    "default": true,
+                                    "condition": {
+                                        "dependsOn": "layout_autoplay",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_transition_group",
+                            "type": "setting_group",
+                            "label": "Transition",
+                            "settings": [
+                                {
+                                    "key": "layout_transition",
+                                    "type": "button_group",
+                                    "label": "Transition Between Items",
+                                    "options": [
+                                        {
+                                            "label": "Fade",
+                                            "value": "fade",
+                                            "icon": "transition_fade",
+                                            "condition": {
+                                                "dependsOn": "layout",
+                                                "values": [
+                                                    "image-viewer"
+                                                ]
+                                            },
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Horizontal",
+                                            "value": "horizontal",
+                                            "icon": "transition_horizontal",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Vertical",
+                                            "value": "vertical",
+                                            "icon": "transition_vertical",
+                                            "condition": {
+                                                "dependsOn": "layout",
+                                                "values": [
+                                                    "image-viewer"
+                                                ]
+                                            },
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "None",
+                                            "value": "none",
+                                            "icon": "x",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "horizontal",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_transition_duration",
+                                    "type": "button_group",
+                                    "label": "Transition Duration",
+                                    "options": [
+                                        {
+                                            "label": "Fast",
+                                            "value": "fast",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Normal",
+                                            "value": "normal",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Slow",
+                                            "value": "slow",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Custom",
+                                            "value": "custom",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "normal",
+                                    "condition": {
+                                        "dependsOn": "layout_transition",
+                                        "values": [
+                                            "fade",
+                                            "horizontal",
+                                            "vertical"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_transition_duration_custom",
+                                    "type": "range",
+                                    "label": "Custom Duration",
+                                    "unit": "ms",
+                                    "min": 50,
+                                    "max": 2000,
+                                    "step": 25,
+                                    "default": 300,
+                                    "condition": {
+                                        "all": [
+                                            {
+                                                "dependsOn": "layout_transition",
+                                                "values": ["none"],
+                                                "condition_operator": "not_in"
+                                            },
+                                            {
+                                                "dependsOn": "layout_transition_duration",
+                                                "values": [
+                                                    "custom"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "layout_easing",
+                                    "type": "button_group",
+                                    "label": "Easing",
+                                    "description": "The acceleration curve the transition follows.",
+                                    "options": [
+                                        {
+                                            "label": "Ease",
+                                            "value": "ease",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Linear",
+                                            "value": "linear",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Ease In",
+                                            "value": "ease_in",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Ease Out",
+                                            "value": "ease_out",
+                                            "tier_required": "free"
+                                        },
+                                        {
+                                            "label": "Ease In Out",
+                                            "value": "ease_in_out",
+                                            "tier_required": "free"
+                                        }
+                                    ],
+                                    "default": "ease",
+                                    "condition": {
+                                        "dependsOn": "layout_transition",
+                                        "values": [
+                                            "fade",
+                                            "horizontal",
+                                            "vertical"
+                                        ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "arrows": {
+                    "id": "arrows",
+                    "label": "Arrows",
+                    "icon": "arrow_circle_right",
+                    "settings": [
+                        {
+                            "key": "layout_show_arrows",
+                            "type": "toggle",
+                            "label": "Show Arrows",
+                            "description": "Show previous and next arrows.",
+                            "default": true,
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "slider"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrow_icon",
+                            "type": "button_group",
+                            "label": "Arrow Icon Style",
+                            "options": [
+                                {
+                                    "value": "chevron",
+                                    "icon": "chevron_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "chevron_double",
+                                    "icon": "chevron_right_double",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow",
+                                    "icon": "arrow_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_narrow",
+                                    "icon": "arrow_right_narrow",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_square",
+                                    "icon": "arrow_square_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_circle",
+                                    "icon": "arrow_circle_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_circle_broken",
+                                    "icon": "arrow_circle_broken_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_block",
+                                    "icon": "arrow_block_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "chevron",
+                            "condition": {
+                                "any": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "image-viewer"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrow_size",
+                            "type": "range",
+                            "label": "Arrow Size",
+                            "min": 16,
+                            "max": 120,
+                            "default": 40,
+                            "units": [
+                                "px",
+                                "em",
+                                "rem",
+                                "%"
+                            ],
+                            "condition": {
+                                "any": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "image-viewer"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrows_location",
+                            "type": "button_group",
+                            "label": "Arrows Location",
+                            "description": "Where the arrows sit relative to the image edge.",
+                            "options": [
+                                {
+                                    "label": "Bottom",
+                                    "value": "bottom",
+                                    "tier_required": "free",
+                                    "condition": {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "image-viewer"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "Inset",
+                                    "value": "inset",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Overlap",
+                                    "value": "overlap",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Outset",
+                                    "value": "outset",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "inset",
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "slider"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrow_distance",
+                            "type": "range",
+                            "label": "Arrow Distance",
+                            "description": "Inset: distance from the inner edge. Outset: distance from the outer edge.",
+                            "min": 0,
+                            "max": 80,
+                            "default": 8,
+                            "units": [
+                                "px"
+                            ],
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_arrows_location",
+                                        "values": [
+                                            "inset",
+                                            "outset"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrows_reserve_space",
+                            "type": "toggle",
+                            "label": "Reserve Space for Arrows",
+                            "description": "Shrinks the slider viewport so arrows sit outside the image instead of overlapping the next page element.",
+                            "default": false,
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_arrows_location",
+                                        "values": [
+                                            "overlap",
+                                            "outset"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrows_visibility",
+                            "type": "button_group",
+                            "label": "Arrows Visibility",
+                            "options": [
+                                {
+                                    "label": "Always Visible",
+                                    "value": "always",
+                                    "icon": "eye",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Show on Hover",
+                                    "value": "hover_show",
+                                    "icon": "click_alt",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Hide on Hover",
+                                    "value": "hover_hide",
+                                    "icon": "hover_alt",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "always",
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_hide_arrows_at_ends",
+                            "type": "toggle",
+                            "label": "Hide Arrows at First and Last Item",
+                            "description": "Hides the previous arrow on the first item and the next arrow on the last when loop is off.",
+                            "default": false,
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_loop",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_arrows_at_ends_mode",
+                            "type": "button_group",
+                            "label": "At First and Last Item",
+                            "description": "Whether to dim the arrow or hide it entirely at the start and end.",
+                            "options": [
+                                {
+                                    "label": "Hide",
+                                    "value": "hide",
+                                    "icon": "eye_off",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Dim",
+                                    "value": "dim",
+                                    "icon": "eye",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "hide",
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_loop",
+                                        "values": [
+                                            false,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_hide_arrows_at_ends",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "use": "nav-colors",
+                            "key_prefix": "layout_arrow_",
+                            "states_label": "Arrow Colors",
+                            "colors": [
+                                "bg",
+                                "border_color",
+                                "arrow_color"
+                            ],
+                            "condition": {
+                                "all": [
+                                    {
+                                        "dependsOn": "layout",
+                                        "values": [
+                                            "slider"
+                                        ]
+                                    },
+                                    {
+                                        "dependsOn": "layout_show_arrows",
+                                        "values": [
+                                            true,
+                                            "1"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "use": "nav-colors",
+                            "key_prefix": "layout_viewer_arrow_",
+                            "states_label": "Arrow Colors",
+                            "colors": [
+                                "bg",
+                                "border_color",
+                                "arrow_color"
+                            ],
+                            "condition": {
+                                "dependsOn": "layout",
+                                "values": [
+                                    "image-viewer"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "bullets": {
+                    "id": "bullets",
+                    "label": "Bullets",
+                    "icon": "bullets",
+                    "condition": {
+                        "dependsOn": "layout",
+                        "values": [
+                            "slider"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "layout_show_bullets",
+                            "type": "toggle",
+                            "label": "Show Bullets",
+                            "description": "Show pagination dots that indicate the current item.",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "use": "bullet-geometry",
+                            "key_prefix": "layout_bullet_",
+                            "condition": {
+                                "dependsOn": "layout_show_bullets",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            }
+                        },
+                        {
+                            "use": "nav-colors",
+                            "key_prefix": "layout_bullet_",
+                            "states_label": "Bullet Colors",
+                            "colors": [
+                                "bg",
+                                "border_color"
+                            ],
+                            "condition": {
+                                "dependsOn": "layout_show_bullets",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "layout_bullets_location",
+                            "type": "button_group",
+                            "label": "Bullets Location",
+                            "options": [
+                                {
+                                    "label": "Top",
+                                    "value": "top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Bottom",
+                                    "value": "bottom",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Overlay Top",
+                                    "value": "overlay_top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Overlay Bottom",
+                                    "value": "overlay_bottom",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "bottom",
+                            "condition": {
+                                "dependsOn": "layout_show_bullets",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_bullet_distance",
+                            "type": "range",
+                            "label": "Bullets Distance",
+                            "description": "Top: distance from the top edge. Bottom: distance from the bottom edge. Applies whether the bullets are inset or overlayed.",
+                            "min": 0,
+                            "max": 60,
+                            "default": 8,
+                            "units": [
+                                "px"
+                            ],
+                            "condition": {
+                                "dependsOn": "layout_show_bullets",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_bullets_visibility",
+                            "type": "button_group",
+                            "label": "Bullets Visibility",
+                            "options": [
+                                {
+                                    "label": "Always Visible",
+                                    "value": "always",
+                                    "icon": "eye",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Show on Hover",
+                                    "value": "hover_show",
+                                    "icon": "click_alt",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Hide on Hover",
+                                    "value": "hover_hide",
+                                    "icon": "hover_alt",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "always",
+                            "condition": {
+                                "dependsOn": "layout_show_bullets",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "thumbnails": {
+                    "id": "thumbnails",
+                    "label": "Thumbnails",
+                    "icon": "flex_align_bottom",
+                    "condition": {
+                        "dependsOn": "layout",
+                        "values": [
+                            "slider"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "layout_thumbnails_show",
+                            "type": "toggle",
+                            "label": "Show Thumbnails",
+                            "description": "Show a strip of mini-images that scroll the slider when clicked.",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_thumbnails_location",
+                            "type": "button_group",
+                            "label": "Thumbnails Location",
+                            "options": [
+                                {
+                                    "label": "Bottom",
+                                    "value": "bottom",
+                                    "icon": "flex_align_bottom",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Top",
+                                    "value": "top",
+                                    "icon": "flex_align_top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Left",
+                                    "value": "left",
+                                    "icon": "flex_align_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Right",
+                                    "value": "right",
+                                    "icon": "flex_align_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "bottom",
+                            "condition": {
+                                "dependsOn": "layout_thumbnails_show",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_thumbnails_size",
+                            "type": "button_group",
+                            "label": "Thumbnail Size",
+                            "options": [
+                                {
+                                    "label": "Small",
+                                    "value": "small",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Normal",
+                                    "value": "normal",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Large",
+                                    "value": "large",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "normal",
+                            "condition": {
+                                "dependsOn": "layout_thumbnails_show",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_thumbnails_spacing",
+                            "type": "range",
+                            "label": "Space Between Thumbnails",
+                            "min": 0,
+                            "max": 20,
+                            "default": 5,
+                            "unit": "px",
+                            "condition": {
+                                "dependsOn": "layout_thumbnails_show",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_thumbnails_drag",
+                            "type": "toggle",
+                            "label": "Drag Thumbnails",
+                            "description": "Allow visitors to drag the thumbnail strip with a mouse on desktop.",
+                            "default": true,
+                            "condition": {
+                                "dependsOn": "layout_thumbnails_show",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "layout_thumbnails_swipe",
+                            "type": "toggle",
+                            "label": "Swipe Thumbnails",
+                            "description": "Allow visitors to swipe the thumbnail strip on touch devices.",
+                            "default": true,
+                            "condition": {
+                                "dependsOn": "layout_thumbnails_show",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "tier_required": "free"
+}

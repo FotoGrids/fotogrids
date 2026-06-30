@@ -1,0 +1,108 @@
+.fotogrids-table-container {
+	background: white;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	overflow: hidden;
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		th,
+		td {
+			padding: 12px 16px;
+			text-align: left;
+			border-bottom: 1px solid #f0f0f1;
+		}
+
+		th {
+			background: #f6f7f7;
+			font-weight: 600;
+			color: #1e1e1e;
+			border-bottom: 1px solid #c3c4c7;
+		}
+
+		tr:last-child td {
+			border-bottom: none;
+		}
+
+		tr:hover {
+			background: #f9f9f9;
+		}
+
+		.row-actions {
+			display: flex;
+			gap: 0.5rem;
+
+			.button {
+				padding: 4px 8px;
+				font-size: 12px;
+				line-height: 1.4;
+				min-height: auto;
+			}
+		}
+	}
+}
+
+.post-type-fotogrids_gallery,
+.post-type-fotogrids_album {
+	table.fixed {
+		table-layout: auto;
+	}
+}
+
+.widefat {
+	.column-fotogrids_shortcode {
+		white-space: nowrap;
+
+		.fg-button {
+			flex-shrink: 0;
+
+			.fotogrids-icon {
+				width: 16px;
+				height: 16px;
+			}
+		}
+
+		.fotogrids-shortcode-cell {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+	}
+
+	.column-fotogrids_shortcode,
+	.column-fotogrids_layout {
+		width: 1%;
+	}
+
+	.column-fotogrids_items,
+	.column-fotogrids_galleries,
+	.column-fotogrids_stats {
+		text-align: center;
+	}
+}
+
+.fotogrids-shortcode-text {
+	flex: 1 0 auto;
+	min-width: 0;
+	max-width: 100%;
+	font-size: 11px;
+	line-height: 18px;
+	padding: 4px 8px;
+	border: 1px solid var(--fg-border-secondary);
+	border-radius: 4px;
+	background: var(--fg-background-primary);
+	font-family: inherit;
+	user-select: text;
+	-webkit-user-select: text;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&:focus {
+		outline: 0;
+		border-color: var(--fg-border-focus);
+		box-shadow: 0 0 0 1px var(--fg-border-focus);
+	}
+}

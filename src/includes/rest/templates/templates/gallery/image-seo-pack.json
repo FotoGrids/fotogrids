@@ -1,0 +1,11 @@
+{
+  "id": "image-seo-pack",
+  "name": "Image SEO Pack",
+  "description": "Justified grid with structured data, image sitemap, Open Graph, and AI alt-text all enabled. Built to get image traffic from search.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "general",
+  "order": 36,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

@@ -1,0 +1,11 @@
+{
+  "id": "client-delivery-suite",
+  "name": "Client Delivery Suite",
+  "description": "One album per client with proofing, expiry, and watermark pre-wired. Clients proof inside the album; selections land in wp-admin in real time.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "photography",
+  "order": 12,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

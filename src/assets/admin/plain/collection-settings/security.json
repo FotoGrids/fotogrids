@@ -1,0 +1,161 @@
+{
+    "id": "security",
+    "label": "Security",
+    "icon": "security",
+    "settings": [
+        {
+            "key": "disable_right_click",
+            "type": "toggle",
+            "label": "Disable Right Click",
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "password_protect_group",
+            "type": "setting_group",
+            "label": "Password Protection",
+            "settings": [
+                {
+                    "key": "password_protect",
+                    "type": "toggle",
+                    "label": "Password Protect {postType}",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "password",
+                    "type": "password_input",
+                    "label": "{postType} Password",
+                    "default": "",
+                    "condition": {
+                        "dependsOn": "password_protect",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "password_remember",
+                    "type": "toggle",
+                    "label": "Remember Unlock",
+                    "description": "Allow visitors to stay unlocked across sessions using a cookie.",
+                    "default": false,
+                    "condition": {
+                        "dependsOn": "password_protect",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "password_remember_days",
+                    "type": "number",
+                    "label": "Remember For (days)",
+                    "default": 7,
+                    "min": 1,
+                    "max": 365,
+                    "condition": {
+                        "dependsOn": "password_remember",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "watermark_generation_group",
+            "type": "setting_group",
+            "label": "Watermark Generation",
+            "settings": [
+                {
+                    "key": "watermark_global_off_notice",
+                    "type": "info_block",
+                    "subtitle": "Watermarking is turned off site-wide",
+                    "message": "Watermarks are disabled in FotoGrids settings. Turn them on under <a href=\"admin.php?page=fotogrids-settings&tab=watermark\" target=\"_blank\" rel=\"noopener noreferrer\">FotoGrids → Settings → Watermark</a> to apply a watermark to this {postType.lower}.",
+                    "icon": "security",
+                    "button_label": "Open Watermark settings",
+                    "button_url": "admin.php?page=fotogrids-settings&tab=watermark",
+                    "full_width": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true,
+                    "condition_global": {
+                        "source": "watermark",
+                        "dependsOn": "enable_watermark",
+                        "values": [
+                            false
+                        ]
+                    }
+                },
+                {
+                    "key": "watermark_apply_to_collection",
+                    "type": "toggle",
+                    "label": "Apply watermark to this {postType}",
+                    "description": "The site-wide watermark is burned into this {postType.lower}'s images. Turn this off to leave this {postType.lower}'s images unwatermarked. Configure the watermark itself under <a href=\"admin.php?page=fotogrids-settings&tab=watermark\" target=\"_blank\" rel=\"noopener noreferrer\">FotoGrids → Settings → Watermark</a>.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true,
+                    "condition_global": {
+                        "source": "watermark",
+                        "dependsOn": "enable_watermark",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    }
+                },
+                {
+                    "key": "watermark_status",
+                    "type": "watermark_status",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true,
+                    "condition_global": {
+                        "source": "watermark",
+                        "dependsOn": "enable_watermark",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    }
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "postTypes": [
+                "gallery"
+            ]
+        }
+    ],
+    "tier_required": "free"
+}

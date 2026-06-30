@@ -1,0 +1,11 @@
+{
+  "id": "campaign-performance-hub",
+  "name": "Campaign Performance Hub",
+  "description": "One album per campaign with extended analytics, CTA click-tracking, and lead-capture forms wired up across all galleries inside.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "leads",
+  "order": 24,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

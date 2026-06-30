@@ -1,0 +1,46 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "fotogrids/album",
+    "version": "1.0.0",
+    "title": "FotoGrids Album",
+    "category": "media",
+    "description": "Insert a FotoGrids album.",
+    "keywords": [ "album", "gallery group", "collection", "fotogrids" ],
+    "textdomain": "fotogrids",
+    "supports": {
+        "html": false,
+        "anchor": true,
+        "align": [ "left", "center", "right", "wide", "full" ],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        },
+        "interactivity": false
+    },
+    "attributes": {
+        "albumId": {
+            "type": "number",
+            "default": 0
+        },
+        "align": {
+            "type": "string"
+        },
+        "previewClickBehavior": {
+            "type": "boolean",
+            "default": false
+        },
+        "previewPagination": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "example": {
+        "attributes": {
+            "albumId": 0
+        }
+    },
+    "editorScript": "fotogrids-pb-gutenberg-album",
+    "editorStyle": "fotogrids-pb-gutenberg-album",
+    "render": "file:./render.php"
+}

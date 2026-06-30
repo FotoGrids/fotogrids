@@ -1,0 +1,27 @@
+{
+	"partial": "nav-colors",
+	"inline_defaults": true,
+	"layout": [
+		{
+			"state_subtabs": {
+				"use": "nav-state",
+				"key_suffix": "state_subtabs",
+				"label": "Colors",
+				"node_attrs": {
+					"tier_required": "free",
+					"render_when_unlicensed": true,
+					"setting_lives_in": "free",
+					"visible_when_uninstalled": true
+				},
+				"states": ["regular", "hover", "active", "focus"],
+				"state_meta": {
+					"regular": { "infix": "", "label": "Regular", "icon": "square" },
+					"hover": { "infix": "hover_", "label": "Hover", "icon": "hover" },
+					"active": { "infix": "active_", "label": "Active", "icon": "check_square" },
+					"focus": { "infix": "focus_", "label": "Focus", "icon": "focus" }
+				}
+			}
+		}
+	],
+	"fields": {}
+}

@@ -1,0 +1,18 @@
+/* Stronger, longer cinematic push than the free Pan: bigger zoom and a more
+   pronounced multi-axis drift with eased-out timing. */
+
+.fotogrids-collection[data-fg-hover='zoom-pan'] .fg-item-media {
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='zoom-pan'] .fg-item-media img {
+	transition: transform 6s cubic-bezier(0.22, 1, 0.36, 1);
+	transform-origin: center center;
+}
+
+.fotogrids-collection[data-fg-hover='zoom-pan']
+	.fg-item:hover
+	.fg-item-media
+	img {
+	transform: scale(1.25) translate(-6%, -4%);
+}

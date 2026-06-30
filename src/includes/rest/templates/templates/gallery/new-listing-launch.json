@@ -1,0 +1,11 @@
+{
+  "id": "new-listing-launch",
+  "name": "New Listing Launch",
+  "description": "Password-protected gallery with expiry pre-set, watermark on, right-click protection on. Goes live when you're ready - remove the password and publish.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "order": 39,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

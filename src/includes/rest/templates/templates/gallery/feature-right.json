@@ -1,0 +1,18 @@
+{
+  "id": "feature-right",
+  "name": "Feature Rail",
+  "description": "Feature image with the thumbnail rail on the right. A magazine-style spotlight for showcasing a hero piece.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "order": 24,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "featured-item",
+    "featured_image_side": "right",
+    "featured_thumbs_count": 8,
+    "captions": true,
+    "item_click_behavior": "lightbox"
+  }
+}

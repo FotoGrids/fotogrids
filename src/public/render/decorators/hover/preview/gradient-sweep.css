@@ -1,0 +1,46 @@
+/* A coloured gradient sheen sweeps diagonally across the image on hover, then
+   the caption fades in. The sweep travels over the media (a moving pseudo-
+   element) so the motion is clearly visible, not just a caption reveal. */
+
+.fotogrids-collection[data-fg-hover='gradient-sweep'] .fg-item-media {
+	position: relative;
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='gradient-sweep'] .fg-item-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		120deg,
+		transparent 15%,
+		rgba(99, 102, 241, 0.4) 35%,
+		rgba(236, 72, 153, 0.2) 66%,
+		transparent 85%
+	);
+	transform: translateX(-100%);
+	pointer-events: none;
+	z-index: 1;
+}
+
+.fotogrids-collection[data-fg-hover='gradient-sweep']
+	.fg-item:hover
+	.fg-item-media::after {
+	transition: transform 0.6s ease;
+	transform: translateX(100%);
+}
+
+.fotogrids-collection[data-fg-hover='gradient-sweep'] .fg-caption-content {
+	opacity: 0;
+	transform: translateY(10px);
+	transition:
+		opacity 0.35s ease 0.2s,
+		transform 0.35s ease 0.2s;
+}
+
+.fotogrids-collection[data-fg-hover='gradient-sweep']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+	transform: translateY(0);
+}

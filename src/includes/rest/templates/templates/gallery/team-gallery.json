@@ -1,0 +1,11 @@
+{
+  "id": "team-gallery",
+  "name": "Team Gallery",
+  "description": "Grid of headshots with name and title captions on hover. Clean, brand-consistent, easy to update when someone joins or leaves.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "order": 32,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

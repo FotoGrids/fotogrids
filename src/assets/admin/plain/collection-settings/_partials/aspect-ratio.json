@@ -1,0 +1,108 @@
+{
+	"partial": "aspect-ratio",
+	"inline_defaults": true,
+	"layout": [
+		"ratio",
+		{
+			"wrap": "setting_group",
+			"label": "Custom Ratio",
+			"condition": {
+				"dependsOn": "{{key_prefix}}ratio",
+				"values": ["custom"]
+			},
+			"fields": ["ratio_w", "ratio_h"]
+		}
+	],
+	"field_defaults": {
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"ratio": {
+			"type": "button_group",
+			"label": "Item Aspect Ratio",
+			"description": "Shape of each item. Choose \"None\" to keep the image's original aspect ratio.",
+			"bigIcons": true,
+			"sameWidth": true,
+			"options": [
+				{
+					"label": "None",
+					"value": "none",
+					"icon": "aspect_ratio_custom",
+					"condition": {
+						"dependsOn": "layout",
+						"values": ["single-item", "image-viewer", "slider"]
+					},
+					"tier_required": "free"
+				},
+				{
+					"label": "1:1",
+					"value": "1/1",
+					"icon": "aspect_ratio_1_1",
+					"tier_required": "free"
+				},
+				{
+					"label": "4:3",
+					"value": "4/3",
+					"icon": "aspect_ratio_4_3",
+					"tier_required": "free"
+				},
+				{
+					"label": "3:2",
+					"value": "3/2",
+					"icon": "aspect_ratio_3_2",
+					"tier_required": "free"
+				},
+				{
+					"label": "16:9",
+					"value": "16/9",
+					"icon": "aspect_ratio_16_9",
+					"tier_required": "free"
+				},
+				{
+					"label": "3:4",
+					"value": "3/4",
+					"icon": "aspect_ratio_3_4",
+					"tier_required": "free"
+				},
+				{
+					"label": "2:3",
+					"value": "2/3",
+					"icon": "aspect_ratio_2_3",
+					"tier_required": "free"
+				},
+				{
+					"label": "Custom",
+					"value": "custom",
+					"icon": "aspect_ratio_custom",
+					"tier_required": "free"
+				}
+			],
+			"default": "4/3"
+		},
+		"ratio_w": {
+			"type": "range",
+			"label": "Width",
+			"min": 1,
+			"max": 50,
+			"default": 4,
+			"condition": {
+				"dependsOn": "{{key_prefix}}ratio",
+				"values": ["custom"]
+			}
+		},
+		"ratio_h": {
+			"type": "range",
+			"label": "Height",
+			"min": 1,
+			"max": 50,
+			"default": 3,
+			"condition": {
+				"dependsOn": "{{key_prefix}}ratio",
+				"values": ["custom"]
+			}
+		}
+	}
+}

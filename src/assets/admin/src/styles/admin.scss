@@ -1,0 +1,451 @@
+@use "sass:map";
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
+@use "./pro.scss" as *;
+@use "./inputs.scss" as *;
+@use "./fg-button/fg-button.scss" as *;
+@use "./fg-checkbox/fg-checkbox.scss" as *;
+@use "./fg-radio/fg-radio.scss" as *;
+@use "./fg-textarea/fg-textarea.scss" as *;
+@use "./fg-form-field/fg-form-field.scss" as *;
+@use "./fg-modal/fg-modal.scss" as *;
+@use "./SearchBar/SearchBar.scss" as *;
+@use "./item-edit/item-edit.scss" as *;
+@use "./video-embed/video-embed.scss" as *;
+@use "./blocks.scss" as *;
+@use "./items.scss" as *;
+@use "./settings.scss" as *;
+@use "./settings-lock.scss" as *;
+@use "./collection-settings/readonly-mode.scss" as *;
+@use "./ajax-save.scss" as *;
+@use "./album-assignment.scss" as *;
+@use "./album-galleries.scss" as *;
+@use "./stats.scss" as *;
+@use "./shortcode-metabox.scss" as *;
+@use "./featured-image-metabox.scss" as *;
+@use "./admin-header.scss" as *;
+@use "./admin-blocks-grid.scss" as *;
+@use "./dashboard.scss" as *;
+@use "./sidebar-tabs.scss" as *;
+@use "./primitives.scss" as *;
+@use "./plugin-settings.scss" as *;
+@use "./setup-wizard.scss" as *;
+@use "./tools.scss" as *;
+@use "./tables.scss" as *;
+@use "./library.scss" as *;
+
+@use "./ui-elements/ui-elements.scss" as *;
+@use "./toast.scss" as *;
+@use "./tooltip.scss" as *;
+@use "./fg-icon/fg-icon.scss" as *;
+
+#fotogrids_gallery_items > .inside {
+	padding: 0;
+	margin: 0;
+}
+
+.fotogrids-gallery-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: -1px;
+}
+
+.fotogrids-gallery-tabs {
+	display: flex;
+	gap: 0;
+}
+
+.fotogrids-gallery-tab {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 16px 20px 17px;
+	border: 0;
+	border-inline-end: 1px solid $tabbar-border-light;
+	border-bottom: 1px solid $tabbar-border-light;
+	background: $tabbar-bg-light;
+	color: $tabbar-text-secondary;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 1;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	position: relative;
+
+	.fotogrids-icon {
+		font-size: 0;
+		width: 16px;
+		height: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+
+		svg {
+			width: 100%;
+			height: 100%;
+		}
+	}
+
+	&:hover:not(.fotogrids-gallery-tab--active) {
+		background: $tabbar-hover-bg;
+		color: $tabbar-text-primary;
+	}
+
+	&--active {
+		background: $tabbar-bg-white;
+		color: $tabbar-text-primary;
+		border-color: $tabbar-border-light;
+		z-index: 1;
+
+		&::after {
+			content: "";
+			position: absolute;
+			bottom: -1px;
+			left: 0;
+			right: 0;
+			height: 1px;
+			background: $tabbar-bg-white;
+		}
+
+		&:hover {
+			background: $tabbar-bg-white;
+			color: $tabbar-text-primary;
+		}
+	}
+}
+
+.fotogrids-gallery-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	padding: 10px;
+}
+
+.fotogrids-add-new-dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.fotogrids-add-new-toggle {
+	display: flex;
+	align-items: stretch;
+	gap: 4px;
+	padding-inline-start: 14px;
+
+	span.fotogrids-icon {
+		font-size: 0;
+		line-height: 1;
+		height: auto;
+
+		svg {
+			width: 16px;
+			transition: transform 0.2s ease;
+		}
+	}
+
+	.fotogrids-icon--chevron_down {
+		border-inline-start: 1px solid rgba(255, 255, 255, 0.2);
+		padding-inline-start: 10px;
+		margin-inline-start: 8px;
+	}
+
+	&.fotogrids-dropdown-open {
+		box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
+
+		.fotogrids-icon--chevron_down svg {
+			transform: rotate(180deg);
+		}
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 4px rgba($fotogrids-colors-blue, 0.1);
+	}
+}
+
+.fotogrids-add-new-menu {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	margin-top: 4px;
+	background: $tabbar-bg-white;
+	border: 1px solid $tabbar-border-light;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	width: 100%;
+	box-sizing: border-box;
+	display: none;
+	overflow: hidden;
+
+	&.fotogrids-dropdown-open {
+		display: block;
+	}
+}
+
+.fotogrids-add-option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px 12px;
+	box-sizing: border-box;
+	border: none;
+	border-bottom: 1px solid $tabbar-border-light;
+	background: none;
+	text-align: left;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	position: relative;
+
+	&:hover:not(.fotogrids-add-option--pro) {
+		background: $tabbar-hover-bg;
+	}
+
+	&:last-of-type {
+		border-bottom: none;
+	}
+
+	&--pro {
+		color: #aaa;
+
+		&:hover {
+			background: $tabbar-bg-light;
+		}
+	}
+
+	.fotogrids-option-desc {
+		font-size: 11px;
+		color: #666;
+		margin-top: 2px;
+	}
+}
+
+.fotogrids-items-bulk-editor {
+	padding-inline-end: 0;
+	align-items: stretch;
+	overflow: hidden;
+
+	.fg-button__label {
+		display: flex;
+		align-items: stretch;
+		gap: 10px;
+	}
+
+	.fotogrids-pro-badge {
+		display: inline-flex;
+		align-items: center;
+	}
+}
+
+.fotogrids-gallery-content {
+	border-top: 1px solid $tabbar-border-light;
+	background: $tabbar-bg-white;
+	padding: 20px;
+	margin-top: 0;
+}
+
+.fotogrids-gallery-tab-content {
+	display: none;
+
+	&--active {
+		display: block;
+	}
+}
+
+.fotogrids-preview-placeholder {
+	padding: 40px;
+	text-align: center;
+	background: #f9f9f9;
+	border: 2px dashed var(--fg-border-secondary);
+	border-radius: 8px;
+	color: #666;
+}
+
+.fotogrids-items-bulk-f {
+	padding-inline-end: 0;
+	overflow: hidden;
+
+	.fotogrids-pro-badge {
+		padding: 0 6px;
+	}
+}
+// Hide action buttons when not on manage tab
+.fotogrids-gallery-tab-content:not([data-tab="manage"])
+	~ .fotogrids-gallery-header
+	.fotogrids-gallery-actions {
+	.fotogrids-add-new-dropdown,
+	.fotogrids-remove-all {
+		display: none;
+	}
+}
+
+body[class*="fotogrids_page_"],
+body[class*="post-type-fotogrids_"] {
+	#wpcontent {
+		padding-left: 0;
+		padding-right: 0;
+		position: relative;
+	}
+
+	#wpbody-content > .wrap {
+		margin: 0;
+	}
+
+	#fotogrids-admin-header {
+		padding: 1rem 2rem;
+		background-color: #fff;
+
+		h1 {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin: 0;
+			font-size: 1.6rem;
+			font-weight: 600;
+			color: var(--fg-text-primary);
+		}
+	}
+
+	.fotogrids-admin-page {
+		padding: 20px;
+	}
+}
+
+.fotogrids-search-section {
+	margin-bottom: 1.5rem;
+
+	.fotogrids-search-input {
+		max-width: 300px;
+		padding: 0.5rem;
+		border: 1px solid var(--fg-border-dark);
+		border-radius: 4px;
+		font-size: 14px;
+
+		&:focus {
+			border-color: var(--fg-blue);
+			box-shadow: 0 0 0 1px var(--fg-blue);
+			outline: none;
+		}
+	}
+}
+
+.fotogrids-form-container {
+	background: white;
+	padding: 1.5rem;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+
+	.fotogrids-form-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+		margin-bottom: 1.5rem;
+
+		@media (max-width: 768px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.fotogrids-form-actions {
+		display: flex;
+		gap: 0.75rem;
+		padding-top: 1rem;
+		border-top: 1px solid #e0e0e0;
+	}
+}
+
+.loading {
+	text-align: center;
+	padding: 3rem;
+	color: #757575;
+	font-style: italic;
+
+	&::before {
+		content: "⟳";
+		display: inline-block;
+		animation: spin 1s linear infinite;
+		margin-right: 0.5rem;
+		font-size: 1.2rem;
+	}
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+// Custom column styles for post list tables
+.fotogrids-layout-badge {
+	display: inline-block;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 10px;
+	line-height: 12px;
+	letter-spacing: 0.5px;
+	font-weight: 500;
+	text-transform: uppercase;
+	background: #f0f0f1;
+	color: #1e1e1e;
+	white-space: nowrap;
+
+	@each $layout, $colors in map.get($fotogrids-ui-colors, layout) {
+		&.layout-#{$layout} {
+			background: map.get($colors, bg);
+			color: map.get($colors, text);
+		}
+	}
+}
+
+.fotogrids-stats {
+	font-size: 0.9rem;
+
+	.views,
+	.shares {
+		display: block;
+		color: #757575;
+	}
+}
+
+.loading {
+	text-align: center;
+	padding: 2rem;
+	color: #757575;
+	font-style: italic;
+}
+
+@media (max-width: 768px) {
+	.fotogrids-dashboard-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.templates-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.stats-filters {
+		flex-direction: column;
+
+		.components-base-control {
+			min-width: auto;
+		}
+	}
+
+	.stats-grid {
+		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+	}
+
+	.license-actions {
+		flex-direction: column;
+	}
+}
+
+.fotogrids-text--error {
+	color: var(--fg-text-error);
+}

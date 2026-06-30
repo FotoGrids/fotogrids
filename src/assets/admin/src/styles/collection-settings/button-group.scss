@@ -1,0 +1,132 @@
+.fg-button-group {
+	&__buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+	}
+
+	&__button {
+		color: var(--fg-text-primary);
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 10px 12px 12px;
+		border: 1px solid var(--fg-border-dark);
+		border-radius: 4px;
+		background: #fff;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		font-size: 13px;
+
+		&:hover:not(&__pro):not(.fg-is-active) {
+			border-color: var(--fg-blue);
+			background: #f6f7f7;
+		}
+
+		&.fg-is-active {
+			border-color: var(--fg-blue);
+			background: var(--fg-blue);
+			color: #fff;
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.fg-button-icon {
+			display: flex;
+			align-items: center;
+			font-size: 0;
+
+			svg {
+				width: 16px;
+				height: 16px;
+			}
+		}
+
+		.fg-button-label {
+			font-weight: 400;
+		}
+
+		&__pro {
+			padding: 0;
+			padding-inline-start: 12px;
+			gap: 12px;
+			align-items: stretch;
+			overflow: visible; // allow tooltip bubble to escape
+
+			.fg-button-label {
+				display: flex;
+				align-items: center;
+				padding-bottom: 2px;
+			}
+
+			.fg-tooltip-trigger {
+				display: flex;
+				align-items: center;
+				margin-inline-start: auto;
+				padding-inline-end: 10px;
+			}
+
+			.fg-pro-badge {
+				flex-shrink: 0;
+				margin-inline-start: 0;
+			}
+		}
+	}
+
+	&--big-icons {
+		.fg-button-group__button {
+			padding: 24px;
+			flex-direction: column;
+			border-color: var(--fg-border-primary);
+
+			.fg-button-icon svg {
+				width: 24px;
+				height: 24px;
+			}
+		}
+	}
+
+	&--big-icons.fg-button-group--same-width {
+		.fg-button-group__buttons {
+			display: grid;
+			align-items: center;
+			justify-content: start;
+			grid-template-columns: repeat(auto-fill, minmax(80px, 100px));
+
+			.fg-button-group__button {
+				padding: 20px;
+				gap: 8px;
+
+				.fg-button-icon svg {
+					path,
+					rect,
+					line {
+						stroke-width: 1.4;
+					}
+				}
+			}
+		}
+	}
+
+	&--big-icons.fg-button-group--extra-big-icons {
+		.fg-button-group__buttons {
+			.fg-button-group__button {
+				padding: 16px 24px;
+
+				.fg-button-icon svg {
+					width: 40px;
+					height: 40px;
+
+					path,
+					rect,
+					line {
+						stroke-width: 0.8;
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,11 @@
+{
+  "id": "press-kit",
+  "name": "Press Kit Gallery",
+  "description": "Grid with download tokens pre-configured. Approved press images only, with right-click protection on everything else.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "order": 48,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

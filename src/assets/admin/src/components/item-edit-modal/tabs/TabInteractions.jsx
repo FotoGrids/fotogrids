@@ -1,0 +1,45 @@
+import React from 'react';
+
+const TabInteractions = ({ formData, handleInputChange, disabled = false }) => {
+    return (
+        <div className="fotogrids-tab-panel fg-is-active">
+            <div className="fotogrids-interactions-section">
+                <h4>Item Interactions</h4>
+                <div className="fotogrids-external-url-section">
+                    <div className="fotogrids-field-group">
+                        <label htmlFor="fotogrids-item-external-url">External URL</label>
+                        <input
+                            type="url"
+                            id="fotogrids-item-external-url"
+                            placeholder="https://example.com"
+                            value={formData?.external_url || ''}
+                            onChange={(e) => handleInputChange('external_url', e.target.value)}
+                            disabled={disabled}
+                        />
+                        <p className="description">
+                            URL to redirect to when this item is clicked.
+                        </p>
+                    </div>
+                    <div className="fotogrids-field-group">
+                        <label htmlFor="fotogrids-item-link-target">Link Target</label>
+                        <select
+                            id="fotogrids-item-link-target"
+                            value={formData?.link_target || ''}
+                            onChange={(e) => handleInputChange('link_target', e.target.value)}
+                            disabled={disabled}
+                        >
+                            <option value="global">Use Gallery Default</option>
+                            <option value="_self">Same Tab</option>
+                            <option value="_blank">New Tab</option>
+                        </select>
+                        <p className="description">
+                            How the external link should open.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TabInteractions;

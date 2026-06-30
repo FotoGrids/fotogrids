@@ -1,0 +1,70 @@
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
+
+#fotogrids_gallery_shortcode,
+#fotogrids_album_shortcode {
+	.inside {
+		display: flex;
+		flex-direction: column;
+		gap: calc(ui-size(padding, base) * 1.5);
+		margin: 0;
+		padding: calc(ui-size(padding, base) * 1.5);
+	}
+
+	.fotogrids-shortcode-title {
+		font-weight: 500;
+	}
+
+	p {
+		margin: 0 !important;
+	}
+}
+.fotogrids-shortcode-container {
+	display: flex;
+	gap: calc(ui-size(padding, base) / 2);
+	align-items: stretch;
+
+	.fotogrids-shortcode-input {
+		flex: 1;
+		font-family: "Courier New", Courier, monospace;
+		font-size: 12px;
+		line-height: 38px;
+		padding: 0 8px;
+		margin: 0;
+		border: 1px solid var(--fg-border-primary);
+		border-radius: 3px;
+		background-color: #f9f9f9;
+		cursor: pointer;
+
+		&:focus {
+			outline: none;
+			border-color: var(--fg-blue);
+			box-shadow: 0 0 0 1px var(--fg-blue);
+		}
+
+		&:hover {
+			background-color: #fff;
+		}
+	}
+
+	.fotogrids-shortcode-copy {
+		flex-shrink: 0;
+		min-width: 40px;
+	}
+}
+
+@media (max-width: 782px) {
+	.fotogrids-shortcode-container {
+		flex-direction: column;
+		gap: 8px;
+
+		.fotogrids-shortcode-input {
+			width: 100%;
+		}
+
+		.fotogrids-shortcode-copy {
+			width: 100%;
+			text-align: center;
+		}
+	}
+}

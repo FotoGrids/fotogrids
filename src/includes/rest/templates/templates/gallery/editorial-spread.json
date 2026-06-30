@@ -1,0 +1,11 @@
+{
+  "id": "editorial-spread",
+  "name": "Editorial Spread",
+  "description": "Magazine-style asymmetric mosaic with caption-slide-in hover. Built for editorial and commercial photographers.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "order": 22,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

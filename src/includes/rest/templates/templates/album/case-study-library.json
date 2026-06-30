@@ -1,0 +1,11 @@
+{
+  "id": "case-study-library",
+  "name": "Case Study Library",
+  "description": "One album per case study with CTA overlays and lead-capture forms pre-wired. Analytics on every image so you know which projects convert.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "leads",
+  "order": 15,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

@@ -1,0 +1,66 @@
+// Loading Icon
+//
+// State model - driven by data-fg-media-state on .fg-item (<figure>):
+//
+//   [data-fg-media-state="loading"]  - server-rendered default; loader visible,
+//                                      image invisible, pointer-events blocked.
+//   [data-fg-media-state="loaded"]   - JS-applied after img load/error; loader
+//                                      hidden, image fades in, clicks enabled.
+//
+// The loader is <div class="fg-item-loader"> containing a full inline SVG
+// (one per item - <symbol>/<use> breaks SMIL animation ID cross-references).
+// It is absolutely positioned so it sits centred over the image bounding box
+// without affecting layout.
+//
+// Color: SVGs use fill="currentColor", so --fg-loader-color drives the tint.
+// Falls back to a mid-gray that reads on both light and dark backgrounds.
+
+// .fg-item-media must be position:relative so the absolute loader is contained.
+// collection-base.css already sets it; reinforced here in case of overrides.
+.fotogrids-collection .fg-item-media {
+    position: relative;
+}
+
+// Loader container - centred absolutely inside .fg-item-media
+.fotogrids-collection .fg-item-loader {
+    position:        absolute;
+    inset:           0;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    pointer-events:  none;
+    color:           var(--fg-loader-color);
+    opacity:         1;
+    transition:      opacity 0.2s ease;
+
+    svg {
+        width:    32px;
+        height:   32px;
+        display:  block;
+        overflow: visible;
+    }
+}
+
+// Loading state - loader visible, image hidden, anchor clicks blocked.
+
+// Hide the image while it's loading so the loader reads clearly on the
+// background colour rather than competing with a half-decoded image.
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
+    opacity: 0;
+}
+
+// Block clicks on the item's anchor while the image hasn't loaded yet.
+// Prevents the lightbox from opening on a blank/placeholder slot.
+.fotogrids-collection .fg-item[data-fg-media-state="loading"] > a {
+    pointer-events: none;
+}
+
+// Loaded state - loader fades out, image fades in.
+.fotogrids-collection .fg-item[data-fg-media-state="loaded"] .fg-item-loader {
+    opacity: 0;
+}
+
+// Image reveal on load is handled by the Loaded_Effect feature
+// (features/loaded-effect/effects/*.css), which drives opacity and any
+// additional transform / filter transitions via data-fg-loaded-effect.

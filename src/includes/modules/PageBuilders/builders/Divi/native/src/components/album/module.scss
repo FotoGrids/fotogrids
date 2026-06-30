@@ -1,0 +1,10 @@
+.fotogrids_divi_album {
+  &__inner { width: 100%; }
+  &__empty,
+  &__loading {
+    padding: 24px;
+    text-align: center;
+    color: #50575e;
+    font-size: 13px;
+  }
+}

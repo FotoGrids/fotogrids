@@ -1,0 +1,21 @@
+.fotogrids-collection .fg-item-media .fg-video--playing {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-player {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+    object-fit: contain;
+}
+
+.fotogrids-collection:where(
+    [data-fg-layout="masonry"],
+    [data-fg-layout="justified"]
+) .fg-item-media .fg-video--playing {
+    aspect-ratio: var(--fg-item-aspect-ratio, 16 / 9);
+}

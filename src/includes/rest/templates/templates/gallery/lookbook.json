@@ -1,0 +1,11 @@
+{
+  "id": "lookbook",
+  "name": "Lookbook",
+  "description": "Full-bleed editorial layout with slow-zoom hover, variant swatches inline, and quick-add CTA overlays on each product image.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "order": 42,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

@@ -1,0 +1,27 @@
+{
+  "id": "property-listings",
+  "name": "Property Listings",
+  "description": "One album per property with the address as the title and the hero shot as the cover. Scales to any size agency without extra configuration.",
+  "type": "free",
+  "category": "album",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 3,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "captions": true,
+    "watermark_apply_to_collection": true,
+    "item_click_behavior": "lightbox"
+  }
+}

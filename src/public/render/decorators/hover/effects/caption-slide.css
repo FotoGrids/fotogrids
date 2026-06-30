@@ -1,0 +1,32 @@
+/* The caption background fades in while its content sweeps in horizontally, so
+   the overlay edge never visibly slides. */
+
+.fotogrids-collection[data-fg-hover='caption-slide'] .fg-item {
+	overflow: hidden;
+}
+
+.fotogrids-collection[data-fg-hover='caption-slide'] .fg-caption-bg {
+	opacity: 0;
+	transition-property: opacity;
+}
+
+.fotogrids-collection[data-fg-hover='caption-slide'] .fg-caption-content {
+	opacity: 0;
+	transform: translateX(calc(var(--fg-hover-caption-shift) * -1));
+	transition-property: opacity, transform;
+}
+
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item:hover
+	.fg-caption-bg,
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item:hover
+	.fg-caption-content {
+	opacity: 1;
+}
+
+.fotogrids-collection[data-fg-hover='caption-slide']
+	.fg-item:hover
+	.fg-caption-content {
+	transform: translateX(0);
+}

@@ -1,0 +1,11 @@
+{
+  "id": "area-guide",
+  "name": "Area Guide",
+  "description": "Map block plus a geo-filtered gallery grid. Show listings by postcode with a lead form embedded directly in the results strip.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "order": 40,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

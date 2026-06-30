@@ -1,0 +1,19 @@
+{
+  "id": "featured-portfolio",
+  "name": "Featured Portfolio",
+  "description": "A large feature image with a thumbnail rail. Click a thumb to feature it. Great for portfolios and product hero shots.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "order": 23,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "featured-item",
+    "featured_image_side": "left",
+    "featured_thumbs_count": 6,
+    "captions": true,
+    "caption_title_source": "title",
+    "item_click_behavior": "lightbox"
+  }
+}

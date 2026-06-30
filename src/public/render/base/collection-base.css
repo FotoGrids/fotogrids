@@ -1,0 +1,224 @@
+/* Global frontend tokens */
+
+:root {
+    --fg-colors-blue:  rgba(60, 70, 240, 1);
+    --fg-colors-white: rgba(255, 255, 255, 1);
+}
+
+.fotogrids-collection {
+    list-style: none;
+    font-size: 12px;
+}
+
+.fotogrids-collection:focus {
+    outline: none;
+}
+
+.fg-item-hidden {
+    visibility: hidden;
+}
+
+.fotogrids-collection .fg-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    min-width: 0;
+    cursor: var(--fg-hover-cursor, default);
+}
+
+.fotogrids-collection .fg-item:focus {
+    outline: none;
+}
+
+.fotogrids-collection .fg-item:focus-visible {
+    outline: 2px solid var(--fg-colors-blue);
+    outline-offset: 2px;
+}
+
+/* When a decorator wraps the entire item contents (media + caption) in an
+   anchor, the <a> becomes the flex child of fg-item. These rules ensure it
+   inherits the same flex layout so gap and direction still apply correctly. */
+.fotogrids-collection .fg-item > a {
+    display: inherit;
+    flex-direction: inherit;
+    gap: inherit;
+    flex: inherit;
+    cursor: var(--fg-hover-cursor-link, pointer);
+    min-width: 0;
+    max-height: 100%;
+    text-decoration: none;
+}
+
+/* Suppress the default :focus outline on every focusable control in a
+   collection (anchors, buttons, custom tabindex elements such as slider
+   arrows/dots, pagination, and lightbox toolbar buttons). Keyboard focus is
+   still made visible via the :focus-visible ring on .fg-item and on each
+   control's own :focus-visible rule. */
+.fotogrids-collection a:focus,
+.fotogrids-collection button:focus,
+.fotogrids-collection [tabindex]:focus {
+    outline: none;
+}
+
+.fotogrids-collection .fg-item-media {
+    display: block;
+    width: 100%;
+    border-radius: var(--fg-radius, 0);
+    overflow: hidden;
+    box-sizing: border-box;
+    line-height: 0;
+}
+
+.fotogrids-collection .fg-item-media picture,
+.fotogrids-collection .fg-item-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+/* Video items. The .fg-video wrapper holds a poster (image or placeholder)
+   and a play badge; the player is injected client-side on interaction. The
+   wrapper behaves like the picture/img above so layout sizing is shared. */
+.fotogrids-collection .fg-item-media .fg-video {
+    position: relative;
+    display: block;
+    width: 100%;
+    cursor: pointer;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-poster {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-poster--placeholder {
+    aspect-ratio: var(--fg-item-aspect-ratio, 16 / 9);
+    background-color: #1d2327;
+    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+
+.fotogrids-collection .fg-item-media .fg-video-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 56px;
+    height: 56px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    transition: background 0.15s ease;
+    z-index: 1;
+}
+
+.fotogrids-collection .fg-item-media .fg-video-badge::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 54%;
+    transform: translate(-50%, -50%);
+    border-style: solid;
+    border-width: 11px 0 11px 18px;
+    border-color: transparent transparent transparent #fff;
+}
+
+.fotogrids-collection .fg-item-media .fg-video:hover .fg-video-badge {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+/* Box-and-fit layouts. Grid, Single Item, and Image Viewer give the media
+   container a fixed aspect-ratio and use object-fit to control how the
+   image fills that ratio. Layouts that flow with the image's natural
+   dimensions (Masonry, Justified) don't opt in here. */
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"]
+) .fg-item-media {
+    aspect-ratio: var(--fg-item-aspect-ratio, 4 / 3);
+}
+
+/* Featured Item applies the chosen aspect-ratio to the featured image only,
+   and only on desktop (see featured-item.css). The grid tiles instead size
+   themselves to the height the featured image takes, so the ratio setting
+   does not blanket the grid here. */
+
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
+) .fg-item-media picture,
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
+) .fg-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--fg-item-fit, cover);
+}
+
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
+) .fg-item-media .fg-video,
+.fotogrids-collection:where(
+    [data-fg-layout="grid"],
+    [data-fg-layout="single-item"],
+    [data-fg-layout="image-viewer"],
+    [data-fg-layout="featured-item"]
+) .fg-item-media .fg-video-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--fg-item-fit, cover);
+}
+
+/* Single Item with "None" aspect ratio: the layout adds
+   data-fg-natural-ratio="1" to the wrapper, opting out of the fixed-box
+   behavior so the image keeps its intrinsic dimensions. */
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media {
+    aspect-ratio: auto;
+}
+
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media picture,
+.fotogrids-collection[data-fg-layout="single-item"][data-fg-natural-ratio="1"] .fg-item-media img {
+    height: auto;
+    object-fit: initial;
+}
+
+/* Border - only painted when the decorator is active. */
+.fotogrids-collection[data-fg-border] .fg-item-media {
+    border-width: var(--fg-border-w);
+    border-color: var(--fg-border-color);
+    border-style: var(--fg-border-style);
+}
+
+/* Wrapper margin/padding - only applied when the Spacing decorator is active,
+   so a collection with no configured spacing doesn't override a theme's
+   defaults. Each variable is set independently, so unconfigured sides fall
+   back to 0. */
+.fotogrids-collection[data-fg-spacing] {
+    margin: var(--fg-margin, 0);
+    padding: var(--fg-padding, 0);
+    box-sizing: border-box;
+}
+
+/* Thumbnail image filters - only applied when the decorator is active.
+   --fg-hover-filter lets a hover-effect module append to the filter chain so
+   image-filter settings and filter-based hover effects compose. */
+.fotogrids-collection[data-fg-filter] .fg-item-media img {
+    filter: var(--fg-thumb-filter-regular) var(--fg-hover-filter, );
+    transition: filter 0.25s ease;
+}
+
+.fotogrids-collection[data-fg-filter] .fg-item:hover .fg-item-media img {
+    filter: var(--fg-thumb-filter-hover) var(--fg-hover-filter-hover, var(--fg-hover-filter, ));
+}

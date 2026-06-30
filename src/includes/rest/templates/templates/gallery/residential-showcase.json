@@ -1,0 +1,11 @@
+{
+  "id": "residential-showcase",
+  "name": "Residential Showcase",
+  "description": "Large justified grid with address captions, watermarks, and a 'Book a Viewing' CTA overlay per image.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "order": 41,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

@@ -1,0 +1,12 @@
+/**
+ * Compact-mode tweaks for Modal.
+ *
+ * Toggled by the React component when `<Modal compact />`. Independent
+ * of `size` - a `compact` modal at any size gets the same tightening
+ * (smaller paddings, shorter headers, lighter dividers, etc.). Keep
+ * selectors scoped to `.fg-modal--compact` so non-compact modals stay
+ * untouched.
+ */
+
+.fg-modal--compact {
+}

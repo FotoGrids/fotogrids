@@ -1,0 +1,64 @@
+{
+	"partial": "shadow",
+	"inline_defaults": true,
+	"layout": [
+		"color",
+		"offset_x",
+		"offset_y",
+		"blur",
+		"spread"
+	],
+	"field_defaults": {
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"color": {
+			"type": "color",
+			"label": "Shadow Color",
+			"default": "rgba(0,0,0,0.5)"
+		},
+		"offset_x": {
+			"type": "responsive_range",
+			"label": "Horizontal Offset",
+			"unit": "px",
+			"responsive": {
+				"desktop": { "min": -50, "max": 50, "default": 0 },
+				"tablet": { "min": -50, "max": 50, "default": 0 },
+				"mobile": { "min": -50, "max": 50, "default": 0 }
+			}
+		},
+		"offset_y": {
+			"type": "responsive_range",
+			"label": "Vertical Offset",
+			"unit": "px",
+			"responsive": {
+				"desktop": { "min": -50, "max": 50, "default": 4 },
+				"tablet": { "min": -50, "max": 50, "default": 4 },
+				"mobile": { "min": -50, "max": 50, "default": 4 }
+			}
+		},
+		"blur": {
+			"type": "responsive_range",
+			"label": "Blur",
+			"unit": "px",
+			"responsive": {
+				"desktop": { "min": 0, "max": 50, "default": 10 },
+				"tablet": { "min": 0, "max": 50, "default": 10 },
+				"mobile": { "min": 0, "max": 50, "default": 10 }
+			}
+		},
+		"spread": {
+			"type": "responsive_range",
+			"label": "Spread",
+			"unit": "px",
+			"responsive": {
+				"desktop": { "min": -20, "max": 20, "default": 0 },
+				"tablet": { "min": -20, "max": 20, "default": 0 },
+				"mobile": { "min": -20, "max": 20, "default": 0 }
+			}
+		}
+	}
+}

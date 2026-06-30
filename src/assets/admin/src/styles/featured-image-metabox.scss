@@ -1,0 +1,27 @@
+.fotogrids-featured-image {
+	&__preview {
+		margin-bottom: 8px;
+
+		img {
+			display: block;
+			width: 100%;
+			height: auto;
+			border-radius: 4px;
+		}
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin: 0 0 8px;
+	}
+
+	&__remove[hidden] {
+		display: none;
+	}
+}

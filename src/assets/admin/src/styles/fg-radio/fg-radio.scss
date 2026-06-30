@@ -1,0 +1,141 @@
+@use "../colors.scss" as *;
+
+// Sizing tokens
+$fg-radio-size-sm: 14px;
+$fg-radio-size-md: 18px;
+$fg-radio-size-lg: 22px;
+$fg-radio-border: 1.5px;
+
+.fg-radio-group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+
+	&__label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
+}
+
+.fg-radio__wrapper {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 4px;
+
+	.fg-radio__description {
+		margin-left: calc(#{$fg-radio-size-md} + 8px);
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 1.5;
+		color: var(--fg-text-secondary);
+	}
+}
+
+.fg-radio {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	user-select: none;
+	line-height: 1.4;
+	color: var(--fg-text-primary);
+
+	&--disabled {
+		cursor: not-allowed;
+		opacity: 0.55;
+	}
+
+	&__label {
+		font-size: 13px;
+
+		&--stronger {
+			font-weight: 500;
+		}
+	}
+}
+
+// Control (input + visual circle)
+.fg-radio__control {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: $fg-radio-size-md;
+	height: $fg-radio-size-md;
+}
+
+.fg-radio__input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	opacity: 0;
+	cursor: inherit;
+
+	// Keep the native input on top so it owns click/focus.
+	z-index: 1;
+}
+
+.fg-radio__circle {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--fg-background-primary, #fff);
+	border: $fg-radio-border solid var(--fg-border-dark, #8c8f94);
+	border-radius: 50%;
+	box-sizing: border-box;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease,
+		box-shadow 0.15s ease;
+	pointer-events: none;
+}
+
+.fg-radio__dot {
+	width: 50%;
+	height: 50%;
+	border-radius: 50%;
+	background: #fff;
+	opacity: 0;
+	transform: scale(0.4);
+	transition:
+		opacity 0.12s ease,
+		transform 0.12s ease;
+}
+
+// States
+.fg-radio:hover:not(.fg-radio--disabled) .fg-radio__circle {
+	border-color: var(--fg-blue);
+}
+
+.fg-radio__input:focus-visible + .fg-radio__circle {
+	border-color: var(--fg-blue);
+	box-shadow: 0 0 0 3px rgba($fotogrids-colors-blue, 0.18);
+}
+
+.fg-radio--checked .fg-radio__circle {
+	background: var(--fg-blue);
+	border-color: var(--fg-blue);
+}
+
+.fg-radio--checked .fg-radio__dot {
+	opacity: 1;
+	transform: scale(1);
+}
+
+// Size modifiers
+.fg-radio--size-sm .fg-radio__control {
+	width: $fg-radio-size-sm;
+	height: $fg-radio-size-sm;
+}
+
+.fg-radio--size-lg .fg-radio__control {
+	width: $fg-radio-size-lg;
+	height: $fg-radio-size-lg;
+}

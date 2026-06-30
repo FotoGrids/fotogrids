@@ -1,0 +1,23 @@
+/* Colour wash over the media at rest, clearing on hover. The wash sits below an
+   overlay caption (z-index) so the caption stays legible. */
+
+.fotogrids-collection[data-fg-hover='tint'] .fg-item-media {
+	position: relative;
+}
+
+.fotogrids-collection[data-fg-hover='tint'] .fg-item-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--fg-hover-tint-color);
+	opacity: 1;
+	transition: opacity var(--fg-hover-duration) var(--fg-hover-ease);
+	pointer-events: none;
+	z-index: 1;
+}
+
+.fotogrids-collection[data-fg-hover='tint']
+	.fg-item:hover
+	.fg-item-media::after {
+	opacity: 0;
+}

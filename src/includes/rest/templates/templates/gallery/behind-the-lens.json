@@ -1,0 +1,11 @@
+{
+  "id": "behind-the-lens",
+  "name": "Behind the Lens",
+  "description": "Mixed image-and-video playlist. Behind-the-scenes reels alongside still work, in one lightbox.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "order": 24,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

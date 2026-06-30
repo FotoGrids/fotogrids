@@ -1,0 +1,160 @@
+/*
+ * FotoGrids - Pagination: page buttons (per-method overrides).
+ *
+ * Base button styling (.fg-pagination__btn + states), the sr-only status
+ * region, and the disabled/loading states all live in the shared
+ * pagination.css. This file only adds page-buttons-specific concerns:
+ *
+ *   - the flex wrapper + alignment classes (including .fg-pagination--align-stretch
+ *     which load-more doesn't have),
+ *   - the .fg-pagination__numbers ordered list,
+ *   - the .fg-is-active "current page" state (only meaningful for numbered chips),
+ *   - the .fg-is-trimmed / ellipsis pieces driven by the truncation algorithm,
+ *   - the pager-level loading dim (.fg-pagination--pages.fg-is-loading),
+ *   - the .fg-pagination__icon SVG wrapper used by the prev/next icons.
+ *
+ * Truncation behaviour is controlled by data-fg-pages-truncate on the
+ * gallery wrapper (set from the pages_truncate boolean) and the
+ * --fg-pagination-siblings CSS var (per-breakpoint). page-buttons.js reads
+ * both via getComputedStyle so the mobile sibling count automatically
+ * picks up whichever @media block CSS resolved.
+ */
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages {
+    --fg-pagination-gap: calc(var( --fg-pagination-base-size ) / 2);
+
+    display: flex;
+    align-items: center;
+    gap: var( --fg-pagination-gap );
+    flex-wrap: wrap;
+}
+
+/*
+ * Each chip <li> spans one grid column (set on .fg-pagination__numbers).
+ * Stretching the inner button to fill the cell makes every chip visually
+ * the same width even when the page numbers differ in digit count, so a
+ * bar like [1] [...] [4] [5] [6] [...] [12] reads as a uniform row.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__number-item {
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    width: 100%;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination__number-item > .fg-pagination__btn {
+    width: 100%;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-left    { justify-content: flex-start; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-center  { justify-content: center; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-right   { justify-content: flex-end; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-pagination--align-stretch { justify-content: space-between; }
+
+/*
+ * Active (current) page chip. Only numbered buttons use this state -
+ * load-more never has an active state because there's only one button.
+ *
+ * The three colour tokens come from the Active subtab in the Styling
+ * panel (resolved via Pagination_Common::common_style_vars()), with
+ * the brand-blue defaults from pagination.css as fallback.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages .fg-pagination__btn.fg-is-active {
+    background: var( --fg-pagination-btn-active-bg );
+    border-color: var( --fg-pagination-btn-active-border-color );
+    color: var( --fg-pagination-btn-active-color );
+    cursor: default;
+}
+
+/*
+ * Numbered-chips track. Equal-width columns sized to whichever chip is
+ * widest - picked because the page numbers vary in digit count (1 vs 10
+ * vs 999) and the ellipsis sits in the same row, so a flex layout would
+ * give visibly uneven gaps.
+ *
+ * The trick: grid-auto-flow:column + grid-auto-columns:1fr distributes
+ * available width equally across N columns. By setting the container to
+ * width:max-content the "available width" becomes exactly N × widest-
+ * child, so each 1fr column resolves to the widest child's natural size
+ * - no stretching to fill the parent, no manual N-computation, and no
+ * repeat(auto-fit,…) which requires a minmax() track size.
+ *
+ * .fg-is-trimmed <li>s use display:none and so don't count as grid
+ * items; the track contracts naturally as pages get hidden behind
+ * ellipses.
+ *
+ * flex:0 0 auto (overriding the previous "fill the remaining row")
+ * lets the grid keep its max-content sizing while still living inside
+ * the .fg-pagination flex parent next to Prev / Next.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__numbers {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    width: max-content;
+    align-items: center;
+    gap: var( --fg-pagination-gap );
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+/*
+ * .fg-is-trimmed applies to the <li> wrapper, not the inner button. This
+ * removes the whole list-item from the layout flow (flex gap collapses
+ * with it) instead of just hiding the button while leaving an empty <li>
+ * taking up gap space.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__number-item.fg-is-trimmed {
+    display: none;
+}
+
+/*
+ * The ellipsis sits inside the same .fg-pagination__number-item wrapper
+ * as the numbered buttons and renders as a disabled .fg-pagination__btn
+ * so it inherits the exact same height, padding, font-size and vertical
+ * rhythm as the chips it sits between. The interactive affordances
+ * (hover/focus rings, pointer events) are removed so it reads as a gap
+ * indicator, not a clickable target.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis {
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+}
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:hover,
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:focus,
+.fotogrids-collection.fotogrids-gallery .fg-pagination__btn.fg-pagination__ellipsis:focus-visible {
+    background: inherit;
+    border-color: inherit;
+    color: inherit;
+    box-shadow: none;
+    outline: none;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--pages.fg-is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/*
+ * Prev/Next icon. SVG markup is owned by features/lightbox/arrow-icons.json
+ * and embedded inline by Page_Buttons::render_icon(). Size is driven from the
+ * button's font-size so the icon scales with the button label.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var( --fg-pagination-icon-size, 1em );
+    height: var( --fg-pagination-icon-size, 1em );
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination__icon > svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

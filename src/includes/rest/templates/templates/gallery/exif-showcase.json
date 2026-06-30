@@ -1,0 +1,11 @@
+{
+  "id": "exif-showcase",
+  "name": "EXIF Showcase",
+  "description": "Masonry with full EXIF on hover - camera, lens, aperture, shutter, ISO. For photographers whose audience cares about the gear.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "order": 27,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

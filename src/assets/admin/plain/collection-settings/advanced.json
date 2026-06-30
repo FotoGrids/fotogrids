@@ -1,0 +1,154 @@
+{
+    "id": "advanced",
+    "label": "Advanced",
+    "icon": "settings",
+    "settings": [
+        {
+            "key": "maintenance_group",
+            "type": "setting_group",
+            "label": "Maintenance",
+            "settings": [
+                {
+                    "key": "auto_clear_cache",
+                    "type": "toggle",
+                    "label": "Auto Clear Cache",
+                    "description": "Automatically clear cache when settings are updated.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "data_management_group",
+            "type": "setting_group",
+            "label": "Data Management",
+            "settings": [
+                {
+                    "key": "enable_statistics",
+                    "type": "toggle",
+                    "label": "Enable Statistics Tracking",
+                    "description": "Track {postType.lower} views and interactions for analytics.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "retain_statistics",
+                    "type": "button_group",
+                    "label": "Retain Statistics",
+                    "description": "Choose how long to retain statistics data before cleanup.",
+                    "options": [
+                        {
+                            "label": "Forever",
+                            "value": "forever",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "30 Days",
+                            "value": "30",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "90 Days",
+                            "value": "90",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "180 Days",
+                            "value": "180",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "365 Days",
+                            "value": "365",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "default": "forever",
+                    "condition": {
+                        "dependsOn": "enable_statistics",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "view_page_group",
+            "type": "setting_group",
+            "label": "View Page",
+            "settings": [
+                {
+                    "key": "view_page_override_defaults",
+                    "type": "toggle",
+                    "label": "Override Defaults",
+                    "description": "Apply custom Max Width and Background Color to this {postType.lower}'s view page instead of the site defaults.",
+                    "default": false,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "view_page_max_width",
+                    "type": "responsive_range",
+                    "label": "Max Width",
+                    "description": "Cap the width of the gallery view page content area.",
+                    "units": ["vw", "px", "%"],
+                    "responsive": {
+                        "desktop": { "min": 20, "max": 100, "default": 60 },
+                        "tablet": { "min": 20, "max": 100, "default": 60 },
+                        "mobile": { "min": 20, "max": 100, "default": 60 }
+                    },
+                    "condition": {
+                        "dependsOn": "view_page_override_defaults",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "view_page_background_color",
+                    "type": "color",
+                    "label": "Background Color",
+                    "description": "Background color for the gallery view page.",
+                    "default": "rgba(255, 255, 255, 1)",
+                    "condition": {
+                        "dependsOn": "view_page_override_defaults",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

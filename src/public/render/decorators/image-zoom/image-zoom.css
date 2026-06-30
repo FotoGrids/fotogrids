@@ -1,0 +1,29 @@
+/* Inline zoom: a magnifier layer is painted over the media box with the
+   full-size image as its background. The JS toggles the active class and pans
+   the background-position on mousemove. The layer fades in over the thumbnail. */
+[data-fg-zoom-style="inline"] .fg-item-media {
+    overflow: hidden;
+    cursor: zoom-in;
+}
+
+.fg-zoom-lens {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0;
+    transition: opacity 220ms ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.fg-zoom-lens.is-active {
+    opacity: 1;
+}
+
+/* Popover zoom: the image itself is the trigger. Click mode shows a zoom-in
+   cursor; hover mode keeps the default so the page-level click behaviour is
+   still discoverable. */
+[data-fg-zoom-style="popover"][data-fg-zoom-mode="click"] .fg-item-media {
+    cursor: zoom-in;
+}

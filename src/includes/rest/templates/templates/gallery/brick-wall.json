@@ -1,0 +1,29 @@
+{
+  "id": "brick-wall",
+  "name": "The Brick Wall",
+  "description": "Dense masonry, tight gutters, edge-to-edge feel. Built for editorial and commercial portfolios that want impact over elegance.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 9,
+  "settings": {
+    "layout": "masonry",
+    "columns": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "item_click_behavior": "lightbox",
+    "hover_effect": "tint",
+    "captions": true,
+    "caption_placement": "bottom",
+    "caption_title_source": "title"
+  }
+}

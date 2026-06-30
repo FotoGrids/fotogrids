@@ -1,0 +1,16 @@
+/**
+ * FotoGrids Frontend Styles
+ *
+ * Main CSS file for FotoGrids galleries and albums
+ */
+
+.fotogrids-error {
+    background: #ffebe8;
+    border: 1px solid #d63638;
+    border-radius: 4px;
+    color: #d63638;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-size: 14px;
+    font-weight: 500;
+}

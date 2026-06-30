@@ -1,0 +1,47 @@
+/* Hover-effect shared scaffold. Loaded once when any non-none effect is active.
+   Per-effect files build on these variables and the transition base. */
+
+.fotogrids-collection[data-fg-hover] {
+	--fg-hover-zoom-scale: 1.08;
+	--fg-hover-zoom-scale-soft: 1.04;
+	--fg-hover-lift-distance: -5px;
+	--fg-hover-tilt-angle: -2deg;
+	--fg-hover-duration: 250ms;
+	--fg-hover-ease: ease;
+	--fg-hover-frame-color: rgba(0, 0, 0, 0.4);
+	--fg-hover-frame-caption-scale: 0.9;
+	--fg-hover-tint-color: rgba(0, 0, 0, 0.4);
+	--fg-hover-caption-shift: 12px;
+	/* Empty (not `none`) so it contributes nothing when composed into the
+	   multi-function filter chain at collection-base.css; a bare `none` mixed
+	   with filter functions invalidates the whole declaration. Filter-based
+	   hover effects override this with a real value. */
+	--fg-hover-filter: ;
+}
+
+.fotogrids-collection[data-fg-hover] .fg-item-media {
+	line-height: 0;
+}
+
+.fotogrids-collection[data-fg-hover] .fg-item,
+.fotogrids-collection[data-fg-hover] .fg-item-media,
+.fotogrids-collection[data-fg-hover] .fg-caption,
+.fotogrids-collection[data-fg-hover] .fg-caption-bg,
+.fotogrids-collection[data-fg-hover] .fg-caption-content {
+	transition-timing-function: var(--fg-hover-ease);
+	transition-duration: var(--fg-hover-duration);
+}
+
+.fotogrids-collection[data-fg-hover] .fg-item-media,
+.fotogrids-collection[data-fg-hover] .fg-item {
+	will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fotogrids-collection[data-fg-hover] .fg-item,
+	.fotogrids-collection[data-fg-hover] .fg-item-media,
+	.fotogrids-collection[data-fg-hover] .fg-caption {
+		transition: none !important;
+		animation: none !important;
+	}
+}

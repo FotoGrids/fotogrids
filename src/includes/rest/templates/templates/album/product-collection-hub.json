@@ -1,0 +1,11 @@
+{
+  "id": "product-collection-hub",
+  "name": "Product Collection Hub",
+  "description": "One album per collection, each with filter and WooCommerce hand-off pre-enabled. Browsing turns into buying without leaving the gallery.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "products",
+  "order": 17,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

@@ -1,0 +1,19 @@
+{
+  "id": "gallery-viewer",
+  "name": "Gallery Viewer",
+  "description": "Large image with a built-in viewer frame. Ideal for walking a client through a curated set, one frame at a time.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "showcase",
+  "order": 21,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "image-viewer",
+    "captions": true,
+    "caption_title_source": "title",
+    "layout_height_mode": "fixed",
+    "layout_height_fixed": 520,
+    "item_click_behavior": "lightbox"
+  }
+}

@@ -1,0 +1,11 @@
+/*
+ * FotoGrids - Loaded Effect: fade
+ *
+ * Plain opacity fade-in. The default effect.
+ */
+
+[data-fg-loaded-effect="fade"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > img,
+[data-fg-loaded-effect="fade"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > picture img {
+    opacity:    1;
+    transition: opacity 0.35s ease;
+}

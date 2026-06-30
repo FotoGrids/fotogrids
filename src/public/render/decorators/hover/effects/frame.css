@@ -1,0 +1,36 @@
+/* An inset ring grows in around the media. Drawn on a pseudo-element over the
+   media (the image would otherwise paint over an inset box-shadow) so it hugs
+   the image rather than the whole item, never touches the user's border
+   setting, and causes no layout shift. */
+
+.fotogrids-collection[data-fg-hover='frame'] .fg-item-media {
+	position: relative;
+}
+
+.fotogrids-collection[data-fg-hover='frame'] .fg-item-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: var(--fg-radius, 0);
+	box-shadow: inset 0 0 0 0 transparent;
+	transition: box-shadow var(--fg-hover-duration) var(--fg-hover-ease);
+	pointer-events: none;
+	z-index: 2;
+}
+
+.fotogrids-collection[data-fg-hover='frame']
+	.fg-item:hover
+	.fg-item-media::after {
+	box-shadow: inset 0 0 0 8px var(--fg-hover-frame-color);
+}
+
+.fotogrids-collection[data-fg-hover='frame'][data-fg-caption='overlay']
+	.fg-caption-content {
+	transition: transform var(--fg-hover-duration) var(--fg-hover-ease);
+}
+
+.fotogrids-collection[data-fg-hover='frame'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-content {
+	transform: scale(var(--fg-hover-frame-caption-scale));
+}

@@ -1,0 +1,312 @@
+/* Lightbox Mini viewer - a single image over a dimmed backdrop with
+   prev/next arrows, optional bullets, and a close button.
+
+   The palette is selected by [data-fg-mv-theme]; the backdrop blur by
+   [data-fg-mv-blur]; per-gallery padding arrives via a scoped <style> block.
+   No per-element inline styles. */
+
+/* ---- Tunables -------------------------------------------------------- */
+.fg-lb-mv {
+    --fg-lb-mv-z: 999999;
+    --fg-lb-mv-padding: 24px;
+    --fg-lb-mv-max-width: 96vw;
+    --fg-lb-mv-max-height: 96vh;
+    --fg-lb-mv-radius: 12px;
+    --fg-lb-mv-blur: 0px;
+    --fg-lb-mv-button-fade: 0.3s;
+
+    /* Image frame */
+    --fg-lb-mv-border-width: 8px;
+    --fg-lb-mv-image-shadow: 0 12px 48px rgba( 0, 0, 0, 0.6 );
+
+    /* Caption */
+    --fg-lb-mv-caption-gap: 12px;
+    --fg-lb-mv-caption-padding: 8px 12px;
+    --fg-lb-mv-caption-radius: 4px;
+    --fg-lb-mv-caption-font-size: 13px;
+    --fg-lb-mv-caption-line-height: 1.4;
+
+    --fg-lb-mv-buttons-border-width: 1px;
+
+    /* Prev / next arrows */
+    --fg-lb-mv-nav-size: 44px;
+    --fg-lb-mv-nav-radius: 4px;
+    --fg-lb-mv-nav-icon-size: 24px;
+    --fg-lb-mv-nav-offset: -56px;
+    --fg-lb-mv-nav-disabled-opacity: 0.35;
+
+    /* Close button */
+    --fg-lb-mv-close-size: 24px;
+    --fg-lb-mv-close-offset: 4px;
+    --fg-lb-mv-close-radius: 4px;
+    --fg-lb-mv-close-icon-size: 12px;
+
+    /* Bullets */
+    --fg-lb-mv-bullet-size: 10px;
+    --fg-lb-mv-bullet-gap: 8px;
+    --fg-lb-mv-bullet-margin: 16px;
+    --fg-lb-mv-bullet-border-width: 1px;
+    --fg-lb-mv-bullet-radius: 50%;
+
+    padding: calc(var( --fg-lb-mv-padding ) + var( --fg-lb-mv-close-size ) + var( --fg-lb-mv-close-offset )) var( --fg-lb-mv-padding ) var( --fg-lb-mv-padding );
+}
+
+/* ---- Theme palettes -------------------------------------------------- */
+.fg-lb-mv[data-fg-mv-theme="dark"] {
+    --fg-lb-mv-bg: rgba( 0, 0, 0, 0.7 );
+    --fg-lb-mv-text: rgba( 255, 255, 255, 0.9 );
+    --fg-lb-mv-border-color: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-caption-bg: rgba( 0, 0, 0, 0.55 );
+    --fg-lb-mv-nav-color: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-nav-color-hover: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-nav-bg: rgba( 255, 255, 255, 0 );
+    --fg-lb-mv-nav-bg-hover: rgba( 255, 255, 255, 0.1 );
+    --fg-lb-mv-close-color: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-close-color-hover: rgba( 0, 0, 0, 1 );
+    --fg-lb-mv-close-bg: rgba( 0, 0, 0, 0 );
+    --fg-lb-mv-close-bg-hover: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-close-border-color: rgba( 255, 255, 255, 0.5 );
+    --fg-lb-mv-bullet-border: rgba( 255, 255, 255, 0.5 );
+    --fg-lb-mv-bullet-hover: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-bullet-active: rgba( 255, 255, 255, 0.9 );
+}
+
+.fg-lb-mv[data-fg-mv-theme="light"] {
+    --fg-lb-mv-bg: rgba( 255, 255, 255, 0.7 );
+    --fg-lb-mv-text: rgba( 0, 0, 0, 0.9 );
+    --fg-lb-mv-border-color: rgba( 0, 0, 0, 1 );
+    --fg-lb-mv-caption-bg: rgba( 255, 255, 255, 0.7 );
+    --fg-lb-mv-nav-color: rgba( 0, 0, 0, 0.7 );
+    --fg-lb-mv-nav-color-hover: rgba( 0, 0, 0, 1 );
+    --fg-lb-mv-nav-bg: rgba( 0, 0, 0, 0 );
+    --fg-lb-mv-nav-bg-hover: rgba( 0, 0, 0, 0.08 );
+    --fg-lb-mv-close-color: rgba( 0, 0, 0, 0.7);
+    --fg-lb-mv-close-color-hover: rgba( 255, 255, 255, 1 );
+    --fg-lb-mv-close-bg: rgba( 255, 255, 255, 0 );
+    --fg-lb-mv-close-bg-hover: rgba( 0, 0, 0, 1 );
+    --fg-lb-mv-close-border-color: rgba( 0, 0, 0, 0.4 );
+    --fg-lb-mv-bullet-border: rgba( 0, 0, 0, 0.4 );
+    --fg-lb-mv-bullet-hover: rgba( 0, 0, 0, 1 );
+    --fg-lb-mv-bullet-active: rgba( 0, 0, 0, 0.8 );
+}
+
+/* ---- Backdrop blur levels ------------------------------------------- */
+.fg-lb-mv[data-fg-mv-blur="light"] {
+    --fg-lb-mv-blur: 6px;
+}
+
+.fg-lb-mv[data-fg-mv-blur="strong"] {
+    --fg-lb-mv-blur: 16px;
+}
+
+.fg-lb-mv[data-fg-mv-blur="none"] {
+    --fg-lb-mv-blur: 0px;
+}
+
+/* ---- Overlay --------------------------------------------------------- */
+.fg-lb-mv {
+    position: fixed;
+    inset: 0;
+    z-index: var( --fg-lb-mv-z );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fg-lb-mv-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var( --fg-lb-mv-bg );
+    -webkit-backdrop-filter: blur( var( --fg-lb-mv-blur ) );
+    backdrop-filter: blur( var( --fg-lb-mv-blur ) );
+}
+
+.fg-lb-mv-stage {
+    position: relative;
+    z-index: 1;
+    max-width: min( var( --fg-lb-mv-max-width ), 100% );
+    max-height: min( var( --fg-lb-mv-max-height ), 100% );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fg-lb-mv-figure {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: transparent;
+}
+
+.fg-lb-mv-figure--radius {
+    border-radius: var( --fg-lb-mv-radius );
+}
+
+.fg-lb-mv:has(.fg-lb-mv-figure--radius) {
+    --fg-lb-mv-nav-radius: 999px;
+    --fg-lb-mv-close-radius: 999px;
+    --fg-lb-mv-caption-radius: 8px;
+    --fg-lb-mv-close-offset: 0px;
+}
+
+.fg-lb-mv-figure--border {
+    border: var( --fg-lb-mv-border-width ) solid var( --fg-lb-mv-border-color );
+}
+
+.fg-lb-mv-figure--shadow {
+    box-shadow: var( --fg-lb-mv-image-shadow );
+}
+
+.fg-lb-mv-image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: calc( var( --fg-lb-mv-max-width ) - 2 * var( --fg-lb-mv-padding ) );
+    max-height: calc( var( --fg-lb-mv-max-height ) - 2 * var( --fg-lb-mv-padding ) );
+    object-fit: contain;
+}
+
+.fg-lb-mv-caption {
+    margin-top: var( --fg-lb-mv-caption-gap );
+    padding: var( --fg-lb-mv-caption-padding );
+    max-width: 100%;
+    font-size: var( --fg-lb-mv-caption-font-size );
+    line-height: var( --fg-lb-mv-caption-line-height );
+    text-align: center;
+    color: var( --fg-lb-mv-text );
+    background: var( --fg-lb-mv-caption-bg );
+    border-radius: var( --fg-lb-mv-caption-radius );
+}
+
+/* ---- Prev / next arrows --------------------------------------------- */
+.fg-lb-mv-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY( -50% );
+    width: var( --fg-lb-mv-nav-size );
+    height: var( --fg-lb-mv-nav-size );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var( --fg-lb-mv-nav-color );
+    background: var( --fg-lb-mv-nav-bg );
+    border: 0;
+    padding: 0;
+    border-radius: var( --fg-lb-mv-nav-radius );
+    cursor: pointer;
+    transition: background var( --fg-lb-mv-button-fade ) ease, color var( --fg-lb-mv-button-fade ) ease;
+}
+
+.fg-lb-mv-nav:focus {
+    background: var( --fg-lb-mv-nav-bg );
+    outline: none;
+    box-shadow: none;
+    border: 0;
+}
+
+.fg-lb-mv-nav:hover {
+    color: var( --fg-lb-mv-nav-color-hover );
+    background: var( --fg-lb-mv-nav-bg-hover );
+}
+
+.fg-lb-mv-nav:disabled {
+    opacity: var( --fg-lb-mv-nav-disabled-opacity );
+    cursor: default;
+}
+
+.fg-lb-mv-nav:focus,
+.fg-lb-mv-nav:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.fg-lb-mv-nav svg {
+    width: var( --fg-lb-mv-nav-icon-size );
+    height: var( --fg-lb-mv-nav-icon-size );
+}
+
+.fg-lb-mv-prev {
+    inset-inline-start: var( --fg-lb-mv-nav-offset );
+}
+
+.fg-lb-mv-next {
+    inset-inline-end: var( --fg-lb-mv-nav-offset );
+}
+
+/* ---- Close ----------------------------------------------------------- */
+.fg-lb-mv-close {
+    position: absolute;
+    top: calc( var( --fg-lb-mv-close-offset ) * -1 );
+    inset-inline-end: calc( var( --fg-lb-mv-close-offset ) * -1 );
+    width: var( --fg-lb-mv-close-size );
+    height: var( --fg-lb-mv-close-size );
+    transform: translate( 100%, -100% );
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var( --fg-lb-mv-close-color );
+    background: var( --fg-lb-mv-close-bg );
+    border: var( --fg-lb-mv-buttons-border-width ) solid var( --fg-lb-mv-close-border-color );
+    border-radius: var( --fg-lb-mv-close-radius );
+    cursor: pointer;
+    transition: background var( --fg-lb-mv-button-fade ) ease, color var( --fg-lb-mv-button-fade ) ease;
+}
+
+.fg-lb-mv-close:hover {
+    color: var( --fg-lb-mv-close-color-hover );
+    background: var( --fg-lb-mv-close-bg-hover );
+}
+
+.fg-lb-mv-close:focus,
+.fg-lb-mv-close:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+.fg-lb-mv-close svg {
+    width: var( --fg-lb-mv-close-icon-size );
+    height: var( --fg-lb-mv-close-icon-size );
+    stroke-width: calc( var( --fg-lb-mv-buttons-border-width ) * 3 );
+}
+
+/* ---- Bullets --------------------------------------------------------- */
+.fg-lb-mv-bullets {
+    display: flex;
+    gap: var( --fg-lb-mv-bullet-gap );
+    justify-content: center;
+    margin-top: var( --fg-lb-mv-bullet-margin );
+}
+
+.fg-lb-mv-bullet {
+    width: var( --fg-lb-mv-bullet-size );
+    height: var( --fg-lb-mv-bullet-size );
+    padding: 0;
+    border: var( --fg-lb-mv-bullet-border-width ) solid var( --fg-lb-mv-bullet-border );
+    border-radius: var( --fg-lb-mv-bullet-radius );
+    background: transparent;
+    cursor: pointer;
+}
+
+.fg-lb-mv-bullet:focus,
+.fg-lb-mv-bullet:focus-visible {
+    background: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.fg-lb-mv-bullet:hover {
+    background: none;
+    border-color: var( --fg-lb-mv-bullet-hover );
+}
+
+.fg-lb-mv-bullet[aria-current="true"] {
+    background: var( --fg-lb-mv-bullet-active );
+}
+
+@media ( max-width: 600px ) {
+    .fg-lb-mv-close {
+        top: var( --fg-lb-mv-close-top-mobile );
+    }
+}

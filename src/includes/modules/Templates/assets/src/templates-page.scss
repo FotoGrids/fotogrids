@@ -1,0 +1,736 @@
+/**
+ * Templates module - admin page styles.
+ * Split out of the former shared assets/admin/src/styles/templates.scss so the
+ * Templates module owns its CSS. Built via the module-Templates-templates-page
+ * webpack entry into includes/modules/Templates/assets/templates-page.css.
+ */
+
+@keyframes fotogrids-refresh-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Refresh button: spin the icon while loading, keep the label and just disable
+   the button (rather than the component's busy state, which hides the label). */
+.fg-button.fotogrids-refresh-spinning .fg-button__icon {
+    animation: fotogrids-refresh-spin 0.8s linear infinite;
+    transform-origin: center;
+}
+
+.fotogrids-templates-page {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    min-height: 500px;
+
+    &__info {
+        flex: 0 0 320px;
+        background: #fff;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 8px;
+        padding: 32px 12px 20px;
+        box-sizing: border-box;
+
+        h2 {
+            margin: 0 12px 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--fg-text-primary);
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--fg-text-secondary);
+            line-height: 1.5;
+        }
+
+        > p {
+            margin: 0 12px;
+        }
+    }
+
+    &__info-list {
+        list-style: none;
+        margin: 12px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    &__info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+
+        &--pro {
+            cursor: pointer;
+
+            &:hover {
+                border-color: var(--fg-border-primary);
+            }
+        }
+
+        &__heading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .fotogrids-icon {
+                line-height: 0;
+            }
+
+            svg {
+                width: 20px;
+                height: 20px;
+                color: var(--fg-green);
+            }
+        }
+
+        h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--fg-text-primary);
+            line-height: 17px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    }
+
+    &__library-bar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+
+        // Free / Pro tier toggles sit at the left; the synced label and the
+        // Refresh button are pushed to the right.
+        &__tiers {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-inline-end: auto;
+        }
+
+        &__updated {
+            font-size: 11px;
+            color: var(--fg-text-secondary);
+            cursor: default;
+        }
+    }
+
+    &__main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--fg-border-primary);
+    }
+
+    &__tabs {
+        display: flex;
+        box-sizing: border-box;
+    }
+
+    &__types {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 0 24px;
+    }
+
+    &__tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 24px;
+        border: none;
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-inline-end: 1px solid var(--fg-border-primary);
+        position: relative;
+
+        &:hover {
+            background: #e6e7e8;
+        }
+
+        &.fg-is-active {
+            background: #fff;
+            font-weight: 600;
+
+            &:after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                left: 0;
+                bottom: -1px;
+                background: #fff;
+            }
+        }
+
+        &__icon {
+            font-size: 0;
+            width: 16px;
+            text-align: center;
+        }
+
+        &__label {
+            flex: 1;
+            font-size: 14px;
+        }
+    }
+
+    &__content {
+        flex: 1;
+        padding: 24px;
+        display: inline-flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    &--loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        gap: 16px;
+    }
+
+    &__section {
+        h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            color: var(--fg-text-primary);
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+    }
+
+    &--empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+}
+
+.fotogrids-template-card {
+    background: #fff;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    &__preview {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #f5f5f5;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__preview-icon {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        color: rgba(60, 70, 240, 0.5);
+
+        .fotogrids-icon {
+            width: 64px;
+            height: 48px;
+        }
+    }
+
+    &__preview-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+
+    &__content {
+        padding: 16px;
+        flex: 1;
+        display: inline-flex;
+        flex-direction: column;
+
+        h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e1e1e;
+        }
+
+        p {
+            margin: 0 0 16px 0;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            flex: 1;
+        }
+    }
+
+    &__actions {
+        display: grid;
+        gap: 4px;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+
+        .fg-button {
+            border-radius: 2px;
+        }
+    }
+}
+
+// Template Apply Modal specific styles (used within fotogrids-modal)
+.fotogrids-template-apply {
+    &--warning-notice {
+        background: var(--fg-background-warning);
+        border: 1px solid var(--fg-yellow);
+        border-radius: 4px;
+        padding: 12px;
+        margin-bottom: 16px;
+        color: var(--fg-text-warning-dark);
+
+        strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+    }
+
+    &--search {
+        margin-bottom: 16px;
+    }
+
+    &--list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 4px;
+        padding: 8px;
+    }
+
+    &--item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: #f5f5f5;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        input[type="checkbox"] {
+            margin: 0;
+        }
+
+        span {
+            flex: 1;
+        }
+    }
+
+    &--item-meta {
+        font-size: 12px;
+        color: #666;
+    }
+}
+
+// Template Preview
+.fotogrids-template-preview {
+    &--container {
+        width: 100%;
+        height: 100%;
+        min-height: 600px;
+        background: #f9f9f9;
+        position: relative;
+        overflow: auto;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    &--iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 600px;
+        border: none;
+        background: #fff;
+    }
+
+    &--placeholder {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+
+        &__icon {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 16px;
+        }
+
+        p {
+            margin: 0;
+            font-size: 14px;
+        }
+    }
+
+    &__header {
+        position: relative;
+    }
+
+    &__header-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        pointer-events: auto;
+    }
+
+    &__controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 16px;
+
+        .fg-form-field {
+            gap: 12px;
+
+            &--layout-row {
+                grid-template-columns: auto 1fr;
+            }
+        }
+    }
+}
+
+// On narrower viewports the absolutely-centred device control can collide
+// with the side zones; fall back to inline flow inside the leading zone.
+@media (max-width: 782px) {
+    .fotogrids-template-preview__header-center {
+        position: static;
+        transform: none;
+    }
+}
+
+// Pro badge in modal header
+.fotogrids-modal__header {
+    .fotogrids-pro-badge {
+        margin-left: 8px;
+        vertical-align: middle;
+    }
+}
+
+// Template Overview Modal
+.fotogrids-template-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    &__intro {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+
+    &__thumb {
+        flex-shrink: 0;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--fg-background-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    }
+
+    &__thumb-placeholder {
+        color: #ccc;
+
+        .fotogrids-icon {
+            width: 32px;
+            height: 32px;
+        }
+    }
+
+    &__meta {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    &__name {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e1e1e;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__description {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #50575e;
+        max-width: 48ch;
+    }
+
+    &__settings {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    &__settings-title {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--fg-text-secondary);
+    }
+
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__group-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e1e1e;
+        margin: 0;
+    }
+
+    &__rows {
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 14px;
+
+        & + & {
+            border-top: 1px solid var(--fg-border-primary);
+        }
+    }
+
+    &__row-label {
+        font-size: 13px;
+        color: var(--fg-text-primary);
+    }
+
+    &__row-value {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--fg-text-primary);
+        text-align: right;
+        line-height: 22px;
+    }
+
+    &__breakpoints {
+        display: inline-flex;
+        gap: 6px;
+    }
+
+    &__bp {
+        display: inline-flex;
+        flex-direction: row;
+        gap: 4px;
+        background: var(--fg-background-tertiary);
+        padding: 4px 8px;
+        border-radius: 4px;
+        line-height: 14px;
+    }
+
+    &__bp-label {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--fg-text-secondary);
+    }
+
+    &__bp-value {
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    &__color {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1px solid var(--fg-border-primary);
+        flex-shrink: 0;
+    }
+
+    &__loading {
+        display: flex;
+        justify-content: center;
+        padding: 24px 0;
+    }
+
+    &__empty {
+        margin: 0;
+        font-size: 14px;
+        color: #50575e;
+    }
+}
+
+// Templates Settings Tab
+.fotogrids-settings-tab-content {
+    .fotogrids-pro-feature-notice {
+        text-align: center;
+        padding: 40px 20px;
+        background: #fff;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 8px;
+
+        .fotogrids-pro-badge {
+            margin: 0 auto 16px;
+            display: inline-flex;
+        }
+
+        h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+        }
+
+        p {
+            margin: 0 0 20px;
+            color: #666;
+        }
+    }
+
+    .fotogrids-templates-settings-categories {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+
+        .fg-button.fg-is-active {
+            background: var(--fg-blue);
+            color: white;
+        }
+    }
+
+    .fotogrids-templates-settings-section {
+        margin-bottom: 32px;
+
+        h4 {
+            margin: 0 0 12px;
+            font-size: 16px;
+        }
+    }
+
+    .fotogrids-templates-settings-empty {
+        text-align: center;
+        padding: 40px 20px;
+        background: #f9f9f9;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 4px;
+    }
+
+    .fotogrids-templates-settings-predefined {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .fotogrids-template-settings-card {
+        background: #fff;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 4px;
+        padding: 16px;
+
+        h5 {
+            margin: 0 0 8px;
+            font-size: 14px;
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: #666;
+        }
+    }
+}
+

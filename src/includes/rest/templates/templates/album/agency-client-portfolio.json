@@ -1,0 +1,11 @@
+{
+  "id": "agency-client-portfolio",
+  "name": "Agency Client Portfolio",
+  "description": "One album per client with brand controls inherited from a shared template. Consistent finish, zero per-client setup from scratch.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "editorial",
+  "order": 14,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

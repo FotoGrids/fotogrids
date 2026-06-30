@@ -1,0 +1,11 @@
+{
+  "id": "shop-hero",
+  "name": "Shop Hero",
+  "description": "Hero carousel pre-wired for seasonal campaigns: per-slide CTA, image SEO enabled, mobile-first load order.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "order": 44,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

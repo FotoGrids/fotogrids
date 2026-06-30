@@ -1,0 +1,10 @@
+{
+	"core": null,
+	"plugins": [ "./dist/fotogrids" ],
+	"port": 8888,
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"WP_DEBUG_DISPLAY": false
+	}
+}

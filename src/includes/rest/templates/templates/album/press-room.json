@@ -1,0 +1,11 @@
+{
+  "id": "press-room",
+  "name": "Press Room",
+  "description": "One album for press, one for partners, one for internal. Download tokens on approved assets, right-click protection on everything else.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "editorial",
+  "order": 21,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

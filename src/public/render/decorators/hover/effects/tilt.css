@@ -1,0 +1,10 @@
+/* Frame effect: the whole tile leans toward the viewer. Caption rides with it. */
+
+.fotogrids-collection[data-fg-hover='tilt'] .fg-item {
+	transition-property: transform;
+	transform-origin: center center;
+}
+
+.fotogrids-collection[data-fg-hover='tilt'] .fg-item:hover {
+	transform: perspective(800px) rotate(var(--fg-hover-tilt-angle)) scale(1.02);
+}

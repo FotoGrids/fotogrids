@@ -1,0 +1,28 @@
+{
+  "id": "campaign-archive",
+  "name": "Campaign Archive",
+  "description": "One album per campaign, keeping hero assets, lookbooks, and product drops separated by launch date. Never rebuild last year's Black Friday from memory.",
+  "type": "free",
+  "category": "album",
+  "subcategory": "leads",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 5,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "captions": true,
+    "default_sort_order": "date",
+    "date_sort_direction": "desc",
+    "item_click_behavior": "lightbox"
+  }
+}

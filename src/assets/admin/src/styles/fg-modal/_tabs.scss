@@ -1,0 +1,71 @@
+@use "../colors.scss" as *;
+
+.fg-modal__tabs {
+	display: flex;
+	flex-shrink: 0;
+	border-bottom: 1px solid var(--fg-border-primary);
+	background: $tabbar-bg-light;
+	overflow-x: auto;
+
+	&--disabled {
+		pointer-events: none;
+		opacity: 0.6;
+	}
+
+	&__button {
+		background: $tabbar-bg-light;
+		border: none;
+		padding: 14px 20px;
+		cursor: pointer;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--fg-text-secondary);
+		position: relative;
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
+		border-inline-end: 1px solid $tabbar-border-color;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		white-space: nowrap;
+
+		&:hover:not(:disabled):not(.fg-modal__tabs__button--active) {
+			background: $tabbar-hover-bg;
+			color: var(--fg-text-primary);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--fg-blue);
+			outline-offset: -2px;
+		}
+
+		&:disabled,
+		&--disabled {
+			cursor: not-allowed;
+			opacity: 0.6;
+		}
+
+		&--active {
+			background: #fff;
+			color: var(--fg-text-primary);
+
+			&::after {
+				content: "";
+				position: absolute;
+				bottom: -1px;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: var(--fg-blue);
+			}
+		}
+	}
+}
+
+.fg-modal__tabs-panel {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding: 24px;
+	min-height: 0;
+}

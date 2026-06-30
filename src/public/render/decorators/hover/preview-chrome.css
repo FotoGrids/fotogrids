@@ -1,0 +1,106 @@
+/* Caption placement + default styling for hover-effect preview cards only.
+   The live frontend gets these from the captions decorator's per-render
+   variables; the admin grid has no render context, so the preview supplies
+   self-contained defaults that mirror overlay / top / bottom placement. */
+
+.fotogrids-hover-effect-option__preview {
+	cursor: var(--fg-hover-cursor, pointer);
+}
+
+.fotogrids-hover-effect-option__preview .fotogrids-collection .fg-item {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+}
+
+.fotogrids-hover-effect-option__preview .fg-item-media {
+	position: relative;
+	overflow: hidden;
+}
+
+.fotogrids-hover-effect-option__preview .fg-caption {
+	margin: 0;
+	box-sizing: border-box;
+	line-height: 1.4;
+}
+
+.fotogrids-hover-effect-option__preview .fg-caption-content {
+	display: block;
+	box-sizing: border-box;
+	padding: 0.5rem 0.6rem;
+}
+
+.fotogrids-hover-effect-option__preview .fg-caption-title {
+	display: block;
+	font-weight: 600;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.fotogrids-hover-effect-option__preview .fg-caption-description {
+	display: block;
+	font-size: 0.85em;
+	opacity: 0.85;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* Overlay: caption fills the media box. The bg layer carries the tint; the
+   content layer holds the text, anchored to the bottom. Both fill the box. */
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='overlay']
+	.fg-caption {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='overlay']
+	.fg-caption-bg,
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='overlay']
+	.fg-caption-content {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='overlay']
+	.fg-caption-bg {
+	background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.55));
+}
+
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='overlay']
+	.fg-caption-content {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	color: #fff;
+}
+
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='top']
+	.fg-caption {
+	order: -1;
+}
+
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='top']
+	.fg-caption
+	.fg-caption-content {
+	padding: 0 0 0.5rem;
+}
+
+.fotogrids-hover-effect-option__preview
+	.fotogrids-collection[data-fg-caption='bottom']
+	.fg-caption
+	.fg-caption-content {
+	padding: 0.5rem 0 0;
+}

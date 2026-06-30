@@ -1,0 +1,24 @@
+/**
+ * Base styles for the FG Icon component (`<Icon name="…" />`).
+ *
+ * The component reads its SVG payloads from a runtime
+ * `window.FotoGridsIcons` global populated by
+ * `assets/admin/plain/icons.js`. Anywhere the JS bundle is enqueued
+ * AND this stylesheet is loaded, icons render correctly.
+ *
+ * Kept deliberately minimal - just the sizing + flex centering. Any
+ * surface-specific tweaks (button icon spacing, tab icon colour, etc.)
+ * live alongside that surface's own rules.
+ */
+
+.fotogrids-icon {
+	line-height: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+}

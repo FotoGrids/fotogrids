@@ -1,0 +1,28 @@
+{
+  "id": "instant-memories",
+  "name": "Instant Memories",
+  "description": "Instant-photo frames with a sticker accent and a hand-pinned look. A warm, scrapbook feel for personal galleries.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "creative",
+  "order": 26,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "instant-photos",
+    "columns": {
+      "desktop": 4,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 20,
+      "tablet": 16,
+      "mobile": 12
+    },
+    "instant_photo_sticker": true,
+    "instant_photo_elevation": true,
+    "captions": true,
+    "item_click_behavior": "lightbox"
+  }
+}

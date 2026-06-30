@@ -1,0 +1,17 @@
+/*
+ * FotoGrids - Loaded Effect: blur
+ *
+ * Fades in while deblurring (blur 4px → 0).
+ */
+
+[data-fg-loaded-effect="blur"] .fg-item[data-fg-media-state="loading"] .fg-item-media > img,
+[data-fg-loaded-effect="blur"] .fg-item[data-fg-media-state="loading"] .fg-item-media > picture img {
+    filter: blur(4px);
+}
+
+[data-fg-loaded-effect="blur"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > img,
+[data-fg-loaded-effect="blur"] .fg-item[data-fg-media-state="loaded"] .fg-item-media > picture img {
+    opacity:    1;
+    filter:     blur(0);
+    transition: opacity 0.4s ease, filter 0.4s ease;
+}

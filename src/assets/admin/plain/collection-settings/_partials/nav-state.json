@@ -1,0 +1,23 @@
+{
+	"partial": "nav-state",
+	"inline_defaults": true,
+	"layout": [
+		{
+			"wrap": "side_by_side",
+			"fields": ["bg", "border_color", "arrow_color"]
+		}
+	],
+	"field_defaults": {
+		"type": "color",
+		"default": "",
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"bg": { "label": "Background Color" },
+		"border_color": { "label": "Border Color" },
+		"arrow_color": { "label": "Arrow Color" }
+	}
+}

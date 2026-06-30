@@ -1,0 +1,371 @@
+{
+    "id": "media",
+    "label": "Media",
+    "icon": "image",
+    "postTypes": [
+        "gallery"
+    ],
+    "settings": [
+        {
+            "key": "thumbnail_size_group",
+            "type": "setting_group",
+            "label": "Thumbnail Size",
+            "condition": {
+                "dependsOn": "layout",
+                "values": ["image-viewer"],
+                "condition_operator": "not_in"
+            },
+            "settings": [
+                {
+                    "key": "thumbnail_size",
+                    "type": "image_size",
+                    "label": "",
+                    "api_endpoint": "/wp-json/fotogrids/v1/admin/image-sizes",
+                    "options_key": "sizes",
+                    "default": "fotogrids_thumbnail",
+                    "append_option": {
+                        "label": "Custom",
+                        "value": "custom",
+                        "tier_required": "free"
+                    },
+                    "fallback_options": [
+                        {
+                            "label": "FG Thumbnail",
+                            "value": "fotogrids_thumbnail",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Thumbnail",
+                            "value": "thumbnail",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Medium",
+                            "value": "medium",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Large",
+                            "value": "large",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Full",
+                            "value": "full",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "thumbnail_custom_size",
+                    "type": "setting_group",
+                    "label": "Custom Thumbnail Size",
+                    "condition": {
+                        "dependsOn": "thumbnail_size",
+                        "values": [
+                            "custom"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "thumbnail_custom_size_width",
+                            "type": "range",
+                            "label": "Width",
+                            "min": 50,
+                            "max": 1200,
+                            "default": 400,
+                            "unit": "px",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "thumbnail_custom_size_height",
+                            "type": "range",
+                            "label": "Height",
+                            "min": 50,
+                            "max": 1200,
+                            "default": 300,
+                            "unit": "px",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "thumbnail_custom_size_crop",
+                            "type": "toggle",
+                            "label": "Hard Crop",
+                            "default": true,
+                            "description": "When enabled, images will be cropped to the exact width and height specified.<br>When disabled, images will be scaled to fit the dimensions while maintaining their aspect ratio.",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "thumbnail_custom_size_crop_alignment",
+                            "type": "alignment_grid",
+                            "label": "Crop Alignment",
+                            "default": "center",
+                            "options": [
+                                {
+                                    "value": "top-left",
+                                    "icon": "dots_grid_top_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "top-center",
+                                    "icon": "dots_grid_top_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "top-right",
+                                    "icon": "dots_grid_top_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "center-left",
+                                    "icon": "dots_grid_center_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "center",
+                                    "icon": "dots_grid_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "center-right",
+                                    "icon": "dots_grid_center_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bottom-left",
+                                    "icon": "dots_grid_bottom_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bottom-center",
+                                    "icon": "dots_grid_bottom_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bottom-right",
+                                    "icon": "dots_grid_bottom_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "condition": {
+                                "dependsOn": "thumbnail_custom_size_crop",
+                                "values": [
+                                    true,
+                                    "1",
+                                    1
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ],
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "full_image_size_group",
+            "type": "setting_group",
+            "label": "Full Image Size",
+            "settings": [
+                {
+                    "key": "full_image_size",
+                    "type": "image_size",
+                    "label": "",
+                    "api_endpoint": "/wp-json/fotogrids/v1/admin/image-sizes",
+                    "options_key": "sizes",
+                    "default": "fotogrids_full",
+                    "exclude_values": [
+                        "thumbnail",
+                        "fotogrids_full_mobile"
+                    ],
+                    "append_option": {
+                        "label": "Custom",
+                        "value": "custom",
+                        "tier_required": "free"
+                    },
+                    "fallback_options": [
+                        {
+                            "label": "FG Full",
+                            "value": "fotogrids_full",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Large",
+                            "value": "large",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Full",
+                            "value": "full",
+                            "tier_required": "free"
+                        }
+                    ],
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "full_image_custom_size",
+                    "type": "setting_group",
+                    "label": "Custom Full Image Size",
+                    "condition": {
+                        "dependsOn": "full_image_size",
+                        "values": [
+                            "custom"
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "full_image_custom_size_width",
+                            "type": "range",
+                            "label": "Width",
+                            "min": 200,
+                            "max": 4000,
+                            "default": 1920,
+                            "unit": "px",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "full_image_custom_size_height",
+                            "type": "range",
+                            "label": "Height (0 = proportional)",
+                            "min": 0,
+                            "max": 4000,
+                            "default": 0,
+                            "unit": "px",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "full_image_custom_size_crop",
+                            "type": "toggle",
+                            "label": "Hard Crop",
+                            "default": false,
+                            "description": "When enabled, images will be cropped to the exact width and height specified.<br>When disabled, images will be scaled to fit the dimensions while maintaining their aspect ratio.",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "full_image_custom_size_crop_alignment",
+                            "type": "alignment_grid",
+                            "label": "Crop Alignment",
+                            "default": "center",
+                            "options": [
+                                {
+                                    "value": "top-left",
+                                    "icon": "dots_grid_top_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "top-center",
+                                    "icon": "dots_grid_top_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "top-right",
+                                    "icon": "dots_grid_top_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "center-left",
+                                    "icon": "dots_grid_center_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "center",
+                                    "icon": "dots_grid_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "center-right",
+                                    "icon": "dots_grid_center_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bottom-left",
+                                    "icon": "dots_grid_bottom_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bottom-center",
+                                    "icon": "dots_grid_bottom_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bottom-right",
+                                    "icon": "dots_grid_bottom_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "condition": {
+                                "dependsOn": "full_image_custom_size_crop",
+                                "values": [
+                                    true,
+                                    "1",
+                                    1
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ],
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "media_regen_info",
+            "type": "info_block",
+            "subtitle": "Existing images may need regenerating",
+            "message": "WordPress generates image sizes at upload time. After changing these settings, use the regeneration tool to rebuild thumbnails for images already in your galleries.",
+            "icon": "image",
+            "button_label": "Regenerate Thumbnails",
+            "button_url": "admin.php?page=fotogrids-tools&tool=regenerate-thumbnails",
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

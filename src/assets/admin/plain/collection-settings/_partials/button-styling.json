@@ -1,0 +1,83 @@
+{
+	"partial": "button-styling",
+	"inline_defaults": true,
+	"layout": [
+		{ "use_partial": "typography" },
+		{
+			"wrap": "side_by_side",
+			"fields": ["radius", "border_width"]
+		},
+		"padding",
+		{
+			"state_subtabs": {
+				"use": "button-state",
+				"key_suffix": "state_subtabs",
+				"label": "Button States",
+				"node_attrs": {
+					"tier_required": "free",
+					"render_when_unlicensed": true,
+					"setting_lives_in": "free",
+					"visible_when_uninstalled": true
+				},
+				"states": ["regular", "hover", "focus", "active"],
+				"state_meta": {
+					"regular": { "infix": "", "label": "Regular", "icon": "square" },
+					"hover": { "infix": "hover_", "label": "Hover", "icon": "hover" },
+					"focus": { "infix": "focus_", "label": "Focus", "icon": "focus" },
+					"active": { "infix": "active_", "label": "Active", "icon": "check_square" }
+				}
+			}
+		},
+		"box_shadow"
+	],
+	"fields": {
+		"border_width": {
+			"type": "range",
+			"label": "Border Width",
+			"unit": "px",
+			"min": 0,
+			"max": 10,
+			"default": 1,
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"radius": {
+			"type": "range",
+			"label": "Border Radius",
+			"unit": "px",
+			"min": 0,
+			"max": 50,
+			"default": 4,
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"box_shadow": {
+			"type": "box_shadow",
+			"label": "Box Shadow",
+			"default": "",
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		},
+		"padding": {
+			"type": "responsive_range",
+			"label": "Padding",
+			"unit": "px",
+			"four_sided": true,
+			"responsive": {
+				"desktop": { "min": 0, "max": 40, "default": 6 },
+				"tablet": { "min": 0, "max": 40, "default": 6 },
+				"mobile": { "min": 0, "max": 40, "default": 6 }
+			},
+			"tier_required": "free",
+			"render_when_unlicensed": true,
+			"setting_lives_in": "free",
+			"visible_when_uninstalled": true
+		}
+	}
+}

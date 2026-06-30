@@ -1,0 +1,325 @@
+[data-fg-layout="image-viewer"] {
+    --fg-viewer-height-cap: 100vh;
+    --fg-viewer-duration: 300ms;
+    --fg-viewer-height-duration: 300ms;
+    --fg-viewer-easing: ease;
+    --fg-viewer-shift: 10px;
+
+    --fg-viewer-stage-bg: rgba( 0, 0, 0, 0.1 );
+    --fg-viewer-stage-radius: 6px;
+
+    --fg-viewer-bar-gap: 12px;
+    --fg-viewer-bar-padding: 8px;
+    --fg-viewer-bar-bg: rgba( 0, 0, 0, 0.1 );
+    --fg-viewer-bar-radius: 6px;
+
+    --fg-arrow-size: 40px;
+    --fg-viewer-arrow-radius: 4px;
+    --fg-viewer-arrow-disabled-opacity: 0.3;
+    --fg-viewer-arrow-icon-size: 60%;
+    --fg-viewer-arrow-transition: background-color 0.15s ease,
+        border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+
+    --fg-viewer-counter-font-size: 13px;
+    --fg-viewer-title-gap: 1em;
+
+    position: relative;
+}
+
+/* Container stacks the stage and the control bar; the gap between them is the
+   admin "Distance between Stage and Bar" setting. data-fg-viewer="1" sits on
+   the container itself, so this is a compound selector (no descendant space). */
+[data-fg-viewer="1"].fg-viewer-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var( --fg-viewer-stage-bar-gap, 12px );
+}
+
+[data-fg-viewer="1"] .fg-viewer-stage {
+    position: relative;
+    overflow: hidden;
+    max-height: var( --fg-viewer-height-cap, 100vh );
+    background: var( --fg-viewer-stage-bg );
+    border-radius: var( --fg-viewer-stage-radius );
+    border: var( --fg-viewer-stage-border-width, 0 ) solid var( --fg-viewer-stage-border-color, transparent );
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="auto"] .fg-viewer-stage {
+    max-height: var( --fg-height-max, var( --fg-viewer-height-cap, 100vh ) );
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="fixed"] .fg-viewer-stage {
+    height: min( var( --fg-height-fixed, 500px ), var( --fg-viewer-height-cap, 100vh ) );
+}
+
+[data-fg-viewer="1"] .fg-viewer-track {
+    position: relative;
+    width: 100%;
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="fixed"] .fg-viewer-track {
+    height: 100%;
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+[data-fg-layout="image-viewer"][data-fg-height-mode="auto"]:not( [data-fg-natural-ratio="1"] ) .fg-viewer-track {
+    aspect-ratio: var( --fg-item-aspect-ratio, 4 / 3 );
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media picture,
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media img,
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video,
+[data-fg-viewer="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var( --fg-item-fit, cover );
+}
+
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-stage,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-track {
+    height: min(
+        var( --fg-height-max, var( --fg-viewer-height-cap, 100vh ) ),
+        var( --fg-viewer-height-cap, 100vh )
+    );
+    transition: height var( --fg-viewer-height-duration, 300ms ) var( --fg-viewer-easing, ease );
+}
+
+[data-fg-viewer="1"] .fg-viewer-stage.fg-viewer-no-anim,
+[data-fg-viewer="1"] .fg-viewer-track.fg-viewer-no-anim {
+    transition: none;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+    [data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-stage,
+    [data-fg-layout="image-viewer"][data-fg-natural-ratio="1"][data-fg-height-mode="auto"] .fg-viewer-track {
+        transition: none;
+    }
+}
+
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media picture,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media img,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video,
+[data-fg-layout="image-viewer"][data-fg-natural-ratio="1"] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster {
+    object-fit: contain;
+}
+
+[data-fg-layout="image-viewer"][data-fg-full-filter] .fg-viewer-track .fg-item .fg-item-media img,
+[data-fg-layout="image-viewer"][data-fg-full-filter] .fg-viewer-track .fg-item .fg-item-media .fg-video-poster {
+    filter: var( --fg-full-filter-regular );
+    transition: filter 0.25s ease;
+}
+
+[data-fg-layout="image-viewer"][data-fg-full-filter] .fg-viewer-track .fg-item:hover .fg-item-media img,
+[data-fg-layout="image-viewer"][data-fg-full-filter] .fg-viewer-track .fg-item:hover .fg-item-media .fg-video-poster {
+    filter: var( --fg-full-filter-hover );
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity   var( --fg-viewer-duration ) var( --fg-viewer-easing, ease ),
+        transform var( --fg-viewer-duration ) var( --fg-viewer-easing, ease ),
+        visibility 0s linear var( --fg-viewer-duration );
+}
+
+[data-fg-viewer="1"] .fg-viewer-track .fg-item.fg-is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+        opacity   var( --fg-viewer-duration ) var( --fg-viewer-easing, ease ),
+        transform var( --fg-viewer-duration ) var( --fg-viewer-easing, ease ),
+        visibility 0s linear 0s;
+}
+
+[data-fg-layout="image-viewer"][data-fg-transition="none"] .fg-viewer-track .fg-item,
+[data-fg-layout="image-viewer"][data-fg-transition="none"] .fg-viewer-track .fg-item.fg-is-active {
+    transition: none;
+}
+
+@media ( prefers-reduced-motion: no-preference ) {
+    [data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item {
+        transform: translateX( calc( -1 * var( --fg-viewer-shift ) ) );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="horizontal"][data-fg-dir="prev"] .fg-viewer-track .fg-item {
+        transform: translateX( var( --fg-viewer-shift ) );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item.fg-is-active {
+        transform: translateX( 0 );
+        opacity: 1;
+        transition:
+            opacity   calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ) calc( var( --fg-viewer-duration ) * 0.5 ),
+            transform calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ) calc( var( --fg-viewer-duration ) * 0.5 ),
+            visibility 0s linear 0s;
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="horizontal"] .fg-viewer-track .fg-item.fg-is-leaving {
+        transform: translateX( var( --fg-viewer-shift ) );
+        opacity: 0;
+        visibility: visible;
+        transition:
+            opacity   calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ),
+            transform calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ),
+            visibility 0s linear var( --fg-viewer-duration );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="horizontal"][data-fg-dir="prev"] .fg-viewer-track .fg-item.fg-is-leaving {
+        transform: translateX( calc( -1 * var( --fg-viewer-shift ) ) );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item {
+        transform: translateY( calc( -1 * var( --fg-viewer-shift ) ) );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="vertical"][data-fg-dir="prev"] .fg-viewer-track .fg-item {
+        transform: translateY( var( --fg-viewer-shift ) );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item.fg-is-active {
+        transform: translateY( 0 );
+        opacity: 1;
+        transition:
+            opacity   calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ) calc( var( --fg-viewer-duration ) * 0.5 ),
+            transform calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ) calc( var( --fg-viewer-duration ) * 0.5 ),
+            visibility 0s linear 0s;
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="vertical"] .fg-viewer-track .fg-item.fg-is-leaving {
+        transform: translateY( var( --fg-viewer-shift ) );
+        opacity: 0;
+        visibility: visible;
+        transition:
+            opacity   calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ),
+            transform calc( var( --fg-viewer-duration ) * 0.5 ) var( --fg-viewer-easing, ease ),
+            visibility 0s linear var( --fg-viewer-duration );
+    }
+
+    [data-fg-layout="image-viewer"][data-fg-transition="vertical"][data-fg-dir="prev"] .fg-viewer-track .fg-item.fg-is-leaving {
+        transform: translateY( calc( -1 * var( --fg-viewer-shift ) ) );
+    }
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+    [data-fg-viewer="1"] .fg-viewer-track .fg-item,
+    [data-fg-viewer="1"] .fg-viewer-track .fg-item.fg-is-active {
+        transition-duration: 0s;
+        transform: none;
+    }
+}
+
+[data-fg-viewer="1"] .fg-viewer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var( --fg-viewer-bar-gap );
+    padding: var( --fg-viewer-bar-padding );
+    background: var( --fg-viewer-bar-bg );
+    border-radius: var( --fg-viewer-bar-radius );
+    border: var( --fg-viewer-bar-border-width, 0 ) solid var( --fg-viewer-bar-border-color, transparent );
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width:  var( --fg-arrow-size );
+    height: var( --fg-arrow-size );
+    padding: 0;
+    border: 1px solid var( --fg-viewer-arrow-border, transparent );
+    border-radius: var( --fg-viewer-arrow-radius );
+    background: var( --fg-viewer-arrow-bg, transparent );
+    color: var( --fg-viewer-arrow-color, inherit );
+    cursor: pointer;
+    transition: var( --fg-viewer-arrow-transition, background-color 0.15s ease, opacity 0.15s ease );
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow:hover {
+    background: var( --fg-viewer-arrow-bg-hover, rgba( 0, 0, 0, 0.08 ) );
+    border-color: var( --fg-viewer-arrow-border-hover, transparent );
+    color: var( --fg-viewer-arrow-color-hover, inherit );
+    outline: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow:active {
+    background: var( --fg-viewer-arrow-bg-active, rgba( 0, 0, 0, 0.08 ) );
+    border-color: var( --fg-viewer-arrow-border-active, transparent );
+    color: var( --fg-viewer-arrow-color-active, inherit );
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow:focus-visible {
+    background: var( --fg-viewer-arrow-bg-focus, rgba( 0, 0, 0, 0.08 ) );
+    border-color: var( --fg-viewer-arrow-border-focus, transparent );
+    color: var( --fg-viewer-arrow-color-focus, inherit );
+    outline: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow[disabled] {
+    opacity: var( --fg-viewer-arrow-disabled-opacity );
+    pointer-events: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow--at-end-hidden {
+    visibility: hidden;
+}
+
+[data-fg-viewer="1"] .fg-viewer-arrow > svg {
+    width: var( --fg-viewer-arrow-icon-size );
+    height: var( --fg-viewer-arrow-icon-size );
+}
+
+[data-fg-viewer="1"] .fg-viewer-title-wrapper {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: var( --fg-viewer-title-gap );
+    line-height: 1.2;
+    color: var( --fg-caption-title-color );
+    font-family: var( --fg-caption-title-font-family, inherit );
+    font-weight: var( --fg-caption-title-font-weight, inherit );
+    font-size: var( --fg-caption-title-font-size, var( --fg-viewer-counter-font-size ) );
+    user-select: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-counter {
+    flex: 0 0 auto;
+}
+
+[data-fg-viewer="1"] .fg-viewer-counter--hidden {
+    display: none;
+}
+
+[data-fg-viewer="1"] .fg-viewer-title {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+[data-fg-viewer="1"] .fg-viewer-title--empty {
+    display: none;
+}
+

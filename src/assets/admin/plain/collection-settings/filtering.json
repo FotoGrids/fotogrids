@@ -1,0 +1,1144 @@
+{
+    "id": "filtering",
+    "label": "Filtering",
+    "icon": "filter",
+    "condition": {
+        "dependsOn": "layout",
+        "values": [
+            "grid",
+            "masonry",
+            "justified",
+            "slider",
+            "instant-photos",
+            "video",
+            "carousel",
+            "products"
+        ]
+    },
+    "settings": [
+        {
+            "key": "filtering_enabled",
+            "type": "toggle",
+            "label": "Enable Filtering",
+            "description": "Allow visitors to filter {postType} items by selected criteria",
+            "default": false,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "filtering_multiple_enabled",
+            "type": "toggle",
+            "label": "Multiple Selection",
+            "description": "When enabled, allows visitors to select multiple options within the same filter group",
+            "default": true,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "filter_by",
+            "type": "token_select",
+            "label": "Filter By",
+            "description": "Which criteria visitors can filter items by",
+            "options": [
+                { "label": "Tags", "value": "tags", "tier_required": "free" },
+                { "label": "People", "value": "people", "tier_required": "pro_starter" },
+                { "label": "Location", "value": "location", "tier_required": "pro_starter" },
+                { "label": "Date", "value": "date", "tier_required": "pro_starter" },
+                { "label": "EXIF", "value": "exif", "tier_required": "pro_starter" }
+            ],
+            "default": ["tags"],
+            "condition": {
+                "dependsOn": "filtering_enabled",
+                "values": [true, "1"]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "date_filter_type",
+            "type": "button_group",
+            "label": "Date Filter Type",
+            "description": "Which date to use for filtering",
+            "options": [
+                {
+                    "label": "Date Taken",
+                    "value": "date_taken",
+                    "icon": "camera",
+                    "tier_required": "pro_starter"
+                },
+                {
+                    "label": "Date Uploaded",
+                    "value": "date_uploaded",
+                    "icon": "upload",
+                    "tier_required": "pro_starter"
+                }
+            ],
+            "default": "date_taken",
+            "condition": {
+                "dependsOn": "filter_by",
+                "values": ["date"],
+                "condition_operator": "array_includes"
+            },
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "filter_controls_subtabs",
+            "type": "setting_subtabs",
+            "label": "Filter Controls",
+            "condition": {
+                "dependsOn": "filtering_enabled",
+                "values": [true, "1"]
+            },
+            "subTabs": {
+                "appearance": {
+                    "id": "appearance",
+                    "label": "Appearance",
+                    "icon": "eye",
+                    "settings": [
+                        {
+                            "key": "filter_ui_position",
+                            "type": "button_group",
+                            "label": "Position",
+                            "description": "Where to display the filter controls",
+                            "options": [
+                                {
+                                    "label": "Top",
+                                    "value": "top",
+                                    "icon": "flex_align_top",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Sidebar",
+                                    "value": "sidebar",
+                                    "icon": "flex_align_left",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "top",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_display_mode",
+                            "type": "button_group",
+                            "label": "Display",
+                            "description": "Whether the filter bar is always visible or revealed by a toggle button",
+                            "options": [
+                                {
+                                    "label": "Toggle Button",
+                                    "value": "toggle",
+                                    "icon": "click",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Always Visible",
+                                    "value": "always",
+                                    "icon": "eye",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "toggle",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true,
+                            "condition": {
+                                "dependsOn": "filter_ui_position",
+                                "values": [
+                                    "top"
+                                ]
+                            }
+                        },
+                        {
+                            "key": "filter_sidebar_side",
+                            "type": "button_group",
+                            "label": "Sidebar Side",
+                            "description": "Which side the filter sidebar appears on",
+                            "options": [
+                                {
+                                    "label": "Left",
+                                    "value": "left",
+                                    "icon": "align_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Right",
+                                    "value": "right",
+                                    "icon": "align_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "left",
+                            "condition": {
+                                "dependsOn": "filter_ui_position",
+                                "values": ["sidebar"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_ui_style",
+                            "type": "button_group",
+                            "label": "Style",
+                            "description": "How the filter controls are displayed",
+                            "options": [
+                                {
+                                    "label": "Dropdowns",
+                                    "value": "dropdowns",
+                                    "icon": "caret_square_down",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Buttons",
+                                    "value": "buttons",
+                                    "icon": "layout",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Checkboxes",
+                                    "value": "checkboxes",
+                                    "icon": "check_square",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "buttons",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_panel_bg",
+                            "type": "color",
+                            "label": "Filter Panel Background",
+                            "description": "Background colour of the filter panel itself",
+                            "default": "rgba(0, 0, 0, 0)",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_panel_radius",
+                            "type": "range",
+                            "label": "Filter Panel Border Radius",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 40,
+                            "default": 12,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_reset_btn_group",
+                            "type": "setting_group",
+                            "label": "Reset Button",
+                            "settings": [
+                                {
+                                    "key": "filter_reset_btn_enabled",
+                                    "type": "toggle",
+                                    "label": "Show Reset Button",
+                                    "default": true,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_reset_btn_position",
+                                    "type": "button_group",
+                                    "label": "Reset Button Position",
+                                    "options": [
+                                        { "label": "Start", "value": "start", "tier_required": "free" },
+                                        { "label": "End",   "value": "end",   "tier_required": "free" }
+                                    ],
+                                    "default": "start",
+                                    "condition": {
+                                        "dependsOn": "filter_reset_btn_enabled",
+                                        "values": [ true, "1" ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_reset_btn_label",
+                                    "type": "text_input",
+                                    "label": "\"All\" Label",
+                                    "description": "Text for the reset control that shows all items",
+                                    "default": "All",
+                                    "condition": {
+                                        "dependsOn": "filter_reset_btn_enabled",
+                                        "values": [ true, "1" ]
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "spacing": {
+                    "id": "spacing",
+                    "label": "Spacing",
+                    "icon": "spacing_width",
+                    "settings": [
+                        {
+                            "key": "filter_panel_padding",
+                            "type": "responsive_range",
+                            "label": "Filter Panel Padding",
+                            "description": "Padding inside the Filter Panel itself",
+                            "units": [ "px", "em", "rem" ],
+                            "four_sided": true,
+                            "responsive": {
+                                "desktop": { "min": 0, "max": 64, "default": 0 },
+                                "tablet":  { "min": 0, "max": 64, "default": 0 },
+                                "mobile":  { "min": 0, "max": 64, "default": 0 }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_wrapper_gap",
+                            "type": "responsive_range",
+                            "label": "Gap Between Bar and {postType}",
+                            "description": "Space between the Filter Panel and the {postType} grid",
+                            "units": [ "px", "em", "rem" ],
+                            "responsive": {
+                                "desktop": { "min": 0, "max": 64, "default": 16 },
+                                "tablet":  { "min": 0, "max": 64, "default": 16 },
+                                "mobile":  { "min": 0, "max": 64, "default": 12 }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_bar_gap",
+                            "type": "responsive_range",
+                            "label": "Gap Between Groups",
+                            "description": "Space between filter groups (e.g. Tags row and People row)",
+                            "units": [ "px", "em", "rem" ],
+                            "responsive": {
+                                "desktop": { "min": 0, "max": 48, "default": 8 },
+                                "tablet":  { "min": 0, "max": 48, "default": 8 },
+                                "mobile":  { "min": 0, "max": 48, "default": 6 }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_gap",
+                            "type": "responsive_range",
+                            "label": "Gap Between Controls",
+                            "description": "Space between individual buttons, options, or checkboxes within a group",
+                            "units": [ "px", "em", "rem" ],
+                            "responsive": {
+                                "desktop": { "min": 0, "max": 32, "default": 8 },
+                                "tablet":  { "min": 0, "max": 32, "default": 8 },
+                                "mobile":  { "min": 0, "max": 32, "default": 6 }
+                            },
+                            "condition": {
+                                "dependsOn": "filter_ui_style",
+                                "values": ["buttons", "checkboxes"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_sidebar_width",
+                            "type": "responsive_range",
+                            "label": "Sidebar Width",
+                            "description": "Width of the filter column when position is set to Sidebar",
+                            "units": [ "px", "em", "rem" ],
+                            "responsive": {
+                                "desktop": { "min": 100, "max": 400, "default": 200 },
+                                "tablet":  { "min": 100, "max": 400, "default": 180 },
+                                "mobile":  { "min": 100, "max": 400, "default": 160 }
+                            },
+                            "condition": {
+                                "dependsOn": "filter_ui_position",
+                                "values": ["sidebar"]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "buttons": {
+                    "id": "buttons",
+                    "label": "Buttons",
+                    "icon": "layout",
+                    "condition": {
+                        "dependsOn": "filter_ui_style",
+                        "values": ["buttons"]
+                    },
+                    "settings": [
+                        {
+                            "use": "button-styling",
+                            "key_prefix": "filter_btn_",
+                            "exclude": ["box_shadow"],
+                            "states": ["regular", "hover", "active"],
+                            "composed": {
+                                "typography": {
+                                    "overrides": {
+                                        "font_size": {
+                                            "units": ["px", "em", "rem"],
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 32, "default": 14 },
+                                                "tablet": { "min": 8, "max": 28, "default": 14 },
+                                                "mobile": { "min": 8, "max": 24, "default": 13 }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "overrides": {
+                                "radius": { "default": 4 },
+                                "border_width": { "default": 0 },
+                                "padding": { "responsive": {
+                                    "desktop": { "min": 0, "max": 40, "default": 6 },
+                                    "tablet": { "min": 0, "max": 40, "default": 6 },
+                                    "mobile": { "min": 0, "max": 40, "default": 6 }
+                                } }
+                            }
+                        }
+                    ]
+                },
+                "dropdowns": {
+                    "id": "dropdowns",
+                    "label": "Dropdowns",
+                    "icon": "arrow_square_down",
+                    "condition": {
+                        "dependsOn": "filter_ui_style",
+                        "values": ["dropdowns"]
+                    },
+                    "settings": [
+                        {
+                            "key": "filter_dropdown_typography_group",
+                            "type": "setting_group",
+                            "label": "Typography",
+                            "settings": [
+                                {
+                                    "use": "typography",
+                                    "key_prefix": "filter_dropdown_",
+                                    "overrides": {
+                                        "font_size": {
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 32, "default": 14 },
+                                                "tablet": { "min": 8, "max": 28, "default": 14 },
+                                                "mobile": { "min": 8, "max": 24, "default": 13 }
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_dropdown_trigger_group",
+                            "type": "setting_group",
+                            "label": "Trigger Button",
+                            "settings": [
+                                {
+                                    "use": "button-styling",
+                                    "key_prefix": "filter_select_",
+                                    "exclude": ["box_shadow", "typography"],
+                                    "states": ["regular", "hover", "open"],
+                                    "states_label": "Trigger States",
+                                    "state_meta": {
+                                        "regular": { "icon": "caret_square_down" },
+                                        "open": { "infix": "open_", "label": "Open", "icon": "caret_square_up" }
+                                    },
+                                    "overrides": {
+                                        "padding": { "responsive": {
+                                            "desktop": { "min": 0, "max": 40, "default": 6 },
+                                            "tablet": { "min": 0, "max": 40, "default": 6 },
+                                            "mobile": { "min": 0, "max": 40, "default": 6 }
+                                        } }
+                                    }
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_dropdown_list_group",
+                            "type": "setting_group",
+                            "label": "Popover List",
+                            "settings": [
+                                {
+                                    "type": "side_by_side",
+                                    "settings": [
+                                        {
+                                            "key": "filter_dropdown_list_radius",
+                                            "type": "range",
+                                            "label": "Border Radius",
+                                            "unit": "px",
+                                            "min": 0,
+                                            "max": 20,
+                                            "default": 4,
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "filter_dropdown_list_border_width",
+                                            "type": "range",
+                                            "label": "Border Width",
+                                            "unit": "px",
+                                            "min": 0,
+                                            "max": 10,
+                                            "default": 1,
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "side_by_side",
+                                    "settings": [
+                                        {
+                                            "key": "filter_dropdown_list_bg",
+                                            "type": "color",
+                                            "label": "Background Color",
+                                            "description": "Background of the whole popover panel.",
+                                            "default": "rgba(255, 255, 255, 1)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "filter_dropdown_list_border_color",
+                                            "type": "color",
+                                            "label": "Border Color",
+                                            "default": "rgba(0, 0, 0, 1)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        },
+                                        {
+                                            "key": "filter_dropdown_option_separator_color",
+                                            "type": "color",
+                                            "label": "Separator Color",
+                                            "description": "1px line drawn between options. Set to transparent to hide.",
+                                            "default": "rgba(0, 0, 0, 0.08)",
+                                            "tier_required": "free",
+                                            "render_when_unlicensed": true,
+                                            "setting_lives_in": "free",
+                                            "visible_when_uninstalled": true
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "filter_dropdown_options_group",
+                                    "type": "setting_group",
+                                    "label": "Options",
+                                    "settings": [
+                                    {
+                                        "key": "filter_dropdown_option_state_subtabs",
+                                        "type": "setting_subtabs",
+                                        "label": "Option States",
+                                        "subTabs": {
+                                            "regular": {
+                                                "id": "regular",
+                                                "label": "Regular",
+                                                "icon": "square",
+                                                "settings": [
+                                                    {
+                                                        "type": "side_by_side",
+                                                        "settings": [
+                                                            {
+                                                                "key": "filter_dropdown_option_bg",
+                                                                "type": "color",
+                                                                "label": "Background",
+                                                                "default": "rgba(255, 255, 255, 1)",
+                                                                "tier_required": "free",
+                                                                "render_when_unlicensed": true,
+                                                                "setting_lives_in": "free",
+                                                                "visible_when_uninstalled": true
+                                                            },
+                                                            {
+                                                                "key": "filter_dropdown_option_color",
+                                                                "type": "color",
+                                                                "label": "Text Color",
+                                                                "default": "rgba(0, 0, 0, 1)",
+                                                                "tier_required": "free",
+                                                                "render_when_unlicensed": true,
+                                                                "setting_lives_in": "free",
+                                                                "visible_when_uninstalled": true
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "hover": {
+                                                "id": "hover",
+                                                "label": "Hover",
+                                                "icon": "hover",
+                                                "settings": [
+                                                    {
+                                                        "type": "side_by_side",
+                                                        "settings": [
+                                                            {
+                                                                "key": "filter_dropdown_option_hover_bg",
+                                                                "type": "color",
+                                                                "label": "Background",
+                                                                "default": "rgba(60, 70, 240, 0.05)",
+                                                                "tier_required": "free",
+                                                                "render_when_unlicensed": true,
+                                                                "setting_lives_in": "free",
+                                                                "visible_when_uninstalled": true
+                                                            },
+                                                            {
+                                                                "key": "filter_dropdown_option_hover_color",
+                                                                "type": "color",
+                                                                "label": "Text Color",
+                                                                "default": "rgba(60, 70, 240, 1)",
+                                                                "tier_required": "free",
+                                                                "render_when_unlicensed": true,
+                                                                "setting_lives_in": "free",
+                                                                "visible_when_uninstalled": true
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "selected": {
+                                                "id": "selected",
+                                                "label": "Selected",
+                                                "icon": "check_square",
+                                                "settings": [
+                                                    {
+                                                        "type": "side_by_side",
+                                                        "settings": [
+                                                            {
+                                                                "key": "filter_dropdown_option_selected_bg",
+                                                                "type": "color",
+                                                                "label": "Background",
+                                                                "default": "rgba(60, 70, 240, 1)",
+                                                                "tier_required": "free",
+                                                                "render_when_unlicensed": true,
+                                                                "setting_lives_in": "free",
+                                                                "visible_when_uninstalled": true
+                                                            },
+                                                            {
+                                                                "key": "filter_dropdown_option_selected_color",
+                                                                "type": "color",
+                                                                "label": "Text Color",
+                                                                "default": "rgba(255, 255, 255, 1)",
+                                                                "tier_required": "free",
+                                                                "render_when_unlicensed": true,
+                                                                "setting_lives_in": "free",
+                                                                "visible_when_uninstalled": true
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "tier_required": "free",
+                                        "render_when_unlicensed": true,
+                                        "setting_lives_in": "free",
+                                        "visible_when_uninstalled": true
+                                    }
+                                    ],
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "checkboxes": {
+                    "id": "checkboxes",
+                    "label": "Checkboxes",
+                    "icon": "check_square",
+                    "condition": {
+                        "dependsOn": "filter_ui_style",
+                        "values": ["checkboxes"]
+                    },
+                    "settings": [
+                        {
+                            "key": "filter_cb_shape_group",
+                            "type": "setting_group",
+                            "label": "Box",
+                            "settings": [
+                                {
+                                    "key": "filter_cb_size",
+                                    "type": "range",
+                                    "label": "Size",
+                                    "description": "Width and height of the checkbox box",
+                                    "unit": "px",
+                                    "min": 10,
+                                    "max": 28,
+                                    "default": 16,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "description": "0 = square, 50% equivalent = circle",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 14,
+                                    "default": 3,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_cb_gap",
+                                    "type": "range",
+                                    "label": "Gap to Label",
+                                    "description": "Space between the checkbox box and its label text",
+                                    "unit": "px",
+                                    "min": 2,
+                                    "max": 24,
+                                    "default": 8,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_cb_typography_group",
+                            "type": "setting_group",
+                            "label": "Typography",
+                            "settings": [
+                                {
+                                    "use": "typography",
+                                    "key_prefix": "filter_cb_",
+                                    "overrides": {
+                                        "font_size": {
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 32, "default": 14 },
+                                                "tablet": { "min": 8, "max": 28, "default": 14 },
+                                                "mobile": { "min": 8, "max": 24, "default": 13 }
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_cb_border_width",
+                            "type": "range",
+                            "label": "Border Width",
+                            "unit": "px",
+                            "min": 0,
+                            "max": 10,
+                            "default": 1,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_cb_state_subtabs",
+                            "type": "setting_subtabs",
+                            "label": "Checkbox States",
+                            "subTabs": {
+                                "unchecked": {
+                                    "id": "unchecked",
+                                    "label": "Unchecked",
+                                    "icon": "square",
+                                    "settings": [
+                                        {
+                                            "type": "side_by_side",
+                                            "settings": [
+                                                {
+                                                    "key": "filter_cb_bg",
+                                                    "type": "color",
+                                                    "label": "Background",
+                                                    "default": "rgba(255, 255, 255, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "filter_cb_border_color",
+                                                    "type": "color",
+                                                    "label": "Border",
+                                                    "default": "rgba(0, 0, 0, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "hover": {
+                                    "id": "hover",
+                                    "label": "Hover",
+                                    "icon": "hover",
+                                    "settings": [
+                                        {
+                                            "type": "side_by_side",
+                                            "settings": [
+                                                {
+                                                    "key": "filter_cb_hover_bg",
+                                                    "type": "color",
+                                                    "label": "Background",
+                                                    "default": "rgba(255, 255, 255, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "filter_cb_hover_border_color",
+                                                    "type": "color",
+                                                    "label": "Border",
+                                                    "default": "rgba(60, 70, 240, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "filter_cb_hover_checkmark_color",
+                                                    "type": "color",
+                                                    "label": "Checkmark",
+                                                    "description": "Rendered semi-transparently on hover to preview the checked state",
+                                                    "default": "rgba(60, 70, 240, 0.3)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "checked": {
+                                    "id": "checked",
+                                    "label": "Checked",
+                                    "icon": "check_square",
+                                    "settings": [
+                                        {
+                                            "type": "side_by_side",
+                                            "settings": [
+                                                {
+                                                    "key": "filter_cb_checked_bg",
+                                                    "type": "color",
+                                                    "label": "Background",
+                                                    "default": "rgba(60, 70, 240, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "filter_cb_checked_border_color",
+                                                    "type": "color",
+                                                    "label": "Border",
+                                                    "default": "rgba(60, 70, 240, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                },
+                                                {
+                                                    "key": "filter_cb_checked_checkmark_color",
+                                                    "type": "color",
+                                                    "label": "Checkmark",
+                                                    "description": "Color of the tick mark inside a checked box",
+                                                    "default": "rgba(255, 255, 255, 1)",
+                                                    "tier_required": "free",
+                                                    "render_when_unlicensed": true,
+                                                    "setting_lives_in": "free",
+                                                    "visible_when_uninstalled": true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "count_badge": {
+                    "id": "count_badge",
+                    "label": "Count Badge",
+                    "icon": "notification_message",
+                    "settings": [
+                        {
+                            "key": "show_filter_count",
+                            "type": "toggle",
+                            "label": "Show Item Count",
+                            "description": "Display the number of matching items next to each filter option",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "filter_count_group",
+                            "type": "setting_group",
+                            "label": "Badge",
+                            "condition": {
+                                "dependsOn": "show_filter_count",
+                                "values": [true, "1"]
+                            },
+                            "settings": [
+                                {
+                                    "key": "filter_count_state_subtabs",
+                                    "type": "setting_subtabs",
+                                    "label": "Badge States",
+                                    "subTabs": {
+                                        "regular": {
+                                            "id": "regular",
+                                            "label": "Regular",
+                                            "icon": "square",
+                                            "settings": [
+                                                {
+                                                    "type": "side_by_side",
+                                                    "settings": [
+                                                        {
+                                                            "key": "filter_count_bg",
+                                                            "type": "color",
+                                                            "label": "Background",
+                                                            "default": "rgba(0, 0, 0, 0.1)",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "filter_count_color",
+                                                            "type": "color",
+                                                            "label": "Text Color",
+                                                            "default": "rgba(0, 0, 0, 0.7)",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "hover": {
+                                            "id": "hover",
+                                            "label": "Hover",
+                                            "icon": "hover",
+                                            "settings": [
+                                                {
+                                                    "type": "side_by_side",
+                                                    "settings": [
+                                                        {
+                                                            "key": "filter_count_hover_bg",
+                                                            "type": "color",
+                                                            "label": "Background",
+                                                            "default": "rgba(60, 70, 240, 0.2)",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "filter_count_hover_color",
+                                                            "type": "color",
+                                                            "label": "Text Color",
+                                                            "default": "rgba(60, 70, 240, 1)",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "active": {
+                                            "id": "active",
+                                            "label": "Active",
+                                            "icon": "check_square",
+                                            "settings": [
+                                                {
+                                                    "type": "side_by_side",
+                                                    "settings": [
+                                                        {
+                                                            "key": "filter_count_active_bg",
+                                                            "type": "color",
+                                                            "label": "Background",
+                                                            "default": "rgba(255, 255, 255, 0.3)",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        },
+                                                        {
+                                                            "key": "filter_count_active_color",
+                                                            "type": "color",
+                                                            "label": "Text Color",
+                                                            "default": "rgba(255, 255, 255, 1)",
+                                                            "tier_required": "free",
+                                                            "render_when_unlicensed": true,
+                                                            "setting_lives_in": "free",
+                                                            "visible_when_uninstalled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_font_size",
+                                    "type": "responsive_range",
+                                    "label": "Font Size",
+                                    "units": [ "px", "em", "rem" ],
+                                    "responsive": {
+                                        "desktop": { "min": 8, "max": 28, "default": 12 },
+                                        "tablet":  { "min": 8, "max": 24, "default": 12 },
+                                        "mobile":  { "min": 8, "max": 20, "default": 11 }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_radius",
+                                    "type": "range",
+                                    "label": "Border Radius",
+                                    "unit": "px",
+                                    "min": 0,
+                                    "max": 20,
+                                    "default": 3,
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "filter_count_padding",
+                                    "type": "responsive_range",
+                                    "label": "Padding",
+                                    "unit": "px",
+                                    "four_sided": true,
+                                    "responsive": {
+                                        "desktop": { "min": 0, "max": 20, "default": 4 },
+                                        "tablet":  { "min": 0, "max": 20, "default": 4 },
+                                        "mobile":  { "min": 0, "max": 20, "default": 4 }
+                                    },
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ],
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "advanced_filtering_promo",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "Advanced EXIF & Metadata Filtering",
+                    "message": "Filter by camera settings (ISO, aperture, shutter speed), file properties (size, dimensions), and other EXIF data to find exactly what you're looking for."
+                },
+                {
+                    "subtitle": "People & Location Filtering",
+                    "message": "Filter {postType.lower.plural} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
+                },
+                {
+                    "subtitle": "Smart Filter Presets & Dynamic Filtering",
+                    "message": "Save your favorite filter combinations as presets for quick access, and enable real-time filtering that updates results as users type or select options."
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

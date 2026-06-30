@@ -1,0 +1,11 @@
+{
+  "id": "carousel-portfolio",
+  "name": "Carousel Portfolio",
+  "description": "Auto-advancing carousel, scrub-pause on hover. Built for photographers who want motion on the homepage without video.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "order": 26,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

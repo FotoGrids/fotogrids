@@ -1,0 +1,311 @@
+@use "save-button" as *;
+@use "./colors.scss" as *;
+@use "./sizes.scss" as *;
+
+#fotogrids-items-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 10px;
+
+	.fotogrids-item-item {
+		position: relative;
+		aspect-ratio: 1;
+		border: 1px solid var(--fg-border-primary);
+		overflow: hidden;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
+
+		&:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+			.fotogrids-item-featured,
+			.fotogrids-item-controls {
+				opacity: 1;
+			}
+		}
+
+		&.fotogrids-item-hoverable {
+			cursor: move;
+		}
+
+		&[draggable="true"] {
+			cursor: grab;
+		}
+
+		&.fotogrids-dragging {
+			opacity: 0.7;
+			transform: rotate(2deg);
+			z-index: 1000;
+			cursor: grabbing;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+			cursor: pointer;
+		}
+
+		// Shown for video items whose poster could not be resolved (no custom
+		// poster, no WP poster, no oEmbed thumbnail).
+		.fotogrids-item-thumb-placeholder {
+			width: 100%;
+			height: 100%;
+			display: block;
+			background-color: #1d2327;
+			background-image: radial-gradient(
+				circle at center,
+				rgba(255, 255, 255, 0.08),
+				transparent 70%
+			);
+		}
+
+		// Play badge marking video items in the grid.
+		.fotogrids-item-video-badge {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 36px;
+			height: 36px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			background: rgba(0, 0, 0, 0.55);
+			color: #fff;
+			pointer-events: none;
+			z-index: 2;
+
+			.fotogrids-icon {
+				width: 18px;
+				height: 18px;
+				margin-left: 2px;
+			}
+
+			svg {
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
+	// While any item is being dragged, the cursor stays in "grabbing" mode
+	// across the whole grid so it looks consistent even when the pointer
+	// moves over gaps or the placeholder.
+	&.fotogrids-sortable--dragging {
+		cursor: grabbing;
+	}
+
+	.fotogrids-item-placeholder {
+		border: 2px dashed var(--fg-blue, #2271b1);
+		background-color: #f9f9f9;
+		opacity: 0.6;
+		border-radius: 4px;
+		min-height: 100px;
+		position: relative;
+
+		background-image: repeating-linear-gradient(
+			45deg,
+			transparent,
+			transparent 5px,
+			rgba(0, 0, 0, 0.1) 5px,
+			rgba(0, 0, 0, 0.1) 10px
+		);
+
+		* {
+			visibility: hidden;
+		}
+
+		&::after {
+			content: attr(data-drop-text);
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			color: #666;
+			font-size: 12px;
+			font-weight: 500;
+			visibility: visible;
+			z-index: 1;
+		}
+	}
+
+	.fotogrids-item-featured,
+	.fotogrids-item-controls {
+		position: absolute;
+		top: 2px;
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
+
+	.fotogrids-item-featured {
+		left: 2px;
+	}
+
+	// When this item is the gallery's featured item, surface the star at
+	// rest (no hover needed). The button stays clickable so the user can
+	// clear the featured choice - clicking sends `item_id: null` which
+	// hands the cover-resolver back the responsibility of picking one.
+	.fotogrids-item-featured.is-featured {
+		opacity: 1;
+
+		.fotogrids-item-featured-button {
+			background: rgba(0, 0, 0, 1);
+			color: var(--fg-yellow, #ffb914);
+		}
+	}
+
+	.fotogrids-item-controls {
+		right: 2px;
+		display: flex;
+		gap: 2px;
+	}
+
+	.fotogrids-edit-item,
+	.fotogrids-remove-item,
+	.fotogrids-item-featured-button {
+		background: rgba(0, 0, 0, 0.6);
+		color: white;
+		border: none;
+		width: 24px;
+		height: 24px;
+		cursor: pointer;
+		font-size: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background-color 0.2s ease;
+		padding: 0;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+
+		&:hover {
+			background: rgba(0, 0, 0, 0.9);
+		}
+	}
+
+	.fotogrids-icon {
+		width: 14px;
+		height: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		svg {
+			width: 100%;
+			height: 100%;
+			color: currentColor;
+		}
+	}
+
+	.fotogrids-item-title {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: rgba(0, 0, 0, 0.7);
+		color: white;
+		padding: 4px;
+		font-size: 11px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+}
+
+.fotogrids-noitems-add-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 12px;
+	margin-top: 12px;
+
+	@media (max-width: 900px) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media (max-width: 520px) {
+		grid-template-columns: 1fr;
+	}
+
+	.fotogrids-noitems-add-block {
+		border: 1px solid var(--fg-border-primary);
+		border-radius: 4px;
+		background: none;
+		transition: all 0.2s ease;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 120px;
+		padding: 8px;
+		text-align: center;
+		cursor: pointer;
+
+		&--upload {
+			cursor: default;
+
+			.fotogrids-upload-area-wrapper {
+				margin-bottom: 0;
+				width: 100%;
+			}
+
+			.fotogrids-upload-area {
+				border-radius: 2px;
+			}
+		}
+
+		&--action {
+			font-family: inherit;
+			color: var(--fg-text-primary);
+
+			&:hover {
+				border-color: var(--fg-blue);
+				background: rgba(60, 70, 240, 0.06);
+
+				.fotogrids-noitems-add-block__icon {
+					color: var(--fg-blue);
+					background: rgba(60, 70, 240, 0.1);
+				}
+			}
+
+			&:focus {
+				outline: none;
+				box-shadow: 0 0 0 2px rgba(60, 70, 240, 0.3);
+			}
+		}
+
+		&__icon {
+			width: 40px;
+			height: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 4px;
+			color: var(--fg-text-secondary);
+			margin-bottom: 10px;
+			transition: all 0.2s ease;
+
+			svg {
+				width: 24px;
+				height: 24px;
+			}
+		}
+
+		h4 {
+			font-size: 14px;
+			font-weight: 600;
+			margin: 0;
+			color: var(--fg-blue);
+		}
+
+		p {
+			font-size: 12px;
+			color: var(--fg-text-secondary);
+			opacity: 0.7;
+			margin: 0;
+		}
+	}
+}

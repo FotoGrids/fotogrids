@@ -1,0 +1,432 @@
+/**
+ * Shared styles for every page-builder host.
+ *
+ * Scoped under the `.fg-pb-*` class prefix. No global selectors. Keeps the
+ * picker / preview / inspector visually consistent across Gutenberg,
+ * Elementor, Divi, and Bricks while staying out of the host's way.
+ *
+ * Imported by each builder's editor bundle (currently only Gutenberg).
+ */
+
+/* Picker modal.
+ *
+ * The picker uses the standard Modal compound layout:
+ *   Modal.Header       - title + close
+ *   Modal.SubHeader    - search + sort (this `.fg-pb-picker__toolbar`)
+ *   Modal.Body         - scrolling list (this `.fg-pb-picker__list`)
+ *   Modal.Footer       - cancel + create-new
+ *
+ * Modal owns the modal height (`size="lg"` → 90vh), the body's overflow,
+ * and the header/sub-header/footer dividers. The rules below only style
+ * picker-specific inner content; the chrome (padding, borders, modal
+ * sizing) belongs to Modal.
+ */
+
+.fg-pb-picker {
+    &__toolbar {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+
+        .components-search-control {
+            flex: 1;
+        }
+
+        .components-select-control {
+            min-width: 180px;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    &__empty {
+        text-align: center;
+        padding: 48px 24px;
+        color: #757575;
+
+        .components-button {
+            margin-top: 16px;
+        }
+    }
+
+    &__error {
+        color: var(--fg-red);
+        padding: 16px 24px;
+        text-align: center;
+
+        .components-button {
+            margin-left: 12px;
+        }
+    }
+
+    &__loading {
+        text-align: center;
+        padding: 24px;
+    }
+
+    &__sentinel {
+        height: 1px;
+    }
+}
+
+.fg-pb-picker-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--fg-background-primary);
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+
+    &:hover,
+    &.is-highlighted {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+        border-color: var(--fg-blue);
+    }
+
+    &.is-selected {
+        border-color: var(--fg-blue);
+        box-shadow: 0 0 0 2px var(--fg-blue);
+    }
+
+    &.is-disabled {
+        cursor: not-allowed;
+        opacity: .65;
+
+        &:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #ddd;
+        }
+    }
+
+    &__thumb {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        background: #f0f0f0;
+        overflow: hidden;
+        border: 4px solid var(--fg-background-primary);
+        box-shadow: 0 1px 0 0 var(--fg-border-light);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        &-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 1px;
+
+            .fotogrids-icon {
+                width: 32px;
+                height: 32px;
+
+                svg {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+        }
+    }
+
+    &__badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #1d2327;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        padding: 3px 7px;
+        border-radius: 2px;
+    }
+
+    &__body {
+        padding: 16px;
+        flex: 1;
+    }
+
+    &__title {
+        margin: 0 0 4px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: #1d2327;
+    }
+
+    &__meta {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        font-size: 12px;
+        color: #757575;
+    }
+
+    &.is-empty &__count {
+        color: var(--fg-red);
+    }
+
+    &__date-label {
+        color: #999;
+    }
+
+    &__status {
+        position: absolute;
+        inset-block-start: 10px;
+        inset-inline-end: 10px;
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        background: #000;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 2px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    &__action {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, .2);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: inherit;
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity .15s ease;
+        pointer-events: none;
+        z-index: 2;
+
+        .fg-button:disabled {
+            background: var(--fg-green);
+            color: var(--fg-button-primary-text);
+            border-color: var(--fg-green);
+            opacity: 1;
+        }
+    }
+
+    &:hover &__action {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    &.is-disabled &__action {
+        display: none;
+    }
+}
+
+.fg-pb-block-placeholder {
+    position: relative;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 0;
+
+    &__chrome {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 24px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, .82) 0%, rgba(255, 255, 255, .96) 100%);
+        text-align: center;
+    }
+
+    &__label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1d2327;
+        letter-spacing: .3px;
+    }
+
+    &__instructions {
+        font-size: 13px;
+        color: #50575e;
+        max-width: 420px;
+        margin: 0;
+    }
+
+    &__actions {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+.fg-pb-skeleton {
+    padding: 16px;
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    &__tile {
+        aspect-ratio: 1 / 1;
+        background: #ddd;
+        border-radius: 4px;
+    }
+
+    &--album &__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    &--album &__tile {
+        aspect-ratio: 1 / 1;
+    }
+}
+
+/* Live preview */
+
+.fg-pb-live-preview {
+    position: relative;
+}
+
+.fg-pb-live-preview__loading,
+.fg-pb-live-preview__error {
+    padding: 16px;
+    text-align: center;
+    background: #f0f0f0;
+    border-radius: 4px;
+    color: #757575;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.fg-pb-live-preview__error {
+    background: #fcf0f1;
+    color: #cc1818;
+}
+
+/*
+ * The toolbar dropdown popover keeps a small amount of internal
+ * padding so the toggle controls don't crash into the popover edges.
+ */
+.fg-pb-preview-options-toolbar {
+    padding: 12px 16px;
+    min-width: 280px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &__heading {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: #757575;
+        margin-bottom: 4px;
+    }
+
+    /* WP's ToggleControl reserves a slim help row; widen it a touch
+       so two-line explanations look intentional rather than cramped. */
+    .components-base-control__help {
+        font-size: 12px;
+        line-height: 1.4;
+        opacity: 0.6;
+    }
+}
+
+/* Inspector */
+
+.fg-pb-inspector-summary {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    &__thumb {
+        flex: 0 0 64px;
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: 4px;
+        background: #f0f0f0;
+    }
+
+    &__text {
+        flex: 1;
+        min-width: 0;
+
+        strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+    }
+
+    &__meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 12px;
+        color: #757575;
+    }
+}
+
+.fg-pb-inspector-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.fg-pb-inspector-settings {
+    border-top: 1px solid #ddd;
+    margin-top: 12px;
+    padding-top: 12px;
+
+    &__list {
+        list-style: none;
+        margin: 8px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__label {
+        font-weight: 600;
+        color: #1d2327;
+        margin-right: 8px;
+    }
+
+    &__value {
+        color: #757575;
+    }
+}

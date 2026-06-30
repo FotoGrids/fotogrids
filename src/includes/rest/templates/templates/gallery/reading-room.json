@@ -1,0 +1,19 @@
+{
+  "id": "reading-room",
+  "name": "Reading Room",
+  "description": "A focused viewer that shows the title and details beside each image. Built for editorial sets and storytelling.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "order": 22,
+  "isUserTemplate": false,
+  "thumbnail": "",
+  "settings": {
+    "layout": "image-viewer",
+    "captions": true,
+    "caption_title_source": "title",
+    "caption_description_source": "description",
+    "layout_height_mode": "auto",
+    "item_click_behavior": "lightbox"
+  }
+}

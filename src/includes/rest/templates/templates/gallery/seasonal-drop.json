@@ -1,0 +1,11 @@
+{
+  "id": "seasonal-drop",
+  "name": "Seasonal Drop",
+  "description": "Campaign-ready hero slider plus a filter grid below. Rebuild Black Friday or any product launch in one click instead of from scratch.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "order": 45,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

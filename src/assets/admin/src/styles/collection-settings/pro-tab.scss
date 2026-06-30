@@ -1,0 +1,136 @@
+.fotogrids-pro-tab {
+	&--content {
+		text-align: center;
+		border-radius: 8px;
+		overflow: hidden;
+		background: var(--fg-background-secondary);
+	}
+
+	&--header {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 32px;
+		background: var(--fg-yellow);
+		position: relative;
+		border-radius: 8px;
+
+		&--icon {
+			width: 24px;
+			height: 24px;
+			color: var(--fg-text-primary);
+		}
+
+		h3 {
+			margin: 0 !important;
+			font-size: 20px;
+			font-weight: 600;
+			color: var(--fg-text-primary);
+		}
+
+		.fotogrids-pro-badge-large {
+			background: white;
+			color: var(--fg-yellow);
+			border-radius: 4px;
+			margin-inline-start: 8px;
+		}
+	}
+
+	&--features {
+		text-align: left;
+		padding: 36px 24px;
+
+		h4 {
+			margin: 0 auto 36px;
+			font-size: 16px;
+			font-weight: 600;
+			color: var(--fg-text-primary);
+			text-align: center;
+			max-width: 88%;
+		}
+
+		ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 16px;
+
+			@media (max-width: 1024px) {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			@media (max-width: 768px) {
+				grid-template-columns: 1fr;
+
+				.fotogrids-pro-tab--feature {
+					max-width: 100%;
+				}
+			}
+		}
+	}
+
+	&--feature {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 28px 16px 12px;
+		border: 1px solid var(--fg-border-primary);
+		border-radius: 8px;
+		margin: 0;
+		position: relative;
+		background: var(--fg-background-card);
+
+		&--icon {
+			font-size: 0;
+			line-height: 0;
+			position: absolute;
+			width: 24px;
+			top: -16px;
+			inset-inline-start: 12px;
+			border-radius: 50%;
+			border: 4px solid var(--fg-background-secondary);
+			box-shadow: 0 1px 0 0 var(--fg-border-primary);
+			background: var(--fg-background-card);
+			color: var(--fg-green);
+
+			.fotogrids-icon svg {
+				width: 24px;
+				height: 24px;
+			}
+		}
+
+		&--content {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		&--title {
+			margin: 0;
+			font-size: 15px;
+			font-weight: 600;
+			color: var(--fg-text-primary);
+			line-height: 17px;
+			height: 34px;
+		}
+
+		&--description {
+			margin: 0;
+			font-size: 13px;
+			color: var(--fg-text-secondary);
+			line-height: 1.5;
+		}
+	}
+
+	&--cta {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding-bottom: 36px;
+	}
+}

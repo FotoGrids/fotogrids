@@ -1,0 +1,391 @@
+{
+    "id": "effects",
+    "label": "Effects",
+    "icon": "magic",
+    "settings": [
+        {
+            "key": "effects_section",
+            "type": "setting_subtabs",
+            "subTabs": {
+                "loading_effects": {
+                    "id": "loading_effects",
+                    "label": "Loading Effects",
+                    "icon": "loading",
+                    "settings": [
+                        {
+                            "key": "loading_icon",
+                            "type": "button_group",
+                            "label": "Loading Icon",
+                            "options": [
+                                {
+                                    "value": "fotogrids",
+                                    "icon": "loading_icon_fotogrids",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bars-rotate-fade",
+                                    "icon": "loading_icon_bars-rotate-fade",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "spinner",
+                                    "icon": "loading_icon_spinner",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "8-dots",
+                                    "icon": "loading_icon_8-dots",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "spinning-circles",
+                                    "icon": "loading_icon_spinning-circles",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "12-dots",
+                                    "icon": "loading_icon_12-dots",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "6-dots-scale",
+                                    "icon": "loading_icon_6-dots-scale",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "6-dots-rotate",
+                                    "icon": "loading_icon_6-dots-rotate",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "ball-triangle",
+                                    "icon": "loading_icon_ball-triangle",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "gooey-balls",
+                                    "icon": "loading_icon_gooey-balls",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bouncing-ball",
+                                    "icon": "loading_icon_bouncing-ball",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "pulse",
+                                    "icon": "loading_icon_pulse",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "puff",
+                                    "icon": "loading_icon_puff",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "dot-revolve",
+                                    "icon": "loading_icon_dot-revolve",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "90-ring",
+                                    "icon": "loading_icon_90-ring",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "180-ring-with-bg",
+                                    "icon": "loading_icon_180-ring-with-bg",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "180-ring",
+                                    "icon": "loading_icon_180-ring",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "ring-resize",
+                                    "icon": "loading_icon_ring-resize",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "wifi",
+                                    "icon": "loading_icon_wifi",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "jump",
+                                    "icon": "loading_icon_jump",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "3-dots-rotate",
+                                    "icon": "loading_icon_3-dots-rotate",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "3-dots-bounce",
+                                    "icon": "loading_icon_3-dots-bounce",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "3-dots-fade",
+                                    "icon": "loading_icon_3-dots-fade",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "3-dots-move",
+                                    "icon": "loading_icon_3-dots-move",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "3-dots-scale",
+                                    "icon": "loading_icon_3-dots-scale",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "4-dots-swing",
+                                    "icon": "loading_icon_4-dots-swing",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "grid",
+                                    "icon": "loading_icon_grid",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "blocks-shuffle-5",
+                                    "icon": "loading_icon_blocks-shuffle-5",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "blocks-shuffle-4",
+                                    "icon": "loading_icon_blocks-shuffle-4",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "blocks-shuffle-3",
+                                    "icon": "loading_icon_blocks-shuffle-3",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "blocks-shuffle-2",
+                                    "icon": "loading_icon_blocks-shuffle-2",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "blocks-scale",
+                                    "icon": "loading_icon_blocks-scale",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "blocks-wave",
+                                    "icon": "loading_icon_blocks-wave",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "square",
+                                    "icon": "loading_icon_square",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "square-loader",
+                                    "icon": "loading_icon_square-loader",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bars-fade",
+                                    "icon": "loading_icon_bars-fade",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bars-scale-fade",
+                                    "icon": "loading_icon_bars-scale-fade",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bars-scale",
+                                    "icon": "loading_icon_bars-scale",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "bars",
+                                    "icon": "loading_icon_bars",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "12-dots",
+                            "bigIcons": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "loading_icon_color",
+                            "type": "color",
+                            "label": "Loading Icon Color",
+                            "default": "",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "loaded_effect",
+                            "type": "button_group",
+                            "label": "Loaded Effect",
+                            "options": [
+                                {
+                                    "label": "None",
+                                    "value": "none",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Fade",
+                                    "value": "fade",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Rise",
+                                    "value": "rise",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Drop",
+                                    "value": "drop",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Zoom",
+                                    "value": "zoom",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Blur",
+                                    "value": "blur",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "fade",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "hover_effects": {
+                    "id": "hover_effects",
+                    "label": "Hover Effects",
+                    "icon": "hover",
+                    "condition": {
+                        "dependsOn": "layout",
+                        "values": [
+                            "instant-photos"
+                        ],
+                        "condition_operator": "not_in"
+                    },
+                    "settings": [
+                        {
+                            "key": "hover_cursor_icon",
+                            "type": "button_group",
+                            "label": "Cursor Style",
+                            "options": [
+                                {
+                                    "label": "Default",
+                                    "value": "default",
+                                    "icon": "cursor_default",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Pointer",
+                                    "value": "pointer",
+                                    "icon": "cursor_pointer",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Alias",
+                                    "value": "alias",
+                                    "icon": "cursor_alias",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Zoom In",
+                                    "value": "zoom-in",
+                                    "icon": "zoom",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Crosshair",
+                                    "value": "crosshair",
+                                    "icon": "cursor_crosshair",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "pointer",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "hover_effect_info",
+                            "type": "info_block",
+                            "subtitle": "Hover effects and your styling",
+                            "message": "Some hover effects animate the image, border, or shadow on hover. When an effect controls one of these, it takes over that property on hover - so a Hover Image Filter, Border, or Shadow you set under Styling may not apply while that effect is active.",
+                            "icon": "bulb",
+                            "full_width": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "hover_effect",
+                            "type": "hover_effects_grid",
+                            "label": "Hover Effect",
+                            "default": "none",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "hover_affect_others",
+                            "type": "button_group",
+                            "label": "Other Items on Hover",
+                            "help": "When one item is hovered, apply a subtle effect to the rest of the gallery to make the hovered item stand out.",
+                            "options": [
+                                {
+                                    "label": "None",
+                                    "value": "none",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Fade",
+                                    "value": "fade",
+                                    "tier_required": "pro_starter"
+                                },
+                                {
+                                    "label": "Blur",
+                                    "value": "blur",
+                                    "tier_required": "pro_starter"
+                                }
+                            ],
+                            "default": "none",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

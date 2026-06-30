@@ -1,0 +1,141 @@
+{
+    "id": "performance",
+    "label": "Performance",
+    "icon": "speed",
+    "settings": [
+        {
+            "key": "lazy_loading_group",
+            "type": "setting_group",
+            "label": "Lazy Loading",
+            "postTypes": [
+                "gallery"
+            ],
+            "settings": [
+                {
+                    "key": "lazy_load",
+                    "type": "toggle",
+                    "label": "Enable Lazy Loading",
+                    "description": "Load images only when they enter the viewport. Improves initial page load time.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "lightbox_preload_slides",
+                    "type": "range",
+                    "label": "Lightbox Slide Preload",
+                    "description": "How many slides ahead and behind the current item to preload in the background. Higher values feel faster but use more memory.",
+                    "min": 0,
+                    "max": 5,
+                    "default": 2,
+                    "condition": {
+                        "dependsOn": "item_click_behavior",
+                        "values": [
+                            "lightbox"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "caching_group",
+            "type": "setting_group",
+            "label": "Caching",
+            "settings": [
+                {
+                    "key": "enable_cache",
+                    "type": "toggle",
+                    "label": "Enable {postType} Cache",
+                    "description": "Cache rendered {postType.lower} HTML to improve performance on subsequent loads.",
+                    "default": false,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "cache_duration",
+                    "type": "range",
+                    "label": "Cache Duration",
+                    "description": "How long to cache {postType.lower} output (in hours).",
+                    "unit": "hours",
+                    "min": 1,
+                    "max": 168,
+                    "default": 24,
+                    "condition": {
+                        "dependsOn": "enable_cache",
+                        "values": [
+                            true,
+                            "1"
+                        ]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "cache_status",
+                    "type": "cache_status",
+                    "label": "Cache Status",
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true,
+                    "condition": {
+                        "dependsOn": "enable_cache",
+                        "values": [true, "1"]
+                    }
+                },
+                {
+                    "key": "cache_scope_info",
+                    "type": "info_block",
+                    "subtitle": "Caching applies to regular visitors only.",
+                    "message": "FotoGrids editors and preview mode always see live, uncached output. Regular logged-in users are served from cache.",
+                    "full_width": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true,
+                    "condition": {
+                        "dependsOn": "enable_cache",
+                        "values": [true, "1"]
+                    }
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "cdn_promotion",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "Accelerate your {postType.plural.lower} with lightning-fast CDN delivery.",
+                    "message": "Serve images and assets from a global network of servers for maximum performance and reduced load times worldwide."
+                },
+                {
+                    "subtitle": "Built-in Image Optimizer for peak performance.",
+                    "message": "Automatically optimize all your gallery images for faster loading, smaller file sizes, and better user experience without any manual work."
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

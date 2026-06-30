@@ -1,0 +1,18 @@
+// Stacked modals get incrementally higher z-indexes so they layer correctly
+// over each other. Depth is tracked by useModalStack and written as a
+// modifier class on the root.
+.fg-modal--stack-1 {
+	--fg-modal-z: 100010;
+}
+.fg-modal--stack-2 {
+	--fg-modal-z: 100020;
+}
+.fg-modal--stack-3 {
+	--fg-modal-z: 100030;
+}
+.fg-modal--stack-4 {
+	--fg-modal-z: 100040;
+}
+.fg-modal--stack-5 {
+	--fg-modal-z: 100050;
+}

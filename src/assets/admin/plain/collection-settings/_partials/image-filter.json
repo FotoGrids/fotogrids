@@ -1,0 +1,149 @@
+{
+	"partial": "image-filter",
+	"layout": [
+		"grayscale",
+		"sepia",
+		"blur",
+		"brightness",
+		"contrast",
+		"saturate",
+		"invert",
+		"opacity",
+		"hue_rotate"
+	],
+	"field_defaults": {
+		"type": "responsive_range",
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"grayscale": {
+			"label": "Grayscale Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 100, "default": 50 },
+				"tablet": { "min": 0, "max": 100, "default": 50 },
+				"mobile": { "min": 0, "max": 100, "default": 50 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["grayscale"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"sepia": {
+			"label": "Sepia Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 100, "default": 50 },
+				"tablet": { "min": 0, "max": 100, "default": 50 },
+				"mobile": { "min": 0, "max": 100, "default": 50 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["sepia"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"blur": {
+			"label": "Blur Amount",
+			"unit": "px",
+			"responsive": {
+				"desktop": { "min": 0, "max": 20, "default": 5 },
+				"tablet": { "min": 0, "max": 20, "default": 5 },
+				"mobile": { "min": 0, "max": 20, "default": 5 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["blur"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"brightness": {
+			"label": "Brightness Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 200, "default": 100 },
+				"tablet": { "min": 0, "max": 200, "default": 100 },
+				"mobile": { "min": 0, "max": 200, "default": 100 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["brightness"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"contrast": {
+			"label": "Contrast Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 200, "default": 100 },
+				"tablet": { "min": 0, "max": 200, "default": 100 },
+				"mobile": { "min": 0, "max": 200, "default": 100 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["contrast"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"saturate": {
+			"label": "Saturation Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 200, "default": 100 },
+				"tablet": { "min": 0, "max": 200, "default": 100 },
+				"mobile": { "min": 0, "max": 200, "default": 100 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["saturate"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"invert": {
+			"label": "Invert Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 100, "default": 100 },
+				"tablet": { "min": 0, "max": 100, "default": 100 },
+				"mobile": { "min": 0, "max": 100, "default": 100 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["invert"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"opacity": {
+			"label": "Opacity Amount",
+			"unit": "%",
+			"responsive": {
+				"desktop": { "min": 0, "max": 100, "default": 100 },
+				"tablet": { "min": 0, "max": 100, "default": 100 },
+				"mobile": { "min": 0, "max": 100, "default": 100 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["opacity"],
+				"condition_operator": "array_includes"
+			}
+		},
+		"hue_rotate": {
+			"label": "Hue Rotation",
+			"unit": "deg",
+			"responsive": {
+				"desktop": { "min": 0, "max": 360, "default": 0 },
+				"tablet": { "min": 0, "max": 360, "default": 0 },
+				"mobile": { "min": 0, "max": 360, "default": 0 }
+			},
+			"condition": {
+				"dependsOn": "{{filter_type_key}}",
+				"values": ["hue-rotate"],
+				"condition_operator": "array_includes"
+			}
+		}
+	}
+}

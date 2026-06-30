@@ -1,0 +1,11 @@
+{
+  "id": "commercial-portfolio",
+  "name": "Commercial Portfolio",
+  "description": "Full-bleed hero slider plus a justified gallery below. Watermark and right-click protection on. Shows the work, guards the originals.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "portfolio",
+  "order": 25,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

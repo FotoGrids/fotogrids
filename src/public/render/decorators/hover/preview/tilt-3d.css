@@ -1,0 +1,19 @@
+/* A bold 3D lean toward the viewer with a tighter perspective for stronger
+   depth. The shadow hugs the media (not the whole item incl. caption block). */
+
+.fotogrids-collection[data-fg-hover='tilt-3d'] .fg-item {
+	transition: transform 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='tilt-3d'] .fg-item-media {
+	transition: box-shadow 0.3s ease;
+}
+
+.fotogrids-collection[data-fg-hover='tilt-3d'] .fg-item:hover {
+	transform: perspective(500px) rotateX(12deg) rotateY(-14deg)
+		translateZ(24px);
+}
+
+.fotogrids-collection[data-fg-hover='tilt-3d'] .fg-item:hover .fg-item-media {
+	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+}

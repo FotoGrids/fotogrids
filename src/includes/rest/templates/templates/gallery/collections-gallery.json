@@ -1,0 +1,11 @@
+{
+  "id": "collections-gallery",
+  "name": "Collections Gallery",
+  "description": "Filter-enabled masonry grid organised by product collection, with CTA overlays and analytics tracking per image.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "order": 47,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

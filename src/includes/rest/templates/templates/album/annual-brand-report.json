@@ -1,0 +1,11 @@
+{
+  "id": "annual-brand-report",
+  "name": "Annual Brand Report",
+  "description": "One album per year of the company story, with case studies, event recaps, and campaign highlights inside. The brand archive that grows every year.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "editorial",
+  "order": 23,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

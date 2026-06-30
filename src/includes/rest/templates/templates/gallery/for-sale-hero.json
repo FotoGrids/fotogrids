@@ -1,0 +1,27 @@
+{
+  "id": "for-sale-hero",
+  "name": "For-Sale Hero",
+  "description": "Full-bleed hero slider per listing with caption block for price, beds, and a 'Book a Viewing' CTA placeholder.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 15,
+  "settings": {
+    "layout": "slider",
+    "columns": {
+      "desktop": 1,
+      "tablet": 1,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 0,
+      "tablet": 0,
+      "mobile": 0
+    },
+    "captions": true,
+    "layout_autoplay": false,
+    "item_click_behavior": "lightbox"
+  }
+}

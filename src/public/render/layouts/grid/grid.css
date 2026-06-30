@@ -1,0 +1,20 @@
+[data-fg-layout="grid"] .fg-grid-track {
+    display: grid;
+    gap: var(--fg-gap);
+    align-items: stretch;
+}
+
+[data-fg-layout="grid"][data-fg-columns-mode="fixed"] .fg-grid-track {
+    grid-template-columns: repeat(var(--fg-cols), minmax(0, 1fr));
+}
+
+[data-fg-layout="grid"][data-fg-columns-mode="auto"] .fg-grid-track {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(var(--fg-col-min), 100%), 1fr)
+    );
+}
+
+[data-fg-layout="grid"] .fg-item {
+    min-width: 0;
+}

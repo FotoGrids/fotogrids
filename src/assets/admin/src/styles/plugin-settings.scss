@@ -1,0 +1,174 @@
+// Maintenance tab - inline feedback row shown under a destructive action and
+// the helper note rendered below the Debug Log channel list.
+.fotogrids-maintenance__feedback {
+	margin: 0.5rem 0 1.25rem;
+	padding: 0.75rem 1rem;
+	border-radius: 4px;
+	font-size: 0.875rem;
+	line-height: 1.4;
+	border: 1px solid transparent;
+
+	&--success {
+		background: #f0f9f0;
+		border-color: #c2e4c2;
+		color: #1e4620;
+	}
+
+	&--error {
+		background: #fef0f0;
+		border-color: #f0c2c2;
+		color: #4d1e1e;
+	}
+}
+
+.fotogrids-maintenance__note {
+	margin: 0.75rem 0 0;
+	padding-top: 0.75rem;
+	border-top: 1px solid #e5e7eb;
+	color: #50575e;
+	font-size: 0.8125rem;
+	line-height: 1.5;
+}
+
+.fotogrids-plugin-settings {
+	.permissions-info,
+	.integrations-info {
+		margin-bottom: 1.5rem;
+		padding: 1rem;
+		background: #f6f7f7;
+		border-radius: 4px;
+
+		p {
+			margin: 0;
+			color: #1e1e1e;
+		}
+	}
+
+	.permission-setting {
+		margin-bottom: 2rem;
+
+		h4 {
+			margin-bottom: 0.75rem;
+			font-size: 1rem;
+			font-weight: 600;
+		}
+
+		.role-checkboxes {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			label {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-weight: 500;
+
+				input[type="checkbox"] {
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	.fotogrids-gallery-settings {
+		border: 1px solid var(--fg-border-primary);
+	}
+
+	.settings-actions {
+		margin-top: 2rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid #f0f0f1;
+	}
+}
+
+// DimensionsField - Width × Height pair.
+.fotogrids-dimensions-field {
+	display: flex;
+	align-items: flex-end;
+	gap: 12px;
+	flex-wrap: wrap;
+
+	&__item {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	&__label {
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--fg-text-secondary);
+	}
+
+	&__times {
+		color: var(--fg-text-tertiary);
+		font-size: 16px;
+		line-height: 38px;
+	}
+}
+
+// BreakpointPreview.
+.fotogrids-breakpoint-preview {
+	display: inline-flex;
+	align-items: flex-end;
+	gap: 8px;
+	background: var(--fg-background-secondary);
+	border: 1px solid var(--fg-border-primary);
+	border-radius: 10px;
+	padding: 16px;
+
+	&__device {
+		background: var(--fg-background-primary);
+		border: 1px solid var(--fg-border-secondary);
+		border-radius: 6px;
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: flex-end;
+		gap: 12px;
+		padding: 8px 8px 12px;
+		flex-shrink: 0;
+
+		&--mobile {
+			width: 60px;
+			height: 90px;
+		}
+		&--tablet {
+			width: 95px;
+			height: 120px;
+		}
+		&--desktop {
+			width: 170px;
+			height: 140px;
+		}
+	}
+
+	&__screen {
+		width: 100%;
+		flex: 1;
+		background: var(--fg-interactive-selected-bg);
+		border-radius: 3px;
+	}
+
+	&__device-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 2px;
+	}
+
+	&__label {
+		font-size: 11px;
+		line-height: 1.2;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
+
+	&__range {
+		font-size: 10px;
+		line-height: 1;
+		color: var(--fg-text-tertiary);
+	}
+}

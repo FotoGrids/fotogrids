@@ -1,0 +1,265 @@
+@use "sizes.scss" as *;
+@use "colors.scss" as *;
+
+#fotogrids_gallery_albums {
+	.inside {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.fotogrids-album-assignment {
+	padding: 0;
+
+	.fotogrids-assigned-summary {
+		margin-bottom: ui-size(margin, md);
+		padding: ui-size(padding, base) ui-size(padding, md);
+		background-color: rgba($fotogrids-colors-blue, 0.1);
+		display: flex;
+		flex-direction: column;
+		gap: ui-size(spacing, base);
+
+		p {
+			margin: 0 ui-size(padding, xs);
+		}
+
+		.fotogrids-assigned-list {
+			display: flex;
+			flex-direction: column;
+			gap: ui-size(spacing, sm);
+			padding-bottom: ui-size(spacing, sm);
+		}
+
+		.fotogrids-assigned-album {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: ui-size(padding, base);
+			background: white;
+			border: ui-size(border-width, base) solid
+				rgba($fotogrids-colors-blue, 0.5);
+			border-radius: ui-size(border-radius, sm);
+			font-size: ui-size(font-size, sm);
+
+			.fotogrids-assigned-album-thumb-wrap {
+				width: ui-size(height, 2xl);
+				height: ui-size(height, 2xl);
+				flex-shrink: 0;
+			}
+
+			.fotogrids-assigned-album-thumb {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: ui-size(border-radius, sm);
+				background: ui-color(background, tertiary);
+			}
+
+			.fotogrids-assigned-album-details {
+				flex: 1;
+				min-width: 0;
+
+				.fotogrids-assigned-album-title {
+					font-weight: 500;
+					color: ui-color(text, primary);
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				.fotogrids-assigned-album-meta {
+					font-size: ui-size(font-size, xs);
+					color: ui-color(text, secondary);
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+			}
+		}
+	}
+
+	.fotogrids-album-search {
+		margin: 0 ui-size(margin, md) ui-size(margin, md);
+		color: ui-color(text, primary);
+
+		.fotogrids-search-input-wrapper {
+			position: relative;
+			width: 100%;
+		}
+
+		.fotogrids-search-icon {
+			position: absolute;
+			inset-inline-start: calc(ui-size(padding, base) * 1.25);
+			top: 50%;
+			transform: translateY(-50%);
+			width: ui-size(width, base);
+			height: ui-size(height, base);
+			pointer-events: none;
+			z-index: 1;
+
+			svg {
+				width: 100%;
+				height: 100%;
+			}
+		}
+
+		.fotogrids-search-input {
+			width: 100%;
+			height: 40px;
+			padding: 0 ui-size(padding, base);
+			padding-inline-start: ui-size(padding, 3xl);
+			margin: 0;
+			border: ui-size(border-width, base) solid ui-color(border, primary);
+			border-radius: ui-size(border-radius, sm);
+			font-size: ui-size(font-size, base);
+			color: inherit;
+
+			&:focus {
+				border-color: ui-color(border, focus);
+				box-shadow: 0 0 0 1px ui-color(border, focus);
+				outline: none;
+			}
+		}
+	}
+
+	.fotogrids-album-list {
+		max-height: ui-size(height, textarea-lg);
+		overflow-y: auto;
+		border: ui-size(border-width, base) solid ui-color(border, primary);
+		border-radius: ui-size(border-radius, sm);
+		margin: 0 ui-size(margin, md) ui-size(margin, md);
+
+		.fotogrids-no-albums {
+			padding: ui-size(padding, xl);
+			text-align: center;
+			color: ui-color(text, secondary);
+			margin: 0;
+		}
+
+		.fotogrids-albums {
+			.fotogrids-album-item {
+				border-bottom: ui-size(border-width, base) solid
+					ui-color(border, light);
+				display: flex;
+				align-items: center;
+				padding: ui-size(padding, md);
+				transition: ui-size(transition, colors);
+				gap: ui-size(spacing, md);
+
+				&:last-child {
+					border-bottom: none;
+				}
+
+				&.available:hover {
+					background-color: #f0fff0;
+				}
+
+				.fotogrids-album-thumb-wrap {
+					width: ui-size(height, lg);
+					height: ui-size(height, lg);
+					flex-shrink: 0;
+				}
+
+				.fotogrids-album-thumb {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+					border-radius: ui-size(border-radius, sm);
+					background: ui-color(background, tertiary);
+				}
+
+				.fotogrids-album-details {
+					flex: 1;
+					min-width: 0;
+
+					.fotogrids-album-title {
+						font-weight: 500;
+						color: ui-color(text, primary);
+						margin-bottom: ui-size(margin, xs);
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+
+					.fotogrids-album-meta {
+						font-size: ui-size(font-size, xs);
+						color: ui-color(text, secondary);
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
+			}
+		}
+	}
+
+	.fotogrids-create-album {
+		text-align: center;
+		margin: 0 ui-size(margin, md) ui-size(margin, md);
+
+		.fg-button {
+			width: 100%;
+		}
+	}
+
+	.fotogrids-saving,
+	.fotogrids-loading {
+		display: flex;
+		align-items: center;
+		gap: ui-size(spacing, base);
+		padding: ui-size(padding, md);
+		background-color: ui-color(background, secondary);
+		border: ui-size(border-width, base) solid ui-color(border, primary);
+		border-radius: ui-size(border-radius, sm);
+		font-size: ui-size(font-size, base);
+		color: ui-color(text, secondary);
+
+		.spinner {
+			float: none;
+			margin: 0;
+		}
+	}
+
+	.notice {
+		margin: ui-size(margin, md) 0;
+		padding: ui-size(padding, base) ui-size(padding, md);
+
+		&.notice-success {
+			border-left-color: ui-color(border, success);
+		}
+
+		&.notice-error {
+			border-left-color: ui-color(border, error);
+		}
+
+		p {
+			margin: 0;
+			font-size: ui-size(font-size, base);
+		}
+	}
+}
+
+.fotogrids-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: ui-size(padding, xl);
+	color: ui-color(text, secondary);
+
+	.spinner {
+		float: none;
+		margin-right: ui-size(margin, base);
+	}
+}
+
+.fotogrids-error {
+	padding: ui-size(padding, lg);
+	background-color: ui-color(background, error-light);
+	border: ui-size(border-width, base) solid ui-color(border, error);
+	border-radius: ui-size(border-radius, sm);
+	color: ui-color(text, error);
+
+	p {
+		margin: 0;
+	}
+}

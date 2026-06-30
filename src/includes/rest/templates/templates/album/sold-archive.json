@@ -1,0 +1,11 @@
+{
+  "id": "sold-archive",
+  "name": "Sold Archive",
+  "description": "One album per sold property, auto-expiring after a set period. Keeps the site clean without manual cleanup.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "real-estate",
+  "order": 20,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

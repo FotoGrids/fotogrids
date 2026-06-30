@@ -1,0 +1,26 @@
+/**
+ * FotoGrids error message styles.
+ *
+ * Always-on stylesheet (enqueued by Public_Render::enqueue_frontend_scripts)
+ * because error markup can be emitted before the render pipeline runs - e.g.
+ * "gallery not found", "not published", "no items". Those short-circuit before
+ * any layout module runs, so collection-base.css is never enqueued for them.
+ *
+ * Pipeline-produced errors (class-render-result.php) also use this class but
+ * would already have collection-base.css enqueued; styling them here keeps
+ * both paths consistent.
+ *
+ * Note: error strings leak gallery state, so they only render for users who
+ * can edit posts (see Render_Context::_show_render_errors).
+ */
+
+.fotogrids-error {
+    background: #ffebe8;
+    border: 1px solid #d63638;
+    border-radius: 4px;
+    color: #d63638;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-size: 14px;
+    font-weight: 500;
+}

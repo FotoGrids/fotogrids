@@ -1,0 +1,21 @@
+/* Gently blurred at rest, sharp on hover. Composes with the image-filter
+   setting via the shared --fg-hover-filter chain; applies standalone otherwise. */
+
+.fotogrids-collection[data-fg-hover='blur-focus'] {
+	--fg-hover-filter: blur(3px);
+	--fg-hover-filter-hover: blur(0);
+}
+
+.fotogrids-collection[data-fg-hover='blur-focus']:not([data-fg-filter])
+	.fg-item-media
+	img {
+	filter: blur(3px);
+	transition: filter var(--fg-hover-duration) var(--fg-hover-ease);
+}
+
+.fotogrids-collection[data-fg-hover='blur-focus']:not([data-fg-filter])
+	.fg-item:hover
+	.fg-item-media
+	img {
+	filter: blur(0);
+}

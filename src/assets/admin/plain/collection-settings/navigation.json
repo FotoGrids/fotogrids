@@ -1,0 +1,201 @@
+{
+    "id": "navigation",
+    "label": "Navigation",
+    "icon": "transition_horizontal",
+    "postTypes": [
+        "album"
+    ],
+    "settings": [
+        {
+            "key": "navigation_ajax_group",
+            "type": "setting_group",
+            "label": "AJAX Navigation",
+            "settings": [
+                {
+                    "key": "use_ajax_from_album",
+                    "type": "toggle",
+                    "label": "Smooth Album to Gallery Transitions",
+                    "description": "When enabled, opening a Gallery from an Album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "navigation_breadcrumbs_group",
+            "type": "setting_group",
+            "label": "Breadcrumbs",
+            "settings": [
+                {
+                    "key": "navigation_show_breadcrumbs",
+                    "type": "toggle",
+                    "label": "Show Breadcrumbs",
+                    "description": "Display a clickable trail (Album › Gallery) above the Gallery so visitors can navigate back to this Album.",
+                    "default": true,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "navigation_breadcrumbs_placements",
+                    "type": "token_select",
+                    "label": "Show Breadcrumbs On",
+                    "description": "Where the breadcrumb trail should appear when a visitor reaches a Gallery from this Album.",
+                    "options": [
+                        {
+                            "label": "View Pages",
+                            "value": "view_pages",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Embedded Galleries",
+                            "value": "embedded",
+                            "tier_required": "free",
+                            "condition": {
+                                "dependsOn": "use_ajax_from_album",
+                                "values": [true, "1"]
+                            }
+                        }
+                    ],
+                    "default": ["view_pages", "embedded"],
+                    "condition": {
+                        "dependsOn": "navigation_show_breadcrumbs",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "navigation_show_breadcrumbs_on_direct_visit",
+                    "type": "toggle",
+                    "label": "Show Breadcrumbs on Direct Visits",
+                    "description": "Also show the breadcrumb trail when a visitor lands on a Gallery directly (not from this Album) - as long as the Gallery belongs to this Album only. Helpful for SEO and shareable links. Off by default because some sites prefer breadcrumbs only when there's a real visit context.",
+                    "default": false,
+                    "condition": {
+                        "dependsOn": "navigation_show_breadcrumbs",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "navigation_emit_breadcrumb_schema",
+                    "type": "toggle",
+                    "label": "Emit BreadcrumbList Schema (SEO)",
+                    "description": "Adds invisible structured data (schema.org BreadcrumbList) so Google can show your breadcrumb trail directly in search results. Turn off if your SEO plugin (Yoast, Rank Math) already handles this for these pages.",
+                    "default": true,
+                    "condition": {
+                        "dependsOn": "navigation_show_breadcrumbs",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "navigation_breadcrumb_source",
+                    "type": "button_group",
+                    "label": "Breadcrumb Source",
+                    "description": "Choose whether FotoGrids renders the breadcrumb itself or hands rendering off to your SEO plugin. \"Auto-detect\" picks the active SEO plugin (Yoast, Rank Math, SEOPress) when present and falls back to FotoGrids otherwise.",
+                    "options": [
+                        {
+                            "label": "FotoGrids",
+                            "value": "fotogrids",
+                            "tier_required": "free"
+                        },
+                        {
+                            "label": "Auto-detect SEO plugin",
+                            "value": "auto",
+                            "tier_required": "pro_starter"
+                        },
+                        {
+                            "label": "Yoast SEO",
+                            "value": "yoast",
+                            "tier_required": "pro_starter"
+                        },
+                        {
+                            "label": "Rank Math",
+                            "value": "rank_math",
+                            "tier_required": "pro_starter"
+                        }
+                    ],
+                    "default": "fotogrids",
+                    "condition": {
+                        "dependsOn": "navigation_show_breadcrumbs",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "navigation_back_button_group",
+            "type": "setting_group",
+            "label": "Back Button",
+            "settings": [
+                {
+                    "key": "navigation_show_back_button",
+                    "type": "toggle",
+                    "label": "Show \"Back to Album\" Button",
+                    "description": "Display a prominent Back button above the Gallery so visitors can return to this Album in one click.",
+                    "default": false,
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "navigation_back_button_show_Album_name",
+                    "type": "toggle",
+                    "label": "Show Album Name on Button",
+                    "description": "When on, the button reads \"Back to {Album Name}\". When off, it just says \"Back\" - useful when the Album name is long or when the button needs to fit in a tight layout.",
+                    "default": true,
+                    "condition": {
+                        "dependsOn": "navigation_show_back_button",
+                        "values": [true, "1"]
+                    },
+                    "tier_required": "free",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "navigation_info_block",
+            "type": "info_block",
+            "subtitle": "When Breadcrumbs and the Back Button appear",
+            "message": "The Breadcrumb trail and Back Button show up when a visitor reaches a Gallery from this Album. On direct visits to a Gallery they only appear if \"Show Breadcrumbs on Direct Visits\" is enabled AND that Gallery belongs to this Album only. If a Gallery is assigned to two or more Albums there is no single parent to point back to, so nothing is rendered on direct visits regardless of that setting.",
+            "full_width": true,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

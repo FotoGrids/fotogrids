@@ -1,0 +1,11 @@
+{
+  "id": "wedding-day",
+  "name": "Wedding Day",
+  "description": "Full-width justified layout with soft fade hover, album expiry pre-set to 90 days, and client proofing enabled. Built for wedding delivery.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "order": 20,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

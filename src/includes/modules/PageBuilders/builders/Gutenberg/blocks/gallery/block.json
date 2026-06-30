@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "fotogrids/gallery",
+    "version": "1.0.0",
+    "title": "FotoGrids Gallery",
+    "category": "media",
+    "description": "Insert a FotoGrids gallery.",
+    "keywords": [ "gallery", "photos", "images", "fotogrids", "masonry", "slider", "lightbox" ],
+    "textdomain": "fotogrids",
+    "supports": {
+        "html": false,
+        "anchor": true,
+        "align": [ "left", "center", "right", "wide", "full" ],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        },
+        "interactivity": false
+    },
+    "attributes": {
+        "galleryId": {
+            "type": "number",
+            "default": 0
+        },
+        "align": {
+            "type": "string"
+        },
+        "_pendingImportAttachmentIds": {
+            "type": "array",
+            "default": []
+        },
+        "_pendingImportTitle": {
+            "type": "string",
+            "default": ""
+        },
+        "previewClickBehavior": {
+            "type": "boolean",
+            "default": false
+        },
+        "previewPagination": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "example": {
+        "attributes": {
+            "galleryId": 0
+        }
+    },
+    "editorScript": "fotogrids-pb-gutenberg-gallery",
+    "editorStyle": "fotogrids-pb-gutenberg-gallery",
+    "render": "file:./render.php"
+}

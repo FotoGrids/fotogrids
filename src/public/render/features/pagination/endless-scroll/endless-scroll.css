@@ -1,0 +1,52 @@
+/*
+ * FotoGrids - Pagination: endless scroll (per-method overrides).
+ *
+ * The sentinel is invisible. The visible spinner uses the same loading
+ * icon SVG configured for the gallery's items (the .fg-pagination__loader
+ * <div> contains a copy), animated by endless-scroll.js via WAAPI.
+ *
+ * The loader is hidden by default and revealed when the gallery wrapper
+ * gets .fotogrids-gallery--is-paginating (set by pagination-core.js
+ * during goToPage()).
+ *
+ * The sr-only .fg-pagination__status region lives in the shared
+ * pagination.css (loaded automatically via Pagination_Common::common_assets()).
+ */
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--endless-scroll {
+    position: relative;
+    height: var( --fg-pagination-endless-height, 48px );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var( --fg-loader-color, currentColor );
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination__sentinel {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* Loader (SVG) is hidden until the gallery starts paginating. */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__loader {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination__loader svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+
+.fotogrids-collection.fotogrids-gallery.fotogrids-gallery--is-paginating .fg-pagination__loader {
+    opacity: 1;
+}

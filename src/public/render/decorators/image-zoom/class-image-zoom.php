@@ -1,0 +1,252 @@
+<?php
+/**
+ * Image Zoom decorator.
+ *
+ * @package FotoGrids\Render\Decorators\Image_Zoom
+ * @since   1.0.0
+ */
+
+declare(strict_types=1);
+
+namespace FotoGrids\Render\Decorators\Image_Zoom;
+
+use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Collection_Kind;
+use FotoGrids\Render\Api\Decorator;
+use FotoGrids\Render\Api\Item_View;
+use FotoGrids\Render\Api\Module_Assets;
+use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Api\Setting_Helpers;
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+/**
+ * Enlarges gallery images on hover or click, either inline or in a popover.
+ *
+ * Active when interactions_zoom is on for a gallery render. Two styles:
+ * inline transforms the image in place (hover-triggered, CSS only); popover
+ * opens the shared Lightbox Mini overlay with the full-size image, triggered
+ * on hover (after interactions_zoom_hover_delay) or click.
+ *
+ * The wrapper carries data-fg-zoom-style and, for popover, data-fg-zoom-mode
+ * so CSS and the frontend module can branch. Popover appearance settings are
+ * emitted as Lightbox Mini CSS variables on the wrapper.
+ *
+ * @package FotoGrids\Render\Decorators\Image_Zoom
+ * @since   1.0.0
+ */
+final class Image_Zoom implements Decorator {
+
+	use Setting_Helpers;
+
+	public function id(): string {
+		return 'fotogrids/image-zoom';
+	}
+
+	public function origin(): string {
+		return 'fotogrids';
+	}
+
+	public function replaces(): ?string {
+		return null;
+	}
+
+	public function extends_id(): ?string {
+		return null;
+	}
+
+	/**
+	 * Active for galleries with zoom enabled. Albums never zoom.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  bool
+	 */
+	public function supports( Render_Context $render_context ): bool {
+		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
+			return false;
+		}
+		return $this->setting_to_bool( $render_context->settings['interactions_zoom'] ?? false );
+	}
+
+	/**
+	 * Stamps the full-size image URL on each item.
+	 *
+	 * Both styles use the full-size source resolved from the Media tab's
+	 * full_image_size setting: the popover displays it, and inline pans across
+	 * it on mousemove.
+	 *
+	 * @since   1.0.0
+	 * @param   array<int, Item_View> $collection_items Collection items.
+	 * @param   Render_Context        $render_context   Render context.
+	 * @return  array<int, Item_View>
+	 */
+	public function decorate_items( array $collection_items, Render_Context $render_context ): array {
+		$decorated = array();
+
+		foreach ( $collection_items as $item_view ) {
+			if ( 'image' !== $item_view->item_type ) {
+				$decorated[] = $item_view;
+				continue;
+			}
+
+			$full_url = $item_view->full_url ?: $item_view->thumb_url;
+
+			$decorated[] = $item_view->with(
+				array(
+					'data_attrs' => array_merge(
+						$item_view->data_attrs,
+						array( 'data-fg-zoom-full' => esc_url( $full_url ) )
+					),
+				)
+			);
+		}
+
+		return $decorated;
+	}
+
+	/**
+	 * Writes zoom style (and, for popover, mode) on the gallery wrapper.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  array<string, string>
+	 */
+	public function wrapper_data_attrs( Render_Context $render_context ): array {
+		$style = $this->zoom_style( $render_context );
+		$attrs = array( 'data-fg-zoom-style' => $style );
+
+		if ( 'popover' === $style ) {
+			$settings = $render_context->settings;
+
+			$attrs['data-fg-zoom-mode']          = $this->zoom_mode( $render_context );
+			$attrs['data-fg-zoom-close-button']  = $this->setting_to_bool( $settings['lightbox_mini_show_close'] ?? true ) ? '1' : '0';
+			$attrs['data-fg-zoom-click-outside'] = '1';
+
+			// The mini overlay reads these to resolve the backdrop colour + blur
+			// in CSS rather than from inline styles.
+			$attrs['data-fg-mini-theme'] = is_string( $settings['lightbox_mini_theme'] ?? null ) && 'light' === $settings['lightbox_mini_theme']
+				? 'light'
+				: 'dark';
+			$attrs['data-fg-mini-blur']  = is_string( $settings['lightbox_mini_overlay_blur'] ?? null )
+				&& in_array( $settings['lightbox_mini_overlay_blur'], array( 'light', 'strong', 'none' ), true )
+				? $settings['lightbox_mini_overlay_blur']
+				: 'light';
+		}
+
+		return $attrs;
+	}
+
+	/**
+	 * Emits the hover delay and, for popover, the Lightbox Mini appearance vars.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  array<string, string>
+	 */
+	public function style_vars( Render_Context $render_context ): array {
+		$settings = $render_context->settings;
+
+		$vars = array(
+			'--fg-zoom-hover-delay' => $this->setting_scalar( $settings['interactions_zoom_hover_delay'] ?? null, '300' ) . 'ms',
+		);
+
+		if ( 'popover' !== $this->zoom_style( $render_context ) ) {
+			return $vars;
+		}
+
+		// Backdrop colour + blur are resolved in CSS from the theme / blur
+		// data attributes (see wrapper_data_attrs); padding stays a CSS var.
+		$vars['--fg-lb-mini-padding'] = $this->padding_px( $settings['lightbox_mini_padding'] ?? null ) . 'px';
+
+		return $vars;
+	}
+
+	/**
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  Module_Assets
+	 */
+	public function assets( Render_Context $render_context ): Module_Assets {
+		$is_popover = 'popover' === $this->zoom_style( $render_context );
+
+		$css = array(
+			'fotogrids-decorator-image-zoom' => new Asset_Decl(
+				'decorators/image-zoom/image-zoom.css',
+			),
+		);
+
+		$image_zoom_deps = array( 'fotogrids-runtime' );
+		if ( $is_popover ) {
+			$image_zoom_deps[] = 'fotogrids-lightbox-mini';
+		}
+
+		$js = array(
+			'fotogrids-image-zoom' => new Asset_Decl(
+				'../../assets/js/image-zoom.js',
+				$image_zoom_deps,
+				true,
+			),
+		);
+
+		if ( $is_popover ) {
+			$css['fotogrids-lightbox-mini'] = new Asset_Decl(
+				'lightbox/mini/lightbox-mini.css',
+			);
+			$js['fotogrids-lightbox-mini']  = new Asset_Decl(
+				'../../assets/js/lightbox-mini.js',
+				array( 'fotogrids-runtime' ),
+				true,
+			);
+		}
+
+		return new Module_Assets( $css, $js );
+	}
+
+	/**
+	 * Resolves the zoom style, defaulting to inline.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string 'inline'|'popover'
+	 */
+	private function zoom_style( Render_Context $render_context ): string {
+		$style = $this->setting_scalar( $render_context->settings['interactions_zoom_style'] ?? null, 'inline' );
+		return 'popover' === $style ? 'popover' : 'inline';
+	}
+
+	/**
+	 * Resolves the popover trigger mode, defaulting to hover.
+	 *
+	 * @since   1.0.0
+	 * @param   Render_Context $render_context Render context.
+	 * @return  string 'hover'|'click'
+	 */
+	private function zoom_mode( Render_Context $render_context ): string {
+		$mode = $this->setting_scalar( $render_context->settings['interactions_zoom_mode'] ?? null, 'hover' );
+		return 'click' === $mode ? 'click' : 'hover';
+	}
+
+	/**
+	 * Resolve the desktop padding value from the shared mini responsive padding
+	 * setting.
+	 *
+	 * @since   1.0.0
+	 * @param   mixed $padding Saved responsive padding value.
+	 * @return  string Pixel value (no unit).
+	 */
+	private function padding_px( $padding ): string {
+		if ( is_array( $padding ) ) {
+			$desktop = $padding['desktop'] ?? null;
+			if ( is_array( $desktop ) && isset( $desktop['value'] ) ) {
+				return (string) (int) $desktop['value'];
+			}
+			if ( is_numeric( $desktop ) ) {
+				return (string) (int) $desktop;
+			}
+		}
+		return '24';
+	}
+}

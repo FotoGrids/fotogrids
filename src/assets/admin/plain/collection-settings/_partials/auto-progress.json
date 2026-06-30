@@ -1,0 +1,147 @@
+{
+	"partial": "auto-progress",
+	"inline_defaults": true,
+	"layout": [
+		"auto_progress",
+		"auto_progress_delay",
+		"auto_progress_style",
+		"auto_progress_bar_location",
+		"auto_progress_pause_on",
+		"auto_progress_pause_on_hover",
+		"auto_progress_stop_on_interaction",
+		"auto_progress_show_controls"
+	],
+	"field_defaults": {
+		"tier_required": "free",
+		"render_when_unlicensed": true,
+		"setting_lives_in": "free",
+		"visible_when_uninstalled": true
+	},
+	"fields": {
+		"auto_progress": {
+			"type": "toggle",
+			"label": "Enable Auto Progress"
+		},
+		"auto_progress_delay": {
+			"type": "range",
+			"label": "Delay",
+			"unit": "seconds",
+			"min": 1,
+			"max": 20,
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress",
+				"values": [true, "1"]
+			}
+		},
+		"auto_progress_style": {
+			"type": "button_group",
+			"label": "Progress Indicator",
+			"options": [
+				{
+					"label": "Progress Bar",
+					"value": "bar",
+					"tier_required": "free"
+				},
+				{
+					"label": "Spinner",
+					"value": "spinner",
+					"tier_required": "free"
+				},
+				{
+					"label": "None",
+					"value": "none",
+					"tier_required": "free"
+				}
+			],
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress",
+				"values": [true, "1"]
+			}
+		},
+		"auto_progress_bar_location": {
+			"type": "button_group",
+			"label": "Bar Location",
+			"options": [
+				{
+					"label": "Top",
+					"value": "top",
+					"icon": "flex_align_top",
+					"tier_required": "free"
+				},
+				{
+					"label": "Right",
+					"value": "right",
+					"icon": "flex_align_right",
+					"tier_required": "free"
+				},
+				{
+					"label": "Bottom",
+					"value": "bottom",
+					"icon": "flex_align_bottom",
+					"tier_required": "free"
+				},
+				{
+					"label": "Left",
+					"value": "left",
+					"icon": "flex_align_left",
+					"tier_required": "free"
+				}
+			],
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress_style",
+				"values": ["bar"]
+			}
+		},
+		"auto_progress_pause_on": {
+			"type": "token_select",
+			"label": "Pause On",
+			"options": [
+				{
+					"label": "Full Image Hover",
+					"value": "image_hover",
+					"tier_required": "free"
+				},
+				{
+					"label": "Thumbnail Hover",
+					"value": "thumbnail_hover",
+					"tier_required": "free"
+				}
+			],
+			"default": ["image_hover"],
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress",
+				"values": [true, "1"]
+			}
+		},
+		"auto_progress_pause_on_hover": {
+			"type": "toggle",
+			"label": "Pause on Hover",
+			"description": "Pauses auto progress while the visitor's pointer is over the image, resuming when they move away.",
+			"default": true,
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress",
+				"values": [true, "1"]
+			}
+		},
+		"auto_progress_stop_on_interaction": {
+			"type": "toggle",
+			"label": "Stop on User Interaction",
+			"description": "Stops auto progress permanently once the visitor manually navigates, rather than resuming after each slide.",
+			"default": true,
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress",
+				"values": [true, "1"]
+			}
+		},
+		"auto_progress_show_controls": {
+			"type": "toggle",
+			"label": "Show Play / Pause Button",
+			"description": "Adds a play/pause toggle button in the lightbox toolbar so visitors can control auto progress themselves.",
+			"default": false,
+			"condition": {
+				"dependsOn": "{{key_prefix}}auto_progress",
+				"values": [true, "1"]
+			}
+		}
+	}
+}

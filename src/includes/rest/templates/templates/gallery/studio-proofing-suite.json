@@ -1,0 +1,11 @@
+{
+  "id": "studio-proofing-suite",
+  "name": "Studio Proofing Suite",
+  "description": "Album with proofing, expiry, password, watermark, and EXIF editing all pre-configured. The photographer's full delivery setup in one template.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "order": 28,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

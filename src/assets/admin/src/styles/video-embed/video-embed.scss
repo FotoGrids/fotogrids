@@ -1,0 +1,73 @@
+@use "../colors.scss" as *;
+
+// Video embed modal additions
+// Scoped inside .fotogrids-modal so no extra specificity is needed.
+
+// URL row: input + small resolve button side-by-side
+.fotogrids-embed-url-row {
+	display: flex;
+	gap: 6px;
+	align-items: stretch;
+}
+
+// Custom poster actions below the sidebar preview.
+.fotogrids-embed-poster-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.fotogrids-embed-url-input {
+	flex: 1;
+	font-family: monospace;
+	font-size: 12px;
+
+	&--error {
+		border-color: var(--fg-text-error, #d32f2f) !important;
+	}
+
+	&--ok {
+		border-color: #388e3c !important;
+	}
+}
+
+.fotogrids-embed-resolve-btn {
+	flex-shrink: 0;
+	width: 36px;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.fotogrids-embed-spinner {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border: 2px solid rgba(0, 0, 0, 0.15);
+	border-top-color: var(--fg-blue);
+	border-radius: 50%;
+	animation: fotogrids-embed-spin 0.7s linear infinite;
+}
+
+@keyframes fotogrids-embed-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+// Narrow number input for start/end time
+.fotogrids-embed-time-input {
+	width: 100px !important;
+}
+
+// Native color picker sizing
+.fotogrids-embed-color-input {
+	width: 40px;
+	height: 32px;
+	padding: 2px;
+	border: 1px solid var(--fg-border-primary);
+	border-radius: 4px;
+	cursor: pointer;
+	background: #fff;
+}

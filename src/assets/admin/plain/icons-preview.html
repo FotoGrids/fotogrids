@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>FotoGrids Icons Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+    :root {
+        --bg: #f6f7f8;
+        --card: #ffffff;
+        --border: #e4e6eb;
+        --text: #1d1f23;
+        --muted: #6b7280;
+        --accent: #3B3BFF;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    header {
+        position: sticky; top: 0; z-index: 10;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 24px;
+        display: flex; align-items: center; gap: 16px;
+        flex-wrap: wrap;
+    }
+    h1 { font-size: 18px; margin: 0; }
+    .count { color: var(--muted); font-size: 13px; }
+    .controls { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    input[type="search"] {
+        padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+        font: inherit; min-width: 240px; background: #fff;
+    }
+    input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .size-toggle, .bg-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .size-toggle button, .bg-toggle button {
+        background: #fff; border: 0; padding: 6px 10px; font: inherit; cursor: pointer; color: var(--text);
+    }
+    .size-toggle button.active, .bg-toggle button.active { background: var(--accent); color: #fff; }
+    .size-toggle button + button, .bg-toggle button + button { border-left: 1px solid var(--border); }
+    .size-toggle button.active + button, .bg-toggle button.active + button { border-left-color: var(--accent); }
+
+    main { padding: 24px; }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        cursor: pointer;
+        transition: border-color 0.12s, transform 0.06s;
+        text-align: center;
+        user-select: none;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card:active { transform: scale(0.98); }
+
+    .icon-box {
+        width: 64px; height: 64px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text);
+    }
+    .icon-box.size-sm { width: 32px; height: 32px; }
+    .icon-box.size-lg { width: 96px; height: 96px; }
+
+    .icon-box svg { width: 100%; height: 100%; display: block; }
+
+    body.bg-dark .icon-box { color: #fff; }
+    body.bg-dark .card { background: #2a2c30; border-color: #3a3d44; color: #fff; }
+    body.bg-dark { background: #1d1f23; color: #fff; }
+    body.bg-dark header { background: #2a2c30; border-bottom-color: #3a3d44; }
+    body.bg-dark input[type="search"] { background: #1d1f23; color: #fff; border-color: #3a3d44; }
+    body.bg-dark .size-toggle button, body.bg-dark .bg-toggle button { background: #2a2c30; color: #fff; }
+    body.bg-dark .size-toggle button.active, body.bg-dark .bg-toggle button.active { background: var(--accent); }
+
+    .name {
+        font-size: 12px;
+        color: var(--muted);
+        word-break: break-all;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    body.bg-dark .name { color: #b6b9c0; }
+
+    .empty { color: var(--muted); padding: 40px; text-align: center; }
+
+    .toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+        background: #1d1f23; color: #fff; padding: 10px 16px; border-radius: 6px;
+        opacity: 0; transition: opacity 0.18s, transform 0.18s;
+        pointer-events: none; z-index: 100;
+        font-size: 13px;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>FotoGrids Icons</h1>
+    <span class="count" id="count">0 icons</span>
+    <div class="controls">
+        <input type="search" id="search" placeholder="Filter by name..." autocomplete="off" />
+        <div class="size-toggle" role="group" aria-label="Icon size">
+            <button data-size="sm" type="button">S</button>
+            <button data-size="md" type="button" class="active">M</button>
+            <button data-size="lg" type="button">L</button>
+        </div>
+        <div class="bg-toggle" role="group" aria-label="Background">
+            <button data-bg="light" type="button" class="active">Light</button>
+            <button data-bg="dark" type="button">Dark</button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>No icons match that filter.</p>
+</main>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script src="./icons.js"></script>
+<script>
+(function () {
+    const icons = window.FotoGridsIcons || {};
+    const names = Object.keys(icons).sort();
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const search = document.getElementById('search');
+    const countEl = document.getElementById('count');
+    const toast = document.getElementById('toast');
+
+    let currentSize = 'md';
+
+    function render(filter) {
+        const term = (filter || '').toLowerCase().trim();
+        grid.innerHTML = '';
+        let shown = 0;
+
+        names.forEach((name) => {
+            if (term && !name.toLowerCase().includes(term)) return;
+            shown++;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.title = 'Click to copy "' + name + '"';
+
+            const box = document.createElement('div');
+            box.className = 'icon-box size-' + currentSize;
+            box.innerHTML = icons[name];
+
+            const label = document.createElement('div');
+            label.className = 'name';
+            label.textContent = name;
+
+            card.appendChild(box);
+            card.appendChild(label);
+
+            card.addEventListener('click', () => {
+                copyToClipboard(name);
+                showToast('Copied: ' + name);
+            });
+
+            grid.appendChild(card);
+        });
+
+        countEl.textContent = shown + ' of ' + names.length + ' icons';
+        empty.hidden = shown !== 0;
+    }
+
+    function copyToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+
+    search.addEventListener('input', (e) => render(e.target.value));
+
+    document.querySelectorAll('.size-toggle button').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.size-toggle button').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSize = btn.dataset.size;
+            render(search.value);
+        });
+    });
+
+    document.querySelectorAll('.bg-toggle button').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.bg-toggle button').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.body.classList.toggle('bg-dark', btn.dataset.bg === 'dark');
+        });
+    });
+
+    if (!names.length) {
+        grid.innerHTML = '<p class="empty">FotoGridsIcons not found. Make sure icons.js is loadable from this page.</p>';
+        countEl.textContent = '0 icons';
+    } else {
+        render('');
+    }
+})();
+</script>
+
+</body>
+</html>

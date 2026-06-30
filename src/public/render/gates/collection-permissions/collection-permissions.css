@@ -1,0 +1,28 @@
+/* Collection Permissions Gate (gate-specific styles).
+   Shared chrome (ghost grid, overlay, card, title, description) is
+   handled by gate-lock.css via Gate_Renderer::shared_asset_decl(). */
+
+.fotogrids-gate .fg-permissions-actions {
+    margin: 0;
+}
+
+.fotogrids-gate .fg-permissions-login-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #ffffff;
+    background: #2563eb;
+    border-radius: 8px;
+    padding: 10px 18px;
+    transition: background-color 0.2s ease;
+}
+
+.fotogrids-gate .fg-permissions-login-link:hover,
+.fotogrids-gate .fg-permissions-login-link:focus {
+    color: #ffffff;
+    background: #1d4ed8;
+}

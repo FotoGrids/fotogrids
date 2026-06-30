@@ -1,0 +1,172 @@
+{
+    "id": "video",
+    "label": "Video",
+    "icon": "video",
+    "description": "Embed videos from your WordPress Media Library and mix them with images to build richer galleries.",
+    "postTypes": [
+        "gallery"
+    ],
+    "settings": [
+        {
+            "key": "video_playback_mode",
+            "type": "button_group",
+            "label": "Video Playback",
+            "description": "Set how video items open when visitors click them.",
+            "options": [
+                {
+                    "label": "Play Inline",
+                    "value": "inline",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Video Lightbox",
+                    "value": "lightbox",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "inline",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "tier_required": "free"
+        },
+        {
+            "key": "video_lightbox_appearance_subtabs",
+            "type": "setting_subtabs",
+            "label": "Lightbox Appearance",
+            "condition": {
+                "dependsOn": "video_playback_mode",
+                "values": ["lightbox"]
+            },
+            "subTabs": {
+                "general": {
+                    "id": "general",
+                    "label": "General",
+                    "icon": "settings",
+                    "settings": [
+                        {
+                            "use": "lightbox-mini",
+                            "key_prefix": "lightbox_mini_",
+                            "include": [
+                                "show_close",
+                                "show_arrows",
+                                "show_bullets",
+                                "padding"
+                            ]
+                        }
+                    ]
+                },
+                "styling": {
+                    "id": "styling",
+                    "label": "Styling",
+                    "icon": "styling",
+                    "settings": [
+                        {
+                            "use": "lightbox-mini",
+                            "key_prefix": "lightbox_mini_",
+                            "include": [
+                                "show_overlay",
+                                "overlay_blur",
+                                "show_border",
+                                "show_shadow",
+                                "show_radius",
+                                "theme"
+                            ]
+                        }
+                    ]
+                },
+                "captions": {
+                    "id": "captions",
+                    "label": "Captions",
+                    "icon": "align_center",
+                    "settings": [
+                        {
+                            "use": "lightbox-captions",
+                            "key_prefix": "lightbox_lite_caption_"
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "video_lightbox_behavior_group",
+            "type": "setting_group",
+            "label": "Video Lightbox Behaviour",
+            "condition": {
+                "dependsOn": "video_playback_mode",
+                "values": [
+                    "lightbox"
+                ]
+            },
+            "settings": [
+                {
+                    "key": "video_autoplay_on_open",
+                    "type": "toggle",
+                    "label": "Autoplay When Lightbox Opens",
+                    "description": "Automatically start playing the video when the lightbox opens on it.",
+                    "default": true,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "video_autoplay_on_slide",
+                    "type": "toggle",
+                    "label": "Autoplay When Navigating to Video",
+                    "description": "Automatically start playing a video when a visitor navigates to it inside the lightbox.",
+                    "default": false,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                },
+                {
+                    "key": "video_advance_after_end",
+                    "type": "toggle",
+                    "label": "Advance to Next Item After Video Ends",
+                    "description": "Automatically move to the next gallery item when the current video finishes playing.",
+                    "default": true,
+                    "tier_required": "pro_starter",
+                    "render_when_unlicensed": true,
+                    "setting_lives_in": "free",
+                    "visible_when_uninstalled": true
+                }
+            ],
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "video_pro_features_promo",
+            "type": "promo",
+            "messages": [
+                {
+                    "subtitle": "More Video Platforms",
+                    "message": "Unlock TikTok, Instagram, Facebook, Dailymotion, Twitch, Wistia, VideoPress, Loom, and more embeds for broader video source support.",
+                    "learn_more": "feature-video"
+                },
+                {
+                    "subtitle": "Premium Playback Experience",
+                    "message": "Enable Premium Video Lightbox and Video Playlist Layout with enhanced navigation.",
+                    "learn_more": "feature-video"
+                },
+                {
+                    "subtitle": "Advanced Video Controls",
+                    "message": "Get deeper playback controls, richer behavior options, and advanced video customization.",
+                    "learn_more": "feature-video"
+                }
+            ],
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

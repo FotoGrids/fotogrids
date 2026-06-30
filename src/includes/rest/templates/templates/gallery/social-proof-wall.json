@@ -1,0 +1,11 @@
+{
+  "id": "social-proof-wall",
+  "name": "Social Proof Wall",
+  "description": "Mosaic of user-generated or testimonial imagery with CTA overlays linking to individual case studies or product pages.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "leads",
+  "order": 37,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

@@ -1,0 +1,28 @@
+{
+  "id": "proofing-gallery",
+  "name": "Proofing Gallery",
+  "description": "Password-protected grid with watermarks pre-enabled. Drop in the photos and send the link the same evening.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "photography",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 8,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 8,
+      "tablet": 6,
+      "mobile": 4
+    },
+    "password_protect": true,
+    "watermark_apply_to_collection": true,
+    "disable_right_click": true,
+    "item_click_behavior": "lightbox"
+  }
+}

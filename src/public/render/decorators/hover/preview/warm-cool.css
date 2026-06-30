@@ -1,0 +1,10 @@
+.fotogrids-collection[data-fg-hover='warm-cool'] .fg-item-media img {
+	filter: hue-rotate(-15deg) sepia(0.15);
+	transition: filter 0.3s ease;
+}
+.fotogrids-collection[data-fg-hover='warm-cool']
+	.fg-item:hover
+	.fg-item-media
+	img {
+	filter: hue-rotate(15deg) sepia(0.35);
+}

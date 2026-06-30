@@ -1,0 +1,473 @@
+{
+    "id": "pagination",
+    "label": "Pagination",
+    "icon": "layers",
+    "condition": {
+        "dependsOn": "layout",
+        "values": [
+            "grid",
+            "masonry",
+            "justified",
+            "instant-photos"
+        ]
+    },
+    "settings": [
+        {
+            "key": "pagination_type",
+            "type": "button_group",
+            "label": "Display Mode",
+            "options": [
+                {
+                    "label": "Break into Pages",
+                    "value": "paginated",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Show All Items",
+                    "value": "show_all",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "paginated",
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "items_per_page",
+            "type": "responsive_range",
+            "label": "Items Per Page",
+            "responsive": {
+                "desktop": {
+                    "min": 1,
+                    "max": 100,
+                    "default": 24
+                },
+                "tablet": {
+                    "min": 1,
+                    "max": 50,
+                    "default": 18
+                },
+                "mobile": {
+                    "min": 1,
+                    "max": 30,
+                    "default": 12
+                }
+            },
+            "condition": {
+                "dependsOn": "pagination_type",
+                "values": [
+                    "paginated"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "preload_next_page",
+            "type": "toggle",
+            "label": "Preload Next Page",
+            "description": "Preload next page content in the background for even faster navigation.",
+            "default": false,
+            "condition": {
+                "dependsOn": "pagination_type",
+                "values": [
+                    "paginated"
+                ]
+            },
+            "tier_required": "pro_starter",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "pagination_method",
+            "type": "button_group",
+            "label": "Pagination Method",
+            "options": [
+                {
+                    "label": "Endless Scroll",
+                    "value": "endless_scroll",
+                    "icon": "arrow_square_down",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Load More Button",
+                    "value": "load_more",
+                    "icon": "plus_square",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Page Buttons",
+                    "value": "pages",
+                    "icon": "code_square",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "load_more",
+            "condition": {
+                "dependsOn": "pagination_type",
+                "values": [
+                    "paginated"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "pagination_distance_from_items",
+            "type": "responsive_range",
+            "label": "Distance From Items",
+            "description": "Space between the gallery items and the pagination controls.",
+            "units": [ "px", "em", "rem" ],
+            "responsive": {
+                "desktop": { "min": 0, "max": 100, "default": 16 },
+                "tablet":  { "min": 0, "max": 100, "default": 16 },
+                "mobile":  { "min": 0, "max": 100, "default": 16 }
+            },
+            "condition": {
+                "dependsOn": "pagination_type",
+                "values": [
+                    "paginated"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "pagination_buttons_subtabs",
+            "type": "setting_subtabs",
+            "label": "Pagination Buttons",
+            "condition": {
+                "dependsOn": [
+                    "pagination_type",
+                    "pagination_method"
+                ],
+                "values": [
+                    [
+                        "paginated"
+                    ],
+                    [
+                        "load_more",
+                        "pages"
+                    ]
+                ]
+            },
+            "subTabs": {
+                "button": {
+                    "id": "button",
+                    "label": "Button",
+                    "icon": "plus_square",
+                    "condition": {
+                        "dependsOn": [
+                            "pagination_type",
+                            "pagination_method"
+                        ],
+                        "values": [
+                            [
+                                "paginated"
+                            ],
+                            [
+                                "load_more"
+                            ]
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "load_more_button_text",
+                            "type": "text_input",
+                            "label": "Button Text",
+                            "default": "Load More",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "load_more_button_full_width",
+                            "type": "toggle",
+                            "label": "Full Width Button",
+                            "default": false,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "load_more_button_alignment",
+                            "type": "button_group",
+                            "label": "Button Alignment",
+                            "options": [
+                                {
+                                    "label": "Left",
+                                    "value": "left",
+                                    "icon": "item_align_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Center",
+                                    "value": "center",
+                                    "icon": "item_align_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Right",
+                                    "value": "right",
+                                    "icon": "item_align_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "center",
+                            "condition": {
+                                "dependsOn": "load_more_button_full_width",
+                                "values": [
+                                    false,
+                                    "0",
+                                    0
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "buttons": {
+                    "id": "buttons",
+                    "label": "Buttons",
+                    "icon": "layout",
+                    "condition": {
+                        "dependsOn": [
+                            "pagination_type",
+                            "pagination_method"
+                        ],
+                        "values": [
+                            [
+                                "paginated"
+                            ],
+                            [
+                                "pages"
+                            ]
+                        ]
+                    },
+                    "settings": [
+                        {
+                            "key": "pagination_alignment",
+                            "type": "button_group",
+                            "label": "Pagination Alignment",
+                            "description": "Controls the alignment of all pagination controls (Previous/Next buttons and page numbers)",
+                            "options": [
+                                {
+                                    "label": "Stretch",
+                                    "value": "stretch",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Left",
+                                    "value": "left",
+                                    "icon": "item_align_left",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Center",
+                                    "value": "center",
+                                    "icon": "item_align_center",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "label": "Right",
+                                    "value": "right",
+                                    "icon": "item_align_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "center",
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "pages_show_prev_next",
+                            "type": "toggle",
+                            "label": "Show Previous/Next Buttons",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "type": "side_by_side",
+                            "condition": {
+                                "dependsOn": "pages_show_prev_next",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "settings": [
+                                {
+                                    "key": "pages_prev_text",
+                                    "type": "text_input",
+                                    "label": "Previous Button Text",
+                                    "default": "Previous",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                },
+                                {
+                                    "key": "pages_next_text",
+                                    "type": "text_input",
+                                    "label": "Next Button Text",
+                                    "default": "Next",
+                                    "tier_required": "free",
+                                    "render_when_unlicensed": true,
+                                    "setting_lives_in": "free",
+                                    "visible_when_uninstalled": true
+                                }
+                            ]
+                        },
+                        {
+                            "key": "pages_button_icon",
+                            "type": "button_group",
+                            "label": "Button Icon",
+                            "options": [
+                                {
+                                    "label": "None",
+                                    "value": "none",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "chevron",
+                                    "icon": "chevron_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "chevron_double",
+                                    "icon": "chevron_right_double",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow",
+                                    "icon": "arrow_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_narrow",
+                                    "icon": "arrow_right_narrow",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_square",
+                                    "icon": "arrow_square_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_circle",
+                                    "icon": "arrow_circle_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_circle_broken",
+                                    "icon": "arrow_circle_broken_right",
+                                    "tier_required": "free"
+                                },
+                                {
+                                    "value": "arrow_block",
+                                    "icon": "arrow_block_right",
+                                    "tier_required": "free"
+                                }
+                            ],
+                            "default": "chevron",
+                            "condition": {
+                                "dependsOn": "pages_show_prev_next",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "pages_show_numbers",
+                            "type": "toggle",
+                            "label": "Show Page Numbers",
+                            "default": true,
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        },
+                        {
+                            "key": "pages_truncate",
+                            "type": "toggle",
+                            "label": "Truncate Long Pagination",
+                            "description": "Use \"…\" to keep the page bar compact on galleries with many pages.",
+                            "default": true,
+                            "condition": {
+                                "dependsOn": "pages_show_numbers",
+                                "values": [
+                                    true,
+                                    "1"
+                                ]
+                            },
+                            "tier_required": "free",
+                            "render_when_unlicensed": true,
+                            "setting_lives_in": "free",
+                            "visible_when_uninstalled": true
+                        }
+                    ]
+                },
+                "styling": {
+                    "id": "styling",
+                    "label": "Styling",
+                    "icon": "styling",
+                    "settings": [
+                        {
+                            "use": "button-styling",
+                            "key_prefix": "pagination_button_",
+                            "states": ["regular", "hover", "focus", "active"],
+                            "composed": {
+                                "typography": {
+                                    "overrides": {
+                                        "font_size": {
+                                            "responsive": {
+                                                "desktop": { "min": 8, "max": 32, "default": 14 },
+                                                "tablet": { "min": 8, "max": 28, "default": 14 },
+                                                "mobile": { "min": 8, "max": 24, "default": 13 }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "state_conditions": {
+                                "active": {
+                                    "dependsOn": ["pagination_method", "pages_show_numbers"],
+                                    "values": [["pages"], [true, "1"]]
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

@@ -1,0 +1,1 @@
+window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};

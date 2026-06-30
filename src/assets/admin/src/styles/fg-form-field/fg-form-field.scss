@@ -1,0 +1,135 @@
+@use "../colors.scss" as *;
+@use "../sizes.scss" as *;
+
+.fg-form-fields {
+	display: grid;
+	gap: 12px 0;
+	margin: 0;
+}
+
+.fg-form-field {
+	display: grid;
+	gap: 6px;
+	align-items: start;
+	margin-bottom: 0;
+
+	&__label {
+		padding: 0;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+		font-size: 13px;
+		line-height: 40px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	&__required {
+		color: var(--fg-text-error);
+		font-weight: 700;
+	}
+
+	&__control {
+		min-width: 0;
+
+		input[type="text"],
+		input[type="url"],
+		input[type="email"],
+		input[type="number"],
+		input[type="search"],
+		input[type="password"],
+		textarea,
+		select {
+			width: 100%;
+			min-height: 40px;
+			margin: 0;
+			padding: 8px 12px;
+			border: 1px solid var(--fg-border-dark);
+			border-radius: 4px;
+			font-size: 14px;
+			font-family: inherit;
+			box-sizing: border-box;
+
+			&:focus {
+				border-color: var(--fg-blue);
+				outline: none;
+				box-shadow: none;
+			}
+
+			&:disabled {
+				background-color: #f6f7f7;
+				color: var(--fg-text-tertiary);
+				cursor: not-allowed;
+				opacity: 0.7;
+			}
+		}
+
+		.fg-has-unit input[type="number"] {
+			padding-inline-end: 40px;
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 80px;
+		}
+	}
+
+	&__description {
+		margin: 4px 0 0;
+		font-size: 12px;
+		color: var(--fg-text-secondary);
+		line-height: 1.4;
+	}
+
+	&__error {
+		margin: 4px 0 0;
+		font-size: 12px;
+		color: var(--fg-text-error);
+		line-height: 1.4;
+	}
+
+	// Row layout: label on the left, control on the right, fixed-width label
+	&--layout-row {
+		grid-template-columns: 120px 1fr;
+
+		.fg-form-field__description,
+		.fg-form-field__error {
+			grid-column: 2;
+		}
+	}
+
+	// Column layout: label on top, control below
+	&--layout-column {
+		grid-template-columns: 1fr;
+		gap: 6px;
+
+		.fg-form-field__label {
+			line-height: 1.4;
+		}
+	}
+
+	&--has-error {
+		.fg-form-field__control {
+			input[type="text"],
+			input[type="url"],
+			input[type="email"],
+			input[type="number"],
+			input[type="search"],
+			input[type="password"],
+			textarea,
+			select {
+				border-color: var(--fg-text-error);
+
+				&:focus {
+					border-color: var(--fg-text-error);
+					box-shadow: 0 0 0 1px var(--fg-text-error);
+				}
+			}
+		}
+	}
+}
+
+// Standalone spacing for consecutive fields not wrapped in <FormFields>.
+.fg-form-field + .fg-form-field {
+	margin-top: 12px;
+}

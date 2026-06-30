@@ -1,0 +1,11 @@
+{
+  "id": "boudoir-portrait",
+  "name": "Boudoir & Portrait",
+  "description": "Album with password and right-click protection on every gallery inside. Private by default, shared only when you say so.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "photography",
+  "order": 11,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

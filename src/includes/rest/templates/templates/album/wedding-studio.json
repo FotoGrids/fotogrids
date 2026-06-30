@@ -1,0 +1,11 @@
+{
+  "id": "wedding-studio",
+  "name": "Wedding Studio",
+  "description": "One album per couple: password, watermark, expiry, and client proofing pre-configured across every gallery inside. Everything a wedding photographer delivers in one place.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "photography",
+  "order": 10,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

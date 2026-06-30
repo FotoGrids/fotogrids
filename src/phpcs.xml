@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<ruleset name="FotoGrids">
+    <description>
+        FotoGrids coding-standards configuration for WordPress Plugin Check / PHPCS.
+
+        This file documents the project-wide, deliberately-accepted exceptions so
+        they live in one reviewable place instead of being scattered as inline
+        annotations. Each exclusion below is a reviewed decision, not an oversight.
+    </description>
+
+    <!--
+        What to scan. This file lives in src/, so '.' is the plugin's PHP root.
+        Run from here with `phpcs -p` or via composer (`composer lint`), which
+        invokes `phpcs` with this file as the active ruleset.
+    -->
+    <file>.</file>
+
+    <!-- Scan PHP only; skip build output, deps, and the bundled Freemius SDK. -->
+    <arg name="extensions" value="php"/>
+    <arg name="basepath" value="."/>
+    <arg name="parallel" value="8"/>
+    <arg value="ps"/>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/dist/*</exclude-pattern>
+    <exclude-pattern>*/freemius/*</exclude-pattern>
+    <exclude-pattern>*/index.php</exclude-pattern>
+
+    <!--
+        Base standard. WordPress-Extra covers coding style + best practices;
+        WordPress.WP adds WordPress-specific correctness/security sniffs. We
+        intentionally do NOT pull in WordPress-Docs (docblock formatting) as a
+        hard gate yet. Minimum supported versions are declared for the relevant
+        version-aware sniffs.
+    -->
+    <config name="minimum_wp_version" value="6.1"/>
+    <config name="testVersion" value="7.4-"/>
+
+    <!--
+        Warnings are advisory, not gating. Errors fail the build; warnings are
+        surfaced in reports but do not change the exit code. This keeps the CI
+        lint job (and the pre-commit hook) green on reviewed false-positive
+        warnings such as Squiz.PHP.CommentedOutCode.Found on data fixtures,
+        while still failing on any real error.
+    -->
+    <config name="ignore_warnings_on_exit" value="1"/>
+
+    <rule ref="WordPress-Extra"/>
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="fotogrids"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        Declare FotoGrids' real symbol prefixes so the PrefixAllGlobals sniff
+        knows what "prefixed" means for this plugin. Without this, the sniff
+        treats hierarchical hook-name strings (see below) as if they were symbol
+        prefixes and reports InvalidPrefixPassed. These are the genuine PHP
+        prefixes used across the codebase.
+    -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="fotogrids"/>
+                <element value="FOTOGRIDS"/>
+                <element value="FotoGrids"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        DynamicHooknameFound: deliberately suppressed project-wide.
+
+        FotoGrids hook names are hierarchical, slash-namespaced string CONSTANTS
+        centralised in includes/hooks/ (e.g.
+        Filters_Settings::DEFAULTS_GALLERY = 'fotogrids/settings/defaults/gallery',
+        Actions_Library::ITEM_METADATA   = 'fotogrids/save/item/metadata').
+
+        Every hook name is always prefixed 'fotogrids/'. The sniff fires only
+        because it cannot statically resolve a class constant to its string
+        value, so it cannot see that the prefix is present. This is therefore a
+        reviewed false positive, not an unprefixed-hook risk. Suppressing it here
+        (rather than with 130+ identical inline ignores) keeps the intent in one
+        documented place.
+    -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound">
+        <severity>0</severity>
+    </rule>
+
+    <!--
+        Custom capabilities. FotoGrids registers its own capabilities in
+        class-activator.php (manage_fotogrids and friends, added to admin/
+        editor/author roles). The Capabilities sniff only knows WordPress core
+        capabilities, so it reports these real, registered ones as "Unknown".
+        Declaring them here teaches the sniff they are legitimate.
+    -->
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="manage_fotogrids"/>
+                <element value="manage_fotogrids_settings"/>
+                <element value="manage_fotogrids_library"/>
+                <element value="view_fotogrids_stats"/>
+                <element value="edit_fotogrids_galleries"/>
+                <element value="edit_fotogrids_albums"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        File-naming conventions. Two deliberate naming systems coexist here and
+        are documented in CLAUDE.md:
+          1. REST resources use the three-file pattern <resource>-data.php /
+             <resource>-permissions.php / register-<resource>-routes.php. These
+             files DO contain classes but are intentionally not class-*.php.
+          2. Namespaced modules use PSR-style Module.php / ModuleInterface.php.
+        WordPress.Files.FileName expects class-<kebab>.php for any file holding a
+        class, so it flags both systems. These are reviewed conventions, not
+        oversights, so the sniff is scoped off for those paths only.
+    -->
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+        <exclude-pattern>*/includes/rest/*</exclude-pattern>
+        <exclude-pattern>*/modules/*/rest/*</exclude-pattern>
+        <exclude-pattern>*/modules/*/Module.php</exclude-pattern>
+        <exclude-pattern>*/modules/*/*/Module.php</exclude-pattern>
+        <exclude-pattern>*/PageBuilders/*/Module.php</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+        <exclude-pattern>*/Module.php</exclude-pattern>
+    </rule>
+
+    <!--
+        Hook-name underscores. FotoGrids hook names are slash-namespaced
+        ('fotogrids/settings/defaults/gallery'), the same convention already
+        documented for DynamicHooknameFound above. ValidHookName wants
+        underscores; our slash style is intentional and consistent across the
+        hook catalogue in includes/hooks/.
+    -->
+    <rule ref="WordPress.NamingConventions.ValidHookName.UseUnderscores">
+        <severity>0</severity>
+    </rule>
+
+    <!--
+        Short ternary (?:). The simple-variable cases (e.g. $title ?: 'Untitled')
+        have been rewritten to the explicit $a ? $a : $b form. The remaining uses
+        all have a function/method call as the left operand (e.g.
+        get_post_meta(...) ?: 'grid', $request->get_json_params() ?: ...,
+        $wpdb->get_results(...) ?: array()). For those, the short ternary is the
+        CORRECT tool: expanding to $a ? $a : $b would evaluate the call twice
+        (re-running queries / REST parsing), and switching to ?? would change the
+        falsy-vs-null fallback semantics the code relies on. The sniff is
+        therefore suppressed as a reviewed, deliberate decision.
+    -->
+    <rule ref="Universal.Operators.DisallowShortTernary.Found">
+        <severity>0</severity>
+    </rule>
+</ruleset>

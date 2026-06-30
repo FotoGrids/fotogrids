@@ -1,0 +1,25 @@
+/* Title reveals first, description follows a beat later. Degrades to a plain
+   title reveal when no description is rendered. */
+
+.fotogrids-collection[data-fg-hover='caption-split'] .fg-caption-title,
+.fotogrids-collection[data-fg-hover='caption-split'] .fg-caption-description {
+	opacity: 0;
+	transform: translateY(var(--fg-hover-caption-shift));
+	transition-property: opacity, transform;
+	transition-duration: var(--fg-hover-duration);
+	transition-timing-function: var(--fg-hover-ease);
+}
+
+.fotogrids-collection[data-fg-hover='caption-split'] .fg-caption-description {
+	transition-delay: 80ms;
+}
+
+.fotogrids-collection[data-fg-hover='caption-split']
+	.fg-item:hover
+	.fg-caption-title,
+.fotogrids-collection[data-fg-hover='caption-split']
+	.fg-item:hover
+	.fg-caption-description {
+	opacity: 1;
+	transform: translateY(0);
+}

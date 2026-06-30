@@ -1,0 +1,48 @@
+/*
+ * FotoGrids - Pagination: load-more (per-method overrides).
+ *
+ * Base button styling and the sr-only status region live in the shared
+ * pagination.css. This file only adds:
+ *   - the flex wrapper + alignment classes,
+ *   - the .fg-pagination--full-width modifier,
+ *   - the load-more-specific padding default (roomier than the page-buttons
+ *     default - load-more is a single hero CTA, page-buttons are small chips),
+ *   - the .fg-pagination--exhausted hidden state.
+ *
+ * The button itself carries `.fg-pagination__btn .fg-pagination__load-more`
+ * - base look from `.fg-pagination__btn` in pagination.css, the second
+ * class is purely a structural hook used by full-width and any future
+ * load-more-only theming.
+ */
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--load-more {
+    display: flex;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--load-more.fg-pagination--align-left   { justify-content: flex-start; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--load-more.fg-pagination--align-center { justify-content: center; }
+.fotogrids-collection.fotogrids-gallery .fg-pagination--load-more.fg-pagination--align-right  { justify-content: flex-end; }
+
+/*
+ * Load-more uses a roomier default padding than page-buttons - it's a
+ * single hero CTA, not a numbered-page chip. The user's
+ * `pagination_button_padding` setting (emitted as
+ * --fg-pagination-button-padding) wins when set; otherwise the roomier
+ * load-more default applies.
+ *
+ * All other button theming (font, bg, text, border colours, hover state)
+ * is shared with the Page Buttons method now - those vars are declared
+ * on `.fg-pagination` in pagination.css and resolve from the unified
+ * `pagination_button_*` settings in the Styling subtab.
+ */
+.fotogrids-collection.fotogrids-gallery .fg-pagination__load-more {
+    --fg-pagination-btn-padding: var(--fg-pagination-button-padding, calc(var(--fg-pagination-base-size) * 2) calc(var(--fg-pagination-base-size) * 3));
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--full-width .fg-pagination__load-more {
+    width: 100%;
+}
+
+.fotogrids-collection.fotogrids-gallery .fg-pagination--exhausted {
+    display: none;
+}

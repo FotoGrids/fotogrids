@@ -1,0 +1,96 @@
+{
+    "id": "lightbox-mini",
+    "label": "Lightbox",
+    "icon": "click_lightbox",
+    "postTypes": [
+        "gallery"
+    ],
+    "placement": {
+        "mode": "insert_tab",
+        "after": "lightbox"
+    },
+    "condition": {
+        "all": [
+            {
+                "dependsOn": "item_click_behavior",
+                "values": ["lightbox"]
+            },
+            {
+                "dependsOn": "lightbox_variant",
+                "values": ["mini"]
+            },
+            {
+                "dependsOn": "layout",
+                "values": [
+                    "grid",
+                    "masonry",
+                    "justified",
+                    "image-viewer",
+                    "single-item",
+                    "slider",
+                    "instant-photos"
+                ]
+            }
+        ]
+    },
+    "settings": [
+        {
+            "key": "lightbox_mini_section",
+            "type": "setting_subtabs",
+            "subTabs": {
+                "general": {
+                    "id": "general",
+                    "label": "General",
+                    "icon": "settings",
+                    "settings": [
+                        {
+                            "use": "lightbox-mini",
+                            "key_prefix": "lightbox_mini_",
+                            "include": [
+                                "show_close",
+                                "show_arrows",
+                                "show_bullets",
+                                "padding"
+                            ]
+                        }
+                    ]
+                },
+                "styling": {
+                    "id": "styling",
+                    "label": "Styling",
+                    "icon": "styling",
+                    "settings": [
+                        {
+                            "use": "lightbox-mini",
+                            "key_prefix": "lightbox_mini_",
+                            "include": [
+                                "show_overlay",
+                                "overlay_blur",
+                                "show_border",
+                                "show_shadow",
+                                "show_radius",
+                                "theme"
+                            ]
+                        }
+                    ]
+                },
+                "captions": {
+                    "id": "captions",
+                    "label": "Captions",
+                    "icon": "align_center",
+                    "settings": [
+                        {
+                            "use": "lightbox-captions",
+                            "key_prefix": "lightbox_lite_caption_"
+                        }
+                    ]
+                }
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        }
+    ],
+    "tier_required": "free"
+}

@@ -1,0 +1,53 @@
+name: CodeQL
+
+# CodeQL upload requires GitHub code scanning, which is only available on
+# public repositories or with GitHub Advanced Security. While this repo is
+# private without GHAS, the job is set to manual-only (workflow_dispatch) so it
+# does not run on push/PR and cannot report a failing required check.
+#
+# TO RE-ENABLE when the repo is public (or GHAS is on): restore the triggers
+# below and enable code scanning (Settings -> Advanced Security -> Code
+# scanning -> Set up -> Advanced).
+#
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+#   schedule:
+#     - cron: '0 6 * * 1'   # Weekly full scan, Mondays 06:00 UTC.
+on:
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # CodeQL has no first-party PHP-on-WordPress pack tuned for this project,
+        # so JS/TS is the high-signal target. Add 'php' here if you later want it.
+        language: [ 'javascript-typescript' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

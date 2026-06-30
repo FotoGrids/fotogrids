@@ -1,0 +1,11 @@
+{
+  "id": "proof-pack",
+  "name": "The Proof Pack",
+  "description": "Album expiry, password, watermark, and client proofing all pre-configured. Drop in the photos and send the link. Nothing else to configure.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "order": 23,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

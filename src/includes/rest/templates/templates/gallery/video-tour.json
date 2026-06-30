@@ -1,0 +1,11 @@
+{
+  "id": "video-tour",
+  "name": "Video Tour",
+  "description": "Mixed image-and-video playlist for property walkthroughs or project overviews. One lightbox for both stills and tour clips.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "order": 49,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

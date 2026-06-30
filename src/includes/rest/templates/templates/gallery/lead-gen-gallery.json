@@ -1,0 +1,11 @@
+{
+  "id": "lead-gen-gallery",
+  "name": "Lead-Gen Gallery",
+  "description": "Gallery with inline lead-capture form pre-wired to webhook. Every image view turns into a capture opportunity.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "leads",
+  "order": 35,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

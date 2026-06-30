@@ -1,0 +1,284 @@
+@use "sass:meta";
+@use "sass:map";
+
+// FotoGrids Brand Colors
+$fotogrids-colors-blue: #3c46f0;
+$fotogrids-colors-blue-light: #5865f2;
+$fotogrids-colors-blue-dark: #2d35c7;
+$fotogrids-colors-blue-hover: #4f5af3;
+
+$fotogrids-colors-green: #46b450;
+$fotogrids-colors-green-hover: #5ac162;
+
+// Other FotoGrids Colors
+$fotogrids-colors-red: #f01e32;
+$fotogrids-colors-yellow: #ffb914;
+$fotogrids-colors-teal: #0d9488;
+$fotogrids-colors-grey-02: #8c8f94;
+$fotogrids-colors-grey-06: #323232;
+$fotogrids-colors-charcoal: #1d2327;
+$fotogrids-colors-gainsboro: #ddd;
+$fotogrids-colors-silver: #c1c1c1;
+
+// Tabbar colors (used for both settings tabs and gallery tabs)
+$tabbar-border-color: $fotogrids-colors-gainsboro;
+$tabbar-border-light: #e0e0e0;
+$tabbar-bg-light: #f6f7f7;
+$tabbar-bg-white: #fff;
+$tabbar-hover-bg: #e6e7e8;
+$tabbar-active-border: $fotogrids-colors-blue;
+$tabbar-text-primary: $fotogrids-colors-charcoal;
+$tabbar-text-secondary: #50575e;
+
+// Other colors
+$settings-pro-color: $fotogrids-colors-red;
+$settings-pro-notice-bg: #f0f6fc;
+$settings-pro-notice-border: #c3dcf0;
+
+// FotoGrids UI Color Map
+$fotogrids-ui-colors: (
+	// Background Colors
+	background: (
+			primary: #ffffff,
+			secondary: #f6f7f7,
+			tertiary: #f0f0f1,
+			dark: $fotogrids-colors-charcoal,
+			overlay: rgba(0, 0, 0, 0.5),
+			modal: rgba(0, 0, 0, 0.8),
+			card: #ffffff,
+			sidebar: #f6f7f7,
+			header: #ffffff,
+			footer: #f6f7f7,
+			warning: #fff9e5,
+			warning-hover: #fff2c4,
+			interactive: $fotogrids-colors-gainsboro,
+			"silver": $fotogrids-colors-silver,
+		),
+
+	// Border Colors
+	border: (
+			primary: $fotogrids-colors-gainsboro,
+			secondary: #e0e0e0,
+			light: #f0f0f0,
+			dark: $fotogrids-colors-grey-02,
+			focus: $fotogrids-colors-blue,
+			error: $fotogrids-colors-red,
+			success: $fotogrids-colors-green,
+			warning: $fotogrids-colors-yellow,
+			input: $fotogrids-colors-grey-02,
+			divider: #c3c4c7,
+		),
+
+	// Text Colors
+	text: (
+			primary: $fotogrids-colors-charcoal,
+			secondary: #50575e,
+			tertiary: $fotogrids-colors-grey-02,
+			inverse: #ffffff,
+			muted: #a7aaad,
+			link: $fotogrids-colors-blue,
+			link-hover: $fotogrids-colors-blue-hover,
+			link-visited: $fotogrids-colors-blue,
+			error: $fotogrids-colors-red,
+			success: $fotogrids-colors-green,
+			warning: $fotogrids-colors-yellow,
+			warning-dark: #856404,
+			info: $fotogrids-colors-blue,
+		),
+
+	// Button Colors
+	button: (
+			primary-bg: $fotogrids-colors-blue,
+			primary-text: #ffffff,
+			primary-text-light: rgba(255, 255, 255, 0.7),
+			primary-hover-bg: $fotogrids-colors-blue-hover,
+			primary-hover-text: #ffffff,
+			primary-active-bg: $fotogrids-colors-blue-dark,
+			primary-border: $fotogrids-colors-blue,
+
+			secondary-bg: #ffffff,
+			secondary-text: #50575e,
+			secondary-hover-bg: #f6f7f7,
+			secondary-hover-text: $fotogrids-colors-charcoal,
+			secondary-active-bg: #e0e0e0,
+			secondary-border: $fotogrids-colors-grey-02,
+
+			danger-bg: #d63638,
+			danger-text: #ffffff,
+			danger-hover-bg: #b32d2e,
+			danger-hover-text: #ffffff,
+			danger-active-bg: #8a2424,
+			danger-border: #d63638,
+
+			success-bg: #00a32a,
+			success-text: #ffffff,
+			success-hover-bg: #008a20,
+			success-hover-text: #ffffff,
+			success-active-bg: #007017,
+			success-border: #00a32a,
+
+			warning-bg: #dba617,
+			warning-text: #ffffff,
+			warning-hover-bg: #c29d0b,
+			warning-hover-text: #ffffff,
+			warning-active-bg: #996800,
+			warning-border: #dba617,
+
+			accent-bg: $fotogrids-colors-yellow,
+			accent-text: $fotogrids-colors-charcoal,
+			accent-hover-bg: #e6a500,
+			accent-hover-text: $fotogrids-colors-charcoal,
+			accent-active-bg: #cc9500,
+			accent-border: $fotogrids-colors-yellow,
+
+			disabled-bg: #f6f7f7,
+			disabled-text: #a7aaad,
+			disabled-border: $fotogrids-colors-gainsboro,
+		),
+
+	// Input Colors
+	input: (
+			bg: #ffffff,
+			text: $fotogrids-colors-charcoal,
+			placeholder: $fotogrids-colors-grey-02,
+			border: $fotogrids-colors-grey-02,
+			border-hover: #50575e,
+			border-focus: $fotogrids-colors-blue,
+			border-error: $fotogrids-colors-red,
+			border-success: $fotogrids-colors-green,
+			shadow-focus: rgba(34, 113, 177, 0.25),
+			disabled-bg: #f6f7f7,
+			disabled-text: #a7aaad,
+			disabled-border: $fotogrids-colors-gainsboro,
+		),
+
+	// Status Colors
+	status: (
+			error-bg: #fcf0f1,
+			error-text: $fotogrids-colors-red,
+			error-border: #f087a3,
+
+			success-bg: #f0f6fc,
+			success-text: $fotogrids-colors-green,
+			success-border: #68de7c,
+
+			warning-bg: #fcf9e8,
+			warning-text: #996800,
+			warning-border: #f2d675,
+
+			info-bg: #f0f6fc,
+			info-text: $fotogrids-colors-blue,
+			info-border: #c3dcf0,
+		),
+
+	// Interactive Colors
+	interactive: (
+			bg: #f0f0f1,
+			hover-bg: #e6e7e8,
+			active-bg: #c3c4c7,
+			selected-bg: #f0f6fc,
+			selected-bg-darker: #e2f0fd,
+			selected-border: $fotogrids-colors-blue,
+			focus-outline: $fotogrids-colors-blue,
+			focus-shadow: rgba(34, 113, 177, 0.25),
+		),
+
+	// Brand Colors
+	brand: (
+			primary: $fotogrids-colors-blue,
+			primary-light: $fotogrids-colors-blue-light,
+			primary-dark: $fotogrids-colors-blue-dark,
+			primary-hover: $fotogrids-colors-blue-hover,
+			secondary: $fotogrids-colors-red,
+			accent: $fotogrids-colors-yellow,
+			neutral: $fotogrids-colors-grey-06,
+		),
+
+	// Shadow Colors
+	shadow: (
+			light: rgba(0, 0, 0, 0.1),
+			medium: rgba(0, 0, 0, 0.15),
+			dark: rgba(0, 0, 0, 0.25),
+			focus: rgba(34, 113, 177, 0.25),
+			error: rgba(214, 54, 56, 0.25),
+			success: rgba(0, 163, 42, 0.25),
+		),
+
+	// Layout Badge Colors
+	layout: (
+			grid: (
+				bg: #e1f5fe,
+				text: #0277bd,
+			),
+			masonry: (
+				bg: #f3e5f5,
+				text: #7b1fa2,
+			),
+			justified: (
+				bg: #e8f5e8,
+				text: #2e7d32,
+			),
+			slider: (
+				bg: #fff3e0,
+				text: #ef6c00,
+			),
+			image-viewer: (
+				bg: #e0f7fa,
+				text: #00838f,
+			),
+			single-item: (
+				bg: #e8eaf6,
+				text: #3949ab,
+			),
+			video: (
+				bg: #fce4ec,
+				text: #c2185b,
+			),
+			carousel: (
+				bg: #fff8e1,
+				text: #ff8f00,
+			),
+			products: (
+				bg: #eceff1,
+				text: #546e7a,
+			),
+		)
+);
+
+// Helper function to get color from the map
+@function ui-color($category, $shade: null) {
+	@if $shade {
+		@return map.get(map.get($fotogrids-ui-colors, $category), $shade);
+	} @else {
+		@return map.get($fotogrids-ui-colors, $category);
+	}
+}
+
+:root {
+	--fg-blue: #{$fotogrids-colors-blue};
+	--fg-blue-light: #{$fotogrids-colors-blue-light};
+	--fg-blue-dark: #{$fotogrids-colors-blue-dark};
+	--fg-blue-hover: #{$fotogrids-colors-blue-hover};
+	--fg-red: #{$fotogrids-colors-red};
+	--fg-yellow: #{$fotogrids-colors-yellow};
+	--fg-green: #{$fotogrids-colors-green};
+	--fg-green-hover: #{$fotogrids-colors-green-hover};
+	--fg-teal: #{$fotogrids-colors-teal};
+	--fg-grey: #{$fotogrids-colors-grey-06};
+
+	@each $category, $colors in $fotogrids-ui-colors {
+		@if meta.type-of($colors) == "map" {
+			@each $shade, $color in $colors {
+				@if meta.type-of($color) == "map" {
+					@each $subkey, $subvalue in $color {
+						--fg-#{$category}-#{$shade}-#{$subkey}: #{$subvalue};
+					}
+				} @else {
+					--fg-#{$category}-#{$shade}: #{$color};
+				}
+			}
+		} @else {
+			--fg-#{$category}: #{$colors};
+		}
+	}
+}

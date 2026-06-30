@@ -1,0 +1,169 @@
+.fotogrids-collection .fg-item {
+	gap: var(--fg-caption-gap);
+}
+
+.fotogrids-collection .fg-item-media {
+	align-self: var(--fg-caption-media-align);
+}
+
+.fotogrids-collection .fg-caption {
+	margin: 0;
+	text-align: var(--fg-caption-align);
+}
+
+/* Caption Padding for top/bottom placement. Overlay placement pads the
+   content layer instead (--fg-caption-overlay-padding); this only fires when
+   the caption flows above or below the media. */
+.fotogrids-collection[data-fg-caption='top'] .fg-caption,
+.fotogrids-collection[data-fg-caption='bottom'] .fg-caption {
+	padding: var(--fg-caption-padding, 0);
+	box-sizing: border-box;
+}
+
+/* Block-level so hover effects can transform it in every placement (an inline
+   span would ignore translate). */
+.fotogrids-collection .fg-caption-content {
+	display: block;
+}
+
+/* Caption Visibility - shown/hidden on hover. The decorator omits
+   data-fg-caption-show entirely when the active hover effect animates the
+   caption, so a caption hover effect always wins over this setting. The
+   transition is declared here because the hover-decorator base stylesheet
+   (which supplies hover timing) is only present when a hover effect is active,
+   and this setting can be used on its own. */
+.fotogrids-collection[data-fg-caption-show='hide_on_hover'] .fg-caption,
+.fotogrids-collection[data-fg-caption-show='show_on_hover'] .fg-caption {
+	transition-property: opacity;
+	transition-duration: 250ms;
+	transition-timing-function: ease;
+}
+
+.fotogrids-collection[data-fg-caption-show='show_on_hover'] .fg-caption {
+	opacity: 0;
+}
+
+.fotogrids-collection[data-fg-caption-show='show_on_hover']
+	.fg-item:hover
+	.fg-caption {
+	opacity: 1;
+}
+
+.fotogrids-collection[data-fg-caption-show='hide_on_hover']
+	.fg-item:hover
+	.fg-caption {
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fotogrids-collection[data-fg-caption-show='hide_on_hover'] .fg-caption,
+	.fotogrids-collection[data-fg-caption-show='show_on_hover'] .fg-caption {
+		transition: none;
+	}
+}
+
+.fotogrids-collection[data-fg-caption='top'] .fg-item {
+	align-self: flex-end;
+}
+
+.fotogrids-collection[data-fg-caption='top'] .fg-caption {
+	order: -1;
+}
+
+/* The caption is split into two stacked layers so a hover effect can animate
+   the tinted background and the text content independently:
+     .fg-caption-bg      - the tint / hover-darken layer
+     .fg-caption-content - the title and description
+   In overlay placement both fill the whole item. */
+
+/* Overlay placement: the caption box fills the whole item so the tinted
+   background acts as a hover-darkening layer across the entire thumbnail.
+   Vertical anchoring of the text is controlled by --fg-caption-overlay-align
+   (top / middle / bottom). Horizontal alignment comes from --fg-caption-align
+   via text-align. */
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption-bg,
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption-content {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption-bg {
+	border-radius: var(--fg-radius);
+	background: var(--fg-caption-overlay-bg);
+	transition: background-color 220ms ease;
+}
+
+.fotogrids-collection[data-fg-caption='overlay'] .fg-item:hover .fg-caption-bg {
+	background: var(
+		--fg-caption-overlay-bg-hover,
+		var(--fg-caption-overlay-bg, rgba(0, 0, 0, 0.5))
+	);
+}
+
+.fotogrids-collection[data-fg-caption='overlay'] .fg-caption-content {
+	display: flex;
+	flex-direction: column;
+	justify-content: var(--fg-caption-overlay-align);
+	padding: var(--fg-caption-overlay-padding, 1rem);
+	color: var(--fg-caption-title-color);
+}
+
+.fotogrids-collection .fg-caption-title {
+	display: block;
+	font-family: var(--fg-caption-title-font-family);
+	font-weight: var(--fg-caption-title-font-weight);
+	font-style: var(--fg-caption-title-font-style);
+	font-size: var(--fg-caption-title-font-size);
+	line-height: var(--fg-caption-title-line-height, normal);
+	letter-spacing: var(--fg-caption-title-letter-spacing, normal);
+	word-spacing: var(--fg-caption-title-word-spacing, normal);
+	color: var(--fg-caption-title-color);
+}
+
+/* Distance between Title and Description. The adjacent-sibling selector means
+   the gap is only added when a description follows a title, so a description-
+   only or title-only caption gets no stray spacing. */
+.fotogrids-collection .fg-caption-title + .fg-caption-description {
+	margin-top: var(--fg-caption-title-desc-gap, 8px);
+}
+
+.fotogrids-collection .fg-caption-description {
+	display: block;
+	font-family: var(--fg-caption-desc-font-family);
+	font-weight: var(--fg-caption-desc-font-weight);
+	font-style: var(--fg-caption-desc-font-style);
+	font-size: var(--fg-caption-desc-font-size);
+	line-height: var(--fg-caption-desc-line-height, normal);
+	letter-spacing: var(--fg-caption-desc-letter-spacing, normal);
+	word-spacing: var(--fg-caption-desc-word-spacing, normal);
+	color: var(--fg-caption-desc-color);
+}
+
+/* Line-clamp - active when the decorator emits an integer for
+   --fg-caption-*-lines; falls back to 'none' (no clamp) otherwise.
+   @supports gates the -webkit-box display so browsers without line-clamp
+   keep plain block display and show all text rather than breaking layout. */
+@supports (-webkit-line-clamp: 1) {
+	.fotogrids-collection .fg-caption-title {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: var(--fg-caption-title-lines);
+		overflow: hidden;
+	}
+
+	.fotogrids-collection .fg-caption-description {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: var(--fg-caption-desc-lines);
+		overflow: hidden;
+	}
+}

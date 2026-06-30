@@ -1,0 +1,11 @@
+{
+  "id": "product-grid-pro",
+  "name": "Product Grid Pro",
+  "description": "Replaces the default WooCommerce product gallery with zoom-on-hover, variant swatches, and quick-add CTA. Faster, more on-brand.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "products",
+  "order": 43,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

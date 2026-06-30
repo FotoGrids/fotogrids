@@ -1,0 +1,14 @@
+.fotogrids-deactivation-form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+
+	&__intro {
+		margin: 0;
+	}
+
+	&__primary-actions {
+		display: flex;
+		gap: 8px;
+	}
+}

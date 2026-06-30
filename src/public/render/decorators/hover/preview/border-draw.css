@@ -1,0 +1,73 @@
+/* The border is drawn on, tracing the perimeter: two pseudo-elements over the
+   media grow their edges in sequence (top+right, then bottom+left). On mouseout
+   it snaps back instantly (transitions live only on :hover) so re-entering
+   mid-animation never looks broken. Edges are inset slightly and bottom-left
+   aligned so the two layers never double up in the corners. */
+
+.fotogrids-collection[data-fg-hover='border-draw'] .fg-item-media {
+	position: relative;
+}
+
+.fotogrids-collection[data-fg-hover='border-draw'] .fg-item-media::before,
+.fotogrids-collection[data-fg-hover='border-draw'] .fg-item-media::after {
+	opacity: 0;
+	content: '';
+	position: absolute;
+	pointer-events: none;
+	z-index: 2;
+	box-sizing: border-box;
+	width: 0;
+	height: 0;
+}
+
+/* Top + right edges, anchored top-left. */
+.fotogrids-collection[data-fg-hover='border-draw'] .fg-item-media::before {
+	inset: 0 auto auto 0;
+	border-top: 8px solid var(--fg-hover-frame-color);
+	border-right: 8px solid var(--fg-hover-frame-color);
+}
+
+/* Bottom + left edges, anchored bottom-left, inset by the border width so the
+   two layers meet cleanly instead of overlapping at the corners. */
+.fotogrids-collection[data-fg-hover='border-draw'] .fg-item-media::after {
+	inset: auto auto 0 0;
+	border-bottom: 8px solid var(--fg-hover-frame-color);
+	border-left: 8px solid var(--fg-hover-frame-color);
+	transform-origin: bottom right;
+}
+
+.fotogrids-collection[data-fg-hover='border-draw']
+	.fg-item:hover
+	.fg-item-media::before {
+	opacity: 1;
+	width: 100%;
+	height: 100%;
+	transition:
+		opacity 0.1s,
+		width 0.18s ease,
+		height 0.18s ease 0.18s;
+}
+
+.fotogrids-collection[data-fg-hover='border-draw']
+	.fg-item:hover
+	.fg-item-media::after {
+	opacity: 1;
+	width: calc(100% - 8px);
+	height: calc(100% - 8px);
+	transition:
+		opacity 0.1s 0.36s,
+		width 0.18s ease 0.36s,
+		height 0.18s ease 0.54s;
+}
+
+/* Overlay caption gently shrinks while the border draws. */
+.fotogrids-collection[data-fg-hover='border-draw'][data-fg-caption='overlay']
+	.fg-caption-content {
+	transition: transform 0.36s ease;
+}
+
+.fotogrids-collection[data-fg-hover='border-draw'][data-fg-caption='overlay']
+	.fg-item:hover
+	.fg-caption-content {
+	transform: scale(0.94);
+}

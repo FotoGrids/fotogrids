@@ -1,0 +1,11 @@
+{
+  "id": "pre-launch-listings",
+  "name": "Pre-Launch Listings",
+  "description": "All new properties password-protected by default across every gallery inside. Remove the password when the listing goes live - nothing else to change.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "real-estate",
+  "order": 19,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

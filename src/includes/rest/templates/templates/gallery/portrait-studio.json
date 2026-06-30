@@ -1,0 +1,11 @@
+{
+  "id": "portrait-studio",
+  "name": "Portrait Studio",
+  "description": "Elegant two-column justified strip with slow-zoom hover. Built for portrait and boudoir work where each image deserves space.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "photography",
+  "order": 21,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

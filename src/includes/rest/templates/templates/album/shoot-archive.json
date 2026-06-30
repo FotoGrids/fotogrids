@@ -1,0 +1,28 @@
+{
+  "id": "shoot-archive",
+  "name": "Shoot Archive",
+  "description": "One album per year, auto-sorted by date. A simple permanent home for every shoot you've ever delivered.",
+  "type": "free",
+  "category": "album",
+  "subcategory": "photography",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 1,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 10,
+      "tablet": 8,
+      "mobile": 5
+    },
+    "captions": true,
+    "default_sort_order": "date",
+    "date_sort_direction": "asc",
+    "item_click_behavior": "lightbox"
+  }
+}

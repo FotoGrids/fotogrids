@@ -1,0 +1,11 @@
+{
+  "id": "real-estate-agency",
+  "name": "Real-Estate Agency",
+  "description": "One album per agent, each album containing individual property listings with map block and lead form inside. The whole agency in one structure.",
+  "type": "pro",
+  "category": "album",
+  "subcategory": "real-estate",
+  "order": 18,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

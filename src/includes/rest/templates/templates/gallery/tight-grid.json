@@ -1,0 +1,26 @@
+{
+  "id": "tight-grid",
+  "name": "Tight Grid",
+  "description": "Four-column grid with minimal gutters. Dense, wall-of-work feel. Good for large collections where browsing speed matters.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "general",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 4,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "item_spacing": {
+      "desktop": 4,
+      "tablet": 3,
+      "mobile": 2
+    },
+    "hover_effect": "grayscale",
+    "captions": false
+  }
+}

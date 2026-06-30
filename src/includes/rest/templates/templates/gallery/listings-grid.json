@@ -1,0 +1,32 @@
+{
+  "id": "listings-grid",
+  "name": "Listings Grid",
+  "description": "Clean property grid with address captions and watermark enabled by default. Looks right on mobile from day one.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 12,
+  "settings": {
+    "layout": "grid",
+    "columns": {
+      "desktop": 3,
+      "tablet": 2,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 12,
+      "tablet": 10,
+      "mobile": 6
+    },
+    "captions": true,
+    "caption_placement": "bottom",
+    "watermark_apply_to_collection": true,
+    "item_click_behavior": "lightbox",
+    "hover_effect": "zoom",
+    "border_enabled": true,
+    "border_width": 1,
+    "border_color": "#eeeeee"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "campaign-strip",
+  "name": "Campaign Strip",
+  "description": "Hero slider with per-slide caption and a CTA overlay placeholder. Ready for the next product drop or campaign launch.",
+  "type": "free",
+  "category": "gallery",
+  "subcategory": "leads",
+  "preview_image": "",
+  "isUserTemplate": false,
+  "order": 13,
+  "settings": {
+    "layout": "slider",
+    "columns": {
+      "desktop": 1,
+      "tablet": 1,
+      "mobile": 1
+    },
+    "item_spacing": {
+      "desktop": 0,
+      "tablet": 0,
+      "mobile": 0
+    },
+    "captions": true,
+    "layout_autoplay": true,
+    "layout_autoplay_delay": 5000
+  }
+}

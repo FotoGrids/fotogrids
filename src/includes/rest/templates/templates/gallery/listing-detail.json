@@ -1,0 +1,11 @@
+{
+  "id": "listing-detail",
+  "name": "Listing Detail",
+  "description": "Full property detail layout: large hero slider, scrollable photo strip, map block, and an inline enquiry form. Everything a listing page needs in one template.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "real-estate",
+  "order": 38,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}

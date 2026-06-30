@@ -1,0 +1,137 @@
+{
+    "id": "sharing",
+    "label": "Sharing",
+    "icon": "share",
+    "settings": [
+        {
+            "key": "sharing_global_off_notice",
+            "type": "info_block",
+            "subtitle": "Sharing is turned off site-wide",
+            "message": "Social sharing is disabled in FotoGrids settings. Turn it on under FotoGrids → Settings → Sharing to configure sharing for this {postType}.",
+            "icon": "share",
+            "button_label": "Open Sharing settings",
+            "button_url": "admin.php?page=fotogrids-settings&tab=sharing",
+            "full_width": true,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [false]
+            }
+        },
+        {
+            "key": "sharing_override",
+            "type": "toggle",
+            "label": "Override sharing for this {postType}",
+            "description": "By default this {postType.lower} inherits the site-wide sharing settings. Turn this on to customise sharing just for this {postType.lower}.",
+            "default": false,
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [true, "1"]
+            }
+        },
+        {
+            "key": "sharing_disabled_for_collection",
+            "type": "toggle",
+            "label": "Disable sharing for this {postType}",
+            "description": "Hide all share controls on this {postType}, even though sharing is enabled site-wide.",
+            "default": false,
+            "disabled_unless": "sharing_override",
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [true, "1"]
+            }
+        },
+        {
+            "key": "sharing_networks_override",
+            "type": "token_select",
+            "label": "Networks",
+            "description": "Which share buttons to show for this {postType}.",
+            "options": [
+                { "label": "Facebook", "value": "facebook", "tier_required": "free" },
+                { "label": "X (Twitter)", "value": "x", "tier_required": "free" },
+                { "label": "Pinterest", "value": "pinterest", "tier_required": "free" },
+                { "label": "LinkedIn", "value": "linkedin", "tier_required": "free" },
+                { "label": "WhatsApp", "value": "whatsapp", "tier_required": "free" },
+                { "label": "Telegram", "value": "telegram", "tier_required": "free" },
+                { "label": "Reddit", "value": "reddit", "tier_required": "free" },
+                { "label": "Email", "value": "email", "tier_required": "free" },
+                { "label": "Copy Link", "value": "copy_link", "tier_required": "free" }
+            ],
+            "default": ["facebook", "x", "pinterest", "email", "copy_link"],
+            "disabled_unless": "sharing_override",
+            "inherit_from": "networks",
+            "condition": {
+                "dependsOn": "sharing_disabled_for_collection",
+                "values": [false, "0"]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [true, "1"]
+            }
+        },
+        {
+            "key": "sharing_placements_override",
+            "type": "token_select",
+            "label": "Display at",
+            "description": "Where share controls appear for this {postType}.",
+            "options": [
+                { "label": "View page", "value": "view_page", "tier_required": "free" },
+                { "label": "Lightbox", "value": "lightbox", "tier_required": "free" },
+                { "label": "Thumbnails", "value": "thumbnail", "tier_required": "free" }
+            ],
+            "default": ["view_page", "lightbox"],
+            "disabled_unless": "sharing_override",
+            "inherit_from": "placements",
+            "condition": {
+                "dependsOn": "sharing_disabled_for_collection",
+                "values": [false, "0"]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [true, "1"]
+            }
+        },
+        {
+            "key": "sharing_custom_text_override",
+            "type": "text_input",
+            "label": "Custom share text",
+            "description": "Text included when sharing this {postType}. Use {title} and {url} as placeholders.",
+            "placeholder": "Check out {title} - {url}",
+            "default": "",
+            "disabled_unless": "sharing_override",
+            "inherit_from": "custom_text",
+            "condition": {
+                "dependsOn": "sharing_disabled_for_collection",
+                "values": [false, "0"]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true,
+            "condition_global": {
+                "dependsOn": "enable_social_sharing",
+                "values": [true, "1"]
+            }
+        }
+    ],
+    "tier_required": "free"
+}

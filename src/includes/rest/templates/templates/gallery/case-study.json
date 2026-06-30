@@ -1,0 +1,11 @@
+{
+  "id": "case-study",
+  "name": "Case Study",
+  "description": "Justified gallery with inline CTA overlays and a lead-capture form pre-wired. Built for business portfolios where each project should generate enquiries.",
+  "type": "pro",
+  "category": "gallery",
+  "subcategory": "editorial",
+  "order": 30,
+  "isUserTemplate": false,
+  "thumbnail": ""
+}
