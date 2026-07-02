@@ -297,6 +297,7 @@ function buildControlView(kind) {
 
                 $select.select2({
                     width: '100%',
+                    allowClear: true,
                     placeholder: kind === 'album'
                         ? __('Select an album…', 'fotogrids')
                         : __('Select a gallery…', 'fotogrids'),
@@ -439,6 +440,26 @@ if (window.elementor && window.elementor.on) {
 tryBindIframe();
 setTimeout(tryBindIframe, 0);
 setTimeout(tryBindIframe, 1000);
+
+// Standalone "Create new" button. It is a widget-level RAW_HTML control
+// (outside any picker control view) so it stays visible in every gallery
+// source mode; a delegated listener opens the new-gallery/album screen in
+// a new tab. The button carries the target URL in `data-fg-create-url`.
+document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!target || !target.closest) {
+        return;
+    }
+    const button = target.closest('.fg-pb-elementor-create');
+    if (!button) {
+        return;
+    }
+    event.preventDefault();
+    const url = button.dataset.fgCreateUrl;
+    if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+});
 
 // ─── Empty-state CTA bridge ─────────────────────────────────────────────────
 // When a gallery/album widget renders its empty-state panel inside the

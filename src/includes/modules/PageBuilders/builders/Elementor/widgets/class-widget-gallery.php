@@ -109,12 +109,60 @@ class Widget_Gallery extends Widget_Base {
 		);
 
 		$this->add_control(
+			'gallery_source',
+			array(
+				'label'   => __( 'Gallery source', 'fotogrids' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'picker',
+				'options' => array(
+					'picker'  => __( 'Gallery Picker', 'fotogrids' ),
+					'dynamic' => __( 'Dynamic', 'fotogrids' ),
+				),
+			)
+		);
+
+		$this->add_control(
 			'gallery_id',
 			array(
 				'label'       => __( 'Gallery', 'fotogrids' ),
 				'type'        => Gallery_Picker::TYPE,
 				'default'     => '',
 				'label_block' => true,
+				'condition'   => array( 'gallery_source' => 'picker' ),
+			)
+		);
+
+		// Native field for a dynamic-tag gallery ID. The picker control is
+		// a custom Select2 view, which Elementor cannot render its
+		// dynamic-value editor into; a native TEXT control can, so an ACF
+		// field (or any tag) can supply the ID. Categories cover the tag
+		// types an ID-bearing field registers under.
+		$this->add_control(
+			'gallery_id_dynamic',
+			array(
+				'label'       => __( 'Dynamic Gallery ID', 'fotogrids' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'label_block' => true,
+				'description' => __( 'Bind a dynamic source that outputs a gallery ID.', 'fotogrids' ),
+				'condition'   => array( 'gallery_source' => 'dynamic' ),
+				'dynamic'     => array(
+					'active'     => true,
+					'categories' => array( 'text', 'number', 'post_meta' ),
+				),
+			)
+		);
+
+		// Standalone create button - no condition, so it shows in both the
+		// picker and dynamic source modes.
+		$this->add_control(
+			'fotogrids_create_new',
+			array(
+				'type' => Controls_Manager::RAW_HTML,
+				'raw'  => Elementor_Module::create_button_html(
+					admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
+					__( 'Create new gallery', 'fotogrids' )
+				),
 			)
 		);
 
@@ -177,8 +225,17 @@ class Widget_Gallery extends Widget_Base {
 	 * @return void
 	 */
 	protected function render(): void {
-		$settings   = $this->get_settings_for_display();
-		$gallery_id = isset( $settings['gallery_id'] ) ? absint( $settings['gallery_id'] ) : 0;
+		$settings = $this->get_settings_for_display();
+		$source   = isset( $settings['gallery_source'] ) ? $settings['gallery_source'] : 'picker';
+
+		// In "dynamic" mode the ID comes from the native field, whose
+		// dynamic tag get_settings_for_display() has already resolved to a
+		// value; otherwise it comes from the picker.
+		if ( 'dynamic' === $source ) {
+			$gallery_id = isset( $settings['gallery_id_dynamic'] ) ? absint( $settings['gallery_id_dynamic'] ) : 0;
+		} else {
+			$gallery_id = isset( $settings['gallery_id'] ) ? absint( $settings['gallery_id'] ) : 0;
+		}
 
 		if ( $gallery_id <= 0 ) {
 			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {

@@ -107,6 +107,18 @@ class Widget_Album extends Widget_Base {
 			)
 		);
 
+		// Standalone create button, mirroring the gallery widget.
+		$this->add_control(
+			'fotogrids_create_new',
+			array(
+				'type' => Controls_Manager::RAW_HTML,
+				'raw'  => Elementor_Module::create_button_html(
+					admin_url( 'post-new.php?post_type=fotogrids_album' ),
+					__( 'Create new album', 'fotogrids' )
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		// Preview section - editor-only toggles, see Widget_Gallery for

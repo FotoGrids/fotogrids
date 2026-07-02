@@ -107,8 +107,14 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
             updated_at: null,
             status: 'publish',
         });
-        const url = `${restUrl}picker/items?type=album&per_page=100&orderby=newest`;
-        fetch(url, { headers: { 'X-WP-Nonce': restNonce } })
+        // URL + searchParams keeps the query valid on plain permalinks
+        // (restUrl carries a `?rest_route=` query already), where a manual
+        // `?` concat would yield rest_no_route.
+        const url = new URL(`${restUrl}picker/items`);
+        url.searchParams.set('type', 'album');
+        url.searchParams.set('per_page', '100');
+        url.searchParams.set('orderby', 'newest');
+        fetch(url.toString(), { headers: { 'X-WP-Nonce': restNonce } })
             .then((r) => (r.ok ? r.json() : null))
             .then((data) => {
                 if (!data || !Array.isArray(data.items)) return;

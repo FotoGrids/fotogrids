@@ -63,9 +63,11 @@
 		}
 	}
 
-	&__input {
+	&__input,
+	input[type='search'] {
 		flex: 1;
 		min-width: 0;
+		min-height: 0;
 		appearance: none;
 		background: transparent;
 		border: none;
@@ -92,6 +94,12 @@
 		&:disabled {
 			cursor: not-allowed;
 			color: #888;
+		}
+
+		&:focus,
+		&:focus-visible {
+			outline: none;
+			box-shadow: none;
 		}
 	}
 
@@ -151,7 +159,8 @@
 		height: 14px;
 	}
 
-	&--size-compact &__input {
+	&--size-compact &__input,
+	&--size-compact input[type='search'] {
 		font-size: 13px;
 		padding: 2px 0;
 	}
