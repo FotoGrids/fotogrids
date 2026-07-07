@@ -10,13 +10,14 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Builds a schema.org BreadcrumbList JSON-LD block for a gallery → album
- * trail and returns it as a ready-to-emit `<script type="application/ld+json">`
- * string.
+ * Builds a schema.org BreadcrumbList JSON-LD document for a gallery → album
+ * trail and returns it as a bare JSON string (no <script> tags).
  *
- * Called from Collection_Header::html_appendix() - so the schema is only
- * built when the visible header is being built. The schema mirrors the
- * visible breadcrumb exactly: parent album, then current gallery.
+ * Called from Collection_Header::json_ld() - the controller emits it as a
+ * per-render JSON-LD document (wp_footer <script type="application/ld+json">
+ * on page renders, a response field on AJAX renders) rather than embedding it
+ * in the gallery markup. The schema mirrors the visible breadcrumb exactly:
+ * parent album, then current gallery.
  *
  * Gates:
  *   - The album's per-collection `navigation_emit_breadcrumb_schema`
@@ -42,7 +43,7 @@ final class Breadcrumb_Schema {
 	 * @param int                  $album_id      Resolved parent album.
 	 * @param array<string, mixed> $album_settings Album settings map.
 	 * @param bool                 $is_ajax_swap  True if this render is producing an AJAX swap payload.
-	 * @return string Empty string when suppressed.
+	 * @return string Bare JSON-LD document (no <script> tags), or '' when suppressed.
 	 */
 	public static function build( int $gallery_id, int $album_id, array $album_settings, bool $is_ajax_swap ): string {
 		if ( $is_ajax_swap ) {
@@ -127,9 +128,6 @@ final class Breadcrumb_Schema {
 			return '';
 		}
 
-		// Inline script. Output is JSON, no need for esc_js() - the
-		// surrounding type="application/ld+json" tells the browser to
-		// parse it as data, not JavaScript.
-		return '<script type="application/ld+json" class="fg-breadcrumb-schema">' . $json . '</script>';
+		return $json;
 	}
 }

@@ -587,12 +587,13 @@ class Renderer {
 	}
 
 	/**
-	 * Body element attributes.
+	 * Space-separated class list for the view page <body>. The template escapes
+	 * it with esc_attr(); the fixed body id is Renderer::BODY_ID.
 	 *
 	 * @since 1.0.0
 	 * @return string
 	 */
-	public function body_attrs(): string {
+	public function body_class(): string {
 		$theme   = $this->settings['theme'] ?? 'light';
 		$classes = array(
 			'fotogrids-view',
@@ -610,23 +611,22 @@ class Renderer {
 		$classes = (array) apply_filters( Filters_View::BODY_CLASSES, $classes, $this->post );
 		$classes = array_map( 'sanitize_html_class', $classes );
 
-		return 'id="' . esc_attr( self::BODY_ID ) . '"'
-			. ' class="' . esc_attr( implode( ' ', $classes ) ) . '"';
+		return implode( ' ', $classes );
 	}
 
 	/**
-	 * Scoped CSS-variable <style> block for the view page body.
-	 *
-	 * Emitted as the first child of <body> so the accent, max width, and
-	 * background custom properties are scoped to #fotogrids-view rather than
-	 * stamped on the body as an inline style attribute. The max width is a
-	 * responsive range, so it is carried as a Responsive_Var and
-	 * Style_Var_Builder emits one @media block per configured breakpoint.
+	 * Scoped CSS-variable block for the view page body, as bare CSS (no <style>
+	 * tags). Enqueued by enqueue_assets() via wp_add_inline_style() on the
+	 * fotogrids-view-collection handle rather than embedded in the markup, so the
+	 * accent, max width, and background custom properties reach the page as an
+	 * enqueued stylesheet scoped to #fotogrids-view. The max width is a
+	 * responsive range, carried as a Responsive_Var so Style_Var_Builder emits
+	 * one @media block per configured breakpoint.
 	 *
 	 * @since  1.0.0
-	 * @return string The full <style> element, or '' when no variables apply.
+	 * @return string The CSS rules, or '' when no variables apply.
 	 */
-	public function body_style_element(): string {
+	public function body_vars_css(): string {
 		$vars = array();
 
 		$accent = (string) ( $this->settings['accent_color'] ?? '#3c46f0' );
@@ -659,7 +659,7 @@ class Renderer {
 
 		$builder = new Style_Var_Builder();
 
-		return $builder->build_style_element(
+		return $builder->build_css(
 			$vars,
 			self::BODY_ID,
 			Breakpoint_Config::from_settings()
@@ -930,6 +930,15 @@ class Renderer {
 			array(),
 			FOTOGRIDS_VERSION
 		);
+
+		// Per-page CSS variables (accent, max width, background) scoped to
+		// #fotogrids-view. Attached to the view-collection handle - enqueued
+		// here before wp_head(), so it prints in <head> rather than being
+		// embedded as a <style> in the body markup.
+		$body_vars_css = $this->body_vars_css();
+		if ( '' !== $body_vars_css ) {
+			wp_add_inline_style( 'fotogrids-view-collection', $body_vars_css );
+		}
 
 		wp_enqueue_style(
 			'fotogrids-fg-tooltip',

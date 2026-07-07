@@ -198,9 +198,10 @@ class Widget_Album extends Widget_Base {
 				: 0;
 
 			if ( 0 === $child_count ) {
-				echo '<div class="fg-pb-elementor-preview fg-pb-elementor-preview--empty">'
-					. Preview_Renderer::render_empty_state_html( 'album', $album_id ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$fg_markup = '<div class="fg-pb-elementor-preview fg-pb-elementor-preview--empty">'
+					. Preview_Renderer::render_empty_state_html( 'album', $album_id )
 					. '</div>';
+				echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
 				return;
 			}
 
@@ -208,9 +209,10 @@ class Widget_Album extends Widget_Base {
 			$html            = Preview_Renderer::render_album_html( $album_id, $preview_options );
 
 			$pagination_off = ( ! $preview_options['pagination'] ) ? ' is-fg-pb-pagination-frozen' : '';
-			echo '<div class="fg-pb-elementor-preview' . esc_attr( $pagination_off ) . '">'
-				. $html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$fg_markup      = '<div class="fg-pb-elementor-preview' . $pagination_off . '">'
+				. $html
 				. '</div>';
+			echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
 			return;
 		}
 
@@ -221,7 +223,8 @@ class Widget_Album extends Widget_Base {
 		$shortcode_args = array(
 			'id' => $album_id,
 		);
-		echo \FotoGrids\Public_Render::album_shortcode( $shortcode_args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$fg_markup      = \FotoGrids\Public_Render::album_shortcode( $shortcode_args );
+		echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
 	}
 
 	/**

@@ -328,8 +328,7 @@ class Integrated_Renderer {
 			return;
 		}
 
-		// Renderer::head_meta() is already escape-aware.
-		echo Renderer::for_post( $post )->head_meta(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( Renderer::for_post( $post )->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 	}
 
 	/**

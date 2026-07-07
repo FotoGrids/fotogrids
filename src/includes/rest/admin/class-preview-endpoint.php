@@ -123,6 +123,9 @@ final class Preview_Endpoint {
 				'instance_id'    => $render_result->instance_id,
 				'active_modules' => $render_result->active_modules,
 				'http_status'    => $render_result->http_status,
+				'inlineCss'      => $render_result->inline_css,
+				'inlineJs'       => $render_result->inline_js,
+				'jsonLd'         => $render_result->json_ld,
 				'assets'         => array(
 					'css'      => $css_assets,
 					'js'       => $js_payload,

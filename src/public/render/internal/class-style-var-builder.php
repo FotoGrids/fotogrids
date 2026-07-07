@@ -48,15 +48,15 @@ if ( ! defined( 'WPINC' ) ) {
 final class Style_Var_Builder {
 
 	/**
-	 * Serializes the variable map into a complete inline style element.
+	 * Serializes the variable map into raw CSS (no <style> tags).
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, string|Responsive_Var> $css_variables Variable map.
 	 * @param  string                               $instance_id   Gallery wrapper element ID.
 	 * @param  Breakpoint_Config                    $breakpoints   User-configured breakpoints.
-	 * @return string  The full <style> element, or '' when the map is empty.
+	 * @return string  The CSS rules, or '' when the map is empty.
 	 */
-	public function build_style_element(
+	public function build_css(
 		array $css_variables,
 		string $instance_id,
 		Breakpoint_Config $breakpoints
@@ -105,7 +105,7 @@ final class Style_Var_Builder {
 		}
 
 		$selector = '#' . esc_attr( $instance_id );
-		$output   = "<style class=\"fg-vars\">\n";
+		$output   = '';
 
 		$output .= $selector . " {\n";
 		foreach ( $base_vars as $name => $val ) {
@@ -133,9 +133,25 @@ final class Style_Var_Builder {
 			$output .= "}\n";
 		}
 
-		$output .= '</style>';
-
 		return $output;
+	}
+
+	/**
+	 * Serializes the variable map into a complete <style> element.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, string|Responsive_Var> $css_variables Variable map.
+	 * @param  string                               $instance_id   Gallery wrapper element ID.
+	 * @param  Breakpoint_Config                    $breakpoints   User-configured breakpoints.
+	 * @return string  The full <style> element, or '' when the map is empty.
+	 */
+	public function build_style_element(
+		array $css_variables,
+		string $instance_id,
+		Breakpoint_Config $breakpoints
+	): string {
+		$css = $this->build_css( $css_variables, $instance_id, $breakpoints );
+		return '' === $css ? '' : "<style class=\"fg-vars\">\n" . $css . '</style>';
 	}
 
 	/**

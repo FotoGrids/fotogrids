@@ -6,7 +6,9 @@ use FotoGrids\Hooks\Filters_Page_Builders;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
+use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Render_Controller;
+use FotoGrids\Render\Internal\Render_Result;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -184,8 +186,17 @@ class Public_Render {
 			);
 		}
 
-		$render_result          = Render_Controller::factory()->render( $render_context );
-		self::$last_render_meta = $render_context->meta;
+		$render_result            = Render_Controller::factory()->render( $render_context );
+		self::$last_render_meta   = $render_context->meta;
+		self::$last_render_result = $render_result;
+
+		// Direct page renders enqueue their per-render inline CSS/JS; REST/AJAX
+		// and preview renders skip this (the emitter self-gates on the request
+		// context) and expose the assets via last_render_result() instead.
+		if ( ! $is_preview ) {
+			Inline_Asset_Emitter::enqueue( $render_result );
+		}
+
 		return (string) $render_result->html;
 	}
 
@@ -201,6 +212,16 @@ class Public_Render {
 	private static ?\FotoGrids\Render\Api\Render_Meta $last_render_meta = null;
 
 	/**
+	 * Holds the full Render_Result of the most recent render in this request.
+	 * REST/AJAX handlers read it to return the per-render inline CSS/JS/JSON-LD
+	 * (which are no longer embedded in the markup) for the client to inject.
+	 *
+	 * @since 1.0.0
+	 * @var Render_Result|null
+	 */
+	private static ?Render_Result $last_render_result = null;
+
+	/**
 	 * Returns the Render_Meta from the most recent gallery render in this
 	 * request, or null when no render has run yet.
 	 *
@@ -208,6 +229,16 @@ class Public_Render {
 	 */
 	public static function last_render_meta(): ?\FotoGrids\Render\Api\Render_Meta {
 		return self::$last_render_meta;
+	}
+
+	/**
+	 * Returns the full Render_Result from the most recent gallery render in this
+	 * request, or null when no render has run yet.
+	 *
+	 * @since  1.0.0
+	 */
+	public static function last_render_result(): ?Render_Result {
+		return self::$last_render_result;
 	}
 
 	/**
@@ -396,7 +427,7 @@ class Public_Render {
 		$atts = shortcode_atts(
 			array(
 				'id'       => 0,
-				'template' => 'grid',
+				'template' => '',
 			),
 			$atts,
 			'fotogrids_album'
@@ -456,7 +487,9 @@ class Public_Render {
 			$child_gallery_ids,
 		);
 
-		$result = Render_Controller::factory()->render( $context );
+		$result                   = Render_Controller::factory()->render( $context );
+		self::$last_render_result = $result;
+		Inline_Asset_Emitter::enqueue( $result );
 
 		return $result->html;
 	}
@@ -661,7 +694,26 @@ class Public_Render {
 			)
 		);
 
-		return (string) Render_Controller::factory()->render( $render_context )->html;
+		$result = Render_Controller::factory()->render( $render_context );
+
+		// Template previews render into a self-contained document (admin
+		// picker iframe / REST preview) that has no wp_head/wp_footer to
+		// enqueue into, so the per-render CSS/JS are embedded here - in the
+		// document-assembly layer, not in the render pipeline - alongside the
+		// pure markup the controller returns.
+		$head = '' !== $result->inline_css
+			? '<style class="fotogrids-inline-css">' . $result->inline_css . '</style>'
+			: '';
+
+		$foot = '';
+		if ( '' !== $result->inline_js ) {
+			$foot .= '<script>' . $result->inline_js . '</script>';
+		}
+		if ( '' !== $result->json_ld ) {
+			$foot .= '<script type="application/ld+json">' . str_replace( '</', '<\/', $result->json_ld ) . '</script>';
+		}
+
+		return $head . $result->html . $foot;
 	}
 
 	/**

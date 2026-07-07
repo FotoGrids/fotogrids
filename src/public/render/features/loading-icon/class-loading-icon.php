@@ -64,23 +64,28 @@ final class Loading_Icon implements Feature {
 	private const DEFAULT_ICON = '12-dots';
 
 	/**
-	 * Whether wp_add_inline_script has been scheduled for the footer.
-	 *
-	 * @since 1.0.0
-	 * @var bool
-	 */
-	private static bool $footer_scheduled = false;
-
-	/**
-	 * Distinct icon names used by galleries on this page, in encounter order.
-	 *
-	 * Populated by assets() as each gallery is rendered. The footer action
-	 * reads this to build the full icons map.
+	 * Icon names whose animate-fn has already been published to the page map.
 	 *
 	 * @since 1.0.0
 	 * @var array<string, true>
 	 */
-	private static array $icon_names_seen = array();
+	private static array $published_icons = array();
+
+	/**
+	 * Monotonic counter guaranteeing a unique inline-script handle per icon.
+	 *
+	 * @since 1.0.0
+	 * @var int
+	 */
+	private static int $map_seq = 0;
+
+	/**
+	 * Whether a single-icon window.fotogridsLoadingIcon has been published yet.
+	 *
+	 * @since 1.0.0
+	 * @var bool
+	 */
+	private static bool $default_published = false;
 
 	public function id(): string {
 		return 'fotogrids/loading-icon';
@@ -132,98 +137,20 @@ final class Loading_Icon implements Feature {
 	}
 
 	/**
-	 * Emits a tiny inline <script> immediately after each gallery wrapper.
+	 * No markup appended after the gallery wrapper.
 	 *
-	 * Two responsibilities, both timing-critical:
-	 *
-	 *  1. Push the gallery's instance ID onto window.fgAnimQueue for the
-	 *     footer drain. This is kept as a fallback path for galleries that
-	 *     somehow don't get processed inline (defensive only).
-	 *
-	 *  2. Start the WAAPI loader animations on every .fg-item-loader svg
-	 *     inside this gallery, RIGHT NOW, while the parser is still walking
-	 *     the page body. This guarantees the animation has a head start
-	 *     before any image's load event fires.
-	 *
-	 *     The previous design queued IDs here and ran animate() in the
-	 *     footer. That left a fatal gap on fast networks/cached images:
-	 *     by footer time, img.complete was already true, so loading-icon.js
-	 *     called markLoaded() immediately, which cancelled the animation
-	 *     before it ever became visible. Starting animations here closes
-	 *     that window - the animation is already running at the moment
-	 *     loading-icon.js wires its load listener.
-	 *
-	 *     If window.fotogridsLoadingIcons isn't defined yet (footer global
-	 *     hasn't run), we fall back to the queue-only path. In practice
-	 *     this happens for the very first gallery on a page when the global
-	 *     script lands later, hence the dual approach.
-	 *
-	 * The script contains no JS operators that wptexturize could mangle
-	 * outside of string literals.
+	 * The loader animations were previously started by an inline <script>
+	 * emitted here. That script was removed so the gallery markup can pass
+	 * through wp_kses(); loading-icon.js now starts the animations per gallery
+	 * from the runtime's onGallery hook, using the icon map published by
+	 * publish_icon_map() during assets().
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.
 	 * @return  string
 	 */
 	public function html_after( Render_Context $render_context ): string {
-		$instance_id = $render_context->meta->instance_id;
-		$id_json     = wp_json_encode( $instance_id );
-
-		// Record this icon so the footer drainer's build_global_js() picks it
-		// up. assets() also records it (belt-and-braces), but assets() runs
-		// after html_after() and only when the pipeline reaches it.
-		$this_icon                           = $this->resolve_icon_name( $render_context );
-		self::$icon_names_seen[ $this_icon ] = true;
-
-		// Per-collection inline runner. Runs synchronously as the parser
-		// passes the wrapper. Two important constraints govern the script
-		// body below:
-		//
-		//  1. It is emitted into the_content output, which means WordPress
-		//     filters (convert_chars, wpautop, block normalizers, kses on
-		//     re-saved posts) may HTML-encode any &, &&, <, or > literals
-		//     inside it. We MUST therefore avoid those characters and we
-		//     MUST NOT interpolate JS source that contains them (the icon
-		//     animate functions DO contain `&&` and `<`, so they cannot
-		//     appear here - they live in the footer global instead, which
-		//     ships via wp_add_inline_script and bypasses the_content).
-		//
-		//  2. Even with the global not yet defined, the script still does
-		//     useful work: it queues the collection ID onto fgAnimQueue,
-		//     which the footer drainer reads to start animations for every
-		//     collection on the page. On a healthy page the global may
-		//     already be present (footer-printed-in-head extension, second
-		//     collection on the page after the global painted) and the
-		//     inline runner starts the animation immediately.
-		//
-		// Banned characters below: & (and any operator built from it: &&,
-		// &amp;), < and > (other than the script tag bracket itself).
-		// `||` and `|` are safe - pipes are not HTML-special.
-		return '<script>'
-			. '(function(id){'
-			. 'if(!window.fgLoaderHandles){window.fgLoaderHandles=new WeakMap();}'
-			. 'if(!window.fgAnimQueue){window.fgAnimQueue=[];}'
-			. 'window.fgAnimQueue.push(id);'
-			. 'var icons=window.fotogridsLoadingIcons;'
-			. 'if(!icons){return;}'
-			. 'var g=document.getElementById(id);'
-			. 'if(!g){return;}'
-			. 'var iconName=g.getAttribute("data-fg-loading-icon")||"";'
-			. 'var icon=icons[iconName];'
-			. 'if(!icon){icon=icons[Object.keys(icons)[0]];}'
-			. 'if(!icon){return;}'
-			. 'if(typeof icon.animate!=="function"){return;}'
-			. 'g.querySelectorAll(".fg-item").forEach(function(item){'
-			. 'if(window.fgLoaderHandles.has(item)){return;}'
-			. 'var svg=item.querySelector(".fg-item-loader svg");'
-			. 'if(!svg){return;}'
-			. 'try{'
-			. 'var h=icon.animate(svg);'
-			. 'window.fgLoaderHandles.set(item,Array.isArray(h)?h:[]);'
-			. '}catch(e){}'
-			. '});'
-			. '})(' . $id_json . ');'
-			. '</script>';
+		return '';
 	}
 
 	/**
@@ -267,11 +194,10 @@ final class Loading_Icon implements Feature {
 	 * @return  Module_Assets
 	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
-		// Accumulate distinct icon names; footer action reads this later.
-		$icon_name                           = $this->resolve_icon_name( $render_context );
-		self::$icon_names_seen[ $icon_name ] = true;
-
-		$this->maybe_schedule_footer_global();
+		// Publish this gallery's icon into the page-level map. Done here (during
+		// render, before Asset_Resolver force-prints loading-icon.js) so the map
+		// reaches the page ahead of the script that reads it.
+		$this->publish_icon_map( $this->resolve_icon_name( $render_context ) );
 
 		return new Module_Assets(
 			array(
@@ -284,7 +210,7 @@ final class Loading_Icon implements Feature {
 			array(
 				'fotogrids-loading-icon' => new Asset_Decl(
 					'../../assets/js/loading-icon.js',
-					array(),
+					array( 'fotogrids-runtime' ),
 					true,
 				),
 			)
@@ -304,174 +230,86 @@ final class Loading_Icon implements Feature {
 	}
 
 	/**
-	 * Builds JS that defines window.fotogridsLoadingIcons - a map of all icon
-	 * names used on this page, each with its svg template and WAAPI animate fn.
-	 *
-	 * Also sets window.fotogridsLoadingIcon to the first / default icon for
-	 * backwards compatibility with lightbox.js which reads that single-icon form.
+	 * Builds the JS object literal for one icon: its svg template and pre-built
+	 * WAAPI animate function, e.g. `{svg:"...",animate:function animate(svg){...}}`.
 	 *
 	 * @since   1.0.0
-	 * @param   array<string, true> $icon_names_seen Distinct icon names to include.
-	 * @return  string Raw JS (no <script> tags).
+	 * @param   string $icon_name Icon name.
+	 * @return  string Raw JS object literal (no <script> tags).
 	 */
-	private static function build_global_js( array $icon_names_seen ): string {
-		$entries = array();
-		$first   = null;
-
-		foreach ( array_keys( $icon_names_seen ) as $icon_name ) {
-			$svg        = \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, '' );
-			$animate_fn = \FotoGrids\Assets\Loading_Icon_Library::animate_fn( $icon_name );
-			if ( '' === $animate_fn ) {
-				$animate_fn = 'function animate(){return [];}';
-			}
-
-			$entries[] = sprintf(
-				'%s:{svg:%s,animate:%s}',
-				wp_json_encode( $icon_name ),
-				wp_json_encode( $svg ),
-				$animate_fn
-			);
-
-			if ( null === $first ) {
-				$first = $icon_name;
-			}
+	private static function build_icon_entry_js( string $icon_name ): string {
+		$svg        = \FotoGrids\Assets\Loading_Icon_Library::svg( $icon_name, '' );
+		$animate_fn = \FotoGrids\Assets\Loading_Icon_Library::animate_fn( $icon_name );
+		if ( '' === $animate_fn ) {
+			$animate_fn = 'function animate(){return [];}';
 		}
 
-		$map_js = 'window.fotogridsLoadingIcons={' . implode( ',', $entries ) . '};';
-
-		// Keep window.fotogridsLoadingIcon pointing at the first icon for
-		// lightbox.js and other callers that use the single-icon API.
-		$default_js = '';
-		if ( null !== $first ) {
-			$svg        = \FotoGrids\Assets\Loading_Icon_Library::svg( $first, '' );
-			$animate_fn = \FotoGrids\Assets\Loading_Icon_Library::animate_fn( $first );
-			if ( '' === $animate_fn ) {
-				$animate_fn = 'function animate(){return [];}';
-			}
-			$default_js = sprintf(
-				'window.fotogridsLoadingIcon={name:%s,svg:%s,animate:%s};',
-				wp_json_encode( $first ),
-				wp_json_encode( $svg ),
-				$animate_fn
-			);
-		}
-
-		return $map_js . $default_js;
+		return sprintf(
+			'{svg:%s,animate:%s}',
+			wp_json_encode( $svg ),
+			$animate_fn
+		);
 	}
 
 	/**
-	 * Schedules the footer global + queue drainer via wp_add_inline_script.
+	 * Publishes one gallery's loading icon into the page-level icon map.
 	 *
-	 * wp_add_inline_script bypasses the_content filters (wptexturize etc.) so
-	 * the full animate function - which contains &&, <, > - is emitted safely.
+	 * The map (window.fotogridsLoadingIcons) carries the icon svg + its WAAPI
+	 * animate function, which loading-icon.js reads to start the loader
+	 * animations. It cannot ride inside the gallery markup: the animate
+	 * functions contain &&, <, > that the_content filters (wptexturize etc.)
+	 * would mangle, and the markup is destined for wp_kses(). It also cannot be
+	 * attached to loading-icon.js as a 'before' inline, because Asset_Resolver
+	 * force-prints that handle mid-content and a later inline addition is lost.
 	 *
-	 * The script:
-	 *  1. Defines window.fotogridsLoadingIcon = { name, svg, animate }.
-	 *  2. Drains window.fgAnimQueue: for each queued gallery instance ID,
-	 *     finds its loader SVGs and calls animate() on each, storing handles
-	 *     in window.fgLoaderHandles for loading-icon.js to cancel on load.
-	 *
-	 * The queue is populated by the tiny per-gallery inline scripts in
-	 * html_after() as the page body is parsed, so every gallery is processed
-	 * in order as soon as this footer script runs.
+	 * So each distinct icon is emitted through its own src-less script handle,
+	 * force-printed immediately when the document head has already rendered
+	 * (the normal shortcode-in-the_content case) - the same pattern
+	 * Inline_Asset_Emitter uses for per-render CSS. The assignment is additive
+	 * (Object.assign) so multiple galleries with different icons each contribute
+	 * without clobbering. A unique handle per icon keeps each independently
+	 * printable. When the head has not rendered yet (REST preview / very early
+	 * render) the handle is enqueued and flushed on wp_footer + late_assets.
 	 *
 	 * @since   1.0.0
-	 * @param   Render_Context $render_context Render context.
+	 * @param   string $icon_name Icon name for the gallery being rendered.
 	 * @return  void
 	 */
-	private function maybe_schedule_footer_global(): void {
-		if ( self::$footer_scheduled ) {
+	private function publish_icon_map( string $icon_name ): void {
+		if ( isset( self::$published_icons[ $icon_name ] ) ) {
+			return;
+		}
+		self::$published_icons[ $icon_name ] = true;
+
+		$entry = self::build_icon_entry_js( $icon_name );
+		$js    = 'window.fotogridsLoadingIcons=Object.assign(window.fotogridsLoadingIcons||{},{'
+			. wp_json_encode( $icon_name ) . ':' . $entry . '});';
+
+		// Keep the single-icon window.fotogridsLoadingIcon (first icon seen) for
+		// lightbox.js and other callers that use that shorthand.
+		if ( ! self::$default_published ) {
+			self::$default_published = true;
+			$js                     .= 'window.fotogridsLoadingIcon=Object.assign({name:'
+				. wp_json_encode( $icon_name ) . '},' . $entry . ');';
+		}
+
+		$handle = 'fotogrids-loading-icons-' . (string) ++self::$map_seq;
+		wp_register_script( $handle, false, array(), FOTOGRIDS_VERSION, false );
+		wp_enqueue_script( $handle );
+		wp_add_inline_script( $handle, $js );
+
+		if ( did_action( 'wp_head' ) > 0 || did_action( 'admin_head' ) > 0 ) {
+			wp_print_scripts( $handle );
 			return;
 		}
 
-		self::$footer_scheduled = true;
-
-		// Footer drain - defensive fallback for any gallery whose
-		// per-gallery inline script bailed (e.g. unexpected DOM state).
-		// On a healthy page this is a no-op because every item already
-		// has handles set via the inline runner. Skips already-cached
-		// images so we don't start an animation only to cancel it in
-		// the same frame.
-		//
-		// The drain runs as a chunked rAF loop instead of one big
-		// synchronous pass. Two reasons:
-		//   1. icon.animate(svg) attaches a WAAPI animation AND an rAF
-		//      attribute interpolator (fgAnimAttr). Starting N of those
-		//      in one synchronous loop pins the main thread on the very
-		//      first frame, which queues image load events behind the
-		//      backlog and visibly batches every gallery's reveals.
-		//   2. The same blocking loop is why initial loader animations
-		//      don't visibly run - the browser never gets a paint
-		//      between animate() and the loading-icon.js wireGallery
-		//      cancel pass for already-cached images.
-		// We process up to FG_DRAIN_BATCH items per animation frame so
-		// the browser can paint between batches.
-		$drain_js = '(function(){'
-			. 'var icons=window.fotogridsLoadingIcons||{};'
-			. 'var q=window.fgAnimQueue||[];'
-			. 'if(!window.fgLoaderHandles)window.fgLoaderHandles=new WeakMap();'
-			. 'var pending=[];'
-			// Collect every (gallery, item, icon) tuple to process - cheap
-			// pass, no animate() calls yet.
-			. 'for(var i=0;i<q.length;i++){'
-			. 'var g=document.getElementById(q[i]);'
-			. 'if(!g)continue;'
-			. 'var iconName=g.getAttribute("data-fg-loading-icon")||"";'
-			. 'var icon=icons[iconName]||icons[Object.keys(icons)[0]];'
-			. 'if(!icon||typeof icon.animate!=="function")continue;'
-			. 'var items=g.querySelectorAll(".fg-item");'
-			. 'for(var j=0;j<items.length;j++){'
-			. 'pending.push({item:items[j],icon:icon});'
-			. '}'
-			. '}'
-			// Drain pending in small rAF batches so each animate() call has
-			// breathing room to paint. BATCH of 4 keeps a 60-item gallery
-			// wired up in ~15 frames (~250ms) while still streaming.
-			. 'var BATCH=4;var pos=0;'
-			. 'function step(){'
-			. 'var end=Math.min(pos+BATCH,pending.length);'
-			. 'for(;pos<end;pos++){'
-			. 'var item=pending[pos].item;'
-			. 'var icon=pending[pos].icon;'
-			. 'if(window.fgLoaderHandles.has(item))continue;'
-			. 'var img=item.querySelector(".fg-item-media img");'
-			. 'if(img && img.complete && img.naturalWidth > 0){'
-			. 'window.fgLoaderHandles.set(item,[]);'
-			. 'continue;'
-			. '}'
-			. 'var svg=item.querySelector(".fg-item-loader svg");'
-			. 'if(!svg)continue;'
-			. 'try{'
-			. 'var h=icon.animate(svg);'
-			. 'window.fgLoaderHandles.set(item,Array.isArray(h)?h:[]);'
-			. '}catch(e){}'
-			. '}'
-			. 'if(pos<pending.length){'
-			. '(window.requestAnimationFrame||function(f){setTimeout(f,16);})(step);'
-			. '}'
-			. '}'
-			. 'if(pending.length){'
-			. '(window.requestAnimationFrame||function(f){setTimeout(f,16);})(step);'
-			. '}'
-			. '})();';
-
-		// Defensive footer drain - catches any galleries whose per-gallery
-		// inline script bailed (e.g. unexpected DOM/JS state). On a healthy
-		// page this is a no-op because all items already have handles set.
-		//
-		// Also hooks `fotogrids/render/late_assets`, fired by the admin
-		// preview endpoint after the render completes. wp_footer never fires
-		// inside a REST request, so without this second hook the loading
-		// icons map (window.fotogridsLoadingIcons) is never published to the
-		// preview document and every item stays stuck on its spinner.
-		$publish_inline = static function () use ( $drain_js ): void {
-			$global_js = self::build_global_js( self::$icon_names_seen );
-			$inline    = $global_js . $drain_js;
-			wp_add_inline_script( 'fotogrids-loading-icon', $inline, 'before' );
+		// Head not rendered yet (REST preview / very early render): flush on
+		// wp_footer and on the preview endpoint's late_assets action.
+		$flush = static function () use ( $handle ): void {
+			wp_print_scripts( $handle );
 		};
-
-		add_action( 'wp_footer', $publish_inline, 10 );
-		add_action( Actions_Render::LATE_ASSETS, $publish_inline, 10 );
+		add_action( 'wp_footer', $flush, 10 );
+		add_action( Actions_Render::LATE_ASSETS, $flush, 10 );
 	}
 
 	/**
@@ -481,7 +319,8 @@ final class Loading_Icon implements Feature {
 	 * @return  void
 	 */
 	public static function reset_for_tests(): void {
-		self::$footer_scheduled = false;
-		self::$icon_names_seen  = array();
+		self::$published_icons   = array();
+		self::$map_seq           = 0;
+		self::$default_published = false;
 	}
 }

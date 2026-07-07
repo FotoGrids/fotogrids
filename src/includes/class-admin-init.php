@@ -652,6 +652,12 @@ class Admin_Init {
 	 * AJAX handler to update plugin setting
 	 */
 	public static function ajax_update_plugin_setting() {
+		check_ajax_referer( 'fotogrids_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
+		}
+
 		\FotoGrids\Debug_Log::write(
 			'license',
 			sprintf(
@@ -660,12 +666,6 @@ class Admin_Init {
 				isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '(unset)'
 			)
 		);
-
-		check_ajax_referer( 'fotogrids_admin', 'nonce' );
-
-		if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
-		}
 
 		$setting = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
 		$value   = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
@@ -1026,15 +1026,13 @@ class Admin_Init {
 	 * Handle bulk actions for galleries
 	 */
 	public static function handle_gallery_bulk_actions( $redirect_to, $doaction, $post_ids ) {
-		// This is a `handle_bulk_actions-{screen}` callback. WordPress core
-		// verifies the bulk-action nonce (check_admin_referer) in wp-admin
-		// before invoking this filter, so the bulk-action nonce is already
-		// checked upstream. The $_REQUEST reads below are additional params on
-		// that already-verified request.
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( ! in_array( $doaction, array( 'assign_to_album', 'remove_from_albums' ), true ) ) {
 			return $redirect_to;
 		}
+
+		// WordPress core verifies the bulk-action nonce before this filter fires;
+		// re-check it explicitly here before reading any request data.
+		check_admin_referer( 'bulk-posts' );
 
 		if ( empty( $post_ids ) ) {
 			return $redirect_to;
@@ -1109,7 +1107,6 @@ class Admin_Init {
 		}
 
 		return $redirect_to;
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**

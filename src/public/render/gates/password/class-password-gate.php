@@ -126,7 +126,8 @@ final class Password_Gate implements Gate {
 
 		return Gate_Result::block(
 			$this->render_lock_screen( $render_context ),
-			200
+			200,
+			Gate_Renderer::build_css( $render_context )
 		);
 	}
 

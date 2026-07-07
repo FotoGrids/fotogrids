@@ -144,6 +144,46 @@
     }
 
     /**
+     * Inject the render's per-render inline CSS (the pipeline no longer embeds
+     * it in the markup). Scoped by the gallery instance id inside the CSS.
+     *
+     * @param {string} css  Bare CSS (no <style> tags), or ''.
+     */
+    function injectInlineCss( css ) {
+        if ( ! css || typeof css !== 'string' ) return;
+        const style     = document.createElement( 'style' );
+        style.className = 'fotogrids-inline-css';
+        style.textContent = css;
+        document.head.appendChild( style );
+    }
+
+    /**
+     * Inject the render's per-render inline JS (loading-icon runner, etc.).
+     * A created + appended <script> with textContent executes on insertion.
+     *
+     * @param {string} js  Bare JS (no <script> tags), or ''.
+     */
+    function injectInlineJs( js ) {
+        if ( ! js || typeof js !== 'string' ) return;
+        const script     = document.createElement( 'script' );
+        script.textContent = js;
+        document.head.appendChild( script );
+    }
+
+    /**
+     * Inject the render's JSON-LD structured data, if any.
+     *
+     * @param {string} jsonLd  Bare JSON-LD document, or ''.
+     */
+    function injectJsonLd( jsonLd ) {
+        if ( ! jsonLd || typeof jsonLd !== 'string' ) return;
+        const script     = document.createElement( 'script' );
+        script.type      = 'application/ld+json';
+        script.textContent = jsonLd;
+        document.head.appendChild( script );
+    }
+
+    /**
      * Resolve the album wrapper that owns a trigger. Used as the target
      * container for the swap.
      *
@@ -214,6 +254,9 @@
                 injectMissingStyles( data.css || {} );
                 injectMissingScripts( data.js || {} );
                 injectFontStylesheet( data.fonts || '' );
+                injectInlineCss( data.inlineCss || '' );
+                injectInlineJs( data.inlineJs || '' );
+                injectJsonLd( data.jsonLd || '' );
 
                 // Stash the album's original HTML before the swap so the
                 // in-place Back button (rendered inside the swapped-in

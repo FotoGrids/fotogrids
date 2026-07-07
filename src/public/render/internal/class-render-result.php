@@ -19,6 +19,9 @@ final class Render_Result {
 	public string $instance_id;
 	public array $active_modules;
 	public int $http_status;
+	public string $inline_css;
+	public string $inline_js;
+	public string $json_ld;
 
 	/**
 	 * @param array<string, array<int, string>> $active_modules Active module IDs by category.
@@ -27,12 +30,18 @@ final class Render_Result {
 		string $html,
 		string $instance_id,
 		array $active_modules,
-		int $http_status
+		int $http_status,
+		string $inline_css = '',
+		string $inline_js = '',
+		string $json_ld = ''
 	) {
 		$this->html           = $html;
 		$this->instance_id    = $instance_id;
 		$this->active_modules = $active_modules;
 		$this->http_status    = $http_status;
+		$this->inline_css     = $inline_css;
+		$this->inline_js      = $inline_js;
+		$this->json_ld        = $json_ld;
 	}
 
 	/**
@@ -48,6 +57,31 @@ final class Render_Result {
 			$this->instance_id,
 			$this->active_modules,
 			$this->http_status,
+			$this->inline_css,
+			$this->inline_js,
+			$this->json_ld,
+		);
+	}
+
+	/**
+	 * Returns a cloned render result carrying the collected per-render inline
+	 * assets (bare CSS/JS/JSON-LD payloads, no wrapping tags).
+	 *
+	 * @since   1.0.0
+	 * @param   string $inline_css Bare CSS.
+	 * @param   string $inline_js  Bare JavaScript.
+	 * @param   string $json_ld    Bare JSON-LD document.
+	 * @return  self
+	 */
+	public function with_inline_assets( string $inline_css, string $inline_js, string $json_ld ): self {
+		return new self(
+			$this->html,
+			$this->instance_id,
+			$this->active_modules,
+			$this->http_status,
+			$inline_css,
+			$inline_js,
+			$json_ld,
 		);
 	}
 
