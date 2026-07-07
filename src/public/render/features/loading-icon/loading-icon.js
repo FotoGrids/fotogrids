@@ -3,16 +3,23 @@
  *
  * Manages the data-fg-media-state attribute on .fg-item elements.
  *
- * WAAPI animations are started by an inline <script> emitted immediately after
- * each gallery wrapper (Loading_Icon::html_after). That script runs as the
- * browser parses the page - before images load from cache - and stores
- * animation handles in window.fgLoaderHandles (a WeakMap keyed by .fg-item).
+ * This script owns both starting and stopping the loader animations:
+ *  1. For every gallery (initial DOM, DOMContentLoaded, the runtime's
+ *     onGallery hook, and the MutationObserver for dynamic inserts) it starts
+ *     the WAAPI loader animation on each .fg-item's loader svg, keyed by the
+ *     gallery's data-fg-loading-icon, and stores the handles in
+ *     window.fgLoaderHandles (a WeakMap keyed by .fg-item).
+ *  2. Wire load/error listeners on every <img> inside each gallery.
+ *  3. When an image settles, cancel its loader's WAAPI handles and set
+ *     data-fg-media-state="loaded" so CSS hides the loader and reveals the
+ *     image.
  *
- * This footer script's job is purely state management:
- *  1. Wire load/error listeners on every <img> inside each gallery.
- *  2. When an image settles, cancel its loader's WAAPI handles (retrieved from
- *     window.fgLoaderHandles) and set data-fg-media-state="loaded" so CSS
- *     hides the loader and reveals the image.
+ * Animations were previously started by an inline <script> emitted inside the
+ * gallery markup (Loading_Icon::html_after). That script was removed so the
+ * markup can pass through wp_kses(); starting the animations here from the
+ * onGallery hook is the runtime-contract-compliant replacement. The icon map
+ * (window.fotogridsLoadingIcons) is published via wp_add_inline_script before
+ * this file, so it is always defined when the passes below run.
  *
  * Individually per image, so heavy galleries reveal each thumbnail as it
  * arrives. Pointer-events on the clickable wrapper (<a>) are blocked via CSS
@@ -77,6 +84,75 @@
     function markLoaded( item ) {
         cancelLoaderAnimation( item );
         item.setAttribute( STATE_ATTR, STATE_LOADED );
+    }
+
+    /**
+     * Resolves the WAAPI animate function for a collection from the page-level
+     * icon map, keyed by the collection's data-fg-loading-icon attribute.
+     * Falls back to the first icon in the map, then to the single-icon global
+     * (window.fotogridsLoadingIcon) that lightbox surfaces also use.
+     *
+     * @param {Element} container A .fotogrids-collection element.
+     * @returns {Function|null}
+     */
+    function resolveAnimateFn( container ) {
+        const icons = window.fotogridsLoadingIcons;
+        if ( icons && typeof icons === 'object' ) {
+            const name = container.getAttribute( 'data-fg-loading-icon' ) || '';
+            let icon = icons[ name ];
+            if ( ! icon ) {
+                const keys = Object.keys( icons );
+                if ( keys.length ) icon = icons[ keys[ 0 ] ];
+            }
+            if ( icon && typeof icon.animate === 'function' ) {
+                return icon.animate;
+            }
+        }
+        if ( window.fotogridsLoadingIcon && typeof window.fotogridsLoadingIcon.animate === 'function' ) {
+            return window.fotogridsLoadingIcon.animate;
+        }
+        return null;
+    }
+
+    /**
+     * Starts the loader animation on a single .fg-item and stores the handles
+     * so markLoaded can cancel them. No-op when the item already has handles
+     * (idempotent across the multiple wiring passes) or has no loader svg.
+     *
+     * @param {Element}  item
+     * @param {Function} animateFn
+     */
+    function startItemAnimation( item, animateFn ) {
+        if ( ! animateFn || getHandleMap().has( item ) ) {
+            return;
+        }
+        const svg = item.querySelector( '.fg-item-loader svg' );
+        if ( ! svg ) {
+            return;
+        }
+        try {
+            const h = animateFn( svg );
+            getHandleMap().set( item, Array.isArray( h ) ? h : [] );
+        } catch ( e ) {
+            // Never let an animation error break gallery functionality.
+        }
+    }
+
+    /**
+     * Starts loader animations for every item in a collection, using the icon
+     * configured on that collection. Replaces the per-gallery inline <script>
+     * that Loading_Icon::html_after used to emit.
+     *
+     * @param {Element} container A .fotogrids-collection element.
+     */
+    function startGalleryAnimations( container ) {
+        const animateFn = resolveAnimateFn( container );
+        if ( ! animateFn ) {
+            return;
+        }
+        container.querySelectorAll( '.fg-item' ).forEach( function ( item ) {
+            startItemAnimation( item, animateFn );
+        } );
     }
 
     /**
@@ -174,6 +250,12 @@
      */
     function wireGallery( container, opts ) {
         const initial = !! ( opts && opts.initial );
+
+        // Start the loader animations before wiring load listeners, so a
+        // cached image's markLoaded (which cancels the animation) always has
+        // handles to cancel and, in the initial pass, one painted frame first.
+        startGalleryAnimations( container );
+
         const imgs = container.querySelectorAll( '.fg-item-media img' );
 
         if ( ! initial ) {
@@ -230,27 +312,6 @@
             return;
         }
 
-        const animateFn = window.fotogridsLoadingIcon && typeof window.fotogridsLoadingIcon.animate === 'function'
-            ? window.fotogridsLoadingIcon.animate
-            : null;
-
-        /**
-         * Starts a loader animation for a dynamically inserted item.
-         *
-         * @param {Element} item
-         */
-        function startDynamicAnimation( item ) {
-            if ( ! animateFn ) return;
-            const svg = item.querySelector( '.fg-item-loader svg' );
-            if ( ! svg ) return;
-            try {
-                const h = animateFn( svg );
-                getHandleMap().set( item, Array.isArray( h ) ? h : [] );
-            } catch ( e ) {
-                // Never let an animation error break gallery functionality.
-            }
-        }
-
         const observer = new MutationObserver( function ( mutations ) {
             mutations.forEach( function ( mutation ) {
                 mutation.addedNodes.forEach( function ( node ) {
@@ -258,22 +319,24 @@
                         return;
                     }
 
-                    // Newly inserted gallery wrapper - wire images inside it.
+                    // Newly inserted gallery wrapper - start animations + wire
+                    // images inside it (wireGallery starts the animations).
                     if ( node.matches( '.fotogrids-collection' ) ) {
-                        node.querySelectorAll( '.fg-item' ).forEach( startDynamicAnimation );
                         wireGallery( node );
                     }
 
                     // Galleries nested inside an inserted subtree.
                     node.querySelectorAll( '.fotogrids-collection' ).forEach( function ( gallery ) {
-                        gallery.querySelectorAll( '.fg-item' ).forEach( startDynamicAnimation );
                         wireGallery( gallery );
                     } );
 
                     // Individual .fg-item appended into an existing gallery
                     // (e.g. pagination load-more).
                     if ( node.matches( '.fg-item' ) ) {
-                        startDynamicAnimation( node );
+                        const gallery = node.closest( '.fotogrids-collection' );
+                        if ( gallery ) {
+                            startItemAnimation( node, resolveAnimateFn( gallery ) );
+                        }
                         const img = node.querySelector( '.fg-item-media img' );
                         if ( img ) {
                             wireImage( img );

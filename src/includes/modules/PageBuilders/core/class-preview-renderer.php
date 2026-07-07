@@ -14,6 +14,7 @@ use FotoGrids\Hooks\Actions_Render;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Context_Builder;
+use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Render_Controller;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -83,6 +84,8 @@ final class Preview_Renderer {
 		// normal wp_footer path.
 		do_action( Actions_Render::LATE_ASSETS, $context );
 
+		Inline_Asset_Emitter::enqueue( $result );
+
 		return (string) $result->html;
 	}
 
@@ -136,6 +139,8 @@ final class Preview_Renderer {
 		$result = Render_Controller::factory()->render( $context );
 
 		do_action( Actions_Render::LATE_ASSETS, $context );
+
+		Inline_Asset_Emitter::enqueue( $result );
 
 		return (string) $result->html;
 	}

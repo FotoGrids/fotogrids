@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Features\Custom_Code;
 
 use FotoGrids\Render\Api\Feature;
+use FotoGrids\Render\Api\Inline_Assets;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
@@ -43,14 +44,15 @@ if ( ! defined( 'WPINC' ) ) {
  *  - Null bytes and ASCII control characters
  *  - Orphan `<` / `>` that could smuggle HTML markup
  *
- * The output is placed in a dedicated `<style>` element rendered
- * *after* the gallery wrapper so that it never appears inside the wrapper
- * div (matching Feature::html_after contract).
+ * The output is contributed as per-render inline CSS (Inline_Assets::inline_css)
+ * rather than embedded as a `<style>` in the markup, so the gallery HTML stays
+ * pure and can pass through wp_kses(); the controller enqueues the CSS on page
+ * renders and returns it as a response field for AJAX-injected renders.
  *
  * @package FotoGrids\Render\Features\Custom_Code
  * @since   1.0.0
  */
-final class Custom_Css implements Feature {
+final class Custom_Css implements Feature, Inline_Assets {
 
 	/**
 	 * Token users write to reference the current gallery selector.
@@ -92,27 +94,53 @@ final class Custom_Css implements Feature {
 	}
 
 	/**
-	 * Returns a scoped, sanitized `<style>` block placed after the wrapper.
+	 * No markup after the wrapper - the scoped CSS is contributed as inline_css.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context.
 	 * @return string
 	 */
 	public function html_after( Render_Context $render_context ): string {
+		return '';
+	}
+
+	/**
+	 * Returns the scoped, sanitized custom CSS as a bare CSS string (no <style>
+	 * tags). Contributed as per-render inline CSS so the gallery markup stays
+	 * pure and can pass through wp_kses(); the controller enqueues it (page) or
+	 * returns it in the REST response (AJAX-injected renders).
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	public function inline_css( Render_Context $render_context ): string {
 		$custom_css = $this->resolve_custom_css( $render_context );
 		if ( '' === $custom_css ) {
 			return '';
 		}
 
-		$instance_id = $render_context->meta->instance_id;
-		$selector    = '#' . esc_attr( $instance_id );
-		$scoped_css  = $this->scope_css( $custom_css, $selector );
+		$selector = '#' . esc_attr( $render_context->meta->instance_id );
 
-		if ( '' === $scoped_css ) {
-			return '';
-		}
+		return $this->scope_css( $custom_css, $selector );
+	}
 
-		return '<style class="fg-custom-css">' . "\n" . $scoped_css . "\n" . '</style>';
+	/**
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	public function inline_js( Render_Context $render_context ): string {
+		return '';
+	}
+
+	/**
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	public function json_ld( Render_Context $render_context ): string {
+		return '';
 	}
 
 	public function wrapper_data_attrs( Render_Context $render_context ): array {

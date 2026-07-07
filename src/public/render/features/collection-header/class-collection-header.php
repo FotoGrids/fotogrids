@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Filters_Breadcrumb;
 use FotoGrids\Render\Api\Asset_Decl;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
+use FotoGrids\Render\Api\Inline_Assets;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 
@@ -42,7 +43,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @package FotoGrids\Render\Features\Collection_Header
  * @since   1.0.0
  */
-final class Collection_Header implements Feature {
+final class Collection_Header implements Feature, Inline_Assets {
 
 	/**
 	 * Default chevron separator. Matches the visual weight of native
@@ -162,24 +163,43 @@ final class Collection_Header implements Feature {
 	}
 
 	public function html_appendix( Render_Context $render_context ): string {
+		return '';
+	}
+
+	public function html_after( Render_Context $render_context ): string {
+		return '';
+	}
+
+	public function inline_css( Render_Context $render_context ): string {
+		return '';
+	}
+
+	public function inline_js( Render_Context $render_context ): string {
+		return '';
+	}
+
+	/**
+	 * Returns the BreadcrumbList JSON-LD document (bare JSON, no <script> tags)
+	 * so the controller can emit it outside the gallery markup. Breadcrumb_Schema
+	 * applies the per-album schema toggle, the is_ajax_swap guard, and the
+	 * fotogrids/breadcrumb/should_emit_schema filter on its own.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context.
+	 * @return string
+	 */
+	public function json_ld( Render_Context $render_context ): string {
 		$resolution = $this->resolve( $render_context );
 		if ( null === $resolution ) {
 			return '';
 		}
 
-		// Defer to the schema emitter. It checks the per-album schema
-		// toggle, the is_ajax_swap guard, and the
-		// fotogrids/breadcrumb/should_emit_schema filter on its own.
 		return Breadcrumb_Schema::build(
 			$render_context->meta->gallery_id,
 			$resolution['album_id'],
 			$resolution['album_settings'],
 			$render_context->meta->is_ajax_swap
 		);
-	}
-
-	public function html_after( Render_Context $render_context ): string {
-		return '';
 	}
 
 	public function wrapper_data_attrs( Render_Context $render_context ): array {

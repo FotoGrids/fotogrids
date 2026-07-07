@@ -194,13 +194,17 @@ class Review_Prompt {
 		// Track that this variant was shown
 		self::track_message_shown( $variant_index );
 
-		// Build review URL with variant tracking
-		$review_url = add_query_arg(
-			array(
-				'fotogrids_review' => '1',
-				'variant'          => $variant_index,
+		// Build review URL with variant tracking and a nonce so the click
+		// handler can verify the request origin before recording any state.
+		$review_url = wp_nonce_url(
+			add_query_arg(
+				array(
+					'fotogrids_review' => '1',
+					'variant'          => $variant_index,
+				),
+				admin_url()
 			),
-			admin_url()
+			'fotogrids_review_click'
 		);
 
 		$messages = self::get_review_messages();
@@ -218,12 +222,13 @@ class Review_Prompt {
 	 * Tracks the click, stores user meta, and redirects to WordPress.org reviews
 	 */
 	public static function handle_review_click() {
-		// Read-only handling of a review-prompt click link in wp-admin: detects
-		// the ?fotogrids_review marker and an absint() variant index, records
-		// dismissal, and redirects. No state-changing form submission, so nonce
-		// verification does not apply.
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( ! is_admin() || ! isset( $_GET['fotogrids_review'] ) ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['_wpnonce'] )
+			|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'fotogrids_review_click' )
+		) {
 			return;
 		}
 
@@ -253,7 +258,6 @@ class Review_Prompt {
 
 		wp_safe_redirect( 'https://wordpress.org/plugins/fotogrids/#reviews' );
 		exit;
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**

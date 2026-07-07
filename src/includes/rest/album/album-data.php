@@ -142,7 +142,7 @@ class Album_Data {
 		}
 
 		$meta = array(
-			'layout'           => get_post_meta( $album_id, 'fotogrids_album_layout', true ) ?: 'grid',
+			'layout'           => get_post_meta( $album_id, 'fotogrids_layout', true ) ?: 'grid',
 			'featured_gallery' => (int) get_post_meta( $album_id, 'fotogrids_featured_gallery', true ) ?: null,
 		);
 

@@ -157,6 +157,9 @@ namespace FotoGrids\Render\Internal {
                 'instance_id' => 'fg-preview-1',
                 'active_modules' => [ 'layouts' => [ 'fotogrids/grid' ] ],
                 'http_status' => 200,
+                'inline_css' => '',
+                'inline_js' => '',
+                'json_ld' => '',
             ];
         }
     }

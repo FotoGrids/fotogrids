@@ -77,6 +77,7 @@ final class Collection_Save_Pipeline {
 			delete_post_meta( $post_id, 'fotogrids_gallery_items' );
 		}
 
+		// $_POST is sanitised per key/type inside (allowlist + Setting_Value_Codec).
 		self::persist_settings_with_gate( (int) $post_id, $_POST );
 	}
 
@@ -151,6 +152,8 @@ final class Collection_Save_Pipeline {
 			}
 		}
 
+		// Both callees read only their known keys from the request payload and
+		// sanitise each value internally (allowlist + Setting_Value_Codec).
 		self::save_featured_image( $post_id, $_POST );
 
 		$gated_result = self::persist_settings_with_gate( (int) $post_id, $_POST );
@@ -224,13 +227,20 @@ final class Collection_Save_Pipeline {
 	 * Walk the gallery/album catalog, normalise + persist each setting whose
 	 * key is present in the request payload, then route through Edit_Gate.
 	 *
+	 * Sanitisation: `$request_data` is treated as untrusted. Only keys present
+	 * in the `Collection_Defaults` allowlist are read; every value is run
+	 * through the type-aware `Setting_Value_Codec::normalize_incoming()` (which
+	 * unslashes and sanitises per field type, including `Array_Field::deep()`
+	 * for nested arrays) before it is persisted. Unknown request keys are
+	 * ignored.
+	 *
 	 * Returns the gate result + any keys that were dropped because the user
 	 * lacked the per-CPT settings cap (Option A: silent skip, surfaced to
 	 * the caller for toasting).
 	 *
 	 * @since 1.0.0
 	 * @param int   $post_id       Post being saved.
-	 * @param array $request_data  Raw request payload.
+	 * @param array $request_data  Raw request payload (sanitised per key/type inside).
 	 * @return array{settings: array<string,mixed>, gated: array<int,array<string,mixed>>, skipped_for_permissions?: string[]}
 	 */
 	private static function persist_settings_with_gate( int $post_id, array $request_data ): array {

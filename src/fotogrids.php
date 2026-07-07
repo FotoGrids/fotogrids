@@ -34,6 +34,7 @@ foreach ( array( 'actions', 'filters', 'js-events' ) as $fotogrids_hooks_group )
 }
 unset( $fotogrids_hooks_group, $fotogrids_hooks_file );
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-svg.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-kses.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-links.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-activator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-deactivator.php';
@@ -122,6 +123,7 @@ register_uninstall_hook( __FILE__, array( 'FotoGrids\Uninstaller', 'uninstall' )
 function fotogrids_init() {
 	FotoGrids\Activator::maybe_upgrade();
 
+	FotoGrids\Kses::register();
 	FotoGrids\Post_Types::init();
 	FotoGrids\REST::init();
 	FotoGrids\Gallery_Album_Relations::init();

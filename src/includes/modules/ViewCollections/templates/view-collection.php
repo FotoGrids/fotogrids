@@ -35,7 +35,7 @@ $fg_view->track_view();
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><?php echo esc_html( $fg_view->page_title() ); ?></title>
 	<?php
-	echo $fg_view->head_meta(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo wp_kses( $fg_view->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 
 	/**
 	 * Fires inside the view page document head.
@@ -48,10 +48,8 @@ $fg_view->track_view();
 	wp_head();
 	?>
 </head>
-<body <?php echo $fg_view->body_attrs(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+<body id="<?php echo esc_attr( Renderer::BODY_ID ); ?>" class="<?php echo esc_attr( $fg_view->body_class() ); ?>">
 	<?php
-	echo $fg_view->body_style_element(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
 	/**
 	 * Fires immediately inside the body, before the shell.
 	 *
@@ -70,7 +68,8 @@ $fg_view->track_view();
 	<?php if ( $fg_view->shows_header() ) : ?>
 	<header class="fotogrids-view__header">
 		<?php
-		echo $fg_view->header_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$fotogrids_header = $fg_view->header_html();
+		echo wp_kses( $fotogrids_header, \FotoGrids\Kses::rules( $fotogrids_header ) );
 
 		/**
 		 * Fires at the end of the header region.
@@ -93,7 +92,8 @@ $fg_view->track_view();
 		 */
 		do_action( Actions_View::BEFORE_GALLERY, $fg_post );
 
-		echo $fg_view->gallery_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$fotogrids_gallery = $fg_view->gallery_html();
+		echo wp_kses( $fotogrids_gallery, \FotoGrids\Kses::rules( $fotogrids_gallery ) );
 
 		/**
 		 * Fires after the gallery/album markup.
@@ -108,8 +108,10 @@ $fg_view->track_view();
 	<?php if ( $fg_view->shows_footer() ) : ?>
 	<footer class="fotogrids-view__footer">
 		<?php
-		echo $fg_view->share_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $fg_view->footer_credit_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$fotogrids_share = $fg_view->share_html();
+		echo wp_kses( $fotogrids_share, \FotoGrids\Kses::rules( $fotogrids_share ) );
+		$fotogrids_credit = $fg_view->footer_credit_html();
+		echo wp_kses( $fotogrids_credit, \FotoGrids\Kses::rules( $fotogrids_credit ) );
 
 		/**
 		 * Fires at the end of the footer region.
