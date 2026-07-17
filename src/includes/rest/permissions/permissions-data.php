@@ -20,16 +20,11 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Two endpoints today:
+ * Role-based Permissions Manager endpoints:
  *
- *   GET  /permissions/registry        - definitions + roles + grant snapshot
+ *   GET  /permissions/registry        - definitions + editable roles + their caps
+ *   POST /permissions/options         - write the unauthorised-visibility option
  *   POST /permissions/simple          - write Panel 1 lowest-role dropdowns
- *
- * Reserved (registered later by Pro, NOT here):
- *
- *   POST /permissions/grants          - per-cap per-grantee writes (Pro)
- *   POST /permissions/grants/scoped   - per-gallery / per-album scoped grants (Pro)
- *   GET/POST /permissions/users/{id}  - per-user grant snapshot + writes (Pro)
  *
  * @since 1.0.0
  */
@@ -44,7 +39,7 @@ final class Permissions_Data {
 	 *     simple:      Permission_Definition[],          // Panel 1
 	 *     advanced:    Permission_Definition[],          // Panel 2
 	 *     roles:       Role[],                           // editable WP roles + their caps
-	 *     grantee_types: string[],                       // Free: ['role']; Pro extends.
+	 *     grantee_types: string[],                       // Free: ['role'].
 	 *     has_pro:     bool,
 	 *   }
 	 *
@@ -57,8 +52,7 @@ final class Permissions_Data {
 		/**
 		 * Filter: grantee types the UI should expose.
 		 *
-		 * Free returns ['role']. Pro filters to add 'user' (and later 'token'
-		 * for Client Proofing). The matrix component reads this to decide
+		 * Free returns ['role']. The Permissions Manager reads this to decide
 		 * which dimensions to render.
 		 *
 		 * @since 1.0.0

@@ -8,6 +8,7 @@ use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Hooks\Filters_Data;
 use FotoGrids\Render\Api\Setting_Helpers;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -525,14 +526,6 @@ final class Lightbox implements Feature {
 					'exif_aperture'      => 'aperture',
 					'exif_shutter_speed' => 'shutter_speed',
 					'exif_iso'           => 'iso',
-					'exif_lens'          => 'lens',
-					'exif_focal_length'  => 'focal_length',
-					'exif_date_taken'    => 'date_taken',
-					'exif_copyright'     => 'copyright',
-					'exif_orientation'   => 'orientation',
-					'exif_flash'         => 'flash',
-					'exif_white_balance' => 'white_balance',
-					'exif_exposure_mode' => 'exposure_mode',
 				);
 				$enabled_fields = array();
 				foreach ( $exif_key_map as $setting_key => $field_key ) {
@@ -540,6 +533,14 @@ final class Lightbox implements Feature {
 						$enabled_fields[] = $field_key;
 					}
 				}
+				// Add-ons extend the emitted EXIF field list (mirrors
+				// Exif_Extractor::enabled_fields_for_gallery()).
+				$enabled_fields = (array) apply_filters(
+					Filters_Data::EXIF_ENABLED_FIELDS,
+					$enabled_fields,
+					$s,
+					$render_context->meta->gallery_id
+				);
 				if ( ! empty( $enabled_fields ) ) {
 					$attrs['data-fg-lb-exif-fields'] = implode( ' ', $enabled_fields );
 				}

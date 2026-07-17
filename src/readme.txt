@@ -152,7 +152,7 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 
 = Can I migrate from another gallery plugin? =
 
-Yes. FotoGrids includes an import tool to bring galleries over from other popular gallery plugins. See our [documentation](https://go.fotogrids.com/docs/) for step-by-step guides.
+Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/) for step-by-step guides.
 
 = Where can I get support? =
 

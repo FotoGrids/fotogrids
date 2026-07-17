@@ -98,7 +98,6 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoint
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-collection-save-pipeline.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-extractor.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/albums/class-album-repository.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-code-field.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-array-field.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-check.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-definition.php';
@@ -106,7 +105,6 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-regis
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-core-permissions.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-tool-harvester.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-module-harvester.php';
-require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-grants-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-gate.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/permissions/class-permission-options.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';

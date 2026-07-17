@@ -93,7 +93,7 @@ class Templates_Data {
 	 * @return \WP_REST_Response Array of available templates with metadata
 	 */
 	public static function get_templates( $request ) {
-		$category = $request->get_param( 'category' ); // 'gallery' or 'album'
+		$category = $request->get_param( 'category' ); // Gallery or album.
 		$refresh  = (bool) $request->get_param( 'refresh' );
 
 		// Predefined templates come from the library service (cached), falling
@@ -371,77 +371,6 @@ class Templates_Data {
 			array(
 				'success' => true,
 				'message' => __( 'Template applied successfully.', 'fotogrids' ),
-			)
-		);
-	}
-
-	/**
-	 * Save current settings as template
-	 *
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Success or error
-	 */
-	public static function save_template( $request ) {
-		$post_id     = $request->get_param( 'post_id' );
-		$post_type   = $request->get_param( 'post_type' );
-		$name        = sanitize_text_field( $request->get_param( 'name' ) );
-		$description = sanitize_textarea_field( $request->get_param( 'description' ) );
-
-		if ( ! $name ) {
-			return new \WP_Error( 'missing_name', __( 'Template name is required.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		if ( ! $post_id || ! $post_type ) {
-			return new \WP_Error( 'missing_params', __( 'Post ID and post type are required.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		$post = get_post( $post_id );
-		if ( ! $post ) {
-			return new \WP_Error( 'invalid_post', __( 'Invalid post.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		$post_type_map      = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
-		);
-		$expected_post_type = isset( $post_type_map[ $post_type ] ) ? $post_type_map[ $post_type ] : $post_type;
-		if ( $post->post_type !== $expected_post_type ) {
-			return new \WP_Error( 'invalid_post', __( 'Invalid post.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		$settings  = array();
-		$meta_keys = get_post_meta( $post_id );
-
-		foreach ( $meta_keys as $key => $values ) {
-			if ( strpos( $key, 'fotogrids_' ) === 0 ) {
-				$setting_key              = str_replace( 'fotogrids_', '', $key );
-				$value                    = maybe_unserialize( $values[0] );
-				$settings[ $setting_key ] = $value;
-			}
-		}
-
-		$template = array(
-			'id'             => 'user_' . time() . '_' . wp_generate_password( 8, false ),
-			'name'           => $name,
-			'description'    => $description,
-			'type'           => 'user',
-			'category'       => 'fotogrids_gallery' === $post_type ? 'gallery' : 'album',
-			'settings'       => $settings,
-			'isUserTemplate' => true,
-			'created'        => current_time( 'mysql' ),
-			'createdBy'      => get_current_user_id(),
-		);
-
-		$user_templates   = get_user_meta( get_current_user_id(), 'fotogrids_user_templates', true );
-		$user_templates   = $user_templates ? json_decode( $user_templates, true ) : array();
-		$user_templates[] = $template;
-		update_user_meta( get_current_user_id(), 'fotogrids_user_templates', wp_json_encode( $user_templates ) );
-
-		return rest_ensure_response(
-			array(
-				'success'  => true,
-				'message'  => __( 'Template saved successfully.', 'fotogrids' ),
-				'template' => $template,
 			)
 		);
 	}

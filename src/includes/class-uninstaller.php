@@ -89,7 +89,6 @@ class Uninstaller {
 			$wpdb->prefix . 'fotogrids_tags',
 			$wpdb->prefix . 'fotogrids_item_metadata',
 			$wpdb->prefix . 'fotogrids_render_cache',
-			$wpdb->prefix . 'fotogrids_permission_grants',
 		);
 
 		foreach ( $tables as $table ) {

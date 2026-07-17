@@ -225,14 +225,6 @@ class Admin_Init {
 		);
 
 		wp_enqueue_script(
-			'fotogrids-codemirror-init',
-			FOTOGRIDS_PLUGIN_URL . 'assets/js/codemirror-init.js',
-			array(),
-			FOTOGRIDS_VERSION,
-			true
-		);
-
-		wp_enqueue_script(
 			'fotogrids-toast-init',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/toast-init.js',
 			array( 'fotogrids-admin' ),
@@ -372,7 +364,7 @@ class Admin_Init {
 		}
 
 		if ( 'fotogrids_page_fotogrids-settings' === $hook || strpos( $hook, 'fotogrids-settings' ) !== false ) {
-			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true, false );
+			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true );
 
 			// Read-only routing, sanitised; no state change so nonce is N/A.
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
