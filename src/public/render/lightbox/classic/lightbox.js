@@ -2854,8 +2854,6 @@ class FotoGridsLightbox {
 			'people',
 			'location',
 			'share',
-			'rating',
-			'download',
 		];
 		const blocks = s.infoBlocks || ALL_BLOCKS;
 
@@ -2903,9 +2901,6 @@ class FotoGridsLightbox {
 				}
 				blockEl.appendChild(shareBar);
 				infoEl.appendChild(blockEl);
-			} else if (blockId === 'rating' || blockId === 'download') {
-				// Pro-only blocks - not available in Free, skip entirely.
-				continue;
 			} else if (restBlocks.has(blockId)) {
 				// REST-fetched block - render nothing until data arrives.
 				// The empty container stays in the DOM (with data-fg-lb-block)
@@ -2915,6 +2910,27 @@ class FotoGridsLightbox {
 				// having no data, _fillInfoBlocksFromData removes it
 				// (and _fillInfoBlocksNoData handles the no-id case).
 				infoEl.appendChild(blockEl);
+			} else {
+				// Extension block - an add-on may register a renderer for a
+				// non-core block id (e.g. rating, download) via
+				// FotoGrids.modules.lightboxInfoBlocks[id] = (el, item, lightbox).
+				// The container is appended only if the renderer produces
+				// content, so an unknown id with no renderer is a no-op.
+				const registry =
+					window.FotoGrids &&
+					window.FotoGrids.modules &&
+					window.FotoGrids.modules.lightboxInfoBlocks;
+				const renderer = registry && registry[blockId];
+				if (typeof renderer === 'function') {
+					try {
+						renderer(blockEl, item, this);
+					} catch (err) {
+						blockEl.innerHTML = '';
+					}
+					if (blockEl.childNodes.length) {
+						infoEl.appendChild(blockEl);
+					}
+				}
 			}
 		}
 

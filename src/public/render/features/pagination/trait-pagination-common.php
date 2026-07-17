@@ -99,9 +99,6 @@ trait Pagination_Common {
 	/**
 	 * Whether preloading the next page is enabled.
 	 *
-	 * Pro-gated: setting lives in Free but the toggle is tier_required:
-	 * pro_starter, so unlicensed sites get false even if the value is true.
-	 *
 	 * @since 1.0.0
 	 */
 	protected function preload_enabled( Render_Context $render_context ): bool {

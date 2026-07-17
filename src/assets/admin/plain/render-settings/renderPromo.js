@@ -32,15 +32,6 @@ window.FotoGridsRenderSettings.renderPromo = (
 		return template.replace('{{path}}', encodeURIComponent(learnMorePath));
 	};
 
-	const handleLearnMoreClick = (learnMorePath) => (e) => {
-		e.preventDefault();
-		e.stopPropagation();
-		const url = buildLearnMoreUrl(learnMorePath);
-		if (url) {
-			window.open(url, '_blank');
-		}
-	};
-
 	return h(
 		'div',
 		{

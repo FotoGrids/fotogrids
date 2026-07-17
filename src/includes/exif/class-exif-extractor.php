@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Exif;
 
 use FotoGrids\Galleries\Gallery_Repository;
-use FotoGrids\Hooks\Filters_Features;
+use FotoGrids\Hooks\Filters_Data;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -29,9 +29,9 @@ if ( ! defined( 'WPINC' ) ) {
  *    field whitelist that `extract()` expects.
  *
  * Free's whitelist covers the four core fields (camera, aperture,
- * shutter_speed, iso). Pro extends with lens, focal_length, date_taken,
- * copyright, orientation, flash, white_balance, exposure_mode - gated by the
- * `fotogrids/features/pro/is_active` filter.
+ * shutter_speed, iso). Add-ons extend the whitelist and the extracted values
+ * through the `fotogrids/data/exif/enabled_fields` and
+ * `fotogrids/data/exif/extract` filters.
  *
  * @since 1.0.0
  */
@@ -106,65 +106,20 @@ final class Exif_Extractor {
 			$exif_data['iso'] = sanitize_text_field( $image_meta['iso'] );
 		}
 
-		// Lens.
-		if ( in_array( 'lens', $enabled_fields, true ) && ! empty( $image_meta['lens'] ) ) {
-			$exif_data['lens'] = sanitize_text_field( $image_meta['lens'] );
-		}
-
-		// Focal length.
-		if ( in_array( 'focal_length', $enabled_fields, true ) && ! empty( $image_meta['focal_length'] ) ) {
-			$focal_length              = $image_meta['focal_length'];
-			$exif_data['focal_length'] = is_numeric( $focal_length )
-				? number_format( (float) $focal_length, 0 ) . 'mm'
-				: sanitize_text_field( $focal_length );
-		}
-
-		// Date taken.
-		if ( in_array( 'date_taken', $enabled_fields, true ) && ! empty( $image_meta['created_timestamp'] ) ) {
-			$timestamp               = $image_meta['created_timestamp'];
-			$exif_data['date_taken'] = is_numeric( $timestamp )
-				? gmdate( 'Y-m-d H:i:s', (int) $timestamp )
-				: sanitize_text_field( $timestamp );
-		}
-
-		// Copyright.
-		if ( in_array( 'copyright', $enabled_fields, true ) && ! empty( $image_meta['copyright'] ) ) {
-			$exif_data['copyright'] = sanitize_text_field( $image_meta['copyright'] );
-		}
-
-		// Orientation.
-		if ( in_array( 'orientation', $enabled_fields, true ) && ! empty( $image_meta['orientation'] ) ) {
-			$exif_data['orientation'] = sanitize_text_field( $image_meta['orientation'] );
-		}
-
-		// Flash.
-		if ( in_array( 'flash', $enabled_fields, true ) && isset( $image_meta['flash'] ) ) {
-			$flash = $image_meta['flash'];
-			if ( is_numeric( $flash ) ) {
-				$exif_data['flash'] = ( $flash > 0 ) ? __( 'Yes', 'fotogrids' ) : __( 'No', 'fotogrids' );
-			} else {
-				$exif_data['flash'] = sanitize_text_field( $flash );
-			}
-		}
-
-		// White balance.
-		if ( in_array( 'white_balance', $enabled_fields, true ) && ! empty( $image_meta['white_balance'] ) ) {
-			$exif_data['white_balance'] = sanitize_text_field( $image_meta['white_balance'] );
-		}
-
-		// Exposure mode.
-		if ( in_array( 'exposure_mode', $enabled_fields, true ) && ! empty( $image_meta['exposure_mode'] ) ) {
-			$exif_data['exposure_mode'] = sanitize_text_field( $image_meta['exposure_mode'] );
-		}
-
-		return $exif_data;
+		/**
+		 * Allow add-ons to populate values for any additional EXIF field keys
+		 * they enabled via Filters_Data::EXIF_ENABLED_FIELDS.
+		 *
+		 * @see Filters_Data::EXIF_EXTRACT
+		 */
+		return (array) apply_filters( Filters_Data::EXIF_EXTRACT, $exif_data, $enabled_fields, $image_meta, $attachment_id );
 	}
 
 	/**
 	 * Build the EXIF-field whitelist for a gallery, from its settings.
 	 *
-	 * Free returns up to 4 fields. Pro extends with 8 more, gated on
-	 * `Filters_Features::PRO_IS_ACTIVE`.
+	 * Free enables camera / aperture / shutter_speed / iso. Add-ons extend the
+	 * list via the Filters_Data::EXIF_ENABLED_FIELDS filter.
 	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id Gallery post ID.
@@ -179,7 +134,6 @@ final class Exif_Extractor {
 
 		$enabled_fields = array();
 
-		// Free fields.
 		if ( ! empty( $settings['exif_camera'] ) ) {
 			$enabled_fields[] = 'camera';
 		}
@@ -193,25 +147,12 @@ final class Exif_Extractor {
 			$enabled_fields[] = 'iso';
 		}
 
-		// Pro fields (only if Pro is active).
-		if ( (bool) apply_filters( Filters_Features::PRO_IS_ACTIVE, false ) ) {
-			$pro_keys = array(
-				'lens',
-				'focal_length',
-				'date_taken',
-				'copyright',
-				'orientation',
-				'flash',
-				'white_balance',
-				'exposure_mode',
-			);
-			foreach ( $pro_keys as $key ) {
-				if ( ! empty( $settings[ 'exif_' . $key ] ) ) {
-					$enabled_fields[] = $key;
-				}
-			}
-		}
-
-		return $enabled_fields;
+		/**
+		 * Allow add-ons to enable additional EXIF field keys from the gallery's
+		 * settings (e.g. lens, focal_length).
+		 *
+		 * @see Filters_Data::EXIF_ENABLED_FIELDS
+		 */
+		return (array) apply_filters( Filters_Data::EXIF_ENABLED_FIELDS, $enabled_fields, $settings, $gallery_id );
 	}
 }

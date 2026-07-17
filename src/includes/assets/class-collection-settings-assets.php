@@ -19,9 +19,8 @@ if ( ! defined( 'WPINC' ) ) {
  * settings panel needs to render.
  *
  * Two surfaces call this: the gallery/album metabox on the post-edit screen,
- * and the standalone admin settings page. The two flags on `enqueue()` let
- * each surface opt in to the bits it actually wants (the metabox does want
- * the CodeMirror editor; the settings page does not).
+ * and the standalone admin settings page. The flag on `enqueue()` lets each
+ * surface opt in to the bits it actually wants.
  *
  * @since 1.0.0
  */
@@ -58,7 +57,6 @@ final class Collection_Settings_Assets {
 		'renderBulkModal',
 		'renderExternalUrlManager',
 		'renderGroup',
-		'renderCodeArea',
 		'renderPromo',
 		'renderInfoBlock',
 		'renderTokenSelect',
@@ -86,9 +84,8 @@ final class Collection_Settings_Assets {
 	 *
 	 * @since 1.0.0
 	 * @param bool $enqueue_settings_loader Whether to enqueue the settings loader script.
-	 * @param bool $enqueue_codemirror      Whether to enqueue codemirror-init.
 	 */
-	public static function enqueue( bool $enqueue_settings_loader = true, bool $enqueue_codemirror = false ): void {
+	public static function enqueue( bool $enqueue_settings_loader = true ): void {
 		if ( $enqueue_settings_loader ) {
 			wp_enqueue_script(
 				'fotogrids-settings-loader',
@@ -101,16 +98,6 @@ final class Collection_Settings_Assets {
 
 		self::enqueue_fg_tooltip();
 		self::enqueue_hover_effect_previews();
-
-		if ( $enqueue_codemirror ) {
-			wp_enqueue_script(
-				'fotogrids-codemirror-init',
-				FOTOGRIDS_PLUGIN_URL . 'assets/js/codemirror-init.js',
-				array(),
-				FOTOGRIDS_VERSION,
-				true
-			);
-		}
 
 		self::enqueue_render_helper_utils();
 
@@ -216,8 +203,7 @@ final class Collection_Settings_Assets {
 
 		// Post-type placeholder helpers - single source of truth for
 		// {postType} replacement, used by collection-settings.js (translation
-		// pass) and any render helper that reads raw placeholder strings
-		// (e.g. renderCodeArea hints).
+		// pass) and any render helper that reads raw placeholder strings.
 		wp_enqueue_script(
 			'fotogrids-post-type-placeholders',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/post-type-placeholders.js',
@@ -258,10 +244,6 @@ final class Collection_Settings_Assets {
 
 		if ( in_array( $function_name, self::USES_PRO_BADGES, true ) ) {
 			$dependencies[] = 'fotogrids-tooltip-utils';
-		}
-
-		if ( 'renderCodeArea' === $function_name ) {
-			$dependencies[] = 'fotogrids-codemirror-init';
 		}
 
 		if ( 'renderColorPicker' === $function_name ) {

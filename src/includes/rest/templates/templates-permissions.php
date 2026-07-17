@@ -58,21 +58,6 @@ class Templates_Permissions {
 	}
 
 	/**
-	 * Check if user can save templates (Pro feature)
-	 *
-	 * @param \WP_REST_Request $request Request object
-	 * @return bool True if user has permission and Pro license
-	 */
-	public static function check_template_save( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return false;
-		}
-
-		// Templates saving is a Pro feature
-		return \FotoGrids\License_Manager::has_pro();
-	}
-
-	/**
 	 * Check if user can delete templates
 	 *
 	 * @param \WP_REST_Request $request Request object

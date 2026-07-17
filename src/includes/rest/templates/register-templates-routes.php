@@ -76,37 +76,6 @@ class Register_Templates_Routes {
 			)
 		);
 
-		// Save template endpoint
-		register_rest_route(
-			'fotogrids/v1',
-			'/templates/save',
-			array(
-				array(
-					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => array( '\FotoGrids\REST\Templates\Templates_Data', 'save_template' ),
-					'permission_callback' => array( '\FotoGrids\REST\Templates\Templates_Permissions', 'check_template_save' ),
-					'args'                => array(
-						'post_id'     => array(
-							'required'          => true,
-							'sanitize_callback' => 'absint',
-						),
-						'post_type'   => array(
-							'required'          => true,
-							'sanitize_callback' => 'sanitize_text_field',
-						),
-						'name'        => array(
-							'required'          => true,
-							'sanitize_callback' => 'sanitize_text_field',
-						),
-						'description' => array(
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_textarea_field',
-						),
-					),
-				),
-			)
-		);
-
 		// Delete template endpoint
 		register_rest_route(
 			'fotogrids/v1',

@@ -17,10 +17,11 @@ if ( ! defined( 'WPINC' ) ) {
  * Shared base for filter sources that key off `fotogrids_item_metadata`
  * + `fotogrids_tags` joined by `metadata_type` / `tags.type`.
  *
- * All three core sources (Tags, People, Location) share the same query
- * shape and predicate logic - only the metadata_type discriminator,
- * arg key, label, and item data attribute differ. Subclasses just
- * declare those constants; everything else lives here.
+ * Metadata-backed filter sources share the same query shape and predicate
+ * logic - only the metadata_type discriminator, arg key, label, and item
+ * data attribute differ. Subclasses just declare those constants; everything
+ * else lives here. Free ships the Tags source; Pro adds further sources
+ * (e.g. People, Location) by extending this base.
  *
  * Pro filter sources that don't fit this schema (e.g. EXIF-based filters
  * with custom storage) should implement Filter_Source directly instead

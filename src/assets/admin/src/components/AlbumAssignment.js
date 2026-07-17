@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 const FotoGridsIcons = window.FotoGridsIcons || {};
 const AlbumAssignment = () => {
-	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [assignedAlbums, setAssignedAlbums] = useState([]);
 	const [allAlbums, setAllAlbums] = useState([]);
