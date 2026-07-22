@@ -48,7 +48,7 @@
     "@wordpress/i18n": "^4.0.0",
     "chart.js": "^4.5.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
@@ -60,7 +60,7 @@
     "@babel/preset-react": "^7.22.0",
     "@babel/preset-typescript": "^7.22.0",
     "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
+    "@types/react-dom": "^19.2.3",
     "babel-jest": "^29.7.0",
     "babel-loader": "^9.1.0",
     "concurrently": "^8.2.2",
