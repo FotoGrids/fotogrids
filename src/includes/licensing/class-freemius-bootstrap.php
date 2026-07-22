@@ -145,5 +145,4 @@ class Freemius_Bootstrap {
 
 		return file_exists( $candidate . '/start.php' ) ? $candidate : null;
 	}
-
 }
