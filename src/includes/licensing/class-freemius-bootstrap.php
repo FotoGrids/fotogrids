@@ -77,7 +77,36 @@ class Freemius_Bootstrap {
 		}
 
 		try {
-			self::$instance = fs_dynamic_init( self::config() );
+			// Config is passed inline (not via a helper) so the WordPress.org
+			// compliance flags - is_premium => false and is_org_compliant => true -
+			// are visible at the fs_dynamic_init() call site.
+			self::$instance = fs_dynamic_init(
+				array(
+					'id'                  => '27760',
+					'slug'                => 'fotogrids',
+					'premium_slug'        => 'fotogrids-pro',
+					'type'                => 'plugin',
+					'public_key'          => 'pk_6a5e7b6d7191997f147022ce9002d',
+					'is_premium'          => false,
+					'has_premium_version' => true,
+					'has_addons'          => true,
+					'has_paid_plans'      => true,
+					'is_org_compliant'    => true,
+					// Start sites in anonymous mode so the SDK never overrides the
+					// FotoGrids menu page with its own connect/opt-in screen. The
+					// plugin owns onboarding via its setup wizard; no data reaches
+					// Freemius until a user explicitly opts in.
+					'anonymous_mode'      => true,
+					'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
+					'menu'                => array(
+						'slug'    => 'fotogrids-dashboard',
+						'account' => true,
+						'contact' => false,
+						'support' => false,
+						'pricing' => false,
+					),
+				)
+			);
 		} catch ( \Throwable $e ) {
 			\FotoGrids\Debug_Log::write( 'license', 'Freemius init failed: ' . $e->getMessage() );
 			return null;
@@ -117,37 +146,4 @@ class Freemius_Bootstrap {
 		return file_exists( $candidate . '/start.php' ) ? $candidate : null;
 	}
 
-	/**
-	 * SDK configuration array.
-	 *
-	 * @since  1.0.0
-	 * @return array<string,mixed>
-	 */
-	private static function config(): array {
-		return array(
-			'id'                  => '27760',
-			'slug'                => 'fotogrids',
-			'premium_slug'        => 'fotogrids-pro',
-			'type'                => 'plugin',
-			'public_key'          => 'pk_6a5e7b6d7191997f147022ce9002d',
-			'is_premium'          => false,
-			'has_premium_version' => true,
-			'has_addons'          => true,
-			'has_paid_plans'      => true,
-			'is_org_compliant'    => true,
-			// Start sites in anonymous mode so the SDK never overrides the
-			// FotoGrids menu page with its own connect/opt-in screen. The
-			// plugin owns onboarding via its setup wizard; no data reaches
-			// Freemius until a user explicitly opts in.
-			'anonymous_mode'      => true,
-			'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
-			'menu'                => array(
-				'slug'    => 'fotogrids-dashboard',
-				'account' => true,
-				'contact' => false,
-				'support' => false,
-				'pricing' => false,
-			),
-		);
-	}
 }
