@@ -1030,6 +1030,15 @@ class Admin_Init {
 			return $redirect_to;
 		}
 
+		// Stamp a nonce onto the redirect URL so bulk_action_admin_notices()
+		// can confirm the result flags it renders were set here, not forged in
+		// a crafted URL. add_query_arg() preserves it across the branches below.
+		$redirect_to = add_query_arg(
+			'_fg_bulk_notice',
+			wp_create_nonce( 'fotogrids_bulk_notice' ),
+			$redirect_to
+		);
+
 		$processed = 0;
 		$errors    = 0;
 
@@ -1107,13 +1116,18 @@ class Admin_Init {
 	public static function bulk_action_admin_notices() {
 		global $post_type, $pagenow;
 
-		// Renders one-time admin notices from post-redirect ?bulk_* flags after
-		// a bulk action already handled (and nonce-verified) by WordPress core.
-		// These are read-only display values (counts / an error slug), all run
-		// through absint()/sanitize_text_field(); there is nothing to nonce on a
-		// redirected GET notice render.
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( 'edit.php' !== $pagenow || 'fotogrids_gallery' !== $post_type ) {
+			return;
+		}
+
+		// The result flags read below come from the post-redirect URL set by
+		// handle_gallery_bulk_actions() (itself nonce-verified). Verify the
+		// nonce it stamped before rendering, so a crafted URL cannot spoof a
+		// notice. Every value read is a read-only display count, absint()'d.
+		$notice_nonce = isset( $_REQUEST['_fg_bulk_notice'] )
+			? sanitize_text_field( wp_unslash( $_REQUEST['_fg_bulk_notice'] ) )
+			: '';
+		if ( ! wp_verify_nonce( $notice_nonce, 'fotogrids_bulk_notice' ) ) {
 			return;
 		}
 
@@ -1234,7 +1248,6 @@ class Admin_Init {
 				echo '<div class="notice notice-error is-dismissible"><p>' . esc_html( $message ) . '</p></div>';
 			}
 		}
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**

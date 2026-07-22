@@ -136,23 +136,6 @@ final class Style_Var_Builder {
 		return $output;
 	}
 
-	/**
-	 * Serializes the variable map into a complete <style> element.
-	 *
-	 * @since  1.0.0
-	 * @param  array<string, string|Responsive_Var> $css_variables Variable map.
-	 * @param  string                               $instance_id   Gallery wrapper element ID.
-	 * @param  Breakpoint_Config                    $breakpoints   User-configured breakpoints.
-	 * @return string  The full <style> element, or '' when the map is empty.
-	 */
-	public function build_style_element(
-		array $css_variables,
-		string $instance_id,
-		Breakpoint_Config $breakpoints
-	): string {
-		$css = $this->build_css( $css_variables, $instance_id, $breakpoints );
-		return '' === $css ? '' : "<style class=\"fg-vars\">\n" . $css . '</style>';
-	}
 
 	/**
 	 * Strips characters that would break out of a CSS declaration value.
