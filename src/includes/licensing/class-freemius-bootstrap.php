@@ -53,21 +53,10 @@ class Freemius_Bootstrap {
 		}
 		self::$initialized = true;
 
-		$canonical_sdk_dir = self::canonical_sdk_dir();
-
-		$sdk_path = ( null !== $canonical_sdk_dir )
-			? $canonical_sdk_dir . '/start.php'
-			: FOTOGRIDS_PLUGIN_DIR . 'freemius/start.php';
+		$sdk_path = FOTOGRIDS_PLUGIN_DIR . 'freemius/start.php';
 
 		if ( ! file_exists( $sdk_path ) ) {
 			return null;
-		}
-
-		// Pin WP_FS__DIR to the canonical plugin path so the SDK's asset URLs
-		// resolve against /wp-content/plugins/<plugin>/ rather than the resolved
-		// realpath, which can leak filesystem paths under symlinked dev setups.
-		if ( ! defined( 'WP_FS__DIR' ) && null !== $canonical_sdk_dir ) {
-			define( 'WP_FS__DIR', $canonical_sdk_dir ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WP_FS__DIR is a Freemius SDK constant name, not ours to prefix.
 		}
 
 		require_once $sdk_path;
@@ -127,22 +116,5 @@ class Freemius_Bootstrap {
 		do_action( Actions_Licensing::FREEMIUS_LOADED, self::$instance );
 
 		return self::$instance;
-	}
-
-	/**
-	 * Resolve the canonical (non-realpath) plugin SDK directory.
-	 *
-	 * @since  1.0.0
-	 * @return string|null
-	 */
-	private static function canonical_sdk_dir(): ?string {
-		if ( ! defined( 'WP_PLUGIN_DIR' ) || ! defined( 'FOTOGRIDS_PLUGIN_BASENAME' ) ) {
-			return null;
-		}
-
-		$plugin_folder = explode( '/', FOTOGRIDS_PLUGIN_BASENAME )[0];
-		$candidate     = WP_PLUGIN_DIR . '/' . $plugin_folder . '/freemius';
-
-		return file_exists( $candidate . '/start.php' ) ? $candidate : null;
 	}
 }
