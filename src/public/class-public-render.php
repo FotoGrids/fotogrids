@@ -391,7 +391,7 @@ class Public_Render {
 			if ( false !== $cached ) {
 				self::replay_cached_assets( $cached['css'], $cached['js'] );
 				do_action( Actions_Cache::HIT, $gallery_id, $cache_key );
-				return $cached['html'];
+				return wp_kses( $cached['html'], \FotoGrids\Kses::rules( $cached['html'] ) );
 			}
 		}
 
@@ -406,7 +406,7 @@ class Public_Render {
 			do_action( Actions_Cache::WRITTEN, $gallery_id, $cache_key );
 		}
 
-		return $html;
+		return wp_kses( $html, \FotoGrids\Kses::rules( $html ) );
 	}
 
 	/**
@@ -491,7 +491,7 @@ class Public_Render {
 		self::$last_render_result = $result;
 		Inline_Asset_Emitter::enqueue( $result );
 
-		return $result->html;
+		return wp_kses( $result->html, \FotoGrids\Kses::rules( $result->html ) );
 	}
 
 	/**

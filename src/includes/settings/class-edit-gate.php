@@ -4,15 +4,20 @@ declare(strict_types=1);
 namespace FotoGrids\Settings;
 
 use FotoGrids\Catalog\Catalog;
-use FotoGrids\Catalog\State_Resolver;
-use FotoGrids\Render\Api\Field_State;
+use FotoGrids\Hooks\Filters_Settings;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
 /**
- * Filters incoming setting writes against Catalog and license state.
+ * Filters incoming setting writes against the Catalog.
+ *
+ * The free plugin drops keys that are not in the Catalog and runs each field's
+ * declared sanitiser. It applies NO tier or license gating - every setting the
+ * free plugin ships is fully writable. The Pro add-on hooks the
+ * 'fotogrids/settings/edit_gate' filter to re-apply its own per-plan write
+ * enforcement.
  *
  * @package FotoGrids\Settings
  * @since   1.0.0
@@ -20,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 final class Edit_Gate {
 
 	/**
-	 * Filters incoming settings against editable field states.
+	 * Filters incoming settings: drops unknown keys, sanitises known ones.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $incoming Incoming settings payload.
@@ -46,34 +51,8 @@ final class Edit_Gate {
 				continue;
 			}
 
-			$existing_value = $existing[ $field_id ] ?? null;
-			$field_state    = State_Resolver::resolve( $field_id );
-			if ( Field_State::EDITABLE !== $field_state ) {
-				$filtered_settings[ $field_id ] = $existing_value;
-				$gated_fields[]                 = array(
-					'field'  => $field_id,
-					'reason' => $field_state,
-				);
-				continue;
-			}
-
-			if ( ! empty( $entry['options'] ) && is_array( $entry['options'] ) && is_string( $new_value ) ) {
-				$option_state = State_Resolver::resolve( $field_id, $new_value );
-				if ( Field_State::EDITABLE !== $option_state ) {
-					$filtered_settings[ $field_id ] = $existing_value;
-					$gated_fields[]                 = array(
-						'field'  => $field_id,
-						'reason' => $option_state,
-						'option' => $new_value,
-					);
-					continue;
-				}
-			}
-
 			$sanitize_callback = $entry['sanitize'] ?? null;
-			if ( is_string( $sanitize_callback ) && is_callable( $sanitize_callback ) ) {
-				$new_value = call_user_func( $sanitize_callback, $new_value );
-			} elseif ( is_callable( $sanitize_callback ) ) {
+			if ( is_callable( $sanitize_callback ) ) {
 				$new_value = call_user_func( $sanitize_callback, $new_value );
 			}
 
@@ -86,10 +65,30 @@ final class Edit_Gate {
 			}
 		}
 
-		return array(
+		$result = array(
 			'settings' => $filtered_settings,
 			'gated'    => $gated_fields,
 		);
+
+		/**
+		 * Filter the edit-gate result so the Pro add-on can apply its own
+		 * per-plan write enforcement (reverting fields its license does not
+		 * cover and adding them to the 'gated' list). Free registers no
+		 * callback, so no tier or license gating runs here.
+		 *
+		 * @since 1.0.0
+		 * @param array                $result   { settings: array, gated: array }.
+		 * @param array<string, mixed> $incoming Incoming settings payload.
+		 * @param array<string, mixed> $existing Existing saved settings.
+		 */
+		$result = apply_filters( Filters_Settings::EDIT_GATE, $result, $incoming, $existing );
+
+		return is_array( $result ) && isset( $result['settings'], $result['gated'] )
+			? $result
+			: array(
+				'settings' => $filtered_settings,
+				'gated'    => $gated_fields,
+			);
 	}
 
 	/**
