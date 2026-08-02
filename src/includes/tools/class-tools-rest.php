@@ -11,13 +11,12 @@ if ( ! defined( 'WPINC' ) ) {
  * Registers GET /fotogrids/v1/admin/tools which returns the manifest
  * of all tools the current user can access.
  *
- * Each tool entry includes a pre-computed access_state resolved from
- * the tool's tier_required and the current user's license, following
- * the same pattern as the collection-settings catalog:
+ * Each tool entry includes a pre-computed access_state derived statically
+ * from the tool's tier_required with no license check, following the same
+ * pattern as the collection-settings catalog:
  *
- *   'editable' - user is on the required tier (or tier is 'free')
- *   'teaser'   - feature exists on a higher tier the user doesn't have
- *   'locked'   - user was on the right tier but license has expired
+ *   'editable' - tier is 'free' (fully available in the free plugin)
+ *   'teaser'   - feature exists on a higher tier; a static upgrade prompt
  *
  * @since 1.0.0
  */
@@ -80,14 +79,14 @@ class Tools_Rest {
 	}
 
 	/**
-	 * Resolve tier_required → access_state for the current user.
+	 * Resolve tier_required → access_state (static; no license check).
 	 *
 	 * Delegates to the shared Access_State resolver so the Tools manifest,
 	 * the Modules manifest, and the collection-settings catalog all use the
 	 * same vocabulary and the same logic.
 	 *
 	 * @param string $tier_required
-	 * @return string 'editable' | 'teaser' | 'locked'
+	 * @return string 'editable' | 'teaser'
 	 */
 	private static function resolve_access_state( string $tier_required ): string {
 		return \FotoGrids\Licensing\Access_State::resolve( $tier_required );

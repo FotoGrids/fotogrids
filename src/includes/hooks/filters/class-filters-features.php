@@ -62,4 +62,18 @@ final class Filters_Features {
 	 * @param array $features Default empty in Free.
 	 */
 	public const PRO_ENABLED_FEATURES = 'fotogrids/features/pro/enabled';
+
+	/**
+	 * Resolved access state for a required tier ('editable' | 'teaser' | 'locked').
+	 *
+	 * Free derives this statically from the tier with no license check (free ->
+	 * editable, higher tier -> a static teaser). Pro hooks here to apply its own
+	 * license/plan resolution and unlock the tiers its license covers. Used by
+	 * the Modules and Tools manifests. Free registers no callback.
+	 *
+	 * @since 1.0.0
+	 * @param string $state         Resolved state (default, tier-derived).
+	 * @param string $tier_required The required tier slug.
+	 */
+	public const ACCESS_STATE = 'fotogrids/features/access_state';
 }

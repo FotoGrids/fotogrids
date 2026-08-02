@@ -102,19 +102,6 @@ class Templates_Data {
 		$user_templates       = self::get_user_templates();
 		$templates            = array_merge( $predefined_templates, $user_templates );
 
-		// When the library hides Pro, drop Pro templates entirely so they can't
-		// be listed, previewed, or applied. User templates are never Pro.
-		$flags = Templates_Catalog::get_flags();
-		if ( empty( $flags['show_pro'] ) ) {
-			$templates = array_filter(
-				$templates,
-				static function ( $template ) {
-					$type = isset( $template['type'] ) ? $template['type'] : 'free';
-					return 'pro' !== $type;
-				}
-			);
-		}
-
 		if ( $category ) {
 			$templates = array_filter(
 				$templates,
@@ -186,12 +173,7 @@ class Templates_Data {
 	 * @return bool
 	 */
 	private static function resolve_can_apply( $template ) {
-		$type   = isset( $template['type'] ) ? $template['type'] : 'free';
-		$is_pro = 'free' !== $type && 'user' !== $type;
-
-		$can_apply = ! $is_pro || \FotoGrids\License_Manager::has_pro();
-
-		return (bool) apply_filters( \FotoGrids\Hooks\Filters_Templates::CAN_APPLY, $can_apply, $template );
+		return (bool) apply_filters( \FotoGrids\Hooks\Filters_Templates::CAN_APPLY, true, $template );
 	}
 
 	/**
@@ -346,10 +328,6 @@ class Templates_Data {
 			return new \WP_Error( 'template_not_found', __( 'Template not found.', 'fotogrids' ), array( 'status' => 404 ) );
 		}
 
-		if ( isset( $template['type'] ) && 'free' !== $template['type'] && ! \FotoGrids\License_Manager::has_pro() ) {
-			return new \WP_Error( 'pro_required', __( 'Pro license required for this template.', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		// Applying a template is a bulk write of every setting on the target
 		// post - gated on the per-CPT settings cap.
 		$settings_cap = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $expected_post_type );
@@ -455,17 +433,9 @@ class Templates_Data {
 
 		$template_name = isset( $template['name'] ) ? $template['name'] : __( 'Template Preview', 'fotogrids' );
 
-		$is_pro_template = isset( $template['type'] ) && 'pro' === $template['type'];
-		$has_pro_license = \FotoGrids\License_Manager::has_pro();
-
-		// Unlicensed Pro templates fall back to the limited preview_settings.
-		if ( $is_pro_template && ! $has_pro_license && isset( $template['preview_settings'] ) && is_array( $template['preview_settings'] ) ) {
-			$settings = $template['preview_settings'];
-		} else {
-			$settings = isset( $template['settings'] ) && is_array( $template['settings'] )
-				? $template['settings']
-				: array();
-		}
+		$settings = isset( $template['settings'] ) && is_array( $template['settings'] )
+			? $template['settings']
+			: array();
 
 		$defaults       = \FotoGrids\Collection_Defaults::resolve_gallery();
 		$final_settings = array_merge( $defaults, $settings );
@@ -637,17 +607,9 @@ class Templates_Data {
 			}
 		}
 
-		// When the library hides Pro, a Pro template must not be resolvable by id
-		// either - this closes the preview/apply path, not just the listing.
-		$flags         = Templates_Catalog::get_flags();
-		$pro_is_hidden = empty( $flags['show_pro'] );
-
 		$predefined = self::load_predefined_templates( $category );
 		foreach ( $predefined as $template ) {
 			if ( isset( $template['id'] ) && $template['id'] === $template_id ) {
-				if ( $pro_is_hidden && isset( $template['type'] ) && 'pro' === $template['type'] ) {
-					return null;
-				}
 				return $template;
 			}
 		}

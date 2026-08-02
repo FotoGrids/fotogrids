@@ -585,12 +585,6 @@ class Register_Admin_Routes {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( '\FotoGrids\REST\Admin\Catalog_Field_States_Endpoint', 'get_field_states' ),
-					'args'                => array(
-						'simulate_state' => array(
-							'default'           => null,
-							'sanitize_callback' => 'sanitize_text_field',
-						),
-					),
 					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
 				),
 			)
