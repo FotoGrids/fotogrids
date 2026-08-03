@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for reporting. Please confirm this is a **bug**, not a feature request or a how-to.
         - 🚀 Feature idea → [Feature Requests discussion](../../discussions/new?category=feature-requests)
-        - 🙏 How do I…? → [Q&A / Help discussion](../../discussions/new?category=q-a-help)
+        - 🙏 How do I…? → [Q&A / Help discussion](../../discussions/new?category=q-a)
   - type: checkboxes
     id: prechecks
     attributes:

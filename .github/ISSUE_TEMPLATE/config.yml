@@ -1,10 +1,10 @@
 blank_issues_enabled: false
 contact_links:
   - name: 🚀 Feature request or idea
-    url: https://github.com/fotogrids/fotogrids/discussions/new?category=feature-requests
+    url: https://github.com/FotoGrids/fotogrids/discussions/new?category=feature-requests
     about: Suggest a new feature or improvement. Requests live in Discussions so the community can vote.
   - name: 🙏 Question / help
-    url: https://github.com/fotogrids/fotogrids/discussions/new?category=q-a-help
+    url: https://github.com/FotoGrids/fotogrids/discussions/new?category=q-a
     about: Setup help, "how do I…", or troubleshooting that isn't a confirmed bug.
   - name: 📚 Documentation
     url: https://www.fotogrids.com/docs/
