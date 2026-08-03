@@ -1,0 +1,68 @@
+title: "[Feature]: "
+labels: ["request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping shape FotoGrids! A few things before you post:
+
+        - **Search first** — someone may have already requested this. If so, add your 👍 to their post instead of opening a new one.
+        - **One request per thread** — so we can track and reference each idea cleanly.
+        - **Upvote, don't "+1"** — use the 👍 on the original post to show support.
+  - type: checkboxes
+    id: prechecks
+    attributes:
+      label: Before posting
+      options:
+        - label: I searched existing Feature Requests and this isn't a duplicate.
+          required: true
+        - label: This is a single, focused request (not a list).
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the pain point or the workflow that's currently hard. Focus on the "why" before the "how".
+      placeholder: "When I build a gallery, I can't… so I have to…"
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like FotoGrids to do? Screenshots, mockups, or screen recordings help a lot — just drag and drop them here.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or workarounds
+      description: Anything you've tried, or other plugins that do this well.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this touch?
+      options:
+        - Lightbox
+        - Gallery layouts
+        - Albums
+        - Captions / metadata / SEO
+        - Page builders
+        - Performance / loading
+        - Admin UI
+        - Statistics
+        - Other / not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which plugin is this for?
+      options:
+        - FotoGrids (Free)
+        - FotoGrids Pro
+        - Not sure
+    validations:
+      required: true
