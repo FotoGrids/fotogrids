@@ -6,6 +6,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import './styles/admin.scss';
+import './shared-registry';
 
 import Dashboard from './components/pages/Dashboard';
 import StatsPage from './components/pages/StatsPage';
