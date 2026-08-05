@@ -281,7 +281,9 @@ class Integrated_Renderer {
 		 * @param \WP_Post $post
 		 * @param string   $original_content
 		 */
-		return (string) apply_filters( Filters_View::INTEGRATED_CONTENT, $html, $post, $content );
+		$html = (string) apply_filters( Filters_View::INTEGRATED_CONTENT, $html, $post, $content );
+
+		return wp_kses( $html, \FotoGrids\Kses::rules( $html ) );
 	}
 
 	/**
