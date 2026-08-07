@@ -41,6 +41,14 @@ class View_Collections_Data {
 			);
 		}
 
+		if ( 'publish' !== $post->post_status && ! current_user_can( 'edit_post', $post_id ) ) {
+			return new \WP_Error(
+				'fotogrids_not_found',
+				__( 'Collection not found.', 'fotogrids' ),
+				array( 'status' => 404 )
+			);
+		}
+
 		$data = array(
 			'id'       => $post_id,
 			'url'      => get_permalink( $post ),

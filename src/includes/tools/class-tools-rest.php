@@ -42,7 +42,7 @@ class Tools_Rest {
 	 * Individual tool visibility is filtered inside get_manifest().
 	 */
 	public static function check_permission(): bool {
-		return current_user_can( 'manage_fotogrids' );
+		return ! empty( Tools_Registry::get_all_for_user() );
 	}
 
 	/**
