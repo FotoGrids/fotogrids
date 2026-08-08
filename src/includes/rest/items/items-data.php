@@ -39,8 +39,16 @@ class Items_Data {
 		$query_params     = array();
 
 		if ( $gallery_id ) {
+			$gallery_id = (int) $gallery_id;
+
+			if ( 'publish' !== get_post_status( $gallery_id ) && ! current_user_can( 'edit_post', $gallery_id ) ) {
+				return self::empty_items_response( $limit, $offset );
+			}
+
 			$where_conditions[] = 'gallery_id = %d';
 			$query_params[]     = $gallery_id;
+		} elseif ( ! current_user_can( 'edit_posts' ) ) {
+			return self::empty_items_response( $limit, $offset );
 		}
 
 		$where_sql = '';
@@ -84,6 +92,28 @@ class Items_Data {
 			array(
 				'items'  => $items,
 				'total'  => count( $items ),
+				'limit'  => $limit,
+				'offset' => $offset,
+			)
+		);
+	}
+
+	/**
+	 * Build an empty items query response.
+	 *
+	 * Returned when the caller may not read the requested items (an
+	 * unpublished gallery they cannot edit, or an unfiltered query without
+	 * editing rights) so the public endpoint never leaks item metadata.
+	 *
+	 * @param int $limit  Requested limit, echoed back.
+	 * @param int $offset Requested offset, echoed back.
+	 * @return \WP_REST_Response
+	 */
+	private static function empty_items_response( int $limit, int $offset ) {
+		return rest_ensure_response(
+			array(
+				'items'  => array(),
+				'total'  => 0,
 				'limit'  => $limit,
 				'offset' => $offset,
 			)
