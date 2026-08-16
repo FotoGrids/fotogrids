@@ -74,19 +74,22 @@ const PickerModal = ({
         setLoading(true);
         setError(null);
 
-        const params = new URLSearchParams({
-            type: kind,
-            page: String(pageNum),
-            per_page: String(PER_PAGE),
-            orderby,
-        });
+        // Build via URL + searchParams so params are appended with the
+        // correct separator whether restUrl is pretty (…/wp-json/…/) or
+        // plain (…/?rest_route=/…/). A manual `?` concat produces a
+        // second `?` on plain permalinks and yields rest_no_route.
+        const url = new URL(`${restUrl}picker/items`);
+        url.searchParams.set('type', kind);
+        url.searchParams.set('page', String(pageNum));
+        url.searchParams.set('per_page', String(PER_PAGE));
+        url.searchParams.set('orderby', orderby);
         if (search) {
-            params.set('search', search);
+            url.searchParams.set('search', search);
         }
 
         try {
             const response = await fetch(
-                `${restUrl}picker/items?${params.toString()}`,
+                url.toString(),
                 {
                     headers: {
                         'X-WP-Nonce': restNonce,
@@ -147,6 +150,11 @@ const PickerModal = ({
             fetchPage(page, false);
         }
     }, [page]);
+
+    const handleRefresh = useCallback(() => {
+        setPage(1);
+        fetchPage(1, true);
+    }, [fetchPage]);
 
     /** Keyboard nav across cards. */
     const onKeyDown = useCallback((event) => {
@@ -219,6 +227,16 @@ const PickerModal = ({
                         value={orderby}
                         options={sortOptions}
                         onChange={setOrderby}
+                    />
+                    <Button
+                        className="fg-pb-picker__refresh"
+                        variant="secondary"
+                        icon="refresh_cv"
+                        size="lg"
+                        iconOnly
+                        busy={loading}
+                        onClick={handleRefresh}
+                        ariaLabel={__('Refresh', 'fotogrids')}
                     />
                 </div>
             </Modal.SubHeader>

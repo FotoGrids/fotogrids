@@ -48,7 +48,7 @@ class Embed_Data {
 	 */
 	public static function resolve_embed( $request ) {
 		$url    = esc_url_raw( $request->get_param( 'url' ) );
-		$source = sanitize_key( $request->get_param( 'source' ) ); // 'video_youtube' | 'video_vimeo'
+		$source = sanitize_key( $request->get_param( 'source' ) ); // Either video_youtube or video_vimeo.
 
 		if ( empty( $url ) ) {
 			return new \WP_Error(

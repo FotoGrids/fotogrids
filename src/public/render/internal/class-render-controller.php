@@ -5,6 +5,7 @@ namespace FotoGrids\Render\Internal;
 
 use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Collection_Kind;
+use FotoGrids\Render\Api\Inline_Assets;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Render_Context;
 
@@ -95,6 +96,7 @@ final class Render_Controller {
 						$render->meta->instance_id,
 						$active_modules,
 						$gate_result->http_status,
+						$gate_result->inline_css,
 					);
 					Hooks::fire_action( 'after_render', $render, $render_result );
 
@@ -106,12 +108,20 @@ final class Render_Controller {
 			$layout_css_classes = array();
 			$wrapper_data_attrs = array();
 			$css_variables      = array();
+			$inline_css_parts   = '';
+			$inline_js_parts    = '';
+			$json_ld_parts      = '';
 
 			foreach ( Module_Registry::active_modules( 'decorators', $render ) as $decorator_module ) {
 				$collection_items   = $decorator_module->decorate_items( $collection_items, $render );
 				$wrapper_data_attrs = array_merge( $wrapper_data_attrs, $decorator_module->wrapper_data_attrs( $render ) );
 				$css_variables      = array_merge( $css_variables, $decorator_module->style_vars( $render ) );
 				$this->asset_resolver->collect( $decorator_module->assets( $render ), $decorator_module->origin() );
+				if ( $decorator_module instanceof Inline_Assets ) {
+					$inline_css_parts .= $decorator_module->inline_css( $render );
+					$inline_js_parts  .= $decorator_module->inline_js( $render );
+					$json_ld_parts    .= $decorator_module->json_ld( $render );
+				}
 				$active_modules['decorators'][] = $decorator_module->id();
 			}
 
@@ -180,6 +190,11 @@ final class Render_Controller {
 				$feature_appendix_html .= $feature_module->html_appendix( $render );
 				$feature_after_html    .= $feature_module->html_after( $render );
 				$this->asset_resolver->collect( $feature_module->assets( $render ), $feature_module->origin() );
+				if ( $feature_module instanceof Inline_Assets ) {
+					$inline_css_parts .= $feature_module->inline_css( $render );
+					$inline_js_parts  .= $feature_module->inline_js( $render );
+					$json_ld_parts    .= $feature_module->json_ld( $render );
+				}
 				$active_modules['features'][] = $feature_module->id();
 			}
 
@@ -187,6 +202,11 @@ final class Render_Controller {
 			foreach ( Module_Registry::active_modules( 'sidecars', $render ) as $sidecar_module ) {
 				$sidecar_html .= $sidecar_module->render( $render );
 				$this->asset_resolver->collect( $sidecar_module->assets( $render ), $sidecar_module->origin() );
+				if ( $sidecar_module instanceof Inline_Assets ) {
+					$inline_css_parts .= $sidecar_module->inline_css( $render );
+					$inline_js_parts  .= $sidecar_module->inline_js( $render );
+					$json_ld_parts    .= $sidecar_module->json_ld( $render );
+				}
 				$active_modules['sidecars'][] = $sidecar_module->id();
 			}
 
@@ -211,11 +231,21 @@ final class Render_Controller {
 				$layout_body_html = $layout_inner_html . $feature_appendix_html;
 			}
 
+			// Per-gallery CSS variables are enqueued (page) / returned (REST) as
+			// inline CSS rather than embedded as a <style> in the wrapper.
+			$vars_css = $this->style_var_builder->build_css(
+				$css_variables,
+				$render->meta->instance_id,
+				$this->breakpoints,
+			);
+			if ( '' !== $vars_css ) {
+				$inline_css_parts = $vars_css . $inline_css_parts;
+			}
+
 			$wrapper_html = $this->build_wrapper(
 				$render,
 				$layout_css_classes,
 				$wrapper_data_attrs,
-				$css_variables,
 				$feature_before_html . $layout_body_html,
 			);
 
@@ -225,6 +255,7 @@ final class Render_Controller {
 				$active_modules,
 				200,
 			);
+			$render_result = $render_result->with_inline_assets( $inline_css_parts, $inline_js_parts, $json_ld_parts );
 
 			$filtered_html = Hooks::apply_filter( 'final_html', $render_result->html, $render );
 			$render_result = $render_result->with_html( is_string( $filtered_html ) ? $filtered_html : $render_result->html );
@@ -278,7 +309,6 @@ final class Render_Controller {
 	 * @param  Render_Context                       $render             Render context.
 	 * @param  array<int, string>                   $layout_css_classes Layout structural classes.
 	 * @param  array<string, string>                $wrapper_data_attrs Merged data-fg-* attributes.
-	 * @param  array<string, string|Responsive_Var> $css_variables      Accumulated CSS vars.
 	 * @param  string                               $inner_html         Wrapper inner HTML.
 	 * @return string
 	 */
@@ -286,7 +316,6 @@ final class Render_Controller {
 		Render_Context $render,
 		array $layout_css_classes,
 		array $wrapper_data_attrs,
-		array $css_variables,
 		string $inner_html
 	): string {
 		// Every wrapper carries the umbrella class 'fotogrids-collection'
@@ -319,18 +348,11 @@ final class Render_Controller {
 			$serialized_attributes .= sprintf( ' %s="%s"', esc_attr( $attr_name ), esc_attr( $attr_value ) );
 		}
 
-		$inline_style = $this->style_var_builder->build_style_element(
-			$css_variables,
-			$render->meta->instance_id,
-			$this->breakpoints,
-		);
-
 		return sprintf(
-			'<div id="%s" class="%s"%s>%s%s</div>',
+			'<div id="%s" class="%s"%s>%s</div>',
 			esc_attr( $render->meta->instance_id ),
 			$class_attribute,
 			$serialized_attributes,
-			$inline_style,
 			$inner_html
 		);
 	}

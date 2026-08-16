@@ -292,6 +292,29 @@ final class Module {
 	}
 
 	/**
+	 * Markup for the standalone "Create new" panel button.
+	 *
+	 * Used as the `raw` value of a RAW_HTML widget control so the button
+	 * stays visible in every source mode. editor.js opens the URL carried
+	 * in `data-fg-create-url` in a new tab.
+	 *
+	 * @since 1.0.0
+	 * @param string $url   Target admin URL.
+	 * @param string $label Button label.
+	 * @return string
+	 */
+	public static function create_button_html( string $url, string $label ): string {
+		$icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+		return sprintf(
+			'<button type="button" class="fg-pb-elementor-create fg-button fg-button--variant-secondary fg-button--size-sm" data-fg-create-url="%1$s"><span class="fotogrids-icon fg-button__icon fg-pb-elementor-create-icon" aria-hidden="true">%2$s</span><span class="fg-button__label">%3$s</span></button>',
+			esc_url( $url ),
+			$icon,
+			esc_html( $label )
+		);
+	}
+
+	/**
 	 * Stamp `data-elementor-open-lightbox="no"` on every anchor a
 	 * FotoGrids decorator emits during an Elementor-sourced render.
 	 *

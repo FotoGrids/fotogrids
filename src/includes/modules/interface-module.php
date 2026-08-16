@@ -60,10 +60,8 @@ interface Module_Interface {
 	 * Minimum tier required for this module's headline gated capability.
 	 *
 	 * One of: 'free' | 'pro_starter' | 'pro_plus' | 'agency'. The registry
-	 * resolves this to an access_state ('editable' / 'teaser' / 'locked') for
-	 * the manifest. A module may be tier 'free' (always runs) and still gate
-	 * individual actions internally - this is the headline gate, not the only
-	 * gate.
+	 * resolves this statically (no license check) to an access_state
+	 * ('editable' for free, 'teaser' otherwise) for the manifest.
 	 *
 	 * @since 1.0.0
 	 * @return string

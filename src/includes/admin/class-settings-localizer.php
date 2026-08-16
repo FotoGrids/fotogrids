@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace FotoGrids\Admin;
 
 use FotoGrids\Collection_Defaults;
-use FotoGrids\License_Manager;
 use FotoGrids\Links;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Settings\SEO_Settings_Store;
@@ -263,8 +262,6 @@ final class Settings_Localizer {
 			'postType'         => $args['post_type'],
 			'nonce'            => wp_create_nonce( 'fotogrids_settings' ),
 			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
-			'isProActive'      => License_Manager::is_pro_active(),
-			'enabledFeatures'  => License_Manager::get_enabled_features(),
 			'allowGoogleFonts' => (bool) get_option( 'fotogrids_allow_google_fonts', true ),
 			'galleryItems'     => $gallery_items,
 			'canEditPosts'     => current_user_can( 'edit_posts' ),
@@ -294,20 +291,6 @@ final class Settings_Localizer {
 			// GET /gallery/{id}/password REST endpoint.
 			$stored_password       = (string) get_post_meta( $args['post_id'], 'fotogrids_password', true );
 			$data['passwordIsSet'] = Password_Crypto::is_encrypted( $stored_password );
-		}
-
-		if ( current_user_can( 'manage_fotogrids_settings' ) ) {
-			// Read-only admin preview toggle, capability-gated above, sanitised
-			// and allowlisted below. No form submission/state change, so nonce
-			// verification does not apply.
-            // phpcs:disable WordPress.Security.NonceVerification.Recommended
-			$simulate_state = isset( $_GET['fotogrids_simulate_state'] )
-				? sanitize_text_field( wp_unslash( (string) $_GET['fotogrids_simulate_state'] ) )
-				: '';
-            // phpcs:enable WordPress.Security.NonceVerification.Recommended
-			if ( in_array( $simulate_state, array( 'ok', 'password_required', 'expired', 'unauthorized' ), true ) ) {
-				$data['catalogSimulateState'] = $simulate_state;
-			}
 		}
 
 		if ( $args['is_defaults'] ) {

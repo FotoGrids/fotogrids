@@ -153,8 +153,8 @@ window.FotoGridsRenderSettings.FieldGate = FieldGate;
 
 // Post-type placeholder helpers live in render-settings/utils/post-type-placeholders.js
 // (wrapped in an IIFE) and are enqueued before this script. Pull them off the
-// shared global so the renderers (e.g. renderCodeArea for hint strings) and
-// the settings translator share a single implementation.
+// shared global so the renderers (for hint strings) and the settings translator
+// share a single implementation.
 const replacePostTypePlaceholders =
 	window.FotoGridsRenderSettings.replacePostTypePlaceholders;
 const processSettingPlaceholders =
@@ -323,10 +323,10 @@ function CollectionSettings() {
 	const [settings, setSettings] = useState(
 		window.fotogridsSettings?.settings || {}
 	);
-	const [saving, setSaving] = useState(false);
+	const [, setSaving] = useState(false);
 	const [activeDevice, setActiveDevice] = useState('desktop');
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
-	const [validationErrors, setValidationErrors] = useState({});
+	const [, setValidationErrors] = useState({});
 	const [fieldStates, setFieldStates] = useState(
 		window.fotogridsCatalog?.field_states || {}
 	);
@@ -1908,42 +1908,6 @@ function CollectionSettings() {
 						renderSetting,
 						__,
 					}
-				);
-				break;
-
-			case 'codearea':
-				control = window.FotoGridsRenderSettings?.renderCodeArea(
-					setting,
-					currentValue,
-					(value, errorInfo) => {
-						updateSetting(setting.key, value);
-
-						if (errorInfo && typeof errorInfo === 'object') {
-							setValidationErrors((prev) => {
-								const newErrors = {
-									...prev,
-									[setting.key]: errorInfo,
-								};
-
-								window.FotoGridsValidationErrors = newErrors;
-
-								return newErrors;
-							});
-						} else {
-							setValidationErrors((prev) => {
-								const newErrors = { ...prev };
-								delete newErrors[setting.key];
-
-								window.FotoGridsValidationErrors = newErrors;
-
-								return newErrors;
-							});
-						}
-					},
-					[],
-					isDisabled,
-					getFieldState,
-					__
 				);
 				break;
 

@@ -1,6 +1,6 @@
 /**
  * Branch-coverage push for collection-settings.js: exercises the remaining
- * renderSetting dispatcher cases (codearea, password_input, cache_status,
+ * renderSetting dispatcher cases (password_input, cache_status,
  * watermark_status, promo, image types) plus the condition / condition_global /
  * inherit_from / disabled_unless / on_change.switch_tab logic and defaults mode.
  */
@@ -17,7 +17,6 @@ import '@/admin/plain/render-settings/renderImageSize';
 import '@/admin/plain/render-settings/renderImagePicker';
 import '@/admin/plain/render-settings/renderColorPicker';
 import '@/admin/plain/render-settings/renderTokenSelect';
-import '@/admin/plain/render-settings/renderCodeArea';
 import '@/admin/plain/render-settings/renderPasswordInput';
 import '@/admin/plain/render-settings/renderCacheStatus';
 import '@/admin/plain/render-settings/renderWatermarkStatus';
@@ -40,12 +39,6 @@ const DISPATCH_CATALOG = {
 		icon: 'i',
 		free: true,
 		settings: [
-			{
-				key: 'css',
-				type: 'codearea',
-				label: 'Custom CSS',
-				language: 'css',
-			},
 			{ key: 'pw', type: 'password_input', label: 'Password' },
 			{ key: 'cache', type: 'cache_status', label: 'Cache' },
 			{ key: 'wm', type: 'watermark_status', label: 'Watermark' },
@@ -198,11 +191,10 @@ describe('CollectionSettings dispatcher + condition branches', () => {
 		delete window.FotoGridsAjaxSave;
 	});
 
-	it('renders the codearea / password / cache / watermark / promo / image types', async () => {
+	it('renders the password / cache / watermark / promo / image types', async () => {
 		const handle = mount();
 		await flush();
 		const html = handle.container.innerHTML;
-		expect(handle.container.querySelector('.fotogrids-codearea-group')).not.toBeNull();
 		expect(
 			handle.container.querySelector('.fotogrids-password-input')
 		).not.toBeNull();

@@ -98,10 +98,9 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
 	 */
 	public function content_template(): void {
 		$kind_attr  = $this->get_kind();
-		$browse_lbl = $this->get_kind() === 'album'
-			? __( 'Browse all albums', 'fotogrids' )
-			: __( 'Browse all galleries', 'fotogrids' );
-		$edit_lbl   = $this->get_kind() === 'album'
+		$is_album   = $this->get_kind() === 'album';
+		$browse_lbl = __( 'Browse all', 'fotogrids' );
+		$edit_lbl   = $is_album
 			? __( 'Edit album', 'fotogrids' )
 			: __( 'Edit gallery', 'fotogrids' );
 		?>
@@ -131,7 +130,6 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
 							hidden
 						>
 							<span class="fg-button__label"><?php echo esc_html( $edit_lbl ); ?></span>
-							<span class="fotogrids-icon fotogrids-icon--click_external fg-button__icon fg-pb-elementor-picker__edit-icon" aria-hidden="true"></span>
 						</a>
 					</div>
 				</div>

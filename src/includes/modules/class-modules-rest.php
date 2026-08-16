@@ -16,10 +16,10 @@ if ( ! defined( 'WPINC' ) ) {
  * Registers GET /fotogrids/v1/admin/modules, returning the manifest of all
  * modules the current user can access.
  *
- * Each entry carries a pre-computed access_state ('editable' / 'teaser' /
- * 'locked') resolved from the module's tier_required and the current user's
- * license - the same vocabulary the Tools manifest and collection-settings
- * catalog use. This lets the admin UI, docs tooling, and launch dashboard
+ * Each entry carries a pre-computed access_state ('editable' / 'teaser')
+ * derived statically from the module's tier_required with no license check -
+ * the same vocabulary the Tools manifest and collection-settings catalog use.
+ * This lets the admin UI, docs tooling, and launch dashboard
  * read feature inventory from one source of truth.
  *
  * @since 1.0.0

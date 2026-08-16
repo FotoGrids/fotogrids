@@ -107,6 +107,19 @@ const PickerCard = ({
                         }
                     </div>
                 )}
+                <div className="fg-pb-picker-card__action">
+                    <Button
+                        variant={selected ? 'success' : 'primary'}
+                        icon={selected ? 'check' : undefined}
+                        disabled={selected}
+                        tabIndex={-1}
+                    >
+                        {selected
+                            ? __('Selected', 'fotogrids')
+                            : __('Select', 'fotogrids')
+                        }
+                    </Button>
+                </div>
             </div>
             <div className="fg-pb-picker-card__body">
                 <h3 id={titleId} className="fg-pb-picker-card__title">
@@ -137,19 +150,6 @@ const PickerCard = ({
                         </span>
                     )}
                 </div>
-            </div>
-            <div className="fg-pb-picker-card__action">
-                <Button
-                    variant={selected ? 'success' : 'primary'}
-                    icon={selected ? 'check' : undefined}
-                    disabled={selected}
-                    tabIndex={-1}
-                >
-                    {selected
-                        ? __('Selected', 'fotogrids')
-                        : __('Select', 'fotogrids')
-                    }
-                </Button>
             </div>
         </article>
     );

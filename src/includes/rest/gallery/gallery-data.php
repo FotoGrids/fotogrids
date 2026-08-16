@@ -286,15 +286,19 @@ class Gallery_Data {
 		// never reaches the visitor's already-loaded page. Return the combined
 		// fonts URL so the client can inject the <link> alongside the CSS/JS.
 		$fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
+		$inline    = \FotoGrids\Public_Render::last_render_result();
 
 		return rest_ensure_response(
 			array(
-				'success'  => true,
-				'html'     => $html,
-				'css'      => $css_urls,
-				'js'       => $js_data,
-				'fonts'    => $fonts_url,
-				'remember' => $remember,
+				'success'   => true,
+				'html'      => $html,
+				'css'       => $css_urls,
+				'js'        => $js_data,
+				'fonts'     => $fonts_url,
+				'remember'  => $remember,
+				'inlineCss' => null !== $inline ? $inline->inline_css : '',
+				'inlineJs'  => null !== $inline ? $inline->inline_js : '',
+				'jsonLd'    => null !== $inline ? $inline->json_ld : '',
 			)
 		);
 	}
@@ -373,14 +377,18 @@ class Gallery_Data {
 			$css_urls  = $resolver->get_css_asset_urls();
 			$js_data   = $resolver->get_js_asset_data();
 			$fonts_url = \FotoGrids\Render\Api\Font_Resolver::instance()->get_collected_fonts_url();
+			$inline    = \FotoGrids\Public_Render::last_render_result();
 
 			return rest_ensure_response(
 				array(
-					'success' => true,
-					'html'    => $html,
-					'css'     => $css_urls,
-					'js'      => $js_data,
-					'fonts'   => $fonts_url,
+					'success'   => true,
+					'html'      => $html,
+					'css'       => $css_urls,
+					'js'        => $js_data,
+					'fonts'     => $fonts_url,
+					'inlineCss' => null !== $inline ? $inline->inline_css : '',
+					'inlineJs'  => null !== $inline ? $inline->inline_js : '',
+					'jsonLd'    => null !== $inline ? $inline->json_ld : '',
 				)
 			);
 		}

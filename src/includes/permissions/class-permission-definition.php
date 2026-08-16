@@ -18,9 +18,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Immutable description of a single permission.
  *
  * A Permission_Definition describes WHAT a permission is and how the UI should
- * present it. It never carries grant data (who has it) - that lives in either
- * WP_Role::capabilities (for role-global grants) or the
- * fotogrids_permission_grants table (for everything else).
+ * present it. It never carries grant data (who has it) - that lives in
+ * WP_Role::capabilities.
  *
  * Two kinds of definitions coexist in the registry:
  *

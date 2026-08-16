@@ -301,7 +301,7 @@ final class Metabox_Registrar {
 		wp_enqueue_script( 'wp-components' );
 		wp_enqueue_script( 'wp-i18n' );
 
-		Collection_Settings_Assets::enqueue( true, true );
+		Collection_Settings_Assets::enqueue( true );
 
 		wp_enqueue_script(
 			'fotogrids-metabox',

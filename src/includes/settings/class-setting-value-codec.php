@@ -13,7 +13,6 @@ namespace FotoGrids\Settings;
 use FotoGrids\Catalog\Catalog;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Sanitization\Array_Field;
-use FotoGrids\Sanitization\Code_Field;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -39,7 +38,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Plus one helper, `catalog_field_type()`, that resolves a setting key's
  * control type via the catalog so persist/normalize can branch on
- * 'codearea' vs 'password_input' etc.
+ * 'button_group' vs 'password_input' etc.
  *
  * @since 1.0.0
  */
@@ -51,7 +50,7 @@ final class Setting_Value_Codec {
 	 * @since 1.0.0
 	 * @param mixed  $raw_value     Raw value from the request (string or array).
 	 * @param mixed  $default_value Default value shape - drives type coercion.
-	 * @param string $field_type    Catalog field control type, e.g. 'codearea'.
+	 * @param string $field_type    Catalog field control type, e.g. 'password_input'.
 	 * @return mixed
 	 */
 	public static function normalize_incoming( $raw_value, $default_value, string $field_type = '' ) {
@@ -85,15 +84,6 @@ final class Setting_Value_Codec {
 			return is_numeric( $raw_value ) ? $raw_value + 0 : $default_value;
 		}
 
-		// codearea fields contain raw CSS/JS - use Code_Field::sanitize() which
-		// strips only null bytes and control characters, preserving < > and all
-		// other characters valid in source code. sanitize_textarea_field must
-		// NOT be used here: it strips HTML tags and encodes entities,
-		// corrupting JS comparisons, arrow functions, etc.
-		if ( 'codearea' === $field_type ) {
-			return Code_Field::sanitize( (string) $raw_value );
-		}
-
 		// password_input fields pass through as-is (sanitize_text_field would
 		// strip special characters valid in passwords). The value is encrypted
 		// - not stored as plain text - by `persist()`.
@@ -112,7 +102,7 @@ final class Setting_Value_Codec {
 	 *
 	 * @since 1.0.0
 	 * @param string $setting_key Setting key (without the `fotogrids_` prefix).
-	 * @return string Catalog control type, e.g. 'codearea', 'toggle'.
+	 * @return string Catalog control type, e.g. 'password_input', 'toggle'.
 	 */
 	public static function catalog_field_type( string $setting_key ): string {
 		$entry = Catalog::get( $setting_key );
@@ -165,7 +155,6 @@ final class Setting_Value_Codec {
 	 * Numerics get `sanitize_text_field()`. Catalog-typed strings route
 	 * through their dedicated sanitiser:
 	 *
-	 *   - `codearea`       → Code_Field::sanitize()
 	 *   - `password_input` → Password_Crypto::encrypt() (or delete on empty;
 	 *                        re-encryption guard if value already encrypted)
 	 *   - default          → sanitize_text_field()
@@ -175,7 +164,7 @@ final class Setting_Value_Codec {
 	 * @param string $post_meta_key Full meta key (e.g. `fotogrids_layout`).
 	 * @param mixed  $setting_value Already-normalised value.
 	 * @param mixed  $default_value Default value shape - drives serialisation.
-	 * @param string $field_type    Catalog field control type, e.g. 'codearea'.
+	 * @param string $field_type    Catalog field control type, e.g. 'password_input'.
 	 * @return void
 	 */
 	public static function persist( int $post_id, string $post_meta_key, $setting_value, $default_value, string $field_type = '' ): void {
@@ -191,13 +180,6 @@ final class Setting_Value_Codec {
 
 		if ( is_numeric( $default_value ) ) {
 			update_post_meta( $post_id, $post_meta_key, sanitize_text_field( (string) $setting_value ) );
-			return;
-		}
-
-		// codearea fields contain raw CSS/JS - see normalize_incoming for the
-		// rationale.
-		if ( 'codearea' === $field_type ) {
-			update_post_meta( $post_id, $post_meta_key, Code_Field::sanitize( (string) $setting_value ) );
 			return;
 		}
 

@@ -40,10 +40,9 @@ if ( method_exists( '\FotoGrids\Public_Render', 'gallery_shortcode' ) ) {
 		)
 	);
 
-	if ( '' !== $wrapper_attributes ) {
-		printf( '<div %s>%s</div>', $wrapper_attributes, $inner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	} else {
-		echo $inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	}
+	$fg_markup = '' !== $wrapper_attributes
+		? '<div ' . $wrapper_attributes . '>' . $inner . '</div>'
+		: $inner;
+	echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
 }
 // phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

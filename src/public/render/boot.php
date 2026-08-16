@@ -146,7 +146,6 @@ add_action(
 		// Stats fires view + share pings to the REST API. Gated by the
 		// enable_statistics setting (default true) and never active in previews.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Stats\Stats::class );
-		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Custom_Code\Custom_Css::class );
 		// Inline video playback - active when video_playback_mode is "inline".
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Inline::class );
 		// Minimal video lightbox - active when video_playback_mode is "lightbox"
@@ -164,16 +163,12 @@ add_action(
 		// supports() and html_before(). Tags decorator runs with decorators so
 		// data-fg-tags is stamped before layout and feature rendering starts.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\Tags\Tags_Filter_Source::class );
-		\FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\People\People_Filter_Source::class );
-		\FotoGrids\Render\Internal\Module_Registry::register( 'filter_sources', \FotoGrids\Render\Filters\Sources\Location\Location_Filter_Source::class );
 		// Sequence index decorator stamps data-fg-sequence-index on
 		// every item using Gallery_Item_Sequence::resolve(). Lightbox
 		// reads it to know each item's position in the full
 		// filtered+sorted set. Always runs (gallery-only via supports).
 		\FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Decorators\Sequence_Index\Sequence_Index_Decorator::class );
 		\FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\Tags\Tags_Filter_Decorator::class );
-		\FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\People\People_Filter_Decorator::class );
-		\FotoGrids\Render\Internal\Module_Registry::register( 'decorators', \FotoGrids\Render\Filters\Decorators\Location\Location_Filter_Decorator::class );
 		// Collection Header (back-to-album button + breadcrumbs) MUST be
 		// registered before Filter_Ui so its html_before output renders
 		// above .fotogrids-filters inside the gallery wrapper. The feature

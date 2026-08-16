@@ -1194,15 +1194,6 @@ class Collection_Defaults {
 			'exif_aperture'                                => true,
 			'exif_shutter_speed'                           => true,
 			'exif_iso'                                     => true,
-			'exif_lens'                                    => false,
-			'exif_focal_length'                            => false,
-			'exif_date_taken'                              => false,
-			'exif_copyright'                               => false,
-			'exif_orientation'                             => false,
-			'exif_flash'                                   => false,
-			'exif_white_balance'                           => false,
-			'exif_exposure_mode'                           => false,
-			'custom_css'                                   => '',
 		);
 
 		$defaults = self::process_defaults_array( $defaults, $is_defaults_page );
