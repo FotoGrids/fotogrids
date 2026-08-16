@@ -57,12 +57,13 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
         ).replace('{{targetName}}', selectedTarget?.title || targetId);
 
         const modal = window.FotoGridsAdmin?.modal;
-        const confirmed = modal?.warning
-            ? await modal.warning({
+        const confirmed = modal?.confirm
+            ? await modal.confirm({
                 title: __('Override existing settings?', 'fotogrids'),
                 message: confirmMessage,
                 confirmLabel: __('Apply Template', 'fotogrids'),
                 cancelLabel: __('Cancel', 'fotogrids'),
+                headerIcon: false,
             })
             : window.confirm(confirmMessage);
 

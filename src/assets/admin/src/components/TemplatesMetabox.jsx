@@ -114,15 +114,16 @@ const TemplatesMetabox = () => {
     const confirmApply = async () => {
         const modal = window.FotoGridsAdmin?.modal;
 
-        if (!modal?.warning) {
+        if (!modal?.confirm) {
             return window.confirm(strings.confirmApply);
         }
 
-        return modal.warning({
+        return modal.confirm({
             title: strings.confirmApplyTitle,
             message: strings.confirmApply,
             confirmLabel: strings.applyTemplate,
             cancelLabel: strings.cancel,
+            headerIcon: false,
         });
     };
 

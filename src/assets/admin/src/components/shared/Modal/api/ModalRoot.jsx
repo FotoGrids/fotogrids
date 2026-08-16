@@ -21,6 +21,7 @@ const renderEntry = (entry) => {
                     onClose={ close }
                     onConfirm={ options.onConfirm }
                     variant={ options.variant }
+                    headerIcon={ options.headerIcon }
                     title={ options.title }
                     message={ options.message }
                     confirmLabel={ options.confirmLabel }
