@@ -293,7 +293,14 @@ const GalleryMetabox = ({
         }
     }, [strings]);
 
-    const openMediaUploader = useCallback(() => {
+    /**
+     * Opens the WordPress media frame.
+     *
+     * @param {string} contentMode Router tab to land on: 'upload' for the
+     *                             "Upload Files" pane, 'browse' for the
+     *                             "Media Library" pane.
+     */
+    const openMediaUploader = useCallback((contentMode = 'browse') => {
         if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
             alert(strings.mediaNotAvailable);
             return;
@@ -304,6 +311,15 @@ const GalleryMetabox = ({
             button: { text: strings.addToGallery },
             multiple: true,
             library: { type: 'image' }
+        });
+
+        // The Library state restores whichever router tab was used last
+        // (`libraryContent` user setting), so the tab has to be forced after
+        // the state activates - which is what the 'open' event guarantees.
+        mediaUploader.on('open', () => {
+            if (mediaUploader.content) {
+                mediaUploader.content.mode(contentMode);
+            }
         });
 
         mediaUploader.on('select', () => {
@@ -612,8 +628,10 @@ const GalleryMetabox = ({
 
         switch (action) {
             case 'upload':
+                openMediaUploader('upload');
+                break;
             case 'library':
-                openMediaUploader();
+                openMediaUploader('browse');
                 break;
             case 'folder':
                 alert('Browse uploads folder functionality will be implemented soon.');
