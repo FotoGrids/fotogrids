@@ -171,7 +171,9 @@ final class Collection_Save_Pipeline {
 				/* translators: %s: collection type (Gallery or Album). */
 				'message'                 => sprintf( __( '%s saved successfully', 'fotogrids' ), $collection_type ),
 				'post_id'                 => $post_id,
-				'post_title'              => get_the_title( $post_id ),
+				// Decoded because the JS save handler writes this into a DOM text
+				// node; wptexturize (via the_title) returns entities like &#8211;.
+				'post_title'              => html_entity_decode( get_the_title( $post_id ), ENT_QUOTES, 'UTF-8' ),
 				'post_type'               => $post->post_type,
 				'redirect_url'            => get_edit_post_link( $post_id, 'raw' ),
 				'gated'                   => $gated_result['gated'] ?? array(),
