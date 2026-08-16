@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useState } from 'react';
 import Modal from '../Modal';
 import Button from '../../Button/Button';
 import Icon from '../../Icon';
@@ -13,6 +13,11 @@ const VARIANT_DEFAULTS = {
 };
 
 const t = (s) => (typeof window !== 'undefined' && window.wp?.i18n?.__?.(s, 'fotogrids')) || s;
+
+const format = (template, value) => {
+    const sprintf = typeof window !== 'undefined' && window.wp?.i18n?.sprintf;
+    return sprintf ? sprintf(template, value) : template.replace('%s', value);
+};
 
 const Confirm = ({
     isOpen,
@@ -30,6 +35,7 @@ const Confirm = ({
     children,
 }) => {
     const defaults = VARIANT_DEFAULTS[variant] || VARIANT_DEFAULTS.question;
+    const requireInputId = useId();
     const [confirmText, setConfirmText] = useState('');
     const [internalBusy, setInternalBusy] = useState(false);
     const busy = busyProp || internalBusy;
@@ -38,7 +44,7 @@ const Confirm = ({
         if (!isOpen) setConfirmText('');
     }, [isOpen]);
 
-    const meetsRequireText = !requireText || confirmText === requireText;
+    const meetsRequireText = !requireText || confirmText.trim() === requireText;
 
     const handleConfirm = useCallback(async () => {
         if (!meetsRequireText || busy) return;
@@ -92,15 +98,19 @@ const Confirm = ({
                 { children }
                 { requireText && (
                     <div className="fg-confirm__require-text">
-                        <label htmlFor="fg-confirm-require-input">
-                            { t(`Type "${ requireText }" to confirm`) }
+                        <label htmlFor={ requireInputId }>
+                            { format(t('Type %s to continue'), requireText) }
                         </label>
                         <input
-                            id="fg-confirm-require-input"
+                            id={ requireInputId }
                             type="text"
                             value={ confirmText }
                             onChange={ (e) => setConfirmText(e.target.value) }
+                            onKeyDown={ (e) => { if (e.key === 'Enter') handleConfirm(); } }
+                            placeholder={ requireText }
                             autoComplete="off"
+                            autoCorrect="off"
+                            spellCheck="false"
                             disabled={ busy }
                         />
                     </div>
