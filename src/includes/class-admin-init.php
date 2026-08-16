@@ -188,22 +188,10 @@ class Admin_Init {
 			true
 		);
 
-		// vendors.js is the webpack shared-chunk for node_modules code split out
-		// of admin.js. admin.js's entry module is deferred behind this chunk via
-		// __webpack_require__.O - if vendors.js hasn't run first, admin.js never
-		// executes its own entry point and window.FotoGridsToolsComponents is never set.
-		wp_enqueue_script(
-			'fotogrids-vendors',
-			FOTOGRIDS_PLUGIN_URL . 'assets/js/vendors.js',
-			array(),
-			FOTOGRIDS_VERSION,
-			true
-		);
-
 		wp_enqueue_script(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/admin.js',
-			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'fotogrids-icons', 'fotogrids-ui-state-manager', 'fotogrids-vendors' ),
+			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
 			FOTOGRIDS_VERSION,
 			true
 		);

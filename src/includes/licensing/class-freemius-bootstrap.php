@@ -39,6 +39,39 @@ class Freemius_Bootstrap {
 	private static bool $initialized = false;
 
 	/**
+	 * Points the SDK at the plugin's WordPress-visible directory.
+	 *
+	 * The SDK derives WP_FS__DIR from __FILE__, which PHP resolves through
+	 * symlinks. Its own recovery only matches a symlink whose name equals its
+	 * target's, so a differently named link leaves every SDK asset URL wrong.
+	 * Must run before the SDK is loaded.
+	 *
+	 * @since  1.0.0
+	 * @return void
+	 */
+	private static function maybe_define_sdk_dir(): void {
+		if ( defined( 'WP_FS__DIR' ) || class_exists( '\\Freemius' ) ) {
+			return;
+		}
+
+		$plugin_slug = dirname( FOTOGRIDS_PLUGIN_BASENAME );
+		$sdk_dir     = wp_normalize_path( WP_PLUGIN_DIR . '/' . $plugin_slug . '/freemius' );
+		$sdk_real    = realpath( $sdk_dir );
+
+		if ( false === $sdk_real ) {
+			return;
+		}
+
+		$sdk_real = wp_normalize_path( $sdk_real );
+
+		if ( $sdk_real === $sdk_dir || basename( dirname( $sdk_real ) ) === $plugin_slug ) {
+			return;
+		}
+
+		define( 'WP_FS__DIR', $sdk_dir ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Freemius SDK constant.
+	}
+
+	/**
 	 * Initialise the Freemius SDK.
 	 *
 	 * Returns null if the SDK files are not present at <plugin>/freemius/start.php
@@ -58,6 +91,8 @@ class Freemius_Bootstrap {
 		if ( ! file_exists( $sdk_path ) ) {
 			return null;
 		}
+
+		self::maybe_define_sdk_dir();
 
 		require_once $sdk_path;
 
