@@ -113,7 +113,7 @@ class Import_Export_Data {
 		header( 'Content-Type: ' . $content_type . '; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
 		header( 'Content-Length: ' . strlen( $body ) );
-		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Serialised XML/JSON file download (Content-Disposition: attachment), not HTML; HTML-escaping would corrupt the export. XML entities are encoded in serialise_xml().
 		exit;
 	}
 

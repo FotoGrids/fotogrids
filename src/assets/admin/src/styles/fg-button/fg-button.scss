@@ -311,7 +311,7 @@
 .fg-button--size-sm {
 	padding: 0px 12px;
 	font-size: 12px;
-	line-height: 2.2;
+	line-height: 2;
 }
 
 // --size-md is the default and matches .fg-button base rules.
@@ -367,15 +367,15 @@
 	}
 
 	&.fg-button--size-lg {
-		padding: 12px;
-		min-width: 44px;
-		min-height: 44px;
+		padding: 10px;
+		min-width: 40px;
+		min-height: 40px;
 	}
 
 	&.fg-button--size-xl {
-		padding: 14px;
-		min-width: 52px;
-		min-height: 52px;
+		padding: 12px;
+		min-width: 48px;
+		min-height: 48px;
 	}
 }
 

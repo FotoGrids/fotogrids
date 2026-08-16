@@ -675,7 +675,7 @@ final class Catalog_Assembler {
 			return $this->splice_associative( $existing, 0, $new_key, $new_node );
 		}
 
-		// at_end (default).
+		// Default behaviour appends at the end.
 		$existing[ $new_key ] = $new_node;
 		return $existing;
 	}

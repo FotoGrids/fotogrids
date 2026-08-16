@@ -295,8 +295,8 @@ final class Font_Resolver {
 
 	/**
 	 * Footer fallback for fonts that were collected after wp_enqueue_scripts
-	 * already fired. Prints a `<link rel="stylesheet">` directly because the
-	 * enqueue pipeline is closed by the time wp_footer runs.
+	 * already fired. Registers, enqueues, and prints the stylesheet through
+	 * WordPress at footer time via wp_print_styles().
 	 *
 	 * Idempotent across both wp_footer and wp_print_footer_scripts (whichever
 	 * fires first wins - the second call returns early).
@@ -319,16 +319,15 @@ final class Font_Resolver {
 
 		$this->stylesheet_printed = true;
 
-		// Google Fonts link is printed inline at the exact point fonts are resolved
-		// during render; deferring to wp_enqueue_style() would lose the per-render
-		// font set. The <link> string sits on its own line inside the printf(), so a
-		// disable/enable block is used rather than a single next-line ignore.
-        // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
-		printf(
-			'<link rel="stylesheet" id="fotogrids-google-fonts-css" href="%s" media="all" />' . "\n",
-			esc_url( $url )
-		);
-        // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
+		// wp_enqueue_scripts has already fired by footer time, so the stylesheet
+		// is registered, enqueued, and printed through WordPress here (rather than
+		// echoed as a raw <link>). Version is null because Google Fonts URLs carry
+		// their own versioning.
+		// phpcs:disable WordPress.WP.EnqueuedResourceParameters.MissingVersion
+		wp_register_style( 'fotogrids-google-fonts', $url, array(), null );
+		// phpcs:enable WordPress.WP.EnqueuedResourceParameters.MissingVersion
+		wp_enqueue_style( 'fotogrids-google-fonts' );
+		wp_print_styles( 'fotogrids-google-fonts' );
 	}
 
 	/**

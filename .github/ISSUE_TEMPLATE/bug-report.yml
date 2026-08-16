@@ -1,0 +1,64 @@
+name: 🐞 Bug report
+description: Something in FotoGrids is broken or behaving incorrectly.
+title: "[Bug]: "
+labels: ["bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please confirm this is a **bug**, not a feature request or a how-to.
+        - 🚀 Feature idea → [Feature Requests discussion](../../discussions/new?category=feature-requests)
+        - 🙏 How do I…? → [Q&A / Help discussion](../../discussions/new?category=q-a)
+  - type: checkboxes
+    id: prechecks
+    attributes:
+      label: Before reporting
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+        - label: I reproduced this with all other plugins disabled and a default theme.
+          required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead? Screenshots or a screen recording help.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Create a gallery with…
+        2. Set layout to…
+        3. View on front end…
+        4. See error
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Environment
+      description: FotoGrids version, WordPress version, PHP version, theme, and any page builder.
+      placeholder: "FotoGrids 1.0.0 · WP 6.8 · PHP 8.1 · GeneratePress · Elementor"
+    validations:
+      required: true
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Free or Pro?
+      options:
+        - FotoGrids (Free)
+        - FotoGrids Pro
+        - Both
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console / PHP errors
+      description: Any browser console errors or PHP notices (from debug.log). Optional but very helpful.
+      render: shell
+    validations:
+      required: false

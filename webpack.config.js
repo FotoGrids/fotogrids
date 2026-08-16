@@ -193,7 +193,6 @@ const mainConfig = {
         // styling. The `admin` bundle still includes the same partials
         // via admin.scss for FotoGrids admin pages.
         'fg-shared-styles': './src/assets/admin/src/styles/fg-shared/fg-shared.scss',
-        'codemirror-init': './src/assets/admin/src/codemirror-init.js',
         'dashboard-widget': './src/assets/admin/src/dashboard-widget.js',
         'dashboard-widget-styles': './src/assets/admin/src/styles/dashboard-widget.scss',
         'toast-init': './src/assets/admin/src/toast-init.js',

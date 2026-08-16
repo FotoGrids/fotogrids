@@ -281,7 +281,9 @@ class Integrated_Renderer {
 		 * @param \WP_Post $post
 		 * @param string   $original_content
 		 */
-		return (string) apply_filters( Filters_View::INTEGRATED_CONTENT, $html, $post, $content );
+		$html = (string) apply_filters( Filters_View::INTEGRATED_CONTENT, $html, $post, $content );
+
+		return wp_kses( $html, \FotoGrids\Kses::rules( $html ) );
 	}
 
 	/**
@@ -328,8 +330,7 @@ class Integrated_Renderer {
 			return;
 		}
 
-		// Renderer::head_meta() is already escape-aware.
-		echo Renderer::for_post( $post )->head_meta(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( Renderer::for_post( $post )->head_meta(), \FotoGrids\Kses::head_meta_rules() );
 	}
 
 	/**

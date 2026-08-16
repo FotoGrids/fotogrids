@@ -37,16 +37,28 @@
         }
     }
 
+    &__refresh {
+        flex: 0 0 auto;
+    }
+
     &__grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
         gap: 16px;
     }
 
+    &__empty, &__error {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+    }
+
     &__empty {
         text-align: center;
         padding: 48px 24px;
-        color: #757575;
+        color: var(--fg-text-tertiary);
 
         .components-button {
             margin-top: 16px;

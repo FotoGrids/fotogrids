@@ -225,14 +225,6 @@ class Admin_Init {
 		);
 
 		wp_enqueue_script(
-			'fotogrids-codemirror-init',
-			FOTOGRIDS_PLUGIN_URL . 'assets/js/codemirror-init.js',
-			array(),
-			FOTOGRIDS_VERSION,
-			true
-		);
-
-		wp_enqueue_script(
 			'fotogrids-toast-init',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/toast-init.js',
 			array( 'fotogrids-admin' ),
@@ -372,7 +364,7 @@ class Admin_Init {
 		}
 
 		if ( 'fotogrids_page_fotogrids-settings' === $hook || strpos( $hook, 'fotogrids-settings' ) !== false ) {
-			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true, false );
+			\FotoGrids\Assets\Collection_Settings_Assets::enqueue( true );
 
 			// Read-only routing, sanitised; no state change so nonce is N/A.
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -496,6 +488,11 @@ class Admin_Init {
 				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 			} elseif ( is_numeric( $default_value ) ) {
 				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
+			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
+				// Passwords must not pass through sanitize_text_field(), which
+				// would strip characters that are valid in a password. Keep the
+				// value as-is; the per-collection save path encrypts it.
+				$sanitized[ $key ] = (string) $value;
 			} else {
 				$sanitized[ $key ] = sanitize_text_field( $value );
 			}
@@ -652,6 +649,12 @@ class Admin_Init {
 	 * AJAX handler to update plugin setting
 	 */
 	public static function ajax_update_plugin_setting() {
+		check_ajax_referer( 'fotogrids_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
+		}
+
 		\FotoGrids\Debug_Log::write(
 			'license',
 			sprintf(
@@ -660,12 +663,6 @@ class Admin_Init {
 				isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '(unset)'
 			)
 		);
-
-		check_ajax_referer( 'fotogrids_admin', 'nonce' );
-
-		if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
-		}
 
 		$setting = isset( $_POST['setting'] ) ? sanitize_text_field( wp_unslash( $_POST['setting'] ) ) : '';
 		$value   = isset( $_POST['value'] ) ? sanitize_text_field( wp_unslash( $_POST['value'] ) ) : '';
@@ -1026,19 +1023,26 @@ class Admin_Init {
 	 * Handle bulk actions for galleries
 	 */
 	public static function handle_gallery_bulk_actions( $redirect_to, $doaction, $post_ids ) {
-		// This is a `handle_bulk_actions-{screen}` callback. WordPress core
-		// verifies the bulk-action nonce (check_admin_referer) in wp-admin
-		// before invoking this filter, so the bulk-action nonce is already
-		// checked upstream. The $_REQUEST reads below are additional params on
-		// that already-verified request.
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( ! in_array( $doaction, array( 'assign_to_album', 'remove_from_albums' ), true ) ) {
 			return $redirect_to;
 		}
 
+		// WordPress core verifies the bulk-action nonce before this filter fires;
+		// re-check it explicitly here before reading any request data.
+		check_admin_referer( 'bulk-posts' );
+
 		if ( empty( $post_ids ) ) {
 			return $redirect_to;
 		}
+
+		// Stamp a nonce onto the redirect URL so bulk_action_admin_notices()
+		// can confirm the result flags it renders were set here, not forged in
+		// a crafted URL. add_query_arg() preserves it across the branches below.
+		$redirect_to = add_query_arg(
+			'_fg_bulk_notice',
+			wp_create_nonce( 'fotogrids_bulk_notice' ),
+			$redirect_to
+		);
 
 		$processed = 0;
 		$errors    = 0;
@@ -1109,7 +1113,6 @@ class Admin_Init {
 		}
 
 		return $redirect_to;
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -1118,13 +1121,18 @@ class Admin_Init {
 	public static function bulk_action_admin_notices() {
 		global $post_type, $pagenow;
 
-		// Renders one-time admin notices from post-redirect ?bulk_* flags after
-		// a bulk action already handled (and nonce-verified) by WordPress core.
-		// These are read-only display values (counts / an error slug), all run
-		// through absint()/sanitize_text_field(); there is nothing to nonce on a
-		// redirected GET notice render.
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( 'edit.php' !== $pagenow || 'fotogrids_gallery' !== $post_type ) {
+			return;
+		}
+
+		// The result flags read below come from the post-redirect URL set by
+		// handle_gallery_bulk_actions() (itself nonce-verified). Verify the
+		// nonce it stamped before rendering, so a crafted URL cannot spoof a
+		// notice. Every value read is a read-only display count, absint()'d.
+		$notice_nonce = isset( $_REQUEST['_fg_bulk_notice'] )
+			? sanitize_text_field( wp_unslash( $_REQUEST['_fg_bulk_notice'] ) )
+			: '';
+		if ( ! wp_verify_nonce( $notice_nonce, 'fotogrids_bulk_notice' ) ) {
 			return;
 		}
 
@@ -1245,7 +1253,6 @@ class Admin_Init {
 				echo '<div class="notice notice-error is-dismissible"><p>' . esc_html( $message ) . '</p></div>';
 			}
 		}
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**

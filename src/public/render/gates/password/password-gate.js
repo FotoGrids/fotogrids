@@ -106,6 +106,45 @@
     }
 
     /**
+     * Inject the render's per-render inline CSS (no longer embedded in markup).
+     *
+     * @param {string} css  Bare CSS (no <style> tags), or ''.
+     */
+    function injectInlineCss( css ) {
+        if ( ! css || typeof css !== 'string' ) return;
+        const style     = document.createElement( 'style' );
+        style.className = 'fotogrids-inline-css';
+        style.textContent = css;
+        document.head.appendChild( style );
+    }
+
+    /**
+     * Inject the render's per-render inline JS. A created + appended <script>
+     * with textContent executes on insertion.
+     *
+     * @param {string} js  Bare JS (no <script> tags), or ''.
+     */
+    function injectInlineJs( js ) {
+        if ( ! js || typeof js !== 'string' ) return;
+        const script     = document.createElement( 'script' );
+        script.textContent = js;
+        document.head.appendChild( script );
+    }
+
+    /**
+     * Inject the render's JSON-LD structured data, if any.
+     *
+     * @param {string} jsonLd  Bare JSON-LD document, or ''.
+     */
+    function injectJsonLd( jsonLd ) {
+        if ( ! jsonLd || typeof jsonLd !== 'string' ) return;
+        const script     = document.createElement( 'script' );
+        script.type      = 'application/ld+json';
+        script.textContent = jsonLd;
+        document.head.appendChild( script );
+    }
+
+    /**
      * Ask the browser to save the just-used gallery password.
      *
      * The form submits via fetch() and swaps the DOM in place - it never
@@ -213,6 +252,9 @@
                 injectMissingStyles( data.css || {} );
                 injectMissingScripts( data.js || {} );
                 injectFontStylesheet( data.fonts || '' );
+                injectInlineCss( data.inlineCss || '' );
+                injectInlineJs( data.inlineJs || '' );
+                injectJsonLd( data.jsonLd || '' );
 
                 const html = data.html || '';
                 if ( ! html || ! wrapper ) {

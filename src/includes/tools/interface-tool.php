@@ -78,8 +78,8 @@ interface Tool_Interface {
 	 * Minimum tier required to use this tool.
 	 * Must be one of: 'free', 'pro_starter', 'pro_plus', 'agency'.
 	 *
-	 * The manifest endpoint resolves this to an access_state
-	 * ('editable' / 'teaser' / 'locked') for the current user.
+	 * The manifest endpoint resolves this statically (no license check) to an
+	 * access_state ('editable' for free, 'teaser' otherwise).
 	 *
 	 * @return string
 	 */

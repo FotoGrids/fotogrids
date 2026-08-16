@@ -79,6 +79,20 @@ class Admin_Permissions {
 	}
 
 	/**
+	 * Check if user can view statistics.
+	 *
+	 * Matches the capability that gates the Statistics admin page so the
+	 * stats REST endpoints are not readable by users who cannot see the
+	 * Statistics surface itself.
+	 *
+	 * @param \WP_REST_Request $request Request object
+	 * @return bool True if user has permission
+	 */
+	public static function check_view_stats( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return current_user_can( 'view_fotogrids_stats' );
+	}
+
+	/**
 	 * Check if user can manage license
 	 *
 	 * @param \WP_REST_Request $request Request object

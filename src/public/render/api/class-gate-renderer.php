@@ -10,9 +10,11 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Shared HTML renderer for all gate lock screens.
  *
- * Owns the structural template that every gate reuses: an inline CSS-var block,
- * a ghost grid placeholder that mirrors the real gallery layout, and a centred
- * overlay card. Individual gates supply their card content via Gate_Card.
+ * Owns the structural template that every gate reuses: a ghost grid placeholder
+ * that mirrors the real gallery layout, and a centred overlay card. Individual
+ * gates supply their card content via Gate_Card. The per-render CSS-var block
+ * that drives the ghost grid is built separately by build_css() and travels as
+ * Gate_Result::inline_css so the markup stays free of <style> tags.
  *
  * Ghost grid
  * ----------
@@ -35,6 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   return Gate_Result::block(
  *       html: Gate_Renderer::render( $render_context, new Gate_Card( ... ) ),
  *       http_status: 200,
+ *       inline_css: Gate_Renderer::build_css( $render_context ),
  *   );
  *
  * @package FotoGrids\Render\Api
@@ -84,10 +87,50 @@ final class Gate_Renderer {
 	}
 
 	/**
-	 * Builds the full gate lock-screen HTML.
+	 * Builds the gate lock-screen's per-render CSS custom-property block as a
+	 * bare CSS string (no <style> tags).
 	 *
-	 * Produces: inline CSS-var style block → outer wrapper → ghost grid →
-	 * overlay → card (icon? + title + description + body_html).
+	 * Sets --fg-cols / --fg-gap on the instance selector for the ghost grid,
+	 * mirroring the gallery's real layout across the three breakpoints. Gates
+	 * pass the result to Gate_Result::block() as inline_css so it is enqueued /
+	 * returned separately from the markup rather than embedded as a <style>.
+	 *
+	 * @since  1.0.0
+	 * @param  Render_Context $render_context Render context for this gallery.
+	 * @return string
+	 */
+	public static function build_css( Render_Context $render_context ): string {
+		$instance_id = $render_context->meta->instance_id;
+		$layout      = $render_context->layout;
+
+		$cols_desktop = absint( $layout->responsive_columns['desktop'] ?? 3 ) ?: 3;
+		$cols_tablet  = absint( $layout->responsive_columns['tablet'] ?? 2 ) ?: 2;
+		$cols_mobile  = absint( $layout->responsive_columns['mobile'] ?? 1 ) ?: 1;
+
+		$gap_desktop = self::resolve_gap( $layout->responsive_spacing['desktop'] ?? array() );
+		$gap_tablet  = self::resolve_gap( $layout->responsive_spacing['tablet'] ?? array() );
+		$gap_mobile  = self::resolve_gap( $layout->responsive_spacing['mobile'] ?? array() );
+
+		return sprintf(
+			'#%1$s{--fg-cols:%2$d;--fg-gap:%3$s}'
+			. '@media(max-width:768px){#%1$s{--fg-cols:%4$d;--fg-gap:%5$s}}'
+			. '@media(max-width:480px){#%1$s{--fg-cols:%6$d;--fg-gap:%7$s}}',
+			esc_attr( $instance_id ),
+			$cols_desktop,
+			esc_attr( $gap_desktop ),
+			$cols_tablet,
+			esc_attr( $gap_tablet ),
+			$cols_mobile,
+			esc_attr( $gap_mobile )
+		);
+	}
+
+	/**
+	 * Builds the gate lock-screen HTML (pure markup, no <style> tags).
+	 *
+	 * Produces: outer wrapper → ghost grid → overlay → card (icon? + title +
+	 * description + body_html). The accompanying CSS custom-property block is
+	 * supplied separately by build_css().
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context  Render context for this gallery.
@@ -102,31 +145,6 @@ final class Gate_Renderer {
 	): string {
 		$instance_id = $render_context->meta->instance_id;
 		$gallery_id  = $render_context->meta->gallery_id;
-		$layout      = $render_context->layout;
-
-		// --- CSS custom-property block -----------------------------------
-		$cols_desktop = absint( $layout->responsive_columns['desktop'] ?? 3 ) ?: 3;
-		$cols_tablet  = absint( $layout->responsive_columns['tablet'] ?? 2 ) ?: 2;
-		$cols_mobile  = absint( $layout->responsive_columns['mobile'] ?? 1 ) ?: 1;
-
-		$gap_desktop = self::resolve_gap( $layout->responsive_spacing['desktop'] ?? array() );
-		$gap_tablet  = self::resolve_gap( $layout->responsive_spacing['tablet'] ?? array() );
-		$gap_mobile  = self::resolve_gap( $layout->responsive_spacing['mobile'] ?? array() );
-
-		$style = sprintf(
-			'<style>'
-			. '#%1$s{--fg-cols:%2$d;--fg-gap:%3$s}'
-			. '@media(max-width:768px){#%1$s{--fg-cols:%4$d;--fg-gap:%5$s}}'
-			. '@media(max-width:480px){#%1$s{--fg-cols:%6$d;--fg-gap:%7$s}}'
-			. '</style>',
-			esc_attr( $instance_id ),
-			$cols_desktop,
-			esc_attr( $gap_desktop ),
-			$cols_tablet,
-			esc_attr( $gap_tablet ),
-			$cols_mobile,
-			esc_attr( $gap_mobile )
-		);
 
 		// --- Ghost grid --------------------------------------------------
 		$ghost_cells = str_repeat( '<div class="fg-ghost-cell" aria-hidden="true"></div>', max( 0, $ghost_cell_count ) );
@@ -147,8 +165,7 @@ final class Gate_Renderer {
 
 		// --- Assemble ----------------------------------------------------
 		return sprintf(
-			'%s'
-			. '<div id="%s" class="%s" data-fg-gallery-id="%d"%s>'
+			'<div id="%s" class="%s" data-fg-gallery-id="%d"%s>'
 			. '<div class="fg-ghost-grid" aria-hidden="true">%s</div>'
 			. '<div class="fg-gate-overlay" role="dialog" aria-modal="false" aria-label="%s">'
 			. '<div class="fg-gate-card">'
@@ -159,7 +176,6 @@ final class Gate_Renderer {
 			. '</div>'             // .fg-gate-card
 			. '</div>'             // .fg-gate-overlay
 			. '</div>',            // .fotogrids-gate
-			$style,
 			esc_attr( $instance_id ),
 			esc_attr( $wrapper_class ),
 			$gallery_id,

@@ -13,21 +13,19 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Resolves a required tier into the product-wide access-state vocabulary
- * ('editable' | 'teaser' | 'locked') for the current user.
+ * Resolves a required tier into the product-wide access-state vocabulary.
  *
- * This is the single source of truth for that resolution. It mirrors the
- * logic previously duplicated in:
- *   - includes/catalog/class-state-resolver.php  (Field_State enum form)
- *   - includes/tools/class-tools-rest.php        (string form)
- *
- * Both the Tools manifest and the Modules manifest call this so the whole
- * product describes "can you touch this right now" with one vocabulary.
+ * The free plugin runs NO license or plan check: state is derived purely from
+ * the declared tier. Both the Tools manifest and the Modules manifest call
+ * this so the whole product describes availability with one vocabulary.
  *
  * Vocabulary:
- *   'editable' - user is on the required tier (or the tier is 'free')
- *   'teaser'   - feature lives on a higher tier the user has never had
- *   'locked'   - user was on the right tier but the license has expired
+ *   'editable' - the tier is 'free' (fully available in the free plugin)
+ *   'teaser'   - the feature lives on a higher tier; shown as a static
+ *                upgrade prompt (advertising), never a lock on working code
+ *   'locked'   - not produced by the free plugin; reserved for the Pro
+ *                add-on, which applies its own resolution via the
+ *                'fotogrids/features/access_state' filter
  *
  * @since 1.0.0
  */
@@ -55,32 +53,29 @@ final class Access_State {
 	public const LOCKED = 'locked';
 
 	/**
-	 * Resolve a required tier to an access state for the current user.
-	 *
-	 * Uses the static License_Manager tier API. Free tiers short-circuit
-	 * before any provider round-trip.
+	 * Resolve a required tier to an access state (static; no license check).
 	 *
 	 * @since 1.0.0
 	 * @param string $tier_required One of 'free' | 'pro_starter' | 'pro_plus' | 'agency'.
 	 * @return string One of self::EDITABLE | self::TEASER | self::LOCKED.
 	 */
 	public static function resolve( string $tier_required ): string {
-		if ( 'free' === $tier_required || '' === $tier_required ) {
-			return self::EDITABLE;
-		}
+		// No license or plan check: state is derived purely from the declared
+		// tier. Free features are editable; higher-tier features are shown as
+		// static teasers (advertising), never as a lock on working code.
+		$state = ( 'free' === $tier_required || '' === $tier_required )
+			? self::EDITABLE
+			: self::TEASER;
 
-		// User is on the required plan (or higher).
-		if ( \FotoGrids\License_Manager::on_plan( $tier_required ) ) {
-			return self::EDITABLE;
-		}
-
-		// User has an active Pro license but not this tier / it has lapsed
-		// for this tier - treat as locked (they had access at some point).
-		if ( \FotoGrids\License_Manager::is_pro_active() ) {
-			return self::LOCKED;
-		}
-
-		// User has never been on this tier.
-		return self::TEASER;
+		/**
+		 * Filter the resolved access state so the Pro add-on can apply its own
+		 * per-plan license resolution. Free registers no callback, so the
+		 * static tier-derived state stands and no license check runs here.
+		 *
+		 * @since 1.0.0
+		 * @param string $state         Resolved state ('editable' | 'teaser' | 'locked').
+		 * @param string $tier_required The required tier slug.
+		 */
+		return (string) apply_filters( \FotoGrids\Hooks\Filters_Features::ACCESS_STATE, $state, $tier_required );
 	}
 }

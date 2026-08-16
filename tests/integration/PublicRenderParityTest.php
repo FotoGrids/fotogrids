@@ -347,7 +347,7 @@ final class Parity_Layout_Module implements Layout {
 final class PublicRenderParityTest {
     public static function run(): void {
         self::test_wrapper_includes_required_class_and_data_attribute();
-        self::test_render_output_emits_scoped_vars_style_tag();
+        self::test_render_output_emits_scoped_vars_as_inline_css();
         self::test_error_markup_visibility_respects_settings_flag();
     }
 
@@ -362,15 +362,18 @@ final class PublicRenderParityTest {
         self::assert_contains( 'data-fg-gallery-id="321"', $render_result->html, 'Wrapper should expose gallery ID via the data-fg-* attribute convention.' );
     }
 
-    private static function test_render_output_emits_scoped_vars_style_tag(): void {
+    private static function test_render_output_emits_scoped_vars_as_inline_css(): void {
         Module_Registry::reset();
         Module_Registry::register( 'layouts', Parity_Layout_Module::class );
 
         $render_result = Render_Controller::factory()->render( self::make_context( true ) );
 
-        self::assert_contains( '<style class="fg-vars">', $render_result->html, 'Render path should include scoped variable style tag.' );
-        self::assert_contains( '#fg-instance-321 {', $render_result->html, 'Scoped variable style should target wrapper instance ID.' );
-        self::assert_contains( '--fg-gap-d: 10px;', $render_result->html, 'Scoped variable style should use readable declaration formatting.' );
+        // Per-instance CSS variables are carried on Render_Result::inline_css
+        // (enqueued on page renders / returned for AJAX), NOT embedded as an
+        // inline <style> in the markup - so the markup can pass through wp_kses().
+        self::assert_not_contains( '<style', $render_result->html, 'Render markup must not embed an inline <style> tag.' );
+        self::assert_contains( '#fg-instance-321 {', $render_result->inline_css, 'Scoped variables should be emitted as inline_css targeting the wrapper instance ID.' );
+        self::assert_contains( '--fg-gap-d: 10px;', $render_result->inline_css, 'inline_css should use readable declaration formatting.' );
     }
 
     private static function test_error_markup_visibility_respects_settings_flag(): void {
@@ -445,6 +448,12 @@ final class PublicRenderParityTest {
     private static function assert_contains( string $needle, string $haystack, string $message ): void {
         if ( strpos( $haystack, $needle ) === false ) {
             throw new \RuntimeException( $message . ' Missing fragment: ' . $needle );
+        }
+    }
+
+    private static function assert_not_contains( string $needle, string $haystack, string $message ): void {
+        if ( strpos( $haystack, $needle ) !== false ) {
+            throw new \RuntimeException( $message . ' Unexpected fragment present: ' . $needle );
         }
     }
 }
