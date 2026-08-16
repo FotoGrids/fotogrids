@@ -21,12 +21,11 @@ if ( ! defined( 'WPINC' ) ) {
  *
  *   1. Fast path - delegate to user_can() / current_user_can() with the
  *      object id if one was passed (engages WP map_meta_cap on CPT caps).
- *   2. Fire the 'fotogrids/permissions/check' filter so Pro can extend
- *      with user-level grants, scoped grants, and deny rules without
- *      every call site having to know about them.
+ *   2. Fire the 'fotogrids/permissions/check' filter so extensions can adjust
+ *      the decision without every call site having to know about them.
  *
- * Free's behaviour is identical to native WP. Pro hooks the filter to layer
- * the Permissions Manager grants table on top.
+ * Free's behaviour is identical to native WP; Free registers no callback for
+ * the filter.
  *
  * Three call shapes:
  *
@@ -108,11 +107,8 @@ final class Permission_Check {
 		/**
 		 * Filter: post-WP permission decision.
 		 *
-		 * Pro hooks here to consult the fotogrids_permission_grants table for
-		 * scoped, user-level and token grants. Receives the resolved WP
-		 * decision plus full context so Pro can flip it either way.
-		 *
-		 * Free never registers a callback for this filter.
+		 * Extensions receive the resolved WP decision plus full context and may
+		 * flip it either way. Free never registers a callback for this filter.
 		 *
 		 * @since 1.0.0
 		 * @param bool          $allowed    The current decision.

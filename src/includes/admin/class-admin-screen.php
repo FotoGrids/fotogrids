@@ -64,6 +64,20 @@ final class Admin_Screen {
 	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
 
 	/**
+	 * The screen-hook allowlist, filtered through
+	 * {@see \FotoGrids\Hooks\Filters_Admin::PAGE_HOOKS} so extensions can
+	 * register their own pages under the FotoGrids menu.
+	 *
+	 * @since  1.0.0
+	 * @return string[]
+	 */
+	private static function page_hooks(): array {
+		$hooks = apply_filters( \FotoGrids\Hooks\Filters_Admin::PAGE_HOOKS, self::PAGE_HOOKS );
+
+		return is_array( $hooks ) ? array_values( array_filter( $hooks, 'is_string' ) ) : self::PAGE_HOOKS;
+	}
+
+	/**
 	 * Return true when the current request is on a FotoGrids admin page.
 	 *
 	 * @since 1.0.0
@@ -85,7 +99,7 @@ final class Admin_Screen {
 		} elseif ( is_string( $hook_or_screen ) ) {
 			$screen = get_current_screen();
 			if ( $screen && $screen->id !== $hook_or_screen ) {
-				if ( in_array( $hook_or_screen, self::PAGE_HOOKS, true ) ) {
+				if ( in_array( $hook_or_screen, self::page_hooks(), true ) ) {
 					return true;
 				}
 
@@ -104,7 +118,7 @@ final class Admin_Screen {
 			return false;
 		}
 
-		if ( in_array( $screen->id, self::PAGE_HOOKS, true )
+		if ( in_array( $screen->id, self::page_hooks(), true )
 			|| in_array( $screen->id, self::POST_SCREEN_IDS, true )
 		) {
 			return true;

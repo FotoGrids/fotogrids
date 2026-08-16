@@ -62,4 +62,19 @@ final class Filters_Settings {
 	 * @param int $days_to_keep Retention window in days. Default 365.
 	 */
 	public const STATS_RETENTION_DAYS = 'fotogrids/settings/stats/retention_days';
+
+	/**
+	 * Result of the settings edit-gate ({settings, gated}).
+	 *
+	 * The free plugin drops unknown keys and sanitises values, but applies no
+	 * tier or license gating. Pro hooks here to re-apply its own per-plan write
+	 * enforcement - reverting fields its license does not cover and adding them
+	 * to the 'gated' list. Free registers no callback.
+	 *
+	 * @since 1.0.0
+	 * @param array                $result   { settings: array, gated: array }.
+	 * @param array<string, mixed> $incoming Incoming settings payload.
+	 * @param array<string, mixed> $existing Existing saved settings.
+	 */
+	public const EDIT_GATE = 'fotogrids/settings/edit_gate';
 }

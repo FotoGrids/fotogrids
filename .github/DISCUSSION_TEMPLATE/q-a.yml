@@ -1,0 +1,32 @@
+title: "[Help]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help with FotoGrids? Search first - your question may already be answered.
+        For a confirmed bug, please open an [Issue](../../issues/new/choose) instead.
+  - type: textarea
+    id: question
+    attributes:
+      label: What are you trying to do?
+      description: Describe your goal and what's happening instead. Screenshots help.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: FotoGrids version, WordPress version, PHP version, and your theme/page builder.
+      placeholder: "FotoGrids 1.0.0 · WP 6.8 · PHP 8.1 · Elementor"
+    validations:
+      required: true
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Free or Pro?
+      options:
+        - FotoGrids (Free)
+        - FotoGrids Pro
+    validations:
+      required: true

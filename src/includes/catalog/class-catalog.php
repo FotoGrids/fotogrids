@@ -185,7 +185,6 @@ final class Catalog {
 			$free_catalog_dir . 'seo.json',
 			$free_catalog_dir . 'navigation.json',
 			$free_catalog_dir . 'advanced.json',
-			$free_catalog_dir . 'custom-code.json',
 			$free_catalog_dir . 'ecommerce.json',
 		);
 

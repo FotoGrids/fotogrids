@@ -78,7 +78,7 @@
                     "paginated"
                 ]
             },
-            "tier_required": "pro_starter",
+            "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",
             "visible_when_uninstalled": true

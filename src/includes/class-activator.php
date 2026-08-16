@@ -120,14 +120,13 @@ class Activator {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$table_item_meta         = $wpdb->prefix . 'fotogrids_item_meta';
-		$table_stats             = $wpdb->prefix . 'fotogrids_statistics';
-		$table_stats_daily       = $wpdb->prefix . 'fotogrids_statistics_daily';
-		$table_gallery_albums    = $wpdb->prefix . 'fotogrids_gallery_albums';
-		$table_tags              = $wpdb->prefix . 'fotogrids_tags';
-		$table_item_metadata     = $wpdb->prefix . 'fotogrids_item_metadata';
-		$table_render_cache      = $wpdb->prefix . 'fotogrids_render_cache';
-		$table_permission_grants = $wpdb->prefix . 'fotogrids_permission_grants';
+		$table_item_meta      = $wpdb->prefix . 'fotogrids_item_meta';
+		$table_stats          = $wpdb->prefix . 'fotogrids_statistics';
+		$table_stats_daily    = $wpdb->prefix . 'fotogrids_statistics_daily';
+		$table_gallery_albums = $wpdb->prefix . 'fotogrids_gallery_albums';
+		$table_tags           = $wpdb->prefix . 'fotogrids_tags';
+		$table_item_metadata  = $wpdb->prefix . 'fotogrids_item_metadata';
+		$table_render_cache   = $wpdb->prefix . 'fotogrids_render_cache';
 
 		$sql = "
         CREATE TABLE $table_item_meta (
@@ -233,25 +232,6 @@ class Activator {
           PRIMARY KEY (id),
           UNIQUE KEY cache_key (cache_key),
           KEY object_lookup (object_type, object_id),
-          KEY expires_at (expires_at)
-        ) $charset_collate;
-
-        CREATE TABLE $table_permission_grants (
-          id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-          grantee_type ENUM('role','user','token') NOT NULL,
-          grantee_id VARCHAR(64) NOT NULL,
-          scope_type ENUM('global','gallery','album') NOT NULL DEFAULT 'global',
-          scope_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
-          capability VARCHAR(96) NOT NULL,
-          state ENUM('granted','denied') NOT NULL DEFAULT 'granted',
-          source VARCHAR(32) NOT NULL DEFAULT 'fotogrids',
-          created_by BIGINT UNSIGNED NOT NULL DEFAULT 0,
-          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          expires_at DATETIME NULL,
-          PRIMARY KEY (id),
-          UNIQUE KEY grant_idx (grantee_type, grantee_id, scope_type, scope_id, capability),
-          KEY capability (capability),
-          KEY scope_lookup (scope_type, scope_id),
           KEY expires_at (expires_at)
         ) $charset_collate;
         ";

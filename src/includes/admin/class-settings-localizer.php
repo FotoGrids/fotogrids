@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace FotoGrids\Admin;
 
 use FotoGrids\Collection_Defaults;
-use FotoGrids\License_Manager;
 use FotoGrids\Links;
 use FotoGrids\Password_Crypto;
 use FotoGrids\Settings\SEO_Settings_Store;
@@ -263,8 +262,6 @@ final class Settings_Localizer {
 			'postType'         => $args['post_type'],
 			'nonce'            => wp_create_nonce( 'fotogrids_settings' ),
 			'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
-			'isProActive'      => License_Manager::is_pro_active(),
-			'enabledFeatures'  => License_Manager::get_enabled_features(),
 			'allowGoogleFonts' => (bool) get_option( 'fotogrids_allow_google_fonts', true ),
 			'galleryItems'     => $gallery_items,
 			'canEditPosts'     => current_user_can( 'edit_posts' ),

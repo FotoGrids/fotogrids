@@ -93,7 +93,7 @@ class Templates_Data {
 	 * @return \WP_REST_Response Array of available templates with metadata
 	 */
 	public static function get_templates( $request ) {
-		$category = $request->get_param( 'category' ); // 'gallery' or 'album'
+		$category = $request->get_param( 'category' ); // Gallery or album.
 		$refresh  = (bool) $request->get_param( 'refresh' );
 
 		// Predefined templates come from the library service (cached), falling
@@ -101,19 +101,6 @@ class Templates_Data {
 		$predefined_templates = Templates_Catalog::get_templates( $refresh );
 		$user_templates       = self::get_user_templates();
 		$templates            = array_merge( $predefined_templates, $user_templates );
-
-		// When the library hides Pro, drop Pro templates entirely so they can't
-		// be listed, previewed, or applied. User templates are never Pro.
-		$flags = Templates_Catalog::get_flags();
-		if ( empty( $flags['show_pro'] ) ) {
-			$templates = array_filter(
-				$templates,
-				static function ( $template ) {
-					$type = isset( $template['type'] ) ? $template['type'] : 'free';
-					return 'pro' !== $type;
-				}
-			);
-		}
 
 		if ( $category ) {
 			$templates = array_filter(
@@ -186,12 +173,7 @@ class Templates_Data {
 	 * @return bool
 	 */
 	private static function resolve_can_apply( $template ) {
-		$type   = isset( $template['type'] ) ? $template['type'] : 'free';
-		$is_pro = 'free' !== $type && 'user' !== $type;
-
-		$can_apply = ! $is_pro || \FotoGrids\License_Manager::has_pro();
-
-		return (bool) apply_filters( \FotoGrids\Hooks\Filters_Templates::CAN_APPLY, $can_apply, $template );
+		return (bool) apply_filters( \FotoGrids\Hooks\Filters_Templates::CAN_APPLY, true, $template );
 	}
 
 	/**
@@ -346,10 +328,6 @@ class Templates_Data {
 			return new \WP_Error( 'template_not_found', __( 'Template not found.', 'fotogrids' ), array( 'status' => 404 ) );
 		}
 
-		if ( isset( $template['type'] ) && 'free' !== $template['type'] && ! \FotoGrids\License_Manager::has_pro() ) {
-			return new \WP_Error( 'pro_required', __( 'Pro license required for this template.', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		// Applying a template is a bulk write of every setting on the target
 		// post - gated on the per-CPT settings cap.
 		$settings_cap = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $expected_post_type );
@@ -371,77 +349,6 @@ class Templates_Data {
 			array(
 				'success' => true,
 				'message' => __( 'Template applied successfully.', 'fotogrids' ),
-			)
-		);
-	}
-
-	/**
-	 * Save current settings as template
-	 *
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Success or error
-	 */
-	public static function save_template( $request ) {
-		$post_id     = $request->get_param( 'post_id' );
-		$post_type   = $request->get_param( 'post_type' );
-		$name        = sanitize_text_field( $request->get_param( 'name' ) );
-		$description = sanitize_textarea_field( $request->get_param( 'description' ) );
-
-		if ( ! $name ) {
-			return new \WP_Error( 'missing_name', __( 'Template name is required.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		if ( ! $post_id || ! $post_type ) {
-			return new \WP_Error( 'missing_params', __( 'Post ID and post type are required.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		$post = get_post( $post_id );
-		if ( ! $post ) {
-			return new \WP_Error( 'invalid_post', __( 'Invalid post.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		$post_type_map      = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
-		);
-		$expected_post_type = isset( $post_type_map[ $post_type ] ) ? $post_type_map[ $post_type ] : $post_type;
-		if ( $post->post_type !== $expected_post_type ) {
-			return new \WP_Error( 'invalid_post', __( 'Invalid post.', 'fotogrids' ), array( 'status' => 400 ) );
-		}
-
-		$settings  = array();
-		$meta_keys = get_post_meta( $post_id );
-
-		foreach ( $meta_keys as $key => $values ) {
-			if ( strpos( $key, 'fotogrids_' ) === 0 ) {
-				$setting_key              = str_replace( 'fotogrids_', '', $key );
-				$value                    = maybe_unserialize( $values[0] );
-				$settings[ $setting_key ] = $value;
-			}
-		}
-
-		$template = array(
-			'id'             => 'user_' . time() . '_' . wp_generate_password( 8, false ),
-			'name'           => $name,
-			'description'    => $description,
-			'type'           => 'user',
-			'category'       => 'fotogrids_gallery' === $post_type ? 'gallery' : 'album',
-			'settings'       => $settings,
-			'isUserTemplate' => true,
-			'created'        => current_time( 'mysql' ),
-			'createdBy'      => get_current_user_id(),
-		);
-
-		$user_templates   = get_user_meta( get_current_user_id(), 'fotogrids_user_templates', true );
-		$user_templates   = $user_templates ? json_decode( $user_templates, true ) : array();
-		$user_templates[] = $template;
-		update_user_meta( get_current_user_id(), 'fotogrids_user_templates', wp_json_encode( $user_templates ) );
-
-		return rest_ensure_response(
-			array(
-				'success'  => true,
-				'message'  => __( 'Template saved successfully.', 'fotogrids' ),
-				'template' => $template,
 			)
 		);
 	}
@@ -526,17 +433,9 @@ class Templates_Data {
 
 		$template_name = isset( $template['name'] ) ? $template['name'] : __( 'Template Preview', 'fotogrids' );
 
-		$is_pro_template = isset( $template['type'] ) && 'pro' === $template['type'];
-		$has_pro_license = \FotoGrids\License_Manager::has_pro();
-
-		// Unlicensed Pro templates fall back to the limited preview_settings.
-		if ( $is_pro_template && ! $has_pro_license && isset( $template['preview_settings'] ) && is_array( $template['preview_settings'] ) ) {
-			$settings = $template['preview_settings'];
-		} else {
-			$settings = isset( $template['settings'] ) && is_array( $template['settings'] )
-				? $template['settings']
-				: array();
-		}
+		$settings = isset( $template['settings'] ) && is_array( $template['settings'] )
+			? $template['settings']
+			: array();
 
 		$defaults       = \FotoGrids\Collection_Defaults::resolve_gallery();
 		$final_settings = array_merge( $defaults, $settings );
@@ -708,17 +607,9 @@ class Templates_Data {
 			}
 		}
 
-		// When the library hides Pro, a Pro template must not be resolvable by id
-		// either - this closes the preview/apply path, not just the listing.
-		$flags         = Templates_Catalog::get_flags();
-		$pro_is_hidden = empty( $flags['show_pro'] );
-
 		$predefined = self::load_predefined_templates( $category );
 		foreach ( $predefined as $template ) {
 			if ( isset( $template['id'] ) && $template['id'] === $template_id ) {
-				if ( $pro_is_hidden && isset( $template['type'] ) && 'pro' === $template['type'] ) {
-					return null;
-				}
 				return $template;
 			}
 		}
