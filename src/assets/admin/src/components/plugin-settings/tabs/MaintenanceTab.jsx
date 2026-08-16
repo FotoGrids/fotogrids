@@ -13,6 +13,9 @@ import {
 
 const { __ } = wp.i18n;
 
+// Untranslated on purpose: the user has to type this string exactly.
+const CONFIRM_KEYWORD = 'CONFIRM';
+
 /**
  * Plugin Settings -> Maintenance tab.
  *
@@ -113,6 +116,7 @@ const MaintenanceTab = () => {
             body: __('This clears every FotoGrids plugin setting and restores defaults. Your galleries, albums, statistics and Pro licence are not affected.', 'fotogrids'),
             actionLabel: __('Reset settings', 'fotogrids'),
             runningLabel: __('Resetting…', 'fotogrids'),
+            requireText: CONFIRM_KEYWORD,
             handler: runResetOptions,
         },
         reinstall: {
@@ -120,6 +124,7 @@ const MaintenanceTab = () => {
             body: __('This re-runs the FotoGrids schema migration to recreate any missing tables, columns or indexes. No rows are deleted.', 'fotogrids'),
             actionLabel: __('Reinstall tables', 'fotogrids'),
             runningLabel: __('Reinstalling…', 'fotogrids'),
+            requireText: CONFIRM_KEYWORD,
             handler: runReinstallTables,
         },
     };
@@ -329,6 +334,7 @@ const MaintenanceTab = () => {
                 title={activeConfirm?.title || ''}
                 message={activeConfirm?.body || ''}
                 confirmLabel={activeConfirm?.actionLabel}
+                requireText={activeConfirm?.requireText || null}
                 busy={running !== null}
             />
         </div>

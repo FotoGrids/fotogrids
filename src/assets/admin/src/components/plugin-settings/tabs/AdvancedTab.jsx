@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import Toggle from '../../shared/Toggle';
+import { Confirm } from '../../shared/Modal';
 import {
     SettingsPanel,
     PanelRow,
@@ -9,6 +10,9 @@ import {
 } from '../../shared/settings';
 
 const { __ } = wp.i18n;
+
+// Untranslated on purpose: the user has to type this string exactly.
+const CONFIRM_KEYWORD = 'CONFIRM';
 
 const DEFAULTS = {
     autosave: false,
@@ -39,6 +43,7 @@ const AdvancedTab = () => {
     const [saved, setSaved] = useState(initial);
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState(null);
+    const [uninstallPending, setUninstallPending] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -67,6 +72,18 @@ const AdvancedTab = () => {
     const update = (key, value) => {
         setSettings(prev => ({ ...prev, [key]: value }));
         setStatus(null);
+    };
+
+    const handleUninstallToggle = (value) => {
+        if (!value) {
+            update('delete_data_on_uninstall', false);
+            return;
+        }
+        setUninstallPending(true);
+    };
+
+    const confirmUninstallToggle = () => {
+        update('delete_data_on_uninstall', true);
     };
 
     const handleSave = async () => {
@@ -193,7 +210,7 @@ const AdvancedTab = () => {
                     <Toggle
                         id="fotogrids_delete_on_uninstall"
                         checked={settings.delete_data_on_uninstall}
-                        onChange={(v) => update('delete_data_on_uninstall', v)}
+                        onChange={handleUninstallToggle}
                     />
                 </DangerZone>
             </SettingsPanel>
@@ -204,6 +221,17 @@ const AdvancedTab = () => {
                 status={status}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
+            />
+
+            <Confirm
+                isOpen={uninstallPending}
+                onClose={() => setUninstallPending(false)}
+                onConfirm={confirmUninstallToggle}
+                variant="danger"
+                title={__('Delete all data on uninstall?', 'fotogrids')}
+                message={__('If FotoGrids is deleted, every gallery, album, template, statistic and setting is removed permanently. This cannot be undone.', 'fotogrids')}
+                confirmLabel={__('Enable data deletion', 'fotogrids')}
+                requireText={CONFIRM_KEYWORD}
             />
         </div>
     );
