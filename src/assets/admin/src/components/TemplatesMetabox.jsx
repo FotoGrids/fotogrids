@@ -111,8 +111,24 @@ const TemplatesMetabox = () => {
         }
     };
 
+    const confirmApply = async () => {
+        const modal = window.FotoGridsAdmin?.modal;
+
+        if (!modal?.confirm) {
+            return window.confirm(strings.confirmApply);
+        }
+
+        return modal.confirm({
+            title: strings.confirmApplyTitle,
+            message: strings.confirmApply,
+            confirmLabel: strings.applyTemplate,
+            cancelLabel: strings.cancel,
+            headerIcon: false,
+        });
+    };
+
     const handleApply = async (template) => {
-        if (!confirm(strings.confirmApply)) {
+        if (!await confirmApply()) {
             return;
         }
 

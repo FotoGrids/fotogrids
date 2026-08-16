@@ -44,11 +44,11 @@ class Admin_Init {
 		add_action( 'admin_footer-edit.php', array( __CLASS__, 'bulk_action_album_selector' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_bulk_album_selector_assets' ) );
 
-		if ( ! \FotoGrids\License_Manager::has_pro() ) {
-			require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-upgrade-modal-integration.php';
-			require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-upgrade-modal.php';
-			\FotoGrids\Admin\Upgrade_Modal_Integration::init();
-		}
+		// Registers the global modal API for every tier - the class gates the
+		// non-Pro upgrade-modal assets internally.
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-upgrade-modal-integration.php';
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-upgrade-modal.php';
+		\FotoGrids\Admin\Upgrade_Modal_Integration::init();
 
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-deactivation-feedback.php';
 		\FotoGrids\Admin\Deactivation_Feedback::init();

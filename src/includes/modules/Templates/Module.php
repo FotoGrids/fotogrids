@@ -314,6 +314,7 @@ class Module extends Abstract_Module {
 			'noTemplates'                => __( 'No templates available', 'fotogrids' ),
 			'templateApplied'            => __( 'Template applied successfully', 'fotogrids' ),
 			'templateSaved'              => __( 'Template saved successfully', 'fotogrids' ),
+			'confirmApplyTitle'          => __( 'Override existing settings?', 'fotogrids' ),
 			'confirmApply'               => __( 'This will override your current settings. Are you sure?', 'fotogrids' ),
 			'templateName'               => __( 'Template Name', 'fotogrids' ),
 			'templateDescription'        => __( 'Description (optional)', 'fotogrids' ),
