@@ -571,12 +571,16 @@ const GalleryMetabox = ({
                 setCurrentItemId(itemId);
                 return true;
             } else {
-                alert(strings.errorLoadingItem);
+                if (window.fotogridsToast) {
+                    window.fotogridsToast.error(strings.errorLoadingItem);
+                }
                 return false;
             }
         } catch (error) {
             console.error('Error loading item data:', error);
-            alert(strings.errorLoadingItem);
+            if (window.fotogridsToast) {
+                window.fotogridsToast.error(strings.errorLoadingItem);
+            }
             return false;
         } finally {
             setLoading(false);
