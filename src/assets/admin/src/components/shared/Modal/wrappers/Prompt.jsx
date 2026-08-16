@@ -7,7 +7,7 @@ import Icon from '../../Icon';
 const VARIANT_ICONS = {
     info: 'info_circle',
     question: 'help_circle',
-    warning: 'warning_triangle',
+    warning: 'alert_bubble',
     danger: 'trash',
     success: 'check_circle',
 };

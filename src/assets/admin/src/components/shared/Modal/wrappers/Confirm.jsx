@@ -7,7 +7,7 @@ import { emit } from '../api/events';
 const VARIANT_DEFAULTS = {
     info:     { icon: 'info_circle',      confirmVariant: 'primary', confirmLabel: 'OK' },
     question: { icon: 'help_circle',      confirmVariant: 'primary', confirmLabel: 'Continue' },
-    warning:  { icon: 'warning_triangle', confirmVariant: 'warning', confirmLabel: 'Continue' },
+    warning:  { icon: 'alert_bubble',     confirmVariant: 'warning', confirmLabel: 'Continue' },
     danger:   { icon: 'trash',            confirmVariant: 'danger',  confirmLabel: 'Delete' },
     success:  { icon: 'check_circle',     confirmVariant: 'success', confirmLabel: 'OK' },
 };
