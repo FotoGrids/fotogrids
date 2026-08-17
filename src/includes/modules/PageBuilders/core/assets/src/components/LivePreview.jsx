@@ -25,7 +25,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { __ } from '@wordpress/i18n';
 
-import { applyPreviewResponse } from '../lib/preview-asset-wiring';
+import { applyPreviewResponse } from '@/admin/src/utils/preview-asset-wiring';
 
 const DEBOUNCE_MS = 300;
 

@@ -29,7 +29,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { applyPreviewResponse } from '@modules/PageBuilders/core/assets/src/lib/preview-asset-wiring';
+import { applyPreviewResponse } from '../utils/preview-asset-wiring';
 
 const GalleryPreview = ({ galleryId = null }) => {
     const previewRef = useRef(null);
