@@ -58,8 +58,8 @@
 // ---------------------------------------------------------------------------
 
 const loadedCssHandles = new Set();
-const loadedJsHandles = new Map();        // handle -> Promise<void>
-const appliedInlinePayloads = new Set();  // dedup key for inline before/after
+const loadedJsHandles = new Map(); // handle -> Promise<void>
+const appliedInlinePayloads = new Set(); // dedup key for inline before/after
 
 /**
  * Ensures every CSS handle from the preview response has a <link> in the
@@ -69,34 +69,40 @@ const appliedInlinePayloads = new Set();  // dedup key for inline before/after
  * @param {Document} [ownerDocument=document] document to inject into
  */
 export const ensurePreviewCssAssets = (cssAssets, ownerDocument = document) => {
-    if (!cssAssets || typeof cssAssets !== 'object') {
-        return;
-    }
+	if (!cssAssets || typeof cssAssets !== 'object') {
+		return;
+	}
 
-    Object.entries(cssAssets).forEach(([handle, href]) => {
-        if (!handle || typeof href !== 'string' || !href) {
-            return;
-        }
-        if (loadedCssHandles.has(handle)) {
-            return;
-        }
-        if (ownerDocument.querySelector(`link[data-fotogrids-preview-css="${handle}"]`)) {
-            loadedCssHandles.add(handle);
-            return;
-        }
-        const existingByHref = ownerDocument.querySelector(`link[rel="stylesheet"][href="${href}"]`);
-        if (existingByHref) {
-            existingByHref.setAttribute('data-fotogrids-preview-css', handle);
-            loadedCssHandles.add(handle);
-            return;
-        }
-        const link = ownerDocument.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = href;
-        link.setAttribute('data-fotogrids-preview-css', handle);
-        ownerDocument.head.appendChild(link);
-        loadedCssHandles.add(handle);
-    });
+	Object.entries(cssAssets).forEach(([handle, href]) => {
+		if (!handle || typeof href !== 'string' || !href) {
+			return;
+		}
+		if (loadedCssHandles.has(handle)) {
+			return;
+		}
+		if (
+			ownerDocument.querySelector(
+				`link[data-fotogrids-preview-css="${handle}"]`
+			)
+		) {
+			loadedCssHandles.add(handle);
+			return;
+		}
+		const existingByHref = ownerDocument.querySelector(
+			`link[rel="stylesheet"][href="${href}"]`
+		);
+		if (existingByHref) {
+			existingByHref.setAttribute('data-fotogrids-preview-css', handle);
+			loadedCssHandles.add(handle);
+			return;
+		}
+		const link = ownerDocument.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = href;
+		link.setAttribute('data-fotogrids-preview-css', handle);
+		ownerDocument.head.appendChild(link);
+		loadedCssHandles.add(handle);
+	});
 };
 
 /**
@@ -115,25 +121,29 @@ export const ensurePreviewCssAssets = (cssAssets, ownerDocument = document) => {
  * @param {string}   css             Inline CSS payload.
  * @param {Document} [ownerDocument] Document to inject into.
  */
-export const applyPreviewInlineCss = (instanceId, css, ownerDocument = document) => {
-    const key = instanceId || 'default';
-    const selector = `style[data-fotogrids-preview-inline-css="${key}"]`;
-    let style = ownerDocument.querySelector(selector);
+export const applyPreviewInlineCss = (
+	instanceId,
+	css,
+	ownerDocument = document
+) => {
+	const key = instanceId || 'default';
+	const selector = `style[data-fotogrids-preview-inline-css="${key}"]`;
+	let style = ownerDocument.querySelector(selector);
 
-    if (!css) {
-        if (style) {
-            style.remove();
-        }
-        return;
-    }
+	if (!css) {
+		if (style) {
+			style.remove();
+		}
+		return;
+	}
 
-    if (!style) {
-        style = ownerDocument.createElement('style');
-        style.setAttribute('data-fotogrids-preview-inline-css', key);
-    }
+	if (!style) {
+		style = ownerDocument.createElement('style');
+		style.setAttribute('data-fotogrids-preview-inline-css', key);
+	}
 
-    style.textContent = css;
-    ownerDocument.head.appendChild(style);
+	style.textContent = css;
+	ownerDocument.head.appendChild(style);
 };
 
 /**
@@ -147,36 +157,38 @@ export const applyPreviewInlineCss = (instanceId, css, ownerDocument = document)
  * @return {Promise<void>}
  */
 const ensureScript = (descriptor, ownerDocument) => {
-    const { handle, src } = descriptor;
-    if (!handle || !src) {
-        return Promise.resolve();
-    }
-    if (loadedJsHandles.has(handle)) {
-        return loadedJsHandles.get(handle);
-    }
+	const { handle, src } = descriptor;
+	if (!handle || !src) {
+		return Promise.resolve();
+	}
+	if (loadedJsHandles.has(handle)) {
+		return loadedJsHandles.get(handle);
+	}
 
-    const promise = new Promise((resolve) => {
-        const existing = ownerDocument.querySelector(`script[data-fotogrids-preview-js="${handle}"]`);
-        if (existing) {
-            resolve();
-            return;
-        }
-        const script = ownerDocument.createElement('script');
-        script.src = src;
-        script.async = false;  // preserve execution order
-        script.setAttribute('data-fotogrids-preview-js', handle);
-        script.addEventListener('load', () => resolve());
-        script.addEventListener('error', () => {
-            // Resolve anyway - a broken module shouldn't block the rest of
-            // the preview. The browser console will surface the network
-            // error.
-            resolve();
-        });
-        ownerDocument.head.appendChild(script);
-    });
+	const promise = new Promise((resolve) => {
+		const existing = ownerDocument.querySelector(
+			`script[data-fotogrids-preview-js="${handle}"]`
+		);
+		if (existing) {
+			resolve();
+			return;
+		}
+		const script = ownerDocument.createElement('script');
+		script.src = src;
+		script.async = false; // preserve execution order
+		script.setAttribute('data-fotogrids-preview-js', handle);
+		script.addEventListener('load', () => resolve());
+		script.addEventListener('error', () => {
+			// Resolve anyway - a broken module shouldn't block the rest of
+			// the preview. The browser console will surface the network
+			// error.
+			resolve();
+		});
+		ownerDocument.head.appendChild(script);
+	});
 
-    loadedJsHandles.set(handle, promise);
-    return promise;
+	loadedJsHandles.set(handle, promise);
+	return promise;
 };
 
 /**
@@ -190,18 +202,18 @@ const ensureScript = (descriptor, ownerDocument) => {
  * @param {Document} ownerDocument
  */
 const ensureInlineScript = (handle, position, code, ownerDocument) => {
-    if (!code) {
-        return;
-    }
-    const key = `${handle}::${position}`;
-    if (appliedInlinePayloads.has(key)) {
-        return;
-    }
-    const script = ownerDocument.createElement('script');
-    script.setAttribute('data-fotogrids-preview-inline', key);
-    script.textContent = code;
-    ownerDocument.head.appendChild(script);
-    appliedInlinePayloads.add(key);
+	if (!code) {
+		return;
+	}
+	const key = `${handle}::${position}`;
+	if (appliedInlinePayloads.has(key)) {
+		return;
+	}
+	const script = ownerDocument.createElement('script');
+	script.setAttribute('data-fotogrids-preview-inline', key);
+	script.textContent = code;
+	ownerDocument.head.appendChild(script);
+	appliedInlinePayloads.add(key);
 };
 
 /**
@@ -216,21 +228,34 @@ const ensureInlineScript = (handle, position, code, ownerDocument) => {
  * @param {Array<Object>} jsDescriptors
  * @param {Document} [ownerDocument=document] document to inject into
  */
-export const ensureScriptsSequenced = async (jsDescriptors, ownerDocument = document) => {
-    if (!Array.isArray(jsDescriptors)) {
-        return;
-    }
-    for (const descriptor of jsDescriptors) {
-        if (!descriptor || typeof descriptor !== 'object') {
-            continue;
-        }
-        // Apply the inline 'before' payload BEFORE the external script so
-        // any global it defines (e.g. window.fotogridsLoadingIcons) is
-        // available when the main script executes.
-        ensureInlineScript(descriptor.handle, 'before', descriptor.inline_before || '', ownerDocument);
-        await ensureScript(descriptor, ownerDocument);
-        ensureInlineScript(descriptor.handle, 'after', descriptor.inline_after || '', ownerDocument);
-    }
+export const ensureScriptsSequenced = async (
+	jsDescriptors,
+	ownerDocument = document
+) => {
+	if (!Array.isArray(jsDescriptors)) {
+		return;
+	}
+	for (const descriptor of jsDescriptors) {
+		if (!descriptor || typeof descriptor !== 'object') {
+			continue;
+		}
+		// Apply the inline 'before' payload BEFORE the external script so
+		// any global it defines (e.g. window.fotogridsLoadingIcons) is
+		// available when the main script executes.
+		ensureInlineScript(
+			descriptor.handle,
+			'before',
+			descriptor.inline_before || '',
+			ownerDocument
+		);
+		await ensureScript(descriptor, ownerDocument);
+		ensureInlineScript(
+			descriptor.handle,
+			'after',
+			descriptor.inline_after || '',
+			ownerDocument
+		);
+	}
 };
 
 /**
@@ -245,24 +270,24 @@ export const ensureScriptsSequenced = async (jsDescriptors, ownerDocument = docu
  * @param {string} html
  */
 export const injectPreviewHtml = (container, html) => {
-    container.innerHTML = '';
-    if (!html) {
-        return;
-    }
-    const template = container.ownerDocument.createElement('template');
-    template.innerHTML = html;
-    container.appendChild(template.content);
+	container.innerHTML = '';
+	if (!html) {
+		return;
+	}
+	const template = container.ownerDocument.createElement('template');
+	template.innerHTML = html;
+	container.appendChild(template.content);
 
-    const scripts = container.querySelectorAll('script');
-    scripts.forEach((node) => {
-        const replacement = container.ownerDocument.createElement('script');
-        for (let i = 0; i < node.attributes.length; i++) {
-            const attr = node.attributes[i];
-            replacement.setAttribute(attr.name, attr.value);
-        }
-        replacement.textContent = node.textContent;
-        node.parentNode.replaceChild(replacement, node);
-    });
+	const scripts = container.querySelectorAll('script');
+	scripts.forEach((node) => {
+		const replacement = container.ownerDocument.createElement('script');
+		for (let i = 0; i < node.attributes.length; i++) {
+			const attr = node.attributes[i];
+			replacement.setAttribute(attr.name, attr.value);
+		}
+		replacement.textContent = node.textContent;
+		node.parentNode.replaceChild(replacement, node);
+	});
 };
 
 /**
@@ -283,20 +308,28 @@ export const injectPreviewHtml = (container, html) => {
  * @param {Window}      [opts.ownerWindow=window] window where the localize merge happens.
  */
 export const applyPreviewResponse = async (container, response, opts = {}) => {
-    if (!container || !response) {
-        return;
-    }
-    const ownerWindow = opts.ownerWindow || window;
-    const ownerDocument = container.ownerDocument || document;
+	if (!container || !response) {
+		return;
+	}
+	const ownerWindow = opts.ownerWindow || window;
+	const ownerDocument = container.ownerDocument || document;
 
-    const localize = response?.assets?.localize?.fotogrids;
-    if (localize && typeof localize === 'object') {
-        ownerWindow.fotogrids = Object.assign({}, ownerWindow.fotogrids || {}, localize);
-    }
+	const localize = response?.assets?.localize?.fotogrids;
+	if (localize && typeof localize === 'object') {
+		ownerWindow.fotogrids = Object.assign(
+			{},
+			ownerWindow.fotogrids || {},
+			localize
+		);
+	}
 
-    ensurePreviewCssAssets(response?.assets?.css, ownerDocument);
-    applyPreviewInlineCss(response.instance_id, response.inlineCss || '', ownerDocument);
-    await ensureScriptsSequenced(response?.assets?.js, ownerDocument);
+	ensurePreviewCssAssets(response?.assets?.css, ownerDocument);
+	applyPreviewInlineCss(
+		response.instance_id,
+		response.inlineCss || '',
+		ownerDocument
+	);
+	await ensureScriptsSequenced(response?.assets?.js, ownerDocument);
 
-    injectPreviewHtml(container, response.html || '');
+	injectPreviewHtml(container, response.html || '');
 };

@@ -64,6 +64,13 @@ final class Loading_Icon implements Feature {
 	private const DEFAULT_ICON = '12-dots';
 
 	/**
+	 * Script handle the loading-icon JS is registered under.
+	 *
+	 * @since 1.0.0
+	 */
+	private const SCRIPT_HANDLE = 'fotogrids-loading-icon';
+
+	/**
 	 * Icon names whose animate-fn has already been published to the page map.
 	 *
 	 * @since 1.0.0
@@ -86,6 +93,22 @@ final class Loading_Icon implements Feature {
 	 * @var bool
 	 */
 	private static bool $default_published = false;
+
+	/**
+	 * Icon-map payloads awaiting attachment during a REST or AJAX render.
+	 *
+	 * @since 1.0.0
+	 * @var array<int, string>
+	 */
+	private static array $deferred_icon_map = array();
+
+	/**
+	 * Whether the deferred-attachment callback is hooked for this request.
+	 *
+	 * @since 1.0.0
+	 * @var bool
+	 */
+	private static bool $deferred_hooked = false;
 
 	public function id(): string {
 		return 'fotogrids/loading-icon';
@@ -268,8 +291,9 @@ final class Loading_Icon implements Feature {
 	 * Inline_Asset_Emitter uses for per-render CSS. The assignment is additive
 	 * (Object.assign) so multiple galleries with different icons each contribute
 	 * without clobbering. A unique handle per icon keeps each independently
-	 * printable. When the head has not rendered yet (REST preview / very early
-	 * render) the handle is enqueued and flushed on wp_footer + late_assets.
+	 * printable. When the head has not rendered yet the handle is enqueued and
+	 * flushed on wp_footer. REST and AJAX renders print nothing at all and go
+	 * through defer_icon_map() instead.
 	 *
 	 * @since   1.0.0
 	 * @param   string $icon_name Icon name for the gallery being rendered.
@@ -293,6 +317,13 @@ final class Loading_Icon implements Feature {
 				. wp_json_encode( $icon_name ) . '},' . $entry . ');';
 		}
 
+		// REST and AJAX renders share their output stream with the JSON body,
+		// so nothing may be printed. The map travels as data instead.
+		if ( wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			self::defer_icon_map( $js );
+			return;
+		}
+
 		$handle = 'fotogrids-loading-icons-' . (string) ++self::$map_seq;
 		wp_register_script( $handle, false, array(), FOTOGRIDS_VERSION, false );
 		wp_enqueue_script( $handle );
@@ -303,13 +334,51 @@ final class Loading_Icon implements Feature {
 			return;
 		}
 
-		// Head not rendered yet (REST preview / very early render): flush on
-		// wp_footer and on the preview endpoint's late_assets action.
-		$flush = static function () use ( $handle ): void {
-			wp_print_scripts( $handle );
-		};
-		add_action( 'wp_footer', $flush, 10 );
-		add_action( Actions_Render::LATE_ASSETS, $flush, 10 );
+		// Head not rendered yet (very early render): flush on wp_footer.
+		add_action(
+			'wp_footer',
+			static function () use ( $handle ): void {
+				wp_print_scripts( $handle );
+			},
+			10
+		);
+	}
+
+	/**
+	 * Queues the icon-map JS as a 'before' inline on the loading-icon handle.
+	 *
+	 * The preview serialisers snapshot inline 'before' / 'after' payloads off
+	 * each enqueued JS handle and the preview client re-injects them around the
+	 * matching script tag. Asset_Resolver::flush() registers the handle after
+	 * this module's assets() has run, so the attachment defers to LATE_ASSETS.
+	 *
+	 * @since   1.0.0
+	 * @param   string $js Icon-map assignment JS.
+	 * @return  void
+	 */
+	private static function defer_icon_map( string $js ): void {
+		self::$deferred_icon_map[] = $js;
+
+		if ( self::$deferred_hooked ) {
+			return;
+		}
+		self::$deferred_hooked = true;
+
+		add_action(
+			Actions_Render::LATE_ASSETS,
+			static function (): void {
+				if ( ! wp_script_is( self::SCRIPT_HANDLE, 'registered' ) ) {
+					return;
+				}
+
+				foreach ( self::$deferred_icon_map as $payload ) {
+					wp_add_inline_script( self::SCRIPT_HANDLE, $payload, 'before' );
+				}
+
+				self::$deferred_icon_map = array();
+			},
+			5
+		);
 	}
 
 	/**
@@ -322,5 +391,7 @@ final class Loading_Icon implements Feature {
 		self::$published_icons   = array();
 		self::$map_seq           = 0;
 		self::$default_published = false;
+		self::$deferred_icon_map = array();
+		self::$deferred_hooked   = false;
 	}
 }
