@@ -431,7 +431,16 @@ table.fg-stats-table.widefat {
 	&:hover {
 		color: $fotogrids-colors-blue;
 		text-decoration: underline;
+
+		.fg-stats-untitled {
+			color: inherit;
+		}
 	}
+}
+
+.fg-stats-untitled {
+	color: var(--fg-text-tertiary);
+	font-weight: 400;
 }
 
 @media (max-width: 768px) {
