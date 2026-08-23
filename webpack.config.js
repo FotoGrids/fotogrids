@@ -579,9 +579,10 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Self-hosted admin web fonts (Poppins, SIL OFL). Bundled
-                    // locally instead of loading from fonts.googleapis.com so no
-                    // visitor/admin data is sent to Google.
+                    // Self-hosted admin web fonts (Poppins and JetBrains Mono,
+                    // both SIL OFL). Bundled locally instead of loading from
+                    // fonts.googleapis.com so no visitor/admin data is sent to
+                    // Google.
                     from: 'src/assets/admin/fonts/**/*',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);

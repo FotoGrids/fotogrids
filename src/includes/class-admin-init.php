@@ -230,10 +230,19 @@ class Admin_Init {
 			FOTOGRIDS_VERSION
 		);
 
+		// JetBrains Mono, the admin monospace face - self-hosted on the same
+		// terms as Poppins.
+		wp_enqueue_style(
+			'fotogrids-jetbrains-mono',
+			FOTOGRIDS_PLUGIN_URL . 'assets/admin/fonts/jetbrains-mono/jetbrains-mono.css',
+			array(),
+			FOTOGRIDS_VERSION
+		);
+
 		wp_enqueue_style(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/css/admin.css',
-			array( 'wp-components', 'fotogrids-google-fonts' ),
+			array( 'wp-components', 'fotogrids-google-fonts', 'fotogrids-jetbrains-mono' ),
 			FOTOGRIDS_VERSION
 		);
 
