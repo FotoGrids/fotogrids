@@ -178,12 +178,17 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     const [ resolveError, setResolveError ] = useState( '' );
     const [ adding, setAdding ]       = useState( false );
 
+    // Per-source drafts, so switching YouTube <-> Vimeo and back restores the
+    // link and options that were already entered for that source.
+    const sourceDrafts = useRef( {} );
+
     // Prefill the form when opening in edit mode; reset to defaults on open in
     // add mode. Keyed on the embed's id so re-opening a different embed reloads.
     useEffect( () => {
         if ( ! isOpen ) {
             return;
         }
+        sourceDrafts.current = {};
         if ( editItem ) {
             setForm( editItemToForm( editItem ) );
             setUrlDraft( editItem.embed?.embed_url || '' );
@@ -202,6 +207,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
         setForm( prev => ( { ...prev, [ key ]: value } ) ), [] );
 
     const resetForm = useCallback( () => {
+        sourceDrafts.current = {};
         setForm( { ...DEFAULT_STATE } );
         setUrlDraft( '' );
         setResolveError( '' );
@@ -214,11 +220,24 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     }, [ onClose, resetForm ] );
 
     const handleSourceChange = useCallback( ( source ) => {
-        setForm( { ...DEFAULT_STATE, source } );
-        setUrlDraft( '' );
+        if ( source === form.source ) {
+            return;
+        }
+
+        sourceDrafts.current[ form.source ] = { form, urlDraft };
+
+        const draft = sourceDrafts.current[ source ];
+        if ( draft ) {
+            setForm( draft.form );
+            setUrlDraft( draft.urlDraft );
+        } else {
+            setForm( { ...DEFAULT_STATE, source } );
+            setUrlDraft( '' );
+        }
+
         setResolveError( '' );
         setActiveTab( 'link' );
-    }, [] );
+    }, [ form, urlDraft ] );
 
     const resolveUrl = useCallback( async ( rawUrl ) => {
         const url = rawUrl.trim();
