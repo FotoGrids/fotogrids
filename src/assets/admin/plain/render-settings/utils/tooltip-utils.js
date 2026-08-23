@@ -7,7 +7,9 @@
  * For React admin pages, import Tooltip / ProBadge from
  * assets/admin/src/components/ instead.
  *
- * Exposes: window.FotoGridsTooltip.ProBadge( props )
+ * Exposes:
+ *   window.FotoGridsTooltip.ProBadge( props )
+ *   window.FotoGridsTooltip.Tooltip( props )
  */
 (function () {
 	'use strict';
@@ -129,7 +131,12 @@
 		}
 
 		render() {
-			const { children, content, position = 'top' } = this.props;
+			const {
+				children,
+				content,
+				position = 'top',
+				asChild = false,
+			} = this.props;
 			const { visible, top, left } = this.state;
 
 			const bubble = visible
@@ -148,21 +155,34 @@
 					)
 				: null;
 
-			return h(
-				wp.element.Fragment,
-				null,
-				h(
-					'span',
-					{
-						ref: this.triggerRef,
-						className: 'fg-tooltip-trigger',
-						onMouseEnter: this.show,
-						onMouseLeave: this.hide,
-					},
-					children
-				),
-				bubble
-			);
+			const handlers = {
+				onMouseEnter: this.show,
+				onMouseLeave: this.hide,
+				onFocus: this.show,
+				onBlur: this.hide,
+			};
+
+			// asChild attaches the trigger handlers to the child element itself
+			// instead of adding a wrapper span, so grouped controls keep their
+			// :first-child / :last-child styling.
+			const trigger = asChild
+				? wp.element.cloneElement(
+						wp.element.Children.only(children),
+						Object.assign({ ref: this.triggerRef }, handlers)
+					)
+				: h(
+						'span',
+						Object.assign(
+							{
+								ref: this.triggerRef,
+								className: 'fg-tooltip-trigger',
+							},
+							handlers
+						),
+						children
+					);
+
+			return h(wp.element.Fragment, null, trigger, bubble);
 		}
 	}
 
@@ -199,4 +219,13 @@
 
 	window.FotoGridsTooltip = window.FotoGridsTooltip || {};
 	window.FotoGridsTooltip.ProBadge = ProBadge;
+
+	/**
+	 * Wraps any trigger with the FotoGrids tooltip bubble.
+	 *
+	 * Props: children (trigger), content (bubble), position ("top" | "bottom" |
+	 * "left" | "right"), asChild (clone the single child instead of wrapping
+	 * it - any ref already on that child is replaced).
+	 */
+	window.FotoGridsTooltip.Tooltip = TooltipPortal;
 })();
