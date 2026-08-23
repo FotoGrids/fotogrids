@@ -21,12 +21,44 @@ const TypeBadge = ( { type } ) => {
     );
 };
 
-const TitleCell = ( { title, editUrl } ) =>
-    editUrl ? (
-        <a className="fg-stats-title-link" href={ editUrl }>{ title }</a>
+const UNTITLED_LABELS = {
+    gallery: __( 'Untitled Gallery', 'fotogrids' ),
+    album:   __( 'Untitled Album',   'fotogrids' ),
+    item:    __( 'Untitled Item',    'fotogrids' ),
+};
+
+/**
+ * Build the placeholder shown in place of an empty object title.
+ *
+ * @param {string} type Object type (gallery, album, item).
+ * @param {number} id   Object ID.
+ * @returns {string} Placeholder label, e.g. "Untitled Gallery #123".
+ */
+const untitledLabel = ( type, id ) => {
+    const base = UNTITLED_LABELS[ type ] || __( 'Untitled', 'fotogrids' );
+    return id ? `${ base } #${ id }` : base;
+};
+
+const UntitledTitle = ( { type, id } ) => (
+    <>
+        <span className="fg-stats-untitled">
+            { UNTITLED_LABELS[ type ] || __( 'Untitled', 'fotogrids' ) }
+        </span>
+        { id ? ` #${ id }` : '' }
+    </>
+);
+
+const TitleCell = ( { title, row } ) => {
+    const label = typeof title === 'string' && title.trim()
+        ? title
+        : <UntitledTitle type={ row.type } id={ row.id } />;
+
+    return row.edit_url ? (
+        <a className="fg-stats-title-link" href={ row.edit_url }>{ label }</a>
     ) : (
-        <strong>{ title }</strong>
+        <strong>{ label }</strong>
     );
+};
 
 const PERIODS = [
     { days: 7,  label: __( '7 Days',  'fotogrids' ) },
@@ -34,12 +66,47 @@ const PERIODS = [
     { days: 90, label: __( '90 Days', 'fotogrids' ) },
 ];
 
-const recentActivityColumns = [
+const PERIOD_PARAM   = 'fg_stats_period';
+const DEFAULT_PERIOD = 7;
+
+/**
+ * Read the selected period from the page URL, falling back to the default.
+ *
+ * @returns {number} Period length in days.
+ */
+const readPeriodParam = () => {
+    try {
+        const days = parseInt(
+            new URLSearchParams( window.location.search ).get( PERIOD_PARAM ),
+            10
+        );
+        return PERIODS.some( ( p ) => p.days === days ) ? days : DEFAULT_PERIOD;
+    } catch ( _e ) {
+        return DEFAULT_PERIOD;
+    }
+};
+
+/**
+ * Persist the selected period to the page URL so a reload restores it.
+ *
+ * Uses replaceState so switching a filter does not add a history entry.
+ *
+ * @param {number} days Period length in days.
+ */
+const writePeriodParam = ( days ) => {
+    try {
+        const url = new URL( window.location.href );
+        url.searchParams.set( PERIOD_PARAM, String( days ) );
+        window.history.replaceState( {}, '', url.toString() );
+    } catch ( _e ) {}
+};
+
+const recentlyViewedColumns = [
     {
         key: 'title',
         label: __( 'Name', 'fotogrids' ),
         ellipsis: true,
-        render: ( val, row ) => <TitleCell title={ val } editUrl={ row.edit_url } />,
+        render: ( val, row ) => <TitleCell title={ val } row={ row } />,
     },
     {
         key: 'type',
@@ -56,7 +123,7 @@ const topContentColumns = [
         key: 'title',
         label: __( 'Name', 'fotogrids' ),
         ellipsis: true,
-        render: ( val, row ) => <TitleCell title={ val } editUrl={ row.edit_url } />,
+        render: ( val, row ) => <TitleCell title={ val } row={ row } />,
     },
     {
         key: 'type',
@@ -81,9 +148,9 @@ const StatsPage = () => {
     const [ overview,         setOverview         ] = useState( defaultOverview );
     const [ viewsData,        setViewsData        ] = useState( { labels: [], data: [] } );
     const [ popularGalleries, setPopularGalleries ] = useState( { labels: [], data: [] } );
-    const [ recentActivity,   setRecentActivity   ] = useState( [] );
+    const [ recentlyViewed,   setRecentlyViewed   ] = useState( [] );
     const [ topContent,       setTopContent       ] = useState( [] );
-    const [ selectedPeriod,   setSelectedPeriod   ] = useState( 7 );
+    const [ selectedPeriod,   setSelectedPeriod   ] = useState( readPeriodParam );
     const [ loading,          setLoading          ] = useState( true );
     const [ error,            setError            ] = useState( null );
     const [ refreshToken,     setRefreshToken     ] = useState( 0 );
@@ -216,8 +283,16 @@ const StatsPage = () => {
                     shares:    overviewRes?.shares    ?? 0,
                 } );
                 setViewsData( { labels: viewsRes?.labels ?? [], data: viewsRes?.data ?? [] } );
-                setPopularGalleries( { labels: popularRes?.labels ?? [], data: popularRes?.data ?? [] } );
-                setRecentActivity( Array.isArray( activityRes ) ? activityRes : [] );
+                const popularIds = popularRes?.ids ?? [];
+                setPopularGalleries( {
+                    labels: ( popularRes?.labels ?? [] ).map( ( label, i ) => (
+                        typeof label === 'string' && label.trim()
+                            ? label
+                            : untitledLabel( 'gallery', popularIds[ i ] )
+                    ) ),
+                    data: popularRes?.data ?? [],
+                } );
+                setRecentlyViewed( Array.isArray( activityRes ) ? activityRes : [] );
                 setTopContent( Array.isArray( topRes ) ? topRes : [] );
 
             } catch ( err ) {
@@ -238,6 +313,11 @@ const StatsPage = () => {
         && overview.views     === 0
         && overview.galleries === 0;
 
+    const handlePeriodChange = ( days ) => {
+        setSelectedPeriod( days );
+        writePeriodParam( days );
+    };
+
     return (
         <div className="fg-stats-dashboard">
 
@@ -248,7 +328,7 @@ const StatsPage = () => {
                         <Button
                             key={ p.days }
                             variant={ selectedPeriod === p.days ? 'primary' : 'secondary' }
-                            onClick={ () => setSelectedPeriod( p.days ) }
+                            onClick={ () => handlePeriodChange( p.days ) }
                             aria-pressed={ selectedPeriod === p.days }
                         >
                             { p.label }
@@ -334,11 +414,11 @@ const StatsPage = () => {
 
             <div className="fg-stats-tables">
                 <StatsTable
-                    title={ __( 'Recent Activity', 'fotogrids' ) }
-                    columns={ recentActivityColumns }
-                    rows={ recentActivity }
+                    title={ __( 'Recently Viewed', 'fotogrids' ) }
+                    columns={ recentlyViewedColumns }
+                    rows={ recentlyViewed }
                     loading={ loading }
-                    emptyMsg={ __( 'No recent activity in this period.', 'fotogrids' ) }
+                    emptyMsg={ __( 'Nothing was viewed in this period.', 'fotogrids' ) }
                 />
                 <StatsTable
                     title={ __( 'Top Performing Content', 'fotogrids' ) }

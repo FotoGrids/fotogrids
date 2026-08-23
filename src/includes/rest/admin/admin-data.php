@@ -1059,12 +1059,14 @@ class Admin_Data {
 
 		$labels = array();
 		$data   = array();
+		$ids    = array();
 
 		foreach ( $results as $result ) {
 			$gallery = get_post( $result['object_id'] );
 			if ( $gallery ) {
 				$labels[] = $gallery->post_title;
 				$data[]   = (int) $result['total_views'];
+				$ids[]    = (int) $gallery->ID;
 			}
 		}
 
@@ -1072,6 +1074,7 @@ class Admin_Data {
 			array(
 				'labels' => $labels,
 				'data'   => $data,
+				'ids'    => $ids,
 			)
 		);
 	}
