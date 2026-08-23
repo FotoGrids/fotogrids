@@ -106,7 +106,14 @@
 		opacity: 0.6;
 		border-radius: 4px;
 		min-height: 100px;
-		position: relative;
+
+		// Flex centring rather than an absolutely positioned label: with
+		// `left: 50%` the label's shrink-to-fit width is capped at half the
+		// placeholder, so the text wrapped and rendered left-aligned inside
+		// that half - visibly off-centre in narrow grid columns.
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		background-image: repeating-linear-gradient(
 			45deg,
@@ -122,13 +129,12 @@
 
 		&::after {
 			content: attr(data-drop-text);
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
+			padding: 0 6px;
 			color: #666;
 			font-size: 12px;
 			font-weight: 500;
+			line-height: 1.3;
+			text-align: center;
 			visibility: visible;
 			z-index: 1;
 		}
