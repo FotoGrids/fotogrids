@@ -428,46 +428,21 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						].filter(Boolean)
 					),
 
-					h(
-						'button',
-						{
-							type: 'button',
-							className: `fotogrids-fourside-link-btn${isLinked ? ' fg-is-active' : ''}`,
-							onClick: (e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								!isDisabled && handleLinkToggle();
-							},
-							disabled: isDisabled,
-							title: isLinked
-								? __('Unlink values', 'fotogrids')
-								: __('Link values', 'fotogrids'),
-						},
-						renderIcon('link')
-					),
+					renderLinkButton(h, {
+						isLinked,
+						isDisabled,
+						onToggle: handleLinkToggle,
+						renderIcon,
+						__,
+					}),
 
-					h(
-						'div',
-						{ className: 'fotogrids-responsive-setting__devices' },
-						devices.map((device) =>
-							h(
-								'button',
-								{
-									key: device.key,
-									type: 'button',
-									className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
-									onClick: (e) => {
-										e.preventDefault();
-										e.stopPropagation();
-										setActiveDevice(device.key);
-									},
-									disabled: isDisabled,
-									title: device.label,
-								},
-								renderIcon(device.icon)
-							)
-						)
-					),
+					renderDeviceButtons(h, {
+						devices,
+						activeDevice,
+						setActiveDevice,
+						isDisabled,
+						renderIcon,
+					}),
 				]
 			),
 
@@ -1092,31 +1067,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									),
 							].filter(Boolean)
 						),
-						h(
-							'div',
-							{
-								className:
-									'fotogrids-responsive-setting__devices',
-							},
-							devices.map((device) =>
-								h(
-									'button',
-									{
-										key: device.key,
-										type: 'button',
-										className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
-										onClick: (e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											setActiveDevice(device.key);
-										},
-										disabled: isDisabled,
-										title: device.label,
-									},
-									renderIcon(device.icon)
-								)
-							)
-						),
+						renderDeviceButtons(h, {
+							devices,
+							activeDevice,
+							setActiveDevice,
+							isDisabled,
+							renderIcon,
+						}),
 					].filter(Boolean)
 				),
 
@@ -1315,30 +1272,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						].filter(Boolean)
 					),
 
-					h(
-						'div',
-						{
-							className: 'fotogrids-responsive-setting__devices',
-						},
-						devices.map((device) =>
-							h(
-								'button',
-								{
-									key: device.key,
-									type: 'button',
-									className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
-									onClick: (e) => {
-										e.preventDefault();
-										e.stopPropagation();
-										setActiveDevice(device.key);
-									},
-									disabled: isDisabled,
-									title: device.label,
-								},
-								renderIcon(device.icon)
-							)
-						)
-					),
+					renderDeviceButtons(h, {
+						devices,
+						activeDevice,
+						setActiveDevice,
+						isDisabled,
+						renderIcon,
+					}),
 				]
 			),
 
@@ -1585,23 +1525,13 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 						]
 					),
 
-					h(
-						'button',
-						{
-							type: 'button',
-							className: `fotogrids-fourside-link-btn${isLinked ? ' fg-is-active' : ''}`,
-							onClick: (e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								!isDisabled && handleLinkToggle();
-							},
-							disabled: isDisabled,
-							title: isLinked
-								? __('Unlink values', 'fotogrids')
-								: __('Link values', 'fotogrids'),
-						},
-						renderIcon('link')
-					),
+					renderLinkButton(h, {
+						isLinked,
+						isDisabled,
+						onToggle: handleLinkToggle,
+						renderIcon,
+						__,
+					}),
 				]
 			),
 
@@ -1646,4 +1576,85 @@ function renderUnitSelect(h, currentUnit, onChange, isDisabled, setting) {
 				},
 				setting.units.map((u) => h('option', { key: u, value: u }, u))
 			);
+}
+
+// Wraps an icon-only control in the FotoGrids tooltip. Falls back to the bare
+// control when tooltip-utils has not been enqueued.
+function withTooltip(h, content, control, key) {
+	const Tooltip = window.FotoGridsTooltip?.Tooltip;
+
+	if (!Tooltip) {
+		return control;
+	}
+
+	return h(
+		Tooltip,
+		{ key, content, position: 'top', asChild: true },
+		control
+	);
+}
+
+// Link / unlink toggle shared by the four-sided and two-sided fields. The label
+// lives in the tooltip, so the accessible name comes from aria-label.
+function renderLinkButton(
+	h,
+	{ isLinked, isDisabled, onToggle, renderIcon, __ }
+) {
+	const label = isLinked
+		? __('Unlink values', 'fotogrids')
+		: __('Link values', 'fotogrids');
+
+	return withTooltip(
+		h,
+		label,
+		h(
+			'button',
+			{
+				type: 'button',
+				className: `fotogrids-fourside-link-btn${isLinked ? ' fg-is-active' : ''}`,
+				onClick: (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					!isDisabled && onToggle();
+				},
+				disabled: isDisabled,
+				'aria-label': label,
+			},
+			renderIcon('link')
+		)
+	);
+}
+
+// Desktop / tablet / mobile toggles shared by every responsive variant.
+function renderDeviceButtons(
+	h,
+	{ devices, activeDevice, setActiveDevice, isDisabled, renderIcon }
+) {
+	return h(
+		'div',
+		{ className: 'fotogrids-responsive-setting__devices' },
+		devices.map((device) =>
+			withTooltip(
+				h,
+				device.label,
+				h(
+					'button',
+					{
+						key: device.key,
+						type: 'button',
+						className: `fotogrids-responsive-device-btn ${activeDevice === device.key ? 'fg-is-active' : ''}`,
+						onClick: (e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							setActiveDevice(device.key);
+						},
+						disabled: isDisabled,
+						'aria-label': device.label,
+					},
+					renderIcon(device.icon)
+				),
+				device.key
+			)
+		)
+	);
 }

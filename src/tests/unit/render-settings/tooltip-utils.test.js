@@ -67,3 +67,50 @@ describe('tooltip-utils ProBadge', () => {
 		).toBeNull();
 	});
 });
+
+describe('tooltip-utils Tooltip', () => {
+	const h = wp.element.createElement;
+
+	const build = (props) =>
+		h(
+			window.FotoGridsTooltip.Tooltip,
+			props,
+			h('button', { className: 'trigger', type: 'button' })
+		);
+
+	afterEach(() => {
+		document.body.innerHTML = '';
+	});
+
+	it('wraps the trigger in a span by default', () => {
+		const { container } = renderElement(build({ content: 'Desktop' }));
+		expect(
+			container.querySelector('.fg-tooltip-trigger .trigger')
+		).not.toBeNull();
+	});
+
+	it('attaches to the child itself in asChild mode', () => {
+		const { container } = renderElement(
+			build({ content: 'Desktop', asChild: true })
+		);
+		expect(container.querySelector('.fg-tooltip-trigger')).toBeNull();
+		expect(container.firstChild).toBe(container.querySelector('.trigger'));
+	});
+
+	it('shows the bubble from the cloned child in asChild mode', () => {
+		const { container } = renderElement(
+			build({ content: 'Desktop', asChild: true })
+		);
+		const trigger = container.querySelector('.trigger');
+
+		fireMouse(trigger, 'mouseover');
+		expect(
+			document.querySelector('.fg-tooltip[role="tooltip"]').textContent
+		).toBe('Desktop');
+
+		fireMouse(trigger, 'mouseout');
+		expect(
+			document.querySelector('.fg-tooltip[role="tooltip"]')
+		).toBeNull();
+	});
+});

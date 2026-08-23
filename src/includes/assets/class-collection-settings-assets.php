@@ -80,6 +80,16 @@ final class Collection_Settings_Assets {
 	);
 
 	/**
+	 * Render helpers that show a tooltip without a Pro badge; they depend on
+	 * the same tooltip utility.
+	 *
+	 * @var string[]
+	 */
+	private const USES_TOOLTIPS = array(
+		'renderResponsiveRange',
+	);
+
+	/**
 	 * Enqueue every script + stylesheet the settings panel needs.
 	 *
 	 * @since 1.0.0
@@ -192,7 +202,8 @@ final class Collection_Settings_Assets {
 	 * render-* script (and before collection-settings itself).
 	 */
 	private static function enqueue_render_helper_utils(): void {
-		// Tooltip utilities - must load before any Pro-badge render helper.
+		// Tooltip utilities - must load before any Pro-badge or tooltip render
+		// helper.
 		wp_enqueue_script(
 			'fotogrids-tooltip-utils',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/tooltip-utils.js',
@@ -242,7 +253,8 @@ final class Collection_Settings_Assets {
 			wp_enqueue_media();
 		}
 
-		if ( in_array( $function_name, self::USES_PRO_BADGES, true ) ) {
+		$tooltip_helpers = array_merge( self::USES_PRO_BADGES, self::USES_TOOLTIPS );
+		if ( in_array( $function_name, $tooltip_helpers, true ) ) {
 			$dependencies[] = 'fotogrids-tooltip-utils';
 		}
 

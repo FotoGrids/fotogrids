@@ -1,8 +1,14 @@
 /**
  * Tests for renderResponsiveRange.js (responsive slider with device tabs)
  */
+import '@/admin/plain/render-settings/utils/tooltip-utils';
 import '@/admin/plain/render-settings/renderResponsiveRange';
-import { renderElement, click, changeValue } from '@tests/helpers/render-component';
+import {
+	renderElement,
+	click,
+	changeValue,
+	fireMouse,
+} from '@tests/helpers/render-component';
 
 const __ = (t) => t;
 const renderIcon = (n) => n;
@@ -85,6 +91,41 @@ describe('renderResponsiveRange (simple per-device value)', () => {
 		expect(
 			container.querySelector('.fotogrids-responsive-device-btn.fg-is-active')
 		).not.toBeNull();
+	});
+
+	it('labels the device tabs with a FotoGrids tooltip instead of a title', () => {
+		const { container } = renderElement(
+			build(SETTING, { desktop: 3, tablet: 2, mobile: 1 }, false)
+		);
+		const tab = container.querySelector('.fotogrids-responsive-device-btn');
+
+		expect(tab.getAttribute('title')).toBeNull();
+		expect(tab.getAttribute('aria-label')).toBe('Desktop');
+
+		fireMouse(tab, 'mouseover');
+		expect(
+			document.querySelector('.fg-tooltip[role="tooltip"]').textContent
+		).toBe('Desktop');
+
+		fireMouse(tab, 'mouseout');
+		expect(
+			document.querySelector('.fg-tooltip[role="tooltip"]')
+		).toBeNull();
+	});
+
+	it('keeps the device tabs as direct children of the device group', () => {
+		const { container } = renderElement(
+			build(SETTING, { desktop: 3, tablet: 2, mobile: 1 }, false)
+		);
+		const group = container.querySelector(
+			'.fotogrids-responsive-setting__devices'
+		);
+		expect(group.children).toHaveLength(3);
+		expect(
+			[...group.children].every((child) =>
+				child.classList.contains('fotogrids-responsive-device-btn')
+			)
+		).toBe(true);
 	});
 
 	it('shows a pro badge from field state', () => {
@@ -223,6 +264,15 @@ describe('renderResponsiveRange (four-sided)', () => {
 		);
 		const linkBtn = container.querySelector('.fotogrids-fourside-link-btn');
 		expect(linkBtn).not.toBeNull();
+		expect(linkBtn.getAttribute('title')).toBeNull();
+		expect(linkBtn.getAttribute('aria-label')).toBe('Unlink values');
+
+		fireMouse(linkBtn, 'mouseover');
+		expect(
+			document.querySelector('.fg-tooltip[role="tooltip"]').textContent
+		).toBe('Unlink values');
+		fireMouse(linkBtn, 'mouseout');
+
 		click(linkBtn);
 		// toggling link writes UI-only state (the _linked flag)
 		expect(updateSettingStateOnly).toHaveBeenCalled();
