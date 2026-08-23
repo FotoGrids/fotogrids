@@ -197,6 +197,11 @@ const UpgradeModal = () => {
             className="fg-modal--upgrade"
             type="upgrade"
         >
+            <Modal.HeaderClose
+                className="fotogrids-upgrade-modal__close"
+                ariaLabel={strings.close}
+            />
+
             <Modal.Body padding={false} scroll={false}>
                 <div className="fotogrids-upgrade-modal__content">
                     <div

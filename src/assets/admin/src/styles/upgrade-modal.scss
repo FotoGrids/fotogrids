@@ -20,6 +20,16 @@
 	height: 100%;
 }
 
+// The upgrade modal has no header bar, so the close button floats over the
+// dialog corner. Base button styling comes from `fg-modal__header__close`
+// in styles/fg-modal/_header.scss; only placement is set here.
+.fg-modal--upgrade .fotogrids-upgrade-modal__close {
+	position: absolute;
+	top: 12px;
+	inset-inline-end: 12px;
+	z-index: 3;
+}
+
 .fotogrids-upgrade-modal__image {
 	flex: 1;
 	display: flex;
@@ -194,6 +204,14 @@
 
 	.fotogrids-upgrade-modal__content {
 		flex-direction: column;
+	}
+
+	.fg-modal--upgrade .fotogrids-upgrade-modal__close {
+		background: rgba(255, 255, 255, 0.85);
+
+		&:hover {
+			background: #fff;
+		}
 	}
 
 	.fotogrids-upgrade-modal__image {
