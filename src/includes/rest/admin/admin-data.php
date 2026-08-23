@@ -950,7 +950,7 @@ class Admin_Data {
 
 		$media = get_option( 'fotogrids_media_settings', null );
 
-		if ( is_array( $media ) && $media !== \FotoGrids\Image_Size_Manager::get_plugin_size_defaults() ) {
+		if ( is_array( $media ) && \FotoGrids\Image_Size_Manager::get_plugin_size_defaults() !== $media ) {
 			return true;
 		}
 
