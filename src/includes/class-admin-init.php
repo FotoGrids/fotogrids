@@ -265,7 +265,6 @@ class Admin_Init {
 				'autosave'          => (bool) get_option( 'fotogrids_autosave', '0' ),
 				'settingsMode'      => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
 				'userPersona'       => (string) get_option( 'fotogrids_user_persona', '' ),
-				'wpDebug'           => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'settingsBaseUrl'   => admin_url( 'admin.php?page=fotogrids-settings' ),
 				'isFotoGridsPage'   => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
 				'capabilities'      => self::get_current_user_capabilities_snapshot(),

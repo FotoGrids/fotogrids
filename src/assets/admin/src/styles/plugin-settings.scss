@@ -30,6 +30,15 @@
 	line-height: 1.5;
 }
 
+// Maintenance tab - the PHP constant printed under each Debug Log channel.
+.fotogrids-debug-channel__constant {
+	display: block;
+	margin-top: 3px;
+	font-family: "JetBrains Mono", "Roboto Mono", monospace;
+	font-size: 11px;
+	color: var(--fg-text-muted);
+}
+
 .fotogrids-plugin-settings {
 	.permissions-info,
 	.integrations-info {
