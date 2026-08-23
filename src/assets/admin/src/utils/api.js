@@ -157,15 +157,19 @@ export const addItemsToGallery = (galleryId, itemIds) => {
  * Fetch dashboard overview statistics
  */
 export const fetchDashboardStats = () => {
+	const emptyStats = {
+		galleries: 0,
+		galleries_total: 0,
+		galleries_published: 0,
+		settings_configured: false,
+		albums: 0,
+		items: 0,
+		views: 0,
+		shares: 0,
+	};
+
 	if (!isApiAvailable()) {
-		return Promise.resolve({
-			galleries: 0,
-			albums: 0,
-			items: 0,
-			views: 0,
-			shares: 0,
-			shortcodes_used: false,
-		});
+		return Promise.resolve({ ...emptyStats });
 	}
 
 	return wp
@@ -175,13 +179,6 @@ export const fetchDashboardStats = () => {
 		})
 		.catch((error) => {
 			console.error('Error fetching dashboard stats:', error);
-			return {
-				galleries: 0,
-				albums: 0,
-				items: 0,
-				views: 0,
-				shares: 0,
-				shortcodes_used: false,
-			};
+			return { ...emptyStats };
 		});
 };

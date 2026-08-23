@@ -260,11 +260,13 @@ describe('utils/api', () => {
 	describe('fetchDashboardStats', () => {
 		const zero = {
 			galleries: 0,
+			galleries_total: 0,
+			galleries_published: 0,
+			settings_configured: false,
 			albums: 0,
 			items: 0,
 			views: 0,
 			shares: 0,
-			shortcodes_used: false,
 		};
 
 		it('resolves zeros when API unavailable', async () => {

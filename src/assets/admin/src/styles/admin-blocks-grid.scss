@@ -203,6 +203,28 @@
 						justify-content: center;
 					}
 
+					.fg-abc-checklist-link {
+						display: flex;
+						align-items: center;
+						gap: 12px;
+						flex: 1;
+						color: inherit;
+						text-decoration: none;
+						box-shadow: none;
+
+						&:hover,
+						&:focus {
+							color: white;
+							text-decoration: underline;
+						}
+
+						&:focus {
+							outline: 1px solid white;
+							outline-offset: 3px;
+							box-shadow: none;
+						}
+					}
+
 					&.completed {
 						color: white;
 
