@@ -142,6 +142,11 @@ class Freemius_Bootstrap {
 		// renders instead of the Freemius opt-in screen.
 		self::$instance->add_filter( 'redirect_on_activation', '__return_false' );
 
+		// Run data cleanup through the SDK's uninstall action instead of
+		// register_uninstall_hook()/uninstall.php so Freemius can report the
+		// uninstall event before the data is dropped.
+		self::$instance->add_action( 'after_uninstall', array( self::class, 'run_uninstall_cleanup' ) );
+
 		/**
 		 * Fires after the Freemius SDK instance is ready.
 		 *
@@ -151,5 +156,22 @@ class Freemius_Bootstrap {
 		do_action( Actions_Licensing::FREEMIUS_LOADED, self::$instance );
 
 		return self::$instance;
+	}
+
+	/**
+	 * Runs plugin data cleanup after Freemius reports the uninstall event.
+	 *
+	 * Hooked to the SDK's `after_uninstall` action. Loads the uninstaller
+	 * explicitly because the uninstall request may not have required it yet.
+	 *
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public static function run_uninstall_cleanup(): void {
+		if ( ! class_exists( '\FotoGrids\Uninstaller' ) ) {
+			require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
+		}
+
+		\FotoGrids\Uninstaller::uninstall();
 	}
 }

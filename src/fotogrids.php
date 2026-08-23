@@ -113,7 +113,9 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'public/render/boot.php';
 
 register_activation_hook( __FILE__, array( 'FotoGrids\Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'FotoGrids\Deactivator', 'deactivate' ) );
-register_uninstall_hook( __FILE__, array( 'FotoGrids\Uninstaller', 'uninstall' ) );
+// Uninstall cleanup runs on the Freemius `after_uninstall` action (registered
+// in Freemius_Bootstrap), not register_uninstall_hook()/uninstall.php, so the
+// uninstall event is reported to Freemius before the plugin data is removed.
 
 /**
  * Initialize the plugin

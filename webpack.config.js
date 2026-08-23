@@ -479,10 +479,6 @@ const mainConfig = {
                     to: 'index.php',
                 },
                 {
-                    from: 'src/uninstall.php',
-                    to: 'uninstall.php',
-                },
-                {
                     // Freemius SDK non-PHP assets (CSS, JS, fonts, images, languages).
                     from: 'src/freemius/**/*',
                     to: ({ context, absoluteFilename }) => {
