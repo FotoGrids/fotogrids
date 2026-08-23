@@ -866,7 +866,8 @@ class Admin_Data {
 
 		global $wpdb;
 
-		$galleries_count = wp_count_posts( 'fotogrids_gallery' )->publish;
+		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
+		$galleries_count = (int) $gallery_counts->publish;
 		$albums_count    = wp_count_posts( 'fotogrids_album' )->publish;
 
 		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
@@ -882,13 +883,78 @@ class Admin_Data {
 
 		return rest_ensure_response(
 			array(
-				'galleries' => (int) $galleries_count,
-				'albums'    => (int) $albums_count,
-				'items'     => (int) $items_count,
-				'views'     => (int) $views_count,
-				'shares'    => (int) $shares_count,
+				'galleries'           => $galleries_count,
+				'galleries_total'     => self::count_editable_posts( $gallery_counts ),
+				'galleries_published' => $galleries_count,
+				'settings_configured' => self::has_configured_settings(),
+				'albums'              => (int) $albums_count,
+				'items'               => (int) $items_count,
+				'views'               => (int) $views_count,
+				'shares'              => (int) $shares_count,
 			)
 		);
+	}
+
+	/**
+	 * Sum the post statuses that represent a post the user has authored.
+	 *
+	 * Excludes trash, auto-draft and inherit so an abandoned autosave or a
+	 * trashed gallery does not read as work in progress.
+	 *
+	 * @since 1.0.0
+	 * @param object $counts Result of wp_count_posts().
+	 * @return int
+	 */
+	private static function count_editable_posts( $counts ): int {
+		$statuses = array( 'publish', 'future', 'draft', 'pending', 'private' );
+		$total    = 0;
+
+		foreach ( $statuses as $status ) {
+			$total += isset( $counts->$status ) ? (int) $counts->$status : 0;
+		}
+
+		return $total;
+	}
+
+	/**
+	 * Whether the user has saved any of the plugin's Setup settings pages.
+	 *
+	 * Each option below is written only when its Settings tab is saved, so the
+	 * presence of a non-empty value is the signal. The one exception is
+	 * fotogrids_media_settings, which Activator seeds on first activation and
+	 * therefore only counts once it diverges from the seeded defaults.
+	 *
+	 * @since 1.0.0
+	 * @return bool
+	 */
+	private static function has_configured_settings(): bool {
+		$option_keys = array(
+			'fotogrids_general_settings',
+			'fotogrids_gallery_defaults',
+			'fotogrids_album_defaults',
+			'fotogrids_permission_settings',
+			'fotogrids_integration_settings',
+			'fotogrids_sharing_settings',
+			'fotogrids_view_settings',
+			'fotogrids_watermark_settings',
+			'fotogrids_seo_settings',
+		);
+
+		foreach ( $option_keys as $option_key ) {
+			$stored = get_option( $option_key, null );
+
+			if ( null !== $stored && array() !== $stored && '' !== $stored ) {
+				return true;
+			}
+		}
+
+		$media = get_option( 'fotogrids_media_settings', null );
+
+		if ( is_array( $media ) && $media !== \FotoGrids\Image_Size_Manager::get_plugin_size_defaults() ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

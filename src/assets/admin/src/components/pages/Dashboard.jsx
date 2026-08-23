@@ -18,11 +18,13 @@ const { __ } = wp.i18n;
 const Dashboard = () => {
     const [stats, setStats] = useState({
         galleries: 0,
+        galleries_total: 0,
+        galleries_published: 0,
+        settings_configured: false,
         albums: 0,
         items: 0,
         views: 0,
-        shares: 0,
-        shortcodes_used: false
+        shares: 0
     });
     const [loading, setLoading] = useState(true);
 
@@ -36,11 +38,13 @@ const Dashboard = () => {
             .then(data => {
                 setStats({
                     galleries: data.galleries || 0,
+                    galleries_total: data.galleries_total || 0,
+                    galleries_published: data.galleries_published || 0,
+                    settings_configured: data.settings_configured || false,
                     albums: data.albums || 0,
                     items: data.items || 0,
                     views: data.views || 0,
-                    shares: data.shares || 0,
-                    shortcodes_used: data.shortcodes_used || false
+                    shares: data.shares || 0
                 });
                 setLoading(false);
             })
@@ -70,8 +74,9 @@ const Dashboard = () => {
                 />
 
                 <Checklist
-                    galleriesCount={stats.galleries}
-                    shortcodesUsed={stats.shortcodes_used}
+                    galleriesTotal={stats.galleries_total}
+                    galleriesPublished={stats.galleries_published}
+                    settingsConfigured={stats.settings_configured}
                 />
 
                 <FileUploader onUploadComplete={handleUploadComplete} />
