@@ -19,9 +19,7 @@
 		background: ui-color(input, bg);
 		border: ui-size(border-width, base) solid ui-color(input, border);
 		border-radius: ui-size(border-radius, input);
-		font-family:
-			"Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro",
-			monospace;
+		font-family: "JetBrains Mono", "Roboto Mono", monospace;
 		font-size: ui-size(font-size, input-base);
 		line-height: ui-size(line-height, input);
 		transition:
@@ -307,7 +305,7 @@
 		border: 1px solid var(--fg-yellow);
 		border-radius: 3px;
 		padding: 0 3px;
-		font-family: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
+		font-family: "JetBrains Mono", "Roboto Mono", monospace;
 		font-size: ui-size(font-size, xs);
 		font-weight: 600;
 		font-style: normal;
