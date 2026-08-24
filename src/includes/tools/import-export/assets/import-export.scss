@@ -247,42 +247,160 @@
     }
 }
 
-.fg-ie-log-op {
-    font-weight: 500;
-    text-transform: capitalize;
+.fg-ie-log-op,
+.fg-ie-log-status {
+    white-space: nowrap;
+    width: 1%;
 }
 
 .fg-ie-log-date {
     white-space: nowrap;
+    width: 1%;
     color: var(--fg-text-secondary);
 }
 
 .fg-ie-log-detail {
-    max-width: 320px;
-    word-break: break-word;
+    width: auto;
+    word-break: normal;
+    overflow-wrap: anywhere;
+
+    &__empty {
+        color: var(--fg-text-muted);
+    }
+}
+
+// Shared pill geometry for the Type and Status columns.
+%fg-ie-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.6;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    .fotogrids-icon svg,
+    svg {
+        width: 12px;
+        height: 12px;
+
+        path {
+            stroke-width: 2.4 !important;
+
+        }
+    }
+}
+
+.fg-ie-type-pill {
+    @extend %fg-ie-pill;
+
+    // Solid fill, no visible border. The transparent border from the
+    // placeholder is kept so type and status pills stay the same height.
+    border-color: transparent;
+    color: var(--fg-text-inverse);
+
+    &--import {
+        background: var(--fg-green);
+    }
+
+    &--export {
+        background: var(--fg-blue);
+    }
 }
 
 .fg-ie-status-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
+    @extend %fg-ie-pill;
 
+    // Unknown / legacy status values fall back to a neutral pill.
+    background: var(--fg-background-tertiary);
+    border-color: var(--fg-border-secondary);
+    color: var(--fg-text-secondary);
+
+    &--complete,
     &--success {
         background: rgba(70, 180, 80, 0.1);
+        border-color: rgba(70, 180, 80, 0.25);
         color: var(--fg-green);
     }
 
-    &--error, &--failed {
-        background: rgba(240, 30, 50, 0.1);
+    &--error,
+    &--failed {
+        background: rgba(240, 30, 50, 0.08);
+        border-color: rgba(240, 30, 50, 0.2);
         color: var(--fg-red);
     }
 
     &--partial {
-        background: rgba(50, 50, 50, 0.1);
-        color: var(--fg-grey);
+        background: var(--fg-status-warning-bg);
+        border-color: var(--fg-status-warning-border);
+        color: var(--fg-status-warning-text);
+    }
+}
+
+// Details column: one light-grey chip per data type.
+.fg-ie-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 2px 0;
+}
+
+.fg-ie-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid var(--fg-border-secondary);
+    border-radius: 4px;
+    background: var(--fg-background-tertiary);
+    font-size: 11px;
+    line-height: 1.7;
+    white-space: nowrap;
+    color: var(--fg-text-secondary);
+
+    &__count {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--fg-text-primary);
+    }
+
+    &__label {
+        font-weight: 500;
+    }
+
+    // Zero counts stay visible but recede.
+    &--empty {
+        opacity: 0.55;
+
+        .fg-ie-chip__count {
+            color: var(--fg-text-secondary);
+        }
+    }
+
+    // File format marker (JSON / XML).
+    &--format {
+        background: transparent;
+        border-color: var(--fg-border-secondary);
+        border-style: dashed;
+        letter-spacing: 0.4px;
+
+        .fg-ie-chip__label {
+            font-weight: 600;
+        }
+    }
+
+    // Skipped records reported by the importer.
+    &--skipped {
+        background: var(--fg-status-warning-bg);
+        border-color: var(--fg-status-warning-border);
+        color: var(--fg-status-warning-text);
+
+        .fg-ie-chip__count {
+            color: var(--fg-status-warning-text);
+        }
     }
 }
