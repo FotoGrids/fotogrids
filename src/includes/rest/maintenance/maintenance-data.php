@@ -49,6 +49,7 @@ class Maintenance_Data {
 			'fotogrids_autosave',
 			'fotogrids_share_statistics',
 			'fotogrids_allow_google_fonts',
+			'fotogrids_allow_news_updates',
 			'fotogrids_preserve_data_on_uninstall',
 
 			// In-product UX state
@@ -188,7 +189,6 @@ class Maintenance_Data {
 			$wpdb->prefix . 'fotogrids_item_meta',
 			$wpdb->prefix . 'fotogrids_statistics',
 			$wpdb->prefix . 'fotogrids_statistics_daily',
-			$wpdb->prefix . 'fotogrids_licenses',
 			$wpdb->prefix . 'fotogrids_gallery_albums',
 			$wpdb->prefix . 'fotogrids_tags',
 			$wpdb->prefix . 'fotogrids_item_metadata',
@@ -212,8 +212,9 @@ class Maintenance_Data {
 	 * @return array<string, mixed>
 	 */
 	private static function build_debug_channels_payload(): array {
-		$wp_debug = defined( 'WP_DEBUG' ) && WP_DEBUG;
-		$enabled  = \FotoGrids\Debug_Log::get_enabled_channels();
+		$wp_debug     = defined( 'WP_DEBUG' ) && WP_DEBUG;
+		$wp_debug_log = defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG;
+		$enabled      = \FotoGrids\Debug_Log::get_enabled_channels();
 
 		$channels = array();
 		foreach ( \FotoGrids\Debug_Log::get_channels() as $entry ) {
@@ -231,12 +232,24 @@ class Maintenance_Data {
 			);
 		}
 
+		$notice_title = '';
+		$notice       = '';
+
+		if ( ! $wp_debug ) {
+			$notice_title = __( 'Logging is switched off', 'fotogrids' );
+			$notice       = __( 'FotoGrids is not writing any debug-log lines, so these channels have no effect. Add define( \'WP_DEBUG\', true ); to your wp-config.php file to switch logging on.', 'fotogrids' );
+		} elseif ( ! $wp_debug_log ) {
+			$notice_title = __( 'Lines are not being saved to a file', 'fotogrids' );
+			$notice       = __( 'Log lines are not collected in wp-content/debug.log. Depending on your host they may go to the server error log instead, or nowhere at all. Add define( \'WP_DEBUG_LOG\', true ); to your wp-config.php file to save them to a file.', 'fotogrids' );
+		}
+
 		return array(
-			'wp_debug' => $wp_debug,
-			'channels' => $channels,
-			'note'     => $wp_debug
-				? __( 'These toggles only take effect while WP_DEBUG is true. The constant override always wins.', 'fotogrids' )
-				: __( 'WP_DEBUG is off, so FotoGrids is not writing any debug-log lines. Set WP_DEBUG to true in wp-config.php to use these toggles.', 'fotogrids' ),
+			'wp_debug'     => $wp_debug,
+			'wp_debug_log' => $wp_debug_log,
+			'channels'     => $channels,
+			'notice_title' => $notice_title,
+			'notice'       => $notice,
+			'note'         => __( 'Each channel can also be locked from your wp-config.php file using the constant shown under its name - for example define( \'FOTOGRIDS_DEBUG_CATALOG\', true );. A channel whose constant is set ignores the toggle here and shows as locked.', 'fotogrids' ),
 		);
 	}
 

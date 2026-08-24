@@ -4,6 +4,7 @@ import Toggle from '../../shared/Toggle';
 import { Confirm } from '../../shared/Modal';
 import { Button } from '../../shared/Button';
 import InfoBlock from '../../shared/InfoBlock';
+import StatusLight from '../../shared/StatusLight';
 import {
     SettingsPanel,
     PanelRow,
@@ -11,7 +12,7 @@ import {
     SaveBar,
 } from '../../shared/settings';
 
-const { __ } = wp.i18n;
+const { __, sprintf } = wp.i18n;
 
 // Untranslated on purpose: the user has to type this string exactly.
 const CONFIRM_KEYWORD = 'CONFIRM';
@@ -24,8 +25,10 @@ const CONFIRM_KEYWORD = 'CONFIRM';
  *     database tables") with a confirm modal each, gated to admins on the
  *     server side by the `manage_fotogrids` capability.
  *  2. Debug Log - one toggle per channel exposed by the PHP Debug_Log helper.
- *     Renders only when WP_DEBUG is true on the server. Channels overridden
- *     by a FOTOGRIDS_DEBUG_<UPPER_SLUG> constant render as locked rows.
+ *     The panel header reports the server's WP_DEBUG and WP_DEBUG_LOG state as
+ *     status lights, and an InfoBlock explains whichever of the two is off.
+ *     Each row prints its FOTOGRIDS_DEBUG_<UPPER_SLUG> constant; channels
+ *     overridden by that constant render as locked rows.
  *
  * All state lives in this component. The destructive actions are imperative
  * (no dirty-state tracking) - they execute on confirm. The Debug Log panel
@@ -33,15 +36,6 @@ const CONFIRM_KEYWORD = 'CONFIRM';
  * stage their channel selections before persisting them.
  */
 const MaintenanceTab = () => {
-    const seed = window.fotogridsAdmin || {};
-    // wp_localize_script stringifies scalar values, so a PHP `true` arrives in
-    // JS as the string '1'. Coerce here so the panel renders whether the
-    // localize call sends a real boolean, '1', or 'true'.
-    const wpDebugOn = seed.wpDebug === true
-        || seed.wpDebug === '1'
-        || seed.wpDebug === 'true'
-        || seed.wpDebug === 1;
-
     // `pending` holds the action key currently being confirmed by the modal
     // (null if the modal is closed). `running` is the action key whose REST
     // call is in-flight. `result` is the most recent {kind: 'reset' |
@@ -131,19 +125,28 @@ const MaintenanceTab = () => {
 
     const activeConfirm = pending ? confirmConfig[pending] : null;
 
-    // `null` while the initial GET is in flight; an array once loaded; never
-    // observed when WP_DEBUG is off (the panel is skipped entirely).
     const [debugLoaded, setDebugLoaded] = useState(false);
     const [debugChannels, setDebugChannels] = useState([]);
     const [debugNote, setDebugNote] = useState('');
+    const [debugNotice, setDebugNotice] = useState(null);
+    const [wpDebug, setWpDebug] = useState(false);
+    const [wpDebugLog, setWpDebugLog] = useState(false);
     const [savedEnabled, setSavedEnabled] = useState([]);
     const [enabled, setEnabled] = useState([]);
     const [debugSaving, setDebugSaving] = useState(false);
     const [debugStatus, setDebugStatus] = useState(null);
 
-    useEffect(() => {
-        if (!wpDebugOn) return undefined;
+    // The GET and POST responses carry identical environment metadata.
+    const applyDebugMeta = useCallback((data) => {
+        setDebugNote(data?.note || '');
+        setWpDebug(data?.wp_debug === true);
+        setWpDebugLog(data?.wp_debug_log === true);
+        setDebugNotice(data?.notice
+            ? { title: data?.notice_title || '', description: data.notice }
+            : null);
+    }, []);
 
+    useEffect(() => {
         let active = true;
         apiFetch({ path: '/fotogrids/v1/admin/maintenance/debug-channels' })
             .then((data) => {
@@ -153,7 +156,7 @@ const MaintenanceTab = () => {
                     .filter((channel) => channel.enabled === true)
                     .map((channel) => channel.slug);
                 setDebugChannels(channels);
-                setDebugNote(data?.note || '');
+                applyDebugMeta(data);
                 setSavedEnabled(enabledSlugs);
                 setEnabled(enabledSlugs);
                 setDebugLoaded(true);
@@ -163,7 +166,7 @@ const MaintenanceTab = () => {
             });
 
         return () => { active = false; };
-    }, [wpDebugOn]);
+    }, [applyDebugMeta]);
 
     const debugDirty = useMemo(() => {
         // Compare as sorted sets so order changes don't show as dirty.
@@ -198,7 +201,7 @@ const MaintenanceTab = () => {
                 .filter((channel) => channel.enabled === true)
                 .map((channel) => channel.slug);
             setDebugChannels(channels);
-            setDebugNote(data?.note || '');
+            applyDebugMeta(data);
             setSavedEnabled(enabledSlugs);
             setEnabled(enabledSlugs);
             setDebugStatus('saved');
@@ -269,54 +272,90 @@ const MaintenanceTab = () => {
                 )}
             </SettingsPanel>
 
-            {wpDebugOn && (
-                <SettingsPanel
-                    title={__('Debug Log', 'fotogrids')}
-                    description={__('FotoGrids writes structured `[FotoGrids …]` lines to your WordPress debug.log while WP_DEBUG is on. Turn on only the channels you need - everything is off by default.', 'fotogrids')}
-                >
-                    {!debugLoaded && (
-                        <PanelRow title={__('Loading channels…', 'fotogrids')} fullWidth>
-                            <span aria-hidden="true" />
-                        </PanelRow>
-                    )}
-
-                    {debugLoaded && debugChannels.length === 0 && (
-                        <PanelRow title={__('No channels available.', 'fotogrids')} fullWidth>
-                            <span aria-hidden="true" />
-                        </PanelRow>
-                    )}
-
-                    {debugLoaded && debugChannels.map((channel) => {
-                        const isForced = channel.forced_by_constant === true;
-                        const checked = isForced ? channel.forced_value === true : enabled.includes(channel.slug);
-                        const description = isForced
-                            ? `${channel.description} ${__('Locked by constant', 'fotogrids')} ${channel.constant_name}.`
-                            : channel.description;
-                        return (
-                            <PanelRow
-                                key={channel.slug}
-                                title={channel.label}
-                                description={description}
-                                htmlFor={`fotogrids_debug_channel_${channel.slug}`}
-                            >
-                                <Toggle
-                                    id={`fotogrids_debug_channel_${channel.slug}`}
-                                    checked={checked}
-                                    onChange={(value) => toggleChannel(channel.slug, value)}
-                                    disabled={isForced}
-                                />
-                            </PanelRow>
-                        );
-                    })}
-
-                    {debugLoaded && debugNote && (
-                        <InfoBlock
-                            title={__('Note', 'fotogrids')}
-                            description={debugNote}
+            <SettingsPanel
+                title={__('Debug Log', 'fotogrids')}
+                description={__('Turn on only the channels you need - everything is off by default.', 'fotogrids')}
+                action={debugLoaded && debugChannels.length > 0 && (
+                    <div className="fotogrids-status-lights">
+                        <StatusLight
+                            label="WP_DEBUG"
+                            state={wpDebug ? 'on' : 'off'}
+                            stateLabel={wpDebug ? __('On', 'fotogrids') : __('Off', 'fotogrids')}
                         />
-                    )}
-                </SettingsPanel>
-            )}
+                        <StatusLight
+                            label="WP_DEBUG_LOG"
+                            state={wpDebug ? (wpDebugLog ? 'on' : 'off') : 'muted'}
+                            stateLabel={!wpDebug
+                                ? __('Not used', 'fotogrids')
+                                : (wpDebugLog ? __('On', 'fotogrids') : __('Off', 'fotogrids'))}
+                        />
+                    </div>
+                )}
+            >
+                {!debugLoaded && (
+                    <PanelRow title={__('Loading channels…', 'fotogrids')} fullWidth>
+                        <span aria-hidden="true" />
+                    </PanelRow>
+                )}
+
+                {debugLoaded && debugChannels.length === 0 && (
+                    <PanelRow title={__('No channels available.', 'fotogrids')} fullWidth>
+                        <span aria-hidden="true" />
+                    </PanelRow>
+                )}
+
+                {debugLoaded && debugChannels.map((channel) => {
+                    const isForced = channel.forced_by_constant === true;
+                    const checked = isForced ? channel.forced_value === true : enabled.includes(channel.slug);
+
+                    let constantLine = channel.constant_name;
+                    if (isForced && channel.forced_value === true) {
+                        /* translators: %s: PHP constant name. */
+                        constantLine = sprintf(__('Locked on by %s in wp-config.php', 'fotogrids'), channel.constant_name);
+                    } else if (isForced) {
+                        /* translators: %s: PHP constant name. */
+                        constantLine = sprintf(__('Locked off by %s in wp-config.php', 'fotogrids'), channel.constant_name);
+                    }
+
+                    const description = (
+                        <>
+                            {channel.description}
+                            <span className="fotogrids-debug-channel__constant">{constantLine}</span>
+                        </>
+                    );
+
+                    return (
+                        <PanelRow
+                            key={channel.slug}
+                            title={channel.label}
+                            description={description}
+                            htmlFor={`fotogrids_debug_channel_${channel.slug}`}
+                        >
+                            <Toggle
+                                id={`fotogrids_debug_channel_${channel.slug}`}
+                                checked={checked}
+                                onChange={(value) => toggleChannel(channel.slug, value)}
+                                disabled={isForced || !wpDebug}
+                            />
+                        </PanelRow>
+                    );
+                })}
+
+                {debugLoaded && debugNotice && (
+                    <InfoBlock
+                        icon="alert_circle"
+                        title={debugNotice.title}
+                        description={debugNotice.description}
+                    />
+                )}
+
+                {debugLoaded && debugNote && (
+                    <InfoBlock
+                        title={__('Note', 'fotogrids')}
+                        description={debugNote}
+                    />
+                )}
+            </SettingsPanel>
 
             <SaveBar
                 dirty={debugDirty}
