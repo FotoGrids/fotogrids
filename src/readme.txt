@@ -20,7 +20,7 @@ We built FotoGrids to respect your time, your site speed, and your creative visi
 
 No artificial limits. No dark patterns. No fake urgency timers. Just a gallery plugin built to earn its place on your site.
 
-[View Live Demos](https://go.fotogrids.com/demos/) &nbsp;|&nbsp; [Documentation](https://go.fotogrids.com/docs/) &nbsp;|&nbsp; [Free vs Pro](https://go.fotogrids.com/free-vs-pro/)
+[View Live Demos](https://go.fotogrids.com/demos/?utm_source=readme&utm_medium=wporg&utm_campaign=demos) &nbsp;|&nbsp; [Documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs) &nbsp;|&nbsp; [Free vs Pro](https://go.fotogrids.com/free-vs-pro/?utm_source=readme&utm_medium=wporg&utm_campaign=comparison)
 
 = Every layout your photos deserve =
 
@@ -114,7 +114,7 @@ The free version is a full kit on its own. **Pro layers on the rest** - more lay
 * **Integrations** - import from Google Photos, Dropbox, Instagram, Lightroom, and many more, with bulk import and editing.
 * **Agency tools** - white label, client proofing, multisite management, and many more for gallery management at scale.
 
-[Compare Free vs Pro &rarr;](https://go.fotogrids.com/free-vs-pro/?utm_source=plugin&utm_medium=readme&utm_campaign=comparison)
+[Compare Free vs Pro &rarr;](https://go.fotogrids.com/free-vs-pro/?utm_source=readme&utm_medium=wporg&utm_campaign=comparison)
 
 == Installation ==
 
@@ -152,11 +152,11 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 
 = Can I migrate from another gallery plugin? =
 
-Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/) for step-by-step guides.
+Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs&utm_content=faq) for step-by-step guides.
 
 = Where can I get support? =
 
-Free users can post in the [WordPress.org support forum](https://wordpress.org/support/plugin/fotogrids/). Pro users get priority support at [fotogrids.com](https://go.fotogrids.com/support/).
+Free users can post in the [WordPress.org support forum](https://wordpress.org/support/plugin/fotogrids/). Pro users get priority support at [fotogrids.com](https://go.fotogrids.com/support/?utm_source=readme&utm_medium=wporg&utm_campaign=support).
 
 == Screenshots ==
 
