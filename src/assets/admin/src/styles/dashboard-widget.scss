@@ -14,17 +14,14 @@
 		justify-content: space-between;
 		align-items: center;
 		background: white;
-		margin: 0 -12px 0;
-		padding: 0 12px 12px;
+		margin: 0 0 12px;
 		gap: 16px;
-		flex-wrap: wrap;
 
 		.fotogrids-dw-header-left {
 			display: flex;
 			align-items: center;
 			gap: 12px;
 			flex: 1;
-			min-width: 200px;
 
 			.fotogrids-dw-logo {
 				display: flex;
@@ -48,7 +45,60 @@
 		.fotogrids-dw-header-right {
 			display: flex;
 			gap: 8px;
-			flex-wrap: wrap;
+		}
+
+		.fotogrids-dw-create {
+			position: relative;
+
+			.fotogrids-dw-create-toggle {
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.fotogrids-dw-create-caret {
+				display: inline-flex;
+				width: 12px;
+				height: 12px;
+			}
+
+			.fotogrids-dw-create-menu {
+				position: absolute;
+				inset-inline-end: 0;
+				top: calc(100% + 4px);
+				z-index: 10;
+				width: 100%;
+				padding: 4px 0;
+				background: #fff;
+				border: 1px solid #dcdcde;
+				border-radius: 4px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+				&[hidden] {
+					display: none;
+				}
+
+				a {
+					display: block;
+					padding: 6px 12px;
+					color: #1e1e1e;
+					text-decoration: none;
+					font-size: 13px;
+
+					&:hover,
+					&:focus-visible {
+						background: #f0f0f1;
+						color: var(--fg-blue, #3c46f0);
+					}
+
+					// The menu moves focus to the first item on open, which
+					// wp-admin paints with its own a:focus ring.
+					&:focus:not(:focus-visible) {
+						box-shadow: none;
+						outline: none;
+					}
+				}
+			}
 		}
 	}
 
@@ -174,6 +224,22 @@
 				}
 
 				.fotogrids-dw-recent-item-title {
+					display: flex;
+					align-items: center;
+					gap: 6px;
+
+					.fotogrids-dw-recent-tag {
+						flex: 0 0 auto;
+						font-size: 9px;
+						font-weight: 600;
+						line-height: 1.4;
+						text-transform: uppercase;
+						padding: 1px 4px;
+						border-radius: 3px;
+						color: #fff;
+						background: #8c8f94;
+					}
+
 					a {
 						text-decoration: none;
 						display: flex;
@@ -311,9 +377,11 @@
 					border-inline-start: 1px solid #f0f0f1;
 				}
 
-				.dashicons {
-					margin-right: 0;
-					margin-left: 0;
+				.fotogrids-dw-external-icon {
+					display: inline-flex;
+					width: 13px;
+					height: 13px;
+					flex: 0 0 auto;
 				}
 			}
 		}

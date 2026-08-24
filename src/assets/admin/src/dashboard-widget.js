@@ -1,8 +1,9 @@
 /**
  * FotoGrids Dashboard Widget JavaScript
  *
- * Fills the News & Updates list from /fotogrids/v1/admin/news. Stats and the
- * recently-edited list are rendered server-side.
+ * Fills the News & Updates list from /fotogrids/v1/admin/news and drives the
+ * Create New menu. Stats and the recently-edited list are rendered
+ * server-side.
  */
 
 (function () {
@@ -19,11 +20,7 @@
 		i18n || {}
 	);
 
-	if (!restUrl) {
-		return;
-	}
-
-	if (typeof wp !== 'undefined' && wp.apiFetch && restNonce) {
+	if (restUrl && typeof wp !== 'undefined' && wp.apiFetch && restNonce) {
 		wp.apiFetch.use(wp.apiFetch.createNonceMiddleware(restNonce));
 	}
 
@@ -117,8 +114,56 @@
 		renderItems(container, items);
 	}
 
+	function initCreateMenu() {
+		const toggle = document.querySelector('.fotogrids-dw-create-toggle');
+		const menu = document.getElementById('fotogrids-dw-create-menu');
+
+		if (!toggle || !menu) {
+			return;
+		}
+
+		const setOpen = (open) => {
+			menu.hidden = !open;
+			toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+		};
+
+		toggle.addEventListener('click', (event) => {
+			event.preventDefault();
+			const willOpen = menu.hidden;
+			setOpen(willOpen);
+			if (willOpen) {
+				const first = menu.querySelector('a');
+				if (first) {
+					first.focus();
+				}
+			}
+		});
+
+		document.addEventListener('click', (event) => {
+			if (menu.hidden) {
+				return;
+			}
+			if (
+				!menu.contains(event.target) &&
+				!toggle.contains(event.target)
+			) {
+				setOpen(false);
+			}
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key !== 'Escape' || menu.hidden) {
+				return;
+			}
+			setOpen(false);
+			toggle.focus();
+		});
+	}
+
 	function init() {
-		if (typeof wp === 'undefined' || !wp.apiFetch) {
+		initCreateMenu();
+
+		if (!restUrl || typeof wp === 'undefined' || !wp.apiFetch) {
 			return;
 		}
 
