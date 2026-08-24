@@ -16,9 +16,24 @@ const flushAsync = async () => {
 
 describe('dashboard-widget', () => {
 	beforeEach(() => {
-		jest.useFakeTimers();
-		document.body.innerHTML =
-			'<div id="fotogrids-dw-news-list"></div>';
+		document.body.innerHTML = `
+			<div class="fotogrids-dw-header-right">
+				<div class="fotogrids-dw-create">
+					<button
+						class="fotogrids-dw-create-toggle"
+						aria-expanded="false"
+						aria-controls="fotogrids-dw-create-menu"
+					></button>
+					<div class="fotogrids-dw-create-menu" id="fotogrids-dw-create-menu" hidden>
+						<a href="#gallery">Gallery</a>
+						<a href="#album">Album</a>
+					</div>
+				</div>
+			</div>
+			<div class="fotogrids-dw-news">
+				<div id="fotogrids-dw-news-list"></div>
+			</div>
+		`;
 		window.fotogridsDashboard = {
 			restUrl: 'https://x/wp-json/fotogrids/v1/',
 			restNonce: 'n',
@@ -30,7 +45,6 @@ describe('dashboard-widget', () => {
 	});
 
 	afterEach(() => {
-		jest.useRealTimers();
 		delete window.fotogridsDashboard;
 		document.body.innerHTML = '';
 	});
@@ -38,86 +52,168 @@ describe('dashboard-widget', () => {
 	const load = () =>
 		jest.isolateModules(() => require('@/admin/src/dashboard-widget'));
 
+	const newsHtml = () =>
+		document.getElementById('fotogrids-dw-news-list').innerHTML;
+
 	it('bails when restUrl is missing', () => {
 		delete window.fotogridsDashboard;
 		expect(() => load()).not.toThrow();
 	});
 
 	it('renders fetched news items into the list', async () => {
-		global.wp.apiFetch.mockResolvedValue([
-			{ title: 'Hello', description: 'World', url: 'https://x.test' },
-		]);
+		global.wp.apiFetch.mockResolvedValue({
+			enabled: true,
+			items: [
+				{
+					title: 'Hello',
+					summary: 'World',
+					url: 'https://x.test',
+					date_label: 'May 1, 2026',
+				},
+			],
+		});
 		load();
-		jest.advanceTimersByTime(150);
 		await flushAsync();
-		expect(document.getElementById('fotogrids-dw-news-list').innerHTML).toContain(
-			'Hello'
-		);
+		const html = newsHtml();
+		expect(html).toContain('Hello');
+		expect(html).toContain('World');
+		expect(html).toContain('May 1, 2026');
+		expect(html).toContain('href="https://x.test"');
+	});
+
+	it('tags every item as New', async () => {
+		global.wp.apiFetch.mockResolvedValue({
+			enabled: true,
+			items: [
+				{ title: 'One', url: 'https://x.test' },
+				{ title: 'Two', url: 'https://y.test' },
+			],
+		});
+		load();
+		await flushAsync();
+		expect(
+			document.querySelectorAll('.fotogrids-dw-news-tag')
+		).toHaveLength(2);
+	});
+
+	it('renders a title without a link when the item has no url', async () => {
+		global.wp.apiFetch.mockResolvedValue({
+			enabled: true,
+			items: [{ title: 'Unlinked' }],
+		});
+		load();
+		await flushAsync();
+		expect(newsHtml()).toContain('Unlinked');
+		expect(newsHtml()).not.toContain('<a');
+	});
+
+	it('caps the list at four items', async () => {
+		global.wp.apiFetch.mockResolvedValue({
+			enabled: true,
+			items: Array.from({ length: 7 }, (_, i) => ({
+				title: `Item ${i}`,
+				url: 'https://x.test',
+			})),
+		});
+		load();
+		await flushAsync();
+		expect(
+			document.querySelectorAll('.fotogrids-dw-news-item')
+		).toHaveLength(4);
 	});
 
 	it('shows an empty state when there is no news', async () => {
-		global.wp.apiFetch.mockResolvedValue([]);
+		global.wp.apiFetch.mockResolvedValue({ enabled: true, items: [] });
 		load();
-		jest.advanceTimersByTime(150);
 		await flushAsync();
-		expect(
-			document.querySelector('.fotogrids-dw-empty')
-		).not.toBeNull();
+		expect(document.querySelector('.fotogrids-dw-empty')).not.toBeNull();
 	});
 
 	it('shows an error state when the request fails', async () => {
-		const err = jest.spyOn(console, 'error').mockImplementation(() => {});
 		global.wp.apiFetch.mockRejectedValue(new Error('boom'));
 		load();
-		jest.advanceTimersByTime(150);
 		await flushAsync();
-		expect(
-			document.querySelector('.fotogrids-dw-empty')
-		).not.toBeNull();
-		err.mockRestore();
+		expect(document.querySelector('.fotogrids-dw-empty')).not.toBeNull();
 	});
 
-	it('normalizes a { data: [...] } response shape', async () => {
-		global.wp.apiFetch.mockResolvedValue({
-			data: [{ title: 'Wrapped', description: 'd', url: 'https://x.test' }],
-		});
+	it('hides the whole section when the feed is turned off', async () => {
+		global.wp.apiFetch.mockResolvedValue({ enabled: false, items: [] });
 		load();
-		jest.advanceTimersByTime(150);
 		await flushAsync();
-		expect(
-			document.getElementById('fotogrids-dw-news-list').innerHTML
-		).toContain('Wrapped');
-	});
-
-	it('normalizes an object whose first value is the news array', async () => {
-		global.wp.apiFetch.mockResolvedValue({
-			items: [{ title: 'FirstVal', description: 'd', url: 'https://x.test' }],
-		});
-		load();
-		jest.advanceTimersByTime(150);
-		await flushAsync();
-		expect(
-			document.getElementById('fotogrids-dw-news-list').innerHTML
-		).toContain('FirstVal');
+		expect(document.querySelector('.fotogrids-dw-news').hidden).toBe(true);
 	});
 
 	it('falls back to the empty state for an unusable response shape', async () => {
 		global.wp.apiFetch.mockResolvedValue({ unexpected: 'string' });
 		load();
-		jest.advanceTimersByTime(150);
 		await flushAsync();
 		expect(document.querySelector('.fotogrids-dw-empty')).not.toBeNull();
 	});
 
-	it('escapes HTML in news titles/descriptions', async () => {
-		global.wp.apiFetch.mockResolvedValue([
-			{ title: '<b>x</b>', description: '<i>y</i>', url: 'https://x.test' },
-		]);
+	it('escapes HTML in news titles and summaries', async () => {
+		global.wp.apiFetch.mockResolvedValue({
+			enabled: true,
+			items: [
+				{
+					title: '<b>x</b>',
+					summary: '<i>y</i>',
+					url: 'https://x.test',
+				},
+			],
+		});
 		load();
-		jest.advanceTimersByTime(150);
 		await flushAsync();
-		const html = document.getElementById('fotogrids-dw-news-list').innerHTML;
+		const html = newsHtml();
 		expect(html).toContain('&lt;b&gt;');
+		expect(html).toContain('&lt;i&gt;');
+	});
+
+	describe('create menu', () => {
+		const toggle = () =>
+			document.querySelector('.fotogrids-dw-create-toggle');
+		const menu = () => document.getElementById('fotogrids-dw-create-menu');
+
+		beforeEach(() => {
+			global.wp.apiFetch.mockResolvedValue({ enabled: true, items: [] });
+		});
+
+		it('opens on click and reflects the state on the toggle', () => {
+			load();
+			toggle().click();
+			expect(menu().hidden).toBe(false);
+			expect(toggle().getAttribute('aria-expanded')).toBe('true');
+		});
+
+		it('closes on a second click', () => {
+			load();
+			toggle().click();
+			toggle().click();
+			expect(menu().hidden).toBe(true);
+			expect(toggle().getAttribute('aria-expanded')).toBe('false');
+		});
+
+		it('closes on Escape', () => {
+			load();
+			toggle().click();
+			document.dispatchEvent(
+				new window.KeyboardEvent('keydown', { key: 'Escape' })
+			);
+			expect(menu().hidden).toBe(true);
+		});
+
+		it('closes when clicking outside', () => {
+			load();
+			toggle().click();
+			document.body.click();
+			expect(menu().hidden).toBe(true);
+		});
+
+		it('wires up even without a news list', () => {
+			document.getElementById('fotogrids-dw-news-list').remove();
+			load();
+			toggle().click();
+			expect(menu().hidden).toBe(false);
+		});
 	});
 });
 

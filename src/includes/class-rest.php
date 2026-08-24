@@ -78,6 +78,7 @@ class REST {
 
 		// Admin files
 		require_once $base_path . 'admin/admin-permissions.php';
+		require_once $base_path . 'admin/class-news-feed.php';
 		require_once $base_path . 'admin/admin-data.php';
 		require_once $base_path . 'admin/register-admin-routes.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-rest-endpoint.php';

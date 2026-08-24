@@ -430,6 +430,10 @@ class Register_Admin_Routes {
 							'type'    => 'boolean',
 							'default' => false,
 						),
+						'allow_news_updates'       => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
 						'delete_data_on_uninstall' => array(
 							'type'    => 'boolean',
 							'default' => false,
@@ -617,6 +621,20 @@ class Register_Admin_Routes {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_recently_edited' ),
+					'args'                => array(
+						'limit'           => array(
+							'default'           => 10,
+							'type'              => 'integer',
+							'minimum'           => 1,
+							'maximum'           => 50,
+							'sanitize_callback' => 'absint',
+						),
+						'include_private' => array(
+							'default'           => false,
+							'type'              => 'boolean',
+							'sanitize_callback' => 'rest_sanitize_boolean',
+						),
+					),
 					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
 				),
 			)
@@ -630,6 +648,13 @@ class Register_Admin_Routes {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_news_updates' ),
+					'args'                => array(
+						'refresh' => array(
+							'default'           => false,
+							'type'              => 'boolean',
+							'sanitize_callback' => 'rest_sanitize_boolean',
+						),
+					),
 					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
 				),
 			)

@@ -611,6 +611,7 @@ class Admin_Data {
 				'share_statistics'         => $request->get_param( 'share_statistics' ),
 				'marketing_allowed'        => $request->get_param( 'marketing_allowed' ),
 				'allow_google_fonts'       => $request->get_param( 'allow_google_fonts' ),
+				'allow_news_updates'       => $request->get_param( 'allow_news_updates' ),
 				'delete_data_on_uninstall' => $request->get_param( 'delete_data_on_uninstall' ),
 			)
 		);
@@ -1253,49 +1254,100 @@ class Admin_Data {
 	 * @param \WP_REST_Request $request Request object
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
-	public static function get_recently_edited( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+	public static function get_recently_edited( $request ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
 		}
 
+		$post_status = array( 'publish', 'draft' );
+		if ( $request->get_param( 'include_private' ) ) {
+			$post_status[] = 'private';
+		}
+
+		return rest_ensure_response(
+			array(
+				'items' => self::fetch_recently_edited(
+					array(
+						'limit'       => (int) $request->get_param( 'limit' ),
+						'post_status' => $post_status,
+					)
+				),
+			)
+		);
+	}
+
+	/**
+	 * Recently edited galleries and albums
+	 *
+	 * Shared by the REST route above and the dashboard widget, which renders
+	 * the same rows server-side with its own limit and status set.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, mixed> $args Optional. Keys: limit, post_type, post_status.
+	 * @return array<int, array<string, mixed>> Normalized rows, newest first.
+	 */
+	public static function fetch_recently_edited( array $args = array() ): array {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'limit'       => 10,
+				'post_type'   => array( 'fotogrids_gallery', 'fotogrids_album' ),
+				'post_status' => array( 'publish', 'draft' ),
+			)
+		);
+
 		$posts = get_posts(
 			array(
-				'post_type'      => array( 'fotogrids_gallery', 'fotogrids_album' ),
-				'post_status'    => array( 'publish', 'draft' ),
-				'posts_per_page' => 10,
+				'post_type'      => $args['post_type'],
+				'post_status'    => $args['post_status'],
+				'posts_per_page' => (int) $args['limit'],
 				'orderby'        => 'modified',
 				'order'          => 'DESC',
 			)
 		);
 
+		$datetime_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+
 		$items = array();
 		foreach ( $posts as $post ) {
+			$is_album = 'fotogrids_album' === $post->post_type;
+
 			$items[] = array(
-				'id'           => $post->ID,
-				'title'        => $post->post_title ?: __( '(no title)', 'fotogrids' ),
-				'type'         => $post->post_type,
-				'status'       => $post->post_status,
-				'modified'     => $post->post_modified,
-				'modified_gmt' => $post->post_modified_gmt,
-				'edit_url'     => get_edit_post_link( $post->ID, 'raw' ),
+				'id'                 => $post->ID,
+				'title'              => trim( $post->post_title ),
+				'untitled_label'     => $is_album ? __( 'Untitled Album', 'fotogrids' ) : __( 'Untitled Gallery', 'fotogrids' ),
+				'type'               => $post->post_type,
+				'type_label'         => $is_album ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' ),
+				'status'             => $post->post_status,
+				'modified'           => $post->post_modified,
+				'modified_gmt'       => $post->post_modified_gmt,
+				'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
+				'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
 			);
 		}
 
-		return rest_ensure_response( array( 'items' => $items ) );
+		return $items;
 	}
 
 	/**
-	 * Get news and updates
+	 * Get news and updates for the dashboard widget
 	 *
 	 * @param \WP_REST_Request $request Request object
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
-	public static function get_news_updates( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+	public static function get_news_updates( $request ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
 		}
 
-		return rest_ensure_response( array( 'items' => array() ) );
+		$refresh = (bool) $request->get_param( 'refresh' );
+
+		return rest_ensure_response(
+			array(
+				'enabled' => News_Feed::is_enabled(),
+				'items'   => News_Feed::get_items( $refresh ),
+			)
+		);
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

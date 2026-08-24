@@ -22,7 +22,7 @@ No artificial limits. No dark patterns. No fake urgency timers. Just a gallery p
 
 [View Live Demos](https://go.fotogrids.com/demos/?utm_source=readme&utm_medium=wporg&utm_campaign=demos) &nbsp;|&nbsp; [Documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs) &nbsp;|&nbsp; [Free vs Pro](https://go.fotogrids.com/free-vs-pro/?utm_source=readme&utm_medium=wporg&utm_campaign=comparison)
 
-= Every layout your photos deserve =
+= 🖼️ Every layout your photos deserve =
 
 FotoGrids ships **eight fully responsive layouts in the free version**, each crafted to make your images look their absolute best on every device:
 
@@ -37,11 +37,11 @@ FotoGrids ships **eight fully responsive layouts in the free version**, each cra
 
 Pick the one that fits and fine-tune spacing, aspect ratios, and hover effects - without writing a single line of CSS.
 
-= Photos and video, side by side =
+= 🎬 Photos and video, side by side =
 
 FotoGrids isn't image-only. Add videos straight from your Media Library, or embed from YouTube and Vimeo - they sit right alongside your photos in the same gallery and open in the same lightbox.
 
-= An immersive lightbox, built in =
+= 🔍 An immersive lightbox, built in =
 
 Click any image to open a full-screen fully-customizable lightbox with swipe gestures, keyboard navigation, captions and descriptions, an autoplay slideshow, and a share bar. It works on every device, loads instantly, and respects your visitors' accessibility out of the box.
 
@@ -49,13 +49,13 @@ Click any image to open a full-screen fully-customizable lightbox with swipe ges
 * Social sharing - share any image to Facebook, X, Pinterest, LinkedIn, WhatsApp, Telegram, Reddit, email, and copy-link. Free, and built in.
 * Deep linking - link straight to a single image inside a gallery.
 
-= Sorting, filtering, and EXIF - standard with FotoGrids =
+= 🏷️ Sorting, filtering, and EXIF - standard with FotoGrids =
 
 * **Sorting** - order items by date, title, filename, manually, or at random.
 * **Filtering** - let visitors filter a gallery by tag, person (Pro), or location (Pro), right on the page.
 * **EXIF details** - capture and display camera, lens, aperture, and shutter data from your originals.
 
-= Effortless by design =
+= 🖱️ Effortless by design =
 
 Whether you're a solo photographer with 10,000 images or an agency juggling 20 client sites, FotoGrids fits how you already work.
 
@@ -63,12 +63,12 @@ Whether you're a solo photographer with 10,000 images or an agency juggling 20 c
 * **Unlimited albums & collections** - group related galleries into albums and display an entire collection with a single shortcode. No caps on galleries or albums. Perfect for portfolios, product catalogs, and event series.
 * **Rich image details** - add per-image captions, descriptions, alt text, tags, people, and location data. Great for SEO and accessibility.
 
-= Start from a template =
+= 🧩 Start from a template =
 
 You don't have to build from a blank canvas. FotoGrids ships with a library of ready-made templates - pick one, drop in your images, swap a few colors, and publish. The free version includes templates to get you going, and Pro adds 30+ more designed for portfolios, shops, real estate, and editorial work.
 With Pro you can even save your own settings as a reusable template, so every gallery on your site shares the same look.
 
-= Built for speed and search engines =
+= ⚡ Built for speed and search engines =
 
 FotoGrids renders your galleries server-side as clean, semantic HTML, then loads only the assets each gallery actually needs. Your galleries work as hard for Google as they do for your visitors.
 
@@ -78,18 +78,18 @@ FotoGrids renders your galleries server-side as clean, semantic HTML, then loads
 * Pagination for large galleries.
 * Built with vanilla JavaScript - no jQuery dependency.
 
-= Analytics without a third party =
+= 📊 Analytics without a third party =
 
 Track views and interactions per gallery right inside your WordPress dashboard. Know which galleries perform and which images get the most attention - no Google Analytics account required.
 
-= Works everywhere you build =
+= 🔌 Works everywhere you build =
 
 * **Gutenberg blocks** - add a gallery or album block in the WordPress editor.
 * **Shortcodes** - drop `[fotogrids_gallery id="123"]` or `[fotogrids_album id="123"]` into any post, page, or widget.
 * **Any theme** - galleries inherit your site's width and styling.
 * **Page builders** - Elementor, Divi, and Bricks work in the free version; Pro adds enhanced widgets and controls.
 
-= A complete toolkit, not just a plugin =
+= 🧰 A complete toolkit, not just a plugin =
 
 From drag-and-drop simplicity to REST API power, FotoGrids is built to handle anything, for anyone:
 
@@ -98,7 +98,7 @@ From drag-and-drop simplicity to REST API power, FotoGrids is built to handle an
 * **Bloggers & creators** - beautiful galleries the same day you publish, no code required.
 * **Online shops** - display products beautifully, then sell them with Pro.
 
-= FotoGrids Pro =
+= 🔥 FotoGrids Pro =
 
 The free version is a full kit on its own. **Pro layers on the rest** - more layouts, more analytics insights, more control and conversion tools.
 
@@ -192,7 +192,7 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 = 1.0.0 =
 Build stunning WordPress galleries fast. Eight layouts, video, sliders, an immersive lightbox, albums, templates, and built-in statistics - beautiful by default.
 
-== Development ==
+== 🛠️ Development ==
 
 FotoGrids is developed in the open. The complete, human-readable source - PHP, un-minified JavaScript, and SCSS - together with the build tooling lives in our public repository:
 
@@ -202,27 +202,27 @@ The compiled JavaScript and CSS shipped in the plugin's assets directory are bui
 
 Bundled third-party libraries:
 
-* Chart.js 4.4.0 (https://www.chartjs.org/) - MIT License - used for the admin analytics charts.
-* Freemius WordPress SDK (https://github.com/Freemius/wordpress-sdk) - GPLv2-or-later - used for activation, updates, and licensing.
+* **Chart.js 4.4.0** (https://www.chartjs.org/) - MIT License - used for the admin analytics charts.
+* **Freemius WordPress SDK** (https://github.com/Freemius/wordpress-sdk) - GPLv2-or-later - used for activation, updates, and licensing.
 
-== External Services ==
+== 🔗 External Services ==
 
 FotoGrids connects to a few external services. What each one does, when it runs, and what it sends is listed below.
 
-1. Freemius
+1. **Freemius**
 
 This plugin uses Freemius to handle activation, license management for FotoGrids Pro, and optional usage analytics. On activation you are shown an opt-in screen and can skip it. If you opt in, Freemius collects information such as your site URL, WordPress and PHP versions, active theme and plugins, and your administrator email. If you skip, this data is not sent. This service runs on plugin activation and when checking for updates or validating a license.
 
 Freemius terms of service: https://freemius.com/terms/
 Freemius privacy policy: https://freemius.com/privacy/
 
-2. FotoGrids usage statistics (optional, off by default)
+2. **FotoGrids usage statistics** (optional, off by default)
 
 If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes your site URL, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
-3. Google Fonts
+3. **Google Fonts**
 
 a) Admin font picker (metadata): When you open the FotoGrids settings where you choose a font, the plugin requests the public Google Fonts metadata list (https://fonts.google.com/metadata/fonts) from your server (not your visitors' browsers) to populate the font picker. The request is cached and sends no personal data. It runs only in wp-admin when the font picker is loaded.
 
@@ -231,24 +231,30 @@ b) Front-end font loading: When a gallery uses a Google Font (an administrator s
 Google privacy policy: https://policies.google.com/privacy
 Google Fonts FAQ: https://developers.google.com/fonts/faq/privacy
 
-4. YouTube and Vimeo oEmbed
+4. **YouTube and Vimeo oEmbed**
 
 When you add a YouTube or Vimeo video to a gallery, FotoGrids calls the relevant provider's public oEmbed endpoint to fetch the video's title and thumbnail. The video URL you entered is sent to that provider. This runs only when you add or resolve a video embed in the editor.
 
 YouTube/Google privacy policy: https://policies.google.com/privacy
 Vimeo privacy policy: https://vimeo.com/privacy
 
-5. FotoGrids Template Library
+5. **FotoGrids Template Library**
 
 When you browse the template library in the FotoGrids admin, the plugin requests the current template catalog from the FotoGrids library service (https://library.fotogrids.com). The request is made from your server (not your visitors' browsers), carries no personal data or site information, and the result is cached for 12 hours. If the service is unavailable, FotoGrids falls back to the templates bundled with the plugin. It runs only in wp-admin when the template library is loaded.
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
-== Privacy Policy ==
+6. **FotoGrids news**
 
-* Gallery statistics (views and shares) are stored locally in your own WordPress database.
-* No personal data is collected or sent to FotoGrids without your consent. The "Share anonymous statistics" setting is off by default.
-* External services are listed in the "External Services" section above, along with what each one sends and when.
-* FotoGrids is built to support GDPR and other privacy requirements.
+To fill the "News & Updates" list in the FotoGrids dashboard widget and the "What's New" panel, the plugin requests the latest posts in the News category from the public FotoGrids blog (https://www.fotogrids.com). The request is made from your server (not your visitors' browsers), carries no personal data or site information, and the result is cached for 12 hours. It runs only in wp-admin, when the dashboard widget or the What's New panel is opened. If the site is unavailable, the announcements bundled with the plugin are shown instead. You can turn it off with the "Show news" setting in FotoGrids > Settings > Advanced - when disabled, no request is made and neither surface shows news.
+
+FotoGrids privacy policy: https://go.fotogrids.com/privacy/
+
+== 🔒 Privacy Policy ==
+
+* **Gallery statistics** (views and shares) are stored locally in your own WordPress database.
+* **No personal data** is collected or sent to FotoGrids without your consent. The "Share anonymous statistics" setting is off by default.
+* **External services** are listed in the "External Services" section above, along with what each one sends and when.
+* FotoGrids is built to support **GDPR** and other privacy requirements.
 
 For more details, see our [Privacy Policy](https://go.fotogrids.com/privacy/).

@@ -128,6 +128,7 @@ final class Plugin_Settings_Store {
 			),
 			'marketing_allowed'        => (bool) get_option( 'fotogrids_marketing_allowed', false ),
 			'allow_google_fonts'       => (bool) get_option( 'fotogrids_allow_google_fonts', true ),
+			'allow_news_updates'       => (bool) get_option( 'fotogrids_allow_news_updates', true ),
 			// UI: "delete on uninstall" - persisted as the inverse "preserve" flag.
 			'delete_data_on_uninstall' => ! (bool) get_option( 'fotogrids_preserve_data_on_uninstall', true ),
 		);
@@ -137,7 +138,7 @@ final class Plugin_Settings_Store {
 	 * Persist advanced settings from a raw map (REST params or POST).
 	 *
 	 * @param array<string, mixed> $input Keys: autosave, share_statistics,
-	 *        allow_google_fonts, delete_data_on_uninstall.
+	 *        allow_google_fonts, allow_news_updates, delete_data_on_uninstall.
 	 * @return array<string, bool> The stored settings.
 	 */
 	public static function save_advanced( array $input ): array {
@@ -156,6 +157,8 @@ final class Plugin_Settings_Store {
 		}
 
 		update_option( 'fotogrids_allow_google_fonts', self::truthy( $input['allow_google_fonts'] ?? false ) );
+
+		update_option( 'fotogrids_allow_news_updates', self::truthy( $input['allow_news_updates'] ?? false ) );
 
 		// Persist the inverse "preserve" flag the uninstaller reads.
 		$delete = self::truthy( $input['delete_data_on_uninstall'] ?? false );
