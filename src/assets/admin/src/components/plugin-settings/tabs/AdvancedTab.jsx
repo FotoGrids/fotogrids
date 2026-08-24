@@ -19,6 +19,7 @@ const DEFAULTS = {
     share_statistics: false,
     marketing_allowed: false,
     allow_google_fonts: true,
+    allow_news_updates: true,
     delete_data_on_uninstall: false,
 };
 
@@ -36,6 +37,7 @@ const AdvancedTab = () => {
         share_statistics: seed.shareStatistics === true,
         marketing_allowed: seed.marketingAllowed === true,
         allow_google_fonts: DEFAULTS.allow_google_fonts,
+        allow_news_updates: DEFAULTS.allow_news_updates,
         delete_data_on_uninstall: DEFAULTS.delete_data_on_uninstall,
     };
 
@@ -55,6 +57,7 @@ const AdvancedTab = () => {
                     share_statistics: data.settings.share_statistics === true,
                     marketing_allowed: data.settings.marketing_allowed === true,
                     allow_google_fonts: data.settings.allow_google_fonts === true,
+                    allow_news_updates: data.settings.allow_news_updates === true,
                     delete_data_on_uninstall: data.settings.delete_data_on_uninstall === true,
                 };
                 setSettings(s);
@@ -101,6 +104,7 @@ const AdvancedTab = () => {
                     share_statistics: result.settings.share_statistics === true,
                     marketing_allowed: result.settings.marketing_allowed === true,
                     allow_google_fonts: result.settings.allow_google_fonts === true,
+                    allow_news_updates: result.settings.allow_news_updates === true,
                     delete_data_on_uninstall: result.settings.delete_data_on_uninstall === true,
                 }
                 : settings;
@@ -194,6 +198,18 @@ const AdvancedTab = () => {
                         checked={settings.allow_google_fonts}
                         onChange={(v) => update('allow_google_fonts', v)}
                         label={__('Load Google Fonts', 'fotogrids')}
+                    />
+                </PanelRow>
+
+                <PanelRow
+                    title={__('FotoGrids news', 'fotogrids')}
+                    description={__('When enabled, FotoGrids fetches the latest announcements from fotogrids.com for the dashboard widget and the What\'s New panel. The request is made from your server, sends no site or personal data, and is cached for 12 hours. Disable to stop it entirely.', 'fotogrids')}
+                >
+                    <Toggle
+                        id="fotogrids_allow_news_updates"
+                        checked={settings.allow_news_updates}
+                        onChange={(v) => update('allow_news_updates', v)}
+                        label={__('Show news', 'fotogrids')}
                     />
                 </PanelRow>
             </SettingsPanel>

@@ -27,6 +27,7 @@ const Modal = ({
     isOpen,
     onClose,
     size = 'md',
+    position = 'center',
     hasSidebar = false,
     sidebarCollapsible = false,
     sidebarInitiallyCollapsed = false,
@@ -98,10 +99,13 @@ const Modal = ({
     });
 
     const baseClass = 'fg-modal';
+    const isDrawer = position === 'left' || position === 'right';
     const rootClasses = [
         `${baseClass}`,
         `${baseClass}--open`,
         `fg-modal--size-${ size }`,
+        isDrawer && `${baseClass}--drawer`,
+        isDrawer && `${baseClass}--drawer-${ position }`,
         hasSidebar && `${baseClass}--has-sidebar`,
         sidebarCollapsed && `${baseClass}--sidebar-collapsed`,
         compact && `${baseClass}--compact`,

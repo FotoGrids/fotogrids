@@ -161,14 +161,17 @@
 			background: white;
 			display: flex;
 			flex-direction: column;
-			gap: 8px;
-			border-top: 1px solid #f0f0f1;
-			padding-top: 8px;
+			box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
 
 			.fotogrids-dw-recent-item {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
+				padding: 4px 8px;
+
+				&:nth-child(odd of &) {
+					background-color: rgba(0, 0, 0, 0.04);
+				}
 
 				.fotogrids-dw-recent-item-title {
 					a {
@@ -182,6 +185,11 @@
 
 						&:hover .dashicons {
 							opacity: 1;
+						}
+
+						.fotogrids-dw-untitled {
+							color: #8c8f94;
+							font-weight: 400;
 						}
 					}
 				}
@@ -214,11 +222,10 @@
 
 		.fotogrids-dw-news-list {
 			background: white;
-			border-radius: 4px;
-			padding: 8px;
+			border-top: 1px solid #f0f0f1;
+			padding-top: 8px;
 
 			.fotogrids-dw-news-item {
-				padding: 12px;
 				border-bottom: 1px solid #f0f0f1;
 
 				&:last-child {
@@ -230,6 +237,9 @@
 					font-weight: 600;
 					color: #1e1e1e;
 					margin: 0 0 4px 0;
+					display: flex;
+					align-items: baseline;
+					gap: 6px;
 
 					a {
 						color: inherit;
@@ -246,6 +256,26 @@
 					color: #646970;
 					line-height: 1.5;
 					margin: 0;
+				}
+
+				.fotogrids-dw-news-item-date {
+					font-size: 11px;
+					color: #8c8f94;
+					margin-top: 4px;
+				}
+
+				.fotogrids-dw-news-tag {
+					flex: 0 0 auto;
+					font-size: 10px;
+					font-weight: 600;
+					line-height: 1.4;
+					text-transform: uppercase;
+					letter-spacing: 0.4px;
+					padding: 2px 6px;
+					margin-inline-end: 4px;
+					border-radius: 3px;
+					color: #fff;
+					background: var(--fg-blue, #3c46f0);
 				}
 			}
 

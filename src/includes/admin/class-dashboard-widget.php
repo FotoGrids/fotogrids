@@ -108,6 +108,11 @@ class Dashboard_Widget {
 						'restNonce' => wp_create_nonce( 'wp_rest' ),
 						'pluginUrl' => FOTOGRIDS_PLUGIN_URL,
 						'version'   => FOTOGRIDS_VERSION,
+						'i18n'      => array(
+							'error'  => __( 'Unable to load news and updates.', 'fotogrids' ),
+							'empty'  => __( 'No news available at this time.', 'fotogrids' ),
+							'newTag' => __( 'New', 'fotogrids' ),
+						),
 					)
 				);
 				break;
@@ -205,7 +210,12 @@ class Dashboard_Widget {
 							<div class="fotogrids-dw-recent-item">
 								<div class="fotogrids-dw-recent-item-title">
 									<a href="<?php echo esc_url( $item['edit_url'] ); ?>">
-										<?php echo esc_html( $item['title'] ); ?>
+										<?php if ( '' !== $item['title'] ) : ?>
+											<?php echo esc_html( $item['title'] ); ?>
+										<?php else : ?>
+											<span class="fotogrids-dw-untitled"><?php echo esc_html( $item['untitled_label'] ); ?></span>
+											<?php printf( '#%d', (int) $item['id'] ); ?>
+										<?php endif; ?>
 										<span class="dashicons dashicons-edit" />
 									</a>
 								</div>
@@ -319,7 +329,8 @@ class Dashboard_Widget {
 		foreach ( $galleries as $gallery ) {
 			$recent[] = array(
 				'id'                 => $gallery->ID,
-				'title'              => $gallery->post_title,
+				'title'              => trim( $gallery->post_title ),
+				'untitled_label'     => __( 'Untitled Gallery', 'fotogrids' ),
 				'type'               => 'gallery',
 				'edit_url'           => get_edit_post_link( $gallery->ID, 'raw' ),
 				'modified'           => $gallery->post_modified,
@@ -330,7 +341,8 @@ class Dashboard_Widget {
 		foreach ( $albums as $album ) {
 			$recent[] = array(
 				'id'                 => $album->ID,
-				'title'              => $album->post_title,
+				'title'              => trim( $album->post_title ),
+				'untitled_label'     => __( 'Untitled Album', 'fotogrids' ),
 				'type'               => 'album',
 				'edit_url'           => get_edit_post_link( $album->ID, 'raw' ),
 				'modified'           => $album->post_modified,

@@ -11,6 +11,8 @@ import type { ComponentType, ReactNode, MutableRefObject } from 'react';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full';
 
+export type ModalPosition = 'center' | 'left' | 'right';
+
 export type ConfirmVariant =
 	| 'info'
 	| 'question'
@@ -114,6 +116,7 @@ export interface ModalProps {
 	isOpen: boolean;
 	onClose: (reason: ModalCloseReason) => void;
 	size?: ModalSize;
+	position?: ModalPosition;
 	hasSidebar?: boolean;
 	sidebarCollapsible?: boolean;
 	sidebarInitiallyCollapsed?: boolean;

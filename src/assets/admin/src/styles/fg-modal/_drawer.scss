@@ -1,0 +1,49 @@
+.fg-modal--drawer {
+	.fg-modal__dialog {
+		top: 0;
+		bottom: 0;
+		left: auto;
+		right: 0;
+		transform: none;
+		width: var(--fg-modal-drawer-width, 440px);
+		height: 100%;
+		max-width: 100vw;
+		max-height: 100vh;
+		border-radius: 0;
+		box-shadow: -4px 0 24px rgba(0, 0, 0, 0.25);
+		animation: fg-modal-drawer-in 220ms ease-out;
+	}
+
+	&.fg-modal--drawer-left .fg-modal__dialog {
+		right: auto;
+		left: 0;
+		box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+		animation-name: fg-modal-drawer-in-left;
+	}
+}
+
+@keyframes fg-modal-drawer-in {
+	from {
+		transform: translateX(100%);
+	}
+
+	to {
+		transform: none;
+	}
+}
+
+@keyframes fg-modal-drawer-in-left {
+	from {
+		transform: translateX(-100%);
+	}
+
+	to {
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fg-modal--drawer .fg-modal__dialog {
+		animation: none;
+	}
+}

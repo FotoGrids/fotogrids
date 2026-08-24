@@ -611,6 +611,7 @@ class Admin_Data {
 				'share_statistics'         => $request->get_param( 'share_statistics' ),
 				'marketing_allowed'        => $request->get_param( 'marketing_allowed' ),
 				'allow_google_fonts'       => $request->get_param( 'allow_google_fonts' ),
+				'allow_news_updates'       => $request->get_param( 'allow_news_updates' ),
 				'delete_data_on_uninstall' => $request->get_param( 'delete_data_on_uninstall' ),
 			)
 		);
@@ -1285,17 +1286,24 @@ class Admin_Data {
 	}
 
 	/**
-	 * Get news and updates
+	 * Get news and updates for the dashboard widget
 	 *
 	 * @param \WP_REST_Request $request Request object
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
-	public static function get_news_updates( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+	public static function get_news_updates( $request ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
 		}
 
-		return rest_ensure_response( array( 'items' => array() ) );
+		$refresh = (bool) $request->get_param( 'refresh' );
+
+		return rest_ensure_response(
+			array(
+				'enabled' => News_Feed::is_enabled(),
+				'items'   => News_Feed::get_items( $refresh ),
+			)
+		);
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

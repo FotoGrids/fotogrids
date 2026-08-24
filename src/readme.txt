@@ -244,6 +244,12 @@ When you browse the template library in the FotoGrids admin, the plugin requests
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
+6. FotoGrids news
+
+To fill the "News & Updates" list in the FotoGrids dashboard widget and the "What's New" panel, the plugin requests the latest posts in the News category from the public FotoGrids blog (https://www.fotogrids.com). The request is made from your server (not your visitors' browsers), carries no personal data or site information, and the result is cached for 12 hours. It runs only in wp-admin, when the dashboard widget or the What's New panel is opened. If the site is unavailable, the announcements bundled with the plugin are shown instead. You can turn it off with the "Show news" setting in FotoGrids > Settings > Advanced - when disabled, no request is made and neither surface shows news.
+
+FotoGrids privacy policy: https://go.fotogrids.com/privacy/
+
 == Privacy Policy ==
 
 * Gallery statistics (views and shares) are stored locally in your own WordPress database.
