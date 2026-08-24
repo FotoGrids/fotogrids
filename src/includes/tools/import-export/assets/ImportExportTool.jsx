@@ -79,6 +79,154 @@ function formatDate( iso ) {
     try { return new Date( iso ).toLocaleString(); } catch { return iso; }
 }
 
+/**
+ * Presentation metadata for the operation type recorded in the log.
+ */
+const LOG_TYPE_META = {
+    export: { icon: 'download', label: __( 'Export', 'fotogrids' ) },
+    import: { icon: 'upload',   label: __( 'Import', 'fotogrids' ) },
+};
+
+/**
+ * Presentation metadata for the status recorded in the log.
+ */
+const LOG_STATUS_META = {
+    complete: { icon: 'check_circle', label: __( 'Complete', 'fotogrids' ) },
+    partial:  { icon: 'alert_circle', label: __( 'Partial',  'fotogrids' ) },
+    failed:   { icon: 'x_circle',     label: __( 'Failed',   'fotogrids' ) },
+    error:    { icon: 'x_circle',     label: __( 'Failed',   'fotogrids' ) },
+    success:  { icon: 'check_circle', label: __( 'Complete', 'fotogrids' ) },
+};
+
+/**
+ * Singular / plural labels for the data types counted in a log summary.
+ * Keys match the raw English keys written server-side.
+ */
+const LOG_DETAIL_LABELS = {
+    galleries: [ __( 'Gallery',  'fotogrids' ), __( 'Galleries', 'fotogrids' ) ],
+    albums:    [ __( 'Album',    'fotogrids' ), __( 'Albums',    'fotogrids' ) ],
+    items:     [ __( 'Item',     'fotogrids' ), __( 'Items',     'fotogrids' ) ],
+    tags:      [ __( 'Tag',      'fotogrids' ), __( 'Tags',      'fotogrids' ) ],
+    templates: [ __( 'Template', 'fotogrids' ), __( 'Templates', 'fotogrids' ) ],
+    settings:  [ __( 'Settings', 'fotogrids' ), __( 'Settings',  'fotogrids' ) ],
+};
+
+/**
+ * Turn a stored log summary into chip descriptors.
+ *
+ * Summaries are plain strings written server-side, e.g.
+ * "12 galleries, 1 albums, 0 templates, settings · JSON" (export) or
+ * "3 galleries, 8 items · 2 skipped" (import).
+ *
+ * @param {string} summary Raw summary string.
+ * @return {Array} Chip descriptors: { variant, count, label }.
+ */
+function parseSummary( summary ) {
+    if ( ! summary || ! summary.trim() ) {
+        return [];
+    }
+
+    const chips = [];
+
+    summary.split( '·' ).forEach( ( segment ) => {
+        const chunk = segment.trim();
+
+        if ( ! chunk ) {
+            return;
+        }
+
+        // Trailing format marker: JSON / XML.
+        if ( /^[a-z]+$/i.test( chunk ) && ! LOG_DETAIL_LABELS[ chunk.toLowerCase() ] ) {
+            chips.push( { variant: 'format', label: chunk.toUpperCase() } );
+            return;
+        }
+
+        // Trailing skip marker written by the importer.
+        const skipped = chunk.match( /^(\d+)\s+skipped$/i );
+        if ( skipped ) {
+            chips.push( {
+                variant: 'skipped',
+                count:   parseInt( skipped[ 1 ], 10 ),
+                label:   __( 'skipped', 'fotogrids' ),
+            } );
+            return;
+        }
+
+        chunk.split( ',' ).forEach( ( rawPart ) => {
+            const part = rawPart.trim();
+
+            if ( ! part ) {
+                return;
+            }
+
+            const counted = part.match( /^(\d+)\s+(.+)$/ );
+
+            if ( ! counted ) {
+                const labels = LOG_DETAIL_LABELS[ part.toLowerCase() ];
+                chips.push( { variant: 'count', label: labels ? labels[ 1 ] : part } );
+                return;
+            }
+
+            const count  = parseInt( counted[ 1 ], 10 );
+            const labels = LOG_DETAIL_LABELS[ counted[ 2 ].toLowerCase() ];
+
+            chips.push( {
+                variant: 0 === count ? 'empty' : 'count',
+                count,
+                label:   labels ? labels[ 1 === count ? 0 : 1 ] : counted[ 2 ],
+            } );
+        } );
+    } );
+
+    return chips;
+}
+
+const LogTypePill = ( { type } ) => {
+    const meta = LOG_TYPE_META[ type ] || { icon: 'info_circle', label: type };
+
+    return (
+        <span className={ `fg-ie-type-pill fg-ie-type-pill--${ type }` }>
+            <Icon name={ meta.icon } className="fg-ie-type-pill__icon" />
+            <span className="fg-ie-type-pill__label">{ meta.label }</span>
+        </span>
+    );
+};
+
+const LogStatusPill = ( { status } ) => {
+    const meta = LOG_STATUS_META[ status ] || { icon: 'info_circle', label: status };
+
+    return (
+        <span className={ `fg-ie-status-pill fg-ie-status-pill--${ status }` }>
+            <Icon name={ meta.icon } className="fg-ie-status-pill__icon" />
+            <span className="fg-ie-status-pill__label">{ meta.label }</span>
+        </span>
+    );
+};
+
+const LogSummary = ( { summary } ) => {
+    const chips = parseSummary( summary );
+
+    if ( 0 === chips.length ) {
+        return <span className="fg-ie-log-detail__empty">&mdash;</span>;
+    }
+
+    return (
+        <span className="fg-ie-chips">
+            { chips.map( ( chip, index ) => (
+                <span
+                    key={ `${ chip.label }-${ index }` }
+                    className={ `fg-ie-chip fg-ie-chip--${ chip.variant }` }
+                >
+                    { undefined !== chip.count && (
+                        <span className="fg-ie-chip__count">{ chip.count }</span>
+                    ) }
+                    <span className="fg-ie-chip__label">{ chip.label }</span>
+                </span>
+            ) ) }
+        </span>
+    );
+};
+
 const OperationBanner = ( { message } ) => (
     <div className="fg-ie-banner">
         <span className="fg-ie-banner__spinner" aria-hidden="true" />
@@ -514,12 +662,14 @@ const HistoryPanel = () => {
                         { log.map( ( entry ) => (
                             <tr key={ entry.id }>
                                 <td className="fg-ie-log-date">{ formatDate( entry.date ) }</td>
-                                <td className="fg-ie-log-op">{ entry.type }</td>
-                                <td className="fg-ie-log-detail">{ entry.summary || '-' }</td>
-                                <td>
-                                    <span className={ `fg-ie-status-pill fg-ie-status-pill--${ entry.status }` }>
-                                        { entry.status }
-                                    </span>
+                                <td className="fg-ie-log-op">
+                                    <LogTypePill type={ entry.type } />
+                                </td>
+                                <td className="fg-ie-log-detail">
+                                    <LogSummary summary={ entry.summary } />
+                                </td>
+                                <td className="fg-ie-log-status">
+                                    <LogStatusPill status={ entry.status } />
                                 </td>
                             </tr>
                         ) ) }
