@@ -31,8 +31,8 @@ if ( ! defined( 'WPINC' ) ) {
  *   3. Logical caps for Panel 2 (the matrix) - one row per action a site
  *      owner recognises, each mapping to the atomic CPT caps behind it.
  *
- *   4. Logical caps for Panel 1 (NextGEN-style "lowest role" dropdowns).
- *      Each maps to a subset of the CPT/plugin atomic caps.
+ *   4. Logical caps for Panel 1 (the "lowest role" dropdowns). Each maps to a
+ *      subset of the CPT/plugin atomic caps.
  *
  * Pro registers additional caps via the 'fotogrids/permissions/register'
  * filter - never by editing this file.
@@ -403,7 +403,7 @@ final class Core_Permissions {
 	}
 
 	/**
-	 * Logical caps for Panel 1 - the NextGEN-style "lowest role" dropdowns.
+	 * Logical caps for Panel 1 - the "lowest role" dropdowns.
 	 *
 	 * Each one maps to a curated subset of atomic caps. Writing one Panel 1
 	 * dropdown writes every atomic cap in `underlying_caps`.
