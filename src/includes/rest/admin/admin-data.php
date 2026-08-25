@@ -872,7 +872,7 @@ class Admin_Data {
 		$albums_count    = wp_count_posts( 'fotogrids_album' )->publish;
 
 		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
-		$items_count = $wpdb->get_var( "SELECT COUNT(*) FROM $items_table" );
+		$items_count = $wpdb->get_var( "SELECT COUNT(*) FROM `{$items_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
 
 		$stats_table  = $wpdb->prefix . 'fotogrids_statistics';
 		$totals       = $wpdb->get_row(

@@ -307,13 +307,13 @@ class Dashboard_Widget {
 		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
 		$items_count = 0;
 
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '$items_table'" ) === $items_table ) {
-			$items_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $items_table" );
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $items_table ) ) === $items_table ) {
+			$items_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$items_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
 		}
 
 		$total_views = 0;
 		$stats_table = $wpdb->prefix . 'fotogrids_statistics';
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '$stats_table'" ) === $stats_table ) {
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $stats_table ) ) === $stats_table ) {
 			$stats_totals = \FotoGrids\Statistics::get_totals();
 			$total_views  = (int) ( $stats_totals['total_views'] ?? 0 );
 		}

@@ -260,7 +260,7 @@ class FotoGrids_Cache {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'fotogrids_render_cache';
-		$wpdb->query( "DELETE FROM {$table}" );
+		$wpdb->query( "DELETE FROM `{$table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
 
 		// Backend-agnostic group invalidation (orphans every namespaced L1 key)
 		// in place of wp_cache_flush_group(), which not all backends implement.

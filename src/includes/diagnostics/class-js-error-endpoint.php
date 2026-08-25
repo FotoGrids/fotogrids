@@ -121,7 +121,7 @@ final class JS_Error_Endpoint {
 				'context' => array(
 					'stack' => mb_substr( $stack, 0, 2000 ),
 					'url'   => esc_url_raw( (string) $request->get_param( 'url' ) ),
-					'agent' => sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ),
+					'agent' => sanitize_text_field( wp_unslash( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ) ),
 				),
 			)
 		);
