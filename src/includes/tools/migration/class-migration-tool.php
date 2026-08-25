@@ -44,7 +44,7 @@ class Migration_Tool extends Abstract_Tool {
 	}
 
 	public function get_image_bg_color(): ?string {
-		return 'var(--fg-interactive-selected-bg-darker)';
+		return 'var(--fg-blue-dark)';
 	}
 
 	/**

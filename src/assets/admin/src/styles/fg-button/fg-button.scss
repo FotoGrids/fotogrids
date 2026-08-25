@@ -17,6 +17,7 @@
 	transition: all 0.2s ease;
 	user-select: none;
 	white-space: nowrap;
+	box-sizing: border-box;
 }
 
 @mixin fg-button-secondary() {

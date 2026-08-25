@@ -62,7 +62,7 @@ class System_Info_Tool extends Abstract_Tool {
 	 * {@inheritdoc}
 	 */
 	public function get_image_bg_color(): ?string {
-		return 'var(--fg-interactive-selected-bg-darker)';
+		return 'var(--fg-interactive-selected-bg)';
 	}
 
 	/**
