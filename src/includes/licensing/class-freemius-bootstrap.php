@@ -113,7 +113,10 @@ class Freemius_Bootstrap {
 					'public_key'          => 'pk_6a5e7b6d7191997f147022ce9002d',
 					'is_premium'          => false,
 					'has_premium_version' => true,
-					'has_addons'          => true,
+					// No Freemius add-ons are published for this product: Pro ships as
+					// the premium version (premium_slug), not as an add-on. Leaving this
+					// true adds an empty Add-Ons submenu and plugins-row link.
+					'has_addons'          => false,
 					'has_paid_plans'      => true,
 					'is_org_compliant'    => true,
 					// Start sites in anonymous mode so the SDK never overrides the
@@ -147,6 +150,13 @@ class Freemius_Bootstrap {
 		// uninstall event before the data is dropped.
 		self::$instance->add_action( 'after_uninstall', array( self::class, 'run_uninstall_cleanup' ) );
 
+		// The SDK adds its own opt-in/opt-out link to the plugins row. FotoGrids
+		// owns that consent in Settings > Advanced, which also mirrors the choice
+		// into Freemius; the SDK link resets anonymous mode without updating the
+		// stored option, so it is removed to keep a single control.
+		add_filter( 'plugin_action_links_' . FOTOGRIDS_PLUGIN_BASENAME, array( self::class, 'remove_sdk_tracking_link' ), 15 );
+		add_filter( 'network_admin_plugin_action_links_' . FOTOGRIDS_PLUGIN_BASENAME, array( self::class, 'remove_sdk_tracking_link' ), 15 );
+
 		/**
 		 * Fires after the Freemius SDK instance is ready.
 		 *
@@ -156,6 +166,27 @@ class Freemius_Bootstrap {
 		do_action( Actions_Licensing::FREEMIUS_LOADED, self::$instance );
 
 		return self::$instance;
+	}
+
+	/**
+	 * Removes the Freemius opt-in/opt-out link from the plugins row.
+	 *
+	 * The SDK keys the link `opt-in-or-opt-out <slug>` and adds it at the
+	 * default filter priority, so this callback must run later than 10 and
+	 * before any callback that reindexes the array.
+	 *
+	 * @since  1.0.0
+	 * @param  array<int|string, string> $links Plugin action links.
+	 * @return array<int|string, string>
+	 */
+	public static function remove_sdk_tracking_link( array $links ): array {
+		foreach ( array_keys( $links ) as $key ) {
+			if ( is_string( $key ) && 0 === strpos( $key, 'opt-in-or-opt-out' ) ) {
+				unset( $links[ $key ] );
+			}
+		}
+
+		return $links;
 	}
 
 	/**
