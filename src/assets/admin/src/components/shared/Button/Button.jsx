@@ -14,7 +14,7 @@ const VARIANTS = new Set([
     'link',
 ]);
 
-const SIZES = new Set(['sm', 'md', 'lg', 'xl']);
+const SIZES = new Set(['xs', 'sm', 'md', 'lg', 'xl']);
 
 const Button = ({
     variant = 'secondary',
