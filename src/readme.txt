@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.1
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,46 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Changelog ==
 
+= 1.1.0 =
+
+**New**
+
+* **System Info tool** - Tools > System Info reports your WordPress, server, database and media environment alongside FotoGrids' own state, and can be copied or downloaded as plain text for a support ticket. A second tab lists PHP and browser errors raised by FotoGrids code, plus a read-only tail of the WordPress debug log.
+* **Media tab in the item editor** - see every image size WordPress generated for an item, with preview, dimensions, file size and origin, and copy or open any URL. Sizes that were never produced are flagged as Not generated, File missing or Source too small, and link straight to Regenerate Thumbnails.
+* **News & Updates on the dashboard**, plus a What's New panel in the FotoGrids header. Both are opt-out under Settings > Advanced.
+* The Interactions tab now warns when a per-item link is saved under a click behavior that will never follow it.
+
+**Improved**
+
+* **Verified against WordPress 7.1.**
+* **Faster gallery uploads** - the uploader now uses WordPress' own media uploader, so a batch of photos uploads in parallel instead of one at a time, brings your site's mime and file-size validation with it, and no longer strands the rest of a batch when one file fails.
+* **Permissions Manager** now lists what FotoGrids actually gates. Tools are named rather than shown as capability slugs, the twenty-six capabilities WordPress derives from the post types collapse into four plain-language rows per collection type, and every row carries a description. Existing role grants are unchanged.
+* **Statistics** keeps the selected period in the URL, so a reload or a shared link opens on the same range. "Recent Activity" is renamed "Recently Viewed", which is what the table has always shown.
+* **Import / Export log** reads at a glance - coloured Export and Import pills, one chip per data type with a correctly singularised label, and styled status pills.
+* **Debug Log panel** always renders now, and reports WP_DEBUG and WP_DEBUG_LOG as status lights. Each channel row names its FOTOGRIDS_DEBUG_* constant.
+* **Lighter, sharper admin fonts** - Poppins now ships as woff2 instead of TTF, cutting the admin font payload from 748 KB to 241 KB, and JetBrains Mono is bundled and self-hosted for every monospace surface. Both are served from your own site, so no admin data reaches Google.
+* Tooltips now appear on the link / unlink and desktop / tablet / mobile controls in the collection settings panel, and open on focus as well as hover.
+* Each Tools card carries its own colour instead of three of the four looking identical.
+
+**Fixed**
+
+* **EXIF and XMP data was missing from large photos.** Both were read from the `-scaled` copy WordPress creates for images over the big-image threshold, and WordPress strips metadata when it makes that file - so camera, lens, aperture, shutter and ISO came back empty for essentially every modern camera photo. They are now read from the preserved original.
+* **Watermarking under WordPress 7.1** no longer runs before the image sizes exist, which previously left it recording no variants on the first pass.
+* **Complete Your Setup** - three of the five dashboard steps could never be ticked, and the progress bar could never reach 100%.
+* **The plugins screen lists only links that lead somewhere.** The bundled Freemius SDK added an Add-Ons link and an empty Add-Ons submenu for add-ons that do not exist - Pro is the premium version, not an add-on - and an Opt In link that could leave your usage-data choice out of step with the setting in Settings > Advanced. Both are gone, and consent stays in one place.
+* Switching between YouTube and Vimeo in the video embed modal no longer discards the URL, caption, poster and playback options you had already entered.
+* The upgrade modal now has a close button.
+* The "Drop here" label in the Manage Items grid is centred instead of wrapping into a narrow left-aligned column.
+* Buttons using the extra-small size render at that size, most visibly in the Library Actions column.
+* The Featured / Share Image metabox now aligns with the templates metaboxes.
+* Galleries and albums with no title show "Untitled Gallery #123" in Statistics and Recently Edited instead of a blank line.
+* Tool scripts and styles are cache-busted per build, so a rebuilt asset is no longer served from the browser cache.
+
+**Security and hardening**
+
+* Table names interpolated into direct SQL are now prepared or quoted, and the JS error endpoint unslashes the user agent before sanitising it.
+* WordPress Plugin Check now runs on every pull request instead of by hand before a release.
+
 = 1.0.0 =
 * Initial release.
 * Eight gallery layouts: Grid, Masonry, Justified, Slider, Image Viewer, Single Item, Featured Item, and Instant Photos.
@@ -188,6 +228,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Fixes EXIF and XMP data going missing on large photos, makes gallery uploads much faster, and adds a System Info tool for support. Verified against WordPress 7.1.
 
 = 1.0.0 =
 Build stunning WordPress galleries fast. Eight layouts, video, sliders, an immersive lightbox, albums, templates, and built-in statistics - beautiful by default.
