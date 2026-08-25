@@ -1,0 +1,207 @@
+.fg-system-info {
+
+    &__message {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 0 12px;
+        color: var(--fg-text-secondary);
+
+        &--error {
+            color: var(--fg-red);
+        }
+
+        &--good {
+            color: var(--fg-green);
+        }
+    }
+
+    &__report-panel {
+
+        // Rows carry the horizontal padding instead of the body so the striping
+        // runs the full width of the panel.
+        .fotogrids-sidebar-layout__panel__body {
+            padding: 16px 22px;
+            gap: 0;
+        }
+
+        .fotogrids-sidebar-layout__panel__row {
+            grid-template-columns: 200px minmax(0, 1fr);
+            gap: 20px;
+            padding: 5px 10px;
+            border-bottom: 0;
+            align-items: baseline;
+
+            &:nth-child(even) {
+                background: var(--fg-background-secondary);
+            }
+
+            &:last-child {
+                padding-bottom: 7px;
+            }
+        }
+
+        .fotogrids-sidebar-layout__panel__row__title {
+            font-weight: 400;
+            color: var(--fg-text-secondary);
+        }
+
+        .fotogrids-sidebar-layout__panel__row__description {
+            margin-top: 2px;
+        }
+    }
+
+    &__log-note {
+        margin: 0 0 8px;
+        color: var(--fg-text-secondary);
+        font-size: 12px;
+    }
+
+    &__value {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    &__value-text {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        color: var(--fg-text-primary);
+    }
+
+    &__status {
+        display: inline-flex;
+        flex: 0 0 auto;
+        line-height: 1;
+
+        &--ok {
+            color: var(--fg-green);
+        }
+
+        &--warn {
+            color: var(--fg-yellow);
+        }
+
+        &--error {
+            color: var(--fg-red);
+        }
+    }
+
+    &__cta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__generated {
+        margin: 12px 0 0;
+        color: var(--fg-text-tertiary);
+        font-size: 12px;
+    }
+
+    &__errors {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 10px 16px;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid var(--fg-border-secondary);
+        }
+
+        th {
+            color: var(--fg-text-secondary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    }
+
+    &__level {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        background: var(--fg-background-secondary);
+        color: var(--fg-text-secondary);
+
+        &--error {
+            background: var(--fg-red);
+            color: var(--fg-text-inverse);
+        }
+
+        &--warning {
+            background: var(--fg-yellow);
+            color: var(--fg-background-dark);
+        }
+    }
+
+    &__error-message {
+        width: 55%;
+        overflow-wrap: anywhere;
+    }
+
+    &__disclose {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--fg-text-primary);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+            text-decoration: underline;
+        }
+    }
+
+    &__error-times,
+    &__error-seen {
+        white-space: nowrap;
+        color: var(--fg-text-secondary);
+    }
+
+    &__error-detail {
+
+        td {
+            background: var(--fg-background-secondary);
+        }
+
+        p {
+            margin: 0 0 6px;
+        }
+
+        pre {
+            max-height: 260px;
+            margin: 6px 0 0;
+            padding: 10px;
+            overflow: auto;
+            background: var(--fg-background-primary);
+            border: 1px solid var(--fg-border-secondary);
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    &__debug-log {
+        max-height: 420px;
+        margin: 0;
+        padding: 12px;
+        overflow: auto;
+        background: var(--fg-background-secondary);
+        border: 1px solid var(--fg-border-secondary);
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+}

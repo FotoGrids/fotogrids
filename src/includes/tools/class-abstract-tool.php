@@ -107,7 +107,6 @@ abstract class Abstract_Tool implements Tool_Interface {
 			return;
 		}
 
-		$version    = defined( 'FOTOGRIDS_VERSION' ) ? FOTOGRIDS_VERSION : '1.0.0';
 		$script_url = $this->get_script_url();
 		$style_url  = $this->get_style_url();
 
@@ -119,7 +118,7 @@ abstract class Abstract_Tool implements Tool_Interface {
 				'fotogrids-tool-' . $this->get_id(),
 				$script_url,
 				array( 'wp-element', 'wp-i18n', 'wp-api-fetch', 'fotogrids-admin' ),
-				$version,
+				self::asset_version( $script_url ),
 				true // Load in footer - fotogrids-admin and the DOM are ready.
 			);
 		}
@@ -132,9 +131,41 @@ abstract class Abstract_Tool implements Tool_Interface {
 				'fotogrids-tool-' . $this->get_id(),
 				$style_url,
 				array( 'fotogrids-admin' ),
-				$version
+				self::asset_version( $style_url )
 			);
 		}
+	}
+
+	/**
+	 * Cache-busting version for a tool asset.
+	 *
+	 * FOTOGRIDS_VERSION does not change between builds during development, so a
+	 * rebuilt asset would keep being served from the browser cache. When the URL
+	 * resolves to a file inside this plugin, its modification time is used
+	 * instead; anything else falls back to the plugin version.
+	 *
+	 * @since  1.0.0
+	 * @param  string $url Absolute asset URL.
+	 * @return string
+	 */
+	protected static function asset_version( string $url ): string {
+		$fallback = defined( 'FOTOGRIDS_VERSION' ) ? FOTOGRIDS_VERSION : '1.0.0';
+
+		if ( ! defined( 'FOTOGRIDS_PLUGIN_URL' ) || ! defined( 'FOTOGRIDS_PLUGIN_DIR' ) ) {
+			return $fallback;
+		}
+
+		if ( ! str_starts_with( $url, FOTOGRIDS_PLUGIN_URL ) ) {
+			return $fallback;
+		}
+
+		$path = FOTOGRIDS_PLUGIN_DIR . substr( $url, strlen( FOTOGRIDS_PLUGIN_URL ) );
+
+		if ( ! file_exists( $path ) ) {
+			return $fallback;
+		}
+
+		return (string) filemtime( $path );
 	}
 
 	/**
