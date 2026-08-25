@@ -116,7 +116,6 @@ const LibraryTableRow = memo(({
                         <Button
                             size="xs"
                             variant="danger"
-                            style="ghost"
                             disabled={!canManage}
                             onClick={() => onRequestDelete(item)}
                             ariaLabel={sprintf(__('Delete %s', 'fotogrids'), item.name)}
