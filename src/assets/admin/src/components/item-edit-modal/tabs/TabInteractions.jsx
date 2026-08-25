@@ -1,13 +1,35 @@
 import React from 'react';
+import Icon from '../../shared/Icon';
+import useItemClickBehavior from '../useItemClickBehavior';
 
-const TabInteractions = ({ formData, handleInputChange, disabled = false }) => {
+const EXTERNAL_BEHAVIOR = 'external';
+
+const TabInteractions = ({ formData, handleInputChange, strings = {}, disabled = false }) => {
+    const clickBehavior = useItemClickBehavior();
+    const showNotice = '' !== clickBehavior && EXTERNAL_BEHAVIOR !== clickBehavior;
+
     return (
         <div className="fotogrids-tab-panel fg-is-active">
             <div className="fotogrids-interactions-section">
-                <h4>Item Interactions</h4>
+                <h4>{strings.itemInteractions}</h4>
+
+                {showNotice && (
+                    <div className="fotogrids-edit-item-notice fotogrids-edit-item-notice--warning">
+                        <Icon name="alert_circle" className="fotogrids-edit-item-notice__icon" />
+                        <div className="fotogrids-edit-item-notice__body">
+                            <strong>
+                                {strings.externalUrlIgnoredTitle}
+                            </strong>
+                            <span>{strings.externalUrlIgnoredBody}</span>
+                        </div>
+                    </div>
+                )}
+
                 <div className="fotogrids-external-url-section">
                     <div className="fotogrids-field-group">
-                        <label htmlFor="fotogrids-item-external-url">External URL</label>
+                        <label htmlFor="fotogrids-item-external-url">
+                            {strings.externalUrl}
+                        </label>
                         <input
                             type="url"
                             id="fotogrids-item-external-url"
@@ -17,23 +39,31 @@ const TabInteractions = ({ formData, handleInputChange, disabled = false }) => {
                             disabled={disabled}
                         />
                         <p className="description">
-                            URL to redirect to when this item is clicked.
+                            {strings.externalUrlDesc}
                         </p>
                     </div>
                     <div className="fotogrids-field-group">
-                        <label htmlFor="fotogrids-item-link-target">Link Target</label>
+                        <label htmlFor="fotogrids-item-link-target">
+                            {strings.linkTarget}
+                        </label>
                         <select
                             id="fotogrids-item-link-target"
                             value={formData?.link_target || ''}
                             onChange={(e) => handleInputChange('link_target', e.target.value)}
                             disabled={disabled}
                         >
-                            <option value="global">Use Gallery Default</option>
-                            <option value="_self">Same Tab</option>
-                            <option value="_blank">New Tab</option>
+                            <option value="global">
+                                {strings.linkTargetGlobal}
+                            </option>
+                            <option value="_self">
+                                {strings.linkTargetSelf}
+                            </option>
+                            <option value="_blank">
+                                {strings.linkTargetBlank}
+                            </option>
                         </select>
                         <p className="description">
-                            How the external link should open.
+                            {strings.linkTargetDesc}
                         </p>
                     </div>
                 </div>

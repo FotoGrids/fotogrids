@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TabDetails from './tabs/TabDetails';
 import TabVideo from './tabs/TabVideo';
+import TabMedia from './tabs/TabMedia';
 import TabTags from './tabs/TabTags';
 import TabPeople from './tabs/TabPeople';
 import TabLocation from './tabs/TabLocation';
@@ -94,7 +95,8 @@ export const ItemPreviewPane = ({ itemData, loading, formData, strings }) => {
 const tabConfig = (strings, isVideoFile) => [
     { id: 'details',      label: strings.details },
     // Video tab appears right after Details, for Media Library video items only.
-    ...(isVideoFile ? [{ id: 'video', label: strings.video || 'Video' }] : []),
+    ...(isVideoFile ? [{ id: 'video', label: strings.video }] : []),
+    { id: 'media',        label: strings.media },
     { id: 'tags',         label: strings.tags },
     { id: 'people',       label: strings.people },
     { id: 'location',     label: strings.location },
@@ -159,6 +161,17 @@ export const ItemEditTabs = ({
                 </Modal.TabsPanel>
             )}
 
+            {!isVideoFile && (
+                <Modal.TabsPanel id="media" activeId={activeTab}>
+                    <TabMedia
+                        itemData={itemData}
+                        loading={loading}
+                        disabled={isDisabled}
+                        strings={strings}
+                    />
+                </Modal.TabsPanel>
+            )}
+
             <Modal.TabsPanel id="tags" activeId={activeTab}>
                 <TabTags
                     metadata={metadata}
@@ -206,6 +219,7 @@ export const ItemEditTabs = ({
                 <TabInteractions
                     formData={formData}
                     handleInputChange={handleInputChange}
+                    strings={strings}
                     disabled={isDisabled}
                 />
             </Modal.TabsPanel>

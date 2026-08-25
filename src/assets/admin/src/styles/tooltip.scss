@@ -3,8 +3,8 @@
 // Shared styles for both the React <Tooltip> component and the vanilla-JS
 // window.FotoGridsTooltip.ProBadge used in render helpers.
 //
-// Rendered via a portal so all bubbles sit on document.body at z-index 99999,
-// safely above wp-admin modals (~9999).
+// Rendered via a portal so all bubbles sit on document.body above every other
+// layer, including the FotoGrids modal stack (--fg-modal-z tops out at 100050).
 
 .fg-tooltip-trigger {
 	display: inline-flex;
@@ -13,7 +13,7 @@
 
 .fg-tooltip {
 	position: absolute;
-	z-index: 99999;
+	z-index: 100100;
 	pointer-events: none;
 
 	max-width: 220px;

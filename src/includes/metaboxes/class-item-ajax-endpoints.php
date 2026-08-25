@@ -194,8 +194,138 @@ final class Item_Ajax_Endpoints {
 				'item_type'     => $item_type,
 				'video_url'     => $video_url,
 				'poster_url'    => $poster_url,
+				'media_sizes'   => self::build_media_sizes( $item_id, $attachment_meta ),
 			)
 		);
+	}
+
+	/**
+	 * Build the registered-image-size inventory for an attachment.
+	 *
+	 * Every registered size is reported, including sizes WordPress never
+	 * generated, so the item editor can flag gaps. Each entry carries a
+	 * `status` of `generated`, `missing_file`, `source_too_small`, or
+	 * `not_generated`.
+	 *
+	 * @since 1.1.0
+	 * @param   int   $item_id         Attachment ID.
+	 * @param   mixed $attachment_meta Result of wp_get_attachment_metadata().
+	 * @return  array<int, array<string, mixed>>
+	 */
+	private static function build_media_sizes( int $item_id, $attachment_meta ): array {
+		if ( ! wp_attachment_is_image( $item_id ) ) {
+			return array();
+		}
+
+		$meta       = is_array( $attachment_meta ) ? $attachment_meta : array();
+		$meta_sizes = isset( $meta['sizes'] ) && is_array( $meta['sizes'] ) ? $meta['sizes'] : array();
+		$source_w   = (int) ( $meta['width'] ?? 0 );
+		$source_h   = (int) ( $meta['height'] ?? 0 );
+		$core_sizes = array( 'thumbnail', 'medium', 'medium_large', 'large', '1536x1536', '2048x2048' );
+
+		$upload_dir = wp_get_upload_dir();
+		$base_file  = (string) ( $meta['file'] ?? '' );
+		$base_dir   = '' !== $base_file
+			? trailingslashit( $upload_dir['basedir'] ) . dirname( $base_file )
+			: '';
+
+		$full_path   = get_attached_file( $item_id );
+		$full_exists = $full_path && file_exists( $full_path );
+
+		$sizes = array(
+			array(
+				'name'     => 'full',
+				'label'    => self::label_for_image_size( 'full' ),
+				'width'    => $source_w,
+				'height'   => $source_h,
+				'crop'     => false,
+				'url'      => (string) ( wp_get_attachment_image_url( $item_id, 'full' ) ?: '' ),
+				'filename' => $full_path ? basename( $full_path ) : '',
+				'filesize' => $full_exists ? size_format( filesize( $full_path ) ) : '',
+				'status'   => $full_exists ? 'generated' : 'missing_file',
+				'source'   => 'core',
+			),
+		);
+
+		foreach ( wp_get_registered_image_subsizes() as $name => $registered ) {
+			$target_w = (int) ( $registered['width'] ?? 0 );
+			$target_h = (int) ( $registered['height'] ?? 0 );
+			$crop     = ! empty( $registered['crop'] );
+			$entry    = isset( $meta_sizes[ $name ] ) && is_array( $meta_sizes[ $name ] ) ? $meta_sizes[ $name ] : null;
+
+			$origin = 'theme';
+			if ( in_array( $name, $core_sizes, true ) ) {
+				$origin = 'core';
+			} elseif ( 0 === strpos( $name, 'fotogrids_' ) ) {
+				$origin = 'fotogrids';
+			}
+
+			$row = array(
+				'name'     => $name,
+				'label'    => self::label_for_image_size( $name ),
+				'width'    => $entry ? (int) ( $entry['width'] ?? 0 ) : $target_w,
+				'height'   => $entry ? (int) ( $entry['height'] ?? 0 ) : $target_h,
+				'crop'     => $crop,
+				'url'      => '',
+				'filename' => $entry ? (string) ( $entry['file'] ?? '' ) : '',
+				'filesize' => '',
+				'status'   => 'not_generated',
+				'source'   => $origin,
+			);
+
+			if ( $entry ) {
+				$file_path   = ( '' !== $base_dir && '' !== $row['filename'] )
+					? trailingslashit( $base_dir ) . $row['filename']
+					: '';
+				$file_exists = '' !== $file_path && file_exists( $file_path );
+
+				$row['url']      = (string) ( wp_get_attachment_image_url( $item_id, $name ) ?: '' );
+				$row['status']   = $file_exists ? 'generated' : 'missing_file';
+				$row['filesize'] = $file_exists ? size_format( filesize( $file_path ) ) : '';
+			} elseif ( $source_w > 0 && self::source_too_small( $source_w, $source_h, $target_w, $target_h, $crop ) ) {
+				$row['status'] = 'source_too_small';
+			}
+
+			$sizes[] = $row;
+		}
+
+		return $sizes;
+	}
+
+	/**
+	 * Whether the original image is too small for WordPress to produce a subsize.
+	 *
+	 * @since 1.1.0
+	 * @param   int  $source_w Original width.
+	 * @param   int  $source_h Original height.
+	 * @param   int  $target_w Registered width.
+	 * @param   int  $target_h Registered height.
+	 * @param   bool $crop     Whether the size is a hard crop.
+	 * @return  bool
+	 */
+	private static function source_too_small( int $source_w, int $source_h, int $target_w, int $target_h, bool $crop ): bool {
+		if ( $crop ) {
+			return $source_w < $target_w || $source_h < $target_h;
+		}
+
+		$fits_width  = 0 === $target_w || $source_w <= $target_w;
+		$fits_height = 0 === $target_h || $source_h <= $target_h;
+
+		return $fits_width && $fits_height;
+	}
+
+	/**
+	 * Turn an image-size slug into a readable label.
+	 *
+	 * @since 1.1.0
+	 * @param   string $name Image size slug.
+	 * @return  string
+	 */
+	private static function label_for_image_size( string $name ): string {
+		$label = 0 === strpos( $name, 'fotogrids_' ) ? substr( $name, 10 ) : $name;
+		$label = str_replace( array( '_', '-' ), ' ', $label );
+
+		return ucwords( $label );
 	}
 
 	/**
