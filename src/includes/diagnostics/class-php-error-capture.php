@@ -134,7 +134,7 @@ final class PHP_Error_Capture {
 	public static function on_error( int $errno, string $message, string $file = '', int $line = 0 ): bool {
 		// A silenced expression (@) reports error_reporting() as 0 in PHP 7 and
 		// as a fixed mask in PHP 8; either way the author asked for silence.
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting, WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting -- read, never set; needed to honour the @ operator.
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting, WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting, PluginCheck.CodeAnalysis.PHPErrorReporting.DirectErrorReportingCall -- read, never set; needed to honour the @ operator.
 		if ( 0 === ( error_reporting() & $errno ) ) {
 			return self::delegate( $errno, $message, $file, $line );
 		}
