@@ -63,9 +63,13 @@ final class Permission_Definition {
 	 *
 	 * 'simple'   - Panel 1 only (logical caps; never appear in Panel 2 either,
 	 *              because they are not real WP caps).
-	 * 'advanced' - Panel 2 only (atomic caps).
+	 * 'advanced' - Panel 2 only (matrix rows).
 	 * 'both'     - Panel 2 always; also appears in Panel 1 with a simplified
 	 *              presentation (currently unused, reserved for future).
+	 * 'none'     - Registered but never rendered. Used for atomic caps that
+	 *              exist so the activator can grant them and map_meta_cap can
+	 *              resolve them, but that the matrix represents through a
+	 *              curated row instead.
 	 */
 	public string $panel;
 
@@ -90,6 +94,12 @@ final class Permission_Definition {
 	 * underlying caps each remain admin-only).
 	 */
 	public string $default_lowest_role;
+
+	/**
+	 * Sort weight inside the permission's group. Lower renders first;
+	 * equal weights fall back to alphabetical key order.
+	 */
+	public int $order;
 
 	/**
 	 * Source - one of 'fotogrids' | 'fotogrids-pro' | 'third-party'.
@@ -153,6 +163,7 @@ final class Permission_Definition {
 	 *     panel?: string,
 	 *     underlying_caps?: string[],
 	 *     default_lowest_role?: string,
+	 *     order?: int,
 	 *     tier?: string,
 	 *     scopes?: string[],
 	 *     is_core?: bool
@@ -181,21 +192,29 @@ final class Permission_Definition {
 			: array( 'global' );
 		$this->is_core             = ! empty( $args['is_core'] );
 		$this->is_meta_cap         = ! empty( $args['is_meta_cap'] );
+		$this->order               = isset( $args['order'] ) ? (int) $args['order'] : 0;
 
 		// Source is set by the registry, not the caller.
 		$this->source = 'fotogrids';
 
-		if ( ! in_array( $this->panel, array( 'simple', 'advanced', 'both' ), true ) ) {
+		if ( ! in_array( $this->panel, array( 'simple', 'advanced', 'both', 'none' ), true ) ) {
 			$this->panel = 'advanced';
 		}
 	}
 
 	/**
-	 * Whether this is a logical permission (panel=simple with underlying caps)
-	 * rather than an atomic WP capability.
+	 * Whether this is a logical permission - a registry-only key that maps to a
+	 * set of atomic caps - rather than a real WP capability.
+	 *
+	 * Logical permissions are never granted to a role directly: the activator
+	 * and the current-user capability snapshot skip them and their
+	 * `underlying_caps` carry the grants instead.
+	 *
+	 * @since 1.0.0
+	 * @return bool
 	 */
 	public function is_logical(): bool {
-		return 'simple' === $this->panel && ! empty( $this->underlying_caps );
+		return ! empty( $this->underlying_caps );
 	}
 
 	/**
@@ -225,6 +244,7 @@ final class Permission_Definition {
 			'panel'               => $this->panel,
 			'underlying_caps'     => $this->underlying_caps,
 			'default_lowest_role' => $this->default_lowest_role,
+			'order'               => $this->order,
 			'source'              => $this->source,
 			'tier'                => $this->tier,
 			'scopes'              => $this->scopes,
