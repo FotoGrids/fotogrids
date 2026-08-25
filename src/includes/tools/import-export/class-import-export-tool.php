@@ -38,6 +38,10 @@ class Import_Export_Tool extends Abstract_Tool {
 		return 'switch_horizontal';
 	}
 
+	public function get_image_bg_color(): ?string {
+		return 'var(--fg-blue)';
+	}
+
 	public function get_group(): string {
 		return 'data';
 	}
