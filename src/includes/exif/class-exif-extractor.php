@@ -52,7 +52,14 @@ final class Exif_Extractor {
 			return array();
 		}
 
-		$file_path = get_attached_file( $attachment_id );
+		// WordPress strips metadata from the `-scaled` file it generates for
+		// images above big_image_size_threshold, so read the preserved
+		// original. Falls back to the attached file when there is no original.
+		$file_path = wp_get_original_image_path( $attachment_id );
+		if ( ! $file_path ) {
+			$file_path = get_attached_file( $attachment_id );
+		}
+
 		if ( ! $file_path || ! file_exists( $file_path ) ) {
 			return array();
 		}

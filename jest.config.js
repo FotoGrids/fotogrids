@@ -40,7 +40,8 @@ module.exports = {
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/assets/$1',
         '^@tests/(.*)$': '<rootDir>/src/tests/$1',
-        '^@modules/(.*)$': '<rootDir>/src/includes/modules/$1'
+        '^@modules/(.*)$': '<rootDir>/src/includes/modules/$1',
+        '^@wordpress/media-utils$': '<rootDir>/src/tests/setup/mediaUtilsStub.js'
     },
 
     collectCoverageFrom: [

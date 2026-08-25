@@ -200,7 +200,14 @@ class Lightbox_Data {
 	 * @return string
 	 */
 	private static function read_xmp_credit( int $item_id ): string {
-		$file_path = get_attached_file( $item_id );
+		// The XMP packet only survives on the preserved original; WordPress
+		// strips it from the `-scaled` file get_attached_file() returns for
+		// images above big_image_size_threshold.
+		$file_path = wp_get_original_image_path( $item_id );
+		if ( ! $file_path ) {
+			$file_path = get_attached_file( $item_id );
+		}
+
 		if ( ! $file_path || ! file_exists( $file_path ) ) {
 			return '';
 		}

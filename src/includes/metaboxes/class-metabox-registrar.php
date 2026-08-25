@@ -306,7 +306,7 @@ final class Metabox_Registrar {
 		wp_enqueue_script(
 			'fotogrids-metabox',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/metabox.js',
-			array( 'wp-element', 'wp-components', 'wp-i18n', 'jquery', 'jquery-ui-sortable', 'fotogrids-icons' ),
+			array( 'wp-element', 'wp-components', 'wp-i18n', 'wp-media-utils', 'jquery', 'jquery-ui-sortable', 'fotogrids-icons' ),
 			FOTOGRIDS_VERSION,
 			true
 		);

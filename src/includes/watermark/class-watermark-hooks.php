@@ -56,12 +56,21 @@ final class Watermark_Hooks {
 	 * Generation is a side effect and only runs when watermarking is enabled
 	 * site-wide.
 	 *
+	 * Client-side media processing fires this filter once during the upload,
+	 * before the browser has sent any sub-sizes, and again once they are on
+	 * disk. An empty `sizes` array marks that first pass, which has nothing to
+	 * watermark.
+	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $metadata      Attachment metadata.
 	 * @param int                  $attachment_id Attachment ID.
 	 * @return array<string, mixed> The unchanged metadata.
 	 */
 	public static function on_metadata_generated( $metadata, $attachment_id ) {
+		if ( empty( $metadata['sizes'] ) ) {
+			return $metadata;
+		}
+
 		if ( self::watermarking_enabled() ) {
 			Watermark_Generator::generate_for_attachment( (int) $attachment_id );
 		}
