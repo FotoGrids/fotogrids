@@ -25,6 +25,12 @@ define( 'FOTOGRIDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_FILE', __FILE__ );
 define( 'FOTOGRIDS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
+// Booted before the requires below so a fatal raised while loading the plugin's
+// own files is still recorded by the shutdown handler.
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/diagnostics/class-error-store.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/diagnostics/class-php-error-capture.php';
+\FotoGrids\Diagnostics\PHP_Error_Capture::boot();
+
 // Hook name catalogue: each action / filter / JS-event identifier is a class
 // constant under includes/hooks/{actions,filters,js-events}/, auto-loaded by glob.
 foreach ( array( 'actions', 'filters', 'js-events' ) as $fotogrids_hooks_group ) {
@@ -132,6 +138,9 @@ function fotogrids_init() {
 	FotoGrids\Image_Size_Manager::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
 
+	require_once FOTOGRIDS_PLUGIN_DIR . 'includes/diagnostics/class-js-error-endpoint.php';
+	\FotoGrids\Diagnostics\JS_Error_Endpoint::init();
+
 	// Boot on 'init' (not 'plugins_loaded') so it runs after every plugin's
 	// 'plugins_loaded' callback; source-derived sorting in the registry then
 	// guarantees Free modules init before Pro regardless of registration order.
@@ -210,10 +219,12 @@ add_action(
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-tool.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/import-export/class-import-export-tool.php';
 		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/migration/class-migration-tool.php';
+		require_once FOTOGRIDS_PLUGIN_DIR . 'includes/tools/system-info/class-system-info-tool.php';
 
 		\FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\RegenerateThumbnails\Regenerate_Thumbnails_Tool() );
 		\FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\ImportExport\Import_Export_Tool() );
 		\FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\Migration\Migration_Tool() );
+		\FotoGrids\Tools\Tools_Registry::register( new \FotoGrids\Tools\SystemInfo\System_Info_Tool() );
 	},
 	10
 );

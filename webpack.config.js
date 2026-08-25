@@ -378,6 +378,17 @@ const mainConfig = {
                     },
                 },
                 {
+                    // Standalone diagnostics scripts. These are enqueued directly
+                    // by PHP rather than built as webpack entries (entry discovery
+                    // only covers tools/ and modules/), and the broad copy pattern
+                    // above matches *.php only, so they need their own pattern.
+                    from: 'src/includes/diagnostics/assets/**/*.js',
+                    to: ({ context, absoluteFilename }) => {
+                        const relativePath = path.relative(context, absoluteFilename);
+                        return relativePath.replace('src/', '');
+                    },
+                },
+                {
                     // Block.json metadata for the PageBuilders Gutenberg sub-module
                     // (and any future module that ships Gutenberg blocks). Copied
                     // verbatim into dist/; register_block_type() reads them from
