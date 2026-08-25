@@ -1,108 +1,100 @@
 /**
  * MediaUpload - uploads image files to the WordPress Media Library.
  *
- * Drop-in replacement for the original UploadArea component: same external
- * props, same behaviour. Renders via the UploadArea visual template; owns all
- * WP media upload logic internally.
+ * Renders through the UploadArea visual template and owns the upload logic.
+ * Files go to the REST endpoint through `uploadMedia()`, which validates mime
+ * type and file size against the site's limits, translates its own errors, and
+ * uploads the batch concurrently.
  *
- * Accepts multiple image files, uploads them sequentially to /wp/v2/media
- * (with admin-ajax.php fallback), tracks per-file progress, and calls
- * onUploadComplete(attachmentIds[]) when all uploads are done.
+ * onUploadComplete() is called once with every attachment ID that landed, after
+ * the batch settles - including when part of it failed.
  *
  * @param {Function} props.onUploadComplete  Called with array of WP attachment IDs.
  * @param {string}   [props.inputId]         HTML id for the hidden file input.
  */
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { uploadMedia } from '@wordpress/media-utils';
 import UploadArea from './UploadArea';
 
 const { __ } = wp.i18n;
+
+const ALLOWED_TYPES = ['image'];
+
+const imagesOnly = (fileList) =>
+    Array.from(fileList).filter((file) => file.type.startsWith('image/'));
+
+const collectIds = (attachments) =>
+    (attachments || []).map((attachment) => attachment?.id).filter(Boolean);
 
 const MediaUpload = ({
     onUploadComplete,
     inputId = 'fotogrids-upload-input',
 }) => {
-    const [isDragging, setIsDragging]         = useState(false);
-    const [isUploading, setIsUploading]       = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [error, setError]                   = useState(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [error, setError] = useState(null);
+    const [counts, setCounts] = useState({ done: 0, total: 0 });
+
     const inputRef = useRef(null);
 
-    const handleFiles = async (fileList) => {
-        const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-        if (files.length === 0) return;
-
-        setIsUploading(true);
-        setError(null);
-        setUploadProgress(0);
-
-        try {
-            if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-                throw new Error(__('WordPress media library is not available. Please refresh the page.', 'fotogrids'));
+    const handleFiles = useCallback(
+        (fileList) => {
+            const files = imagesOnly(fileList);
+            if (files.length === 0) {
+                return;
             }
 
-            const uploadedIds = [];
-            const total = files.length;
+            // uploadMedia() reports successes and failures separately and never
+            // signals completion, so both are counted until every file settles.
+            const uploaded = new Set();
+            let failed = 0;
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const formData = new FormData();
-                formData.append('file', file);
+            const settle = () => {
+                const done = uploaded.size + failed;
+                setCounts({ done, total: files.length });
 
-                try {
-                    const res = await wp.apiFetch({
-                        path: '/wp/v2/media',
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'Content-Disposition': `attachment; filename="${file.name}"`,
-                        },
-                    });
-                    if (res?.id) uploadedIds.push(res.id);
-                } catch (uploadErr) {
-                    console.error('REST upload failed for:', file.name, uploadErr);
-                    // Fallback: admin-ajax.php
-                    const ajaxData = new FormData();
-                    ajaxData.append('file', file);
-                    ajaxData.append('action', 'upload-attachment');
-                    ajaxData.append('_wpnonce', wp.media?.view?.settings?.nonce || window.fotogridsAdmin?.restNonce || '');
-
-                    const fallback = await fetch(window.ajaxurl || '/wp-admin/admin-ajax.php', {
-                        method: 'POST',
-                        body: ajaxData,
-                    });
-                    if (fallback.ok) {
-                        const data = await fallback.json();
-                        if (data.success && data.data?.id) uploadedIds.push(data.data.id);
-                    } else {
-                        console.warn(__('Failed to upload file: ', 'fotogrids') + file.name);
-                    }
+                if (done < files.length) {
+                    return;
                 }
 
-                setUploadProgress(Math.round(((i + 1) / total) * 100));
-            }
-
-            if (uploadedIds.length > 0 && onUploadComplete) {
-                await onUploadComplete(uploadedIds);
-            }
-
-            setUploadProgress(100);
-            setTimeout(() => {
                 setIsUploading(false);
-                setUploadProgress(0);
-            }, 500);
-        } catch (err) {
-            console.error('Upload error:', err);
-            setError(err.message || __('An error occurred during upload.', 'fotogrids'));
-            setIsUploading(false);
-            setUploadProgress(0);
-        }
-    };
+                setCounts({ done: 0, total: 0 });
+
+                if (uploaded.size > 0) {
+                    onUploadComplete?.(Array.from(uploaded));
+                }
+            };
+
+            setError(null);
+            setIsUploading(true);
+            setCounts({ done: 0, total: files.length });
+
+            uploadMedia({
+                filesList: files,
+                allowedTypes: ALLOWED_TYPES,
+                onFileChange: (attachments) => {
+                    collectIds(attachments).forEach((id) => uploaded.add(id));
+                    settle();
+                },
+                onError: (uploadError) => {
+                    setError(uploadError.message);
+                    failed += 1;
+                    settle();
+                },
+            });
+        },
+        [onUploadComplete]
+    );
 
     return (
         <UploadArea
             isDragging={isDragging}
             isUploading={isUploading}
-            uploadProgress={uploadProgress}
+            uploadProgress={
+                counts.total
+                    ? Math.round((counts.done / counts.total) * 100)
+                    : 0
+            }
             error={error}
             title={__('Select files to upload', 'fotogrids')}
             subtitle={__('or drag and drop files here', 'fotogrids')}
