@@ -3,7 +3,7 @@
  * Plugin Name: FotoGrids
  * Plugin URI: https://www.fotogrids.com
  * Description: The most robust and beautiful WordPress gallery plugin. Create stunning photo galleries and albums with drag-and-drop ease, modern responsive layouts, powerful lightbox, and detailed analytics. Perfect for photographers, artists, and businesses.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: FotoGrids
  * Author URI: https://www.fotogrids.com/about/
  * Text Domain: fotogrids
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'FOTOGRIDS_VERSION', '1.0.0' );
+define( 'FOTOGRIDS_VERSION', '1.1.0' );
 define( 'FOTOGRIDS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_FILE', __FILE__ );
