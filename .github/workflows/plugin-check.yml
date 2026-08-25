@@ -1,0 +1,75 @@
+name: Plugin Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  # Manual run - useful before a release or a version bump.
+  workflow_dispatch:
+
+concurrency:
+  group: plugin-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Runs the official WordPress Plugin Check - the tool that enforces the
+  # WordPress.org plugin guidelines - against the BUILT plugin, not the repo
+  # tree: readme.txt, headers and enqueued asset paths are only correct after
+  # webpack has produced dist/.
+  #
+  # The action spins up wp-env, installs plugin-check, and runs
+  # `wp plugin check <slug>`. The slug is the basename of build-dir, which is
+  # why the plugin is staged into dist/fotogrids/ (same layout as zip:prod).
+  # ---------------------------------------------------------------------------
+  plugin-check:
+    name: WordPress Plugin Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v7
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Stage built plugin
+        # Mirror the zip:prod layout so the checked directory is named
+        # `fotogrids` - the action derives the plugin slug from it.
+        run: |
+          rm -rf dist/fotogrids
+          mkdir dist/fotogrids
+          find dist -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} dist/fotogrids/ \;
+
+      - name: Run Plugin Check
+        # This action writes its own .wp-env.json into the workspace root, so
+        # keep it in a job that does not also use the project's wp-env setup.
+        #
+        # Non-blocking for now: the report is worth reading on every PR, but
+        # Plugin Check overlaps rules our phpcs.xml deliberately exempts, so it
+        # needs triage first. Drop continue-on-error to make this a real gate.
+        continue-on-error: true
+        uses: WordPress/plugin-check-action@v1
+        with:
+          build-dir: './dist/fotogrids'
+          # Bundled third-party SDK - not ours to fix, and it trips many checks.
+          exclude-directories: |
+            freemius
+          # Experimental checks are noisy and outside the published guidelines.
+          include-experimental: false
+          # ignore-warnings controls what the report contains, not what fails
+          # the job: false keeps warnings visible as annotations. Failure is
+          # driven by errors; strict promotes warnings to errors. Both are set
+          # explicitly so an upstream default change cannot flip the gate.
+          ignore-warnings: false
+          strict: false
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
