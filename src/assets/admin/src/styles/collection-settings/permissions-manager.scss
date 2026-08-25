@@ -87,59 +87,11 @@
 
 	&__permission-name {
 		font-size: 12px;
-		line-height: 1;
+		line-height: 1.3;
 		color: var(--fg-text-primary);
-		position: relative;
-		cursor: help;
-		display: inline-block;
 
-		&[data-tooltip] {
-			position: relative;
-
-			&::before,
-			&::after {
-				opacity: 0;
-				pointer-events: none;
-				transition:
-					opacity 0.2s ease,
-					transform 0.2s ease;
-				position: absolute;
-				z-index: 1070;
-				left: 50%;
-			}
-
-			&::before {
-				content: attr(data-tooltip);
-				background: #1f2937;
-				color: #fff;
-				padding: 8px 12px;
-				border-radius: 6px;
-				font-size: 13px;
-				font-weight: normal;
-				max-width: 300px;
-				white-space: normal;
-				line-height: 1.5;
-				box-shadow:
-					0 4px 6px -1px rgba(0, 0, 0, 0.1),
-					0 2px 4px -1px rgba(0, 0, 0, 0.06);
-				bottom: calc(100% + 12px);
-				transform: translateX(-50%) translateY(-4px);
-				word-wrap: break-word;
-			}
-
-			&::after {
-				content: "";
-				border: 6px solid transparent;
-				border-top-color: #1f2937;
-				bottom: calc(100%);
-				transform: translateX(-50%);
-			}
-
-			&:hover::before,
-			&:hover::after {
-				opacity: 1;
-				transform: translateX(-50%) translateY(0);
-			}
+		&--has-tooltip {
+			cursor: help;
 		}
 	}
 

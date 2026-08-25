@@ -3,6 +3,7 @@ import apiFetch from '@wordpress/api-fetch';
 import Icon from '../../shared/Icon';
 import InfoBlock from '../../shared/InfoBlock';
 import Segmented from '../../shared/Segmented';
+import Tooltip from '../../Tooltip';
 import { Button } from '../../shared/Button';
 import Panel from '../../shared/SidebarTabs/elements/Panel';
 import PanelRow from '../../shared/SidebarTabs/elements/PanelRow';
@@ -27,6 +28,21 @@ const GROUP_LABELS = {
     tools: __('Tools', 'fotogrids'),
     modules: __('Modules', 'fotogrids'),
     plugin: __('Plugin', 'fotogrids'),
+};
+
+/**
+ * Whether a role holds a permission.
+ *
+ * Rows backed by several atomic caps - the curated gallery and album rows -
+ * count as granted only when the role holds every one of them, so a
+ * partially-granted role never reads as fully granted.
+ */
+const roleHasPermission = (def, role) => {
+    if (!role) return false;
+    if (def.underlying_caps && def.underlying_caps.length > 0) {
+        return def.underlying_caps.every((cap) => role.capabilities[cap] === true);
+    }
+    return role.capabilities[def.key] === true;
 };
 
 /**
@@ -311,15 +327,18 @@ const PermissionsManagerTab = () => {
                                 return (
                                     <React.Fragment key={def.key}>
                                         <div className={`fg-rpm__cell fg-rpm__cell--permission ${isEven ? 'fg-rpm__cell--even' : 'fg-rpm__cell--odd'}`}>
-                                            <span
-                                                className="fg-rpm__permission-name"
-                                                data-tooltip={def.description || def.key}
-                                            >
-                                                {def.label}
-                                            </span>
+                                            {def.description ? (
+                                                <Tooltip content={def.description} position="top">
+                                                    <span className="fg-rpm__permission-name fg-rpm__permission-name--has-tooltip">
+                                                        {def.label}
+                                                    </span>
+                                                </Tooltip>
+                                            ) : (
+                                                <span className="fg-rpm__permission-name">{def.label}</span>
+                                            )}
                                         </div>
                                         {allRoles.map((role) => {
-                                            const checked = role.capabilities[def.key] === true;
+                                            const checked = roleHasPermission(def, role);
                                             const iconName = checked ? 'check_circle' : 'circle';
                                             return (
                                                 <div

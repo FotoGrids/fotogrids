@@ -162,7 +162,7 @@ final class Permissions_Data {
 		}
 
 		$def = Permission_Registry::get( $key );
-		if ( ! $def || ! $def->is_logical() ) {
+		if ( ! $def || ! $def->is_logical() || 'simple' !== $def->panel ) {
 			return new \WP_Error(
 				'fotogrids_invalid_permission',
 				__( 'Unknown logical permission.', 'fotogrids' ),

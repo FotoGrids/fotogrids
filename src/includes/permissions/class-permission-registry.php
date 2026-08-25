@@ -148,7 +148,8 @@ final class Permission_Registry {
 	 * All registered definitions, sorted.
 	 *
 	 * Sort order: group (registry-defined priority, then alphabetical),
-	 * source (fotogrids < pro < third-party), then registration order.
+	 * source (fotogrids < pro < third-party), the definition's own `order`
+	 * weight, then key.
 	 *
 	 * @return Permission_Definition[]
 	 */
@@ -170,6 +171,9 @@ final class Permission_Registry {
 				$b_prio = self::SOURCE_PRIORITY[ $b->source ] ?? 99;
 				if ( $a_prio !== $b_prio ) {
 					return $a_prio - $b_prio;
+				}
+				if ( $a->order !== $b->order ) {
+					return $a->order - $b->order;
 				}
 				return strcmp( $a->key, $b->key );
 			}

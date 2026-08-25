@@ -16,7 +16,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Walks the Module_Registry and registers a Permission_Definition for every
- * module's `get_capability()`. Same shape as Tool_Harvester.
+ * module's `get_capability()`. Same shape as Tool_Harvester, including
+ * labelling the row with the module's own name.
  *
  * @since 1.0.0
  */
@@ -56,17 +57,20 @@ final class Module_Harvester {
 				continue;
 			}
 
-			$tier        = method_exists( $module, 'get_tier_required' ) ? (string) $module->get_tier_required() : 'free';
-			$label       = method_exists( $module, 'get_name' ) ? (string) $module->get_name() : $cap;
-			$description = method_exists( $module, 'get_description' )
-				? (string) $module->get_description()
-				: sprintf( /* translators: %s: module name */ __( 'Access the %s module.', 'fotogrids' ), $label );
+			$tier = method_exists( $module, 'get_tier_required' ) ? (string) $module->get_tier_required() : 'free';
+			$name = self::module_name( $module );
+
+			$description = method_exists( $module, 'get_description' ) ? (string) $module->get_description() : '';
+			if ( '' === $description ) {
+				/* translators: %s: module name. */
+				$description = sprintf( __( 'Use the features the %s module adds.', 'fotogrids' ), $name );
+			}
 
 			Permission_Registry::register(
 				new Permission_Definition(
 					array(
 						'key'                 => $cap,
-						'label'               => $label,
+						'label'               => $name,
 						'description'         => $description,
 						'group'               => 'modules',
 						'panel'               => 'advanced',
@@ -76,5 +80,30 @@ final class Module_Harvester {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Resolve a module's display name.
+	 *
+	 * Module_Interface declares `get_name()`; `get_label()` is accepted as a
+	 * fallback for third-party modules that follow the Tool_Interface shape.
+	 * Falls back to the module id so a matrix row never renders a raw
+	 * capability slug.
+	 *
+	 * @since 1.0.0
+	 * @param object $module Registered module instance.
+	 * @return string
+	 */
+	private static function module_name( object $module ): string {
+		foreach ( array( 'get_name', 'get_label', 'get_id' ) as $method ) {
+			if ( ! method_exists( $module, $method ) ) {
+				continue;
+			}
+			$name = trim( (string) $module->{$method}() );
+			if ( '' !== $name ) {
+				return $name;
+			}
+		}
+		return __( 'Unnamed', 'fotogrids' );
 	}
 }

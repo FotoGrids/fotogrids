@@ -19,6 +19,11 @@ if ( ! defined( 'WPINC' ) ) {
  * tool's `get_capability()`. New tools therefore appear in the Permissions
  * matrix automatically - no JSX edit, no PHP edit.
  *
+ * The row is labelled with the tool's own name rather than a generated
+ * phrase, so a tool whose label is already a sentence ("Migrate from other
+ * plugins") is never mangled. The matrix groups these rows under Tools, which
+ * supplies the "can use" sense.
+ *
  * If two tools declare the same capability, the first one wins and a debug
  * log line records the collision.
  *
@@ -63,17 +68,20 @@ final class Tool_Harvester {
 				continue;
 			}
 
-			$tier        = method_exists( $tool, 'get_tier_required' ) ? (string) $tool->get_tier_required() : 'free';
-			$label       = method_exists( $tool, 'get_name' ) ? (string) $tool->get_name() : $cap;
-			$description = method_exists( $tool, 'get_description' )
-				? (string) $tool->get_description()
-				: sprintf( /* translators: %s: tool name */ __( 'Access the %s tool.', 'fotogrids' ), $label );
+			$tier = method_exists( $tool, 'get_tier_required' ) ? (string) $tool->get_tier_required() : 'free';
+			$name = self::tool_name( $tool );
+
+			$description = method_exists( $tool, 'get_description' ) ? (string) $tool->get_description() : '';
+			if ( '' === $description ) {
+				/* translators: %s: tool name. */
+				$description = sprintf( __( 'Open and run the %s tool.', 'fotogrids' ), $name );
+			}
 
 			Permission_Registry::register(
 				new Permission_Definition(
 					array(
 						'key'                 => $cap,
-						'label'               => $label,
+						'label'               => $name,
 						'description'         => $description,
 						'group'               => 'tools',
 						'panel'               => 'advanced',
@@ -83,5 +91,30 @@ final class Tool_Harvester {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Resolve a tool's display name.
+	 *
+	 * Tool_Interface declares `get_label()`; `get_name()` is accepted as a
+	 * fallback for third-party tools that follow the Module_Interface shape.
+	 * Falls back to the tool id so a matrix row never renders a raw
+	 * capability slug.
+	 *
+	 * @since 1.0.0
+	 * @param object $tool Registered tool instance.
+	 * @return string
+	 */
+	private static function tool_name( object $tool ): string {
+		foreach ( array( 'get_label', 'get_name', 'get_id' ) as $method ) {
+			if ( ! method_exists( $tool, $method ) ) {
+				continue;
+			}
+			$name = trim( (string) $tool->{$method}() );
+			if ( '' !== $name ) {
+				return $name;
+			}
+		}
+		return __( 'Unnamed', 'fotogrids' );
 	}
 }
