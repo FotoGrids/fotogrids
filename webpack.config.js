@@ -706,6 +706,13 @@ const mainConfig = {
         minimize: isProduction,
         minimizer: [
             new TerserPlugin({
+                // Vendored third-party libraries are copied verbatim by
+                // CopyWebpackPlugin and ship with their upstream source map.
+                // Terser would otherwise re-minify the copied asset, which
+                // invalidates the map and has produced broken output before
+                // (Chart.js: `let` narrowed to `const` -> "Assignment to
+                // constant variable" at runtime).
+                exclude: /assets[\\/]admin[\\/]vendor[\\/]/,
                 terserOptions: {
                     compress: {
                         drop_console: isProduction,

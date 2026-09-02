@@ -307,7 +307,7 @@ class Admin_Init {
 				'chartjs',
 				FOTOGRIDS_PLUGIN_URL . 'assets/admin/vendor/chartjs/chart.umd.js',
 				array(),
-				'4.4.0',
+				FOTOGRIDS_VERSION,
 				true
 			);
 		}
