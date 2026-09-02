@@ -4,6 +4,61 @@ import Icon from '../shared/Icon';
 const { __ } = wp.i18n;
 
 /**
+ * Card artwork - one grid motif in two states.
+ *
+ * Both cards share the same cell geometry so the pair reads as a single
+ * comparison: outlined and empty on the left, filled and arranged on the
+ * right. Colours come from SCSS classes, never from attributes, so the
+ * artwork follows the admin colour tokens.
+ */
+const ART_VIEWBOX = '0 0 224 98';
+
+const ScratchArt = () => (
+    <svg
+        className="fotogrids-setup__create-art"
+        viewBox={ ART_VIEWBOX }
+        aria-hidden="true"
+        focusable="false"
+    >
+        <g className="fotogrids-setup__create-art-outline">
+            <rect x="24" y="18" width="39.5" height="28" rx="3" />
+            <rect x="69.5" y="18" width="39.5" height="28" rx="3" />
+            <rect x="115" y="18" width="39.5" height="28" rx="3" />
+            <rect x="160.5" y="18" width="39.5" height="28" rx="3" />
+            <rect x="24" y="52" width="39.5" height="28" rx="3" />
+            <rect x="69.5" y="52" width="39.5" height="28" rx="3" />
+            <rect x="115" y="52" width="39.5" height="28" rx="3" />
+            <rect x="160.5" y="52" width="39.5" height="28" rx="3" />
+        </g>
+        <g className="fotogrids-setup__create-art-mark">
+            <line x1="39" y1="32" x2="48.5" y2="32" />
+            <line x1="43.75" y1="27.25" x2="43.75" y2="36.75" />
+        </g>
+    </svg>
+);
+
+const TemplateArt = () => (
+    <svg
+        className="fotogrids-setup__create-art"
+        viewBox={ ART_VIEWBOX }
+        aria-hidden="true"
+        focusable="false"
+    >
+        <g className="fotogrids-setup__create-art-accent">
+            <rect x="24" y="18" width="39.5" height="62" rx="3" opacity="1" />
+            <rect x="69.5" y="52" width="39.5" height="28" rx="3" opacity="0.35" />
+            <rect x="115" y="18" width="39.5" height="18" rx="3" opacity="0.5" />
+            <rect x="160.5" y="62" width="39.5" height="18" rx="3" opacity="0.6" />
+        </g>
+        <g className="fotogrids-setup__create-art-cell">
+            <rect x="69.5" y="18" width="39.5" height="28" rx="3" opacity="0.18" />
+            <rect x="115" y="42" width="39.5" height="38" rx="3" opacity="0.18" />
+            <rect x="160.5" y="18" width="39.5" height="38" rx="3" opacity="0.28" />
+        </g>
+    </svg>
+);
+
+/**
  * Step 5 - Create your first gallery.
  *
  * Two equal-weight *action* cards: clicking either one closes the wizard
@@ -20,7 +75,8 @@ const CARDS = [
     {
         id:    'custom',
         icon:  'layout',
-        color: 'var(--fg-interactive-selected-bg-darker)',
+        color: 'var(--fg-background-secondary)',
+        art:   ScratchArt,
         title: __( 'Build from scratch', 'fotogrids' ),
         body:  __( 'Start with an empty gallery. Drop in photos, pick a layout, embed on a page.', 'fotogrids' ),
         cta:   __( 'Build custom', 'fotogrids' ),
@@ -29,11 +85,12 @@ const CARDS = [
     {
         id:    'template',
         icon:  'templates',
-        color: 'var(--fg-blue)',
+        color: 'color-mix(in srgb, var(--fg-blue) 8%, var(--fg-background-primary))',
+        art:   TemplateArt,
         title: __( 'Choose a template', 'fotogrids' ),
         body:  __( 'Start from a ready-made layout we’ll fill with your photos.', 'fotogrids' ),
         cta:   __( 'Browse templates', 'fotogrids' ),
-        href:  'admin.php?page=fotogrids-templates',
+        href:  'admin.php?page=fotogrids-templates&fg_choose=1',
     },
 ];
 
@@ -62,6 +119,7 @@ const StepCreateGallery = ( { onClose } ) => {
             <div className="fotogrids-setup__card-grid fotogrids-setup__card-grid--create">
                 { CARDS.map( ( card ) => {
                     const baseClass = 'fotogrids-setup__create-card';
+                    const Art       = card.art;
 
                     return (
                         <button
@@ -71,7 +129,9 @@ const StepCreateGallery = ( { onClose } ) => {
                             style={ { '--fg-tool-card-color': card.color } }
                             onClick={ ( e ) => handleClick( e, card ) }
                         >
-                            <div className={ `${ baseClass }-image` }></div>
+                            <div className={ `${ baseClass }-image` }>
+                                <Art />
+                            </div>
                             <div className={ `${ baseClass }-body` }>
                                 <div className={ `${ baseClass }-body-header` }>
                                     <Icon name={ card.icon } />

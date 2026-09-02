@@ -21,7 +21,7 @@ const DEVICE_WIDTHS = {
 const DEFAULT_CUSTOM_BG = '#0066cc';
 const DEFAULT_CUSTOM_WIDTH = 1000;
 
-const PreviewTemplateModal = ({ template, onClose, onApply }) => {
+const PreviewTemplateModal = ({ template, onClose, onApply, applyLabel }) => {
 	const [showOverviewModal, setShowOverviewModal] = useState(false);
 	const [showApplyModal, setShowApplyModal] = useState(false);
 	const [pageBackground, setPageBackground] = useState('light'); // 'light' | 'dark' | 'custom'
@@ -238,7 +238,7 @@ const PreviewTemplateModal = ({ template, onClose, onApply }) => {
 								}
 							}}
 						>
-							{__('Apply', 'fotogrids')}
+							{applyLabel || __('Apply', 'fotogrids')}
 						</Button>
 					</Modal.HeaderActions>
 				</Modal.Header>
