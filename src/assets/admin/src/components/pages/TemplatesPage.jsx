@@ -24,7 +24,15 @@ const ALBUM_TEMPLATES_ENABLED = false;
  * node and shows the new image. An imperative style.display change would survive
  * reconciliation and keep the refreshed thumbnail hidden until a full reload.
  */
-const TemplateCard = ({ template, isProActive, onPreview, onApply }) => {
+const TemplateCard = ({
+	template,
+	isProActive,
+	chooseMode,
+	creating,
+	onPreview,
+	onApply,
+	onChoose,
+}) => {
 	const src = template.thumbnail_url || template.preview || '';
 	const [imgError, setImgError] = useState(false);
 
@@ -81,9 +89,17 @@ const TemplateCard = ({ template, isProActive, onPreview, onApply }) => {
 						<Button
 							variant="primary"
 							size="xs"
-							onClick={() => onApply(template)}
+							busy={creating}
+							disabled={creating}
+							onClick={() =>
+								chooseMode
+									? onChoose(template)
+									: onApply(template)
+							}
 						>
-							{__('Apply', 'fotogrids')}
+							{chooseMode
+								? __('Use this template', 'fotogrids')
+								: __('Apply', 'fotogrids')}
 						</Button>
 					)}
 				</div>
@@ -109,7 +125,16 @@ const TemplatesPage = () => {
 	const [showPro, setShowPro] = useState(true);
 	const [libraryMeta, setLibraryMeta] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
+	const [creatingId, setCreatingId] = useState(null);
 	const isProActive = window.fotogridsSettings?.isProActive || false;
+
+	// The setup wizard links here with ?fg_choose=1 to pick a template for a
+	// gallery that does not exist yet. Read once - the flag never changes
+	// within a page load.
+	const [chooseMode] = useState(
+		() =>
+			new URLSearchParams(window.location.search).get('fg_choose') === '1'
+	);
 
 	useEffect(() => {
 		loadTemplates();
@@ -230,13 +255,57 @@ const TemplatesPage = () => {
 		setShowApplyModal(true);
 	};
 
+	const handleChoose = async (template) => {
+		if (creatingId) {
+			return;
+		}
+		setCreatingId(template.id);
+		try {
+			const response = await wp.apiFetch({
+				path: `/fotogrids/v1/templates/${template.id}/create-collection`,
+				method: 'POST',
+				data: {
+					post_type: activeTab,
+					title: template.name || '',
+				},
+			});
+
+			if (response.edit_url) {
+				window.location.assign(response.edit_url);
+				return;
+			}
+
+			throw new Error(
+				response.message ||
+					__(
+						'Could not create a gallery from this template.',
+						'fotogrids'
+					)
+			);
+		} catch (error) {
+			setCreatingId(null);
+			if (window.fotogridsToast) {
+				window.fotogridsToast.error(
+					error.message ||
+						__(
+							'Could not create a gallery from this template.',
+							'fotogrids'
+						)
+				);
+			}
+		}
+	};
+
 	const renderTemplateCard = (template) => (
 		<TemplateCard
 			key={template.id}
 			template={template}
 			isProActive={isProActive}
+			chooseMode={chooseMode}
+			creating={creatingId === template.id}
 			onPreview={handlePreview}
 			onApply={handleApply}
+			onChoose={handleChoose}
 		/>
 	);
 
@@ -389,6 +458,18 @@ const TemplatesPage = () => {
 			{!isProActive && renderInfoColumn()}
 
 			<div className="fotogrids-templates-page__main">
+				{chooseMode && (
+					<div className="fotogrids-templates-page__choose-bar">
+						<Icon name="templates" />
+						<p>
+							{__(
+								'Pick a template and we’ll open a new gallery with it applied.',
+								'fotogrids'
+							)}
+						</p>
+					</div>
+				)}
+
 				<div className="fotogrids-templates-page__header">
 					<div className="fotogrids-templates-page__tabs">
 						<button
@@ -553,10 +634,19 @@ const TemplatesPage = () => {
 						setShowPreviewModal(false);
 						setPreviewParam(null);
 					}}
+					applyLabel={
+						chooseMode
+							? __('Use this template', 'fotogrids')
+							: __('Apply', 'fotogrids')
+					}
 					onApply={(template) => {
 						setShowPreviewModal(false);
 						setPreviewParam(null);
-						handleApply(template);
+						if (chooseMode) {
+							handleChoose(template);
+						} else {
+							handleApply(template);
+						}
 					}}
 				/>
 			)}

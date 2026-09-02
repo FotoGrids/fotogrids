@@ -58,6 +58,33 @@ class Templates_Permissions {
 	}
 
 	/**
+	 * Check if user can create a new gallery or album from a template
+	 *
+	 * @param \WP_REST_Request $request Request object
+	 * @return bool True if user has permission
+	 */
+	public static function check_create_collection_from_template( $request ) {
+		$post_type = $request->get_param( 'post_type' );
+
+		$expected_types = array(
+			'gallery' => 'fotogrids_gallery',
+			'album'   => 'fotogrids_album',
+		);
+
+		if ( ! isset( $expected_types[ $post_type ] ) ) {
+			return false;
+		}
+
+		$post_type_object = get_post_type_object( $expected_types[ $post_type ] );
+
+		if ( ! $post_type_object ) {
+			return false;
+		}
+
+		return current_user_can( $post_type_object->cap->create_posts );
+	}
+
+	/**
 	 * Check if user can delete templates
 	 *
 	 * @param \WP_REST_Request $request Request object

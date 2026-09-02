@@ -138,6 +138,29 @@
         overflow: hidden;
     }
 
+    &__choose-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        border-bottom: 1px solid var(--fg-border-primary);
+        background: var(--fg-interactive-selected-bg);
+
+        .fotogrids-icon {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            color: var(--fg-blue);
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--fg-text-primary);
+        }
+    }
+
     &__header {
         display: flex;
         justify-content: space-between;

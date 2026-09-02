@@ -354,6 +354,96 @@ class Templates_Data {
 	}
 
 	/**
+	 * Create a new gallery or album seeded with a template.
+	 *
+	 * Inserts a draft post, writes the template's settings onto it and returns
+	 * the edit URL so the caller can send the user straight to the editor.
+	 *
+	 * @since 1.2.0
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return \WP_REST_Response|\WP_Error New post id and edit URL, or error.
+	 */
+	public static function create_collection_from_template( $request ) {
+		$template_id = $request->get_param( 'id' );
+		$post_type   = $request->get_param( 'post_type' );
+
+		$post_type_map = array(
+			'gallery' => 'fotogrids_gallery',
+			'album'   => 'fotogrids_album',
+		);
+
+		if ( ! $template_id || ! isset( $post_type_map[ $post_type ] ) ) {
+			return new \WP_Error(
+				'missing_params',
+				__( 'Template ID and a valid post type are required.', 'fotogrids' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$target_post_type = $post_type_map[ $post_type ];
+		$template         = self::get_template_by_id( $template_id, $post_type );
+
+		if ( ! $template ) {
+			return new \WP_Error( 'template_not_found', __( 'Template not found.', 'fotogrids' ), array( 'status' => 404 ) );
+		}
+
+		$settings = isset( $template['settings'] ) && is_array( $template['settings'] ) ? $template['settings'] : array();
+
+		if ( empty( $settings ) ) {
+			return new \WP_Error(
+				'template_not_available',
+				__( 'This template is not available on your plan.', 'fotogrids' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$settings_cap = \FotoGrids\Permissions\Permission_Gate::settings_cap_for( $target_post_type );
+		if ( null !== $settings_cap && ! \FotoGrids\Permissions\Permission_Check::can( $settings_cap ) ) {
+			return new \WP_Error(
+				'fotogrids_forbidden_settings',
+				__( 'You do not have permission to change settings.', 'fotogrids' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$title = (string) $request->get_param( 'title' );
+		if ( '' === $title && ! empty( $template['name'] ) ) {
+			$title = (string) $template['name'];
+		}
+		if ( '' === $title ) {
+			$title = 'fotogrids_album' === $target_post_type
+				? __( 'New album', 'fotogrids' )
+				: __( 'New gallery', 'fotogrids' );
+		}
+
+		$new_post_id = wp_insert_post(
+			array(
+				'post_type'   => $target_post_type,
+				'post_title'  => sanitize_text_field( $title ),
+				'post_status' => 'draft',
+			),
+			true
+		);
+
+		if ( is_wp_error( $new_post_id ) ) {
+			return $new_post_id;
+		}
+
+		foreach ( $settings as $key => $value ) {
+			update_post_meta( $new_post_id, 'fotogrids_' . $key, $value );
+		}
+
+		return rest_ensure_response(
+			array(
+				'success'  => true,
+				'post_id'  => (int) $new_post_id,
+				'edit_url' => admin_url( 'post.php?action=edit&post=' . (int) $new_post_id ),
+				'message'  => __( 'Gallery created from template.', 'fotogrids' ),
+			)
+		);
+	}
+
+	/**
 	 * Delete user template
 	 *
 	 * @param \WP_REST_Request $request The REST API request object
@@ -612,6 +702,18 @@ class Templates_Data {
 			if ( isset( $template['id'] ) && $template['id'] === $template_id ) {
 				return $template;
 			}
+		}
+
+		// The listing endpoint serves the remote catalog, so an entry can be
+		// offered for apply without existing in the bundled set.
+		foreach ( Templates_Catalog::get_templates() as $template ) {
+			if ( ! isset( $template['id'] ) || $template['id'] !== $template_id ) {
+				continue;
+			}
+			if ( $category && isset( $template['category'] ) && $template['category'] !== $category ) {
+				continue;
+			}
+			return $template;
 		}
 
 		return null;

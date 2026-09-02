@@ -76,6 +76,33 @@ class Register_Templates_Routes {
 			)
 		);
 
+		// Create a new gallery or album from a template
+		register_rest_route(
+			'fotogrids/v1',
+			'/templates/(?P<id>[a-zA-Z0-9_-]+)/create-collection',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( '\FotoGrids\REST\Templates\Templates_Data', 'create_collection_from_template' ),
+					'permission_callback' => array( '\FotoGrids\REST\Templates\Templates_Permissions', 'check_create_collection_from_template' ),
+					'args'                => array(
+						'id'        => array(
+							'required'          => true,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'post_type' => array(
+							'required'          => true,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'title'     => array(
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+					),
+				),
+			)
+		);
+
 		// Delete template endpoint
 		register_rest_route(
 			'fotogrids/v1',
