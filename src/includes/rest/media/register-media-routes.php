@@ -63,7 +63,7 @@ class Register_Media_Routes {
 
 		register_rest_route(
 			'fotogrids/v1',
-			'/media/folders/import',
+			'/media/import/folder',
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
@@ -89,7 +89,7 @@ class Register_Media_Routes {
 
 		register_rest_route(
 			'fotogrids/v1',
-			'/media/zip',
+			'/media/import/zip',
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,

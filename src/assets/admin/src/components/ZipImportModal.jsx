@@ -51,7 +51,7 @@ const uploadArchive = (file, galleryId, onProgress) =>
         body.append('gallery_id', galleryId);
 
         const request = new XMLHttpRequest();
-        request.open('POST', `${root}fotogrids/v1/media/zip`);
+        request.open('POST', `${root}fotogrids/v1/media/import/zip`);
         request.setRequestHeader('X-WP-Nonce', nonce);
 
         request.upload.addEventListener('progress', (event) => {

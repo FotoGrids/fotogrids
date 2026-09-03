@@ -202,7 +202,7 @@ const FolderImportModal = ({
                 // pushes shared hosts into a memory limit.
                 // eslint-disable-next-line no-await-in-loop
                 const response = await wp.apiFetch({
-                    path: '/fotogrids/v1/media/folders/import',
+                    path: '/fotogrids/v1/media/import/folder',
                     method: 'POST',
                     data: { gallery_id: galleryId, files: chunk },
                 });
