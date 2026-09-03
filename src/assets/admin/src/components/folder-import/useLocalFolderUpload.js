@@ -18,10 +18,11 @@ import { uploadMedia } from '@wordpress/media-utils';
 
 // Browsers report an empty type for formats they have no MIME mapping for
 // (HEIC and friends), so the extension is the fallback.
-const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp|avif|bmp|tiff?|heic|heif|svg|ico)$/i;
+const IMAGE_EXTENSIONS =
+	/\.(jpe?g|png|gif|webp|avif|bmp|tiff?|heic|heif|svg|ico)$/i;
 
 const isImageFile = (file) =>
-    file.type.startsWith('image/') || IMAGE_EXTENSIONS.test(file.name || '');
+	file.type.startsWith('image/') || IMAGE_EXTENSIONS.test(file.name || '');
 
 /**
  * Name of the folder the visitor picked, taken from the first file's path.
@@ -30,109 +31,115 @@ const isImageFile = (file) =>
  * @return {string}
  */
 const pickedFolderName = (files) => {
-    const relative = files[0]?.webkitRelativePath || '';
-    return relative.split('/')[0] || '';
+	const relative = files[0]?.webkitRelativePath || '';
+	return relative.split('/')[0] || '';
 };
 
 const useLocalFolderUpload = ({
-    isOpen,
-    onUploadComplete,
-    onFinished,
-    noImagesMessage,
-    failedMessage,
+	isOpen,
+	onUploadComplete,
+	onFinished,
+	noImagesMessage,
+	failedMessage,
 }) => {
-    const [files, setFiles] = useState([]);
-    const [folderName, setFolderName] = useState('');
-    const [uploading, setUploading] = useState(false);
-    const [counts, setCounts] = useState({ done: 0, total: 0 });
-    const [error, setError] = useState(null);
+	const [files, setFiles] = useState([]);
+	const [folderName, setFolderName] = useState('');
+	const [uploading, setUploading] = useState(false);
+	const [counts, setCounts] = useState({ done: 0, total: 0 });
+	const [error, setError] = useState(null);
 
-    useEffect(() => {
-        if (isOpen) return;
+	useEffect(() => {
+		if (isOpen) return;
 
-        setFiles([]);
-        setFolderName('');
-        setError(null);
-        setCounts({ done: 0, total: 0 });
-    }, [isOpen]);
+		setFiles([]);
+		setFolderName('');
+		setError(null);
+		setCounts({ done: 0, total: 0 });
+	}, [isOpen]);
 
-    const pickFiles = useCallback(
-        (fileList) => {
-            const picked = Array.from(fileList || []);
-            const images = picked.filter(isImageFile);
+	const pickFiles = useCallback(
+		(fileList) => {
+			const picked = Array.from(fileList || []);
+			const images = picked.filter(isImageFile);
 
-            setFolderName(pickedFolderName(picked));
-            setFiles(images);
-            // An empty pick is otherwise indistinguishable from the picker
-            // never having opened.
-            setError(picked.length > 0 && images.length === 0 ? noImagesMessage : null);
-        },
-        [noImagesMessage]
-    );
+			setFolderName(pickedFolderName(picked));
+			setFiles(images);
+			// An empty pick is otherwise indistinguishable from the picker
+			// never having opened.
+			setError(
+				picked.length > 0 && images.length === 0
+					? noImagesMessage
+					: null
+			);
+		},
+		[noImagesMessage]
+	);
 
-    const startUpload = useCallback(() => {
-        if (files.length === 0) return;
+	const startUpload = useCallback(() => {
+		if (files.length === 0) return;
 
-        const uploaded = new Set();
-        let failed = 0;
+		const uploaded = new Set();
+		let failed = 0;
 
-        const settle = () => {
-            const done = uploaded.size + failed;
-            setCounts({ done, total: files.length });
+		const settle = () => {
+			const done = uploaded.size + failed;
+			setCounts({ done, total: files.length });
 
-            if (done < files.length) return;
+			if (done < files.length) return;
 
-            setUploading(false);
-            setCounts({ done: 0, total: 0 });
+			setUploading(false);
+			setCounts({ done: 0, total: 0 });
 
-            if (uploaded.size > 0) {
-                onUploadComplete?.(Array.from(uploaded));
-            }
+			if (uploaded.size > 0) {
+				onUploadComplete?.(Array.from(uploaded));
+			}
 
-            onFinished?.();
-        };
+			onFinished?.();
+		};
 
-        setError(null);
-        setUploading(true);
-        setCounts({ done: 0, total: files.length });
+		setError(null);
+		setUploading(true);
+		setCounts({ done: 0, total: files.length });
 
-        // uploadMedia() validates before either callback can fire, so a
-        // rejection there would otherwise leave the caller busy forever.
-        Promise.resolve(
-            uploadMedia({
-                filesList: files,
-                allowedTypes: ['image'],
-                onFileChange: (attachments) => {
-                    (attachments || []).forEach((attachment) => {
-                        if (attachment?.id) uploaded.add(attachment.id);
-                    });
-                    settle();
-                },
-                onError: (uploadError) => {
-                    setError(uploadError.message);
-                    failed += 1;
-                    settle();
-                },
-            })
-        ).catch((uploadError) => {
-            setError(uploadError?.message || failedMessage);
-            setUploading(false);
-            setCounts({ done: 0, total: 0 });
-        });
-    }, [files, onUploadComplete, onFinished, failedMessage]);
+		// uploadMedia() validates before either callback can fire, so a
+		// rejection there would otherwise leave the caller busy forever.
+		Promise.resolve(
+			uploadMedia({
+				filesList: files,
+				allowedTypes: ['image'],
+				onFileChange: (attachments) => {
+					(attachments || []).forEach((attachment) => {
+						if (attachment?.id) uploaded.add(attachment.id);
+					});
+					settle();
+				},
+				onError: (uploadError) => {
+					setError(uploadError.message);
+					failed += 1;
+					settle();
+				},
+			})
+		).catch((uploadError) => {
+			setError(uploadError?.message || failedMessage);
+			setUploading(false);
+			setCounts({ done: 0, total: 0 });
+		});
+	}, [files, onUploadComplete, onFinished, failedMessage]);
 
-    const percent = counts.total ? Math.round((counts.done / counts.total) * 100) : 0;
+	const percent = counts.total
+		? Math.round((counts.done / counts.total) * 100)
+		: 0;
 
-    return {
-        files,
-        folderName,
-        uploading,
-        counts,
-        percent,
-        error,
-        pickFiles,
-        startUpload,
-    };
+	return {
+		files,
+		folderName,
+		uploading,
+		counts,
+		percent,
+		error,
+		pickFiles,
+		startUpload,
+	};
 };
 
 export default useLocalFolderUpload;

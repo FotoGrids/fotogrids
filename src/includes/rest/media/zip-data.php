@@ -130,7 +130,7 @@ class Zip_Data {
 				return $budget;
 			}
 
-			$extracted = trailingslashit( $temp ) . 'extracted';
+			$extracted  = trailingslashit( $temp ) . 'extracted';
 			$extraction = self::extract_images( $archive, $extracted );
 
 			wp_delete_file( $archive );
@@ -190,7 +190,7 @@ class Zip_Data {
 		$wanted   = array();
 		$rejected = array();
 
-		for ( $index = 0; $index < $zip->numFiles; $index++ ) {
+		for ( $index = 0; $index < $zip->numFiles; $index++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive defines this property name.
 			$name = $zip->getNameIndex( $index );
 
 			if ( ! is_string( $name ) || '' === $name || '/' === substr( $name, -1 ) ) {
@@ -351,7 +351,7 @@ class Zip_Data {
 			);
 		}
 
-		$entries = $zip->numFiles;
+		$entries = $zip->numFiles; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive defines this property name.
 		$total   = 0;
 
 		for ( $index = 0; $index < $entries; $index++ ) {

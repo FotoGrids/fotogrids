@@ -41,17 +41,17 @@ class Register_Media_Routes {
 							'sanitize_callback' => 'absint',
 							'description'       => __( 'The gallery being edited.', 'fotogrids' ),
 						),
-						'path'     => array(
+						'path'       => array(
 							'default'     => '',
 							'type'        => 'string',
 							'description' => __( 'Folder path relative to the uploads folder.', 'fotogrids' ),
 						),
-						'page'     => array(
+						'page'       => array(
 							'default'           => 1,
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
 						),
-						'per_page' => array(
+						'per_page'   => array(
 							'default'           => 100,
 							'type'              => 'integer',
 							'sanitize_callback' => 'absint',
@@ -76,7 +76,7 @@ class Register_Media_Routes {
 							'sanitize_callback' => 'absint',
 							'description'       => __( 'The gallery being edited.', 'fotogrids' ),
 						),
-						'files' => array(
+						'files'      => array(
 							'required'    => true,
 							'type'        => 'array',
 							'items'       => array( 'type' => 'string' ),
