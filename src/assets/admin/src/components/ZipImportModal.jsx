@@ -106,7 +106,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     const acceptFile = useCallback(
         (candidate) => {
             if (!isZip(candidate)) {
-                setError(strings.uploadFromZipInvalid || 'That file is not a ZIP archive.');
+                setError(strings.uploadFromZipInvalid);
                 return;
             }
             setError(null);
@@ -165,8 +165,8 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
             isUploading={busy}
             uploadProgress={progress}
             error={error}
-            title={strings.uploadFromZipChoose || 'Select a ZIP file to upload'}
-            subtitle={strings.uploadFromZipDragDrop || 'or drag and drop it here'}
+            title={strings.uploadFromZipChoose}
+            subtitle={strings.uploadFromZipDragDrop}
             hint={strings.uploadFromZipMaxSize}
             accept=".zip,application/zip"
             multiple={false}
@@ -181,10 +181,10 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
         <div className="fg-upload-zip-result">
             <p className="fg-upload-zip-result__headline">
                 <Icon name="check_circle" />
-                {result.added} {strings.uploadFromZipImagesAdded || 'images added.'}
+                {result.added} {strings.uploadFromZipImagesAdded}
             </p>
             <p className="fg-upload-zip-result__subhead">
-                {result.skipped.length} {strings.uploadFromZipEntriesSkipped || 'entries were skipped:'}
+                {result.skipped.length} {strings.uploadFromZipEntriesSkipped}
             </p>
             <ul className="fg-upload-zip-result__list">
                 {result.skipped.slice(0, 50).map((entry, index) => (
@@ -206,7 +206,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
         >
             <Modal.Header>
                 <Modal.HeaderTitle>
-                    {strings.uploadFromZipModalTitle || 'Add images from a ZIP file'}
+                    {strings.uploadFromZipModalTitle}
                 </Modal.HeaderTitle>
             </Modal.Header>
 
@@ -227,7 +227,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
 
                         {extracting && (
                             <p className="fg-upload-zip-status">
-                                {strings.uploadFromZipExtracting || 'Extracting images…'}
+                                {strings.uploadFromZipExtracting}
                             </p>
                         )}
                     </>
@@ -237,12 +237,12 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
             <Modal.Footer>
                 {result ? (
                     <Button variant="primary" onClick={onClose}>
-                        {strings.done || 'Done'}
+                        {strings.done}
                     </Button>
                 ) : (
                     <>
                         <Button variant="secondary" onClick={onClose} disabled={busy}>
-                            {strings.cancel || 'Cancel'}
+                            {strings.cancel}
                         </Button>
                         <Button
                             variant="primary"
@@ -250,7 +250,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
                             busy={busy}
                             disabled={!file || busy}
                         >
-                            {strings.uploadFromZipUploadAndAdd || 'Upload & Add'}
+                            {strings.uploadFromZipUploadAndAdd}
                         </Button>
                     </>
                 )}

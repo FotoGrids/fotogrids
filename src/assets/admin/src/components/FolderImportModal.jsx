@@ -220,7 +220,7 @@ const FolderImportModal = ({
 
             if (skipped.length > 0 && window.fotogridsToast) {
                 window.fotogridsToast.error(
-                    `${skipped.length} ${strings.uploadFromFolderFilesSkipped || 'files were skipped.'}`
+                    `${skipped.length} ${strings.uploadFromFolderFilesSkipped}`
                 );
             }
 
@@ -242,7 +242,7 @@ const FolderImportModal = ({
             setLocalFiles(files);
             setError(
                 picked.length > 0 && files.length === 0
-                    ? strings.uploadFromFolderNoImages || 'No images found in that folder.'
+                    ? strings.uploadFromFolderNoImages
                     : null
             );
         },
@@ -301,7 +301,7 @@ const FolderImportModal = ({
     const busy = importing || uploading;
 
     const renderBreadcrumbs = () => (
-        <nav className="fg-upload-folder-crumbs" aria-label={strings.uploadFromFolder || 'From Folder'}>
+        <nav className="fg-upload-folder-crumbs" aria-label={strings.uploadFromFolder}>
             {listing.breadcrumbs.map((crumb, index) => (
                 <React.Fragment key={crumb.path || 'root'}>
                     {index > 0 && <Icon name="chevron_right" className="fg-upload-folder-crumbs__sep" />}
@@ -323,7 +323,7 @@ const FolderImportModal = ({
             {error && <div className="fg-upload-folder-browser__error">{error}</div>}
 
             {loading ? (
-                <p className="fg-upload-folder-browser__empty">{strings.loading || 'Loading…'}</p>
+                <p className="fg-upload-folder-browser__empty">{strings.loading}</p>
             ) : (
                 <>
                     {listing.folders.length > 0 && (
@@ -370,7 +370,7 @@ const FolderImportModal = ({
 
                     {listing.files.length === 0 ? (
                         <p className="fg-upload-folder-browser__empty">
-                            {strings.uploadFromFolderEmpty || 'No images in this folder.'}
+                            {strings.uploadFromFolderEmpty}
                         </p>
                     ) : (
                         <>
@@ -379,7 +379,7 @@ const FolderImportModal = ({
                                     id="fg-upload-folder-select-all"
                                     checked={allVisibleSelected}
                                     onChange={toggleAllVisible}
-                                    label={strings.uploadFromFolderSelectAll || 'Select all'}
+                                    label={strings.uploadFromFolderSelectAll}
                                     disabled={busy}
                                 />
                                 <span className="fg-upload-folder-browser__count">
@@ -418,7 +418,7 @@ const FolderImportModal = ({
                                                 )}
                                                 {!file.attachment_id && (
                                                     <span className="fg-upload-folder-tile__badge">
-                                                        {strings.uploadFromFolderNewBadge || 'New'}
+                                                        {strings.uploadFromFolderNewBadge}
                                                     </span>
                                                 )}
                                             </button>
@@ -442,7 +442,7 @@ const FolderImportModal = ({
                                         busy={loadingMore}
                                         disabled={busy}
                                     >
-                                        {strings.uploadFromFolderLoadMore || 'Load more'}
+                                        {strings.uploadFromFolderLoadMore}
                                     </Button>
                                 </div>
                             )}
@@ -464,11 +464,10 @@ const FolderImportModal = ({
                 isUploading={uploading}
                 uploadProgress={uploadPercent}
                 error={error}
-                title={strings.uploadFromFolderSelectTitle || 'Select a folder to upload'}
-                subtitle={strings.uploadFromFolderDragDrop || 'or drag and drop images here'}
+                title={strings.uploadFromFolderSelectTitle}
+                subtitle={strings.uploadFromFolderDragDrop}
                 hint={
-                    strings.uploadFromFolderHint ||
-                    'Every image in the folder and its sub-folders is uploaded to your Media Library.'
+                    strings.uploadFromFolderHint
                 }
                 accept="image/*"
                 multiple
@@ -483,7 +482,7 @@ const FolderImportModal = ({
                     <Icon name="image" />
                     <span>
                         {localFolder ? `${localFolder} — ` : ''}
-                        {localFiles.length} {strings.uploadFromFolderImagesReady || 'images ready to upload'}
+                        {localFiles.length} {strings.uploadFromFolderImagesReady}
                     </span>
                 </div>
             )}
@@ -491,22 +490,22 @@ const FolderImportModal = ({
     );
 
     const tabs = [
-        { id: TAB_SERVER, label: strings.uploadFromFolderOnServer || 'On the server' },
-        { id: TAB_COMPUTER, label: strings.uploadFromFolderOnComputer || 'From my computer' },
+        { id: TAB_SERVER, label: strings.uploadFromFolderOnServer },
+        { id: TAB_COMPUTER, label: strings.uploadFromFolderOnComputer },
     ];
 
     const primaryLabel = () => {
         if (activeTab === TAB_COMPUTER) {
             return uploading
-                ? `${strings.uploading || 'Uploading…'} ${uploadCounts.done}/${uploadCounts.total}`
-                : strings.uploadFromFolderUploadAndAdd || 'Upload & Add';
+                ? `${strings.uploading} ${uploadCounts.done}/${uploadCounts.total}`
+                : strings.uploadFromFolderUploadAndAdd;
         }
         if (importing) {
-            return `${strings.adding || 'Adding…'} ${importProgress.done}/${importProgress.total}`;
+            return `${strings.adding} ${importProgress.done}/${importProgress.total}`;
         }
         return selected.length > 0
-            ? `${strings.addToGallery || 'Add to Gallery'} (${selected.length})`
-            : strings.addToGallery || 'Add to Gallery';
+            ? `${strings.addToGallery} (${selected.length})`
+            : strings.addToGallery;
     };
 
     return (
@@ -518,7 +517,7 @@ const FolderImportModal = ({
         >
             <Modal.Header>
                 <Modal.HeaderTitle>
-                    {strings.uploadFromFolderModalTitle || 'Add images from a folder'}
+                    {strings.uploadFromFolderModalTitle}
                 </Modal.HeaderTitle>
             </Modal.Header>
 
@@ -541,7 +540,7 @@ const FolderImportModal = ({
 
             <Modal.Footer>
                 <Button variant="secondary" onClick={onClose} disabled={busy}>
-                    {strings.cancel || 'Cancel'}
+                    {strings.cancel}
                 </Button>
                 <Button
                     variant="primary"
