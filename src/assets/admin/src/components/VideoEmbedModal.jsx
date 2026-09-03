@@ -752,7 +752,6 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
             onClose={ handleClose }
             size="md"
             hasSidebar
-            closeOnOverlay={ false }
             preventClose={ adding }
         >
             <Modal.Header>

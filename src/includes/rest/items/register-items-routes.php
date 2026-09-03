@@ -31,7 +31,7 @@ class Register_Items_Routes {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( '\FotoGrids\REST\Items\Save_Item_Data', 'save' ),
-					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_items_write' ),
+					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_item_write' ),
 					'args'                => array(
 						'id'             => array(
 							'required'          => true,
@@ -152,7 +152,7 @@ class Register_Items_Routes {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( '\FotoGrids\REST\Items\Embed_Data', 'resolve_embed' ),
-					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_items_write' ),
+					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_embed_resolve' ),
 					'args'                => array(
 						'url'    => array(
 							'required'          => true,
@@ -180,7 +180,7 @@ class Register_Items_Routes {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( '\FotoGrids\REST\Items\Embed_Data', 'create_embed' ),
-					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_items_write' ),
+					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_embed_create' ),
 					'args'                => array(
 						'gallery_id'     => array(
 							'required'          => true,
@@ -233,7 +233,7 @@ class Register_Items_Routes {
 				array(
 					'methods'             => \WP_REST_Server::EDITABLE,
 					'callback'            => array( '\FotoGrids\REST\Items\Embed_Data', 'update_embed' ),
-					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_items_write' ),
+					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_embed_write' ),
 					'args'                => array(
 						'id'             => array(
 							'required'          => true,
@@ -278,7 +278,7 @@ class Register_Items_Routes {
 				array(
 					'methods'             => \WP_REST_Server::DELETABLE,
 					'callback'            => array( '\FotoGrids\REST\Items\Embed_Data', 'delete_embed' ),
-					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_items_write' ),
+					'permission_callback' => array( '\FotoGrids\REST\Items\Items_Permissions', 'check_embed_write' ),
 					'args'                => array(
 						'id' => array(
 							'required'          => true,

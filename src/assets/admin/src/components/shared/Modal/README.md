@@ -85,8 +85,8 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 - `Modal.Body` - scroll container. With `hasSidebar`, switches to flex row layout. Props: `padding`, `scroll`.
 - `Modal.Sidebar` - 280px left pane. Renders the collapse toggle when the modal's `sidebarCollapsible` is true.
 - `Modal.Main` - the right pane.
-- `Modal.Tabs` - props: `tabs` (array of `{ id, label, badge?, disabled? }`), `activeId`, `onChange`, `disabled`, `emitEvents` (fires `tab-changed` event).
-- `Modal.TabsPanel` - props: `id`, `activeId`. Renders children only when `id === activeId`.
+- `Modal.Tabs` - props: `tabs` (array of `{ id, label, badge?, disabled? }`), `activeId`, `onChange`, `disabled`, `larger` (roomier tab buttons), `emitEvents` (fires `tab-changed` event).
+- `Modal.TabsPanel` - props: `id`, `activeId`, `padding` (default true; set false when the body already pads, as `Modal.Body` does). Renders children only when `id === activeId`.
 - `Modal.Footer` - props: `align` (`right` | `left` | `between`), `divider`.
 - `Modal.Nav` - props: `direction` (`prev` | `next`), `onClick`, `disabled`, `ariaLabel`. Rendered as overlay sibling, not inside the dialog.
 
