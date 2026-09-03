@@ -7,6 +7,7 @@ const ModalTabs = ({
     activeId,
     onChange,
     disabled = false,
+    larger = false,
     emitEvents = false,
     className = '',
     ...rest
@@ -25,6 +26,7 @@ const ModalTabs = ({
     const classes = [
         'fg-modal__tabs',
         disabled && 'fg-modal__tabs--disabled',
+        larger && 'fg-modal__tabs--larger',
         className,
     ].filter(Boolean).join(' ');
 

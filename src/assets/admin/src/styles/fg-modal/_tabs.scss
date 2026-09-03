@@ -12,6 +12,12 @@
 		opacity: 0.6;
 	}
 
+	&--larger {
+		.fg-modal__tabs__button {
+			padding: 14px 24px;
+		}
+	}
+
 	&__button {
 		background: $tabbar-bg-light;
 		border: none;
@@ -68,4 +74,8 @@
 	overflow-y: auto;
 	padding: 24px;
 	min-height: 0;
+
+	&--no-padding {
+		padding: 0;
+	}
 }

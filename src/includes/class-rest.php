@@ -64,6 +64,13 @@ class REST {
 		require_once $base_path . 'items/save-item-data.php';
 		require_once $base_path . 'items/register-items-routes.php';
 
+		// Media import files (uploads folder browser + ZIP import)
+		require_once $base_path . 'media/media-permissions.php';
+		require_once $base_path . 'media/media-items.php';
+		require_once $base_path . 'media/folder-data.php';
+		require_once $base_path . 'media/zip-data.php';
+		require_once $base_path . 'media/register-media-routes.php';
+
 		// Metadata files
 		require_once $base_path . 'metadata/metadata-permissions.php';
 		require_once $base_path . 'metadata/metadata-data.php';
@@ -112,6 +119,7 @@ class REST {
 		\FotoGrids\REST\Stats\Register_Stats_Routes::register();
 		// Templates routes are registered by the Templates module on rest_api_init.
 		\FotoGrids\REST\Items\Register_Items_Routes::register();
+		\FotoGrids\REST\Media\Register_Media_Routes::register();
 		\FotoGrids\REST\Metadata\Register_Metadata_Routes::register();
 		\FotoGrids\REST\Metadata\Register_Library_Routes::register();
 		\FotoGrids\REST\Lightbox\Register_Lightbox_Routes::register();

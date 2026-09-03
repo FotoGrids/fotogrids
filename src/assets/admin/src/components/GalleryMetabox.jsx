@@ -5,6 +5,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ItemEditModal from './ItemEditModal.jsx';
 import VideoEmbedModal from './VideoEmbedModal.jsx';
+import FolderImportModal from './FolderImportModal.jsx';
+import ZipImportModal from './ZipImportModal.jsx';
 import Icon from './shared/Icon.jsx';
 import { Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
@@ -39,6 +41,8 @@ const GalleryMetabox = ({
     const [items, setItems] = useState(Array.isArray(galleryItems) ? galleryItems : []);
     const [showModal, setShowModal] = useState(false);
     const [showVideoEmbedModal, setShowVideoEmbedModal] = useState(false);
+    const [showFolderImportModal, setShowFolderImportModal] = useState(false);
+    const [showZipImportModal, setShowZipImportModal] = useState(false);
     const [editingEmbed, setEditingEmbed] = useState(null);
     const [showClearAllModal, setShowClearAllModal] = useState(false);
     const [clearAllConfirmValue, setClearAllConfirmValue] = useState('');
@@ -359,6 +363,31 @@ const GalleryMetabox = ({
         mediaUploader.open();
     }, [strings]);
 
+    /**
+     * Insert items into the grid, ignoring any whose attachment is already
+     * present, and mark the gallery dirty.
+     */
+    const appendItems = useCallback((newItems) => {
+        if (!Array.isArray(newItems) || newItems.length === 0) return;
+
+        setItems(prevItems => {
+            const existingIds = new Set(prevItems.map(img => img.id));
+            const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
+            const updatedItems = [...prevItems, ...uniqueNewItems];
+
+            if (State) {
+                const itemIds = updatedItems.map(item => String(item.id)).filter(Boolean);
+                State.items.setItems(itemIds);
+            }
+
+            return updatedItems;
+        });
+
+        document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
+            detail: { source: 'items-add' },
+        }));
+    }, []);
+
     const handleUploadComplete = useCallback(async (uploadedIds) => {
         if (!uploadedIds || uploadedIds.length === 0) return;
 
@@ -379,25 +408,8 @@ const GalleryMetabox = ({
             }
         }
 
-        if (newItems.length === 0) return;
-
-        setItems(prevItems => {
-            const existingIds = new Set(prevItems.map(img => img.id));
-            const uniqueNewItems = newItems.filter(img => !existingIds.has(img.id));
-            const updatedItems = [...prevItems, ...uniqueNewItems];
-
-            if (State) {
-                const itemIds = updatedItems.map(item => String(item.id)).filter(Boolean);
-                State.items.setItems(itemIds);
-            }
-
-            return updatedItems;
-        });
-
-        document.dispatchEvent(new CustomEvent('fotogrids:setting_changed', {
-            detail: { source: 'items-add' },
-        }));
-    }, []);
+        appendItems(newItems);
+    }, [appendItems]);
 
     // Click the star: if not featured, make this item the featured one.
     // If already featured, clear (so there's a real "remove" affordance -
@@ -638,10 +650,10 @@ const GalleryMetabox = ({
                 openMediaUploader('browse');
                 break;
             case 'folder':
-                alert('Browse uploads folder functionality will be implemented soon.');
+                setShowFolderImportModal(true);
                 break;
             case 'zip':
-                alert('ZIP upload functionality will be implemented soon.');
+                setShowZipImportModal(true);
                 break;
             case 'video_embed':
                 setShowVideoEmbedModal(true);
@@ -1054,13 +1066,29 @@ const GalleryMetabox = ({
                 />
             )}
 
-            {/* Video Embed Modal (add + edit) */}
             <VideoEmbedModal
                 isOpen={showVideoEmbedModal}
                 editItem={editingEmbed}
                 onClose={() => { setShowVideoEmbedModal(false); setEditingEmbed(null); }}
                 onAdd={handleAddVideoEmbed}
                 onUpdate={handleUpdateVideoEmbed}
+                strings={strings}
+            />
+
+            <FolderImportModal
+                isOpen={showFolderImportModal}
+                onClose={() => setShowFolderImportModal(false)}
+                onAddItems={appendItems}
+                onUploadComplete={handleUploadComplete}
+                galleryId={window.fotogridsMetaBoxes?.postId || 0}
+                strings={strings}
+            />
+
+            <ZipImportModal
+                isOpen={showZipImportModal}
+                onClose={() => setShowZipImportModal(false)}
+                onAddItems={appendItems}
+                galleryId={window.fotogridsMetaBoxes?.postId || 0}
                 strings={strings}
             />
 
