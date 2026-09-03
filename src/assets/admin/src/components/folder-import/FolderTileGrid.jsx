@@ -13,7 +13,7 @@
 
 import React from 'react';
 import Icon from '../shared/Icon.jsx';
-import formatBytes from '../shared/format-bytes';
+import { formatFileSize } from '../../utils/format-file-size';
 
 const FolderTileGrid = ({
     files = [],
@@ -59,7 +59,7 @@ const FolderTileGrid = ({
                     <span className="fg-upload-folder-tile__name" title={file.name}>
                         {file.name}
                     </span>
-                    <span className="fg-upload-folder-tile__meta">{formatBytes(file.size)}</span>
+                    <span className="fg-upload-folder-tile__meta">{formatFileSize(file.size)}</span>
                 </li>
             );
         })}

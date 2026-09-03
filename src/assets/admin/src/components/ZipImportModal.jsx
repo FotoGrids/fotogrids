@@ -16,8 +16,7 @@ import { Modal } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import UploadArea from './blocks/UploadArea';
-import formatBytes from './shared/format-bytes';
-
+import { formatFileSize } from '../utils/format-file-size';
 
 const isZip = (file) =>
     Boolean(file) && /\.zip$/i.test(file.name || '');
@@ -211,7 +210,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
                             <div className="fg-upload-zip-file">
                                 <Icon name="file_attachment" />
                                 <span className="fg-upload-zip-file__name">{file.name}</span>
-                                <span className="fg-upload-zip-file__size">{formatBytes(file.size)}</span>
+                                <span className="fg-upload-zip-file__size">{formatFileSize(file.size)}</span>
                             </div>
                         )}
 
