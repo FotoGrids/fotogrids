@@ -1,6 +1,7 @@
 import React from 'react';
 import Icon from '../../shared/Icon';
 import { Button } from '../../shared/Button';
+import ProFeatureNotice from '../../shared/ProFeatureNotice';
 
 const MetadataTab = ({
     metadata,
@@ -119,17 +120,14 @@ const MetadataTab = ({
 
                 {/* Pro feature notice */}
                 {showProNotice && proNoticeContent && (
-                    <div className="fotogrids-pro-feature-notice">
-                        <div className="fotogrids-pro-feature-notice__content">
-                            <span className="fotogrids-pro-badge">{proNoticeContent.badge || strings.pro}</span>
-                            <span className="fotogrids-pro-feature-notice__text">
-                                <strong>{proNoticeContent.title}</strong> {proNoticeContent.description}
-                            </span>
-                        </div>
-                        <Button variant="link" onClick={handleUpgrade}>
-                            {proNoticeContent.upgradeText || strings.upgradeToPro}
-                        </Button>
-                    </div>
+                    <ProFeatureNotice
+                        badge={proNoticeContent.badge || strings.pro}
+                        actionLabel={proNoticeContent.upgradeText || strings.upgradeToPro}
+                        onAction={handleUpgrade}
+                        center
+                    >
+                        <strong>{proNoticeContent.title}</strong> {proNoticeContent.description}
+                    </ProFeatureNotice>
                 )}
 
                 {/* Current items */}

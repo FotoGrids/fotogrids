@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../shared/Button';
+import ProFeatureNotice from '../../shared/ProFeatureNotice';
 import FormField from '../../shared/FormField/FormField.jsx';
 import FormFields from '../../shared/FormField/FormFields.jsx';
 
@@ -60,17 +60,14 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
             </FormFields>
 
             {!isProActive && (
-                <div className="fotogrids-pro-feature-notice">
-                    <div className="fotogrids-pro-feature-notice__content">
-                        <span className="fotogrids-pro-badge">{strings.pro || ''}</span>
-                        <span className="fotogrids-pro-feature-notice__text">
-                            <strong>{strings.exifPerImageOverrides || ''}</strong>
-                        </span>
-                    </div>
-                    <Button variant="link" onClick={handleUpgrade}>
-                        {strings.upgradeToPro || ''}
-                    </Button>
-                </div>
+                <ProFeatureNotice
+                    badge={strings.pro || ''}
+                    actionLabel={strings.upgradeToPro || ''}
+                    onAction={handleUpgrade}
+                    center
+                >
+                    <strong>{strings.exifPerImageOverrides || ''}</strong>
+                </ProFeatureNotice>
             )}
         </div>
     );
