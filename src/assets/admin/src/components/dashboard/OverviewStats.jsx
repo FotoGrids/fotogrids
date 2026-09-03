@@ -12,8 +12,8 @@ const OVERVIEW_CARDS = [
     { key: 'galleries', iconName: 'layout_3x3', label: __( 'Galleries', 'fotogrids' ), accent: 'blue' },
     { key: 'albums', iconName: 'layout_2x2', label: __( 'Albums', 'fotogrids' ), accent: 'red' },
     { key: 'items', iconName: 'image', label: __( 'Items', 'fotogrids' ), accent: 'yellow' },
-    { key: 'views', iconName: 'eye', label: __( 'Total Views', 'fotogrids' ), accent: 'grey' },
-    { key: 'shares', iconName: 'click', label: __( 'Total Interactions', 'fotogrids' ), accent: 'green' },
+    { key: 'views', iconName: 'eye', label: __( 'Views', 'fotogrids' ), accent: 'grey' },
+    { key: 'shares', iconName: 'click', label: __( 'Interactions', 'fotogrids' ), accent: 'green' },
 ];
 
 const OverviewStats = ( { stats, loading } ) => {

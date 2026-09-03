@@ -860,7 +860,7 @@ class Admin_Data {
 	 * @param \WP_REST_Request $request Request object
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
-	public static function get_overview_stats( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+	public static function get_overview_stats( $request ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
 		}
@@ -882,6 +882,8 @@ class Admin_Data {
 		$views_count  = isset( $totals['views'] ) ? (int) $totals['views'] : 0;
 		$shares_count = isset( $totals['shares'] ) ? (int) $totals['shares'] : 0;
 
+		$trend = self::get_period_trend( (int) $request->get_param( 'days' ) );
+
 		return rest_ensure_response(
 			array(
 				'galleries'           => $galleries_count,
@@ -892,7 +894,63 @@ class Admin_Data {
 				'items'               => (int) $items_count,
 				'views'               => (int) $views_count,
 				'shares'              => (int) $shares_count,
+				'trend'               => $trend,
 			)
+		);
+	}
+
+	/**
+	 * Totals for the selected window and the window immediately before it.
+	 *
+	 * Both windows are the same length, so the pair supports a like-for-like
+	 * comparison. Also carries the prior window's start and end dates for
+	 * display. Returns null when no period is selected, since an all-time view
+	 * has nothing to compare against.
+	 *
+	 * @since 1.0.0
+	 * @param int $days Window length in days.
+	 * @return array|null
+	 */
+	private static function get_period_trend( int $days ) {
+		if ( $days <= 0 ) {
+			return null;
+		}
+
+		global $wpdb;
+		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT
+                    SUM(CASE WHEN viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN views  ELSE 0 END) AS views_current,
+                    SUM(CASE WHEN viewed_date <  DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN views  ELSE 0 END) AS views_previous,
+                    SUM(CASE WHEN viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN shares ELSE 0 END) AS shares_current,
+                    SUM(CASE WHEN viewed_date <  DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN shares ELSE 0 END) AS shares_previous
+                 FROM $daily_table
+                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                   AND viewed_date <= CURDATE()",
+				$days - 1,
+				$days - 1,
+				$days - 1,
+				$days - 1,
+				( 2 * $days ) - 1
+			),
+			ARRAY_A
+		);
+
+		// Formatted with gmdate to match the window the SQL above selected and
+		// the axis labels in get_views_data().
+		$previous_start = gmdate( 'M j', strtotime( '-' . ( ( 2 * $days ) - 1 ) . ' days' ) );
+		$previous_end   = gmdate( 'M j', strtotime( '-' . $days . ' days' ) );
+
+		return array(
+			'days'            => $days,
+			'views'           => isset( $row['views_current'] ) ? (int) $row['views_current'] : 0,
+			'views_previous'  => isset( $row['views_previous'] ) ? (int) $row['views_previous'] : 0,
+			'shares'          => isset( $row['shares_current'] ) ? (int) $row['shares_current'] : 0,
+			'shares_previous' => isset( $row['shares_previous'] ) ? (int) $row['shares_previous'] : 0,
+			'previous_start'  => $previous_start,
+			'previous_end'    => $previous_end,
 		);
 	}
 
@@ -977,8 +1035,9 @@ class Admin_Data {
 		global $wpdb;
 		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
 
-		// Fetch all daily rows within the window in one query, then map to a
-		// dense date-keyed array so days with zero views are still represented.
+		// Fetch the selected window plus the one before it in one query, then
+		// map to a dense date-keyed array so days with zero views are still
+		// represented.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT viewed_date, SUM(views) AS daily_views
@@ -987,7 +1046,7 @@ class Admin_Data {
                AND viewed_date <= CURDATE()
              GROUP BY viewed_date
              ORDER BY viewed_date ASC",
-				$days - 1
+				( 2 * $days ) - 1
 			),
 			ARRAY_A
 		);
@@ -997,19 +1056,26 @@ class Admin_Data {
 			$views_by_date[ $row['viewed_date'] ] = (int) $row['daily_views'];
 		}
 
-		$labels = array();
-		$data   = array();
+		$labels   = array();
+		$data     = array();
+		$previous = array();
 
 		for ( $i = $days - 1; $i >= 0; $i-- ) {
 			$date     = gmdate( 'Y-m-d', strtotime( "-$i days" ) );
 			$labels[] = gmdate( 'M j', strtotime( "-$i days" ) );
 			$data[]   = $views_by_date[ $date ] ?? 0;
+
+			// Same weekday offset one window earlier, so the two lines compare
+			// like for like.
+			$prior_date = gmdate( 'Y-m-d', strtotime( '-' . ( $i + $days ) . ' days' ) );
+			$previous[] = $views_by_date[ $prior_date ] ?? 0;
 		}
 
 		return rest_ensure_response(
 			array(
-				'labels' => $labels,
-				'data'   => $data,
+				'labels'   => $labels,
+				'data'     => $data,
+				'previous' => $previous,
 			)
 		);
 	}
@@ -1029,10 +1095,12 @@ class Admin_Data {
 
 		global $wpdb;
 
+		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+		$stats_table = $wpdb->prefix . 'fotogrids_statistics';
+
 		if ( $days > 0 ) {
 			// Scope to the daily table for the selected period.
-			$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
-			$results     = $wpdb->get_results(
+			$results = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT object_id, SUM(views) AS total_views
                  FROM $daily_table
@@ -1045,9 +1113,18 @@ class Admin_Data {
 				),
 				ARRAY_A
 			);
+
+			$total_views = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT SUM(views)
+                 FROM $daily_table
+                 WHERE object_type = 'gallery'
+                   AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)",
+					$days - 1
+				)
+			);
 		} else {
-			$stats_table = $wpdb->prefix . 'fotogrids_statistics';
-			$results     = $wpdb->get_results(
+			$results = $wpdb->get_results(
 				"SELECT object_id, SUM(views) AS total_views
                  FROM $stats_table
                  WHERE object_type = 'gallery'
@@ -1055,6 +1132,12 @@ class Admin_Data {
                  ORDER BY total_views DESC
                  LIMIT 10",
 				ARRAY_A
+			);
+
+			$total_views = (int) $wpdb->get_var(
+				"SELECT SUM(views)
+                 FROM $stats_table
+                 WHERE object_type = 'gallery'"
 			);
 		}
 
@@ -1076,6 +1159,7 @@ class Admin_Data {
 				'labels' => $labels,
 				'data'   => $data,
 				'ids'    => $ids,
+				'total'  => $total_views,
 			)
 		);
 	}
@@ -1153,9 +1237,11 @@ class Admin_Data {
 
 		global $wpdb;
 
+		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
+		$stats_table = $wpdb->prefix . 'fotogrids_statistics';
+
 		if ( $days > 0 ) {
-			$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
-			$results     = $wpdb->get_results(
+			$results = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT object_type, object_id,
                         SUM(views) AS views, SUM(shares) AS shares
@@ -1168,15 +1254,25 @@ class Admin_Data {
 				),
 				ARRAY_A
 			);
+
+			$total_views = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT SUM(views)
+                 FROM $daily_table
+                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)",
+					$days - 1
+				)
+			);
 		} else {
-			$stats_table = $wpdb->prefix . 'fotogrids_statistics';
-			$results     = $wpdb->get_results(
+			$results = $wpdb->get_results(
 				"SELECT object_type, object_id, views, shares
                  FROM $stats_table
                  ORDER BY views DESC
                  LIMIT 20",
 				ARRAY_A
 			);
+
+			$total_views = (int) $wpdb->get_var( "SELECT SUM(views) FROM $stats_table" );
 		}
 
 		$content = array();
@@ -1184,13 +1280,16 @@ class Admin_Data {
 		foreach ( $results as $result ) {
 			$post = get_post( $result['object_id'] );
 			if ( $post ) {
+				$views = (int) $result['views'];
+
 				$content[] = array(
-					'id'       => (int) $result['object_id'],
-					'title'    => $post->post_title,
-					'type'     => $result['object_type'],
-					'views'    => (int) $result['views'],
-					'shares'   => (int) ( $result['shares'] ?: 0 ),
-					'edit_url' => get_edit_post_link( $post->ID, 'raw' ),
+					'id'          => (int) $result['object_id'],
+					'title'       => $post->post_title,
+					'type'        => $result['object_type'],
+					'views'       => $views,
+					'views_share' => $total_views > 0 ? round( $views / $total_views * 100, 1 ) : 0.0,
+					'shares'      => (int) ( $result['shares'] ?: 0 ),
+					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
 				);
 			}
 		}

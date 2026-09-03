@@ -1,6 +1,12 @@
 @use "./colors.scss" as *;
 @use "./sizes.scss" as *;
 
+@keyframes fg-stat-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 @keyframes fg-shimmer {
 	0% {
 		background-position: -600px 0;
@@ -117,6 +123,7 @@
 }
 
 .fg-stat-card {
+	position: relative;
 	padding: 2vw;
 	display: flex;
 	align-items: center;
@@ -198,6 +205,61 @@
 		}
 	}
 
+	&__value-row {
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+	}
+
+	// Logical inset so the corner sits at the trailing edge under RTL.
+	&__meta {
+		position: absolute;
+		inset-block-end: 8px;
+		inset-inline-end: 12px;
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+		font-size: 11px;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+
+		.fg-tooltip-trigger {
+			display: inline-flex;
+		}
+	}
+
+	&__footnote {
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	&__delta {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 2px;
+		font-weight: 400;
+		cursor: help;
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	&__spinner {
+		display: block;
+		width: 24px;
+		height: 24px;
+		margin-bottom: 4px;
+		color: #fff;
+		animation: fg-stat-spin 0.9s linear infinite;
+
+		circle {
+			fill: none;
+			stroke: currentColor;
+			stroke-width: 2.5;
+			stroke-linecap: round;
+			// r=9 gives a circumference of ~56.5; a 42.4/14.1 dash leaves the
+			// ring three-quarters drawn.
+			stroke-dasharray: 42.4 14.1;
+		}
+	}
+
 	&__label {
 		font-size: 11px;
 		line-height: 1;
@@ -205,16 +267,6 @@
 		font-weight: 500;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
-	}
-
-	&__skeleton {
-		@extend %fg-skeleton;
-		display: block;
-		height: 28px;
-		width: 60px;
-		margin-bottom: 6px;
-		border-radius: 4px;
-		opacity: 0.4;
 	}
 
 	&--invert {
@@ -226,8 +278,17 @@
 		}
 
 		.fg-stat-card__value,
-		.fg-stat-card__label {
+		.fg-stat-card__label,
+		.fg-stat-card__spinner {
 			color: var(--fg-text-primary);
+		}
+
+		.fg-stat-card__footnote {
+			color: var(--fg-text-tertiary);
+		}
+
+		.fg-stat-card__delta {
+			color: var(--fg-text-secondary);
 		}
 
 		&:hover {
@@ -277,13 +338,13 @@
 // While loading, the skeleton sits on top and the canvas is hidden.
 .fg-chart-body {
 	position: relative;
-	min-height: 260px;
+	height: 300px;
 }
 
 .fg-chart-canvas {
-	max-height: 300px;
 	display: block;
 	width: 100%;
+	height: 100%;
 
 	// Hidden while the skeleton overlay is showing
 	.fg-chart-container.fg-is-loading & {
@@ -379,9 +440,86 @@ table.fg-stats-table.widefat {
 		text-align: center;
 	}
 
+	// Tighter gutters than a normal cell: the column carries two values and a
+	// divider, and at 1025-1300px viewports each table is only ~400px wide.
+	.fg-stats-table__th--metric,
+	.fg-stats-table__cell--metric {
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+
+	.fg-stats-table__sort {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 0;
+		border: 0;
+		background: none;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+
+		&:hover,
+		&--active {
+			color: var(--fg-blue);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--fg-blue);
+			outline-offset: 2px;
+			border-radius: 2px;
+		}
+	}
+
+	.fg-stats-table__sort-arrow {
+		width: 14px;
+		height: 14px;
+		flex-shrink: 0;
+		opacity: 0.5;
+
+		svg {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+
+		&--asc svg {
+			transform: rotate(180deg);
+		}
+
+		.fg-stats-table__sort--active & {
+			opacity: 1;
+		}
+	}
+
+	// A block-level grid fills the cell, so the divider sits at the column's
+	// midpoint on every row. minmax(0, 1fr) rather than 1fr: the default auto
+	// minimum lets a wider value push the split off-centre.
+	.fg-stats-metric {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		align-items: center;
+
+		&__value {
+			padding-right: 6px;
+			font-weight: 600;
+			font-variant-numeric: tabular-nums;
+			text-align: right;
+		}
+
+		&__share {
+			padding-left: 6px;
+			border-left: 1px solid $tabbar-border-light;
+			color: $tabbar-text-secondary;
+			font-size: 12px;
+			font-variant-numeric: tabular-nums;
+			text-align: left;
+		}
+	}
+
 	.fg-stats-table__th--ellipsis,
 	.fg-stats-table__cell--ellipsis {
-		width: 45%;
+		width: 36%;
 	}
 
 	.fg-stats-table__cell--ellipsis .fg-stats-title-link,
