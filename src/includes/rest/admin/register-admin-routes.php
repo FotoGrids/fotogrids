@@ -464,6 +464,15 @@ class Register_Admin_Routes {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_overview_stats' ),
+					'args'                => array(
+						'days' => array(
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
+							'validate_callback' => function ( $param ) {
+								return is_numeric( $param ) && $param >= 0 && $param <= 365;
+							},
+						),
+					),
 					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_view_stats' ),
 				),
 			)
