@@ -106,14 +106,14 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     const acceptFile = useCallback(
         (candidate) => {
             if (!isZip(candidate)) {
-                setError(strings.zipInvalid || 'That file is not a ZIP archive.');
+                setError(strings.uploadFromZipInvalid || 'That file is not a ZIP archive.');
                 return;
             }
             setError(null);
             setResult(null);
             setFile(candidate);
         },
-        [strings.zipInvalid]
+        [strings.uploadFromZipInvalid]
     );
 
     const handleUpload = useCallback(async () => {
@@ -145,12 +145,12 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
 
             setResult({ added: items.length, skipped });
         } catch (err) {
-            setError(err.message || strings.zipFailed);
+            setError(err.message || strings.uploadFromZipFailed);
         } finally {
             setBusy(false);
             setExtracting(false);
         }
-    }, [file, galleryId, onAddItems, onClose, strings.zipFailed]);
+    }, [file, galleryId, onAddItems, onClose, strings.uploadFromZipFailed]);
 
     const handleFiles = useCallback(
         (fileList) => {
@@ -165,9 +165,9 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
             isUploading={busy}
             uploadProgress={progress}
             error={error}
-            title={strings.zipChoose || 'Select a ZIP file to upload'}
-            subtitle={strings.zipDragDrop || 'or drag and drop it here'}
-            hint={strings.maxUploadSize}
+            title={strings.uploadFromZipChoose || 'Select a ZIP file to upload'}
+            subtitle={strings.uploadFromZipDragDrop || 'or drag and drop it here'}
+            hint={strings.uploadFromZipMaxSize}
             accept=".zip,application/zip"
             multiple={false}
             onFiles={handleFiles}
@@ -181,10 +181,10 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
         <div className="fg-zip-result">
             <p className="fg-zip-result__headline">
                 <Icon name="check_circle" />
-                {result.added} {strings.zipImagesAdded || 'images added.'}
+                {result.added} {strings.uploadFromZipImagesAdded || 'images added.'}
             </p>
             <p className="fg-zip-result__subhead">
-                {result.skipped.length} {strings.zipEntriesSkipped || 'entries were skipped:'}
+                {result.skipped.length} {strings.uploadFromZipEntriesSkipped || 'entries were skipped:'}
             </p>
             <ul className="fg-zip-result__list">
                 {result.skipped.slice(0, 50).map((entry, index) => (
@@ -206,7 +206,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
         >
             <Modal.Header>
                 <Modal.HeaderTitle>
-                    {strings.zipModalTitle || 'Add images from a ZIP file'}
+                    {strings.uploadFromZipModalTitle || 'Add images from a ZIP file'}
                 </Modal.HeaderTitle>
             </Modal.Header>
 
@@ -227,7 +227,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
 
                         {extracting && (
                             <p className="fg-zip-status">
-                                {strings.zipExtracting || 'Extracting images…'}
+                                {strings.uploadFromZipExtracting || 'Extracting images…'}
                             </p>
                         )}
                     </>
@@ -250,7 +250,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
                             busy={busy}
                             disabled={!file || busy}
                         >
-                            {strings.zipUploadAndAdd || 'Upload & Add'}
+                            {strings.uploadFromZipUploadAndAdd || 'Upload & Add'}
                         </Button>
                     </>
                 )}

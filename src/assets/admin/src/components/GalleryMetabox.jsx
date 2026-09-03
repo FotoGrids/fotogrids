@@ -956,10 +956,10 @@ const GalleryMetabox = ({
 						{strings.fromLibrary}
                     </div>
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('folder')}>
-						{strings.fromFolder}
+						{strings.uploadFromFolder}
                     </div>
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('zip')}>
-						{strings.fromZip}
+						{strings.uploadFromZip}
                     </div>
                     <div className="fotogrids-add-option" onClick={() => handleAddOption('video_embed')}>
 						{strings.videoEmbed}

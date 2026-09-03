@@ -121,14 +121,14 @@ const FolderImportModal = ({
                 setListing(data);
                 setPath(data.path);
             } catch (err) {
-                setError(err.message || strings.folderLoadFailed);
+                setError(err.message || strings.uploadFromFolderLoadFailed);
                 setListing(EMPTY_LISTING);
                 setPath(targetPath);
             } finally {
                 setLoading(false);
             }
         },
-        [fetchListing, strings.folderLoadFailed]
+        [fetchListing, strings.uploadFromFolderLoadFailed]
     );
 
     useEffect(() => {
@@ -154,11 +154,11 @@ const FolderImportModal = ({
                 files: [...prev.files, ...data.files],
             }));
         } catch (err) {
-            setError(err.message || strings.folderLoadFailed);
+            setError(err.message || strings.uploadFromFolderLoadFailed);
         } finally {
             setLoadingMore(false);
         }
-    }, [fetchListing, path, listing.page, strings.folderLoadFailed]);
+    }, [fetchListing, path, listing.page, strings.uploadFromFolderLoadFailed]);
 
     const toggleFile = useCallback((filePath) => {
         setSelected((prev) =>
@@ -220,18 +220,18 @@ const FolderImportModal = ({
 
             if (skipped.length > 0 && window.fotogridsToast) {
                 window.fotogridsToast.error(
-                    `${skipped.length} ${strings.filesSkipped || 'files were skipped.'}`
+                    `${skipped.length} ${strings.uploadFromFolderFilesSkipped || 'files were skipped.'}`
                 );
             }
 
             onClose?.();
         } catch (err) {
-            setError(err.message || strings.importFailed);
+            setError(err.message || strings.uploadFromFolderImportFailed);
         } finally {
             setImporting(false);
             setImportProgress({ done: 0, total: 0 });
         }
-    }, [selected, galleryId, onAddItems, onClose, strings.filesSkipped, strings.importFailed]);
+    }, [selected, galleryId, onAddItems, onClose, strings.uploadFromFolderFilesSkipped, strings.uploadFromFolderImportFailed]);
 
     const handleDirectoryPick = useCallback(
         (fileList) => {
@@ -242,11 +242,11 @@ const FolderImportModal = ({
             setLocalFiles(files);
             setError(
                 picked.length > 0 && files.length === 0
-                    ? strings.folderNoImages || 'No images found in that folder.'
+                    ? strings.uploadFromFolderNoImages || 'No images found in that folder.'
                     : null
             );
         },
-        [strings.folderNoImages]
+        [strings.uploadFromFolderNoImages]
     );
 
     const handleLocalUpload = useCallback(() => {
@@ -292,16 +292,16 @@ const FolderImportModal = ({
                 },
             })
         ).catch((uploadError) => {
-            setError(uploadError?.message || strings.importFailed);
+            setError(uploadError?.message || strings.uploadFromFolderImportFailed);
             setUploading(false);
             setUploadCounts({ done: 0, total: 0 });
         });
-    }, [localFiles, onUploadComplete, onClose, strings.importFailed]);
+    }, [localFiles, onUploadComplete, onClose, strings.uploadFromFolderImportFailed]);
 
     const busy = importing || uploading;
 
     const renderBreadcrumbs = () => (
-        <nav className="fg-folder-crumbs" aria-label={strings.fromFolder || 'From Folder'}>
+        <nav className="fg-folder-crumbs" aria-label={strings.uploadFromFolder || 'From Folder'}>
             {listing.breadcrumbs.map((crumb, index) => (
                 <React.Fragment key={crumb.path || 'root'}>
                     {index > 0 && <Icon name="chevron_right" className="fg-folder-crumbs__sep" />}
@@ -370,7 +370,7 @@ const FolderImportModal = ({
 
                     {listing.files.length === 0 ? (
                         <p className="fg-folder-browser__empty">
-                            {strings.folderEmpty || 'No images in this folder.'}
+                            {strings.uploadFromFolderEmpty || 'No images in this folder.'}
                         </p>
                     ) : (
                         <>
@@ -379,7 +379,7 @@ const FolderImportModal = ({
                                     id="fg-folder-select-all"
                                     checked={allVisibleSelected}
                                     onChange={toggleAllVisible}
-                                    label={strings.selectAll || 'Select all'}
+                                    label={strings.uploadFromFolderSelectAll || 'Select all'}
                                     disabled={busy}
                                 />
                                 <span className="fg-folder-browser__count">
@@ -418,7 +418,7 @@ const FolderImportModal = ({
                                                 )}
                                                 {!file.attachment_id && (
                                                     <span className="fg-folder-tile__badge">
-                                                        {strings.notInLibrary || 'New'}
+                                                        {strings.uploadFromFolderNewBadge || 'New'}
                                                     </span>
                                                 )}
                                             </button>
@@ -442,7 +442,7 @@ const FolderImportModal = ({
                                         busy={loadingMore}
                                         disabled={busy}
                                     >
-                                        {strings.loadMore || 'Load more'}
+                                        {strings.uploadFromFolderLoadMore || 'Load more'}
                                     </Button>
                                 </div>
                             )}
@@ -464,10 +464,10 @@ const FolderImportModal = ({
                 isUploading={uploading}
                 uploadProgress={uploadPercent}
                 error={error}
-                title={strings.selectFolderTitle || 'Select a folder to upload'}
-                subtitle={strings.dragDropImages || 'or drag and drop images here'}
+                title={strings.uploadFromFolderSelectTitle || 'Select a folder to upload'}
+                subtitle={strings.uploadFromFolderDragDrop || 'or drag and drop images here'}
                 hint={
-                    strings.chooseFolderDescription ||
+                    strings.uploadFromFolderHint ||
                     'Every image in the folder and its sub-folders is uploaded to your Media Library.'
                 }
                 accept="image/*"
@@ -483,7 +483,7 @@ const FolderImportModal = ({
                     <Icon name="image" />
                     <span>
                         {localFolder ? `${localFolder} — ` : ''}
-                        {localFiles.length} {strings.imagesReady || 'images ready to upload'}
+                        {localFiles.length} {strings.uploadFromFolderImagesReady || 'images ready to upload'}
                     </span>
                 </div>
             )}
@@ -491,15 +491,15 @@ const FolderImportModal = ({
     );
 
     const tabs = [
-        { id: TAB_SERVER, label: strings.folderOnServer || 'On the server' },
-        { id: TAB_COMPUTER, label: strings.folderOnComputer || 'From my computer' },
+        { id: TAB_SERVER, label: strings.uploadFromFolderOnServer || 'On the server' },
+        { id: TAB_COMPUTER, label: strings.uploadFromFolderOnComputer || 'From my computer' },
     ];
 
     const primaryLabel = () => {
         if (activeTab === TAB_COMPUTER) {
             return uploading
                 ? `${strings.uploading || 'Uploading…'} ${uploadCounts.done}/${uploadCounts.total}`
-                : strings.uploadAndAdd || 'Upload & Add';
+                : strings.uploadFromFolderUploadAndAdd || 'Upload & Add';
         }
         if (importing) {
             return `${strings.adding || 'Adding…'} ${importProgress.done}/${importProgress.total}`;
@@ -518,7 +518,7 @@ const FolderImportModal = ({
         >
             <Modal.Header>
                 <Modal.HeaderTitle>
-                    {strings.folderModalTitle || 'Add images from a folder'}
+                    {strings.uploadFromFolderModalTitle || 'Add images from a folder'}
                 </Modal.HeaderTitle>
             </Modal.Header>
 
