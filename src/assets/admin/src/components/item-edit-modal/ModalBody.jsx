@@ -102,11 +102,7 @@ const tabConfig = (strings, isVideoFile) => [
     { id: 'location',     label: strings.location },
     { id: 'interactions', label: strings.interactions },
     { id: 'exif',         label: strings.exif },
-    { id: 'seo',          label: (
-        <>
-            {strings.seo} <span className="fotogrids-pro-badge">{strings.pro}</span>
-        </>
-    ) },
+    { id: 'seo',          label: strings.seo },
 ];
 
 export const ItemEditTabs = ({
@@ -236,7 +232,8 @@ export const ItemEditTabs = ({
             <Modal.TabsPanel id="seo" activeId={activeTab}>
                 <TabSEO
                     formData={formData}
-                    handleInputChange={handleInputChange}
+                    itemData={itemData}
+                    setActiveTab={setActiveTab}
                     disabled={isDisabled}
                     strings={strings}
                 />
