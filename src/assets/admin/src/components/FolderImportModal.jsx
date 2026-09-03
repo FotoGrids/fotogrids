@@ -4,66 +4,34 @@
  * Adds images to a gallery from a folder: either one that already sits in the
  * site's uploads directory, or one picked from the visitor's own computer.
  *
+ * Browsing and local uploading each live in their own hook; this component owns
+ * the selection, the import request, and the footer that drives both tabs.
+ *
  * @param {Object}   props
  * @param {boolean}  props.isOpen             Modal visibility.
  * @param {Function} props.onClose            Called when the modal should close.
  * @param {Function} props.onAddItems         Called with an array of gallery item objects.
  * @param {Function} props.onUploadComplete   Called with an array of new attachment IDs.
+ * @param {number}   props.galleryId          Gallery the import is for.
  * @param {Object}   [props.strings]          Localized labels.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { uploadMedia } from '@wordpress/media-utils';
 import { Modal } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import Checkbox from './shared/Checkbox';
 import UploadArea from './blocks/UploadArea';
+import FolderBreadcrumbs from './folder-import/FolderBreadcrumbs.jsx';
+import FolderList from './folder-import/FolderList.jsx';
+import FolderTileGrid from './folder-import/FolderTileGrid.jsx';
+import useUploadsFolderBrowser from './folder-import/useUploadsFolderBrowser';
+import useLocalFolderUpload from './folder-import/useLocalFolderUpload';
 
 const IMPORT_CHUNK = 200;
 
 const TAB_SERVER = 'server';
 const TAB_COMPUTER = 'computer';
-
-const EMPTY_LISTING = {
-    path: '',
-    parent: null,
-    breadcrumbs: [],
-    folders: [],
-    files: [],
-    total: 0,
-    page: 1,
-};
-
-const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp|avif|bmp|tiff?|heic|heif|svg|ico)$/i;
-
-const isImageFile = (file) =>
-    file.type.startsWith('image/') || IMAGE_EXTENSIONS.test(file.name || '');
-
-const imagesOnly = (fileList) => Array.from(fileList || []).filter(isImageFile);
-
-/**
- * Name of the folder the visitor picked, taken from the first file's path.
- *
- * @param {File[]} files
- * @return {string}
- */
-const pickedFolderName = (files) => {
-    const relative = files[0]?.webkitRelativePath || '';
-    return relative.split('/')[0] || '';
-};
-
-const formatBytes = (bytes) => {
-    if (!bytes) return '';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let value = bytes;
-    let unit = 0;
-    while (value >= 1024 && unit < units.length - 1) {
-        value /= 1024;
-        unit += 1;
-    }
-    return `${value < 10 && unit > 0 ? value.toFixed(1) : Math.round(value)} ${units[unit]}`;
-};
 
 const FolderImportModal = ({
     isOpen,
@@ -74,22 +42,29 @@ const FolderImportModal = ({
     strings = {},
 }) => {
     const [activeTab, setActiveTab] = useState(TAB_SERVER);
-    const [listing, setListing] = useState(EMPTY_LISTING);
-    const [path, setPath] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [error, setError] = useState(null);
     const [selected, setSelected] = useState([]);
     const [importing, setImporting] = useState(false);
+    const [importError, setImportError] = useState(null);
     const [importProgress, setImportProgress] = useState({ done: 0, total: 0 });
-
-    const [localFiles, setLocalFiles] = useState([]);
-    const [localFolder, setLocalFolder] = useState('');
-    const [uploading, setUploading] = useState(false);
-    const [uploadCounts, setUploadCounts] = useState({ done: 0, total: 0 });
     const [dragging, setDragging] = useState(false);
 
     const directoryInputRef = useRef(null);
+
+    const browser = useUploadsFolderBrowser({
+        galleryId,
+        isOpen,
+        loadFailedMessage: strings.uploadFromFolderLoadFailed,
+    });
+
+    const localUpload = useLocalFolderUpload({
+        isOpen,
+        onUploadComplete,
+        onFinished: onClose,
+        noImagesMessage: strings.uploadFromFolderNoImages,
+        failedMessage: strings.uploadFromFolderImportFailed,
+    });
+
+    const { listing } = browser;
 
     // `webkitdirectory` is not part of React's known attribute list, so it is
     // set on the DOM node directly.
@@ -100,65 +75,13 @@ const FolderImportModal = ({
         input.setAttribute('directory', '');
     }, [activeTab, isOpen]);
 
-    const fetchListing = useCallback(
-        async (targetPath, page = 1) => {
-            const query = [
-                `gallery_id=${encodeURIComponent(galleryId)}`,
-                `path=${encodeURIComponent(targetPath)}`,
-                `page=${page}`,
-            ].join('&');
-            return wp.apiFetch({ path: `/fotogrids/v1/media/folders?${query}` });
-        },
-        [galleryId]
-    );
-
-    const loadFolder = useCallback(
-        async (targetPath) => {
-            setLoading(true);
-            setError(null);
-            try {
-                const data = await fetchListing(targetPath, 1);
-                setListing(data);
-                setPath(data.path);
-            } catch (err) {
-                setError(err.message || strings.uploadFromFolderLoadFailed);
-                setListing(EMPTY_LISTING);
-                setPath(targetPath);
-            } finally {
-                setLoading(false);
-            }
-        },
-        [fetchListing, strings.uploadFromFolderLoadFailed]
-    );
-
     useEffect(() => {
-        if (isOpen) {
-            loadFolder('');
-        } else {
-            setSelected([]);
-            setLocalFiles([]);
-            setLocalFolder('');
-            setError(null);
-            setActiveTab(TAB_SERVER);
-            setListing(EMPTY_LISTING);
-            setPath('');
-        }
-    }, [isOpen, loadFolder]);
+        if (isOpen) return;
 
-    const loadMore = useCallback(async () => {
-        setLoadingMore(true);
-        try {
-            const data = await fetchListing(path, listing.page + 1);
-            setListing((prev) => ({
-                ...data,
-                files: [...prev.files, ...data.files],
-            }));
-        } catch (err) {
-            setError(err.message || strings.uploadFromFolderLoadFailed);
-        } finally {
-            setLoadingMore(false);
-        }
-    }, [fetchListing, path, listing.page, strings.uploadFromFolderLoadFailed]);
+        setSelected([]);
+        setImportError(null);
+        setActiveTab(TAB_SERVER);
+    }, [isOpen]);
 
     const toggleFile = useCallback((filePath) => {
         setSelected((prev) =>
@@ -188,7 +111,7 @@ const FolderImportModal = ({
         if (selected.length === 0) return;
 
         setImporting(true);
-        setError(null);
+        setImportError(null);
         setImportProgress({ done: 0, total: selected.length });
 
         const collected = [];
@@ -226,147 +149,40 @@ const FolderImportModal = ({
 
             onClose?.();
         } catch (err) {
-            setError(err.message || strings.uploadFromFolderImportFailed);
+            setImportError(err.message || strings.uploadFromFolderImportFailed);
         } finally {
             setImporting(false);
             setImportProgress({ done: 0, total: 0 });
         }
-    }, [selected, galleryId, onAddItems, onClose, strings.uploadFromFolderFilesSkipped, strings.uploadFromFolderImportFailed]);
+    }, [
+        selected,
+        galleryId,
+        onAddItems,
+        onClose,
+        strings.uploadFromFolderFilesSkipped,
+        strings.uploadFromFolderImportFailed,
+    ]);
 
-    const handleDirectoryPick = useCallback(
-        (fileList) => {
-            const picked = Array.from(fileList || []);
-            const files = imagesOnly(picked);
-
-            setLocalFolder(pickedFolderName(picked));
-            setLocalFiles(files);
-            setError(
-                picked.length > 0 && files.length === 0
-                    ? strings.uploadFromFolderNoImages
-                    : null
-            );
-        },
-        [strings.uploadFromFolderNoImages]
-    );
-
-    const handleLocalUpload = useCallback(() => {
-        if (localFiles.length === 0) return;
-
-        const uploaded = new Set();
-        let failed = 0;
-
-        const settle = () => {
-            const done = uploaded.size + failed;
-            setUploadCounts({ done, total: localFiles.length });
-
-            if (done < localFiles.length) return;
-
-            setUploading(false);
-            setUploadCounts({ done: 0, total: 0 });
-
-            if (uploaded.size > 0) {
-                onUploadComplete?.(Array.from(uploaded));
-            }
-
-            onClose?.();
-        };
-
-        setError(null);
-        setUploading(true);
-        setUploadCounts({ done: 0, total: localFiles.length });
-
-        Promise.resolve(
-            uploadMedia({
-                filesList: localFiles,
-                allowedTypes: ['image'],
-                onFileChange: (attachments) => {
-                    (attachments || []).forEach((attachment) => {
-                        if (attachment?.id) uploaded.add(attachment.id);
-                    });
-                    settle();
-                },
-                onError: (uploadError) => {
-                    setError(uploadError.message);
-                    failed += 1;
-                    settle();
-                },
-            })
-        ).catch((uploadError) => {
-            setError(uploadError?.message || strings.uploadFromFolderImportFailed);
-            setUploading(false);
-            setUploadCounts({ done: 0, total: 0 });
-        });
-    }, [localFiles, onUploadComplete, onClose, strings.uploadFromFolderImportFailed]);
-
-    const busy = importing || uploading;
-
-    const renderBreadcrumbs = () => (
-        <nav className="fg-upload-folder-crumbs" aria-label={strings.uploadFromFolder}>
-            {listing.breadcrumbs.map((crumb, index) => (
-                <React.Fragment key={crumb.path || 'root'}>
-                    {index > 0 && <Icon name="chevron_right" className="fg-upload-folder-crumbs__sep" />}
-                    <button
-                        type="button"
-                        className="fg-upload-folder-crumbs__item"
-                        disabled={crumb.path === listing.path || busy}
-                        onClick={() => loadFolder(crumb.path)}
-                    >
-                        {crumb.label}
-                    </button>
-                </React.Fragment>
-            ))}
-        </nav>
-    );
+    const busy = importing || localUpload.uploading;
+    const serverError = importError || browser.error;
 
     const renderServerTab = () => (
         <div className="fotogrids-tab-panel fg-is-active fg-upload-folder-browser">
-            {error && <div className="fg-upload-folder-browser__error">{error}</div>}
+            {serverError && (
+                <div className="fg-upload-folder-browser__error">{serverError}</div>
+            )}
 
-            {loading ? (
+            {browser.loading ? (
                 <p className="fg-upload-folder-browser__empty">{strings.loading}</p>
             ) : (
                 <>
-                    {listing.folders.length > 0 && (
-                        <ul className="fg-upload-folder-list">
-                            {listing.parent !== null && (
-                                <li>
-                                    <button
-                                        type="button"
-                                        className="fg-upload-folder-list__item"
-                                        onClick={() => loadFolder(listing.parent)}
-                                        disabled={busy}
-                                    >
-                                        <Icon name="folder" />
-                                        <span className="fg-upload-folder-list__name">..</span>
-                                    </button>
-                                </li>
-                            )}
-                            {listing.folders.map((folder) => (
-                                <li key={folder.name}>
-                                    <button
-                                        type="button"
-                                        className="fg-upload-folder-list__item"
-                                        onClick={() =>
-                                            loadFolder(
-                                                listing.path
-                                                    ? `${listing.path}/${folder.name}`
-                                                    : folder.name
-                                            )
-                                        }
-                                        disabled={busy}
-                                    >
-                                        <Icon name="folder" />
-                                        <span className="fg-upload-folder-list__name">{folder.name}</span>
-                                        {folder.count > 0 && (
-                                            <span className="fg-upload-folder-list__count">
-                                                {folder.count}
-                                            </span>
-                                        )}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    <FolderList
+                        folders={listing.folders}
+                        parent={listing.parent}
+                        currentPath={listing.path}
+                        disabled={busy}
+                        onNavigate={browser.loadFolder}
+                    />
 
                     {listing.files.length === 0 ? (
                         <p className="fg-upload-folder-browser__empty">
@@ -387,59 +203,21 @@ const FolderImportModal = ({
                                 </span>
                             </div>
 
-                            <ul className="fg-upload-folder-grid">
-                                {listing.files.map((file) => {
-                                    const isSelected = selected.includes(file.path);
-                                    return (
-                                        <li
-                                            key={file.path}
-                                            className={`fg-upload-folder-tile${
-                                                isSelected ? ' fg-upload-folder-tile--selected' : ''
-                                            }`}
-                                        >
-                                            <button
-                                                type="button"
-                                                className="fg-upload-folder-tile__button"
-                                                onClick={() => toggleFile(file.path)}
-                                                disabled={busy}
-                                                aria-pressed={isSelected}
-                                            >
-                                                <img
-                                                    src={file.thumbnail}
-                                                    alt=""
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    className="fg-upload-folder-tile__image"
-                                                />
-                                                {isSelected && (
-                                                    <span className="fg-upload-folder-tile__check">
-                                                        <Icon name="check" />
-                                                    </span>
-                                                )}
-                                                {!file.attachment_id && (
-                                                    <span className="fg-upload-folder-tile__badge">
-                                                        {strings.uploadFromFolderNewBadge}
-                                                    </span>
-                                                )}
-                                            </button>
-                                            <span className="fg-upload-folder-tile__name" title={file.name}>
-                                                {file.name}
-                                            </span>
-                                            <span className="fg-upload-folder-tile__meta">
-                                                {formatBytes(file.size)}
-                                            </span>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
+                            <FolderTileGrid
+                                files={listing.files}
+                                selected={selected}
+                                disabled={busy}
+                                onToggle={toggleFile}
+                                newBadgeLabel={strings.uploadFromFolderNewBadge}
+                            />
 
                             {listing.files.length < listing.total && (
                                 <div className="fg-upload-folder-browser__more">
                                     <Button
                                         variant="secondary"
                                         size="sm"
-                                        onClick={loadMore}
-                                        busy={loadingMore}
+                                        onClick={browser.loadMore}
+                                        busy={browser.loadingMore}
                                         disabled={busy}
                                     >
                                         {strings.uploadFromFolderLoadMore}
@@ -453,36 +231,30 @@ const FolderImportModal = ({
         </div>
     );
 
-    const uploadPercent = uploadCounts.total
-        ? Math.round((uploadCounts.done / uploadCounts.total) * 100)
-        : 0;
-
     const renderComputerTab = () => (
         <div className="fotogrids-tab-panel fg-is-active fg-upload-folder-local">
             <UploadArea
                 isDragging={dragging}
-                isUploading={uploading}
-                uploadProgress={uploadPercent}
-                error={error}
+                isUploading={localUpload.uploading}
+                uploadProgress={localUpload.percent}
+                error={localUpload.error}
                 title={strings.uploadFromFolderSelectTitle}
                 subtitle={strings.uploadFromFolderDragDrop}
-                hint={
-                    strings.uploadFromFolderHint
-                }
+                hint={strings.uploadFromFolderHint}
                 accept="image/*"
                 multiple
-                onFiles={handleDirectoryPick}
+                onFiles={localUpload.pickFiles}
                 onDragChange={setDragging}
                 inputRef={directoryInputRef}
                 inputId="fotogrids-folder-upload-input"
             />
 
-            {localFiles.length > 0 && !uploading && (
+            {localUpload.files.length > 0 && !localUpload.uploading && (
                 <div className="fg-upload-folder-local__summary">
                     <Icon name="image" />
                     <span>
-                        {localFolder ? `${localFolder} — ` : ''}
-                        {localFiles.length} {strings.uploadFromFolderImagesReady}
+                        {localUpload.folderName ? `${localUpload.folderName} — ` : ''}
+                        {localUpload.files.length} {strings.uploadFromFolderImagesReady}
                     </span>
                 </div>
             )}
@@ -496,8 +268,8 @@ const FolderImportModal = ({
 
     const primaryLabel = () => {
         if (activeTab === TAB_COMPUTER) {
-            return uploading
-                ? `${strings.uploading} ${uploadCounts.done}/${uploadCounts.total}`
+            return localUpload.uploading
+                ? `${strings.uploading} ${localUpload.counts.done}/${localUpload.counts.total}`
                 : strings.uploadFromFolderUploadAndAdd;
         }
         if (importing) {
@@ -509,22 +281,23 @@ const FolderImportModal = ({
     };
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            size="lg"
-            preventClose={busy}
-        >
+        <Modal isOpen={isOpen} onClose={onClose} size="lg" preventClose={busy}>
             <Modal.Header>
-                <Modal.HeaderTitle>
-                    {strings.uploadFromFolderModalTitle}
-                </Modal.HeaderTitle>
+                <Modal.HeaderTitle>{strings.uploadFromFolderModalTitle}</Modal.HeaderTitle>
             </Modal.Header>
 
             <Modal.Tabs tabs={tabs} activeId={activeTab} onChange={setActiveTab} larger />
 
             {activeTab === TAB_SERVER && (
-                <Modal.SubHeader>{renderBreadcrumbs()}</Modal.SubHeader>
+                <Modal.SubHeader>
+                    <FolderBreadcrumbs
+                        crumbs={listing.breadcrumbs}
+                        currentPath={listing.path}
+                        disabled={busy}
+                        onNavigate={browser.loadFolder}
+                        label={strings.uploadFromFolder}
+                    />
+                </Modal.SubHeader>
             )}
 
             <Modal.Body>
@@ -544,12 +317,12 @@ const FolderImportModal = ({
                 </Button>
                 <Button
                     variant="primary"
-                    onClick={activeTab === TAB_COMPUTER ? handleLocalUpload : handleImport}
+                    onClick={activeTab === TAB_COMPUTER ? localUpload.startUpload : handleImport}
                     busy={busy}
                     disabled={
                         busy ||
                         (activeTab === TAB_COMPUTER
-                            ? localFiles.length === 0
+                            ? localUpload.files.length === 0
                             : selected.length === 0)
                     }
                 >

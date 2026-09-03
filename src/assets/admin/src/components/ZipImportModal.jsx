@@ -16,18 +16,8 @@ import { Modal } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import UploadArea from './blocks/UploadArea';
+import formatBytes from './shared/format-bytes';
 
-const formatBytes = (bytes) => {
-    if (!bytes) return '';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let value = bytes;
-    let unit = 0;
-    while (value >= 1024 && unit < units.length - 1) {
-        value /= 1024;
-        unit += 1;
-    }
-    return `${value < 10 && unit > 0 ? value.toFixed(1) : Math.round(value)} ${units[unit]}`;
-};
 
 const isZip = (file) =>
     Boolean(file) && /\.zip$/i.test(file.name || '');
