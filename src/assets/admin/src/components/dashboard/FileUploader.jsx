@@ -3,12 +3,22 @@
  * Handles file uploads, drag and drop, and media library selection
  */
 import React from 'react';
-import UploadArea from '../blocks/UploadArea';
+import MediaUpload from '../blocks/MediaUpload';
 import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
 
 const FileUploader = ({ onUploadComplete }) => {
+    const handleUploadComplete = (attachmentIds) => {
+        if (!attachmentIds || attachmentIds.length === 0 || !onUploadComplete) {
+            return;
+        }
+
+        Promise.resolve(onUploadComplete(attachmentIds)).catch((error) => {
+            console.error('Error creating gallery from upload:', error);
+        });
+    };
+
     const openMediaLibrary = () => {
         if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
             alert(__('WordPress media library is not available. Please refresh the page.', 'fotogrids'));
@@ -49,11 +59,9 @@ const FileUploader = ({ onUploadComplete }) => {
                 <p>{__('Click or drag files here to create a gallery automatically.', 'fotogrids')}</p>
             </div>
             <div className="fotogrids-admin-block-card-content">
-                <UploadArea
-                    onUploadComplete={onUploadComplete}
+                <MediaUpload
+                    onUploadComplete={handleUploadComplete}
                     inputId="fotogrids-dashboard-upload-input"
-                    title={__('Select files to upload', 'fotogrids')}
-                    subtitle={__('or drag and drop files here', 'fotogrids')}        
                 />
                 <p className="fotogrids-upload-or">
                     {__('or ', 'fotogrids')}
