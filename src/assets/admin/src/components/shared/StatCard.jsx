@@ -97,7 +97,7 @@ const StatCard = ( {
             { ! loading && ( footnote || hasDelta ) && (
                 <span className={`${baseClass}__meta`}>
                     { hasDelta && (
-                        <Tooltip content={ deltaTitle }>
+                        <Tooltip content={ deltaTitle } position="bottom">
                             <span className={`${baseClass}__delta ${baseClass}__delta--${ direction }`}>
                                 { DELTA_GLYPHS[ direction ] }
                                 { `${ Math.abs( delta ) }%` }
