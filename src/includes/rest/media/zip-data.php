@@ -131,23 +131,15 @@ class Zip_Data {
 			}
 
 			$extracted = trailingslashit( $temp ) . 'extracted';
-			$guard     = self::budget_guard();
-
-			add_filter( 'pre_unzip_file', $guard, 10, 5 );
-			$unzipped = unzip_file( $archive, $extracted );
-			remove_filter( 'pre_unzip_file', $guard, 10 );
+			$extraction = self::extract_images( $archive, $extracted );
 
 			wp_delete_file( $archive );
 
-			if ( is_wp_error( $unzipped ) ) {
-				return new \WP_Error(
-					'fotogrids_zip_extract_failed',
-					$unzipped->get_error_message(),
-					array( 'status' => 400 )
-				);
+			if ( is_wp_error( $extraction ) ) {
+				return $extraction;
 			}
 
-			$result = self::sideload_images( $extracted );
+			$result = self::sideload_images( $extracted, $extraction );
 
 			if ( empty( $result['items'] ) && empty( $result['skipped'] ) ) {
 				return new \WP_Error(
@@ -161,6 +153,145 @@ class Zip_Data {
 		} finally {
 			self::remove_dir( $temp );
 		}
+	}
+
+	/**
+	 * Unpack an archive, writing only the entries that are allowed images.
+	 *
+	 * ZipArchive can extract a chosen subset, so every other entry - scripts,
+	 * archives, anything unrecognised - is never written to disk at all. That
+	 * matters because the extraction folder can, on a host where
+	 * `get_temp_dir()` falls back to WP_CONTENT_DIR, sit inside the document
+	 * root, where a `.htaccess` deny rule only covers Apache.
+	 *
+	 * Without ext/zip, `unzip_file()` handles the archive as before and the
+	 * deny files written by protect_dir() are the remaining mitigation.
+	 *
+	 * @since 1.1.0
+	 * @param string $archive Absolute path of the archive.
+	 * @param string $dest    Absolute path to extract into.
+	 * @return array<int, string>|\WP_Error Rejected entry names.
+	 */
+	private static function extract_images( $archive, $dest ) {
+		if ( ! class_exists( '\ZipArchive' ) ) {
+			return self::extract_with_core( $archive, $dest );
+		}
+
+		$zip = new \ZipArchive();
+
+		if ( true !== $zip->open( $archive ) ) {
+			return new \WP_Error(
+				'fotogrids_zip_unreadable',
+				__( 'That archive could not be read.', 'fotogrids' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$wanted   = array();
+		$rejected = array();
+
+		for ( $index = 0; $index < $zip->numFiles; $index++ ) {
+			$name = $zip->getNameIndex( $index );
+
+			if ( ! is_string( $name ) || '' === $name || '/' === substr( $name, -1 ) ) {
+				continue;
+			}
+
+			if ( ! self::is_safe_entry_name( $name ) ) {
+				continue;
+			}
+
+			if ( Folder_Data::is_allowed_image( $name ) ) {
+				$wanted[] = $name;
+			} else {
+				$rejected[] = wp_basename( $name );
+			}
+		}
+
+		if ( empty( $wanted ) ) {
+			$zip->close();
+			return $rejected;
+		}
+
+		if ( ! wp_mkdir_p( $dest ) ) {
+			$zip->close();
+			return new \WP_Error(
+				'fotogrids_temp_dir_failed',
+				__( 'A temporary folder for the import could not be created.', 'fotogrids' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		$extracted = $zip->extractTo( $dest, $wanted );
+
+		$zip->close();
+
+		if ( ! $extracted ) {
+			return new \WP_Error(
+				'fotogrids_zip_extract_failed',
+				__( 'That archive could not be extracted.', 'fotogrids' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		return $rejected;
+	}
+
+	/**
+	 * Unpack an archive with core's unzip_file().
+	 *
+	 * @since 1.1.0
+	 * @param string $archive Absolute path of the archive.
+	 * @param string $dest    Absolute path to extract into.
+	 * @return array<int, string>|\WP_Error Rejected entry names.
+	 */
+	private static function extract_with_core( $archive, $dest ) {
+		$guard = self::budget_guard();
+
+		add_filter( 'pre_unzip_file', $guard, 10, 5 );
+		$unzipped = unzip_file( $archive, $dest );
+		remove_filter( 'pre_unzip_file', $guard, 10 );
+
+		if ( is_wp_error( $unzipped ) ) {
+			return new \WP_Error(
+				'fotogrids_zip_extract_failed',
+				$unzipped->get_error_message(),
+				array( 'status' => 400 )
+			);
+		}
+
+		return array();
+	}
+
+	/**
+	 * Whether an archive entry name is safe to extract.
+	 *
+	 * @since 1.1.0
+	 * @param string $name Entry name as stored in the archive.
+	 * @return bool
+	 */
+	private static function is_safe_entry_name( $name ) {
+		$normalised = wp_normalize_path( $name );
+
+		if ( 0 !== validate_file( $normalised ) ) {
+			return false;
+		}
+
+		if ( 0 === strpos( $normalised, '/' ) || preg_match( '#^[A-Za-z]:#', $normalised ) ) {
+			return false;
+		}
+
+		foreach ( explode( '/', $normalised ) as $segment ) {
+			if ( '' === $segment || 0 === strpos( $segment, '.' ) ) {
+				return false;
+			}
+
+			if ( in_array( $segment, self::IGNORED_DIRS, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -406,6 +537,14 @@ class Zip_Data {
 			$wp_filesystem->put_contents( $root . '.htaccess', $rules );
 		}
 
+		if ( ! $wp_filesystem->exists( $root . 'web.config' ) ) {
+			$config = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+				. "<configuration><system.webServer><authorization>\n"
+				. "<deny users=\"*\" />\n"
+				. "</authorization></system.webServer></configuration>\n";
+			$wp_filesystem->put_contents( $root . 'web.config', $config );
+		}
+
 		if ( ! $wp_filesystem->exists( $root . 'index.php' ) ) {
 			$wp_filesystem->put_contents( $root . 'index.php', "<?php\n// Silence is golden.\n" );
 		}
@@ -415,14 +554,16 @@ class Zip_Data {
 	 * Walk an extracted archive and sideload every allowed image it holds.
 	 *
 	 * @since 1.1.0
-	 * @param string $root Absolute path of the extraction folder.
+	 * @param string             $root     Absolute path of the extraction folder.
+	 * @param array<int, string> $rejected Entry names refused before extraction.
 	 * @return array{items: array, skipped: array}
 	 */
-	private static function sideload_images( $root ) {
+	private static function sideload_images( $root, $rejected = array() ) {
 		$items    = array();
 		$skipped  = array();
 		$attempts = 0;
 		$found    = self::collect_files( $root );
+		$rejected = array_merge( (array) $rejected, $found['rejected'] );
 
 		foreach ( $found['images'] as $path ) {
 			if ( $attempts >= self::MAX_FILES ) {
@@ -464,7 +605,7 @@ class Zip_Data {
 			}
 		}
 
-		foreach ( $found['rejected'] as $name ) {
+		foreach ( $rejected as $name ) {
 			$skipped[] = array(
 				'path'   => $name,
 				'reason' => __( 'Not a supported image file.', 'fotogrids' ),
