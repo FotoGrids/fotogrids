@@ -301,13 +301,13 @@ const FolderImportModal = ({
     const busy = importing || uploading;
 
     const renderBreadcrumbs = () => (
-        <nav className="fg-folder-crumbs" aria-label={strings.uploadFromFolder || 'From Folder'}>
+        <nav className="fg-upload-folder-crumbs" aria-label={strings.uploadFromFolder || 'From Folder'}>
             {listing.breadcrumbs.map((crumb, index) => (
                 <React.Fragment key={crumb.path || 'root'}>
-                    {index > 0 && <Icon name="chevron_right" className="fg-folder-crumbs__sep" />}
+                    {index > 0 && <Icon name="chevron_right" className="fg-upload-folder-crumbs__sep" />}
                     <button
                         type="button"
-                        className="fg-folder-crumbs__item"
+                        className="fg-upload-folder-crumbs__item"
                         disabled={crumb.path === listing.path || busy}
                         onClick={() => loadFolder(crumb.path)}
                     >
@@ -319,25 +319,25 @@ const FolderImportModal = ({
     );
 
     const renderServerTab = () => (
-        <div className="fotogrids-tab-panel fg-is-active fg-folder-browser">
-            {error && <div className="fg-folder-browser__error">{error}</div>}
+        <div className="fotogrids-tab-panel fg-is-active fg-upload-folder-browser">
+            {error && <div className="fg-upload-folder-browser__error">{error}</div>}
 
             {loading ? (
-                <p className="fg-folder-browser__empty">{strings.loading || 'Loading…'}</p>
+                <p className="fg-upload-folder-browser__empty">{strings.loading || 'Loading…'}</p>
             ) : (
                 <>
                     {listing.folders.length > 0 && (
-                        <ul className="fg-folder-list">
+                        <ul className="fg-upload-folder-list">
                             {listing.parent !== null && (
                                 <li>
                                     <button
                                         type="button"
-                                        className="fg-folder-list__item"
+                                        className="fg-upload-folder-list__item"
                                         onClick={() => loadFolder(listing.parent)}
                                         disabled={busy}
                                     >
                                         <Icon name="folder" />
-                                        <span className="fg-folder-list__name">..</span>
+                                        <span className="fg-upload-folder-list__name">..</span>
                                     </button>
                                 </li>
                             )}
@@ -345,7 +345,7 @@ const FolderImportModal = ({
                                 <li key={folder.name}>
                                     <button
                                         type="button"
-                                        className="fg-folder-list__item"
+                                        className="fg-upload-folder-list__item"
                                         onClick={() =>
                                             loadFolder(
                                                 listing.path
@@ -356,9 +356,9 @@ const FolderImportModal = ({
                                         disabled={busy}
                                     >
                                         <Icon name="folder" />
-                                        <span className="fg-folder-list__name">{folder.name}</span>
+                                        <span className="fg-upload-folder-list__name">{folder.name}</span>
                                         {folder.count > 0 && (
-                                            <span className="fg-folder-list__count">
+                                            <span className="fg-upload-folder-list__count">
                                                 {folder.count}
                                             </span>
                                         )}
@@ -369,37 +369,37 @@ const FolderImportModal = ({
                     )}
 
                     {listing.files.length === 0 ? (
-                        <p className="fg-folder-browser__empty">
+                        <p className="fg-upload-folder-browser__empty">
                             {strings.uploadFromFolderEmpty || 'No images in this folder.'}
                         </p>
                     ) : (
                         <>
-                            <div className="fg-folder-browser__bar">
+                            <div className="fg-upload-folder-browser__bar">
                                 <Checkbox
-                                    id="fg-folder-select-all"
+                                    id="fg-upload-folder-select-all"
                                     checked={allVisibleSelected}
                                     onChange={toggleAllVisible}
                                     label={strings.uploadFromFolderSelectAll || 'Select all'}
                                     disabled={busy}
                                 />
-                                <span className="fg-folder-browser__count">
+                                <span className="fg-upload-folder-browser__count">
                                     {listing.files.length} / {listing.total}
                                 </span>
                             </div>
 
-                            <ul className="fg-folder-grid">
+                            <ul className="fg-upload-folder-grid">
                                 {listing.files.map((file) => {
                                     const isSelected = selected.includes(file.path);
                                     return (
                                         <li
                                             key={file.path}
-                                            className={`fg-folder-tile${
-                                                isSelected ? ' fg-folder-tile--selected' : ''
+                                            className={`fg-upload-folder-tile${
+                                                isSelected ? ' fg-upload-folder-tile--selected' : ''
                                             }`}
                                         >
                                             <button
                                                 type="button"
-                                                className="fg-folder-tile__button"
+                                                className="fg-upload-folder-tile__button"
                                                 onClick={() => toggleFile(file.path)}
                                                 disabled={busy}
                                                 aria-pressed={isSelected}
@@ -409,23 +409,23 @@ const FolderImportModal = ({
                                                     alt=""
                                                     loading="lazy"
                                                     decoding="async"
-                                                    className="fg-folder-tile__image"
+                                                    className="fg-upload-folder-tile__image"
                                                 />
                                                 {isSelected && (
-                                                    <span className="fg-folder-tile__check">
+                                                    <span className="fg-upload-folder-tile__check">
                                                         <Icon name="check" />
                                                     </span>
                                                 )}
                                                 {!file.attachment_id && (
-                                                    <span className="fg-folder-tile__badge">
+                                                    <span className="fg-upload-folder-tile__badge">
                                                         {strings.uploadFromFolderNewBadge || 'New'}
                                                     </span>
                                                 )}
                                             </button>
-                                            <span className="fg-folder-tile__name" title={file.name}>
+                                            <span className="fg-upload-folder-tile__name" title={file.name}>
                                                 {file.name}
                                             </span>
-                                            <span className="fg-folder-tile__meta">
+                                            <span className="fg-upload-folder-tile__meta">
                                                 {formatBytes(file.size)}
                                             </span>
                                         </li>
@@ -434,7 +434,7 @@ const FolderImportModal = ({
                             </ul>
 
                             {listing.files.length < listing.total && (
-                                <div className="fg-folder-browser__more">
+                                <div className="fg-upload-folder-browser__more">
                                     <Button
                                         variant="secondary"
                                         size="sm"
@@ -458,7 +458,7 @@ const FolderImportModal = ({
         : 0;
 
     const renderComputerTab = () => (
-        <div className="fotogrids-tab-panel fg-is-active fg-folder-local">
+        <div className="fotogrids-tab-panel fg-is-active fg-upload-folder-local">
             <UploadArea
                 isDragging={dragging}
                 isUploading={uploading}
@@ -479,7 +479,7 @@ const FolderImportModal = ({
             />
 
             {localFiles.length > 0 && !uploading && (
-                <div className="fg-folder-local__summary">
+                <div className="fg-upload-folder-local__summary">
                     <Icon name="image" />
                     <span>
                         {localFolder ? `${localFolder} — ` : ''}

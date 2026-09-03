@@ -178,19 +178,19 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     );
 
     const renderResult = () => (
-        <div className="fg-zip-result">
-            <p className="fg-zip-result__headline">
+        <div className="fg-upload-zip-result">
+            <p className="fg-upload-zip-result__headline">
                 <Icon name="check_circle" />
                 {result.added} {strings.uploadFromZipImagesAdded || 'images added.'}
             </p>
-            <p className="fg-zip-result__subhead">
+            <p className="fg-upload-zip-result__subhead">
                 {result.skipped.length} {strings.uploadFromZipEntriesSkipped || 'entries were skipped:'}
             </p>
-            <ul className="fg-zip-result__list">
+            <ul className="fg-upload-zip-result__list">
                 {result.skipped.slice(0, 50).map((entry, index) => (
                     <li key={`${entry.path}-${index}`}>
-                        <span className="fg-zip-result__name">{entry.path}</span>
-                        <span className="fg-zip-result__reason">{entry.reason}</span>
+                        <span className="fg-upload-zip-result__name">{entry.path}</span>
+                        <span className="fg-upload-zip-result__reason">{entry.reason}</span>
                     </li>
                 ))}
             </ul>
@@ -218,15 +218,15 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
                         {renderDropZone()}
 
                         {file && !busy && (
-                            <div className="fg-zip-file">
+                            <div className="fg-upload-zip-file">
                                 <Icon name="file_attachment" />
-                                <span className="fg-zip-file__name">{file.name}</span>
-                                <span className="fg-zip-file__size">{formatBytes(file.size)}</span>
+                                <span className="fg-upload-zip-file__name">{file.name}</span>
+                                <span className="fg-upload-zip-file__size">{formatBytes(file.size)}</span>
                             </div>
                         )}
 
                         {extracting && (
-                            <p className="fg-zip-status">
+                            <p className="fg-upload-zip-status">
                                 {strings.uploadFromZipExtracting || 'Extracting images…'}
                             </p>
                         )}
