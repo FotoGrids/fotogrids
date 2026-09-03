@@ -14,6 +14,27 @@ let keyHandler = null;
 let lastFocus = null;
 let state = null;
 
+/**
+ * Resolve a URL and return it only when it points at an http(s) resource.
+ *
+ * Item URLs arrive as JSON on a data attribute, so anything that is not
+ * http(s) - javascript:, data:, blob: - is dropped before it reaches src.
+ *
+ * @param {string} url
+ * @return {string} The resolved URL, or an empty string when unusable.
+ */
+function httpUrl( url ) {
+    if ( ! url ) {
+        return '';
+    }
+    try {
+        const parsed = new URL( url, window.location.href );
+        return ( 'http:' === parsed.protocol || 'https:' === parsed.protocol ) ? parsed.href : '';
+    } catch ( err ) {
+        return '';
+    }
+}
+
 function svgIcon( paths ) {
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
         + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
@@ -67,7 +88,7 @@ function render() {
     const it = items[ index ];
 
     const img = overlay.querySelector( '.fg-lb-mv-image' );
-    img.src = it.full || it.thumb || '';
+    img.src = httpUrl( it.full || it.thumb || '' );
     img.alt = it.alt || '';
 
     const cap = overlay.querySelector( '.fg-lb-mv-caption' );
