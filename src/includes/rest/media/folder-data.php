@@ -544,70 +544,56 @@ class Folder_Data {
 	 * @return array{originals: array<string, int>, derivatives: array<string, bool>}
 	 */
 	private static function attachments_in( $relative ) {
-		global $wpdb;
-
 		$originals   = array();
 		$derivatives = array();
 
-		// Attachment file paths are not exposed by any core API, and the result
-		// is scoped to the single folder being viewed.
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		if ( '' === $relative ) {
-			$rows = $wpdb->get_results(
-				"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value NOT LIKE '%/%'"
-			);
-		} else {
-			$rows = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s",
-					$wpdb->esc_like( $relative . '/' ) . '%'
-				)
-			);
-		}
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$query = new \WP_Query(
+			array(
+				'post_type'              => 'attachment',
+				'post_status'            => 'inherit',
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'ignore_sticky_posts'    => true,
+				'update_post_term_cache' => false,
+				'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The attached-file path is the only link between an uploads folder and its attachments.
+					'' === $relative
+						? array(
+							'key'     => '_wp_attached_file',
+							'value'   => '/',
+							'compare' => 'NOT LIKE',
+						)
+						: array(
+							'key'     => '_wp_attached_file',
+							'value'   => $relative . '/',
+							'compare' => 'LIKE',
+						),
+				),
+			)
+		);
 
-		if ( empty( $rows ) ) {
+		if ( empty( $query->posts ) ) {
 			return array(
 				'originals'   => $originals,
 				'derivatives' => $derivatives,
 			);
 		}
 
-		$ids = array();
+		// One prime for the whole folder; the per-attachment reads below are
+		// then served from the object cache.
+		update_meta_cache( 'post', $query->posts );
 
-		foreach ( $rows as $row ) {
-			$file = wp_normalize_path( (string) $row->meta_value );
+		foreach ( $query->posts as $attachment_id ) {
+			$attachment_id = (int) $attachment_id;
+			$file          = wp_normalize_path( (string) get_post_meta( $attachment_id, '_wp_attached_file', true ) );
 
-			if ( self::parent_of( $file ) !== ( '' === $relative ? '' : $relative ) ) {
+			if ( '' === $file || self::parent_of( $file ) !== $relative ) {
 				continue;
 			}
 
-			$originals[ wp_basename( $file ) ] = (int) $row->post_id;
-			$ids[]                             = (int) $row->post_id;
-		}
+			$originals[ wp_basename( $file ) ] = $attachment_id;
 
-		if ( empty( $ids ) ) {
-			return array(
-				'originals'   => $originals,
-				'derivatives' => $derivatives,
-			);
-		}
-
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-
-		// The IN list is built from a counted array of integers and the values
-		// still go through prepare().
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$meta_rows = $wpdb->get_col(
-			$wpdb->prepare(
-				"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attachment_metadata' AND post_id IN ( {$placeholders} )",
-				$ids
-			)
-		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
-		foreach ( (array) $meta_rows as $serialized ) {
-			$meta = maybe_unserialize( $serialized );
+			$meta = wp_get_attachment_metadata( $attachment_id );
 
 			if ( ! is_array( $meta ) ) {
 				continue;
@@ -646,19 +632,27 @@ class Folder_Data {
 	 * @return int Attachment ID, or 0 when the file is not in the library.
 	 */
 	private static function attachment_id_for( $relative ) {
-		global $wpdb;
-
-		// Core offers no lookup from an uploads-relative path to an attachment ID.
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$id = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value = %s LIMIT 1",
-				$relative
+		$query = new \WP_Query(
+			array(
+				'post_type'              => 'attachment',
+				'post_status'            => 'inherit',
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'ignore_sticky_posts'    => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The attached-file path is the only link between an uploads file and its attachment.
+					array(
+						'key'     => '_wp_attached_file',
+						'value'   => $relative,
+						'compare' => '=',
+					),
+				),
 			)
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-		return $id ? (int) $id : 0;
+		return empty( $query->posts ) ? 0 : (int) $query->posts[0];
 	}
 
 	/**
