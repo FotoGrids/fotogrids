@@ -159,6 +159,10 @@ final class Layout_Featured_Item implements Layout {
 	 * attribute the LightboxGrid JS delegates on, plus its label. Position
 	 * + styling are driven by wrapper data-attrs / CSS vars.
 	 *
+	 * The marker carries an explicit value: wp_kses() only allows the
+	 * data-* attribute names it finds written as `name=` in the markup, so
+	 * a valueless marker is stripped from every kses-filtered render.
+	 *
 	 * @since 1.0.0
 	 * @param Render_Context $render_context Render context.
 	 * @return string
@@ -170,7 +174,7 @@ final class Layout_Featured_Item implements Layout {
 		}
 
 		return sprintf(
-			'<button type="button" class="fg-featured-show-all" data-fg-show-all data-fg-show-all-label="%s">%s<span class="fg-featured-show-all-text">%s</span></button>',
+			'<button type="button" class="fg-featured-show-all" data-fg-show-all="true" data-fg-show-all-label="%s">%s<span class="fg-featured-show-all-text">%s</span></button>',
 			esc_attr( $label ),
 			self::show_all_icon(),
 			esc_html( $label )
