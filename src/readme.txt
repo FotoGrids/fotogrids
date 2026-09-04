@@ -87,7 +87,7 @@ Track views and interactions per gallery right inside your WordPress dashboard. 
 * **Gutenberg blocks** - add a gallery or album block in the WordPress editor.
 * **Shortcodes** - drop `[fotogrids_gallery id="123"]` or `[fotogrids_album id="123"]` into any post, page, or widget.
 * **Any theme** - galleries inherit your site's width and styling.
-* **Page builders** - Elementor, Divi, and Bricks work in the free version; Pro adds enhanced widgets and controls.
+* **Page builders** - Elementor and Divi work in the free version; Pro adds enhanced widgets and controls.
 
 = 🧰 A complete toolkit, not just a plugin =
 
@@ -144,7 +144,7 @@ FotoGrids supports every image format WordPress handles natively, including JPEG
 
 = Does it work with page builders? =
 
-Yes. FotoGrids includes dedicated widgets for Elementor, Divi, and Bricks in the free version, and works through shortcodes in any other page builder. Pro adds enhanced widgets and controls.
+Yes. FotoGrids includes dedicated widgets for Elementor and Divi in the free version, and works through shortcodes in any other page builder. Pro adds enhanced widgets and controls.
 
 = Is it mobile-friendly? =
 
@@ -218,7 +218,7 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * Immersive lightbox with keyboard navigation, autoplay, swipe gestures, and social sharing.
 * Sorting, on-page filtering, and EXIF details.
 * Text watermarking and password protection.
-* Page builder widgets for Elementor, Divi, and Bricks.
+* Page builder widgets for Elementor and Divi.
 * View and share statistics.
 * Gutenberg blocks and shortcodes.
 * Drag-and-drop image reordering.
