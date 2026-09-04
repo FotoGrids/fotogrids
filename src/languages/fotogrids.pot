@@ -2530,7 +2530,7 @@ msgid "Page Builders"
 msgstr ""
 
 #: includes/modules/PageBuilders/Module.php:92
-msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi and Bricks."
+msgid "Insert FotoGrids galleries and albums from Gutenberg, Elementor and Divi."
 msgstr ""
 
 #: includes/modules/Templates/Module.php:47
