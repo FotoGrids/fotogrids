@@ -18,6 +18,10 @@
 
 window.FGColorPicker = window.FGColorPicker || {};
 
+// Counter behind each picker's scope token. It only has to be unique within
+// the document, so a sequence is both sufficient and stable to debug.
+window.FGColorPicker._instanceCount = window.FGColorPicker._instanceCount || 0;
+
 function clamp(n, min, max) {
 	return Math.min(max, Math.max(min, n));
 }
@@ -217,7 +221,7 @@ window.FGColorPicker.create = function (options) {
 	let format = 'RGBA';
 	let suppressTextUpdate = false;
 
-	const uid = 'fg-cp-' + Math.random().toString(36).slice(2, 8);
+	const uid = 'fg-cp-' + ++window.FGColorPicker._instanceCount;
 
 	const CANVAS_W = 264;
 	const CANVAS_H = 160;

@@ -13,6 +13,28 @@
     const PLAYER_SELECTOR = '.fg-video[data-fg-playback-mode="inline"]';
 
     /**
+     * Resolve a URL and return it only when it points at an http(s) resource.
+     *
+     * Player sources come from data attributes, which a filter or a stray
+     * template edit can change after the server has escaped them. Anything
+     * that is not http(s) - javascript:, data:, blob: - is dropped.
+     *
+     * @param {string} url
+     * @return {string} The resolved URL, or an empty string when unusable.
+     */
+    function httpUrl(url) {
+        if (!url) {
+            return '';
+        }
+        try {
+            const parsed = new URL(url, window.location.href);
+            return ('http:' === parsed.protocol || 'https:' === parsed.protocol) ? parsed.href : '';
+        } catch (err) {
+            return '';
+        }
+    }
+
+    /**
      * Build a YouTube embed URL from the item's stored settings.
      *
      * @param {string} embedId
@@ -107,7 +129,7 @@
         const settings = readSettings(el);
 
         if (itemType === 'video_file') {
-            const src = el.getAttribute('data-fg-video-src') || '';
+            const src = httpUrl(el.getAttribute('data-fg-video-src') || '');
             if (!src) {
                 return null;
             }
