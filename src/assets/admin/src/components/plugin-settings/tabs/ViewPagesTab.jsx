@@ -16,6 +16,11 @@ const { __ } = wp.i18n;
 const DEFAULTS = {
     layout_mode: 'integrated',
 
+    // Permalink base. An empty prefix puts the segments at the site root.
+    base_prefix: 'fotogrids',
+    base_gallery_segment: 'gallery',
+    base_album_segment: 'album',
+
     // Standalone-only appearance.
     accent_color: '#3c46f0',
     theme: 'light',
@@ -57,6 +62,7 @@ const ViewPagesTab = () => {
     const [saved, setSaved] = useState(normalize(window.fotogridsAdmin?.viewSettings));
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -79,11 +85,13 @@ const ViewPagesTab = () => {
     const update = (key, value) => {
         setSettings(prev => ({ ...prev, [key]: value }));
         setStatus(null);
+        setErrorMessage(null);
     };
 
     const handleSave = async () => {
         setSaving(true);
         setStatus(null);
+        setErrorMessage(null);
         try {
             const result = await apiFetch({
                 path: '/fotogrids/v1/admin/view-settings',
@@ -97,6 +105,7 @@ const ViewPagesTab = () => {
             setTimeout(() => setStatus(null), 3000);
         } catch (err) {
             setStatus('error');
+            setErrorMessage(err?.message || null);
         } finally {
             setSaving(false);
         }
@@ -105,6 +114,7 @@ const ViewPagesTab = () => {
     const handleDiscard = () => {
         setSettings(saved);
         setStatus(null);
+        setErrorMessage(null);
     };
 
     // Reuse the plugin's existing color picker widget (plain global) by passing
@@ -134,8 +144,73 @@ const ViewPagesTab = () => {
 
     const isIntegrated = settings.layout_mode === 'integrated';
 
+    const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
+
+    const previewUrl = (segment) => {
+        const parts = [settings.base_prefix, segment]
+            .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
+            .filter(Boolean);
+        return `${homeUrl}/${parts.join('/')}/my-gallery/`;
+    };
+
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="view-pages-content">
+            <SettingsPanel
+                title={__('Address', 'fotogrids')}
+                description={__('Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root.', 'fotogrids')}
+            >
+                <PanelRow
+                    title={__('Prefix', 'fotogrids')}
+                    description={__('Sits in front of every view page address. Clear it to remove that part of the address entirely.', 'fotogrids')}
+                    htmlFor="fg-view-base-prefix"
+                >
+                    <input
+                        id="fg-view-base-prefix"
+                        type="text"
+                        className="fotogrids-text-input"
+                        value={settings.base_prefix}
+                        placeholder={__('fotogrids', 'fotogrids')}
+                        onChange={(e) => update('base_prefix', e.target.value)}
+                    />
+                </PanelRow>
+
+                <PanelRow
+                    title={__('Gallery segment', 'fotogrids')}
+                    description={'`' + previewUrl(settings.base_gallery_segment) + '`'}
+                    htmlFor="fg-view-base-gallery"
+                >
+                    <input
+                        id="fg-view-base-gallery"
+                        type="text"
+                        className="fotogrids-text-input"
+                        value={settings.base_gallery_segment}
+                        placeholder={__('gallery', 'fotogrids')}
+                        onChange={(e) => update('base_gallery_segment', e.target.value)}
+                    />
+                </PanelRow>
+
+                <PanelRow
+                    title={__('Album segment', 'fotogrids')}
+                    description={'`' + previewUrl(settings.base_album_segment) + '`'}
+                    htmlFor="fg-view-base-album"
+                >
+                    <input
+                        id="fg-view-base-album"
+                        type="text"
+                        className="fotogrids-text-input"
+                        value={settings.base_album_segment}
+                        placeholder={__('album', 'fotogrids')}
+                        onChange={(e) => update('base_album_segment', e.target.value)}
+                    />
+                </PanelRow>
+
+                <PanelRow
+                    fullWidth
+                    title={__('Before you change this', 'fotogrids')}
+                    description={__('Addresses on the default `fotogrids/gallery` and `fotogrids/album` base keep working and forward to the new one. Links you shared under a custom base you set earlier will stop resolving.', 'fotogrids')}
+                />
+            </SettingsPanel>
+
             <SettingsPanel
                 title={__('Page layout', 'fotogrids')}
                 description={__('Choose how view pages render. Integrated treats each gallery or album as a normal post in your theme. Standalone renders a theme-less shell that owns the whole page.', 'fotogrids')}
@@ -276,6 +351,10 @@ const ViewPagesTab = () => {
                         />
                     </PanelRow>
                 </SettingsPanel>
+            )}
+
+            {errorMessage && (
+                <div className="notice notice-error" role="alert"><p>{errorMessage}</p></div>
             )}
 
             <SaveBar
