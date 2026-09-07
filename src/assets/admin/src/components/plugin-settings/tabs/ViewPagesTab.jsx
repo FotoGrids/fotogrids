@@ -146,7 +146,10 @@ const ViewPagesTab = () => {
 
     const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
     const permalinksUrl = window.fotogridsAdmin?.permalinksUrl || '';
-    const prettyPermalinks = window.fotogridsAdmin?.prettyPermalinks !== false;
+    // wp_localize_script casts every scalar to a string, so the structure is
+    // compared against the empty string rather than read as a boolean. An
+    // absent key means an older bundle and is treated as pretty permalinks.
+    const prettyPermalinks = window.fotogridsAdmin?.permalinkStructure !== '';
 
     // Without a permalink structure WordPress ignores the rewrite base and
     // serves view pages from the post type's query var instead.
