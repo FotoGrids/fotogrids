@@ -268,6 +268,7 @@ class Admin_Init {
 				'watermarkSettings'  => \FotoGrids\Settings\Watermark_Settings_Store::get(),
 				'seoSettings'        => \FotoGrids\Settings\SEO_Settings_Store::get(),
 				'viewSettings'       => \FotoGrids\Settings\View_Settings_Store::get(),
+				'viewDefaults'       => \FotoGrids\Settings\View_Settings_Store::defaults(),
 				'currentUser'        => wp_get_current_user(),
 				'shareStatistics'    => self::resolve_share_statistics_state(),
 				'marketingAllowed'   => (bool) get_option( 'fotogrids_marketing_allowed', false ),

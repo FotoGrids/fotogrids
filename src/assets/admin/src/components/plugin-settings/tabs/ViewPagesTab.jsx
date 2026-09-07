@@ -13,30 +13,10 @@ import { Button } from '../../shared/Button';
 
 const { __ } = wp.i18n;
 
-// Keep aligned with View_Settings_Store::defaults() in
-// Plugin/src/includes/settings/class-view-settings-store.php.
-const DEFAULTS = {
-    layout_mode: 'integrated',
-
-    // Permalink base. An empty prefix puts the segments at the site root.
-    base_prefix: 'fotogrids',
-    base_gallery_segment: 'gallery',
-    base_album_segment: 'album',
-
-    // Standalone-only appearance.
-    accent_color: '#3c46f0',
-    theme: 'light',
-    max_width: 1200,
-    show_header: true,
-    show_footer: true,
-
-    // Integrated-mode toggles.
-    integrated_show_title_block: false,
-    integrated_hide_featured_image: true,
-    integrated_allow_comments: false,
-    integrated_include_in_archives: false,
-    integrated_post_navigation: false,
-};
+// View_Settings_Store::defaults() reaches the browser through
+// wp_localize_script, so PHP owns the values. Nested arrays keep their types
+// through localisation; only top-level scalars are cast to strings.
+const DEFAULTS = window.fotogridsAdmin?.viewDefaults || {};
 
 const normalize = (raw) => ({ ...DEFAULTS, ...(raw || {}) });
 
