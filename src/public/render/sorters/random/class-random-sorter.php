@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Render\Sorters\Random;
 
+use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Sorter;
@@ -14,13 +16,84 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Random sorter - shuffles the item list on every public render.
  *
- * Note: random sort intentionally disables HTML caching (documented in
- * sorting.json). That is handled at the caching layer, not here.
+ * The shuffle is seeded and therefore stable for the lifetime of whatever
+ * cache holds the rendered page. The random_mode setting decides how that is
+ * answered. MODE_REFETCH (default) and MODE_REORDER both keep the page
+ * cacheable and are handled client-side by random-sort.js; MODE_UNCACHED
+ * re-renders per request and opts the page out of caching instead.
  *
  * @package FotoGrids\Render\Sorters\Random
  * @since   1.0.0
  */
 final class Random_Sorter implements Sorter {
+
+	/**
+	 * random_mode value: the page stays cacheable and the browser requests a
+	 * fresh random selection once it has loaded. The only mode that can change
+	 * which items appear when the render is a subset of the collection.
+	 *
+	 * @since 1.0.0
+	 */
+	public const MODE_REFETCH = 'refetch';
+
+	/**
+	 * random_mode value: the page stays cacheable and the browser rearranges
+	 * the items it was served. No request, but the selection cannot change.
+	 *
+	 * @since 1.0.0
+	 */
+	public const MODE_REORDER = 'reorder';
+
+	/**
+	 * random_mode value: a fresh order is chosen while the page is built, and
+	 * the page opts out of every cache so the choice is not stored.
+	 *
+	 * @since 1.0.0
+	 */
+	public const MODE_UNCACHED = 'uncached';
+
+	/**
+	 * Resolve the random_mode setting. Unrecognised values fall back to
+	 * MODE_REFETCH, which matches the shipped default.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, mixed> $settings Collection settings.
+	 * @return string
+	 */
+	public static function mode( array $settings ): string {
+		$mode = (string) ( $settings['random_mode'] ?? '' );
+
+		return in_array( $mode, array( self::MODE_REORDER, self::MODE_UNCACHED ), true )
+			? $mode
+			: self::MODE_REFETCH;
+	}
+
+	/**
+	 * Whether the supplied settings select random sorting resolved in the
+	 * visitor's browser - either by rearranging the rendered items or by
+	 * requesting a fresh selection.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, mixed> $settings Collection settings.
+	 * @return bool
+	 */
+	public static function is_client_randomized( array $settings ): bool {
+		return 'random' === ( $settings['default_sort_order'] ?? '' )
+			&& self::MODE_UNCACHED !== self::mode( $settings );
+	}
+
+	/**
+	 * Whether the supplied settings select random sorting served from the
+	 * server on every request.
+	 *
+	 * @since  1.0.0
+	 * @param  array<string, mixed> $settings Collection settings.
+	 * @return bool
+	 */
+	public static function is_server_randomized( array $settings ): bool {
+		return 'random' === ( $settings['default_sort_order'] ?? '' )
+			&& self::MODE_UNCACHED === self::mode( $settings );
+	}
 
 	public function id(): string {
 		return 'fotogrids/sort/random';
@@ -103,7 +176,37 @@ final class Random_Sorter implements Sorter {
 		return $shuffled;
 	}
 
+	/**
+	 * Declares the client-side randomization module.
+	 *
+	 * Returned only for gallery renders the JS will actually act on - those
+	 * carrying data-fg-random-mode. MODE_UNCACHED and albums ship nothing. The
+	 * stylesheet holds the items while a fetch is in flight, so it is declared
+	 * for MODE_REFETCH only.
+	 *
+	 * @since  1.0.0
+	 */
 	public function assets( Render_Context $render_context ): Module_Assets {
-		return new Module_Assets();
+		if ( Collection_Kind::GALLERY !== $render_context->meta->collection_kind
+			|| ! self::is_client_randomized( $render_context->settings )
+		) {
+			return new Module_Assets();
+		}
+
+		$css = array();
+		if ( self::MODE_REFETCH === self::mode( $render_context->settings ) ) {
+			$css['fotogrids-random-sort'] = new Asset_Decl( 'sorters/random/random-sort.css' );
+		}
+
+		return new Module_Assets(
+			$css,
+			array(
+				'fotogrids-random-sort' => new Asset_Decl(
+					'../../assets/js/random-sort.js',
+					array( 'fotogrids-runtime' ),
+					true
+				),
+			)
+		);
 	}
 }

@@ -960,6 +960,38 @@ body.rtl {
 		color: var(--fg-text-primary);
 	}
 
+	&__item {
+		display: flex;
+		flex-direction: column;
+	}
+
+	// Only separates sibling blocks in a multi-message info block; a single
+	// message keeps the tighter 4px gap the content column already sets.
+	&__item + &__item {
+		margin-top: 8px;
+	}
+
+	&__item-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 8px;
+	}
+
+	&__item-subtitle {
+		font-size: 13px;
+		line-height: 17px;
+		font-weight: 600;
+		color: var(--fg-text-primary);
+	}
+
+	&__item-tag {
+		font-size: 12px;
+		line-height: 17px;
+		font-weight: 400;
+		color: var(--fg-text-tertiary);
+	}
+
 	&__text {
 		font-size: 13px;
 		line-height: 17px;

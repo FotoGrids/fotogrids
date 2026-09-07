@@ -1,0 +1,11 @@
+/* Random sort - fetch mode.
+
+   Holds the server-rendered items while the request for a fresh random
+   selection is in flight, so the visitor never sees one set of items
+   replaced by another. visibility (not display) keeps the box in flow, so
+   nothing shifts when the swap lands. Removed by random-sort.js as soon as
+   the response arrives or the hold times out. */
+
+.fg-random-pending {
+    visibility: hidden;
+}

@@ -159,8 +159,18 @@ interface Layout {
 	 *
 	 * Known capability keys (extend this list as new cross-cutting
 	 * features need to ask):
-	 *  - paginates : bool - Pagination modules should render chrome.
-	 *  - filters   : bool - Filter_Ui should render the filter bar.
+	 *  - paginates         : bool - Pagination modules should render chrome.
+	 *  - filters           : bool - Filter_Ui should render the filter bar.
+	 *  - enforces_item_box : bool - Layout_Wrapper_Composer contributes the
+	 *                        item-box CSS variables (aspect ratio, fit).
+	 *  - uses_columns      : bool - Composer contributes the responsive
+	 *                        column-count variables.
+	 *  - uses_item_spacing : bool - Composer contributes the gap variables.
+	 *  - lightbox_extends  : bool - Composer stamps the extended-lightbox
+	 *                        markers so the overlay spans the whole gallery.
+	 *  - randomizes        : bool - Composer stamps data-fg-random-mode so
+	 *                        random-sort.js resolves the order client-side.
+	 *                        Opt out when the layout owns its item order.
 	 *
 	 * @since   1.0.0
 	 * @return  array<string, bool>

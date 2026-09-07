@@ -78,6 +78,7 @@ final class Render_Controller {
 
 			$active_modules = array(
 				'gates'      => array(),
+				'sorters'    => array(),
 				'decorators' => array(),
 				'layouts'    => array(),
 				'features'   => array(),
@@ -102,6 +103,15 @@ final class Render_Controller {
 
 					return $render_result;
 				}
+			}
+
+			// The sort itself already ran in Context_Builder (item IDs are
+			// ordered before hydration); only the winning sorter's assets are
+			// collected here. Same first-wins precedence rule the builder uses.
+			$sorter_module = Module_Registry::active_modules( 'sorters', $render )[0] ?? null;
+			if ( null !== $sorter_module ) {
+				$this->asset_resolver->collect( $sorter_module->assets( $render ), $sorter_module->origin() );
+				$active_modules['sorters'][] = $sorter_module->id();
 			}
 
 			$collection_items   = $render->items;
