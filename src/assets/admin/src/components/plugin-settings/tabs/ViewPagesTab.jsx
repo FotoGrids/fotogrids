@@ -168,7 +168,7 @@ const ViewPagesTab = () => {
             >
                 <PanelRow
                     title={__('Prefix', 'fotogrids')}
-                    description={__('The folder galleries and albums sit in. Clear it to move them to the top level of your site.', 'fotogrids')}
+                    description={__('The part both addresses below share. Clear it and they start straight after your domain.', 'fotogrids')}
                     htmlFor="fg-view-base-prefix"
                 >
                     <input
