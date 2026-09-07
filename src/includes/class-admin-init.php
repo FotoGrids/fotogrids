@@ -276,6 +276,8 @@ class Admin_Init {
 				'userPersona'       => (string) get_option( 'fotogrids_user_persona', '' ),
 				'settingsBaseUrl'   => admin_url( 'admin.php?page=fotogrids-settings' ),
 				'homeUrl'           => home_url(),
+				'permalinksUrl'     => admin_url( 'options-permalink.php' ),
+				'prettyPermalinks'  => (bool) get_option( 'permalink_structure' ),
 				'isFotoGridsPage'   => \FotoGrids\Admin\Admin_Screen::is_fotogrids( $hook ),
 				'capabilities'      => self::get_current_user_capabilities_snapshot(),
 			)

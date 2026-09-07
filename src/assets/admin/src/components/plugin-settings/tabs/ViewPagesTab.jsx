@@ -145,16 +145,24 @@ const ViewPagesTab = () => {
     const isIntegrated = settings.layout_mode === 'integrated';
 
     const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
+    const permalinksUrl = window.fotogridsAdmin?.permalinksUrl || '';
+    const prettyPermalinks = window.fotogridsAdmin?.prettyPermalinks !== false;
 
-    const previewUrl = (segment, sample) => {
+    // Without a permalink structure WordPress ignores the rewrite base and
+    // serves view pages from the post type's query var instead.
+    const previewUrl = (segment, sample, queryVar) => {
+        if (!prettyPermalinks) {
+            return `${homeUrl}/?${queryVar}=${sample}`;
+        }
+
         const parts = [settings.base_prefix, segment]
             .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
             .filter(Boolean);
         return `${homeUrl}/${parts.join('/')}/${sample}/`;
     };
 
-    const urlPreview = (segment, sample) => (
-        <p className="fotogrids-field-help">{previewUrl(segment, sample)}</p>
+    const urlPreview = (segment, sample, queryVar) => (
+        <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
     );
 
     return (
@@ -163,6 +171,20 @@ const ViewPagesTab = () => {
                 title={__('Address', 'fotogrids')}
                 description={__('Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root.', 'fotogrids')}
             >
+                {!prettyPermalinks && (
+                    <div className="notice notice-warning">
+                        <p>
+                            {__('Your site uses plain permalinks, so view pages are served from a query address and the settings below have no effect yet. They apply as soon as you choose any other permalink structure.', 'fotogrids')}
+                            {permalinksUrl && (
+                                <>
+                                    {' '}
+                                    <a href={permalinksUrl}>{__('Open Permalink settings', 'fotogrids')}</a>
+                                </>
+                            )}
+                        </p>
+                    </div>
+                )}
+
                 <PanelRow
                     title={__('Prefix', 'fotogrids')}
                     description={__('The part both addresses below share. Clear it and they start straight after your domain.', 'fotogrids')}
@@ -191,7 +213,7 @@ const ViewPagesTab = () => {
                         placeholder={__('gallery', 'fotogrids')}
                         onChange={(e) => update('base_gallery_segment', e.target.value)}
                     />
-                    {urlPreview(settings.base_gallery_segment, 'gallery-name')}
+                    {urlPreview(settings.base_gallery_segment, 'gallery-name', 'fotogrids_gallery')}
                 </PanelRow>
 
                 <PanelRow
@@ -207,7 +229,7 @@ const ViewPagesTab = () => {
                         placeholder={__('album', 'fotogrids')}
                         onChange={(e) => update('base_album_segment', e.target.value)}
                     />
-                    {urlPreview(settings.base_album_segment, 'album-name')}
+                    {urlPreview(settings.base_album_segment, 'album-name', 'fotogrids_album')}
                 </PanelRow>
 
                 <PanelRow

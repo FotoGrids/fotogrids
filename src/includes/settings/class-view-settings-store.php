@@ -270,8 +270,10 @@ final class View_Settings_Store {
 			return __( 'WordPress itself', 'fotogrids' );
 		}
 
-		if ( get_page_by_path( $path ) instanceof \WP_Post ) {
-			return __( 'an existing page', 'fotogrids' );
+		$occupant = self::resolved_post_type( $path );
+
+		if ( null !== $occupant ) {
+			return $occupant;
 		}
 
 		foreach ( get_post_types( array(), 'objects' ) as $post_type ) {
@@ -291,6 +293,38 @@ final class View_Settings_Store {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Describe the content WordPress already resolves at a path, if any.
+	 *
+	 * Asking the rewrite rules covers posts, pages and other post types under
+	 * whatever permalink structure the site runs, which a page-only lookup
+	 * misses.
+	 *
+	 * @since 1.2.0
+	 * @param string $path Path relative to the site root, no surrounding slashes.
+	 * @return string|null
+	 */
+	private static function resolved_post_type( string $path ): ?string {
+		$post_id = url_to_postid( home_url( '/' . $path . '/' ) );
+
+		if ( $post_id < 1 ) {
+			return null;
+		}
+
+		$post = get_post( $post_id );
+		$type = $post instanceof \WP_Post ? get_post_type_object( $post->post_type ) : null;
+
+		if ( null === $type || '' === (string) $type->labels->singular_name ) {
+			return __( 'existing content', 'fotogrids' );
+		}
+
+		return sprintf(
+			/* translators: %s: the singular name of a post type, e.g. "page". */
+			__( 'an existing %s', 'fotogrids' ),
+			strtolower( $type->labels->singular_name )
+		);
 	}
 
 	/**
