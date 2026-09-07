@@ -21,6 +21,8 @@ tests=(
     "${plugin_root}/tests/integration/HookFiringOrderTest.php"
     "${plugin_root}/tests/integration/PreviewEndpointTest.php"
     "${plugin_root}/tests/integration/PublicRenderParityTest.php"
+    "${plugin_root}/tests/integration/RenderCacheInlineAssetsTest.php"
+    "${plugin_root}/tests/integration/RandomSortModeTest.php"
     "${plugin_root}/tests/integration/TemplateConfigValidityTest.php"
 )
 

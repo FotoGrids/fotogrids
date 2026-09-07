@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Internal;
 
 use FotoGrids\Hooks\Filters_Render;
+use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Columns_Mode;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Responsive_Var;
+use FotoGrids\Render\Sorters\Random\Random_Sorter;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -65,6 +67,7 @@ final class Layout_Wrapper_Composer {
 		'uses_columns'      => array( self::class, 'columns_adapter' ),
 		'uses_item_spacing' => array( self::class, 'item_spacing_adapter' ),
 		'lightbox_extends'  => array( self::class, 'lightbox_extended_adapter' ),
+		'randomizes'        => array( self::class, 'random_sort_adapter' ),
 	);
 
 	/**
@@ -354,6 +357,41 @@ final class Layout_Wrapper_Composer {
 			&& null !== $render_context->meta->random_seed
 		) {
 			$wrapper_data_attrs['data-fg-random-seed'] = (string) $render_context->meta->random_seed;
+		}
+
+		return array(
+			'wrapper_data_attrs' => $wrapper_data_attrs,
+		);
+	}
+
+	/**
+	 * Wrapper attributes for client-side random sorting.
+	 *
+	 * data-fg-random-mode is what random-sort.js gates on. The `randomizes`
+	 * capability defaults to true, so this runs for every layout; one that
+	 * resolves its own item order returns `[ 'randomizes' => false ]` to opt
+	 * out. In MODE_REFETCH the render URL and nonce travel with it: a gallery
+	 * that is neither paginated nor lightbox-extended has no other reason to
+	 * carry them.
+	 *
+	 * @since   1.0.0
+	 * @return array{wrapper_data_attrs: array<string, string>}
+	 */
+	private static function random_sort_adapter( Layout $layout, Render_Context $render_context ): array {
+		unset( $layout );
+
+		if ( Collection_Kind::GALLERY !== $render_context->meta->collection_kind
+			|| ! Random_Sorter::is_client_randomized( $render_context->settings )
+		) {
+			return array( 'wrapper_data_attrs' => array() );
+		}
+
+		$mode               = Random_Sorter::mode( $render_context->settings );
+		$wrapper_data_attrs = array( 'data-fg-random-mode' => $mode );
+
+		if ( Random_Sorter::MODE_REFETCH === $mode ) {
+			$wrapper_data_attrs['data-fg-render-url']   = esc_url( rest_url( 'fotogrids/v1/gallery/render' ) );
+			$wrapper_data_attrs['data-fg-render-nonce'] = esc_attr( wp_create_nonce( 'wp_rest' ) );
 		}
 
 		return array(
