@@ -387,7 +387,12 @@ const ViewPagesTab = () => {
             )}
 
             {errorMessage && (
-                <div className="notice notice-error" role="alert"><p>{errorMessage}</p></div>
+                <InfoBlock
+                    variant="error"
+                    role="alert"
+                    title={__('That address could not be saved', 'fotogrids')}
+                    description={errorMessage}
+                />
             )}
 
             <SaveBar

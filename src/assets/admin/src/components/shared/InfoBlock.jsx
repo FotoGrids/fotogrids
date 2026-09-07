@@ -13,7 +13,8 @@ import Icon from './Icon';
  * @param {string|React.ReactNode} props.title
  * @param {string|React.ReactNode} [props.description]
  * @param {string}                 [props.icon]      FotoGridsIcons name. Defaults to the variant's icon.
- * @param {'info'|'warning'}       [props.variant]   Colour treatment. Defaults to "info".
+ * @param {'info'|'warning'|'error'} [props.variant] Colour treatment. Defaults to "info".
+ * @param {string}                 [props.role]      ARIA role, e.g. "alert" for a validation failure.
  * @param {React.ReactNode}        props.children    The control (right slot).
  */
 const InfoBlock = ({
@@ -21,13 +22,18 @@ const InfoBlock = ({
     description,
     icon,
     variant = 'info',
+    role,
     children,
 }) => {
     const baseClass = 'fotogrids-info-block';
-    const resolvedIcon = icon || ('warning' === variant ? 'alert_circle' : 'info_square');
+    const variantIcons = {
+        warning: 'alert_circle',
+        error: 'x_circle',
+    };
+    const resolvedIcon = icon || variantIcons[variant] || 'info_square';
 
     return (
-        <div className={`${baseClass} ${baseClass}--${variant}`}>
+        <div className={`${baseClass} ${baseClass}--${variant}`} role={role}>
             <div className={`${baseClass}__icon`}>
                 <Icon name={resolvedIcon} />
             </div>
