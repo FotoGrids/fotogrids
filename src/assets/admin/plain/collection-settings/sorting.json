@@ -7,7 +7,7 @@
             "key": "default_sort_order",
             "type": "button_group",
             "label": "Default Sort Order",
-            "description": "How items are sorted when the {postType.lower} is loaded.<br><strong>Note:</strong> Random sorting will automatically disable HTML caching.",
+            "description": "How items are sorted when the {postType.lower} is loaded.",
             "options": [
                 {
                     "label": "Manual",
@@ -124,6 +124,89 @@
                 "dependsOn": "default_sort_order",
                 "values": [
                     "title"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "random_mode",
+            "type": "button_group",
+            "postTypes": [
+                "gallery"
+            ],
+            "label": "Randomize Order",
+            "options": [
+                {
+                    "label": "Fully random each visit",
+                    "value": "refetch",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Reorder only",
+                    "value": "reorder",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Random on every request",
+                    "value": "uncached",
+                    "tier_required": "free"
+                }
+            ],
+            "default": "refetch",
+            "condition": {
+                "dependsOn": "default_sort_order",
+                "values": [
+                    "random"
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
+        },
+        {
+            "key": "random_sort_caching_notice",
+            "type": "info_block",
+            "postTypes": [
+                "gallery"
+            ],
+            "subtitle": "Random order and caching",
+            "messages": [
+                {
+                    "message": "Random order is decided while the page is built. If that built page is stored and reused, the order is stored with it."
+                },
+                {
+                    "subtitle": "Two caches can store it",
+                    "tag": "you control one",
+                    "message": "The FotoGrids cache, which you turn on and off per {postType.lower} under <strong>Performance</strong>. And your site's page cache - a caching plugin, your host, or a CDN - which FotoGrids can ask to skip a page but cannot control."
+                },
+                {
+                    "subtitle": "Fully random each visit",
+                    "tag": "Recommended - works with any caching",
+                    "message": "After the page loads, the browser asks FotoGrids for a fresh selection. Because that request happens after the page was served, no cache of any kind can affect it. Costs one small request per visit, which loads the {postType.lower} only and not the whole page."
+                },
+                {
+                    "subtitle": "Reorder only",
+                    "tag": "Lightest - same items, no extra request",
+                    "message": "The browser rearranges the items the page already contains. Nothing is requested and no cache can affect it, but the selection cannot change. Use this only when <strong>Display Mode</strong> is set to <strong>Show All Items</strong> - with <strong>Break into Pages</strong>, or on a Single Item layout, the same items appear every visit in a different order."
+                },
+                {
+                    "subtitle": "Random on every request",
+                    "tag": "Heaviest - stops this page being cached",
+                    "message": "FotoGrids picks a new selection while building the page, skips its own cache for this {postType.lower}, and asks your site's page cache not to store the result. Some caching plugins and CDNs ignore that request, so check a live page afterwards. Choose this only if the order has to change for visitors with JavaScript turned off."
+                }
+            ],
+            "icon": "bulb",
+            "full_width": true,
+            "button_label": "Read more on how caching affects random order",
+            "button_url": "https://www.fotogrids.com/docs/performance-and-seo/random-sort-and-caching/",
+            "condition": {
+                "dependsOn": "default_sort_order",
+                "values": [
+                    "random"
                 ]
             },
             "tier_required": "free",

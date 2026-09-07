@@ -55,6 +55,17 @@ namespace {
             return (string) $value;
         }
     }
+    if ( ! function_exists( 'rest_url' ) ) {
+        function rest_url( string $path = '' ): string {
+            return 'https://example.com/wp-json/' . ltrim( $path, '/' );
+        }
+    }
+    if ( ! function_exists( 'wp_create_nonce' ) ) {
+        function wp_create_nonce( string $action = '' ): string {
+            unset( $action );
+            return 'test-nonce';
+        }
+    }
     if ( ! function_exists( 'absint' ) ) {
         function absint( mixed $value ): int {
             return abs( (int) $value );
@@ -256,6 +267,8 @@ require_once dirname( __DIR__, 2 ) . '/src/includes/settings/class-watermark-set
 require_once dirname( __DIR__, 2 ) . '/src/includes/hooks/filters/class-filters-watermark.php';
 require_once dirname( __DIR__, 2 ) . '/src/includes/class-debug-log.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-layout-wrapper-composer.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/api/interface-sorter.php';
+require_once dirname( __DIR__, 2 ) . '/src/public/render/sorters/random/class-random-sorter.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/internal/class-layout-capabilities.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/api/class-responsive-var.php';
 require_once dirname( __DIR__, 2 ) . '/src/public/render/video/class-video-item-helpers.php';
@@ -267,7 +280,7 @@ require_once dirname( __DIR__, 2 ) . '/src/includes/assets/class-loading-icon-li
  * @package FotoGrids\Tests\Integration
  * @since   1.0.0
  */
-final class Parity_Layout_Module implements Layout {
+class Parity_Layout_Module implements Layout {
     public function id(): string {
         return 'tests/parity-layout';
     }
@@ -339,6 +352,25 @@ final class Parity_Layout_Module implements Layout {
 }
 
 /**
+ * Layout stub that owns its own item order and opts out of `randomizes`.
+ *
+ * @package FotoGrids\Tests\Integration
+ * @since   1.0.0
+ */
+final class Fixed_Order_Layout_Module extends Parity_Layout_Module {
+    public function id(): string {
+        return 'tests/fixed-order-layout';
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    public function capabilities(): array {
+        return [ 'randomizes' => false ];
+    }
+}
+
+/**
  * Integration tests for public render output parity.
  *
  * @package FotoGrids\Tests\Integration
@@ -349,6 +381,44 @@ final class PublicRenderParityTest {
         self::test_wrapper_includes_required_class_and_data_attribute();
         self::test_render_output_emits_scoped_vars_as_inline_css();
         self::test_error_markup_visibility_respects_settings_flag();
+        self::test_random_sort_stamps_the_mode_attribute();
+        self::test_layout_can_opt_out_of_random_sort_attributes();
+    }
+
+    private static function test_random_sort_stamps_the_mode_attribute(): void {
+        Module_Registry::reset();
+        Module_Registry::register( 'layouts', Parity_Layout_Module::class );
+
+        $render_result = Render_Controller::factory()->render( self::make_random_context() );
+
+        self::assert_contains( 'data-fg-random-mode="refetch"', $render_result->html, 'A random-sorted gallery should carry the mode the client module gates on.' );
+        self::assert_contains( 'data-fg-render-url=', $render_result->html, 'Refetch mode needs the render URL even when the layout is neither paginated nor lightbox-extended.' );
+        self::assert_contains( 'data-fg-render-nonce=', $render_result->html, 'Refetch mode needs the render nonce.' );
+    }
+
+    private static function test_layout_can_opt_out_of_random_sort_attributes(): void {
+        Module_Registry::reset();
+        Module_Registry::register( 'layouts', Fixed_Order_Layout_Module::class );
+
+        $render_result = Render_Controller::factory()->render( self::make_random_context() );
+
+        self::assert_not_contains( 'data-fg-random-mode', $render_result->html, 'A layout declaring randomizes = false should suppress the attribute.' );
+    }
+
+    private static function make_random_context(): Render_Context {
+        $context = self::make_context( true );
+
+        return $context->with(
+            array(
+                'settings' => array_merge(
+                    $context->settings,
+                    array(
+                        'default_sort_order' => 'random',
+                        'random_mode'        => 'refetch',
+                    )
+                ),
+            )
+        );
     }
 
     private static function test_wrapper_includes_required_class_and_data_attribute(): void {

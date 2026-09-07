@@ -12,7 +12,10 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
  *   "type": "info_block",
  *   "key": "...",          // optional - block is not saved
  *   "subtitle": "...",     // optional; bold label rendered above the message
- *   "message": "...",      // required; supports <strong> and <a> tags
+ *   "message": "...",      // required unless `messages` is given; supports <strong> and <a> tags
+ *   "messages": [          // optional; renders each entry as its own block
+ *     { "subtitle": "...", "tag": "...", "message": "..." }
+ *   ],                     // `tag` is a short qualifier shown beside the subtitle
  *   "icon": "info_square", // optional; renders a fotogrids-icon before the inner block; defaults to the variant icon
  *   "variant": "info",     // optional; "info" (default) or "danger" (red warning styling)
  *   "full_width": false,   // optional; when true, removes content max-width limit
@@ -24,8 +27,15 @@ window.FotoGridsRenderSettings.renderInfoBlock = (setting) => {
 	const { createElement: h } = wp.element;
 
 	const subtitle = setting.subtitle || null;
-	const message = setting.message || setting.description || '';
 	const buttonLabel = setting.button_label || null;
+
+	// Same shape as renderPromo: `messages` renders one block per entry, and a
+	// single `message` collapses to a one-entry list so existing blocks are
+	// unaffected.
+	const messages =
+		Array.isArray(setting.messages) && setting.messages.length > 0
+			? setting.messages
+			: [{ message: setting.message || setting.description || '' }];
 
 	// button_url: direct URL string.
 	// button_url_key: a key on window.fotogridsSettings (for dynamic admin URLs).
@@ -105,11 +115,53 @@ window.FotoGridsRenderSettings.renderInfoBlock = (setting) => {
 										subtitle
 									)
 								: null,
-							h('span', {
-								key: 'message',
-								className: `${baseClass}__text`,
-								dangerouslySetInnerHTML: { __html: message },
-							}),
+							...messages.map((entry, index) =>
+								h(
+									'div',
+									{
+										key: `message-${index}`,
+										className: `${baseClass}__item`,
+									},
+									[
+										entry.subtitle
+											? h(
+													'span',
+													{
+														key: 'item-head',
+														className: `${baseClass}__item-head`,
+													},
+													[
+														h(
+															'strong',
+															{
+																key: 'item-subtitle',
+																className: `${baseClass}__item-subtitle`,
+															},
+															entry.subtitle
+														),
+														entry.tag
+															? h(
+																	'span',
+																	{
+																		key: 'item-tag',
+																		className: `${baseClass}__item-tag`,
+																	},
+																	entry.tag
+																)
+															: null,
+													].filter(Boolean)
+												)
+											: null,
+										h('span', {
+											key: 'item-text',
+											className: `${baseClass}__text`,
+											dangerouslySetInnerHTML: {
+												__html: entry.message || '',
+											},
+										}),
+									].filter(Boolean)
+								)
+							),
 						].filter(Boolean)
 					),
 					buttonLabel && buttonUrl

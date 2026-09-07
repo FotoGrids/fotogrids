@@ -654,6 +654,7 @@ class Collection_Defaults {
 			'pagination_type'                              => 'paginated',
 			'pagination_method'                            => 'load_more',
 			'default_sort_order'                           => 'manual',
+			'random_mode'                                  => 'refetch',
 			'date_sort_type'                               => 'date_created',
 			'date_sort_direction'                          => 'desc',
 			'title_sort_direction'                         => 'asc',
