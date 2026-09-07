@@ -146,12 +146,19 @@ const ViewPagesTab = () => {
 
     const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
 
-    const previewUrl = (segment) => {
+    const previewUrl = (segment, sample) => {
         const parts = [settings.base_prefix, segment]
             .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
             .filter(Boolean);
-        return `${homeUrl}/${parts.join('/')}/my-gallery/`;
+        return `${homeUrl}/${parts.join('/')}/${sample}/`;
     };
+
+    const urlPreview = (segment, sample) => (
+        <p className="fotogrids-field-help">
+            {__('Example:', 'fotogrids')}{' '}
+            <code>{previewUrl(segment, sample)}</code>
+        </p>
+    );
 
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="view-pages-content">
@@ -161,7 +168,7 @@ const ViewPagesTab = () => {
             >
                 <PanelRow
                     title={__('Prefix', 'fotogrids')}
-                    description={__('Sits in front of every view page address. Clear it to remove that part of the address entirely.', 'fotogrids')}
+                    description={__('The folder galleries and albums sit in. Clear it to move them to the top level of your site.', 'fotogrids')}
                     htmlFor="fg-view-base-prefix"
                 >
                     <input
@@ -176,7 +183,7 @@ const ViewPagesTab = () => {
 
                 <PanelRow
                     title={__('Gallery segment', 'fotogrids')}
-                    description={'`' + previewUrl(settings.base_gallery_segment) + '`'}
+                    description={__('The word that marks a gallery in the address.', 'fotogrids')}
                     htmlFor="fg-view-base-gallery"
                 >
                     <input
@@ -187,11 +194,12 @@ const ViewPagesTab = () => {
                         placeholder={__('gallery', 'fotogrids')}
                         onChange={(e) => update('base_gallery_segment', e.target.value)}
                     />
+                    {urlPreview(settings.base_gallery_segment, 'my-gallery')}
                 </PanelRow>
 
                 <PanelRow
                     title={__('Album segment', 'fotogrids')}
-                    description={'`' + previewUrl(settings.base_album_segment) + '`'}
+                    description={__('The word that marks an album in the address.', 'fotogrids')}
                     htmlFor="fg-view-base-album"
                 >
                     <input
@@ -202,6 +210,7 @@ const ViewPagesTab = () => {
                         placeholder={__('album', 'fotogrids')}
                         onChange={(e) => update('base_album_segment', e.target.value)}
                     />
+                    {urlPreview(settings.base_album_segment, 'my-album')}
                 </PanelRow>
 
                 <PanelRow
