@@ -8,6 +8,8 @@ import {
     SaveBar,
 } from '../../shared/settings';
 import Toggle from '../../shared/Toggle';
+import InfoBlock from '../../shared/InfoBlock';
+import { Button } from '../../shared/Button';
 
 const { __ } = wp.i18n;
 
@@ -175,17 +177,17 @@ const ViewPagesTab = () => {
                 description={__('Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root.', 'fotogrids')}
             >
                 {!prettyPermalinks && (
-                    <div className="notice notice-warning">
-                        <p>
-                            {__('Your site uses plain permalinks, so view pages are served from a query address and the settings below have no effect yet. They apply as soon as you choose any other permalink structure.', 'fotogrids')}
-                            {permalinksUrl && (
-                                <>
-                                    {' '}
-                                    <a href={permalinksUrl}>{__('Open Permalink settings', 'fotogrids')}</a>
-                                </>
-                            )}
-                        </p>
-                    </div>
+                    <InfoBlock
+                        variant="warning"
+                        title={__('Plain permalinks are on', 'fotogrids')}
+                        description={__('View pages are served from a query address, so the settings below have no effect yet. They apply as soon as you choose any other permalink structure.', 'fotogrids')}
+                    >
+                        {permalinksUrl && (
+                            <Button variant="secondary" size="sm" href={permalinksUrl}>
+                                {__('Permalink settings', 'fotogrids')}
+                            </Button>
+                        )}
+                    </InfoBlock>
                 )}
 
                 <PanelRow

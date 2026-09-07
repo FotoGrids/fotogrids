@@ -262,6 +262,23 @@
 	}
 }
 
+// Warning variant. Compound selector so it wins over the info skin above
+// regardless of source order.
+.fotogrids-info-block.fotogrids-info-block--warning {
+	background: #fef8ee;
+	border-color: #f0b849;
+
+	.fotogrids-info-block__icon {
+		background: rgba(240, 184, 73, 0.18);
+		color: #f0b849;
+	}
+
+	.fotogrids-info-block__title,
+	.fotogrids-info-block__description {
+		color: var(--fg-text-secondary);
+	}
+}
+
 // SaveBar - sticky bottom bar.
 .fotogrids-save-bar {
 	position: sticky;

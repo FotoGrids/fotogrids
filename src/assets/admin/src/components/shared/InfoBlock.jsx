@@ -12,21 +12,24 @@ import Icon from './Icon';
  * @param {Object}                 props
  * @param {string|React.ReactNode} props.title
  * @param {string|React.ReactNode} [props.description]
- * @param {string}                 [props.icon]      FotoGridsIcons name (defaults to "alert_bubble").
+ * @param {string}                 [props.icon]      FotoGridsIcons name. Defaults to the variant's icon.
+ * @param {'info'|'warning'}       [props.variant]   Colour treatment. Defaults to "info".
  * @param {React.ReactNode}        props.children    The control (right slot).
  */
 const InfoBlock = ({
     title,
     description,
-    icon = 'info_square',
+    icon,
+    variant = 'info',
     children,
 }) => {
     const baseClass = 'fotogrids-info-block';
+    const resolvedIcon = icon || ('warning' === variant ? 'alert_circle' : 'info_square');
 
     return (
-        <div className={baseClass}>
+        <div className={`${baseClass} ${baseClass}--${variant}`}>
             <div className={`${baseClass}__icon`}>
-                <Icon name={icon} />
+                <Icon name={resolvedIcon} />
             </div>
             <div className={`${baseClass}__text`}>
                 {title && <h4 className={`${baseClass}__title`}>{title}</h4>}
