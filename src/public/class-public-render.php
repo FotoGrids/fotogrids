@@ -3,12 +3,14 @@ namespace FotoGrids;
 
 use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Filters_Page_Builders;
+use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Api\Item_View;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Render_Controller;
 use FotoGrids\Render\Internal\Render_Result;
+use FotoGrids\Render\Sorters\Random\Random_Sorter;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -77,6 +79,38 @@ class Public_Render {
 	}
 
 	/**
+	 * Opt the current page out of host, page-builder and CDN caching when a
+	 * randomly-sorted gallery is set to randomize on the server.
+	 *
+	 * The other random_mode values keep the page cacheable and resolve in the
+	 * browser, so this does nothing for them. Server mode promises a new order
+	 * per request, which only holds if nothing downstream stores the response.
+	 * The fotogrids/cache/bypass_page_cache filter has the final say either
+	 * way; it covers only the caches FotoGrids does not own, so it cannot
+	 * re-enable the render cache that should_cache() already skipped.
+	 *
+	 * @since  1.0.0
+	 * @param  array $settings   Gallery settings.
+	 * @param  int   $gallery_id Gallery ID.
+	 * @return void
+	 */
+	private static function maybe_bypass_page_cache_for_random( array $settings, int $gallery_id ): void {
+		$bypass = Random_Sorter::is_server_randomized( $settings );
+
+		if ( ! apply_filters( Filters_Cache::BYPASS_PAGE_CACHE, $bypass, $settings, $gallery_id ) ) {
+			return;
+		}
+
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- De-facto constant read by host and plugin page caches; the name is fixed, not plugin-owned.
+		}
+
+		if ( ! headers_sent() ) {
+			header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+		}
+	}
+
+	/**
 	 * Re-enqueue the CSS and JS assets that were collected during the original render.
 	 *
 	 * On a cache hit the render pipeline never runs, so Asset_Resolver never
@@ -114,6 +148,34 @@ class Public_Render {
 			wp_register_script( $handle, $meta['src'], array(), FOTOGRIDS_VERSION, $meta['in_footer'] );
 			wp_enqueue_script( $handle );
 		}
+	}
+
+	/**
+	 * Re-emit the per-render inline CSS, inline JS and JSON-LD stored with a
+	 * cache entry.
+	 *
+	 * Routed through Inline_Asset_Emitter rather than printed here so the
+	 * late-print behaviour (wp_head already fired) and the
+	 * fotogrids/render/should_inline_assets filter behave identically on a
+	 * cache hit and a cache miss. The emitter self-gates on REST/AJAX, so this
+	 * is a no-op there.
+	 *
+	 * @since  1.0.0
+	 * @param  array{inline_css: string, inline_js: string, json_ld: string} $cached Decoded cache entry.
+	 * @return void
+	 */
+	private static function replay_cached_inline_assets( array $cached ): void {
+		Inline_Asset_Emitter::enqueue(
+			new Render_Result(
+				'',
+				'',
+				array(),
+				200,
+				(string) ( $cached['inline_css'] ?? '' ),
+				(string) ( $cached['inline_js'] ?? '' ),
+				(string) ( $cached['json_ld'] ?? '' )
+			)
+		);
 	}
 
 	/**
@@ -367,6 +429,8 @@ class Public_Render {
 			return '<div class="fotogrids-error">FotoGrids: Gallery with ID ' . esc_html( (string) $gallery_id ) . ' exists but has no items.</div>';
 		}
 
+		self::maybe_bypass_page_cache_for_random( $settings, $gallery_id );
+
 		$source = Request_Source::SHORTCODE;
 		if ( Request_Source::BLOCK === $atts['_source'] ) {
 			$source = Request_Source::BLOCK;
@@ -389,7 +453,10 @@ class Public_Render {
 			$cache_key = \FotoGrids\FotoGrids_Cache::make_key( $gallery_id, $settings, $item_ids, $atts );
 			$cached    = \FotoGrids\FotoGrids_Cache::get( $gallery_id, $cache_key );
 			if ( false !== $cached ) {
+				// Order matters: replay_cached_assets() registers
+				// fotogrids-runtime, which the inline JS attaches to.
 				self::replay_cached_assets( $cached['css'], $cached['js'] );
+				self::replay_cached_inline_assets( $cached );
 				do_action( Actions_Cache::HIT, $gallery_id, $cache_key );
 				return wp_kses( $cached['html'], \FotoGrids\Kses::rules( $cached['html'] ) );
 			}
@@ -402,7 +469,18 @@ class Public_Render {
 			$resolver = \FotoGrids\Render\Internal\Asset_Resolver::instance();
 			$css      = $resolver->get_css_asset_urls();
 			$js       = $resolver->get_js_asset_data();
-			\FotoGrids\FotoGrids_Cache::put( $gallery_id, $cache_key, $html, $css, $js, $duration );
+			$rendered = self::$last_render_result;
+			\FotoGrids\FotoGrids_Cache::put(
+				$gallery_id,
+				$cache_key,
+				$html,
+				$css,
+				$js,
+				null !== $rendered ? $rendered->inline_css : '',
+				null !== $rendered ? $rendered->inline_js : '',
+				null !== $rendered ? $rendered->json_ld : '',
+				$duration
+			);
 			do_action( Actions_Cache::WRITTEN, $gallery_id, $cache_key );
 		}
 

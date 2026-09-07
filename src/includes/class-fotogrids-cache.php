@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Hooks\Actions_Item;
 use FotoGrids\Hooks\Filters_Cache;
+use FotoGrids\Render\Sorters\Random\Random_Sorter;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -51,6 +52,13 @@ class FotoGrids_Cache {
 
 	private const OBJECT_CACHE_GROUP = 'fotogrids_render';
 	private const OBJECT_CACHE_TTL   = 0;
+
+	/**
+	 * Envelope schema version. Entries below this are treated as a miss so a
+	 * gallery cached before the inline payloads existed re-renders instead of
+	 * replaying without its per-render CSS.
+	 */
+	private const ENTRY_SCHEMA = 2;
 
 	/**
 	 * Shared object-cache (L1) primitive for the render cache.
@@ -126,19 +134,27 @@ class FotoGrids_Cache {
 	 * Returns false on a miss or when the entry has expired.
 	 *
 	 * The return value is an associative array with:
-	 *   - 'html' (string)  Rendered gallery HTML.
-	 *   - 'css'  (array)   Handle → URL map (Asset_Resolver::get_css_asset_urls()).
-	 *   - 'js'   (array)   Handle → {src, in_footer} map (Asset_Resolver::get_js_asset_data()).
+	 *   - 'html'       (string)  Rendered gallery HTML.
+	 *   - 'css'        (array)   Handle → URL map (Asset_Resolver::get_css_asset_urls()).
+	 *   - 'js'         (array)   Handle → {src, in_footer} map (Asset_Resolver::get_js_asset_data()).
+	 *   - 'inline_css' (string)  Per-render inline CSS (Render_Result::$inline_css).
+	 *   - 'inline_js'  (string)  Per-render inline JS (Render_Result::$inline_js).
+	 *   - 'json_ld'    (string)  Per-render JSON-LD document (Render_Result::$json_ld).
 	 *
 	 * @since  1.0.0
 	 * @param  int    $gallery_id
 	 * @param  string $cache_key  md5 key produced by make_key().
-	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}|false
+	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string}|false
 	 */
 	public static function get( int $gallery_id, string $cache_key ) {
 		$l1 = self::l1()->get( $cache_key );
 		if ( false !== $l1 ) {
-			return self::decode_entry( (string) $l1 );
+			$decoded_l1 = self::decode_entry( (string) $l1 );
+			if ( false === $decoded_l1 ) {
+				self::l1()->delete( $cache_key );
+				return false;
+			}
+			return $decoded_l1;
 		}
 
 		global $wpdb;
@@ -158,16 +174,22 @@ class FotoGrids_Cache {
 			return false;
 		}
 
+		$decoded = self::decode_entry( (string) $row->html );
+		if ( false === $decoded ) {
+			return false;
+		}
+
 		self::l1()->set( $cache_key, $row->html );
 
-		return self::decode_entry( $row->html );
+		return $decoded;
 	}
 
 	/**
 	 * Store a rendered gallery entry in the cache.
 	 *
-	 * The HTML string and the asset maps (CSS + JS) are encoded together so a
-	 * cache hit can replay the exact assets that the original render required.
+	 * The HTML string, the asset maps (CSS + JS) and the per-render inline
+	 * payloads are encoded together so a cache hit can replay everything the
+	 * original render emitted, not just the asset files.
 	 *
 	 * Writes to both the DB (L2) and object cache (L1).
 	 * Uses INSERT … ON DUPLICATE KEY UPDATE so concurrent requests producing the
@@ -179,13 +201,26 @@ class FotoGrids_Cache {
 	 * @param  string                                         $html
 	 * @param  array<string, string>                          $css  Handle → URL map from Asset_Resolver::get_css_asset_urls().
 	 * @param  array<string, array{src: string, in_footer: bool}> $js   Handle → metadata map from Asset_Resolver::get_js_asset_data().
+	 * @param  string                                         $inline_css Per-render inline CSS.
+	 * @param  string                                         $inline_js  Per-render inline JS.
+	 * @param  string                                         $json_ld    Per-render JSON-LD document.
 	 * @param  int                                            $duration_hours
 	 * @return bool
 	 */
-	public static function put( int $gallery_id, string $cache_key, string $html, array $css, array $js, int $duration_hours ): bool {
+	public static function put(
+		int $gallery_id,
+		string $cache_key,
+		string $html,
+		array $css,
+		array $js,
+		string $inline_css,
+		string $inline_js,
+		string $json_ld,
+		int $duration_hours
+	): bool {
 		global $wpdb;
 
-		$payload = self::encode_entry( $html, $css, $js );
+		$payload = self::encode_entry( $html, $css, $js, $inline_css, $inline_js, $json_ld );
 		$table   = $wpdb->prefix . 'fotogrids_render_cache';
 		$now     = current_time( 'mysql' );
 		// Intentionally WP-local frame: expires_at is compared against current_time('mysql') (local) on read, so the write must match it.
@@ -344,6 +379,10 @@ class FotoGrids_Cache {
 	 * Domain-specific exclusions (gates, Pro features, etc.) are handled via
 	 * the fotogrids/cache/should_cache filter.
 	 *
+	 * Random sort in server mode is the one sort-level exclusion: the setting
+	 * promises a new order per request, so a stored render would silently
+	 * break it.
+	 *
 	 * @since  1.0.0
 	 * @param  array $settings  Gallery settings array.
 	 * @param  int   $gallery_id
@@ -351,6 +390,12 @@ class FotoGrids_Cache {
 	 */
 	public static function should_cache( array $settings, int $gallery_id ): bool {
 		if ( empty( $settings['enable_cache'] ) ) {
+			return false;
+		}
+
+		// Server-side random sort asks for a fresh order on every request,
+		// which a stored render cannot give.
+		if ( Random_Sorter::is_server_randomized( $settings ) ) {
 			return false;
 		}
 
@@ -429,49 +474,69 @@ class FotoGrids_Cache {
 	}
 
 	/**
-	 * Encode HTML, CSS, and JS asset maps into a single storable string.
+	 * Encode the rendered HTML, the asset maps and the per-render inline
+	 * payloads into a single storable string.
 	 *
 	 * @since  1.0.0
 	 * @param  string                                            $html
 	 * @param  array<string, string>                             $css
 	 * @param  array<string, array{src: string, in_footer: bool}> $js
+	 * @param  string                                            $inline_css
+	 * @param  string                                            $inline_js
+	 * @param  string                                            $json_ld
 	 * @return string
 	 */
-	private static function encode_entry( string $html, array $css, array $js ): string {
+	private static function encode_entry(
+		string $html,
+		array $css,
+		array $js,
+		string $inline_css,
+		string $inline_js,
+		string $json_ld
+	): string {
 		return wp_json_encode(
 			array(
-				'html' => $html,
-				'css'  => $css,
-				'js'   => $js,
+				'schema'     => self::ENTRY_SCHEMA,
+				'html'       => $html,
+				'css'        => $css,
+				'js'         => $js,
+				'inline_css' => $inline_css,
+				'inline_js'  => $inline_js,
+				'json_ld'    => $json_ld,
 			),
 			JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 		);
 	}
 
 	/**
-	 * Decode a stored entry back into its HTML, CSS, and JS components.
+	 * Decode a stored entry back into its components.
 	 *
-	 * Falls back gracefully for legacy entries that contain raw HTML (no JSON
-	 * envelope) so an old cache row never causes a hard error.
+	 * Returns false for any envelope below ENTRY_SCHEMA - raw-HTML rows and
+	 * schema-1 JSON envelopes both predate the inline payloads, so replaying
+	 * them would serve a gallery without its per-render CSS. Treating them as a
+	 * miss re-renders and rewrites the entry at the current schema.
 	 *
 	 * @since  1.0.0
 	 * @param  string $stored
-	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>}
+	 * @return array{html: string, css: array<string, string>, js: array<string, array{src: string, in_footer: bool}>, inline_css: string, inline_js: string, json_ld: string}|false
 	 */
-	private static function decode_entry( string $stored ): array {
+	private static function decode_entry( string $stored ) {
 		$decoded = json_decode( $stored, true );
-		if ( is_array( $decoded ) && isset( $decoded['html'] ) ) {
-			return array(
-				'html' => (string) $decoded['html'],
-				'css'  => is_array( $decoded['css'] ?? null ) ? $decoded['css'] : array(),
-				'js'   => is_array( $decoded['js'] ?? null ) ? $decoded['js'] : array(),
-			);
+		if ( ! is_array( $decoded ) || ! isset( $decoded['html'] ) ) {
+			return false;
+		}
+
+		if ( (int) ( $decoded['schema'] ?? 0 ) < self::ENTRY_SCHEMA ) {
+			return false;
 		}
 
 		return array(
-			'html' => $stored,
-			'css'  => array(),
-			'js'   => array(),
+			'html'       => (string) $decoded['html'],
+			'css'        => is_array( $decoded['css'] ?? null ) ? $decoded['css'] : array(),
+			'js'         => is_array( $decoded['js'] ?? null ) ? $decoded['js'] : array(),
+			'inline_css' => (string) ( $decoded['inline_css'] ?? '' ),
+			'inline_js'  => (string) ( $decoded['inline_js'] ?? '' ),
+			'json_ld'    => (string) ( $decoded['json_ld'] ?? '' ),
 		);
 	}
 
