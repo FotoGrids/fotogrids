@@ -154,10 +154,7 @@ const ViewPagesTab = () => {
     };
 
     const urlPreview = (segment, sample) => (
-        <p className="fotogrids-field-help">
-            {__('Example:', 'fotogrids')}{' '}
-            <code>{previewUrl(segment, sample)}</code>
-        </p>
+        <p className="fotogrids-field-help">{previewUrl(segment, sample)}</p>
     );
 
     return (
@@ -194,7 +191,7 @@ const ViewPagesTab = () => {
                         placeholder={__('gallery', 'fotogrids')}
                         onChange={(e) => update('base_gallery_segment', e.target.value)}
                     />
-                    {urlPreview(settings.base_gallery_segment, 'my-gallery')}
+                    {urlPreview(settings.base_gallery_segment, 'gallery-name')}
                 </PanelRow>
 
                 <PanelRow
@@ -210,7 +207,7 @@ const ViewPagesTab = () => {
                         placeholder={__('album', 'fotogrids')}
                         onChange={(e) => update('base_album_segment', e.target.value)}
                     />
-                    {urlPreview(settings.base_album_segment, 'my-album')}
+                    {urlPreview(settings.base_album_segment, 'album-name')}
                 </PanelRow>
 
                 <PanelRow
