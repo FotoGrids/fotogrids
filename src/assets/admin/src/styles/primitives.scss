@@ -270,12 +270,12 @@
 // Warning variant. Compound selector so it wins over the info skin above
 // regardless of source order.
 .fotogrids-info-block.fotogrids-info-block--warning {
-	background: #fef8ee;
-	border-color: #f0b849;
+	background: var(--fg-status-warning-bg);
+	border-color: var(--fg-status-warning-border);
 
 	.fotogrids-info-block__icon {
-		background: rgba(240, 184, 73, 0.18);
-		color: #f0b849;
+		background: var(--fg-status-warning-border);
+		color: var(--fg-status-warning-text);
 	}
 
 	.fotogrids-info-block__title,
