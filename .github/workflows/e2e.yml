@@ -18,14 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node 18
-        uses: actions/setup-node@v7
-        with:
-          node-version: '18'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
 
       - name: Build plugin
         run: npm run build:dev
@@ -38,8 +32,21 @@ jobs:
           mkdir dist/fotogrids
           find dist -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} dist/fotogrids/ \;
 
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('./node_modules/@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        # No --with-deps: ubuntu-latest already carries every shared library
+        # Chromium needs, and installing them costs ~12s per run. Verified by
+        # launching the browser after a bare install.
+        run: npx playwright install chromium
 
       - name: Start WordPress (wp-env)
         run: npm run env:start
@@ -47,9 +54,8 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:e2e
 
-      - name: Stop WordPress
-        if: always()
-        run: npm run env:stop
+      # No teardown step: the runner is destroyed when the job ends, so
+      # `wp-env stop` only added ~13s to every run.
 
       - name: Upload Playwright report
         if: always()
