@@ -230,14 +230,6 @@ final class View_Settings_Store {
 			self::base_path( $base['base_prefix'], $base['base_album_segment'] ),
 		);
 
-		if ( $paths[0] === $paths[1] ) {
-			return new \WP_Error(
-				'fotogrids_base_duplicate',
-				__( 'Galleries and albums would share the same address. Give at least one of them a segment of its own.', 'fotogrids' ),
-				array( 'status' => 400 )
-			);
-		}
-
 		foreach ( $paths as $path ) {
 			// An empty base is the site root, which owns no path to collide with.
 			if ( '' === $path ) {

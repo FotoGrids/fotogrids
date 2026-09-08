@@ -145,8 +145,8 @@ const ViewPagesTab = () => {
     const galleryBase = basePath(settings.base_gallery_segment);
     const albumBase = basePath(settings.base_album_segment);
 
-    // Two post types cannot answer one address, so this is never savable.
-    const basesCollide = galleryBase === albumBase;
+    // Allowed: FotoGrids serves both types from one rule and resolves the slug.
+    const basesShared = galleryBase === albumBase;
     const atSiteRoot = '' === galleryBase || '' === albumBase;
 
     const previewUrl = (segment, sample, queryVar) => {
@@ -158,14 +158,9 @@ const ViewPagesTab = () => {
         return `${homeUrl}/${base ? `${base}/` : ''}${sample}/`;
     };
 
-    const urlPreview = (segment, sample, queryVar) =>
-        basesCollide ? (
-            <p className="fotogrids-field-help fotogrids-field-help--error">
-                {__('Galleries and albums would share this address. Give at least one of them a segment of its own.', 'fotogrids')}
-            </p>
-        ) : (
-            <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
-        );
+    const urlPreview = (segment, sample, queryVar) => (
+        <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
+    );
 
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="view-pages-content">
@@ -187,7 +182,15 @@ const ViewPagesTab = () => {
                     </InfoBlock>
                 )}
 
-                {prettyPermalinks && atSiteRoot && !basesCollide && (
+                {prettyPermalinks && basesShared && (
+                    <InfoBlock
+                        variant="error"
+                        title={__('Galleries and albums share one address', 'fotogrids')}
+                        description={__('Both open from the same path, so a gallery and an album that carry the same slug cannot both be reached — the gallery wins and the album stays available through its own segment. Keeping their slugs distinct is up to you. Use with caution.', 'fotogrids')}
+                    />
+                )}
+
+                {prettyPermalinks && atSiteRoot && (
                     <InfoBlock
                         variant="warning"
                         title={__('These pages sit at the top level of your site', 'fotogrids')}
@@ -402,7 +405,6 @@ const ViewPagesTab = () => {
 
             <SaveBar
                 dirty={dirty}
-                disabled={basesCollide}
                 saving={saving}
                 status={status}
                 onSave={handleSave}

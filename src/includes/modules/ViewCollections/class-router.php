@@ -98,7 +98,9 @@ class Router {
 	 */
 	private static function rewrite_signature(): string {
 		return self::REWRITE_VERSION . ':' . md5(
-			self::base_slug( 'fotogrids_gallery' ) . '|' . self::base_slug( 'fotogrids_album' )
+			self::base_slug( 'fotogrids_gallery' )
+			. '|' . self::base_slug( 'fotogrids_album' )
+			. '|' . ( Shared_Base::is_active() ? 'shared' : 'split' )
 		);
 	}
 
@@ -145,10 +147,15 @@ class Router {
 		// editor and front-end admin bar render the native View link.
 		$args['show_in_admin_bar'] = true;
 		$args['has_archive']       = false;
-		$args['rewrite']           = array(
-			'slug'       => self::base_slug( $post_type ),
-			'with_front' => false,
-		);
+
+		// Both types at one base would collapse into a single rewrite rule, so
+		// Shared_Base owns the route instead.
+		$args['rewrite'] = Shared_Base::is_active()
+			? false
+			: array(
+				'slug'       => self::base_slug( $post_type ),
+				'with_front' => false,
+			);
 
 		// The admin bar "New" dropdown uses name_admin_bar; brand it so it is
 		// distinguishable from other gallery plugins' entries.

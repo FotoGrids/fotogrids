@@ -85,10 +85,10 @@ class Base_Fallback_Redirect {
 			return null;
 		}
 
-		foreach ( self::known_bases() as $base => $post_type ) {
-			$prefix = $base . '/';
+		foreach ( self::known_bases() as $base => $post_types ) {
+			$prefix = '' !== $base ? $base . '/' : '';
 
-			if ( 0 !== strpos( $path, $prefix ) ) {
+			if ( '' !== $prefix && 0 !== strpos( $path, $prefix ) ) {
 				continue;
 			}
 
@@ -98,10 +98,12 @@ class Base_Fallback_Redirect {
 				continue;
 			}
 
-			$post = self::find( $identifier, $post_type );
+			foreach ( $post_types as $post_type ) {
+				$post = self::find( $identifier, $post_type );
 
-			if ( $post instanceof \WP_Post ) {
-				return $post;
+				if ( $post instanceof \WP_Post ) {
+					return $post;
+				}
 			}
 		}
 
@@ -112,20 +114,23 @@ class Base_Fallback_Redirect {
 	 * Bases a view page URL may legitimately have been built on.
 	 *
 	 * @since 1.2.0
-	 * @return array<string,string> Base path mapped to its post type.
+	 * @return array<string,string[]> Base path mapped to the types it serves.
 	 */
 	private static function known_bases(): array {
 		$default_prefix = View_Settings_Store::DEFAULT_BASE_PREFIX;
 
 		$bases = array(
-			$default_prefix . '/' . View_Settings_Store::DEFAULT_GALLERY_SEGMENT => 'fotogrids_gallery',
-			$default_prefix . '/' . View_Settings_Store::DEFAULT_ALBUM_SEGMENT   => 'fotogrids_album',
+			$default_prefix . '/' . View_Settings_Store::DEFAULT_GALLERY_SEGMENT => array( 'fotogrids_gallery' ),
+			$default_prefix . '/' . View_Settings_Store::DEFAULT_ALBUM_SEGMENT   => array( 'fotogrids_album' ),
 		);
 
-		$bases[ Router::base_slug( 'fotogrids_gallery' ) ] = 'fotogrids_gallery';
-		$bases[ Router::base_slug( 'fotogrids_album' ) ]   = 'fotogrids_album';
+		foreach ( array( 'fotogrids_gallery', 'fotogrids_album' ) as $post_type ) {
+			$base = Router::base_slug( $post_type );
 
-		unset( $bases[''] );
+			$bases[ $base ] = array_values(
+				array_unique( array_merge( $bases[ $base ] ?? array(), array( $post_type ) ) )
+			);
+		}
 
 		return $bases;
 	}
