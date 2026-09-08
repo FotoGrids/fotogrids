@@ -182,9 +182,10 @@ class Router {
 			? $settings['base_album_segment']
 			: $settings['base_gallery_segment'];
 
-		$slug = '' !== $settings['base_prefix']
-			? $settings['base_prefix'] . '/' . $segment
-			: $segment;
+		$slug = \FotoGrids\Settings\View_Settings_Store::base_path(
+			$settings['base_prefix'],
+			$segment
+		);
 
 		/**
 		 * Filter the rewrite base for a collection view page.

@@ -72,6 +72,11 @@
 	color: var(--fg-text-tertiary);
 	line-height: 1.5;
 	word-break: break-all;
+
+	&--error {
+		color: var(--fg-status-error-text);
+		word-break: normal;
+	}
 }
 
 // Segmented control.

@@ -135,20 +135,37 @@ const ViewPagesTab = () => {
 
     // Without a permalink structure WordPress ignores the rewrite base and
     // serves view pages from the post type's query var instead.
+    // Prefix and segment are each optional; an empty result is the site root.
+    const basePath = (segment) =>
+        [settings.base_prefix, segment]
+            .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
+            .filter(Boolean)
+            .join('/');
+
+    const galleryBase = basePath(settings.base_gallery_segment);
+    const albumBase = basePath(settings.base_album_segment);
+
+    // Two post types cannot answer one address, so this is never savable.
+    const basesCollide = galleryBase === albumBase;
+    const atSiteRoot = '' === galleryBase || '' === albumBase;
+
     const previewUrl = (segment, sample, queryVar) => {
         if (!prettyPermalinks) {
             return `${homeUrl}/?${queryVar}=${sample}`;
         }
 
-        const parts = [settings.base_prefix, segment]
-            .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
-            .filter(Boolean);
-        return `${homeUrl}/${parts.join('/')}/${sample}/`;
+        const base = basePath(segment);
+        return `${homeUrl}/${base ? `${base}/` : ''}${sample}/`;
     };
 
-    const urlPreview = (segment, sample, queryVar) => (
-        <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
-    );
+    const urlPreview = (segment, sample, queryVar) =>
+        basesCollide ? (
+            <p className="fotogrids-field-help fotogrids-field-help--error">
+                {__('Galleries and albums would share this address. Give at least one of them a segment of its own.', 'fotogrids')}
+            </p>
+        ) : (
+            <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
+        );
 
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="view-pages-content">
@@ -168,6 +185,14 @@ const ViewPagesTab = () => {
                             </Button>
                         )}
                     </InfoBlock>
+                )}
+
+                {prettyPermalinks && atSiteRoot && !basesCollide && (
+                    <InfoBlock
+                        variant="warning"
+                        title={__('These pages sit at the top level of your site', 'fotogrids')}
+                        description={__('An address directly after your domain can resolve to a gallery or album, so a page or post you add later at the same path may stop opening.', 'fotogrids')}
+                    />
                 )}
 
                 <PanelRow
@@ -377,6 +402,7 @@ const ViewPagesTab = () => {
 
             <SaveBar
                 dirty={dirty}
+                disabled={basesCollide}
                 saving={saving}
                 status={status}
                 onSave={handleSave}

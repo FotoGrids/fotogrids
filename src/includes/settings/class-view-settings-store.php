@@ -173,10 +173,8 @@ final class View_Settings_Store {
 	/**
 	 * Sanitise the three permalink base fields.
 	 *
-	 * The prefix may be empty, which places the collection segments at the
-	 * site root. Both collection segments fall back to the stored value rather
-	 * than resolving to an empty path, so a payload that omits these keys
-	 * leaves the base where it is.
+	 * Any of the three may be empty. A key absent from the input keeps its
+	 * stored value; a key present and empty is honoured as empty.
 	 *
 	 * @since 1.2.0
 	 * @param array<string,mixed> $input Raw input.
@@ -185,23 +183,26 @@ final class View_Settings_Store {
 	private static function sanitize_base( array $input ): array {
 		$current = self::get();
 
-		$prefix  = self::sanitize_path( (string) ( $input['base_prefix'] ?? $current['base_prefix'] ) );
-		$gallery = self::sanitize_path( (string) ( $input['base_gallery_segment'] ?? $current['base_gallery_segment'] ) );
-		$album   = self::sanitize_path( (string) ( $input['base_album_segment'] ?? $current['base_album_segment'] ) );
-
-		if ( '' === $gallery ) {
-			$gallery = $current['base_gallery_segment'];
-		}
-
-		if ( '' === $album ) {
-			$album = $current['base_album_segment'];
-		}
-
 		return array(
-			'base_prefix'          => $prefix,
-			'base_gallery_segment' => $gallery,
-			'base_album_segment'   => $album,
+			'base_prefix'          => self::sanitize_path( (string) ( $input['base_prefix'] ?? $current['base_prefix'] ) ),
+			'base_gallery_segment' => self::sanitize_path( (string) ( $input['base_gallery_segment'] ?? $current['base_gallery_segment'] ) ),
+			'base_album_segment'   => self::sanitize_path( (string) ( $input['base_album_segment'] ?? $current['base_album_segment'] ) ),
 		);
+	}
+
+	/**
+	 * Join a prefix and a segment into a URL base, skipping empty parts.
+	 *
+	 * The single place the base is composed; Router reads it too so the
+	 * rewrite slug and the validated path can never disagree.
+	 *
+	 * @since 1.2.0
+	 * @param string $prefix  Shared prefix, may be empty.
+	 * @param string $segment Collection segment, may be empty.
+	 * @return string Base path with no surrounding slashes. Empty means site root.
+	 */
+	public static function base_path( string $prefix, string $segment ): string {
+		return implode( '/', array_filter( array( $prefix, $segment ), 'strlen' ) );
 	}
 
 	/**
@@ -224,18 +225,24 @@ final class View_Settings_Store {
 			return true;
 		}
 
-		if ( $base['base_gallery_segment'] === $base['base_album_segment'] ) {
+		$paths = array(
+			self::base_path( $base['base_prefix'], $base['base_gallery_segment'] ),
+			self::base_path( $base['base_prefix'], $base['base_album_segment'] ),
+		);
+
+		if ( $paths[0] === $paths[1] ) {
 			return new \WP_Error(
-				'fotogrids_base_duplicate_segment',
-				__( 'Galleries and albums need different segments, otherwise their addresses would be identical.', 'fotogrids' ),
+				'fotogrids_base_duplicate',
+				__( 'Galleries and albums would share the same address. Give at least one of them a segment of its own.', 'fotogrids' ),
 				array( 'status' => 400 )
 			);
 		}
 
-		foreach ( array( 'base_gallery_segment', 'base_album_segment' ) as $key ) {
-			$path = '' !== $base['base_prefix']
-				? $base['base_prefix'] . '/' . $base[ $key ]
-				: $base[ $key ];
+		foreach ( $paths as $path ) {
+			// An empty base is the site root, which owns no path to collide with.
+			if ( '' === $path ) {
+				continue;
+			}
 
 			$conflict = self::base_conflict( $path );
 
