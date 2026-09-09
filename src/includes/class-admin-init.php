@@ -258,9 +258,10 @@ class Admin_Init {
 			'fotogridsAdmin',
 			array(
 				'nonce'              => wp_create_nonce( 'fotogrids_admin' ),
-				'settingsNonce'      => wp_create_nonce( 'fotogrids_settings-options' ),
+				'settingsNonce'      => wp_create_nonce( 'fotogrids_gallery_defaults-options' ),
 				'restUrl'            => 'fotogrids/v1/',
 				'restNonce'          => wp_create_nonce( 'wp_rest' ),
+				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 				'pluginUrl'          => FOTOGRIDS_PLUGIN_URL,
 				'apiUrl'             => rest_url(),
 				'generalSettings'    => self::get_general_settings(),
@@ -272,7 +273,7 @@ class Admin_Init {
 				'currentUser'        => wp_get_current_user(),
 				'shareStatistics'    => self::resolve_share_statistics_state(),
 				'marketingAllowed'   => (bool) get_option( 'fotogrids_marketing_allowed', false ),
-				'autosave'           => (bool) get_option( 'fotogrids_autosave', '0' ),
+				'autosave'           => (bool) get_option( 'fotogrids_autosave', true ),
 				'settingsMode'       => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
 				'userPersona'        => (string) get_option( 'fotogrids_user_persona', '' ),
 				'settingsBaseUrl'    => admin_url( 'admin.php?page=fotogrids-settings' ),
@@ -428,7 +429,7 @@ class Admin_Init {
 			'fotogrids_autosave',
 			array(
 				'type'              => 'boolean',
-				'default'           => false,
+				'default'           => true,
 				'sanitize_callback' => array( __CLASS__, 'sanitize_autosave' ),
 			)
 		);
@@ -441,8 +442,11 @@ class Admin_Init {
 				'sanitize_callback' => 'rest_sanitize_boolean',
 			)
 		);
+		// Own settings group, deliberately. `options.php` writes every option
+		// registered to the posted group, passing null for any the form omits, so
+		// a group with more than one member silently resets its other options.
 		register_setting(
-			'fotogrids_settings',
+			'fotogrids_gallery_defaults',
 			'fotogrids_gallery_defaults',
 			array(
 				'sanitize_callback' => array( __CLASS__, 'sanitize_gallery_defaults' ),

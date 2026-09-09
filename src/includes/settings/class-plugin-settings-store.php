@@ -116,7 +116,7 @@ final class Plugin_Settings_Store {
 	public static function get_advanced(): array {
 		$share_raw = get_option( 'fotogrids_share_statistics', null );
 		return array(
-			'autosave'                 => (bool) get_option( 'fotogrids_autosave', false ),
+			'autosave'                 => (bool) get_option( 'fotogrids_autosave', true ),
 			// Tolerant cast - see `Admin_Init::resolve_share_statistics_state()`
 			// for the same logic. Defaults to off on fresh install.
 			'share_statistics'         => ! (

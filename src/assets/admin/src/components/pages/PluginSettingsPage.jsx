@@ -237,9 +237,13 @@ const PluginSettingsPage = () => {
                             * options.php form and submitting via the WordPress Settings
                             * API. This form is scoped to the Defaults tab only - the
                             * other tabs save via REST.
+                            *
+                            * The option_page group holds `fotogrids_gallery_defaults`
+                            * alone. options.php writes every option in the posted group,
+                            * passing null for any this form does not carry.
                             */}
                             <form method="post" action="options.php" className="fotogrids-defaults-form">
-                                <input type="hidden" name="option_page" value="fotogrids_settings" />
+                                <input type="hidden" name="option_page" value="fotogrids_gallery_defaults" />
                                 <input type="hidden" name="action" value="update" />
                                 <input type="hidden" name="_wpnonce" value={window.fotogridsAdmin?.settingsNonce || ''} />
                                 <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />

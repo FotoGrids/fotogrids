@@ -294,7 +294,7 @@ class Import_Export_Data {
 			$data['settings'] = array(
 				'media'                      => get_option( 'fotogrids_media_settings', array() ),
 				'gallery_defaults'           => get_option( 'fotogrids_gallery_defaults', array() ),
-				'autosave'                   => get_option( 'fotogrids_autosave', false ),
+				'autosave'                   => get_option( 'fotogrids_autosave', true ),
 				'share_statistics'           => get_option( 'fotogrids_share_statistics', false ),
 				'preserve_data_on_uninstall' => get_option( 'fotogrids_preserve_data_on_uninstall', true ),
 			);

@@ -15,7 +15,7 @@ const { __ } = wp.i18n;
 const CONFIRM_KEYWORD = 'CONFIRM';
 
 const DEFAULTS = {
-    autosave: false,
+    autosave: true,
     share_statistics: false,
     marketing_allowed: false,
     allow_google_fonts: true,
@@ -33,7 +33,7 @@ const DEFAULTS = {
 const AdvancedTab = () => {
     const seed = window.fotogridsAdmin || {};
     const initial = {
-        autosave: seed.autosave === true,
+        autosave: seed.autosave !== false,
         share_statistics: seed.shareStatistics === true,
         marketing_allowed: seed.marketingAllowed === true,
         allow_google_fonts: DEFAULTS.allow_google_fonts,

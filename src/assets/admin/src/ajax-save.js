@@ -386,57 +386,49 @@
 		);
 	}
 
+	// `fotogridsAdmin.autosave` carries the localised `fotogrids_autosave`
+	// option and is the only source for it in the browser. Undefined means the
+	// option has never been written, which reads as on.
+	function readAutosaveSetting() {
+		return window.fotogridsAdmin?.autosave !== false;
+	}
+
+	// A collection that has never been saved is still a WordPress auto-draft.
+	// wp_update_post() promotes an auto-draft to a draft, so autosaving one
+	// would leave a stray gallery behind for anyone who opens Add New, types a
+	// title and walks away. Explicit saves are unaffected.
+	function isUnsavedCollection() {
+		const original = document.getElementById('original_post_status');
+		return original?.value === 'auto-draft';
+	}
+
+	// Autosave is only in force once the collection exists. Everywhere autosave
+	// changes behaviour goes through here so the unsaved-changes badge and the
+	// leave-page warning stay in step with what actually gets saved.
+	function autosaveActive() {
+		return Boolean(State?.autosave.enabled) && !isUnsavedCollection();
+	}
+
 	function initAutosave() {
 		if (!State) return;
 
-		const getAutosaveSetting = () => {
-			const galleryAutosaveInput = document.querySelector(
-				'input[name="fotogrids_autosave"]'
-			);
-			if (galleryAutosaveInput) {
-				return (
-					galleryAutosaveInput.value === '1' ||
-					galleryAutosaveInput.value === 'true'
-				);
-			}
+		State.autosave.set(readAutosaveSetting());
 
-			const defaultsAutosaveInput = document.querySelector(
-				'input[name="fotogrids_gallery_defaults[autosave]"]'
-			);
-			if (defaultsAutosaveInput) {
-				return (
-					defaultsAutosaveInput.value === '1' ||
-					defaultsAutosaveInput.value === 'true'
-				);
-			}
-
-			if (window.fotogridsSettings?.settings?.autosave !== undefined) {
-				return window.fotogridsSettings.settings.autosave;
-			}
-
-			return false;
-		};
-
-		State.autosave.set(getAutosaveSetting());
-
-		document.addEventListener('change', (e) => {
-			if (
-				e.target.matches(
-					'input[name="fotogrids_autosave"], input[name="fotogrids_gallery_defaults[autosave]"]'
-				)
-			) {
-				const enabled =
-					e.target.value === '1' || e.target.value === 'true';
-				State.autosave.set(enabled);
-				updateUnsavedChangesDisplay();
-			}
+		// The editor's autosave toggle persists the option over AJAX and then
+		// announces it here, so this file stays the only writer of
+		// State.autosave.
+		document.addEventListener('fotogrids:autosave_changed', (e) => {
+			const enabled =
+				typeof e.detail?.enabled === 'boolean'
+					? e.detail.enabled
+					: readAutosaveSetting();
+			State.autosave.set(enabled);
+			updateUnsavedChangesDisplay();
 		});
 
-		if (State) {
-			State.on('autosave', () => {
-				updateUnsavedChangesDisplay();
-			});
-		}
+		State.on('autosave', () => {
+			updateUnsavedChangesDisplay();
+		});
 	}
 
 	function handleSaveError(message) {
@@ -493,9 +485,8 @@
 	function updateUnsavedChangesDisplay() {
 		if (!State) return;
 
-		const autosaveEnabled = State.autosave.enabled;
 		const hasChanges = State.unsavedChanges.has();
-		const shouldShow = hasChanges && !autosaveEnabled;
+		const shouldShow = hasChanges && !autosaveActive();
 
 		const unsavedChanges = document.getElementById(
 			'fotogrids-unsaved-changes'
@@ -549,7 +540,7 @@
 
 		const handleFormChange = () => {
 			showUnsavedChanges('form');
-			if (State.autosave.enabled) {
+			if (autosaveActive()) {
 				State.autosave.trigger(() => saveCollectionAjax());
 			}
 		};
@@ -600,11 +591,7 @@
 
 	function initBeforeUnloadWarning() {
 		window.addEventListener('beforeunload', (e) => {
-			if (
-				State &&
-				State.unsavedChanges.has() &&
-				!State.autosave.enabled
-			) {
+			if (State && State.unsavedChanges.has() && !autosaveActive()) {
 				e.preventDefault();
 				e.returnValue = strings.unsavedChangesConfirm;
 				return strings.unsavedChangesConfirm;

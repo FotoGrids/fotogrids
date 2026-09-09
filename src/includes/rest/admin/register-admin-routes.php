@@ -416,7 +416,7 @@ class Register_Admin_Routes {
 					'args'                => array(
 						'autosave'                 => array(
 							'type'    => 'boolean',
-							'default' => false,
+							'default' => true,
 						),
 						'share_statistics'         => array(
 							'type'    => 'boolean',
