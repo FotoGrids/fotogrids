@@ -93,7 +93,7 @@ class Router {
 	 * settings screen or through the base_slug filter regenerates the rules on
 	 * the next load, without a visit to Settings > Permalinks.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return string
 	 */
 	private static function rewrite_signature(): string {
