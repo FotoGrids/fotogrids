@@ -16,8 +16,8 @@ async function loginAsAdmin(page: Page) {
 	await page.goto('/wp-login.php');
 	await page.fill('#user_login', process.env.WP_ADMIN_USER ?? 'admin');
 	await page.fill('#user_pass', process.env.WP_ADMIN_PASS ?? 'password');
-	await Promise.all([page.waitForNavigation(), page.click('#wp-submit')]);
-	await expect(page.locator('#wpadminbar')).toBeVisible();
+	await page.click('#wp-submit');
+	await page.waitForURL(/\/wp-admin\//, { timeout: 30000 });
 }
 
 async function toggleState(page: Page, id: string) {
@@ -51,7 +51,10 @@ test.describe('settings persistence', () => {
 			name: /save defaults/i,
 		});
 		await expect(saveDefaults).toBeVisible({ timeout: 15000 });
-		await Promise.all([page.waitForNavigation(), saveDefaults.click()]);
+		await saveDefaults.click();
+		await page.waitForURL(/options\.php|page=fotogrids-settings/, {
+			timeout: 30000,
+		});
 
 		await page.goto(`${SETTINGS}&tab=advanced`);
 		expect(await toggleState(page, 'fotogrids_autosave')).toBe(
