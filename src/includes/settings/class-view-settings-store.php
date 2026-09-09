@@ -176,7 +176,7 @@ final class View_Settings_Store {
 	 * Any of the three may be empty. A key absent from the input keeps its
 	 * stored value; a key present and empty is honoured as empty.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param array<string,mixed> $input Raw input.
 	 * @return array<string,string>
 	 */
@@ -196,7 +196,7 @@ final class View_Settings_Store {
 	 * The single place the base is composed; Router reads it too so the
 	 * rewrite slug and the validated path can never disagree.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $prefix  Shared prefix, may be empty.
 	 * @param string $segment Collection segment, may be empty.
 	 * @return string Base path with no surrounding slashes. Empty means site root.
@@ -211,7 +211,7 @@ final class View_Settings_Store {
 	 * An unchanged base always validates, so a collision introduced after the
 	 * base was set never blocks an unrelated settings save.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param array<string,mixed> $input Raw input.
 	 * @return true|\WP_Error
 	 */
@@ -258,7 +258,7 @@ final class View_Settings_Store {
 	/**
 	 * Describe whatever already occupies a URL path.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $path Path relative to the site root, no surrounding slashes.
 	 * @return string|null Human-readable owner, or null when the path is free.
 	 */
@@ -301,7 +301,7 @@ final class View_Settings_Store {
 	 * whatever permalink structure the site runs, which a page-only lookup
 	 * misses.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $path Path relative to the site root, no surrounding slashes.
 	 * @return string|null
 	 */
@@ -329,7 +329,7 @@ final class View_Settings_Store {
 	/**
 	 * URL roots WordPress reserves for itself.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return string[]
 	 */
 	private static function reserved_roots(): array {
@@ -364,7 +364,7 @@ final class View_Settings_Store {
 	/**
 	 * Reduce a raw path to slug-safe segments joined by slashes.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $raw Raw path.
 	 * @return string
 	 */

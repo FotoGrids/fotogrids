@@ -359,7 +359,7 @@ class Templates_Data {
 	 * Inserts a draft post, writes the template's settings onto it and returns
 	 * the edit URL so the caller can send the user straight to the editor.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param \WP_REST_Request $request The REST API request object.
 	 * @return \WP_REST_Response|\WP_Error New post id and edit URL, or error.
 	 */

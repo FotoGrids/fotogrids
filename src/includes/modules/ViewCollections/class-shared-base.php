@@ -26,7 +26,7 @@ if ( ! defined( 'WPINC' ) ) {
  * A slug held by both types resolves to the gallery. The album stays
  * reachable through its own segment and through its ID.
  *
- * @since 1.2.0
+ * @since 1.1.1
  */
 class Shared_Base {
 
@@ -47,7 +47,7 @@ class Shared_Base {
 	/**
 	 * Register the shared route.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return void
 	 */
 	public static function init(): void {
@@ -61,7 +61,7 @@ class Shared_Base {
 	/**
 	 * Whether both collection types resolve to the same base.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return bool
 	 */
 	public static function is_active(): bool {
@@ -76,7 +76,7 @@ class Shared_Base {
 	/**
 	 * The shared base, with no surrounding slashes. Empty means site root.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return string
 	 */
 	public static function base(): string {
@@ -88,7 +88,7 @@ class Shared_Base {
 	/**
 	 * Collection types in resolution order.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return string[]
 	 */
 	public static function post_types(): array {
@@ -98,7 +98,7 @@ class Shared_Base {
 	/**
 	 * Add the rule that catches every slug under the shared base.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return void
 	 */
 	public static function register_rule(): void {
@@ -119,7 +119,7 @@ class Shared_Base {
 	/**
 	 * Make the shared query var public.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string[] $vars Registered query vars.
 	 * @return string[]
 	 */
@@ -137,7 +137,7 @@ class Shared_Base {
 	 * matters most at the site root, where the shared rule would otherwise
 	 * capture every top-level address.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param array<string,mixed> $vars Parsed query vars.
 	 * @return array<string,mixed>
 	 */
@@ -172,7 +172,7 @@ class Shared_Base {
 	/**
 	 * Build the pretty permalink both types share.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string   $link Permalink WordPress resolved.
 	 * @param \WP_Post $post Post being linked.
 	 * @return string
@@ -195,7 +195,7 @@ class Shared_Base {
 	/**
 	 * The collection type a published slug belongs to.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $slug Post slug.
 	 * @return string|null
 	 */

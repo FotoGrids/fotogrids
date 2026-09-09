@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.1
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -168,6 +168,33 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 6. Statistics dashboard showing views and shares.
 
 == Changelog ==
+
+= 1.1.1 =
+
+**New**
+
+* **Editable gallery and album addresses.** View pages were fixed at `/fotogrids/gallery/{slug}` and `/fotogrids/album/{slug}`, and the only way to change them was to write a filter. Settings > View Pages now has an editable prefix and one segment per collection type, each with a live preview of the resulting address. Any of the three may be empty, so `example.com/{slug}` is reachable. The base is validated on save against existing pages and posts, the rewrite slugs of other post types and taxonomies, and the roots WordPress reserves for itself; a collision is rejected with the conflicting owner named rather than saved. Addresses built on the old base, or ending in a collection ID rather than a slug, redirect to the current permalink.
+* **Add items from a folder or a ZIP.** The Add New menu's From Folder and From ZIP entries now work. From Folder browses your uploads directory on the server, with breadcrumbs, sub-folder image counts and per-file selection; files already in the Media Library are reused and the rest are registered where they sit, so nothing on disk is copied, moved or deleted. From my computer uploads a whole folder from your machine, and From ZIP imports the images out of an archive.
+* **An SEO checkup in the item editor.** The SEO tab held four Pro cards and an upgrade button, while every field Google actually weighs sat one tab away in Free. It now runs seven checks against the item - alt text, filename, title, caption, description, credit and file weight - grades it Bad, Needs improvement or Good, and gives every failing row a Fix link that jumps to the field and focuses it. The Pro badge is gone.
+
+**Improved**
+
+* **Statistics follows the period filter.** Views and Interactions report the selected 7, 30 or 90 days rather than all time, each with a percentage change against the preceding window of equal length; the lifetime figure moves to a footnote, shown only when it differs. Top content tables are sortable, and the donut palette ranks by value.
+* **Choosing a template during setup now creates the gallery.** The wizard's Choose a template card led to the Templates page, whose only action is Apply - and Apply needs a gallery a first-time user does not have. The card now opens the page in a mode where every template reads Use this template and creates the gallery for you.
+* **Freemius SDK updated to 2.13.4.**
+
+**Fixed**
+
+* **Galleries lost their layout for logged-out visitors.** A cached gallery replayed its HTML without the inline custom properties it was built with, so `--fg-cols` was missing and the grid collapsed to a single column. Editors never saw it, because the cache is bypassed for anyone who can manage galleries. Galleries cached before this release re-render rather than replaying.
+* **Random sorting was frozen by caching.** A seeded order was chosen while the page was built, and every cache in front of it stored that one order - so "random" was the same on every visit.
+* **The offline template set listed 46 templates that could not be applied.** When the remote catalogue is unreachable and nothing is cached, the bundled fallback served 46 Pro entries that carry no settings and no thumbnail, so they rendered as grey placeholder cards and applying them did nothing. The bundled set is now 23 gallery and 5 album templates, all with real settings. The Pro upsell is unaffected - it comes from the remote catalogue, not from disk.
+* **Every chart in wp-admin was blank** - Library, Statistics and the dashboard widgets - because the vendored Chart.js bundle threw on load. Rebuilt, and updated to 4.5.1.
+* **The Featured Item layout's Show all images button did nothing when clicked.**
+
+**Security and hardening**
+
+* Frontend JavaScript now validates URLs at the DOM sinks it writes to rather than relying only on the server having escaped them, so the guarantee still holds if a filter, page builder or template edit sits downstream.
+* Cleared six high-severity advisories in the build toolchain. All were in development tooling; the shipped output is unchanged.
 
 = 1.1.0 =
 

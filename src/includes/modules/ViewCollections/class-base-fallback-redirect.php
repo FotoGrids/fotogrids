@@ -25,14 +25,14 @@ if ( ! defined( 'WPINC' ) ) {
  * Resolution runs only on requests WordPress has already answered with a 404,
  * so it can never shadow a page, a post or another plugin's route.
  *
- * @since 1.2.0
+ * @since 1.1.1
  */
 class Base_Fallback_Redirect {
 
 	/**
 	 * Register the fallback handler.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return void
 	 */
 	public static function init(): void {
@@ -42,7 +42,7 @@ class Base_Fallback_Redirect {
 	/**
 	 * Redirect a recoverable view page URL to its current permalink.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return void
 	 */
 	public static function maybe_redirect(): void {
@@ -76,7 +76,7 @@ class Base_Fallback_Redirect {
 	/**
 	 * Resolve a request path to the collection it addresses.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $path Request path relative to the site root.
 	 * @return \WP_Post|null
 	 */
@@ -113,7 +113,7 @@ class Base_Fallback_Redirect {
 	/**
 	 * Bases a view page URL may legitimately have been built on.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return array<string,string[]> Base path mapped to the types it serves.
 	 */
 	private static function known_bases(): array {
@@ -138,7 +138,7 @@ class Base_Fallback_Redirect {
 	/**
 	 * Look a collection up by ID or by slug.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @param string $identifier Trailing URL segment.
 	 * @param string $post_type  Collection post type.
 	 * @return \WP_Post|null
@@ -172,7 +172,7 @@ class Base_Fallback_Redirect {
 	/**
 	 * The resolved request path, without surrounding slashes or query string.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return string
 	 */
 	private static function request_path(): string {
@@ -188,7 +188,7 @@ class Base_Fallback_Redirect {
 	/**
 	 * The raw requested URI path, used to guard against a redirect loop.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.1
 	 * @return string
 	 */
 	private static function request_uri_path(): string {
