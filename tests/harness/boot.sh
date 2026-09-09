@@ -131,12 +131,14 @@ stage_plugin() {
 }
 
 write_env() {
+  # Values are quoted: FG_WP_CLI contains spaces, and an unquoted assignment
+  # under `set -a` is parsed as an assignment followed by a command to run.
   cat > "$ENV_FILE" <<EOF
 # Written by tests/harness/boot.sh - do not edit, do not commit.
-FG_MODE=$1
-WP_BASE_URL=$2
-FG_WP_CLI=$3
-FG_WP_PATH=$4
+FG_MODE="$1"
+WP_BASE_URL="$2"
+FG_WP_CLI="$3"
+FG_WP_PATH="$4"
 EOF
   step "Wrote $ENV_FILE"
   cat "$ENV_FILE" >&2
