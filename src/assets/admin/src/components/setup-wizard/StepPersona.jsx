@@ -29,10 +29,10 @@ const PERSONAS = [
         body:  __( 'Showcasing your work, sharing galleries, and selling prints.', 'fotogrids' ),
     },
     {
-        id:    'personal',
+        id:    'blogger',
         icon:  'feather',
-        title: __( 'Personal Website', 'fotogrids' ),
-        body:  __( 'Creating a blog, portfolio, hobby site, or creative archive.', 'fotogrids' ),
+        title: __( 'Blogger / Personal Site', 'fotogrids' ),
+        body:  __( 'Publishing your own work — a blog, portfolio, hobby site, or archive.', 'fotogrids' ),
     },
     {
         id:    'agency',
@@ -41,13 +41,13 @@ const PERSONAS = [
         body:  __( 'Managing websites and visual content across many client sites.', 'fotogrids' ),
     },
     {
-        id:    'business',
+        id:    'business_owner',
         icon:  'briefcase',
         title: __( 'Business Owner', 'fotogrids' ),
         body:  __( 'Presenting your brand, services, team, products, or portfolio.', 'fotogrids' ),
     },
     {
-        id:    'shop',
+        id:    'online_shop',
         icon:  'cart',
         title: __( 'Online Shop', 'fotogrids' ),
         body:  __( 'Selling products with rich, flexible, photo-focused galleries.', 'fotogrids' ),
@@ -65,7 +65,7 @@ const StepPersona = ( { picked = null, onPick } ) => {
                 { __( 'What best describes you?', 'fotogrids' ) }
             </h1>
             <p className="fotogrids-setup__step-subhead">
-                { __( 'We’ll use this to tailor a few defaults. Skip if you’d rather not say.', 'fotogrids' ) }
+                { __( 'We use this to understand who FotoGrids is being built for. Skip if you’d rather not say.', 'fotogrids' ) }
             </p>
 
             <div
