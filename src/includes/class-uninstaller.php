@@ -137,23 +137,34 @@ class Uninstaller {
 	private static function remove_options() {
 		global $wpdb;
 
-		// Remove all options that start with 'fotogrids_'
 		$wpdb->query(
-			"DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE 'fotogrids_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( 'fotogrids_' ) . '%'
+			)
 		);
 	}
 
 	/**
-	 * Remove plugin post meta
+	 * Remove plugin post meta.
+	 *
+	 * Matches the `fotogrids_*` keys on collection posts, the `_fotogrids_*`
+	 * keys on attachments, and the FotoGrids-owned `_wp_attachment_item_alt`.
+	 * Core's `_wp_attachment_image_alt` is matched by none of the three.
 	 */
 	private static function remove_post_meta() {
 		global $wpdb;
 
-		// Remove all post meta that starts with 'fotogrids_'
 		$wpdb->query(
-			"DELETE FROM {$wpdb->postmeta} 
-             WHERE meta_key LIKE 'fotogrids_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->postmeta}
+                 WHERE meta_key LIKE %s
+                    OR meta_key LIKE %s
+                    OR meta_key = %s",
+				$wpdb->esc_like( 'fotogrids_' ) . '%',
+				$wpdb->esc_like( '_fotogrids_' ) . '%',
+				'_wp_attachment_item_alt'
+			)
 		);
 	}
 
@@ -163,11 +174,14 @@ class Uninstaller {
 	private static function remove_transients() {
 		global $wpdb;
 
-		// Remove all transients that start with 'fotogrids_'
 		$wpdb->query(
-			"DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE '_transient_fotogrids_%' 
-             OR option_name LIKE '_transient_timeout_fotogrids_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options}
+                 WHERE option_name LIKE %s
+                    OR option_name LIKE %s",
+				$wpdb->esc_like( '_transient_fotogrids_' ) . '%',
+				$wpdb->esc_like( '_transient_timeout_fotogrids_' ) . '%'
+			)
 		);
 	}
 
