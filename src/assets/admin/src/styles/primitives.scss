@@ -167,9 +167,9 @@
 		justify-content: center;
 		border-radius: 4px;
 
-		svg {
-			width: 20px;
-			height: 20px;
+		.fotogrids-icon svg {
+			width: 18px;
+			height: 18px;
 		}
 	}
 
@@ -271,11 +271,11 @@
 // regardless of source order.
 .fotogrids-info-block.fotogrids-info-block--warning {
 	background: var(--fg-status-warning-bg);
-	border-color: var(--fg-status-warning-border);
+	border-color: var(--fg-yellow);
 
 	.fotogrids-info-block__icon {
-		background: var(--fg-status-warning-border);
-		color: var(--fg-status-warning-text);
+		background: rgba(255, 185, 20, 0.8);
+		color: white;
 	}
 
 	.fotogrids-info-block__title,
