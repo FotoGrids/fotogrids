@@ -82,3 +82,6 @@ logs
 
 # Local-only working docs (drafts, plans, scratch notes).
 /docs/
+
+# Test harness state - a throwaway WordPress install and its server logs.
+tests/harness/.state/
