@@ -564,12 +564,23 @@ class Admin_Data {
 	 *
 	 * POST /wp-json/fotogrids/v1/admin/view-settings
 	 *
+	 * A rejected permalink base fails the whole request, so a collision never
+	 * leaves the site with addresses that resolve to nothing.
+	 *
 	 * @since  1.0.0
 	 * @param  \WP_REST_Request $request
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public static function save_view_settings( $request ): \WP_REST_Response {
-		$settings = \FotoGrids\Settings\View_Settings_Store::save( $request->get_json_params() ?: $request->get_params() );
+	public static function save_view_settings( $request ) {
+		$input = $request->get_json_params() ?: $request->get_params();
+
+		$valid = \FotoGrids\Settings\View_Settings_Store::validate_base( is_array( $input ) ? $input : array() );
+
+		if ( is_wp_error( $valid ) ) {
+			return $valid;
+		}
+
+		$settings = \FotoGrids\Settings\View_Settings_Store::save( $input );
 
 		return rest_ensure_response( array( 'settings' => $settings ) );
 	}

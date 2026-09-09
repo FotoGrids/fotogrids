@@ -69,10 +69,14 @@ class Module extends Abstract_Module implements Lifecycle_Module_Interface {
 		require_once __DIR__ . '/class-renderer.php';
 		require_once __DIR__ . '/class-integrated-renderer.php';
 		require_once __DIR__ . '/class-seo-conflict-guard.php';
+		require_once __DIR__ . '/class-shared-base.php';
+		require_once __DIR__ . '/class-base-fallback-redirect.php';
 
 		Router::init();
 		Integrated_Renderer::init();
 		SEO_Conflict_Guard::init();
+		Shared_Base::init();
+		Base_Fallback_Redirect::init();
 
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 	}
@@ -101,6 +105,7 @@ class Module extends Abstract_Module implements Lifecycle_Module_Interface {
 	 * @return void
 	 */
 	public function on_activate(): void {
+		require_once __DIR__ . '/class-shared-base.php';
 		require_once __DIR__ . '/class-router.php';
 
 		add_filter( 'register_post_type_args', array( Router::class, 'filter_cpt_args' ), 10, 2 );

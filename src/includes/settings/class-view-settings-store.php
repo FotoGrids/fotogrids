@@ -26,6 +26,12 @@ final class View_Settings_Store {
 
 	const OPTION = 'fotogrids_view_settings';
 
+	const DEFAULT_BASE_PREFIX = 'fotogrids';
+
+	const DEFAULT_GALLERY_SEGMENT = 'gallery';
+
+	const DEFAULT_ALBUM_SEGMENT = 'album';
+
 	/**
 	 * Default values for every view page appearance setting.
 	 *
@@ -39,6 +45,12 @@ final class View_Settings_Store {
 			// injecting the gallery via the_content. 'standalone' renders the
 			// theme-less shell that this module ships.
 			'layout_mode'                    => 'integrated',
+
+			// Permalink base for view page URLs. An empty prefix places the
+			// collection segments at the site root.
+			'base_prefix'                    => self::DEFAULT_BASE_PREFIX,
+			'base_gallery_segment'           => self::DEFAULT_GALLERY_SEGMENT,
+			'base_album_segment'             => self::DEFAULT_ALBUM_SEGMENT,
 
 			// Standalone-only appearance. Only consulted when
 			// layout_mode === 'standalone'.
@@ -125,8 +137,14 @@ final class View_Settings_Store {
 			$layout_mode = $defaults['layout_mode'];
 		}
 
+		$base = self::sanitize_base( $input );
+
 		$sanitized = array(
 			'layout_mode'                    => $layout_mode,
+
+			'base_prefix'                    => $base['base_prefix'],
+			'base_gallery_segment'           => $base['base_gallery_segment'],
+			'base_album_segment'             => $base['base_album_segment'],
 
 			'accent_color'                   => $accent,
 			'theme'                          => $theme,
@@ -153,6 +171,211 @@ final class View_Settings_Store {
 	}
 
 	/**
+	 * Sanitise the three permalink base fields.
+	 *
+	 * Any of the three may be empty. A key absent from the input keeps its
+	 * stored value; a key present and empty is honoured as empty.
+	 *
+	 * @since 1.1.1
+	 * @param array<string,mixed> $input Raw input.
+	 * @return array<string,string>
+	 */
+	private static function sanitize_base( array $input ): array {
+		$current = self::get();
+
+		return array(
+			'base_prefix'          => self::sanitize_path( (string) ( $input['base_prefix'] ?? $current['base_prefix'] ) ),
+			'base_gallery_segment' => self::sanitize_path( (string) ( $input['base_gallery_segment'] ?? $current['base_gallery_segment'] ) ),
+			'base_album_segment'   => self::sanitize_path( (string) ( $input['base_album_segment'] ?? $current['base_album_segment'] ) ),
+		);
+	}
+
+	/**
+	 * Join a prefix and a segment into a URL base, skipping empty parts.
+	 *
+	 * The single place the base is composed; Router reads it too so the
+	 * rewrite slug and the validated path can never disagree.
+	 *
+	 * @since 1.1.1
+	 * @param string $prefix  Shared prefix, may be empty.
+	 * @param string $segment Collection segment, may be empty.
+	 * @return string Base path with no surrounding slashes. Empty means site root.
+	 */
+	public static function base_path( string $prefix, string $segment ): string {
+		return implode( '/', array_filter( array( $prefix, $segment ), 'strlen' ) );
+	}
+
+	/**
+	 * Check a requested permalink base against the rest of the site.
+	 *
+	 * An unchanged base always validates, so a collision introduced after the
+	 * base was set never blocks an unrelated settings save.
+	 *
+	 * @since 1.1.1
+	 * @param array<string,mixed> $input Raw input.
+	 * @return true|\WP_Error
+	 */
+	public static function validate_base( array $input ) {
+		$base   = self::sanitize_base( $input );
+		$stored = self::get();
+
+		if ( $base['base_prefix'] === $stored['base_prefix']
+			&& $base['base_gallery_segment'] === $stored['base_gallery_segment']
+			&& $base['base_album_segment'] === $stored['base_album_segment'] ) {
+			return true;
+		}
+
+		$paths = array(
+			self::base_path( $base['base_prefix'], $base['base_gallery_segment'] ),
+			self::base_path( $base['base_prefix'], $base['base_album_segment'] ),
+		);
+
+		foreach ( $paths as $path ) {
+			// An empty base is the site root, which owns no path to collide with.
+			if ( '' === $path ) {
+				continue;
+			}
+
+			$conflict = self::base_conflict( $path );
+
+			if ( null !== $conflict ) {
+				return new \WP_Error(
+					'fotogrids_base_conflict',
+					sprintf(
+						/* translators: 1: requested URL path, 2: what already uses that path. */
+						__( '/%1$s/ is already used by %2$s. Pick a different address.', 'fotogrids' ),
+						$path,
+						$conflict
+					),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Describe whatever already occupies a URL path.
+	 *
+	 * @since 1.1.1
+	 * @param string $path Path relative to the site root, no surrounding slashes.
+	 * @return string|null Human-readable owner, or null when the path is free.
+	 */
+	private static function base_conflict( string $path ): ?string {
+		$root = explode( '/', $path )[0];
+
+		if ( in_array( $root, self::reserved_roots(), true ) ) {
+			return __( 'WordPress itself', 'fotogrids' );
+		}
+
+		$occupant = self::resolved_post_type( $path );
+
+		if ( null !== $occupant ) {
+			return $occupant;
+		}
+
+		foreach ( get_post_types( array(), 'objects' ) as $post_type ) {
+			if ( in_array( $post_type->name, array( 'fotogrids_gallery', 'fotogrids_album' ), true ) ) {
+				continue;
+			}
+
+			if ( is_array( $post_type->rewrite ) && ( $post_type->rewrite['slug'] ?? '' ) === $path ) {
+				return $post_type->labels->name ?? $post_type->name;
+			}
+		}
+
+		foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy ) {
+			if ( is_array( $taxonomy->rewrite ) && ( $taxonomy->rewrite['slug'] ?? '' ) === $path ) {
+				return $taxonomy->labels->name ?? $taxonomy->name;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Describe the content WordPress already resolves at a path, if any.
+	 *
+	 * Asking the rewrite rules covers posts, pages and other post types under
+	 * whatever permalink structure the site runs, which a page-only lookup
+	 * misses.
+	 *
+	 * @since 1.1.1
+	 * @param string $path Path relative to the site root, no surrounding slashes.
+	 * @return string|null
+	 */
+	private static function resolved_post_type( string $path ): ?string {
+		$post_id = url_to_postid( home_url( '/' . $path . '/' ) );
+
+		if ( $post_id < 1 ) {
+			return null;
+		}
+
+		$post = get_post( $post_id );
+		$type = $post instanceof \WP_Post ? get_post_type_object( $post->post_type ) : null;
+
+		if ( null === $type || '' === (string) $type->labels->singular_name ) {
+			return __( 'existing content', 'fotogrids' );
+		}
+
+		return sprintf(
+			/* translators: %s: the singular name of a post type, e.g. "page". */
+			__( 'an existing %s', 'fotogrids' ),
+			strtolower( $type->labels->singular_name )
+		);
+	}
+
+	/**
+	 * URL roots WordPress reserves for itself.
+	 *
+	 * @since 1.1.1
+	 * @return string[]
+	 */
+	private static function reserved_roots(): array {
+		global $wp_rewrite;
+
+		$roots = array(
+			'wp-admin',
+			'wp-content',
+			'wp-includes',
+			'wp-json',
+			'feed',
+			'embed',
+			'page',
+			'comments',
+			'search',
+			'attachment',
+			'author',
+			'trackback',
+		);
+
+		if ( $wp_rewrite instanceof \WP_Rewrite ) {
+			$roots[] = $wp_rewrite->pagination_base;
+			$roots[] = $wp_rewrite->comments_base;
+			$roots[] = $wp_rewrite->author_base;
+			$roots[] = $wp_rewrite->search_base;
+			$roots[] = $wp_rewrite->feed_base;
+		}
+
+		return array_values( array_filter( array_unique( $roots ), 'strlen' ) );
+	}
+
+	/**
+	 * Reduce a raw path to slug-safe segments joined by slashes.
+	 *
+	 * @since 1.1.1
+	 * @param string $raw Raw path.
+	 * @return string
+	 */
+	private static function sanitize_path( string $raw ): string {
+		$parts = array_filter( explode( '/', $raw ), 'strlen' );
+		$parts = array_map( 'sanitize_title_with_dashes', $parts );
+
+		return implode( '/', array_filter( $parts, 'strlen' ) );
+	}
+
+	/**
 	 * Sanitise and persist view page settings.
 	 *
 	 * @since 1.0.0
@@ -161,6 +384,13 @@ final class View_Settings_Store {
 	 */
 	public static function save( $value ): array {
 		update_option( self::OPTION, self::sanitize( $value ) );
+
+		// The rewrite base may have moved; drop the stamp so the routes are
+		// rebuilt on the next load rather than at Settings > Permalinks.
+		if ( class_exists( '\FotoGrids\Modules\ViewCollections\Router' ) ) {
+			\FotoGrids\Modules\ViewCollections\Router::clear_rewrite_flush();
+		}
+
 		return self::get();
 	}
 
