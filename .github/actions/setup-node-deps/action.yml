@@ -1,0 +1,35 @@
+name: 'Set up Node and dependencies'
+description: 'Sets up Node 18 and restores node_modules from cache, installing only on a miss.'
+
+inputs:
+  node-version:
+    description: 'Node version to set up.'
+    required: false
+    default: '18'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node ${{ inputs.node-version }}
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node-version }}
+        # Only reached on a node_modules cache miss, where it makes `npm ci`
+        # cheaper by serving tarballs from ~/.npm.
+        cache: npm
+
+    - name: Restore node_modules
+      id: node-modules
+      uses: actions/cache@v6
+      with:
+        path: node_modules
+        # No restore-keys, deliberately. A partial key match would restore a
+        # tree built from a different package-lock.json and the install step
+        # below would then be skipped, running the whole workflow against the
+        # wrong dependency versions with nothing to signal it.
+        key: node-modules-${{ runner.os }}-node${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
+
+    - name: Install dependencies
+      if: steps.node-modules.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm ci

@@ -23,14 +23,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node 18
-        uses: actions/setup-node@v7
-        with:
-          node-version: '18'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
 
       - name: ESLint
         run: npm run lint
@@ -53,20 +47,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node 18
-        uses: actions/setup-node@v7
-        with:
-          node-version: '18'
-          cache: npm
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
 
       - name: Set up PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.1'
           coverage: none
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Run test suite (guards + PHP integration + Jest coverage)
         env:
@@ -131,14 +119,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node 18
-        uses: actions/setup-node@v7
-        with:
-          node-version: '18'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
 
       - name: Production build
         run: npm run build
