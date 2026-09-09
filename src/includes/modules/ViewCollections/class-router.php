@@ -42,9 +42,8 @@ class Router {
 	private static $current_post = null;
 
 	/**
-	 * Rewrite rules version. Bump when the rewrite base or query handling
-	 * changes so the version-gated flush regenerates rules without requiring
-	 * the user to reactivate the plugin or visit the Permalinks screen.
+	 * Rewrite rules version. Bump when the query handling changes; the base
+	 * itself is covered by the signature the stamp is built from.
 	 *
 	 * @var string
 	 */
@@ -80,11 +79,29 @@ class Router {
 	 * @return void
 	 */
 	public static function maybe_flush_rewrite_rules(): void {
-		if ( get_option( self::REWRITE_VERSION_OPTION ) === self::REWRITE_VERSION ) {
+		if ( get_option( self::REWRITE_VERSION_OPTION ) === self::rewrite_signature() ) {
 			return;
 		}
 
 		self::stamp_rewrite_flush();
+	}
+
+	/**
+	 * Stamp value covering the rewrite version and both resolved bases.
+	 *
+	 * Keying the stamp on the resolved bases means a base changed through the
+	 * settings screen or through the base_slug filter regenerates the rules on
+	 * the next load, without a visit to Settings > Permalinks.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	private static function rewrite_signature(): string {
+		return self::REWRITE_VERSION . ':' . md5(
+			self::base_slug( 'fotogrids_gallery' )
+			. '|' . self::base_slug( 'fotogrids_album' )
+			. '|' . ( Shared_Base::is_active() ? 'shared' : 'split' )
+		);
 	}
 
 	/**
@@ -95,7 +112,7 @@ class Router {
 	 */
 	public static function stamp_rewrite_flush(): void {
 		flush_rewrite_rules();
-		update_option( self::REWRITE_VERSION_OPTION, self::REWRITE_VERSION );
+		update_option( self::REWRITE_VERSION_OPTION, self::rewrite_signature() );
 	}
 
 	/**
@@ -130,10 +147,15 @@ class Router {
 		// editor and front-end admin bar render the native View link.
 		$args['show_in_admin_bar'] = true;
 		$args['has_archive']       = false;
-		$args['rewrite']           = array(
-			'slug'       => self::base_slug( $post_type ),
-			'with_front' => false,
-		);
+
+		// Both types at one base would collapse into a single rewrite rule, so
+		// Shared_Base owns the route instead.
+		$args['rewrite'] = Shared_Base::is_active()
+			? false
+			: array(
+				'slug'       => self::base_slug( $post_type ),
+				'with_front' => false,
+			);
 
 		// The admin bar "New" dropdown uses name_admin_bar; brand it so it is
 		// distinguishable from other gallery plugins' entries.
@@ -154,12 +176,23 @@ class Router {
 	/**
 	 * Rewrite base for a collection type, e.g. 'fotogrids/gallery'.
 	 *
+	 * Composed from the stored permalink base settings.
+	 *
 	 * @since 1.0.0
 	 * @param string $post_type Post type key.
 	 * @return string
 	 */
 	public static function base_slug( string $post_type ): string {
-		$slug = 'fotogrids_album' === $post_type ? 'fotogrids/album' : 'fotogrids/gallery';
+		$settings = \FotoGrids\Settings\View_Settings_Store::get();
+
+		$segment = 'fotogrids_album' === $post_type
+			? $settings['base_album_segment']
+			: $settings['base_gallery_segment'];
+
+		$slug = \FotoGrids\Settings\View_Settings_Store::base_path(
+			$settings['base_prefix'],
+			$segment
+		);
 
 		/**
 		 * Filter the rewrite base for a collection view page.

@@ -19,6 +19,7 @@ const { __ } = wp.i18n;
  * @param {boolean}         [props.saving]          Save in progress (disables the button).
  * @param {string}          [props.status]          'saved' | 'error' | null - transient feedback.
  * @param {Function}        props.onSave            Save handler.
+ * @param {boolean}         [props.disabled]        Blocks saving while the form is invalid; Discard stays available.
  * @param {Function}        [props.onDiscard]       Discard handler. Hidden if omitted.
  * @param {string}          [props.savedHint]       Sub-text shown when clean, e.g. "just now".
  * @param {string}          [props.saveLabel]       Primary button label.
@@ -29,6 +30,7 @@ const SaveBar = ({
     saving = false,
     status = null,
     onSave,
+    disabled = false,
     onDiscard,
     savedHint,
     saveLabel,
@@ -100,7 +102,7 @@ const SaveBar = ({
                 variant="primary"
                 size="xs"
                 onClick={onSave}
-                disabled={saving || !dirty}
+                disabled={saving || !dirty || disabled}
                 busy={saving}
             >
                 {saving

@@ -8,28 +8,15 @@ import {
     SaveBar,
 } from '../../shared/settings';
 import Toggle from '../../shared/Toggle';
+import InfoBlock from '../../shared/InfoBlock';
+import { Button } from '../../shared/Button';
 
 const { __ } = wp.i18n;
 
-// Keep aligned with View_Settings_Store::defaults() in
-// Plugin/src/includes/settings/class-view-settings-store.php.
-const DEFAULTS = {
-    layout_mode: 'integrated',
-
-    // Standalone-only appearance.
-    accent_color: '#3c46f0',
-    theme: 'light',
-    max_width: 1200,
-    show_header: true,
-    show_footer: true,
-
-    // Integrated-mode toggles.
-    integrated_show_title_block: false,
-    integrated_hide_featured_image: true,
-    integrated_allow_comments: false,
-    integrated_include_in_archives: false,
-    integrated_post_navigation: false,
-};
+// View_Settings_Store::defaults() reaches the browser through
+// wp_localize_script, so PHP owns the values. Nested arrays keep their types
+// through localisation; only top-level scalars are cast to strings.
+const DEFAULTS = window.fotogridsAdmin?.viewDefaults || {};
 
 const normalize = (raw) => ({ ...DEFAULTS, ...(raw || {}) });
 
@@ -57,6 +44,7 @@ const ViewPagesTab = () => {
     const [saved, setSaved] = useState(normalize(window.fotogridsAdmin?.viewSettings));
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -79,11 +67,13 @@ const ViewPagesTab = () => {
     const update = (key, value) => {
         setSettings(prev => ({ ...prev, [key]: value }));
         setStatus(null);
+        setErrorMessage(null);
     };
 
     const handleSave = async () => {
         setSaving(true);
         setStatus(null);
+        setErrorMessage(null);
         try {
             const result = await apiFetch({
                 path: '/fotogrids/v1/admin/view-settings',
@@ -97,6 +87,7 @@ const ViewPagesTab = () => {
             setTimeout(() => setStatus(null), 3000);
         } catch (err) {
             setStatus('error');
+            setErrorMessage(err?.message || null);
         } finally {
             setSaving(false);
         }
@@ -105,6 +96,7 @@ const ViewPagesTab = () => {
     const handleDiscard = () => {
         setSettings(saved);
         setStatus(null);
+        setErrorMessage(null);
     };
 
     // Reuse the plugin's existing color picker widget (plain global) by passing
@@ -134,8 +126,132 @@ const ViewPagesTab = () => {
 
     const isIntegrated = settings.layout_mode === 'integrated';
 
+    const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
+    const permalinksUrl = window.fotogridsAdmin?.permalinksUrl || '';
+    // wp_localize_script casts every scalar to a string, so the structure is
+    // compared against the empty string rather than read as a boolean. An
+    // absent key means an older bundle and is treated as pretty permalinks.
+    const prettyPermalinks = window.fotogridsAdmin?.permalinkStructure !== '';
+
+    // Without a permalink structure WordPress ignores the rewrite base and
+    // serves view pages from the post type's query var instead.
+    // Prefix and segment are each optional; an empty result is the site root.
+    const basePath = (segment) =>
+        [settings.base_prefix, segment]
+            .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
+            .filter(Boolean)
+            .join('/');
+
+    const galleryBase = basePath(settings.base_gallery_segment);
+    const albumBase = basePath(settings.base_album_segment);
+
+    // Allowed: FotoGrids serves both types from one rule and resolves the slug.
+    const basesShared = galleryBase === albumBase;
+    const atSiteRoot = '' === galleryBase || '' === albumBase;
+
+    const previewUrl = (segment, sample, queryVar) => {
+        if (!prettyPermalinks) {
+            return `${homeUrl}/?${queryVar}=${sample}`;
+        }
+
+        const base = basePath(segment);
+        return `${homeUrl}/${base ? `${base}/` : ''}${sample}/`;
+    };
+
+    const urlPreview = (segment, sample, queryVar) => (
+        <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
+    );
+
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="view-pages-content">
+            <SettingsPanel
+                title={__('Address', 'fotogrids')}
+                description={__('Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root.', 'fotogrids')}
+            >
+                {!prettyPermalinks && (
+                    <InfoBlock
+                        variant="warning"
+                        title={__('Plain permalinks are on', 'fotogrids')}
+                        description={__('View pages are served from a query address, so the settings below have no effect yet. They apply as soon as you choose any other permalink structure.', 'fotogrids')}
+                    >
+                        {permalinksUrl && (
+                            <Button variant="secondary" size="sm" href={permalinksUrl}>
+                                {__('Permalink settings', 'fotogrids')}
+                            </Button>
+                        )}
+                    </InfoBlock>
+                )}
+
+                {prettyPermalinks && basesShared && (
+                    <InfoBlock
+                        variant="error"
+                        title={__('Galleries and albums share one address', 'fotogrids')}
+                        description={__('Both open from the same path, so a gallery and an album that carry the same slug cannot both be reached — the gallery wins and the album stays available through its own segment. Keeping their slugs distinct is up to you. Use with caution.', 'fotogrids')}
+                    />
+                )}
+
+                {prettyPermalinks && atSiteRoot && (
+                    <InfoBlock
+                        variant="warning"
+                        title={__('These pages sit at the top level of your site', 'fotogrids')}
+                        description={__('An address directly after your domain can resolve to a gallery or album, so a page or post you add later at the same path may stop opening.', 'fotogrids')}
+                    />
+                )}
+
+                <PanelRow
+                    title={__('Prefix', 'fotogrids')}
+                    description={__('The part both addresses below share. Clear it and they start straight after your domain.', 'fotogrids')}
+                    htmlFor="fg-view-base-prefix"
+                >
+                    <input
+                        id="fg-view-base-prefix"
+                        type="text"
+                        className="fotogrids-text-input"
+                        value={settings.base_prefix}
+                        placeholder={__('fotogrids', 'fotogrids')}
+                        onChange={(e) => update('base_prefix', e.target.value)}
+                    />
+                </PanelRow>
+
+                <PanelRow
+                    title={__('Gallery segment', 'fotogrids')}
+                    description={__('The word that marks a gallery in the address.', 'fotogrids')}
+                    htmlFor="fg-view-base-gallery"
+                >
+                    <input
+                        id="fg-view-base-gallery"
+                        type="text"
+                        className="fotogrids-text-input"
+                        value={settings.base_gallery_segment}
+                        placeholder={__('gallery', 'fotogrids')}
+                        onChange={(e) => update('base_gallery_segment', e.target.value)}
+                    />
+                    {urlPreview(settings.base_gallery_segment, 'gallery-name', 'fotogrids_gallery')}
+                </PanelRow>
+
+                <PanelRow
+                    title={__('Album segment', 'fotogrids')}
+                    description={__('The word that marks an album in the address.', 'fotogrids')}
+                    htmlFor="fg-view-base-album"
+                >
+                    <input
+                        id="fg-view-base-album"
+                        type="text"
+                        className="fotogrids-text-input"
+                        value={settings.base_album_segment}
+                        placeholder={__('album', 'fotogrids')}
+                        onChange={(e) => update('base_album_segment', e.target.value)}
+                    />
+                    {urlPreview(settings.base_album_segment, 'album-name', 'fotogrids_album')}
+                </PanelRow>
+
+                <PanelRow
+                    fullWidth
+                    title={__('Before you change this', 'fotogrids')}
+                    description={__('Addresses on the default `fotogrids/gallery` and `fotogrids/album` base keep working and forward to the new one. Links you shared under a custom base you set earlier will stop resolving.', 'fotogrids')}
+                />
+            </SettingsPanel>
+
             <SettingsPanel
                 title={__('Page layout', 'fotogrids')}
                 description={__('Choose how view pages render. Integrated treats each gallery or album as a normal post in your theme. Standalone renders a theme-less shell that owns the whole page.', 'fotogrids')}
@@ -276,6 +392,15 @@ const ViewPagesTab = () => {
                         />
                     </PanelRow>
                 </SettingsPanel>
+            )}
+
+            {errorMessage && (
+                <InfoBlock
+                    variant="error"
+                    role="alert"
+                    title={__('That address could not be saved', 'fotogrids')}
+                    description={errorMessage}
+                />
             )}
 
             <SaveBar
