@@ -3,7 +3,14 @@ import { test, expect, Page } from '@playwright/test';
 /**
  * Autosave is on by default, so the Add New screen has to stay inert until the
  * gallery actually exists: wp_update_post() promotes an auto-draft to a draft,
- * which would leave a gallery behind for anyone who types a title and leaves.
+ * which would leave a gallery behind for anyone who changes a setting and
+ * walks away.
+ *
+ * These drive FotoGrids' own change channel, `fotogrids:setting_changed`, the
+ * event every settings panel and the item grid dispatch. They deliberately do
+ * not blur the title: WordPress core auto-saves a new post on title blur all
+ * by itself (wp-admin/js/post.js, "Auto save new posts after a title is
+ * typed"), which would mask what is being tested here.
  *
  * Serial: these share one WordPress site and assert on the gallery list.
  */
@@ -25,10 +32,10 @@ async function loginAsAdmin(page: Page) {
 }
 
 /**
- * Titles and statuses of every gallery in the list, so a failure names what
- * appeared rather than just reporting a count.
+ * Titles of every gallery in the list, so a failure names what appeared
+ * rather than just reporting a count.
  */
-async function galleryRows(page: Page): Promise<string[]> {
+async function galleryTitles(page: Page): Promise<string[]> {
 	await page.goto(GALLERY_LIST);
 	await expect(page.locator('#the-list')).toBeVisible({ timeout: 15000 });
 	return page
@@ -45,27 +52,36 @@ async function openAddNew(page: Page) {
 	);
 }
 
+async function changeAFotoGridsSetting(page: Page) {
+	await page.evaluate(() => {
+		document.dispatchEvent(
+			new CustomEvent('fotogrids:setting_changed', {
+				detail: { source: 'e2e' },
+			})
+		);
+	});
+}
+
 test('opening Add New and waiting creates nothing', async ({ page }) => {
 	await loginAsAdmin(page);
-	const before = await galleryRows(page);
+	const before = await galleryTitles(page);
 
 	await openAddNew(page);
 	await page.waitForTimeout(PAST_DEBOUNCE);
 
-	expect(await galleryRows(page)).toEqual(before);
+	expect(await galleryTitles(page)).toEqual(before);
 });
 
-test('typing a title on Add New creates nothing', async ({ page }) => {
+test('a settings change on Add New creates nothing', async ({ page }) => {
 	await loginAsAdmin(page);
-	const before = await galleryRows(page);
+	const before = await galleryTitles(page);
 
 	await openAddNew(page);
-	const title = page.locator('#title');
-	await title.fill('Autosave should ignore me');
-	await title.blur();
+	await page.fill('#title', 'Autosave should ignore me');
+	await changeAFotoGridsSetting(page);
 	await page.waitForTimeout(PAST_DEBOUNCE);
 
-	expect(await galleryRows(page)).toEqual(before);
+	expect(await galleryTitles(page)).toEqual(before);
 });
 
 test('an unsaved gallery still warns about unsaved changes', async ({
@@ -74,9 +90,8 @@ test('an unsaved gallery still warns about unsaved changes', async ({
 	await loginAsAdmin(page);
 	await openAddNew(page);
 
-	const title = page.locator('#title');
-	await title.fill('Still unsaved');
-	await title.blur();
+	await page.fill('#title', 'Still unsaved');
+	await changeAFotoGridsSetting(page);
 
 	await expect(page.locator('#fotogrids-unsaved-changes')).toBeVisible({
 		timeout: 15000,
