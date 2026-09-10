@@ -31,8 +31,8 @@ const PERSONAS = [
     {
         id:    'blogger',
         icon:  'feather',
-        title: __( 'Blogger / Personal Site', 'fotogrids' ),
-        body:  __( 'Publishing your own work — a blog, portfolio, hobby site, or archive.', 'fotogrids' ),
+        title: __( 'Personal Website', 'fotogrids' ),
+        body:  __( 'Creating a blog, portfolio, hobby site, or creative archive.', 'fotogrids' ),
     },
     {
         id:    'agency',
