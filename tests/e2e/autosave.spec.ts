@@ -77,7 +77,8 @@ test('a settings change on Add New creates nothing', async ({ page }) => {
 	const before = await galleryTitles(page);
 
 	await openAddNew(page);
-	await page.fill('#title', 'Autosave should ignore me');
+	// Deliberately no title: WordPress core auto-saves a new post on title
+	// blur, which would create the draft this test is watching for.
 	await changeAFotoGridsSetting(page);
 	await page.waitForTimeout(PAST_DEBOUNCE);
 
@@ -90,7 +91,6 @@ test('an unsaved gallery still warns about unsaved changes', async ({
 	await loginAsAdmin(page);
 	await openAddNew(page);
 
-	await page.fill('#title', 'Still unsaved');
 	await changeAFotoGridsSetting(page);
 
 	await expect(page.locator('#fotogrids-unsaved-changes')).toBeVisible({

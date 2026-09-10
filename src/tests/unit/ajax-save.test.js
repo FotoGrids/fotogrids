@@ -46,7 +46,8 @@ describe('ajax-save', () => {
 		jest.useFakeTimers();
 		window.ajaxurl = 'https://x.test/admin-ajax.php';
 		// Autosave now defaults on, so tests that are not about it opt out.
-		window.fotogridsAdmin = { autosave: false };
+		// '' is what wp_localize_script sends for a false option.
+		window.fotogridsAdmin = { autosave: '' };
 		window.fotogridsAjaxSave = {
 			strings: {
 				youHaveUnsavedChanges: 'Unsaved changes',
@@ -154,26 +155,32 @@ describe('ajax-save', () => {
 		expect(window.fotogridsToast.error).toHaveBeenCalled();
 	});
 
-	it('seeds autosave from the localised option', () => {
-		window.fotogridsAdmin = { autosave: true };
-		loadAndInit();
-		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(true);
-	});
+	// wp_localize_script casts every scalar to a string, so the option reaches
+	// the browser as '1' or '' on a page load - never a boolean. The toggle
+	// writes the AJAX response back as a real boolean. Both shapes are live.
+	describe('reading the localised option', () => {
+		const cases = [
+			['1', true, "localised on ('1')"],
+			['', false, "localised off ('')"],
+			[true, true, 'boolean true from the toggle response'],
+			[false, false, 'boolean false from the toggle response'],
+			[undefined, false, 'missing key'],
+		];
 
-	it('treats an unwritten autosave option as on', () => {
-		window.fotogridsAdmin = {};
-		loadAndInit();
-		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(true);
-	});
-
-	it('seeds autosave off when the option is off', () => {
-		window.fotogridsAdmin = { autosave: false };
-		loadAndInit();
-		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(false);
+		cases.forEach(([raw, expected, label]) => {
+			it(`seeds autosave ${expected ? 'on' : 'off'} for ${label}`, () => {
+				window.fotogridsAdmin =
+					raw === undefined ? {} : { autosave: raw };
+				loadAndInit();
+				expect(window.FotoGridsCollectionState.autosave.enabled).toBe(
+					expected
+				);
+			});
+		});
 	});
 
 	it('follows fotogrids:autosave_changed', () => {
-		window.fotogridsAdmin = { autosave: true };
+		window.fotogridsAdmin = { autosave: '1' };
 		loadAndInit();
 		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(true);
 
@@ -195,7 +202,7 @@ describe('ajax-save', () => {
 	// The settings metabox can be hidden from Screen Options, so autosave must
 	// not depend on that React tree having mounted.
 	it('stays on without the collection settings panel in the DOM', () => {
-		window.fotogridsAdmin = { autosave: true };
+		window.fotogridsAdmin = { autosave: '1' };
 		loadAndInit();
 		expect(
 			document.getElementById('fotogrids-collection-settings-root')
@@ -204,7 +211,7 @@ describe('ajax-save', () => {
 	});
 
 	it('autosaves a form change after the debounce', () => {
-		window.fotogridsAdmin = { autosave: true };
+		window.fotogridsAdmin = { autosave: '1' };
 		window.fotogridsToast = { error: jest.fn(), success: jest.fn() };
 		global.fetch = jest.fn(() =>
 			Promise.resolve({
@@ -227,7 +234,7 @@ describe('ajax-save', () => {
 	// wp_update_post() promotes an auto-draft to a draft, so an autosave on the
 	// Add New screen would create a gallery nobody asked for.
 	it('does not autosave a gallery that has never been saved', () => {
-		window.fotogridsAdmin = { autosave: true };
+		window.fotogridsAdmin = { autosave: '1' };
 		document.getElementById('original_post_status').value = 'auto-draft';
 		global.fetch = jest.fn();
 		loadAndInit();
@@ -242,7 +249,7 @@ describe('ajax-save', () => {
 	});
 
 	it('still warns about unsaved changes on a never-saved gallery', () => {
-		window.fotogridsAdmin = { autosave: true };
+		window.fotogridsAdmin = { autosave: '1' };
 		document.getElementById('original_post_status').value = 'auto-draft';
 		loadAndInit();
 
@@ -256,7 +263,7 @@ describe('ajax-save', () => {
 	});
 
 	it('does not autosave a form change when autosave is off', () => {
-		window.fotogridsAdmin = { autosave: false };
+		window.fotogridsAdmin = { autosave: '' };
 		global.fetch = jest.fn();
 		loadAndInit();
 		global.fetch.mockClear();

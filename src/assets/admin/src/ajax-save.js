@@ -386,11 +386,15 @@
 		);
 	}
 
-	// `fotogridsAdmin.autosave` carries the localised `fotogrids_autosave`
-	// option and is the only source for it in the browser. Undefined means the
-	// option has never been written, which reads as on.
+	// `fotogridsAdmin.autosave` carries the `fotogrids_autosave` option and is
+	// the only source for it in the browser. It arrives in two shapes:
+	// wp_localize_script casts every scalar to a string, so a page load gives
+	// '1' or '', while the editor's toggle writes the AJAX response back as a
+	// real boolean. Anything else means we cannot tell, and off is the safe
+	// answer - the user still gets the unsaved-changes badge.
 	function readAutosaveSetting() {
-		return window.fotogridsAdmin?.autosave !== false;
+		const raw = window.fotogridsAdmin?.autosave;
+		return true === raw || '1' === raw;
 	}
 
 	// A collection that has never been saved is still a WordPress auto-draft.

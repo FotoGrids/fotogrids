@@ -142,7 +142,7 @@ final class Plugin_Settings_Store {
 	 * @return array<string, bool> The stored settings.
 	 */
 	public static function save_advanced( array $input ): array {
-		update_option( 'fotogrids_autosave', self::truthy( $input['autosave'] ?? false ) );
+		self::save_bool( 'fotogrids_autosave', self::truthy( $input['autosave'] ?? false ) );
 
 		// share_statistics has a Freemius side-effect; route through the
 		// shared helper so this REST path and the wizard's AJAX path
@@ -156,15 +156,35 @@ final class Plugin_Settings_Store {
 			self::apply_marketing_consent( self::truthy( $input['marketing_allowed'] ?? false ) );
 		}
 
-		update_option( 'fotogrids_allow_google_fonts', self::truthy( $input['allow_google_fonts'] ?? false ) );
+		self::save_bool( 'fotogrids_allow_google_fonts', self::truthy( $input['allow_google_fonts'] ?? false ) );
 
-		update_option( 'fotogrids_allow_news_updates', self::truthy( $input['allow_news_updates'] ?? false ) );
+		self::save_bool( 'fotogrids_allow_news_updates', self::truthy( $input['allow_news_updates'] ?? false ) );
 
 		// Persist the inverse "preserve" flag the uninstaller reads.
 		$delete = self::truthy( $input['delete_data_on_uninstall'] ?? false );
-		update_option( 'fotogrids_preserve_data_on_uninstall', ! $delete );
+		self::save_bool( 'fotogrids_preserve_data_on_uninstall', ! $delete );
 
 		return self::get_advanced();
+	}
+
+	/**
+	 * Persist a boolean option as the string '1' or '0'.
+	 *
+	 * `update_option()` returns early when the new value matches the current
+	 * one, and `get_option()` answers `false` for a row that does not exist.
+	 * Writing a raw `false` to an option that has never been written is
+	 * therefore a silent no-op, which leaves any option whose default is true
+	 * stuck on - the user switches it off and it comes back on. The '1'/'0'
+	 * strings are never equal to that `false`, and are what
+	 * `Admin_Init::ajax_update_plugin_setting()` already stores, so both write
+	 * paths agree on the stored shape. Every reader treats '0' as falsey.
+	 *
+	 * @param  string $option Option name.
+	 * @param  bool   $value  Value to store.
+	 * @return bool True when the option was written.
+	 */
+	private static function save_bool( string $option, bool $value ): bool {
+		return update_option( $option, $value ? '1' : '0' );
 	}
 
 	/**

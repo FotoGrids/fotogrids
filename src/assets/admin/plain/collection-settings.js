@@ -17,6 +17,11 @@ const FIELD_STATE = {
 	TEASER: 'teaser',
 };
 
+// `fotogridsAdmin.autosave` arrives in two shapes: wp_localize_script casts
+// every scalar to a string, so a page load gives '1' or '', while the autosave
+// toggle writes the AJAX response back as a real boolean.
+const autosaveIsOn = (raw) => true === raw || '1' === raw;
+
 const isFreeTier = (config) => {
 	if (!config || typeof config !== 'object') {
 		return true;
@@ -350,7 +355,7 @@ function CollectionSettings() {
 	const [bulkUrl, setBulkUrl] = useState('');
 	const [bulkTarget, setBulkTarget] = useState('global');
 	const [autosaveValue, setAutosaveValue] = useState(
-		window.fotogridsAdmin?.autosave !== false
+		autosaveIsOn(window.fotogridsAdmin?.autosave)
 	);
 	// The wizard's step 3 writes the same fotogrids_settings_mode option this
 	// Segmented control mirrors, so users can flip modes without reopening it.

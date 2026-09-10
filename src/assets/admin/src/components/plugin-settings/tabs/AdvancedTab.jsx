@@ -31,11 +31,15 @@ const DEFAULTS = {
  * "delete on uninstall" but is persisted server-side as its inverse.
  */
 const AdvancedTab = () => {
+    // wp_localize_script casts scalars to strings, so these seeds arrive as
+    // '1' or '' rather than booleans. They only cover the first paint; the
+    // REST read below replaces them with real booleans.
     const seed = window.fotogridsAdmin || {};
+    const isOn = (value) => true === value || '1' === value;
     const initial = {
-        autosave: seed.autosave !== false,
-        share_statistics: seed.shareStatistics === true,
-        marketing_allowed: seed.marketingAllowed === true,
+        autosave: isOn(seed.autosave),
+        share_statistics: isOn(seed.shareStatistics),
+        marketing_allowed: isOn(seed.marketingAllowed),
         allow_google_fonts: DEFAULTS.allow_google_fonts,
         allow_news_updates: DEFAULTS.allow_news_updates,
         delete_data_on_uninstall: DEFAULTS.delete_data_on_uninstall,
