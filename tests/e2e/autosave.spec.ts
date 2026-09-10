@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { loginAsAdmin } from './helpers';
 
 /**
  * Autosave is on by default, so the Add New screen has to stay inert until the
@@ -22,14 +23,6 @@ const GALLERY_NEW = '/wp-admin/post-new.php?post_type=fotogrids_gallery';
 const PAST_DEBOUNCE = 6000;
 
 test.describe.configure({ mode: 'serial' });
-
-async function loginAsAdmin(page: Page) {
-	await page.goto('/wp-login.php');
-	await page.fill('#user_login', process.env.WP_ADMIN_USER ?? 'admin');
-	await page.fill('#user_pass', process.env.WP_ADMIN_PASS ?? 'password');
-	await page.click('#wp-submit');
-	await page.waitForURL(/\/wp-admin\//, { timeout: 30000 });
-}
 
 /**
  * Titles of every gallery in the list, so a failure names what appeared

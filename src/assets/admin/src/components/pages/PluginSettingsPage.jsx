@@ -11,7 +11,6 @@ import SharingTab from '../plugin-settings/tabs/SharingTab';
 import WatermarkTab from '../plugin-settings/tabs/WatermarkTab';
 import SEOTab from '../plugin-settings/tabs/SEOTab';
 import ViewPagesTab from '../plugin-settings/tabs/ViewPagesTab';
-import { Button } from '../shared/Button';
 import TabBar from '../shared/TabBar.jsx';
 
 const { __ } = wp.i18n;
@@ -231,26 +230,7 @@ const PluginSettingsPage = () => {
                             />
                         </Panel>
                         <Panel equalBodyPadding>
-                            {/*
-                            * Defaults uses the shared CollectionSettings app, which in
-                            * defaults mode persists by writing hidden inputs into this
-                            * options.php form and submitting via the WordPress Settings
-                            * API. This form is scoped to the Defaults tab only - the
-                            * other tabs save via REST.
-                            *
-                            * The option_page group holds `fotogrids_gallery_defaults`
-                            * alone. options.php writes every option in the posted group,
-                            * passing null for any this form does not carry.
-                            */}
-                            <form method="post" action="options.php" className="fotogrids-defaults-form">
-                                <input type="hidden" name="option_page" value="fotogrids_gallery_defaults" />
-                                <input type="hidden" name="action" value="update" />
-                                <input type="hidden" name="_wpnonce" value={window.fotogridsAdmin?.settingsNonce || ''} />
-                                <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />
-                                <Button type="submit" variant="primary" size="xs">
-                                    {__('Save Defaults', 'fotogrids')}
-                                </Button>
-                            </form>
+                            <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />
                         </Panel>
                     </>
                 );

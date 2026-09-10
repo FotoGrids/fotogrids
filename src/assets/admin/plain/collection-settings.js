@@ -913,40 +913,21 @@ function CollectionSettings() {
 
 		try {
 			if (isDefaultsMode) {
-				// In defaults mode, save to form inputs for WordPress Settings API
-				const form = document.querySelector(
-					'form[action="options.php"]'
+				// Defaults persist over REST through <DefaultsTab>, which
+				// collects these events and drives the save bar. Announce the
+				// change and let it own the write.
+				document.dispatchEvent(
+					new CustomEvent('fotogrids:setting_changed', {
+						detail: {
+							key,
+							value:
+								typeof value === 'object' && value !== null
+									? JSON.stringify(value)
+									: value,
+							scope: 'defaults',
+						},
+					})
 				);
-				if (!form) {
-					console.warn('FotoGrids: Settings form not found');
-					return;
-				}
-
-				let input = form.querySelector(
-					`input[name="fotogrids_gallery_defaults[${key}]"]`
-				);
-
-				if (!input) {
-					input = document.createElement('input');
-					input.type = 'hidden';
-					input.name = `fotogrids_gallery_defaults[${key}]`;
-					form.appendChild(input);
-				}
-
-				if (typeof value === 'object' && value !== null) {
-					input.value = JSON.stringify(value);
-				} else {
-					input.value = value;
-				}
-
-				const customEvent = new CustomEvent(
-					'fotogrids:setting_changed',
-					{
-						bubbles: true,
-						detail: { key, value, input },
-					}
-				);
-				input.dispatchEvent(customEvent);
 			} else {
 				// In gallery mode, save to post meta inputs
 				let input = document.querySelector(

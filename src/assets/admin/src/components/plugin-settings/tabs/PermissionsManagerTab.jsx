@@ -5,6 +5,7 @@ import InfoBlock from '../../shared/InfoBlock';
 import Segmented from '../../shared/Segmented';
 import Tooltip from '../../Tooltip';
 import { Button } from '../../shared/Button';
+import { SaveBar } from '../../shared/settings';
 import Panel from '../../shared/SidebarTabs/elements/Panel';
 import PanelRow from '../../shared/SidebarTabs/elements/PanelRow';
 
@@ -86,6 +87,35 @@ const PermissionsManagerTab = () => {
     const [overrideMatrix, setOverrideMatrix] = useState(null);
     const [overridePanelOne, setOverridePanelOne] = useState(null);
 
+    // With Autosave off these choices are held here until the user saves, so
+    // the controls read through `pending` and fall back to the registry. With
+    // it on, `commit` runs straight away and `pending` never fills up.
+    const [pending, setPending] = useState({ options: {}, simple: {} });
+    const [barSaving, setBarSaving] = useState(false);
+    const [barStatus, setBarStatus] = useState(null);
+
+    const [autosave, setAutosave] = useState(() => {
+        const raw = window.fotogridsAdmin?.autosave;
+        return true === raw || '1' === raw;
+    });
+
+    useEffect(() => {
+        const handleAutosaveChanged = (e) => {
+            if ('boolean' === typeof e.detail?.enabled) {
+                setAutosave(e.detail.enabled);
+            }
+        };
+        document.addEventListener(
+            'fotogrids:autosave_changed',
+            handleAutosaveChanged
+        );
+        return () =>
+            document.removeEventListener(
+                'fotogrids:autosave_changed',
+                handleAutosaveChanged
+            );
+    }, []);
+
     // Pro extension point: Pro replaces the Panel 2 matrix component by
     // calling window.FotoGridsAdmin.permissions.registerMatrixOverride(C).
     // Pro can also augment Panel 1 via registerPanelOverride('simple', C).
@@ -139,28 +169,56 @@ const PermissionsManagerTab = () => {
         return ROLE_LADDER.filter((key) => rolesByKey[key]);
     }, [rolesByKey]);
 
+    const commitOption = useCallback(async (key, value) => {
+        await apiFetch({
+            path: '/fotogrids/v1/permissions/options',
+            method: 'POST',
+            data: { key, value },
+        });
+    }, []);
+
+    const commitSimple = useCallback(async (key, lowestRole) => {
+        await apiFetch({
+            path: '/fotogrids/v1/permissions/simple',
+            method: 'POST',
+            data: { key, lowest_role: lowestRole },
+        });
+    }, []);
+
     const handleOptionChange = useCallback(async (key, value) => {
+        setBarStatus(null);
+
+        if (!autosave) {
+            setPending((prev) => ({
+                ...prev,
+                options: { ...prev.options, [key]: value },
+            }));
+            return;
+        }
+
         try {
-            await apiFetch({
-                path: '/fotogrids/v1/permissions/options',
-                method: 'POST',
-                data: { key, value },
-            });
+            await commitOption(key, value);
             await loadRegistry();
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error('FotoGrids permissions: failed to save option', e);
         }
-    }, [loadRegistry]);
+    }, [autosave, commitOption, loadRegistry]);
 
     const handleSimpleChange = useCallback(async (key, lowestRole) => {
+        setBarStatus(null);
+
+        if (!autosave) {
+            setPending((prev) => ({
+                ...prev,
+                simple: { ...prev.simple, [key]: lowestRole },
+            }));
+            return;
+        }
+
         setSaving((prev) => ({ ...prev, [key]: true }));
         try {
-            await apiFetch({
-                path: '/fotogrids/v1/permissions/simple',
-                method: 'POST',
-                data: { key, lowest_role: lowestRole },
-            });
+            await commitSimple(key, lowestRole);
             await loadRegistry();
         } catch (e) {
             // eslint-disable-next-line no-console
@@ -168,7 +226,36 @@ const PermissionsManagerTab = () => {
         } finally {
             setSaving((prev) => ({ ...prev, [key]: false }));
         }
-    }, [loadRegistry]);
+    }, [autosave, commitSimple, loadRegistry]);
+
+    const pendingCount =
+        Object.keys(pending.options).length + Object.keys(pending.simple).length;
+
+    const handleBarSave = useCallback(async () => {
+        setBarSaving(true);
+        setBarStatus(null);
+        try {
+            for (const [key, value] of Object.entries(pending.options)) {
+                await commitOption(key, value);
+            }
+            for (const [key, role] of Object.entries(pending.simple)) {
+                await commitSimple(key, role);
+            }
+            setPending({ options: {}, simple: {} });
+            await loadRegistry();
+            setBarStatus('saved');
+            setTimeout(() => setBarStatus(null), 3000);
+        } catch (e) {
+            setBarStatus('error');
+        } finally {
+            setBarSaving(false);
+        }
+    }, [pending, commitOption, commitSimple, loadRegistry]);
+
+    const handleBarDiscard = useCallback(() => {
+        setPending({ options: {}, simple: {} });
+        setBarStatus(null);
+    }, []);
 
     if (loading) {
         return (
@@ -216,7 +303,10 @@ const PermissionsManagerTab = () => {
                 >
                     <Segmented
                         ariaLabel={__('Unauthorised settings panels', 'fotogrids')}
-                        value={unauthorisedVisibility}
+                        value={
+                            pending.options.unauthorised_visibility ??
+                            unauthorisedVisibility
+                        }
                         onChange={(v) => handleOptionChange('unauthorised_visibility', v)}
                         options={[
                             { value: 'readonly', label: __('Read-only with notice', 'fotogrids') },
@@ -226,7 +316,9 @@ const PermissionsManagerTab = () => {
                 </PanelRow>
 
                 {registry.simple.map((def) => {
-                    const currentValue = resolveLowestRole(def, rolesByKey);
+                    const currentValue =
+                        pending.simple[def.key] ??
+                        resolveLowestRole(def, rolesByKey);
                     const isCustom = currentValue === 'custom';
                     const isSaving = !!saving[def.key];
                     const selectId = `fg-perm-${def.key}`;
@@ -374,6 +466,18 @@ const PermissionsManagerTab = () => {
             >
                 {renderMatrixPanel()}
             </Panel>
+
+            {/* With Autosave on, each change is already written, so there is
+                nothing for a save bar to do. */}
+            {!autosave && (
+                <SaveBar
+                    dirty={pendingCount > 0}
+                    saving={barSaving}
+                    status={barStatus}
+                    onSave={handleBarSave}
+                    onDiscard={handleBarDiscard}
+                />
+            )}
         </>
     );
 };

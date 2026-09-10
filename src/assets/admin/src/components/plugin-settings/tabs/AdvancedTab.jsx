@@ -114,6 +114,19 @@ const AdvancedTab = () => {
                 : settings;
             setSettings(next);
             setSaved(next);
+
+            // Everything that autosaves reads window.fotogridsAdmin.autosave,
+            // so keep it current and announce the change - otherwise the other
+            // tabs and the gallery editor only notice after a reload.
+            if (window.fotogridsAdmin) {
+                window.fotogridsAdmin.autosave = next.autosave;
+            }
+            document.dispatchEvent(
+                new CustomEvent('fotogrids:autosave_changed', {
+                    detail: { enabled: next.autosave },
+                })
+            );
+
             setStatus('saved');
             setTimeout(() => setStatus(null), 3000);
         } catch (err) {
@@ -131,12 +144,12 @@ const AdvancedTab = () => {
     return (
         <div className="fotogrids-sidebar-tabs__content__inner" key="advanced-content">
             <SettingsPanel
-                title={__('Editor behaviour', 'fotogrids')}
-                description={__('How FotoGrids saves your work in the gallery and album editors.', 'fotogrids')}
+                title={__('Saving', 'fotogrids')}
+                description={__('How FotoGrids saves your work.', 'fotogrids')}
             >
                 <PanelRow
                     title={__('Autosave', 'fotogrids')}
-                    description={__('Saves gallery and album settings changes automatically as you work.', 'fotogrids')}
+                    description={__('Writes every change as you make it - in the gallery and album editors, and on these settings screens. Turn it off to save with a button instead.', 'fotogrids')}
                 >
                     <Toggle
                         id="fotogrids_autosave"
@@ -241,6 +254,7 @@ const AdvancedTab = () => {
                 status={status}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
+                watch={settings}
             />
 
             <Confirm

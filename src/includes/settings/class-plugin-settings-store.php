@@ -205,7 +205,7 @@ final class Plugin_Settings_Store {
 	 */
 	public static function apply_share_statistics_consent( bool $opted_in ): bool {
 		$before_option = get_option( 'fotogrids_share_statistics', null );
-		$update_result = update_option( 'fotogrids_share_statistics', $opted_in );
+		$update_result = self::save_bool( 'fotogrids_share_statistics', $opted_in );
 		$after_option  = get_option( 'fotogrids_share_statistics', null );
 
 		$fs_before = self::probe_freemius_state();
@@ -369,7 +369,7 @@ final class Plugin_Settings_Store {
 	 */
 	public static function apply_marketing_consent( bool $allowed ): bool {
 		$before = (bool) get_option( 'fotogrids_marketing_allowed', false );
-		update_option( 'fotogrids_marketing_allowed', $allowed );
+		self::save_bool( 'fotogrids_marketing_allowed', $allowed );
 
 		// Idempotent: nothing changed, so skip the Freemius API round-trip.
 		if ( $before === $allowed ) {

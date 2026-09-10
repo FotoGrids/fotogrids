@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { loginAsAdmin } from './helpers';
 
 /**
  * Saving one settings tab must not disturb another, and a setting turned off
@@ -22,14 +23,6 @@ const EDITOR_TOGGLE =
 
 test.describe.configure({ mode: 'serial' });
 
-async function loginAsAdmin(page: Page) {
-	await page.goto('/wp-login.php');
-	await page.fill('#user_login', process.env.WP_ADMIN_USER ?? 'admin');
-	await page.fill('#user_pass', process.env.WP_ADMIN_PASS ?? 'password');
-	await page.click('#wp-submit');
-	await page.waitForURL(/\/wp-admin\//, { timeout: 30000 });
-}
-
 /**
  * Open the Advanced tab and wait for its REST read, so assertions see the
  * settled values rather than the first-paint seed.
@@ -51,6 +44,16 @@ async function toggleState(page: Page, id: string) {
 	return toggle.getAttribute('aria-checked');
 }
 
+/** A POST to the advanced-settings endpoint, however it was triggered. */
+function advancedWrite(page: Page) {
+	return page.waitForResponse(
+		(r) =>
+			decodeURIComponent(r.url()).includes(ADVANCED_REST) &&
+			r.request().method() === 'POST',
+		{ timeout: 30000 }
+	);
+}
+
 /** Set Autosave from the Advanced tab and wait for the write to land. */
 async function setAutosave(page: Page, on: boolean) {
 	await openAdvanced(page);
@@ -58,14 +61,14 @@ async function setAutosave(page: Page, on: boolean) {
 	await expect(toggle).toBeVisible({ timeout: 15000 });
 
 	if ((await toggle.getAttribute('aria-checked')) !== String(on)) {
-		const write = page.waitForResponse(
-			(r) =>
-				decodeURIComponent(r.url()).includes(ADVANCED_REST) &&
-				r.request().method() === 'POST',
-			{ timeout: 30000 }
-		);
+		const write = advancedWrite(page);
 		await toggle.click();
-		await page.getByRole('button', { name: /save changes/i }).click();
+		// Pressing Save is harmless when autosave would have fired anyway, and
+		// makes this helper deterministic in both states.
+		const save = page.getByRole('button', { name: /save changes/i });
+		if (await save.isEnabled()) {
+			await save.click();
+		}
 		await write;
 	}
 
@@ -107,6 +110,64 @@ test.describe('settings persistence', () => {
 		);
 	});
 
+	/**
+	 * The point of the setting: a change on a settings screen writes itself,
+	 * with no Save click.
+	 */
+	test('a settings change saves itself when autosave is on', async ({
+		page,
+	}) => {
+		await setAutosave(page, true);
+
+		await openAdvanced(page);
+		const fonts = page.locator('#fotogrids_allow_google_fonts');
+		const before = await fonts.getAttribute('aria-checked');
+
+		const write = advancedWrite(page);
+		await fonts.click();
+		await write;
+
+		await openAdvanced(page);
+		expect(
+			await toggleState(page, 'fotogrids_allow_google_fonts')
+		).not.toBe(before);
+
+		// Put it back, again without touching Save.
+		const restore = advancedWrite(page);
+		await page.locator('#fotogrids_allow_google_fonts').click();
+		await restore;
+	});
+
+	test('a settings change waits for Save when autosave is off', async ({
+		page,
+	}) => {
+		await setAutosave(page, false);
+
+		await openAdvanced(page);
+		const fonts = page.locator('#fotogrids_allow_google_fonts');
+		const before = await fonts.getAttribute('aria-checked');
+		await fonts.click();
+		// Comfortably past the 2s debounce, so a stray autosave would have run.
+		await page.waitForTimeout(6000);
+
+		await openAdvanced(page);
+		expect(await toggleState(page, 'fotogrids_allow_google_fonts')).toBe(
+			before
+		);
+
+		await setAutosave(page, true);
+	});
+
+	test('the defaults tab saves over REST, not through options.php', async ({
+		page,
+	}) => {
+		await page.goto(`${SETTINGS}&tab=defaults`);
+		await expect(page.locator('.fotogrids-save-bar')).toBeVisible({
+			timeout: 20000,
+		});
+		await expect(page.locator('form[action="options.php"]')).toHaveCount(0);
+	});
+
 	test('saving gallery defaults leaves the advanced settings alone', async ({
 		page,
 	}) => {
@@ -121,11 +182,7 @@ test.describe('settings persistence', () => {
 		const saveDefaults = page.getByRole('button', {
 			name: /save defaults/i,
 		});
-		await expect(saveDefaults).toBeVisible({ timeout: 15000 });
-		await saveDefaults.click();
-		await page.waitForURL(/options\.php|page=fotogrids-settings/, {
-			timeout: 30000,
-		});
+		await expect(saveDefaults).toBeVisible({ timeout: 20000 });
 
 		await openAdvanced(page);
 		expect(await toggleState(page, 'fotogrids_autosave')).toBe(

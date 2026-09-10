@@ -258,7 +258,6 @@ class Admin_Init {
 			'fotogridsAdmin',
 			array(
 				'nonce'              => wp_create_nonce( 'fotogrids_admin' ),
-				'settingsNonce'      => wp_create_nonce( 'fotogrids_gallery_defaults-options' ),
 				'restUrl'            => 'fotogrids/v1/',
 				'restNonce'          => wp_create_nonce( 'wp_rest' ),
 				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
@@ -442,20 +441,16 @@ class Admin_Init {
 				'sanitize_callback' => 'rest_sanitize_boolean',
 			)
 		);
-		// Own settings group, deliberately. `options.php` writes every option
-		// registered to the posted group, passing null for any the form omits, so
-		// a group with more than one member silently resets its other options.
-		register_setting(
-			'fotogrids_gallery_defaults',
-			'fotogrids_gallery_defaults',
-			array(
-				'sanitize_callback' => array( __CLASS__, 'sanitize_gallery_defaults' ),
-			)
-		);
 	}
 
 	/**
-	 * Sanitize gallery defaults option
+	 * Sanitize gallery defaults option.
+	 *
+	 * No longer a Settings API callback - collection defaults are written by
+	 * `Admin_Data::save_gallery_defaults()`, which calls this directly. The
+	 * plugin posts no `options.php` form: that route writes every option in the
+	 * posted group, passing null for any the form omits, which silently reset
+	 * the settings the form did not carry.
 	 *
 	 * @param array $input Raw input data
 	 * @return array Sanitized data

@@ -594,6 +594,40 @@ class Admin_Data {
 	 * @param  \WP_REST_Request $request
 	 * @return \WP_REST_Response
 	 */
+	public static function get_gallery_defaults( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return rest_ensure_response(
+			array(
+				'defaults' => (array) get_option( 'fotogrids_gallery_defaults', array() ),
+			)
+		);
+	}
+
+	/**
+	 * Persist collection defaults.
+	 *
+	 * Merges the incoming keys over what is stored rather than replacing the
+	 * option, so a caller that sends one setting does not drop the rest.
+	 *
+	 * POST /wp-json/fotogrids/v1/admin/gallery-defaults
+	 *
+	 * @since  1.1.2
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public static function save_gallery_defaults( $request ): \WP_REST_Response {
+		$incoming = (array) $request->get_param( 'defaults' );
+		$stored   = (array) get_option( 'fotogrids_gallery_defaults', array() );
+
+		$merged = array_merge(
+			$stored,
+			\FotoGrids\Admin_Init::sanitize_gallery_defaults( $incoming )
+		);
+
+		update_option( 'fotogrids_gallery_defaults', $merged );
+
+		return rest_ensure_response( array( 'defaults' => $merged ) );
+	}
+
 	public static function get_advanced_settings( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		return rest_ensure_response(
 			array(

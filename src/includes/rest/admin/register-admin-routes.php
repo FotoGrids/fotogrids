@@ -399,6 +399,30 @@ class Register_Admin_Routes {
 			)
 		);
 
+		// Collection defaults: GET / POST /admin/gallery-defaults
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/gallery-defaults',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_gallery_defaults' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'save_gallery_defaults' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_manage_settings' ),
+					'args'                => array(
+						'defaults' => array(
+							'type'     => 'object',
+							'required' => true,
+						),
+					),
+				),
+			)
+		);
+
 		// Advanced (boolean) settings: GET / POST /admin/advanced-settings
 		register_rest_route(
 			'fotogrids/v1',
