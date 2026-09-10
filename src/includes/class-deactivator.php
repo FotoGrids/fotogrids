@@ -48,8 +48,7 @@ class Deactivator {
 
 		wp_clear_scheduled_hook( \FotoGrids\Hooks\Actions_Cron::CACHE_PURGE );
 		wp_clear_scheduled_hook( \FotoGrids\Hooks\Actions_Cron::STATS_CLEANUP );
-		// Review_Prompt schedules this one under a literal, not the Actions_Cron constant.
-		wp_clear_scheduled_hook( 'fotogrids_send_statistics' );
+		wp_clear_scheduled_hook( \FotoGrids\Hooks\Actions_Cron::SEND_STATISTICS );
 
 		self::clear_transients();
 
