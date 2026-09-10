@@ -277,10 +277,13 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
             onClose={() => setConfirmingClose(false)}
             onConfirm={discardAndClose}
             variant="warning"
+            headerIcon={false}
             title={strings.unsavedChangesTitle}
             message={strings.unsavedChangesConfirm}
             confirmLabel={strings.unsavedChangesDiscard}
+            confirmVariant="secondary"
             cancelLabel={strings.unsavedChangesKeepEditing}
+            cancelVariant="primary"
         />
         </>
     );

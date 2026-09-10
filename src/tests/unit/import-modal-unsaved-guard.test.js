@@ -24,7 +24,7 @@ const STRINGS = {
 	loading: 'Loading',
 	unsavedChangesConfirm: 'You have unsaved changes.',
 	unsavedChangesTitle: 'Discard changes?',
-	unsavedChangesDiscard: 'Discard',
+	unsavedChangesDiscard: 'Discard changes',
 	unsavedChangesKeepEditing: 'Keep editing',
 	uploadFromZipModalTitle: 'Import from ZIP',
 	uploadFromZipUploadAndAdd: 'Upload and add',
@@ -141,7 +141,7 @@ describe('ZipImportModal unsaved guard', () => {
 
 		await selectFiles('fotogrids-zip-upload-input', [zipFile()]);
 		await clickAsync(buttonByText('Cancel'));
-		await clickAsync(buttonByText('Discard'));
+		await clickAsync(buttonByText('Discard changes'));
 
 		expect(onClose).toHaveBeenCalledTimes(1);
 		handle.unmount();
@@ -236,7 +236,7 @@ describe('FolderImportModal unsaved guard', () => {
 
 		await queueLocalFolder();
 		await clickAsync(buttonByText('Cancel'));
-		await clickAsync(buttonByText('Discard'));
+		await clickAsync(buttonByText('Discard changes'));
 
 		expect(onClose).toHaveBeenCalledTimes(1);
 		handle.unmount();
@@ -266,6 +266,28 @@ describe('VideoEmbedModal unsaved guard', () => {
 				strings: STRINGS,
 			})
 		);
+
+	it('presents Keep editing as the primary action and no header icon', async () => {
+		const onClose = jest.fn();
+		const handle = render(onClose);
+
+		changeValue(
+			document.getElementById('fg-embed-url'),
+			'https://www.youtube.com/watch?v=bbbbbbbbbbb'
+		);
+		await clickAsync(buttonByText('Cancel'));
+
+		const dialog = confirmDialog();
+		expect(dialog).toBeTruthy();
+		expect(dialog.querySelector('.fg-confirm__icon')).toBeNull();
+		expect(buttonByText('Keep editing').className).toContain(
+			'fg-button--variant-primary'
+		);
+		expect(buttonByText('Discard changes').className).toContain(
+			'fg-button--variant-secondary'
+		);
+		handle.unmount();
+	});
 
 	it('escapes the dash in the URL pattern so the v flag accepts it', async () => {
 		const onClose = jest.fn();
@@ -351,7 +373,7 @@ describe('VideoEmbedModal unsaved guard', () => {
 			'https://www.youtube.com/watch?v=bbbbbbbbbbb'
 		);
 		await clickAsync(buttonByText('Cancel'));
-		await clickAsync(buttonByText('Discard'));
+		await clickAsync(buttonByText('Discard changes'));
 
 		expect(onClose).toHaveBeenCalledTimes(1);
 		handle.unmount();

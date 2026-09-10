@@ -748,7 +748,7 @@ final class Metabox_Registrar {
 			'unsavedChangesConfirm'               => __( 'You have unsaved changes. Are you sure you want to close without saving?', 'fotogrids' ),
 			'unsavedChangesNavigate'              => __( 'You have unsaved changes. Are you sure you want to navigate away without saving?', 'fotogrids' ),
 			'unsavedChangesTitle'                 => __( 'Discard changes?', 'fotogrids' ),
-			'unsavedChangesDiscard'               => __( 'Discard', 'fotogrids' ),
+			'unsavedChangesDiscard'               => __( 'Discard changes', 'fotogrids' ),
 			'unsavedChangesKeepEditing'           => __( 'Keep editing', 'fotogrids' ),
 			'title'                               => __( 'Title', 'fotogrids' ),
 			'altText'                             => __( 'Alt Text', 'fotogrids' ),
