@@ -140,7 +140,7 @@ final class Lightbox_Slide_Builder {
 				$slide['video_src']      = (string) ( wp_get_attachment_url( $aid ) ?: '' );
 				$slide['embed_provider'] = '';
 				$slide['embed_id']       = '';
-				$slide['embed_settings'] = $custom_data;
+				$slide['embed_settings'] = \FotoGrids\Render\Video\Video_Item_Helpers::playback_settings( $custom_data );
 				$slide['thumb_url']      = $poster;
 				$slide['full_url']       = $poster;
 			}

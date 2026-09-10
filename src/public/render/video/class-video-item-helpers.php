@@ -110,6 +110,27 @@ final class Video_Item_Helpers {
 	}
 
 	/**
+	 * Extract the playback settings from a video item's stored custom_data.
+	 *
+	 * custom_data also carries the poster fields, which the poster resolver
+	 * reads separately; only the playback keys belong in the markup the
+	 * frontend players consume. An absent autoplay or controls value defaults
+	 * to true, matching the item editor.
+	 *
+	 * @since 1.1.2
+	 * @param array<string, mixed> $custom_data Stored item custom_data.
+	 * @return array<string, bool>
+	 */
+	public static function playback_settings( array $custom_data ): array {
+		return array(
+			'autoplay' => ! isset( $custom_data['autoplay'] ) || (bool) $custom_data['autoplay'],
+			'mute'     => ! empty( $custom_data['mute'] ),
+			'loop'     => ! empty( $custom_data['loop'] ),
+			'controls' => ! isset( $custom_data['controls'] ) || (bool) $custom_data['controls'],
+		);
+	}
+
+	/**
 	 * Build the iframe src for an embed item, applying its stored settings.
 	 *
 	 * Uses the privacy-enhanced host (youtube-nocookie / player.vimeo) when
