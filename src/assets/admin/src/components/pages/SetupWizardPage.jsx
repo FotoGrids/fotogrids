@@ -65,17 +65,13 @@ const writeStepToUrl = ( index ) => {
 const SetupWizardPage = () => {
     const [ stepIndex, setStepIndex ] = useState( readStepFromUrl );
 
-    // Persona state is lifted because the shell's Continue button gates
-    // on it. Everything else stays inside its step component. Initial
-    // value comes from the localized PHP payload so the picked card is
-    // preserved across wizard close + reopen.
+    // Seeded from the localized PHP payload so the picked card survives
+    // closing and reopening the wizard.
     const initialPersona = ( window.fotogridsAdmin && window.fotogridsAdmin.userPersona )
         ? String( window.fotogridsAdmin.userPersona )
         : null;
     const [ persona, setPersona ] = useState( initialPersona || null );
 
-    // Persist immediately on pick - the user's last click wins. We
-    // wrap the raw setter so the step component stays presentational.
     const handlePersonaPick = ( id ) => {
         setPersona( id );
         persistSetting( 'fotogrids_user_persona', id );
@@ -122,13 +118,6 @@ const SetupWizardPage = () => {
     const StepComponent = current.component;
     const isLast  = stepIndex === TOTAL;
     const isFirst = stepIndex === 1;
-
-    const continueDisabled = ( () => {
-        if ( current.id === 'persona' ) {
-            return persona === null;
-        }
-        return false;
-    } )();
 
     const renderedStep = ( () => {
         if ( current.id === 'welcome' ) {
@@ -218,7 +207,6 @@ const SetupWizardPage = () => {
                             <Button
                                 variant="primary"
                                 size="md"
-                                disabled={ continueDisabled }
                                 onClick={ isLast ? closeWizard : goNext }
                             >
                                 { isLast ? __( 'Finish', 'fotogrids' ) : __( 'Continue', 'fotogrids' ) }

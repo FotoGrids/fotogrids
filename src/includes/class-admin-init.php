@@ -721,7 +721,7 @@ class Admin_Init {
 	private static function allowed_values_for_string_setting( string $setting ): array {
 		switch ( $setting ) {
 			case 'fotogrids_user_persona':
-				return array( 'developer', 'photographer', 'personal', 'agency', 'business', 'shop' );
+				return array( 'developer', 'photographer', 'blogger', 'agency', 'business_owner', 'online_shop' );
 			case 'fotogrids_settings_mode':
 				return array( 'easy', 'advanced' );
 			default:

@@ -48,6 +48,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-post-types.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-rest.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-statistics.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-usage-reporter.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-object-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-metadata-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-fotogrids-cache.php';
@@ -136,6 +137,7 @@ function fotogrids_init() {
 	FotoGrids\FotoGrids_Cache::init();
 	FotoGrids\License_Manager::init();
 	FotoGrids\Image_Size_Manager::init();
+	FotoGrids\Usage_Reporter::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
 
 	require_once FOTOGRIDS_PLUGIN_DIR . 'includes/diagnostics/class-js-error-endpoint.php';
