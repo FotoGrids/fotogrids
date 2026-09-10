@@ -78,6 +78,16 @@ const selectFiles = async (id, files) => {
 	});
 };
 
+const SUPPORTS_V_FLAG = (() => {
+	try {
+		// eslint-disable-next-line no-new
+		new RegExp('a', 'v');
+		return true;
+	} catch (err) {
+		return false;
+	}
+})();
+
 const zipFile = () => new File(['archive'], 'photos.zip', { type: 'application/zip' });
 const imageFile = () => new File(['binary'], 'shot.jpg', { type: 'image/jpeg' });
 
@@ -257,20 +267,36 @@ describe('VideoEmbedModal unsaved guard', () => {
 			})
 		);
 
-	it('gives the URL field a pattern the v flag accepts', async () => {
+	it('escapes the dash in the URL pattern so the v flag accepts it', async () => {
 		const onClose = jest.fn();
 		const handle = render(onClose);
 
 		const { pattern } = document.getElementById('fg-embed-url');
 		expect(pattern).toBeTruthy();
-		// The pattern attribute compiles with the `v` flag, which treats a
-		// bare '-' inside a character class as a reserved punctuator.
-		expect(() => new RegExp(`^(?:${pattern})$`, 'v')).not.toThrow();
+
+		// The pattern attribute compiles with the `v` flag, which reserves a
+		// bare '-' inside a character class. Node 18 has no `v` flag, so the
+		// character classes are checked directly and the compile is only
+		// asserted on an engine that supports it.
+		const classes = pattern.match(/\[[^\]]*\]/g) || [];
+		expect(classes.length).toBeGreaterThan(0);
+		classes.forEach((characterClass) => {
+			const withoutEscapesAndRanges = characterClass
+				.replace(/\\-/g, '')
+				.replace(/\w-\w/g, '');
+			expect(withoutEscapesAndRanges).not.toContain('-');
+		});
+
 		expect(
-			new RegExp(`^(?:${pattern})$`, 'v').test(
+			new RegExp(`^(?:${pattern})$`, 'u').test(
 				'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 			)
 		).toBe(true);
+
+		if (SUPPORTS_V_FLAG) {
+			expect(() => new RegExp(`^(?:${pattern})$`, 'v')).not.toThrow();
+		}
+
 		handle.unmount();
 	});
 
