@@ -28,7 +28,7 @@ class Usage_Reporter {
 	 *
 	 * @since 1.1.2
 	 */
-	const ENDPOINT = 'https://www.fotogrids.com/wp-json/fotogrids/v1/statistics';
+	const ENDPOINT = 'https://www.fotogrids.com/wp-json/fg-telemetry/v1/report';
 
 	/**
 	 * Option holding the site owner's usage-data consent.
