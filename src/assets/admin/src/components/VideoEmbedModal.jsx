@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Modal } from './shared/Modal';
+import { Modal, useModal } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon        from './shared/Icon.jsx';
 import Toggle      from './shared/Toggle.jsx';
@@ -167,6 +167,22 @@ function editItemToForm( editItem ) {
     };
 }
 
+/**
+ * Serialise the form and its URL draft into a value that can be compared for
+ * equality. Keys are sorted so a re-created form object does not read as a
+ * change on its own.
+ *
+ * @param {Object} form
+ * @param {string} urlDraft
+ * @return {string}
+ */
+function snapshot( form, urlDraft ) {
+    return JSON.stringify( [
+        urlDraft,
+        Object.keys( form ).sort().map( key => [ key, form[ key ] ] ),
+    ] );
+}
+
 const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, strings = {} } ) => {
 
     const isEditing = !! editItem;
@@ -182,6 +198,13 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     // link and options that were already entered for that source.
     const sourceDrafts = useRef( {} );
 
+    // The form as it stood when the modal opened, so an edit-mode prefill is
+    // not mistaken for something the visitor typed.
+    const baseline = useRef( snapshot( DEFAULT_STATE, '' ) );
+    const confirmOpen = useRef( false );
+
+    const modal = useModal();
+
     // Prefill the form when opening in edit mode; reset to defaults on open in
     // add mode. Keyed on the embed's id so re-opening a different embed reloads.
     useEffect( () => {
@@ -189,17 +212,13 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
             return;
         }
         sourceDrafts.current = {};
-        if ( editItem ) {
-            setForm( editItemToForm( editItem ) );
-            setUrlDraft( editItem.embed?.embed_url || '' );
-            setResolveError( '' );
-            setActiveTab( 'link' );
-        } else {
-            setForm( { ...DEFAULT_STATE } );
-            setUrlDraft( '' );
-            setResolveError( '' );
-            setActiveTab( 'link' );
-        }
+        const nextForm = editItem ? editItemToForm( editItem ) : { ...DEFAULT_STATE };
+        const nextUrlDraft = editItem ? ( editItem.embed?.embed_url || '' ) : '';
+        setForm( nextForm );
+        setUrlDraft( nextUrlDraft );
+        setResolveError( '' );
+        setActiveTab( 'link' );
+        baseline.current = snapshot( nextForm, nextUrlDraft );
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ isOpen, editItem?.id ] );
 
@@ -212,12 +231,55 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
         setUrlDraft( '' );
         setResolveError( '' );
         setActiveTab( 'link' );
+        baseline.current = snapshot( DEFAULT_STATE, '' );
     }, [] );
 
-    const handleClose = useCallback( () => {
+    const closeAndReset = useCallback( () => {
         resetForm();
         onClose();
     }, [ onClose, resetForm ] );
+
+    const hasUnsavedWork = snapshot( form, urlDraft ) !== baseline.current;
+
+    /**
+     * Close the modal, asking first when the form has moved since it opened.
+     * Covers the overlay, Esc, the header close button and Cancel, all of
+     * which reach the modal through this handler.
+     */
+    const handleClose = useCallback( async () => {
+        if ( adding ) return;
+
+        if ( ! hasUnsavedWork ) {
+            closeAndReset();
+            return;
+        }
+
+        if ( confirmOpen.current ) return;
+        confirmOpen.current = true;
+
+        let discard = false;
+        try {
+            discard = await modal.warning( {
+                title:        strings.unsavedChangesTitle,
+                message:      strings.unsavedChangesConfirm,
+                confirmLabel: strings.unsavedChangesDiscard,
+                cancelLabel:  strings.unsavedChangesKeepEditing,
+            } );
+        } finally {
+            confirmOpen.current = false;
+        }
+
+        if ( discard ) closeAndReset();
+    }, [
+        adding,
+        hasUnsavedWork,
+        closeAndReset,
+        modal,
+        strings.unsavedChangesTitle,
+        strings.unsavedChangesConfirm,
+        strings.unsavedChangesDiscard,
+        strings.unsavedChangesKeepEditing,
+    ] );
 
     const handleSourceChange = useCallback( ( source ) => {
         if ( source === form.source ) {
@@ -337,13 +399,13 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
             } else {
                 await onAdd( payload );
             }
-            handleClose();
+            closeAndReset();
         } catch ( err ) {
             console.error( '[FotoGrids] VideoEmbedModal: save failed', err );
         } finally {
             setAdding( false );
         }
-    }, [ form, isEditing, editItem, onAdd, onUpdate, handleClose ] );
+    }, [ form, isEditing, editItem, onAdd, onUpdate, closeAndReset ] );
 
     const hasVideo = !! form.videoId;
 

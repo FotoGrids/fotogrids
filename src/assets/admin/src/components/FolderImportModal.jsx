@@ -17,7 +17,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal } from './shared/Modal';
+import { Modal, useModal } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import Checkbox from './shared/Checkbox';
@@ -49,6 +49,9 @@ const FolderImportModal = ({
     const [dragging, setDragging] = useState(false);
 
     const directoryInputRef = useRef(null);
+    const confirmOpen = useRef(false);
+
+    const modal = useModal();
 
     const browser = useUploadsFolderBrowser({
         galleryId,
@@ -165,6 +168,47 @@ const FolderImportModal = ({
 
     const busy = importing || localUpload.uploading;
     const serverError = importError || browser.error;
+    const hasUnsavedWork = selected.length > 0 || localUpload.files.length > 0;
+
+    /**
+     * Close the modal, asking first when files are selected or queued but not
+     * yet imported. Covers the overlay, Esc, the header close button and
+     * Cancel, all of which reach the modal through this handler.
+     */
+    const requestClose = useCallback(async () => {
+        if (busy) return;
+
+        if (!hasUnsavedWork) {
+            onClose?.();
+            return;
+        }
+
+        if (confirmOpen.current) return;
+        confirmOpen.current = true;
+
+        let discard = false;
+        try {
+            discard = await modal.warning({
+                title: strings.unsavedChangesTitle,
+                message: strings.unsavedChangesConfirm,
+                confirmLabel: strings.unsavedChangesDiscard,
+                cancelLabel: strings.unsavedChangesKeepEditing,
+            });
+        } finally {
+            confirmOpen.current = false;
+        }
+
+        if (discard) onClose?.();
+    }, [
+        busy,
+        hasUnsavedWork,
+        modal,
+        onClose,
+        strings.unsavedChangesTitle,
+        strings.unsavedChangesConfirm,
+        strings.unsavedChangesDiscard,
+        strings.unsavedChangesKeepEditing,
+    ]);
 
     const renderServerTab = () => (
         <div className="fotogrids-tab-panel fg-is-active fg-upload-folder-browser">
@@ -281,7 +325,7 @@ const FolderImportModal = ({
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="lg" preventClose={busy}>
+        <Modal isOpen={isOpen} onClose={requestClose} size="lg" preventClose={busy}>
             <Modal.Header>
                 <Modal.HeaderTitle>{strings.uploadFromFolderModalTitle}</Modal.HeaderTitle>
             </Modal.Header>
@@ -312,7 +356,7 @@ const FolderImportModal = ({
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="secondary" onClick={onClose} disabled={busy}>
+                <Button variant="secondary" onClick={requestClose} disabled={busy}>
                     {strings.cancel}
                 </Button>
                 <Button

@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal } from './shared/Modal';
+import { Modal, useModal } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import UploadArea from './blocks/UploadArea';
@@ -80,6 +80,9 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     const [result, setResult] = useState(null);
 
     const inputRef = useRef(null);
+    const confirmOpen = useRef(false);
+
+    const modal = useModal();
 
     useEffect(() => {
         if (!isOpen) {
@@ -91,6 +94,48 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
             setExtracting(false);
         }
     }, [isOpen]);
+
+    const hasUnsavedWork = Boolean(file) && !result;
+
+    /**
+     * Close the modal, asking first when an archive is staged but not yet
+     * imported. Covers the overlay, Esc, the header close button and Cancel,
+     * all of which reach the modal through this handler.
+     */
+    const requestClose = useCallback(async () => {
+        if (busy) return;
+
+        if (!hasUnsavedWork) {
+            onClose?.();
+            return;
+        }
+
+        if (confirmOpen.current) return;
+        confirmOpen.current = true;
+
+        let discard = false;
+        try {
+            discard = await modal.warning({
+                title: strings.unsavedChangesTitle,
+                message: strings.unsavedChangesConfirm,
+                confirmLabel: strings.unsavedChangesDiscard,
+                cancelLabel: strings.unsavedChangesKeepEditing,
+            });
+        } finally {
+            confirmOpen.current = false;
+        }
+
+        if (discard) onClose?.();
+    }, [
+        busy,
+        hasUnsavedWork,
+        modal,
+        onClose,
+        strings.unsavedChangesTitle,
+        strings.unsavedChangesConfirm,
+        strings.unsavedChangesDiscard,
+        strings.unsavedChangesKeepEditing,
+    ]);
 
     const acceptFile = useCallback(
         (candidate) => {
@@ -189,7 +234,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     return (
         <Modal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={requestClose}
             size="md"
             preventClose={busy}
         >
@@ -230,7 +275,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
                     </Button>
                 ) : (
                     <>
-                        <Button variant="secondary" onClick={onClose} disabled={busy}>
+                        <Button variant="secondary" onClick={requestClose} disabled={busy}>
                             {strings.cancel}
                         </Button>
                         <Button
