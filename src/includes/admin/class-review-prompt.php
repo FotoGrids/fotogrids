@@ -5,7 +5,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-use FotoGrids\Hooks\Actions_Cron;
+use FotoGrids\Usage_Reporter;
 /**
  * Admin Footer Review Prompt Class
  *
@@ -20,10 +20,6 @@ class Review_Prompt {
 	public static function init() {
 		add_filter( 'admin_footer_text', array( __CLASS__, 'admin_footer_review' ), 99 );
 		add_action( 'admin_init', array( __CLASS__, 'handle_review_click' ) );
-
-		// Schedule statistics sending if enabled
-		add_action( 'update_option_fotogrids_share_statistics', array( __CLASS__, 'handle_statistics_sharing_change' ), 10, 2 );
-		add_action( Actions_Cron::SEND_STATISTICS, array( __CLASS__, 'send_statistics' ) );
 	}
 
 	/**
@@ -108,9 +104,7 @@ class Review_Prompt {
 
 		update_option( 'fotogrids_review_stats', $stats );
 
-		if ( self::is_statistics_sharing_enabled() ) {
-			self::schedule_statistics_send();
-		}
+		Usage_Reporter::schedule();
 	}
 
 	/**
@@ -132,9 +126,7 @@ class Review_Prompt {
 
 		update_option( 'fotogrids_review_stats', $stats );
 
-		if ( self::is_statistics_sharing_enabled() ) {
-			self::schedule_statistics_send();
-		}
+		Usage_Reporter::schedule();
 	}
 
 	/**
@@ -258,89 +250,5 @@ class Review_Prompt {
 
 		wp_safe_redirect( 'https://wordpress.org/plugins/fotogrids/#reviews' );
 		exit;
-	}
-
-	/**
-	 * Check if statistics sharing is enabled
-	 *
-	 * @return bool True if sharing is enabled
-	 */
-	public static function is_statistics_sharing_enabled() {
-		return (bool) get_option( 'fotogrids_share_statistics', false );
-	}
-
-	/**
-	 * Schedule statistics sending
-	 *
-	 * Uses WordPress transients to throttle sending (once per day)
-	 */
-	public static function schedule_statistics_send() {
-		$last_sent = get_transient( 'fotogrids_stats_last_sent' );
-
-		// Only send once per day
-		if ( false === $last_sent ) {
-			// Schedule for immediate sending (next page load)
-			set_transient( 'fotogrids_stats_last_sent', time(), DAY_IN_SECONDS );
-			wp_schedule_single_event( time() + 10, Actions_Cron::SEND_STATISTICS );
-		}
-	}
-
-	/**
-	 * Handle statistics sharing setting change
-	 *
-	 * @param mixed $old_value Previous value
-	 * @param mixed $new_value New value
-	 */
-	public static function handle_statistics_sharing_change( $old_value, $new_value ) {
-		if ( $new_value ) {
-			// If enabled, send current stats immediately
-			self::send_statistics();
-		} else {
-			// If disabled, clear scheduled sends
-			wp_clear_scheduled_hook( Actions_Cron::SEND_STATISTICS );
-		}
-	}
-
-	/**
-	 * Send statistics to FotoGrids
-	 *
-	 * Sends anonymous review prompt statistics to FotoGrids servers
-	 */
-	public static function send_statistics() {
-		if ( ! self::is_statistics_sharing_enabled() ) {
-			return;
-		}
-
-		$stats = self::get_review_stats();
-
-		if ( empty( $stats ) ) {
-			return;
-		}
-
-		// Prepare anonymous data
-		$data = array(
-			'plugin_version' => FOTOGRIDS_VERSION,
-			'wp_version'     => get_bloginfo( 'version' ),
-			'php_version'    => PHP_VERSION,
-			'site_url'       => home_url(),
-			'stats'          => $stats,
-			'timestamp'      => current_time( 'mysql' ),
-		);
-
-		// Send to FotoGrids API endpoint
-		$response = wp_remote_post(
-			'https://www.fotogrids.com/wp-json/fotogrids/v1/statistics',
-			array(
-				'body'     => wp_json_encode( $data ),
-				'headers'  => array(
-					'Content-Type' => 'application/json',
-				),
-				'timeout'  => 15,
-				'blocking' => false, // Non-blocking request
-			)
-		);
-
-		// Update last sent time
-		set_transient( 'fotogrids_stats_last_sent', time(), DAY_IN_SECONDS );
 	}
 }
