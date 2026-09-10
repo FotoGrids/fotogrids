@@ -281,7 +281,7 @@ class Review_Prompt {
 		if ( false === $last_sent ) {
 			// Schedule for immediate sending (next page load)
 			set_transient( 'fotogrids_stats_last_sent', time(), DAY_IN_SECONDS );
-			wp_schedule_single_event( time() + 10, 'fotogrids_send_statistics' );
+			wp_schedule_single_event( time() + 10, Actions_Cron::SEND_STATISTICS );
 		}
 	}
 
