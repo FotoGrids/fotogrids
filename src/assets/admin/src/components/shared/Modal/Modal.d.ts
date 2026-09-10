@@ -20,6 +20,18 @@ export type ConfirmVariant =
 	| 'danger'
 	| 'success';
 
+export type ButtonVariant =
+	| 'primary'
+	| 'secondary'
+	| 'tertiary'
+	| 'danger'
+	| 'success'
+	| 'warning'
+	| 'accent'
+	| 'ghost'
+	| 'outline'
+	| 'link';
+
 export type ModalCloseReason =
 	| 'overlay'
 	| 'esc'
@@ -40,6 +52,8 @@ interface ModalCommonOptions {
 export interface ConfirmOptions extends ModalCommonOptions {
 	type?: 'confirm';
 	variant?: ConfirmVariant;
+	confirmVariant?: ButtonVariant;
+	cancelVariant?: ButtonVariant;
 	requireText?: string | null;
 	onConfirm?: () => void | Promise<void>;
 }
