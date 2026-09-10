@@ -216,7 +216,7 @@ final class Plugin_Settings_Store {
 				// Passwords must not pass through sanitize_text_field(), which
 				// would strip characters that are valid in a password. Keep the
 				// value as-is; the per-collection save path encrypts it.
-				$sanitized[ $key ] = (string) $value;
+				$sanitized[ $key ] = is_scalar( $value ) ? (string) $value : '';
 			} else {
 				$sanitized[ $key ] = sanitize_text_field( $value );
 			}
