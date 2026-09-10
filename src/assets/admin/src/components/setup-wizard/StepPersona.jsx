@@ -65,7 +65,7 @@ const StepPersona = ( { picked = null, onPick } ) => {
                 { __( 'What best describes you?', 'fotogrids' ) }
             </h1>
             <p className="fotogrids-setup__step-subhead">
-                { __( 'We use this to understand who FotoGrids is being built for. Skip if you’d rather not say.', 'fotogrids' ) }
+                { __( 'We use this to understand who FotoGrids is being built for — shared with us only if usage data is on in Settings. Skip if you’d rather not say.', 'fotogrids' ) }
             </p>
 
             <div
