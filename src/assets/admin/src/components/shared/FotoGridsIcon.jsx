@@ -19,8 +19,8 @@ import React from 'react';
  *                              through verbatim (so `'2em'`, `'100%'`,
  *                              etc. all work). Defaults to 20.
  * - variant: 'full' | 'mono' - `full` uses the canonical brand colours
- *                              (the orange / red / yellow / dark / blue
- *                              mix); `mono` makes every rect use
+ *                              (the blue / red / yellow / dark mix);
+ *                              `mono` makes every rect use
  *                              `currentColor` so the surrounding text
  *                              colour drives tone. Use mono for
  *                              greyscale UI, white-on-dark surfaces,

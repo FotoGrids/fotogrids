@@ -5,6 +5,7 @@ import InfoBlock from '../../shared/InfoBlock';
 import Segmented from '../../shared/Segmented';
 import Tooltip from '../../Tooltip';
 import { Button } from '../../shared/Button';
+import { SaveBar } from '../../shared/settings';
 import Panel from '../../shared/SidebarTabs/elements/Panel';
 import PanelRow from '../../shared/SidebarTabs/elements/PanelRow';
 
@@ -82,9 +83,16 @@ const PermissionsManagerTab = () => {
     const [registry, setRegistry] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [saving, setSaving] = useState({});
     const [overrideMatrix, setOverrideMatrix] = useState(null);
     const [overridePanelOne, setOverridePanelOne] = useState(null);
+
+    // Choices are held here until they are committed, so the controls read
+    // through `pending` and fall back to the registry. The save bar decides
+    // when to commit: on its own debounce with Autosave on, on the button
+    // without. This tab behaves like every other one either way.
+    const [pending, setPending] = useState({ options: {}, simple: {} });
+    const [barSaving, setBarSaving] = useState(false);
+    const [barStatus, setBarStatus] = useState(null);
 
     // Pro extension point: Pro replaces the Panel 2 matrix component by
     // calling window.FotoGridsAdmin.permissions.registerMatrixOverride(C).
@@ -108,8 +116,10 @@ const PermissionsManagerTab = () => {
         return () => document.removeEventListener('fotogrids:admin:permissions:override', onOverride);
     }, []);
 
-    const loadRegistry = useCallback(async () => {
-        setLoading(true);
+    const loadRegistry = useCallback(async ({ silent = false } = {}) => {
+        if (!silent) {
+            setLoading(true);
+        }
         setError(null);
         try {
             const data = await apiFetch({ path: '/fotogrids/v1/permissions/registry' });
@@ -120,7 +130,9 @@ const PermissionsManagerTab = () => {
         } catch (e) {
             setError(e?.message || __('Failed to load permissions.', 'fotogrids'));
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     }, []);
 
@@ -139,36 +151,68 @@ const PermissionsManagerTab = () => {
         return ROLE_LADDER.filter((key) => rolesByKey[key]);
     }, [rolesByKey]);
 
-    const handleOptionChange = useCallback(async (key, value) => {
-        try {
-            await apiFetch({
-                path: '/fotogrids/v1/permissions/options',
-                method: 'POST',
-                data: { key, value },
-            });
-            await loadRegistry();
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('FotoGrids permissions: failed to save option', e);
-        }
-    }, [loadRegistry]);
+    const commitOption = useCallback(async (key, value) => {
+        await apiFetch({
+            path: '/fotogrids/v1/permissions/options',
+            method: 'POST',
+            data: { key, value },
+        });
+    }, []);
 
-    const handleSimpleChange = useCallback(async (key, lowestRole) => {
-        setSaving((prev) => ({ ...prev, [key]: true }));
+    const commitSimple = useCallback(async (key, lowestRole) => {
+        await apiFetch({
+            path: '/fotogrids/v1/permissions/simple',
+            method: 'POST',
+            data: { key, lowest_role: lowestRole },
+        });
+    }, []);
+
+    const handleOptionChange = useCallback((key, value) => {
+        setBarStatus(null);
+        setPending((prev) => ({
+            ...prev,
+            options: { ...prev.options, [key]: value },
+        }));
+    }, []);
+
+    const handleSimpleChange = useCallback((key, lowestRole) => {
+        setBarStatus(null);
+        setPending((prev) => ({
+            ...prev,
+            simple: { ...prev.simple, [key]: lowestRole },
+        }));
+    }, []);
+
+    const pendingCount =
+        Object.keys(pending.options).length + Object.keys(pending.simple).length;
+
+    const handleBarSave = useCallback(async () => {
+        setBarSaving(true);
+        setBarStatus(null);
         try {
-            await apiFetch({
-                path: '/fotogrids/v1/permissions/simple',
-                method: 'POST',
-                data: { key, lowest_role: lowestRole },
-            });
-            await loadRegistry();
+            for (const [key, value] of Object.entries(pending.options)) {
+                await commitOption(key, value);
+            }
+            for (const [key, role] of Object.entries(pending.simple)) {
+                await commitSimple(key, role);
+            }
+            // Refresh without unmounting the panel, and keep the overlay up
+            // until the fresh registry has landed so nothing flickers back.
+            await loadRegistry({ silent: true });
+            setPending({ options: {}, simple: {} });
+            setBarStatus('saved');
+            setTimeout(() => setBarStatus(null), 3000);
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('FotoGrids permissions: failed to save', e);
+            setBarStatus('error');
         } finally {
-            setSaving((prev) => ({ ...prev, [key]: false }));
+            setBarSaving(false);
         }
-    }, [loadRegistry]);
+    }, [pending, commitOption, commitSimple, loadRegistry]);
+
+    const handleBarDiscard = useCallback(() => {
+        setPending({ options: {}, simple: {} });
+        setBarStatus(null);
+    }, []);
 
     if (loading) {
         return (
@@ -216,7 +260,10 @@ const PermissionsManagerTab = () => {
                 >
                     <Segmented
                         ariaLabel={__('Unauthorised settings panels', 'fotogrids')}
-                        value={unauthorisedVisibility}
+                        value={
+                            pending.options.unauthorised_visibility ??
+                            unauthorisedVisibility
+                        }
                         onChange={(v) => handleOptionChange('unauthorised_visibility', v)}
                         options={[
                             { value: 'readonly', label: __('Read-only with notice', 'fotogrids') },
@@ -226,9 +273,11 @@ const PermissionsManagerTab = () => {
                 </PanelRow>
 
                 {registry.simple.map((def) => {
-                    const currentValue = resolveLowestRole(def, rolesByKey);
+                    const currentValue =
+                        pending.simple[def.key] ??
+                        resolveLowestRole(def, rolesByKey);
                     const isCustom = currentValue === 'custom';
-                    const isSaving = !!saving[def.key];
+                    const isSaving = barSaving;
                     const selectId = `fg-perm-${def.key}`;
                     return (
                         <PanelRow
@@ -374,6 +423,15 @@ const PermissionsManagerTab = () => {
             >
                 {renderMatrixPanel()}
             </Panel>
+
+            <SaveBar
+                dirty={pendingCount > 0}
+                saving={barSaving}
+                status={barStatus}
+                onSave={handleBarSave}
+                onDiscard={handleBarDiscard}
+                watch={pending}
+            />
         </>
     );
 };

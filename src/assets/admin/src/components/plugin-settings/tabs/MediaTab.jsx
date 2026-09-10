@@ -297,6 +297,7 @@ const MediaTab = () => {
                 status={status}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
+                watch={settings}
                 extraAction={
                     <Button href={regenUrl} variant="secondary" size="xs">
                         {__('Regenerate thumbnails', 'fotogrids')}
