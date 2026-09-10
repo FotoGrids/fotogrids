@@ -745,7 +745,7 @@ final class Metabox_Registrar {
 			'errorLoadingItem'                    => __( 'Error loading item data', 'fotogrids' ),
 			'errorSaving'                         => __( 'Error saving item data. Please try again', 'fotogrids' ),
 			'itemSavedSuccessfully'               => __( 'Item saved successfully!', 'fotogrids' ),
-			'unsavedChangesConfirm'               => __( 'You have unsaved changes. Are you sure you want to close without saving?', 'fotogrids' ),
+			'unsavedChangesConfirm'               => __( "You have unsaved changes.\nAre you sure you want to close without saving?", 'fotogrids' ),
 			'unsavedChangesNavigate'              => __( 'You have unsaved changes. Are you sure you want to navigate away without saving?', 'fotogrids' ),
 			'unsavedChangesTitle'                 => __( 'Discard changes?', 'fotogrids' ),
 			'unsavedChangesDiscard'               => __( 'Discard changes', 'fotogrids' ),
