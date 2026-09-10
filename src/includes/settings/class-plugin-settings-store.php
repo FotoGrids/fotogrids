@@ -168,6 +168,62 @@ final class Plugin_Settings_Store {
 	}
 
 	/**
+	 * Sanitise a map of collection defaults.
+	 *
+	 * Keys not in the resolved defaults are dropped, and each value is coerced
+	 * to the shape its default declares. Lives here rather than in `Admin_Init`
+	 * because the REST write path runs outside `is_admin()`, where that class is
+	 * never loaded.
+	 *
+	 * @param  mixed $input Raw map of setting key => value.
+	 * @return array<string, mixed>
+	 */
+	public static function sanitize_collection_defaults( $input ): array {
+		if ( ! is_array( $input ) ) {
+			return array();
+		}
+
+		$defaults  = \FotoGrids\Collection_Defaults::resolve_gallery();
+		$sanitized = array();
+
+		foreach ( $defaults as $key => $default_value ) {
+			if ( ! isset( $input[ $key ] ) ) {
+				continue;
+			}
+
+			$value = $input[ $key ];
+
+			if ( is_array( $default_value ) ) {
+				if ( is_string( $value ) ) {
+					$decoded = json_decode( stripslashes( $value ), true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $decoded );
+					} else {
+						$sanitized[ $key ] = $default_value;
+					}
+				} elseif ( is_array( $value ) ) {
+					$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $value );
+				} else {
+					$sanitized[ $key ] = $default_value;
+				}
+			} elseif ( is_bool( $default_value ) ) {
+				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
+			} elseif ( is_numeric( $default_value ) ) {
+				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
+			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
+				// Passwords must not pass through sanitize_text_field(), which
+				// would strip characters that are valid in a password. Keep the
+				// value as-is; the per-collection save path encrypts it.
+				$sanitized[ $key ] = (string) $value;
+			} else {
+				$sanitized[ $key ] = sanitize_text_field( $value );
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
 	 * Persist a boolean option as the string '1' or '0'.
 	 *
 	 * `update_option()` returns early when the new value matches the current

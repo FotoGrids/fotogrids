@@ -443,62 +443,6 @@ class Admin_Init {
 		);
 	}
 
-	/**
-	 * Sanitize gallery defaults option.
-	 *
-	 * No longer a Settings API callback - collection defaults are written by
-	 * `Admin_Data::save_gallery_defaults()`, which calls this directly. The
-	 * plugin posts no `options.php` form: that route writes every option in the
-	 * posted group, passing null for any the form omits, which silently reset
-	 * the settings the form did not carry.
-	 *
-	 * @param array $input Raw input data
-	 * @return array Sanitized data
-	 */
-	public static function sanitize_gallery_defaults( $input ) {
-		if ( ! is_array( $input ) ) {
-			return array();
-		}
-
-		$defaults  = \FotoGrids\Collection_Defaults::resolve_gallery();
-		$sanitized = array();
-
-		foreach ( $defaults as $key => $default_value ) {
-			if ( ! isset( $input[ $key ] ) ) {
-				continue;
-			}
-
-			$value = $input[ $key ];
-
-			if ( is_array( $default_value ) ) {
-				if ( is_string( $value ) ) {
-					$decoded = json_decode( stripslashes( $value ), true );
-					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
-						$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $decoded );
-					} else {
-						$sanitized[ $key ] = $default_value;
-					}
-				} elseif ( is_array( $value ) ) {
-					$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $value );
-				} else {
-					$sanitized[ $key ] = $default_value;
-				}
-			} elseif ( is_bool( $default_value ) ) {
-				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
-			} elseif ( is_numeric( $default_value ) ) {
-				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
-			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
-				// Passwords must not pass through sanitize_text_field(), which
-				// would strip characters that are valid in a password. Keep the
-				// value as-is; the per-collection save path encrypts it.
-				$sanitized[ $key ] = (string) $value;
-			} else {
-				$sanitized[ $key ] = sanitize_text_field( $value );
-			}
-		}
-
-		return $sanitized;
-	}
 
 	/**
 	 * Return default values for general settings.

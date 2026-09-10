@@ -229,9 +229,7 @@ const PluginSettingsPage = () => {
                                 onTabChange={ handleSubTabChange }
                             />
                         </Panel>
-                        <Panel equalBodyPadding>
-                            <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />
-                        </Panel>
+                        <DefaultsTab key={activeDefaultsSubTab} type={activeDefaultsSubTab} />
                     </>
                 );
             case 'view_pages':

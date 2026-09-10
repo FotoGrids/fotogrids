@@ -620,7 +620,7 @@ class Admin_Data {
 
 		$merged = array_merge(
 			$stored,
-			\FotoGrids\Admin_Init::sanitize_gallery_defaults( $incoming )
+			\FotoGrids\Settings\Plugin_Settings_Store::sanitize_collection_defaults( $incoming )
 		);
 
 		update_option( 'fotogrids_gallery_defaults', $merged );

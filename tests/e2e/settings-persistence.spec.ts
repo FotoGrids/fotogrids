@@ -168,6 +168,73 @@ test.describe('settings persistence', () => {
 		await expect(page.locator('form[action="options.php"]')).toHaveCount(0);
 	});
 
+	/**
+	 * Drives the same event the settings panel dispatches, then saves for real.
+	 * The REST write runs outside is_admin(), so a class the endpoint reaches
+	 * for has to exist there - which is the shape of failure this catches.
+	 */
+	test('a defaults change round-trips through the endpoint', async ({
+		page,
+	}) => {
+		await page.goto(`${SETTINGS}&tab=defaults`);
+		await expect(page.locator('.fotogrids-save-bar')).toBeVisible({
+			timeout: 20000,
+		});
+
+		const value = String(4 + (Date.now() % 20));
+		await page.evaluate((v) => {
+			document.dispatchEvent(
+				new CustomEvent('fotogrids:setting_changed', {
+					detail: {
+						key: 'featured_show_all_radius',
+						value: v,
+						scope: 'defaults',
+					},
+				})
+			);
+		}, value);
+
+		const message = page.locator('.fotogrids-save-bar__message').first();
+		await expect(message).toContainText(/unsaved changes/i);
+
+		await page.getByRole('button', { name: /save defaults/i }).click();
+		await expect(message).toContainText(/all changes saved/i, {
+			timeout: 20000,
+		});
+
+		// Read it back from the server rather than trusting the bar.
+		const stored = await page.evaluate(async () =>
+			window.wp.apiFetch({
+				path: '/fotogrids/v1/admin/gallery-defaults',
+			})
+		);
+		expect(stored.defaults.featured_show_all_radius).toBe(value);
+	});
+
+	test('the defaults save bar sits where the other tabs put it', async ({
+		page,
+	}) => {
+		const parentClass = async (url: string) => {
+			await page.goto(url);
+			const bar = page.locator('.fotogrids-save-bar');
+			await expect(bar).toBeVisible({ timeout: 20000 });
+			return bar.evaluate((el) => el.parentElement?.className ?? '');
+		};
+
+		const advanced = await parentClass(`${SETTINGS}&tab=advanced`);
+		const defaults = await parentClass(`${SETTINGS}&tab=defaults`);
+
+		expect(advanced).toContain('fotogrids-sidebar-tabs__content__inner');
+		expect(defaults).toBe(advanced);
+	});
+
+	test('permissions manager shows a save bar', async ({ page }) => {
+		await page.goto(`${SETTINGS}&tab=permissions_manager`);
+		await expect(page.locator('.fotogrids-save-bar')).toBeVisible({
+			timeout: 20000,
+		});
+	});
+
 	test('saving gallery defaults leaves the advanced settings alone', async ({
 		page,
 	}) => {

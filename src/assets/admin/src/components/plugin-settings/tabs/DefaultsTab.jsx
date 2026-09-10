@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import apiFetch from '@wordpress/api-fetch';
-import { SaveBar } from '../../shared/settings';
+import { Panel, SaveBar } from '../../shared/settings';
 
 const { __ } = wp.i18n;
 
@@ -135,8 +135,10 @@ const DefaultsTab = ({ type = 'gallery' }) => {
     const keyValue = `${type}-defaults-content`;
 
     return (
-        <div key={keyValue}>
-            <div id={containerId} ref={containerRef}></div>
+        <div className="fotogrids-sidebar-tabs__content__inner" key={keyValue}>
+            <Panel equalBodyPadding>
+                <div id={containerId} ref={containerRef}></div>
+            </Panel>
             <SaveBar
                 dirty={Object.keys(pending).length > 0}
                 saving={saving}

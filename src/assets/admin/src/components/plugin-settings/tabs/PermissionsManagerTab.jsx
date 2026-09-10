@@ -467,17 +467,16 @@ const PermissionsManagerTab = () => {
                 {renderMatrixPanel()}
             </Panel>
 
-            {/* With Autosave on, each change is already written, so there is
-                nothing for a save bar to do. */}
-            {!autosave && (
-                <SaveBar
-                    dirty={pendingCount > 0}
-                    saving={barSaving}
-                    status={barStatus}
-                    onSave={handleBarSave}
-                    onDiscard={handleBarDiscard}
-                />
-            )}
+            {/* With Autosave on nothing ever goes dirty here, because each
+                change is written as it is made - the bar stays as the status
+                readout every other tab shows. */}
+            <SaveBar
+                dirty={pendingCount > 0}
+                saving={barSaving}
+                status={barStatus}
+                onSave={handleBarSave}
+                onDiscard={autosave ? undefined : handleBarDiscard}
+            />
         </>
     );
 };
