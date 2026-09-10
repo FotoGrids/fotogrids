@@ -7,6 +7,7 @@ use FotoGrids\Hooks\Actions_Cache;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Hooks\Actions_Item;
 use FotoGrids\Hooks\Filters_Cache;
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Render\Sorters\Random\Random_Sorter;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -94,6 +95,7 @@ class FotoGrids_Cache {
 		add_action( Actions_Item::ADDED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( Actions_Item::REMOVED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( Actions_Item::META_UPDATED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
+		add_action( 'edit_attachment', array( __CLASS__, 'on_attachment_edit' ), 10, 1 );
 		add_action( Actions_Gallery::REORDERED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
@@ -121,6 +123,20 @@ class FotoGrids_Cache {
 	 */
 	public static function on_gallery_mutation( $gallery_id ): void {
 		self::flush_for_gallery( (int) $gallery_id );
+	}
+
+	/**
+	 * Flush every gallery containing an attachment that was just edited.
+	 *
+	 * Covers both the item editor (which updates the attachment post) and an
+	 * edit made directly in the WordPress media modal.
+	 *
+	 * @since  1.1.2
+	 * @param  int|mixed $attachment_id
+	 * @return void
+	 */
+	public static function on_attachment_edit( $attachment_id ): void {
+		self::flush_for_item( (int) $attachment_id );
 	}
 
 	// -------------------------------------------------------------------------
@@ -244,6 +260,23 @@ class FotoGrids_Cache {
 		}
 
 		return false !== $result;
+	}
+
+	/**
+	 * Flush every cached render that contains a given item.
+	 *
+	 * Item data (title, alt, caption, credit, EXIF, structured metadata) is
+	 * stored per item rather than per gallery, so one edit invalidates every
+	 * gallery the item appears in.
+	 *
+	 * @since  1.1.2
+	 * @param  int $item_id Item ID (attachment or embed post).
+	 * @return void
+	 */
+	public static function flush_for_item( int $item_id ): void {
+		foreach ( Gallery_Repository::find_galleries_for_item( $item_id ) as $gallery_id ) {
+			self::flush_for_gallery( $gallery_id );
+		}
 	}
 
 	/**

@@ -190,6 +190,44 @@ final class Gallery_Repository {
 	}
 
 	/**
+	 * Find every gallery whose item list contains the given item.
+	 *
+	 * Membership is a JSON array in the `fotogrids_gallery_items` post meta,
+	 * so the LIKE only narrows the candidate rows; each candidate is decoded
+	 * and checked for an exact id match.
+	 *
+	 * @since 1.1.2
+	 * @param int $item_id Item ID (attachment or embed post).
+	 * @return int[] Gallery post IDs, in no particular order.
+	 */
+	public static function find_galleries_for_item( int $item_id ): array {
+		if ( $item_id <= 0 ) {
+			return array();
+		}
+
+		global $wpdb;
+
+		$rows = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post_id FROM {$wpdb->postmeta}
+             WHERE meta_key = 'fotogrids_gallery_items'
+               AND meta_value LIKE %s",
+				'%' . $wpdb->esc_like( (string) $item_id ) . '%'
+			)
+		);
+
+		$gallery_ids = array();
+		foreach ( (array) $rows as $gallery_id ) {
+			$ids = self::get_item_ids( (int) $gallery_id );
+			if ( in_array( $item_id, $ids, true ) ) {
+				$gallery_ids[] = (int) $gallery_id;
+			}
+		}
+
+		return $gallery_ids;
+	}
+
+	/**
 	 * Find which gallery an embed post belongs to, by scanning item lists.
 	 *
 	 * Embeds are one-per-gallery, so this returns the first gallery whose item
@@ -200,25 +238,9 @@ final class Gallery_Repository {
 	 * @return int Gallery ID, or 0 when none references it.
 	 */
 	public static function find_gallery_for_embed( int $embed_id ): int {
-		global $wpdb;
+		$gallery_ids = self::find_galleries_for_item( $embed_id );
 
-		$rows = $wpdb->get_col(
-			$wpdb->prepare(
-				"SELECT post_id FROM {$wpdb->postmeta}
-             WHERE meta_key = 'fotogrids_gallery_items'
-               AND meta_value LIKE %s",
-				'%' . $wpdb->esc_like( (string) $embed_id ) . '%'
-			)
-		);
-
-		foreach ( (array) $rows as $gallery_id ) {
-			$ids = self::get_item_ids( (int) $gallery_id );
-			if ( in_array( $embed_id, $ids, true ) ) {
-				return (int) $gallery_id;
-			}
-		}
-
-		return 0;
+		return $gallery_ids[0] ?? 0;
 	}
 
 	/**
