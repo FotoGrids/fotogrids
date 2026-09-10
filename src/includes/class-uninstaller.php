@@ -50,6 +50,8 @@ class Uninstaller {
 			return;
 		}
 
+		self::remove_cpt_posts();
+
 		// Let lifecycle modules drop the tables/options they own before the
 		// core cleanup runs. Guarded: if the registry is not loaded in this
 		// uninstall request, the blanket option/postmeta cleanup below still
@@ -186,25 +188,43 @@ class Uninstaller {
 	}
 
 	/**
-	 * Remove custom post type posts
-	 * This will be called automatically by WordPress when CPTs are unregistered
+	 * Delete every gallery, album and embed post.
+	 *
+	 * WordPress leaves posts of an unregistered post type in place, and the
+	 * FotoGrids post types are not registered during the uninstall request, so
+	 * the rows are collected with a direct query instead of WP_Query. That
+	 * query carries no status filter: `post_status => 'any'` excludes trashed
+	 * and auto-draft posts. Each row is removed with wp_delete_post() so core
+	 * and third-party `before_delete_post` listeners clear their own data.
+	 *
+	 * @return void
 	 */
 	private static function remove_cpt_posts() {
-		$post_types = array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' );
+		global $wpdb;
 
-		foreach ( $post_types as $post_type ) {
-			$posts = get_posts(
-				array(
-					'post_type'   => $post_type,
-					'numberposts' => -1,
-					'post_status' => 'any',
-				)
-			);
+		$post_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts}
+                 WHERE post_type IN ( %s, %s, %s )",
+				'fotogrids_gallery',
+				'fotogrids_album',
+				'fotogrids_embed'
+			)
+		);
 
-			foreach ( $posts as $post ) {
-				wp_delete_post( $post->ID, true );
-			}
+		if ( empty( $post_ids ) ) {
+			return;
 		}
+
+		wp_defer_term_counting( true );
+		wp_suspend_cache_invalidation( true );
+
+		foreach ( $post_ids as $post_id ) {
+			wp_delete_post( (int) $post_id, true );
+		}
+
+		wp_suspend_cache_invalidation( false );
+		wp_defer_term_counting( false );
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
