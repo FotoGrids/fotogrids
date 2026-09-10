@@ -288,7 +288,7 @@ Freemius privacy policy: https://freemius.com/privacy/
 
 2. **FotoGrids usage statistics** (optional, off by default)
 
-If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes a random identifier created when the plugin is activated, plugin version, WordPress version, PHP version, your answer to the setup wizard's "What best describes you?" question, and counts of how often the review prompt was shown. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
+If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes a random identifier created when the plugin is activated, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
