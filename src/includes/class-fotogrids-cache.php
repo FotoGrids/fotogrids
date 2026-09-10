@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids;
 
 use FotoGrids\Hooks\Actions_Cache;
+use FotoGrids\Hooks\Actions_Cron;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Hooks\Actions_Item;
 use FotoGrids\Hooks\Filters_Cache;
@@ -98,6 +99,23 @@ class FotoGrids_Cache {
 		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::IMPORTED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
+
+		add_action( 'init', array( __CLASS__, 'init_purge_schedule' ) );
+		add_action( Actions_Cron::CACHE_PURGE, array( __CLASS__, 'purge_expired' ) );
+	}
+
+	/**
+	 * Ensure the expired-row purge is on the schedule.
+	 *
+	 * Runs daily: cache_duration defaults to 24 hours, with a one-hour floor.
+	 *
+	 * @since  1.1.2
+	 * @return void
+	 */
+	public static function init_purge_schedule(): void {
+		if ( ! wp_next_scheduled( Actions_Cron::CACHE_PURGE ) ) {
+			wp_schedule_event( time(), 'daily', Actions_Cron::CACHE_PURGE );
+		}
 	}
 
 	// -------------------------------------------------------------------------
@@ -343,7 +361,7 @@ class FotoGrids_Cache {
 	/**
 	 * Delete all expired rows from the cache table.
 	 *
-	 * Intended for use in a scheduled cleanup hook.
+	 * Runs on the Actions_Cron::CACHE_PURGE schedule.
 	 *
 	 * @since  1.0.0
 	 * @return int Number of rows deleted.
