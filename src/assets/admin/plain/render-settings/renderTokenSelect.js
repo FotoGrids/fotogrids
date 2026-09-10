@@ -46,14 +46,19 @@ const TokenSelectComponent = ({
 
 	const serializeValue = (arr) => JSON.stringify(arr);
 
+	// A setting declaring `api_endpoint` resolves its options over REST; one
+	// without it resolves to its static `options` synchronously.
+	const { options: resolvedOptions, loading: optionsLoading } =
+		window.FotoGridsDynamicOptions.useDynamicOptions(setting);
+
 	// Options - filter isGlobalDefault in defaults mode (same as button_group),
 	// then drop any option whose per-option `condition` evaluates false against
 	// the current settings. Per-option conditions let us hide dropdown choices
 	// that only make sense when another setting is on (e.g. an "Embedded"
 	// placement that requires AJAX navigation to be on).
 	const baseOptions = isDefaultsMode
-		? (setting.options || []).filter((o) => !o.isGlobalDefault)
-		: setting.options || [];
+		? resolvedOptions.filter((o) => !o.isGlobalDefault)
+		: resolvedOptions;
 	const allOptions = baseOptions.filter((option) => {
 		if (!option || !option.condition) return true;
 		if (typeof isOptionVisible !== 'function') return true;
@@ -85,13 +90,19 @@ const TokenSelectComponent = ({
 	// not remove without re-enabling the gating setting) a chip whose option
 	// is no longer in the dropdown.
 	useEffect(() => {
+		// Never prune against an option list that has not resolved yet - for a
+		// setting fetching its options, that would wipe the saved selection
+		// before the request lands.
+		if (optionsLoading || allOptions.length === 0) {
+			return;
+		}
 		const visibleValues = new Set(allOptions.map((o) => o.value));
 		const pruned = selectedValues.filter((v) => visibleValues.has(v));
 		if (pruned.length !== selectedValues.length) {
 			setSelectedValues(pruned);
 			updateSetting(setting.key, serializeValue(pruned));
 		}
-	}, [allOptions.map((o) => o.value).join('|')]);
+	}, [allOptions.map((o) => o.value).join('|'), optionsLoading]);
 
 	const settingState =
 		typeof getFieldState === 'function'

@@ -261,6 +261,32 @@ class Admin_Data {
 	}
 
 	/**
+	 * Get the EXIF field vocabulary as picker options.
+	 *
+	 * Backs the `exif_fields` gallery setting and the item editor's EXIF tab,
+	 * so both name the same fields as `Exif_Extractor` reads.
+	 *
+	 * @since 1.2.0
+	 * @param \WP_REST_Request $request Request object
+	 * @return \WP_REST_Response|\WP_Error Response object
+	 */
+	public static function get_exif_fields( $request ) {
+		unset( $request );
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
+		}
+
+		return rest_ensure_response(
+			array(
+				'fields'  => \FotoGrids\Exif\Exif_Fields::as_options(),
+				'groups'  => \FotoGrids\Exif\Exif_Fields::GROUPS,
+				'default' => \FotoGrids\Exif\Exif_Fields::DEFAULT_FIELDS,
+			)
+		);
+	}
+
+	/**
 	 * Get WordPress image sizes
 	 *
 	 * @param \WP_REST_Request $request Request object

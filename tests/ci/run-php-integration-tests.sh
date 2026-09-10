@@ -18,6 +18,7 @@ fi
 
 tests=(
     "${plugin_root}/tests/integration/CatalogFieldStatesEndpointTest.php"
+    "${plugin_root}/tests/integration/ExifFieldVocabularyTest.php"
     "${plugin_root}/tests/integration/HookFiringOrderTest.php"
     "${plugin_root}/tests/integration/PreviewEndpointTest.php"
     "${plugin_root}/tests/integration/PublicRenderParityTest.php"

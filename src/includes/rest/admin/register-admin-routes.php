@@ -175,6 +175,19 @@ class Register_Admin_Routes {
 			)
 		);
 
+		// Get the EXIF field vocabulary: GET /admin/exif-fields
+		register_rest_route(
+			'fotogrids/v1',
+			'/admin/exif-fields',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( '\FotoGrids\REST\Admin\Admin_Data', 'get_exif_fields' ),
+					'permission_callback' => array( '\FotoGrids\REST\Admin\Admin_Permissions', 'check_edit_posts' ),
+				),
+			)
+		);
+
 		// Get WordPress image sizes: GET /admin/image-sizes
 		register_rest_route(
 			'fotogrids/v1',

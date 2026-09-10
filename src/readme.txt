@@ -53,7 +53,7 @@ Click any image to open a full-screen fully-customizable lightbox with swipe ges
 
 * **Sorting** - order items by date, title, filename, manually, or at random.
 * **Filtering** - let visitors filter a gallery by tag, person (Pro), or location (Pro), right on the page.
-* **EXIF details** - capture and display camera, lens, aperture, and shutter data from your originals.
+* **EXIF details** - capture and display camera, lens, aperture, shutter speed, ISO, focal length, flash, white balance, metering, exposure and GPS data from your originals. Pick which fields a gallery shows, and in what order.
 
 = 🖱️ Effortless by design =
 
@@ -172,6 +172,8 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 = 1.1.1 =
 
 **New**
+
+* **Every EXIF field your camera writes, not four.** FotoGrids read camera, aperture, shutter speed and ISO, and nothing else - lens was listed in this readme but never actually read, and the item editor's EXIF tab showed eight boxes that could never fill in. It now reads lens, focal length (and its 35mm equivalent), exposure compensation, exposure program and mode, metering mode, flash, white balance, date taken, orientation, color space, software, artist, copyright and GPS coordinates as well. A gallery's Exif tab replaces its four checkboxes with one list: pick the fields you want and drag them into the order the lightbox should show them in.
 
 * **Editable gallery and album addresses.** View pages were fixed at `/fotogrids/gallery/{slug}` and `/fotogrids/album/{slug}`, and the only way to change them was to write a filter. Settings > View Pages now has an editable prefix and one segment per collection type, each with a live preview of the resulting address. Any of the three may be empty, so `example.com/{slug}` is reachable. The base is validated on save against existing pages and posts, the rewrite slugs of other post types and taxonomies, and the roots WordPress reserves for itself; a collision is rejected with the conflicting owner named rather than saved. Addresses built on the old base, or ending in a collection ID rather than a slug, redirect to the current permalink.
 * **Add items from a folder or a ZIP.** The Add New menu's From Folder and From ZIP entries now work. From Folder browses your uploads directory on the server, with breadcrumbs, sub-folder image counts and per-file selection; files already in the Media Library are reused and the rest are registered where they sit, so nothing on disk is copied, moved or deleted. From my computer uploads a whole folder from your machine, and From ZIP imports the images out of an archive.

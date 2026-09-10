@@ -15,20 +15,13 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
         }
     };
 
-    const exifFields = [
-        { key: 'camera', label: strings.camera || '', type: 'text' },
-        { key: 'aperture', label: strings.aperture || '', type: 'text' },
-        { key: 'shutter_speed', label: strings.shutterSpeed || '', type: 'text' },
-        { key: 'iso', label: strings.iso || '', type: 'text' },
-        { key: 'lens', label: strings.lens || '', type: 'text' },
-        { key: 'focal_length', label: strings.focalLength || '', type: 'text' },
-        { key: 'date_taken', label: strings.dateTaken || '', type: 'text' },
-        { key: 'copyright', label: strings.copyright || '', type: 'text' },
-        { key: 'orientation', label: strings.orientation || '', type: 'text' },
-        { key: 'flash', label: strings.flash || '', type: 'text' },
-        { key: 'white_balance', label: strings.whiteBalance || '', type: 'text' },
-        { key: 'exposure_mode', label: strings.exposureMode || '', type: 'text' }
-    ];
+    // The EXIF field vocabulary, from the same registry the extractor reads.
+    const exifFields = Array.isArray(strings.exifFields)
+        ? strings.exifFields.map((field) => ({
+              key: field.value,
+              label: field.label || field.value
+          }))
+        : [];
 
     const exifData = formData?.exif || {};
 
@@ -43,7 +36,7 @@ const TabEXIF = ({ formData, handleInputChange, strings = {}, disabled = false }
                         layout="column"
                     >
                         <input
-                            type={field.type}
+                            type="text"
                             id={`fotogrids-exif-${field.key}`}
                             value={exifData[field.key] || ''}
                             onChange={(e) => {

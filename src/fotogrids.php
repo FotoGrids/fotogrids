@@ -104,6 +104,9 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-registrar.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoints.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-collection-save-pipeline.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-fields.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-formatter.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-reader.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-extractor.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/albums/class-album-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-array-field.php';
