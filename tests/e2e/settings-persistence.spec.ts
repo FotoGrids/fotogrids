@@ -235,6 +235,56 @@ test.describe('settings persistence', () => {
 		});
 	});
 
+	/**
+	 * It used to POST on every change and reload the whole panel, which felt
+	 * nothing like the other tabs. A change must now go dirty, wait out the
+	 * debounce, then commit - and the panel must stay mounted throughout.
+	 */
+	test('permissions manager debounces like the other tabs', async ({
+		page,
+	}) => {
+		await setAutosave(page, true);
+		await page.goto(`${SETTINGS}&tab=permissions_manager`);
+
+		const message = page.locator('.fotogrids-save-bar__message').first();
+		await expect(message).toBeVisible({ timeout: 20000 });
+
+		const writes: string[] = [];
+		page.on('request', (r) => {
+			const url = decodeURIComponent(r.url());
+			if ('POST' === r.method() && url.includes('/permissions/')) {
+				writes.push(url);
+			}
+		});
+
+		const select = page
+			.locator('.fg-rpm__panel select, select[id^="fg-perm-"]')
+			.first();
+		await expect(select).toBeVisible({ timeout: 20000 });
+		const options = await select
+			.locator('option:not([value="__custom__"])')
+			.evaluateAll((els: HTMLOptionElement[]) =>
+				els.map((el) => el.value)
+			);
+		const current = await select.inputValue();
+		const next = options.find((v) => v && v !== current);
+		test.skip(!next, 'no alternative role to switch to');
+
+		await select.selectOption(next as string);
+
+		// Nothing may have gone out yet, and the panel must still be there.
+		expect(writes).toHaveLength(0);
+		await expect(message).toContainText(/unsaved changes/i);
+		await expect(select).toBeVisible();
+
+		await expect(message).toContainText(/all changes saved/i, {
+			timeout: 20000,
+		});
+		expect(writes.length).toBeGreaterThan(0);
+		// The panel was never swapped out for the loading state.
+		await expect(select).toBeVisible();
+	});
+
 	test('saving gallery defaults leaves the advanced settings alone', async ({
 		page,
 	}) => {

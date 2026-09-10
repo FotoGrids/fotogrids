@@ -83,38 +83,16 @@ const PermissionsManagerTab = () => {
     const [registry, setRegistry] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [saving, setSaving] = useState({});
     const [overrideMatrix, setOverrideMatrix] = useState(null);
     const [overridePanelOne, setOverridePanelOne] = useState(null);
 
-    // With Autosave off these choices are held here until the user saves, so
-    // the controls read through `pending` and fall back to the registry. With
-    // it on, `commit` runs straight away and `pending` never fills up.
+    // Choices are held here until they are committed, so the controls read
+    // through `pending` and fall back to the registry. The save bar decides
+    // when to commit: on its own debounce with Autosave on, on the button
+    // without. This tab behaves like every other one either way.
     const [pending, setPending] = useState({ options: {}, simple: {} });
     const [barSaving, setBarSaving] = useState(false);
     const [barStatus, setBarStatus] = useState(null);
-
-    const [autosave, setAutosave] = useState(() => {
-        const raw = window.fotogridsAdmin?.autosave;
-        return true === raw || '1' === raw;
-    });
-
-    useEffect(() => {
-        const handleAutosaveChanged = (e) => {
-            if ('boolean' === typeof e.detail?.enabled) {
-                setAutosave(e.detail.enabled);
-            }
-        };
-        document.addEventListener(
-            'fotogrids:autosave_changed',
-            handleAutosaveChanged
-        );
-        return () =>
-            document.removeEventListener(
-                'fotogrids:autosave_changed',
-                handleAutosaveChanged
-            );
-    }, []);
 
     // Pro extension point: Pro replaces the Panel 2 matrix component by
     // calling window.FotoGridsAdmin.permissions.registerMatrixOverride(C).
@@ -138,8 +116,10 @@ const PermissionsManagerTab = () => {
         return () => document.removeEventListener('fotogrids:admin:permissions:override', onOverride);
     }, []);
 
-    const loadRegistry = useCallback(async () => {
-        setLoading(true);
+    const loadRegistry = useCallback(async ({ silent = false } = {}) => {
+        if (!silent) {
+            setLoading(true);
+        }
         setError(null);
         try {
             const data = await apiFetch({ path: '/fotogrids/v1/permissions/registry' });
@@ -150,7 +130,9 @@ const PermissionsManagerTab = () => {
         } catch (e) {
             setError(e?.message || __('Failed to load permissions.', 'fotogrids'));
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     }, []);
 
@@ -185,48 +167,21 @@ const PermissionsManagerTab = () => {
         });
     }, []);
 
-    const handleOptionChange = useCallback(async (key, value) => {
+    const handleOptionChange = useCallback((key, value) => {
         setBarStatus(null);
+        setPending((prev) => ({
+            ...prev,
+            options: { ...prev.options, [key]: value },
+        }));
+    }, []);
 
-        if (!autosave) {
-            setPending((prev) => ({
-                ...prev,
-                options: { ...prev.options, [key]: value },
-            }));
-            return;
-        }
-
-        try {
-            await commitOption(key, value);
-            await loadRegistry();
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('FotoGrids permissions: failed to save option', e);
-        }
-    }, [autosave, commitOption, loadRegistry]);
-
-    const handleSimpleChange = useCallback(async (key, lowestRole) => {
+    const handleSimpleChange = useCallback((key, lowestRole) => {
         setBarStatus(null);
-
-        if (!autosave) {
-            setPending((prev) => ({
-                ...prev,
-                simple: { ...prev.simple, [key]: lowestRole },
-            }));
-            return;
-        }
-
-        setSaving((prev) => ({ ...prev, [key]: true }));
-        try {
-            await commitSimple(key, lowestRole);
-            await loadRegistry();
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('FotoGrids permissions: failed to save', e);
-        } finally {
-            setSaving((prev) => ({ ...prev, [key]: false }));
-        }
-    }, [autosave, commitSimple, loadRegistry]);
+        setPending((prev) => ({
+            ...prev,
+            simple: { ...prev.simple, [key]: lowestRole },
+        }));
+    }, []);
 
     const pendingCount =
         Object.keys(pending.options).length + Object.keys(pending.simple).length;
@@ -241,8 +196,10 @@ const PermissionsManagerTab = () => {
             for (const [key, role] of Object.entries(pending.simple)) {
                 await commitSimple(key, role);
             }
+            // Refresh without unmounting the panel, and keep the overlay up
+            // until the fresh registry has landed so nothing flickers back.
+            await loadRegistry({ silent: true });
             setPending({ options: {}, simple: {} });
-            await loadRegistry();
             setBarStatus('saved');
             setTimeout(() => setBarStatus(null), 3000);
         } catch (e) {
@@ -320,7 +277,7 @@ const PermissionsManagerTab = () => {
                         pending.simple[def.key] ??
                         resolveLowestRole(def, rolesByKey);
                     const isCustom = currentValue === 'custom';
-                    const isSaving = !!saving[def.key];
+                    const isSaving = barSaving;
                     const selectId = `fg-perm-${def.key}`;
                     return (
                         <PanelRow
@@ -467,15 +424,13 @@ const PermissionsManagerTab = () => {
                 {renderMatrixPanel()}
             </Panel>
 
-            {/* With Autosave on nothing ever goes dirty here, because each
-                change is written as it is made - the bar stays as the status
-                readout every other tab shows. */}
             <SaveBar
                 dirty={pendingCount > 0}
                 saving={barSaving}
                 status={barStatus}
                 onSave={handleBarSave}
-                onDiscard={autosave ? undefined : handleBarDiscard}
+                onDiscard={handleBarDiscard}
+                watch={pending}
             />
         </>
     );
