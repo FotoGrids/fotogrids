@@ -443,7 +443,6 @@ class Admin_Init {
 		);
 	}
 
-
 	/**
 	 * Return default values for general settings.
 	 *

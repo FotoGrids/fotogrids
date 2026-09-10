@@ -586,11 +586,11 @@ class Admin_Data {
 	}
 
 	/**
-	 * Get advanced (boolean) settings.
+	 * Get collection defaults.
 	 *
-	 * GET /wp-json/fotogrids/v1/admin/advanced-settings
+	 * GET /wp-json/fotogrids/v1/admin/gallery-defaults
 	 *
-	 * @since  1.0.0
+	 * @since  1.1.2
 	 * @param  \WP_REST_Request $request
 	 * @return \WP_REST_Response
 	 */
@@ -628,6 +628,15 @@ class Admin_Data {
 		return rest_ensure_response( array( 'defaults' => $merged ) );
 	}
 
+	/**
+	 * Get advanced (boolean) settings.
+	 *
+	 * GET /wp-json/fotogrids/v1/admin/advanced-settings
+	 *
+	 * @since  1.0.0
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
 	public static function get_advanced_settings( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		return rest_ensure_response(
 			array(
