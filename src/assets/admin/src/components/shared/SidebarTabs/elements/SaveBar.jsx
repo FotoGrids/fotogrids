@@ -24,7 +24,24 @@ const { __ } = wp.i18n;
  * @param {string}          [props.savedHint]       Sub-text shown when clean, e.g. "just now".
  * @param {string}          [props.saveLabel]       Primary button label.
  * @param {React.ReactNode} [props.extraAction]     Optional secondary action.
+ * @param {*}               [props.watch]           The value being edited. When Autosave is on
+ *                                                  the save is debounced from the last change to
+ *                                                  this, so a half-typed field is never written.
+ *                                                  Omit it and the debounce runs from the moment
+ *                                                  the form first went dirty instead.
  */
+
+// Milliseconds of quiet before an autosave fires. Matches the gallery
+// editor's debounce so both surfaces feel the same.
+const AUTOSAVE_DELAY = 2000;
+
+// `fotogridsAdmin.autosave` is a string on page load - wp_localize_script casts
+// every scalar - and a real boolean once a toggle has written the AJAX response
+// back. Anything else means we cannot tell, and off is the safe answer.
+const autosaveIsOn = () => {
+    const raw = window.fotogridsAdmin?.autosave;
+    return true === raw || '1' === raw;
+};
 const SaveBar = ({
     dirty,
     saving = false,
@@ -35,7 +52,49 @@ const SaveBar = ({
     savedHint,
     saveLabel,
     extraAction,
+    watch,
 }) => {
+    const [autosave, setAutosave] = useState(autosaveIsOn);
+
+    // The Advanced tab announces the option changing, so the other tabs pick it
+    // up without a reload.
+    useEffect(() => {
+        const handleAutosaveChanged = (e) =>
+            setAutosave(
+                typeof e.detail?.enabled === 'boolean'
+                    ? e.detail.enabled
+                    : autosaveIsOn()
+            );
+
+        document.addEventListener(
+            'fotogrids:autosave_changed',
+            handleAutosaveChanged
+        );
+        return () =>
+            document.removeEventListener(
+                'fotogrids:autosave_changed',
+                handleAutosaveChanged
+            );
+    }, []);
+
+    // Held in a ref so a new onSave identity on each render does not restart
+    // the debounce.
+    const onSaveRef = useRef(onSave);
+    onSaveRef.current = onSave;
+
+    const watchToken = watch === undefined ? null : JSON.stringify(watch);
+
+    useEffect(() => {
+        // `status === 'error'` stops a failed save retrying on a loop. Editing
+        // again clears the status, which re-arms this.
+        if (!autosave || !dirty || saving || disabled || 'error' === status) {
+            return undefined;
+        }
+
+        const timer = setTimeout(() => onSaveRef.current?.(), AUTOSAVE_DELAY);
+        return () => clearTimeout(timer);
+    }, [autosave, dirty, saving, disabled, status, watchToken]);
+
     // A sentinel sits directly after the bar. While the bar is pinned to the
     // bottom of the viewport the sentinel is scrolled out of view (not
     // intersecting); once the user reaches the end of the content the sentinel
@@ -84,7 +143,7 @@ const SaveBar = ({
                 )}
             </span>
 
-            {dirty && onDiscard && (
+            {dirty && onDiscard && !autosave && (
                 <Button
                     variant="secondary"
                     style="ghost"

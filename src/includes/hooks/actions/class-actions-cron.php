@@ -35,4 +35,11 @@ final class Actions_Cron {
 	 * @since 1.0.0
 	 */
 	public const SEND_STATISTICS = 'fotogrids/cron/send_statistics';
+
+	/**
+	 * Scheduled WP-Cron action used to purge expired render-cache rows.
+	 *
+	 * @since 1.1.2
+	 */
+	public const CACHE_PURGE = 'fotogrids/cron/cache_purge';
 }

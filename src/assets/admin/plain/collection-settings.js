@@ -17,6 +17,11 @@ const FIELD_STATE = {
 	TEASER: 'teaser',
 };
 
+// `fotogridsAdmin.autosave` arrives in two shapes: wp_localize_script casts
+// every scalar to a string, so a page load gives '1' or '', while the autosave
+// toggle writes the AJAX response back as a real boolean.
+const autosaveIsOn = (raw) => true === raw || '1' === raw;
+
 const isFreeTier = (config) => {
 	if (!config || typeof config !== 'object') {
 		return true;
@@ -296,6 +301,13 @@ window.FotoGridsCollectionSettings = window.FotoGridsCollectionSettings || {};
 function CollectionSettings() {
 	const postType = window.fotogridsSettings?.postType || 'gallery';
 	const isDefaultsMode = window.fotogridsSettings?.isDefaultsMode || false;
+	// Autosave drives ajax-save.js, which is only enqueued on the gallery and
+	// album edit screens, and its AJAX writer requires the settings cap. An
+	// absent capabilities bag is not a denial - see <SettingsLock>.
+	const showAutosaveToggle =
+		!isDefaultsMode &&
+		window.fotogridsAdmin?.capabilities?.manage_fotogrids_settings !==
+			false;
 	const normalizedPostType =
 		postType === 'fotogrids_gallery'
 			? 'gallery'
@@ -343,7 +355,7 @@ function CollectionSettings() {
 	const [bulkUrl, setBulkUrl] = useState('');
 	const [bulkTarget, setBulkTarget] = useState('global');
 	const [autosaveValue, setAutosaveValue] = useState(
-		window.fotogridsAdmin?.autosave || false
+		autosaveIsOn(window.fotogridsAdmin?.autosave)
 	);
 	// The wizard's step 3 writes the same fotogrids_settings_mode option this
 	// Segmented control mirrors, so users can flip modes without reopening it.
@@ -691,38 +703,6 @@ function CollectionSettings() {
 		isDefaultsMode,
 	]);
 
-	useEffect(() => {
-		const currentValue = window.fotogridsAdmin?.autosave || false;
-		setAutosaveValue(currentValue);
-
-		if (State) {
-			State.autosave.set(currentValue);
-		}
-
-		const handleAutosaveChange = (e) => {
-			if (e.target.name === 'fotogrids_autosave') {
-				const newValue = e.target.checked;
-				setAutosaveValue(newValue);
-				if (State) {
-					State.autosave.set(newValue);
-				}
-			}
-		};
-
-		const autosaveInput = document.querySelector(
-			'input[name="fotogrids_autosave"]'
-		);
-		if (autosaveInput) {
-			autosaveInput.addEventListener('change', handleAutosaveChange);
-			return () => {
-				autosaveInput.removeEventListener(
-					'change',
-					handleAutosaveChange
-				);
-			};
-		}
-	}, []);
-
 	const loadItemData = async () => {
 		try {
 			setLoadingItems(true);
@@ -933,40 +913,21 @@ function CollectionSettings() {
 
 		try {
 			if (isDefaultsMode) {
-				// In defaults mode, save to form inputs for WordPress Settings API
-				const form = document.querySelector(
-					'form[action="options.php"]'
+				// Defaults persist over REST through <DefaultsTab>, which
+				// collects these events and drives the save bar. Announce the
+				// change and let it own the write.
+				document.dispatchEvent(
+					new CustomEvent('fotogrids:setting_changed', {
+						detail: {
+							key,
+							value:
+								typeof value === 'object' && value !== null
+									? JSON.stringify(value)
+									: value,
+							scope: 'defaults',
+						},
+					})
 				);
-				if (!form) {
-					console.warn('FotoGrids: Settings form not found');
-					return;
-				}
-
-				let input = form.querySelector(
-					`input[name="fotogrids_gallery_defaults[${key}]"]`
-				);
-
-				if (!input) {
-					input = document.createElement('input');
-					input.type = 'hidden';
-					input.name = `fotogrids_gallery_defaults[${key}]`;
-					form.appendChild(input);
-				}
-
-				if (typeof value === 'object' && value !== null) {
-					input.value = JSON.stringify(value);
-				} else {
-					input.value = value;
-				}
-
-				const customEvent = new CustomEvent(
-					'fotogrids:setting_changed',
-					{
-						bubbles: true,
-						detail: { key, value, input },
-					}
-				);
-				input.dispatchEvent(customEvent);
 			} else {
 				// In gallery mode, save to post meta inputs
 				let input = document.querySelector(
@@ -2155,9 +2116,11 @@ function CollectionSettings() {
 						if (window.fotogridsAdmin) {
 							window.fotogridsAdmin.autosave = savedValue;
 						}
-						if (State) {
-							State.autosave.set(savedValue);
-						}
+						document.dispatchEvent(
+							new CustomEvent('fotogrids:autosave_changed', {
+								detail: { enabled: savedValue },
+							})
+						);
 						setAutosaveValue(savedValue);
 						if (window.fotogridsToast) {
 							window.fotogridsToast.success(
@@ -2335,47 +2298,48 @@ function CollectionSettings() {
 								),
 							]
 						),
-						h(
-							'div',
-							{
-								className:
-									'fotogrids-settings-docs-strip__autosave',
-							},
-							[
-								h(
-									'span',
-									{
-										className:
-											'fotogrids-settings-docs-strip__autosave-label',
-									},
-									__('Autosave', 'fotogrids')
-								),
-								h(
-									'button',
-									{
-										type: 'button',
-										className: `fotogrids-toggle fotogrids-toggle--small fotogrids-toggle--green ${autosaveValue ? 'fgt-is-checked' : ''}`,
-										onClick: handleAutosaveToggle,
-										title: __(
-											'Toggle autosave',
-											'fotogrids'
-										),
-										'aria-checked': autosaveValue,
-										role: 'switch',
-									},
-									[
-										h('span', {
+						showAutosaveToggle &&
+							h(
+								'div',
+								{
+									className:
+										'fotogrids-settings-docs-strip__autosave',
+								},
+								[
+									h(
+										'span',
+										{
 											className:
-												'fotogrids-toggle__track',
-										}),
-										h('span', {
-											className:
-												'fotogrids-toggle__thumb',
-										}),
-									]
-								),
-							]
-						),
+												'fotogrids-settings-docs-strip__autosave-label',
+										},
+										__('Autosave', 'fotogrids')
+									),
+									h(
+										'button',
+										{
+											type: 'button',
+											className: `fotogrids-toggle fotogrids-toggle--small fotogrids-toggle--green ${autosaveValue ? 'fgt-is-checked' : ''}`,
+											onClick: handleAutosaveToggle,
+											title: __(
+												'Toggle autosave',
+												'fotogrids'
+											),
+											'aria-checked': autosaveValue,
+											role: 'switch',
+										},
+										[
+											h('span', {
+												className:
+													'fotogrids-toggle__track',
+											}),
+											h('span', {
+												className:
+													'fotogrids-toggle__thumb',
+											}),
+										]
+									),
+								]
+							),
 					]
 				),
 			]
