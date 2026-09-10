@@ -127,10 +127,14 @@ class Usage_Reporter {
 		wp_remote_post(
 			self::ENDPOINT,
 			array(
-				'body'     => wp_json_encode( $payload ),
-				'headers'  => array( 'Content-Type' => 'application/json' ),
-				'timeout'  => 15,
-				'blocking' => false,
+				'body'       => wp_json_encode( $payload ),
+				'headers'    => array( 'Content-Type' => 'application/json' ),
+				// WordPress defaults this to "WordPress/<version>; <site url>"
+				// (wp-includes/class-wp-http.php). Overridden so the report does
+				// not carry the site address the payload deliberately omits.
+				'user-agent' => 'FotoGrids/' . FOTOGRIDS_VERSION,
+				'timeout'    => 15,
+				'blocking'   => false,
 			)
 		);
 	}
@@ -139,7 +143,7 @@ class Usage_Reporter {
 	 * Build the report body.
 	 *
 	 * `site_id` is the random identifier minted at activation. The site URL is
-	 * deliberately not sent, which is what lets readme.txt call this anonymous.
+	 * deliberately not sent, in the body or in the request's user agent.
 	 *
 	 * @since  1.1.2
 	 * @return array<string, mixed>
