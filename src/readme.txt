@@ -169,13 +169,6 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Changelog ==
 
-= 1.1.2 =
-
-**Fixed**
-
-* **The anonymous usage report never sent, and described itself wrongly.** The scheduled report documented under External Services was registered under one hook name and scheduled under another, so it never ran; its handler was also only loaded inside wp-admin, while WP-Cron and the Settings tab both save consent outside it. All three are fixed, and the report now carries what this readme says it carries. It still sends nothing unless "Share anonymous statistics" is on, and it now identifies the site by the random identifier generated at activation rather than by your site address.
-* **The setup wizard's "What best describes you?" answer went nowhere.** The step said the answer would tailor a few defaults and said it could be skipped. Neither was true - nothing read the answer, and Continue stayed disabled until a card was picked. The step is now genuinely optional, the wording says what the answer is actually for, and the answer is included in the anonymous usage report when usage-data sharing is on.
-
 = 1.1.1 =
 
 **New**
@@ -295,7 +288,7 @@ Freemius privacy policy: https://freemius.com/privacy/
 
 2. **FotoGrids usage statistics** (optional, off by default)
 
-If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin sends a usage report to FotoGrids at most once a day to help us decide what to build next. The report contains a random identifier generated when the plugin is activated, the plugin, WordPress and PHP versions, the answer you gave to the setup wizard's "What best describes you?" question if you answered it, and counts of how often the review prompt was shown and clicked. Your site URL, your email address and your gallery content are not sent, in the report or in the request that carries it. As with any request over the internet, your server's IP address is visible to the receiving server; it is not stored and not linked to the identifier. Nothing is sent unless you turn this setting on.
+If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes a random identifier created when the plugin is activated, plugin version, WordPress version, PHP version, your answer to the setup wizard's "What best describes you?" question, and counts of how often the review prompt was shown. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
