@@ -122,8 +122,8 @@ class Register_Templates_Routes {
 			)
 		);
 
-		// Template preview endpoint (returns HTML)
-		// Note: This endpoint can be accessed via iframe, so we allow nonce-based auth
+		// Template preview endpoint (returns HTML). Loaded in an iframe, so the
+		// REST nonce arrives as the _wpnonce query parameter.
 		register_rest_route(
 			'fotogrids/v1',
 			'/templates/preview',
@@ -131,7 +131,7 @@ class Register_Templates_Routes {
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( '\FotoGrids\REST\Templates\Templates_Data', 'render_template_preview' ),
-					'permission_callback' => '__return_true', // We'll check permissions inside the callback
+					'permission_callback' => array( '\FotoGrids\REST\Templates\Templates_Permissions', 'check_templates_read' ),
 					'args'                => array(
 						'template_id'        => array(
 							'required'          => true,
@@ -148,10 +148,6 @@ class Register_Templates_Routes {
 						'preview_bg_color'   => array(
 							'default'           => '',
 							'sanitize_callback' => array( '\FotoGrids\REST\Templates\Templates_Data', 'sanitize_css_color' ),
-						),
-						'_wpnonce'           => array(
-							'default'           => '',
-							'sanitize_callback' => 'sanitize_text_field',
 						),
 					),
 				),
