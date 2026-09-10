@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Modal, useModal } from './shared/Modal';
+import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon        from './shared/Icon.jsx';
 import Toggle      from './shared/Toggle.jsx';
@@ -193,6 +193,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     const [ resolving, setResolving ] = useState( false );
     const [ resolveError, setResolveError ] = useState( '' );
     const [ adding, setAdding ]       = useState( false );
+    const [ confirmingClose, setConfirmingClose ] = useState( false );
 
     // Per-source drafts, so switching YouTube <-> Vimeo and back restores the
     // link and options that were already entered for that source.
@@ -201,9 +202,6 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     // The form as it stood when the modal opened, so an edit-mode prefill is
     // not mistaken for something the visitor typed.
     const baseline = useRef( snapshot( DEFAULT_STATE, '' ) );
-    const confirmOpen = useRef( false );
-
-    const modal = useModal();
 
     // Prefill the form when opening in edit mode; reset to defaults on open in
     // add mode. Keyed on the embed's id so re-opening a different embed reloads.
@@ -218,6 +216,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
         setUrlDraft( nextUrlDraft );
         setResolveError( '' );
         setActiveTab( 'link' );
+        setConfirmingClose( false );
         baseline.current = snapshot( nextForm, nextUrlDraft );
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ isOpen, editItem?.id ] );
@@ -246,40 +245,21 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
      * Covers the overlay, Esc, the header close button and Cancel, all of
      * which reach the modal through this handler.
      */
-    const handleClose = useCallback( async () => {
+    const handleClose = useCallback( () => {
         if ( adding ) return;
 
-        if ( ! hasUnsavedWork ) {
-            closeAndReset();
+        if ( hasUnsavedWork ) {
+            setConfirmingClose( true );
             return;
         }
 
-        if ( confirmOpen.current ) return;
-        confirmOpen.current = true;
+        closeAndReset();
+    }, [ adding, hasUnsavedWork, closeAndReset ] );
 
-        let discard = false;
-        try {
-            discard = await modal.warning( {
-                title:        strings.unsavedChangesTitle,
-                message:      strings.unsavedChangesConfirm,
-                confirmLabel: strings.unsavedChangesDiscard,
-                cancelLabel:  strings.unsavedChangesKeepEditing,
-            } );
-        } finally {
-            confirmOpen.current = false;
-        }
-
-        if ( discard ) closeAndReset();
-    }, [
-        adding,
-        hasUnsavedWork,
-        closeAndReset,
-        modal,
-        strings.unsavedChangesTitle,
-        strings.unsavedChangesConfirm,
-        strings.unsavedChangesDiscard,
-        strings.unsavedChangesKeepEditing,
-    ] );
+    const discardAndClose = useCallback( () => {
+        setConfirmingClose( false );
+        closeAndReset();
+    }, [ closeAndReset ] );
 
     const handleSourceChange = useCallback( ( source ) => {
         if ( source === form.source ) {
@@ -575,7 +555,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
                             }
                             pattern={
                                 form.source === 'youtube'
-                                    ? 'https?://(www\\.)?(youtube\\.com/(watch\\?.*v=|embed/|shorts/)|youtu\\.be/)[a-zA-Z0-9_-]{11}.*'
+                                    ? 'https?://(www\\.)?(youtube\\.com/(watch\\?.*v=|embed/|shorts/)|youtu\\.be/)[a-zA-Z0-9_\\-]{11}.*'
                                     : 'https?://(www\\.)?vimeo\\.com/(video/)?[0-9]+'
                             }
                             className={ `fotogrids-embed-url-input ${ resolveError ? 'fotogrids-embed-url-input--error' : '' }` }
@@ -809,6 +789,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     const tabItems = tabs.map(tab => ({ id: tab.id, label: tab.label }));
 
     return (
+        <>
         <Modal
             isOpen={ isOpen }
             onClose={ handleClose }
@@ -863,6 +844,18 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
                 </Button>
             </Modal.Footer>
         </Modal>
+
+        <Confirm
+            isOpen={ confirmingClose }
+            onClose={ () => setConfirmingClose( false ) }
+            onConfirm={ discardAndClose }
+            variant="warning"
+            title={ strings.unsavedChangesTitle }
+            message={ strings.unsavedChangesConfirm }
+            confirmLabel={ strings.unsavedChangesDiscard }
+            cancelLabel={ strings.unsavedChangesKeepEditing }
+        />
+        </>
     );
 };
 

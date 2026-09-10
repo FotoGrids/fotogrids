@@ -2,14 +2,15 @@
  * Tests for the unsaved-work guard on the three modals that hold a
  * part-filled form: ZIP import, folder import and video embed.
  *
- * Each modal is rendered next to a ModalRoot so the real confirmation dialog
- * is exercised rather than a stand-in.
+ * Each modal is rendered on its own, with no ModalRoot mounted. The admin
+ * bundles these modals into `metabox`, which webpack keeps separate from
+ * `global-modal-init` where the only ModalRoot lives, so a dialog routed
+ * through the imperative registry never renders on the real screen.
  */
 import React from 'react';
 import ZipImportModal from '@/admin/src/components/ZipImportModal';
 import FolderImportModal from '@/admin/src/components/FolderImportModal';
 import VideoEmbedModal from '@/admin/src/components/VideoEmbedModal';
-import { ModalRoot, modalRegistry } from '@/admin/src/components/shared/Modal';
 import { renderElement, act, changeValue } from '@tests/helpers/render-component';
 
 const h = React.createElement;
@@ -37,8 +38,6 @@ const STRINGS = {
 	addVideoEmbed: 'Add Video Embed',
 	editVideoEmbed: 'Edit Video Embed',
 };
-
-const withRoot = (element) => h(React.Fragment, null, element, h(ModalRoot));
 
 const buttons = () => Array.from(document.body.querySelectorAll('button'));
 
@@ -83,22 +82,19 @@ const zipFile = () => new File(['archive'], 'photos.zip', { type: 'application/z
 const imageFile = () => new File(['binary'], 'shot.jpg', { type: 'image/jpeg' });
 
 beforeEach(() => {
-	modalRegistry.closeAll();
 	document.body.innerHTML = '';
 });
 
 describe('ZipImportModal unsaved guard', () => {
 	const render = (onClose) =>
 		renderElement(
-			withRoot(
-				h(ZipImportModal, {
-					isOpen: true,
-					onClose,
-					onAddItems: jest.fn(),
-					galleryId: 7,
-					strings: STRINGS,
-				})
-			)
+			h(ZipImportModal, {
+				isOpen: true,
+				onClose,
+				onAddItems: jest.fn(),
+				galleryId: 7,
+				strings: STRINGS,
+			})
 		);
 
 	it('closes without asking when no archive has been chosen', async () => {
@@ -169,16 +165,14 @@ describe('ZipImportModal unsaved guard', () => {
 describe('FolderImportModal unsaved guard', () => {
 	const render = (onClose) =>
 		renderElement(
-			withRoot(
-				h(FolderImportModal, {
-					isOpen: true,
-					onClose,
-					onAddItems: jest.fn(),
-					onUploadComplete: jest.fn(),
-					galleryId: 7,
-					strings: STRINGS,
-				})
-			)
+			h(FolderImportModal, {
+				isOpen: true,
+				onClose,
+				onAddItems: jest.fn(),
+				onUploadComplete: jest.fn(),
+				galleryId: 7,
+				strings: STRINGS,
+			})
 		);
 
 	beforeEach(() => {
@@ -253,17 +247,32 @@ describe('VideoEmbedModal unsaved guard', () => {
 
 	const render = (onClose, editItem = null) =>
 		renderElement(
-			withRoot(
-				h(VideoEmbedModal, {
-					isOpen: true,
-					onClose,
-					onAdd: jest.fn(),
-					onUpdate: jest.fn(),
-					editItem,
-					strings: STRINGS,
-				})
-			)
+			h(VideoEmbedModal, {
+				isOpen: true,
+				onClose,
+				onAdd: jest.fn(),
+				onUpdate: jest.fn(),
+				editItem,
+				strings: STRINGS,
+			})
 		);
+
+	it('gives the URL field a pattern the v flag accepts', async () => {
+		const onClose = jest.fn();
+		const handle = render(onClose);
+
+		const { pattern } = document.getElementById('fg-embed-url');
+		expect(pattern).toBeTruthy();
+		// The pattern attribute compiles with the `v` flag, which treats a
+		// bare '-' inside a character class as a reserved punctuator.
+		expect(() => new RegExp(`^(?:${pattern})$`, 'v')).not.toThrow();
+		expect(
+			new RegExp(`^(?:${pattern})$`, 'v').test(
+				'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+			)
+		).toBe(true);
+		handle.unmount();
+	});
 
 	it('closes without asking when the form was never touched', async () => {
 		const onClose = jest.fn();

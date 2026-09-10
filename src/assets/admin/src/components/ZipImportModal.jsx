@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, useModal } from './shared/Modal';
+import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import UploadArea from './blocks/UploadArea';
@@ -78,11 +78,9 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     const [extracting, setExtracting] = useState(false);
     const [error, setError] = useState(null);
     const [result, setResult] = useState(null);
+    const [confirmingClose, setConfirmingClose] = useState(false);
 
     const inputRef = useRef(null);
-    const confirmOpen = useRef(false);
-
-    const modal = useModal();
 
     useEffect(() => {
         if (!isOpen) {
@@ -92,6 +90,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
             setProgress(0);
             setBusy(false);
             setExtracting(false);
+            setConfirmingClose(false);
         }
     }, [isOpen]);
 
@@ -102,40 +101,21 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
      * imported. Covers the overlay, Esc, the header close button and Cancel,
      * all of which reach the modal through this handler.
      */
-    const requestClose = useCallback(async () => {
+    const requestClose = useCallback(() => {
         if (busy) return;
 
-        if (!hasUnsavedWork) {
-            onClose?.();
+        if (hasUnsavedWork) {
+            setConfirmingClose(true);
             return;
         }
 
-        if (confirmOpen.current) return;
-        confirmOpen.current = true;
+        onClose?.();
+    }, [busy, hasUnsavedWork, onClose]);
 
-        let discard = false;
-        try {
-            discard = await modal.warning({
-                title: strings.unsavedChangesTitle,
-                message: strings.unsavedChangesConfirm,
-                confirmLabel: strings.unsavedChangesDiscard,
-                cancelLabel: strings.unsavedChangesKeepEditing,
-            });
-        } finally {
-            confirmOpen.current = false;
-        }
-
-        if (discard) onClose?.();
-    }, [
-        busy,
-        hasUnsavedWork,
-        modal,
-        onClose,
-        strings.unsavedChangesTitle,
-        strings.unsavedChangesConfirm,
-        strings.unsavedChangesDiscard,
-        strings.unsavedChangesKeepEditing,
-    ]);
+    const discardAndClose = useCallback(() => {
+        setConfirmingClose(false);
+        onClose?.();
+    }, [onClose]);
 
     const acceptFile = useCallback(
         (candidate) => {
@@ -232,6 +212,7 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
     );
 
     return (
+        <>
         <Modal
             isOpen={isOpen}
             onClose={requestClose}
@@ -290,6 +271,18 @@ const ZipImportModal = ({ isOpen, onClose, onAddItems, galleryId, strings = {} }
                 )}
             </Modal.Footer>
         </Modal>
+
+        <Confirm
+            isOpen={confirmingClose}
+            onClose={() => setConfirmingClose(false)}
+            onConfirm={discardAndClose}
+            variant="warning"
+            title={strings.unsavedChangesTitle}
+            message={strings.unsavedChangesConfirm}
+            confirmLabel={strings.unsavedChangesDiscard}
+            cancelLabel={strings.unsavedChangesKeepEditing}
+        />
+        </>
     );
 };
 

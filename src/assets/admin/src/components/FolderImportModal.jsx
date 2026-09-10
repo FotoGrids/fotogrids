@@ -17,7 +17,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, useModal } from './shared/Modal';
+import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import Checkbox from './shared/Checkbox';
@@ -47,11 +47,9 @@ const FolderImportModal = ({
     const [importError, setImportError] = useState(null);
     const [importProgress, setImportProgress] = useState({ done: 0, total: 0 });
     const [dragging, setDragging] = useState(false);
+    const [confirmingClose, setConfirmingClose] = useState(false);
 
     const directoryInputRef = useRef(null);
-    const confirmOpen = useRef(false);
-
-    const modal = useModal();
 
     const browser = useUploadsFolderBrowser({
         galleryId,
@@ -84,6 +82,7 @@ const FolderImportModal = ({
         setSelected([]);
         setImportError(null);
         setActiveTab(TAB_SERVER);
+        setConfirmingClose(false);
     }, [isOpen]);
 
     const toggleFile = useCallback((filePath) => {
@@ -175,40 +174,21 @@ const FolderImportModal = ({
      * yet imported. Covers the overlay, Esc, the header close button and
      * Cancel, all of which reach the modal through this handler.
      */
-    const requestClose = useCallback(async () => {
+    const requestClose = useCallback(() => {
         if (busy) return;
 
-        if (!hasUnsavedWork) {
-            onClose?.();
+        if (hasUnsavedWork) {
+            setConfirmingClose(true);
             return;
         }
 
-        if (confirmOpen.current) return;
-        confirmOpen.current = true;
+        onClose?.();
+    }, [busy, hasUnsavedWork, onClose]);
 
-        let discard = false;
-        try {
-            discard = await modal.warning({
-                title: strings.unsavedChangesTitle,
-                message: strings.unsavedChangesConfirm,
-                confirmLabel: strings.unsavedChangesDiscard,
-                cancelLabel: strings.unsavedChangesKeepEditing,
-            });
-        } finally {
-            confirmOpen.current = false;
-        }
-
-        if (discard) onClose?.();
-    }, [
-        busy,
-        hasUnsavedWork,
-        modal,
-        onClose,
-        strings.unsavedChangesTitle,
-        strings.unsavedChangesConfirm,
-        strings.unsavedChangesDiscard,
-        strings.unsavedChangesKeepEditing,
-    ]);
+    const discardAndClose = useCallback(() => {
+        setConfirmingClose(false);
+        onClose?.();
+    }, [onClose]);
 
     const renderServerTab = () => (
         <div className="fotogrids-tab-panel fg-is-active fg-upload-folder-browser">
@@ -325,6 +305,7 @@ const FolderImportModal = ({
     };
 
     return (
+        <>
         <Modal isOpen={isOpen} onClose={requestClose} size="lg" preventClose={busy}>
             <Modal.Header>
                 <Modal.HeaderTitle>{strings.uploadFromFolderModalTitle}</Modal.HeaderTitle>
@@ -374,6 +355,18 @@ const FolderImportModal = ({
                 </Button>
             </Modal.Footer>
         </Modal>
+
+        <Confirm
+            isOpen={confirmingClose}
+            onClose={() => setConfirmingClose(false)}
+            onConfirm={discardAndClose}
+            variant="warning"
+            title={strings.unsavedChangesTitle}
+            message={strings.unsavedChangesConfirm}
+            confirmLabel={strings.unsavedChangesDiscard}
+            cancelLabel={strings.unsavedChangesKeepEditing}
+        />
+        </>
     );
 };
 
