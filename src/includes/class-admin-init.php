@@ -650,13 +650,10 @@ class Admin_Init {
 		if ( in_array( $setting, $boolean_settings, true ) ) {
 			$sanitized_bool = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 
-			// `fotogrids_share_statistics` has a Freemius side-effect AND
-			// historically the Settings tab stores it as a real bool
-			// (`'1'` / `''`). The legacy AJAX path stored `'1'` / `'0'`
-			// strings, which `(bool)` casts as truthy in both cases. To
-			// keep the wizard and the Settings tab in sync, route this
-			// setting through the same shared helper. Other booleans
-			// keep the original `'1'` / `'0'` storage.
+			// `fotogrids_share_statistics` has a Freemius side-effect, so
+			// route it through the shared helper to keep the wizard and the
+			// Settings tab in sync. Every boolean option stores `'1'` / `'0'`;
+			// both cast correctly, since `'0'` is falsey in PHP.
 			if ( 'fotogrids_share_statistics' === $setting ) {
 				$applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_share_statistics_consent( $sanitized_bool );
 				wp_send_json_success( array( 'value' => $applied ) );

@@ -597,9 +597,31 @@ class Admin_Data {
 	public static function get_gallery_defaults( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		return rest_ensure_response(
 			array(
-				'defaults' => (array) get_option( 'fotogrids_gallery_defaults', array() ),
+				'defaults' => self::redact_passwords(
+					(array) get_option( 'fotogrids_gallery_defaults', array() )
+				),
 			)
 		);
+	}
+
+	/**
+	 * Blank every password field in a defaults map.
+	 *
+	 * The same hard guarantee `Settings_Localizer::data_for_collection()` makes
+	 * for the per-collection payload: a stored password never reaches the
+	 * browser. Reading it back is not a supported operation on any surface.
+	 *
+	 * @param  array<string, mixed> $defaults Stored defaults.
+	 * @return array<string, mixed>
+	 */
+	private static function redact_passwords( array $defaults ): array {
+		foreach ( array_keys( $defaults ) as $key ) {
+			if ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( (string) $key ) ) {
+				$defaults[ $key ] = '';
+			}
+		}
+
+		return $defaults;
 	}
 
 	/**
@@ -612,9 +634,9 @@ class Admin_Data {
 	 *
 	 * @since  1.1.2
 	 * @param  \WP_REST_Request $request
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public static function save_gallery_defaults( $request ): \WP_REST_Response {
+	public static function save_gallery_defaults( $request ) {
 		$incoming = (array) $request->get_param( 'defaults' );
 		$stored   = (array) get_option( 'fotogrids_gallery_defaults', array() );
 
@@ -623,9 +645,21 @@ class Admin_Data {
 			\FotoGrids\Settings\Plugin_Settings_Store::sanitize_collection_defaults( $incoming )
 		);
 
-		update_option( 'fotogrids_gallery_defaults', $merged );
+		if ( ! update_option( 'fotogrids_gallery_defaults', $merged ) ) {
+			// update_option() also answers false when nothing changed, so the
+			// stored value is what decides whether this actually failed.
+			$current = (array) get_option( 'fotogrids_gallery_defaults', array() );
 
-		return rest_ensure_response( array( 'defaults' => $merged ) );
+			if ( wp_json_encode( $current ) !== wp_json_encode( $merged ) ) {
+				return new \WP_Error(
+					'fotogrids_defaults_not_saved',
+					__( 'The defaults could not be saved.', 'fotogrids' ),
+					array( 'status' => 500 )
+				);
+			}
+		}
+
+		return rest_ensure_response( array( 'defaults' => self::redact_passwords( $merged ) ) );
 	}
 
 	/**

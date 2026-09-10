@@ -195,7 +195,9 @@ final class Plugin_Settings_Store {
 
 			if ( is_array( $default_value ) ) {
 				if ( is_string( $value ) ) {
-					$decoded = json_decode( stripslashes( $value ), true );
+					// No stripslashes(): REST bodies arrive unslashed, and
+					// stripping here would eat legitimate JSON escapes.
+					$decoded = json_decode( $value, true );
 					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
 						$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $decoded );
 					} else {
@@ -246,7 +248,7 @@ final class Plugin_Settings_Store {
 	/**
 	 * Apply the user's usage-data sharing choice.
 	 *
-	 * Writes the local `fotogrids_share_statistics` option as a real bool
+	 * Writes the local `fotogrids_share_statistics` option as `'1'` / `'0'`
 	 * and mirrors the change into Freemius. On first opt-in, when the site
 	 * is still anonymous and has no install, `opt_in()` registers it and
 	 * starts sending data; afterwards the choice toggles the per-site
