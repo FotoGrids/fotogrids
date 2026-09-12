@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../shared/Modal';
 import Icon from '../shared/Icon';
+import LoadingIcon from '../shared/LoadingIcon';
 
 const { __ } = wp.i18n;
 
@@ -394,7 +395,7 @@ const TemplateOverviewModal = ({ template, isPro, isOpen, onClose }) => {
 
 						{loadingCatalog ? (
 							<div className="fotogrids-template-overview__loading">
-								<span className="spinner fg-is-active" />
+								<LoadingIcon size={32} />
 							</div>
 						) : hasSettings ? (
 							sections.map((section) => (

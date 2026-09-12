@@ -10,11 +10,29 @@ import ApplyTemplateModal from '../templates/ApplyTemplateModal';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import Checkbox from '../shared/Checkbox';
+import LoadingIcon from '../shared/LoadingIcon';
 
 const { __ } = wp.i18n;
 
 // Album templates are not ready for release; set to true to re-enable the tab.
 const ALBUM_TEMPLATES_ENABLED = false;
+
+// Placeholder cards shown while the catalog loads, so the grid keeps its shape
+// instead of appearing only once the request resolves.
+const SKELETON_CARD_COUNT = 8;
+
+const TemplateCardSkeleton = () => (
+	<div
+		className="fotogrids-template-card fotogrids-template-card--skeleton"
+		aria-hidden="true"
+	>
+		<div className="fotogrids-template-card__preview" />
+		<div className="fotogrids-template-card__content">
+			<span className="fotogrids-template-card__skeleton-line" />
+			<span className="fotogrids-template-card__skeleton-line fotogrids-template-card__skeleton-line--short" />
+		</div>
+	</div>
+);
 
 /**
  * Single template card with a state-driven thumbnail fallback.
@@ -575,9 +593,28 @@ const TemplatesPage = () => {
 					)}
 
 					{loading ? (
-						<div className="fotogrids-templates-page--loading">
-							<span className="spinner fg-is-active"></span>
-							<p>{__('Loading templates...', 'fotogrids')}</p>
+						<div className="fotogrids-templates-page__loading">
+							<div
+								className="fotogrids-loading-screen"
+								role="status"
+							>
+								<span className="fotogrids-loading-screen__icon">
+									<LoadingIcon size="100%" />
+								</span>
+								<p className="fotogrids-loading-screen__label">
+									{__('Loading templates...', 'fotogrids')}
+								</p>
+							</div>
+							<div
+								className="fotogrids-templates-page__grid"
+								aria-hidden="true"
+							>
+								{Array.from({
+									length: SKELETON_CARD_COUNT,
+								}).map((ignored, index) => (
+									<TemplateCardSkeleton key={index} />
+								))}
+							</div>
 						</div>
 					) : (
 						<>
