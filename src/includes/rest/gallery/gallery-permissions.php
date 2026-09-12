@@ -1,7 +1,10 @@
 <?php
 namespace FotoGrids\REST\Gallery;
 
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Filters_Security;
+use FotoGrids\Render\Internal\Gallery_Item_Sequence;
+use FotoGrids\Render\Internal\Render_Controller;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -27,6 +30,59 @@ class Gallery_Permissions {
 	 * @return bool True if access is allowed, false otherwise
 	 */
 	public static function check_gallery_read( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return true;
+	}
+
+	/**
+	 * Permission check for endpoints that return a gallery's item data
+	 * outside the render pipeline.
+	 *
+	 * @since 1.1.2
+	 * @param \WP_REST_Request $request The REST API request object.
+	 * @return true|\WP_Error
+	 */
+	public static function check_gallery_view( $request ) {
+		return self::authorize_gallery_view( absint( $request->get_param( 'gallery_id' ) ) );
+	}
+
+	/**
+	 * Decides whether the current visitor may see a gallery's items.
+	 *
+	 * The gallery must be published, or editable by the current user, and
+	 * every gate that would run on a public render (password, view
+	 * permissions, and any add-on gates) must pass.
+	 *
+	 * @since 1.1.2
+	 * @param int $gallery_id Gallery post ID.
+	 * @return true|\WP_Error
+	 */
+	public static function authorize_gallery_view( int $gallery_id ) {
+		$gallery = $gallery_id > 0 ? get_post( $gallery_id ) : null;
+		if ( ! $gallery || 'fotogrids_gallery' !== $gallery->post_type ) {
+			return new \WP_Error(
+				'gallery_not_found',
+				__( 'Gallery not found.', 'fotogrids' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'edit_post', $gallery_id ) ) {
+			return new \WP_Error(
+				'gallery_not_published',
+				__( 'Gallery is not published.', 'fotogrids' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		$context = Gallery_Item_Sequence::stub_context( $gallery_id, Gallery_Repository::get_settings( $gallery_id ) );
+		if ( ! Render_Controller::evaluate_gates( $context )->passed ) {
+			return new \WP_Error(
+				'fotogrids_gallery_locked',
+				__( 'You do not have access to this gallery.', 'fotogrids' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		return true;
 	}
 

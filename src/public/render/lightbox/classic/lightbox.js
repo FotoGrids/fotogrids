@@ -1470,8 +1470,9 @@ class FotoGridsLightbox {
 					'fotogrids/v1/gallery/lightbox/slides'
 				: '/wp-json/fotogrids/v1/gallery/lightbox/slides';
 		const nonce =
+			window.fotogrids?.restNonce ||
 			gEl.dataset.fgRenderNonce ||
-			(window.fotogrids && window.fotogrids.renderNonce) ||
+			window.fotogrids?.renderNonce ||
 			'';
 		const galleryId = parseInt(gEl.dataset.fgGalleryId || '0', 10);
 		const randomSeed = parseInt(gEl.dataset.fgRandomSeed || '0', 10);
@@ -2967,9 +2968,19 @@ class FotoGridsLightbox {
 			`fotogrids/v1/lightbox/item/${itemId}?credit_source=${creditSource}` +
 			(galleryId ? `&gallery_id=${galleryId}` : '');
 
+		const headers = { Accept: 'application/json' };
+		const nonce =
+			window.fotogrids?.restNonce ||
+			this.galleryEl?.dataset.fgRenderNonce ||
+			window.fotogrids?.renderNonce ||
+			'';
+		if (nonce) {
+			headers['X-WP-Nonce'] = nonce;
+		}
+
 		fetch(url, {
 			credentials: 'same-origin',
-			headers: { Accept: 'application/json' },
+			headers,
 		})
 			.then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
 			.then((data) => {
