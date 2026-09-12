@@ -23,7 +23,9 @@ import React from 'react';
  */
 
 // The three horizontal bars wipe out to the right and redraw from the left;
-// the two vertical bars collapse downwards and redraw from the bottom.
+// the two vertical bars collapse downwards and redraw from the bottom. The
+// key times leave only a short rest at the end of each cycle, so a loader that
+// is only on screen for a moment is visibly moving the whole time.
 const BARS = [
 	{
 		x: 0,
@@ -31,7 +33,7 @@ const BARS = [
 		width: 115,
 		height: 29,
 		axis: 'width',
-		keyTimes: '0;0.267;0.4;0.567;0.7;1',
+		keyTimes: '0;0.03;0.251;0.528;0.749;1',
 	},
 	{
 		x: 0,
@@ -39,7 +41,7 @@ const BARS = [
 		width: 72,
 		height: 29,
 		axis: 'width',
-		keyTimes: '0;0.3;0.433;0.6;0.733;1',
+		keyTimes: '0;0.085;0.306;0.583;0.804;1',
 	},
 	{
 		x: 0,
@@ -47,7 +49,7 @@ const BARS = [
 		width: 29,
 		height: 29,
 		axis: 'width',
-		keyTimes: '0;0.333;0.45;0.633;0.75;1',
+		keyTimes: '0;0.14;0.334;0.638;0.832;1',
 	},
 	{
 		x: 43,
@@ -55,7 +57,7 @@ const BARS = [
 		width: 29,
 		height: 29,
 		axis: 'height',
-		keyTimes: '0;0.367;0.483;0.667;0.783;1',
+		keyTimes: '0;0.196;0.389;0.694;0.887;1',
 		opacity: 0.7,
 	},
 	{
@@ -64,10 +66,14 @@ const BARS = [
 		width: 29,
 		height: 72,
 		axis: 'height',
-		keyTimes: '0;0.4;0.533;0.7;0.833;1',
+		keyTimes: '0;0.251;0.472;0.749;0.97;1',
 		opacity: 0.7,
 	},
 ];
+
+// One cycle of the mark. Shorter than the source asset so the loader reads as
+// moving even when it is on screen briefly.
+const DURATION = '1.8s';
 
 const prefersReducedMotion = () =>
 	typeof window !== 'undefined' &&
@@ -125,14 +131,14 @@ const LoadingIcon = ({ size = 40, label, className, ...rest }) => {
 								<>
 									<animate
 										attributeName={bar.axis}
-										dur="3s"
+										dur={DURATION}
 										repeatCount="indefinite"
 										keyTimes={bar.keyTimes}
 										values={spanValues}
 									/>
 									<animate
 										attributeName={originAxis}
-										dur="3s"
+										dur={DURATION}
 										repeatCount="indefinite"
 										keyTimes={bar.keyTimes}
 										values={originValues}
