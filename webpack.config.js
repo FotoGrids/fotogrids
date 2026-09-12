@@ -609,48 +609,15 @@ const mainConfig = {
                     },
                 },
                 {
-                    from: 'src/public/render/**/*',
+                    // Stylesheets, icons and the shared arrow-icon JSON ship as-is.
+                    // Every .js under public/render is a webpack entry or is imported
+                    // by one, so its built output lands in assets/js/ and copying the
+                    // source would ship it twice. .scss is handled by
+                    // MiniCssExtractPlugin and .php by the src/**/*.php pattern above.
+                    from: 'src/public/render/**/*.{css,svg,json}',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
                         return relativePath.replace('src/', '');
-                    },
-                    globOptions: {
-                        // .php and .scss are excluded because webpack handles them (PHP via
-                        // the php copy patterns above; SCSS via MiniCssExtractPlugin).
-                        // fg-tooltip.js and runtime.js are also excluded because they're
-                        // webpack entry points - the built output lands in assets/js/.
-                        ignore: [
-                            '**/.DS_Store',
-                            '**/*.php',
-                            '**/*.scss',
-                            '**/*.md',
-                            '**/fg-tooltip/fg-tooltip.js',
-                            '**/internal/runtime/runtime.js',
-                            '**/decorators/sharing/sharing.js',
-                            '**/decorators/image-zoom/image-zoom.js',
-                            '**/gates/password/password-gate.js',
-                            '**/features/lazy-load/lazy-load.js',
-                            '**/sorters/random/random-sort.js',
-                            '**/layouts/justified/justified.js',
-                            '**/layouts/masonry/masonry.js',
-                            '**/layouts/slider/slider.js',
-                            '**/layouts/image-viewer/image-viewer.js',
-                            '**/layouts/single-item/single-item.js',
-                            '**/layouts/_helpers/**',
-                            '**/features/stats/stats.js',
-                            '**/video/video-inline.js',
-                            '**/video/video-lightbox-mini.js',
-                            '**/lightbox/mini/lightbox-mini.js',
-                            '**/lightbox/classic/lightbox.js',
-                            '**/lightbox/grid/lightbox-grid.js',
-                            '**/lightbox/mini-viewer/lightbox-mini-viewer.js',
-                            '**/decorators/album-to-gallery-ajax/album-to-gallery-ajax.js',
-                            '**/features/collection-header/collection-header.js',
-                            '**/features/pagination/pagination-core.js',
-                            '**/features/pagination/endless-scroll/endless-scroll.js',
-                            '**/features/pagination/load-more/load-more.js',
-                            '**/features/pagination/page-buttons/page-buttons.js',
-                        ],
                     },
                 },
                 {
