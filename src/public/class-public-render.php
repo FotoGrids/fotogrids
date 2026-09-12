@@ -630,17 +630,17 @@ class Public_Render {
 
 		$sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
 
-		// window.fotogrids carries only the sharing-related deep-link
-		// settings now. REST URLs and nonces are per-render: Stats and
-		// Album_To_Gallery_Ajax write their own URL/nonce into per-element
-		// data attributes. Lazy-load is gated by the per-gallery
-		// data-fg-lazy attribute, not a global.
+		// window.fotogrids carries the sharing-related deep-link settings
+		// and, for signed-in visitors only, a REST nonce. Per-render nonces
+		// in data attributes can come from the render cache, so they are
+		// not tied to the current visitor.
 		wp_localize_script(
 			'fotogrids-runtime',
 			'fotogrids',
 			array(
 				'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
 				'embedded_share_target' => $sharing['embedded_share_target'],
+				'restNonce'             => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 			)
 		);
 	}

@@ -105,6 +105,21 @@ final class Gallery_Item_Sequence {
 	}
 
 	/**
+	 * Builds an item-stub Render_Context for a gallery's stored items.
+	 *
+	 * Carries settings, meta and item IDs only - enough for gate, sorter
+	 * and filter-source predicates, not for rendering.
+	 *
+	 * @since  1.1.2
+	 * @param  int                  $gallery_id Gallery post ID.
+	 * @param  array<string, mixed> $settings   Resolved gallery settings.
+	 * @return Render_Context
+	 */
+	public static function stub_context( int $gallery_id, array $settings ): Render_Context {
+		return self::build_stub_context( $gallery_id, $settings, null, array(), self::raw_ids( $gallery_id ) );
+	}
+
+	/**
 	 * @return array<int, int>
 	 */
 	private static function raw_ids( int $gallery_id ): array {

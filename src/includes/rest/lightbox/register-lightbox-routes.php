@@ -48,7 +48,7 @@ class Register_Lightbox_Routes {
 							'type'              => 'integer',
 							'default'           => 0,
 							'sanitize_callback' => 'absint',
-							'description'       => __( 'Gallery ID, used to determine which EXIF fields are enabled for display.', 'fotogrids' ),
+							'description'       => __( 'Gallery the item is shown in. Required unless the current user can edit the item; also selects which EXIF fields are read live.', 'fotogrids' ),
 						),
 					),
 				),
