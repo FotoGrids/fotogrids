@@ -265,7 +265,7 @@ class Module extends Abstract_Module {
 				</div>
 
 				<div class="fotogrids-templates-page__content">
-					<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading templates...', 'fotogrids' ) ); ?>
+					<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading templates', 'fotogrids' ) ); ?>
 				</div>
 			</div>
 		</div>
@@ -475,7 +475,7 @@ class Module extends Abstract_Module {
 			'proSaveDescriptionAlbum'    => __( 'With a {pro_badge} license, you will be able to save the current album settings as a reusable template and apply it across multiple albums.', 'fotogrids' ),
 			'dismiss'                    => __( 'Dismiss', 'fotogrids' ),
 			'upgradeToPro'               => __( 'Upgrade to Pro', 'fotogrids' ),
-			'loading'                    => __( 'Loading templates...', 'fotogrids' ),
+			'loading'                    => __( 'Loading templates', 'fotogrids' ),
 			'noTemplates'                => __( 'No templates available', 'fotogrids' ),
 			'templateApplied'            => __( 'Template applied successfully', 'fotogrids' ),
 			'templateSaved'              => __( 'Template saved successfully', 'fotogrids' ),

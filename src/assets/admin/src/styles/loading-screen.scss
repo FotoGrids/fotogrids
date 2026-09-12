@@ -16,8 +16,8 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-text-tertiary);
-		width: 48px;
-		height: 48px;
+		width: 36px;
+		height: 36px;
 
 		.fotogrids-loading-mark {
 			width: 100%;
@@ -44,7 +44,7 @@
 	&__bar {
 		position: absolute;
 		background: currentColor;
-		animation: fotogrids-loading-wipe-x 1.8s linear infinite;
+		animation: fotogrids-loading-wipe-x 1.4s linear infinite;
 		transform-origin: left center;
 	}
 
@@ -60,7 +60,7 @@
 		inset-inline-start: 0;
 		width: 62.609%;
 		height: 25.217%;
-		animation-delay: 0.12s;
+		animation-delay: 0.09s;
 	}
 
 	&__bar--3 {
@@ -68,7 +68,7 @@
 		inset-inline-start: 0;
 		width: 25.217%;
 		height: 25.217%;
-		animation-delay: 0.24s;
+		animation-delay: 0.18s;
 	}
 
 	&__bar--4 {
@@ -78,7 +78,7 @@
 		height: 25.217%;
 		opacity: 0.7;
 		animation-name: fotogrids-loading-wipe-y;
-		animation-delay: 0.36s;
+		animation-delay: 0.27s;
 		transform-origin: center bottom;
 	}
 
@@ -89,7 +89,7 @@
 		height: 62.609%;
 		opacity: 0.7;
 		animation-name: fotogrids-loading-wipe-y;
-		animation-delay: 0.48s;
+		animation-delay: 0.36s;
 		transform-origin: center bottom;
 	}
 }

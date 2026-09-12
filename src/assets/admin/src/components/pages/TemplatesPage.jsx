@@ -581,7 +581,7 @@ const TemplatesPage = () => {
 								<LoadingIcon size="100%" />
 							</span>
 							<p className="fotogrids-loading-screen__label">
-								{__('Loading templates...', 'fotogrids')}
+								{__('Loading templates', 'fotogrids')}
 							</p>
 						</div>
 					) : (
