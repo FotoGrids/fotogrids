@@ -1,0 +1,145 @@
+/**
+ * Shared admin loading screen: the animated FotoGrids mark over a label,
+ * used wherever a page or panel waits for its first data.
+ */
+.fotogrids-loading-screen {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 24px;
+	padding: 64px;
+	color: var(--fg-text-tertiary);
+
+	&__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-text-tertiary);
+		width: 36px;
+		height: 36px;
+
+		.fotogrids-loading-mark {
+			width: 100%;
+		}
+	}
+
+	&__label {
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+}
+
+/**
+ * The animated FotoGrids mark. Bars are positioned as percentages of the
+ * 115-unit brand grid and animated with transforms only, so the animation is
+ * composited and keeps running while the main thread parses the admin bundles.
+ */
+.fotogrids-loading-mark {
+	position: relative;
+	display: block;
+	aspect-ratio: 1 / 1;
+
+	&__bar {
+		position: absolute;
+		background: currentColor;
+		animation: fotogrids-loading-wipe-x 1.4s linear infinite;
+		transform-origin: left center;
+	}
+
+	&__bar--1 {
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		width: 100%;
+		height: 25.217%;
+	}
+
+	&__bar--2 {
+		inset-block-start: 37.391%;
+		inset-inline-start: 0;
+		width: 62.609%;
+		height: 25.217%;
+		animation-delay: 0.09s;
+	}
+
+	&__bar--3 {
+		inset-block-start: 74.783%;
+		inset-inline-start: 0;
+		width: 25.217%;
+		height: 25.217%;
+		animation-delay: 0.18s;
+	}
+
+	&__bar--4 {
+		inset-block-start: 74.783%;
+		inset-inline-start: 37.391%;
+		width: 25.217%;
+		height: 25.217%;
+		opacity: 0.7;
+		animation-name: fotogrids-loading-wipe-y;
+		animation-delay: 0.27s;
+		transform-origin: center bottom;
+	}
+
+	&__bar--5 {
+		inset-block-start: 37.391%;
+		inset-inline-start: 74.783%;
+		width: 25.217%;
+		height: 62.609%;
+		opacity: 0.7;
+		animation-name: fotogrids-loading-wipe-y;
+		animation-delay: 0.36s;
+		transform-origin: center bottom;
+	}
+}
+
+/* Horizontal bars clear to the right and grow back from the left. The jump back
+   happens while the bar is scaled to nothing, so it is not visible. */
+@keyframes fotogrids-loading-wipe-x {
+	0%,
+	4% {
+		transform: translateX(0) scaleX(1);
+	}
+
+	44% {
+		transform: translateX(100%) scaleX(0);
+	}
+
+	44.01% {
+		transform: translateX(0) scaleX(0);
+	}
+
+	88%,
+	100% {
+		transform: translateX(0) scaleX(1);
+	}
+}
+
+/* Vertical bars clear upwards and grow back upwards, so they travel in one
+   direction the way the horizontal bars do. */
+@keyframes fotogrids-loading-wipe-y {
+	0%,
+	4% {
+		transform: translateY(0) scaleY(1);
+	}
+
+	44% {
+		transform: translateY(-100%) scaleY(0);
+	}
+
+	44.01% {
+		transform: translateY(0) scaleY(0);
+	}
+
+	88%,
+	100% {
+		transform: translateY(0) scaleY(1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fotogrids-loading-mark__bar {
+		animation: none;
+	}
+}

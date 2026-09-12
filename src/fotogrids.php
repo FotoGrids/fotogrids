@@ -66,6 +66,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-regenera
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-collection-defaults.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-password-crypto.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-screen.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-loading-indicator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-settings-localizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-debug-log.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-partial-expander.php';
