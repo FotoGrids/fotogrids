@@ -127,7 +127,10 @@ const TemplatesPage = () => {
 	const [libraryMeta, setLibraryMeta] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
 	const [creatingId, setCreatingId] = useState(null);
-	const isProActive = window.fotogridsSettings?.isProActive || false;
+	const isProActive =
+		window.fotogridsTemplatesPage?.isPro ||
+		window.fotogridsSettings?.isProActive ||
+		false;
 
 	// The setup wizard links here with ?fg_choose=1 to pick a template for a
 	// gallery that does not exist yet. Read once - the flag never changes

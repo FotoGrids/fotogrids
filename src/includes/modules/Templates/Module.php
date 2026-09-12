@@ -35,19 +35,6 @@ class Module extends Abstract_Module {
 	 */
 	private const PAGE_HOOK = 'fotogrids_page_fotogrids-templates';
 
-	/**
-	 * Tab icon markup, copied from `assets/admin/plain/icons.js` (`layout_3x3`)
-	 * because that library is JavaScript-only and the placeholder renders
-	 * before it loads.
-	 */
-	private const ICON_LAYOUT_3X3 = '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="3" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="3" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="10" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="10" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="10" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="17" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="17" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/><rect x="17" y="17" width="4" height="4" rx="0.4" stroke="currentColor" stroke-width="1.5"/></svg>';
-
-	/**
-	 * Info-list icon markup, copied from `assets/admin/plain/icons.js`
-	 * (`check_circle`) for the same reason.
-	 */
-	private const ICON_CHECK_CIRCLE = '<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 12L10.5 15L16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
 	public function get_id(): string {
 		return 'templates';
 	}
@@ -196,6 +183,9 @@ class Module extends Abstract_Module {
 	 * (header + container class) the shared admin renderer used, so appearance
 	 * and any styles targeting .fotogrids-admin-page are preserved.
 	 *
+	 * The mount point holds a loading indicator, which the React tree replaces
+	 * when it mounts, so the screen is not blank while the bundle loads.
+	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
@@ -208,160 +198,8 @@ class Module extends Abstract_Module {
 				</h1>
 			</div>
 			<div id="fotogrids-templates-page" class="fotogrids-admin-page">
-				<?php $this->render_page_placeholder(); ?>
+				<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading templates', 'fotogrids' ) ); ?>
 			</div>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Render the page chrome the React tree mounts over.
-	 *
-	 * The page bundle is enqueued in the footer, so without this the screen is
-	 * empty until the bundle has downloaded, parsed and mounted - the longest
-	 * part of the wait on a slow connection. Everything except the template
-	 * grid is server-rendered here and replaced by the equivalent React markup
-	 * on mount; the grid area carries the loading indicator until the catalog
-	 * request resolves.
-	 *
-	 * Mirrors the chrome in `assets/admin/src/components/pages/TemplatesPage.jsx`
-	 * - the two must be changed together.
-	 *
-	 * @since 1.1.1
-	 * @return void
-	 */
-	private function render_page_placeholder(): void {
-		?>
-		<div class="fotogrids-templates-page fotogrids-templates-page--placeholder">
-			<?php $this->render_placeholder_info(); ?>
-
-			<div class="fotogrids-templates-page__main">
-				<div class="fotogrids-templates-page__header">
-					<div class="fotogrids-templates-page__tabs">
-						<button type="button" class="fotogrids-templates-page__tab fg-is-active">
-							<span class="fotogrids-templates-page__tab__icon">
-								<span class="fotogrids-icon fotogrids-icon--layout_3x3"><?php echo self::ICON_LAYOUT_3X3; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Class constant holding static SVG markup. ?></span>
-							</span>
-							<span class="fotogrids-templates-page__tab__label">
-								<?php esc_html_e( 'Gallery Templates', 'fotogrids' ); ?>
-							</span>
-						</button>
-					</div>
-
-					<div class="fotogrids-templates-page__types">
-						<?php
-						$this->render_placeholder_checkbox(
-							__( 'Your Templates', 'fotogrids' ),
-							false,
-							! \FotoGrids\License_Manager::has_pro()
-						);
-						$this->render_placeholder_checkbox(
-							__( 'FotoGrids Templates', 'fotogrids' ),
-							true,
-							false
-						);
-						?>
-					</div>
-				</div>
-
-				<div class="fotogrids-templates-page__content">
-					<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading templates', 'fotogrids' ) ); ?>
-				</div>
-			</div>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Render the "What are Templates?" column of the placeholder chrome.
-	 *
-	 * Shown to free installations only, matching the React tree.
-	 *
-	 * @since 1.1.1
-	 * @return void
-	 */
-	private function render_placeholder_info(): void {
-		if ( \FotoGrids\License_Manager::has_pro() ) {
-			return;
-		}
-
-		$items = array(
-			array(
-				'title'       => __( 'Save valuable time', 'fotogrids' ),
-				'description' => __( 'Launch new galleries in minutes using ready-made layouts instead of rebuilding designs from scratch.', 'fotogrids' ),
-				'pro'         => false,
-			),
-			array(
-				'title'       => __( 'Keep every gallery on-brand', 'fotogrids' ),
-				'description' => __( 'Apply the same spacing, colors and interactions across multiple galleries and albums with one click.', 'fotogrids' ),
-				'pro'         => false,
-			),
-			array(
-				'title'       => __( 'Create your own templates', 'fotogrids' ),
-				'description' => __( 'Turn your best-performing gallery and album designs into reusable templates that your whole team can apply in a few clicks.', 'fotogrids' ),
-				'pro'         => true,
-			),
-		);
-		?>
-		<aside class="fotogrids-templates-page__info">
-			<h2><?php esc_html_e( 'What are Templates?', 'fotogrids' ); ?></h2>
-			<p><?php esc_html_e( 'Templates are complete, ready-to-use gallery and album configurations.', 'fotogrids' ); ?></p>
-			<p><?php esc_html_e( 'Templates bundle layout, spacing, hover effects and styling into reusable presets that you can apply in one click.', 'fotogrids' ); ?></p>
-
-			<ul class="fotogrids-templates-page__info-list">
-				<?php foreach ( $items as $item ) : ?>
-					<li class="fotogrids-templates-page__info-item <?php echo $item['pro'] ? 'fotogrids-templates-page__info-item--pro' : ''; ?>">
-						<div class="fotogrids-templates-page__info-item__heading">
-							<span class="fotogrids-icon fotogrids-icon--check_circle"><?php echo self::ICON_CHECK_CIRCLE; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Class constant holding static SVG markup. ?></span>
-							<h5>
-								<?php echo esc_html( $item['title'] ); ?>
-								<?php if ( $item['pro'] ) : ?>
-									<span class="fotogrids-pro-badge"><?php esc_html_e( 'Pro', 'fotogrids' ); ?></span>
-								<?php endif; ?>
-							</h5>
-						</div>
-						<p><?php echo esc_html( $item['description'] ); ?></p>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-		</aside>
-		<?php
-	}
-
-	/**
-	 * Render one checkbox of the placeholder chrome.
-	 *
-	 * Markup matches `components/shared/Checkbox.jsx` so the control does not
-	 * change appearance when React takes over.
-	 *
-	 * @since 1.1.1
-	 * @param string $label    Visible label.
-	 * @param bool   $checked  Whether the box is ticked.
-	 * @param bool   $disabled Whether the control is disabled.
-	 * @return void
-	 */
-	private function render_placeholder_checkbox( string $label, bool $checked, bool $disabled ): void {
-		$classes = 'fg-checkbox fg-checkbox--size-md';
-		if ( $checked ) {
-			$classes .= ' fg-checkbox--checked';
-		}
-		if ( $disabled ) {
-			$classes .= ' fg-checkbox--disabled';
-		}
-		?>
-		<div class="fg-checkbox__wrapper">
-			<label class="<?php echo esc_attr( $classes ); ?>">
-				<span class="fg-checkbox__control">
-					<input type="checkbox" class="fg-checkbox__input" <?php checked( $checked ); ?> <?php disabled( $disabled ); ?> />
-					<span class="fg-checkbox__box" aria-hidden="true">
-						<svg class="fg-checkbox__check" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-							<path class="fg-checkbox__check-path" d="M3.5 8.5l3 3 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-							<path class="fg-checkbox__dash-path" d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-						</svg>
-					</span>
-				</span>
-				<span class="fg-checkbox__label"><?php echo esc_html( $label ); ?></span>
-			</label>
 		</div>
 		<?php
 	}
@@ -435,16 +273,26 @@ class Module extends Abstract_Module {
 			return;
 		}
 
-		// Depend on fotogrids-admin so the shared admin runtime + design-system
-		// CSS load alongside the page bundle (parity with how Tools depend on
-		// it). Admin_Init enqueues fotogrids-admin at priority 10; this runs at
-		// 20, so the dependency resolves.
+		// Deliberately not dependent on fotogrids-admin: that bundle is four
+		// times the size of this one, and waiting for it delays the mount by
+		// its whole download. Admin_Init enqueues it on this screen anyway, and
+		// the globals it defines are read from click handlers, by which time it
+		// has run. The stylesheet below still depends on it.
 		wp_enqueue_script(
 			'fotogrids-module-templates-page',
 			$this->module_asset_url( 'assets/templates-page.js' ),
-			array( 'wp-element', 'wp-api-fetch', 'wp-i18n', 'fotogrids-admin' ),
+			array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ),
 			FOTOGRIDS_VERSION,
 			true
+		);
+
+		// The page reads the licence state while it mounts. fotogridsSettings is
+		// attached to the admin bundle's handle, which this script no longer
+		// waits for, so the flag travels with the page bundle instead.
+		wp_localize_script(
+			'fotogrids-module-templates-page',
+			'fotogridsTemplatesPage',
+			array( 'isPro' => \FotoGrids\License_Manager::has_pro() )
 		);
 
 		wp_enqueue_style(
