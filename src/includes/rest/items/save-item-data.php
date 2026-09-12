@@ -99,7 +99,7 @@ class Save_Item_Data {
 			);
 		}
 
-		update_post_meta( $item_id, '_wp_attachment_item_alt', $alt );
+		update_post_meta( $item_id, '_wp_attachment_image_alt', $alt );
 
 		// ── fotogrids_item_meta upsert ────────────────────────────────────────
 		$credit       = sanitize_text_field( $request->get_param( 'credit' ) ?? '' );
