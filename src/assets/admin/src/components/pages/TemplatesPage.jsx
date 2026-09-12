@@ -520,35 +520,35 @@ const TemplatesPage = () => {
 				</div>
 
 				<div className="fotogrids-templates-page__content">
-					{!loading && (
-						<div className="fotogrids-templates-page__library-bar">
-							{showFotoGridsTemplates && proTierVisible && (
-								<div className="fotogrids-templates-page__library-bar__tiers">
-									<Checkbox
-										checked={showFree}
-										onChange={handleFreeChange}
-										label={__('Free', 'fotogrids')}
-									/>
-									<Checkbox
-										checked={showPro}
-										onChange={handleProChange}
-										label={__('Pro', 'fotogrids')}
-									/>
-								</div>
-							)}
-							<span
-								className="fotogrids-templates-page__library-bar__updated"
-								title={
-									libraryMeta && libraryMeta.fetched_at
-										? __(
-												'Last synced from the FotoGrids template library. The catalog is cached and refreshes periodically; use Refresh to sync now.',
-												'fotogrids'
-											) +
-											` (${syncedAbsolute(libraryMeta)})`
-										: ''
-								}
-							>
-								{libraryMeta && syncedAgo(libraryMeta)
+					<div className="fotogrids-templates-page__library-bar">
+						{showFotoGridsTemplates && proTierVisible && (
+							<div className="fotogrids-templates-page__library-bar__tiers">
+								<Checkbox
+									checked={showFree}
+									onChange={handleFreeChange}
+									label={__('Free', 'fotogrids')}
+								/>
+								<Checkbox
+									checked={showPro}
+									onChange={handleProChange}
+									label={__('Pro', 'fotogrids')}
+								/>
+							</div>
+						)}
+						<span
+							className="fotogrids-templates-page__library-bar__updated"
+							title={
+								libraryMeta && libraryMeta.fetched_at
+									? __(
+											'Last synced from the FotoGrids template library. The catalog is cached and refreshes periodically; use Refresh to sync now.',
+											'fotogrids'
+										) + ` (${syncedAbsolute(libraryMeta)})`
+									: ''
+							}
+						>
+							{loading
+								? ''
+								: libraryMeta && syncedAgo(libraryMeta)
 									? __(
 											'Last synced {time} ago',
 											'fotogrids'
@@ -560,23 +560,20 @@ const TemplatesPage = () => {
 											'Showing built-in templates',
 											'fotogrids'
 										)}
-							</span>
-							<Button
-								variant="secondary"
-								size="sm"
-								icon="refresh_cv"
-								className={
-									refreshing
-										? 'fotogrids-refresh-spinning'
-										: ''
-								}
-								onClick={() => loadTemplates(true)}
-								disabled={refreshing || loading}
-							>
-								{__('Refresh library', 'fotogrids')}
-							</Button>
-						</div>
-					)}
+						</span>
+						<Button
+							variant="secondary"
+							size="sm"
+							icon="refresh_cv"
+							className={
+								refreshing ? 'fotogrids-refresh-spinning' : ''
+							}
+							onClick={() => loadTemplates(true)}
+							disabled={refreshing || loading}
+						>
+							{__('Refresh library', 'fotogrids')}
+						</Button>
+					</div>
 
 					{loading ? (
 						<div className="fotogrids-loading-screen" role="status">

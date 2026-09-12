@@ -183,9 +183,6 @@ class Module extends Abstract_Module {
 	 * (header + container class) the shared admin renderer used, so appearance
 	 * and any styles targeting .fotogrids-admin-page are preserved.
 	 *
-	 * The mount point holds a loading indicator, which the React tree replaces
-	 * when it mounts, so the screen is not blank while the bundle loads.
-	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
@@ -198,7 +195,7 @@ class Module extends Abstract_Module {
 				</h1>
 			</div>
 			<div id="fotogrids-templates-page" class="fotogrids-admin-page">
-				<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading templates', 'fotogrids' ) ); ?>
+				<!-- Templates React page mounts here (module page bundle). -->
 			</div>
 		</div>
 		<?php
