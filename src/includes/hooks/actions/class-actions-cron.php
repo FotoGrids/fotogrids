@@ -42,4 +42,16 @@ final class Actions_Cron {
 	 * @since 1.1.2
 	 */
 	public const CACHE_PURGE = 'fotogrids/cron/cache_purge';
+
+	/**
+	 * Every scheduled WP-Cron action the plugin owns.
+	 *
+	 * @since 1.1.2
+	 * @var string[]
+	 */
+	public const ALL_CRON_ACTIONS = array(
+		self::STATS_CLEANUP,
+		self::SEND_STATISTICS,
+		self::CACHE_PURGE,
+	);
 }

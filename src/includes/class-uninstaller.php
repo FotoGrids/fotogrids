@@ -46,6 +46,8 @@ class Uninstaller {
 	 * Uninstall the plugin completely
 	 */
 	public static function uninstall() {
+		self::clear_scheduled_events();
+
 		if ( ! self::should_delete_data() ) {
 			return;
 		}
@@ -66,6 +68,27 @@ class Uninstaller {
 		self::remove_options();
 		self::remove_post_meta();
 		self::remove_transients();
+	}
+
+	/**
+	 * Clear every scheduled FotoGrids cron event.
+	 *
+	 * Runs before the data-deletion check: a scheduled event is not site data,
+	 * and one left in the cron option fires into a plugin that is no longer
+	 * installed. Deactivation clears the same events, so the work left here is
+	 * events stranded by a version that did not.
+	 *
+	 * @since  1.1.2
+	 * @return void
+	 */
+	private static function clear_scheduled_events() {
+		if ( ! class_exists( '\FotoGrids\Hooks\Actions_Cron' ) ) {
+			return;
+		}
+
+		foreach ( \FotoGrids\Hooks\Actions_Cron::ALL_CRON_ACTIONS as $hook ) {
+			wp_clear_scheduled_hook( $hook );
+		}
 	}
 
 	/**
