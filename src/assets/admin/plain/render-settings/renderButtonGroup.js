@@ -17,7 +17,9 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 	const { createElement: h } = wp.element;
 
 	const baseOptions = isDefaultsMode
-		? (setting.options || []).filter((option) => !option.isGlobalDefault)
+		? (setting.options || []).filter(
+				(option) => !option || !option.isGlobalDefault
+			)
 		: setting.options || [];
 
 	// Per-option `condition` evaluation. Lets an option opt out of the
