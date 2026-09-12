@@ -111,15 +111,6 @@
         justify-content: flex-end;
         gap: 12px;
 
-        // Free / Pro tier toggles sit at the left; the synced label and the
-        // Refresh button are pushed to the right.
-        &__tiers {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-inline-end: auto;
-        }
-
         &__updated {
             font-size: 11px;
             color: var(--fg-text-secondary);

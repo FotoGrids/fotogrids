@@ -122,8 +122,6 @@ const TemplatesPage = () => {
 	const [showApplyModal, setShowApplyModal] = useState(false);
 	const [showUserTemplates, setShowUserTemplates] = useState(false);
 	const [showFotoGridsTemplates, setShowFotoGridsTemplates] = useState(true);
-	const [showFree, setShowFree] = useState(true);
-	const [showPro, setShowPro] = useState(true);
 	const [libraryMeta, setLibraryMeta] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
 	const [creatingId, setCreatingId] = useState(null);
@@ -419,39 +417,11 @@ const TemplatesPage = () => {
 		setShowFotoGridsTemplates(checked);
 	};
 
-	const handleFreeChange = (checked) => {
-		// Keep at least one tier visible.
-		if (!checked && !showPro) {
-			return;
-		}
-		setShowFree(checked);
-	};
-
-	const handleProChange = (checked) => {
-		if (!checked && !showFree) {
-			return;
-		}
-		setShowPro(checked);
-	};
-
 	const currentTemplates = templates[activeTab] || [];
 	const currentUserTemplates = userTemplates[activeTab] || [];
 	const filteredUserTemplates = showUserTemplates ? currentUserTemplates : [];
 
-	// Free / Pro toggles filter the already-loaded FotoGrids cards client-side;
-	// no refetch. A template counts as Pro when its type is anything but 'free'.
-	const matchesTier = (template) => {
-		const isPro = template.type && template.type !== 'free';
-		return isPro ? showPro : showFree;
-	};
-	const filteredTemplates = showFotoGridsTemplates
-		? currentTemplates.filter(matchesTier)
-		: [];
-
-	// The library can hide Pro entirely (flags.show_pro). When hidden there are
-	// no Pro templates in the payload, so the Free/Pro tier toggles serve no
-	// purpose and are removed.
-	const proTierVisible = libraryMeta?.flags?.show_pro !== false;
+	const filteredTemplates = showFotoGridsTemplates ? currentTemplates : [];
 	const activeTemplateType =
 		activeTab === 'gallery'
 			? __('Gallery', 'fotogrids')
@@ -521,20 +491,6 @@ const TemplatesPage = () => {
 
 				<div className="fotogrids-templates-page__content">
 					<div className="fotogrids-templates-page__library-bar">
-						{showFotoGridsTemplates && proTierVisible && (
-							<div className="fotogrids-templates-page__library-bar__tiers">
-								<Checkbox
-									checked={showFree}
-									onChange={handleFreeChange}
-									label={__('Free', 'fotogrids')}
-								/>
-								<Checkbox
-									checked={showPro}
-									onChange={handleProChange}
-									label={__('Pro', 'fotogrids')}
-								/>
-							</div>
-						)}
 						<span
 							className="fotogrids-templates-page__library-bar__updated"
 							title={
