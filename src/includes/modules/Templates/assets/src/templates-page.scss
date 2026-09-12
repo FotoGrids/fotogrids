@@ -232,6 +232,14 @@
         gap: 40px;
     }
 
+    &__info-placeholder {
+        flex: 0 0 320px;
+        min-height: 420px;
+        background: #fff;
+        border: 1px solid var(--fg-border-primary);
+        border-radius: 8px;
+    }
+
     &__loading {
         display: flex;
         flex-direction: column;

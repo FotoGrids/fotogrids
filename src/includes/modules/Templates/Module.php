@@ -35,6 +35,12 @@ class Module extends Abstract_Module {
 	 */
 	private const PAGE_HOOK = 'fotogrids_page_fotogrids-templates';
 
+	/**
+	 * Number of placeholder cards in the server-rendered loading state.
+	 * Matches SKELETON_CARD_COUNT in TemplatesPage.jsx.
+	 */
+	private const PLACEHOLDER_CARDS = 8;
+
 	public function get_id(): string {
 		return 'templates';
 	}
@@ -195,7 +201,47 @@ class Module extends Abstract_Module {
 				</h1>
 			</div>
 			<div id="fotogrids-templates-page" class="fotogrids-admin-page">
-				<!-- Templates React page mounts here (module page bundle). -->
+				<?php $this->render_page_placeholder(); ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render the loading state the React page mounts over.
+	 *
+	 * The page bundle is enqueued in the footer, so without this the screen is
+	 * empty until the bundle has downloaded, parsed and mounted - the longest
+	 * part of the wait on a slow connection. React replaces this markup with
+	 * its own equivalent on mount.
+	 *
+	 * @since 1.1.1
+	 * @return void
+	 */
+	private function render_page_placeholder(): void {
+		?>
+		<div class="fotogrids-templates-page">
+			<?php if ( ! \FotoGrids\License_Manager::has_pro() ) : ?>
+				<?php // Holds the width the info column takes once React mounts. ?>
+				<div class="fotogrids-templates-page__info-placeholder" aria-hidden="true"></div>
+			<?php endif; ?>
+			<div class="fotogrids-templates-page__main">
+				<div class="fotogrids-templates-page__content">
+					<div class="fotogrids-templates-page__loading">
+						<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading templates...', 'fotogrids' ) ); ?>
+						<div class="fotogrids-templates-page__grid" aria-hidden="true">
+							<?php for ( $i = 0; $i < self::PLACEHOLDER_CARDS; $i++ ) : ?>
+								<div class="fotogrids-template-card fotogrids-template-card--skeleton">
+									<div class="fotogrids-template-card__preview"></div>
+									<div class="fotogrids-template-card__content">
+										<span class="fotogrids-template-card__skeleton-line"></span>
+										<span class="fotogrids-template-card__skeleton-line fotogrids-template-card__skeleton-line--short"></span>
+									</div>
+								</div>
+							<?php endfor; ?>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php
