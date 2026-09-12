@@ -7,6 +7,7 @@
 import '@/admin/plain/render-settings/utils/post-type-placeholders';
 import '@/admin/plain/render-settings/utils/tooltip-utils';
 import '@/admin/plain/render-settings/utils/fg-color-picker';
+import '@/admin/plain/render-settings/utils/dynamic-options';
 import '@/admin/plain/render-settings/renderToggle';
 import '@/admin/plain/render-settings/renderTextInput';
 import '@/admin/plain/render-settings/renderSelect';

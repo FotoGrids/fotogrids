@@ -125,6 +125,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-info-block-divider    rgba - divider colour (only when style=divided)
  *   data-fg-lb-credit-source         = "exif"  (absent = "item_meta" default)
  *   data-fg-lb-exif-fields           = "camera aperture ..." (space-sep list of enabled EXIF field keys; absent = exif block disabled or display_exif off)
+ *   data-fg-lb-exif-labels           = JSON map of those field keys to their translated labels
  *
  * Image filter attributes (desktop breakpoint values only - lightbox is fullscreen):
  *   data-fg-lb-thumb-filter          = combined CSS filter string for lightbox thumbnail strip images
@@ -521,18 +522,9 @@ final class Lightbox implements Feature {
 			// EXIF fields - which fields are enabled for display in the EXIF block.
 			// Only emitted when the exif block is enabled and display_exif is on.
 			if ( in_array( 'exif', $info_blocks_clean, true ) && $this->setting_to_bool( $s['display_exif'] ?? false ) ) {
-				$exif_key_map   = array(
-					'exif_camera'        => 'camera',
-					'exif_aperture'      => 'aperture',
-					'exif_shutter_speed' => 'shutter_speed',
-					'exif_iso'           => 'iso',
+				$enabled_fields = \FotoGrids\Exif\Exif_Fields::sanitize_keys(
+					\FotoGrids\Exif\Exif_Extractor::parse_field_setting( $s['exif_fields'] ?? array() )
 				);
-				$enabled_fields = array();
-				foreach ( $exif_key_map as $setting_key => $field_key ) {
-					if ( $this->setting_to_bool( $s[ $setting_key ] ?? true ) ) {
-						$enabled_fields[] = $field_key;
-					}
-				}
 				// Add-ons extend the emitted EXIF field list (mirrors
 				// Exif_Extractor::enabled_fields_for_gallery()).
 				$enabled_fields = (array) apply_filters(
@@ -541,8 +533,15 @@ final class Lightbox implements Feature {
 					$s,
 					$render_context->meta->gallery_id
 				);
+				$enabled_fields = \FotoGrids\Exif\Exif_Fields::sanitize_keys( $enabled_fields );
 				if ( ! empty( $enabled_fields ) ) {
 					$attrs['data-fg-lb-exif-fields'] = implode( ' ', $enabled_fields );
+					$attrs['data-fg-lb-exif-labels'] = (string) wp_json_encode(
+						array_intersect_key(
+							\FotoGrids\Exif\Exif_Fields::labels(),
+							array_flip( $enabled_fields )
+						)
+					);
 				}
 			}
 		}

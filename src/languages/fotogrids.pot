@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FotoGrids 1.1.0\n"
-"Report-Msgid-Bugs-To: https://www.fotogrids.com\n"
-"Last-Translator: FotoGrids <hello@fotogrids.com>\n"
-"Language-Team: FotoGrids <hello@fotogrids.com>\n"
+"Project-Id-Version: FotoGrids 1.1.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fotogrids\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-25T17:23:06+00:00\n"
+"POT-Creation-Date: 2026-09-10T18:13:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: includes/class-admin-init.php:71
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
-#: includes/metaboxes/class-metabox-registrar.php:897
+#: includes/metaboxes/class-metabox-registrar.php:951
 #: includes/modules/PageBuilders/builders/Elementor/Module.php:179
 #: assets/admin/src/components/setup-wizard/StepWelcome.jsx:120
 msgid "FotoGrids"
@@ -42,20 +42,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:239
+#: fotogrids.php:244
 msgid "FotoGrids requires WordPress version 6.1 or higher."
 msgstr ""
 
-#: fotogrids.php:240
-#: fotogrids.php:249
+#: fotogrids.php:245
+#: fotogrids.php:254
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:248
+#: fotogrids.php:253
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:264
+#: fotogrids.php:269
 #: includes/class-admin-init.php:135
 #: includes/class-admin-init.php:136
 #: includes/tools/import-export/assets/ImportExportTool.jsx:45
@@ -63,11 +63,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:282
+#: fotogrids.php:287
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:307
+#: fotogrids.php:312
 #: assets/admin/src/components/dashboard/LearnSection.jsx:56
 msgid "Help Center"
 msgstr ""
@@ -90,10 +90,10 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:166
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1320
+#: includes/rest/admin/admin-data.php:1533
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:427
-#: assets/admin/src/components/pages/TemplatesPage.jsx:385
+#: assets/admin/src/components/pages/TemplatesPage.jsx:454
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:39
 #: includes/tools/import-export/assets/ImportExportTool.jsx:107
 msgid "Album"
@@ -111,6 +111,7 @@ msgstr ""
 #: includes/admin/class-dashboard-widget.php:164
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:14
 #: assets/admin/src/components/library/LibraryTabBase.jsx:294
+#: assets/admin/src/components/pages/StatsPage.jsx:206
 #: includes/tools/import-export/assets/ImportExportTool.jsx:30
 #: includes/tools/import-export/assets/ImportExportTool.jsx:108
 msgid "Items"
@@ -119,7 +120,9 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:94
 #: includes/admin/class-admin-columns.php:215
 #: includes/admin/class-dashboard-widget.php:172
-#: includes/metaboxes/class-metabox-registrar.php:839
+#: includes/metaboxes/class-metabox-registrar.php:874
+#: assets/admin/src/components/dashboard/OverviewStats.jsx:16
+#: assets/admin/src/components/pages/StatsPage.jsx:208
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:103
 msgid "Interactions"
 msgstr ""
@@ -151,8 +154,9 @@ msgstr ""
 #: includes/class-post-types.php:328
 #: includes/diagnostics/class-system-report.php:160
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:12
+#: assets/admin/src/components/pages/StatsPage.jsx:204
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:277
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:24
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:25
 #: includes/tools/import-export/assets/ImportExportTool.jsx:18
 #: includes/tools/import-export/assets/ImportExportTool.jsx:106
 #: includes/tools/migration/assets/MigrationTool.jsx:22
@@ -208,6 +212,7 @@ msgid "No news available at this time."
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:114
+#: includes/metaboxes/class-metabox-registrar.php:798
 #: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:53
 msgid "New"
 msgstr ""
@@ -217,7 +222,8 @@ msgstr ""
 #: includes/class-admin-init.php:100
 #: includes/diagnostics/class-system-report.php:161
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:13
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:25
+#: assets/admin/src/components/pages/StatsPage.jsx:205
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:26
 #: includes/tools/import-export/assets/ImportExportTool.jsx:24
 #: includes/tools/import-export/assets/ImportExportTool.jsx:107
 msgid "Albums"
@@ -237,10 +243,10 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:167
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1320
+#: includes/rest/admin/admin-data.php:1533
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:428
-#: assets/admin/src/components/pages/TemplatesPage.jsx:384
+#: assets/admin/src/components/pages/TemplatesPage.jsx:453
 #: assets/admin/src/utils/gallery.js:15
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:40
 #: includes/tools/import-export/assets/ImportExportTool.jsx:106
@@ -294,7 +300,7 @@ msgid "Skip & Deactivate"
 msgstr ""
 
 #: includes/admin/class-deactivation-feedback.php:152
-#: includes/metaboxes/class-metabox-registrar.php:756
+#: includes/metaboxes/class-metabox-registrar.php:759
 #: includes/modules/Templates/Module.php:323
 #: assets/admin/plain/render-settings/renderBulkModal.js:233
 #: assets/admin/src/components/library/LibraryTabBase.jsx:113
@@ -343,6 +349,7 @@ msgid "It's a temporary deactivation - I'm troubleshooting an issue"
 msgstr ""
 
 #: includes/admin/class-deactivation-feedback.php:197
+#: includes/exif/class-exif-formatter.php:273
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:297
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:316
 msgid "Other"
@@ -363,9 +370,9 @@ msgid "Effects"
 msgstr ""
 
 #: includes/admin/class-settings-localizer.php:278
-#: includes/metaboxes/class-metabox-registrar.php:848
-#: assets/admin/plain/collection-settings.js:2328
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:37
+#: includes/metaboxes/class-metabox-registrar.php:883
+#: assets/admin/plain/collection-settings.js:2291
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:28
@@ -373,9 +380,9 @@ msgid "Advanced"
 msgstr ""
 
 #: includes/admin/class-settings-localizer.php:279
-#: includes/metaboxes/class-metabox-registrar.php:850
-#: assets/admin/plain/collection-settings.js:110
-#: assets/admin/plain/collection-settings.js:2441
+#: includes/metaboxes/class-metabox-registrar.php:885
+#: assets/admin/plain/collection-settings.js:115
+#: assets/admin/plain/collection-settings.js:2405
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -391,8 +398,8 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderToggle.js:20
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:181
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:186
-#: assets/admin/src/components/pages/TemplatesPage.jsx:320
-#: assets/admin/src/components/pages/TemplatesPage.jsx:450
+#: assets/admin/src/components/pages/TemplatesPage.jsx:389
+#: assets/admin/src/components/pages/TemplatesPage.jsx:531
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:378
 msgid "Pro"
 msgstr ""
@@ -409,78 +416,79 @@ msgstr ""
 
 #: includes/class-admin-init.php:117
 #: includes/class-admin-init.php:118
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:26
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:27
 msgid "Library"
 msgstr ""
 
 #: includes/class-admin-init.php:126
 #: includes/class-admin-init.php:127
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:27
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:28
 #: includes/tools/import-export/assets/ImportExportTool.jsx:50
 msgid "Statistics"
 msgstr ""
 
 #: includes/class-admin-init.php:144
 #: includes/class-admin-init.php:145
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:28
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:29
 msgid "Tools"
 msgstr ""
 
 #: includes/class-admin-init.php:154
 #: includes/class-admin-init.php:155
-#: includes/metaboxes/class-metabox-registrar.php:857
+#: includes/metaboxes/class-metabox-registrar.php:892
 #: includes/modules/Templates/Module.php:312
-#: assets/admin/plain/collection-settings.js:2544
+#: assets/admin/plain/collection-settings.js:2508
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:651
+#: includes/class-admin-init.php:597
 #: includes/metaboxes/class-collection-save-pipeline.php:96
 #: includes/metaboxes/class-item-ajax-endpoints.php:658
 #: includes/rest/admin/admin-data.php:241
-#: includes/rest/admin/admin-data.php:271
-#: includes/rest/admin/admin-data.php:752
-#: includes/rest/admin/admin-data.php:865
-#: includes/rest/admin/admin-data.php:969
-#: includes/rest/admin/admin-data.php:1025
-#: includes/rest/admin/admin-data.php:1091
-#: includes/rest/admin/admin-data.php:1149
-#: includes/rest/admin/admin-data.php:1259
-#: includes/rest/admin/admin-data.php:1340
+#: includes/rest/admin/admin-data.php:277
+#: includes/rest/admin/admin-data.php:297
+#: includes/rest/admin/admin-data.php:866
+#: includes/rest/admin/admin-data.php:979
+#: includes/rest/admin/admin-data.php:1141
+#: includes/rest/admin/admin-data.php:1205
+#: includes/rest/admin/admin-data.php:1289
+#: includes/rest/admin/admin-data.php:1347
+#: includes/rest/admin/admin-data.php:1472
+#: includes/rest/admin/admin-data.php:1553
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:680
+#: includes/class-admin-init.php:626
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:690
+#: includes/class-admin-init.php:636
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:700
-#: includes/class-admin-init.php:762
+#: includes/class-admin-init.php:646
+#: includes/class-admin-init.php:705
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:767
+#: includes/class-admin-init.php:710
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:1011
+#: includes/class-admin-init.php:954
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:1012
+#: includes/class-admin-init.php:955
 msgid "Remove from All Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1143
+#: includes/class-admin-init.php:1086
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1149
+#: includes/class-admin-init.php:1092
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -488,8 +496,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1162
-#: includes/class-admin-init.php:1176
+#: includes/class-admin-init.php:1105
+#: includes/class-admin-init.php:1119
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -497,7 +505,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from all albums.
-#: includes/class-admin-init.php:1195
+#: includes/class-admin-init.php:1138
 #, php-format
 msgid "%d gallery removed from all albums."
 msgid_plural "%d galleries removed from all albums."
@@ -505,32 +513,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1207
-#: includes/class-admin-init.php:1221
+#: includes/class-admin-init.php:1150
+#: includes/class-admin-init.php:1164
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1239
-#: includes/class-admin-init.php:1433
+#: includes/class-admin-init.php:1182
+#: includes/class-admin-init.php:1376
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1242
+#: includes/class-admin-init.php:1185
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1245
+#: includes/class-admin-init.php:1188
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1290
+#: includes/class-admin-init.php:1233
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1293
+#: includes/class-admin-init.php:1236
 msgid "Choose an album..."
 msgstr ""
 
@@ -631,7 +639,7 @@ msgstr ""
 
 #: includes/class-post-types.php:120
 #: includes/class-post-types.php:189
-#: includes/metaboxes/class-metabox-registrar.php:767
+#: includes/metaboxes/class-metabox-registrar.php:770
 msgid "Add New"
 msgstr ""
 
@@ -866,18 +874,20 @@ msgid "Set featured image"
 msgstr ""
 
 #: includes/class-post-types.php:387
-#: includes/metaboxes/class-metabox-registrar.php:801
+#: includes/metaboxes/class-metabox-registrar.php:836
 #: assets/admin/plain/render-settings/renderImagePicker.js:167
-#: assets/admin/plain/render-settings/renderTokenSelect.js:388
+#: assets/admin/plain/render-settings/renderTokenSelect.js:399
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:234
 msgid "Remove"
 msgstr ""
 
 #: includes/class-post-types.php:459
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:226
 msgid "gallery"
 msgstr ""
 
 #: includes/class-post-types.php:462
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:242
 msgid "album"
 msgstr ""
 
@@ -917,8 +927,8 @@ msgid "Carousel for hero sliders and lookbooks. Video Playlist for video-led gal
 msgstr ""
 
 #: includes/class-upgrade-modal.php:34
-#: includes/metaboxes/class-metabox-registrar.php:847
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:35
+#: includes/metaboxes/class-metabox-registrar.php:882
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:143
 msgid "SEO"
 msgstr ""
@@ -1036,7 +1046,7 @@ msgid "Start from professionally crafted gallery and album presets that look gre
 msgstr ""
 
 #: includes/class-upgrade-modal.php:146
-#: includes/metaboxes/class-metabox-registrar.php:757
+#: includes/metaboxes/class-metabox-registrar.php:760
 #: assets/admin/src/components/shared/Modal/parts/ModalHeaderClose.jsx:22
 msgid "Close"
 msgstr ""
@@ -1044,7 +1054,7 @@ msgstr ""
 #: includes/class-upgrade-modal.php:147
 #: assets/admin/plain/render-settings/renderPromo.js:96
 #: assets/admin/src/components/dashboard/ProFeatures.jsx:56
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:306
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:355
 msgid "Upgrade Now"
 msgstr ""
 
@@ -1078,16 +1088,16 @@ msgstr ""
 
 #: includes/diagnostics/class-system-report.php:54
 #: includes/diagnostics/class-system-report.php:354
-#: includes/metaboxes/class-metabox-registrar.php:889
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:29
+#: includes/metaboxes/class-metabox-registrar.php:943
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:28
 msgid "Media"
 msgstr ""
 
 #: includes/diagnostics/class-system-report.php:55
 #: includes/diagnostics/class-system-report.php:382
-#: includes/metaboxes/class-metabox-registrar.php:899
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:229
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:233
+#: includes/metaboxes/class-metabox-registrar.php:953
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:345
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:349
 msgid "Theme"
 msgstr ""
 
@@ -1325,8 +1335,8 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:367
 #: assets/admin/src/components/library/LibraryTabBase.jsx:284
 #: assets/admin/src/components/library/LibraryTabBase.jsx:836
-#: assets/admin/src/components/pages/StatsPage.jsx:107
-#: assets/admin/src/components/pages/StatsPage.jsx:124
+#: assets/admin/src/components/pages/StatsPage.jsx:150
+#: assets/admin/src/components/pages/StatsPage.jsx:167
 msgid "Name"
 msgstr ""
 
@@ -1335,7 +1345,7 @@ msgid "Version"
 msgstr ""
 
 #: includes/diagnostics/class-system-report.php:369
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:18
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:19
 msgid "Author"
 msgstr ""
 
@@ -1391,6 +1401,260 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderImageSize.js:52
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
 msgid "No"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:61
+msgid "Camera"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:68
+msgid "Lens"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:75
+msgid "Software"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:82
+msgid "Aperture"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:89
+msgid "Shutter Speed"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:96
+msgid "ISO"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:103
+msgid "Focal Length"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:110
+msgid "Focal Length (35mm)"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:117
+msgid "Exposure Compensation"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:124
+msgid "Exposure Program"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:131
+msgid "Exposure Mode"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:138
+msgid "Metering Mode"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:145
+#: public/render/decorators/hover/class-hover-effects-teasers.php:74
+msgid "Flash"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:152
+msgid "White Balance"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:159
+msgid "Date Taken"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:166
+msgid "Orientation"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:173
+msgid "Color Space"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:180
+msgid "Artist"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:187
+msgid "Copyright"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:194
+#: assets/admin/src/components/library/LibraryTabBase.jsx:847
+msgid "Latitude"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:201
+#: assets/admin/src/components/library/LibraryTabBase.jsx:855
+msgid "Longitude"
+msgstr ""
+
+#: includes/exif/class-exif-fields.php:208
+msgid "Altitude"
+msgstr ""
+
+#. translators: %s: shutter-speed denominator, e.g. 250 in 1/250s.
+#: includes/exif/class-exif-formatter.php:145
+#, php-format
+msgid "1/%ss"
+msgstr ""
+
+#. translators: %s: shutter speed in seconds.
+#: includes/exif/class-exif-formatter.php:149
+#, php-format
+msgid "%ss"
+msgstr ""
+
+#. translators: %s: focal length in millimetres.
+#: includes/exif/class-exif-formatter.php:189
+#, php-format
+msgid "%s mm"
+msgstr ""
+
+#. translators: %s: signed exposure compensation, e.g. +0.7.
+#: includes/exif/class-exif-formatter.php:211
+#, php-format
+msgid "%s EV"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:225
+#: includes/exif/class-exif-formatter.php:249
+#: includes/exif/class-exif-formatter.php:326
+msgid "Manual"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:226
+msgid "Program"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:227
+msgid "Aperture priority"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:228
+msgid "Shutter priority"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:229
+msgid "Creative"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:230
+#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:453
+msgid "Action"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:231
+msgid "Portrait"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:232
+msgid "Landscape"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:248
+#: includes/exif/class-exif-formatter.php:325
+msgid "Auto"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:250
+msgid "Auto bracket"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:267
+msgid "Average"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:268
+msgid "Center-weighted average"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:269
+msgid "Spot"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:270
+msgid "Multi-spot"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:271
+msgid "Pattern"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:272
+#: includes/tools/import-export/assets/ImportExportTool.jsx:95
+msgid "Partial"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:294
+msgid "No flash function"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:298
+msgid "Did not fire"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:304
+msgid "Fired, forced"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:308
+msgid "Fired, auto"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:311
+msgid "Fired"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:370
+msgid "Normal"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:371
+msgid "Flipped horizontally"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:372
+msgid "Rotated 180°"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:373
+msgid "Flipped vertically"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:374
+msgid "Transposed"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:375
+msgid "Rotated 90° CW"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:376
+msgid "Transversed"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:377
+msgid "Rotated 90° CCW"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:393
+msgid "sRGB"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:394
+msgid "Adobe RGB"
+msgstr ""
+
+#: includes/exif/class-exif-formatter.php:395
+msgid "Uncalibrated"
+msgstr ""
+
+#. translators: %s: altitude in metres.
+#: includes/exif/class-exif-formatter.php:444
+#, php-format
+msgid "%s m"
 msgstr ""
 
 #: includes/metaboxes/class-collection-save-pipeline.php:92
@@ -1653,7 +1917,7 @@ msgid "Are you sure you want to remove all items?"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:743
-#: assets/admin/src/components/dashboard/FileUploader.jsx:14
+#: assets/admin/src/components/dashboard/FileUploader.jsx:24
 msgid "WordPress media library is not available. Please refresh the page."
 msgstr ""
 
@@ -1670,7 +1934,9 @@ msgid "Item saved successfully!"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:748
-msgid "You have unsaved changes. Are you sure you want to close without saving?"
+msgid ""
+"You have unsaved changes.\n"
+"Are you sure you want to close without saving?"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:749
@@ -1678,48 +1944,60 @@ msgid "You have unsaved changes. Are you sure you want to navigate away without 
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:750
-msgid "Title"
+msgid "Discard changes?"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:751
-msgid "Alt Text"
+msgid "Discard changes"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:752
+msgid "Keep editing"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:753
+msgid "Title"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:754
+msgid "Alt Text"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:755
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:136
 msgid "Caption"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:753
+#: includes/metaboxes/class-metabox-registrar.php:756
 msgid "Description"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:754
+#: includes/metaboxes/class-metabox-registrar.php:757
 msgid "Credit"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:755
+#: includes/metaboxes/class-metabox-registrar.php:758
 msgid "Save Changes"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:758
+#: includes/metaboxes/class-metabox-registrar.php:761
 msgid "Previous item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:759
+#: includes/metaboxes/class-metabox-registrar.php:762
 msgid "Next item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:760
+#: includes/metaboxes/class-metabox-registrar.php:763
 msgid "Drop here"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:761
+#: includes/metaboxes/class-metabox-registrar.php:764
 #: includes/tools/import-export/assets/ImportExportTool.jsx:657
 msgid "Details"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:762
+#: includes/metaboxes/class-metabox-registrar.php:765
 #: includes/rest/metadata/library-data.php:50
 #: public/render/filters/sources/tags/class-tags-filter-source.php:46
 #: includes/tools/import-export/assets/ImportExportTool.jsx:40
@@ -1727,567 +2005,746 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:763
+#: includes/metaboxes/class-metabox-registrar.php:766
 #: includes/rest/metadata/library-data.php:59
 msgid "People"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:764
+#: includes/metaboxes/class-metabox-registrar.php:767
 #: includes/rest/metadata/library-data.php:69
 msgid "Location"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:765
+#: includes/metaboxes/class-metabox-registrar.php:768
 msgid "Manage Items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:766
+#: includes/metaboxes/class-metabox-registrar.php:769
 msgid "Preview Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:768
+#: includes/metaboxes/class-metabox-registrar.php:771
 msgid "Remove All"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:769
+#: includes/metaboxes/class-metabox-registrar.php:772
 msgid "Remove all items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:770
+#: includes/metaboxes/class-metabox-registrar.php:773
 msgid "Remove all gallery items?"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:771
+#: includes/metaboxes/class-metabox-registrar.php:774
 msgid "This action cannot be undone."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:772
+#: includes/metaboxes/class-metabox-registrar.php:775
 msgid "You are about to remove every item from this gallery. The gallery will become empty, and the removed items will no longer appear here."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:773
+#: includes/metaboxes/class-metabox-registrar.php:776
 msgid "Also delete custom data saved for these items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:774
+#: includes/metaboxes/class-metabox-registrar.php:777
 msgid "This includes item-specific FotoGrids data such as custom titles, descriptions, links, captions, alt text overrides, sorting data, tags, filters, and other custom fields. This data will be deleted for these items everywhere they are used in FotoGrids, including other galleries where the same items appear."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:775
+#: includes/metaboxes/class-metabox-registrar.php:778
 msgid "To confirm, type REMOVE ALL below."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:776
+#: includes/metaboxes/class-metabox-registrar.php:779
 msgid "Type REMOVE ALL"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:777
+#: includes/metaboxes/class-metabox-registrar.php:780
 msgid "Bulk Editor"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:778
+#: includes/metaboxes/class-metabox-registrar.php:781
 msgid "Upload"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:779
+#: includes/metaboxes/class-metabox-registrar.php:782
 msgid "Choose files from your computer"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:780
+#: includes/metaboxes/class-metabox-registrar.php:783
 msgid "From Library"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:781
+#: includes/metaboxes/class-metabox-registrar.php:784
 msgid "Add items from library"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:782
+#: includes/metaboxes/class-metabox-registrar.php:785
 msgid "Choose from WordPress media library"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:783
+#: includes/metaboxes/class-metabox-registrar.php:786
 msgid "From Folder"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:784
+#: includes/metaboxes/class-metabox-registrar.php:787
 msgid "Browse uploads folder structure"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:785
+#: includes/metaboxes/class-metabox-registrar.php:788
 msgid "From ZIP"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:786
+#: includes/metaboxes/class-metabox-registrar.php:789
 msgid "Upload and extract ZIP file"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:787
-msgid "Video"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:788
-msgid "Add video files"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:789
-msgid "Video Embed"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:790
-msgid "Add a video embed"
+msgid "Add images from a folder"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:791
-msgid "YouTube / Vimeo"
+msgid "On the server"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:792
-msgid "Video added to gallery."
+msgid "From my computer"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:793
-msgid "Video updated."
+msgid "No images in this folder."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:794
-msgid "Failed to remove the video."
+msgid "That folder could not be read."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:795
-msgid "Edit Video Embed"
+msgid "No images found in that folder."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:796
-msgid "Poster Image"
+msgid "The images could not be added."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:797
-msgid "Shown in the gallery before the video plays. Defaults to the video’s own thumbnail."
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:798
-msgid "Choose Poster"
+msgid "files were skipped."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:799
-msgid "Change Poster"
+#: includes/tools/import-export/assets/ImportExportTool.jsx:306
+msgid "Select all"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:800
-msgid "Use as poster"
+msgid "Load more"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:801
+msgid "Select a folder to upload"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:802
+msgid "or drag and drop images here"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:803
+msgid "Every image in the folder and its sub-folders is uploaded to your Media Library."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:804
+msgid "images ready to upload"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:805
+#: includes/metaboxes/class-metabox-registrar.php:813
+msgid "Upload & Add"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:806
+#: assets/admin/src/components/blocks/UploadArea.jsx:118
+msgid "Uploading…"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:807
+msgid "Add images from a ZIP file"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:808
+msgid "Select a ZIP file to upload"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:809
+msgid "or drag and drop it here"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:810
+#: includes/rest/media/zip-data.php:90
+msgid "That file is not a ZIP archive."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:811
+msgid "The archive could not be imported."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:812
+msgid "Extracting images…"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:814
+msgid "images added."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:815
+msgid "entries were skipped:"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:816
+msgid "Done"
+msgstr ""
+
+#. translators: %s: formatted maximum upload size, e.g. 64 MB.
+#: includes/metaboxes/class-metabox-registrar.php:819
+#, php-format
+msgid "Maximum upload size: %s"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:822
+msgid "Video"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:823
+msgid "Add video files"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:824
+msgid "Video Embed"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:825
+msgid "Add a video embed"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:826
+msgid "YouTube / Vimeo"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:827
+msgid "Video added to gallery."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:828
+msgid "Video updated."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:829
+msgid "Failed to remove the video."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:830
+msgid "Edit Video Embed"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:831
+msgid "Poster Image"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:832
+msgid "Shown in the gallery before the video plays. Defaults to the video’s own thumbnail."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:833
+msgid "Choose Poster"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:834
+msgid "Change Poster"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:835
+msgid "Use as poster"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:837
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:376
 msgid "Link"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:803
+#: includes/metaboxes/class-metabox-registrar.php:838
 msgid "Load video"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:804
+#: includes/metaboxes/class-metabox-registrar.php:839
 msgid "Video loaded successfully."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:805
+#: includes/metaboxes/class-metabox-registrar.php:840
 msgid "Please enter a valid YouTube URL."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:806
+#: includes/metaboxes/class-metabox-registrar.php:841
 msgid "Please enter a valid Vimeo URL."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:807
+#: includes/metaboxes/class-metabox-registrar.php:842
 msgid "Could not resolve video URL."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:808
+#: includes/metaboxes/class-metabox-registrar.php:843
 msgid "Video found but metadata could not be fetched."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:809
+#: includes/metaboxes/class-metabox-registrar.php:844
 msgid "No thumbnail available"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:810
+#: includes/metaboxes/class-metabox-registrar.php:845
 msgid "Preview will appear here"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:811
+#: includes/metaboxes/class-metabox-registrar.php:846
 msgid "Start Time"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:812
+#: includes/metaboxes/class-metabox-registrar.php:847
 msgid "Specify a start time (in seconds)"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:813
+#: includes/metaboxes/class-metabox-registrar.php:848
 msgid "End Time"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:814
+#: includes/metaboxes/class-metabox-registrar.php:849
 msgid "Specify an end time (in seconds)"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:815
+#: includes/metaboxes/class-metabox-registrar.php:850
 msgid "Video Options"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:816
+#: includes/metaboxes/class-metabox-registrar.php:851
 msgid "Autoplay"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:817
+#: includes/metaboxes/class-metabox-registrar.php:852
 msgid "Autoplay is subject to browser autoplay policies."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:818
+#: includes/metaboxes/class-metabox-registrar.php:853
 msgid "Mute"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:819
+#: includes/metaboxes/class-metabox-registrar.php:854
 msgid "Loop"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:820
+#: includes/metaboxes/class-metabox-registrar.php:855
 msgid "Player Controls"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:821
+#: includes/metaboxes/class-metabox-registrar.php:856
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:130
 msgid "Captions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:822
+#: includes/metaboxes/class-metabox-registrar.php:857
 msgid "Privacy Mode"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:823
+#: includes/metaboxes/class-metabox-registrar.php:858
 msgid "When on, the platform won't store information about visitors unless they play the video."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:824
+#: includes/metaboxes/class-metabox-registrar.php:859
 msgid "Suggested Videos"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:825
+#: includes/metaboxes/class-metabox-registrar.php:860
 msgid "Intro Title"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:826
+#: includes/metaboxes/class-metabox-registrar.php:861
 msgid "Intro Portrait"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:827
+#: includes/metaboxes/class-metabox-registrar.php:862
 msgid "Intro Byline"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:828
+#: includes/metaboxes/class-metabox-registrar.php:863
 msgid "Controls Color"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:829
+#: includes/metaboxes/class-metabox-registrar.php:864
 msgid "Reset to default"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:830
+#: includes/metaboxes/class-metabox-registrar.php:865
 msgid "(optional)"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:831
+#: includes/metaboxes/class-metabox-registrar.php:866
 msgid "Adding…"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:832
+#: includes/metaboxes/class-metabox-registrar.php:867
 msgid "Add from other sources"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:833
+#: includes/metaboxes/class-metabox-registrar.php:868
 msgid "Google Photos, Dropbox, Instagram, etc..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:834
+#: includes/metaboxes/class-metabox-registrar.php:869
 msgid "Instagram"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:835
+#: includes/metaboxes/class-metabox-registrar.php:870
 msgid "Import from Instagram"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:836
+#: includes/metaboxes/class-metabox-registrar.php:871
 msgid "No items yet added."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:837
+#: includes/metaboxes/class-metabox-registrar.php:872
 msgid "Gallery preview functionality will be implemented here."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:838
+#: includes/metaboxes/class-metabox-registrar.php:873
 #: includes/modules/Templates/Module.php:322
 msgid "Saving..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:840
+#: includes/metaboxes/class-metabox-registrar.php:875
 msgid "Set as featured item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:841
+#: includes/metaboxes/class-metabox-registrar.php:876
 msgid "Clear featured item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:842
+#: includes/metaboxes/class-metabox-registrar.php:877
 msgid "Featured item set"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:843
+#: includes/metaboxes/class-metabox-registrar.php:878
 msgid "Featured item cleared"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:844
+#: includes/metaboxes/class-metabox-registrar.php:879
 msgid "Error saving featured item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:845
+#: includes/metaboxes/class-metabox-registrar.php:880
 msgid "Copied!"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:846
+#: includes/metaboxes/class-metabox-registrar.php:881
 msgid "Copy failed"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:849
+#: includes/metaboxes/class-metabox-registrar.php:884
 msgid "Add"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:851
+#: includes/metaboxes/class-metabox-registrar.php:886
 msgid "Filename"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:852
+#: includes/metaboxes/class-metabox-registrar.php:887
 msgid "File Size"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:853
+#: includes/metaboxes/class-metabox-registrar.php:888
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:135
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:275
 msgid "Dimensions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:854
+#: includes/metaboxes/class-metabox-registrar.php:889
 msgid "File Type"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:855
+#: includes/metaboxes/class-metabox-registrar.php:890
 msgid "Not Available"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:856
-#: assets/admin/plain/collection-settings.js:750
+#: includes/metaboxes/class-metabox-registrar.php:891
+#: assets/admin/plain/collection-settings.js:730
 msgid "Failed to load item data"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:858
-msgid "SEO Optimization"
+#: includes/metaboxes/class-metabox-registrar.php:893
+msgid "Checks for this image"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:859
-msgid "Unlock powerful SEO features to help your website rank higher in search results and drive more organic traffic through your galleries."
+#. translators: 1: number of passing checks, 2: total number of checks.
+#: includes/metaboxes/class-metabox-registrar.php:895
+#, php-format
+msgid "%1$d of %2$d ready"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:860
-msgid "AI-Powered Meta Optimization"
+#: includes/metaboxes/class-metabox-registrar.php:896
+msgid "Bad"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:861
-msgid "Generate perfect meta titles, descriptions, alt text and tags using AI to maximize search engine visibility and accessibility for each gallery item."
+#: includes/metaboxes/class-metabox-registrar.php:897
+msgid "Needs improvement"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:862
-msgid "File Optimization for SEO"
+#: includes/metaboxes/class-metabox-registrar.php:898
+msgid "Good"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:863
-msgid "Automatically optimize image file names, sizes, and formats for best SEO performance and faster page load times."
+#: includes/metaboxes/class-metabox-registrar.php:899
+msgid "Fix"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:864
-msgid "Schema.org Markup"
+#: includes/metaboxes/class-metabox-registrar.php:900
+msgid "File weight"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:865
-msgid "Automatic structured data markup for images and galleries, helping search engines understand your content better."
+#: includes/metaboxes/class-metabox-registrar.php:901
+msgid "Empty. Screen readers and search engines have nothing to work from."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:866
-msgid "Image Sitemaps"
+#: includes/metaboxes/class-metabox-registrar.php:902
+msgid "Very short. A few descriptive words carry more than one."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:867
-msgid "Generate automatic XML sitemaps for all gallery images, ensuring search engines can discover and index your content."
+#: includes/metaboxes/class-metabox-registrar.php:903
+msgid "Over 125 characters. Screen readers cut long alt text off."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:868
+#: includes/metaboxes/class-metabox-registrar.php:904
+msgid "Same as the title. Describe what is in the frame instead."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:905
+msgid "Describes the image and fits the usual length."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:906
+msgid "A camera default. Rename files descriptively before uploading."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:907
+msgid "No descriptive words. The filename is part of the image URL, so rename before uploading."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:908
+msgid "Only one descriptive word. Two or three that name the subject read better in the URL."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:909
+msgid "Nothing in common with the title, alt text or caption, so it probably does not describe this photo."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:910
+msgid "Descriptive words in the image URL."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:911
+msgid "No filename available for this item."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:912
+msgid "Empty. The title is the fallback when there is no alt text."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:913
+msgid "Still the filename WordPress filled in. Write a readable title."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:914
+msgid "Readable title set."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:915
+msgid "Empty. Captions show in the Lightbox and add context around the image."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:916
+msgid "Caption set."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:917
+msgid "Empty. Room for the longer context a caption cannot hold."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:918
+msgid "Description set."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:919
+msgid "Empty. A credit keeps attribution attached to the image."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:920
+msgid "Taken from the EXIF copyright field."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:921
+msgid "Credit set."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:922
+msgid "Heavy for a gallery image. Large files slow the page on mobile."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:923
+msgid "Larger than most screens need. Resize before uploading."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:924
+msgid "Sensible size for the web."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:925
+msgid "File size not available for this item."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:926
+msgid "What the gallery emits"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:927
+msgid "The values this image renders with on the frontend."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:928
+msgid "From Alt Text"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:929
+msgid "From Title, because Alt Text is empty"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:930
+msgid "Empty, because Alt Text and Title are both unset"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:931
+msgid "In the image URL"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:932
+msgid "Doing this by hand for every photo adds up. Pro writes alt text and titles for a whole gallery in one pass, then marks each image up with structured data and lists it in an XML sitemap so it can rank on its own."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:933
 msgid "Smart location suggestions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:869
+#: includes/metaboxes/class-metabox-registrar.php:934
 msgid "with map integration"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:870
+#: includes/metaboxes/class-metabox-registrar.php:935
 #: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:91
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:188
 msgid "AI Facial Recognition"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:871
+#: includes/metaboxes/class-metabox-registrar.php:936
 msgid "- automatically detect and tag people"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:872
+#: includes/metaboxes/class-metabox-registrar.php:937
 msgid "EXIF"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:873
-msgid "Camera"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:874
-msgid "Aperture"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:875
-msgid "Shutter Speed"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:876
-msgid "ISO"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:877
-msgid "Lens"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:878
-msgid "Focal Length"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:879
-msgid "Date Taken"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:880
-msgid "Copyright"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:881
-msgid "Orientation"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:882
-#: public/render/decorators/hover/class-hover-effects-teasers.php:74
-msgid "Flash"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:883
-msgid "White Balance"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:884
-msgid "Exposure Mode"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:885
+#: includes/metaboxes/class-metabox-registrar.php:939
 msgid "Per-image EXIF overrides"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:886
+#: includes/metaboxes/class-metabox-registrar.php:940
 msgid "Add tags..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:887
+#: includes/metaboxes/class-metabox-registrar.php:941
 msgid "Add people..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:888
+#: includes/metaboxes/class-metabox-registrar.php:942
 msgid "Add location..."
 msgstr ""
 
 #. translators: 1: number of generated image sizes, 2: total number of registered image sizes.
-#: includes/metaboxes/class-metabox-registrar.php:891
+#: includes/metaboxes/class-metabox-registrar.php:945
 #, php-format
 msgid "%1$s of %2$s sizes available"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:892
+#: includes/metaboxes/class-metabox-registrar.php:946
 msgid "Size variants are only generated for images."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:893
+#: includes/metaboxes/class-metabox-registrar.php:947
 msgid "Not generated"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:894
+#: includes/metaboxes/class-metabox-registrar.php:948
 msgid "File missing"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:895
+#: includes/metaboxes/class-metabox-registrar.php:949
 msgid "Source too small"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:896
+#: includes/metaboxes/class-metabox-registrar.php:950
 msgid "cropped"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:898
+#: includes/metaboxes/class-metabox-registrar.php:952
 msgid "WordPress"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:900
+#: includes/metaboxes/class-metabox-registrar.php:954
 msgid "Copy URL"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:901
+#: includes/metaboxes/class-metabox-registrar.php:955
 msgid "Open in new tab"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:902
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:302
+#: includes/metaboxes/class-metabox-registrar.php:956
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:303
 msgid "Regenerate thumbnails"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:903
+#: includes/metaboxes/class-metabox-registrar.php:957
 msgid "Image URL copied"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:904
+#: includes/metaboxes/class-metabox-registrar.php:958
 msgid "Item Interactions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:905
+#: includes/metaboxes/class-metabox-registrar.php:959
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:390
 msgid "External URL"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:906
+#: includes/metaboxes/class-metabox-registrar.php:960
 msgid "URL to redirect to when this item is clicked."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:907
+#: includes/metaboxes/class-metabox-registrar.php:961
 #: assets/admin/plain/render-settings/renderBulkModal.js:151
 msgid "Link Target"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:908
+#: includes/metaboxes/class-metabox-registrar.php:962
 msgid "How the external link should open."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:909
+#: includes/metaboxes/class-metabox-registrar.php:963
 msgid "Use Gallery Default"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:910
+#: includes/metaboxes/class-metabox-registrar.php:964
 #: assets/admin/plain/render-settings/renderBulkModal.js:184
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:187
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:540
@@ -2295,7 +2752,7 @@ msgstr ""
 msgid "Same Tab"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:911
+#: includes/metaboxes/class-metabox-registrar.php:965
 #: assets/admin/plain/render-settings/renderBulkModal.js:194
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:195
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:544
@@ -2303,11 +2760,11 @@ msgstr ""
 msgid "New Tab"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:912
+#: includes/metaboxes/class-metabox-registrar.php:966
 msgid "External URLs are not in use"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:913
+#: includes/metaboxes/class-metabox-registrar.php:967
 msgid "This gallery does not open items using their external URL, so the link below is saved but never followed. Set Item Click Behavior to External URL in the gallery settings to turn it on."
 msgstr ""
 
@@ -2356,8 +2813,7 @@ msgid "Edit gallery"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
-#: includes/modules/ViewCollections/class-router.php:141
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/ViewCollections/class-router.php:163
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:218
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:51
 msgid "FotoGrids Album"
@@ -2371,8 +2827,8 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:129
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:181
-#: includes/rest/templates/templates-data.php:526
-#: assets/admin/src/components/pages/TemplatesPage.jsx:78
+#: includes/rest/templates/templates-data.php:616
+#: assets/admin/src/components/pages/TemplatesPage.jsx:86
 #: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:137
 #: includes/modules/PageBuilders/core/assets/src/components/PreviewOptionsPanel.jsx:34
 msgid "Preview"
@@ -2424,13 +2880,11 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select an album to display."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
-#: includes/modules/ViewCollections/class-router.php:142
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/ViewCollections/class-router.php:164
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:252
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:52
 msgid "FotoGrids Gallery"
@@ -2467,7 +2921,6 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -2574,7 +3027,7 @@ msgid "Dismiss"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:313
-#: assets/admin/src/components/pages/TemplatesPage.jsx:499
+#: assets/admin/src/components/pages/TemplatesPage.jsx:580
 msgid "Loading templates..."
 msgstr ""
 
@@ -2626,7 +3079,7 @@ msgid "User Templates"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:327
-#: assets/admin/src/components/pages/TemplatesPage.jsx:432
+#: assets/admin/src/components/pages/TemplatesPage.jsx:513
 msgid "FotoGrids Templates"
 msgstr ""
 
@@ -2639,7 +3092,7 @@ msgid "Template name is required."
 msgstr ""
 
 #: includes/modules/Templates/Module.php:330
-#: assets/admin/src/components/pages/TemplatesPage.jsx:198
+#: assets/admin/src/components/pages/TemplatesPage.jsx:223
 msgid "Failed to load templates."
 msgstr ""
 
@@ -2941,75 +3394,79 @@ msgid_plural "Gallery added to %d albums."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/rest/admin/admin-data.php:305
+#: includes/rest/admin/admin-data.php:331
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:327
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:438
 msgid "FotoGrids Thumbnails"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:307
+#: includes/rest/admin/admin-data.php:333
 msgid "FotoGrids Full Size"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:309
+#: includes/rest/admin/admin-data.php:335
 msgid "FotoGrids Full Size (Mobile)"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:311
+#: includes/rest/admin/admin-data.php:337
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:330
 msgid "FotoGrids Masonry (variable height)"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:313
+#: includes/rest/admin/admin-data.php:339
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:331
 msgid "FotoGrids Justified (variable width)"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:343
+#: includes/rest/admin/admin-data.php:369
 msgid "Full Size"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:699
+#: includes/rest/admin/admin-data.php:682
+msgid "The defaults could not be saved."
+msgstr ""
+
+#: includes/rest/admin/admin-data.php:813
 #: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:156
 msgid "Attachment not found."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:708
+#: includes/rest/admin/admin-data.php:822
 #: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:165
 msgid "Attachment file not found on disk."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:783
+#: includes/rest/admin/admin-data.php:897
 msgid "Unable to fetch Google Fonts metadata."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:792
+#: includes/rest/admin/admin-data.php:906
 msgid "Google Fonts metadata endpoint returned an unexpected response."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:835
+#: includes/rest/admin/admin-data.php:949
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1214
+#: includes/rest/admin/admin-data.php:1427
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1239
+#: includes/rest/admin/admin-data.php:1452
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/rest/admin/admin-data.php:1318
-#: assets/admin/src/components/pages/StatsPage.jsx:26
+#: includes/rest/admin/admin-data.php:1531
+#: assets/admin/src/components/pages/StatsPage.jsx:39
 msgid "Untitled Album"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1318
-#: assets/admin/src/components/pages/StatsPage.jsx:25
+#: includes/rest/admin/admin-data.php:1531
+#: assets/admin/src/components/pages/StatsPage.jsx:38
 msgid "Untitled Gallery"
 msgstr ""
 
@@ -3083,10 +3540,14 @@ msgid "Gallery is not available."
 msgstr ""
 
 #: includes/rest/gallery/gallery-permissions.php:103
+#: includes/rest/items/items-permissions.php:81
+#: includes/rest/media/media-permissions.php:49
 msgid "Invalid gallery ID."
 msgstr ""
 
 #: includes/rest/gallery/gallery-permissions.php:110
+#: includes/rest/items/items-permissions.php:148
+#: includes/rest/media/media-permissions.php:57
 msgid "You do not have permission to edit this gallery."
 msgstr ""
 
@@ -3121,12 +3582,12 @@ msgid "Failed to save the video embed. Please try again."
 msgstr ""
 
 #: includes/rest/items/embed-data.php:274
-#: includes/rest/items/embed-data.php:370
+#: includes/rest/items/embed-data.php:372
 msgid "An embed item ID is required."
 msgstr ""
 
 #: includes/rest/items/embed-data.php:299
-#: includes/rest/items/embed-data.php:379
+#: includes/rest/items/embed-data.php:381
 msgid "Video embed not found."
 msgstr ""
 
@@ -3134,12 +3595,21 @@ msgstr ""
 msgid "Failed to update the video embed. Please try again."
 msgstr ""
 
-#: includes/rest/items/embed-data.php:394
+#: includes/rest/items/embed-data.php:396
 msgid "Failed to remove the video embed. Please try again."
 msgstr ""
 
-#: includes/rest/items/items-permissions.php:43
-msgid "You do not have permission to manage gallery items."
+#: includes/rest/items/items-permissions.php:62
+#: includes/rest/items/items-permissions.php:115
+msgid "You do not have permission to edit this item."
+msgstr ""
+
+#: includes/rest/items/items-permissions.php:133
+msgid "You do not have permission to add videos."
+msgstr ""
+
+#: includes/rest/items/items-permissions.php:163
+msgid "Invalid item ID."
 msgstr ""
 
 #: includes/rest/items/register-items-routes.php:75
@@ -3279,6 +3749,126 @@ msgstr ""
 msgid "Each channel can also be locked from your wp-config.php file using the constant shown under its name - for example define( 'FOTOGRIDS_DEBUG_CATALOG', true );. A channel whose constant is set ignores the toggle here and shows as locked."
 msgstr ""
 
+#: includes/rest/media/folder-data.php:69
+msgid "That folder no longer exists."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:142
+msgid "Select at least one image to add."
+msgstr ""
+
+#. translators: %d: maximum number of files accepted in one request.
+#: includes/rest/media/folder-data.php:152
+#, php-format
+msgid "Add up to %d images at a time."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:169
+msgid "File not found."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:177
+#: includes/rest/media/folder-data.php:677
+#: includes/rest/media/zip-data.php:611
+msgid "Not a supported image file."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:219
+#: includes/rest/media/folder-data.php:229
+msgid "The uploads folder is not readable."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:291
+msgid "That location is not browsable."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:302
+msgid "That location no longer exists."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:312
+msgid "That location is outside the uploads folder."
+msgstr ""
+
+#: includes/rest/media/folder-data.php:347
+msgid "Uploads"
+msgstr ""
+
+#: includes/rest/media/media-permissions.php:39
+msgid "You do not have permission to upload files."
+msgstr ""
+
+#: includes/rest/media/register-media-routes.php:42
+#: includes/rest/media/register-media-routes.php:77
+#: includes/rest/media/register-media-routes.php:103
+msgid "The gallery being edited."
+msgstr ""
+
+#: includes/rest/media/register-media-routes.php:47
+msgid "Folder path relative to the uploads folder."
+msgstr ""
+
+#: includes/rest/media/register-media-routes.php:83
+msgid "File paths relative to the uploads folder."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:82
+msgid "Choose a ZIP file to upload."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:98
+#: includes/rest/media/zip-data.php:106
+msgid "ZIP import needs direct file access, which this site does not allow."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:147
+msgid "That archive does not contain any images."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:185
+#: includes/rest/media/zip-data.php:349
+msgid "That archive could not be read."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:220
+#: includes/rest/media/zip-data.php:499
+#: includes/rest/media/zip-data.php:511
+msgid "A temporary folder for the import could not be created."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:232
+msgid "That archive could not be extracted."
+msgstr ""
+
+#. translators: %s: maximum unpacked archive size, e.g. 1 GB.
+#: includes/rest/media/zip-data.php:317
+#: includes/rest/media/zip-data.php:388
+#, php-format
+msgid "That archive unpacks to more than %s. Split it into smaller archives."
+msgstr ""
+
+#. translators: %s: maximum number of entries allowed in one archive.
+#: includes/rest/media/zip-data.php:376
+#, php-format
+msgid "That archive holds more than %s files. Split it into smaller archives."
+msgstr ""
+
+#: includes/rest/media/zip-data.php:433
+msgid "The ZIP file could not be uploaded."
+msgstr ""
+
+#. translators: %d: maximum number of images imported from one archive.
+#: includes/rest/media/zip-data.php:574
+#, php-format
+msgid "Only the first %d images were imported."
+msgstr ""
+
+#. translators: %s: number of further skipped entries.
+#: includes/rest/media/zip-data.php:623
+#, php-format
+msgid "and %s more"
+msgstr ""
+
 #: includes/rest/metadata/library-data.php:51
 #: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:52
 #: includes/tools/import-export/assets/ImportExportTool.jsx:109
@@ -3386,8 +3976,9 @@ msgid "Invalid post."
 msgstr ""
 
 #: includes/rest/templates/templates-data.php:328
-#: includes/rest/templates/templates-data.php:385
-#: includes/rest/templates/templates-data.php:431
+#: includes/rest/templates/templates-data.php:387
+#: includes/rest/templates/templates-data.php:475
+#: includes/rest/templates/templates-data.php:521
 msgid "Template not found."
 msgstr ""
 
@@ -3399,56 +3990,100 @@ msgstr ""
 msgid "Template applied successfully."
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:366
+#: includes/rest/templates/templates-data.php:378
+msgid "Template ID and a valid post type are required."
+msgstr ""
+
+#: includes/rest/templates/templates-data.php:395
+msgid "This template is not available on your plan."
+msgstr ""
+
+#: includes/rest/templates/templates-data.php:404
+msgid "You do not have permission to change settings."
+msgstr ""
+
+#: includes/rest/templates/templates-data.php:415
+msgid "New album"
+msgstr ""
+
+#: includes/rest/templates/templates-data.php:416
+msgid "New gallery"
+msgstr ""
+
+#: includes/rest/templates/templates-data.php:441
+msgid "Gallery created from template."
+msgstr ""
+
+#: includes/rest/templates/templates-data.php:456
 msgid "Template ID is required."
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:393
+#: includes/rest/templates/templates-data.php:483
 msgid "Template deleted successfully."
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:420
+#: includes/rest/templates/templates-data.php:510
 msgid "Invalid nonce."
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:423
+#: includes/rest/templates/templates-data.php:513
 msgid "Sorry, you are not allowed to do that."
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:434
+#: includes/rest/templates/templates-data.php:524
 msgid "Template Preview"
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:504
+#: includes/rest/templates/templates-data.php:594
 msgid "Failed to generate gallery preview."
 msgstr ""
 
 #. translators: %d: preview item number.
-#: includes/rest/templates/templates-data.php:657
+#: includes/rest/templates/templates-data.php:759
 #, php-format
 msgid "Video Item %d"
 msgstr ""
 
 #. translators: %d: preview item number.
-#: includes/rest/templates/templates-data.php:659
+#: includes/rest/templates/templates-data.php:761
 #, php-format
 msgid "Video placeholder %d"
 msgstr ""
 
 #. translators: %d: preview item number.
-#: includes/rest/templates/templates-data.php:662
+#: includes/rest/templates/templates-data.php:764
 #, php-format
 msgid "Image Item %d"
 msgstr ""
 
 #. translators: %d: preview item number.
-#: includes/rest/templates/templates-data.php:664
+#: includes/rest/templates/templates-data.php:766
 #, php-format
 msgid "Image placeholder %d"
 msgstr ""
 
-#: includes/rest/templates/templates-data.php:671
+#: includes/rest/templates/templates-data.php:773
 msgid "This is how your gallery will look with this template"
+msgstr ""
+
+#. translators: 1: requested URL path, 2: what already uses that path.
+#: includes/settings/class-view-settings-store.php:246
+#, php-format
+msgid "/%1$s/ is already used by %2$s. Pick a different address."
+msgstr ""
+
+#: includes/settings/class-view-settings-store.php:269
+msgid "WordPress itself"
+msgstr ""
+
+#: includes/settings/class-view-settings-store.php:319
+msgid "existing content"
+msgstr ""
+
+#. translators: %s: the singular name of a post type, e.g. "page".
+#: includes/settings/class-view-settings-store.php:324
+#, php-format
+msgid "an existing %s"
 msgstr ""
 
 #: includes/tools/import-export/class-import-export-data.php:143
@@ -3856,7 +4491,7 @@ msgid "Back to %s"
 msgstr ""
 
 #: public/render/features/collection-header/class-collection-header.php:390
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:216
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:205
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:217
 msgid "Back"
 msgstr ""
@@ -3940,121 +4575,121 @@ msgstr ""
 msgid "Incorrect password. Please try again."
 msgstr ""
 
-#: public/render/layouts/class-layout-featured-item.php:169
+#: public/render/layouts/class-layout-featured-item.php:173
 msgid "Show all images"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:118
+#: assets/admin/plain/collection-settings.js:123
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:481
+#: assets/admin/plain/collection-settings.js:493
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:797
+#: assets/admin/plain/collection-settings.js:777
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:833
+#: assets/admin/plain/collection-settings.js:813
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:851
+#: assets/admin/plain/collection-settings.js:831
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:858
+#: assets/admin/plain/collection-settings.js:838
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:862
+#: assets/admin/plain/collection-settings.js:842
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1572
+#: assets/admin/plain/collection-settings.js:1533
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1573
+#: assets/admin/plain/collection-settings.js:1534
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2045
+#: assets/admin/plain/collection-settings.js:2006
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2093
-#: assets/admin/plain/collection-settings.js:2109
+#: assets/admin/plain/collection-settings.js:2054
+#: assets/admin/plain/collection-settings.js:2070
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2146
+#: assets/admin/plain/collection-settings.js:2107
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2165
+#: assets/admin/plain/collection-settings.js:2128
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2166
+#: assets/admin/plain/collection-settings.js:2129
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2173
-#: assets/admin/plain/collection-settings.js:2184
+#: assets/admin/plain/collection-settings.js:2136
+#: assets/admin/plain/collection-settings.js:2147
 msgid "Failed to update autosave setting"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2224
-#: assets/admin/plain/collection-settings.js:2234
+#: assets/admin/plain/collection-settings.js:2187
+#: assets/admin/plain/collection-settings.js:2197
 msgid "Configure Album defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2228
-#: assets/admin/plain/collection-settings.js:2238
+#: assets/admin/plain/collection-settings.js:2191
+#: assets/admin/plain/collection-settings.js:2201
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2244
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:31
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:223
+#: assets/admin/plain/collection-settings.js:2207
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:222
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2267
+#: assets/admin/plain/collection-settings.js:2230
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2277
+#: assets/admin/plain/collection-settings.js:2240
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2281
+#: assets/admin/plain/collection-settings.js:2244
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2327
+#: assets/admin/plain/collection-settings.js:2290
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2351
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:134
+#: assets/admin/plain/collection-settings.js:2315
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2359
+#: assets/admin/plain/collection-settings.js:2323
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2460
+#: assets/admin/plain/collection-settings.js:2424
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2567
+#: assets/admin/plain/collection-settings.js:2531
 #: assets/admin/plain/render-settings/renderPromo.js:80
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
@@ -4094,12 +4729,12 @@ msgstr ""
 msgid "Clear All"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderButtonGroupDynamic.js:60
+#: assets/admin/plain/render-settings/renderButtonGroupDynamic.js:21
 #: assets/admin/plain/render-settings/renderImageSize.js:38
 msgid "Original"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderButtonGroupDynamic.js:161
+#: assets/admin/plain/render-settings/renderButtonGroupDynamic.js:65
 msgid "Loading options…"
 msgstr ""
 
@@ -4193,7 +4828,7 @@ msgid "Apply URL to All"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:473
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:107
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:168
 msgid "Saving…"
 msgstr ""
 
@@ -4214,12 +4849,12 @@ msgid "No fonts found for this search."
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderFontFamily.js:467
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:44
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:43
 msgid "System"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderFontFamily.js:475
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:193
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:210
 msgid "Google Fonts"
 msgstr ""
 
@@ -4263,7 +4898,6 @@ msgid "Choose image"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderImagePicker.js:134
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:162
 msgid "Loading preview…"
 msgstr ""
@@ -4295,8 +4929,8 @@ msgstr ""
 
 #: assets/admin/plain/render-settings/renderPromo.js:46
 #: assets/admin/src/components/dashboard/ProFeatures.jsx:24
-#: assets/admin/src/components/pages/TemplatesPage.jsx:45
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:290
+#: assets/admin/src/components/pages/TemplatesPage.jsx:53
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:339
 #: assets/admin/src/components/templates/TemplateInfoModal.jsx:50
 #: assets/admin/src/components/TemplatesMetabox.jsx:72
 msgid "PRO"
@@ -4377,7 +5011,7 @@ msgstr ""
 msgid "Search…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderTokenSelect.js:580
+#: assets/admin/plain/render-settings/renderTokenSelect.js:591
 msgid "Select items…"
 msgstr ""
 
@@ -4442,17 +5076,11 @@ msgid "Could not read the file. Please try again."
 msgstr ""
 
 #: assets/admin/src/components/blocks/MediaUpload.jsx:99
-#: assets/admin/src/components/dashboard/FileUploader.jsx:55
 msgid "Select files to upload"
 msgstr ""
 
 #: assets/admin/src/components/blocks/MediaUpload.jsx:100
-#: assets/admin/src/components/dashboard/FileUploader.jsx:56
 msgid "or drag and drop files here"
-msgstr ""
-
-#: assets/admin/src/components/blocks/UploadArea.jsx:118
-msgid "Uploading…"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/Checklist.jsx:34
@@ -4464,7 +5092,7 @@ msgid "Dashboard page visited"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/Checklist.jsx:42
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:56
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:113
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:92
 msgid "Create your first gallery"
 msgstr ""
@@ -4498,36 +5126,36 @@ msgstr ""
 msgid "Finetune Settings"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:19
+#: assets/admin/src/components/dashboard/FileUploader.jsx:29
 msgid "Select Images for Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:21
+#: assets/admin/src/components/dashboard/FileUploader.jsx:31
 msgid "Create Gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:36
+#: assets/admin/src/components/dashboard/FileUploader.jsx:46
 #: assets/admin/src/components/pages/Dashboard.jsx:64
 msgid "Failed to create gallery."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:48
+#: assets/admin/src/components/dashboard/FileUploader.jsx:58
 msgid "Quick Upload"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:49
+#: assets/admin/src/components/dashboard/FileUploader.jsx:59
 msgid "Click or drag files here to create a gallery automatically."
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:59
+#: assets/admin/src/components/dashboard/FileUploader.jsx:67
 msgid "or "
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:68
+#: assets/admin/src/components/dashboard/FileUploader.jsx:76
 msgid "choose existing files"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/FileUploader.jsx:70
+#: assets/admin/src/components/dashboard/FileUploader.jsx:78
 msgid " from media library"
 msgstr ""
 
@@ -4536,7 +5164,7 @@ msgid "Learn & Get Inspired"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/LearnSection.jsx:26
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:45
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:44
 msgid "Getting Started"
 msgstr ""
 
@@ -4581,13 +5209,11 @@ msgid "Add Photos"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:15
-#: assets/admin/src/components/pages/StatsPage.jsx:143
-msgid "Total Views"
-msgstr ""
-
-#: assets/admin/src/components/dashboard/OverviewStats.jsx:16
-#: assets/admin/src/components/pages/StatsPage.jsx:144
-msgid "Total Interactions"
+#: assets/admin/src/components/pages/StatsPage.jsx:160
+#: assets/admin/src/components/pages/StatsPage.jsx:179
+#: assets/admin/src/components/pages/StatsPage.jsx:207
+#: assets/admin/src/components/pages/StatsPage.jsx:313
+msgid "Views"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:22
@@ -4964,14 +5590,6 @@ msgid_plural "You are about to delete %d entries. Linked items will lose these %
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/src/components/library/LibraryTabBase.jsx:847
-msgid "Latitude"
-msgstr ""
-
-#: assets/admin/src/components/library/LibraryTabBase.jsx:855
-msgid "Longitude"
-msgstr ""
-
 #: assets/admin/src/components/library/LibraryTabBase.jsx:866
 msgid "Details (optional)"
 msgstr ""
@@ -5057,279 +5675,302 @@ msgstr ""
 msgid "No library entity types are registered."
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:21
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:20
 msgid "Gallery Defaults"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:22
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:21
 msgid "Album Defaults"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:29
 msgid "Responsiveness"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:32
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:31
 msgid "View Pages"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:33
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:32
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:156
 msgid "Sharing"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:33
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:157
 msgid "Watermark"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:372
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:35
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:421
 msgid "Permissions Manager"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:38
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:37
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:224
 msgid "Maintenance"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:39
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:38
 msgid "Setup Wizard"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:43
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:42
 msgid "Setup"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:224
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:223
 msgid "Default settings applied to new Galleries and Albums."
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:247
-msgid "Save Defaults"
-msgstr ""
-
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:268
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:250
 msgid "Select a tab to configure settings"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:281
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:263
 msgid "Settings sections"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:171
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:160
 msgid "Setup progress"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:180
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:169
 msgid "FotoGrids Setup Wizard"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:208
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:197
 msgid "Skip for now"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:224
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:212
 msgid "Finish"
 msgstr ""
 
-#: assets/admin/src/components/pages/SetupWizardPage.jsx:224
+#: assets/admin/src/components/pages/SetupWizardPage.jsx:212
 msgid "Continue"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:27
+#: assets/admin/src/components/pages/StatsPage.jsx:24
+msgid "<1%"
+msgstr ""
+
+#: assets/admin/src/components/pages/StatsPage.jsx:40
 msgid "Untitled Item"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:38
-#: assets/admin/src/components/pages/StatsPage.jsx:45
+#: assets/admin/src/components/pages/StatsPage.jsx:51
+#: assets/admin/src/components/pages/StatsPage.jsx:58
 msgid "Untitled"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:64
+#: assets/admin/src/components/pages/StatsPage.jsx:77
 msgid "7 Days"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:65
+#: assets/admin/src/components/pages/StatsPage.jsx:78
 msgid "30 Days"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:66
+#: assets/admin/src/components/pages/StatsPage.jsx:79
 msgid "90 Days"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:113
-#: assets/admin/src/components/pages/StatsPage.jsx:130
+#: assets/admin/src/components/pages/StatsPage.jsx:139
+msgid "Other galleries"
+msgstr ""
+
+#: assets/admin/src/components/pages/StatsPage.jsx:156
+#: assets/admin/src/components/pages/StatsPage.jsx:173
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:191
 #: includes/tools/import-export/assets/ImportExportTool.jsx:656
 msgid "Type"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:117
-#: assets/admin/src/components/pages/StatsPage.jsx:134
-#: assets/admin/src/components/pages/StatsPage.jsx:189
-msgid "Views"
-msgstr ""
-
-#: assets/admin/src/components/pages/StatsPage.jsx:118
+#: assets/admin/src/components/pages/StatsPage.jsx:161
 msgid "Last Viewed"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:135
+#: assets/admin/src/components/pages/StatsPage.jsx:194
 msgid "Shares"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:140
-msgid "Total Galleries"
+#. translators: 1: start date, 2: end date, 3: count in that period.
+#: assets/admin/src/components/pages/StatsPage.jsx:257
+#, js-format
+msgid "Compared to %1$s – %2$s (%3$s)"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:141
-msgid "Total Albums"
-msgstr ""
-
-#: assets/admin/src/components/pages/StatsPage.jsx:142
-msgid "Total Items"
-msgstr ""
-
-#: assets/admin/src/components/pages/StatsPage.jsx:301
-msgid "Could not load statistics. Please refresh the page."
+#. translators: %s: all-time count.
+#: assets/admin/src/components/pages/StatsPage.jsx:264
+#, js-format
+msgid "Total %s"
 msgstr ""
 
 #: assets/admin/src/components/pages/StatsPage.jsx:326
+msgid "Previous period"
+msgstr ""
+
+#. translators: 1: view count, 2: share of total views as a percentage.
+#: assets/admin/src/components/pages/StatsPage.jsx:420
+#, js-format
+msgid "%1$s views (%2$d%%)"
+msgstr ""
+
+#: assets/admin/src/components/pages/StatsPage.jsx:497
+msgid "Could not load statistics. Please refresh the page."
+msgstr ""
+
+#: assets/admin/src/components/pages/StatsPage.jsx:522
 msgid "Time period"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:345
+#: assets/admin/src/components/pages/StatsPage.jsx:541
 msgid "Refresh stats"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:347
+#: assets/admin/src/components/pages/StatsPage.jsx:543
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:239
 msgid "Refresh"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:359
+#: assets/admin/src/components/pages/StatsPage.jsx:555
 msgid "No statistics yet"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:362
+#: assets/admin/src/components/pages/StatsPage.jsx:558
 msgid "Your gallery stats will appear here once visitors start viewing your galleries."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:384
+#: assets/admin/src/components/pages/StatsPage.jsx:580
 msgid "Views Over Time"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:396
+#: assets/admin/src/components/pages/StatsPage.jsx:592
 msgid "Most Popular Galleries"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:403
+#: assets/admin/src/components/pages/StatsPage.jsx:599
 msgid "No gallery views in this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:417
+#: assets/admin/src/components/pages/StatsPage.jsx:613
 msgid "Recently Viewed"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:421
+#: assets/admin/src/components/pages/StatsPage.jsx:618
 msgid "Nothing was viewed in this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:424
+#: assets/admin/src/components/pages/StatsPage.jsx:621
 msgid "Top Performing Content"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:428
+#: assets/admin/src/components/pages/StatsPage.jsx:626
 msgid "No data available for this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:86
+#: assets/admin/src/components/pages/TemplatesPage.jsx:101
+#: assets/admin/src/components/pages/TemplatesPage.jsx:639
+msgid "Use this template"
+msgstr ""
+
+#: assets/admin/src/components/pages/TemplatesPage.jsx:102
+#: assets/admin/src/components/pages/TemplatesPage.jsx:640
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:241
 msgid "Apply"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:191
+#: assets/admin/src/components/pages/TemplatesPage.jsx:216
 msgid "Template library refreshed."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:246
+#: assets/admin/src/components/pages/TemplatesPage.jsx:280
+#: assets/admin/src/components/pages/TemplatesPage.jsx:290
+msgid "Could not create a gallery from this template."
+msgstr ""
+
+#: assets/admin/src/components/pages/TemplatesPage.jsx:315
 msgid "Save valuable time"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:247
+#: assets/admin/src/components/pages/TemplatesPage.jsx:316
 msgid "Launch new galleries in minutes using ready-made layouts instead of rebuilding designs from scratch."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:254
+#: assets/admin/src/components/pages/TemplatesPage.jsx:323
 msgid "Keep every gallery on-brand"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:255
+#: assets/admin/src/components/pages/TemplatesPage.jsx:324
 msgid "Apply the same spacing, colors and interactions across multiple galleries and albums with one click."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:262
+#: assets/admin/src/components/pages/TemplatesPage.jsx:331
 msgid "Create your own templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:263
+#: assets/admin/src/components/pages/TemplatesPage.jsx:332
 msgid "Turn your best-performing gallery and album designs into reusable templates that your whole team can apply in a few clicks."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:278
+#: assets/admin/src/components/pages/TemplatesPage.jsx:347
 msgid "What are Templates?"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:280
+#: assets/admin/src/components/pages/TemplatesPage.jsx:349
 msgid "Templates are complete, ready-to-use gallery and album configurations."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:286
+#: assets/admin/src/components/pages/TemplatesPage.jsx:355
 msgid "Templates bundle layout, spacing, hover effects and styling into reusable presets that you can apply in one click."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:403
+#: assets/admin/src/components/pages/TemplatesPage.jsx:465
+msgid "Pick a template and we’ll open a new gallery with it applied."
+msgstr ""
+
+#: assets/admin/src/components/pages/TemplatesPage.jsx:484
 msgid "Gallery Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:416
+#: assets/admin/src/components/pages/TemplatesPage.jsx:497
 msgid "Album Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:427
+#: assets/admin/src/components/pages/TemplatesPage.jsx:508
 msgid "Your Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:445
+#: assets/admin/src/components/pages/TemplatesPage.jsx:526
 msgid "Free"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:458
+#: assets/admin/src/components/pages/TemplatesPage.jsx:539
 msgid "Last synced from the FotoGrids template library. The catalog is cached and refreshes periodically; use Refresh to sync now."
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:467
+#: assets/admin/src/components/pages/TemplatesPage.jsx:548
 msgid "Last synced {time} ago"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:474
+#: assets/admin/src/components/pages/TemplatesPage.jsx:555
 msgid "Showing built-in templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:491
+#: assets/admin/src/components/pages/TemplatesPage.jsx:572
 msgid "Refresh library"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:505
+#: assets/admin/src/components/pages/TemplatesPage.jsx:586
 msgid "My Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:518
+#: assets/admin/src/components/pages/TemplatesPage.jsx:599
 msgid "FotoGrids {type} Templates"
 msgstr ""
 
-#: assets/admin/src/components/pages/TemplatesPage.jsx:538
+#: assets/admin/src/components/pages/TemplatesPage.jsx:619
 msgid "No templates available."
 msgstr ""
 
@@ -5363,108 +6004,112 @@ msgstr ""
 msgid "Coming soon"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:130
-msgid "Editor behaviour"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:131
-msgid "How FotoGrids saves your work in the gallery and album editors."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:135
-msgid "Saves gallery and album settings changes automatically as you work."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:141
-msgid "Save automatically"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:147
-msgid "Privacy & analytics"
+msgid "Saving"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:148
-msgid "Decide what FotoGrids shares about plugin usage."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
-msgid "Usage data"
+msgid "How FotoGrids saves your work."
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:152
-msgid "Helps us spot bugs and decide what to build next. Shares your name, email, site, and plugin details - never your images, image URLs, or visitor data."
+msgid "Writes every change as you make it - in the gallery and album editors, and on these settings screens. Turn it off to save with a button instead."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:158
+msgid "Save automatically"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:164
+msgid "Privacy & analytics"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:165
+msgid "Decide what FotoGrids shares about plugin usage."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:168
+msgid "Usage data"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:169
+msgid "Helps us spot bugs and decide what to build next. Shares your name, email, site, and plugin details - never your images, image URLs, or visitor data."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:186
 msgid "Share usage data"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:175
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:192
 msgid "Product emails"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:176
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:193
 msgid "Occasional FotoGrids news and offers, sent to your account email. Separate from usage data - off unless enabled."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:182
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:199
 msgid "Email me FotoGrids news and offers"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:189
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:206
 msgid "External resources"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:190
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:207
 msgid "Control third-party resources FotoGrids may load on your site."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:194
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:211
 msgid "When enabled, FotoGrids loads Google Fonts for galleries that use one. Disable to prevent Google Fonts from loading anywhere - in the editor and on the front end - so no request is ever made to Google. Useful when your theme or another plugin already provides fonts."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:200
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:217
 msgid "Load Google Fonts"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:205
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:222
 msgid "FotoGrids news"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:206
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:223
 msgid "When enabled, FotoGrids fetches the latest announcements from fotogrids.com for the dashboard widget and the What's New panel. The request is made from your server, sends no site or personal data, and is cached for 12 hours. Disable to stop it entirely."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:212
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:229
 msgid "Show news"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:218
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:235
 msgid "Uninstall"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:219
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:236
 msgid "What happens to your FotoGrids data if the plugin is deleted."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:222
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:239
 msgid "Delete all data on uninstall"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:223
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:240
 msgid "Removes every gallery, album, template, statistic and setting. This cannot be undone."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:247
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:265
 msgid "Delete all data on uninstall?"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:248
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:266
 msgid "If FotoGrids is deleted, every gallery, album, template, statistic and setting is removed permanently. This cannot be undone."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:249
+#: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:267
 msgid "Enable data deletion"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:147
+msgid "Save defaults"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:73
@@ -5742,80 +6387,80 @@ msgstr ""
 msgid "Crop"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:16
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:17
 msgid "Administrator"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:17
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:18
 msgid "Editor"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:19
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:20
 msgid "Contributor"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:20
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:21
 msgid "Subscriber"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:29
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:30
 msgid "Modules"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:30
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:31
 msgid "Plugin"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:121
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:131
 msgid "Failed to load permissions."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:176
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:220
 msgid "Loading permissions…"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:202
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:246
 msgid "How roles & capabilities work"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:203
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:247
 msgid "Pick the lowest role that should have each capability. Higher roles automatically inherit it. For example, setting a capability to \"Editor\" means editors and administrators have it; authors and below do not."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:210
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:218
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:254
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:262
 msgid "Unauthorised settings panels"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:211
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:255
 msgid "How to render the Settings and Templates metaboxes for users who can edit a gallery or album but cannot modify its settings."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:222
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:269
 msgid "Read-only with notice"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:223
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:270
 msgid "Hide entirely"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:253
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:302
 msgid "Custom (configured in matrix)"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:292
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:341
 msgid "Take full control of every capability per role, override permissions per user, and grant access per gallery or album."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:365
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:414
 msgid "Capability Settings"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:366
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:415
 msgid "Quick lowest-role configuration for the most common permissions."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:373
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:422
 msgid "Full granular view of every FotoGrids capability per role."
 msgstr ""
 
@@ -6148,134 +6793,210 @@ msgstr ""
 msgid "Record when visitors click a share button, for statistics."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:140
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:168
+msgid "Address"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:169
+msgid "Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:174
+msgid "Plain permalinks are on"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:175
+msgid "View pages are served from a query address, so the settings below have no effect yet. They apply as soon as you choose any other permalink structure."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:179
+msgid "Permalink settings"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:188
+msgid "Galleries and albums share one address"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:189
+msgid "Both open from the same path, so a gallery and an album that carry the same slug cannot both be reached — the gallery wins and the album stays available through its own segment. Keeping their slugs distinct is up to you. Use with caution."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:196
+msgid "These pages sit at the top level of your site"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:197
+msgid "An address directly after your domain can resolve to a gallery or album, so a page or post you add later at the same path may stop opening."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:202
+msgid "Prefix"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:203
+msgid "The part both addresses below share. Clear it and they start straight after your domain."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:211
+msgid "fotogrids"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:217
+msgid "Gallery segment"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:218
+msgid "The word that marks a gallery in the address."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:233
+msgid "Album segment"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:234
+msgid "The word that marks an album in the address."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:250
+msgid "Before you change this"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:251
+msgid "Addresses on the default `fotogrids/gallery` and `fotogrids/album` base keep working and forward to the new one. Links you shared under a custom base you set earlier will stop resolving."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:256
 msgid "Page layout"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:141
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:257
 msgid "Choose how view pages render. Integrated treats each gallery or album as a normal post in your theme. Standalone renders a theme-less shell that owns the whole page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:144
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:148
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:260
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:264
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:52
 msgid "Layout mode"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:145
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:261
 msgid "Integrated uses your theme’s header, footer and navigation. Standalone overrides the theme entirely."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:152
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:268
 msgid "Integrated"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:153
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:269
 msgid "Standalone"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:161
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:277
 msgid "Integrated view pages"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:162
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:278
 msgid "Behaviour for view pages rendered inside your theme. These settings control how the gallery acts as a normal post on your site."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:165
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:281
 msgid "Show title block above gallery"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:166
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:282
 msgid "Display the FotoGrids title and item count above the gallery. Most themes already render the post title, so this is off by default."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:175
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:291
 msgid "Hide featured image"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:176
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:292
 msgid "Suppress your theme’s featured-image render on view pages. The gallery is the visual content, so an extra featured image above it is usually redundant."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:185
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:301
 msgid "Allow comments"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:186
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:302
 msgid "Let visitors leave comments on view pages if your theme renders them."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:195
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:311
 msgid "Include in author and date archives"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:196
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:312
 msgid "When on, view pages appear in your theme’s author and date archives alongside blog posts."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:205
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:321
 msgid "Previous / next navigation"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:206
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:322
 msgid "When on, previous/next post links on view pages stay within galleries or within albums. When off, navigation is suppressed."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:218
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:334
 msgid "Standalone appearance"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:219
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:335
 msgid "Look and feel of the theme-less shell. These settings apply to every Standalone view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:222
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:338
 msgid "Accent color"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:223
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:339
 msgid "Used for buttons, links and highlights."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:230
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:346
 msgid "The base colour scheme."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:237
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:353
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:259
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:278
 msgid "Light"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:238
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:354
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:260
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:282
 msgid "Dark"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:244
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:360
 msgid "Maximum width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:245
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:361
 msgid "How wide the gallery content can grow on large screens."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:260
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:376
 msgid "Show page header"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:261
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:377
 msgid "Display the title and item count at the top of the view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:270
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:386
 msgid "Show page footer"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:271
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:387
 msgid "Display the sharing controls and footer credit at the bottom of the view page."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:401
+msgid "That address could not be saved"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:158
@@ -6472,31 +7193,31 @@ msgstr ""
 msgid "You can switch any time in FotoGrids Settings."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:24
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:80
 msgid "Build from scratch"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:25
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:81
 msgid "Start with an empty gallery. Drop in photos, pick a layout, embed on a page."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:26
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:82
 msgid "Build custom"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:33
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:90
 msgid "Choose a template"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:34
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:91
 msgid "Start from a ready-made layout we’ll fill with your photos."
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:35
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:92
 msgid "Browse templates"
 msgstr ""
 
-#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:59
+#: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:116
 msgid "You can always change layout, items, and style later."
 msgstr ""
 
@@ -6553,7 +7274,7 @@ msgid "What best describes you?"
 msgstr ""
 
 #: assets/admin/src/components/setup-wizard/StepPersona.jsx:68
-msgid "We’ll use this to tailor a few defaults. Skip if you’d rather not say."
+msgid "It helps us keep improving FotoGrids — shared with us only if usage data is on in Settings. Skip if you’d rather not say."
 msgstr ""
 
 #: assets/admin/src/components/setup-wizard/StepPersona.jsx:74
@@ -6713,28 +7434,34 @@ msgstr ""
 msgid "Your role can view these settings but cannot change them. Ask an administrator if you need to make changes here."
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:65
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:126
 msgid "Save failed"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:68
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:129
 msgid "Unsaved changes"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:71
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:132
 msgid "All changes saved"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:93
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:154
 msgid "Discard"
 msgstr ""
 
-#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:108
+#: assets/admin/src/components/shared/SidebarTabs/elements/SaveBar.jsx:169
 msgid "Save changes"
 msgstr ""
 
-#: assets/admin/src/components/shared/StatsTable.jsx:56
+#: assets/admin/src/components/shared/StatsTable.jsx:113
 msgid "No data available"
+msgstr ""
+
+#. translators: %s: column name.
+#: assets/admin/src/components/shared/StatsTable.jsx:160
+#, js-format
+msgid "Sort by %s"
 msgstr ""
 
 #: assets/admin/src/components/templates/ApplyTemplateModal.jsx:38
@@ -6918,14 +7645,6 @@ msgstr ""
 
 #: assets/admin/src/utils/gallery.js:39
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This gallery has nothing to preview yet."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This album has nothing to preview yet."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:121
@@ -7229,10 +7948,6 @@ msgstr ""
 msgid "Complete"
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:95
-msgid "Partial"
-msgstr ""
-
 #: includes/tools/import-export/assets/ImportExportTool.jsx:96
 #: includes/tools/import-export/assets/ImportExportTool.jsx:97
 msgid "Failed"
@@ -7261,10 +7976,6 @@ msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:298
 msgid "What to export"
-msgstr ""
-
-#: includes/tools/import-export/assets/ImportExportTool.jsx:306
-msgid "Select all"
 msgstr ""
 
 #: includes/tools/import-export/assets/ImportExportTool.jsx:326
@@ -7544,10 +8255,6 @@ msgstr ""
 
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:450
 msgid "Other sizes"
-msgstr ""
-
-#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:453
-msgid "Action"
 msgstr ""
 
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:494

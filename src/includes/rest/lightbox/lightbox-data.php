@@ -117,9 +117,15 @@ class Lightbox_Data {
 		// ── Credit ───────────────────────────────────────────────────────────
 		$credit = '';
 		if ( 'exif' === $credit_source ) {
-			// EXIF Copyright field - stored under the key 'copyright' by TabEXIF.
-			// If exif is missing or the copyright key is absent, return empty - no fallback.
-			$credit = ( is_array( $exif ) && isset( $exif['copyright'] ) ) ? (string) $exif['copyright'] : '';
+			// EXIF Copyright field. It is read whether or not the gallery
+			// displays it in the EXIF block, because choosing EXIF as the
+			// credit source is itself the request for it.
+			if ( is_array( $exif ) && isset( $exif['copyright'] ) ) {
+				$credit = (string) $exif['copyright'];
+			} else {
+				$copyright = \FotoGrids\Exif\Exif_Extractor::extract( $item_id, array( 'copyright' ) );
+				$credit    = $copyright['copyright'] ?? '';
+			}
 		} elseif ( 'xmp' === $credit_source ) {
 			// XMP rights - read from the embedded XMP packet. wp_read_image_metadata
 			// does not parse XMP, so the file is read directly.

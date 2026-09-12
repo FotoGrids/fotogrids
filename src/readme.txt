@@ -53,7 +53,7 @@ Click any image to open a full-screen fully-customizable lightbox with swipe ges
 
 * **Sorting** - order items by date, title, filename, manually, or at random.
 * **Filtering** - let visitors filter a gallery by tag, person (Pro), or location (Pro), right on the page.
-* **EXIF details** - capture and display camera, lens, aperture, and shutter data from your originals.
+* **EXIF details** - capture and display camera, lens, aperture, shutter speed, ISO, focal length, flash, white balance, metering, exposure and GPS data from your originals. Pick which fields a gallery shows, and in what order.
 
 = 🖱️ Effortless by design =
 

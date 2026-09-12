@@ -132,7 +132,7 @@ final class Item_Ajax_Endpoints {
 		if ( null === $exif_data ) {
 			$raw_exif = Exif_Extractor::extract(
 				$item_id,
-				array( 'camera', 'aperture', 'shutter_speed', 'iso', 'lens', 'focal_length', 'date_taken', 'copyright', 'orientation', 'flash', 'white_balance', 'exposure_mode' )
+				\FotoGrids\Exif\Exif_Fields::keys()
 			);
 			if ( ! empty( $raw_exif ) ) {
 				$exif_data = $raw_exif;

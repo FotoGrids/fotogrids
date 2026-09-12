@@ -373,51 +373,26 @@ final class Lightbox_Slide_Builder {
 	}
 
 	/**
-	 * Load EXIF for an attachment, scoped to the fields the gallery
-	 * wants to display. Reads from WordPress's attachment metadata
-	 * (post_mime_type=image/*) - no extra table.
+	 * Load EXIF for an attachment, scoped to the fields the gallery displays.
 	 *
+	 * @param  int   $aid      Attachment ID.
+	 * @param  array $settings Gallery settings.
 	 * @return array<string, mixed>
 	 */
 	private static function load_exif( int $aid, array $settings ): array {
-		$meta = wp_get_attachment_metadata( $aid );
-		if ( ! is_array( $meta ) || empty( $meta['image_meta'] ) || ! is_array( $meta['image_meta'] ) ) {
+		if ( empty( $settings['display_exif'] ) ) {
 			return array();
 		}
 
-		$allowed = $settings['lightbox_exif_fields'] ?? array();
-		if ( ! is_array( $allowed ) ) {
-			$allowed = array();
-		}
-
-		// Map FotoGrids EXIF field keys → WP image_meta keys.
-		$map = array(
-			'camera'        => 'camera',
-			'aperture'      => 'aperture',
-			'shutter_speed' => 'shutter_speed',
-			'iso'           => 'iso',
-			'focal_length'  => 'focal_length',
-			'orientation'   => 'orientation',
-			'created_at'    => 'created_timestamp',
-			'lens'          => 'lens',
+		$enabled = \FotoGrids\Exif\Exif_Fields::sanitize_keys(
+			\FotoGrids\Exif\Exif_Extractor::parse_field_setting( $settings['exif_fields'] ?? array() )
 		);
 
-		$out = array();
-		foreach ( $allowed as $field ) {
-			if ( ! is_string( $field ) ) {
-				continue;
-			}
-			$wp_key = $map[ $field ] ?? $field;
-			if ( ! array_key_exists( $wp_key, $meta['image_meta'] ) ) {
-				continue;
-			}
-			$value = $meta['image_meta'][ $wp_key ];
-			if ( '' === $value || 0 === $value || '0' === $value ) {
-				continue;
-			}
-			$out[ $field ] = $value;
+		if ( empty( $enabled ) ) {
+			return array();
 		}
-		return $out;
+
+		return \FotoGrids\Exif\Exif_Extractor::extract( $aid, $enabled );
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

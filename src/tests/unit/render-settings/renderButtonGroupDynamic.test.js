@@ -2,6 +2,7 @@
  * Tests for renderButtonGroupDynamic.js (+ renderImageSize which wraps it)
  */
 import '@/admin/plain/render-settings/utils/tooltip-utils';
+import '@/admin/plain/render-settings/utils/dynamic-options';
 import '@/admin/plain/render-settings/renderButtonGroup';
 import '@/admin/plain/render-settings/renderButtonGroupDynamic';
 import '@/admin/plain/render-settings/renderImageSize';

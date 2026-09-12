@@ -223,6 +223,16 @@ final class Collection_Settings_Assets {
 			true
 		);
 
+		// Dynamic-options resolver - must load before any render helper whose
+		// setting can declare `api_endpoint`.
+		wp_enqueue_script(
+			'fotogrids-dynamic-options',
+			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/dynamic-options.js',
+			array( 'wp-element' ),
+			FOTOGRIDS_VERSION,
+			true
+		);
+
 		wp_enqueue_script(
 			'fotogrids-fg-color-picker',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/render-settings/utils/fg-color-picker.js',
@@ -260,6 +270,10 @@ final class Collection_Settings_Assets {
 
 		if ( 'renderColorPicker' === $function_name ) {
 			$dependencies[] = 'fotogrids-fg-color-picker';
+		}
+
+		if ( in_array( $function_name, array( 'renderButtonGroupDynamic', 'renderTokenSelect' ), true ) ) {
+			$dependencies[] = 'fotogrids-dynamic-options';
 		}
 
 		if ( in_array( $function_name, array( 'renderRange', 'renderResponsiveRange' ), true ) ) {
