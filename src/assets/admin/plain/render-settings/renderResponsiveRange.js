@@ -284,51 +284,67 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		];
 
 		return h('div', { className: 'fotogrids-responsive-setting' }, [
-			h('div', { className: 'fotogrids-responsive-setting__header' }, [
-				h(
-					'label',
-					{ className: 'fotogrids-setting__label' },
-					[
-						setting.label,
-						setting.unit &&
-							h(
-								'span',
-								{
-									className: 'fotogrids-setting__unit',
-									key: 'unit',
-								},
-								` (${setting.unit})`
-							),
-						showSettingBadge &&
-							h(
-								'span',
-								{
-									className: 'fotogrids-pro-badge',
-									key: 'pro-badge',
-								},
-								settingBadgeText
-							),
-					].filter(Boolean)
-				),
-				h(
-					'span',
-					{ className: 'fotogrids-responsive-setting__device-icon' },
-					renderIcon(activeDeviceData.icon)
-				),
-			]),
+			h(
+				'div',
+				{
+					key: 'header',
+					className: 'fotogrids-responsive-setting__header',
+				},
+				[
+					h(
+						'label',
+						{ key: 'label', className: 'fotogrids-setting__label' },
+						[
+							setting.label,
+							setting.unit &&
+								h(
+									'span',
+									{
+										className: 'fotogrids-setting__unit',
+										key: 'unit',
+									},
+									` (${setting.unit})`
+								),
+							showSettingBadge &&
+								h(
+									'span',
+									{
+										className: 'fotogrids-pro-badge',
+										key: 'pro-badge',
+									},
+									settingBadgeText
+								),
+						].filter(Boolean)
+					),
+					h(
+						'span',
+						{
+							key: 'device-icon',
+							className:
+								'fotogrids-responsive-setting__device-icon',
+						},
+						renderIcon(activeDeviceData.icon)
+					),
+				]
+			),
 
 			h(
 				'div',
 				{
+					key: 'controls',
 					className:
 						'fotogrids-responsive-setting__controls fotogrids-responsive-setting__controls--four-sided',
 				},
 				[
 					h(
 						'div',
-						{ className: 'fotogrids-responsive-setting__range' },
+						{
+							key: 'range',
+							className: 'fotogrids-responsive-setting__range',
+						},
 						[
 							h('input', {
+								key: 'range-slider',
 								type: 'range',
 								min: setting.responsive[activeDevice].min,
 								max: setting.responsive[activeDevice].max,
@@ -347,7 +363,10 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 
 					h(
 						'div',
-						{ className: 'fotogrids-responsive-setting__input' },
+						{
+							key: 'input',
+							className: 'fotogrids-responsive-setting__input',
+						},
 						[
 							h(
 								'div',
@@ -365,6 +384,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										},
 										[
 											h('input', {
+												key: 'number-input',
 												type: 'number',
 												min: setting.responsive[
 													activeDevice
@@ -406,6 +426,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 											h(
 												'span',
 												{
+													key: 'fourside-label',
 													className:
 														'fotogrids-fourside-label',
 												},
@@ -450,6 +471,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				h(
 					'p',
 					{
+						key: 'description',
 						className: 'fotogrids-setting__description',
 					},
 					setting.description
@@ -747,12 +769,14 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				h(
 					'div',
 					{
+						key: 'header',
 						className: 'fotogrids-responsive-setting__header',
 					},
 					[
 						h(
 							'label',
 							{
+								key: 'label',
 								className: 'fotogrids-setting__label',
 							},
 							[
@@ -771,6 +795,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						h(
 							'span',
 							{
+								key: 'device-icon',
 								className:
 									'fotogrids-responsive-setting__device-icon',
 							},
@@ -782,6 +807,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				h(
 					'div',
 					{
+						key: 'controls',
 						className:
 							'fotogrids-responsive-minmax-range__controls',
 					},
@@ -800,6 +826,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 							return h(
 								'div',
 								{
+									key: 'dual-range',
 									className: 'fotogrids-dual-range-container',
 									style: {
 										'--min-percent': `${minPercent}%`,
@@ -810,12 +837,14 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									h(
 										'div',
 										{
+											key: 'range-wrapper',
 											className:
 												'fotogrids-dual-range-wrapper',
 										},
 										[
 											// Min range input (lower z-index, shows left track)
 											h('input', {
+												key: 'range-slider',
 												type: 'range',
 												min: minMin,
 												max: maxMax,
@@ -841,6 +870,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													'fotogrids-range-slider fotogrids-range-slider-min',
 											}),
 											h('input', {
+												key: 'range-slider-2',
 												type: 'range',
 												min: minMin,
 												max: maxMax,
@@ -874,6 +904,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						h(
 							'div',
 							{
+								key: 'inputs',
 								className:
 									'fotogrids-responsive-minmax-range__inputs',
 							},
@@ -881,6 +912,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								h(
 									'div',
 									{
+										key: 'input-group',
 										className:
 											'fotogrids-responsive-minmax-range__input-group',
 									},
@@ -888,6 +920,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										h(
 											'label',
 											{
+												key: 'label',
 												className:
 													'fotogrids-responsive-minmax-range__label',
 											},
@@ -896,11 +929,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										h(
 											'div',
 											{
+												key: 'input',
 												className:
 													'fotogrids-responsive-setting__input',
 											},
 											[
 												h('input', {
+													key: 'number-input',
 													type: 'number',
 													min: minMin,
 													max: currentMaxValue,
@@ -936,6 +971,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 								h(
 									'div',
 									{
+										key: 'input-group-2',
 										className:
 											'fotogrids-responsive-minmax-range__input-group',
 									},
@@ -943,6 +979,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										h(
 											'label',
 											{
+												key: 'label',
 												className:
 													'fotogrids-responsive-minmax-range__label',
 											},
@@ -951,11 +988,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 										h(
 											'div',
 											{
+												key: 'input',
 												className:
 													'fotogrids-responsive-setting__input',
 											},
 											[
 												h('input', {
+													key: 'number-input',
 													type: 'number',
 													min: currentMinValue,
 													max: maxMax,
@@ -992,6 +1031,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									h(
 										'div',
 										{
+											key: 'unit-selector',
 											className:
 												'fotogrids-responsive-minmax-range__unit-selector',
 										},
@@ -1004,6 +1044,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 															.FotoGridsRenderSettings
 															.CustomUnitSelect,
 														{
+															key: 'unit-select',
 															value:
 																currentMinUnit ||
 																currentMaxUnit ||
@@ -1034,6 +1075,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 												: h(
 														'select',
 														{
+															key: 'units-select',
 															value:
 																currentMinUnit ||
 																currentMaxUnit ||
@@ -1081,6 +1123,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 					h(
 						'p',
 						{
+							key: 'description',
 							className: 'fotogrids-setting__description',
 						},
 						setting.description
@@ -1119,20 +1162,20 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 			h(
 				'div',
 				{
+					key: 'header',
 					className: 'fotogrids-responsive-setting__header',
 				},
 				[
 					h(
 						'label',
-						{
-							className: 'fotogrids-setting__label',
-						},
+						{ key: 'label', className: 'fotogrids-setting__label' },
 						[
 							setting.label,
 							setting.unit &&
 								h(
 									'span',
 									{
+										key: 'unit',
 										className: 'fotogrids-setting__unit',
 									},
 									` (${setting.unit})`
@@ -1151,6 +1194,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 					h(
 						'span',
 						{
+							key: 'device-icon',
 							className:
 								'fotogrids-responsive-setting__device-icon',
 						},
@@ -1162,6 +1206,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 			h(
 				'div',
 				{
+					key: 'controls',
 					className: `fotogrids-responsive-setting__controls${noRange ? ' fotogrids-responsive-setting__controls--no-range' : ''}`,
 				},
 				[
@@ -1169,11 +1214,13 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 						h(
 							'div',
 							{
+								key: 'range',
 								className:
 									'fotogrids-responsive-setting__range',
 							},
 							[
 								h('input', {
+									key: 'range-slider',
 									type: 'range',
 									min: setting.responsive[activeDevice].min,
 									max: setting.responsive[activeDevice].max,
@@ -1194,10 +1241,12 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 					h(
 						'div',
 						{
+							key: 'input',
 							className: 'fotogrids-responsive-setting__input',
 						},
 						[
 							h('input', {
+								key: 'number-input',
 								type: 'number',
 								min: setting.responsive[activeDevice].min,
 								max: setting.responsive[activeDevice].max,
@@ -1226,6 +1275,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 											window.FotoGridsRenderSettings
 												.CustomUnitSelect,
 											{
+												key: 'unit-select',
 												value: currentDeviceUnit,
 												onChange: (e) =>
 													!isDisabled &&
@@ -1247,6 +1297,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 									: h(
 											'select',
 											{
+												key: 'units-select',
 												value: currentDeviceUnit,
 												onChange: (e) =>
 													!isDisabled &&
@@ -1286,6 +1337,7 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 				h(
 					'p',
 					{
+						key: 'description',
 						className: 'fotogrids-setting__description',
 					},
 					setting.description
@@ -1420,37 +1472,49 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 		'div',
 		{ className: 'fotogrids-responsive-setting' },
 		[
-			h('div', { className: 'fotogrids-responsive-setting__header' }, [
-				h(
-					'label',
-					{ className: 'fotogrids-setting__label' },
-					[
-						setting.label,
-						showSettingBadge &&
-							h(
-								'span',
-								{
-									className: 'fotogrids-pro-badge',
-									key: 'pro-badge',
-								},
-								settingBadgeText
-							),
-					].filter(Boolean)
-				),
-			]),
+			h(
+				'div',
+				{
+					key: 'header',
+					className: 'fotogrids-responsive-setting__header',
+				},
+				[
+					h(
+						'label',
+						{ key: 'label', className: 'fotogrids-setting__label' },
+						[
+							setting.label,
+							showSettingBadge &&
+								h(
+									'span',
+									{
+										className: 'fotogrids-pro-badge',
+										key: 'pro-badge',
+									},
+									settingBadgeText
+								),
+						].filter(Boolean)
+					),
+				]
+			),
 
 			h(
 				'div',
 				{
+					key: 'controls',
 					className:
 						'fotogrids-responsive-setting__controls fotogrids-responsive-setting__controls--two-sided',
 				},
 				[
 					h(
 						'div',
-						{ className: 'fotogrids-responsive-setting__range' },
+						{
+							key: 'range',
+							className: 'fotogrids-responsive-setting__range',
+						},
 						[
 							h('input', {
+								key: 'range-slider',
 								type: 'range',
 								min: range.min,
 								max: range.max,
@@ -1468,7 +1532,10 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 
 					h(
 						'div',
-						{ className: 'fotogrids-responsive-setting__input' },
+						{
+							key: 'input',
+							className: 'fotogrids-responsive-setting__input',
+						},
 						[
 							h(
 								'div',
@@ -1486,6 +1553,7 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 										},
 										[
 											h('input', {
+												key: 'number-input',
 												type: 'number',
 												min: range.min,
 												max: range.max,
@@ -1513,6 +1581,7 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 											h(
 												'span',
 												{
+													key: 'fourside-label',
 													className:
 														'fotogrids-fourside-label',
 												},
@@ -1538,7 +1607,10 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 			widthDisabledByStretch &&
 				h(
 					'p',
-					{ className: 'fotogrids-setting__description' },
+					{
+						key: 'description',
+						className: 'fotogrids-setting__description',
+					},
 					__(
 						'Width follows the track while alignment is Stretch.',
 						'fotogrids'
@@ -1548,7 +1620,10 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 			setting.description &&
 				h(
 					'p',
-					{ className: 'fotogrids-setting__description' },
+					{
+						key: 'description-2',
+						className: 'fotogrids-setting__description',
+					},
 					setting.description
 				),
 		].filter(Boolean)
@@ -1560,6 +1635,7 @@ function renderUnitSelect(h, currentUnit, onChange, isDisabled, setting) {
 	return window.FotoGridsRenderSettings?.CustomUnitSelect &&
 		typeof React !== 'undefined'
 		? React.createElement(window.FotoGridsRenderSettings.CustomUnitSelect, {
+				key: 'unit-select',
 				value: currentUnit,
 				onChange: (e) => onChange(e.target.value),
 				disabled: isDisabled,
@@ -1569,6 +1645,7 @@ function renderUnitSelect(h, currentUnit, onChange, isDisabled, setting) {
 		: h(
 				'select',
 				{
+					key: 'unit-select',
 					value: currentUnit,
 					onChange: (e) => onChange(e.target.value),
 					disabled: isDisabled,
@@ -1610,6 +1687,7 @@ function renderLinkButton(
 		h(
 			'button',
 			{
+				key: 'link-btn',
 				type: 'button',
 				className: `fotogrids-fourside-link-btn${isLinked ? ' fg-is-active' : ''}`,
 				onClick: (e) => {
@@ -1621,7 +1699,8 @@ function renderLinkButton(
 				'aria-label': label,
 			},
 			renderIcon('link')
-		)
+		),
+		'link-btn'
 	);
 }
 
@@ -1632,7 +1711,7 @@ function renderDeviceButtons(
 ) {
 	return h(
 		'div',
-		{ className: 'fotogrids-responsive-setting__devices' },
+		{ key: 'devices', className: 'fotogrids-responsive-setting__devices' },
 		devices.map((device) =>
 			withTooltip(
 				h,

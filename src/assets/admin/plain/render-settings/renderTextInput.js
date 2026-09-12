@@ -26,9 +26,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 			setting.label &&
 				h(
 					'label',
-					{
-						className: 'fotogrids-setting__label',
-					},
+					{ key: 'label', className: 'fotogrids-setting__label' },
 					[
 						setting.label,
 						showSettingBadge &&
@@ -44,6 +42,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 				),
 			setting.multiline
 				? h('textarea', {
+						key: 'fotogrids-input',
 						className: 'fotogrids-input fotogrids-input--multiline',
 						value: currentValue || setting.default || '',
 						placeholder: setting.placeholder || '',
@@ -54,6 +53,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 						disabled: isDisabled,
 					})
 				: h('input', {
+						key: 'fotogrids-input-2',
 						type: 'text',
 						className: 'fotogrids-input',
 						value: currentValue || setting.default || '',
@@ -67,6 +67,7 @@ window.FotoGridsRenderSettings.renderTextInput = (
 				h(
 					'div',
 					{
+						key: 'description',
 						className: 'fotogrids-setting__description',
 					},
 					setting.description

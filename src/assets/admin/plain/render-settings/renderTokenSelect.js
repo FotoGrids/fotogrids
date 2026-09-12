@@ -496,7 +496,7 @@ const TokenSelectComponent = ({
 
 	const portal =
 		dropdownElement && typeof createPortal === 'function'
-			? createPortal(dropdownElement, document.body)
+			? createPortal(dropdownElement, document.body, 'portal')
 			: dropdownElement;
 
 	const hasTokens = selectedValues.length > 0;
