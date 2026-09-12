@@ -11,7 +11,10 @@ concurrency:
 
 jobs:
   playwright:
-    name: Playwright (wp-env)
+    # Referenced by main's branch protection as a required status check, which
+    # matches on this exact string. Renaming it here stops that check from ever
+    # being reported, and the branch blocks with no failure to point at.
+    name: Playwright
     runs-on: ubuntu-latest
 
     steps:
