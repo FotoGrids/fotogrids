@@ -609,11 +609,8 @@ const mainConfig = {
                     },
                 },
                 {
-                    // Stylesheets, icons and the shared arrow-icon JSON ship as-is.
-                    // Every .js under public/render is a webpack entry or is imported
-                    // by one, so its built output lands in assets/js/ and copying the
-                    // source would ship it twice. .scss is handled by
-                    // MiniCssExtractPlugin and .php by the src/**/*.php pattern above.
+                    // No .js: every file under public/render is a webpack entry, or
+                    // imported by one, and its output lands in assets/js/.
                     from: 'src/public/render/**/*.{css,svg,json}',
                     to: ({ context, absoluteFilename }) => {
                         const relativePath = path.relative(context, absoluteFilename);
