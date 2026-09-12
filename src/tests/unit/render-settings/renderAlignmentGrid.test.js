@@ -35,6 +35,43 @@ describe('renderAlignmentGrid', () => {
 		expect(cells).toHaveLength(9);
 	});
 
+	it('renders a sparse grid in defaults mode without throwing', () => {
+		const options = [
+			{ value: 'top-left', label: 'TL' },
+			{ value: 'center', label: 'C' },
+			{ value: 'bottom-right', label: 'BR' },
+		];
+		const { container } = renderElement(
+			build({ key: 'align', options }, 'center', false, {
+				isDefaultsMode: true,
+			})
+		);
+		// empty slots must survive the defaults-mode isGlobalDefault filter
+		const cells = container.querySelectorAll(
+			'.fg-button-group__button, .fg-button-group__button--empty'
+		);
+		expect(cells).toHaveLength(9);
+	});
+
+	it('drops isGlobalDefault options in defaults mode, keeping the slot empty', () => {
+		const options = [
+			{ value: 'top-left', label: 'TL' },
+			{ value: 'center', label: 'C', isGlobalDefault: true },
+			{ value: 'bottom-right', label: 'BR' },
+		];
+		const { container } = renderElement(
+			build({ key: 'align', options }, 'top-left', false, {
+				isDefaultsMode: true,
+			})
+		);
+		expect(
+			container.querySelectorAll('.fg-button-group__button')
+		).toHaveLength(2);
+		expect(
+			container.querySelectorAll('.fg-button-group__button--empty')
+		).toHaveLength(7);
+	});
+
 	it('maps options into their grid positions, leaving gaps empty', () => {
 		const options = [
 			{ value: 'center', label: 'C' },
