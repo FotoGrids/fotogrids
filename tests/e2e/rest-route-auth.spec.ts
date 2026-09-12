@@ -1,5 +1,10 @@
 import { execFileSync } from 'child_process';
-import { test, expect, APIRequestContext } from '@playwright/test';
+import {
+	test,
+	expect,
+	APIRequestContext,
+	PlaywrightWorkerArgs,
+} from '@playwright/test';
 
 /**
  * API-layer checks that the REST routes returning gallery item data outside
@@ -90,7 +95,7 @@ function route(path: string, query: Record<string, string | number> = {}) {
 }
 
 async function signIn(
-	playwright: typeof import('@playwright/test'),
+	playwright: PlaywrightWorkerArgs['playwright'],
 	user: string,
 	pass: string
 ): Promise<{ context: APIRequestContext; nonce: string }> {
