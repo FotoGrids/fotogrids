@@ -965,6 +965,7 @@ class Renderer {
 			array(
 				'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
 				'embedded_share_target' => $sharing['embedded_share_target'],
+				'restNonce'             => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 			)
 		);
 	}

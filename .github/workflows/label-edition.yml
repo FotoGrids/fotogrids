@@ -1,0 +1,78 @@
+name: Label edition
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: label-edition-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  label:
+    if: contains(github.event.issue.labels.*.name, 'from-users')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply the edition label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Normalise line endings first: a CRLF body otherwise defeats the
+            // matches below.
+            const body = (context.payload.issue.body || '').replace(/\r\n/g, '\n');
+
+            // Both reads are heuristics over a rendered format, not a documented
+            // contract. Every miss must leave the issue unlabelled for manual
+            // triage rather than guess.
+
+            // The System Info report states whether Pro is installed. Its row
+            // value is a version string when it is; anything else means it is
+            // not. Row labels are translated on non-English sites, so a miss
+            // here simply falls through to the form answer below.
+            const proRow = body.match(/^[ \t]*FotoGrids Pro:[ \t]*(\S.*?)[ \t]*$/m);
+            const proInstalled = proRow ? /^\d+\.\d/.test(proRow[1]) : null;
+
+            // The dropdown states which edition the reporter believes this is
+            // about, which is what the label means.
+            const heading = body.match(
+              /^###[ \t]+Which edition\?[ \t]*\n+([\s\S]*?)(?=\n###[ \t]|$)/m
+            );
+            const answer = heading ? heading[1].trim().split('\n')[0].trim() : null;
+            const stated = new Map([
+              ['FotoGrids (Free)', ['edition: free']],
+              ['FotoGrids Pro', ['edition: pro']],
+              ['Both', ['edition: free', 'edition: pro']],
+            ]).get(answer) || null;
+
+            let labels = null;
+            let why = '';
+
+            if (proInstalled === false) {
+              // Pro is not on the site, so the report cannot be about Pro
+              // whatever the dropdown says.
+              labels = ['edition: free'];
+              why = 'System Info reports Pro is not installed';
+            } else if (stated) {
+              labels = stated;
+              why = `form answer "${answer}"`;
+            } else if (proInstalled === true) {
+              labels = ['edition: pro'];
+              why = `System Info reports Pro ${proRow[1]}`;
+            }
+
+            if (!labels) {
+              core.notice('Edition could not be read from the report or the form. Leaving for manual triage.');
+              return;
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              labels,
+            });
+
+            core.notice(`Applied ${labels.join(', ')} — ${why}.`);

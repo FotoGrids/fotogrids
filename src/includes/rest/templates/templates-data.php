@@ -504,15 +504,6 @@ class Templates_Data {
 	 * @return \WP_REST_Response HTML response
 	 */
 	public static function render_template_preview( $request ) {
-		$nonce = $request->get_param( '_wpnonce' );
-		if ( $nonce ) {
-			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new \WP_Error( 'rest_forbidden', __( 'Invalid nonce.', 'fotogrids' ), array( 'status' => 403 ) );
-			}
-		} elseif ( ! current_user_can( 'edit_posts' ) ) {
-			return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to do that.', 'fotogrids' ), array( 'status' => 403 ) );
-		}
-
 		$template_id = $request->get_param( 'template_id' );
 		$category    = $request->get_param( 'category' ) ?: 'gallery';
 

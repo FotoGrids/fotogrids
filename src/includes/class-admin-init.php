@@ -258,9 +258,9 @@ class Admin_Init {
 			'fotogridsAdmin',
 			array(
 				'nonce'              => wp_create_nonce( 'fotogrids_admin' ),
-				'settingsNonce'      => wp_create_nonce( 'fotogrids_settings-options' ),
 				'restUrl'            => 'fotogrids/v1/',
 				'restNonce'          => wp_create_nonce( 'wp_rest' ),
+				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 				'pluginUrl'          => FOTOGRIDS_PLUGIN_URL,
 				'apiUrl'             => rest_url(),
 				'generalSettings'    => self::get_general_settings(),
@@ -272,7 +272,7 @@ class Admin_Init {
 				'currentUser'        => wp_get_current_user(),
 				'shareStatistics'    => self::resolve_share_statistics_state(),
 				'marketingAllowed'   => (bool) get_option( 'fotogrids_marketing_allowed', false ),
-				'autosave'           => (bool) get_option( 'fotogrids_autosave', '0' ),
+				'autosave'           => (bool) get_option( 'fotogrids_autosave', true ),
 				'settingsMode'       => (string) get_option( 'fotogrids_settings_mode', 'easy' ),
 				'userPersona'        => (string) get_option( 'fotogrids_user_persona', '' ),
 				'settingsBaseUrl'    => admin_url( 'admin.php?page=fotogrids-settings' ),
@@ -428,7 +428,7 @@ class Admin_Init {
 			'fotogrids_autosave',
 			array(
 				'type'              => 'boolean',
-				'default'           => false,
+				'default'           => true,
 				'sanitize_callback' => array( __CLASS__, 'sanitize_autosave' ),
 			)
 		);
@@ -441,64 +441,6 @@ class Admin_Init {
 				'sanitize_callback' => 'rest_sanitize_boolean',
 			)
 		);
-		register_setting(
-			'fotogrids_settings',
-			'fotogrids_gallery_defaults',
-			array(
-				'sanitize_callback' => array( __CLASS__, 'sanitize_gallery_defaults' ),
-			)
-		);
-	}
-
-	/**
-	 * Sanitize gallery defaults option
-	 *
-	 * @param array $input Raw input data
-	 * @return array Sanitized data
-	 */
-	public static function sanitize_gallery_defaults( $input ) {
-		if ( ! is_array( $input ) ) {
-			return array();
-		}
-
-		$defaults  = \FotoGrids\Collection_Defaults::resolve_gallery();
-		$sanitized = array();
-
-		foreach ( $defaults as $key => $default_value ) {
-			if ( ! isset( $input[ $key ] ) ) {
-				continue;
-			}
-
-			$value = $input[ $key ];
-
-			if ( is_array( $default_value ) ) {
-				if ( is_string( $value ) ) {
-					$decoded = json_decode( stripslashes( $value ), true );
-					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
-						$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $decoded );
-					} else {
-						$sanitized[ $key ] = $default_value;
-					}
-				} elseif ( is_array( $value ) ) {
-					$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $value );
-				} else {
-					$sanitized[ $key ] = $default_value;
-				}
-			} elseif ( is_bool( $default_value ) ) {
-				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
-			} elseif ( is_numeric( $default_value ) ) {
-				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
-			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
-				// Passwords must not pass through sanitize_text_field(), which
-				// would strip characters that are valid in a password. Keep the
-				// value as-is; the per-collection save path encrypts it.
-				$sanitized[ $key ] = (string) $value;
-			} else {
-				$sanitized[ $key ] = sanitize_text_field( $value );
-			}
-		}
-
-		return $sanitized;
 	}
 
 	/**
@@ -708,13 +650,10 @@ class Admin_Init {
 		if ( in_array( $setting, $boolean_settings, true ) ) {
 			$sanitized_bool = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 
-			// `fotogrids_share_statistics` has a Freemius side-effect AND
-			// historically the Settings tab stores it as a real bool
-			// (`'1'` / `''`). The legacy AJAX path stored `'1'` / `'0'`
-			// strings, which `(bool)` casts as truthy in both cases. To
-			// keep the wizard and the Settings tab in sync, route this
-			// setting through the same shared helper. Other booleans
-			// keep the original `'1'` / `'0'` storage.
+			// `fotogrids_share_statistics` has a Freemius side-effect, so
+			// route it through the shared helper to keep the wizard and the
+			// Settings tab in sync. Every boolean option stores `'1'` / `'0'`;
+			// both cast correctly, since `'0'` is falsey in PHP.
 			if ( 'fotogrids_share_statistics' === $setting ) {
 				$applied = \FotoGrids\Settings\Plugin_Settings_Store::apply_share_statistics_consent( $sanitized_bool );
 				wp_send_json_success( array( 'value' => $applied ) );
@@ -782,7 +721,7 @@ class Admin_Init {
 	private static function allowed_values_for_string_setting( string $setting ): array {
 		switch ( $setting ) {
 			case 'fotogrids_user_persona':
-				return array( 'developer', 'photographer', 'personal', 'agency', 'business', 'shop' );
+				return array( 'developer', 'photographer', 'blogger', 'agency', 'business_owner', 'online_shop' );
 			case 'fotogrids_settings_mode':
 				return array( 'easy', 'advanced' );
 			default:

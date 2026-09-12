@@ -339,6 +339,8 @@ class Embed_Data {
 			);
 		}
 
+		\FotoGrids\FotoGrids_Cache::flush_for_item( $item_id );
+
 		$stored = Embed_Store::get( $item_id );
 
 		return rest_ensure_response(
