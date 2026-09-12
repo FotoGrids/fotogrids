@@ -163,7 +163,8 @@ final class Exif_Formatter {
 
 		$iso = (int) $value;
 
-		return $iso > 0 ? number_format_i18n( $iso ) : '';
+		// Sensitivity is written plain - a photographer reads ISO 1600, not 1,600.
+		return $iso > 0 ? (string) $iso : '';
 	}
 
 	/**
@@ -436,7 +437,7 @@ final class Exif_Formatter {
 			return '';
 		}
 
-		if ( 1 === (int) ( $exif['GPSAltitudeRef'] ?? 0 ) ) {
+		if ( 1 === self::byte_value( $exif['GPSAltitudeRef'] ?? 0 ) ) {
 			$decimal = -$decimal;
 		}
 
@@ -473,6 +474,33 @@ final class Exif_Formatter {
 		}
 
 		return (string) round( $decimal, 6 );
+	}
+
+	/**
+	 * Read an EXIF BYTE tag as an integer.
+	 *
+	 * exif_read_data() returns a BYTE as a raw one-character string, so
+	 * GPSAltitudeRef's "below sea level" arrives as "\x01" rather than "1"
+	 * and a plain integer cast reads it as zero.
+	 *
+	 * @since  1.2.0
+	 * @param  mixed $value Raw tag value.
+	 * @return int
+	 */
+	private static function byte_value( $value ): int {
+		if ( is_int( $value ) ) {
+			return $value;
+		}
+
+		if ( ! is_string( $value ) || '' === $value ) {
+			return 0;
+		}
+
+		if ( is_numeric( $value ) ) {
+			return (int) $value;
+		}
+
+		return 1 === strlen( $value ) ? ord( $value ) : 0;
 	}
 
 	/**
