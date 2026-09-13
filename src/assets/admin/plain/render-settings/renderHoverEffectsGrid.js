@@ -152,7 +152,7 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 	};
 
 	const renderPreviewCaption = () =>
-		h('figcaption', { className: 'fg-caption' }, [
+		h('figcaption', { key: 'caption', className: 'fg-caption' }, [
 			h('span', {
 				className: 'fg-caption-bg',
 				'aria-hidden': 'true',

@@ -146,7 +146,9 @@ const FieldGate = ({
 		{
 			className: `fotogrids-field-gate ${isTeaser ? 'fotogrids-field-gate--teaser' : ''} ${isLocked ? 'fotogrids-field-gate--locked' : ''}`,
 		},
-		[children, isLocked && h(LockedBanner, { __ })].filter(Boolean)
+		[children, isLocked && h(LockedBanner, { key: 'el', __ })].filter(
+			Boolean
+		)
 	);
 };
 
@@ -1973,6 +1975,7 @@ function CollectionSettings() {
 		const gatedControl = h(
 			FieldGate,
 			{
+				key: 'control',
 				setting,
 				currentValue,
 				fieldStates,
@@ -2161,16 +2164,19 @@ function CollectionSettings() {
 		return h(
 			'div',
 			{
+				key: 'docs-strip',
 				className: 'fotogrids-settings-docs-strip',
 			},
 			[
 				h('div', {
+					key: 'help',
 					dangerouslySetInnerHTML: { __html: helpText },
 					className: 'fotogrids-settings-docs-strip__help',
 				}),
 				h(
 					'div',
 					{
+						key: 'buttons',
 						className: 'fotogrids-settings-docs-strip__buttons',
 					},
 					[
@@ -2178,6 +2184,7 @@ function CollectionSettings() {
 							h(
 								'a',
 								{
+									key: 'defaults-link',
 									href: defaultsUrl,
 									className:
 										'fotogrids-settings-docs-strip__link',
@@ -2217,6 +2224,7 @@ function CollectionSettings() {
 						h(
 							'div',
 							{
+								key: 'mode',
 								className:
 									'fotogrids-settings-docs-strip__mode',
 							},
@@ -2224,6 +2232,7 @@ function CollectionSettings() {
 								h(
 									'div',
 									{
+										key: 'segmented',
 										className:
 											'fotogrids-segmented fotogrids-segmented--size-small fotogrids-segmented--variant-rounded',
 										role: 'radiogroup',
@@ -2302,6 +2311,7 @@ function CollectionSettings() {
 							h(
 								'div',
 								{
+									key: 'autosave',
 									className:
 										'fotogrids-settings-docs-strip__autosave',
 								},
@@ -2309,6 +2319,7 @@ function CollectionSettings() {
 									h(
 										'span',
 										{
+											key: 'autosave-label',
 											className:
 												'fotogrids-settings-docs-strip__autosave-label',
 										},
@@ -2317,6 +2328,7 @@ function CollectionSettings() {
 									h(
 										'button',
 										{
+											key: 'autosave-toggle',
 											type: 'button',
 											className: `fotogrids-toggle fotogrids-toggle--small fotogrids-toggle--green ${autosaveValue ? 'fgt-is-checked' : ''}`,
 											onClick: handleAutosaveToggle,
@@ -2329,10 +2341,12 @@ function CollectionSettings() {
 										},
 										[
 											h('span', {
+												key: 'track',
 												className:
 													'fotogrids-toggle__track',
 											}),
 											h('span', {
+												key: 'thumb',
 												className:
 													'fotogrids-toggle__thumb',
 											}),
@@ -2370,38 +2384,43 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'pro-tab',
 							className: 'fotogrids-pro-tab--content',
 						},
 						[
 							h(
 								'div',
 								{
+									key: 'pro-tab',
 									className: 'fotogrids-pro-tab--header',
 								},
 								[
 									h(
 										'span',
 										{
+											key: 'pro-tab',
 											className:
 												'fotogrids-pro-tab--header--icon',
 										},
 										renderIcon(group.icon)
 									),
-									h('h3', {}, group.label),
+									h('h3', { key: 'h3' }, group.label),
 									h(
 										'div',
 										{
+											key: 'pro-badge',
 											className:
 												'fotogrids-pro-badge fotogrids-pro-badge-large',
 										},
 										[
 											h('div', {
+												key: 'fotogrids-fireworks',
 												className:
 													'fotogrids-fireworks',
 											}),
 											h(
 												'span',
-												{},
+												{ key: 'span' },
 												__('Pro', 'fotogrids')
 											),
 										]
@@ -2411,12 +2430,14 @@ function CollectionSettings() {
 							h(
 								'div',
 								{
+									key: 'pro-tab-2',
 									className: 'fotogrids-pro-tab--features',
 								},
 								[
 									h(
 										'h4',
 										{
+											key: 'pro-tab',
 											className:
 												'fotogrids-pro-tab--description',
 										},
@@ -2428,7 +2449,7 @@ function CollectionSettings() {
 									),
 									h(
 										'ul',
-										{},
+										{ key: 'ul' },
 										allSettings.map((setting) =>
 											h(
 												'li',
@@ -2441,6 +2462,7 @@ function CollectionSettings() {
 													h(
 														'span',
 														{
+															key: 'pro-tab',
 															className:
 																'fotogrids-pro-tab--feature--icon',
 														},
@@ -2451,6 +2473,7 @@ function CollectionSettings() {
 													h(
 														'div',
 														{
+															key: 'pro-tab-2',
 															className:
 																'fotogrids-pro-tab--feature--content',
 														},
@@ -2459,6 +2482,7 @@ function CollectionSettings() {
 																h(
 																	'h5',
 																	{
+																		key: 'pro-tab',
 																		className:
 																			'fotogrids-pro-tab--feature--title',
 																	},
@@ -2467,6 +2491,7 @@ function CollectionSettings() {
 															h(
 																'p',
 																{
+																	key: 'pro-tab-2',
 																	className:
 																		'fotogrids-pro-tab--feature--description',
 																},
@@ -2484,12 +2509,14 @@ function CollectionSettings() {
 							h(
 								'div',
 								{
+									key: 'pro-tab-3',
 									className: 'fotogrids-pro-tab--cta',
 								},
 								[
 									h(
 										'button',
 										{
+											key: 'fg-button',
 											type: 'button',
 											className:
 												'fg-button fg-button--variant-primary',
@@ -2510,6 +2537,7 @@ function CollectionSettings() {
 									h(
 										'button',
 										{
+											key: 'fg-button-2',
 											type: 'button',
 											className:
 												'fg-button fg-button--variant-secondary',
@@ -2560,6 +2588,7 @@ function CollectionSettings() {
 						h(
 							'div',
 							{
+								key: 'content',
 								className: 'fotogrids-settings-group__content',
 							},
 							(group.settings || [])
@@ -2581,6 +2610,7 @@ function CollectionSettings() {
 						h(
 							'div',
 							{
+								key: 'content',
 								className: 'fotogrids-settings-group__content',
 							},
 							(singleSubTab.settings || [])
@@ -2616,6 +2646,7 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'nav',
 							className: 'fotogrids-subtabs-nav',
 						},
 						availableSubTabs.map((subTab) =>
@@ -2638,6 +2669,7 @@ function CollectionSettings() {
 									h(
 										'span',
 										{
+											key: 'icon',
 											className: 'fotogrids-subtab__icon',
 										},
 										renderIcon(subTab.icon)
@@ -2645,6 +2677,7 @@ function CollectionSettings() {
 									h(
 										'span',
 										{
+											key: 'label',
 											className:
 												'fotogrids-subtab__label',
 										},
@@ -2658,12 +2691,14 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'content',
 							className: 'fotogrids-subtab-content',
 						},
 						[
 							h(
 								'div',
 								{
+									key: 'group-content',
 									className:
 										'fotogrids-settings-group__content',
 								},
@@ -2694,12 +2729,14 @@ function CollectionSettings() {
 			h(
 				'div',
 				{
+					key: 'settings-group',
 					className: 'fotogrids-settings-group',
 				},
 				[
 					h(
 						'div',
 						{
+							key: 'group-content',
 							className: 'fotogrids-settings-group__content',
 						},
 						visibleSettings.map(renderSetting)
@@ -2718,75 +2755,83 @@ function CollectionSettings() {
 					'fotogrids-gallery-settings fotogrids-gallery-settings--loading',
 			},
 			[
-				h('div', { className: 'fotogrids-loading-screen' }, [
-					h('span', {
-						className: 'fotogrids-loading-screen__icon',
-						'aria-hidden': 'true',
-						dangerouslySetInnerHTML: {
-							__html:
-								'<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><rect x="0" y="0" width="0" height="6"><animate id="fg_ia_fotogrids_1___' +
-								_fgId +
-								'__" begin="0;fg_ia_fotogrids_10___' +
-								_fgId +
-								'__.end-0.3s" attributeName="width" dur="0.4s" values="0;24" fill="freeze"/><animate begin="fg_ia_fotogrids_6___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.4s" values="24;0" fill="freeze"/><animate id="fg_ia_fotogrids_2___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_6___' +
-								_fgId +
-								'__.end-0.2s" attributeName="x" dur="0.4s" values="0;24"/></rect><rect x="0" y="9" width="0" height="6"><animate id="fg_ia_fotogrids_3___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_1___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.4s" values="0;15" fill="freeze"/><animate begin="fg_ia_fotogrids_2___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.4s" values="15;0" fill="freeze"/><animate id="fg_ia_fotogrids_7___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_2___' +
-								_fgId +
-								'__.end-0.2s" attributeName="x" dur="0.4s" values="0;15"/></rect><rect x="0" y="18" width="0" height="6"><animate id="fg_ia_fotogrids_4___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_3___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_7___' +
-								_fgId +
-								'__.end-0.1s" attributeName="width" dur="0.2s" values="6;0" fill="freeze"/><animate id="fg_ia_fotogrids_8___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_7___' +
-								_fgId +
-								'__.end-0.1s" attributeName="x" dur="0.2s" values="0;6"/></rect><rect x="9" y="18" width="6" height="0"><animate id="fg_ia_fotogrids_5___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_4___' +
-								_fgId +
-								'__.end+0.1s" attributeName="height" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_4___' +
-								_fgId +
-								'__.end+0.1s" attributeName="y" dur="0.2s" values="24;18" fill="freeze"/><animate id="fg_ia_fotogrids_9___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_8___' +
-								_fgId +
-								'__.end+0.1s" attributeName="height" dur="0.2s" values="6;0" fill="freeze"/><animate begin="fg_ia_fotogrids_9___' +
-								_fgId +
-								'__.end+0.1s" attributeName="y" dur="0" values="18;24"/></rect><rect x="18" y="9" width="6" height="0"><animate begin="fg_ia_fotogrids_5___' +
-								_fgId +
-								'__.end+0.1s" attributeName="height" dur="0.4s" values="0;15" fill="freeze"/><animate id="fg_ia_fotogrids_6___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_5___' +
-								_fgId +
-								'__.end+0.1s" attributeName="y" dur="0.4s" values="24;9" fill="freeze"/><animate id="fg_ia_fotogrids_10___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_9___' +
-								_fgId +
-								'__.end-0.1s" attributeName="height" dur="0.4s" values="15;0" fill="freeze"/><animate begin="fg_ia_fotogrids_10___' +
-								_fgId +
-								'__.end" attributeName="y" dur="0" values="9;24"/></rect></svg>',
-						},
-					}),
-					h(
-						'span',
-						{ className: 'fotogrids-loading-screen__label' },
-						'Loading settings...'
-					),
-				]),
+				h(
+					'div',
+					{ key: 'screen', className: 'fotogrids-loading-screen' },
+					[
+						h('span', {
+							key: 'icon',
+							className: 'fotogrids-loading-screen__icon',
+							'aria-hidden': 'true',
+							dangerouslySetInnerHTML: {
+								__html:
+									'<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><rect x="0" y="0" width="0" height="6"><animate id="fg_ia_fotogrids_1___' +
+									_fgId +
+									'__" begin="0;fg_ia_fotogrids_10___' +
+									_fgId +
+									'__.end-0.3s" attributeName="width" dur="0.4s" values="0;24" fill="freeze"/><animate begin="fg_ia_fotogrids_6___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.4s" values="24;0" fill="freeze"/><animate id="fg_ia_fotogrids_2___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_6___' +
+									_fgId +
+									'__.end-0.2s" attributeName="x" dur="0.4s" values="0;24"/></rect><rect x="0" y="9" width="0" height="6"><animate id="fg_ia_fotogrids_3___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_1___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.4s" values="0;15" fill="freeze"/><animate begin="fg_ia_fotogrids_2___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.4s" values="15;0" fill="freeze"/><animate id="fg_ia_fotogrids_7___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_2___' +
+									_fgId +
+									'__.end-0.2s" attributeName="x" dur="0.4s" values="0;15"/></rect><rect x="0" y="18" width="0" height="6"><animate id="fg_ia_fotogrids_4___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_3___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_7___' +
+									_fgId +
+									'__.end-0.1s" attributeName="width" dur="0.2s" values="6;0" fill="freeze"/><animate id="fg_ia_fotogrids_8___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_7___' +
+									_fgId +
+									'__.end-0.1s" attributeName="x" dur="0.2s" values="0;6"/></rect><rect x="9" y="18" width="6" height="0"><animate id="fg_ia_fotogrids_5___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_4___' +
+									_fgId +
+									'__.end+0.1s" attributeName="height" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_4___' +
+									_fgId +
+									'__.end+0.1s" attributeName="y" dur="0.2s" values="24;18" fill="freeze"/><animate id="fg_ia_fotogrids_9___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_8___' +
+									_fgId +
+									'__.end+0.1s" attributeName="height" dur="0.2s" values="6;0" fill="freeze"/><animate begin="fg_ia_fotogrids_9___' +
+									_fgId +
+									'__.end+0.1s" attributeName="y" dur="0" values="18;24"/></rect><rect x="18" y="9" width="6" height="0"><animate begin="fg_ia_fotogrids_5___' +
+									_fgId +
+									'__.end+0.1s" attributeName="height" dur="0.4s" values="0;15" fill="freeze"/><animate id="fg_ia_fotogrids_6___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_5___' +
+									_fgId +
+									'__.end+0.1s" attributeName="y" dur="0.4s" values="24;9" fill="freeze"/><animate id="fg_ia_fotogrids_10___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_9___' +
+									_fgId +
+									'__.end-0.1s" attributeName="height" dur="0.4s" values="15;0" fill="freeze"/><animate begin="fg_ia_fotogrids_10___' +
+									_fgId +
+									'__.end" attributeName="y" dur="0" values="9;24"/></rect></svg>',
+							},
+						}),
+						h(
+							'span',
+							{
+								key: 'label',
+								className: 'fotogrids-loading-screen__label',
+							},
+							'Loading settings...'
+						),
+					]
+				),
 			]
 		);
 	}
@@ -2808,6 +2853,7 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'tabs',
 							className: 'fotogrids-settings-tabs',
 						},
 						Object.values(SETTINGS_GROUPS)
@@ -2836,6 +2882,7 @@ function CollectionSettings() {
 										h(
 											'span',
 											{
+												key: 'icon',
 												className:
 													'fotogrids-settings-tab__icon',
 											},
@@ -2844,6 +2891,7 @@ function CollectionSettings() {
 										h(
 											'span',
 											{
+												key: 'label',
 												className:
 													'fotogrids-settings-tab__label',
 											},
@@ -2854,6 +2902,7 @@ function CollectionSettings() {
 											h(
 												'span',
 												{
+													key: 'pro-badge',
 													className:
 														'fotogrids-pro-badge',
 												},
