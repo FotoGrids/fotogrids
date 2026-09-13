@@ -18,6 +18,12 @@ if ( ! defined( 'WPINC' ) ) {
 	define( 'WPINC', 'wp-includes' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress core constant, not plugin-owned.
 }
 
+// ABSPATH is the constant the hook-catalogue classes guard on; without it they
+// exit at file scope and the suite dies before any test runs.
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', dirname( __DIR__, 2 ) . '/' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress core constant, not plugin-owned.
+}
+
 // Plugin dir, pointing at the real src/ so catalog/partial tests read the
 // shipped JSON files.
 if ( ! defined( 'FOTOGRIDS_PLUGIN_DIR' ) ) {
@@ -32,5 +38,36 @@ if ( ! function_exists( 'trailingslashit' ) ) {
 	 */
 	function trailingslashit( $value ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
 		return rtrim( (string) $value, '/\\' ) . '/';
+	}
+}
+
+// Translation lookups for the isolated suite. A test populates
+// $GLOBALS['fotogrids_test_translations'][ $domain ][ $original ] to stand in for
+// a compiled .mo file.
+if ( ! function_exists( '__' ) ) {
+	/**
+	 * @param string $text   Text to translate.
+	 * @param string $domain Text domain.
+	 * @return string
+	 */
+	function __( $text, $domain = 'default' ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		$translations = $GLOBALS['fotogrids_test_translations'][ $domain ] ?? array();
+
+		return $translations[ $text ] ?? $text;
+	}
+}
+
+// Filter dispatch for the isolated suite. A test populates
+// $GLOBALS['fotogrids_test_filters'][ $hook_name ] with a callable.
+if ( ! function_exists( 'apply_filters' ) ) {
+	/**
+	 * @param string $hook_name Filter name.
+	 * @param mixed  $value     Value being filtered.
+	 * @return mixed
+	 */
+	function apply_filters( $hook_name, $value ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		$callback = $GLOBALS['fotogrids_test_filters'][ $hook_name ] ?? null;
+
+		return null === $callback ? $value : $callback( $value );
 	}
 }

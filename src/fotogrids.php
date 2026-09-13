@@ -73,6 +73,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-partial-expa
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-state-resolver.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-assembler.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-i18n.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-normalizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-setting-value-codec.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-plugin-settings-store.php';
