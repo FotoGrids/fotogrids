@@ -154,6 +154,18 @@ final class CatalogI18nTest extends TestCase {
 		);
 	}
 
+	public function test_an_anchor_is_allowed_no_attributes(): void {
+		$allowed_html = ( new \ReflectionClass( Catalog_I18n::class ) )->getConstant( 'ALLOWED_HTML' );
+
+		$this->assertArrayHasKey( 'a', $allowed_html );
+		$this->assertSame(
+			array(),
+			$allowed_html['a'],
+			'Catalog copy marks a link with a bare <a>; the admin UI supplies the destination. '
+			. 'Granting href here would let a translation choose where a settings link points.'
+		);
+	}
+
 	public function test_an_untranslated_locale_leaves_the_tree_unchanged(): void {
 		$tree = array(
 			'tab' => array(

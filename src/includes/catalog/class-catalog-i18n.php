@@ -26,7 +26,10 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * This is also where a translation file first gets to influence the settings
  * UI, and the UI renders the description and message keys as HTML, so those
- * two are filtered to ALLOWED_HTML on the way through.
+ * two are filtered to ALLOWED_HTML on the way through. An anchor keeps no
+ * attributes: catalog copy marks a link with a bare `<a>` and the admin UI
+ * resolves the destination the node declares, so no string carries a URL and a
+ * translation cannot introduce one.
  *
  * @since 1.1.1
  */
@@ -55,11 +58,7 @@ final class Catalog_I18n {
 	 * HTML a catalog string may carry into the settings UI.
 	 */
 	private const ALLOWED_HTML = array(
-		'a'      => array(
-			'href'   => true,
-			'rel'    => true,
-			'target' => true,
-		),
+		'a'      => array(),
 		'br'     => array(),
 		'code'   => array(),
 		'em'     => array(),
@@ -91,6 +90,7 @@ final class Catalog_I18n {
 	/**
 	 * Clears the resolved map. Test-support only.
 	 *
+	 * @internal
 	 * @since   1.1.1
 	 * @return  void
 	 */
