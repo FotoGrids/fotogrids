@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Apply the edition label
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             // Normalise line endings first: a CRLF body otherwise defeats the
