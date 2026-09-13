@@ -29,6 +29,17 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/i18n"
         update-types: ["version-update:semver-major"]
+      # react and react-dom are externals on the same terms, mapped to the React
+      # and ReactDOM globals; WordPress core ships 18.3.1 as of 6.8. Their @types
+      # packages track the runtime major and move with it.
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: composer
     directory: "/"
