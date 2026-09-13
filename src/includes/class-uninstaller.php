@@ -190,7 +190,7 @@ class Uninstaller {
                     OR meta_key = %s",
 				$wpdb->esc_like( 'fotogrids_' ) . '%',
 				$wpdb->esc_like( '_fotogrids_' ) . '%',
-				'_wp_attachment_item_alt' // TODO: Remove at 1.3.0
+				'_wp_attachment_item_alt' // TODO: Remove at 1.4.0
 			)
 		);
 	}
