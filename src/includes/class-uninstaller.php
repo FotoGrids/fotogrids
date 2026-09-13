@@ -174,8 +174,10 @@ class Uninstaller {
 	 * Remove plugin post meta.
 	 *
 	 * Matches the `fotogrids_*` keys on collection posts, the `_fotogrids_*`
-	 * keys on attachments, and the FotoGrids-owned `_wp_attachment_item_alt`.
-	 * Core's `_wp_attachment_image_alt` is matched by none of the three.
+	 * keys on attachments, and `_wp_attachment_item_alt`, which 1.1.1 and
+	 * earlier wrote and nothing writes now. Alt text itself lives in core's
+	 * `_wp_attachment_image_alt`, which is matched by none of the three and
+	 * is left in place.
 	 */
 	private static function remove_post_meta() {
 		global $wpdb;
@@ -188,7 +190,7 @@ class Uninstaller {
                     OR meta_key = %s",
 				$wpdb->esc_like( 'fotogrids_' ) . '%',
 				$wpdb->esc_like( '_fotogrids_' ) . '%',
-				'_wp_attachment_item_alt'
+				'_wp_attachment_item_alt' // TODO: Remove at 1.4.0
 			)
 		);
 	}
