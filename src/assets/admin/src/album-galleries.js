@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import AlbumGalleries from './components/AlbumGalleries.jsx';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 function initializeAlbumGalleries() {
 	const albumGalleriesRoot = document.getElementById(
@@ -9,7 +10,13 @@ function initializeAlbumGalleries() {
 
 	if (albumGalleriesRoot && window.fotogridsAlbumGalleries) {
 		const root = createRoot(albumGalleriesRoot);
-		root.render(React.createElement(AlbumGalleries));
+		root.render(
+			React.createElement(
+				ErrorBoundary,
+				{ label: 'album galleries' },
+				React.createElement(AlbumGalleries)
+			)
+		);
 	}
 }
 

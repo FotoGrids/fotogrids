@@ -106,6 +106,8 @@ final class Collection_Settings_Assets {
 			);
 		}
 
+		self::enqueue_error_boundary();
+
 		self::enqueue_fg_tooltip();
 		self::enqueue_hover_effect_previews();
 
@@ -123,6 +125,7 @@ final class Collection_Settings_Assets {
 				'wp-components',
 				'wp-i18n',
 				'jquery',
+				'fotogrids-error-boundary',
 				'fotogrids-icons',
 				'fotogrids-settings-loader',
 				'fotogrids-ui-state-manager',
@@ -173,6 +176,22 @@ final class Collection_Settings_Assets {
 				FOTOGRIDS_VERSION
 			);
 		}
+	}
+
+	/**
+	 * The shared admin error boundary. Registers
+	 * `window.FotoGridsAdmin.ErrorBoundary`, which the settings panel wraps
+	 * around its root and around every individual setting.
+	 */
+	private static function enqueue_error_boundary(): void {
+		wp_enqueue_script(
+			'fotogrids-error-boundary',
+			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/error-boundary.js',
+			array( 'wp-element', 'wp-i18n' ),
+			FOTOGRIDS_VERSION,
+			true
+		);
+		wp_set_script_translations( 'fotogrids-error-boundary', 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
 	}
 
 	/**

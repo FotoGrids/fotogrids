@@ -4,6 +4,7 @@
  * watermark_status, promo, image types) plus the condition / condition_global /
  * inherit_from / disabled_unless / on_change.switch_tab logic and defaults mode.
  */
+import '@/admin/plain/error-boundary';
 import '@/admin/plain/render-settings/utils/post-type-placeholders';
 import '@/admin/plain/render-settings/utils/tooltip-utils';
 import '@/admin/plain/render-settings/utils/fg-color-picker';
