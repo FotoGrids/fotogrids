@@ -3,7 +3,7 @@
  * Registry of every EXIF field FotoGrids can read, display and translate.
  *
  * @package FotoGrids\Exif
- * @since   1.2.0
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
@@ -31,28 +31,28 @@ if ( ! defined( 'WPINC' ) ) {
  *                 sanitised passthrough.
  *  - `default_on` Whether a new gallery displays the field.
  *
- * @since 1.2.0
+ * @since 1.1.2
  */
 final class Exif_Fields {
 
 	/**
 	 * Field keys a new gallery displays, in display order.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 */
 	public const DEFAULT_FIELDS = array( 'camera', 'lens', 'aperture', 'shutter_speed', 'iso', 'focal_length' );
 
 	/**
 	 * Group keys, in the order pickers should present them.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 */
 	public const GROUPS = array( 'camera', 'exposure', 'image', 'rights', 'location' );
 
 	/**
 	 * Every EXIF field FotoGrids understands, keyed by field key.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @return array<string, array{label:string, group:string, tags:string[], format:?string, default_on:bool}>
 	 */
 	public static function definitions(): array {
@@ -217,7 +217,7 @@ final class Exif_Fields {
 	/**
 	 * Every field key, in group order.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @return string[]
 	 */
 	public static function keys(): array {
@@ -227,7 +227,7 @@ final class Exif_Fields {
 	/**
 	 * Whether a key names a known EXIF field.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  string $key Field key.
 	 * @return bool
 	 */
@@ -238,7 +238,7 @@ final class Exif_Fields {
 	/**
 	 * One field definition.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  string $key Field key.
 	 * @return array{label:string, group:string, tags:string[], format:?string, default_on:bool}|null
 	 */
@@ -250,7 +250,7 @@ final class Exif_Fields {
 	/**
 	 * Field key => translated label, in group order.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @return array<string, string>
 	 */
 	public static function labels(): array {
@@ -267,7 +267,7 @@ final class Exif_Fields {
 	 * item editor. Reading every EXIF field is a Free capability, so every
 	 * option is emitted at the `free` tier.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @return array<int, array{label:string, value:string, group:string, tier_required:string}>
 	 */
 	public static function as_options(): array {
@@ -291,7 +291,7 @@ final class Exif_Fields {
 	 * The caller's order is preserved, because the gallery's field order is
 	 * the order the lightbox renders them in. Duplicates are dropped.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $keys Candidate field keys.
 	 * @return string[]
 	 */

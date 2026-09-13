@@ -119,7 +119,7 @@ final class Exif_Extractor {
 	/**
 	 * Read the `exif_fields` setting, which persists as an array or as JSON.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $raw Stored setting value.
 	 * @return array<int, mixed>
 	 */
@@ -146,7 +146,7 @@ final class Exif_Extractor {
 	/**
 	 * The first of a field's candidate tags that carries a value.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  array<string, mixed> $tags       Raw EXIF tag map.
 	 * @param  string[]             $candidates Tag names, in precedence order.
 	 * @return mixed Null when none is present.

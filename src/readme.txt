@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.1
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,6 +169,32 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Changelog ==
 
+= 1.1.2 =
+
+**New**
+
+* **Every EXIF field your camera records.** FotoGrids used to read four - camera, aperture, shutter speed, ISO - through a WordPress helper that carries no lens, flash, white balance, metering or GPS at all. Tags now come from the file directly, through a 22-field registry shared by the settings panel, the item editor and the lightbox. The Exif tab's four checkboxes become one sortable list, and that order is the order the lightbox renders them.
+
+**Improved**
+
+* **The settings vocabulary is now translatable.** 759 of the 853 strings in the gallery and album settings panel were missing from the translation template, because they live in JSON the string extractor never read. The whole vocabulary is now extracted and translated server-side.
+* **Importing now asks before it discards edits.** From Folder, From ZIP and Video Embed threw a part-filled form away on any exit, with nothing recoverable. Each now asks first.
+* **The render cache cleans up after itself.** Expired rows were filtered out on read but never deleted, so the table grew without bound; a daily purge now runs. Deactivating or uninstalling also clears FotoGrids' scheduled events, which it previously left behind.
+
+**Fixed**
+
+* **Autosave is now applied in settings.** The editor read the setting from three places that do not exist, so it never saw what you had chosen, and switching it off did not stick. The toggle and the editor now read and write one source, and the setting applies.
+* **Saving Gallery Defaults turned off other settings.** One click on Save Defaults cleared autosave, Google Fonts, usage-data sharing and the general, permission and integration settings - the form posted to a WordPress settings group that owns seven options while carrying a field for one, and WordPress writes every option in a posted group. Defaults now saves over REST.
+* **Video playback settings were not affecting the player.** Autoplay, mute, loop and controls never reached it, and autoplay was forced on regardless of the toggle.
+* **Alt text now uses the WordPress alt field.** FotoGrids kept its own copy, seeded once when an item was first added to a gallery and never refreshed, while the lightbox and the collection renderer read WordPress' - so an alt edit updated the grid while the front end served the old text indefinitely. There is one alt field now, WordPress', everywhere.
+* **Editing an item didn't refresh the cached gallery.** The cache listened for an event nothing fires, so logged-out visitors kept the pre-edit render until it expired.
+* **Uninstall left data behind** - gallery, album and embed posts, and four meta keys on attachments. The cleanup queries also passed `_` to SQL `LIKE` unescaped, where it matches any single character.
+
+**Security and hardening**
+
+* **An admin screen carried more user data than it needed.** The whole `WP_User` object was being passed to `wp_localize_script`, putting the current user's account record into the page source of every FotoGrids admin screen. Nothing read it, so it is removed, with a build guard and an end-to-end test against a recurrence.
+* **Three REST routes returned data without checking who was asking.** `GET /lightbox/item/{id}` served any attachment's metadata to anyone, and `POST /gallery/lightbox/slides` checked only that a gallery was published - so slide data for password-protected and registered-users-only galleries was public. All three are now authorised at the route level.
+
 = 1.1.1 =
 
 **New**
@@ -255,6 +281,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.1.2 =
+Now reads every EXIF field your camera records. Fixes autosave, video playback settings, alt text edits, and stale caching. Bug and security fixes.
 
 = 1.1.0 =
 Fixes EXIF and XMP data going missing on large photos, makes gallery uploads much faster, and adds a System Info tool for support. Verified against WordPress 7.1.

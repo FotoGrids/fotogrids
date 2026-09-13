@@ -266,7 +266,7 @@ class Admin_Data {
 	 * Backs the `exif_fields` gallery setting and the item editor's EXIF tab,
 	 * so both name the same fields as `Exif_Extractor` reads.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 * @param \WP_REST_Request $request Request object
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */

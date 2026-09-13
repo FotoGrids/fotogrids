@@ -3,7 +3,7 @@
  * Admin loading indicator markup.
  *
  * @package FotoGrids\Admin
- * @since   1.1.1
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
@@ -22,14 +22,14 @@ if ( ! defined( 'WPINC' ) ) {
  * the styles in `styles/loading-screen.scss` are shared, so the indicator does
  * not change when the tree takes over.
  *
- * @since 1.1.1
+ * @since 1.1.2
  */
 final class Loading_Indicator {
 
 	/**
 	 * Echo a loading indicator with an optional label beside it.
 	 *
-	 * @since 1.1.1
+	 * @since 1.1.2
 	 * @param string $label Optional. Text announced next to the mark.
 	 * @return void
 	 */
