@@ -39,7 +39,7 @@ class Templates_Data {
 			}
 
 			$json_files = glob( $cat_dir . '*.json' );
-			if ( ! $json_files || empty( $json_files ) ) {
+			if ( ! $json_files ) {
 				continue;
 			}
 
@@ -244,7 +244,7 @@ class Templates_Data {
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Success or error response
+	 * @return \WP_REST_Response|\WP_Error Success or error response
 	 */
 	public static function save_user_template( $request ) {
 		$template = $request->get_json_params();
@@ -296,7 +296,7 @@ class Templates_Data {
 	 * Apply template to gallery or album
 	 *
 	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Success or error
+	 * @return \WP_REST_Response|\WP_Error Success or error
 	 */
 	public static function apply_template( $request ) {
 		$template_id = $request->get_param( 'id' );
@@ -447,7 +447,7 @@ class Templates_Data {
 	 * Delete user template
 	 *
 	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response Success or error
+	 * @return \WP_REST_Response|\WP_Error Success or error
 	 */
 	public static function delete_template( $request ) {
 		$template_id = $request->get_param( 'id' );
@@ -501,7 +501,7 @@ class Templates_Data {
 	 * Returns full HTML page for iframe preview with template settings applied
 	 *
 	 * @param \WP_REST_Request $request The REST API request object
-	 * @return \WP_REST_Response HTML response
+	 * @return \WP_REST_Response|\WP_Error HTML response
 	 */
 	public static function render_template_preview( $request ) {
 		$template_id = $request->get_param( 'template_id' );

@@ -45,16 +45,16 @@ final class Filter_Ui implements Feature {
 
 	use Setting_Helpers;
 
-	/** @var array<string, string> Allowed filter_ui_style values. */
+	/** @var array<int, string> Allowed filter_ui_style values. */
 	private const ALLOWED_STYLES = array( 'buttons', 'dropdowns', 'checkboxes' );
 
-	/** @var array<string, string> Allowed filter_ui_position values. */
+	/** @var array<int, string> Allowed filter_ui_position values. */
 	private const ALLOWED_POSITIONS = array( 'top', 'sidebar' );
 
-	/** @var array<string, string> Allowed filter_sidebar_side values. */
+	/** @var array<int, string> Allowed filter_sidebar_side values. */
 	private const ALLOWED_SIDEBAR_SIDES = array( 'left', 'right' );
 
-	/** @var array<string, string> Allowed filter_display_mode values. */
+	/** @var array<int, string> Allowed filter_display_mode values. */
 	private const ALLOWED_DISPLAY_MODES = array( 'always', 'toggle' );
 
 	public function id(): string {

@@ -366,7 +366,7 @@ final class Captions implements Decorator {
 	 * @since  1.0.0
 	 * @param  mixed  $raw_responsive Breakpoint-keyed array, or null/non-array.
 	 * @param  string $breakpoint     'desktop', 'tablet', or 'mobile'.
-	 * @param  int    $default        Fallback line count.
+	 * @param  int    $default_value  Fallback line count.
 	 * @return string                 Plain integer string, e.g. '1', '2'.
 	 */
 	private function responsive_line_count( $raw_responsive, string $breakpoint, int $default_value ): string {

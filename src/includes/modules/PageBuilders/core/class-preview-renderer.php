@@ -157,7 +157,7 @@ final class Preview_Renderer {
 	 *
 	 * @since 1.0.0
 	 * @param Render_Context $context
-	 * @param Request_Source $source
+	 * @param value-of<Request_Source::ALL> $source
 	 * @return Render_Context
 	 */
 	private static function flip_to_preview_context( Render_Context $context, string $source ): Render_Context {

@@ -728,7 +728,7 @@ final class Metabox_Registrar {
 	 * Kept private because every consumer is one of the public render
 	 * methods on this class.
 	 *
-	 * @return array<string, string>
+	 * @return array<string, string|array<int, array<string, string>>>
 	 */
 	private static function common_metabox_strings(): array {
 		return array(

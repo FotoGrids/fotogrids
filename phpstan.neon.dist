@@ -1,0 +1,41 @@
+# PHPStan configuration for FotoGrids Free.
+#
+# php -l proves the code parses and PHPCS proves it is styled correctly.
+# Neither can tell that a change is semantically wrong - a property read off
+# the wrong operand, a docblock that names a type the code never returns.
+# That is what this catches.
+#
+# Level 3 is the floor that sees a property accessed on a non-object, which is
+# the shape most silently-wrong edits take. Raise it deliberately, not by
+# accident: level 4 and above add hundreds of missing-annotation findings that
+# want their own pass.
+
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 3
+
+    # Analyse the same PHP version the plugin is tested against, so a result is
+    # reproducible regardless of the PHP the runner happens to have.
+    phpVersion: 80300
+
+    paths:
+        - src
+
+    excludePaths:
+        analyseAndScan:
+            # No PHP to analyse.
+            - src/languages
+            - src/assets
+        analyse:
+            # Vendored SDK. Scanned so its symbols resolve, never analysed.
+            - src/freemius
+            # The Elementor and Divi bridges are written against third-party
+            # classes with no published stubs, so every reference to them reads
+            # as an unknown symbol. Analysing this directory needs stubs first.
+            - src/includes/modules/PageBuilders
+
+    # Constants defined at runtime by fotogrids.php.
+    bootstrapFiles:
+        - tools/phpstan/constants.php
