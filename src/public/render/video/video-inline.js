@@ -2,9 +2,15 @@
  * Inline video playback.
  *
  * Subscribes to the runtime and, for video items whose playback mode is
- * "inline", swaps the poster for a real player (a <video> for Media Library
- * files, an <iframe> for YouTube / Vimeo embeds) when the visitor clicks the
- * tile. Items whose playback mode is "lightbox" are handled by the lightbox /
+ * "inline", swaps the poster for a real player - a <video> for Media Library
+ * files, an <iframe> for YouTube / Vimeo embeds.
+ *
+ * When that swap happens depends on the item's own settings. An autoplaying
+ * tile mounts its player as it scrolls into view; a file video showing its
+ * controls mounts a paused player straight away, so the native play button is
+ * the affordance; anything else waits for a click on the poster.
+ *
+ * Items whose playback mode is "lightbox" are handled by the lightbox /
  * mini-lightbox modules and are ignored here.
  */
 (function () {
@@ -46,7 +52,7 @@
         const host = privacy ? 'https://www.youtube-nocookie.com' : 'https://www.youtube.com';
         const params = new URLSearchParams();
 
-        params.set('autoplay', '1');
+        params.set('autoplay', settings.autoplay === false ? '0' : '1');
         params.set('mute', settings.mute ? '1' : '0');
         params.set('controls', settings.controls === false ? '0' : '1');
         params.set('cc_load_policy', settings.captions ? '1' : '0');
@@ -77,7 +83,7 @@
     function buildVimeoSrc(embedId, settings) {
         const params = new URLSearchParams();
 
-        params.set('autoplay', '1');
+        params.set('autoplay', settings.autoplay === false ? '0' : '1');
         params.set('muted', settings.mute ? '1' : '0');
         params.set('loop', settings.loop ? '1' : '0');
         params.set('dnt', settings.privacy_mode ? '1' : '0');
@@ -119,12 +125,24 @@
     }
 
     /**
+     * Read the poster image URL off a tile, if it rendered one.
+     *
+     * @param {HTMLElement} el
+     * @return {string}
+     */
+    function posterSrc(el) {
+        const img = el.querySelector('img.fg-video-poster');
+        return img ? img.getAttribute('src') || '' : '';
+    }
+
+    /**
      * Build the player element for a video item.
      *
      * @param {HTMLElement} el
+     * @param {boolean} shouldPlay Whether playback should start on mount.
      * @return {HTMLElement|null}
      */
-    function buildPlayer(el) {
+    function buildPlayer(el, shouldPlay) {
         const itemType = el.getAttribute('data-fg-item-type') || '';
         const settings = readSettings(el);
 
@@ -133,14 +151,19 @@
             if (!src) {
                 return null;
             }
+            const poster = posterSrc(el);
             const video = document.createElement('video');
             video.className = 'fg-video-player';
             video.src = src;
             video.controls = settings.controls === false ? false : true;
-            video.autoplay = true;
+            video.autoplay = !!shouldPlay;
             video.playsInline = true;
             video.muted = !!settings.mute;
             video.loop = !!settings.loop;
+            video.preload = shouldPlay ? 'auto' : 'metadata';
+            if (poster) {
+                video.poster = poster;
+            }
             return video;
         }
 
@@ -149,11 +172,15 @@
             return null;
         }
 
+        const embedSettings = shouldPlay
+            ? Object.assign({}, settings, { autoplay: true })
+            : settings;
+
         let src = '';
         if (itemType === 'video_youtube') {
-            src = buildYouTubeSrc(embedId, settings);
+            src = buildYouTubeSrc(embedId, embedSettings);
         } else if (itemType === 'video_vimeo') {
-            src = buildVimeoSrc(embedId, settings);
+            src = buildVimeoSrc(embedId, embedSettings);
         }
         if (!src) {
             return null;
@@ -171,17 +198,41 @@
     }
 
     /**
-     * Replace the poster with the player. Idempotent - a tile that is already
-     * playing is left untouched.
+     * Add a play badge over a mounted player and start playback when it is
+     * pressed. Used when a browser refuses an autoplay request on a tile whose
+     * controls are hidden, which would otherwise leave the visitor no way in.
      *
      * @param {HTMLElement} el
+     * @param {HTMLVideoElement} video
      */
-    function playInline(el) {
+    function addFallbackBadge(el, video) {
+        if (el.querySelector('.fg-video-badge')) {
+            return;
+        }
+        const badge = document.createElement('span');
+        badge.className = 'fg-video-badge';
+        badge.setAttribute('aria-hidden', 'true');
+        el.appendChild(badge);
+        el.addEventListener('click', function once() {
+            el.removeEventListener('click', once);
+            badge.remove();
+            video.play().catch(function () {});
+        });
+    }
+
+    /**
+     * Swap a tile's poster for its player. Idempotent - a tile that already
+     * mounted one is left untouched.
+     *
+     * @param {HTMLElement} el
+     * @param {boolean} shouldPlay Whether playback should start on mount.
+     */
+    function mountPlayer(el, shouldPlay) {
         if (el.getAttribute('data-fg-playing') === '1') {
             return;
         }
 
-        const player = buildPlayer(el);
+        const player = buildPlayer(el, shouldPlay);
         if (!player) {
             return;
         }
@@ -190,6 +241,74 @@
         el.classList.add('fg-video--playing');
         el.innerHTML = '';
         el.appendChild(player);
+
+        if (!shouldPlay || typeof player.play !== 'function') {
+            return;
+        }
+
+        const started = player.play();
+        if (started && typeof started.catch === 'function') {
+            started.catch(function () {
+                if (!player.controls) {
+                    addFallbackBadge(el, player);
+                }
+            });
+        }
+    }
+
+    /**
+     * Mount a tile's player and start it. The click and public-API entry point.
+     *
+     * @param {HTMLElement} el
+     */
+    function playInline(el) {
+        mountPlayer(el, true);
+    }
+
+    /**
+     * Give a tile its resting state.
+     *
+     * An autoplaying tile mounts its player when it scrolls into view, so a
+     * gallery does not fetch every video at once. A file video whose controls
+     * are showing mounts a paused player, whose own play button is the
+     * affordance. Everything else stays a poster until it is clicked.
+     *
+     * @param {HTMLElement} el
+     */
+    function prepare(el) {
+        const settings = readSettings(el);
+
+        if (settings.autoplay) {
+            observe(el);
+            return;
+        }
+
+        const isFile = el.getAttribute('data-fg-item-type') === 'video_file';
+        if (isFile && settings.controls !== false) {
+            mountPlayer(el, false);
+        }
+    }
+
+    /**
+     * Mount an autoplaying tile once it reaches the viewport.
+     *
+     * @param {HTMLElement} el
+     */
+    function observe(el) {
+        if (typeof window.IntersectionObserver !== 'function') {
+            mountPlayer(el, true);
+            return;
+        }
+        const observer = new window.IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+                observer.disconnect();
+                mountPlayer(entry.target, true);
+            });
+        }, { rootMargin: '100px' });
+        observer.observe(el);
     }
 
     /**
@@ -198,6 +317,8 @@
      * @param {HTMLElement} galleryElement
      */
     function attach(galleryElement) {
+        galleryElement.querySelectorAll(PLAYER_SELECTOR).forEach(prepare);
+
         // Capture phase so inline playback wins over any click-behaviour
         // module (lightbox, direct-link, external-link) that may also be
         // listening on the gallery. stopPropagation prevents those handlers
@@ -225,6 +346,7 @@
         window.FotoGrids.modules = window.FotoGrids.modules || {};
         window.FotoGrids.modules.videoInline = {
             play: playInline,
+            prepare: prepare,
         };
     }
 
