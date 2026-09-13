@@ -30,7 +30,8 @@ if ( ! defined( 'WPINC' ) ) {
  * panel, toolbar, or thumbnails.
  *
  * When click behaviour IS lightbox, videos play inside the full lightbox and
- * this module stays inactive.
+ * this module stays inactive. Every other click behaviour keeps the overlay,
+ * because the video playback setting is what decides how a video opens.
  *
  * @package FotoGrids\Render\Video
  * @since   1.1.0
@@ -55,12 +56,13 @@ final class Video_Lightbox_Mini implements Feature {
 
 	/**
 	 * Active for galleries with lightbox video playback whose click behaviour
-	 * is neither the full lightbox nor disabled.
+	 * is not the full lightbox.
 	 *
-	 * When click behaviour is 'lightbox', videos play in the full lightbox.
-	 * When it is 'nothing' (e.g. the page-builder "Make items clickable" toggle
-	 * is off), items are not interactive at all, so the mini overlay must not
-	 * fire either.
+	 * When click behaviour is 'lightbox', videos play in the full lightbox and
+	 * this module stays out of the way. Every other click behaviour, 'nothing'
+	 * included, leaves videos to their own playback setting: that setting is
+	 * how a gallery says what a video does, and there is no value of it that
+	 * means "do not play".
 	 *
 	 * @since 1.1.0
 	 * @param Render_Context $render_context Render context.
@@ -76,8 +78,7 @@ final class Video_Lightbox_Mini implements Feature {
 			return false;
 		}
 
-		$click = $render_context->behavior->click_behavior;
-		return 'lightbox' !== $click && 'nothing' !== $click;
+		return 'lightbox' !== $render_context->behavior->click_behavior;
 	}
 
 	public function html_before( Render_Context $render_context ): string {

@@ -23,10 +23,11 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Ships the inline-playback assets for galleries set to play videos inline.
  *
- * Active when the gallery's video_playback_mode is "inline". The client swaps
- * a video tile's poster for a real player on click. Galleries set to
- * "lightbox" playback get their video experience from the lightbox / mini
- * lightbox modules instead, so this module's assets are not enqueued there.
+ * Active when the gallery's video_playback_mode is "inline". The client gives
+ * each video tile its resting state - a mounted player or a poster waiting for
+ * a click - from the item's own playback settings. Galleries set to "lightbox"
+ * playback get their video experience from the lightbox / mini lightbox
+ * modules instead, so this module's assets are not enqueued there.
  *
  * @package FotoGrids\Render\Video
  * @since   1.1.0
@@ -50,9 +51,12 @@ final class Video_Inline implements Feature {
 	}
 
 	/**
-	 * Active for galleries whose video playback mode is inline, unless item
-	 * clicks are disabled ('nothing', e.g. the page-builder "Make items
-	 * clickable" toggle is off).
+	 * Active for galleries whose video playback mode is inline.
+	 *
+	 * The item click behaviour does not gate this. A gallery states what its
+	 * videos do through the video playback setting, and that setting has no
+	 * value meaning "do not play"; 'nothing' turns off the click behaviour
+	 * that images share, not video playback.
 	 *
 	 * @since 1.1.0
 	 * @param Render_Context $render_context Render context.
@@ -60,10 +64,6 @@ final class Video_Inline implements Feature {
 	 */
 	public function supports( Render_Context $render_context ): bool {
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
-			return false;
-		}
-
-		if ( 'nothing' === $render_context->behavior->click_behavior ) {
 			return false;
 		}
 
