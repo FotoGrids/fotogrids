@@ -9,7 +9,7 @@
 
 import type { ComponentType, ReactNode, MutableRefObject } from 'react';
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full';
+export type ModalSize = 'sm' | 'md' | 'ml' | 'lg' | 'xl' | 'cover' | 'full';
 
 export type ModalPosition = 'center' | 'left' | 'right';
 

@@ -7,9 +7,10 @@
  * bullet pager, and the slide transitions.
  */
 
+// Dimensions come from the shared `ml` size token; only the carousel's own
+// frame treatment is set here. `overflow: hidden` clips the coloured image
+// pane to the rounded corners during slide transitions.
 .fg-modal--upgrade .fg-modal__dialog {
-	--fg-modal-width: 920px;
-	--fg-modal-height: 480px;
 	--fg-modal-radius: 12px;
 
 	overflow: hidden;
@@ -198,7 +199,7 @@
 }
 
 @media (max-width: 768px) {
-	.fg-modal--upgrade .fg-modal__dialog {
+	.fg-modal.fg-modal--upgrade .fg-modal__dialog {
 		--fg-modal-height: auto;
 	}
 

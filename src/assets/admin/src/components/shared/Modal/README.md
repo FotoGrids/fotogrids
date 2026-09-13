@@ -16,7 +16,7 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 <Modal
 	isOpen={open}
 	onClose={(reason) => setOpen(false)}
-	size="md" // 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full'
+	size="md" // 'sm' | 'md' | 'ml' | 'lg' | 'xl' | 'cover' | 'full'
 	hasSidebar={false}
 	sidebarCollapsible={false}
 	sidebarInitiallyCollapsed={false}
@@ -66,14 +66,15 @@ import { Modal } from '@/admin/src/components/shared/Modal';
 
 #### Sizes
 
-| Size    | Dimensions                           | When to use                                |
-| ------- | ------------------------------------ | ------------------------------------------ |
-| `sm`    | 480px wide, auto height              | Confirms, single-input prompts, tiny forms |
-| `md`    | 720px × auto                         | Most forms                                 |
-| `lg`    | 1024px × 90vh                        | Editors with content (Item Edit)           |
-| `xl`    | 1280px × 90vh                        | Wide content (Upgrade carousel)            |
-| `cover` | viewport minus 16px gap, 12px radius | Big content that should breathe            |
-| `full`  | 100vw × 100vh, no radius             | Edge-to-edge iframes                       |
+| Size    | Dimensions                           | When to use                                 |
+| ------- | ------------------------------------ | ------------------------------------------- |
+| `sm`    | 480px wide, auto height              | Confirms, single-input prompts, tiny forms  |
+| `md`    | 720px × auto                         | Most forms                                  |
+| `ml`    | 920px × 480px                        | Fixed-height split panes (Upgrade carousel) |
+| `lg`    | 1024px × 90vh                        | Editors with content (Item Edit)            |
+| `xl`    | 1280px × 90vh                        | Wide content                                |
+| `cover` | viewport minus 16px gap, 12px radius | Big content that should breathe             |
+| `full`  | 100vw × 100vh, no radius             | Edge-to-edge iframes                        |
 
 #### Sub-component reference
 
