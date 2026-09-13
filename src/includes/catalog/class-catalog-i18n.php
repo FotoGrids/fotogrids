@@ -101,6 +101,10 @@ final class Catalog_I18n {
 	/**
 	 * Loads the generated map and lets other plugins contribute their own.
 	 *
+	 * Entries arrive from any plugin that hooks the filter, so a non-string
+	 * replacement is discarded at the point of use rather than trusted into the
+	 * REST response.
+	 *
 	 * @return array<string, string>
 	 */
 	private static function strings(): array {
@@ -139,7 +143,7 @@ final class Catalog_I18n {
 				continue;
 			}
 
-			if ( isset( $strings[ $value ] ) ) {
+			if ( isset( $strings[ $value ] ) && is_string( $strings[ $value ] ) ) {
 				$value = $strings[ $value ];
 			}
 

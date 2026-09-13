@@ -165,6 +165,18 @@ final class CatalogI18nTest extends TestCase {
 		$this->assertSame( $tree, Catalog_I18n::translate_tree( $tree ) );
 	}
 
+	public function test_a_non_string_replacement_from_a_filter_is_discarded(): void {
+		$GLOBALS['fotogrids_test_filters'][ \FotoGrids\Hooks\Filters_Catalog::STRINGS ] = static function ( array $strings ): array {
+			$strings['Layout Type'] = array( 'not', 'a', 'string' );
+
+			return $strings;
+		};
+
+		$tree = Catalog_I18n::translate_tree( array( 'tab' => array( 'label' => 'Layout Type' ) ) );
+
+		$this->assertSame( 'Layout Type', $tree['tab']['label'] );
+	}
+
 	public function test_another_plugin_can_contribute_its_own_strings(): void {
 		$GLOBALS['fotogrids_test_filters'][ \FotoGrids\Hooks\Filters_Catalog::STRINGS ] = static function ( array $strings ): array {
 			$strings['Carousel Speed'] = 'Karussell-Geschwindigkeit';

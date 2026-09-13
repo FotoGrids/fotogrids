@@ -34,28 +34,37 @@ define( 'WPINC', 'wp-includes' );
 define( 'ABSPATH', $plugin_root . '/' );
 define( 'FOTOGRIDS_PLUGIN_DIR', $plugin_src );
 
-/**
- * Passes a filtered value through unchanged.
- *
- * The catalog runs outside WordPress here, so no plugin can contribute files:
- * the generated registry covers this plugin's own catalog and nothing else.
- *
- * @param  string $hook_name Filter name.
- * @param  mixed  $value     Value being filtered.
- * @return mixed
- */
-function apply_filters( string $hook_name, $value ) {
-	return $value;
+// Declared conditionally so they are bound at runtime rather than hoisted at
+// compile time: an unconditional declaration of a WordPress function name would
+// fatal on redeclare if this file were ever included into a WordPress process,
+// before the CLI guard above could run.
+if ( ! function_exists( 'apply_filters' ) ) {
+	/**
+	 * Passes a filtered value through unchanged.
+	 *
+	 * The catalog runs outside WordPress here, so no plugin can contribute
+	 * files: the generated registry covers this plugin's own catalog and
+	 * nothing else.
+	 *
+	 * @param  string $hook_name Filter name.
+	 * @param  mixed  $value     Value being filtered.
+	 * @return mixed
+	 */
+	function apply_filters( string $hook_name, $value ) {
+		return $value;
+	}
 }
 
-/**
- * Appends a trailing slash.
- *
- * @param  string $value Path.
- * @return string
- */
-function trailingslashit( string $value ): string {
-	return rtrim( $value, '/\\' ) . '/';
+if ( ! function_exists( 'trailingslashit' ) ) {
+	/**
+	 * Appends a trailing slash.
+	 *
+	 * @param  string $value Path.
+	 * @return string
+	 */
+	function trailingslashit( string $value ): string {
+		return rtrim( $value, '/\\' ) . '/';
+	}
 }
 
 foreach ( glob( $plugin_src . 'includes/hooks/filters/class-*.php' ) as $hook_file ) {
@@ -69,6 +78,7 @@ require_once $plugin_src . 'includes/catalog/class-catalog-partial-expander.php'
 require_once $plugin_src . 'includes/catalog/class-catalog-assembler.php';
 require_once $plugin_src . 'includes/catalog/class-catalog.php';
 
+if ( ! function_exists( 'fotogrids_collect_catalog_strings' ) ) {
 /**
  * Collects every user-facing string in a catalog subtree.
  *
@@ -95,6 +105,7 @@ function fotogrids_collect_catalog_strings( array $node, array &$strings ): void
 			fotogrids_collect_catalog_strings( $child, $strings );
 		}
 	}
+}
 }
 
 \FotoGrids\Catalog\Catalog::init();
