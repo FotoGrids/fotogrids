@@ -12,7 +12,7 @@
                     "label": "Grid",
                     "value": "grid",
                     "icon": "layout_grid",
-                    "description": "Evenly spaced items in straight rows and columns - the classic, predictable, clean look. ",
+                    "description": "Evenly spaced items in straight rows and columns - the classic, predictable, clean look.",
                     "tier_required": "free"
                 },
                 {
