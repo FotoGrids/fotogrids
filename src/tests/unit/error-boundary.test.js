@@ -58,6 +58,45 @@ describe('FotoGridsAdmin.ErrorBoundary', () => {
 		handle.unmount();
 	});
 
+	it('carries no class the admin header strips from the page', () => {
+		// class-admin-header.php removes any inserted element matching these
+		// from FotoGrids screens, which would silently delete the fallback.
+		const STRIPPED_CLASSES = [
+			'notice',
+			'notice-info',
+			'notice-warning',
+			'notice-error',
+			'notice-success',
+			'updated',
+			'error',
+			'admin-notice',
+			'promotion',
+			'promo',
+		];
+		const STRIPPED_SUBSTRINGS = [
+			'promotion',
+			'promo',
+			'banner',
+			'upgrade',
+			'premium',
+		];
+
+		const handle = renderElement(h(ErrorBoundary, null, h(Boom)));
+		const fallback = handle.container.querySelector(
+			'.fotogrids-error-boundary'
+		);
+
+		const classes = Array.from(fallback.classList);
+		STRIPPED_CLASSES.forEach((name) => {
+			expect(classes).not.toContain(name);
+		});
+		STRIPPED_SUBSTRINGS.forEach((fragment) => {
+			expect(fallback.className).not.toContain(fragment);
+		});
+
+		handle.unmount();
+	});
+
 	it('reports the error to the console with its label', () => {
 		const handle = renderElement(
 			h(ErrorBoundary, { label: 'gallery metabox' }, h(Boom))
@@ -107,7 +146,8 @@ describe('FotoGridsAdmin.ErrorBoundary', () => {
 		expect(handle.container.textContent).toContain('first row');
 		expect(handle.container.textContent).toContain('third row');
 		expect(
-			handle.container.querySelectorAll('.fotogrids-error-boundary').length
+			handle.container.querySelectorAll('.fotogrids-error-boundary')
+				.length
 		).toBe(1);
 
 		handle.unmount();

@@ -1,0 +1,41 @@
+.fotogrids-error-boundary {
+	margin: 8px 0;
+	padding: 12px 14px;
+	border: 1px solid #dcdcde;
+	border-left: 4px solid #d63638;
+	border-radius: 2px;
+	background: #fff;
+	color: #1d2327;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.fotogrids-error-boundary__message {
+	margin: 0 0 10px;
+	font-weight: 600;
+}
+
+.fotogrids-error-boundary__actions {
+	margin: 0;
+}
+
+.fotogrids-error-boundary__details {
+	margin-top: 10px;
+}
+
+.fotogrids-error-boundary__details summary {
+	cursor: pointer;
+	color: #646970;
+}
+
+.fotogrids-error-boundary__details pre {
+	overflow: auto;
+	max-height: 220px;
+	margin: 8px 0 0;
+	padding: 8px;
+	background: #f6f7f7;
+	color: #3c434a;
+	font-size: 11px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}

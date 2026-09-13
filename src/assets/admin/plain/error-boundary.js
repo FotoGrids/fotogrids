@@ -41,20 +41,20 @@ class FotoGridsErrorBoundary extends wp.element.Component {
 		const { createElement: h } = wp.element;
 		const { __ } = wp.i18n;
 
+		// The admin header strips any inserted element matching `.notice`,
+		// `.error`, `.updated` or a promotional class substring, so the
+		// fallback carries plugin-owned class names only.
 		return h(
 			'div',
-			{
-				className:
-					'notice notice-error inline fotogrids-error-boundary',
-			},
+			{ className: 'fotogrids-error-boundary' },
 			h(
 				'p',
-				null,
+				{ className: 'fotogrids-error-boundary__message' },
 				__('This part of the screen failed to load.', 'fotogrids')
 			),
 			h(
 				'p',
-				null,
+				{ className: 'fotogrids-error-boundary__actions' },
 				h(
 					'button',
 					{
@@ -67,7 +67,7 @@ class FotoGridsErrorBoundary extends wp.element.Component {
 			),
 			h(
 				'details',
-				null,
+				{ className: 'fotogrids-error-boundary__details' },
 				h('summary', null, __('Error details', 'fotogrids')),
 				h('pre', null, error.stack || String(error))
 			)

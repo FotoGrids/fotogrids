@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-13T11:42:09+00:00\n"
+"POT-Creation-Date: 2026-09-13T12:39:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -377,7 +377,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:279
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-registrar.php:880
-#: assets/admin/plain/collection-settings.js:2276
+#: assets/admin/plain/collection-settings.js:2280
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -388,7 +388,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:280
 #: includes/metaboxes/class-metabox-registrar.php:882
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2400
+#: assets/admin/plain/collection-settings.js:2404
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -3962,11 +3962,11 @@ msgstr ""
 #: includes/class-admin-init.php:155
 #: includes/metaboxes/class-metabox-registrar.php:889
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2511
+#: assets/admin/plain/collection-settings.js:2515
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:596
+#: includes/class-admin-init.php:603
 #: includes/metaboxes/class-collection-save-pipeline.php:96
 #: includes/metaboxes/class-item-ajax-endpoints.php:658
 #: includes/rest/admin/admin-data.php:241
@@ -3983,37 +3983,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:625
+#: includes/class-admin-init.php:632
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:635
+#: includes/class-admin-init.php:642
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:645
-#: includes/class-admin-init.php:704
+#: includes/class-admin-init.php:652
+#: includes/class-admin-init.php:711
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:709
+#: includes/class-admin-init.php:716
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:953
+#: includes/class-admin-init.php:960
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:954
+#: includes/class-admin-init.php:961
 msgid "Remove from All Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1085
+#: includes/class-admin-init.php:1092
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1091
+#: includes/class-admin-init.php:1098
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4021,8 +4021,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1104
-#: includes/class-admin-init.php:1118
+#: includes/class-admin-init.php:1111
+#: includes/class-admin-init.php:1125
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4030,7 +4030,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from all albums.
-#: includes/class-admin-init.php:1137
+#: includes/class-admin-init.php:1144
 #, php-format
 msgid "%d gallery removed from all albums."
 msgid_plural "%d galleries removed from all albums."
@@ -4038,32 +4038,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1149
-#: includes/class-admin-init.php:1163
+#: includes/class-admin-init.php:1156
+#: includes/class-admin-init.php:1170
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1181
-#: includes/class-admin-init.php:1375
+#: includes/class-admin-init.php:1188
+#: includes/class-admin-init.php:1382
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1184
+#: includes/class-admin-init.php:1191
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1187
+#: includes/class-admin-init.php:1194
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1232
+#: includes/class-admin-init.php:1239
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1235
+#: includes/class-admin-init.php:1242
 msgid "Choose an album..."
 msgstr ""
 
@@ -5849,7 +5849,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:888
-#: assets/admin/plain/collection-settings.js:699
+#: assets/admin/plain/collection-settings.js:703
 msgid "Failed to load item data"
 msgstr ""
 
@@ -7929,113 +7929,113 @@ msgstr ""
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:462
+#: assets/admin/plain/collection-settings.js:460
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:746
+#: assets/admin/plain/collection-settings.js:750
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:782
+#: assets/admin/plain/collection-settings.js:786
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:800
+#: assets/admin/plain/collection-settings.js:804
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:807
+#: assets/admin/plain/collection-settings.js:811
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:811
+#: assets/admin/plain/collection-settings.js:815
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1502
+#: assets/admin/plain/collection-settings.js:1506
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1503
+#: assets/admin/plain/collection-settings.js:1507
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1985
+#: assets/admin/plain/collection-settings.js:1989
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2033
-#: assets/admin/plain/collection-settings.js:2049
+#: assets/admin/plain/collection-settings.js:2037
+#: assets/admin/plain/collection-settings.js:2053
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2086
+#: assets/admin/plain/collection-settings.js:2090
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2107
+#: assets/admin/plain/collection-settings.js:2111
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2108
+#: assets/admin/plain/collection-settings.js:2112
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2115
-#: assets/admin/plain/collection-settings.js:2126
+#: assets/admin/plain/collection-settings.js:2119
+#: assets/admin/plain/collection-settings.js:2130
 msgid "Failed to update autosave setting"
-msgstr ""
-
-#: assets/admin/plain/collection-settings.js:2170
-#: assets/admin/plain/collection-settings.js:2180
-msgid "Configure Album defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2174
 #: assets/admin/plain/collection-settings.js:2184
+msgid "Configure Album defaults"
+msgstr ""
+
+#: assets/admin/plain/collection-settings.js:2178
+#: assets/admin/plain/collection-settings.js:2188
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2190
+#: assets/admin/plain/collection-settings.js:2194
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:222
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2215
+#: assets/admin/plain/collection-settings.js:2219
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2225
+#: assets/admin/plain/collection-settings.js:2229
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2229
+#: assets/admin/plain/collection-settings.js:2233
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2275
+#: assets/admin/plain/collection-settings.js:2279
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2302
+#: assets/admin/plain/collection-settings.js:2306
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2311
+#: assets/admin/plain/collection-settings.js:2315
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2421
+#: assets/admin/plain/collection-settings.js:2425
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2535
+#: assets/admin/plain/collection-settings.js:2539
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
