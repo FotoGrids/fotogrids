@@ -14,6 +14,26 @@ jobs:
     name: Playwright
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: fotogrids_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+
+    env:
+      FG_DB_HOST: 127.0.0.1
+      FG_DB_PORT: 3306
+      FG_DB_USER: root
+      FG_DB_NAME: fotogrids_test
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -21,16 +41,15 @@ jobs:
       - name: Set up Node and dependencies
         uses: ./.github/actions/setup-node-deps
 
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mysqli, gd, exif, zip, mbstring
+          coverage: none
+
       - name: Build plugin
         run: npm run build:dev
-
-      - name: Stage built plugin for wp-env
-        # .wp-env.json points at ./dist/fotogrids; mirror the zip layout so the
-        # site loads the actual built plugin, not the raw repo tree.
-        run: |
-          rm -rf dist/fotogrids
-          mkdir dist/fotogrids
-          find dist -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} dist/fotogrids/ \;
 
       - name: Resolve Playwright version
         id: playwright
@@ -44,18 +63,26 @@ jobs:
 
       - name: Install Playwright browsers
         # No --with-deps: ubuntu-latest already carries every shared library
-        # Chromium needs, and installing them costs ~12s per run. Verified by
-        # launching the browser after a bare install.
+        # Chromium needs, and installing them costs ~12s per run.
         run: npx playwright install chromium
 
-      - name: Start WordPress (wp-env)
-        run: npm run env:start
+      - name: Boot WordPress
+        run: ./tests/harness/boot.sh --mode=ci
 
       - name: Run Playwright tests
-        run: npm run test:e2e
+        run: |
+          set -a; . ./tests/harness/.env; set +a
+          npm run test:e2e
 
-      # No teardown step: the runner is destroyed when the job ends, so
-      # `wp-env stop` only added ~13s to every run.
+      - name: Harness diagnostics
+        if: failure()
+        run: |
+          echo '--- boot.sh --doctor ---'
+          ./tests/harness/boot.sh --doctor || true
+          echo '--- php server log ---'
+          tail -50 tests/harness/.state/server.log || true
+          echo '--- wordpress debug.log ---'
+          tail -50 tests/harness/.state/wp/wp-content/debug.log || true
 
       - name: Upload Playwright report
         if: always()
