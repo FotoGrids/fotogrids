@@ -43,6 +43,7 @@ final class VideoPlaybackRoutingTest extends TestCase {
 	private function context(
 		string $playback_mode,
 		string $click_behavior,
+		string $lightbox_variant = 'full',
 		string $collection_kind = Collection_Kind::GALLERY
 	): Render_Context {
 		return new Render_Context(
@@ -63,26 +64,30 @@ final class VideoPlaybackRoutingTest extends TestCase {
 				array( 'desktop' => 10 ),
 				array()
 			),
-			new Render_Behavior( $click_behavior, 'show_all', 'load_more', null ),
+			new Render_Behavior( $click_behavior, 'show_all', 'load_more', null, $lightbox_variant ),
 			array( 'video_playback_mode' => $playback_mode ),
 			array()
 		);
 	}
 
 	/**
-	 * @return array<string, array{0: string, 1: string, 2: bool, 3: bool}>
+	 * @return array<string, array{0: string, 1: string, 2: string, 3: bool, 4: bool}>
 	 */
 	public function playback_matrix(): array {
 		return array(
-			// playback mode, click behaviour, inline active, mini active.
-			'inline + lightbox click' => array( 'inline', 'lightbox', true, false ),
-			'inline + direct click'   => array( 'inline', 'direct', true, false ),
-			'inline + external click' => array( 'inline', 'external', true, false ),
-			'inline + no click'       => array( 'inline', 'nothing', true, false ),
-			'lightbox + direct click' => array( 'lightbox', 'direct', false, true ),
-			'lightbox + no click'     => array( 'lightbox', 'nothing', false, true ),
-			// The full lightbox is already on the page and owns video slides.
-			'lightbox + lightbox click' => array( 'lightbox', 'lightbox', false, false ),
+			// playback mode, click behaviour, lightbox variant, inline active, mini active.
+			'inline + lightbox click'  => array( 'inline', 'lightbox', 'full', true, false ),
+			'inline + direct click'    => array( 'inline', 'direct', 'full', true, false ),
+			'inline + external click'  => array( 'inline', 'external', 'full', true, false ),
+			'inline + no click'        => array( 'inline', 'nothing', 'full', true, false ),
+			'lightbox + direct click'  => array( 'lightbox', 'direct', 'full', false, true ),
+			'lightbox + no click'      => array( 'lightbox', 'nothing', 'full', false, true ),
+			// The classic lightbox is on the page and renders the player itself.
+			'lightbox + full variant'  => array( 'lightbox', 'lightbox', 'full', false, false ),
+			// Mini and Grid build an <img> per item and cannot play a video,
+			// so the minimal video overlay takes these.
+			'lightbox + mini variant'  => array( 'lightbox', 'lightbox', 'mini', false, true ),
+			'lightbox + grid variant'  => array( 'lightbox', 'lightbox', 'grid', false, true ),
 		);
 	}
 
@@ -92,26 +97,27 @@ final class VideoPlaybackRoutingTest extends TestCase {
 	public function test_the_playback_mode_decides_the_module(
 		string $mode,
 		string $click,
+		string $variant,
 		bool $inline_active,
 		bool $mini_active
 	): void {
-		$context = $this->context( $mode, $click );
+		$context = $this->context( $mode, $click, $variant );
 
 		$this->assertSame(
 			$inline_active,
 			( new Video_Inline() )->supports( $context ),
-			'Video_Inline for ' . $mode . ' + ' . $click
+			'Video_Inline for ' . $mode . ' + ' . $click . ' + ' . $variant
 		);
 		$this->assertSame(
 			$mini_active,
 			( new Video_Lightbox_Mini() )->supports( $context ),
-			'Video_Lightbox_Mini for ' . $mode . ' + ' . $click
+			'Video_Lightbox_Mini for ' . $mode . ' + ' . $click . ' + ' . $variant
 		);
 	}
 
 	public function test_albums_never_play_video_inline_or_in_the_mini_overlay(): void {
 		foreach ( array( 'inline', 'lightbox' ) as $mode ) {
-			$context = $this->context( $mode, 'direct', Collection_Kind::ALBUM );
+			$context = $this->context( $mode, 'direct', 'full', Collection_Kind::ALBUM );
 			$this->assertFalse( ( new Video_Inline() )->supports( $context ) );
 			$this->assertFalse( ( new Video_Lightbox_Mini() )->supports( $context ) );
 		}

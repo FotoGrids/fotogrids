@@ -29,9 +29,11 @@ if ( ! defined( 'WPINC' ) ) {
  * this minimal overlay instead - just the player and a close button, no info
  * panel, toolbar, or thumbnails.
  *
- * When click behaviour IS lightbox, videos play inside the full lightbox and
- * this module stays inactive. Every other click behaviour keeps the overlay,
- * because the video playback setting is what decides how a video opens.
+ * When the classic lightbox is on the page - a lightbox click behaviour on the
+ * 'full' variant - videos play inside it and this module stays inactive. Every
+ * other combination keeps the overlay, because the video playback setting is
+ * what decides how a video opens, and neither the Mini nor the Grid overlay
+ * can render a player.
  *
  * @package FotoGrids\Render\Video
  * @since   1.1.0
@@ -55,14 +57,16 @@ final class Video_Lightbox_Mini implements Feature {
 	}
 
 	/**
-	 * Active for galleries with lightbox video playback whose click behaviour
-	 * is not the full lightbox.
+	 * Active for galleries with lightbox video playback, unless the classic
+	 * lightbox is already on the page to show the video itself.
 	 *
-	 * When click behaviour is 'lightbox', videos play in the full lightbox and
-	 * this module stays out of the way. Every other click behaviour, 'nothing'
-	 * included, leaves videos to their own playback setting: that setting is
-	 * how a gallery says what a video does, and there is no value of it that
-	 * means "do not play".
+	 * Only the classic lightbox renders a player; the Mini and Grid overlays
+	 * build an <img> per item, which for a video yields its poster at best and
+	 * an empty box when it has none. So this module stands down for exactly
+	 * the combination that puts the classic lightbox on the page - a lightbox
+	 * click behaviour resolving to the 'full' variant - and takes every other
+	 * one, 'nothing' included: the video playback setting is how a gallery
+	 * says what a video does, and no value of it means "do not play".
 	 *
 	 * @since 1.1.0
 	 * @param Render_Context $render_context Render context.
@@ -78,7 +82,9 @@ final class Video_Lightbox_Mini implements Feature {
 			return false;
 		}
 
-		return 'lightbox' !== $render_context->behavior->click_behavior;
+		$behavior = $render_context->behavior;
+
+		return 'lightbox' !== $behavior->click_behavior || 'full' !== $behavior->lightbox_variant;
 	}
 
 	public function html_before( Render_Context $render_context ): string {
