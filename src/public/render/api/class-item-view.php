@@ -126,9 +126,9 @@ final class Item_View {
 		 */
 		string $embed_id = '',
 		/**
-		 * Per-item embed playback settings (autoplay, mute, loop, controls,
-		 * start/end, etc.) as stored in fotogrids_item_meta.custom_data. Empty
-		 * for images and file videos.
+		 * Per-item playback settings (autoplay, mute, loop, controls, and for
+		 * embeds start/end, privacy mode and the rest) as stored in
+		 * fotogrids_item_meta.custom_data. Empty for images.
 		 *
 		 * @var array<string, mixed>
 		 */

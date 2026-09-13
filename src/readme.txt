@@ -281,14 +281,16 @@ FotoGrids connects to a few external services. What each one does, when it runs,
 
 1. **Freemius**
 
-This plugin uses Freemius to handle activation, license management for FotoGrids Pro, and optional usage analytics. On activation you are shown an opt-in screen and can skip it. If you opt in, Freemius collects information such as your site URL, WordPress and PHP versions, active theme and plugins, and your administrator email. If you skip, this data is not sent. This service runs on plugin activation and when checking for updates or validating a license.
+This plugin uses Freemius to handle activation, license management for FotoGrids Pro, and optional usage analytics. On activation you are shown an opt-in screen and can skip it. If you opt in, Freemius collects information such as your site URL, WordPress and PHP versions, active theme and plugins, and your administrator email. If you skip, this data is not sent. You can turn this on or off later with the "Share usage data" setting in FotoGrids > Settings > Advanced. This service runs on plugin activation and when checking for updates or validating a license.
 
 Freemius terms of service: https://freemius.com/terms/
 Freemius privacy policy: https://freemius.com/privacy/
 
 2. **FotoGrids usage statistics** (optional, off by default)
 
-If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes a random identifier created when the plugin is activated, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
+If you enable "Share usage data" in FotoGrids > Settings > Advanced (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes a random identifier created when the plugin is activated, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent, and the report does not include your site address. Nothing is sent unless you turn this setting on.
+
+The same setting also controls the Freemius tracking described above. Turning it on opts your site in to Freemius, which registers the site and sends the data listed in section 1, including your administrator name and email address. Turning it off stops that tracking.
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
@@ -323,7 +325,7 @@ FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 == 🔒 Privacy Policy ==
 
 * **Gallery statistics** (views and shares) are stored locally in your own WordPress database.
-* **No personal data** is collected or sent to FotoGrids without your consent. The "Share anonymous statistics" setting is off by default.
+* **No personal data** is collected or sent to FotoGrids without your consent. The "Share usage data" setting is off by default.
 * **External services** are listed in the "External Services" section above, along with what each one sends and when.
 * FotoGrids is built to support **GDPR** and other privacy requirements.
 
