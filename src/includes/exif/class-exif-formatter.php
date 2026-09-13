@@ -3,7 +3,7 @@
  * Turns raw EXIF tag values into display-ready strings.
  *
  * @package FotoGrids\Exif
- * @since   1.2.0
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
@@ -21,14 +21,14 @@ if ( ! defined( 'WPINC' ) ) {
  * takes the raw tag value and returns a display string, or an empty string
  * when the value carries no meaning.
  *
- * @since 1.2.0
+ * @since 1.1.2
  */
 final class Exif_Formatter {
 
 	/**
 	 * Format a raw tag value using a named formatter.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  string|null $format Formatter name, or null for a plain passthrough.
 	 * @param  mixed       $value  Raw EXIF tag value.
 	 * @param  array       $exif   The full raw EXIF map, for formatters that need siblings.
@@ -49,7 +49,7 @@ final class Exif_Formatter {
 	/**
 	 * Sanitised passthrough for values that need no conversion.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Raw value.
 	 * @return string
 	 */
@@ -68,7 +68,7 @@ final class Exif_Formatter {
 	/**
 	 * Camera name, with the manufacturer prefixed unless the model repeats it.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Model tag.
 	 * @param  array $exif  Full EXIF map.
 	 * @return string
@@ -91,7 +91,7 @@ final class Exif_Formatter {
 	/**
 	 * Lens name, dropping the placeholder values some bodies write.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Lens tag.
 	 * @return string
 	 */
@@ -108,7 +108,7 @@ final class Exif_Formatter {
 	/**
 	 * Aperture as an f-number.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value FNumber tag.
 	 * @return string
 	 */
@@ -129,7 +129,7 @@ final class Exif_Formatter {
 	/**
 	 * Shutter speed, as a fraction below one second and as seconds above it.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value ExposureTime tag.
 	 * @return string
 	 */
@@ -152,7 +152,7 @@ final class Exif_Formatter {
 	/**
 	 * ISO sensitivity.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value ISO tag, sometimes an array of readings.
 	 * @return string
 	 */
@@ -170,7 +170,7 @@ final class Exif_Formatter {
 	/**
 	 * Focal length in millimetres.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value FocalLength tag.
 	 * @return string
 	 */
@@ -193,7 +193,7 @@ final class Exif_Formatter {
 	/**
 	 * Exposure compensation in EV, signed.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value ExposureBiasValue tag.
 	 * @return string
 	 */
@@ -215,7 +215,7 @@ final class Exif_Formatter {
 	/**
 	 * Exposure program name.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value ExposureProgram tag.
 	 * @return string
 	 */
@@ -238,7 +238,7 @@ final class Exif_Formatter {
 	/**
 	 * Exposure mode name.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value ExposureMode tag.
 	 * @return string
 	 */
@@ -257,7 +257,7 @@ final class Exif_Formatter {
 	/**
 	 * Metering mode name.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value MeteringMode tag.
 	 * @return string
 	 */
@@ -279,7 +279,7 @@ final class Exif_Formatter {
 	/**
 	 * Flash state, read from the tag's bit flags.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Flash tag.
 	 * @return string
 	 */
@@ -315,7 +315,7 @@ final class Exif_Formatter {
 	/**
 	 * White balance mode.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value WhiteBalance tag.
 	 * @return string
 	 */
@@ -333,7 +333,7 @@ final class Exif_Formatter {
 	/**
 	 * Capture date, in the site's configured date and time format.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value DateTimeOriginal tag.
 	 * @return string
 	 */
@@ -360,7 +360,7 @@ final class Exif_Formatter {
 	/**
 	 * Orientation, as the transform needed to display the image upright.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Orientation tag.
 	 * @return string
 	 */
@@ -383,7 +383,7 @@ final class Exif_Formatter {
 	/**
 	 * Color space name.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value ColorSpace tag.
 	 * @return string
 	 */
@@ -401,7 +401,7 @@ final class Exif_Formatter {
 	/**
 	 * Latitude in signed decimal degrees.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value GPSLatitude tag.
 	 * @param  array $exif  Full EXIF map, for the hemisphere reference.
 	 * @return string
@@ -413,7 +413,7 @@ final class Exif_Formatter {
 	/**
 	 * Longitude in signed decimal degrees.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value GPSLongitude tag.
 	 * @param  array $exif  Full EXIF map, for the hemisphere reference.
 	 * @return string
@@ -425,7 +425,7 @@ final class Exif_Formatter {
 	/**
 	 * Altitude in metres, negative below sea level.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value GPSAltitude tag.
 	 * @param  array $exif  Full EXIF map, for the below-sea-level reference.
 	 * @return string
@@ -448,7 +448,7 @@ final class Exif_Formatter {
 	/**
 	 * Convert a degrees/minutes/seconds triple to signed decimal degrees.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed    $value          GPS coordinate tag.
 	 * @param  mixed    $reference      Hemisphere reference tag.
 	 * @param  string[] $negative_refs  References that make the value negative.
@@ -483,7 +483,7 @@ final class Exif_Formatter {
 	 * GPSAltitudeRef's "below sea level" arrives as "\x01" rather than "1"
 	 * and a plain integer cast reads it as zero.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Raw tag value.
 	 * @return int
 	 */
@@ -506,7 +506,7 @@ final class Exif_Formatter {
 	/**
 	 * Look a numeric tag value up in a label map.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed                 $value      Raw tag value.
 	 * @param  array<int, string>    $map        Tag value => label.
 	 * @param  bool                  $allow_zero Whether 0 is a meaningful value in this map.
@@ -529,7 +529,7 @@ final class Exif_Formatter {
 	/**
 	 * Read an EXIF rational ("1/250", "28/10") or number as a float.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  mixed $value Raw tag value.
 	 * @return float|null Null when the value is not a number.
 	 */

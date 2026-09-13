@@ -7,7 +7,7 @@
  * Run `npm run i18n:makepot` to regenerate.
  *
  * @package FotoGrids\Catalog
- * @since   1.1.1
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
