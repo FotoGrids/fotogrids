@@ -104,7 +104,7 @@ const useFieldState = (
 				fieldStates,
 				fieldStatesByOption
 			),
-		[setting?.key, currentValue, fieldStates, fieldStatesByOption]
+		[setting, currentValue, fieldStates, fieldStatesByOption]
 	);
 };
 
@@ -331,8 +331,6 @@ function CollectionSettings() {
 	const [settingsMode, setSettingsMode] = useState(
 		window.fotogridsAdmin?.settingsMode === 'advanced' ? 'advanced' : 'easy'
 	);
-	const State = window.FotoGridsCollectionState;
-
 	const isProActive = window.fotogridsSettings?.isProActive || false;
 	const galleryItems = window.fotogridsSettings?.galleryItems || [];
 	const canEditPosts = window.fotogridsSettings?.canEditPosts !== false;
@@ -408,7 +406,7 @@ function CollectionSettings() {
 		};
 	}, [switchTab]);
 
-	const loadAndPrepareSettings = async () => {
+	const loadAndPrepareSettings = useCallback(async () => {
 		if (window.FotoGridsSettings?.loadSettingsGroups) {
 			const postType = window.fotogridsSettings?.postType || 'gallery';
 			const rawSettings =
@@ -430,11 +428,11 @@ function CollectionSettings() {
 			);
 		}
 		setSettingsLoaded(true);
-	};
+	}, [isDefaultsMode, normalizedPostType]);
 
 	useEffect(() => {
 		loadAndPrepareSettings();
-	}, []);
+	}, [loadAndPrepareSettings]);
 
 	// Cross-setting conflict: a popover Image Zoom in click mode and an
 	// Item Click Behavior of "lightbox" both bind the item click. Register the
@@ -665,6 +663,12 @@ function CollectionSettings() {
 		) {
 			loadItemData();
 		}
+		// loadItemData is declared below and closes only over galleryItems,
+		// which wp_localize_script writes once before this tree mounts.
+		// Listing it would re-run the effect on every render whenever the
+		// localized array is absent, because the `|| []` fallback allocates
+		// a new one each time.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		settings.item_click_behavior,
 		galleryItems.length,
