@@ -1,7 +1,7 @@
 name: 🐞 Bug report
 description: Something in FotoGrids is broken or behaving incorrectly.
 title: "[Bug]: "
-labels: ["bug", "needs triage"]
+labels: ["bug", "needs triage", "from-users"]
 body:
   - type: markdown
     attributes:
@@ -18,13 +18,60 @@ body:
           required: true
         - label: I reproduced this with all other plugins disabled and a default theme.
           required: false
-  - type: textarea
-    id: what-happened
+  - type: dropdown
+    id: edition
     attributes:
-      label: What happened?
-      description: What did you expect, and what happened instead? Screenshots or a screen recording help.
+      label: Which edition?
+      options:
+        - FotoGrids (Free)
+        - FotoGrids Pro
+        - Both
+        - Not sure
     validations:
       required: true
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Info report
+      description: |
+        In WordPress, go to **FotoGrids → Tools → System Info** and press **Copy report**, then paste it here. It carries your FotoGrids, WordPress, server, database, theme and plugin details, so none of it has to be chased up later. Database credentials and license keys are left out of the report by design.
+
+        If the site is too broken to reach that screen, say so here and fill in what you can.
+      render: shell
+    validations:
+      required: true
+  - type: dropdown
+    id: page-builder
+    attributes:
+      label: How is the gallery placed on the page?
+      options:
+        - Block editor (Gutenberg)
+        - Elementor
+        - Divi 5
+        - Shortcode
+        - Another page builder
+        - Not sure
+    validations:
+      required: false
+  - type: dropdown
+    id: layout
+    attributes:
+      label: Which layout?
+      description: The layout set on the gallery where this happens.
+      options:
+        - Grid
+        - Masonry
+        - Justified
+        - Slider
+        - Image Viewer
+        - Single Item
+        - Featured Item
+        - Instant Photos
+        - Album view
+        - Happens on every layout
+        - Not sure
+    validations:
+      required: false
   - type: textarea
     id: steps
     attributes:
@@ -36,24 +83,27 @@ body:
         4. See error
     validations:
       required: true
-  - type: input
-    id: versions
+  - type: textarea
+    id: expected
     attributes:
-      label: Environment
-      description: FotoGrids version, WordPress version, PHP version, theme, and any page builder.
-      placeholder: "FotoGrids 1.0.0 · WP 6.8 · PHP 8.1 · GeneratePress · Elementor"
+      label: What you expected
+      description: What should have happened at the last step.
     validations:
       required: true
-  - type: dropdown
-    id: plugin
+  - type: textarea
+    id: actual
     attributes:
-      label: Free or Pro?
-      options:
-        - FotoGrids (Free)
-        - FotoGrids Pro
-        - Both
+      label: What happened instead
+      description: What you saw instead, in as much detail as you can give.
     validations:
       required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or screen recording
+      description: Drag images or a short recording into this box to attach them. A recording of the broken behaviour usually saves a round of questions.
+    validations:
+      required: false
   - type: textarea
     id: console
     attributes:

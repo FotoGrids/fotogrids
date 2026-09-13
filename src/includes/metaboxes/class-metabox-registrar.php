@@ -654,10 +654,7 @@ final class Metabox_Registrar {
 		?>
 		<div id="fotogrids-gallery-albums-root">
 			<!-- React Album Assignment component will mount here -->
-			<div class="fotogrids-loading">
-				<span class="spinner fg-is-active"></span>
-				<?php esc_html_e( 'Loading albums...', 'fotogrids' ); ?>
-			</div>
+			<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading albums...', 'fotogrids' ) ); ?>
 		</div>
 		<?php
 	}
@@ -745,8 +742,11 @@ final class Metabox_Registrar {
 			'errorLoadingItem'                    => __( 'Error loading item data', 'fotogrids' ),
 			'errorSaving'                         => __( 'Error saving item data. Please try again', 'fotogrids' ),
 			'itemSavedSuccessfully'               => __( 'Item saved successfully!', 'fotogrids' ),
-			'unsavedChangesConfirm'               => __( 'You have unsaved changes. Are you sure you want to close without saving?', 'fotogrids' ),
+			'unsavedChangesConfirm'               => __( "You have unsaved changes.\nAre you sure you want to close without saving?", 'fotogrids' ),
 			'unsavedChangesNavigate'              => __( 'You have unsaved changes. Are you sure you want to navigate away without saving?', 'fotogrids' ),
+			'unsavedChangesTitle'                 => __( 'Discard changes?', 'fotogrids' ),
+			'unsavedChangesDiscard'               => __( 'Discard changes', 'fotogrids' ),
+			'unsavedChangesKeepEditing'           => __( 'Keep editing', 'fotogrids' ),
 			'title'                               => __( 'Title', 'fotogrids' ),
 			'altText'                             => __( 'Alt Text', 'fotogrids' ),
 			'caption'                             => __( 'Caption', 'fotogrids' ),
@@ -932,18 +932,7 @@ final class Metabox_Registrar {
 			'facialRecognition'                   => __( 'AI Facial Recognition', 'fotogrids' ),
 			'facialRecognitionDesc'               => __( '- automatically detect and tag people', 'fotogrids' ),
 			'exif'                                => __( 'EXIF', 'fotogrids' ),
-			'camera'                              => __( 'Camera', 'fotogrids' ),
-			'aperture'                            => __( 'Aperture', 'fotogrids' ),
-			'shutterSpeed'                        => __( 'Shutter Speed', 'fotogrids' ),
-			'iso'                                 => __( 'ISO', 'fotogrids' ),
-			'lens'                                => __( 'Lens', 'fotogrids' ),
-			'focalLength'                         => __( 'Focal Length', 'fotogrids' ),
-			'dateTaken'                           => __( 'Date Taken', 'fotogrids' ),
-			'copyright'                           => __( 'Copyright', 'fotogrids' ),
-			'orientation'                         => __( 'Orientation', 'fotogrids' ),
-			'flash'                               => __( 'Flash', 'fotogrids' ),
-			'whiteBalance'                        => __( 'White Balance', 'fotogrids' ),
-			'exposureMode'                        => __( 'Exposure Mode', 'fotogrids' ),
+			'exifFields'                          => \FotoGrids\Exif\Exif_Fields::as_options(),
 			'exifPerImageOverrides'               => __( 'Per-image EXIF overrides', 'fotogrids' ),
 			'addTagsPlaceholder'                  => __( 'Add tags...', 'fotogrids' ),
 			'addPeoplePlaceholder'                => __( 'Add people...', 'fotogrids' ),

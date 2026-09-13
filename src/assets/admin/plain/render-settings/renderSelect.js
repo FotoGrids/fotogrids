@@ -303,6 +303,7 @@ const RenderSelectComponent = ({
 						h(
 							'div',
 							{
+								key: 'div',
 								className: [
 									'fotogrids-render-select__options',
 									optionsClassName,
@@ -332,6 +333,7 @@ const RenderSelectComponent = ({
 												h(
 													'div',
 													{
+														key: 'group-label',
 														className:
 															'fotogrids-render-select__group-label',
 													},
@@ -350,6 +352,7 @@ const RenderSelectComponent = ({
 												h(
 													'div',
 													{
+														key: 'status',
 														className:
 															'fotogrids-render-select__status',
 													},
@@ -366,7 +369,7 @@ const RenderSelectComponent = ({
 
 	const portalElement =
 		dropdownElement && typeof createPortal === 'function'
-			? createPortal(dropdownElement, document.body)
+			? createPortal(dropdownElement, document.body, 'portal')
 			: dropdownElement;
 
 	return h(

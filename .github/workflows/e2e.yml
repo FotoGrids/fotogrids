@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   playwright:
-    name: Playwright (wp-env)
+    name: Playwright
     runs-on: ubuntu-latest
 
     steps:

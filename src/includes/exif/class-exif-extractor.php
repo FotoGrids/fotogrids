@@ -22,16 +22,15 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Two responsibilities:
  *
- *  - `extract()` reads `wp_read_image_metadata()` for an attachment and
- *    returns the requested whitelist of fields in our normalised shape.
- *  - `enabled_fields_for_gallery()` translates a gallery's per-setting
- *    toggles (`display_exif`, `exif_camera`, `exif_aperture`, …) into the
- *    field whitelist that `extract()` expects.
+ *  - `extract()` reads an attachment's raw EXIF tags and returns the requested
+ *    fields, formatted for display.
+ *  - `enabled_fields_for_gallery()` translates a gallery's `display_exif` and
+ *    `exif_fields` settings into the field whitelist `extract()` expects.
  *
- * Free's whitelist covers the four core fields (camera, aperture,
- * shutter_speed, iso). Add-ons extend the whitelist and the extracted values
- * through the `fotogrids/data/exif/enabled_fields` and
- * `fotogrids/data/exif/extract` filters.
+ * The field vocabulary itself lives in `Exif_Fields`. Add-ons extend the
+ * whitelist and the extracted values through the
+ * `fotogrids/data/exif/enabled_fields` and `fotogrids/data/exif/extract`
+ * filters.
  *
  * @since 1.0.0
  */
@@ -42,8 +41,7 @@ final class Exif_Extractor {
 	 *
 	 * @since 1.0.0
 	 * @param int      $attachment_id  Attachment ID.
-	 * @param string[] $enabled_fields Field keys to extract (e.g. ['camera',
-	 *                                 'aperture', 'shutter_speed', 'iso']).
+	 * @param string[] $enabled_fields Field keys to extract, from `Exif_Fields`.
 	 * @return array<string, string> Normalised EXIF data with only the
 	 *                               requested fields populated.
 	 */
@@ -52,65 +50,36 @@ final class Exif_Extractor {
 			return array();
 		}
 
-		// WordPress strips metadata from the `-scaled` file it generates for
-		// images above big_image_size_threshold, so read the preserved
-		// original. Falls back to the attached file when there is no original.
-		$file_path = wp_get_original_image_path( $attachment_id );
-		if ( ! $file_path ) {
-			$file_path = get_attached_file( $attachment_id );
-		}
+		$requested = Exif_Fields::sanitize_keys( $enabled_fields );
 
-		if ( ! $file_path || ! file_exists( $file_path ) ) {
+		if ( empty( $requested ) ) {
 			return array();
 		}
 
-		$image_meta = wp_read_image_metadata( $file_path );
-		if ( ! $image_meta || empty( $image_meta ) ) {
-			return array();
-		}
+		$tags = Exif_Reader::read( $attachment_id );
 
 		$exif_data = array();
 
-		// Camera (combine credit + camera when available).
-		if ( in_array( 'camera', $enabled_fields, true ) ) {
-			$camera_parts = array();
-			if ( ! empty( $image_meta['credit'] ) ) {
-				$camera_parts[] = $image_meta['credit'];
-			}
-			if ( ! empty( $image_meta['camera'] ) ) {
-				$camera_parts[] = $image_meta['camera'];
-			}
-			if ( ! empty( $camera_parts ) ) {
-				$exif_data['camera'] = sanitize_text_field( implode( ' ', $camera_parts ) );
-			}
-		}
+		if ( ! empty( $tags ) ) {
+			foreach ( $requested as $field_key ) {
+				$definition = Exif_Fields::get( $field_key );
 
-		// Aperture.
-		if ( in_array( 'aperture', $enabled_fields, true ) && ! empty( $image_meta['aperture'] ) ) {
-			$aperture              = $image_meta['aperture'];
-			$exif_data['aperture'] = is_numeric( $aperture )
-				? 'f/' . number_format( (float) $aperture, 1 )
-				: sanitize_text_field( $aperture );
-		}
-
-		// Shutter speed (normalise sub-second to fractional notation).
-		if ( in_array( 'shutter_speed', $enabled_fields, true ) && ! empty( $image_meta['shutter'] ) ) {
-			$shutter = $image_meta['shutter'];
-			if ( is_numeric( $shutter ) ) {
-				if ( $shutter < 1 ) {
-					$denominator                = round( 1 / $shutter );
-					$exif_data['shutter_speed'] = '1/' . $denominator . 's';
-				} else {
-					$exif_data['shutter_speed'] = number_format( (float) $shutter, 1 ) . 's';
+				if ( null === $definition ) {
+					continue;
 				}
-			} else {
-				$exif_data['shutter_speed'] = sanitize_text_field( $shutter );
-			}
-		}
 
-		// ISO.
-		if ( in_array( 'iso', $enabled_fields, true ) && ! empty( $image_meta['iso'] ) ) {
-			$exif_data['iso'] = sanitize_text_field( $image_meta['iso'] );
+				$value = self::first_present_tag( $tags, $definition['tags'] );
+
+				if ( null === $value ) {
+					continue;
+				}
+
+				$formatted = Exif_Formatter::apply( $definition['format'], $value, $tags );
+
+				if ( '' !== $formatted ) {
+					$exif_data[ $field_key ] = $formatted;
+				}
+			}
 		}
 
 		/**
@@ -119,14 +88,11 @@ final class Exif_Extractor {
 		 *
 		 * @see Filters_Data::EXIF_EXTRACT
 		 */
-		return (array) apply_filters( Filters_Data::EXIF_EXTRACT, $exif_data, $enabled_fields, $image_meta, $attachment_id );
+		return (array) apply_filters( Filters_Data::EXIF_EXTRACT, $exif_data, $enabled_fields, $tags, $attachment_id );
 	}
 
 	/**
 	 * Build the EXIF-field whitelist for a gallery, from its settings.
-	 *
-	 * Free enables camera / aperture / shutter_speed / iso. Add-ons extend the
-	 * list via the Filters_Data::EXIF_ENABLED_FIELDS filter.
 	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id Gallery post ID.
@@ -139,27 +105,67 @@ final class Exif_Extractor {
 			return array();
 		}
 
-		$enabled_fields = array();
-
-		if ( ! empty( $settings['exif_camera'] ) ) {
-			$enabled_fields[] = 'camera';
-		}
-		if ( ! empty( $settings['exif_aperture'] ) ) {
-			$enabled_fields[] = 'aperture';
-		}
-		if ( ! empty( $settings['exif_shutter_speed'] ) ) {
-			$enabled_fields[] = 'shutter_speed';
-		}
-		if ( ! empty( $settings['exif_iso'] ) ) {
-			$enabled_fields[] = 'iso';
-		}
+		$enabled_fields = Exif_Fields::sanitize_keys( self::parse_field_setting( $settings['exif_fields'] ?? array() ) );
 
 		/**
 		 * Allow add-ons to enable additional EXIF field keys from the gallery's
-		 * settings (e.g. lens, focal_length).
+		 * settings.
 		 *
 		 * @see Filters_Data::EXIF_ENABLED_FIELDS
 		 */
 		return (array) apply_filters( Filters_Data::EXIF_ENABLED_FIELDS, $enabled_fields, $settings, $gallery_id );
+	}
+
+	/**
+	 * Read the `exif_fields` setting, which persists as an array or as JSON.
+	 *
+	 * @since  1.2.0
+	 * @param  mixed $raw Stored setting value.
+	 * @return array<int, mixed>
+	 */
+	public static function parse_field_setting( $raw ): array {
+		if ( is_array( $raw ) ) {
+			return $raw;
+		}
+
+		if ( ! is_string( $raw ) || '' === trim( $raw ) ) {
+			return array();
+		}
+
+		$raw = trim( $raw );
+
+		if ( 0 === strpos( $raw, '[' ) ) {
+			$decoded = json_decode( $raw, true );
+
+			return is_array( $decoded ) ? $decoded : array();
+		}
+
+		return array_filter( array_map( 'trim', explode( ',', $raw ) ) );
+	}
+
+	/**
+	 * The first of a field's candidate tags that carries a value.
+	 *
+	 * @since  1.2.0
+	 * @param  array<string, mixed> $tags       Raw EXIF tag map.
+	 * @param  string[]             $candidates Tag names, in precedence order.
+	 * @return mixed Null when none is present.
+	 */
+	private static function first_present_tag( array $tags, array $candidates ) {
+		foreach ( $candidates as $tag ) {
+			if ( ! array_key_exists( $tag, $tags ) ) {
+				continue;
+			}
+
+			$value = $tags[ $tag ];
+
+			if ( null === $value || '' === $value || array() === $value ) {
+				continue;
+			}
+
+			return $value;
+		}
+
+		return null;
 	}
 }

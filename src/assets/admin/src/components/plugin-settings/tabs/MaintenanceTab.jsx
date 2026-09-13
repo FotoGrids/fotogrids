@@ -363,6 +363,7 @@ const MaintenanceTab = () => {
                 status={debugStatus}
                 onSave={handleDebugSave}
                 onDiscard={handleDebugDiscard}
+                watch={enabled}
             />
 
             <Confirm

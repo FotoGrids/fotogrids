@@ -71,6 +71,7 @@
  *   data-fg-lb-info-blocks-style    "boxed"|"divided"|"plain"         default: "boxed" (attr absent)
  *   data-fg-lb-credit-source        "exif"                            default: "item_meta" (attr absent)
  *   data-fg-lb-exif-fields          space-sep list of enabled EXIF field keys (absent = EXIF block disabled)
+ *   data-fg-lb-exif-labels          JSON map of those field keys to translated labels
  *   data-fg-lb-thumb-filter         combined CSS filter string for lightbox thumbnail strip images
  *                                   e.g. "grayscale(50%) blur(3px)" - absent when filter disabled/empty
  *   data-fg-lb-thumb-filter-hover   combined CSS filter string applied on thumbnail :hover
@@ -212,6 +213,7 @@ function readSettings(galleryEl) {
 		infoBlockDivider: d.fgLbInfoBlockDivider || null,
 		creditSource: d.fgLbCreditSource || 'item_meta',
 		galleryId: parseInt(d.fgGalleryId, 10) || 0,
+		exifLabels: FotoGridsLightbox._parseExifLabels(d.fgLbExifLabels),
 		exifFields: d.fgLbExifFields
 			? d.fgLbExifFields.split(' ').filter(Boolean)
 			: [],
@@ -1468,8 +1470,9 @@ class FotoGridsLightbox {
 					'fotogrids/v1/gallery/lightbox/slides'
 				: '/wp-json/fotogrids/v1/gallery/lightbox/slides';
 		const nonce =
+			window.fotogrids?.restNonce ||
 			gEl.dataset.fgRenderNonce ||
-			(window.fotogrids && window.fotogrids.renderNonce) ||
+			window.fotogrids?.renderNonce ||
 			'';
 		const galleryId = parseInt(gEl.dataset.fgGalleryId || '0', 10);
 		const randomSeed = parseInt(gEl.dataset.fgRandomSeed || '0', 10);
@@ -2583,24 +2586,21 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * EXIF field key → human-readable label.
-	 * Keep in sync with the field keys stored by TabEXIF.
+	 * Parse the translated EXIF labels emitted alongside the field list.
+	 *
+	 * @param {string|undefined} raw JSON map of field key → label.
+	 * @return {Object} Field key → label, empty when the attribute is absent.
 	 */
-	static get EXIF_LABELS() {
-		return {
-			camera: 'Camera',
-			aperture: 'Aperture',
-			shutter_speed: 'Shutter Speed',
-			iso: 'ISO',
-			lens: 'Lens',
-			focal_length: 'Focal Length',
-			date_taken: 'Date Taken',
-			copyright: 'Copyright',
-			orientation: 'Orientation',
-			flash: 'Flash',
-			white_balance: 'White Balance',
-			exposure_mode: 'Exposure Mode',
-		};
+	static _parseExifLabels(raw) {
+		if (!raw) {
+			return {};
+		}
+		try {
+			const parsed = JSON.parse(raw);
+			return parsed && typeof parsed === 'object' ? parsed : {};
+		} catch (e) {
+			return {};
+		}
 	}
 
 	/**
@@ -2965,9 +2965,19 @@ class FotoGridsLightbox {
 			`fotogrids/v1/lightbox/item/${itemId}?credit_source=${creditSource}` +
 			(galleryId ? `&gallery_id=${galleryId}` : '');
 
+		const headers = { Accept: 'application/json' };
+		const nonce =
+			window.fotogrids?.restNonce ||
+			this.galleryEl?.dataset.fgRenderNonce ||
+			window.fotogrids?.renderNonce ||
+			'';
+		if (nonce) {
+			headers['X-WP-Nonce'] = nonce;
+		}
+
 		fetch(url, {
 			credentials: 'same-origin',
-			headers: { Accept: 'application/json' },
+			headers,
 		})
 			.then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
 			.then((data) => {
@@ -3109,7 +3119,7 @@ class FotoGridsLightbox {
 					blockEl.remove();
 					return;
 				}
-				const labels = FotoGridsLightbox.EXIF_LABELS;
+				const labels = s.exifLabels || {};
 				const dl = document.createElement('dl');
 				dl.className = 'fg-lb-info-dl fg-lb-info-exif';
 				let hasAny = false;

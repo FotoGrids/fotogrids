@@ -35,12 +35,13 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 				h(
 					'div',
 					{
+						key: 'permission-notice',
 						className: 'fotogrids-permission-notice',
 					},
 					[
 						h(
 							'p',
-							{},
+							{ key: 'p' },
 							__(
 								'You do not have permission to edit item URLs. The "edit_posts" capability is required.',
 								'fotogrids'
@@ -63,19 +64,19 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 				h(
 					'div',
 					{
+						key: 'bulk-actions',
 						className: 'fotogrids-bulk-actions',
 					},
 					[
 						h('div', {
+							key: 'skeleton',
 							className: 'fotogrids-bulk-actions__skeleton',
 						}),
 					]
 				),
 				h(
 					'div',
-					{
-						className: 'fotogrids-item-url-grid',
-					},
+					{ key: 'url-grid', className: 'fotogrids-item-url-grid' },
 					galleryItems.map((itemId) =>
 						h(
 							'div',
@@ -86,21 +87,25 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 							},
 							[
 								h('div', {
+									key: 'thumbnail',
 									className:
 										'fotogrids-item-url-item__thumbnail',
 								}),
 								h(
 									'div',
 									{
+										key: 'fields',
 										className:
 											'fotogrids-item-url-item__fields',
 									},
 									[
 										h('div', {
+											key: 'url-field',
 											className:
 												'fotogrids-item-url-item__url-field',
 										}),
 										h('div', {
+											key: 'target-field',
 											className:
 												'fotogrids-item-url-item__target-field',
 										}),
@@ -125,13 +130,15 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 				h(
 					'div',
 					{
+						key: 'error-notice',
 						className: 'fotogrids-error-notice',
 					},
 					[
-						h('p', {}, itemError),
+						h('p', { key: 'p' }, itemError),
 						h(
 							'button',
 							{
+								key: 'button',
 								type: 'button',
 								onClick: loadItemData,
 								className: 'button',
@@ -152,25 +159,26 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 		[
 			h(
 				'div',
-				{
-					className: 'fotogrids-bulk-actions',
-				},
+				{ key: 'bulk-actions', className: 'fotogrids-bulk-actions' },
 				[
 					h(
 						'div',
 						{
+							key: 'defaults',
 							className: 'fotogrids-bulk-actions__defaults',
 						},
 						[
 							h(
 								'div',
 								{
+									key: 'button-group',
 									className: 'fg-button-group',
 								},
 								[
 									h(
 										'label',
 										{
+											key: 'label',
 											className:
 												'fotogrids-setting__label',
 										},
@@ -179,6 +187,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 									h(
 										'div',
 										{
+											key: 'buttons',
 											className:
 												'fg-button-group__buttons',
 										},
@@ -220,6 +229,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 														h(
 															'span',
 															{
+																key: 'button-icon',
 																className:
 																	'fg-button-icon',
 															},
@@ -231,6 +241,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 														h(
 															'span',
 															{
+																key: 'button-label',
 																className:
 																	'fg-button-label',
 															},
@@ -247,12 +258,14 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 					h(
 						'div',
 						{
+							key: 'bulk-actions',
 							className: 'fotogrids-bulk-actions__bulk-actions',
 						},
 						[
 							h(
 								'label',
 								{
+									key: 'label',
 									className: 'fotogrids-setting__label',
 								},
 								__('Bulk Actions', 'fotogrids')
@@ -260,12 +273,14 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 							h(
 								'div',
 								{
+									key: 'buttons',
 									className: 'fg-button-group__buttons',
 								},
 								[
 									h(
 										'button',
 										{
+											key: 'fg-button',
 											type: 'button',
 											className:
 												'fg-button fg-button--variant-secondary',
@@ -277,6 +292,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 									h(
 										'button',
 										{
+											key: 'fg-button-2',
 											type: 'button',
 											className:
 												'fg-button fg-button--variant-secondary',
@@ -294,9 +310,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 
 			h(
 				'div',
-				{
-					className: 'fotogrids-item-url-grid',
-				},
+				{ key: 'url-grid', className: 'fotogrids-item-url-grid' },
 				galleryItems.map((itemId) => {
 					const data = itemData[itemId] || {};
 					const currentUrl = data.url || '';
@@ -313,12 +327,14 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 							h(
 								'div',
 								{
+									key: 'thumbnail',
 									className:
 										'fotogrids-item-url-item__thumbnail',
 								},
 								[
 									data.thumbnail
 										? h('img', {
+												key: 'img',
 												src: data.thumbnail,
 												alt:
 													data.alt ||
@@ -329,6 +345,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 										: h(
 												'div',
 												{
+													key: 'thumbnail-placeholder',
 													className:
 														'fotogrids-item-url-item__thumbnail-placeholder',
 												},
@@ -356,6 +373,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 							h(
 								'div',
 								{
+									key: 'fields',
 									className:
 										'fotogrids-item-url-item__fields',
 								},
@@ -363,6 +381,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 									h(
 										'div',
 										{
+											key: 'url-field',
 											className:
 												'fotogrids-item-url-item__url-field',
 										},
@@ -370,6 +389,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											h(
 												'label',
 												{
+													key: 'label',
 													className:
 														'fotogrids-item-url-item__label',
 												},
@@ -378,6 +398,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											h(
 												'div',
 												{
+													key: 'url-input',
 													className:
 														'fotogrids-url-input',
 												},
@@ -457,6 +478,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															isSaving,
 													}),
 													h('div', {
+														key: 'url-validation',
 														className:
 															'fotogrids-url-validation',
 														style: {
@@ -467,6 +489,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 														h(
 															'div',
 															{
+																key: 'saving-indicator',
 																className:
 																	'fotogrids-saving-indicator',
 															},
@@ -483,6 +506,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 									h(
 										'div',
 										{
+											key: 'target-field',
 											className:
 												'fotogrids-item-url-item__target-field',
 										},
@@ -490,6 +514,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											h(
 												'label',
 												{
+													key: 'label',
 													className:
 														'fotogrids-item-url-item__label',
 												},
@@ -498,6 +523,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 											h(
 												'div',
 												{
+													key: 'button-group',
 													className:
 														'fotogrids-target-button-group',
 												},
@@ -505,6 +531,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 													h(
 														'button',
 														{
+															key: 'target-button',
 															type: 'button',
 															className: `fotogrids-target-button ${currentTarget === 'global' ? 'fg-is-active' : ''}`,
 															onClick: () =>
@@ -521,6 +548,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															h(
 																'span',
 																{
+																	key: 'main-label',
 																	className:
 																		'fotogrids-target-button__main-label',
 																},
@@ -532,6 +560,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															h(
 																'span',
 																{
+																	key: 'sub-label',
 																	className:
 																		'fotogrids-target-button__sub-label',
 																},
@@ -551,6 +580,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 													h(
 														'button',
 														{
+															key: 'target-button-2',
 															type: 'button',
 															className: `fotogrids-target-button ${currentTarget === '_self' ? 'fg-is-active' : ''}`,
 															onClick: () =>
@@ -567,6 +597,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															h(
 																'span',
 																{
+																	key: 'icon',
 																	className:
 																		'fotogrids-target-button__icon',
 																},
@@ -577,6 +608,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															h(
 																'span',
 																{
+																	key: 'label',
 																	className:
 																		'fotogrids-target-button__label',
 																},
@@ -590,6 +622,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 													h(
 														'button',
 														{
+															key: 'target-button-3',
 															type: 'button',
 															className: `fotogrids-target-button ${currentTarget === '_blank' ? 'fg-is-active' : ''}`,
 															onClick: () =>
@@ -606,6 +639,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															h(
 																'span',
 																{
+																	key: 'icon',
 																	className:
 																		'fotogrids-target-button__icon',
 																},
@@ -616,6 +650,7 @@ window.FotoGridsRenderSettings.renderExternalUrlManager = (
 															h(
 																'span',
 																{
+																	key: 'label',
 																	className:
 																		'fotogrids-target-button__label',
 																},

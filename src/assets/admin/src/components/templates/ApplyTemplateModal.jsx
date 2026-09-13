@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../shared/Modal';
 import { Button } from '../shared/Button';
 import { FormField } from '../shared/FormField';
+import LoadingIcon from '../shared/LoadingIcon';
 
 const { __ } = wp.i18n;
 
@@ -133,7 +134,7 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
                 >
                     {loading ? (
                         <div className="fotogrids-loading">
-                            <span className="spinner fg-is-active"></span>
+                            <LoadingIcon size={20} />
                             <span>{__('Loading...', 'fotogrids')}</span>
                         </div>
                     ) : (

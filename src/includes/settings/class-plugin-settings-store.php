@@ -116,7 +116,7 @@ final class Plugin_Settings_Store {
 	public static function get_advanced(): array {
 		$share_raw = get_option( 'fotogrids_share_statistics', null );
 		return array(
-			'autosave'                 => (bool) get_option( 'fotogrids_autosave', false ),
+			'autosave'                 => (bool) get_option( 'fotogrids_autosave', true ),
 			// Tolerant cast - see `Admin_Init::resolve_share_statistics_state()`
 			// for the same logic. Defaults to off on fresh install.
 			'share_statistics'         => ! (
@@ -142,7 +142,7 @@ final class Plugin_Settings_Store {
 	 * @return array<string, bool> The stored settings.
 	 */
 	public static function save_advanced( array $input ): array {
-		update_option( 'fotogrids_autosave', self::truthy( $input['autosave'] ?? false ) );
+		self::save_bool( 'fotogrids_autosave', self::truthy( $input['autosave'] ?? false ) );
 
 		// share_statistics has a Freemius side-effect; route through the
 		// shared helper so this REST path and the wizard's AJAX path
@@ -156,21 +156,99 @@ final class Plugin_Settings_Store {
 			self::apply_marketing_consent( self::truthy( $input['marketing_allowed'] ?? false ) );
 		}
 
-		update_option( 'fotogrids_allow_google_fonts', self::truthy( $input['allow_google_fonts'] ?? false ) );
+		self::save_bool( 'fotogrids_allow_google_fonts', self::truthy( $input['allow_google_fonts'] ?? false ) );
 
-		update_option( 'fotogrids_allow_news_updates', self::truthy( $input['allow_news_updates'] ?? false ) );
+		self::save_bool( 'fotogrids_allow_news_updates', self::truthy( $input['allow_news_updates'] ?? false ) );
 
 		// Persist the inverse "preserve" flag the uninstaller reads.
 		$delete = self::truthy( $input['delete_data_on_uninstall'] ?? false );
-		update_option( 'fotogrids_preserve_data_on_uninstall', ! $delete );
+		self::save_bool( 'fotogrids_preserve_data_on_uninstall', ! $delete );
 
 		return self::get_advanced();
 	}
 
 	/**
+	 * Sanitise a map of collection defaults.
+	 *
+	 * Keys not in the resolved defaults are dropped, and each value is coerced
+	 * to the shape its default declares. Lives here rather than in `Admin_Init`
+	 * because the REST write path runs outside `is_admin()`, where that class is
+	 * never loaded.
+	 *
+	 * @param  mixed $input Raw map of setting key => value.
+	 * @return array<string, mixed>
+	 */
+	public static function sanitize_collection_defaults( $input ): array {
+		if ( ! is_array( $input ) ) {
+			return array();
+		}
+
+		$defaults  = \FotoGrids\Collection_Defaults::resolve_gallery();
+		$sanitized = array();
+
+		foreach ( $defaults as $key => $default_value ) {
+			if ( ! isset( $input[ $key ] ) ) {
+				continue;
+			}
+
+			$value = $input[ $key ];
+
+			if ( is_array( $default_value ) ) {
+				if ( is_string( $value ) ) {
+					// No stripslashes(): REST bodies arrive unslashed, and
+					// stripping here would eat legitimate JSON escapes.
+					$decoded = json_decode( $value, true );
+					if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+						$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $decoded );
+					} else {
+						$sanitized[ $key ] = $default_value;
+					}
+				} elseif ( is_array( $value ) ) {
+					$sanitized[ $key ] = \FotoGrids\Sanitization\Array_Field::deep( $value );
+				} else {
+					$sanitized[ $key ] = $default_value;
+				}
+			} elseif ( is_bool( $default_value ) ) {
+				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
+			} elseif ( is_numeric( $default_value ) ) {
+				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
+			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
+				// Passwords must not pass through sanitize_text_field(), which
+				// would strip characters that are valid in a password. Keep the
+				// value as-is; the per-collection save path encrypts it.
+				$sanitized[ $key ] = is_scalar( $value ) ? (string) $value : '';
+			} else {
+				$sanitized[ $key ] = sanitize_text_field( $value );
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Persist a boolean option as the string '1' or '0'.
+	 *
+	 * `update_option()` returns early when the new value matches the current
+	 * one, and `get_option()` answers `false` for a row that does not exist.
+	 * Writing a raw `false` to an option that has never been written is
+	 * therefore a silent no-op, which leaves any option whose default is true
+	 * stuck on - the user switches it off and it comes back on. The '1'/'0'
+	 * strings are never equal to that `false`, and are what
+	 * `Admin_Init::ajax_update_plugin_setting()` already stores, so both write
+	 * paths agree on the stored shape. Every reader treats '0' as falsey.
+	 *
+	 * @param  string $option Option name.
+	 * @param  bool   $value  Value to store.
+	 * @return bool True when the option was written.
+	 */
+	private static function save_bool( string $option, bool $value ): bool {
+		return update_option( $option, $value ? '1' : '0' );
+	}
+
+	/**
 	 * Apply the user's usage-data sharing choice.
 	 *
-	 * Writes the local `fotogrids_share_statistics` option as a real bool
+	 * Writes the local `fotogrids_share_statistics` option as `'1'` / `'0'`
 	 * and mirrors the change into Freemius. On first opt-in, when the site
 	 * is still anonymous and has no install, `opt_in()` registers it and
 	 * starts sending data; afterwards the choice toggles the per-site
@@ -185,7 +263,7 @@ final class Plugin_Settings_Store {
 	 */
 	public static function apply_share_statistics_consent( bool $opted_in ): bool {
 		$before_option = get_option( 'fotogrids_share_statistics', null );
-		$update_result = update_option( 'fotogrids_share_statistics', $opted_in );
+		$update_result = self::save_bool( 'fotogrids_share_statistics', $opted_in );
 		$after_option  = get_option( 'fotogrids_share_statistics', null );
 
 		$fs_before = self::probe_freemius_state();
@@ -349,7 +427,7 @@ final class Plugin_Settings_Store {
 	 */
 	public static function apply_marketing_consent( bool $allowed ): bool {
 		$before = (bool) get_option( 'fotogrids_marketing_allowed', false );
-		update_option( 'fotogrids_marketing_allowed', $allowed );
+		self::save_bool( 'fotogrids_marketing_allowed', $allowed );
 
 		// Idempotent: nothing changed, so skip the Freemius API round-trip.
 		if ( $before === $allowed ) {

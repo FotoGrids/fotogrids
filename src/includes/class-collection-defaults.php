@@ -1191,10 +1191,7 @@ class Collection_Defaults {
 			'navigation_show_back_button'                  => true,
 			'navigation_back_button_show_album_name'       => true,
 			'display_exif'                                 => false,
-			'exif_camera'                                  => true,
-			'exif_aperture'                                => true,
-			'exif_shutter_speed'                           => true,
-			'exif_iso'                                     => true,
+			'exif_fields'                                  => \FotoGrids\Exif\Exif_Fields::DEFAULT_FIELDS,
 		);
 
 		$defaults = self::process_defaults_array( $defaults, $is_defaults_page );

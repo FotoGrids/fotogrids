@@ -26,6 +26,8 @@ const renderEntry = (entry) => {
                     message={ options.message }
                     confirmLabel={ options.confirmLabel }
                     cancelLabel={ options.cancelLabel }
+                    confirmVariant={ options.confirmVariant }
+                    cancelVariant={ options.cancelVariant }
                     requireText={ options.requireText }
                     busy={ options.busy }
                 />

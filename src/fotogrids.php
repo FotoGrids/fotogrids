@@ -48,6 +48,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-post-types.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-rest.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-statistics.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-usage-reporter.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-object-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-metadata-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-fotogrids-cache.php';
@@ -65,6 +66,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-regenera
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-collection-defaults.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-password-crypto.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-screen.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-loading-indicator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-settings-localizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-debug-log.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-partial-expander.php';
@@ -102,6 +104,9 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-registrar.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoints.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-collection-save-pipeline.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-fields.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-formatter.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-reader.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-extractor.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/albums/class-album-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-array-field.php';
@@ -136,6 +141,7 @@ function fotogrids_init() {
 	FotoGrids\FotoGrids_Cache::init();
 	FotoGrids\License_Manager::init();
 	FotoGrids\Image_Size_Manager::init();
+	FotoGrids\Usage_Reporter::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
 
 	require_once FOTOGRIDS_PLUGIN_DIR . 'includes/diagnostics/class-js-error-endpoint.php';

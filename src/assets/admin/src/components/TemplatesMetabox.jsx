@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Select from './shared/Select';
 import { Button } from './shared/Button';
 import Icon from './shared/Icon';
+import LoadingIcon from './shared/LoadingIcon';
 
 const { __ } = wp.i18n;
 
@@ -228,9 +229,13 @@ const TemplatesMetabox = () => {
     const body = (
         <>
             {loading ? (
-                <div className="fotogrids-templates-metabox__loading">
-                    <span className="spinner fg-is-active"></span>
-                    <p>{strings.loading}</p>
+                <div className="fotogrids-loading-screen fotogrids-templates-metabox__loading">
+                    <span className="fotogrids-loading-screen__icon">
+                        <LoadingIcon size="100%" />
+                    </span>
+                    <p className="fotogrids-loading-screen__label">
+                        {strings.loading}
+                    </p>
                 </div>
             ) : (
                 <>

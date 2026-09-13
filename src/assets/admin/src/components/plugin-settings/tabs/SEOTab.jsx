@@ -282,6 +282,7 @@ const SEOTab = () => {
                 status={status}
                 onSave={handleSave}
                 onDiscard={handleDiscard}
+                watch={settings}
             />
         </div>
     );

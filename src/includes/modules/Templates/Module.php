@@ -270,16 +270,26 @@ class Module extends Abstract_Module {
 			return;
 		}
 
-		// Depend on fotogrids-admin so the shared admin runtime + design-system
-		// CSS load alongside the page bundle (parity with how Tools depend on
-		// it). Admin_Init enqueues fotogrids-admin at priority 10; this runs at
-		// 20, so the dependency resolves.
+		// Deliberately not dependent on fotogrids-admin: that bundle is four
+		// times the size of this one, and waiting for it delays the mount by
+		// its whole download. Admin_Init enqueues it on this screen anyway, and
+		// the globals it defines are read from click handlers, by which time it
+		// has run. The stylesheet below still depends on it.
 		wp_enqueue_script(
 			'fotogrids-module-templates-page',
 			$this->module_asset_url( 'assets/templates-page.js' ),
-			array( 'wp-element', 'wp-api-fetch', 'wp-i18n', 'fotogrids-admin' ),
+			array( 'wp-element', 'wp-api-fetch', 'wp-i18n' ),
 			FOTOGRIDS_VERSION,
 			true
+		);
+
+		// The page reads the licence state while it mounts. fotogridsSettings is
+		// attached to the admin bundle's handle, which this script no longer
+		// waits for, so the flag travels with the page bundle instead.
+		wp_localize_script(
+			'fotogrids-module-templates-page',
+			'fotogridsTemplatesPage',
+			array( 'isPro' => \FotoGrids\License_Manager::has_pro() )
 		);
 
 		wp_enqueue_style(
@@ -310,7 +320,7 @@ class Module extends Abstract_Module {
 			'proSaveDescriptionAlbum'    => __( 'With a {pro_badge} license, you will be able to save the current album settings as a reusable template and apply it across multiple albums.', 'fotogrids' ),
 			'dismiss'                    => __( 'Dismiss', 'fotogrids' ),
 			'upgradeToPro'               => __( 'Upgrade to Pro', 'fotogrids' ),
-			'loading'                    => __( 'Loading templates...', 'fotogrids' ),
+			'loading'                    => __( 'Loading templates', 'fotogrids' ),
 			'noTemplates'                => __( 'No templates available', 'fotogrids' ),
 			'templateApplied'            => __( 'Template applied successfully', 'fotogrids' ),
 			'templateSaved'              => __( 'Template saved successfully', 'fotogrids' ),

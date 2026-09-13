@@ -29,11 +29,11 @@
     "sourceMap": true
   },
   "include": [
-    "src/assets/admin/src/index-simple.tsx",
-    "src/assets/admin/src/blocks/gallery-block-simple.tsx",
-    "src/assets/admin/src/components/blocks/*-simple.tsx",
-    "src/assets/admin/src/types/wordpress.d.ts",
+    "src/assets/admin/src/**/*",
+    "src/assets/admin/plain/**/*",
     "src/assets/frontend/src/**/*",
+    "tests/**/*.ts",
+    "playwright.config.ts",
     "**/*.d.ts"
   ],
   "exclude": [

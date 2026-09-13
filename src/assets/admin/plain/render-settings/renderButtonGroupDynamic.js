@@ -12,113 +12,17 @@ const ButtonGroupDynamicComponent = ({
 	__,
 	renderAdditionalContent,
 }) => {
-	const getInitialOptions = () => {
-		let initialOptions = setting.fallback_options || [];
-		if (
-			setting.append_option &&
-			!initialOptions.find(
-				(opt) => opt.value === setting.append_option.value
-			)
-		) {
-			initialOptions = [...initialOptions, setting.append_option];
-		}
-		return initialOptions;
-	};
-
-	const [options, setOptions] = React.useState(getInitialOptions());
-	const [loading, setLoading] = React.useState(true);
-
-	React.useEffect(() => {
-		const fetchOptions = async () => {
-			try {
-				const response = await fetch(setting.api_endpoint, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-WP-Nonce': window.wpApiSettings?.nonce || '',
-					},
-				});
-
-				if (response.ok) {
-					const data = await response.json();
-					let fetchedOptions = data[setting.options_key] || [];
-
-					if (
-						setting.exclude_values &&
-						setting.exclude_values.length > 0
-					) {
-						fetchedOptions = fetchedOptions.filter(
-							(option) =>
-								!setting.exclude_values.includes(option.value)
-						);
-					}
-
-					fetchedOptions = fetchedOptions.map((option) => {
-						if (option.width && option.height) {
-							option.note = `${option.width}x${option.height}`;
-						} else if (option.value === 'full') {
-							option.note = __('Original', 'fotogrids');
-						}
-						return option;
-					});
-
-					if (
-						setting.append_option &&
-						!fetchedOptions.find(
-							(opt) => opt.value === setting.append_option.value
-						)
-					) {
-						fetchedOptions.push(setting.append_option);
-					}
-
-					setOptions(fetchedOptions);
-				} else {
-					console.warn(
-						'FotoGrids: Failed to fetch dynamic options, using fallback'
-					);
-					let fallbackOptions = setting.fallback_options || [];
-
-					if (
-						setting.append_option &&
-						!fallbackOptions.find(
-							(opt) => opt.value === setting.append_option.value
-						)
-					) {
-						fallbackOptions = [
-							...fallbackOptions,
-							setting.append_option,
-						];
-					}
-
-					setOptions(fallbackOptions);
+	const { options, loading } =
+		window.FotoGridsDynamicOptions.useDynamicOptions(setting, {
+			decorate: (option) => {
+				if (option.width && option.height) {
+					option.note = `${option.width}x${option.height}`;
+				} else if (option.value === 'full') {
+					option.note = __('Original', 'fotogrids');
 				}
-			} catch (error) {
-				console.warn(
-					'FotoGrids: Error fetching dynamic options:',
-					error
-				);
-				let fallbackOptions = setting.fallback_options || [];
-
-				if (
-					setting.append_option &&
-					!fallbackOptions.find(
-						(opt) => opt.value === setting.append_option.value
-					)
-				) {
-					fallbackOptions = [
-						...fallbackOptions,
-						setting.append_option,
-					];
-				}
-
-				setOptions(fallbackOptions);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchOptions();
-	}, [setting.api_endpoint, setting.options_key, setting.exclude_values, __]);
+				return option;
+			},
+		});
 
 	if (loading) {
 		const settingState =

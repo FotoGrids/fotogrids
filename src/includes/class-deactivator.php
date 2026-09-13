@@ -46,6 +46,10 @@ class Deactivator {
 			\FotoGrids\FotoGrids_Cache::flush_all();
 		}
 
+		foreach ( \FotoGrids\Hooks\Actions_Cron::ALL_CRON_ACTIONS as $hook ) {
+			wp_clear_scheduled_hook( $hook );
+		}
+
 		self::clear_transients();
 
 		// Let lifecycle modules clear their own scheduled events / transient

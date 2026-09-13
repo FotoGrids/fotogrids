@@ -47,7 +47,7 @@ final class Filters_Data {
 	 * @since 1.0.0
 	 * @param array<string, string> $exif_data      Field key => display value.
 	 * @param string[]              $enabled_fields Field keys requested.
-	 * @param array<string, mixed>  $image_meta     Raw wp_read_image_metadata().
+	 * @param array<string, mixed>  $exif_tags      Raw EXIF tag map from Exif_Reader.
 	 * @param int                   $attachment_id  Attachment ID.
 	 */
 	public const EXIF_EXTRACT = 'fotogrids/data/exif/extract';
