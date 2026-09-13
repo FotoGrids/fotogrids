@@ -33,11 +33,43 @@ jobs:
         run: npm run type-check
 
   # ---------------------------------------------------------------------------
-  # Jest unit + integration tests with coverage (threshold lives in jest.config.js).
-  # Also runs the render CI guards and the standalone PHP integration scripts,
-  # which is exactly what `npm run test:ci` does locally.
+  # Source guards, render guards and the standalone PHP integration scripts.
+  # These have their own job so a guard failure reports under its own name: when
+  # they ran inside the Jest job, a tripped guard surfaced as "Jest tests"
+  # failing and read as a broken test.
+  # No dependency install - every guard is bash, grep and php, so `npm ci` would
+  # buy nothing. The Node setup is only there to run `npm run`, which keeps the
+  # list of guards in package.json rather than duplicated here.
   # FOTOGRIDS_REQUIRE_PHP_TESTS forces the PHP integration step to fail (rather
   # than skip) if php is unavailable - the runner has php, so it must run.
+  # ---------------------------------------------------------------------------
+  guards:
+    name: Guards
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '18'
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: Run guards
+        env:
+          FOTOGRIDS_REQUIRE_PHP_TESTS: '1'
+        run: npm run test:ci:guards
+
+  # ---------------------------------------------------------------------------
+  # Jest unit + integration tests with coverage (threshold lives in jest.config.js).
+  # Needs no php: the guards that did now run in their own job above.
   # ---------------------------------------------------------------------------
   js-test:
     name: Jest tests
@@ -50,16 +82,8 @@ jobs:
       - name: Set up Node and dependencies
         uses: ./.github/actions/setup-node-deps
 
-      - name: Set up PHP 8.1
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          coverage: none
-
-      - name: Run test suite (guards + PHP integration + Jest coverage)
-        env:
-          FOTOGRIDS_REQUIRE_PHP_TESTS: '1'
-        run: npm run test:ci
+      - name: Run Jest with coverage
+        run: npm run test:ci:jest
 
       - name: Upload coverage report
         if: always()

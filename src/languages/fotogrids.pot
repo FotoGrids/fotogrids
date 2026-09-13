@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-13T09:49:19+00:00\n"
+"POT-Creation-Date: 2026-09-13T11:42:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -17,6 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: fotogrids.php
+#: includes/catalog/catalog-strings.php:357
 #: includes/class-admin-init.php:70
 #: includes/class-admin-init.php:71
 #: includes/diagnostics/class-system-report.php:50
@@ -42,20 +43,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:245
+#: fotogrids.php:246
 msgid "FotoGrids requires WordPress version 6.1 or higher."
 msgstr ""
 
-#: fotogrids.php:246
-#: fotogrids.php:255
+#: fotogrids.php:247
+#: fotogrids.php:256
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:254
+#: fotogrids.php:255
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:270
+#: fotogrids.php:271
 #: includes/class-admin-init.php:135
 #: includes/class-admin-init.php:136
 #: includes/tools/import-export/assets/ImportExportTool.jsx:45
@@ -63,11 +64,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:288
+#: fotogrids.php:289
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:313
+#: fotogrids.php:314
 #: assets/admin/src/components/dashboard/LearnSection.jsx:56
 msgid "Help Center"
 msgstr ""
@@ -100,7 +101,8 @@ msgid "Album"
 msgstr ""
 
 #: includes/admin/class-admin-columns.php:92
-#: includes/admin/class-settings-localizer.php:275
+#: includes/admin/class-settings-localizer.php:276
+#: includes/catalog/catalog-strings.php:464
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:78
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:151
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:186
@@ -120,6 +122,7 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:94
 #: includes/admin/class-admin-columns.php:215
 #: includes/admin/class-dashboard-widget.php:172
+#: includes/catalog/catalog-strings.php:439
 #: includes/metaboxes/class-metabox-registrar.php:871
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:16
 #: assets/admin/src/components/pages/StatsPage.jsx:208
@@ -359,19 +362,22 @@ msgstr ""
 msgid "Please share the reason"
 msgstr ""
 
-#: includes/admin/class-settings-localizer.php:276
+#: includes/admin/class-settings-localizer.php:277
+#: includes/catalog/catalog-strings.php:738
 #: includes/class-upgrade-modal.php:52
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:206
 msgid "Styling"
 msgstr ""
 
-#: includes/admin/class-settings-localizer.php:277
+#: includes/admin/class-settings-localizer.php:278
+#: includes/catalog/catalog-strings.php:291
 msgid "Effects"
 msgstr ""
 
-#: includes/admin/class-settings-localizer.php:278
+#: includes/admin/class-settings-localizer.php:279
+#: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-registrar.php:880
-#: assets/admin/plain/collection-settings.js:2309
+#: assets/admin/plain/collection-settings.js:2276
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -379,10 +385,10 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: includes/admin/class-settings-localizer.php:279
+#: includes/admin/class-settings-localizer.php:280
 #: includes/metaboxes/class-metabox-registrar.php:882
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2433
+#: assets/admin/plain/collection-settings.js:2400
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -401,6 +407,3526 @@ msgstr ""
 #: assets/admin/src/components/pages/TemplatesPage.jsx:391
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:379
 msgid "Pro"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:20
+msgid "\"All\" Label"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:21
+msgid "0 = square, 50% equivalent = circle"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:22
+msgid "180 Days"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:23
+msgid "1px line drawn between options. Set to transparent to hide."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:24
+#: assets/admin/src/components/pages/StatsPage.jsx:78
+msgid "30 Days"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:25
+msgid "365 Days"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:26
+#: assets/admin/src/components/pages/StatsPage.jsx:79
+msgid "90 Days"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:27
+msgid "<strong>Full Lightbox:</strong> an immersive viewer with whole-gallery navigation, thumbnails, and an info panel.<br><strong>Lightbox Mini:</strong> a single image in a lightweight overlay with previous / next arrows and a close button.<br><strong>Lightbox Grid:</strong> every image in a scrollable grid with minimal chrome."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:28
+msgid "A max number of lines of text to display. A value of zero will not apply a limit."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:29
+msgid "A mosaic magazine-style layout where items span different numbers of rows and columns."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:30
+msgid "A-Z"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:31
+msgid "AJAX Navigation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:32
+msgid "About Page Trailing Row"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:33
+msgid "About the Show All button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:34
+msgid "Accelerate your {postType.plural.lower} with lightning-fast CDN delivery."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:35
+msgid "Action on Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:36
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:107
+msgid "Active"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:37
+msgid "Add 'Add to Cart' and 'View Product' buttons directly to gallery items. Turn viewers into buyers instantly."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:38
+msgid "Add Border"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:39
+msgid "Add Corner Radius"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:40
+msgid "Add Shadow"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:41
+msgid "Add Sticker"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:42
+msgid "Adds a fullscreen button to the lightbox toolbar."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:43
+msgid "Adds a play/pause toggle button in the lightbox toolbar so visitors can control auto progress themselves."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:44
+msgid "Adds invisible structured data (schema.org BreadcrumbList) so Google can show your breadcrumb trail directly in search results. Turn off if your SEO plugin (Yoast, Rank Math) already handles this for these pages."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:45
+msgid "Adds zoom in and zoom out buttons to the lightbox toolbar."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:46
+msgid "Adjustment Window"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:47
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:17
+msgid "Administrator"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:48
+msgid "Advance to Next Item After Video Ends"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:50
+msgid "Advanced EXIF & Metadata Filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:51
+msgid "Advanced Multi-Criteria Sorting"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:52
+msgid "Advanced Video Controls"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:53
+msgid "Advanced custom captions with HTML and dynamic placeholders."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:54
+msgid "After the last item, loop back to the first. When off, navigation stops at each end."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:55
+msgid "After the last item, return to the first."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:56
+msgid "After the page loads, the browser asks FotoGrids for a fresh selection. Because that request happens after the page was served, no cache of any kind can affect it. Costs one small request per visit, which loads the {postType.lower} only and not the whole page."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:57
+msgid "Alias"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:58
+#: public/render/filters/features/ui/class-filter-ui.php:678
+#: public/render/filters/features/ui/class-filter-ui.php:845
+msgid "All"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:59
+msgid "Allow Users to Change Sort Order"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:60
+msgid "Allow Zooming Beyond Original Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:61
+msgid "Allow visitors to drag the thumbnail strip with a mouse on desktop."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:62
+msgid "Allow visitors to filter {postType} items by selected criteria"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:63
+msgid "Allow visitors to stay unlocked across sessions using a cookie."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:64
+msgid "Allow visitors to swipe the thumbnail strip on touch devices."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:65
+msgid "Allow visitors to zoom into images in the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:66
+msgid "Allow visitors to zoom into the image on hover or click."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:67
+msgid "Also show the breadcrumb trail when a visitor lands on a Gallery directly (not from this Album) - as long as the Gallery belongs to this Album only. Helpful for SEO and shareable links. Off by default because some sites prefer breadcrumbs only when there's a real visit context."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:68
+msgid "Always Visible"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:69
+msgid "Animate Images"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:70
+#: includes/exif/class-exif-fields.php:82
+msgid "Aperture"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:71
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:90
+msgid "Appearance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:72
+msgid "Apply custom Max Width and Background Color to this {postType.lower}'s view page instead of the site defaults."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:73
+msgid "Apply watermark to this {postType}"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:74
+msgid "Approximate height of each row. Actual row heights vary slightly so images can fill the row."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:75
+msgid "Arrow Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:76
+msgid "Arrow Colors"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:77
+msgid "Arrow Distance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:78
+msgid "Arrow Icon Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:79
+msgid "Arrow Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:80
+msgid "Arrows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:81
+msgid "Arrows Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:82
+msgid "Arrows Visibility"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:83
+msgid "As arranged in Manage Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:84
+msgid "At First and Last Item"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:85
+#: includes/diagnostics/class-system-report.php:369
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:19
+msgid "Author"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:86
+#: includes/exif/class-exif-formatter.php:249
+#: includes/exif/class-exif-formatter.php:326
+msgid "Auto"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:87
+msgid "Auto Clear Cache"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:88
+msgid "Auto Progress"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:89
+msgid "Auto sizes the viewport from the Item Aspect Ratio and the number of items per view. Fixed uses an explicit pixel height."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:90
+msgid "Auto-detect SEO plugin"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:91
+msgid "Automatically advance between items."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:92
+msgid "Automatically clear cache when settings are updated."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:93
+msgid "Automatically move to the next gallery item when the current video finishes playing."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:94
+msgid "Automatically optimize all your gallery images for faster loading, smaller file sizes, and better user experience without any manual work."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:95
+msgid "Automatically start playing a video when a visitor navigates to it inside the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:96
+msgid "Automatically start playing the video when the lightbox opens on it."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:97
+#: includes/metaboxes/class-metabox-registrar.php:848
+msgid "Autoplay"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:98
+msgid "Autoplay When Lightbox Opens"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:99
+msgid "Autoplay When Navigating to Video"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:100
+msgid "Back Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:101
+msgid "Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:102
+msgid "Background Blur Intensity"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:103
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:299
+msgid "Background Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:104
+msgid "Background Settings"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:105
+msgid "Background color for the gallery view page."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:106
+msgid "Background colour of the filter panel itself"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:107
+msgid "Background of the whole popover panel."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:108
+msgid "Badge"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:109
+msgid "Badge States"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:110
+msgid "Bar Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:111
+msgid "Blur"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:112
+msgid "Blur Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:113
+msgid "Border"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:114
+msgid "Border Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:115
+msgid "Border Radius"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:116
+msgid "Border Settings"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:117
+msgid "Border Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:118
+msgid "Border Width"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:119
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:282
+msgid "Bottom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:120
+msgid "Box"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:121
+msgid "Box Shadow"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:122
+msgid "Boxed"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:123
+msgid "Breadcrumb Source"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:124
+msgid "Breadcrumbs"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:125
+msgid "Break into Pages"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:126
+msgid "Breathing room between the image and the viewport edges."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:127
+msgid "Brightness"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:128
+msgid "Brightness Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:129
+msgid "Built-in Image Optimizer for peak performance."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:130
+msgid "Bullet Alignment"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:131
+msgid "Bullet Colors"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:132
+msgid "Bullet Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:133
+msgid "Bullets"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:134
+msgid "Bullets Distance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:135
+msgid "Bullets Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:136
+msgid "Bullets Visibility"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:137
+msgid "Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:138
+msgid "Button Alignment"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:139
+msgid "Button Colors"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:140
+msgid "Button Icon"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:141
+msgid "Button Label"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:142
+msgid "Button Position"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:143
+msgid "Button States"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:144
+msgid "Button Text"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:145
+msgid "Buttons"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:146
+msgid "By default this {postType.lower} inherits the site-wide sharing settings. Turn this on to customise sharing just for this {postType.lower}."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:147
+msgid "Cache Duration"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:148
+msgid "Cache Status"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:149
+msgid "Cache rendered {postType.lower} HTML to improve performance on subsequent loads."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:150
+msgid "Caching"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:151
+msgid "Caching applies to regular visitors only."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:152
+#: includes/exif/class-exif-fields.php:61
+msgid "Camera"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:153
+msgid "Canonical URL Override"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:154
+msgid "Cap the width of the gallery view page content area."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:155
+msgid "Cap the width of the grid content area."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:156
+#: includes/metaboxes/class-metabox-registrar.php:752
+#: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:136
+msgid "Caption"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:157
+msgid "Caption Alignment"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:158
+msgid "Caption Distance from Media"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:159
+msgid "Caption Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:160
+msgid "Caption Placement"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:161
+msgid "Caption Source"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:162
+msgid "Caption Type"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:163
+msgid "Caption Visibility"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:164
+#: includes/metaboxes/class-metabox-registrar.php:853
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:131
+msgid "Captions"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:165
+msgid "Carousel"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:166
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:116
+msgid "Center"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:167
+msgid "Change the horizontal alignment of the thumbnail captions."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:168
+msgid "Change the vertical alignment of the caption inside the overlay."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:169
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:280
+msgid "Check out {title} - {url}"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:170
+msgid "Checkbox States"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:171
+msgid "Checkboxes"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:172
+msgid "Checked"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:173
+msgid "Checkmark"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:174
+msgid "Choose a color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:175
+msgid "Choose between fixed number of columns or auto-responsive columns"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:176
+msgid "Choose how long to retain statistics data before cleanup."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:177
+msgid "Choose when the caption is shown. Some hover effects manage caption visibility themselves and override this setting."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:178
+msgid "Choose whether FotoGrids renders the breadcrumb itself or hands rendering off to your SEO plugin. \"Auto-detect\" picks the active SEO plugin (Yoast, Rank Math, SEOPress) when present and falls back to FotoGrids otherwise."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:179
+msgid "Choose which blocks appear in the info panel. Drag to reorder."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:180
+msgid "Choose which image appears in social previews for this album."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:181
+msgid "Choose which image appears in social previews for this {postType}."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:182
+msgid "Clean Row Threshold"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:183
+msgid "Click"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:184
+msgid "Close Lightbox on Background Click"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:185
+msgid "Closed"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:186
+msgid "Color of the tick mark inside a checked box"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:187
+msgid "Column Width Range"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:188
+msgid "Column-major"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:189
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:128
+msgid "Columns"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:190
+msgid "Columns Mode"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:191
+msgid "Complete checkout integration - items added from galleries maintain all product data, variations, and pricing in cart and orders."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:192
+msgid "Conflicts with Image Zoom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:193
+msgid "Conflicts with Item Click Behavior"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:194
+msgid "Contain"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:195
+msgid "Contrast"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:196
+msgid "Contrast Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:197
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:20
+msgid "Contributor"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:198
+msgid "Control who can edit gallery and album posts"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:199
+msgid "Control who can view gallery and album posts"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:200
+msgid "Controls how this view page appears in Google, Bing and other search engines."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:201
+msgid "Controls the alignment of all pagination controls (Previous/Next buttons and page numbers)"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:202
+msgid "Controls the title, description and image that appear when someone shares this view page on Facebook, X, LinkedIn, WhatsApp, iMessage or any other platform that reads Open Graph tags. Empty fields inherit the site-wide default."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:203
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:23
+msgid "Copy Link"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:204
+msgid "Copyright / Credit"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:205
+msgid "Count Badge"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:206
+msgid "Cover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:207
+msgid "Credit Source"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:208
+msgid "Crop Alignment"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:209
+msgid "Crosshair"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:210
+msgid "Cursor Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:211
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:198
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:286
+msgid "Custom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:212
+msgid "Custom Button Colors"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:213
+msgid "Custom Duration"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:214
+msgid "Custom Fields"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:215
+msgid "Custom Full Image Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:216
+msgid "Custom Image"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:217
+msgid "Custom OG Description"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:218
+msgid "Custom OG Image"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:219
+msgid "Custom OG Title"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:220
+msgid "Custom Ratio"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:221
+msgid "Custom Theme"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:222
+msgid "Custom Thumbnail Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:223
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:271
+msgid "Custom share text"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:224
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:354
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:260
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:282
+msgid "Dark"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:225
+msgid "Dashed"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:226
+msgid "Data Management"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:227
+#: includes/tools/import-export/assets/ImportExportTool.jsx:655
+msgid "Date"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:228
+msgid "Date Created"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:229
+msgid "Date Filter Type"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:230
+#: includes/exif/class-exif-fields.php:159
+msgid "Date Taken"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:231
+msgid "Date Type"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:232
+msgid "Date Updated"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:233
+msgid "Date Uploaded"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:234
+msgid "Decorative tape strip across the top of each item."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:235
+#: assets/admin/plain/render-settings/renderColorPicker.js:313
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:555
+#: assets/admin/plain/render-settings/renderFontFamily.js:345
+#: assets/admin/plain/render-settings/renderFontWeight.js:40
+msgid "Default"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:236
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:185
+msgid "Default Link Target"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:237
+msgid "Default Panel State"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:238
+msgid "Default Sort Order"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:239
+msgid "Delay"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:240
+#: includes/metaboxes/class-metabox-registrar.php:753
+msgid "Description"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:241
+msgid "Description Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:242
+msgid "Description Font Family"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:243
+msgid "Description Font Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:244
+msgid "Description Font Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:245
+msgid "Description Font Weight"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:246
+msgid "Description Letter Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:247
+msgid "Description Line Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:248
+msgid "Description Source"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:249
+msgid "Description Word Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:250
+msgid "Dim"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:251
+msgid "Direct Add to Cart"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:252
+msgid "Direct Link to Item"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:253
+msgid "Disable Right Click"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:254
+msgid "Disable sharing for this {postType}"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:255
+msgid "Display"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:256
+msgid "Display EXIF Data"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:257
+msgid "Display Mode"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:258
+msgid "Display a caption below the image."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:259
+msgid "Display a clickable trail (Album › Gallery) above the Gallery so visitors can navigate back to this Album."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:260
+msgid "Display a prominent Back button above the Gallery so visitors can return to this Album in one click."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:261
+msgid "Display and purchase product variations (colors, sizes, options) directly from the lightbox. Complete shopping experience."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:262
+msgid "Display at"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:263
+msgid "Display image details (caption, description, EXIF, and more) alongside the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:264
+msgid "Display the number of matching items next to each filter option"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:265
+msgid "Distance From Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:266
+msgid "Distance between Stage and Bar"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:267
+msgid "Distance between Title and Description"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:268
+msgid "Distraction-free single-image view with subtle controls - built to keep focus on the photo."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:269
+msgid "Divided"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:270
+msgid "Do Nothing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:271
+msgid "Dotted"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:272
+msgid "Double"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:273
+msgid "Double-Click"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:274
+msgid "Download Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:275
+msgid "Drag Thumbnails"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:276
+msgid "Drop"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:277
+msgid "Dropdowns"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:278
+msgid "E-commerce"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:279
+#: includes/metaboxes/class-metabox-registrar.php:934
+msgid "EXIF"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:280
+msgid "EXIF Copyright"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:281
+msgid "EXIF Data"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:282
+msgid "Each item is randomly tilted between minus and plus this angle. Set to 0 to keep all items straight."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:283
+msgid "Ease"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:284
+msgid "Ease In"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:285
+msgid "Ease In Out"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:286
+msgid "Ease Out"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:287
+msgid "Easing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:288
+msgid "Edge Offset"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:289
+msgid "Edit Permissions"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:290
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:18
+msgid "Editor"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:292
+msgid "Elevation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:293
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:22
+msgid "Email"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:294
+msgid "Embed videos from your WordPress Media Library and mix them with images to build richer galleries."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:295
+msgid "Embedded Galleries"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:296
+msgid "Embedded video player paired with a thumbnail playlist for video-led galleries."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:297
+msgid "Emit BreadcrumbList Schema (SEO)"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:298
+msgid "Enable Auto Progress"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:299
+msgid "Enable Autoplay"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:300
+msgid "Enable Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:301
+msgid "Enable Border"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:302
+msgid "Enable Filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:303
+msgid "Enable Image Filter"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:304
+msgid "Enable Image Zoom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:305
+msgid "Enable Lazy Loading"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:306
+msgid "Enable Premium Video Lightbox and Video Playlist Layout with enhanced navigation."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:307
+msgid "Enable Shadow"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:308
+msgid "Enable Shadow on Full Image"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:309
+msgid "Enable Statistics Tracking"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:310
+msgid "Enable Zoom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:311
+msgid "Enable {postType} Cache"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:312
+msgid "End"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:313
+msgid "Endless Scroll"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:314
+msgid "Equal-height rows that fill each line edge-to-edge. Great for big galleries of mixed proportions."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:315
+msgid "Evenly spaced items in straight rows and columns - the classic, predictable, clean look."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:316
+msgid "Exclude"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:317
+msgid "Exif"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:318
+msgid "Existing images may need regenerating"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:319
+#: includes/metaboxes/class-metabox-registrar.php:956
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:411
+msgid "External URL"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:320
+msgid "Eye-catching sale badges, discount ribbons, and dynamic pricing display. Show prices, stock status, and compare-at prices."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:321
+msgid "FG Full"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:322
+msgid "FG Thumbnail"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:323
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:15
+msgid "Facebook"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:324
+msgid "Fade"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:325
+msgid "Fade the sticker out when the visitor hovers over the item."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:326
+msgid "Fast"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:327
+msgid "Featured Gallery"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:328
+msgid "Featured Image Side"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:329
+msgid "Featured Item"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:330
+msgid "Featured Item Layout"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:331
+msgid "Fields to Display"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:332
+msgid "File Info"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:333
+msgid "File Name"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:334
+msgid "Fill with Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:335
+msgid "Filter By"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:336
+msgid "Filter Controls"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:337
+msgid "Filter Panel Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:338
+msgid "Filter Panel Border Radius"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:339
+msgid "Filter Panel Padding"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:340
+msgid "Filter Settings"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:341
+msgid "Filter Types"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:342
+msgid "Filter by camera settings (ISO, aperture, shutter speed), file properties (size, dimensions), and other EXIF data to find exactly what you're looking for."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:343
+msgid "Filter {postType.lower.plural} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:344
+msgid "Filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:345
+msgid "Fit Media to Screen"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:346
+msgid "Fixed"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:347
+msgid "Fixed Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:348
+msgid "Fixed number of columns for each device"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:349
+msgid "Flexible, highly interactive slider with full control over items per view, timing, and navigation."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:350
+#: includes/exif/class-exif-fields.php:103
+msgid "Focal Length"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:351
+msgid "Focus"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:352
+msgid "Font Family"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:353
+msgid "Font Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:354
+msgid "Font Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:355
+msgid "Font Weight"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:356
+msgid "Forever"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:358
+msgid "FotoGrids editors and preview mode always see live, uncached output. Regular logged-in users are served from cache."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:359
+msgid "FotoGrids picks a new selection while building the page, skips its own cache for this {postType.lower}, and asks your site's page cache not to store the result. Some caching plugins and CDNs ignore that request, so check a live page afterwards. Choose this only if the order has to change for visitors with JavaScript turned off."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:360
+msgid "Frame Thickness"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:361
+#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:529
+msgid "Full"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:362
+msgid "Full Image"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:363
+msgid "Full Image Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:364
+msgid "Full Image Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:365
+msgid "Full Images"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:366
+msgid "Full Lightbox"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:367
+msgid "Full Width Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:368
+msgid "Full WooCommerce sync - automatically update galleries when products change. Dynamic product galleries that stay current."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:369
+msgid "Fully random each visit"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:370
+msgid "Gap Between Bar and {postType}"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:371
+msgid "Gap Between Controls"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:372
+msgid "Gap Between Groups"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:373
+msgid "Gap between the button and the edges of its corner."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:374
+msgid "Gap to Label"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:375
+msgid "General"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:376
+msgid "Get deeper playback controls, richer behavior options, and advanced video customization."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:377
+#: public/render/decorators/hover/class-hover-effects-catalog.php:99
+msgid "Grayscale"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:378
+msgid "Grayscale Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:379
+msgid "Grid"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:380
+msgid "Grid Item Aspect Ratio"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:381
+msgid "Grid Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:382
+msgid "Hard Crop"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:383
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1372
+#: assets/admin/src/components/shared/settings/DimensionsField.jsx:29
+msgid "Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:384
+msgid "Height (0 = proportional)"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:385
+msgid "Height Mode"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:386
+msgid "Hero image plus thumbnail strip, built for shop and product pages - the perfect e-commerce companion."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:387
+msgid "Hide"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:388
+msgid "Hide Arrows at First and Last Item"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:389
+msgid "Hide all share controls on this {postType}, even though sharing is enabled site-wide."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:390
+msgid "Hide description"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:391
+msgid "Hide from search engines"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:392
+msgid "Hide on Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:393
+msgid "Hide title"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:394
+msgid "Hides the previous arrow on the first item and the next arrow on the last when loop is off."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:395
+msgid "Horizontal"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:396
+msgid "Horizontal Offset"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:397
+msgid "Horizontal strip of items the visitor can slide or swipe through - compact and touch-friendly."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:398
+msgid "Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:399
+msgid "Hover Delay"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:400
+msgid "Hover Effect"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:401
+msgid "Hover Effects"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:402
+msgid "Hover effects and your styling"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:403
+msgid "How each item reacts when the visitor hovers over it."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:404
+msgid "How far the actual items-per-page count is allowed to drift from the configured value. 20% of a 20-item page means 16 to 24 items."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:405
+msgid "How items are sorted when the {postType.lower} is loaded."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:406
+msgid "How long to cache {postType.lower} output (in hours)."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:407
+msgid "How many items are visible in the slider at once for each device."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:408
+msgid "How many items the grid shows beside the featured image."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:409
+msgid "How many slides ahead and behind the current item to preload in the background. Higher values feel faster but use more memory."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:410
+msgid "How much actual row height can deviate from the target. Higher values give more freedom to fit images per row."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:411
+msgid "How the filter controls are displayed"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:412
+msgid "How the image fills its container."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:413
+msgid "How the popover zoom is triggered. Click mode replaces Item Click Behavior."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:414
+msgid "How to choose between adding more items or removing the last few. Auto removes items when the last row is less than half full and adds items when it is more than half full."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:415
+msgid "How to handle the {postType}'s final row when it does not fill the full width. With pagination on, this only applies to the very last page; trailing rows on intermediate pages are controlled by the Pagination tab."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:416
+msgid "How visitors activate zoom. Scroll and pinch always work regardless of this setting."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:417
+msgid "Hue Rotate"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:418
+msgid "Hue Rotation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:419
+#: includes/exif/class-exif-fields.php:96
+msgid "ISO"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:420
+msgid "Icon Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:421
+msgid "Image Filter"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:422
+msgid "Image Shadow Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:423
+msgid "Image Viewer"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:424
+msgid "Image Zoom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:425
+msgid "Image Zoom is set to <strong>Popover</strong> in <strong>Click</strong> mode, which also opens on click. Set Item Click Behavior to something other than the lightbox, or change Image Zoom to Hover mode."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:426
+msgid "Include"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:427
+msgid "Info Block Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:428
+msgid "Info Block Divider"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:429
+msgid "Info Blocks Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:430
+msgid "Info Panel"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:431
+msgid "Info Panel Blocks"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:432
+msgid "Info Panel Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:433
+msgid "Inline"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:434
+msgid "Inline zooms inside the item. Popover opens a lightweight overlay above the page."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:435
+msgid "Inset"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:436
+msgid "Inset: distance from the inner edge. Outset: distance from the outer edge."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:437
+msgid "Instant Photo Effects"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:438
+msgid "Instant Photos"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:440
+msgid "Invert"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:441
+msgid "Invert Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:442
+msgid "Item Alt"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:443
+msgid "Item Aspect Ratio"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:444
+msgid "Item Caption"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:445
+msgid "Item Click Behavior"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:446
+msgid "Item Click Behavior is set to <strong>Open in Lightbox</strong>, so videos open in the same lightbox as your images, with its navigation, thumbnails and captions. The appearance settings below style the minimal video overlay, which this gallery does not use."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:447
+msgid "Item Click Behavior is set to open the lightbox, which also opens on click. Change Image Zoom to <strong>Hover</strong>, or set Item Click Behavior to something other than the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:448
+msgid "Item Counter"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:449
+msgid "Item Credit"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:450
+msgid "Item Description"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:451
+msgid "Item Fit"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:452
+msgid "Item Order"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:453
+msgid "Item Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:454
+msgid "Item Title"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:455
+msgid "Item URLs"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:456
+msgid "Items Per Page"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:457
+msgid "Items Per View"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:458
+msgid "Just This Image"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:459
+#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:516
+msgid "Justified"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:460
+msgid "Justify"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:461
+msgid "Keep Natural"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:462
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:230
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:249
+msgid "Large"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:463
+msgid "Last Row Behavior"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:465
+msgid "Layout & Styling"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:466
+msgid "Layout Type"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:467
+msgid "Lazy Loading"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:468
+msgid "Lead with a featured photo beside a compact grid, reveal everything on Show All."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:469
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:283
+msgid "Left"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:470
+#: includes/exif/class-exif-fields.php:68
+msgid "Lens"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:471
+msgid "Let AI determine the best order for your {postType.lower.plural} based on relevance, popularity, and user engagement patterns."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:472
+msgid "Let visitors zoom in further than the image's actual resolution."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:473
+msgid "Letter Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:474
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:353
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:259
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:278
+msgid "Light"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:475
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:34
+#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:132
+msgid "Lightbox"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:476
+msgid "Lightbox Appearance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:477
+msgid "Lightbox Contents"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:478
+msgid "Lightbox Grid"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:479
+msgid "Lightbox Mini"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:480
+msgid "Lightbox Slide Preload"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:481
+msgid "Lightbox Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:482
+msgid "Lightbox Theme"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:483
+msgid "Limit Description Length"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:484
+msgid "Limit Title Length"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:485
+msgid "Limit the length of the description in thumbnails.<br>This will NOT limit the length of captions from within the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:486
+msgid "Limit the length of the title in thumbnails. This will NOT limit the length of captions from within the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:487
+msgid "Limit the number of rows. 0 means unlimited."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:488
+msgid "Limits how tall the viewport can grow. Use 0 for no limit. Only applies when Height Mode is Auto."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:489
+msgid "Line Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:490
+msgid "Linear"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:491
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:18
+msgid "LinkedIn"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:492
+msgid "Load More Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:493
+msgid "Load images only when they enter the viewport. Improves initial page load time."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:494
+msgid "Loaded Effect"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:495
+msgid "Loading"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:496
+msgid "Loading Effects"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:497
+msgid "Loading Icon"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:498
+msgid "Loading Icon Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:499
+#: includes/metaboxes/class-metabox-registrar.php:764
+#: includes/rest/metadata/library-data.php:69
+msgid "Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:500
+#: includes/metaboxes/class-metabox-registrar.php:851
+msgid "Loop"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:501
+msgid "Loop Gallery"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:502
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:37
+#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:224
+msgid "Maintenance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:503
+#: includes/exif/class-exif-formatter.php:226
+#: includes/exif/class-exif-formatter.php:250
+#: includes/exif/class-exif-formatter.php:327
+msgid "Manual"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:504
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:302
+msgid "Margin"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:505
+#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:510
+msgid "Masonry"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:506
+msgid "Max Content Width"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:507
+msgid "Max Description Characters"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:508
+msgid "Max Description Lines"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:509
+msgid "Max Rows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:510
+msgid "Max Title Characters"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:511
+msgid "Max Title Lines"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:512
+msgid "Max Width"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:513
+msgid "Maximum Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:514
+msgid "Maximum Rotation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:515
+msgid "Maximum number of characters to display in the description."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:516
+msgid "Maximum number of characters to display in the title."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:517
+#: includes/diagnostics/class-system-report.php:54
+#: includes/diagnostics/class-system-report.php:354
+#: includes/metaboxes/class-metabox-registrar.php:940
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:28
+msgid "Media"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:518
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:229
+msgid "Medium"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:519
+msgid "Metadata-Based Sorting"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:520
+msgid "Middle"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:521
+msgid "Mixed Tiles"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:522
+msgid "Mobile Layout"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:523
+msgid "Mobile Optimized"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:524
+msgid "More Video Platforms"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:525
+msgid "Multiple Selection"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:526
+msgid "Navigation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:527
+msgid "Navigation Arrows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:528
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:173
+msgid "Networks"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:529
+#: includes/metaboxes/class-metabox-registrar.php:962
+#: assets/admin/plain/render-settings/renderBulkModal.js:202
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:204
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:573
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:657
+msgid "New Tab"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:530
+msgid "Newest First"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:531
+msgid "Next Button Text"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:532
+#: includes/diagnostics/class-system-report.php:625
+#: assets/admin/plain/render-settings/renderImageSize.js:52
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
+msgid "No"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:533
+msgid "No info panel blocks selected"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:534
+#: includes/diagnostics/class-system-report.php:156
+#: includes/diagnostics/class-system-report.php:171
+#: includes/diagnostics/class-system-report.php:176
+#: includes/diagnostics/class-system-report.php:287
+#: includes/diagnostics/class-system-report.php:288
+#: includes/diagnostics/class-system-report.php:314
+#: includes/diagnostics/class-system-report.php:346
+#: includes/diagnostics/class-system-report.php:526
+#: includes/diagnostics/class-system-report.php:557
+#: public/render/decorators/hover/class-hover-effects-catalog.php:58
+msgid "None"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:535
+#: includes/exif/class-exif-formatter.php:371
+msgid "Normal"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:536
+msgid "Number of Columns"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:537
+msgid "OG Image Source"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:538
+msgid "Oldest First"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:539
+msgid "Only registered users"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:540
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:292
+msgid "Opacity"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:541
+msgid "Opacity Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:542
+msgid "Open"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:543
+msgid "Open Graph & Social Sharing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:544
+msgid "Open in Lightbox"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:545
+msgid "Option States"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:546
+msgid "Optional. Leave empty to use the collection title."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:547
+msgid "Optional. Leave empty to use the post excerpt, then the post content, then a count summary."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:548
+msgid "Optional. Leave empty to use this view page's permalink. Useful when the same {postType} is published under multiple URLs."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:549
+msgid "Options"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:550
+msgid "Organize and filter gallery items by WooCommerce product categories. Create category-specific product showcases."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:551
+msgid "Other Items on Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:552
+msgid "Outset"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:553
+msgid "Overlap"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:554
+msgid "Overlay"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:555
+msgid "Overlay Blur Intensity"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:556
+msgid "Overlay Bottom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:557
+msgid "Overlay Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:558
+msgid "Overlay Top"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:559
+msgid "Override Defaults"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:560
+msgid "Override EXIF display settings for individual images. Customize which fields to show or hide on a per-image basis for complete control."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:561
+msgid "Override sharing for this {postType}"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:562
+msgid "Override the theme's button colors with your own."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:563
+msgid "Padding"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:564
+msgid "Padding around the caption text."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:565
+msgid "Padding inside the Filter Panel itself"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:566
+msgid "Page Buttons"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:567
+msgid "Page Trailing Row"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:568
+msgid "Pagination"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:569
+msgid "Pagination Alignment"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:570
+msgid "Pagination Buttons"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:571
+msgid "Pagination Method"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:572
+msgid "Panel Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:573
+msgid "Password Protect {postType}"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:574
+msgid "Password Protection"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:575
+msgid "Pause On"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:576
+msgid "Pause on Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:577
+#: includes/metaboxes/class-metabox-registrar.php:763
+#: includes/rest/metadata/library-data.php:59
+msgid "People"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:578
+msgid "People & Location Filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:579
+msgid "Per-image EXIF overrides."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:580
+msgid "Performance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:581
+msgid "Permission type"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:582
+msgid "Permissions"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:583
+msgid "Pick how the trailing row of every intermediate page is handled."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:584
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:17
+msgid "Pinterest"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:585
+msgid "Pinterest-style columns that fit items snugly without cropping. Ideal for editorial layouts."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:586
+#: includes/diagnostics/class-system-report.php:242
+msgid "Plain"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:587
+msgid "Play Inline"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:588
+msgid "Pointer"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:589
+msgid "Popover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:590
+msgid "Popover Appearance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:591
+msgid "Popover List"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:592
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:284
+#: assets/admin/src/components/shared/AlignmentGrid.jsx:47
+msgid "Position"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:593
+msgid "Prefer Add"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:594
+msgid "Prefer Remove"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:595
+msgid "Preload Next Page"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:596
+msgid "Preload next page content in the background for even faster navigation."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:597
+msgid "Premium Playback Experience"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:598
+msgid "Previous Button Text"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:599
+msgid "Product Category Filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:600
+msgid "Product Gallery"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:601
+msgid "Product Variations"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:602
+msgid "Progress Bar"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:603
+msgid "Progress Indicator"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:604
+msgid "Progress Indicator Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:605
+msgid "Random"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:606
+msgid "Random on every request"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:607
+msgid "Random order and caching"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:608
+msgid "Random order is decided while the page is built. If that built page is stored and reused, the order is stored with it."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:609
+msgid "Randomize Order"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:610
+msgid "Rank Math"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:611
+msgid "Rating"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:612
+msgid "Recommended size: 1200×630px."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:613
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:21
+msgid "Reddit"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:614
+#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:108
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:248
+msgid "Regular"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:615
+msgid "Remember For (days)"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:616
+msgid "Remember Unlock"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:617
+msgid "Rendered semi-transparently on hover to preview the checked state"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:618
+msgid "Reorder only"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:619
+msgid "Reserve Space for Arrows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:620
+msgid "Reset Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:621
+msgid "Reset Button Position"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:622
+msgid "Retain Statistics"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:623
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:281
+msgid "Right"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:624
+msgid "Rise"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:625
+msgid "Row Height Tolerance"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:626
+msgid "Row-major"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:627
+msgid "Row-major fills each row before moving down. Column-major arranges items top to bottom, column by column."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:628
+msgid "Rows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:629
+#: includes/class-upgrade-modal.php:34
+#: includes/metaboxes/class-metabox-registrar.php:879
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
+#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:143
+msgid "SEO"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:630
+msgid "Sale Badges & Pricing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:631
+#: includes/metaboxes/class-metabox-registrar.php:961
+#: assets/admin/plain/render-settings/renderBulkModal.js:191
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:196
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:569
+#: assets/admin/plain/render-settings/renderExternalUrlManager.js:615
+msgid "Same Tab"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:632
+msgid "Same as Desktop"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:633
+msgid "Same as {postType}'s Last Row"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:634
+msgid "Saturation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:635
+msgid "Saturation Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:636
+msgid "Save your favorite filter combinations as presets for quick access, and enable real-time filtering that updates results as users type or select options."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:637
+msgid "Scales images to fit the screen. Turn off to show images at their natural size."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:638
+msgid "Scroll & Pinch Only"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:639
+msgid "Seamless Checkout Flow"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:640
+msgid "Search Engines"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:641
+msgid "Security"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:642
+msgid "Select roles"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:643
+msgid "Select users"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:644
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:118
+msgid "Selected"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:645
+msgid "Separator Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:646
+msgid "Sepia"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:647
+msgid "Sepia Amount"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:648
+msgid "Serve images and assets from a global network of servers for maximum performance and reduced load times worldwide."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:649
+msgid "Set how video items open when visitors click them."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:650
+msgid "Set the minimum and maximum width for each column. Columns will automatically adjust based on available space."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:651
+msgid "Shadow"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:652
+msgid "Shadow Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:653
+msgid "Shadow Settings"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:654
+msgid "Shape of each grid tile."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:655
+msgid "Shape of each item. Choose \"None\" to keep the image's original aspect ratio (only available for the Single Item layout)."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:656
+msgid "Share Buttons"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:657
+msgid "Share block won't appear"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:658
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:32
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:156
+msgid "Sharing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:659
+msgid "Sharing is turned off site-wide"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:660
+msgid "Show \"Back to Album\" Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:661
+msgid "Show Album Name on Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:662
+msgid "Show All Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:663
+msgid "Show All Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:664
+msgid "Show Arrows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:665
+msgid "Show Background Overlay"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:666
+msgid "Show Breadcrumbs"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:667
+msgid "Show Breadcrumbs On"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:668
+msgid "Show Breadcrumbs on Direct Visits"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:669
+msgid "Show Bullets"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:670
+msgid "Show Button Tooltips"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:671
+msgid "Show Captions"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:672
+msgid "Show Close Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:673
+msgid "Show Counter"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:674
+msgid "Show Fullscreen Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:675
+msgid "Show Info Panel"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:676
+msgid "Show Item Count"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:677
+msgid "Show Item Counter"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:678
+msgid "Show Navigation Arrows"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:679
+msgid "Show Page Numbers"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:680
+msgid "Show Play / Pause Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:681
+msgid "Show Previous/Next Buttons"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:682
+msgid "Show Reset Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:683
+msgid "Show Thumbnails"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:684
+msgid "Show Zoom Buttons"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:685
+msgid "Show a strip of mini-images that scroll the slider when clicked."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:686
+msgid "Show labels when hovering over lightbox toolbar buttons."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:687
+msgid "Show on Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:688
+msgid "Show pagination dots that indicate the current item."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:689
+msgid "Show previous and next arrows."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:690
+msgid "Show sort controls on the frontend so visitors can change how items are sorted."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:691
+msgid "Show the current position indicator (for example 3 of 12)."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:692
+msgid "Shows one item at a time. Best paired with random sort for a rotating spotlight on each load."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:693
+msgid "Shrinks the slider viewport so arrows sit outside the image instead of overlapping the next page element."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:694
+#: includes/exif/class-exif-fields.php:89
+msgid "Shutter Speed"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:695
+msgid "Sidebar"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:696
+msgid "Sidebar Side"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:697
+msgid "Sidebar Width"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:698
+msgid "Single Item"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:699
+msgid "Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:700
+msgid "Slider"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:701
+msgid "Slider Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:702
+msgid "Slow"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:703
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:228
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:247
+msgid "Small"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:704
+msgid "Smart AI-Powered Sorting"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:705
+msgid "Smart Filter Presets & Dynamic Filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:706
+msgid "Smooth Album to Gallery Transitions"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:707
+msgid "Snap Direction"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:708
+msgid "Social sharing is disabled in FotoGrids settings. Turn it on under FotoGrids → Settings → Sharing to configure sharing for this {postType}."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:709
+msgid "Soft shadow under each item, lit from above."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:710
+msgid "Solid"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:711
+msgid "Some hover effects animate the image, border, or shadow on hover. When an effect controls one of these, it takes over that property on hover - so a Hover Image Filter, Border, or Shadow you set under Styling may not apply while that effect is active."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:712
+msgid "Sort Direction"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:713
+msgid "Sort by multiple fields simultaneously (e.g., date then title), or use custom fields like EXIF data, file size, and dimensions for precise control."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:714
+msgid "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.lower.plural} that adapt to your content."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:715
+msgid "Sorting"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:716
+msgid "Space Between Bullets"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:717
+msgid "Space Between Thumbnails"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:718
+msgid "Space between filter groups (e.g. Tags row and People row)"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:719
+msgid "Space between individual buttons, options, or checkboxes within a group"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:720
+msgid "Space between the Filter Panel and the {postType} grid"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:721
+msgid "Space between the checkbox box and its label text"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:722
+msgid "Space between the gallery items and the pagination controls."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:723
+msgid "Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:724
+msgid "Specific roles"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:725
+msgid "Specific users"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:726
+msgid "Spinner"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:727
+msgid "Spinner Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:728
+msgid "Spread"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:729
+msgid "Start"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:730
+msgid "Sticker Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:731
+msgid "Stop on User Interaction"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:732
+msgid "Stops auto progress permanently once the visitor manually navigates, rather than resuming after each slide."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:733
+msgid "Straighten"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:734
+msgid "Stretch"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:735
+msgid "Strip Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:736
+msgid "Strong"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:737
+msgid "Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:739
+msgid "Styling Settings"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:740
+#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:21
+msgid "Subscriber"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:741
+msgid "Swipe Thumbnails"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:742
+#: includes/metaboxes/class-metabox-registrar.php:762
+#: includes/rest/metadata/library-data.php:50
+#: public/render/filters/sources/tags/class-tags-filter-source.php:46
+#: includes/tools/import-export/assets/ImportExportTool.jsx:40
+#: includes/tools/import-export/assets/ImportExportTool.jsx:109
+msgid "Tags"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:743
+msgid "Target Row Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:744
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:20
+msgid "Telegram"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:745
+msgid "Text Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:746
+msgid "Text for the reset control that shows all items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:747
+msgid "Text included when sharing this {postType}. Use {title} and {url} as placeholders."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:748
+msgid "The Breadcrumb trail and Back Button show up when a visitor reaches a Gallery from this Album. On direct visits to a Gallery they only appear if \"Show Breadcrumbs on Direct Visits\" is enabled AND that Gallery belongs to this Album only. If a Gallery is assigned to two or more Albums there is no single parent to point back to, so nothing is rendered on direct visits regardless of that setting."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:749
+msgid "The FotoGrids cache, which you turn on and off per {postType.lower} under <strong>Performance</strong>. And your site's page cache - a caching plugin, your host, or a CDN - which FotoGrids can ask to skip a page but cannot control."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:750
+msgid "The Share block is selected, but social sharing is turned off site-wide. Turn it on under FotoGrids → Settings → Sharing for the share buttons to show in the lightbox."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:751
+msgid "The Show all button appears automatically when the gallery has more photos than the featured image and grid can show. It opens a full-screen grid of every item."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:752
+msgid "The acceleration curve the transition follows."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:753
+msgid "The browser rearranges the items the page already contains. Nothing is requested and no cache can affect it, but the selection cannot change. Use this only when <strong>Display Mode</strong> is set to <strong>Show All Items</strong> - with <strong>Break into Pages</strong>, or on a Single Item layout, the same items appear every visit in a different order."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:754
+msgid "The fields this gallery shows, in the order they appear. Only fields the image actually carries are rendered."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:755
+msgid "The info panel won't appear in the lightbox until you add at least one block above."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:756
+msgid "The site-wide watermark is burned into this {postType.lower}'s images. Turn this off to leave this {postType.lower}'s images unwatermarked. Configure the watermark itself under <a>FotoGrids → Settings → Watermark</a>."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:757
+msgid "The text shown on the Show all button."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:758
+#: includes/diagnostics/class-system-report.php:55
+#: includes/diagnostics/class-system-report.php:382
+#: includes/metaboxes/class-metabox-registrar.php:950
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:345
+#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:349
+msgid "Theme"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:759
+#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:506
+msgid "Thumbnail"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:760
+msgid "Thumbnail Border"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:761
+msgid "Thumbnail Border Radius"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:762
+msgid "Thumbnail Hover"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:763
+msgid "Thumbnail Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:764
+msgid "Thumbnail Strip Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:765
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:39
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:331
+msgid "Thumbnails"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:766
+msgid "Thumbnails Location"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:767
+msgid "Tilt Further"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:768
+msgid "Time spent on each item before advancing."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:769
+#: includes/metaboxes/class-metabox-registrar.php:750
+msgid "Title"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:770
+msgid "Title Color"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:771
+msgid "Title Font Family"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:772
+msgid "Title Font Size"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:773
+msgid "Title Font Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:774
+msgid "Title Font Weight"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:775
+msgid "Title Letter Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:776
+msgid "Title Line Height"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:777
+msgid "Title Sort Direction"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:778
+msgid "Title Source"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:779
+msgid "Title Word Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:780
+msgid "Toggle Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:781
+msgid "Toolbar"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:782
+msgid "Toolbar Background"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:783
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:280
+msgid "Top"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:784
+msgid "Top: distance from the top edge. Bottom: distance from the bottom edge. Applies whether the bullets are inset or overlayed."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:785
+msgid "Track {postType.lower} views and interactions for analytics."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:786
+msgid "Transform galleries into powerful sales tools. Showcase products and enable direct purchases for a complete shopping experience."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:787
+msgid "Transition"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:788
+msgid "Transition Between Items"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:789
+msgid "Transition Duration"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:790
+msgid "Treat the last row as clean when it fills at least this much of the container width. Above the threshold the page is left alone; below it, items are added or removed within the adjustment window."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:791
+msgid "Trigger Button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:792
+msgid "Trigger States"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:793
+msgid "Truncate Long Pagination"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:794
+msgid "Turns any gallery into a playful wall of instant-style prints - perfect for a relaxed, casual feel."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:795
+msgid "Two caches can store it"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:796
+msgid "Typography"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:797
+msgid "Unchecked"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:798
+msgid "Unlock TikTok, Instagram, Facebook, Dailymotion, Twitch, Wistia, VideoPress, Loom, and more embeds for broader video source support."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:799
+msgid "Use \"…\" to keep the page bar compact on galleries with many pages."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:800
+msgid "Use advanced custom captions with HTML and dynamic placeholders, including integrations with ACF and Pods."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:801
+msgid "Vertical"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:802
+msgid "Vertical Offset"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:803
+#: includes/metaboxes/class-metabox-registrar.php:819
+msgid "Video"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:804
+msgid "Video Lightbox Behaviour"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:805
+msgid "Video Playback"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:806
+msgid "Video Playlist"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:807
+msgid "Videos will use the gallery lightbox"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:808
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:29
+msgid "View Page"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:809
+#: assets/admin/src/components/pages/PluginSettingsPage.jsx:31
+msgid "View Pages"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:810
+msgid "View Permissions"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:811
+msgid "View page"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:812
+msgid "Viewer Bar"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:813
+msgid "Viewer Stage"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:814
+msgid "Viewport height for each device. Items keep their aspect ratio inside this height."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:815
+msgid "Wait this long before opening the popover on hover."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:816
+msgid "Watermark Generation"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:817
+msgid "Watermarking is turned off site-wide"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:818
+msgid "Watermarks are disabled in FotoGrids settings. Turn them on under <a>FotoGrids → Settings → Watermark</a> to apply a watermark to this {postType.lower}."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:819
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:19
+msgid "WhatsApp"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:820
+msgid "When Breadcrumbs and the Back Button appear"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:821
+msgid "When a page does not divide evenly into rows, the last row often shows just one or two items with a lot of empty space on the end.<br/>Choose how to handle the last row of each page when there are more pages after it. The {postType}'s actual final row still follows the Last Row Behavior setting on the Rows tab."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:822
+msgid "When enabled, allows visitors to select multiple options within the same filter group"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:823
+msgid "When enabled, images will be cropped to the exact width and height specified.<br>When disabled, images will be scaled to fit the dimensions while maintaining their aspect ratio."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:824
+msgid "When enabled, opening a Gallery from an Album will load smoothly using AJAX without a page refresh. Disable if you experience compatibility issues or prefer traditional page navigation."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:825
+msgid "When on, emits <meta name=\"robots\" content=\"noindex, nofollow\"> so search engines skip this page. Use for drafts, private clients, or one-off {postType.plural.lower} you don't want indexed."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:826
+msgid "When on, the button reads \"Back to {Album Name}\". When off, it just says \"Back\" - useful when the Album name is long or when the button needs to fit in a tight layout."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:827
+msgid "When one item is hovered, apply a subtle effect to the rest of the gallery to make the hovered item stand out."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:828
+msgid "Where captions appear: in the grid tiles, in the full-size image view, or both."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:829
+msgid "Where share controls appear for this {postType}."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:830
+msgid "Where the arrows sit relative to the image edge."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:831
+msgid "Where the breadcrumb trail should appear when a visitor reaches a Gallery from this Album."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:832
+msgid "Where to display the filter controls"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:833
+msgid "Where to pull the credit text from."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:834
+msgid "Whether the filter bar is always visible or revealed by a toggle button"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:835
+msgid "Whether the info panel starts open or collapsed. Visitors can toggle it either way."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:836
+msgid "Whether the lightbox shows just the displayed image or the full gallery."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:837
+msgid "Whether to dim the arrow or hide it entirely at the start and end."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:838
+msgid "Which corner of the layout the Show all button sits in."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:839
+msgid "Which criteria visitors can filter items by"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:840
+msgid "Which date to use for filtering"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:841
+msgid "Which field to use for the caption text."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:842
+msgid "Which share buttons to show for this {postType}."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:843
+msgid "Which side the filter sidebar appears on"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:844
+msgid "Which side the large featured image sits on. The grid fills the other half."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:845
+msgid "Who can edit this {postType}?"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:846
+msgid "Who can view this {postType}?"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:847
+msgid "Whole Gallery"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:848
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1371
+#: assets/admin/src/components/shared/settings/DimensionsField.jsx:28
+#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:251
+msgid "Width"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:849
+msgid "Width and height of the checkbox box"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:850
+msgid "Width of the filter column when position is set to Sidebar"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:851
+msgid "Width of the white photo border around each image."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:852
+msgid "WooCommerce Integration"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:853
+msgid "Word Spacing"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:854
+msgid "WordPress generates image sizes at upload time. After changing these settings, use the regeneration tool to rebuild thumbnails for images already in your galleries."
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:855
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:16
+msgid "X (Twitter)"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:856
+msgid "XMP Rights"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:857
+#: includes/diagnostics/class-system-report.php:625
+#: assets/admin/plain/render-settings/renderImageSize.js:52
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
+msgid "Yes"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:858
+msgid "Yoast SEO"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:859
+msgid "Z-A"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:860
+#: public/render/decorators/hover/class-hover-effects-catalog.php:68
+msgid "Zoom"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:861
+msgid "Zoom In"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:862
+msgid "Zoom Mode"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:863
+msgid "Zoom Style"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:864
+msgid "Zoom Trigger"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:865
+msgid "by character length"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:866
+msgid "by lines"
+msgstr ""
+
+#: includes/catalog/catalog-strings.php:867
+msgid "{postType} Password"
 msgstr ""
 
 #: includes/class-admin-init.php:108
@@ -436,7 +3962,7 @@ msgstr ""
 #: includes/class-admin-init.php:155
 #: includes/metaboxes/class-metabox-registrar.php:889
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2544
+#: assets/admin/plain/collection-settings.js:2511
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -925,13 +4451,6 @@ msgstr ""
 msgid "Carousel for hero sliders and lookbooks. Video Playlist for video-led galleries. Product Gallery for shop pages. Mixed Tiles for bento-style mosaics. Same builder, same controls - four more shapes to reach for."
 msgstr ""
 
-#: includes/class-upgrade-modal.php:34
-#: includes/metaboxes/class-metabox-registrar.php:879
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
-#: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:143
-msgid "SEO"
-msgstr ""
-
 #: includes/class-upgrade-modal.php:35
 msgid "Get Discovered by Search Engines with"
 msgstr ""
@@ -1085,21 +4604,6 @@ msgstr ""
 msgid "Server environment"
 msgstr ""
 
-#: includes/diagnostics/class-system-report.php:54
-#: includes/diagnostics/class-system-report.php:354
-#: includes/metaboxes/class-metabox-registrar.php:940
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:28
-msgid "Media"
-msgstr ""
-
-#: includes/diagnostics/class-system-report.php:55
-#: includes/diagnostics/class-system-report.php:382
-#: includes/metaboxes/class-metabox-registrar.php:950
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:345
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:349
-msgid "Theme"
-msgstr ""
-
 #: includes/diagnostics/class-system-report.php:56
 msgid "Plugins"
 msgstr ""
@@ -1142,19 +4646,6 @@ msgstr ""
 
 #: includes/diagnostics/class-system-report.php:155
 msgid "Enabled Pro features"
-msgstr ""
-
-#: includes/diagnostics/class-system-report.php:156
-#: includes/diagnostics/class-system-report.php:171
-#: includes/diagnostics/class-system-report.php:176
-#: includes/diagnostics/class-system-report.php:287
-#: includes/diagnostics/class-system-report.php:288
-#: includes/diagnostics/class-system-report.php:314
-#: includes/diagnostics/class-system-report.php:346
-#: includes/diagnostics/class-system-report.php:526
-#: includes/diagnostics/class-system-report.php:557
-#: public/render/decorators/hover/class-hover-effects-catalog.php:58
-msgid "None"
 msgstr ""
 
 #: includes/diagnostics/class-system-report.php:162
@@ -1221,10 +4712,6 @@ msgstr ""
 
 #: includes/diagnostics/class-system-report.php:242
 msgid "Permalink structure"
-msgstr ""
-
-#: includes/diagnostics/class-system-report.php:242
-msgid "Plain"
 msgstr ""
 
 #: includes/diagnostics/class-system-report.php:243
@@ -1343,11 +4830,6 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: includes/diagnostics/class-system-report.php:369
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:19
-msgid "Author"
-msgstr ""
-
 #: includes/diagnostics/class-system-report.php:370
 msgid "Block theme"
 msgstr ""
@@ -1390,44 +4872,8 @@ msgstr ""
 msgid " — set by constant: %s"
 msgstr ""
 
-#: includes/diagnostics/class-system-report.php:625
-#: assets/admin/plain/render-settings/renderImageSize.js:52
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
-msgid "Yes"
-msgstr ""
-
-#: includes/diagnostics/class-system-report.php:625
-#: assets/admin/plain/render-settings/renderImageSize.js:52
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
-msgid "No"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:61
-msgid "Camera"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:68
-msgid "Lens"
-msgstr ""
-
 #: includes/exif/class-exif-fields.php:75
 msgid "Software"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:82
-msgid "Aperture"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:89
-msgid "Shutter Speed"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:96
-msgid "ISO"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:103
-msgid "Focal Length"
 msgstr ""
 
 #: includes/exif/class-exif-fields.php:110
@@ -1457,10 +4903,6 @@ msgstr ""
 
 #: includes/exif/class-exif-fields.php:152
 msgid "White Balance"
-msgstr ""
-
-#: includes/exif/class-exif-fields.php:159
-msgid "Date Taken"
 msgstr ""
 
 #: includes/exif/class-exif-fields.php:166
@@ -1517,12 +4959,6 @@ msgstr ""
 msgid "%s EV"
 msgstr ""
 
-#: includes/exif/class-exif-formatter.php:226
-#: includes/exif/class-exif-formatter.php:250
-#: includes/exif/class-exif-formatter.php:327
-msgid "Manual"
-msgstr ""
-
 #: includes/exif/class-exif-formatter.php:227
 msgid "Program"
 msgstr ""
@@ -1550,11 +4986,6 @@ msgstr ""
 
 #: includes/exif/class-exif-formatter.php:233
 msgid "Landscape"
-msgstr ""
-
-#: includes/exif/class-exif-formatter.php:249
-#: includes/exif/class-exif-formatter.php:326
-msgid "Auto"
 msgstr ""
 
 #: includes/exif/class-exif-formatter.php:251
@@ -1604,10 +5035,6 @@ msgstr ""
 
 #: includes/exif/class-exif-formatter.php:312
 msgid "Fired"
-msgstr ""
-
-#: includes/exif/class-exif-formatter.php:371
-msgid "Normal"
 msgstr ""
 
 #: includes/exif/class-exif-formatter.php:372
@@ -1954,21 +5381,8 @@ msgstr ""
 msgid "Keep editing"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:750
-msgid "Title"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:751
 msgid "Alt Text"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:752
-#: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:136
-msgid "Caption"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:753
-msgid "Description"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:754
@@ -1994,24 +5408,6 @@ msgstr ""
 #: includes/metaboxes/class-metabox-registrar.php:761
 #: includes/tools/import-export/assets/ImportExportTool.jsx:657
 msgid "Details"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:762
-#: includes/rest/metadata/library-data.php:50
-#: public/render/filters/sources/tags/class-tags-filter-source.php:46
-#: includes/tools/import-export/assets/ImportExportTool.jsx:40
-#: includes/tools/import-export/assets/ImportExportTool.jsx:109
-msgid "Tags"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:763
-#: includes/rest/metadata/library-data.php:59
-msgid "People"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:764
-#: includes/rest/metadata/library-data.php:69
-msgid "Location"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:765
@@ -2208,10 +5604,6 @@ msgstr ""
 msgid "Maximum upload size: %s"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:819
-msgid "Video"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:820
 msgid "Add video files"
 msgstr ""
@@ -2321,10 +5713,6 @@ msgstr ""
 msgid "Video Options"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:848
-msgid "Autoplay"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:849
 msgid "Autoplay is subject to browser autoplay policies."
 msgstr ""
@@ -2333,17 +5721,8 @@ msgstr ""
 msgid "Mute"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:851
-msgid "Loop"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:852
 msgid "Player Controls"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:853
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:131
-msgid "Captions"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:854
@@ -2470,7 +5849,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:888
-#: assets/admin/plain/collection-settings.js:732
+#: assets/admin/plain/collection-settings.js:699
 msgid "Failed to load item data"
 msgstr ""
 
@@ -2650,10 +6029,6 @@ msgstr ""
 msgid "- automatically detect and tag people"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:934
-msgid "EXIF"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:936
 msgid "Per-image EXIF overrides"
 msgstr ""
@@ -2721,11 +6096,6 @@ msgstr ""
 msgid "Item Interactions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:956
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:411
-msgid "External URL"
-msgstr ""
-
 #: includes/metaboxes/class-metabox-registrar.php:957
 msgid "URL to redirect to when this item is clicked."
 msgstr ""
@@ -2741,22 +6111,6 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:960
 msgid "Use Gallery Default"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:961
-#: assets/admin/plain/render-settings/renderBulkModal.js:191
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:196
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:569
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:615
-msgid "Same Tab"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:962
-#: assets/admin/plain/render-settings/renderBulkModal.js:202
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:204
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:573
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:657
-msgid "New Tab"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:963
@@ -4337,20 +7691,12 @@ msgstr ""
 msgid "Attachment is not an image."
 msgstr ""
 
-#: public/render/decorators/hover/class-hover-effects-catalog.php:68
-msgid "Zoom"
-msgstr ""
-
 #: public/render/decorators/hover/class-hover-effects-catalog.php:78
 msgid "Pan"
 msgstr ""
 
 #: public/render/decorators/hover/class-hover-effects-catalog.php:89
 msgid "Blur Focus"
-msgstr ""
-
-#: public/render/decorators/hover/class-hover-effects-catalog.php:99
-msgid "Grayscale"
 msgstr ""
 
 #: public/render/decorators/hover/class-hover-effects-catalog.php:109
@@ -4535,11 +7881,6 @@ msgstr ""
 msgid "Toggle filters"
 msgstr ""
 
-#: public/render/filters/features/ui/class-filter-ui.php:678
-#: public/render/filters/features/ui/class-filter-ui.php:845
-msgid "All"
-msgstr ""
-
 #. translators: heading shown when gallery requires login
 #: public/render/gates/collection-permissions/class-collection-permissions.php:122
 msgid "Login Required"
@@ -4588,113 +7929,113 @@ msgstr ""
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:495
+#: assets/admin/plain/collection-settings.js:462
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:779
+#: assets/admin/plain/collection-settings.js:746
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:815
+#: assets/admin/plain/collection-settings.js:782
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:833
+#: assets/admin/plain/collection-settings.js:800
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:840
+#: assets/admin/plain/collection-settings.js:807
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:844
+#: assets/admin/plain/collection-settings.js:811
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1535
+#: assets/admin/plain/collection-settings.js:1502
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1536
+#: assets/admin/plain/collection-settings.js:1503
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2018
+#: assets/admin/plain/collection-settings.js:1985
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2066
-#: assets/admin/plain/collection-settings.js:2082
+#: assets/admin/plain/collection-settings.js:2033
+#: assets/admin/plain/collection-settings.js:2049
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2119
+#: assets/admin/plain/collection-settings.js:2086
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2140
+#: assets/admin/plain/collection-settings.js:2107
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2141
+#: assets/admin/plain/collection-settings.js:2108
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2148
-#: assets/admin/plain/collection-settings.js:2159
+#: assets/admin/plain/collection-settings.js:2115
+#: assets/admin/plain/collection-settings.js:2126
 msgid "Failed to update autosave setting"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2203
-#: assets/admin/plain/collection-settings.js:2213
+#: assets/admin/plain/collection-settings.js:2170
+#: assets/admin/plain/collection-settings.js:2180
 msgid "Configure Album defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2207
-#: assets/admin/plain/collection-settings.js:2217
+#: assets/admin/plain/collection-settings.js:2174
+#: assets/admin/plain/collection-settings.js:2184
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2223
+#: assets/admin/plain/collection-settings.js:2190
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:222
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2248
+#: assets/admin/plain/collection-settings.js:2215
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2258
+#: assets/admin/plain/collection-settings.js:2225
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2262
+#: assets/admin/plain/collection-settings.js:2229
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2308
+#: assets/admin/plain/collection-settings.js:2275
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2335
+#: assets/admin/plain/collection-settings.js:2302
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2344
+#: assets/admin/plain/collection-settings.js:2311
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2454
+#: assets/admin/plain/collection-settings.js:2421
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2568
+#: assets/admin/plain/collection-settings.js:2535
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
@@ -4816,13 +8157,6 @@ msgstr ""
 msgid "Pick color"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderColorPicker.js:313
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:555
-#: assets/admin/plain/render-settings/renderFontFamily.js:345
-#: assets/admin/plain/render-settings/renderFontWeight.js:40
-msgid "Default"
-msgstr ""
-
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:45
 msgid "You do not have permission to edit item URLs. The \"edit_posts\" capability is required."
 msgstr ""
@@ -4830,10 +8164,6 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:146
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:263
 msgid "Retry"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderExternalUrlManager.js:185
-msgid "Default Link Target"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:271
@@ -4977,39 +8307,12 @@ msgstr ""
 msgid "Mobile"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:280
-msgid "Top"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:281
-msgid "Right"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:282
-msgid "Bottom"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:283
-msgid "Left"
-msgstr ""
-
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:927
 msgid "Min"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:986
 msgid "Max"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1371
-#: assets/admin/src/components/shared/settings/DimensionsField.jsx:28
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:251
-msgid "Width"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1372
-#: assets/admin/src/components/shared/settings/DimensionsField.jsx:29
-msgid "Height"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:1614
@@ -5328,15 +8631,6 @@ msgstr ""
 
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:184
 msgid "With smart EXIF locations"
-msgstr ""
-
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:107
-msgid "Active"
-msgstr ""
-
-#: assets/admin/src/components/library/LibraryPeopleHeader.jsx:108
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:248
-msgid "Regular"
 msgstr ""
 
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:109
@@ -5705,15 +8999,6 @@ msgstr ""
 msgid "Responsiveness"
 msgstr ""
 
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:31
-msgid "View Pages"
-msgstr ""
-
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:32
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:156
-msgid "Sharing"
-msgstr ""
-
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:33
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:157
 msgid "Watermark"
@@ -5722,11 +9007,6 @@ msgstr ""
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:35
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:421
 msgid "Permissions Manager"
-msgstr ""
-
-#: assets/admin/src/components/pages/PluginSettingsPage.jsx:37
-#: assets/admin/src/components/plugin-settings/tabs/MaintenanceTab.jsx:224
-msgid "Maintenance"
 msgstr ""
 
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:38
@@ -5784,14 +9064,6 @@ msgstr ""
 
 #: assets/admin/src/components/pages/StatsPage.jsx:77
 msgid "7 Days"
-msgstr ""
-
-#: assets/admin/src/components/pages/StatsPage.jsx:78
-msgid "30 Days"
-msgstr ""
-
-#: assets/admin/src/components/pages/StatsPage.jsx:79
-msgid "90 Days"
 msgstr ""
 
 #: assets/admin/src/components/pages/StatsPage.jsx:139
@@ -6260,10 +9532,6 @@ msgstr ""
 msgid "Center Left"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:116
-msgid "Center"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:117
 msgid "Center Right"
 msgstr ""
@@ -6399,22 +9667,6 @@ msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:276
 msgid "Crop"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:17
-msgid "Administrator"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:18
-msgid "Editor"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:20
-msgid "Contributor"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:21
-msgid "Subscriber"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:30
@@ -6621,62 +9873,12 @@ msgstr ""
 msgid "Emits `twitter:site`. The `@` is added automatically if you leave it off."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:15
-msgid "Facebook"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:16
-msgid "X (Twitter)"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:17
-msgid "Pinterest"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:18
-msgid "LinkedIn"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:19
-msgid "WhatsApp"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:20
-msgid "Telegram"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:21
-msgid "Reddit"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:22
-msgid "Email"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:23
-msgid "Copy Link"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:29
-msgid "View Page"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:30
 msgid "In the header or footer of a Gallery or Album's standalone view page."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:34
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:132
-msgid "Lightbox"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:35
 msgid "Inside Lightboxes."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:39
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:331
-msgid "Thumbnails"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:40
@@ -6693,10 +9895,6 @@ msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:161
 msgid "Show share controls on Galleries, Albums and view pages."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:173
-msgid "Networks"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:175
@@ -6737,20 +9935,6 @@ msgstr ""
 msgid "Button size"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:228
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:247
-msgid "Small"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:229
-msgid "Medium"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:230
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:249
-msgid "Large"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:237
 msgid "Deep linking"
 msgstr ""
@@ -6787,16 +9971,8 @@ msgstr ""
 msgid "The page"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:271
-msgid "Custom share text"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:272
 msgid "Text included when sharing. Use {title} and {url} as placeholders."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:280
-msgid "Check out {title} - {url}"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:285
@@ -6973,18 +10149,6 @@ msgstr ""
 msgid "The base colour scheme."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:353
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:259
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:278
-msgid "Light"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:354
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:260
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:282
-msgid "Dark"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:360
 msgid "Maximum width"
 msgstr ""
@@ -7098,21 +10262,8 @@ msgstr ""
 msgid "Choose where the watermark appears and how visible it should be."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:284
-#: assets/admin/src/components/shared/AlignmentGrid.jsx:47
-msgid "Position"
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:287
 msgid "Watermark position"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:292
-msgid "Opacity"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:302
-msgid "Margin"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:303
@@ -7526,17 +10677,8 @@ msgstr ""
 msgid "Preview device"
 msgstr ""
 
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:198
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:286
-msgid "Custom"
-msgstr ""
-
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:268
 msgid "Page Background"
-msgstr ""
-
-#: assets/admin/src/components/templates/PreviewTemplateModal.jsx:299
-msgid "Background Color"
 msgstr ""
 
 #: assets/admin/src/components/templates/TemplateInfoModal.jsx:14
@@ -7591,16 +10733,8 @@ msgstr ""
 msgid "Happy browsing!"
 msgstr ""
 
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:90
-msgid "Appearance"
-msgstr ""
-
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:127
 msgid "Layout style"
-msgstr ""
-
-#: assets/admin/src/components/templates/TemplateOverviewModal.jsx:128
-msgid "Columns"
 msgstr ""
 
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:129
@@ -7830,10 +10964,6 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:105
 msgid "Private"
-msgstr ""
-
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:118
-msgid "Selected"
 msgstr ""
 
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:119
@@ -8108,10 +11238,6 @@ msgstr ""
 msgid "No operations recorded yet. Export or import data to see a log here."
 msgstr ""
 
-#: includes/tools/import-export/assets/ImportExportTool.jsx:655
-msgid "Date"
-msgstr ""
-
 #: includes/tools/import-export/assets/ImportExportTool.jsx:658
 msgid "Status"
 msgstr ""
@@ -8283,25 +11409,9 @@ msgstr ""
 msgid "Not in any gallery"
 msgstr ""
 
-#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:506
-msgid "Thumbnail"
-msgstr ""
-
-#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:510
-msgid "Masonry"
-msgstr ""
-
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:512
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:518
 msgid "Not used by this gallery’s layout."
-msgstr ""
-
-#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:516
-msgid "Justified"
-msgstr ""
-
-#: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:529
-msgid "Full"
 msgstr ""
 
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:533

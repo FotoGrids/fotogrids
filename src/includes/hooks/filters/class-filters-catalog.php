@@ -30,6 +30,18 @@ final class Filters_Catalog {
 	public const JSON_FILES = 'fotogrids/catalog/json_files';
 
 	/**
+	 * Original-to-translated map applied to the assembled catalog tree.
+	 *
+	 * Free contributes the map generated from its own catalog files. Pro and
+	 * third-party extensions hook here to add the strings of the catalog files
+	 * they contribute, translated in their own text domain.
+	 *
+	 * @since 1.1.1
+	 * @param array<string, string> $strings Catalog string to translation.
+	 */
+	public const STRINGS = 'fotogrids/catalog/strings';
+
+	/**
 	 * Resolved edit-state for a catalog field/option.
 	 *
 	 * Free derives the state purely from the declared tier with no license

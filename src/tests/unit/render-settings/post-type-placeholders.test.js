@@ -6,6 +6,104 @@ import '@/admin/plain/render-settings/utils/post-type-placeholders';
 const RS = () => window.FotoGridsRenderSettings;
 
 describe('post-type-placeholders', () => {
+	describe('resolveCopyLink', () => {
+		afterEach(() => {
+			delete window.fotogridsSettings;
+		});
+
+		it('resolves a bare <a> against the destination the node names', () => {
+			window.fotogridsSettings = {
+				watermarkUrl:
+					'https://example.test/wp-admin/admin.php?page=fotogrids-settings&tab=watermark',
+			};
+
+			expect(
+				RS().resolveCopyLink('Open <a>Watermark</a> to fix it.', {
+					link_url_key: 'watermarkUrl',
+				})
+			).toBe(
+				'Open <a href="https://example.test/wp-admin/admin.php?page=fotogrids-settings&tab=watermark" target="_blank" rel="noopener noreferrer">Watermark</a> to fix it.'
+			);
+		});
+
+		it('accepts a direct link_url', () => {
+			expect(
+				RS().resolveCopyLink('See <a>docs</a>.', {
+					link_url: 'https://example.test/docs',
+				})
+			).toContain('href="https://example.test/docs"');
+		});
+
+		it('leaves the copy alone when the node names no destination', () => {
+			expect(RS().resolveCopyLink('Open <a>Watermark</a>.', {})).toBe(
+				'Open <a>Watermark</a>.'
+			);
+		});
+
+		it('leaves the copy alone when the named key is missing', () => {
+			expect(
+				RS().resolveCopyLink('Open <a>Watermark</a>.', {
+					link_url_key: 'notLocalized',
+				})
+			).toBe('Open <a>Watermark</a>.');
+		});
+
+		it('encodes a destination that would break out of the attribute', () => {
+			const out = RS().resolveCopyLink('Go <a>here</a>.', {
+				link_url: 'https://example.test/"><script>alert(1)</script>',
+			});
+
+			expect(out).not.toContain('<script>');
+			expect(out).toContain('%22%3E%3Cscript%3E');
+		});
+	});
+
+	describe('processSettingPlaceholders link resolution', () => {
+		afterEach(() => {
+			delete window.fotogridsSettings;
+		});
+
+		it('resolves the link in a description and substitutes placeholders', () => {
+			window.fotogridsSettings = {
+				watermarkUrl: 'https://example.test/wp-admin/x',
+			};
+
+			const processed = RS().processSettingPlaceholders(
+				{
+					key: 'watermark_apply_to_collection',
+					description:
+						'Watermark this {postType.lower} under <a>Settings</a>.',
+					link_url_key: 'watermarkUrl',
+				},
+				'album'
+			);
+
+			expect(processed.description).toBe(
+				'Watermark this album under <a href="https://example.test/wp-admin/x" target="_blank" rel="noopener noreferrer">Settings</a>.'
+			);
+		});
+
+		it('resolves the link in an info_block message', () => {
+			window.fotogridsSettings = {
+				watermarkUrl: 'https://example.test/wp-admin/x',
+			};
+
+			const processed = RS().processSettingPlaceholders(
+				{
+					key: 'watermark_global_off_notice',
+					type: 'info_block',
+					message: 'Turn them on under <a>Watermark</a>.',
+					link_url_key: 'watermarkUrl',
+				},
+				'gallery'
+			);
+
+			expect(processed.message).toContain(
+				'<a href="https://example.test/wp-admin/x" target="_blank" rel="noopener noreferrer">'
+			);
+		});
+	});
+
 	describe('getPostTypeValue', () => {
 		it('returns gallery forms by default', () => {
 			expect(RS().getPostTypeValue('gallery')).toBe('Gallery');

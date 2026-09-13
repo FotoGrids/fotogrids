@@ -19,7 +19,7 @@
                     "tier_required": "free"
                 },
                 {
-                    "label": "Video Lightbox",
+                    "label": "Lightbox",
                     "value": "lightbox",
                     "tier_required": "free"
                 }
@@ -29,6 +29,29 @@
             "setting_lives_in": "free",
             "visible_when_uninstalled": true,
             "tier_required": "free"
+        },
+        {
+            "key": "video_playback_full_lightbox_notice",
+            "type": "info_block",
+            "subtitle": "Videos will use the gallery lightbox",
+            "message": "Item Click Behavior is set to <strong>Open in Lightbox</strong>, so videos open in the same lightbox as your images, with its navigation, thumbnails and captions. The appearance settings below style the minimal video overlay, which this gallery does not use.",
+            "icon": "video",
+            "condition": {
+                "all": [
+                    {
+                        "dependsOn": "video_playback_mode",
+                        "values": ["lightbox"]
+                    },
+                    {
+                        "dependsOn": "item_click_behavior",
+                        "values": ["lightbox"]
+                    }
+                ]
+            },
+            "tier_required": "free",
+            "render_when_unlicensed": true,
+            "setting_lives_in": "free",
+            "visible_when_uninstalled": true
         },
         {
             "key": "video_lightbox_appearance_subtabs",

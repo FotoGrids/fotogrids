@@ -110,6 +110,59 @@ final class Video_Item_Helpers {
 	}
 
 	/**
+	 * Extract the playback settings from a video item's stored custom_data.
+	 *
+	 * custom_data also carries the poster fields, which the poster resolver
+	 * reads separately; only the playback keys belong in the markup the
+	 * frontend players consume. An absent controls value defaults to true,
+	 * matching the item editor; every other key defaults to off.
+	 *
+	 * @since 1.1.2
+	 * @param array<string, mixed> $custom_data Stored item custom_data.
+	 * @return array<string, bool>
+	 */
+	public static function playback_settings( array $custom_data ): array {
+		return array(
+			'autoplay' => ! empty( $custom_data['autoplay'] ),
+			'mute'     => ! empty( $custom_data['mute'] ),
+			'loop'     => ! empty( $custom_data['loop'] ),
+			'controls' => ! isset( $custom_data['controls'] ) || (bool) $custom_data['controls'],
+		);
+	}
+
+	/**
+	 * Decide whether a video tile needs the FotoGrids play badge.
+	 *
+	 * The badge is the affordance of last resort: it is drawn only when the
+	 * tile offers no other way to start playback. A file video that mounts a
+	 * native player with its controls showing has one already, and a tile that
+	 * starts playing on its own needs none. Every other case - a poster
+	 * waiting for a click, an embed that has not loaded its iframe yet, or a
+	 * tile that opens a lightbox - keeps it.
+	 *
+	 * @since 1.1.2
+	 * @param string               $item_type     One of the video item_type values.
+	 * @param string               $playback_mode The gallery's video_playback_mode.
+	 * @param array<string, mixed> $settings      Per-item playback settings.
+	 * @return bool
+	 */
+	public static function needs_play_badge( string $item_type, string $playback_mode, array $settings ): bool {
+		if ( 'inline' !== $playback_mode ) {
+			return true;
+		}
+
+		if ( ! empty( $settings['autoplay'] ) ) {
+			return false;
+		}
+
+		if ( self::TYPE_FILE !== $item_type ) {
+			return true;
+		}
+
+		return isset( $settings['controls'] ) && ! $settings['controls'];
+	}
+
+	/**
 	 * Build the iframe src for an embed item, applying its stored settings.
 	 *
 	 * Uses the privacy-enhanced host (youtube-nocookie / player.vimeo) when

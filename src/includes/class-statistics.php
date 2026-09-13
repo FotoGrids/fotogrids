@@ -310,44 +310,6 @@ class Statistics {
 	}
 
 	/**
-	 * Get statistics over time
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $object_id Specific object ID (optional)
-	 * @param int $days Number of days to look back
-	 * @return array Time series data
-	 */
-	public static function get_time_series( $object_type, $object_id = null, $days = 30 ) {
-		global $wpdb;
-
-		$table = $wpdb->prefix . 'fotogrids_statistics';
-
-		$where_conditions = array( 'object_type = %s' );
-		$params           = array( $object_type );
-
-		if ( $object_id ) {
-			$where_conditions[] = 'object_id = %d';
-			$params[]           = $object_id;
-		}
-
-		$where_conditions[] = 'last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
-		$params[]           = $days;
-
-		$where_sql = implode( ' AND ', $where_conditions );
-
-		$sql = "SELECT
-                    DATE(last_viewed) as date,
-                    SUM(views) as daily_views,
-                    SUM(shares) as daily_shares
-                FROM $table
-                WHERE $where_sql
-                GROUP BY DATE(last_viewed)
-                ORDER BY date ASC";
-
-		return $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-	}
-
-	/**
 	 * Clean up old statistics data
 	 *
 	 * @param int $days Number of days to keep (older data will be deleted)

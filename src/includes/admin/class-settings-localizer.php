@@ -271,6 +271,7 @@ final class Settings_Localizer {
 				: Links::go( 'docs/galleries', 'collection-settings', 'docs' ),
 			'proLinkTemplate'  => Links::go( '{{path}}', 'collection-settings', 'feature' ),
 			'toolsUrl'         => admin_url( 'admin.php?page=fotogrids-tools' ),
+			'watermarkUrl'     => admin_url( 'admin.php?page=fotogrids-settings&tab=watermark' ),
 			'strings'          => array(
 				'layout'   => __( 'Layout', 'fotogrids' ),
 				'styling'  => __( 'Styling', 'fotogrids' ),
