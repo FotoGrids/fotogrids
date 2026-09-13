@@ -175,7 +175,7 @@ final class Item_Ajax_Endpoints {
 			array(
 				'id'            => $item_id,
 				'title'         => $attachment->post_title,
-				'alt'           => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
+				'alt'           => get_post_meta( $item_id, '_wp_attachment_image_alt', true ),
 				'caption'       => $attachment->post_excerpt,
 				'description'   => $attachment->post_content,
 				'credit'        => $custom_meta ? ( $custom_meta->credit ?? '' ) : '',
@@ -375,7 +375,7 @@ final class Item_Ajax_Endpoints {
 			wp_send_json_error( 'Failed to update item data' );
 		}
 
-		update_post_meta( $item_id, '_wp_attachment_item_alt', $alt );
+		update_post_meta( $item_id, '_wp_attachment_image_alt', $alt );
 
 		global $wpdb;
 		$table = $wpdb->prefix . 'fotogrids_item_meta';
@@ -454,7 +454,7 @@ final class Item_Ajax_Endpoints {
 				'url'       => $row['external_url'] ? $row['external_url'] : '',
 				'target'    => $row['link_target'] ? $row['link_target'] : 'global',
 				'thumbnail' => wp_get_attachment_image_url( $attachment_id, 'fotogrids_masonry' ),
-				'alt'       => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+				'alt'       => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 				'title'     => $attachment ? $attachment->post_title : '',
 			);
 		}
@@ -468,7 +468,7 @@ final class Item_Ajax_Endpoints {
 					'url'       => '',
 					'target'    => 'global',
 					'thumbnail' => wp_get_attachment_image_url( $item_id, 'fotogrids_masonry' ),
-					'alt'       => get_post_meta( $item_id, '_wp_attachment_item_alt', true ),
+					'alt'       => get_post_meta( $item_id, '_wp_attachment_image_alt', true ),
 					'title'     => $attachment ? $attachment->post_title : '',
 				);
 			}

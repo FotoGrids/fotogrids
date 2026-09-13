@@ -83,7 +83,7 @@ class Items_Data {
 					'location'    => $row['location'],
 					'url'         => wp_get_attachment_url( $attachment_id ),
 					'sizes'       => wp_get_attachment_image_sizes( $attachment_id ),
-					'alt'         => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+					'alt'         => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 				);
 			}
 		}

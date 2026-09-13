@@ -23,7 +23,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 			sizeInfo = React.createElement('span', { key: 'size' }, [
 				React.createElement(
 					'strong',
-					null,
+					{ key: 'label' },
 					__('Image Size:', 'fotogrids')
 				),
 				` ${selectedOption.width}x${selectedOption.height}`,
@@ -32,7 +32,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 			sizeInfo = React.createElement('span', { key: 'size' }, [
 				React.createElement(
 					'strong',
-					null,
+					{ key: 'label' },
 					__('Image Size:', 'fotogrids')
 				),
 				` ${__('Original', 'fotogrids')}`,
@@ -46,7 +46,7 @@ window.FotoGridsRenderSettings.renderImageSize = (
 				? React.createElement('span', { key: 'crop' }, [
 						React.createElement(
 							'strong',
-							null,
+							{ key: 'label' },
 							__('Crop:', 'fotogrids')
 						),
 						` ${selectedOption.crop ? __('Yes', 'fotogrids') : __('No', 'fotogrids')}`,

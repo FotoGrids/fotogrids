@@ -339,7 +339,7 @@ final class Gallery_Repository {
 				'medium'       => wp_get_attachment_image_url( $attachment_id, 'medium' ),
 				'large'        => wp_get_attachment_image_url( $attachment_id, 'large' ),
 				'full'         => wp_get_attachment_url( $attachment_id ),
-				'alt'          => get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+				'alt'          => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 				'title'        => $attachment->post_title,
 				'external_url' => get_post_meta( $attachment_id, '_fotogrids_external_url', true ),
 				'link_target'  => get_post_meta( $attachment_id, '_fotogrids_link_target', true ),

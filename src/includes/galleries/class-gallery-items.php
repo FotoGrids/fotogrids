@@ -59,12 +59,6 @@ final class Gallery_Items {
 	 * extraction enabled, also writes a row into `fotogrids_item_meta` with
 	 * the resolved EXIF + caption / description / location data.
 	 *
-	 * Seeds the FotoGrids alt (`_wp_attachment_item_alt`) from the WP Media
-	 * Library alt (`_wp_attachment_image_alt`) on first add - items added
-	 * before the user has touched the FotoGrids item editor still render with
-	 * the alt the user already typed in the Media Library, rather than
-	 * silently falling back to the title.
-	 *
 	 * @since 1.0.0
 	 * @param int                  $gallery_id    Gallery post ID.
 	 * @param int                  $attachment_id Attachment ID.
@@ -80,14 +74,6 @@ final class Gallery_Items {
 		}
 		if ( ! get_post( $attachment_id ) ) {
 			return false;
-		}
-
-		// Seed FotoGrids alt from the WP Media Library alt if not already set.
-		if ( '' === get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ) ) {
-			$wp_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
-			if ( '' !== (string) $wp_alt ) {
-				update_post_meta( $attachment_id, '_wp_attachment_item_alt', $wp_alt );
-			}
 		}
 
 		// Append to the post-meta ID list (idempotent).

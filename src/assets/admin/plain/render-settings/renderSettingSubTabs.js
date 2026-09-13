@@ -38,6 +38,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 				h(
 					'div',
 					{
+						key: 'inner',
 						className: 'fotogrids-lightbox-subtab-content__inner',
 					},
 					singleSubTab.settings?.map((subSetting) =>
@@ -58,9 +59,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 		[
 			h(
 				'div',
-				{
-					className: 'fotogrids-lightbox-subtabs__nav',
-				},
+				{ key: 'nav', className: 'fotogrids-lightbox-subtabs__nav' },
 				availableSubTabs.map((subTab) =>
 					h(
 						'button',
@@ -79,6 +78,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 							h(
 								'span',
 								{
+									key: 'icon',
 									className:
 										'fotogrids-lightbox-subtab__icon',
 								},
@@ -87,6 +87,7 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 							h(
 								'span',
 								{
+									key: 'label',
 									className:
 										'fotogrids-lightbox-subtab__label',
 								},
@@ -100,12 +101,14 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 			h(
 				'div',
 				{
+					key: 'subtab-content',
 					className: 'fotogrids-lightbox-subtab-content',
 				},
 				[
 					h(
 						'div',
 						{
+							key: 'inner',
 							className:
 								'fotogrids-lightbox-subtab-content__inner',
 						},
