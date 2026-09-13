@@ -82,7 +82,7 @@ const TabVideo = ({ itemData, videoSettings, onChange, disabled = false, strings
                         id="fotogrids-video-autoplay"
                         label={strings.autoplay || 'Autoplay'}
                         description={strings.autoplayNote || 'Autoplay is subject to browser autoplay policies.'}
-                        checked={videoSettings.autoplay === undefined ? true : !!videoSettings.autoplay}
+                        checked={!!videoSettings.autoplay}
                         onChange={(v) => setBool('autoplay', v)}
                         disabled={disabled}
                     />

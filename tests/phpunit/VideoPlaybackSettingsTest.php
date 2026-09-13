@@ -19,7 +19,7 @@ final class VideoPlaybackSettingsTest extends TestCase {
 	public function test_empty_custom_data_yields_the_editor_defaults(): void {
 		$this->assertSame(
 			array(
-				'autoplay' => true,
+				'autoplay' => false,
 				'mute'     => false,
 				'loop'     => false,
 				'controls' => true,
@@ -68,16 +68,66 @@ final class VideoPlaybackSettingsTest extends TestCase {
 	public function test_truthy_and_falsy_scalars_are_cast(): void {
 		$settings = Video_Item_Helpers::playback_settings(
 			array(
-				'autoplay' => 0,
+				'autoplay' => 1,
 				'mute'     => '1',
 				'loop'     => '',
-				'controls' => 1,
+				'controls' => 0,
 			)
 		);
 
-		$this->assertFalse( $settings['autoplay'] );
+		$this->assertTrue( $settings['autoplay'] );
 		$this->assertTrue( $settings['mute'] );
 		$this->assertFalse( $settings['loop'] );
-		$this->assertTrue( $settings['controls'] );
+		$this->assertFalse( $settings['controls'] );
+	}
+
+	public function test_lightbox_playback_always_keeps_the_badge(): void {
+		$this->assertTrue(
+			Video_Item_Helpers::needs_play_badge(
+				Video_Item_Helpers::TYPE_FILE,
+				'lightbox',
+				array( 'autoplay' => true, 'controls' => true )
+			)
+		);
+	}
+
+	public function test_an_autoplaying_inline_tile_needs_no_badge(): void {
+		$this->assertFalse(
+			Video_Item_Helpers::needs_play_badge(
+				Video_Item_Helpers::TYPE_FILE,
+				'inline',
+				array( 'autoplay' => true, 'controls' => false )
+			)
+		);
+	}
+
+	public function test_a_file_video_showing_its_controls_needs_no_badge(): void {
+		$this->assertFalse(
+			Video_Item_Helpers::needs_play_badge(
+				Video_Item_Helpers::TYPE_FILE,
+				'inline',
+				array( 'autoplay' => false, 'controls' => true )
+			)
+		);
+	}
+
+	public function test_a_file_video_hiding_its_controls_keeps_the_badge(): void {
+		$this->assertTrue(
+			Video_Item_Helpers::needs_play_badge(
+				Video_Item_Helpers::TYPE_FILE,
+				'inline',
+				array( 'autoplay' => false, 'controls' => false )
+			)
+		);
+	}
+
+	public function test_an_unloaded_embed_keeps_the_badge_even_with_controls_on(): void {
+		$this->assertTrue(
+			Video_Item_Helpers::needs_play_badge(
+				Video_Item_Helpers::TYPE_YOUTUBE,
+				'inline',
+				array( 'autoplay' => false, 'controls' => true )
+			)
+		);
 	}
 }

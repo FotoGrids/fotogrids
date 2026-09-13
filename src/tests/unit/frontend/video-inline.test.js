@@ -1,8 +1,9 @@
 /**
  * Tests for public/render/video/video-inline.js (IIFE; runs init() on import).
  *
- * The module publishes play() on window.FotoGrids.modules.videoInline, which is
- * what these tests drive - the click wiring itself belongs to onGallery.
+ * The module publishes prepare() and play() on window.FotoGrids.modules
+ * .videoInline. prepare() is what onGallery runs over each tile; play() is the
+ * click path. The click wiring itself belongs to onGallery.
  */
 
 function loadModule() {
@@ -12,18 +13,24 @@ function loadModule() {
 	return window.FotoGrids.modules.videoInline;
 }
 
-function makeTile(attrs) {
+function makeTile(attrs, { poster = '' } = {}) {
 	const tile = document.createElement('span');
 	tile.className = 'fg-video';
 	tile.setAttribute('data-fg-playback-mode', 'inline');
 	Object.entries(attrs).forEach(([name, value]) => {
 		tile.setAttribute(name, value);
 	});
+	if (poster) {
+		const img = document.createElement('img');
+		img.className = 'fg-video-poster';
+		img.src = poster;
+		tile.appendChild(img);
+	}
 	document.body.appendChild(tile);
 	return tile;
 }
 
-function fileTile(settings) {
+function fileTile(settings, opts) {
 	const attrs = {
 		'data-fg-item-type': 'video_file',
 		'data-fg-video-src': 'https://example.com/clip.mp4',
@@ -31,7 +38,15 @@ function fileTile(settings) {
 	if (settings !== undefined) {
 		attrs['data-fg-embed-settings'] = JSON.stringify(settings);
 	}
-	return makeTile(attrs);
+	return makeTile(attrs, opts);
+}
+
+function embedTile(settings) {
+	return makeTile({
+		'data-fg-item-type': 'video_youtube',
+		'data-fg-embed-id': 'abc123',
+		'data-fg-embed-settings': JSON.stringify(settings),
+	});
 }
 
 function playerParams(tile) {
@@ -39,87 +54,178 @@ function playerParams(tile) {
 }
 
 describe('video-inline', () => {
+	let playMock;
+
 	beforeEach(() => {
 		document.body.innerHTML = '';
 		window.FotoGrids = { onGallery: jest.fn() };
+		delete window.IntersectionObserver;
+		playMock = jest.fn(() => Promise.resolve());
+		window.HTMLMediaElement.prototype.play = playMock;
 	});
 
-	it('applies the stored playback settings to a file video', () => {
-		const play = loadModule().play;
-		const tile = fileTile({
-			autoplay: false,
-			mute: true,
-			loop: true,
-			controls: false,
+	describe('resting state', () => {
+		it('mounts a paused native player when controls are on', () => {
+			const { prepare } = loadModule();
+			const tile = fileTile(
+				{ autoplay: false, controls: true, mute: true, loop: true },
+				{ poster: 'https://example.com/poster.jpg' }
+			);
+
+			prepare(tile);
+
+			const video = tile.querySelector('video');
+			expect(video).not.toBeNull();
+			expect(video.controls).toBe(true);
+			expect(video.autoplay).toBe(false);
+			expect(video.muted).toBe(true);
+			expect(video.loop).toBe(true);
+			expect(video.poster).toBe('https://example.com/poster.jpg');
+			expect(video.preload).toBe('metadata');
+			expect(playMock).not.toHaveBeenCalled();
 		});
 
-		play(tile);
+		it('leaves the poster and badge alone when controls are off', () => {
+			const { prepare } = loadModule();
+			const tile = fileTile({ autoplay: false, controls: false });
 
-		const video = tile.querySelector('video');
-		expect(video).not.toBeNull();
-		expect(video.src).toBe('https://example.com/clip.mp4');
-		expect(video.autoplay).toBe(false);
-		expect(video.muted).toBe(true);
-		expect(video.loop).toBe(true);
-		expect(video.controls).toBe(false);
-	});
+			prepare(tile);
 
-	it('falls back to autoplay and controls on when settings are absent', () => {
-		const play = loadModule().play;
-		const tile = fileTile();
-
-		play(tile);
-
-		const video = tile.querySelector('video');
-		expect(video.autoplay).toBe(true);
-		expect(video.controls).toBe(true);
-		expect(video.muted).toBe(false);
-		expect(video.loop).toBe(false);
-	});
-
-	it('carries autoplay through to a YouTube embed', () => {
-		const play = loadModule().play;
-		const off = makeTile({
-			'data-fg-item-type': 'video_youtube',
-			'data-fg-embed-id': 'abc123',
-			'data-fg-embed-settings': JSON.stringify({ autoplay: false }),
-		});
-		const on = makeTile({
-			'data-fg-item-type': 'video_youtube',
-			'data-fg-embed-id': 'abc123',
-			'data-fg-embed-settings': JSON.stringify({ autoplay: true }),
+			expect(tile.querySelector('video')).toBeNull();
+			expect(tile.getAttribute('data-fg-playing')).toBeNull();
 		});
 
-		play(off);
-		play(on);
+		it('does not load an embed iframe until it is clicked', () => {
+			const { prepare } = loadModule();
+			const tile = embedTile({ autoplay: false, controls: true });
 
-		expect(playerParams(off).get('autoplay')).toBe('0');
-		expect(playerParams(on).get('autoplay')).toBe('1');
+			prepare(tile);
+
+			expect(tile.querySelector('iframe')).toBeNull();
+		});
 	});
 
-	it('carries autoplay through to a Vimeo embed', () => {
-		const play = loadModule().play;
-		const tile = makeTile({
-			'data-fg-item-type': 'video_vimeo',
-			'data-fg-embed-id': '987654',
-			'data-fg-embed-settings': JSON.stringify({ autoplay: false, mute: true }),
+	describe('autoplay', () => {
+		it('mounts and plays immediately when there is no IntersectionObserver', () => {
+			const { prepare } = loadModule();
+			const tile = fileTile({ autoplay: true, mute: true });
+
+			prepare(tile);
+
+			const video = tile.querySelector('video');
+			expect(video.autoplay).toBe(true);
+			expect(video.preload).toBe('auto');
+			expect(playMock).toHaveBeenCalled();
 		});
 
-		play(tile);
+		it('waits for the tile to reach the viewport when one exists', () => {
+			const observed = [];
+			let fire;
+			window.IntersectionObserver = function (cb) {
+				fire = cb;
+				this.observe = (el) => observed.push(el);
+				this.disconnect = jest.fn();
+			};
 
-		const params = playerParams(tile);
-		expect(params.get('autoplay')).toBe('0');
-		expect(params.get('muted')).toBe('1');
+			const { prepare } = loadModule();
+			const tile = fileTile({ autoplay: true, mute: true });
+
+			prepare(tile);
+			expect(observed).toEqual([tile]);
+			expect(tile.querySelector('video')).toBeNull();
+
+			fire([{ isIntersecting: true, target: tile }]);
+			expect(tile.querySelector('video')).not.toBeNull();
+			expect(playMock).toHaveBeenCalled();
+		});
+
+		it('restores a play badge when the browser refuses a controls-off autoplay', async () => {
+			playMock.mockReturnValue(Promise.reject(new Error('blocked')));
+			const { prepare } = loadModule();
+			const tile = fileTile({ autoplay: true, controls: false });
+
+			prepare(tile);
+			await Promise.resolve();
+			await Promise.resolve();
+
+			expect(tile.querySelector('.fg-video-badge')).not.toBeNull();
+		});
+
+		it('leaves a refused autoplay alone when the native controls are showing', async () => {
+			playMock.mockReturnValue(Promise.reject(new Error('blocked')));
+			const { prepare } = loadModule();
+			const tile = fileTile({ autoplay: true, controls: true });
+
+			prepare(tile);
+			await Promise.resolve();
+			await Promise.resolve();
+
+			expect(tile.querySelector('.fg-video-badge')).toBeNull();
+		});
 	});
 
-	it('leaves a tile that is already playing untouched', () => {
-		const play = loadModule().play;
-		const tile = fileTile({ mute: true });
+	describe('click', () => {
+		it('starts playback regardless of the stored autoplay value', () => {
+			const { play } = loadModule();
+			const tile = fileTile({ autoplay: false, controls: false, mute: true });
 
-		play(tile);
-		const first = tile.querySelector('video');
-		play(tile);
+			play(tile);
 
-		expect(tile.querySelector('video')).toBe(first);
+			const video = tile.querySelector('video');
+			expect(video.autoplay).toBe(true);
+			expect(video.muted).toBe(true);
+			expect(playMock).toHaveBeenCalled();
+		});
+
+		it('opens a clicked embed with autoplay on, whatever the item stored', () => {
+			const { play } = loadModule();
+			const tile = embedTile({ autoplay: false, mute: true });
+
+			play(tile);
+
+			const params = playerParams(tile);
+			expect(params.get('autoplay')).toBe('1');
+			expect(params.get('mute')).toBe('1');
+		});
+
+		it('leaves a tile that is already playing untouched', () => {
+			const { play } = loadModule();
+			const tile = fileTile({ mute: true });
+
+			play(tile);
+			const first = tile.querySelector('video');
+			play(tile);
+
+			expect(tile.querySelector('video')).toBe(first);
+		});
+	});
+
+	describe('stored settings', () => {
+		it('applies mute, loop and controls to the player', () => {
+			const { play } = loadModule();
+			const tile = fileTile({ mute: true, loop: true, controls: false });
+
+			play(tile);
+
+			const video = tile.querySelector('video');
+			expect(video.muted).toBe(true);
+			expect(video.loop).toBe(true);
+			expect(video.controls).toBe(false);
+		});
+
+		it('carries mute and controls into a Vimeo embed URL', () => {
+			const { play } = loadModule();
+			const tile = makeTile({
+				'data-fg-item-type': 'video_vimeo',
+				'data-fg-embed-id': '987654',
+				'data-fg-embed-settings': JSON.stringify({ mute: true, loop: true }),
+			});
+
+			play(tile);
+
+			const params = playerParams(tile);
+			expect(params.get('muted')).toBe('1');
+			expect(params.get('loop')).toBe('1');
+		});
 	});
 });

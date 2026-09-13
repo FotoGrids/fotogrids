@@ -101,7 +101,7 @@ const ItemEditModal = ({
             if (itemData.item_type === 'video_file') {
                 const cd = itemData.custom_data || {};
                 const initialVideo = {
-                    autoplay:   cd.autoplay === undefined ? true : !!cd.autoplay,
+                    autoplay:   !!cd.autoplay,
                     mute:       !!cd.mute,
                     loop:       !!cd.loop,
                     controls:   cd.controls === undefined ? true : !!cd.controls,
@@ -293,7 +293,7 @@ const ItemEditModal = ({
             // Video items send their poster + playback settings for custom_data.
             if (itemData?.item_type === 'video_file') {
                 payload.video_settings = {
-                    autoplay:   videoSettings.autoplay === undefined ? true : !!videoSettings.autoplay,
+                    autoplay:   !!videoSettings.autoplay,
                     mute:       !!videoSettings.mute,
                     loop:       !!videoSettings.loop,
                     controls:   videoSettings.controls === undefined ? true : !!videoSettings.controls,
