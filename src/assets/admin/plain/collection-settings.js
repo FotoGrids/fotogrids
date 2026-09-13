@@ -1400,7 +1400,7 @@ function CollectionSettings() {
 		return null;
 	};
 
-	const renderSetting = (setting) => {
+	const renderSettingControl = (setting) => {
 		// Drop hidden nodes (set by a `hide` placement) and sections whose
 		// group-level `visible_when` predicate evaluates false.
 		if (setting?.hidden) {
@@ -2000,6 +2000,15 @@ function CollectionSettings() {
 			].filter(Boolean)
 		);
 	};
+
+	// The control is built lazily inside the boundary so a throw in a renderer
+	// is caught by it; a boundary wrapped around an already-built tree is not
+	// enough, because that tree is built during this function's own render.
+	const renderSetting = (setting) =>
+		window.FotoGridsAdmin.withErrorBoundary(
+			{ key: setting.key, label: `setting "${setting.key}"` },
+			() => renderSettingControl(setting)
+		);
 
 	const renderDocumentationStrip = () => {
 		const defaultsUrl = window.fotogridsSettings?.defaultsUrl || '';
@@ -3004,7 +3013,13 @@ function initializeCollectionSettings() {
 		const tree = editable
 			? h(CollectionSettings)
 			: h(ReadonlyWrapper, null, h(CollectionSettings));
-		createRoot(container).render(tree);
+		createRoot(container).render(
+			h(
+				window.FotoGridsAdmin.ErrorBoundary,
+				{ label: 'collection settings' },
+				tree
+			)
+		);
 	} else {
 		setTimeout(initializeCollectionSettings, 100);
 	}

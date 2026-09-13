@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import ToastContainer from './components/toast/ToastContainer';
 import toastManager from './toast-manager';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 function initializeToasts() {
 	if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage) {
@@ -48,7 +49,13 @@ function initializeToasts() {
 	try {
 		const root = createRoot(container);
 		container._reactRootContainer = root;
-		root.render(React.createElement(ToastApp));
+		root.render(
+			React.createElement(
+				ErrorBoundary,
+				{ label: 'toasts' },
+				React.createElement(ToastApp)
+			)
+		);
 	} catch (error) {
 		console.error('FotoGrids: Error initializing toast system:', error);
 	}

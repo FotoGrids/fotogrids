@@ -14,6 +14,7 @@ import PluginSettingsPage from './components/pages/PluginSettingsPage';
 import ToolsPage from './components/pages/ToolsPage';
 import LibraryPage from './components/pages/LibraryPage';
 import SetupWizardPage from './components/pages/SetupWizardPage';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 const SETUP_QUERY_PARAM = 'fotogrids_setup_step';
 
@@ -34,15 +35,21 @@ function renderComponent(containerId, Component) {
 		return;
 	}
 
+	const element = React.createElement(
+		ErrorBoundary,
+		{ label: containerId },
+		React.createElement(Component)
+	);
+
 	if (container._reactRootContainer) {
-		container._reactRootContainer.render(React.createElement(Component));
+		container._reactRootContainer.render(element);
 		return;
 	}
 
 	try {
 		const root = createRoot(container);
 		container._reactRootContainer = root;
-		root.render(React.createElement(Component));
+		root.render(element);
 	} catch (error) {
 		console.error(`FotoGrids: Error rendering ${containerId}:`, error);
 	}
