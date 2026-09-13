@@ -126,6 +126,34 @@ final class CatalogI18nTest extends TestCase {
 		$this->assertSame( self::KNOWN_LABEL, $setting['type'] );
 	}
 
+	public function test_html_rendered_keys_are_filtered_to_the_allowlist(): void {
+		$GLOBALS['fotogrids_test_translations']['fotogrids']['Caption Placement'] =
+			'Caption <strong>Placement</strong><script>alert(1)</script>';
+
+		$tree = Catalog_I18n::translate_tree(
+			array(
+				'tab' => array(
+					'settings' => array(
+						array(
+							'key'         => 'caption_placement',
+							'description' => 'Caption Placement',
+							'label'       => 'Caption Placement',
+						),
+					),
+				),
+			)
+		);
+
+		$setting = $tree['tab']['settings'][0];
+
+		$this->assertSame( 'Caption <strong>Placement</strong>alert(1)', $setting['description'] );
+		$this->assertSame(
+			'Caption <strong>Placement</strong><script>alert(1)</script>',
+			$setting['label'],
+			'A label is rendered as escaped text, so it is not filtered.'
+		);
+	}
+
 	public function test_an_untranslated_locale_leaves_the_tree_unchanged(): void {
 		$tree = array(
 			'tab' => array(

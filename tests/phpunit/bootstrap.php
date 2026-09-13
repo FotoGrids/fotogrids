@@ -71,3 +71,17 @@ if ( ! function_exists( 'apply_filters' ) ) {
 		return null === $callback ? $value : $callback( $value );
 	}
 }
+
+// Stand-in for wp_kses in the isolated suite: filters tags to the allowlist so
+// the key policy in Catalog_I18n can be asserted. Real wp_kses also filters
+// attributes and normalises entities; this double does neither.
+if ( ! function_exists( 'wp_kses' ) ) {
+	/**
+	 * @param string                            $string       Text to filter.
+	 * @param array<string, array<string, bool>> $allowed_html Allowed tags.
+	 * @return string
+	 */
+	function wp_kses( $string, $allowed_html ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		return strip_tags( (string) $string, array_keys( (array) $allowed_html ) );
+	}
+}

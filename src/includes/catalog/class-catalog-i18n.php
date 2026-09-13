@@ -24,6 +24,10 @@ if ( ! defined( 'WPINC' ) ) {
  * each one as a literal __() call, which both feeds the extractor and produces
  * the original-to-translated map this class applies.
  *
+ * This is also where a translation file first gets to influence the settings
+ * UI, and the UI renders the description and message keys as HTML, so those
+ * two are filtered to ALLOWED_HTML on the way through.
+ *
  * @since 1.1.1
  */
 final class Catalog_I18n {
@@ -43,6 +47,26 @@ final class Catalog_I18n {
 	);
 
 	/**
+	 * Text keys the settings UI renders as HTML rather than as escaped text.
+	 */
+	private const HTML_KEYS = array( 'description', 'message' );
+
+	/**
+	 * HTML a catalog string may carry into the settings UI.
+	 */
+	private const ALLOWED_HTML = array(
+		'a'      => array(
+			'href'   => true,
+			'rel'    => true,
+			'target' => true,
+		),
+		'br'     => array(),
+		'code'   => array(),
+		'em'     => array(),
+		'strong' => array(),
+	);
+
+	/**
 	 * Resolved translation map, or null before the first lookup.
 	 *
 	 * @var array<string, string>|null
@@ -50,7 +74,8 @@ final class Catalog_I18n {
 	private static ?array $strings = null;
 
 	/**
-	 * Returns the tree with every user-facing string translated.
+	 * Returns the tree with every user-facing string translated and the
+	 * HTML-rendered ones filtered.
 	 *
 	 * Runs before any consumer substitutes placeholders, so the strings still
 	 * match the catalog literals the map is keyed by.
@@ -60,13 +85,7 @@ final class Catalog_I18n {
 	 * @return  array<string, mixed>
 	 */
 	public static function translate_tree( array $tree ): array {
-		$strings = self::strings();
-
-		if ( array() === $strings ) {
-			return $tree;
-		}
-
-		return self::translate_node( $tree, $strings );
+		return self::translate_node( $tree, self::strings() );
 	}
 
 	/**
@@ -116,13 +135,17 @@ final class Catalog_I18n {
 				continue;
 			}
 
-			if (
-				is_string( $value )
-				&& in_array( $key, self::TEXT_KEYS, true )
-				&& isset( $strings[ $value ] )
-			) {
-				$node[ $key ] = $strings[ $value ];
+			if ( ! is_string( $value ) || ! in_array( $key, self::TEXT_KEYS, true ) ) {
+				continue;
 			}
+
+			if ( isset( $strings[ $value ] ) ) {
+				$value = $strings[ $value ];
+			}
+
+			$node[ $key ] = in_array( $key, self::HTML_KEYS, true )
+				? wp_kses( $value, self::ALLOWED_HTML )
+				: $value;
 		}
 
 		return $node;
