@@ -24,11 +24,13 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 	return h(
 		'div',
 		{
+			key: 'bulk-modal',
 			className: 'fotogrids-modal',
 			id: 'fotogrids-modal__bulk-external-url',
 		},
 		[
 			h('div', {
+				key: 'overlay',
 				className: 'fotogrids-modal__overlay',
 				onClick: (e) => {
 					if (e.target === e.currentTarget) {
@@ -39,19 +41,15 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 
 			h(
 				'div',
-				{
-					className: 'fotogrids-modal__content',
-				},
+				{ key: 'content', className: 'fotogrids-modal__content' },
 				[
 					h(
 						'div',
-						{
-							className: 'fotogrids-modal__header',
-						},
+						{ key: 'header', className: 'fotogrids-modal__header' },
 						[
 							h(
 								'h3',
-								{},
+								{ key: 'h3' },
 								bulkAction === 'apply_to_all'
 									? __('Apply URL to All Items', 'fotogrids')
 									: __('Clear All URLs', 'fotogrids')
@@ -59,6 +57,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 							h(
 								'button',
 								{
+									key: 'close',
 									type: 'button',
 									className: 'fotogrids-modal__close',
 									onClick: closeBulkModal,
@@ -70,13 +69,12 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 
 					h(
 						'div',
-						{
-							className: 'fotogrids-modal__body',
-						},
+						{ key: 'body', className: 'fotogrids-modal__body' },
 						[
 							h(
 								'div',
 								{
+									key: 'layout',
 									className:
 										'fotogrids-modal__layout fotogrids-modal__layout-single',
 								},
@@ -86,6 +84,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 												h(
 													'div',
 													{
+														key: 'field',
 														className:
 															'fotogrids-modal__field',
 													},
@@ -93,6 +92,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 														h(
 															'label',
 															{
+																key: 'label',
 																className:
 																	'fotogrids-setting__label',
 															},
@@ -102,6 +102,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 															)
 														),
 														h('input', {
+															key: 'input',
 															type: 'url',
 															value: bulkUrl,
 															placeholder: __(
@@ -128,6 +129,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 															h(
 																'div',
 																{
+																	key: 'validation',
 																	className: `fotogrids-modal__validation ${validation.valid ? 'fotogrids-modal__validation--valid' : 'fotogrids-modal__validation--invalid'}`,
 																},
 																validation.message
@@ -138,6 +140,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 												h(
 													'div',
 													{
+														key: 'field-2',
 														className:
 															'fotogrids-modal__field',
 													},
@@ -145,6 +148,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 														h(
 															'label',
 															{
+																key: 'label',
 																className:
 																	'fotogrids-setting__label',
 															},
@@ -156,6 +160,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 														h(
 															'select',
 															{
+																key: 'select',
 																value: bulkTarget,
 																onChange: (e) =>
 																	setBulkTarget(
@@ -169,6 +174,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																h(
 																	'option',
 																	{
+																		key: 'option',
 																		value: 'global',
 																	},
 																	__(
@@ -179,6 +185,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																h(
 																	'option',
 																	{
+																		key: 'option-2',
 																		value: '_self',
 																	},
 																	__(
@@ -189,6 +196,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 																h(
 																	'option',
 																	{
+																		key: 'option-3',
 																		value: '_blank',
 																	},
 																	__(
@@ -204,7 +212,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 										: [
 												h(
 													'p',
-													{},
+													{ key: 'p' },
 													__(
 														'Are you sure you want to clear all URLs? This action cannot be undone.',
 														'fotogrids'
@@ -218,13 +226,12 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 
 					h(
 						'div',
-						{
-							className: 'fotogrids-modal__footer',
-						},
+						{ key: 'footer', className: 'fotogrids-modal__footer' },
 						[
 							h(
 								'button',
 								{
+									key: 'fg-button',
 									type: 'button',
 									className:
 										'fg-button fg-button--variant-secondary',
@@ -235,6 +242,7 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 							h(
 								'button',
 								{
+									key: 'fg-button-2',
 									type: 'button',
 									className: `fg-button fg-button--variant-primary`,
 									onClick: executeBulkAction,

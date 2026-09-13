@@ -65,15 +65,14 @@ window.FotoGridsRenderSettings.renderRange = (
 		[
 			h(
 				'label',
-				{
-					className: 'fotogrids-setting__label',
-				},
+				{ key: 'label', className: 'fotogrids-setting__label' },
 				[
 					setting.label,
 					setting.unit &&
 						h(
 							'span',
 							{
+								key: 'unit',
 								className: 'fotogrids-setting__unit',
 							},
 							` (${setting.unit})`
@@ -93,10 +92,12 @@ window.FotoGridsRenderSettings.renderRange = (
 			h(
 				'div',
 				{
+					key: 'controls',
 					className: 'fotogrids-range-control__controls',
 				},
 				[
 					h('input', {
+						key: 'range-slider',
 						type: 'range',
 						min: setting.min,
 						max: setting.max,
@@ -110,10 +111,12 @@ window.FotoGridsRenderSettings.renderRange = (
 					h(
 						'div',
 						{
+							key: 'value',
 							className: 'fotogrids-range-control__value',
 						},
 						[
 							h('input', {
+								key: 'number-input',
 								type: 'number',
 								min: setting.min,
 								max: setting.max,
@@ -138,6 +141,7 @@ window.FotoGridsRenderSettings.renderRange = (
 											window.FotoGridsRenderSettings
 												.CustomUnitSelect,
 											{
+												key: 'unit-select',
 												value: unit,
 												onChange: (e) =>
 													!isDisabled &&
@@ -156,6 +160,7 @@ window.FotoGridsRenderSettings.renderRange = (
 									: h(
 											'select',
 											{
+												key: 'units-select',
 												value: unit,
 												onChange: (e) =>
 													!isDisabled &&
@@ -184,6 +189,7 @@ window.FotoGridsRenderSettings.renderRange = (
 				h(
 					'p',
 					{
+						key: 'description',
 						className: 'fotogrids-setting__description',
 					},
 					setting.description

@@ -16,6 +16,7 @@ window.FotoGridsRenderSettings.renderConditionalMessage = (
 	return h(
 		'div',
 		{
+			key: 'conditional-message',
 			className: 'fotogrids-conditional-message',
 		},
 		h(

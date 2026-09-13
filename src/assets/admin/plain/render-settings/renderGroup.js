@@ -53,6 +53,7 @@ window.FotoGridsRenderSettings.renderGroup = (
 				h(
 					'div',
 					{
+						key: 'content',
 						className: 'fotogrids-setting-group__content',
 					},
 					childSettings
@@ -69,9 +70,7 @@ window.FotoGridsRenderSettings.renderGroup = (
 		[
 			h(
 				'legend',
-				{
-					className: 'fotogrids-setting-group__label',
-				},
+				{ key: 'label', className: 'fotogrids-setting-group__label' },
 				[
 					setting.label,
 					showSettingBadge &&
@@ -89,6 +88,7 @@ window.FotoGridsRenderSettings.renderGroup = (
 			h(
 				'div',
 				{
+					key: 'content',
 					className: 'fotogrids-setting-group__content',
 				},
 				childSettings

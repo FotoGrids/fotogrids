@@ -55,15 +55,14 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 	return h(
 		'div',
 		{
+			key: 'button-group',
 			className: wrapperClassName,
 		},
 		[
 			setting.label &&
 				h(
 					'label',
-					{
-						className: 'fotogrids-setting__label',
-					},
+					{ key: 'label', className: 'fotogrids-setting__label' },
 					[
 						setting.label,
 						showSettingBadge &&
@@ -77,9 +76,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 				),
 			h(
 				'div',
-				{
-					className: buttonsContainerClass,
-				},
+				{ key: 'div', className: buttonsContainerClass },
 				filteredOptions.map((option, index) => {
 					if (!option) {
 						return h('div', {
@@ -117,6 +114,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 								h(
 									'span',
 									{
+										key: 'button-icon',
 										className: 'fg-button-icon',
 									},
 									renderIcon(option.icon)
@@ -125,6 +123,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 								h(
 									'span',
 									{
+										key: 'button-label',
 										className: 'fg-button-label',
 									},
 									[
@@ -133,6 +132,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 											h(
 												'span',
 												{
+													key: 'button-unit',
 													className: 'fg-button-unit',
 												},
 												` (${option.value}${option.unit})`
@@ -141,6 +141,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 											h(
 												'span',
 												{
+													key: 'button-note',
 													className: 'fg-button-note',
 												},
 												` (${option.note})`
@@ -160,6 +161,7 @@ window.FotoGridsRenderSettings.renderButtonGroup = (
 			),
 			setting.description &&
 				h('div', {
+					key: 'description',
 					className: 'fotogrids-setting__description',
 					dangerouslySetInnerHTML: { __html: setting.description },
 				}),
