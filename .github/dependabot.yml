@@ -9,6 +9,26 @@ updates:
       # Keep routine dev-tooling bumps in a single PR to cut review noise.
       dev-dependencies:
         dependency-type: development
+    ignore:
+      # Every @wordpress/* package below is a webpack external: the npm version is
+      # never bundled, it only sets the API surface the build type-checks against.
+      # That has to track the "Requires at least" WordPress version rather than the
+      # latest release, so major bumps are not routine updates. @wordpress/env and
+      # @wordpress/eslint-plugin are real dev tooling and are deliberately absent.
+      - dependency-name: "@wordpress/api-fetch"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@wordpress/block-editor"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@wordpress/blocks"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@wordpress/components"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@wordpress/data"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@wordpress/element"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@wordpress/i18n"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: composer
     directory: "/"
