@@ -16,7 +16,7 @@
         const privacy = !!settings.privacy_mode;
         const host = privacy ? 'https://www.youtube-nocookie.com' : 'https://www.youtube.com';
         const params = new URLSearchParams();
-        params.set('autoplay', '1');
+        params.set('autoplay', settings.autoplay === false ? '0' : '1');
         params.set('mute', settings.mute ? '1' : '0');
         params.set('controls', settings.controls === false ? '0' : '1');
         params.set('cc_load_policy', settings.captions ? '1' : '0');
@@ -37,7 +37,7 @@
 
     function buildVimeoSrc(embedId, settings) {
         const params = new URLSearchParams();
-        params.set('autoplay', '1');
+        params.set('autoplay', settings.autoplay === false ? '0' : '1');
         params.set('muted', settings.mute ? '1' : '0');
         params.set('loop', settings.loop ? '1' : '0');
         params.set('dnt', settings.privacy_mode ? '1' : '0');
@@ -81,7 +81,7 @@
             const video = document.createElement('video');
             video.src = src;
             video.controls = settings.controls === false ? false : true;
-            video.autoplay = true;
+            video.autoplay = settings.autoplay === false ? false : true;
             video.playsInline = true;
             video.muted = !!settings.mute;
             video.loop = !!settings.loop;

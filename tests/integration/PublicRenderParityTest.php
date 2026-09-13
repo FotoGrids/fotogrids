@@ -383,6 +383,20 @@ final class PublicRenderParityTest {
         self::test_error_markup_visibility_respects_settings_flag();
         self::test_random_sort_stamps_the_mode_attribute();
         self::test_layout_can_opt_out_of_random_sort_attributes();
+        self::test_video_item_carries_its_playback_settings();
+    }
+
+    private static function test_video_item_carries_its_playback_settings(): void {
+        Module_Registry::reset();
+        Module_Registry::register( 'layouts', Parity_Layout_Module::class );
+
+        $render_result = Render_Controller::factory()->render( self::make_video_context() );
+
+        self::assert_contains( 'data-fg-item-type="video_file"', $render_result->html, 'A video item should declare its item type for the playback modules.' );
+        self::assert_contains( 'data-fg-video-src="https://example.com/clip.mp4"', $render_result->html, 'A file video should carry its media URL.' );
+        self::assert_contains( '"mute":true', $render_result->html, 'The item playback settings should reach the markup the players read.' );
+        self::assert_contains( '"controls":false', $render_result->html, 'Hiding the player controls should reach the markup.' );
+        self::assert_contains( '"autoplay":false', $render_result->html, 'Turning autoplay off should reach the markup.' );
     }
 
     private static function test_random_sort_stamps_the_mode_attribute(): void {
@@ -496,6 +510,57 @@ final class PublicRenderParityTest {
                 hover_effect: null
             ),
             settings: $show_error ? [ '_show_render_errors' => true ] : [],
+            items: $items,
+            warnings: []
+        );
+    }
+
+    private static function make_video_context(): Render_Context {
+        $items = [
+            new Item_View(
+                id: 12,
+                thumb_url: 'https://example.com/poster.jpg',
+                full_url: 'https://example.com/poster.jpg',
+                alt: 'Video alt',
+                title: 'Video title',
+                caption: 'Video caption',
+                description: 'Video description',
+                item_type: 'video_file',
+                poster_url: 'https://example.com/poster.jpg',
+                video_src: 'https://example.com/clip.mp4',
+                embed_settings: [
+                    'autoplay' => false,
+                    'mute'     => true,
+                    'loop'     => true,
+                    'controls' => false,
+                ]
+            ),
+        ];
+
+        return new Render_Context(
+            meta: new Render_Meta(
+                gallery_id: 322,
+                album_id: null,
+                instance_id: 'fg-instance-322',
+                source: Request_Source::SHORTCODE,
+                is_preview: false,
+                mode: Render_Mode::INITIAL,
+                schema_version: 2
+            ),
+            layout: new Render_Layout(
+                layout_id: 'grid',
+                columns_mode: Columns_Mode::FIXED,
+                responsive_columns: [ 'desktop' => 3, 'tablet' => 2, 'mobile' => 1 ],
+                responsive_spacing: [ 'desktop' => 10, 'tablet' => 8, 'mobile' => 6 ],
+                columns_auto_range: []
+            ),
+            behavior: new Render_Behavior(
+                click_behavior: 'lightbox',
+                pagination_type: 'show_all',
+                pagination_method: 'load_more',
+                hover_effect: null
+            ),
+            settings: [],
             items: $items,
             warnings: []
         );

@@ -240,10 +240,11 @@ final class Item_Renderer {
 	/**
 	 * Renders the poster markup for a video item.
 	 *
-	 * Emits the poster image (or a placeholder when no poster resolved) plus a
-	 * play badge and the data-fg-* attributes the inline-playback and lightbox
-	 * frontend modules read to know how to play the item. The actual player
-	 * (<video> / <iframe>) is injected client-side on interaction.
+	 * Emits the poster image (or a placeholder when no poster resolved) and the
+	 * data-fg-* attributes the inline-playback and lightbox frontend modules
+	 * read to know how to play the item. The actual player (<video> /
+	 * <iframe>) is injected client-side. The play badge is added only for
+	 * tiles that would otherwise offer no way to start playback.
 	 *
 	 * @since   1.1.0
 	 * @param   Item_View      $item_view      Item data.
@@ -281,7 +282,11 @@ final class Item_Renderer {
 			$poster_html = '<span class="fg-video-poster fg-video-poster--placeholder" aria-hidden="true"></span>';
 		}
 
-		$badge_html = '<span class="fg-video-badge" aria-hidden="true"></span>';
+		$badge_html = \FotoGrids\Render\Video\Video_Item_Helpers::needs_play_badge(
+			$item_view->item_type,
+			$playback_mode,
+			$item_view->embed_settings
+		) ? '<span class="fg-video-badge" aria-hidden="true"></span>' : '';
 
 		$video_attrs = array(
 			'class'                 => 'fg-video',
