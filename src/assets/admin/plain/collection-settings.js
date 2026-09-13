@@ -167,69 +167,37 @@ const replacePostTypePlaceholders =
 const processSettingPlaceholders =
 	window.FotoGridsRenderSettings.processSettingPlaceholders;
 
-const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
-	const translated = withLegacyFreeFlag({ ...group });
+const prepareSettingsGroup = (group, normalizedPostType = 'gallery') => {
+	const prepared = withLegacyFreeFlag({ ...group });
 
-	if (translated.label) {
-		translated.label = __(translated.label, 'fotogrids');
-		translated.label = replacePostTypePlaceholders(
-			translated.label,
+	if (prepared.label) {
+		prepared.label = replacePostTypePlaceholders(
+			prepared.label,
 			normalizedPostType
 		);
 	}
 
-	if (translated.settings) {
-		translated.settings = translated.settings.map((setting) => {
-			let translatedSetting = withLegacyFreeFlag({ ...setting });
+	if (prepared.settings) {
+		prepared.settings = prepared.settings.map((setting) => {
+			let preparedSetting = withLegacyFreeFlag({ ...setting });
 
-			if (translatedSetting.label) {
-				translatedSetting.label = __(
-					translatedSetting.label,
-					'fotogrids'
+			if (preparedSetting.options) {
+				preparedSetting.options = preparedSetting.options.map(
+					(option) => withLegacyFreeFlag({ ...option })
 				);
 			}
 
-			if (translatedSetting.description) {
-				translatedSetting.description = __(
-					translatedSetting.description,
-					'fotogrids'
-				);
-			}
-
-			if (translatedSetting.options) {
-				translatedSetting.options = translatedSetting.options.map(
-					(option) =>
-						withLegacyFreeFlag({
-							...option,
-							label: option.label
-								? __(option.label, 'fotogrids')
-								: option.label,
-							description: option.description
-								? __(option.description, 'fotogrids')
-								: option.description,
-						})
-				);
-			}
-
-			if (translatedSetting.conditionalMessage?.message) {
-				translatedSetting.conditionalMessage.message = __(
-					translatedSetting.conditionalMessage.message,
-					'fotogrids'
-				);
-			}
-
-			if (translatedSetting.subTabs) {
-				Object.keys(translatedSetting.subTabs).forEach((subTabKey) => {
-					const subTab = translatedSetting.subTabs[subTabKey];
-					subTab.label = __(subTab.label, 'fotogrids');
+			if (preparedSetting.subTabs) {
+				Object.keys(preparedSetting.subTabs).forEach((subTabKey) => {
+					const subTab = preparedSetting.subTabs[subTabKey];
 					if (subTab.settings) {
 						subTab.settings = subTab.settings.map((subSetting) => {
-							const translatedSubSetting = translateSettingsGroup(
+							const preparedSubSetting = prepareSettingsGroup(
 								{ settings: [subSetting] },
 								normalizedPostType
 							).settings[0];
 							return processSettingPlaceholders(
-								translatedSubSetting,
+								preparedSubSetting,
 								normalizedPostType
 							);
 						});
@@ -237,19 +205,19 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 				});
 			}
 
-			translatedSetting = processSettingPlaceholders(
-				translatedSetting,
+			preparedSetting = processSettingPlaceholders(
+				preparedSetting,
 				normalizedPostType
 			);
 
-			return translatedSetting;
+			return preparedSetting;
 		});
 	}
 
-	if (translated.subTabs) {
+	if (prepared.subTabs) {
 		const processedSubTabs = {};
-		Object.keys(translated.subTabs).forEach((subTabKey) => {
-			const subTab = { ...translated.subTabs[subTabKey] };
+		Object.keys(prepared.subTabs).forEach((subTabKey) => {
+			const subTab = { ...prepared.subTabs[subTabKey] };
 
 			if (subTab.postTypes && Array.isArray(subTab.postTypes)) {
 				if (!subTab.postTypes.includes(normalizedPostType)) {
@@ -258,7 +226,6 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 			}
 
 			if (subTab.label) {
-				subTab.label = __(subTab.label, 'fotogrids');
 				subTab.label = replacePostTypePlaceholders(
 					subTab.label,
 					normalizedPostType
@@ -266,22 +233,22 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 			}
 			if (subTab.settings && Array.isArray(subTab.settings)) {
 				subTab.settings = subTab.settings.map((subSetting) => {
-					const translatedSubSetting = translateSettingsGroup(
+					const preparedSubSetting = prepareSettingsGroup(
 						{ settings: [subSetting] },
 						normalizedPostType
 					).settings[0];
 					return processSettingPlaceholders(
-						translatedSubSetting,
+						preparedSubSetting,
 						normalizedPostType
 					);
 				});
 			}
 			processedSubTabs[subTabKey] = subTab;
 		});
-		translated.subTabs = processedSubTabs;
+		prepared.subTabs = processedSubTabs;
 	}
 
-	return translated;
+	return prepared;
 };
 
 const renderIcon = (iconName) => {
@@ -441,7 +408,7 @@ function CollectionSettings() {
 		};
 	}, [switchTab]);
 
-	const loadAndTranslateSettings = async () => {
+	const loadAndPrepareSettings = async () => {
 		if (window.FotoGridsSettings?.loadSettingsGroups) {
 			const postType = window.fotogridsSettings?.postType || 'gallery';
 			const rawSettings =
@@ -452,7 +419,7 @@ function CollectionSettings() {
 			SETTINGS_GROUPS = {};
 
 			Object.keys(rawSettings).forEach((key) => {
-				SETTINGS_GROUPS[key] = translateSettingsGroup(
+				SETTINGS_GROUPS[key] = prepareSettingsGroup(
 					rawSettings[key],
 					normalizedPostType
 				);
@@ -466,7 +433,7 @@ function CollectionSettings() {
 	};
 
 	useEffect(() => {
-		loadAndTranslateSettings();
+		loadAndPrepareSettings();
 	}, []);
 
 	// Cross-setting conflict: a popover Image Zoom in click mode and an
