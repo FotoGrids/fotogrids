@@ -16,12 +16,18 @@ export default defineConfig({
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,
-	// The whole suite shares one WordPress and one database, so workers past a
-	// couple do not buy parallelism - they queue on PHP-FPM and turn slow admin
-	// screens into timeouts. A laptop defaulting to 7 took 17s over pages that
-	// take 2s at this setting. Matching CI also means local runs reproduce CI's
-	// interference rather than a different one. FG_WORKERS overrides.
-	workers: Number(process.env.FG_WORKERS) || 2,
+	// One worker, deliberately, until the suite is split into projects that
+	// isolate the specs which mutate global state.
+	//
+	// Every spec shares one WordPress and one database. settings-persistence
+	// toggles autosave site-wide while autosave.spec asserts on it, and
+	// rest-route-auth creates galleries while autosave asserts none appeared, so
+	// with more than one worker the result depends on which spec gets there
+	// first. Measured on a laptop: two workers failed a different test on two of
+	// three runs, one worker passed 27/27 three times - in the same 40s, because
+	// the bottleneck is PHP-FPM rather than the browsers. Parallelism here buys
+	// nothing and costs determinism. FG_WORKERS overrides for experiments.
+	workers: Number(process.env.FG_WORKERS) || 1,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
 	use: {
 		baseURL,
