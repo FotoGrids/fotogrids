@@ -62,21 +62,40 @@ done
 
 report() { printf '  %-22s %s\n' "$1" "$2" >&2; }
 
+# True when this shell is LocalWP's site shell, which puts LocalWP's own php,
+# mysql and wp on PATH. Outside it, `php` is the system one, which is not what
+# runs the site in local mode.
+in_local_shell() {
+  case "$(command -v php 2>/dev/null)" in
+    *lightning-services*|*Local.app*|*"Local/"*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 doctor() {
-  step "Environment"
+  local shell_kind="system"
+  in_local_shell && shell_kind="LocalWP site shell"
+
+  step "This shell ($shell_kind)"
   report "uname"    "$(uname -s) $(uname -m)"
   report "bash"     "${BASH_VERSION:-unknown}"
   report "php"      "$(have php && php -r 'echo PHP_VERSION;' || echo 'MISSING')"
+  report "  from"   "$(command -v php 2>/dev/null || echo '-')"
   report "mysql"    "$(have mysql && mysql --version | sed 's/.*Distrib //;s/,.*//' || echo 'MISSING')"
   report "wp-cli"   "$(have wp && wp --version --allow-root 2>/dev/null | head -1 || echo 'MISSING')"
   report "curl"     "$(have curl && echo present || echo 'MISSING')"
   report "node"     "$(have node && node -v || echo 'MISSING')"
 
   if have php; then
-    step "PHP extensions WordPress needs"
+    step "PHP extensions ($shell_kind php)"
     for ext in mysqli gd exif zip mbstring xml curl; do
       if php -m | grep -qx "$ext"; then report "$ext" "ok"; else report "$ext" "MISSING"; fi
     done
+    if ! in_local_shell; then
+      say "  These belong to the php on PATH. In local mode LocalWP runs the"
+      say "  site with its own php, so a MISSING here does not affect it - only"
+      say "  ci mode, which uses this one."
+    fi
   fi
 
   step "LocalWP"
@@ -104,13 +123,19 @@ doctor() {
   fi
 
   step "Verdict"
-  if [ -d "$LOCAL_SITES_DIR/$SITE" ]; then
-    say "  local mode is available: ./tests/harness/boot.sh --mode=local"
-  elif have php && have mysql; then
-    say "  ci mode is available: ./tests/harness/boot.sh --mode=ci"
+  if [ -d "$LOCAL_SITES_DIR/$SITE" ] && in_local_shell; then
+    say "  Ready. Run: ./tests/harness/boot.sh --mode=local"
+  elif [ -d "$LOCAL_SITES_DIR/$SITE" ]; then
+    say "  The '$SITE' site exists, but this is not LocalWP's site shell, so"
+    say "  its wp-cli is not on PATH. In LocalWP, right-click '$SITE' and choose"
+    say "  'Open site shell', then run: ./tests/harness/boot.sh --mode=local"
   else
-    say "  no mode is available yet. LocalWP with a '$SITE' site is the"
-    say "  intended path on macOS; php + mysql on PATH is the alternative."
+    say "  Create an empty LocalWP site named '$SITE', then run this again from"
+    say "  that site's shell. Set FG_LOCAL_SITE to use a different name."
+    if have php && have mysql; then
+      say ""
+      say "  ci mode also works in this shell: ./tests/harness/boot.sh --mode=ci"
+    fi
   fi
 }
 

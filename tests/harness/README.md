@@ -36,6 +36,11 @@ then run the script from that site's shell — right-click the site in LocalWP a
 choose **Open site shell**, which puts LocalWP's own `php`, `wp` and `mysql` on
 your `PATH`.
 
+`--doctor` reports which php it is looking at and says so in its heading. Run
+outside the site shell it reports the *system* php, which is not what runs the
+site in this mode — a missing extension there affects `ci` mode only. Run it
+from the site shell to check the php that actually matters.
+
 **Use a site you do not develop in.** The fixture seeder truncates the seven
 FotoGrids tables and deletes every gallery and album post. `boot.sh` refuses any
 site other than `fotogrids-tests` unless you pass `--force-site`, which is the
