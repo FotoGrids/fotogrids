@@ -14,7 +14,7 @@ It writes `tests/harness/.env` with the values the specs already read:
 | Key | What it is |
 |---|---|
 | `WP_BASE_URL` | where the site answers |
-| `WP_CLI` | path to `.state/wp`, a generated shim - run it, do not parse it |
+| `WP_CLI` | path to `.state/wp-shim`, a generated wrapper - run it, do not parse it |
 | `WP_PATH` | the install path |
 | `WP_ADMIN_USER` / `WP_ADMIN_PASS` | the credentials the specs log in with |
 | `FG_MODE` | which mode produced all of the above |
@@ -114,7 +114,7 @@ duplicated between the harness and the specs.
 - **Pretty permalinks matter.** With plain permalinks the REST API answers on
   `?rest_route=`, which is a different code path from the one production uses,
   and the plugin's standalone view pages 404. The script sets `/%postname%/`.
-- **Everything runs wp-cli through `.state/wp`.** That shim exists because
+- **Everything runs wp-cli through `.state/wp-shim`.** That shim exists because
   three separate things are otherwise decided by accident, and each of them
   cost a debugging session:
   - **Which php.** LocalWP's site shell prepends its bin directories to `PATH`,
