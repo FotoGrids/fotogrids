@@ -4,8 +4,10 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright config for FotoGrids end-to-end tests.
  *
  * Tests assume a WordPress site with the plugin active is reachable at
- * baseURL. In CI that site is provided by @wordpress/env (`wp-env`); locally,
- * run `npm run env:start` first or point WP_BASE_URL at your own site.
+ * baseURL. `tests/harness/boot.sh` boots one and writes WP_BASE_URL (along
+ * with WP_CLI, WP_PATH and the admin credentials) into tests/harness/.env;
+ * source that file before running. Pointing WP_BASE_URL at a site of your own
+ * works too.
  */
 const baseURL = process.env.WP_BASE_URL ?? 'http://localhost:8888';
 

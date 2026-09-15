@@ -9,8 +9,9 @@
 #   ./tests/harness/boot.sh --mode=ci       throwaway install against MySQL
 #   ./tests/harness/boot.sh --stop          stop a ci-mode server
 #
-# Writes tests/harness/.env with WP_BASE_URL and the wp-cli invocation the
-# seeder and the Playwright config both read.
+# Writes tests/harness/.env with WP_BASE_URL, WP_CLI, WP_PATH and the admin
+# credentials - the names tests/e2e/ already reads, so the specs never learn
+# which mode booted them.
 #
 # Portability: this runs on macOS as often as on Linux, so it stays inside
 # POSIX tool behaviour - no `sed -i` without an argument, no `readlink -f`,
@@ -156,14 +157,17 @@ stage_plugin() {
 }
 
 write_env() {
-  # Values are quoted: FG_WP_CLI contains spaces, and an unquoted assignment
-  # under `set -a` is parsed as an assignment followed by a command to run.
+  # These are the names the specs already read, so nothing in tests/e2e/ has to
+  # know a harness exists. WP_CLI is the command alone; the install path goes in
+  # WP_PATH so a path with spaces in it survives - LocalWP keeps its sites under
+  # "~/Local Sites". Values are quoted because an unquoted assignment containing
+  # a space is parsed under `set -a` as an assignment followed by a command.
   cat > "$ENV_FILE" <<EOF
 # Written by tests/harness/boot.sh - do not edit, do not commit.
 FG_MODE="$1"
 WP_BASE_URL="$2"
-FG_WP_CLI="$3"
-FG_WP_PATH="$4"
+WP_CLI="$3"
+WP_PATH="$4"
 WP_ADMIN_USER="${5:-admin}"
 WP_ADMIN_PASS="${6:-password}"
 EOF
@@ -209,7 +213,7 @@ boot_local() {
 
   local url
   url=$(wp --path="$public_dir" option get siteurl)
-  write_env local "$url" "wp --path=$public_dir" "$public_dir" \
+  write_env local "$url" "wp" "$public_dir" \
     "${FG_ADMIN_USER:-admin}" "${FG_ADMIN_PASS:-password}"
 }
 
@@ -249,7 +253,9 @@ boot_ci() {
     curl -sSL -o "$STATE_DIR/wp-cli.phar" \
       https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
   fi
-  local WP="php $STATE_DIR/wp-cli.phar --allow-root --path=$wp_dir"
+  # WP_CLI in .env carries the command without --path; see write_env.
+  local WP_CMD="php $STATE_DIR/wp-cli.phar --allow-root"
+  local WP="$WP_CMD --path=$wp_dir"
 
   if [ ! -f "$wp_dir/wp-settings.php" ]; then
     step "Downloading WordPress ($WP_VERSION)"
@@ -309,7 +315,7 @@ PHP
     sleep 0.25
   done
 
-  write_env ci "$url" "$WP" "$wp_dir" "$admin_user" "$admin_pass"
+  write_env ci "$url" "$WP_CMD" "$wp_dir" "$admin_user" "$admin_pass"
 }
 
 # ---------------------------------------------------------------------------

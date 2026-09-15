@@ -70,10 +70,27 @@ echo 'FGFIXTURES' . wp_json_encode( array(
 ) );
 `;
 
+/**
+ * The words to invoke wp-cli with.
+ *
+ * WP_CLI carries the command only and is split on spaces; the install path
+ * arrives separately in WP_PATH and is appended as one argument, because it
+ * can contain spaces of its own - LocalWP keeps its sites under
+ * `~/Local Sites/`. tests/harness/boot.sh writes both into tests/harness/.env.
+ */
+function wpCli(): string[] {
+	if (!process.env.WP_CLI) {
+		return ['npx', 'wp-env', 'run', 'cli', 'wp'];
+	}
+	const words = process.env.WP_CLI.split(' ').filter(Boolean);
+	if (process.env.WP_PATH) {
+		words.push(`--path=${process.env.WP_PATH}`);
+	}
+	return words;
+}
+
 function createFixtures(): Fixtures {
-	const cli = process.env.WP_CLI
-		? process.env.WP_CLI.split(' ')
-		: ['npx', 'wp-env', 'run', 'cli', 'wp'];
+	const cli = wpCli();
 	const output = execFileSync(
 		cli[0],
 		[...cli.slice(1), 'eval', FIXTURE_PHP],

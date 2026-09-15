@@ -9,9 +9,18 @@ to run against. One script, two real modes.
 ./tests/harness/boot.sh --stop       stop a ci-mode server
 ```
 
-It writes `tests/harness/.env` with `WP_BASE_URL`, the wp-cli invocation and the
-install path. The Playwright config and the fixture seeder both read that file,
-so nothing else needs to know which mode you used.
+It writes `tests/harness/.env` with the values the specs already read:
+
+| Key | What it is |
+|---|---|
+| `WP_BASE_URL` | where the site answers |
+| `WP_CLI` | the wp-cli command, without `--path` |
+| `WP_PATH` | the install path, passed separately so a path containing spaces survives |
+| `WP_ADMIN_USER` / `WP_ADMIN_PASS` | the credentials the install was created with |
+| `FG_MODE` | which mode produced all of the above |
+
+Source that file and the suite runs against whichever mode you booted, so
+nothing in `tests/e2e/` has to know a harness exists.
 
 ## Modes
 
