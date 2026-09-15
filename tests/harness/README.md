@@ -14,10 +14,9 @@ It writes `tests/harness/.env` with the values the specs already read:
 | Key | What it is |
 |---|---|
 | `WP_BASE_URL` | where the site answers |
-| `WP_CLI` | the wp-cli command, without `--path` |
-| `WP_PATH` | the install path, passed separately so a path containing spaces survives |
-| `WP_ADMIN_USER` / `WP_ADMIN_PASS` | the credentials the install was created with |
-| `WP_CLI_PHP` | in local mode, LocalWP's own php - empty otherwise |
+| `WP_CLI` | path to `.state/wp`, a generated shim - run it, do not parse it |
+| `WP_PATH` | the install path |
+| `WP_ADMIN_USER` / `WP_ADMIN_PASS` | the credentials the specs log in with |
 | `FG_MODE` | which mode produced all of the above |
 
 Source that file and the suite runs against whichever mode you booted, so
@@ -115,21 +114,24 @@ duplicated between the harness and the specs.
 - **Pretty permalinks matter.** With plain permalinks the REST API answers on
   `?rest_route=`, which is a different code path from the one production uses,
   and the plugin's standalone view pages 404. The script sets `/%postname%/`.
-- **`php` in LocalWP's site shell is not necessarily LocalWP's php.** The site
-  shell prepends LocalWP's bin directories to `PATH`, and then your shell
-  profile runs and can prepend Homebrew's in front of them. wp-cli runs
-  whichever `php` it finds first, so the suite can end up exercising a PHP
-  version the site never serves - while loading LocalWP's php.ini, which lists
-  extensions built for the other version and so fails to load every one of
-  them. `boot.sh` finds LocalWP's binary on `PATH` and passes it through
-  `WP_CLI_PHP`; `--doctor` prints which php wp-cli will use.
-- **LocalWP's php resolves its php.ini relative to the working directory.**
-  Invoke it from the repo instead of the site and it loads the machine's own
-  php.ini: extensions built for a different PHP version fail loudly, and mysqli
-  quietly gets the wrong socket, so every wp-cli call reports "Error
-  establishing a database connection". `--path` does not help - the problem is
-  the interpreter's configuration, not WordPress's. Both this script and the
-  specs run wp-cli with the install as their working directory.
+- **Everything runs wp-cli through `.state/wp`.** That shim exists because
+  three separate things are otherwise decided by accident, and each of them
+  cost a debugging session:
+  - **Which php.** LocalWP's site shell prepends its bin directories to `PATH`,
+    then your shell profile runs and can prepend Homebrew's in front of them.
+    wp-cli runs whichever `php` comes first, so the suite can exercise a PHP the
+    site never serves - while loading LocalWP's php.ini, which lists extensions
+    built for the other version and so fails to load every one of them. Setting
+    `WP_CLI_PHP` does not reliably help: LocalWP ships its own `wp` wrapper.
+    The shim runs a known phar under a known php instead.
+  - **The working directory.** LocalWP's php resolves its php.ini relative to
+    where it is invoked, so wp-cli run from the repo loads a different
+    configuration and cannot reach the database at all. `--path` does not fix
+    that; the misconfigured thing is the interpreter, not WordPress. The shim
+    `cd`s first.
+  - **Where PHP writes warnings.** Startup warnings go to *stdout*, so anything
+    reading a value back out of wp-cli captures them as part of the value. The
+    shim sets `display_errors=stderr`.
 - **This script runs on macOS as often as on Linux.** It stays inside POSIX tool
   behaviour: no `sed -i` without an argument, no `readlink -f`, no `grep -P`, no
   GNU-only flags. Check any addition against BSD userland.

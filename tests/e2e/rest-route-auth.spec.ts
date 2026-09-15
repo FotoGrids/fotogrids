@@ -71,34 +71,26 @@ echo 'FGFIXTURES' . wp_json_encode( array(
 `;
 
 /**
- * The words to invoke wp-cli with.
+ * How to invoke wp-cli.
  *
- * WP_CLI carries the command only and is split on spaces; the install path
- * arrives separately in WP_PATH and is appended as one argument, because it
- * can contain spaces of its own - LocalWP keeps its sites under
- * `~/Local Sites/`. tests/harness/boot.sh writes both into tests/harness/.env.
+ * WP_CLI, when set, is a single executable: the shim tests/harness/boot.sh
+ * writes, which has the php, the install path and the working directory already
+ * pinned. It is exec'd as one path rather than split on spaces, because the
+ * path can contain them - LocalWP keeps its sites under `~/Local Sites/`.
  */
-function wpCli(): string[] {
-	if (!process.env.WP_CLI) {
-		return ['npx', 'wp-env', 'run', 'cli', 'wp'];
+function wpCli(): { cmd: string; args: string[] } {
+	if (process.env.WP_CLI) {
+		return { cmd: process.env.WP_CLI, args: [] };
 	}
-	const words = process.env.WP_CLI.split(' ').filter(Boolean);
-	if (process.env.WP_PATH) {
-		words.push(`--path=${process.env.WP_PATH}`);
-	}
-	return words;
+	return { cmd: 'npx', args: ['wp-env', 'run', 'cli', 'wp'] };
 }
 
 function createFixtures(): Fixtures {
-	const cli = wpCli();
+	const { cmd, args } = wpCli();
 	const output = execFileSync(
-		cli[0],
-		[...cli.slice(1), 'eval', FIXTURE_PHP],
-		// Run from inside the install. LocalWP's php resolves its php.ini
-		// relative to the working directory, and from anywhere else it picks up
-		// the machine's php.ini instead - which points mysqli at the wrong
-		// socket, so wp-cli cannot reach the database at all.
-		{ encoding: 'utf8', cwd: process.env.WP_PATH }
+		cmd,
+		[...args, 'eval', FIXTURE_PHP],
+		{ encoding: 'utf8' }
 	);
 	const match = output.match(/FGFIXTURES(\{.*\})/);
 	if (!match) {
