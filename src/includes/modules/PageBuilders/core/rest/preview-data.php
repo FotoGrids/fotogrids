@@ -147,7 +147,7 @@ final class Preview_Data {
 	 *
 	 * @since 1.0.0
 	 * @param \FotoGrids\Render\Api\Render_Context $context
-	 * @param \FotoGrids\Render\Api\Request_Source $source
+	 * @param value-of<\FotoGrids\Render\Api\Request_Source::ALL> $source
 	 * @return \FotoGrids\Render\Api\Render_Context
 	 */
 	private static function flip_to_preview_context(

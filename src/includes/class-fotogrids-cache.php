@@ -396,10 +396,14 @@ class FotoGrids_Cache {
 	 *
 	 * Runs on the Actions_Cron::CACHE_PURGE schedule.
 	 *
+	 * The deleted-row count is published on Actions_Cache::PURGED_EXPIRED
+	 * rather than returned: this runs as an action callback, and WordPress
+	 * discards whatever an action callback returns.
+	 *
 	 * @since  1.0.0
-	 * @return int Number of rows deleted.
+	 * @return void
 	 */
-	public static function purge_expired(): int {
+	public static function purge_expired(): void {
 		global $wpdb;
 
 		$table  = $wpdb->prefix . 'fotogrids_render_cache';
@@ -415,8 +419,6 @@ class FotoGrids_Cache {
 		if ( $deleted > 0 ) {
 			do_action( Actions_Cache::PURGED_EXPIRED, $deleted );
 		}
-
-		return $deleted;
 	}
 
 	// -------------------------------------------------------------------------

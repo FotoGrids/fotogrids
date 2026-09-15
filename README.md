@@ -102,9 +102,17 @@ paren spacing). Run `npm run format` before committing JS/TS.
 | `composer lint:fix`    | `phpcbf` autofix for mechanical violations        |
 | `composer lint:compat` | PHP 7.4+ compatibility check                      |
 | `composer test:php`    | PHPUnit (WordPress-independent unit suite)        |
+| `composer analyse`     | PHPStan static analysis over `src/`               |
 
 PHPCS runs in the pre-commit hook (`composer setup-hooks`) and in CI. After
 editing any PHP under `src/`, run `composer lint` before committing.
+
+PHPStan runs in CI only. Its configuration is `phpstan.neon.dist`; it is
+pinned at level 3, which is the floor that catches a property read off a
+non-object - the shape a syntactically valid but semantically wrong edit
+usually takes. The Elementor and Divi bridges under
+`src/includes/modules/PageBuilders` are excluded until stubs exist for those
+page builders.
 
 ### Tests
 
