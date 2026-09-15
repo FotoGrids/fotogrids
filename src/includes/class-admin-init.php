@@ -240,6 +240,13 @@ class Admin_Init {
 		);
 
 		wp_enqueue_style(
+			'fotogrids-error-boundary',
+			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/error-boundary.css',
+			array(),
+			FOTOGRIDS_VERSION
+		);
+
+		wp_enqueue_style(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/css/admin.css',
 			array( 'wp-components', 'fotogrids-google-fonts', 'fotogrids-jetbrains-mono' ),

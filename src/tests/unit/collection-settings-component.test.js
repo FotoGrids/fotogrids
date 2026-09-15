@@ -4,6 +4,7 @@
  * Loads the full render-settings ecosystem, stubs the async settings catalog
  * loader, mounts the component, and exercises tabs + a setting interaction.
  */
+import '@/admin/plain/error-boundary';
 import '@/admin/plain/render-settings/utils/post-type-placeholders';
 import '@/admin/plain/render-settings/utils/tooltip-utils';
 import '@/admin/plain/render-settings/utils/dynamic-options';
@@ -481,5 +482,38 @@ describe('CollectionSettings component', () => {
 		expect(
 			handle.container.querySelector('button.fotogrids-toggle')
 		).not.toBeNull();
+	});
+
+	it('shows the boundary fallback for a renderer that throws and keeps the rest of the tab', async () => {
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		jest.spyOn(
+			window.FotoGridsRenderSettings,
+			'renderToggle'
+		).mockImplementation(() => {
+			throw new TypeError('cannot read properties of null');
+		});
+
+		const handle = mountSettings();
+		await flush();
+
+		const fallback = handle.container.querySelector(
+			'.fotogrids-error-boundary'
+		);
+		expect(fallback).not.toBeNull();
+		expect(fallback.textContent).toContain(
+			'This part of the screen failed to load.'
+		);
+
+		// The tab itself, and the settings either side of the broken one,
+		// still render.
+		expect(
+			handle.container.querySelector('.fotogrids-gallery-settings')
+		).not.toBeNull();
+		expect(
+			handle.container.querySelector('input.fotogrids-input')
+		).not.toBeNull();
+		expect(
+			handle.container.querySelectorAll('.fotogrids-settings-tab').length
+		).toBe(4);
 	});
 });
