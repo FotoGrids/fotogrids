@@ -3,7 +3,7 @@
  * Translation of the assembled settings catalog tree.
  *
  * @package FotoGrids\Catalog
- * @since   1.1.1
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
@@ -31,7 +31,7 @@ if ( ! defined( 'WPINC' ) ) {
  * resolves the destination the node declares, so no string carries a URL and a
  * translation cannot introduce one.
  *
- * @since 1.1.1
+ * @since 1.1.2
  */
 final class Catalog_I18n {
 
@@ -79,7 +79,7 @@ final class Catalog_I18n {
 	 * Runs before any consumer substitutes placeholders, so the strings still
 	 * match the catalog literals the map is keyed by.
 	 *
-	 * @since   1.1.1
+	 * @since   1.1.2
 	 * @param   array<string, mixed> $tree Assembled catalog tree.
 	 * @return  array<string, mixed>
 	 */
@@ -91,7 +91,7 @@ final class Catalog_I18n {
 	 * Clears the resolved map. Test-support only.
 	 *
 	 * @internal
-	 * @since   1.1.1
+	 * @since   1.1.2
 	 * @return  void
 	 */
 	public static function reset_for_tests(): void {

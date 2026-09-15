@@ -3,7 +3,7 @@
  * Reads the raw EXIF tag map for an attachment.
  *
  * @package FotoGrids\Exif
- * @since   1.2.0
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
@@ -23,28 +23,28 @@ if ( ! defined( 'WPINC' ) ) {
  * WordPress resolves - credit and copyright - are merged in behind the EXIF
  * tags of the same meaning.
  *
- * @since 1.2.0
+ * @since 1.1.2
  */
 final class Exif_Reader {
 
 	/**
 	 * Image types `exif_read_data()` can read.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 */
 	private const EXIF_IMAGE_TYPES = array( IMAGETYPE_JPEG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM );
 
 	/**
 	 * EXIF sections to flatten, in precedence order.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 */
 	private const SECTIONS = array( 'IFD0', 'EXIF', 'GPS' );
 
 	/**
 	 * Raw tag maps already read this request, keyed by attachment ID.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 * @var array<int, array<string, mixed>>
 	 */
 	private static $cache = array();
@@ -52,7 +52,7 @@ final class Exif_Reader {
 	/**
 	 * The raw EXIF tag map for an attachment.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  int $attachment_id Attachment ID.
 	 * @return array<string, mixed> Empty when the file carries no readable metadata.
 	 */
@@ -78,7 +78,7 @@ final class Exif_Reader {
 	/**
 	 * Forget cached tag maps.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  int|null $attachment_id Attachment to forget, or null for all.
 	 * @return void
 	 */
@@ -97,7 +97,7 @@ final class Exif_Reader {
 	 * WordPress strips metadata from the `-scaled` file it generates for images
 	 * above big_image_size_threshold, so the preserved original is preferred.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  int $attachment_id Attachment ID.
 	 * @return string Empty when no readable file exists.
 	 */
@@ -118,7 +118,7 @@ final class Exif_Reader {
 	/**
 	 * Flatten the EXIF sections of a file into a single tag map.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  string $file_path Absolute path to the image.
 	 * @return array<string, mixed>
 	 */
@@ -168,7 +168,7 @@ final class Exif_Reader {
 	/**
 	 * Fill rights tags WordPress resolves from IPTC when EXIF has none.
 	 *
-	 * @since  1.2.0
+	 * @since  1.1.2
 	 * @param  array<string, mixed> $tags      Raw EXIF tags.
 	 * @param  string               $file_path Absolute path to the image.
 	 * @return array<string, mixed>
