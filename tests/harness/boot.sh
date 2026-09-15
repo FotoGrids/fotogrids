@@ -19,6 +19,8 @@
 
 set -euo pipefail
 
+FG_LOCAL_PHP=""
+
 HARNESS_DIR=$(cd -- "$(dirname -- "$0")" && pwd -P)
 REPO_DIR=$(cd -- "$HARNESS_DIR/../.." && pwd -P)
 ENV_FILE="$HARNESS_DIR/.env"
@@ -84,6 +86,7 @@ doctor() {
   report "  from"   "$(command -v php 2>/dev/null || echo '-')"
   report "mysql"    "$(have mysql && mysql --version | sed 's/.*Distrib //;s/,.*//' || echo 'MISSING')"
   report "wp-cli"   "$(have wp && wp --version --allow-root 2>/dev/null | head -1 || echo 'MISSING')"
+  report "  its php"  "$(local_php 2>/dev/null || command -v php 2>/dev/null || echo '-')"
   report "curl"     "$(have curl && echo present || echo 'MISSING')"
   report "node"     "$(have node && node -v || echo 'MISSING')"
 
@@ -170,6 +173,8 @@ WP_CLI="$3"
 WP_PATH="$4"
 WP_ADMIN_USER="${5:-admin}"
 WP_ADMIN_PASS="${6:-password}"
+# Empty unless local mode found LocalWP's own php. wp-cli ignores an empty one.
+WP_CLI_PHP="${7:-}"
 EOF
   step "Wrote $ENV_FILE"
   cat "$ENV_FILE" >&2
@@ -190,7 +195,34 @@ EOF
 wp_local() {
   local dir="$1"
   shift
-  ( cd "$dir" && wp --path="$dir" "$@" )
+  ( cd "$dir" && WP_CLI_PHP="${FG_LOCAL_PHP:-}" wp --path="$dir" "$@" )
+}
+
+# The php LocalWP serves the site with.
+#
+# LocalWP's site shell puts its own php on PATH, but a shell profile that
+# prepends Homebrew's bin afterwards wins, and then `php` - and so wp-cli, which
+# runs whichever php it finds first - is a different build entirely. On the
+# machine this was written for that meant PHP 8.5 running against LocalWP's
+# php.ini for 8.2: every extension listed there failed to load, and the suite
+# would have been testing a PHP version the site never uses. wp-cli honours
+# WP_CLI_PHP, so local mode points it at LocalWP's own binary.
+local_php() {
+  local saved_ifs="$IFS" dir
+  IFS=:
+  for dir in $PATH; do
+    case "$dir" in
+      *lightning-services/php-*)
+        if [ -x "$dir/php" ]; then
+          IFS="$saved_ifs"
+          printf '%s\n' "$dir/php"
+          return 0
+        fi
+        ;;
+    esac
+  done
+  IFS="$saved_ifs"
+  return 1
 }
 
 boot_local() {
@@ -214,6 +246,14 @@ boot_local() {
   fi
 
   have wp || die "wp-cli not on PATH. Open LocalWP > right-click the site > 'Open site shell', and run this from there."
+
+  FG_LOCAL_PHP="$(local_php || true)"
+  if [ -n "$FG_LOCAL_PHP" ]; then
+    step "Using LocalWP's php ($("$FG_LOCAL_PHP" -r 'echo PHP_VERSION;' 2>/dev/null))"
+  else
+    say "  note: LocalWP's php is not on PATH, so wp-cli will use $(command -v php)."
+    say "        That is a different build from the one serving the site."
+  fi
 
   # Print what wp-cli actually said. Swallowing it here once cost an afternoon:
   # "cannot reach the database" covers a stopped site, a wrong socket and a
@@ -248,8 +288,11 @@ boot_local() {
   local admin_user admin_pass
   admin_user="${FG_ADMIN_USER:-}"
   if [ -z "$admin_user" ]; then
+    # No pipe here on purpose: --number=1 already returns a single line, and
+    # `| head -1` would SIGPIPE wp-cli, which under `set -e -o pipefail` ends
+    # the script with no output at all.
     admin_user=$(wp_local "$public_dir" user list --role=administrator \
-      --field=user_login --number=1 2>/dev/null | head -1)
+      --field=user_login --number=1 2>/dev/null || true)
   fi
   [ -n "$admin_user" ] || die "no administrator in $SITE - is it a finished WordPress install?"
   admin_pass="${FG_ADMIN_PASS:-password}"
@@ -259,7 +302,7 @@ boot_local() {
 
   local url
   url=$(wp_local "$public_dir" option get siteurl)
-  write_env local "$url" "wp" "$public_dir" "$admin_user" "$admin_pass"
+  write_env local "$url" "wp" "$public_dir" "$admin_user" "$admin_pass" "$FG_LOCAL_PHP"
 }
 
 # ---------------------------------------------------------------------------

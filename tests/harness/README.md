@@ -17,6 +17,7 @@ It writes `tests/harness/.env` with the values the specs already read:
 | `WP_CLI` | the wp-cli command, without `--path` |
 | `WP_PATH` | the install path, passed separately so a path containing spaces survives |
 | `WP_ADMIN_USER` / `WP_ADMIN_PASS` | the credentials the install was created with |
+| `WP_CLI_PHP` | in local mode, LocalWP's own php - empty otherwise |
 | `FG_MODE` | which mode produced all of the above |
 
 Source that file and the suite runs against whichever mode you booted, so
@@ -114,6 +115,14 @@ duplicated between the harness and the specs.
 - **Pretty permalinks matter.** With plain permalinks the REST API answers on
   `?rest_route=`, which is a different code path from the one production uses,
   and the plugin's standalone view pages 404. The script sets `/%postname%/`.
+- **`php` in LocalWP's site shell is not necessarily LocalWP's php.** The site
+  shell prepends LocalWP's bin directories to `PATH`, and then your shell
+  profile runs and can prepend Homebrew's in front of them. wp-cli runs
+  whichever `php` it finds first, so the suite can end up exercising a PHP
+  version the site never serves - while loading LocalWP's php.ini, which lists
+  extensions built for the other version and so fails to load every one of
+  them. `boot.sh` finds LocalWP's binary on `PATH` and passes it through
+  `WP_CLI_PHP`; `--doctor` prints which php wp-cli will use.
 - **LocalWP's php resolves its php.ini relative to the working directory.**
   Invoke it from the repo instead of the site and it loads the machine's own
   php.ini: extensions built for a different PHP version fail loudly, and mysqli
