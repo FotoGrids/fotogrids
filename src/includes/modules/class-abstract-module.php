@@ -109,7 +109,7 @@ abstract class Abstract_Module implements Module_Interface {
 	 * prefix, before the class) from a fully-qualified class name.
 	 *
 	 * @since 1.0.0
-	 * @param string $class  Fully-qualified class name.
+	 * @param string $class_name Fully-qualified class name.
 	 * @param string $prefix Namespace prefix to strip.
 	 * @return string Module directory name, e.g. 'Templates'.
 	 */

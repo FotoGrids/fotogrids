@@ -245,7 +245,7 @@ final class Collection_Settings_Assets {
 	/**
 	 * Enqueue one render-helper script with its computed dependency list.
 	 *
-	 * @param string $function The render-helper function name (camelCase).
+	 * @param string $function_name The render-helper function name (camelCase).
 	 */
 	private static function enqueue_render_function( string $function_name ): void {
 		$dependencies = array(

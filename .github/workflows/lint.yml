@@ -125,3 +125,43 @@ jobs:
 
       - name: Check PHP compatibility
         run: composer lint:compat
+
+  # ---------------------------------------------------------------------------
+  # Static analysis: PHPStan against the project configuration.
+  #
+  # php -l proves the code parses; PHPCS proves it is styled correctly. Neither
+  # sees a change that is valid, well-styled PHP and still semantically wrong -
+  # a property read off the wrong operand, a docblock naming a type the method
+  # never returns. That is this job.
+  #
+  # Runs on 8.3 rather than the 7.4 floor because PHPStan itself is faster and
+  # better supported there; the analysed PHP version is pinned in
+  # phpstan.neon.dist, so the result does not depend on the runner's PHP.
+  # ---------------------------------------------------------------------------
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v6
+        with:
+          path: vendor
+          key: composer-phpstan-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-phpstan-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run PHPStan
+        run: composer analyse

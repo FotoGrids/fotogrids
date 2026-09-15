@@ -56,7 +56,7 @@ final class Context_Builder {
 	 * @param   int                  $gallery_id Gallery identifier.
 	 * @param   array<string, mixed> $render_settings Normalized settings.
 	 * @param   array<int, mixed>    $collection_item_ids Item IDs.
-	 * @param   Request_Source       $source Request source.
+	 * @param   value-of<Request_Source::ALL> $source Request source.
 	 * @param   int|null             $album_id Album identifier.
 	 * @param   array<string, mixed> $meta_overrides Optional Render_Meta field overrides.
 	 *                                               Accepted keys: requested_page,
@@ -416,7 +416,7 @@ final class Context_Builder {
 	 * @param   int                  $album_id            Album post identifier.
 	 * @param   array<string, mixed> $render_settings     Resolved album settings.
 	 * @param   array<int, mixed>    $child_gallery_ids   Child gallery post IDs in album-stored order.
-	 * @param   Request_Source       $source              Request source.
+	 * @param   value-of<Request_Source::ALL> $source     Request source.
 	 * @return  Render_Context
 	 */
 	public function build_for_album(

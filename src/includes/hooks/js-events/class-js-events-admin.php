@@ -24,7 +24,7 @@ final class Js_Events_Admin {
 	 * the admin ajax-save bridge.
 	 *
 	 * @since 1.0.0
-	 * @event-detail (REST response payload)
+	 * @event-detail object  REST response payload.
 	 */
 	public const COLLECTION_SAVED = 'fotogrids:collection_saved';
 

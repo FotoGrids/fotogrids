@@ -315,7 +315,7 @@ final class Lightbox_Colors {
 	 *
 	 * @since 1.0.0
 	 * @param mixed  $value   Raw setting value.
-	 * @param string $default Fallback colour string.
+	 * @param string $default_value Fallback colour string.
 	 * @return string
 	 */
 	public static function safe_color( $value, string $default_value ): string {

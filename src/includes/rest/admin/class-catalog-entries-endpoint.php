@@ -95,7 +95,7 @@ final class Catalog_Entries_Endpoint {
 	 * the grid renders from the single source of truth (Free, Pro, third-party).
 	 *
 	 * @since   1.0.0
-	 * @param   array<string, array<string, mixed>> $tree Assembled tree (by reference).
+	 * @param   array<string, mixed> $tree Assembled tree (by reference).
 	 * @return  void
 	 */
 	private static function inject_hover_effect_options( array &$tree ): void {

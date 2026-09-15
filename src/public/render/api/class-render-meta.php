@@ -41,11 +41,11 @@ final class Render_Meta {
 	 * @param   int             $gallery_id Gallery identifier. Zero when rendering an album-as-collection.
 	 * @param   int|null        $album_id Album identifier. Non-null when rendering a gallery inside an album, OR when collection_kind === ALBUM (in which case this IS the album being rendered).
 	 * @param   string          $instance_id Unique instance ID.
-	 * @param   Request_Source  $source Render source.
+	 * @param   value-of<Request_Source::ALL>  $source Render source.
 	 * @param   bool            $is_preview Whether this is preview mode.
-	 * @param   Render_Mode     $mode Request mode.
+	 * @param   value-of<Render_Mode::ALL>     $mode Request mode.
 	 * @param   int             $schema_version Request schema version.
-	 * @param   Collection_Kind $collection_kind Whether this render is a gallery (default) or an album-as-collection.
+	 * @param   value-of<Collection_Kind::ALL> $collection_kind Whether this render is a gallery (default) or an album-as-collection.
 	 * @param   int|null        $requested_page The 1-based page number requested by the caller (pagination). Null = page 1 / no pagination.
 	 * @param   int|null        $requested_per_page Caller-supplied items_per_page override (pagination REST requests). Null = use saved setting.
 	 * @param   string|null     $breakpoint Active breakpoint hint from the caller ('desktop' | 'tablet' | 'mobile'). Null = unknown.

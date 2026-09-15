@@ -234,7 +234,7 @@ class Admin_Data {
 	 * Get WordPress roles
 	 *
 	 * @param \WP_REST_Request $request Request object
-	 * @return \WP_REST_Response Array of roles with their capabilities
+	 * @return \WP_REST_Response|\WP_Error Array of roles with their capabilities
 	 */
 	public static function get_roles( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
