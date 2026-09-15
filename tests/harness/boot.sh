@@ -179,6 +179,20 @@ EOF
 # local - a LocalWP site on macOS
 # ---------------------------------------------------------------------------
 
+# Run wp-cli with the site as the working directory.
+#
+# LocalWP's php resolves its php.ini relative to where it is invoked. Run it
+# from anywhere else - the repo, say - and it loads whatever php.ini the machine
+# has instead: extensions built for a different PHP version fail to load, and,
+# less visibly, mysqli gets the wrong default socket, so every wp call dies with
+# "Error establishing a database connection". Nothing about --path fixes that,
+# because the problem is the interpreter's configuration and not WordPress's.
+wp_local() {
+  local dir="$1"
+  shift
+  ( cd "$dir" && wp --path="$dir" "$@" )
+}
+
 boot_local() {
   local site_dir="$LOCAL_SITES_DIR/$SITE"
   local public_dir="$site_dir/app/public"
@@ -201,6 +215,9 @@ boot_local() {
 
   have wp || die "wp-cli not on PATH. Open LocalWP > right-click the site > 'Open site shell', and run this from there."
 
+  wp_local "$public_dir" option get siteurl >/dev/null 2>&1 || die \
+    "wp-cli reached $SITE but not its database. Is the site started in LocalWP?"
+
   stage_plugin
 
   step "Linking the built plugin into $SITE"
@@ -209,7 +226,7 @@ boot_local() {
   ln -s "$REPO_DIR/dist/fotogrids" "$target"
 
   step "Activating"
-  wp --path="$public_dir" plugin activate fotogrids
+  wp_local "$public_dir" plugin activate fotogrids
 
   # ci mode installs WordPress and so picks the credentials; local mode inherits
   # a site someone else created, and there is no way to read a password back out
@@ -218,17 +235,17 @@ boot_local() {
   local admin_user admin_pass
   admin_user="${FG_ADMIN_USER:-}"
   if [ -z "$admin_user" ]; then
-    admin_user=$(wp --path="$public_dir" user list --role=administrator \
+    admin_user=$(wp_local "$public_dir" user list --role=administrator \
       --field=user_login --number=1 2>/dev/null | head -1)
   fi
   [ -n "$admin_user" ] || die "no administrator in $SITE - is it a finished WordPress install?"
   admin_pass="${FG_ADMIN_PASS:-password}"
 
   step "Setting $admin_user's password so the specs can log in"
-  wp --path="$public_dir" user update "$admin_user" --user_pass="$admin_pass" --quiet
+  wp_local "$public_dir" user update "$admin_user" --user_pass="$admin_pass" --quiet
 
   local url
-  url=$(wp --path="$public_dir" option get siteurl)
+  url=$(wp_local "$public_dir" option get siteurl)
   write_env local "$url" "wp" "$public_dir" "$admin_user" "$admin_pass"
 }
 

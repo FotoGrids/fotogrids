@@ -94,7 +94,11 @@ function createFixtures(): Fixtures {
 	const output = execFileSync(
 		cli[0],
 		[...cli.slice(1), 'eval', FIXTURE_PHP],
-		{ encoding: 'utf8' }
+		// Run from inside the install. LocalWP's php resolves its php.ini
+		// relative to the working directory, and from anywhere else it picks up
+		// the machine's php.ini instead - which points mysqli at the wrong
+		// socket, so wp-cli cannot reach the database at all.
+		{ encoding: 'utf8', cwd: process.env.WP_PATH }
 	);
 	const match = output.match(/FGFIXTURES(\{.*\})/);
 	if (!match) {

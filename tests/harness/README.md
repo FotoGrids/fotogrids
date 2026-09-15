@@ -114,6 +114,13 @@ duplicated between the harness and the specs.
 - **Pretty permalinks matter.** With plain permalinks the REST API answers on
   `?rest_route=`, which is a different code path from the one production uses,
   and the plugin's standalone view pages 404. The script sets `/%postname%/`.
+- **LocalWP's php resolves its php.ini relative to the working directory.**
+  Invoke it from the repo instead of the site and it loads the machine's own
+  php.ini: extensions built for a different PHP version fail loudly, and mysqli
+  quietly gets the wrong socket, so every wp-cli call reports "Error
+  establishing a database connection". `--path` does not help - the problem is
+  the interpreter's configuration, not WordPress's. Both this script and the
+  specs run wp-cli with the install as their working directory.
 - **This script runs on macOS as often as on Linux.** It stays inside POSIX tool
   behaviour: no `sed -i` without an argument, no `readlink -f`, no `grep -P`, no
   GNU-only flags. Check any addition against BSD userland.
