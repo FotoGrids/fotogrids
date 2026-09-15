@@ -16,6 +16,12 @@ export default defineConfig({
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,
+	// The whole suite shares one WordPress and one database, so workers past a
+	// couple do not buy parallelism - they queue on PHP-FPM and turn slow admin
+	// screens into timeouts. A laptop defaulting to 7 took 17s over pages that
+	// take 2s at this setting. Matching CI also means local runs reproduce CI's
+	// interference rather than a different one. FG_WORKERS overrides.
+	workers: Number(process.env.FG_WORKERS) || 2,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
 	use: {
 		baseURL,

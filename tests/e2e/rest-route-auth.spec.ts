@@ -33,15 +33,30 @@ type Fixtures = {
 
 const FIXTURE_PHP = String.raw`
 require_once ABSPATH . 'wp-admin/includes/image.php';
+// Clear what an earlier run left behind. Seeding cleans up rather than tearing
+// down afterwards, so a crashed or interrupted run still starts from a known
+// state - and a test site does not accumulate a gallery list that gets slower
+// every time the suite is run.
+foreach ( get_posts( array(
+	'post_type'   => array( 'fotogrids_gallery', 'attachment' ),
+	'post_status' => 'any',
+	'numberposts' => -1,
+	'fields'      => 'ids',
+	'meta_key'    => '_fg_rest_auth_fixture',
+) ) as $stale ) {
+	wp_delete_post( $stale, true );
+}
 $png = base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' );
 $attachment = function ( $name ) use ( $png ) {
 	$upload = wp_upload_bits( $name . '.png', null, $png );
 	$id     = wp_insert_attachment( array( 'post_mime_type' => 'image/png', 'post_title' => $name, 'post_content' => 'Private description', 'post_status' => 'inherit' ), $upload['file'] );
+	update_post_meta( $id, '_fg_rest_auth_fixture', '1' );
 	wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
 	return $id;
 };
 $gallery = function ( $title, $items, $meta ) {
 	$id = wp_insert_post( array( 'post_type' => 'fotogrids_gallery', 'post_status' => 'publish', 'post_title' => $title ) );
+	update_post_meta( $id, '_fg_rest_auth_fixture', '1' );
 	update_post_meta( $id, 'fotogrids_gallery_items', wp_json_encode( $items ) );
 	foreach ( $meta as $key => $value ) {
 		update_post_meta( $id, $key, $value );

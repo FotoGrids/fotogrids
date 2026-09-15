@@ -88,7 +88,6 @@ doctor() {
   report "mysql"    "$(have mysql && mysql --version | sed 's/.*Distrib //;s/,.*//' || echo 'MISSING')"
   report "wp-cli"   "$(have wp && wp --version --allow-root 2>/dev/null | head -1 || echo 'MISSING')"
   report "  its php"  "$(local_php 2>/dev/null || command -v php 2>/dev/null || echo '-')"
-  report "  (local mode pins wp-cli to that php; PATH order does not decide it)" ""
   report "curl"     "$(have curl && echo present || echo 'MISSING')"
   report "node"     "$(have node && node -v || echo 'MISSING')"
 
@@ -112,6 +111,13 @@ doctor() {
     done
     if [ -d "$LOCAL_SITES_DIR/$SITE" ]; then
       report "test site" "found"
+      local facts
+      facts="$(local_site_facts "$SITE" || true)"
+      if [ -n "$facts" ]; then
+        report "  runs php" "$(printf '%s' "$facts" | cut -d' ' -f2) (local mode uses this one, whatever PATH says)"
+      else
+        report "  runs php" "not in sites.json - local mode will fall back to PATH"
+      fi
     else
       report "test site" "'$SITE' NOT FOUND - create an empty LocalWP site with that name"
     fi
@@ -128,12 +134,15 @@ doctor() {
   report "  staged as" "dist/fotogrids/ (re-synced on every boot)"
 
   step "Verdict"
-  if [ -d "$LOCAL_SITES_DIR/$SITE" ] && in_local_shell; then
+  if [ -d "$LOCAL_SITES_DIR/$SITE" ]; then
     say "  Ready. Run: ./tests/harness/boot.sh --mode=local"
-  elif [ -d "$LOCAL_SITES_DIR/$SITE" ]; then
-    say "  The '$SITE' site exists, but this is not LocalWP's site shell, so"
-    say "  its wp-cli is not on PATH. In LocalWP, right-click '$SITE' and choose"
-    say "  'Open site shell', then run: ./tests/harness/boot.sh --mode=local"
+    if [ -z "$(local_site_facts "$SITE" || true)" ]; then
+      say ""
+      say "  LocalWP's sites.json does not list '$SITE', so the harness cannot"
+      say "  find the php that serves it and will use whatever is on PATH. Run"
+      say "  this from the site shell (right-click the site > 'Open site shell')"
+      say "  if anything behaves oddly."
+    fi
   else
     say "  Create an empty LocalWP site named '$SITE', then run this again from"
     say "  that site's shell. Set FG_LOCAL_SITE to use a different name."
