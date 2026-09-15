@@ -159,17 +159,15 @@ doctor() {
 
 # Stage the build as dist/fotogrids/ and point a WordPress install at it.
 #
-# The staged directory has to exist, and it has to be named fotogrids. Linking
-# plugins/fotogrids straight at dist/ looks tidier and fatals the site: Freemius
-# resolves its SDK against the plugin directory's REAL name (start.php sets
-# WP_FS__DIR from the resolved symlink), so it goes looking for
-# <dist>/fotogrids/freemius and dies in a require.
+# Two constraints, both load-bearing:
 #
-# It is re-synced on every boot. An earlier version staged it only when it did
-# not already exist, which pinned the site to whatever the first boot built -
-# `npm run build:dev` writes to dist/, never into the copy - so the suite went
-# on testing code the repo no longer had, including a security fix that had
-# landed days earlier. If you touch this, keep the sync unconditional.
+# - The staged directory must be named fotogrids. Freemius resolves its SDK
+#   against the plugin directory's real name (start.php derives WP_FS__DIR from
+#   the resolved symlink), so linking plugins/fotogrids at dist/ makes it
+#   require <dist>/fotogrids/freemius and fatal the site.
+# - The sync is unconditional. `npm run build:dev` writes to dist/, never into
+#   this copy, so staging it only when absent pins the site to whatever was
+#   built first and the suite silently tests code the repo no longer has.
 link_plugin() {
   local target="$1"
   local staged="$REPO_DIR/dist/fotogrids"
@@ -263,21 +261,19 @@ EOF
 # local - a LocalWP site on macOS
 # ---------------------------------------------------------------------------
 
-# The php LocalWP serves the site with.
+# The php LocalWP serves the site with, located on PATH.
 #
-# The site shell prepends LocalWP's bin directories to PATH, and then the user's
-# shell profile runs and can prepend Homebrew's in front of them. wp-cli then
-# runs a php that is not the site's, while still loading LocalWP's php.ini -
-# which lists extensions built for the other version, so every one of them fails
-# to load, noisily. Worse, the suite would be exercising a PHP the site never
-# serves. LocalWP's own binary is still on PATH, just later, so find it there.
-# LocalWP's own runtime for a site, without needing its site shell.
+# PATH order does not settle this: the site shell prepends LocalWP's bin
+# directories, then a shell profile can prepend another php in front of them.
+# wp-cli would then run a php the site never serves, while still loading
+# LocalWP's php.ini - whose extensions are built for the other version and all
+# fail to load. LocalWP's binary is still on PATH, just later.
+# A site's LocalWP runtime: its opaque run-directory id, and its php version.
 #
-# sites.json is the only thing that maps a site name to the opaque id its run
-# directory is keyed by, and it also pins the php build per site. With those two
-# facts the harness can address LocalWP's php, its php.ini and its mysql socket
-# directly, so PATH never has to be right and the site shell stops being a
-# prerequisite. Needs node, which this repo requires anyway.
+# sites.json is the only place both are recorded, and with them the harness can
+# address LocalWP's php, php.ini and mysql socket directly - so PATH never has
+# to be right and the site shell is not a prerequisite. Needs node, which this
+# repo requires anyway.
 LOCAL_ROOT="$HOME/Library/Application Support/Local"
 
 local_site_facts() {
@@ -367,10 +363,9 @@ boot_local() {
   step "Linking the built plugin into $SITE"
   link_plugin "$public_dir/wp-content/plugins/fotogrids"
 
-  # Print what wp-cli actually said. Swallowing it here once cost an afternoon:
-  # "cannot reach the database" covers a stopped site, a wrong socket and a
-  # php.ini that is not the one the interactive shell uses, and they need
-  # different fixes.
+  # Print wp-cli's own output. "Cannot reach the database" covers a stopped
+  # site, a wrong socket and the wrong php.ini, which need different fixes, and
+  # only wp-cli's message distinguishes them.
   local probe
   if ! probe=$( "$WP_SHIM" option get siteurl 2>&1 ); then
     say ""
@@ -396,8 +391,7 @@ boot_local() {
   admin_user="${FG_ADMIN_USER:-}"
   if [ -z "$admin_user" ]; then
     # tail, not head: head closes the pipe early, wp-cli takes SIGPIPE, and
-    # under `set -e -o pipefail` the script ends with no output at all. tail
-    # reads to the end, so nothing is signalled.
+    # under `set -e -o pipefail` that ends the script silently.
     admin_user=$( "$WP_SHIM" user list --role=administrator \
       --field=user_login --number=1 2>/dev/null | tail -n 1 || true )
   fi

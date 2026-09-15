@@ -16,17 +16,15 @@ export default defineConfig({
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 2 : 0,
-	// One worker, deliberately, until the suite is split into projects that
-	// isolate the specs which mutate global state.
+	// One worker, until the suite is split into projects that isolate the specs
+	// which mutate global state.
 	//
-	// Every spec shares one WordPress and one database. settings-persistence
-	// toggles autosave site-wide while autosave.spec asserts on it, and
-	// rest-route-auth creates galleries while autosave asserts none appeared, so
-	// with more than one worker the result depends on which spec gets there
-	// first. Measured on a laptop: two workers failed a different test on two of
-	// three runs, one worker passed 27/27 three times - in the same 40s, because
-	// the bottleneck is PHP-FPM rather than the browsers. Parallelism here buys
-	// nothing and costs determinism. FG_WORKERS overrides for experiments.
+	// Every spec shares one WordPress. settings-persistence toggles autosave
+	// site-wide while autosave.spec asserts on it; rest-route-auth creates
+	// galleries while autosave asserts none appeared. Above one worker the
+	// result depends on ordering. It also costs nothing: the bottleneck is
+	// PHP-FPM, not the browsers, so the suite takes the same time either way.
+	// FG_WORKERS overrides.
 	workers: Number(process.env.FG_WORKERS) || 1,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
 	use: {
