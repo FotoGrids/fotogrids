@@ -125,9 +125,7 @@ doctor() {
   else
     report "dist/" "MISSING - run: npm run build:dev"
   fi
-  if [ -d "$REPO_DIR/dist/fotogrids" ] && [ ! -L "$REPO_DIR/dist/fotogrids" ]; then
-    report "dist/fotogrids/" "stale copy from an older boot.sh - it will be removed on boot"
-  fi
+  report "  staged as" "dist/fotogrids/ (re-synced on every boot)"
 
   step "Verdict"
   if [ -d "$LOCAL_SITES_DIR/$SITE" ] && in_local_shell; then
@@ -150,23 +148,36 @@ doctor() {
 # shared
 # ---------------------------------------------------------------------------
 
-# Point a WordPress install's plugins/fotogrids at dist/.
+# Stage the build as dist/fotogrids/ and point a WordPress install at it.
 #
-# WordPress derives the slug from the directory name, so the link is named
-# fotogrids and dist/ is what it points at. An earlier version copied dist/ into
-# dist/fotogrids/ and linked that, which froze the plugin at whatever the first
-# boot happened to build: `npm run build:dev` writes to dist/, never into the
-# copy, so every later run tested stale code. A link cannot go stale.
+# The staged directory has to exist, and it has to be named fotogrids. Linking
+# plugins/fotogrids straight at dist/ looks tidier and fatals the site: Freemius
+# resolves its SDK against the plugin directory's REAL name (start.php sets
+# WP_FS__DIR from the resolved symlink), so it goes looking for
+# <dist>/fotogrids/freemius and dies in a require.
+#
+# It is re-synced on every boot. An earlier version staged it only when it did
+# not already exist, which pinned the site to whatever the first boot built -
+# `npm run build:dev` writes to dist/, never into the copy - so the suite went
+# on testing code the repo no longer had, including a security fix that had
+# landed days earlier. If you touch this, keep the sync unconditional.
 link_plugin() {
   local target="$1"
+  local staged="$REPO_DIR/dist/fotogrids"
   [ -f "$REPO_DIR/dist/fotogrids.php" ] || \
     die "no dist/fotogrids.php - run 'npm run build:dev' first"
-  if [ -d "$REPO_DIR/dist/fotogrids" ] && [ ! -L "$REPO_DIR/dist/fotogrids" ]; then
-    say "  removing dist/fotogrids/, a stale copy left by an older boot.sh"
-    rm -rf "$REPO_DIR/dist/fotogrids"
+
+  rm -rf "$staged"
+  mkdir -p "$staged"
+  if have rsync; then
+    rsync -a --delete --exclude '/fotogrids/' "$REPO_DIR/dist/" "$staged/"
+  else
+    find "$REPO_DIR/dist" -mindepth 1 -maxdepth 1 ! -name fotogrids \
+      -exec cp -R {} "$staged/" \;
   fi
+
   rm -rf "$target"
-  ln -s "$REPO_DIR/dist" "$target"
+  ln -s "$staged" "$target"
 }
 
 fetch_wp_cli() {
@@ -342,6 +353,11 @@ boot_local() {
   fetch_wp_cli
   write_wp_shim "$FG_LOCAL_PHP" "$public_dir" "" "$phprc" "$sock"
 
+  # Before the probe, not after: a broken link left by a previous run fatals the
+  # site, and the probe would then blame the database.
+  step "Linking the built plugin into $SITE"
+  link_plugin "$public_dir/wp-content/plugins/fotogrids"
+
   # Print what wp-cli actually said. Swallowing it here once cost an afternoon:
   # "cannot reach the database" covers a stopped site, a wrong socket and a
   # php.ini that is not the one the interactive shell uses, and they need
@@ -359,9 +375,6 @@ boot_local() {
     say "  shim:   $WP_SHIM"
     die "cannot reach $SITE's database - is the site started in LocalWP?"
   fi
-
-  step "Linking the built plugin into $SITE"
-  link_plugin "$public_dir/wp-content/plugins/fotogrids"
 
   step "Activating"
   "$WP_SHIM" plugin activate fotogrids
