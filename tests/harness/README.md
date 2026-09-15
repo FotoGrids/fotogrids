@@ -65,8 +65,11 @@ username is left alone - whatever the site was created with is what the specs
 use. `FG_ADMIN_PASS` changes the password it sets; `FG_ADMIN_USER` picks a
 specific account instead of the first administrator.
 
-LocalWP serves over HTTPS with a self-signed certificate, so the Playwright
-config sets `ignoreHTTPSErrors` for this mode.
+A LocalWP site serves over plain HTTP unless you turn on its SSL, and `boot.sh`
+takes the site URL from WordPress rather than assuming either. If you do enable
+HTTPS on the test site, its certificate is self-signed and Playwright will
+reject it - add `ignoreHTTPSErrors: true` to `use` in `playwright.config.ts`,
+or leave the site on HTTP, which is what this is tested against.
 
 ## ci mode
 
