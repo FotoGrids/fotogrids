@@ -69,10 +69,19 @@ straight through:
 | `FG_DB_SOCKET` | unset — takes precedence over host/port |
 | `FG_DB_NAME` / `FG_DB_USER` / `FG_DB_PASS` | `fotogrids_test` / `root` / empty |
 | `FG_PORT` | `8899` |
+| `FG_ADMIN_USER` / `FG_ADMIN_PASS` | `admin` / `password` |
 | `FG_WP_VERSION` | `latest` |
 | `FG_PHP_WORKERS` | `8` |
 
 `--fresh` throws away `.state/` and reinstalls from nothing.
+
+## Credentials
+
+`admin` / `password`, which is what wp-env uses and what `tests/e2e/helpers.ts`
+falls back to. Diverging from it makes every spec that logs in fail on this
+harness and nowhere else. `boot.sh` also writes `WP_ADMIN_USER` and
+`WP_ADMIN_PASS` into `.env`, so the value has one source rather than being
+duplicated between the harness and the specs.
 
 ## Things that already cost time once
 

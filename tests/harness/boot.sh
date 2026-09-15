@@ -164,6 +164,8 @@ FG_MODE="$1"
 WP_BASE_URL="$2"
 FG_WP_CLI="$3"
 FG_WP_PATH="$4"
+WP_ADMIN_USER="${5:-admin}"
+WP_ADMIN_PASS="${6:-password}"
 EOF
   step "Wrote $ENV_FILE"
   cat "$ENV_FILE" >&2
@@ -207,7 +209,8 @@ boot_local() {
 
   local url
   url=$(wp --path="$public_dir" option get siteurl)
-  write_env local "$url" "wp --path=$public_dir" "$public_dir"
+  write_env local "$url" "wp --path=$public_dir" "$public_dir" \
+    "${FG_ADMIN_USER:-admin}" "${FG_ADMIN_PASS:-password}"
 }
 
 # ---------------------------------------------------------------------------
@@ -222,6 +225,8 @@ boot_ci() {
   local db_user="${FG_DB_USER:-root}"
   local db_pass="${FG_DB_PASS:-}"
   local port="${FG_PORT:-8899}"
+  local admin_user="${FG_ADMIN_USER:-admin}"
+  local admin_pass="${FG_ADMIN_PASS:-password}"
   local wp_dir="$STATE_DIR/wp"
   local url="http://127.0.0.1:$port"
 
@@ -268,9 +273,11 @@ define( 'DISABLE_WP_CRON', true );
 PHP
 
   step "Installing"
+  # admin/password are wp-env's defaults, which tests/e2e/helpers.ts falls back
+  # to. Diverging here makes every spec that logs in fail on this harness only.
   $WP core install --url="$url" --title="FotoGrids test" \
-    --admin_user=admin --admin_password=admin --admin_email=test@example.com \
-    --skip-email
+    --admin_user="$admin_user" --admin_password="$admin_pass" \
+    --admin_email=test@example.com --skip-email
 
   # wp core install derives siteurl from the docroot when --url is ambiguous;
   # set both explicitly or auth cookies are issued for the wrong host and every
@@ -302,7 +309,7 @@ PHP
     sleep 0.25
   done
 
-  write_env ci "$url" "$WP" "$wp_dir"
+  write_env ci "$url" "$WP" "$wp_dir" "$admin_user" "$admin_pass"
 }
 
 # ---------------------------------------------------------------------------
