@@ -215,8 +215,21 @@ boot_local() {
 
   have wp || die "wp-cli not on PATH. Open LocalWP > right-click the site > 'Open site shell', and run this from there."
 
-  wp_local "$public_dir" option get siteurl >/dev/null 2>&1 || die \
-    "wp-cli reached $SITE but not its database. Is the site started in LocalWP?"
+  # Print what wp-cli actually said. Swallowing it here once cost an afternoon:
+  # "cannot reach the database" covers a stopped site, a wrong socket and a
+  # php.ini that is not the one the interactive shell uses, and they need
+  # different fixes.
+  local probe
+  if ! probe=$( wp_local "$public_dir" option get siteurl 2>&1 ); then
+    say ""
+    say "wp-cli could not read $SITE's site URL. It said:"
+    say ""
+    printf '%s\n' "$probe" | sed 's/^/    /' >&2
+    say ""
+    say "  php.ini in this shell: $(php --ini 2>/dev/null | sed -n 's/^Loaded Configuration File: *//p')"
+    say "  wp on PATH:            $(command -v wp)"
+    die "cannot reach $SITE's database - is the site started in LocalWP?"
+  fi
 
   stage_plugin
 
