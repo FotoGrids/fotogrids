@@ -58,6 +58,13 @@ only thing standing between the seeder and your working data.
 `FG_LOCAL_SITE` changes the expected name; `FG_LOCAL_SITES_DIR` changes where
 LocalWP keeps its sites.
 
+**It resets the administrator's password** to `password` on every boot. There is
+no way to read a password back out of WordPress, so a site created with any
+password at all would otherwise need that password fed back in by hand. The
+username is left alone - whatever the site was created with is what the specs
+use. `FG_ADMIN_PASS` changes the password it sets; `FG_ADMIN_USER` picks a
+specific account instead of the first administrator.
+
 LocalWP serves over HTTPS with a self-signed certificate, so the Playwright
 config sets `ignoreHTTPSErrors` for this mode.
 

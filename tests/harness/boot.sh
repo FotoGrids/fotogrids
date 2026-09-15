@@ -211,10 +211,25 @@ boot_local() {
   step "Activating"
   wp --path="$public_dir" plugin activate fotogrids
 
+  # ci mode installs WordPress and so picks the credentials; local mode inherits
+  # a site someone else created, and there is no way to read a password back out
+  # of WordPress. So it sets one. The specs get a login that always works, and
+  # the site keeps whatever username it was created with.
+  local admin_user admin_pass
+  admin_user="${FG_ADMIN_USER:-}"
+  if [ -z "$admin_user" ]; then
+    admin_user=$(wp --path="$public_dir" user list --role=administrator \
+      --field=user_login --number=1 2>/dev/null | head -1)
+  fi
+  [ -n "$admin_user" ] || die "no administrator in $SITE - is it a finished WordPress install?"
+  admin_pass="${FG_ADMIN_PASS:-password}"
+
+  step "Setting $admin_user's password so the specs can log in"
+  wp --path="$public_dir" user update "$admin_user" --user_pass="$admin_pass" --quiet
+
   local url
   url=$(wp --path="$public_dir" option get siteurl)
-  write_env local "$url" "wp" "$public_dir" \
-    "${FG_ADMIN_USER:-admin}" "${FG_ADMIN_PASS:-password}"
+  write_env local "$url" "wp" "$public_dir" "$admin_user" "$admin_pass"
 }
 
 # ---------------------------------------------------------------------------
