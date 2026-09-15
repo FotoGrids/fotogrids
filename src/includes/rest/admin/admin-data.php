@@ -261,6 +261,32 @@ class Admin_Data {
 	}
 
 	/**
+	 * Get the EXIF field vocabulary as picker options.
+	 *
+	 * Backs the `exif_fields` gallery setting and the item editor's EXIF tab,
+	 * so both name the same fields as `Exif_Extractor` reads.
+	 *
+	 * @since 1.1.2
+	 * @param \WP_REST_Request $request Request object
+	 * @return \WP_REST_Response|\WP_Error Response object
+	 */
+	public static function get_exif_fields( $request ) {
+		unset( $request );
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new \WP_Error( 'forbidden', __( 'Insufficient permissions', 'fotogrids' ), array( 'status' => 403 ) );
+		}
+
+		return rest_ensure_response(
+			array(
+				'fields'  => \FotoGrids\Exif\Exif_Fields::as_options(),
+				'groups'  => \FotoGrids\Exif\Exif_Fields::GROUPS,
+				'default' => \FotoGrids\Exif\Exif_Fields::DEFAULT_FIELDS,
+			)
+		);
+	}
+
+	/**
 	 * Get WordPress image sizes
 	 *
 	 * @param \WP_REST_Request $request Request object
@@ -583,6 +609,83 @@ class Admin_Data {
 		$settings = \FotoGrids\Settings\View_Settings_Store::save( $input );
 
 		return rest_ensure_response( array( 'settings' => $settings ) );
+	}
+
+	/**
+	 * Get collection defaults.
+	 *
+	 * GET /wp-json/fotogrids/v1/admin/gallery-defaults
+	 *
+	 * @since  1.1.2
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response
+	 */
+	public static function get_gallery_defaults( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return rest_ensure_response(
+			array(
+				'defaults' => self::redact_passwords(
+					(array) get_option( 'fotogrids_gallery_defaults', array() )
+				),
+			)
+		);
+	}
+
+	/**
+	 * Blank every password field in a defaults map.
+	 *
+	 * The same hard guarantee `Settings_Localizer::data_for_collection()` makes
+	 * for the per-collection payload: a stored password never reaches the
+	 * browser. Reading it back is not a supported operation on any surface.
+	 *
+	 * @param  array<string, mixed> $defaults Stored defaults.
+	 * @return array<string, mixed>
+	 */
+	private static function redact_passwords( array $defaults ): array {
+		foreach ( array_keys( $defaults ) as $key ) {
+			if ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( (string) $key ) ) {
+				$defaults[ $key ] = '';
+			}
+		}
+
+		return $defaults;
+	}
+
+	/**
+	 * Persist collection defaults.
+	 *
+	 * Merges the incoming keys over what is stored rather than replacing the
+	 * option, so a caller that sends one setting does not drop the rest.
+	 *
+	 * POST /wp-json/fotogrids/v1/admin/gallery-defaults
+	 *
+	 * @since  1.1.2
+	 * @param  \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public static function save_gallery_defaults( $request ) {
+		$incoming = (array) $request->get_param( 'defaults' );
+		$stored   = (array) get_option( 'fotogrids_gallery_defaults', array() );
+
+		$merged = array_merge(
+			$stored,
+			\FotoGrids\Settings\Plugin_Settings_Store::sanitize_collection_defaults( $incoming )
+		);
+
+		if ( ! update_option( 'fotogrids_gallery_defaults', $merged ) ) {
+			// update_option() also answers false when nothing changed, so the
+			// stored value is what decides whether this actually failed.
+			$current = (array) get_option( 'fotogrids_gallery_defaults', array() );
+
+			if ( wp_json_encode( $current ) !== wp_json_encode( $merged ) ) {
+				return new \WP_Error(
+					'fotogrids_defaults_not_saved',
+					__( 'The defaults could not be saved.', 'fotogrids' ),
+					array( 'status' => 500 )
+				);
+			}
+		}
+
+		return rest_ensure_response( array( 'defaults' => self::redact_passwords( $merged ) ) );
 	}
 
 	/**

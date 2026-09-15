@@ -755,7 +755,8 @@ final class Context_Builder {
 	 * Video attachments produce no image src, so the grid thumbnail comes from
 	 * the poster chain instead. The poster URL is used for both thumb_url and
 	 * full_url so layout sizing and the lightbox poster work unchanged; the
-	 * direct video file URL is carried in video_src for the player.
+	 * direct video file URL is carried in video_src for the player, and the
+	 * per-item playback settings in embed_settings.
 	 *
 	 * @since   1.1.0
 	 * @param   int                    $attachment_id   The video attachment ID.
@@ -782,7 +783,7 @@ final class Context_Builder {
 			$attachment_id,
 			$poster_url,
 			$poster_url,
-			(string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+			(string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 			(string) $attachment_post->post_title,
 			(string) $attachment_post->post_excerpt,
 			(string) $attachment_post->post_content,
@@ -804,6 +805,9 @@ final class Context_Builder {
 			Video_Item_Helpers::TYPE_FILE,
 			$poster_url,
 			(string) ( wp_get_attachment_url( $attachment_id ) ?: '' ),
+			'',
+			'',
+			Video_Item_Helpers::playback_settings( $custom_data ),
 		);
 	}
 
@@ -985,7 +989,7 @@ final class Context_Builder {
 					$attachment_id,
 					$thumb_url,
 					$full_url,
-					(string) get_post_meta( $attachment_id, '_wp_attachment_item_alt', true ),
+					(string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 					(string) $attachment_post->post_title,
 					(string) $attachment_post->post_excerpt,
 					(string) $attachment_post->post_content,

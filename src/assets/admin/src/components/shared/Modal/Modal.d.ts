@@ -9,7 +9,7 @@
 
 import type { ComponentType, ReactNode, MutableRefObject } from 'react';
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'cover' | 'full';
+export type ModalSize = 'sm' | 'md' | 'ml' | 'lg' | 'xl' | 'cover' | 'full';
 
 export type ModalPosition = 'center' | 'left' | 'right';
 
@@ -19,6 +19,18 @@ export type ConfirmVariant =
 	| 'warning'
 	| 'danger'
 	| 'success';
+
+export type ButtonVariant =
+	| 'primary'
+	| 'secondary'
+	| 'tertiary'
+	| 'danger'
+	| 'success'
+	| 'warning'
+	| 'accent'
+	| 'ghost'
+	| 'outline'
+	| 'link';
 
 export type ModalCloseReason =
 	| 'overlay'
@@ -40,6 +52,8 @@ interface ModalCommonOptions {
 export interface ConfirmOptions extends ModalCommonOptions {
 	type?: 'confirm';
 	variant?: ConfirmVariant;
+	confirmVariant?: ButtonVariant;
+	cancelVariant?: ButtonVariant;
 	requireText?: string | null;
 	onConfirm?: () => void | Promise<void>;
 }

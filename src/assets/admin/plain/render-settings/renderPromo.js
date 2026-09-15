@@ -40,14 +40,13 @@ window.FotoGridsRenderSettings.renderPromo = (
 		[
 			h(
 				'span',
-				{
-					className: 'fotogrids-pro-badge',
-				},
+				{ key: 'pro-badge', className: 'fotogrids-pro-badge' },
 				__('PRO', 'fotogrids')
 			),
 			h(
 				'div',
 				{
+					key: 'content',
 					className: 'fotogrids-settings_pro-message__content',
 				},
 				messages.map((message, index) => {
@@ -65,12 +64,14 @@ window.FotoGridsRenderSettings.renderPromo = (
 								h(
 									'strong',
 									{
+										key: 'subtitle',
 										className:
 											'fotogrids-settings_pro-message__subtitle',
 									},
 									message.subtitle
 								),
 							h('span', {
+								key: 'text',
 								className:
 									'fotogrids-settings_pro-message__text',
 								dangerouslySetInnerHTML: {
@@ -88,6 +89,7 @@ window.FotoGridsRenderSettings.renderPromo = (
 			h(
 				'button',
 				{
+					key: 'fg-button',
 					type: 'button',
 					className:
 						'fg-button fg-button--variant-primary fg-button--size-sm',

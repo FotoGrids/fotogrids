@@ -46,9 +46,13 @@ class Uninstaller {
 	 * Uninstall the plugin completely
 	 */
 	public static function uninstall() {
+		self::clear_scheduled_events();
+
 		if ( ! self::should_delete_data() ) {
 			return;
 		}
+
+		self::remove_cpt_posts();
 
 		// Let lifecycle modules drop the tables/options they own before the
 		// core cleanup runs. Guarded: if the registry is not loaded in this
@@ -64,6 +68,27 @@ class Uninstaller {
 		self::remove_options();
 		self::remove_post_meta();
 		self::remove_transients();
+	}
+
+	/**
+	 * Clear every scheduled FotoGrids cron event.
+	 *
+	 * Runs before the data-deletion check: a scheduled event is not site data,
+	 * and one left in the cron option fires into a plugin that is no longer
+	 * installed. Deactivation clears the same events, so the work left here is
+	 * events stranded by a version that did not.
+	 *
+	 * @since  1.1.2
+	 * @return void
+	 */
+	private static function clear_scheduled_events() {
+		if ( ! class_exists( '\FotoGrids\Hooks\Actions_Cron' ) ) {
+			return;
+		}
+
+		foreach ( \FotoGrids\Hooks\Actions_Cron::ALL_CRON_ACTIONS as $hook ) {
+			wp_clear_scheduled_hook( $hook );
+		}
 	}
 
 	/**
@@ -137,23 +162,36 @@ class Uninstaller {
 	private static function remove_options() {
 		global $wpdb;
 
-		// Remove all options that start with 'fotogrids_'
 		$wpdb->query(
-			"DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE 'fotogrids_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				$wpdb->esc_like( 'fotogrids_' ) . '%'
+			)
 		);
 	}
 
 	/**
-	 * Remove plugin post meta
+	 * Remove plugin post meta.
+	 *
+	 * Matches the `fotogrids_*` keys on collection posts, the `_fotogrids_*`
+	 * keys on attachments, and `_wp_attachment_item_alt`, which 1.1.1 and
+	 * earlier wrote and nothing writes now. Alt text itself lives in core's
+	 * `_wp_attachment_image_alt`, which is matched by none of the three and
+	 * is left in place.
 	 */
 	private static function remove_post_meta() {
 		global $wpdb;
 
-		// Remove all post meta that starts with 'fotogrids_'
 		$wpdb->query(
-			"DELETE FROM {$wpdb->postmeta} 
-             WHERE meta_key LIKE 'fotogrids_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->postmeta}
+                 WHERE meta_key LIKE %s
+                    OR meta_key LIKE %s
+                    OR meta_key = %s",
+				$wpdb->esc_like( 'fotogrids_' ) . '%',
+				$wpdb->esc_like( '_fotogrids_' ) . '%',
+				'_wp_attachment_item_alt' // TODO: Remove at 1.4.0
+			)
 		);
 	}
 
@@ -163,34 +201,55 @@ class Uninstaller {
 	private static function remove_transients() {
 		global $wpdb;
 
-		// Remove all transients that start with 'fotogrids_'
 		$wpdb->query(
-			"DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE '_transient_fotogrids_%' 
-             OR option_name LIKE '_transient_timeout_fotogrids_%'"
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options}
+                 WHERE option_name LIKE %s
+                    OR option_name LIKE %s",
+				$wpdb->esc_like( '_transient_fotogrids_' ) . '%',
+				$wpdb->esc_like( '_transient_timeout_fotogrids_' ) . '%'
+			)
 		);
 	}
 
 	/**
-	 * Remove custom post type posts
-	 * This will be called automatically by WordPress when CPTs are unregistered
+	 * Delete every gallery, album and embed post.
+	 *
+	 * WordPress leaves posts of an unregistered post type in place, and the
+	 * FotoGrids post types are not registered during the uninstall request, so
+	 * the rows are collected with a direct query instead of WP_Query. That
+	 * query carries no status filter: `post_status => 'any'` excludes trashed
+	 * and auto-draft posts. Each row is removed with wp_delete_post() so core
+	 * and third-party `before_delete_post` listeners clear their own data.
+	 *
+	 * @return void
 	 */
 	private static function remove_cpt_posts() {
-		$post_types = array( 'fotogrids_gallery', 'fotogrids_album', 'fotogrids_embed' );
+		global $wpdb;
 
-		foreach ( $post_types as $post_type ) {
-			$posts = get_posts(
-				array(
-					'post_type'   => $post_type,
-					'numberposts' => -1,
-					'post_status' => 'any',
-				)
-			);
+		$post_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT ID FROM {$wpdb->posts}
+                 WHERE post_type IN ( %s, %s, %s )",
+				'fotogrids_gallery',
+				'fotogrids_album',
+				'fotogrids_embed'
+			)
+		);
 
-			foreach ( $posts as $post ) {
-				wp_delete_post( $post->ID, true );
-			}
+		if ( empty( $post_ids ) ) {
+			return;
 		}
+
+		wp_defer_term_counting( true );
+		wp_suspend_cache_invalidation( true );
+
+		foreach ( $post_ids as $post_id ) {
+			wp_delete_post( (int) $post_id, true );
+		}
+
+		wp_suspend_cache_invalidation( false );
+		wp_defer_term_counting( false );
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

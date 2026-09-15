@@ -272,6 +272,7 @@ function AlphaColorPicker({
 					h(
 						'button',
 						{
+							key: 'swatch',
 							type: 'button',
 							className:
 								'fotogrids-color-swatch' +
@@ -287,6 +288,7 @@ function AlphaColorPicker({
 						},
 						[
 							h('span', {
+								key: 'fill',
 								className:
 									'fotogrids-color-swatch__fill' +
 									(isUnset
@@ -300,6 +302,7 @@ function AlphaColorPicker({
 					),
 
 					h('input', {
+						key: 'text',
 						type: 'text',
 						className: 'fotogrids-color-text',
 						value: isUnset ? '' : value,
@@ -326,6 +329,7 @@ function AlphaColorPicker({
 				(typeof createPortal === 'function'
 					? createPortal(
 							h('div', {
+								key: 'popover',
 								className:
 									'fotogrids-color-popover fotogrids-color-popover--open',
 								ref: popoverRef,

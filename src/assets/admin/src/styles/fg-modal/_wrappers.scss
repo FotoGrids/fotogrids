@@ -37,6 +37,13 @@
 	color: var(--fg-text-primary);
 	font-size: 14px;
 	line-height: 1.5;
+	white-space: pre-line;
+}
+
+// A message with nothing beside it is the whole body, so the body's own
+// padding and gap already space it.
+.fg-modal__body > .fg-confirm__message:only-child {
+	margin: 0;
 }
 
 .fg-confirm__require-text {

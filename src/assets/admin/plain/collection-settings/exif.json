@@ -17,9 +17,54 @@
             "visible_when_uninstalled": true
         },
         {
-            "key": "exif_fields_group",
-            "type": "setting_group",
+            "key": "exif_fields",
+            "type": "token_select",
             "label": "Fields to Display",
+            "description": "The fields this gallery shows, in the order they appear. Only fields the image actually carries are rendered.",
+            "api_endpoint": "/wp-json/fotogrids/v1/admin/exif-fields",
+            "options_key": "fields",
+            "sortable": true,
+            "keep_open": true,
+            "default": [
+                "camera",
+                "lens",
+                "aperture",
+                "shutter_speed",
+                "iso",
+                "focal_length"
+            ],
+            "fallback_options": [
+                {
+                    "label": "Camera",
+                    "value": "camera",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Lens",
+                    "value": "lens",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Aperture",
+                    "value": "aperture",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Shutter Speed",
+                    "value": "shutter_speed",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "ISO",
+                    "value": "iso",
+                    "tier_required": "free"
+                },
+                {
+                    "label": "Focal Length",
+                    "value": "focal_length",
+                    "tier_required": "free"
+                }
+            ],
             "condition": {
                 "dependsOn": "display_exif",
                 "values": [
@@ -27,48 +72,6 @@
                     "1"
                 ]
             },
-            "settings": [
-                {
-                    "key": "exif_camera",
-                    "type": "toggle",
-                    "label": "Camera",
-                    "default": true,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "exif_aperture",
-                    "type": "toggle",
-                    "label": "Aperture",
-                    "default": true,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "exif_shutter_speed",
-                    "type": "toggle",
-                    "label": "Shutter Speed",
-                    "default": true,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                },
-                {
-                    "key": "exif_iso",
-                    "type": "toggle",
-                    "label": "ISO",
-                    "default": true,
-                    "tier_required": "free",
-                    "render_when_unlicensed": true,
-                    "setting_lives_in": "free",
-                    "visible_when_uninstalled": true
-                }
-            ],
             "tier_required": "free",
             "render_when_unlicensed": true,
             "setting_lives_in": "free",

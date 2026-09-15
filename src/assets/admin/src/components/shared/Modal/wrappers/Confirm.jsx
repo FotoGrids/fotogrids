@@ -29,6 +29,8 @@ const Confirm = ({
     message,
     confirmLabel,
     cancelLabel,
+    confirmVariant,
+    cancelVariant = 'secondary',
     requireText = null,
     showCancel = true,
     busy: busyProp = false,
@@ -119,12 +121,12 @@ const Confirm = ({
 
             <Modal.Footer compact>
                 { showCancel && (
-                    <Button variant="secondary" onClick={ handleCancel } disabled={ busy }>
+                    <Button variant={ cancelVariant } onClick={ handleCancel } disabled={ busy }>
                         { cancelLabel || t('Cancel') }
                     </Button>
                 ) }
                 <Button
-                    variant={ defaults.confirmVariant }
+                    variant={ confirmVariant || defaults.confirmVariant }
                     onClick={ handleConfirm }
                     busy={ busy }
                     disabled={ !meetsRequireText }

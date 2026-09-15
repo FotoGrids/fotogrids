@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Modal } from './shared/Modal';
+import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import Icon        from './shared/Icon.jsx';
 import Toggle      from './shared/Toggle.jsx';
@@ -167,6 +167,22 @@ function editItemToForm( editItem ) {
     };
 }
 
+/**
+ * Serialise the form and its URL draft into a value that can be compared for
+ * equality. Keys are sorted so a re-created form object does not read as a
+ * change on its own.
+ *
+ * @param {Object} form
+ * @param {string} urlDraft
+ * @return {string}
+ */
+function snapshot( form, urlDraft ) {
+    return JSON.stringify( [
+        urlDraft,
+        Object.keys( form ).sort().map( key => [ key, form[ key ] ] ),
+    ] );
+}
+
 const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, strings = {} } ) => {
 
     const isEditing = !! editItem;
@@ -177,10 +193,15 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     const [ resolving, setResolving ] = useState( false );
     const [ resolveError, setResolveError ] = useState( '' );
     const [ adding, setAdding ]       = useState( false );
+    const [ confirmingClose, setConfirmingClose ] = useState( false );
 
     // Per-source drafts, so switching YouTube <-> Vimeo and back restores the
     // link and options that were already entered for that source.
     const sourceDrafts = useRef( {} );
+
+    // The form as it stood when the modal opened, so an edit-mode prefill is
+    // not mistaken for something the visitor typed.
+    const baseline = useRef( snapshot( DEFAULT_STATE, '' ) );
 
     // Prefill the form when opening in edit mode; reset to defaults on open in
     // add mode. Keyed on the embed's id so re-opening a different embed reloads.
@@ -189,17 +210,14 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
             return;
         }
         sourceDrafts.current = {};
-        if ( editItem ) {
-            setForm( editItemToForm( editItem ) );
-            setUrlDraft( editItem.embed?.embed_url || '' );
-            setResolveError( '' );
-            setActiveTab( 'link' );
-        } else {
-            setForm( { ...DEFAULT_STATE } );
-            setUrlDraft( '' );
-            setResolveError( '' );
-            setActiveTab( 'link' );
-        }
+        const nextForm = editItem ? editItemToForm( editItem ) : { ...DEFAULT_STATE };
+        const nextUrlDraft = editItem ? ( editItem.embed?.embed_url || '' ) : '';
+        setForm( nextForm );
+        setUrlDraft( nextUrlDraft );
+        setResolveError( '' );
+        setActiveTab( 'link' );
+        setConfirmingClose( false );
+        baseline.current = snapshot( nextForm, nextUrlDraft );
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ isOpen, editItem?.id ] );
 
@@ -212,12 +230,36 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
         setUrlDraft( '' );
         setResolveError( '' );
         setActiveTab( 'link' );
+        baseline.current = snapshot( DEFAULT_STATE, '' );
     }, [] );
 
-    const handleClose = useCallback( () => {
+    const closeAndReset = useCallback( () => {
         resetForm();
         onClose();
     }, [ onClose, resetForm ] );
+
+    const hasUnsavedWork = snapshot( form, urlDraft ) !== baseline.current;
+
+    /**
+     * Close the modal, asking first when the form has moved since it opened.
+     * Covers the overlay, Esc, the header close button and Cancel, all of
+     * which reach the modal through this handler.
+     */
+    const handleClose = useCallback( () => {
+        if ( adding ) return;
+
+        if ( hasUnsavedWork ) {
+            setConfirmingClose( true );
+            return;
+        }
+
+        closeAndReset();
+    }, [ adding, hasUnsavedWork, closeAndReset ] );
+
+    const discardAndClose = useCallback( () => {
+        setConfirmingClose( false );
+        closeAndReset();
+    }, [ closeAndReset ] );
 
     const handleSourceChange = useCallback( ( source ) => {
         if ( source === form.source ) {
@@ -337,13 +379,13 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
             } else {
                 await onAdd( payload );
             }
-            handleClose();
+            closeAndReset();
         } catch ( err ) {
             console.error( '[FotoGrids] VideoEmbedModal: save failed', err );
         } finally {
             setAdding( false );
         }
-    }, [ form, isEditing, editItem, onAdd, onUpdate, handleClose ] );
+    }, [ form, isEditing, editItem, onAdd, onUpdate, closeAndReset ] );
 
     const hasVideo = !! form.videoId;
 
@@ -513,7 +555,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
                             }
                             pattern={
                                 form.source === 'youtube'
-                                    ? 'https?://(www\\.)?(youtube\\.com/(watch\\?.*v=|embed/|shorts/)|youtu\\.be/)[a-zA-Z0-9_-]{11}.*'
+                                    ? 'https?://(www\\.)?(youtube\\.com/(watch\\?.*v=|embed/|shorts/)|youtu\\.be/)[a-zA-Z0-9_\\-]{11}.*'
                                     : 'https?://(www\\.)?vimeo\\.com/(video/)?[0-9]+'
                             }
                             className={ `fotogrids-embed-url-input ${ resolveError ? 'fotogrids-embed-url-input--error' : '' }` }
@@ -747,6 +789,7 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
     const tabItems = tabs.map(tab => ({ id: tab.id, label: tab.label }));
 
     return (
+        <>
         <Modal
             isOpen={ isOpen }
             onClose={ handleClose }
@@ -801,6 +844,21 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
                 </Button>
             </Modal.Footer>
         </Modal>
+
+        <Confirm
+            isOpen={ confirmingClose }
+            onClose={ () => setConfirmingClose( false ) }
+            onConfirm={ discardAndClose }
+            variant="warning"
+            headerIcon={ false }
+            title={ strings.unsavedChangesTitle }
+            message={ strings.unsavedChangesConfirm }
+            confirmLabel={ strings.unsavedChangesDiscard }
+            confirmVariant="secondary"
+            cancelLabel={ strings.unsavedChangesKeepEditing }
+            cancelVariant="primary"
+        />
+        </>
     );
 };
 

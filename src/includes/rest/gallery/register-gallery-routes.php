@@ -232,7 +232,7 @@ class Register_Gallery_Routes {
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( '\FotoGrids\REST\Gallery\Lightbox_Slides_Data', 'get_lightbox_slides' ),
-					'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_read' ),
+					'permission_callback' => array( '\FotoGrids\REST\Gallery\Gallery_Permissions', 'check_gallery_view' ),
 					'args'                => array(
 						'gallery_id'  => array(
 							'required'          => true,

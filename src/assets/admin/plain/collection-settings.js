@@ -17,6 +17,11 @@ const FIELD_STATE = {
 	TEASER: 'teaser',
 };
 
+// `fotogridsAdmin.autosave` arrives in two shapes: wp_localize_script casts
+// every scalar to a string, so a page load gives '1' or '', while the autosave
+// toggle writes the AJAX response back as a real boolean.
+const autosaveIsOn = (raw) => true === raw || '1' === raw;
+
 const isFreeTier = (config) => {
 	if (!config || typeof config !== 'object') {
 		return true;
@@ -99,7 +104,7 @@ const useFieldState = (
 				fieldStates,
 				fieldStatesByOption
 			),
-		[setting?.key, currentValue, fieldStates, fieldStatesByOption]
+		[setting, currentValue, fieldStates, fieldStatesByOption]
 	);
 };
 
@@ -141,7 +146,9 @@ const FieldGate = ({
 		{
 			className: `fotogrids-field-gate ${isTeaser ? 'fotogrids-field-gate--teaser' : ''} ${isLocked ? 'fotogrids-field-gate--locked' : ''}`,
 		},
-		[children, isLocked && h(LockedBanner, { __ })].filter(Boolean)
+		[children, isLocked && h(LockedBanner, { key: 'el', __ })].filter(
+			Boolean
+		)
 	);
 };
 
@@ -160,69 +167,37 @@ const replacePostTypePlaceholders =
 const processSettingPlaceholders =
 	window.FotoGridsRenderSettings.processSettingPlaceholders;
 
-const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
-	const translated = withLegacyFreeFlag({ ...group });
+const prepareSettingsGroup = (group, normalizedPostType = 'gallery') => {
+	const prepared = withLegacyFreeFlag({ ...group });
 
-	if (translated.label) {
-		translated.label = __(translated.label, 'fotogrids');
-		translated.label = replacePostTypePlaceholders(
-			translated.label,
+	if (prepared.label) {
+		prepared.label = replacePostTypePlaceholders(
+			prepared.label,
 			normalizedPostType
 		);
 	}
 
-	if (translated.settings) {
-		translated.settings = translated.settings.map((setting) => {
-			let translatedSetting = withLegacyFreeFlag({ ...setting });
+	if (prepared.settings) {
+		prepared.settings = prepared.settings.map((setting) => {
+			let preparedSetting = withLegacyFreeFlag({ ...setting });
 
-			if (translatedSetting.label) {
-				translatedSetting.label = __(
-					translatedSetting.label,
-					'fotogrids'
+			if (preparedSetting.options) {
+				preparedSetting.options = preparedSetting.options.map(
+					(option) => withLegacyFreeFlag({ ...option })
 				);
 			}
 
-			if (translatedSetting.description) {
-				translatedSetting.description = __(
-					translatedSetting.description,
-					'fotogrids'
-				);
-			}
-
-			if (translatedSetting.options) {
-				translatedSetting.options = translatedSetting.options.map(
-					(option) =>
-						withLegacyFreeFlag({
-							...option,
-							label: option.label
-								? __(option.label, 'fotogrids')
-								: option.label,
-							description: option.description
-								? __(option.description, 'fotogrids')
-								: option.description,
-						})
-				);
-			}
-
-			if (translatedSetting.conditionalMessage?.message) {
-				translatedSetting.conditionalMessage.message = __(
-					translatedSetting.conditionalMessage.message,
-					'fotogrids'
-				);
-			}
-
-			if (translatedSetting.subTabs) {
-				Object.keys(translatedSetting.subTabs).forEach((subTabKey) => {
-					const subTab = translatedSetting.subTabs[subTabKey];
-					subTab.label = __(subTab.label, 'fotogrids');
+			if (preparedSetting.subTabs) {
+				Object.keys(preparedSetting.subTabs).forEach((subTabKey) => {
+					const subTab = preparedSetting.subTabs[subTabKey];
 					if (subTab.settings) {
 						subTab.settings = subTab.settings.map((subSetting) => {
-							const translatedSubSetting = translateSettingsGroup(
+							const preparedSubSetting = prepareSettingsGroup(
 								{ settings: [subSetting] },
 								normalizedPostType
 							).settings[0];
 							return processSettingPlaceholders(
-								translatedSubSetting,
+								preparedSubSetting,
 								normalizedPostType
 							);
 						});
@@ -230,19 +205,19 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 				});
 			}
 
-			translatedSetting = processSettingPlaceholders(
-				translatedSetting,
+			preparedSetting = processSettingPlaceholders(
+				preparedSetting,
 				normalizedPostType
 			);
 
-			return translatedSetting;
+			return preparedSetting;
 		});
 	}
 
-	if (translated.subTabs) {
+	if (prepared.subTabs) {
 		const processedSubTabs = {};
-		Object.keys(translated.subTabs).forEach((subTabKey) => {
-			const subTab = { ...translated.subTabs[subTabKey] };
+		Object.keys(prepared.subTabs).forEach((subTabKey) => {
+			const subTab = { ...prepared.subTabs[subTabKey] };
 
 			if (subTab.postTypes && Array.isArray(subTab.postTypes)) {
 				if (!subTab.postTypes.includes(normalizedPostType)) {
@@ -251,7 +226,6 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 			}
 
 			if (subTab.label) {
-				subTab.label = __(subTab.label, 'fotogrids');
 				subTab.label = replacePostTypePlaceholders(
 					subTab.label,
 					normalizedPostType
@@ -259,22 +233,22 @@ const translateSettingsGroup = (group, normalizedPostType = 'gallery') => {
 			}
 			if (subTab.settings && Array.isArray(subTab.settings)) {
 				subTab.settings = subTab.settings.map((subSetting) => {
-					const translatedSubSetting = translateSettingsGroup(
+					const preparedSubSetting = prepareSettingsGroup(
 						{ settings: [subSetting] },
 						normalizedPostType
 					).settings[0];
 					return processSettingPlaceholders(
-						translatedSubSetting,
+						preparedSubSetting,
 						normalizedPostType
 					);
 				});
 			}
 			processedSubTabs[subTabKey] = subTab;
 		});
-		translated.subTabs = processedSubTabs;
+		prepared.subTabs = processedSubTabs;
 	}
 
-	return translated;
+	return prepared;
 };
 
 const renderIcon = (iconName) => {
@@ -296,6 +270,13 @@ window.FotoGridsCollectionSettings = window.FotoGridsCollectionSettings || {};
 function CollectionSettings() {
 	const postType = window.fotogridsSettings?.postType || 'gallery';
 	const isDefaultsMode = window.fotogridsSettings?.isDefaultsMode || false;
+	// Autosave drives ajax-save.js, which is only enqueued on the gallery and
+	// album edit screens, and its AJAX writer requires the settings cap. An
+	// absent capabilities bag is not a denial - see <SettingsLock>.
+	const showAutosaveToggle =
+		!isDefaultsMode &&
+		window.fotogridsAdmin?.capabilities?.manage_fotogrids_settings !==
+			false;
 	const normalizedPostType =
 		postType === 'fotogrids_gallery'
 			? 'gallery'
@@ -343,15 +324,13 @@ function CollectionSettings() {
 	const [bulkUrl, setBulkUrl] = useState('');
 	const [bulkTarget, setBulkTarget] = useState('global');
 	const [autosaveValue, setAutosaveValue] = useState(
-		window.fotogridsAdmin?.autosave || false
+		autosaveIsOn(window.fotogridsAdmin?.autosave)
 	);
 	// The wizard's step 3 writes the same fotogrids_settings_mode option this
 	// Segmented control mirrors, so users can flip modes without reopening it.
 	const [settingsMode, setSettingsMode] = useState(
 		window.fotogridsAdmin?.settingsMode === 'advanced' ? 'advanced' : 'easy'
 	);
-	const State = window.FotoGridsCollectionState;
-
 	const isProActive = window.fotogridsSettings?.isProActive || false;
 	const galleryItems = window.fotogridsSettings?.galleryItems || [];
 	const canEditPosts = window.fotogridsSettings?.canEditPosts !== false;
@@ -427,7 +406,7 @@ function CollectionSettings() {
 		};
 	}, [switchTab]);
 
-	const loadAndTranslateSettings = async () => {
+	const loadAndPrepareSettings = useCallback(async () => {
 		if (window.FotoGridsSettings?.loadSettingsGroups) {
 			const postType = window.fotogridsSettings?.postType || 'gallery';
 			const rawSettings =
@@ -438,7 +417,7 @@ function CollectionSettings() {
 			SETTINGS_GROUPS = {};
 
 			Object.keys(rawSettings).forEach((key) => {
-				SETTINGS_GROUPS[key] = translateSettingsGroup(
+				SETTINGS_GROUPS[key] = prepareSettingsGroup(
 					rawSettings[key],
 					normalizedPostType
 				);
@@ -449,11 +428,11 @@ function CollectionSettings() {
 			);
 		}
 		setSettingsLoaded(true);
-	};
+	}, [isDefaultsMode, normalizedPostType]);
 
 	useEffect(() => {
-		loadAndTranslateSettings();
-	}, []);
+		loadAndPrepareSettings();
+	}, [loadAndPrepareSettings]);
 
 	// Cross-setting conflict: a popover Image Zoom in click mode and an
 	// Item Click Behavior of "lightbox" both bind the item click. Register the
@@ -684,44 +663,18 @@ function CollectionSettings() {
 		) {
 			loadItemData();
 		}
+		// loadItemData is declared below and closes only over galleryItems,
+		// which wp_localize_script writes once before this tree mounts.
+		// Listing it would re-run the effect on every render whenever the
+		// localized array is absent, because the `|| []` fallback allocates
+		// a new one each time.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		settings.item_click_behavior,
 		galleryItems.length,
 		canEditPosts,
 		isDefaultsMode,
 	]);
-
-	useEffect(() => {
-		const currentValue = window.fotogridsAdmin?.autosave || false;
-		setAutosaveValue(currentValue);
-
-		if (State) {
-			State.autosave.set(currentValue);
-		}
-
-		const handleAutosaveChange = (e) => {
-			if (e.target.name === 'fotogrids_autosave') {
-				const newValue = e.target.checked;
-				setAutosaveValue(newValue);
-				if (State) {
-					State.autosave.set(newValue);
-				}
-			}
-		};
-
-		const autosaveInput = document.querySelector(
-			'input[name="fotogrids_autosave"]'
-		);
-		if (autosaveInput) {
-			autosaveInput.addEventListener('change', handleAutosaveChange);
-			return () => {
-				autosaveInput.removeEventListener(
-					'change',
-					handleAutosaveChange
-				);
-			};
-		}
-	}, []);
 
 	const loadItemData = async () => {
 		try {
@@ -933,40 +886,21 @@ function CollectionSettings() {
 
 		try {
 			if (isDefaultsMode) {
-				// In defaults mode, save to form inputs for WordPress Settings API
-				const form = document.querySelector(
-					'form[action="options.php"]'
+				// Defaults persist over REST through <DefaultsTab>, which
+				// collects these events and drives the save bar. Announce the
+				// change and let it own the write.
+				document.dispatchEvent(
+					new CustomEvent('fotogrids:setting_changed', {
+						detail: {
+							key,
+							value:
+								typeof value === 'object' && value !== null
+									? JSON.stringify(value)
+									: value,
+							scope: 'defaults',
+						},
+					})
 				);
-				if (!form) {
-					console.warn('FotoGrids: Settings form not found');
-					return;
-				}
-
-				let input = form.querySelector(
-					`input[name="fotogrids_gallery_defaults[${key}]"]`
-				);
-
-				if (!input) {
-					input = document.createElement('input');
-					input.type = 'hidden';
-					input.name = `fotogrids_gallery_defaults[${key}]`;
-					form.appendChild(input);
-				}
-
-				if (typeof value === 'object' && value !== null) {
-					input.value = JSON.stringify(value);
-				} else {
-					input.value = value;
-				}
-
-				const customEvent = new CustomEvent(
-					'fotogrids:setting_changed',
-					{
-						bubbles: true,
-						detail: { key, value, input },
-					}
-				);
-				input.dispatchEvent(customEvent);
 			} else {
 				// In gallery mode, save to post meta inputs
 				let input = document.querySelector(
@@ -2012,6 +1946,7 @@ function CollectionSettings() {
 		const gatedControl = h(
 			FieldGate,
 			{
+				key: 'control',
 				setting,
 				currentValue,
 				fieldStates,
@@ -2155,9 +2090,11 @@ function CollectionSettings() {
 						if (window.fotogridsAdmin) {
 							window.fotogridsAdmin.autosave = savedValue;
 						}
-						if (State) {
-							State.autosave.set(savedValue);
-						}
+						document.dispatchEvent(
+							new CustomEvent('fotogrids:autosave_changed', {
+								detail: { enabled: savedValue },
+							})
+						);
 						setAutosaveValue(savedValue);
 						if (window.fotogridsToast) {
 							window.fotogridsToast.success(
@@ -2198,16 +2135,19 @@ function CollectionSettings() {
 		return h(
 			'div',
 			{
+				key: 'docs-strip',
 				className: 'fotogrids-settings-docs-strip',
 			},
 			[
 				h('div', {
+					key: 'help',
 					dangerouslySetInnerHTML: { __html: helpText },
 					className: 'fotogrids-settings-docs-strip__help',
 				}),
 				h(
 					'div',
 					{
+						key: 'buttons',
 						className: 'fotogrids-settings-docs-strip__buttons',
 					},
 					[
@@ -2215,6 +2155,7 @@ function CollectionSettings() {
 							h(
 								'a',
 								{
+									key: 'defaults-link',
 									href: defaultsUrl,
 									className:
 										'fotogrids-settings-docs-strip__link',
@@ -2254,6 +2195,7 @@ function CollectionSettings() {
 						h(
 							'div',
 							{
+								key: 'mode',
 								className:
 									'fotogrids-settings-docs-strip__mode',
 							},
@@ -2261,6 +2203,7 @@ function CollectionSettings() {
 								h(
 									'div',
 									{
+										key: 'segmented',
 										className:
 											'fotogrids-segmented fotogrids-segmented--size-small fotogrids-segmented--variant-rounded',
 										role: 'radiogroup',
@@ -2335,47 +2278,53 @@ function CollectionSettings() {
 								),
 							]
 						),
-						h(
-							'div',
-							{
-								className:
-									'fotogrids-settings-docs-strip__autosave',
-							},
-							[
-								h(
-									'span',
-									{
-										className:
-											'fotogrids-settings-docs-strip__autosave-label',
-									},
-									__('Autosave', 'fotogrids')
-								),
-								h(
-									'button',
-									{
-										type: 'button',
-										className: `fotogrids-toggle fotogrids-toggle--small fotogrids-toggle--green ${autosaveValue ? 'fgt-is-checked' : ''}`,
-										onClick: handleAutosaveToggle,
-										title: __(
-											'Toggle autosave',
-											'fotogrids'
-										),
-										'aria-checked': autosaveValue,
-										role: 'switch',
-									},
-									[
-										h('span', {
+						showAutosaveToggle &&
+							h(
+								'div',
+								{
+									key: 'autosave',
+									className:
+										'fotogrids-settings-docs-strip__autosave',
+								},
+								[
+									h(
+										'span',
+										{
+											key: 'autosave-label',
 											className:
-												'fotogrids-toggle__track',
-										}),
-										h('span', {
-											className:
-												'fotogrids-toggle__thumb',
-										}),
-									]
-								),
-							]
-						),
+												'fotogrids-settings-docs-strip__autosave-label',
+										},
+										__('Autosave', 'fotogrids')
+									),
+									h(
+										'button',
+										{
+											key: 'autosave-toggle',
+											type: 'button',
+											className: `fotogrids-toggle fotogrids-toggle--small fotogrids-toggle--green ${autosaveValue ? 'fgt-is-checked' : ''}`,
+											onClick: handleAutosaveToggle,
+											title: __(
+												'Toggle autosave',
+												'fotogrids'
+											),
+											'aria-checked': autosaveValue,
+											role: 'switch',
+										},
+										[
+											h('span', {
+												key: 'track',
+												className:
+													'fotogrids-toggle__track',
+											}),
+											h('span', {
+												key: 'thumb',
+												className:
+													'fotogrids-toggle__thumb',
+											}),
+										]
+									),
+								]
+							),
 					]
 				),
 			]
@@ -2406,38 +2355,43 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'pro-tab',
 							className: 'fotogrids-pro-tab--content',
 						},
 						[
 							h(
 								'div',
 								{
+									key: 'pro-tab',
 									className: 'fotogrids-pro-tab--header',
 								},
 								[
 									h(
 										'span',
 										{
+											key: 'pro-tab',
 											className:
 												'fotogrids-pro-tab--header--icon',
 										},
 										renderIcon(group.icon)
 									),
-									h('h3', {}, group.label),
+									h('h3', { key: 'h3' }, group.label),
 									h(
 										'div',
 										{
+											key: 'pro-badge',
 											className:
 												'fotogrids-pro-badge fotogrids-pro-badge-large',
 										},
 										[
 											h('div', {
+												key: 'fotogrids-fireworks',
 												className:
 													'fotogrids-fireworks',
 											}),
 											h(
 												'span',
-												{},
+												{ key: 'span' },
 												__('Pro', 'fotogrids')
 											),
 										]
@@ -2447,12 +2401,14 @@ function CollectionSettings() {
 							h(
 								'div',
 								{
+									key: 'pro-tab-2',
 									className: 'fotogrids-pro-tab--features',
 								},
 								[
 									h(
 										'h4',
 										{
+											key: 'pro-tab',
 											className:
 												'fotogrids-pro-tab--description',
 										},
@@ -2464,7 +2420,7 @@ function CollectionSettings() {
 									),
 									h(
 										'ul',
-										{},
+										{ key: 'ul' },
 										allSettings.map((setting) =>
 											h(
 												'li',
@@ -2477,6 +2433,7 @@ function CollectionSettings() {
 													h(
 														'span',
 														{
+															key: 'pro-tab',
 															className:
 																'fotogrids-pro-tab--feature--icon',
 														},
@@ -2487,6 +2444,7 @@ function CollectionSettings() {
 													h(
 														'div',
 														{
+															key: 'pro-tab-2',
 															className:
 																'fotogrids-pro-tab--feature--content',
 														},
@@ -2495,6 +2453,7 @@ function CollectionSettings() {
 																h(
 																	'h5',
 																	{
+																		key: 'pro-tab',
 																		className:
 																			'fotogrids-pro-tab--feature--title',
 																	},
@@ -2503,6 +2462,7 @@ function CollectionSettings() {
 															h(
 																'p',
 																{
+																	key: 'pro-tab-2',
 																	className:
 																		'fotogrids-pro-tab--feature--description',
 																},
@@ -2520,12 +2480,14 @@ function CollectionSettings() {
 							h(
 								'div',
 								{
+									key: 'pro-tab-3',
 									className: 'fotogrids-pro-tab--cta',
 								},
 								[
 									h(
 										'button',
 										{
+											key: 'fg-button',
 											type: 'button',
 											className:
 												'fg-button fg-button--variant-primary',
@@ -2546,6 +2508,7 @@ function CollectionSettings() {
 									h(
 										'button',
 										{
+											key: 'fg-button-2',
 											type: 'button',
 											className:
 												'fg-button fg-button--variant-secondary',
@@ -2596,6 +2559,7 @@ function CollectionSettings() {
 						h(
 							'div',
 							{
+								key: 'content',
 								className: 'fotogrids-settings-group__content',
 							},
 							(group.settings || [])
@@ -2617,6 +2581,7 @@ function CollectionSettings() {
 						h(
 							'div',
 							{
+								key: 'content',
 								className: 'fotogrids-settings-group__content',
 							},
 							(singleSubTab.settings || [])
@@ -2652,6 +2617,7 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'nav',
 							className: 'fotogrids-subtabs-nav',
 						},
 						availableSubTabs.map((subTab) =>
@@ -2674,6 +2640,7 @@ function CollectionSettings() {
 									h(
 										'span',
 										{
+											key: 'icon',
 											className: 'fotogrids-subtab__icon',
 										},
 										renderIcon(subTab.icon)
@@ -2681,6 +2648,7 @@ function CollectionSettings() {
 									h(
 										'span',
 										{
+											key: 'label',
 											className:
 												'fotogrids-subtab__label',
 										},
@@ -2694,12 +2662,14 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'content',
 							className: 'fotogrids-subtab-content',
 						},
 						[
 							h(
 								'div',
 								{
+									key: 'group-content',
 									className:
 										'fotogrids-settings-group__content',
 								},
@@ -2730,12 +2700,14 @@ function CollectionSettings() {
 			h(
 				'div',
 				{
+					key: 'settings-group',
 					className: 'fotogrids-settings-group',
 				},
 				[
 					h(
 						'div',
 						{
+							key: 'group-content',
 							className: 'fotogrids-settings-group__content',
 						},
 						visibleSettings.map(renderSetting)
@@ -2754,75 +2726,83 @@ function CollectionSettings() {
 					'fotogrids-gallery-settings fotogrids-gallery-settings--loading',
 			},
 			[
-				h('div', { className: 'fotogrids-loading-screen' }, [
-					h('span', {
-						className: 'fotogrids-loading-screen__icon',
-						'aria-hidden': 'true',
-						dangerouslySetInnerHTML: {
-							__html:
-								'<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><rect x="0" y="0" width="0" height="6"><animate id="fg_ia_fotogrids_1___' +
-								_fgId +
-								'__" begin="0;fg_ia_fotogrids_10___' +
-								_fgId +
-								'__.end-0.3s" attributeName="width" dur="0.4s" values="0;24" fill="freeze"/><animate begin="fg_ia_fotogrids_6___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.4s" values="24;0" fill="freeze"/><animate id="fg_ia_fotogrids_2___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_6___' +
-								_fgId +
-								'__.end-0.2s" attributeName="x" dur="0.4s" values="0;24"/></rect><rect x="0" y="9" width="0" height="6"><animate id="fg_ia_fotogrids_3___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_1___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.4s" values="0;15" fill="freeze"/><animate begin="fg_ia_fotogrids_2___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.4s" values="15;0" fill="freeze"/><animate id="fg_ia_fotogrids_7___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_2___' +
-								_fgId +
-								'__.end-0.2s" attributeName="x" dur="0.4s" values="0;15"/></rect><rect x="0" y="18" width="0" height="6"><animate id="fg_ia_fotogrids_4___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_3___' +
-								_fgId +
-								'__.end-0.2s" attributeName="width" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_7___' +
-								_fgId +
-								'__.end-0.1s" attributeName="width" dur="0.2s" values="6;0" fill="freeze"/><animate id="fg_ia_fotogrids_8___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_7___' +
-								_fgId +
-								'__.end-0.1s" attributeName="x" dur="0.2s" values="0;6"/></rect><rect x="9" y="18" width="6" height="0"><animate id="fg_ia_fotogrids_5___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_4___' +
-								_fgId +
-								'__.end+0.1s" attributeName="height" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_4___' +
-								_fgId +
-								'__.end+0.1s" attributeName="y" dur="0.2s" values="24;18" fill="freeze"/><animate id="fg_ia_fotogrids_9___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_8___' +
-								_fgId +
-								'__.end+0.1s" attributeName="height" dur="0.2s" values="6;0" fill="freeze"/><animate begin="fg_ia_fotogrids_9___' +
-								_fgId +
-								'__.end+0.1s" attributeName="y" dur="0" values="18;24"/></rect><rect x="18" y="9" width="6" height="0"><animate begin="fg_ia_fotogrids_5___' +
-								_fgId +
-								'__.end+0.1s" attributeName="height" dur="0.4s" values="0;15" fill="freeze"/><animate id="fg_ia_fotogrids_6___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_5___' +
-								_fgId +
-								'__.end+0.1s" attributeName="y" dur="0.4s" values="24;9" fill="freeze"/><animate id="fg_ia_fotogrids_10___' +
-								_fgId +
-								'__" begin="fg_ia_fotogrids_9___' +
-								_fgId +
-								'__.end-0.1s" attributeName="height" dur="0.4s" values="15;0" fill="freeze"/><animate begin="fg_ia_fotogrids_10___' +
-								_fgId +
-								'__.end" attributeName="y" dur="0" values="9;24"/></rect></svg>',
-						},
-					}),
-					h(
-						'span',
-						{ className: 'fotogrids-loading-screen__label' },
-						'Loading settings...'
-					),
-				]),
+				h(
+					'div',
+					{ key: 'screen', className: 'fotogrids-loading-screen' },
+					[
+						h('span', {
+							key: 'icon',
+							className: 'fotogrids-loading-screen__icon',
+							'aria-hidden': 'true',
+							dangerouslySetInnerHTML: {
+								__html:
+									'<svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><rect x="0" y="0" width="0" height="6"><animate id="fg_ia_fotogrids_1___' +
+									_fgId +
+									'__" begin="0;fg_ia_fotogrids_10___' +
+									_fgId +
+									'__.end-0.3s" attributeName="width" dur="0.4s" values="0;24" fill="freeze"/><animate begin="fg_ia_fotogrids_6___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.4s" values="24;0" fill="freeze"/><animate id="fg_ia_fotogrids_2___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_6___' +
+									_fgId +
+									'__.end-0.2s" attributeName="x" dur="0.4s" values="0;24"/></rect><rect x="0" y="9" width="0" height="6"><animate id="fg_ia_fotogrids_3___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_1___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.4s" values="0;15" fill="freeze"/><animate begin="fg_ia_fotogrids_2___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.4s" values="15;0" fill="freeze"/><animate id="fg_ia_fotogrids_7___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_2___' +
+									_fgId +
+									'__.end-0.2s" attributeName="x" dur="0.4s" values="0;15"/></rect><rect x="0" y="18" width="0" height="6"><animate id="fg_ia_fotogrids_4___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_3___' +
+									_fgId +
+									'__.end-0.2s" attributeName="width" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_7___' +
+									_fgId +
+									'__.end-0.1s" attributeName="width" dur="0.2s" values="6;0" fill="freeze"/><animate id="fg_ia_fotogrids_8___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_7___' +
+									_fgId +
+									'__.end-0.1s" attributeName="x" dur="0.2s" values="0;6"/></rect><rect x="9" y="18" width="6" height="0"><animate id="fg_ia_fotogrids_5___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_4___' +
+									_fgId +
+									'__.end+0.1s" attributeName="height" dur="0.2s" values="0;6" fill="freeze"/><animate begin="fg_ia_fotogrids_4___' +
+									_fgId +
+									'__.end+0.1s" attributeName="y" dur="0.2s" values="24;18" fill="freeze"/><animate id="fg_ia_fotogrids_9___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_8___' +
+									_fgId +
+									'__.end+0.1s" attributeName="height" dur="0.2s" values="6;0" fill="freeze"/><animate begin="fg_ia_fotogrids_9___' +
+									_fgId +
+									'__.end+0.1s" attributeName="y" dur="0" values="18;24"/></rect><rect x="18" y="9" width="6" height="0"><animate begin="fg_ia_fotogrids_5___' +
+									_fgId +
+									'__.end+0.1s" attributeName="height" dur="0.4s" values="0;15" fill="freeze"/><animate id="fg_ia_fotogrids_6___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_5___' +
+									_fgId +
+									'__.end+0.1s" attributeName="y" dur="0.4s" values="24;9" fill="freeze"/><animate id="fg_ia_fotogrids_10___' +
+									_fgId +
+									'__" begin="fg_ia_fotogrids_9___' +
+									_fgId +
+									'__.end-0.1s" attributeName="height" dur="0.4s" values="15;0" fill="freeze"/><animate begin="fg_ia_fotogrids_10___' +
+									_fgId +
+									'__.end" attributeName="y" dur="0" values="9;24"/></rect></svg>',
+							},
+						}),
+						h(
+							'span',
+							{
+								key: 'label',
+								className: 'fotogrids-loading-screen__label',
+							},
+							'Loading settings...'
+						),
+					]
+				),
 			]
 		);
 	}
@@ -2844,6 +2824,7 @@ function CollectionSettings() {
 					h(
 						'div',
 						{
+							key: 'tabs',
 							className: 'fotogrids-settings-tabs',
 						},
 						Object.values(SETTINGS_GROUPS)
@@ -2872,6 +2853,7 @@ function CollectionSettings() {
 										h(
 											'span',
 											{
+												key: 'icon',
 												className:
 													'fotogrids-settings-tab__icon',
 											},
@@ -2880,6 +2862,7 @@ function CollectionSettings() {
 										h(
 											'span',
 											{
+												key: 'label',
 												className:
 													'fotogrids-settings-tab__label',
 											},
@@ -2890,6 +2873,7 @@ function CollectionSettings() {
 											h(
 												'span',
 												{
+													key: 'pro-badge',
 													className:
 														'fotogrids-pro-badge',
 												},

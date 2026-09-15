@@ -1,6 +1,6 @@
 {
   "name": "fotogrids",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "FotoGrids WordPress gallery plugin with freemium Pro features",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "npm run icons:build && npm run test:ci:render-guards && npm run test:ci:php-integration && jest --ci --coverage --watchAll=false",
+    "test:ci": "npm run test:ci:guards && npm run test:ci:jest",
+    "test:ci:guards": "npm run test:ci:source-guards && npm run test:ci:render-guards && npm run test:ci:php-integration",
+    "test:ci:jest": "npm run icons:build && jest --ci --coverage --watchAll=false",
+    "test:ci:source-guards": "bash tests/ci/grep-user-object-in-localize.sh && bash tests/ci/check-catalog-i18n.sh",
     "test:ci:render-guards": "bash tests/ci/run-render-guards.sh",
     "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh",
     "test:e2e": "playwright test",
@@ -25,7 +28,8 @@
     "zip:dev": "npm run build:dev && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-dev.zip && zip -r ../fotogrids-dev.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
     "zip:prod": "npm run build && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-v$npm_package_version.zip && zip -r ../fotogrids-v$npm_package_version.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
     "release": "npm run clean && npm run build && npm run zip:prod",
-    "i18n:makepot": "wp i18n make-pot src src/languages/fotogrids.pot --slug=fotogrids --domain=fotogrids --exclude=freemius,dist,node_modules,tests",
+    "i18n:strings": "php scripts/generate-catalog-strings.php",
+    "i18n:makepot": "npm run i18n:strings && wp i18n make-pot src src/languages/fotogrids.pot --slug=fotogrids --domain=fotogrids --exclude=freemius,dist,node_modules,tests",
     "icons:build": "node scripts/loading-icons-build.js",
     "icons:yaml": "node scripts/json-to-yaml.js"
   },
@@ -70,7 +74,7 @@
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "js-yaml": "^4.1.1",
+    "js-yaml": "^4.3.2",
     "mini-css-extract-plugin": "^2.7.0",
     "prettier": "npm:wp-prettier@^3.0.3",
     "sass": "^1.93.2",
@@ -87,10 +91,17 @@
     "@typescript-eslint/typescript-estree": {
       "minimatch": "^9.0.9"
     },
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^3.15.2"
+    },
+    "@wordpress/env": {
+      "js-yaml": "^3.15.2"
+    },
     "serialize-javascript": "^7.1.1",
     "browserslist": "^4.28.7",
     "fast-uri": "^3.1.6",
-    "postcss-selector-parser": "^7.1.3"
+    "postcss-selector-parser": "^7.1.3",
+    "colord": "^2.9.4"
   },
   "browserslist": [
     "> 1%",

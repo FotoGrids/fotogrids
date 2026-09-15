@@ -28,12 +28,14 @@ window.FotoGridsRenderSettings.renderToggle = (
 			h(
 				'div',
 				{
+					key: 'toggle-wrapper',
 					className: 'fotogrids-toggle-wrapper',
 				},
 				[
 					h(
 						'button',
 						{
+							key: 'fotogrids-toggle',
 							type: 'button',
 							className: `fotogrids-toggle ${isChecked ? 'fgt-is-checked' : ''}`,
 							onClick: () =>
@@ -45,9 +47,11 @@ window.FotoGridsRenderSettings.renderToggle = (
 						},
 						[
 							h('span', {
+								key: 'track',
 								className: 'fotogrids-toggle__track',
 							}),
 							h('span', {
+								key: 'thumb',
 								className: 'fotogrids-toggle__thumb',
 							}),
 						]
@@ -56,9 +60,7 @@ window.FotoGridsRenderSettings.renderToggle = (
 			),
 			h(
 				'label',
-				{
-					className: 'fotogrids-setting__label',
-				},
+				{ key: 'label', className: 'fotogrids-setting__label' },
 				[
 					setting.label,
 					showSettingBadge &&
@@ -74,6 +76,7 @@ window.FotoGridsRenderSettings.renderToggle = (
 			),
 			setting.description &&
 				h('div', {
+					key: 'description',
 					className: 'fotogrids-setting__description',
 					dangerouslySetInnerHTML: { __html: setting.description },
 				}),

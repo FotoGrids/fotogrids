@@ -5,6 +5,7 @@ namespace FotoGrids\Render\Internal;
 
 use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Collection_Kind;
+use FotoGrids\Render\Api\Gate_Result;
 use FotoGrids\Render\Api\Inline_Assets;
 use FotoGrids\Render\Api\Layout;
 use FotoGrids\Render\Api\Render_Context;
@@ -60,6 +61,30 @@ final class Render_Controller {
 		}
 
 		return $instance;
+	}
+
+	/**
+	 * Evaluates a context's gates without rendering it.
+	 *
+	 * Applies the same render_settings filter and gate precedence as
+	 * render(), so a REST handler that returns item data outside the
+	 * pipeline enforces the same access rules as the rendered gallery.
+	 *
+	 * @since  1.1.2
+	 * @param  Render_Context $render Render context.
+	 * @return Gate_Result The first blocking result, or a pass.
+	 */
+	public static function evaluate_gates( Render_Context $render ): Gate_Result {
+		$render = Hooks::apply_filter( 'render_settings', $render, $render );
+
+		foreach ( Module_Registry::active_modules( 'gates', $render ) as $gate_module ) {
+			$gate_result = $gate_module->evaluate( $render );
+			if ( ! $gate_result->passed ) {
+				return $gate_result;
+			}
+		}
+
+		return Gate_Result::pass();
 	}
 
 	/**

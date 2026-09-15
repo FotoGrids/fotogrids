@@ -10,6 +10,7 @@ import ApplyTemplateModal from '../templates/ApplyTemplateModal';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import Checkbox from '../shared/Checkbox';
+import LoadingIcon from '../shared/LoadingIcon';
 
 const { __ } = wp.i18n;
 
@@ -121,12 +122,13 @@ const TemplatesPage = () => {
 	const [showApplyModal, setShowApplyModal] = useState(false);
 	const [showUserTemplates, setShowUserTemplates] = useState(false);
 	const [showFotoGridsTemplates, setShowFotoGridsTemplates] = useState(true);
-	const [showFree, setShowFree] = useState(true);
-	const [showPro, setShowPro] = useState(true);
 	const [libraryMeta, setLibraryMeta] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
 	const [creatingId, setCreatingId] = useState(null);
-	const isProActive = window.fotogridsSettings?.isProActive || false;
+	const isProActive =
+		window.fotogridsTemplatesPage?.isPro ||
+		window.fotogridsSettings?.isProActive ||
+		false;
 
 	// The setup wizard links here with ?fg_choose=1 to pick a template for a
 	// gallery that does not exist yet. Read once - the flag never changes
@@ -415,39 +417,11 @@ const TemplatesPage = () => {
 		setShowFotoGridsTemplates(checked);
 	};
 
-	const handleFreeChange = (checked) => {
-		// Keep at least one tier visible.
-		if (!checked && !showPro) {
-			return;
-		}
-		setShowFree(checked);
-	};
-
-	const handleProChange = (checked) => {
-		if (!checked && !showFree) {
-			return;
-		}
-		setShowPro(checked);
-	};
-
 	const currentTemplates = templates[activeTab] || [];
 	const currentUserTemplates = userTemplates[activeTab] || [];
 	const filteredUserTemplates = showUserTemplates ? currentUserTemplates : [];
 
-	// Free / Pro toggles filter the already-loaded FotoGrids cards client-side;
-	// no refetch. A template counts as Pro when its type is anything but 'free'.
-	const matchesTier = (template) => {
-		const isPro = template.type && template.type !== 'free';
-		return isPro ? showPro : showFree;
-	};
-	const filteredTemplates = showFotoGridsTemplates
-		? currentTemplates.filter(matchesTier)
-		: [];
-
-	// The library can hide Pro entirely (flags.show_pro). When hidden there are
-	// no Pro templates in the payload, so the Free/Pro tier toggles serve no
-	// purpose and are removed.
-	const proTierVisible = libraryMeta?.flags?.show_pro !== false;
+	const filteredTemplates = showFotoGridsTemplates ? currentTemplates : [];
 	const activeTemplateType =
 		activeTab === 'gallery'
 			? __('Gallery', 'fotogrids')
@@ -516,35 +490,21 @@ const TemplatesPage = () => {
 				</div>
 
 				<div className="fotogrids-templates-page__content">
-					{!loading && (
-						<div className="fotogrids-templates-page__library-bar">
-							{showFotoGridsTemplates && proTierVisible && (
-								<div className="fotogrids-templates-page__library-bar__tiers">
-									<Checkbox
-										checked={showFree}
-										onChange={handleFreeChange}
-										label={__('Free', 'fotogrids')}
-									/>
-									<Checkbox
-										checked={showPro}
-										onChange={handleProChange}
-										label={__('Pro', 'fotogrids')}
-									/>
-								</div>
-							)}
-							<span
-								className="fotogrids-templates-page__library-bar__updated"
-								title={
-									libraryMeta && libraryMeta.fetched_at
-										? __(
-												'Last synced from the FotoGrids template library. The catalog is cached and refreshes periodically; use Refresh to sync now.',
-												'fotogrids'
-											) +
-											` (${syncedAbsolute(libraryMeta)})`
-										: ''
-								}
-							>
-								{libraryMeta && syncedAgo(libraryMeta)
+					<div className="fotogrids-templates-page__library-bar">
+						<span
+							className="fotogrids-templates-page__library-bar__updated"
+							title={
+								libraryMeta && libraryMeta.fetched_at
+									? __(
+											'Last synced from the FotoGrids template library. The catalog is cached and refreshes periodically; use Refresh to sync now.',
+											'fotogrids'
+										) + ` (${syncedAbsolute(libraryMeta)})`
+									: ''
+							}
+						>
+							{loading
+								? ''
+								: libraryMeta && syncedAgo(libraryMeta)
 									? __(
 											'Last synced {time} ago',
 											'fotogrids'
@@ -556,28 +516,29 @@ const TemplatesPage = () => {
 											'Showing built-in templates',
 											'fotogrids'
 										)}
-							</span>
-							<Button
-								variant="secondary"
-								size="sm"
-								icon="refresh_cv"
-								className={
-									refreshing
-										? 'fotogrids-refresh-spinning'
-										: ''
-								}
-								onClick={() => loadTemplates(true)}
-								disabled={refreshing || loading}
-							>
-								{__('Refresh library', 'fotogrids')}
-							</Button>
-						</div>
-					)}
+						</span>
+						<Button
+							variant="secondary"
+							size="sm"
+							icon="refresh_cv"
+							className={
+								refreshing ? 'fotogrids-refresh-spinning' : ''
+							}
+							onClick={() => loadTemplates(true)}
+							disabled={refreshing || loading}
+						>
+							{__('Refresh library', 'fotogrids')}
+						</Button>
+					</div>
 
 					{loading ? (
-						<div className="fotogrids-templates-page--loading">
-							<span className="spinner fg-is-active"></span>
-							<p>{__('Loading templates...', 'fotogrids')}</p>
+						<div className="fotogrids-loading-screen" role="status">
+							<span className="fotogrids-loading-screen__icon">
+								<LoadingIcon size="100%" />
+							</span>
+							<p className="fotogrids-loading-screen__label">
+								{__('Loading templates', 'fotogrids')}
+							</p>
 						</div>
 					) : (
 						<>

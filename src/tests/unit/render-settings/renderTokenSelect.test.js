@@ -1,6 +1,7 @@
 /**
  * Tests for renderTokenSelect.js (multi-select chips + dropdown)
  */
+import '@/admin/plain/render-settings/utils/dynamic-options';
 import '@/admin/plain/render-settings/renderTokenSelect';
 import { renderElement, click, act } from '@tests/helpers/render-component';
 

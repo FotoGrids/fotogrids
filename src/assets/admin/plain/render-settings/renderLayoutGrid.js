@@ -26,6 +26,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 			h(
 				'label',
 				{
+					key: 'label',
 					className: 'fotogrids-setting__label',
 				},
 				[
@@ -45,6 +46,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 			h(
 				'div',
 				{
+					key: 'grid',
 					className: 'fotogrids-layout-grid',
 				},
 				setting.options.map((option) => {
@@ -77,6 +79,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 							h(
 								'div',
 								{
+									key: 'preview',
 									className:
 										'fotogrids-layout-option__preview',
 								},
@@ -84,6 +87,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 									h(
 										'div',
 										{
+											key: 'icon',
 											className:
 												'fotogrids-layout-option__icon',
 										},
@@ -95,12 +99,14 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 							h(
 								'div',
 								{
+									key: 'info',
 									className: 'fotogrids-layout-option__info',
 								},
 								[
 									h(
 										'h4',
 										{
+											key: 'name',
 											className:
 												'fotogrids-layout-option__name',
 										},
@@ -109,6 +115,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 									h(
 										'p',
 										{
+											key: 'description',
 											className:
 												'fotogrids-layout-option__description',
 										},
@@ -121,6 +128,7 @@ window.FotoGridsRenderSettings.renderLayoutGrid = (
 								h(
 									'span',
 									{
+										key: 'badge',
 										className:
 											'fotogrids-pro-badge fotogrids-pro-badge__absolute',
 									},

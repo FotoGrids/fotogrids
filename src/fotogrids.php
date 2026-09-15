@@ -3,7 +3,7 @@
  * Plugin Name: FotoGrids
  * Plugin URI: https://www.fotogrids.com
  * Description: The most robust and beautiful WordPress gallery plugin. Create stunning photo galleries and albums with drag-and-drop ease, modern responsive layouts, powerful lightbox, and detailed analytics. Perfect for photographers, artists, and businesses.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: FotoGrids
  * Author URI: https://www.fotogrids.com/about/
  * Text Domain: fotogrids
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'FOTOGRIDS_VERSION', '1.1.1' );
+define( 'FOTOGRIDS_VERSION', '1.1.2' );
 define( 'FOTOGRIDS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_FILE', __FILE__ );
@@ -48,6 +48,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-post-types.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-rest.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-statistics.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-usage-reporter.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-object-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/cache/class-metadata-cache.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-fotogrids-cache.php';
@@ -65,12 +66,14 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/watermark/class-watermark-regenera
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-collection-defaults.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-password-crypto.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-admin-screen.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-loading-indicator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/admin/class-settings-localizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-debug-log.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-partial-expander.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-state-resolver.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-assembler.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/catalog/class-catalog-i18n.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-settings-normalizer.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-setting-value-codec.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-plugin-settings-store.php';
@@ -102,6 +105,9 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-registrar.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoints.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-collection-save-pipeline.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-fields.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-formatter.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-reader.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/exif/class-exif-extractor.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/albums/class-album-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/sanitization/class-array-field.php';
@@ -136,6 +142,7 @@ function fotogrids_init() {
 	FotoGrids\FotoGrids_Cache::init();
 	FotoGrids\License_Manager::init();
 	FotoGrids\Image_Size_Manager::init();
+	FotoGrids\Usage_Reporter::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
 
 	require_once FOTOGRIDS_PLUGIN_DIR . 'includes/diagnostics/class-js-error-endpoint.php';

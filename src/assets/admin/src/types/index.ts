@@ -91,7 +91,6 @@ declare global {
 			nonce: string;
 			restUrl: string;
 			pluginUrl: string;
-			currentUser: any;
 			capabilities: {
 				manage_fotogrids: boolean;
 				edit_fotogrids: boolean;

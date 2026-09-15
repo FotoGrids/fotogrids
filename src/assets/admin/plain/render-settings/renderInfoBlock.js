@@ -12,10 +12,17 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
  *   "type": "info_block",
  *   "key": "...",          // optional - block is not saved
  *   "subtitle": "...",     // optional; bold label rendered above the message
- *   "message": "...",      // required unless `messages` is given; supports <strong> and <a> tags
+ *   "message": "...",      // required unless `messages` is given; supports <strong>,
+ *                          // <br>, <code>, <em> and a bare <a> (see link_url below)
  *   "messages": [          // optional; renders each entry as its own block
- *     { "subtitle": "...", "tag": "...", "message": "..." }
+ *     { "subtitle": "...", "tag": "...", "message": "...", "link_url_key": "..." }
  *   ],                     // `tag` is a short qualifier shown beside the subtitle
+ *   "link_url_key": "...", // optional; key on window.fotogridsSettings supplying the
+ *                          // URL for the bare <a> in this node's copy
+ *   "link_url": "...",     // optional; a direct URL, used when no key applies.
+ *                          // Copy never holds a URL: it marks the link with <a>
+ *                          // and the destination is declared here, so a
+ *                          // translation cannot choose where the link points
  *   "icon": "info_square", // optional; renders a fotogrids-icon before the inner block; defaults to the variant icon
  *   "variant": "info",     // optional; "info" (default) or "danger" (red warning styling)
  *   "full_width": false,   // optional; when true, removes content max-width limit

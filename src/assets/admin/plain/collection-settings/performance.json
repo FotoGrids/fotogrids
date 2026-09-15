@@ -57,7 +57,7 @@
                     "type": "toggle",
                     "label": "Enable {postType} Cache",
                     "description": "Cache rendered {postType.lower} HTML to improve performance on subsequent loads.",
-                    "default": false,
+                    "default": true,
                     "tier_required": "free",
                     "render_when_unlicensed": true,
                     "setting_lives_in": "free",

@@ -497,10 +497,7 @@ class Post_Types {
 
 		?>
 		<div id="fotogrids-album-galleries-root">
-			<div class="fotogrids-loading">
-				<span class="spinner fg-is-active"></span>
-				<?php esc_html_e( 'Loading gallery manager...', 'fotogrids' ); ?>
-			</div>
+			<?php \FotoGrids\Admin\Loading_Indicator::render( __( 'Loading gallery manager...', 'fotogrids' ) ); ?>
 		</div>
 		<?php
 	}

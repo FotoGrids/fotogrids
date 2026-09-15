@@ -5,6 +5,7 @@ namespace FotoGrids\REST\Admin;
 
 use FotoGrids\Catalog\Catalog;
 use FotoGrids\Catalog\Catalog_Assembler;
+use FotoGrids\Catalog\Catalog_I18n;
 use FotoGrids\Render\Internal\Hover_Effect_Registry;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -48,7 +49,8 @@ final class Catalog_Entries_Endpoint {
 		$assembler       = new Catalog_Assembler();
 		$assembly_result = $assembler->assemble( $raw_files );
 
-		$tree = self::filter_tree_by_post_type( $assembly_result['tree'], $post_type );
+		$tree = Catalog_I18n::translate_tree( $assembly_result['tree'] );
+		$tree = self::filter_tree_by_post_type( $tree, $post_type );
 		self::inject_hover_effect_options( $tree );
 
 		return rest_ensure_response(

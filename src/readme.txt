@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.1
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,7 +53,7 @@ Click any image to open a full-screen fully-customizable lightbox with swipe ges
 
 * **Sorting** - order items by date, title, filename, manually, or at random.
 * **Filtering** - let visitors filter a gallery by tag, person (Pro), or location (Pro), right on the page.
-* **EXIF details** - capture and display camera, lens, aperture, and shutter data from your originals.
+* **EXIF details** - capture and display camera, lens, aperture, shutter speed, ISO, focal length, flash, white balance, metering, exposure and GPS data from your originals. Pick which fields a gallery shows, and in what order.
 
 = 🖱️ Effortless by design =
 
@@ -169,6 +169,32 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Changelog ==
 
+= 1.1.2 =
+
+**New**
+
+* **Every EXIF field your camera records.** FotoGrids used to read four - camera, aperture, shutter speed, ISO - through a WordPress helper that carries no lens, flash, white balance, metering or GPS at all. Tags now come from the file directly, through a 22-field registry shared by the settings panel, the item editor and the lightbox. The Exif tab's four checkboxes become one sortable list, and that order is the order the lightbox renders them.
+
+**Improved**
+
+* **The settings vocabulary is now translatable.** 759 of the 853 strings in the gallery and album settings panel were missing from the translation template, because they live in JSON the string extractor never read. The whole vocabulary is now extracted and translated server-side.
+* **Importing now asks before it discards edits.** From Folder, From ZIP and Video Embed threw a part-filled form away on any exit, with nothing recoverable. Each now asks first.
+* **The render cache cleans up after itself.** Expired rows were filtered out on read but never deleted, so the table grew without bound; a daily purge now runs. Deactivating or uninstalling also clears FotoGrids' scheduled events, which it previously left behind.
+
+**Fixed**
+
+* **Autosave is now applied in settings.** The editor read the setting from three places that do not exist, so it never saw what you had chosen, and switching it off did not stick. The toggle and the editor now read and write one source, and the setting applies.
+* **Saving Gallery Defaults turned off other settings.** One click on Save Defaults cleared autosave, Google Fonts, usage-data sharing and the general, permission and integration settings - the form posted to a WordPress settings group that owns seven options while carrying a field for one, and WordPress writes every option in a posted group. Defaults now saves over REST.
+* **Video playback settings were not affecting the player.** Autoplay, mute, loop and controls never reached it, and autoplay was forced on regardless of the toggle.
+* **Alt text now uses the WordPress alt field.** FotoGrids kept its own copy, seeded once when an item was first added to a gallery and never refreshed, while the lightbox and the collection renderer read WordPress' - so an alt edit updated the grid while the front end served the old text indefinitely. There is one alt field now, WordPress', everywhere.
+* **Editing an item didn't refresh the cached gallery.** The cache listened for an event nothing fires, so logged-out visitors kept the pre-edit render until it expired.
+* **Uninstall left data behind** - gallery, album and embed posts, and four meta keys on attachments. The cleanup queries also passed `_` to SQL `LIKE` unescaped, where it matches any single character.
+
+**Security and hardening**
+
+* **An admin screen carried more user data than it needed.** The whole `WP_User` object was being passed to `wp_localize_script`, putting the current user's account record into the page source of every FotoGrids admin screen. Nothing read it, so it is removed, with a build guard and an end-to-end test against a recurrence.
+* **Three REST routes returned data without checking who was asking.** `GET /lightbox/item/{id}` served any attachment's metadata to anyone, and `POST /gallery/lightbox/slides` checked only that a gallery was published - so slide data for password-protected and registered-users-only galleries was public. All three are now authorised at the route level.
+
 = 1.1.1 =
 
 **New**
@@ -256,6 +282,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Upgrade Notice ==
 
+= 1.1.2 =
+Now reads every EXIF field your camera records. Fixes autosave, video playback settings, alt text edits, and stale caching. Bug and security fixes.
+
 = 1.1.0 =
 Fixes EXIF and XMP data going missing on large photos, makes gallery uploads much faster, and adds a System Info tool for support. Verified against WordPress 7.1.
 
@@ -281,14 +310,16 @@ FotoGrids connects to a few external services. What each one does, when it runs,
 
 1. **Freemius**
 
-This plugin uses Freemius to handle activation, license management for FotoGrids Pro, and optional usage analytics. On activation you are shown an opt-in screen and can skip it. If you opt in, Freemius collects information such as your site URL, WordPress and PHP versions, active theme and plugins, and your administrator email. If you skip, this data is not sent. This service runs on plugin activation and when checking for updates or validating a license.
+This plugin uses Freemius to handle activation, license management for FotoGrids Pro, and optional usage analytics. On activation you are shown an opt-in screen and can skip it. If you opt in, Freemius collects information such as your site URL, WordPress and PHP versions, active theme and plugins, and your administrator email. If you skip, this data is not sent. You can turn this on or off later with the "Share usage data" setting in FotoGrids > Settings > Advanced. This service runs on plugin activation and when checking for updates or validating a license.
 
 Freemius terms of service: https://freemius.com/terms/
 Freemius privacy policy: https://freemius.com/privacy/
 
 2. **FotoGrids usage statistics** (optional, off by default)
 
-If you enable "Share anonymous statistics" in FotoGrids settings (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes your site URL, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent. Nothing is sent unless you turn this setting on.
+If you enable "Share usage data" in FotoGrids > Settings > Advanced (this is disabled by default), the plugin periodically sends anonymous usage data to FotoGrids to help us improve the plugin. The data sent includes a random identifier created when the plugin is activated, plugin version, WordPress version, PHP version, and aggregate gallery usage counts. No personal data and no gallery content is sent, and the report does not include your site address. Nothing is sent unless you turn this setting on.
+
+The same setting also controls the Freemius tracking described above. Turning it on opts your site in to Freemius, which registers the site and sends the data listed in section 1, including your administrator name and email address. Turning it off stops that tracking.
 
 FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 
@@ -323,7 +354,7 @@ FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 == 🔒 Privacy Policy ==
 
 * **Gallery statistics** (views and shares) are stored locally in your own WordPress database.
-* **No personal data** is collected or sent to FotoGrids without your consent. The "Share anonymous statistics" setting is off by default.
+* **No personal data** is collected or sent to FotoGrids without your consent. The "Share usage data" setting is off by default.
 * **External services** are listed in the "External Services" section above, along with what each one sends and when.
 * FotoGrids is built to support **GDPR** and other privacy requirements.
 

@@ -45,6 +45,9 @@ describe('ajax-save', () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 		window.ajaxurl = 'https://x.test/admin-ajax.php';
+		// Autosave now defaults on, so tests that are not about it opt out.
+		// '' is what wp_localize_script sends for a false option.
+		window.fotogridsAdmin = { autosave: '' };
 		window.fotogridsAjaxSave = {
 			strings: {
 				youHaveUnsavedChanges: 'Unsaved changes',
@@ -61,6 +64,7 @@ describe('ajax-save', () => {
 		jest.useRealTimers();
 		delete window.FotoGridsAjaxSave;
 		delete window.fotogridsToast;
+		delete window.fotogridsAdmin;
 		document.body.className = '';
 		document.body.innerHTML = '';
 	});
@@ -80,9 +84,7 @@ describe('ajax-save', () => {
 		document.body.className = 'post-type-post';
 		loadAndInit();
 		// API is still defined (assigned at IIFE end) but the unsaved container is not injected
-		expect(
-			document.getElementById('fotogrids-unsaved-changes')
-		).toBeNull();
+		expect(document.getElementById('fotogrids-unsaved-changes')).toBeNull();
 	});
 
 	it('injects the unsaved-changes container into the submit box', () => {
@@ -114,7 +116,10 @@ describe('ajax-save', () => {
 				json: () =>
 					Promise.resolve({
 						success: true,
-						data: { post_title: 'My Gallery', post_type: 'fotogrids_gallery' },
+						data: {
+							post_title: 'My Gallery',
+							post_type: 'fotogrids_gallery',
+						},
 					}),
 			})
 		);
@@ -150,19 +155,125 @@ describe('ajax-save', () => {
 		expect(window.fotogridsToast.error).toHaveBeenCalled();
 	});
 
-	it('reacts to the autosave input toggling', () => {
-		const input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'fotogrids_autosave';
-		input.value = '1';
-		document.getElementById('post').appendChild(input);
+	// wp_localize_script casts every scalar to a string, so the option reaches
+	// the browser as '1' or '' on a page load - never a boolean. The toggle
+	// writes the AJAX response back as a real boolean. Both shapes are live.
+	describe('reading the localised option', () => {
+		const cases = [
+			['1', true, "localised on ('1')"],
+			['', false, "localised off ('')"],
+			[true, true, 'boolean true from the toggle response'],
+			[false, false, 'boolean false from the toggle response'],
+			[undefined, false, 'missing key'],
+		];
+
+		cases.forEach(([raw, expected, label]) => {
+			it(`seeds autosave ${expected ? 'on' : 'off'} for ${label}`, () => {
+				window.fotogridsAdmin =
+					raw === undefined ? {} : { autosave: raw };
+				loadAndInit();
+				expect(window.FotoGridsCollectionState.autosave.enabled).toBe(
+					expected
+				);
+			});
+		});
+	});
+
+	it('follows fotogrids:autosave_changed', () => {
+		window.fotogridsAdmin = { autosave: '1' };
 		loadAndInit();
-		// seed reads the input (value '1' -> autosave on)
 		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(true);
-		// flipping it off via a change event updates the state
-		input.value = '0';
-		input.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+		document.dispatchEvent(
+			new window.CustomEvent('fotogrids:autosave_changed', {
+				detail: { enabled: false },
+			})
+		);
 		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(false);
+
+		document.dispatchEvent(
+			new window.CustomEvent('fotogrids:autosave_changed', {
+				detail: { enabled: true },
+			})
+		);
+		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(true);
+	});
+
+	// The settings metabox can be hidden from Screen Options, so autosave must
+	// not depend on that React tree having mounted.
+	it('stays on without the collection settings panel in the DOM', () => {
+		window.fotogridsAdmin = { autosave: '1' };
+		loadAndInit();
+		expect(
+			document.getElementById('fotogrids-collection-settings-root')
+		).toBeNull();
+		expect(window.FotoGridsCollectionState.autosave.enabled).toBe(true);
+	});
+
+	it('autosaves a form change after the debounce', () => {
+		window.fotogridsAdmin = { autosave: '1' };
+		window.fotogridsToast = { error: jest.fn(), success: jest.fn() };
+		global.fetch = jest.fn(() =>
+			Promise.resolve({
+				ok: true,
+				json: () => Promise.resolve({ success: true, data: {} }),
+			})
+		);
+		loadAndInit();
+		global.fetch.mockClear();
+
+		const title = document.querySelector('input[name="post_title"]');
+		title.value = 'Renamed';
+		title.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+		expect(global.fetch).not.toHaveBeenCalled();
+		jest.advanceTimersByTime(2100);
+		expect(global.fetch).toHaveBeenCalled();
+	});
+
+	// wp_update_post() promotes an auto-draft to a draft, so an autosave on the
+	// Add New screen would create a gallery nobody asked for.
+	it('does not autosave a gallery that has never been saved', () => {
+		window.fotogridsAdmin = { autosave: '1' };
+		document.getElementById('original_post_status').value = 'auto-draft';
+		global.fetch = jest.fn();
+		loadAndInit();
+		global.fetch.mockClear();
+
+		const title = document.querySelector('input[name="post_title"]');
+		title.value = 'Brand new';
+		title.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+		jest.advanceTimersByTime(5000);
+		expect(global.fetch).not.toHaveBeenCalled();
+	});
+
+	it('still warns about unsaved changes on a never-saved gallery', () => {
+		window.fotogridsAdmin = { autosave: '1' };
+		document.getElementById('original_post_status').value = 'auto-draft';
+		loadAndInit();
+
+		const title = document.querySelector('input[name="post_title"]');
+		title.value = 'Brand new';
+		title.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+		expect(
+			document.getElementById('fotogrids-unsaved-changes').style.display
+		).toBe('block');
+	});
+
+	it('does not autosave a form change when autosave is off', () => {
+		window.fotogridsAdmin = { autosave: '' };
+		global.fetch = jest.fn();
+		loadAndInit();
+		global.fetch.mockClear();
+
+		const title = document.querySelector('input[name="post_title"]');
+		title.value = 'Renamed';
+		title.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+		jest.advanceTimersByTime(5000);
+		expect(global.fetch).not.toHaveBeenCalled();
 	});
 
 	it('blocks save and toasts when validation errors are present', () => {
@@ -225,7 +336,8 @@ describe('ajax-save', () => {
 							post_type: 'fotogrids_gallery',
 							post_id: 42,
 							message: 'All good',
-							redirect_url: '/wp-admin/post.php?post=999&action=edit',
+							redirect_url:
+								'/wp-admin/post.php?post=999&action=edit',
 						},
 					}),
 			})

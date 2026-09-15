@@ -157,4 +157,16 @@
     <rule ref="Universal.Operators.DisallowShortTernary.Found">
         <severity>0</severity>
     </rule>
+
+    <!--
+        Generated string registry. includes/catalog/catalog-strings.php is written
+        by scripts/generate-catalog-strings.php: one entry per catalog string,
+        keyed by the string itself. Keys run from 3 to over 200 characters, so
+        aligning the double arrows would pad every short entry out to the width of
+        the longest one. The generator emits a single space instead, and the
+        alignment sniff is scoped off for that one file.
+    -->
+    <rule ref="WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned">
+        <exclude-pattern>*/includes/catalog/catalog-strings.php</exclude-pattern>
+    </rule>
 </ruleset>

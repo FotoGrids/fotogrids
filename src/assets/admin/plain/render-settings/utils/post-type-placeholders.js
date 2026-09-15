@@ -70,11 +70,59 @@
 	};
 
 	/**
+	 * Turn the bare `<a>` a catalog string may carry into a real link.
+	 *
+	 * Catalog copy never holds a URL: it marks where the link goes with `<a>`,
+	 * and the node names the destination with `link_url` or `link_url_key` (a
+	 * key on window.fotogridsSettings). The server strips every attribute from
+	 * the copy before it gets here, so a translation cannot supply a link.
+	 *
+	 * @param {string} text
+	 * @param {Object} node - the node the copy belongs to.
+	 * @returns {string}
+	 */
+	const resolveCopyLink = (text, node) => {
+		if (!text || typeof text !== 'string' || !text.includes('<a>')) {
+			return text;
+		}
+
+		const url =
+			node?.link_url ||
+			(node?.link_url_key &&
+				window.fotogridsSettings?.[node.link_url_key]) ||
+			'';
+
+		if (!url) {
+			return text;
+		}
+
+		return text.replace(
+			'<a>',
+			`<a href="${encodeURI(url)}" target="_blank" rel="noopener noreferrer">`
+		);
+	};
+
+	/**
+	 * Substitute placeholders and resolve the link in one piece of copy.
+	 *
+	 * @param {string} text
+	 * @param {Object} node
+	 * @param {string} normalizedPostType
+	 * @returns {string}
+	 */
+	const processCopy = (text, node, normalizedPostType) =>
+		resolveCopyLink(
+			replacePostTypePlaceholders(text, normalizedPostType),
+			node
+		);
+
+	/**
 	 * Walk a setting object and replace placeholders in every user-visible string.
 	 *
 	 * Covers: label, description, hint, hint_link.label, options[].label/description,
 	 * conditionalMessage.message, messages[].subtitle/message, nested settings,
-	 * and subTabs (also filtered by postTypes).
+	 * and subTabs (also filtered by postTypes). The description and message keys
+	 * also get their `<a>` resolved against the node's declared destination.
 	 *
 	 * @param {Object} setting
 	 * @param {string} normalizedPostType - 'gallery' or 'album'
@@ -95,8 +143,9 @@
 		}
 
 		if (processed.description) {
-			processed.description = replacePostTypePlaceholders(
+			processed.description = processCopy(
 				processed.description,
+				processed,
 				normalizedPostType
 			);
 		}
@@ -128,8 +177,9 @@
 		}
 
 		if (processed.message) {
-			processed.message = replacePostTypePlaceholders(
+			processed.message = processCopy(
 				processed.message,
+				processed,
 				normalizedPostType
 			);
 		}
@@ -171,8 +221,9 @@
 		if (processed.conditionalMessage?.message) {
 			processed.conditionalMessage = {
 				...processed.conditionalMessage,
-				message: replacePostTypePlaceholders(
+				message: processCopy(
 					processed.conditionalMessage.message,
+					processed.conditionalMessage,
 					normalizedPostType
 				),
 			};
@@ -188,8 +239,9 @@
 					);
 				}
 				if (processedMsg.message) {
-					processedMsg.message = replacePostTypePlaceholders(
+					processedMsg.message = processCopy(
 						processedMsg.message,
+						processedMsg,
 						normalizedPostType
 					);
 				}
@@ -240,6 +292,7 @@
 	window.FotoGridsRenderSettings.getPostTypeValue = getPostTypeValue;
 	window.FotoGridsRenderSettings.replacePostTypePlaceholders =
 		replacePostTypePlaceholders;
+	window.FotoGridsRenderSettings.resolveCopyLink = resolveCopyLink;
 	window.FotoGridsRenderSettings.processSettingPlaceholders =
 		processSettingPlaceholders;
 })();
