@@ -69,6 +69,13 @@ jobs:
       - name: Boot WordPress
         run: ./tests/harness/boot.sh --mode=ci
 
+      - name: Seed a representative fixture subset
+        # Not the whole catalogue: no spec consumes fixtures yet, and F-huge
+        # writes 40MB. This is enough to keep the seeder, the EXIF writer and
+        # the album relations from rotting between now and the specs that use
+        # them.
+        run: ./tests/harness/seed.sh only=F-small,F-exif,F-album,F-mixed
+
       - name: Run Playwright tests
         run: |
           set -a; . ./tests/harness/.env; set +a
