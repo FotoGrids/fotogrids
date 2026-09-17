@@ -23,6 +23,7 @@
     "test:ci:render-guards": "bash tests/ci/run-render-guards.sh",
     "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh",
     "test:e2e": "playwright test",
+    "test:seed": "./tests/harness/seed.sh",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
     "zip:dev": "npm run build:dev && cd dist && rm -rf fotogrids && mkdir fotogrids && find . -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} fotogrids/ \\; && find fotogrids -name .DS_Store -delete && rm -f ../fotogrids-dev.zip && zip -r ../fotogrids-dev.zip fotogrids -x '*.map' '*.DS_Store' && rm -rf fotogrids",
