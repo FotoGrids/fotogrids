@@ -321,7 +321,7 @@ If you enable "Share usage data" in FotoGrids > Settings > Advanced (this is dis
 
 The same setting also controls the Freemius tracking described above. Turning it on opts your site in to Freemius, which registers the site and sends the data listed in section 1, including your administrator name and email address. Turning it off stops that tracking.
 
-FotoGrids privacy policy: https://go.fotogrids.com/privacy/
+FotoGrids privacy policy: https://go.fotogrids.com/privacy/?utm_source=readme&utm_medium=wporg&utm_campaign=privacy
 
 3. **Google Fonts**
 
@@ -343,13 +343,13 @@ Vimeo privacy policy: https://vimeo.com/privacy
 
 When you browse the template library in the FotoGrids admin, the plugin requests the current template catalog from the FotoGrids library service (https://library.fotogrids.com). The request is made from your server (not your visitors' browsers), carries no personal data or site information, and the result is cached for 12 hours. If the service is unavailable, FotoGrids falls back to the templates bundled with the plugin. It runs only in wp-admin when the template library is loaded.
 
-FotoGrids privacy policy: https://go.fotogrids.com/privacy/
+FotoGrids privacy policy: https://go.fotogrids.com/privacy/?utm_source=readme&utm_medium=wporg&utm_campaign=privacy
 
 6. **FotoGrids news**
 
 To fill the "News & Updates" list in the FotoGrids dashboard widget and the "What's New" panel, the plugin requests the latest posts in the News category from the public FotoGrids blog (https://www.fotogrids.com). The request is made from your server (not your visitors' browsers), carries no personal data or site information, and the result is cached for 12 hours. It runs only in wp-admin, when the dashboard widget or the What's New panel is opened. If the site is unavailable, the announcements bundled with the plugin are shown instead. You can turn it off with the "Show news" setting in FotoGrids > Settings > Advanced - when disabled, no request is made and neither surface shows news.
 
-FotoGrids privacy policy: https://go.fotogrids.com/privacy/
+FotoGrids privacy policy: https://go.fotogrids.com/privacy/?utm_source=readme&utm_medium=wporg&utm_campaign=privacy
 
 == 🔒 Privacy Policy ==
 
@@ -358,4 +358,4 @@ FotoGrids privacy policy: https://go.fotogrids.com/privacy/
 * **External services** are listed in the "External Services" section above, along with what each one sends and when.
 * FotoGrids is built to support **GDPR** and other privacy requirements.
 
-For more details, see our [Privacy Policy](https://go.fotogrids.com/privacy/).
+For more details, see our [Privacy Policy](https://go.fotogrids.com/privacy/?utm_source=readme&utm_medium=wporg&utm_campaign=privacy).
