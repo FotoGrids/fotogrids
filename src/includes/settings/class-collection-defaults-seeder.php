@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
-
 /**
  * Seeds a newly created collection from the site-wide defaults option.
  *
  * @package FotoGrids\Settings
  * @since   1.1.3
  */
+
+declare(strict_types=1);
 
 namespace FotoGrids\Settings;
 
