@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FotoGrids 1.1.1\n"
+"Project-Id-Version: FotoGrids 1.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fotogrids\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-13T10:48:35+00:00\n"
+"POT-Creation-Date: 2026-09-20T12:05:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -377,7 +377,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:279
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-registrar.php:880
-#: assets/admin/plain/collection-settings.js:2267
+#: assets/admin/plain/collection-settings.js:2271
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -388,7 +388,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:280
 #: includes/metaboxes/class-metabox-registrar.php:882
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2391
+#: assets/admin/plain/collection-settings.js:2395
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -1739,7 +1739,7 @@ msgid "Filter by camera settings (ISO, aperture, shutter speed), file properties
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:343
-msgid "Filter {postType.lower.plural} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
+msgid "Filter {postType.plural.lower} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:344
@@ -2250,7 +2250,7 @@ msgid "Lens"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:471
-msgid "Let AI determine the best order for your {postType.lower.plural} based on relevance, popularity, and user engagement patterns."
+msgid "Let AI determine the best order for your {postType.plural.lower} based on relevance, popularity, and user engagement patterns."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:472
@@ -3289,7 +3289,7 @@ msgid "Sort by multiple fields simultaneously (e.g., date then title), or use cu
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:714
-msgid "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.lower.plural} that adapt to your content."
+msgid "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.plural.lower} that adapt to your content."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:715
@@ -3962,7 +3962,7 @@ msgstr ""
 #: includes/class-admin-init.php:155
 #: includes/metaboxes/class-metabox-registrar.php:889
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2502
+#: assets/admin/plain/collection-settings.js:2506
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -5849,7 +5849,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:888
-#: assets/admin/plain/collection-settings.js:699
+#: assets/admin/plain/collection-settings.js:703
 msgid "Failed to load item data"
 msgstr ""
 
@@ -6167,7 +6167,6 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:218
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:51
 msgid "FotoGrids Album"
@@ -6234,13 +6233,11 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select an album to display."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:252
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:52
 msgid "FotoGrids Gallery"
@@ -6277,7 +6274,6 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -7929,113 +7925,113 @@ msgstr ""
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:462
+#: assets/admin/plain/collection-settings.js:460
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:746
+#: assets/admin/plain/collection-settings.js:750
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:782
+#: assets/admin/plain/collection-settings.js:786
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:800
+#: assets/admin/plain/collection-settings.js:804
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:807
+#: assets/admin/plain/collection-settings.js:811
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:811
+#: assets/admin/plain/collection-settings.js:815
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1502
+#: assets/admin/plain/collection-settings.js:1506
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1503
+#: assets/admin/plain/collection-settings.js:1507
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1976
+#: assets/admin/plain/collection-settings.js:1980
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2024
-#: assets/admin/plain/collection-settings.js:2040
+#: assets/admin/plain/collection-settings.js:2028
+#: assets/admin/plain/collection-settings.js:2044
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2077
+#: assets/admin/plain/collection-settings.js:2081
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2098
+#: assets/admin/plain/collection-settings.js:2102
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2099
+#: assets/admin/plain/collection-settings.js:2103
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2106
-#: assets/admin/plain/collection-settings.js:2117
+#: assets/admin/plain/collection-settings.js:2110
+#: assets/admin/plain/collection-settings.js:2121
 msgid "Failed to update autosave setting"
-msgstr ""
-
-#: assets/admin/plain/collection-settings.js:2161
-#: assets/admin/plain/collection-settings.js:2171
-msgid "Configure Album defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2165
 #: assets/admin/plain/collection-settings.js:2175
+msgid "Configure Album defaults"
+msgstr ""
+
+#: assets/admin/plain/collection-settings.js:2169
+#: assets/admin/plain/collection-settings.js:2179
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2181
+#: assets/admin/plain/collection-settings.js:2185
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:222
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2206
+#: assets/admin/plain/collection-settings.js:2210
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2216
+#: assets/admin/plain/collection-settings.js:2220
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2220
+#: assets/admin/plain/collection-settings.js:2224
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2266
+#: assets/admin/plain/collection-settings.js:2270
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2293
+#: assets/admin/plain/collection-settings.js:2297
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2302
+#: assets/admin/plain/collection-settings.js:2306
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2412
+#: assets/admin/plain/collection-settings.js:2416
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2526
+#: assets/admin/plain/collection-settings.js:2530
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
@@ -8233,7 +8229,6 @@ msgid "Choose image"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderImagePicker.js:134
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:162
 msgid "Loading preview…"
 msgstr ""
@@ -10781,14 +10776,6 @@ msgstr ""
 
 #: assets/admin/src/utils/gallery.js:39
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This gallery has nothing to preview yet."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This album has nothing to preview yet."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:121
