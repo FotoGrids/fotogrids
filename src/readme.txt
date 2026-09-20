@@ -154,9 +154,9 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 
 Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs&utm_content=faq) for step-by-step guides.
 
-= Is FotoGrids available in my language? =
+= Can I help translate FotoGrids? =
 
-Every string in FotoGrids is translatable, and WordPress delivers a language pack to your site automatically once a language reaches enough coverage. Translations are contributed by the people who use the plugin - if yours is missing or incomplete, you can help at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/). No development setup required.
+Please do - FotoGrids is not yet available in any language other than English. Pick your language at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise. No development setup, and no need to finish the whole plugin in one sitting.
 
 = Where can I get support? =
 
@@ -310,15 +310,15 @@ Bundled third-party libraries:
 
 == 🌐 Translations ==
 
-FotoGrids is translated by the people who use it, and contributions are always welcome.
+FotoGrids is not yet available in any language other than English. No translation has been completed, in any locale, and that is something you can change.
 
-Every user-facing string in the plugin - the admin interface, the settings vocabulary, and the front-end labels - is translatable. Once a language reaches enough coverage, WordPress ships its language pack to every FotoGrids site automatically.
-
-Translations are managed on the WordPress.org translation platform:
+Every user-facing string in the plugin - the admin interface, the settings vocabulary, and the front-end labels - is ready to be translated. If you run FotoGrids in your own language, you can be the first person to translate it into that language:
 
 https://translate.wordpress.org/projects/wp-plugins/fotogrids/
 
-Pick your language, suggest a translation for any string you recognise, and a locale editor reviews it. There is nothing to install and no development setup, and a handful of strings is a useful contribution.
+There is nothing to install and no development setup. Sign in with a WordPress.org account, choose your language, and suggest translations for the strings you recognise - a locale editor reviews them from there. You do not have to do the whole plugin; a stretch of strings from one person and a stretch from the next is how these get finished.
+
+Once a language is far enough along, WordPress delivers its language pack automatically to every site running that locale.
 
 == 🔗 External Services ==
 
