@@ -35,12 +35,9 @@ const useItemDragSort = ({ items, strings, onReorder }) => {
 		let placeholder = null;
 		let draggedIndex = -1;
 
-		// All visual state for the dragging item and the placeholder lives in
-		// CSS - see `.fotogrids-dragging` and `.fotogrids-item-placeholder`
-		// in items.scss. Do NOT set inline styles here: when React re-renders
-		// after a successful drop, it reuses DOM nodes by key and any
-		// JS-applied inline `style.*` will outlive the drag (e.g. opacity
-		// stuck at 0.7) because React doesn't manage those properties.
+		// Drag visuals are CSS-only (items.scss). An inline style set here
+		// outlives the drag: React reuses these nodes by key and never clears
+		// style properties it did not set.
 		const createPlaceholder = () => {
 			const placeholderEl = document.createElement('div');
 			placeholderEl.className = 'fotogrids-item-placeholder';

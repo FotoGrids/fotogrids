@@ -184,9 +184,6 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 		[strings]
 	);
 
-	// Remove item. We never auto-promote a different item to featured -
-	// the runtime resolver handles that fallback. We just clear the
-	// explicit featured choice when the user removes the featured item.
 	const removeItem = useCallback(
 		(itemId) => {
 			let needsClear = false;
@@ -244,18 +241,8 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 		notifyChange('items-remove-all');
 	}, [saveFeaturedItem]);
 
-	// The reorder is treated as a regular gallery change: it updates the
-	// shared state manager (which marks `items` as unsaved) and dispatches
-	// the `fotogrids:setting_changed` event so ajax-save.js's autosave
-	// pipeline handles persistence the same way it handles any other
-	// change. If autosave is off, the user will see the "unsaved changes"
-	// badge and can click Update; if it's on, the standard debounced
-	// saveCollectionAjax() fires and produces the usual save toast.
-	//
-	// We deliberately don't hit the legacy `wp_ajax_fotogrids_reorder_gallery_items`
-	// endpoint anymore - order is persisted by the standard save pipeline
-	// (`fotogrids_save_collection` AJAX action) via the hidden
-	// `fotogrids_gallery_items[]` inputs rendered for each item in the grid.
+	// Order has no endpoint of its own: it rides the gallery save through the
+	// hidden `fotogrids_gallery_items[]` inputs each tile renders.
 	const reorderItems = useCallback((newOrder) => {
 		setItems((prevItems) => {
 			const reorderedItems = newOrder
