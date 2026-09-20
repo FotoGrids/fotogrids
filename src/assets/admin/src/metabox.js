@@ -62,7 +62,6 @@ function initializeGalleryMetabox() {
 
 		const props = {
 			galleryItems: metaboxData.galleryItems || [],
-			canEditPosts: metaboxData.canEditPosts || false,
 			ajaxUrl: metaboxData.ajaxUrl || '',
 			nonce: metaboxData.nonce || '',
 			strings: metaboxData.strings || {},

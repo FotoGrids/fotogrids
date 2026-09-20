@@ -98,6 +98,10 @@ From drag-and-drop simplicity to REST API power, FotoGrids is built to handle an
 * **Bloggers & creators** - beautiful galleries the same day you publish, no code required.
 * **Online shops** - display products beautifully, then sell them with Pro.
 
+= 🌐 Help us translate =
+
+Help bring FotoGrids to your language - pick your locale at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise.
+
 = 🔥 FotoGrids Pro =
 
 The free version is a full kit on its own. **Pro layers on the rest** - more layouts, more analytics insights, more control and conversion tools.
@@ -153,6 +157,10 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 = Can I migrate from another gallery plugin? =
 
 Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs&utm_content=faq) for step-by-step guides.
+
+= Can I help translate FotoGrids? =
+
+Please do - FotoGrids is not yet available in any language other than English. Pick your language at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise. No development setup, and no need to finish the whole plugin in one sitting.
 
 = Where can I get support? =
 
