@@ -98,6 +98,10 @@ From drag-and-drop simplicity to REST API power, FotoGrids is built to handle an
 * **Bloggers & creators** - beautiful galleries the same day you publish, no code required.
 * **Online shops** - display products beautifully, then sell them with Pro.
 
+= 🌐 Help us translate =
+
+Help bring FotoGrids to your language - pick your locale at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise.
+
 = 🔥 FotoGrids Pro =
 
 The free version is a full kit on its own. **Pro layers on the rest** - more layouts, more analytics insights, more control and conversion tools.
@@ -307,14 +311,6 @@ Bundled third-party libraries:
 
 * **Chart.js 4.4.0** (https://www.chartjs.org/) - MIT License - used for the admin analytics charts.
 * **Freemius WordPress SDK** (https://github.com/Freemius/wordpress-sdk) - GPLv2-or-later - used for activation, updates, and licensing.
-
-== 🌐 Help us translate ==
-
-Every user-facing string in the plugin - the admin interface, the settings vocabulary, and the front-end labels - is ready to be translated. If you run FotoGrids in your own language, you can be the first person to translate it into that language:
-
-https://translate.wordpress.org/projects/wp-plugins/fotogrids/
-
-There is nothing to install and no development setup. Sign in with a WordPress.org account, choose your language, and suggest translations for the strings you recognise - a locale editor reviews them from there. You do not have to do the whole plugin; a stretch of strings from one person and a stretch from the next is how these get finished.
 
 == 🔗 External Services ==
 
