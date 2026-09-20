@@ -308,17 +308,13 @@ Bundled third-party libraries:
 * **Chart.js 4.4.0** (https://www.chartjs.org/) - MIT License - used for the admin analytics charts.
 * **Freemius WordPress SDK** (https://github.com/Freemius/wordpress-sdk) - GPLv2-or-later - used for activation, updates, and licensing.
 
-== 🌐 Translations ==
-
-FotoGrids is not yet available in any language other than English. No translation has been completed, in any locale, and that is something you can change.
+== 🌐 Help us translate ==
 
 Every user-facing string in the plugin - the admin interface, the settings vocabulary, and the front-end labels - is ready to be translated. If you run FotoGrids in your own language, you can be the first person to translate it into that language:
 
 https://translate.wordpress.org/projects/wp-plugins/fotogrids/
 
 There is nothing to install and no development setup. Sign in with a WordPress.org account, choose your language, and suggest translations for the strings you recognise - a locale editor reviews them from there. You do not have to do the whole plugin; a stretch of strings from one person and a stretch from the next is how these get finished.
-
-Once a language is far enough along, WordPress delivers its language pack automatically to every site running that locale.
 
 == 🔗 External Services ==
 
