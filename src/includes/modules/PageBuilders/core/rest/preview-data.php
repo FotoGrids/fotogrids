@@ -31,11 +31,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Gutenberg block in the first instance, Elementor / Divi / Bricks once
  * those sub-modules ship.
  *
- * Gallery preview is intentionally a thin wrapper around the existing
- * Admin `Preview_Endpoint::preview()` - same response shape, same code
- * path, no behaviour drift between the metabox preview and the
- * page-builder preview. Album preview is built here because no existing
- * endpoint renders albums for an admin caller.
+ * Album preview is built here because no existing endpoint renders
+ * albums for an admin caller.
  *
  * @since 1.0.0
  */
@@ -62,11 +59,10 @@ final class Preview_Data {
 	 * the front-of-site, then flips `is_preview = true` on the meta so
 	 * preview-aware modules (password gate, etc.) take the admin path.
 	 *
-	 * Using `build_for_public()` here - rather than `build_for_preview()`
-	 * which the legacy admin Preview_Endpoint relied on - gives the
-	 * preview the full sorter + filter + pagination behaviour. Without
-	 * that, paginated galleries rendered all items but still showed the
-	 * load-more chrome.
+	 * Uses `build_for_public()` rather than `build_for_preview()`, which
+	 * gives the preview the full sorter + filter + pagination behaviour.
+	 * Without that, paginated galleries rendered all items but still
+	 * showed the load-more chrome.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -226,8 +222,7 @@ final class Preview_Data {
 	 *
 	 * Renders an album through the Render_Controller pipeline with
 	 * `is_preview = true` so the password gate is bypassed (same rule the
-	 * gallery preview follows). Mirrors the Preview_Endpoint response
-	 * shape exactly.
+	 * gallery preview follows).
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -632,8 +627,8 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Mirror of Preview_Endpoint's response packaging, factored out so the
-	 * album endpoint produces the same shape.
+	 * Response packaging, factored out so the gallery and album endpoints
+	 * produce the same shape.
 	 *
 	 * @since 1.0.0
 	 * @param object $render_result Render_Controller render result.
@@ -680,9 +675,7 @@ final class Preview_Data {
 	}
 
 	/**
-	 * Topo-sorted serialisation of enqueued JS handles. Same logic as the
-	 * existing Preview_Endpoint - kept in sync deliberately so both
-	 * endpoints produce identical client-side wiring.
+	 * Topo-sorted serialisation of enqueued JS handles.
 	 *
 	 * @since 1.0.0
 	 * @param array<string, array{src: string, in_footer: bool}> $js_assets
