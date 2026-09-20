@@ -1,0 +1,55 @@
+.fotogrids-pro-feature-notice {
+	margin-top: 24px;
+	padding: 16px;
+	background: var(--fg-background-secondary);
+	border: 1px solid var(--fg-border-primary);
+	border-radius: 4px;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+
+	&--center {
+		align-items: center;
+	}
+
+	&--center &__content {
+		align-items: center;
+	}
+
+	&__content {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		flex: 1;
+	}
+
+	&__text {
+		font-size: 13px;
+		line-height: 17px;
+		color: var(--fg-text-secondary);
+	}
+
+	.fg-button--link {
+		background: none;
+		border: 1px solid transparent;
+		color: var(--fg-text-link);
+		cursor: pointer;
+		font-size: 13px;
+		padding: 4px 8px;
+		white-space: nowrap;
+
+		&:hover {
+			border-color: currentColor;
+		}
+	}
+}
+
+.fotogrids-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 20px;
+	font-size: 16px;
+	color: #666;
+}
