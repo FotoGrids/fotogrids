@@ -16,6 +16,8 @@
 export const toCanonicalSource = (source) =>
 	source === 'vimeo' ? 'video_vimeo' : 'video_youtube';
 
+const EMBED_ROUTE = 'fotogrids/v1/items/embed';
+
 const restConfig = () => ({
 	base: window.wpApiSettings?.root || '/wp-json/',
 	nonce: window.wpApiSettings?.nonce || '',
@@ -49,7 +51,7 @@ const throwResponseError = async (response) => {
 export const createEmbed = async ({ embedForm, galleryId }) => {
 	const { base, nonce } = restConfig();
 
-	const response = await fetch(`${base}fotogrids/v1/items/embed`, {
+	const response = await fetch(`${base}${EMBED_ROUTE}`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -80,20 +82,17 @@ export const createEmbed = async ({ embedForm, galleryId }) => {
 export const updateEmbed = async ({ embedForm }) => {
 	const { base, nonce } = restConfig();
 
-	const response = await fetch(
-		`${base}fotogrids/v1/items/embed/${embedForm.id}`,
-		{
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': nonce,
-			},
-			body: JSON.stringify({
-				...embedForm,
-				source: toCanonicalSource(embedForm.source),
-			}),
-		}
-	);
+	const response = await fetch(`${base}${EMBED_ROUTE}/${embedForm.id}`, {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': nonce,
+		},
+		body: JSON.stringify({
+			...embedForm,
+			source: toCanonicalSource(embedForm.source),
+		}),
+	});
 
 	if (!response.ok) {
 		await throwResponseError(response);
@@ -115,13 +114,10 @@ export const deleteEmbed = async ({ embedId, strings }) => {
 	const { base, nonce } = restConfig();
 
 	try {
-		const response = await fetch(
-			`${base}fotogrids/v1/items/embed/${embedId}`,
-			{
-				method: 'DELETE',
-				headers: { 'X-WP-Nonce': nonce },
-			}
-		);
+		const response = await fetch(`${base}${EMBED_ROUTE}/${embedId}`, {
+			method: 'DELETE',
+			headers: { 'X-WP-Nonce': nonce },
+		});
 		if (!response.ok) {
 			const err = await response.json().catch(() => ({}));
 			throw new Error(err.message || `HTTP ${response.status}`);
