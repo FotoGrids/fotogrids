@@ -154,6 +154,10 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 
 Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs&utm_content=faq) for step-by-step guides.
 
+= Is FotoGrids available in my language? =
+
+Every string in FotoGrids is translatable, and WordPress delivers a language pack to your site automatically once a language reaches enough coverage. Translations are contributed by the people who use the plugin - if yours is missing or incomplete, you can help at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/). No development setup required.
+
 = Where can I get support? =
 
 Free users can post in the [WordPress.org support forum](https://wordpress.org/support/plugin/fotogrids/). Pro users get priority support at [fotogrids.com](https://go.fotogrids.com/support/?utm_source=readme&utm_medium=wporg&utm_campaign=support).
@@ -303,6 +307,18 @@ Bundled third-party libraries:
 
 * **Chart.js 4.4.0** (https://www.chartjs.org/) - MIT License - used for the admin analytics charts.
 * **Freemius WordPress SDK** (https://github.com/Freemius/wordpress-sdk) - GPLv2-or-later - used for activation, updates, and licensing.
+
+== 🌐 Translations ==
+
+FotoGrids is translated by the people who use it, and contributions are always welcome.
+
+Every user-facing string in the plugin - the admin interface, the settings vocabulary, and the front-end labels - is translatable. Once a language reaches enough coverage, WordPress ships its language pack to every FotoGrids site automatically.
+
+Translations are managed on the WordPress.org translation platform:
+
+https://translate.wordpress.org/projects/wp-plugins/fotogrids/
+
+Pick your language, suggest a translation for any string you recognise, and a locale editor reviews it. There is nothing to install and no development setup, and a handful of strings is a useful contribution.
 
 == 🔗 External Services ==
 
