@@ -175,6 +175,9 @@ const GalleryMetabox = ({
             case 'video_embed':
                 setShowVideoEmbedModal(true);
                 break;
+            case 'instagram':
+                window.FotoGridsUpgrade?.launchForFeature?.integrations?.();
+                break;
         }
     }, [openMediaUploader]);
 
