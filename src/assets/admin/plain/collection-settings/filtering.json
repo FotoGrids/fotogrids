@@ -1127,7 +1127,7 @@
                 },
                 {
                     "subtitle": "People & Location Filtering",
-                    "message": "Filter {postType.lower.plural} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
+                    "message": "Filter {postType.plural.lower} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
                 },
                 {
                     "subtitle": "Smart Filter Presets & Dynamic Filtering",
