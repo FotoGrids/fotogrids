@@ -1,12 +1,12 @@
 /**
- * Tests for components/gallery-metabox/useGalleryItems.js
+ * Tests for components/gallery-metabox/hooks/useGalleryItems.js
  *
  * The hook owns the item list and keeps three things in step: React state, the
  * shared collection-state manager, and the `fotogrids:setting_changed` event
  * the save pipeline listens for. A tiny host exposes the API to drive each
  * operation.
  */
-import useGalleryItems from '@/admin/src/components/gallery-metabox/useGalleryItems';
+import useGalleryItems from '@/admin/src/components/gallery-metabox/hooks/useGalleryItems';
 import { renderElement, act } from '@tests/helpers/render-component';
 
 const h = wp.element.createElement;

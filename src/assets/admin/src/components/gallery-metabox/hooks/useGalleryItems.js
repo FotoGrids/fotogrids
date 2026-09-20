@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { deleteEmbed } from './embed-api';
+import { deleteEmbed } from '../api/embed-api';
 
 /**
  * The shared collection-state manager, published by the admin bootstrap before

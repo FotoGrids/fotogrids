@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Button } from '../shared/Button';
+import { Button } from '../../shared/Button';
 
 const ADD_OPTIONS = [
     { action: 'upload',      labelKey: 'upload' },

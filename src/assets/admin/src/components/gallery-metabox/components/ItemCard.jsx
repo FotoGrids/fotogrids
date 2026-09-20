@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import Icon from '../shared/Icon.jsx';
-import Tooltip from '../Tooltip.jsx';
+import Icon from '../../shared/Icon.jsx';
+import Tooltip from '../../Tooltip.jsx';
 
 /**
  * Renders one item tile with its featured toggle, edit and remove controls,

@@ -1,5 +1,5 @@
 /**
- * Tests for components/gallery-metabox/embed-api.js
+ * Tests for components/gallery-metabox/api/embed-api.js
  *
  * The three endpoints differ in how they report failure: create and update
  * toast and throw, delete toast and swallows. Each path is driven here with a
@@ -10,7 +10,7 @@ import {
 	createEmbed,
 	updateEmbed,
 	deleteEmbed,
-} from '@/admin/src/components/gallery-metabox/embed-api';
+} from '@/admin/src/components/gallery-metabox/api/embed-api';
 
 const okResponse = (body) => ({ ok: true, json: () => Promise.resolve(body) });
 const errResponse = (status, body) => ({

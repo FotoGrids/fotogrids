@@ -11,13 +11,13 @@ import { Confirm } from './shared/Modal';
 import Checkbox from './shared/Checkbox';
 import DangerZone from './shared/DangerZone.jsx';
 import GalleryPreview from './GalleryPreview.jsx';
-import MetaboxHeader from './gallery-metabox/MetaboxHeader.jsx';
-import ItemsGrid from './gallery-metabox/ItemsGrid.jsx';
-import ItemsEmptyState from './gallery-metabox/ItemsEmptyState.jsx';
-import useGalleryItems from './gallery-metabox/useGalleryItems';
-import useItemDragSort from './gallery-metabox/useItemDragSort';
-import useMediaUploader from './gallery-metabox/useMediaUploader';
-import { createEmbed, updateEmbed } from './gallery-metabox/embed-api';
+import MetaboxHeader from './gallery-metabox/components/MetaboxHeader.jsx';
+import ItemsGrid from './gallery-metabox/components/ItemsGrid.jsx';
+import ItemsEmptyState from './gallery-metabox/components/ItemsEmptyState.jsx';
+import useGalleryItems from './gallery-metabox/hooks/useGalleryItems';
+import useItemDragSort from './gallery-metabox/hooks/useItemDragSort';
+import useMediaUploader from './gallery-metabox/hooks/useMediaUploader';
+import { createEmbed, updateEmbed } from './gallery-metabox/api/embed-api';
 
 const TABS = ['manage', 'preview'];
 

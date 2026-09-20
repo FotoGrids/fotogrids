@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Button } from '../shared/Button';
+import { Button } from '../../shared/Button';
 import AddNewDropdown from './AddNewDropdown.jsx';
 
 /**

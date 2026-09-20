@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import Icon from '../shared/Icon.jsx';
-import MediaUpload from '../blocks/MediaUpload.jsx';
+import Icon from '../../shared/Icon.jsx';
+import MediaUpload from '../../blocks/MediaUpload.jsx';
 
 /**
  * Renders the four ways to get the first items into an empty gallery.
