@@ -52,10 +52,8 @@ const useItemDragSort = ({ items, strings, onReorder }) => {
 			return itemNodes.indexOf(element);
 		};
 
-		// Defensive cleanup: removes the dragging class from every item.
-		// Called from handleDragEnd AND directly after a drop, because some
-		// browsers don't fire dragend when the source node is reparented
-		// mid-drag (which our drop handler does).
+		// Some browsers skip dragend when the source node is reparented
+		// mid-drag, which the drop handlers do, so they call this too.
 		const clearDraggingState = () => {
 			gridElement
 				.querySelectorAll('.fotogrids-item-item.fotogrids-dragging')
@@ -130,11 +128,6 @@ const useItemDragSort = ({ items, strings, onReorder }) => {
 				return false;
 			}
 
-			// Move the dragged element to wherever the placeholder currently
-			// sits. The placeholder is kept in sync with the cursor by
-			// handleDragOver, so this is the authoritative drop position -
-			// we deliberately do NOT recompute from draggedIndex / targetIndex
-			// because those snapshots get out of sync as the DOM mutates.
 			if (placeholder && placeholder.parentNode === gridElement) {
 				gridElement.insertBefore(draggedElement, placeholder);
 				placeholder.parentNode.removeChild(placeholder);
@@ -166,9 +159,6 @@ const useItemDragSort = ({ items, strings, onReorder }) => {
 				item.getAttribute('data-id')
 			);
 
-			// Belt-and-braces: clear dragging classes here too. dragend
-			// normally handles it, but reparenting the source node during
-			// drop can suppress dragend on some browsers.
 			clearDraggingState();
 
 			if (onReorderRef.current && newOrder.length > 0) {
@@ -202,11 +192,8 @@ const useItemDragSort = ({ items, strings, onReorder }) => {
 				return;
 			}
 
-			// If the placeholder is in the DOM, drop the dragged element where
-			// the placeholder is. This is the path that fires when the user
-			// releases the mouse with the cursor over the placeholder itself
-			// (rather than over another .fotogrids-item-item) - without this,
-			// the item-level `drop` handler never runs and the reorder is lost.
+			// Releasing over the placeholder itself never reaches an item's own
+			// drop handler, so the reorder is lost without this.
 			if (placeholder && placeholder.parentNode === gridElement) {
 				gridElement.insertBefore(draggedElement, placeholder);
 				placeholder.parentNode.removeChild(placeholder);

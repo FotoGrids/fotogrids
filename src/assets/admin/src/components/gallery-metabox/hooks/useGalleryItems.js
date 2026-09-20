@@ -156,9 +156,6 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 		[appendItems]
 	);
 
-	// Click the star: if not featured, make this item the featured one.
-	// If already featured, clear (so there's a real "remove" affordance -
-	// the runtime resolver then falls back to first-valid-item).
 	const setFeatured = useCallback(
 		async (itemId) => {
 			let nextItemId = null;
@@ -222,9 +219,6 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 				saveFeaturedItem(null);
 			}
 
-			// Notify ajax-save.js a setting changed so the removal enters the
-			// standard save pipeline (unsaved-changes badge + autosave debounce),
-			// the same channel handleReorderItems uses.
 			notifyChange('items-remove');
 		},
 		[saveFeaturedItem, deleteEmbedItem]
@@ -232,7 +226,6 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 
 	const clearAllItems = useCallback(() => {
 		setItems([]);
-		// Clear the explicit featured choice when the gallery is emptied.
 		saveFeaturedItem(null);
 		const State = collectionState();
 		if (State) {
@@ -253,8 +246,6 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 				)
 				.filter(Boolean);
 
-			// Update state manager - this fires the 'items' listener which
-			// in turn sets `unsavedChanges.sources.items = true`.
 			const State = collectionState();
 			if (State) {
 				const itemIds = reorderedItems

@@ -30,9 +30,8 @@ const useMediaUploader = ({ strings, onSelect }) =>
 				library: { type: 'image' },
 			});
 
-			// The Library state restores whichever router tab was used last
-			// (`libraryContent` user setting), so the tab has to be forced after
-			// the state activates - which is what the 'open' event guarantees.
+			// The Library state restores the last-used router tab, so the tab
+			// has to be forced after it activates - hence 'open'.
 			mediaUploader.on('open', () => {
 				if (mediaUploader.content) {
 					mediaUploader.content.mode(contentMode);
@@ -45,10 +44,6 @@ const useMediaUploader = ({ strings, onSelect }) =>
 					.get('selection')
 					.toJSON();
 
-				// New items are never auto-featured. The server-side resolver
-				// (`Cover_Resolver::for_gallery()`) falls back to
-				// the first valid item when nothing is explicitly chosen, so
-				// the UI accurately reflects "the user hasn't picked one yet".
 				onSelect(
 					attachments.map((attachment) => ({
 						id: attachment.id,
