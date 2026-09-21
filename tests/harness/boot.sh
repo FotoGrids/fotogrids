@@ -462,8 +462,8 @@ define( 'DISABLE_WP_CRON', true );
 PHP
 
   step "Installing"
-  # admin/password are wp-env's defaults, which tests/e2e/helpers.ts falls back
-  # to. Diverging here makes every spec that logs in fail on this harness only.
+  # admin/password are the credentials tests/e2e/helpers.ts falls back to.
+  # Diverging here makes every spec that logs in fail on this harness only.
   $WP core install --url="$url" --title="FotoGrids test" \
     --admin_user="$admin_user" --admin_password="$admin_pass" \
     --admin_email=test@example.com --skip-email
