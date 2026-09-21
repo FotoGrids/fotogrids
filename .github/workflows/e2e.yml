@@ -11,6 +11,8 @@ concurrency:
 
 jobs:
   playwright:
+    # Required status check on main: the ruleset matches this name exactly.
+    # Renaming it leaves main waiting on a check that never reports.
     name: Playwright
     runs-on: ubuntu-latest
 
