@@ -199,6 +199,24 @@
     }
 
     /**
+     * Hands a swapped-in page 1 to the pagination module, which pages later
+     * requests at the same breakpoint and updates its chrome to match.
+     *
+     * @param {Element} collectionEl
+     * @param {object}  payload
+     * @param {string}  breakpoint
+     */
+    function adoptIntoPagination( collectionEl, payload, breakpoint ) {
+        const pagination = window.FotoGrids
+            && window.FotoGrids.modules
+            && window.FotoGrids.modules.pagination;
+        if ( 'true' !== collectionEl.dataset.fgPaginated || ! pagination || typeof pagination.adopt !== 'function' ) {
+            return;
+        }
+        pagination.adopt( collectionEl, payload, breakpoint );
+    }
+
+    /**
      * Requests a fresh random selection and swaps it in, holding the items
      * hidden until it lands.
      *
@@ -262,6 +280,7 @@
                 // the visitor is already looking at the server order.
                 if ( ! settled ) {
                     applyItems( collectionEl, root, payload );
+                    adoptIntoPagination( collectionEl, payload, breakpoint );
                 }
             } )
             .catch( function () {

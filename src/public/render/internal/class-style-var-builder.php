@@ -15,11 +15,12 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Accepts a mixed map of plain strings and Responsive_Var instances.
  * Plain strings are emitted in the base rule.  Responsive_Var instances
- * are bucketed by breakpoint and emitted as at most two @media blocks
+ * are bucketed by breakpoint and emitted as at most two scoped blocks
  * (tablet, mobile) - the count is bounded by breakpoints, never by the
- * number of properties or decorators.
+ * number of properties or decorators. Breakpoint_Config::scope() decides
+ * how each block is scoped for the configured detection mode.
  *
- * Output shape for instance #fg-123-1 (instance_id pattern is
+ * Output shape with viewport detection, for instance #fg-123-1 (instance_id pattern is
  * "fg-{collection_id}-{seq}", written into the wrapper's id attribute):
  *
  *   <style class="fg-vars">
@@ -113,24 +114,18 @@ final class Style_Var_Builder {
 		}
 		$output .= "}\n";
 
-		if ( ! empty( $tablet_vars ) ) {
-			$output .= '@media (max-width: ' . $breakpoints->tablet_max_width . "px) {\n";
-			$output .= '    ' . $selector . " {\n";
-			foreach ( $tablet_vars as $name => $val ) {
-				$output .= '        ' . $name . ': ' . $val . ";\n";
+		foreach ( array(
+			'tablet' => $tablet_vars,
+			'mobile' => $mobile_vars,
+		) as $breakpoint => $vars ) {
+			if ( empty( $vars ) ) {
+				continue;
 			}
-			$output .= "    }\n";
-			$output .= "}\n";
-		}
-
-		if ( ! empty( $mobile_vars ) ) {
-			$output .= '@media (max-width: ' . $breakpoints->mobile_max_width . "px) {\n";
-			$output .= '    ' . $selector . " {\n";
-			foreach ( $mobile_vars as $name => $val ) {
-				$output .= '        ' . $name . ': ' . $val . ";\n";
+			$declarations = '';
+			foreach ( $vars as $name => $val ) {
+				$declarations .= '        ' . $name . ': ' . $val . ";\n";
 			}
-			$output .= "    }\n";
-			$output .= "}\n";
+			$output .= $breakpoints->scope( $breakpoint, $selector, $declarations );
 		}
 
 		return $output;

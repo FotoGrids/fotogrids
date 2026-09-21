@@ -91,9 +91,10 @@ final class Gate_Renderer {
 	 * bare CSS string (no <style> tags).
 	 *
 	 * Sets --fg-cols / --fg-gap on the instance selector for the ghost grid,
-	 * mirroring the gallery's real layout across the three breakpoints. Gates
-	 * pass the result to Gate_Result::block() as inline_css so it is enqueued /
-	 * returned separately from the markup rather than embedded as a <style>.
+	 * mirroring the gallery's real layout across the three configured
+	 * breakpoints. Gates pass the result to Gate_Result::block() as inline_css
+	 * so it is enqueued / returned separately from the markup rather than
+	 * embedded as a <style>.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context for this gallery.
@@ -111,18 +112,12 @@ final class Gate_Renderer {
 		$gap_tablet  = self::resolve_gap( $layout->responsive_spacing['tablet'] ?? array() );
 		$gap_mobile  = self::resolve_gap( $layout->responsive_spacing['mobile'] ?? array() );
 
-		return sprintf(
-			'#%1$s{--fg-cols:%2$d;--fg-gap:%3$s}'
-			. '@media(max-width:768px){#%1$s{--fg-cols:%4$d;--fg-gap:%5$s}}'
-			. '@media(max-width:480px){#%1$s{--fg-cols:%6$d;--fg-gap:%7$s}}',
-			esc_attr( $instance_id ),
-			$cols_desktop,
-			esc_attr( $gap_desktop ),
-			$cols_tablet,
-			esc_attr( $gap_tablet ),
-			$cols_mobile,
-			esc_attr( $gap_mobile )
-		);
+		$selector    = '#' . esc_attr( $instance_id );
+		$breakpoints = Breakpoint_Config::from_settings();
+
+		return sprintf( '%s{--fg-cols:%d;--fg-gap:%s}', $selector, $cols_desktop, esc_attr( $gap_desktop ) ) . "\n"
+			. $breakpoints->scope( 'tablet', $selector, sprintf( "        --fg-cols: %d;\n        --fg-gap: %s;\n", $cols_tablet, esc_attr( $gap_tablet ) ) )
+			. $breakpoints->scope( 'mobile', $selector, sprintf( "        --fg-cols: %d;\n        --fg-gap: %s;\n", $cols_mobile, esc_attr( $gap_mobile ) ) );
 	}
 
 	/**

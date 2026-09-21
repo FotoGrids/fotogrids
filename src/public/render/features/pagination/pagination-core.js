@@ -35,6 +35,8 @@
      *     page:       Number,  // current page reached
      *     totalPages: Number,  // total pages of THIS filter set
      *     hasMore:    Boolean, // mirrors page < totalPages
+     *     pageSize:   Number,  // items per page of the painted view
+     *     breakpoint: String,  // breakpoint the view was paged at
      *   }
      *
      * Lives in JS memory only - cleared on page navigation/refresh.
@@ -137,11 +139,55 @@
      * goToPage().
      *
      * @param {Element} galleryEl
-     * @param {{page:number,totalPages:number}} next
+     * @param {{page:number,totalPages:number,pageSize?:number,breakpoint?:string}} next
      */
     function writeState( galleryEl, next ) {
         galleryEl.dataset.fgPageCurrent = String( next.page );
         galleryEl.dataset.fgPageTotal   = String( next.totalPages );
+        if ( next.pageSize > 0 ) {
+            galleryEl.dataset.fgPageSize = String( next.pageSize );
+        }
+        if ( next.breakpoint ) {
+            galleryEl.dataset.fgViewBreakpoint = next.breakpoint;
+        }
+    }
+
+    /**
+     * The breakpoint the items on screen were paged at. The server renders
+     * page 1 at desktop; later requests that extend the current view must use
+     * the same breakpoint, or their offsets would not line up with it.
+     *
+     * @param {Element} galleryEl
+     * @returns {string}
+     */
+    function viewBreakpoint( galleryEl ) {
+        return galleryEl.dataset.fgViewBreakpoint || 'desktop';
+    }
+
+    /**
+     * The visitor's breakpoint as the runtime classifies it.
+     *
+     * @returns {string}
+     */
+    function activeBreakpoint() {
+        return ( window.FotoGrids && typeof window.FotoGrids.activeBreakpoint === 'function' )
+            ? window.FotoGrids.activeBreakpoint()
+            : 'desktop';
+    }
+
+    /**
+     * Reads the per-breakpoint page sizes the server wrote to
+     * data-fg-page-sizes ("<desktop> <tablet> <mobile>").
+     *
+     * @param {Element} galleryEl
+     * @returns {{desktop:number,tablet:number,mobile:number}|null}
+     */
+    function readPageSizes( galleryEl ) {
+        const raw = galleryEl.dataset.fgPageSizes;
+        if ( ! raw ) return null;
+        const parts = raw.trim().split( /\s+/ ).map( function ( n ) { return parseInt( n, 10 ); } );
+        if ( parts.length !== 3 || parts.some( function ( n ) { return ! ( n > 0 ); } ) ) return null;
+        return { desktop: parts[ 0 ], tablet: parts[ 1 ], mobile: parts[ 2 ] };
     }
 
     /**
@@ -223,9 +269,10 @@
      *
      * @param {Element} galleryEl
      * @param {number}  page
+     * @param {string}  [breakpoint] Defaults to the breakpoint of the current view.
      * @returns {Promise<object>}
      */
-    function fetchPage( galleryEl, page ) {
+    function fetchPage( galleryEl, page, breakpoint ) {
         let url   = galleryEl.dataset.fgRenderUrl   || ( window.fotogrids && window.fotogrids.renderUrl )   || '';
         const nonce = galleryEl.dataset.fgRenderNonce || ( window.fotogrids && window.fotogrids.renderNonce ) || '';
         const galleryId = parseInt( galleryEl.dataset.fgGalleryId || '0', 10 );
@@ -234,9 +281,7 @@
             return Promise.reject( new Error( 'pagination/no-render-context' ) );
         }
 
-        const breakpoint = ( window.FotoGrids && window.FotoGrids.activeBreakpoint )
-            ? window.FotoGrids.activeBreakpoint()
-            : 'desktop';
+        const requestBreakpoint = breakpoint || viewBreakpoint( galleryEl );
 
         // Pull active filter state from the filters module (if loaded).
         // Sent on every fetch so the server returns items from the
@@ -267,7 +312,7 @@
             body: JSON.stringify( {
                 gallery_id:      galleryId,
                 page:            page,
-                breakpoint:      breakpoint,
+                breakpoint:      requestBreakpoint,
                 partial:         'items_only',
                 filters:         filters,
                 random_seed:     randomSeed,
@@ -292,8 +337,12 @@
      *        time. When provided, the snapshot taken after this paint is
      *        keyed against THIS value (not `activeFingerprint.get(...)`
      *        which can move under us during overlapping requests).
+     * @param {string} [breakpoint] Breakpoint the page was requested at.
+     * @param {boolean} [reflow] True when the page replaces the server
+     *        render for the visitor's breakpoint rather than following a
+     *        visitor action.
      */
-    function applyPage( galleryEl, payload, mode, capturedFingerprint ) {
+    function applyPage( galleryEl, payload, mode, capturedFingerprint, breakpoint, reflow ) {
         injectMissingStyles( payload.css || {} );
 
         let root = resolveItemsRoot( galleryEl );
@@ -342,6 +391,15 @@
             detail:  { items: inserted, galleryEl: galleryEl },
         } ) );
 
+        // State is written before the snapshot below so the cached view
+        // records the page and breakpoint it actually holds.
+        writeState( galleryEl, {
+            page:       payload.page,
+            totalPages: payload.total_pages,
+            pageSize:   payload.page_size,
+            breakpoint: breakpoint,
+        } );
+
         // Snapshot the current view into the filter-view cache so a
         // future filter toggle that returns to this state can paint
         // instantly from cache. Use the fingerprint captured at FETCH
@@ -361,16 +419,12 @@
             }
         }
 
-        writeState( galleryEl, {
-            page:       payload.page,
-            totalPages: payload.total_pages,
-        } );
-
         notify( galleryEl, {
             galleryEl: galleryEl,
             page:      payload.page,
             mode:      mode,
             hasMore:   payload.has_more,
+            reflow:    !! reflow,
         } );
 
         // Kick off preload for the next page if enabled and there is one.
@@ -447,6 +501,8 @@
             page:       s.page,
             totalPages: s.totalPages,
             hasMore:    s.hasMore,
+            pageSize:   s.pageSize,
+            breakpoint: viewBreakpoint( galleryEl ),
         } );
     }
 
@@ -469,6 +525,8 @@
             page:       s.page,
             totalPages: s.totalPages,
             hasMore:    s.hasMore,
+            pageSize:   s.pageSize,
+            breakpoint: viewBreakpoint( galleryEl ),
         } );
     }
 
@@ -498,6 +556,8 @@
         writeState( galleryEl, {
             page:       snap.page,
             totalPages: snap.totalPages,
+            pageSize:   snap.pageSize,
+            breakpoint: snap.breakpoint,
         } );
         activeFingerprint.set( galleryEl, fingerprint );
 
@@ -604,7 +664,7 @@
      *
      * @param {Element} galleryEl
      * @param {number}  page
-     * @param {{mode?:'replace'|'append'}} opts
+     * @param {{mode?:'replace'|'append',fingerprint?:string,reflow?:boolean}} opts
      * @returns {Promise<{page:number,hasMore:boolean}>}
      */
     function goToPage( galleryEl, page, opts ) {
@@ -622,7 +682,12 @@
 
         galleryEl.classList.add( 'fotogrids-gallery--is-paginating' );
 
-        return fetchPage( galleryEl, page )
+        // A replace repaints the whole view, so it can move to the visitor's
+        // breakpoint. An append extends the current view and keeps its own.
+        const breakpoint = 'replace' === mode ? activeBreakpoint() : viewBreakpoint( galleryEl );
+        const reflow     = !! ( opts && opts.reflow );
+
+        return fetchPage( galleryEl, page, breakpoint )
             .then( function ( payload ) {
                 if ( ! isCurrentToken( galleryEl, capturedToken ) ) {
                     // Superseded by a newer request. Surface the payload
@@ -630,7 +695,7 @@
                     // the DOM or cache - the newer request owns those.
                     return { page: payload.page, hasMore: payload.has_more, stale: true };
                 }
-                applyPage( galleryEl, payload, mode, capturedFp );
+                applyPage( galleryEl, payload, mode, capturedFp, breakpoint, reflow );
                 return { page: payload.page, hasMore: payload.has_more };
             } )
             .catch( function ( err ) {
@@ -670,6 +735,47 @@
         listeners.get( galleryEl ).push( cb );
     }
 
+    /**
+     * Whether the visitor's breakpoint pages the gallery differently from
+     * the view on screen.
+     *
+     * @param {Element} galleryEl
+     * @returns {boolean}
+     */
+    function needsReflow( galleryEl ) {
+        const sizes = readPageSizes( galleryEl );
+        if ( ! sizes ) return false;
+        const active = activeBreakpoint();
+        const view   = viewBreakpoint( galleryEl );
+        return active !== view && sizes[ active ] !== sizes[ view ];
+    }
+
+    /**
+     * Records a page 1 another module fetched and painted at the given
+     * breakpoint, so later requests line up with it and the pagination
+     * chrome reflects its page count.
+     *
+     * @param {Element} galleryEl
+     * @param {{page:number,total_pages:number,page_size:number,has_more:boolean}} payload
+     * @param {string}  breakpoint
+     */
+    function adopt( galleryEl, payload, breakpoint ) {
+        if ( ! payload || ! ( payload.total_pages > 0 ) ) return;
+        writeState( galleryEl, {
+            page:       payload.page || 1,
+            totalPages: payload.total_pages,
+            pageSize:   payload.page_size,
+            breakpoint: breakpoint,
+        } );
+        notify( galleryEl, {
+            galleryEl: galleryEl,
+            page:      payload.page || 1,
+            mode:      'replace',
+            hasMore:   !! payload.has_more,
+            reflow:    true,
+        } );
+    }
+
     function expose() {
         const FG = window.FotoGrids;
         if ( ! FG ) return false;
@@ -680,6 +786,7 @@
             prefetch:           prefetch,
             onChange:           onChange,
             swapToFilterState:  swapToFilterState,
+            adopt:              adopt,
             /**
              * Set the global filter strategy. Per-gallery overrides via
              * data-fg-filter-strategy still win.
@@ -718,11 +825,19 @@
         //      current (likely empty) filter fingerprint. This makes
         //      "filter, then un-filter" restore the original view
         //      instantly without a fetch.
-        //   2. Kick off a preload if preload_next_page is enabled.
+        //   2. Re-request page 1 when the visitor's breakpoint pages the
+        //      gallery differently from the server's desktop render. A
+        //      random-sort refetch already requests page 1 at the visitor's
+        //      breakpoint and reports it through adopt().
+        //   3. Otherwise kick off a preload if preload_next_page is enabled.
         window.FotoGrids.onGallery( function ( gEl ) {
             if ( gEl.dataset.fgPaginated !== 'true' ) return;
             if ( strategyFor( gEl ) !== 'server' ) {
                 snapshotCurrentView( gEl );
+            }
+            if ( gEl.getAttribute( 'data-fg-random-mode' ) !== 'refetch' && needsReflow( gEl ) ) {
+                goToPage( gEl, 1, { mode: 'replace', reflow: true } ).catch( function () { /* server render stands */ } );
+                return;
             }
             let s = readState( gEl );
             if ( s.preload && s.hasMore ) {

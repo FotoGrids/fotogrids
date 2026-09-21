@@ -23,8 +23,11 @@
      *
      * @param {Element} gEl
      * @param {Element} nav
+     * @param {boolean} [reflow] True when the page change re-paged the
+     *        server render for the visitor's breakpoint; the gallery is
+     *        not scrolled into view for it.
      */
-    function syncBar( gEl, nav ) {
+    function syncBar( gEl, nav, reflow ) {
         let pagination = window.FotoGrids.modules.pagination;
         let s = pagination.state( gEl );
 
@@ -60,7 +63,7 @@
         // Only when switching pages, not on initial load.
         if ( gEl.dataset.fgPagesInitialScroll !== '1' ) {
             gEl.dataset.fgPagesInitialScroll = '1';
-        } else {
+        } else if ( ! reflow ) {
             gEl.scrollIntoView( { behavior: 'smooth', block: 'start' } );
         }
     }
@@ -317,7 +320,7 @@
 
         // Also re-sync if the page changes via another path (e.g. lightbox
         // "next" walking past the end of the current page).
-        pagination.onChange( gEl, function () { syncBar( gEl, nav ); } );
+        pagination.onChange( gEl, function ( detail ) { syncBar( gEl, nav, !! ( detail && detail.reflow ) ); } );
 
         // Filter change → swap to the new filter state. Restores from
         // cache instantly when available; falls back to a server fetch
