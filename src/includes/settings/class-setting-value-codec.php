@@ -117,17 +117,20 @@ final class Setting_Value_Codec {
 	}
 
 	/**
-	 * Encrypt a password unless it is empty or already ciphertext.
+	 * Encrypt a password unless it is empty or already this site's ciphertext.
 	 *
 	 * Re-encrypting ciphertext on every save grows the blob until PHP runs out
-	 * of memory, so an encrypted value is returned unchanged.
+	 * of memory, so an encrypted value is returned unchanged. A value counts as
+	 * ciphertext only when it decrypts with this site's key to valid UTF-8:
+	 * `Password_Crypto::is_encrypted()` checks shape alone, and a long
+	 * alphanumeric password has that shape.
 	 *
 	 * @since  1.1.3
 	 * @param  string $value Plaintext or ciphertext.
 	 * @return string Ciphertext, or an empty string.
 	 */
 	private static function to_ciphertext( string $value ): string {
-		if ( '' === $value || Password_Crypto::is_encrypted( $value ) ) {
+		if ( '' === $value || '' !== wp_check_invalid_utf8( Password_Crypto::decrypt( $value ) ) ) {
 			return $value;
 		}
 
