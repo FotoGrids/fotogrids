@@ -340,11 +340,13 @@ const titleCheck = (formData, itemData) => {
 		return check('title', 'title_missing', CHECK_FAIL, target);
 	}
 
-	const stem = stripCounterSuffix(filenameStem(itemData.filename));
+	const stem = normalizeForCompare(filenameStem(itemData.filename));
+	const normalizedTitle = normalizeForCompare(title);
 
 	if (
 		'' !== stem &&
-		normalizeForCompare(title) === normalizeForCompare(stem)
+		stem.startsWith(normalizedTitle) &&
+		/^( \d+)*$/.test(stem.slice(normalizedTitle.length))
 	) {
 		return check('title', 'title_from_filename', CHECK_WARN, target);
 	}
