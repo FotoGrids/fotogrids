@@ -93,6 +93,14 @@ final class Lightbox_Decorator implements Decorator {
 				'data-fg-item-id'          => (string) $item_view->id,
 			);
 
+			$mobile = null !== $item_view->full_width && ! \FotoGrids\Render\Video\Video_Item_Helpers::is_video( $item_view->item_type )
+				? \FotoGrids\Image_Size_Manager::mobile_companion( $item_view->id, $item_view->full_width )
+				: null;
+			if ( null !== $mobile ) {
+				$wrapper_attrs['data-fg-full-mobile-src'] = esc_url( $mobile['url'] );
+				$wrapper_attrs['data-fg-full-mobile-w']   = (string) $mobile['width'];
+			}
+
 			if ( '' !== $item_view->caption ) {
 				$wrapper_attrs['data-fg-caption'] = esc_attr( $item_view->caption );
 			}

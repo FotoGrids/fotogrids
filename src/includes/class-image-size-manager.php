@@ -165,9 +165,75 @@ final class Image_Size_Manager {
 			if ( self::size_exists_for_attachment( $attachment_id, $candidate ) ) {
 				return $candidate;
 			}
+
+			// WordPress skips a size the original already fits inside, so the original is that size.
+			if ( 'full' === $role && self::original_fits_size( $attachment_id, $candidate ) ) {
+				return 'full';
+			}
 		}
 
 		return 'full'; // ultimate fallback
+	}
+
+	/**
+	 * Whether an attachment's original fits within a registered size's bounds.
+	 *
+	 * @since  1.1.3
+	 * @param  int    $attachment_id WP attachment post ID.
+	 * @param  string $size_slug     Registered image size slug.
+	 * @return bool
+	 */
+	private static function original_fits_size( int $attachment_id, string $size_slug ): bool {
+		$subsizes = wp_get_registered_image_subsizes();
+		$metadata = wp_get_attachment_metadata( $attachment_id );
+
+		if ( ! isset( $subsizes[ $size_slug ] ) || ! is_array( $metadata )
+			|| empty( $metadata['width'] ) || empty( $metadata['height'] ) ) {
+			return false;
+		}
+
+		return self::dimensions_fit(
+			(int) $metadata['width'],
+			(int) $metadata['height'],
+			(int) $subsizes[ $size_slug ]['width'],
+			(int) $subsizes[ $size_slug ]['height']
+		);
+	}
+
+	/**
+	 * Whether a width × height box fits within a size's bounds, where a bound of 0 is unlimited.
+	 *
+	 * @since  1.1.3
+	 * @param  int $width      Image width in pixels.
+	 * @param  int $height     Image height in pixels.
+	 * @param  int $max_width  Size bound width; 0 means unlimited.
+	 * @param  int $max_height Size bound height; 0 means unlimited.
+	 * @return bool
+	 */
+	public static function dimensions_fit( int $width, int $height, int $max_width, int $max_height ): bool {
+		return ( 0 === $max_width || $width <= $max_width )
+			&& ( 0 === $max_height || $height <= $max_height );
+	}
+
+	/**
+	 * Returns the mobile companion of the Lightbox image when it is narrower than the image itself.
+	 *
+	 * @since  1.1.3
+	 * @param  int $attachment_id WP attachment post ID.
+	 * @param  int $full_width    Width of the resolved Lightbox image in pixels.
+	 * @return array{url: string, width: int}|null
+	 */
+	public static function mobile_companion( int $attachment_id, int $full_width ): ?array {
+		$mobile = image_get_intermediate_size( $attachment_id, self::SLUG_FULL_MOBILE );
+		if ( ! is_array( $mobile ) || empty( $mobile['url'] ) || empty( $mobile['width'] )
+			|| (int) $mobile['width'] >= $full_width ) {
+			return null;
+		}
+
+		return array(
+			'url'   => (string) $mobile['url'],
+			'width' => (int) $mobile['width'],
+		);
 	}
 
 	/**

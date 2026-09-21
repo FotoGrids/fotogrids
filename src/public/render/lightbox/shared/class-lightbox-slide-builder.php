@@ -145,6 +145,16 @@ final class Lightbox_Slide_Builder {
 				$slide['full_url']       = $poster;
 			}
 
+			if ( ! isset( $slide['item_type'] ) ) {
+				$full_src = wp_get_attachment_image_src( $aid, $full_resolved );
+				$mobile   = is_array( $full_src )
+					? Image_Size_Manager::mobile_companion( $aid, (int) ( $full_src[1] ?? 0 ) )
+					: null;
+
+				$slide['full_mobile_url']   = null !== $mobile ? $mobile['url'] : '';
+				$slide['full_mobile_width'] = null !== $mobile ? $mobile['width'] : 0;
+			}
+
 			if ( $include_exif ) {
 				$slide['exif'] = self::load_exif( $aid, $settings );
 			}

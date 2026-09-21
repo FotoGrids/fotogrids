@@ -246,6 +246,23 @@ function readSettings(galleryEl) {
 }
 
 /**
+ * The full image URL to load for a slide: the mobile companion when it covers
+ * the viewport's device pixels, otherwise the full image.
+ *
+ * @param {{fullSrc: string, fullMobileSrc?: string, fullMobileWidth?: number}} item
+ * @returns {string}
+ */
+function fullSrcForViewport(item) {
+	const devicePixels = window.innerWidth * (window.devicePixelRatio || 1);
+
+	if (item.fullMobileSrc && item.fullMobileWidth >= devicePixels) {
+		return item.fullMobileSrc;
+	}
+
+	return item.fullSrc;
+}
+
+/**
  * Collects item data from a gallery element.
  *
  * @param {HTMLElement} galleryEl
@@ -274,6 +291,8 @@ function buildSlideFromTrigger(triggerEl) {
 		sequenceIndex,
 		fullSrc:
 			triggerEl.href || (img ? img.dataset.fgFullSrc || img.src : ''),
+		fullMobileSrc: triggerEl.dataset.fgFullMobileSrc || '',
+		fullMobileWidth: parseInt(triggerEl.dataset.fgFullMobileW, 10) || 0,
 		thumbSrc: img ? img.src : '',
 		alt: img ? img.alt : '',
 		caption: triggerEl.dataset.fgCaption || '',
@@ -296,6 +315,7 @@ function buildSlideFromTrigger(triggerEl) {
 		);
 		slide.thumbSrc = posterImg ? posterImg.src : slide.thumbSrc;
 		slide.fullSrc = posterImg ? posterImg.src : '';
+		slide.fullMobileSrc = '';
 		slide.alt = posterImg ? posterImg.alt : slide.alt;
 	}
 
@@ -421,6 +441,8 @@ function buildSlideFromApi(apiSlide) {
 		figureEl: null,
 		sequenceIndex: null,
 		fullSrc: apiSlide.full_url || '',
+		fullMobileSrc: apiSlide.full_mobile_url || '',
+		fullMobileWidth: apiSlide.full_mobile_width || 0,
 		thumbSrc: apiSlide.thumb_url || '',
 		alt: apiSlide.alt || '',
 		caption: apiSlide.caption || '',
@@ -2422,14 +2444,16 @@ class FotoGridsLightbox {
 				}
 			};
 
-			if (imgEl.complete && imgEl.src === item.fullSrc) {
+			const src = fullSrcForViewport(item);
+
+			if (imgEl.complete && imgEl.src === src) {
 				onLoad();
 				return;
 			}
 
 			imgEl.classList.add('fg-lb-img--loading');
 			imgEl.alt = item.alt;
-			imgEl.src = item.fullSrc;
+			imgEl.src = src;
 			imgEl.addEventListener('load', onLoad, { once: true });
 			imgEl.addEventListener('error', onLoad, { once: true });
 		};
@@ -2577,7 +2601,9 @@ class FotoGridsLightbox {
 
 			candidates.forEach((i) => {
 				if (i < 0 || i >= len) return;
-				const src = this.items[i]?.fullSrc;
+				const src = this.items[i]
+					? fullSrcForViewport(this.items[i])
+					: '';
 				if (!src || this._preloadCache.has(src)) return;
 				this._preloadCache.add(src);
 				new Image().src = src;

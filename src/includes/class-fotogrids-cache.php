@@ -97,6 +97,7 @@ class FotoGrids_Cache {
 		add_action( Actions_Item::REMOVED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( Actions_Item::META_UPDATED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( 'edit_attachment', array( __CLASS__, 'on_attachment_edit' ), 10, 1 );
+		add_filter( 'wp_update_attachment_metadata', array( __CLASS__, 'on_attachment_metadata_update' ), 10, 2 );
 		add_action( Actions_Gallery::REORDERED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
@@ -155,6 +156,19 @@ class FotoGrids_Cache {
 	 */
 	public static function on_attachment_edit( $attachment_id ): void {
 		self::flush_for_item( (int) $attachment_id );
+	}
+
+	/**
+	 * Flush every gallery containing an attachment whose image sizes were just regenerated.
+	 *
+	 * @since  1.1.3
+	 * @param  array|mixed $data          Attachment metadata being saved.
+	 * @param  int|mixed   $attachment_id Attachment post ID.
+	 * @return array|mixed The metadata, unchanged.
+	 */
+	public static function on_attachment_metadata_update( $data, $attachment_id ) {
+		self::flush_for_item( (int) $attachment_id );
+		return $data;
 	}
 
 	// -------------------------------------------------------------------------
