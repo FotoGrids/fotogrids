@@ -34,9 +34,13 @@ function stubMedia({ width = 1280, coarse = false } = {}) {
 }
 
 function stubScreen(width, height) {
-	Object.defineProperty(window, 'screen', {
+	Object.defineProperty(window.screen, 'width', {
 		configurable: true,
-		value: { width, height },
+		value: width,
+	});
+	Object.defineProperty(window.screen, 'height', {
+		configurable: true,
+		value: height,
 	});
 }
 
@@ -47,8 +51,6 @@ function loadRuntime() {
 }
 
 describe('runtime breakpoints', () => {
-	const originalScreen = window.screen;
-
 	beforeEach(() => {
 		document.body.innerHTML = '';
 		document.documentElement.removeAttribute('data-fg-breakpoint');
@@ -58,10 +60,8 @@ describe('runtime breakpoints', () => {
 
 	afterEach(() => {
 		delete window.matchMedia;
-		Object.defineProperty(window, 'screen', {
-			configurable: true,
-			value: originalScreen,
-		});
+		delete window.screen.width;
+		delete window.screen.height;
 	});
 
 	it('reads the configuration from the first wrapper', () => {
