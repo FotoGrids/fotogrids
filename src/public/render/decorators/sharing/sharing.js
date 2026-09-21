@@ -310,6 +310,18 @@
             case 'pinterest':
                 shareUrl = 'https://pinterest.com/pin/create/button/?url=' + encodeURIComponent( shareTarget ) + '&media=' + encodeURIComponent( itemUrl ) + '&description=' + encodeURIComponent( caption );
                 break;
+            case 'linkedin':
+                shareUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent( shareTarget );
+                break;
+            case 'whatsapp':
+                shareUrl = 'https://wa.me/?text=' + encodeURIComponent( caption ? caption + ' ' + shareTarget : shareTarget );
+                break;
+            case 'telegram':
+                shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent( shareTarget ) + '&text=' + encodeURIComponent( caption );
+                break;
+            case 'reddit':
+                shareUrl = 'https://www.reddit.com/submit?url=' + encodeURIComponent( shareTarget ) + '&title=' + encodeURIComponent( caption );
+                break;
             case 'email':
                 shareUrl = 'mailto:?subject=' + encodeURIComponent( caption ) + '&body=' + encodeURIComponent( shareTarget );
                 break;
