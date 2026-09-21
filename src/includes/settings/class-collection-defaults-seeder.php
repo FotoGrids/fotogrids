@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FotoGrids\Settings;
 
+use FotoGrids\Hooks\Filters_Settings;
+
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -22,7 +24,9 @@ if ( ! defined( 'WPINC' ) ) {
  * owns its values from the start and the editor opens showing them.
  *
  * A default applies only to collections created after it was saved: editing a
- * default never reaches a collection that already exists.
+ * default never reaches a collection that already exists. Values are written
+ * through `Setting_Value_Codec::persist()`, the same path a hand-saved setting
+ * takes. Rules that belong to one feature hook `Filters_Settings::DEFAULTS_SEED`.
  *
  * @package FotoGrids\Settings
  * @since   1.1.3
@@ -85,17 +89,15 @@ final class Collection_Defaults_Seeder {
 			? \FotoGrids\Collection_Defaults::resolve_album()
 			: \FotoGrids\Collection_Defaults::resolve_gallery();
 
-		$protect_on = ! empty( $saved['password_protect'] ) && '0' !== $saved['password_protect'];
+		$values = (array) apply_filters(
+			Filters_Settings::DEFAULTS_SEED,
+			array_intersect_key( $saved, $defaults ),
+			$post_id,
+			$post_type
+		);
 
-		foreach ( $saved as $key => $value ) {
+		foreach ( $values as $key => $value ) {
 			if ( ! array_key_exists( $key, $defaults ) ) {
-				continue;
-			}
-
-			// A stored password outlives the protection toggle, matching the
-			// per-collection field. Seeding it while protection is off would
-			// give a new collection a password its owner never set.
-			if ( ! $protect_on && 'password_input' === Setting_Value_Codec::catalog_field_type( $key ) ) {
 				continue;
 			}
 
@@ -105,51 +107,13 @@ final class Collection_Defaults_Seeder {
 				continue;
 			}
 
-			$stored = self::encode( $key, $value, $defaults[ $key ] );
-
-			if ( null === $stored ) {
-				continue;
-			}
-
-			update_post_meta( $post_id, $meta_key, $stored );
+			Setting_Value_Codec::persist(
+				$post_id,
+				$meta_key,
+				$value,
+				$defaults[ $key ],
+				Setting_Value_Codec::catalog_field_type( (string) $key )
+			);
 		}
-	}
-
-	/**
-	 * Convert a saved default into the shape post meta stores.
-	 *
-	 * Mirrors `Setting_Value_Codec::persist()` so a seeded collection is
-	 * indistinguishable from one the user saved by hand. Returns null for a
-	 * value that must not be written.
-	 *
-	 * @since  1.1.3
-	 * @param  string $key           Setting key.
-	 * @param  mixed  $value         Saved default value.
-	 * @param  mixed  $default_value Resolved default - drives serialisation.
-	 * @return string|null
-	 */
-	private static function encode( string $key, $value, $default_value ): ?string {
-		if ( is_array( $default_value ) ) {
-			return is_array( $value ) ? (string) wp_json_encode( $value ) : null;
-		}
-
-		if ( is_bool( $default_value ) ) {
-			return ( true === $value || '1' === $value || 1 === $value || 'true' === $value ) ? '1' : '0';
-		}
-
-		if ( is_numeric( $default_value ) ) {
-			return is_numeric( $value ) ? (string) $value : null;
-		}
-
-		if ( 'password_input' === Setting_Value_Codec::catalog_field_type( $key ) ) {
-			$stored = is_scalar( $value ) ? (string) $value : '';
-
-			// Only ciphertext is seeded. A plaintext row predates encryption on
-			// this path and copying it would carry the exposure into the
-			// collection.
-			return \FotoGrids\Password_Crypto::is_encrypted( $stored ) ? $stored : null;
-		}
-
-		return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : null;
 	}
 }
