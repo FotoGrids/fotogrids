@@ -26,7 +26,9 @@ if ( ! defined( 'WPINC' ) ) {
  * A default applies only to collections created after it was saved: editing a
  * default never reaches a collection that already exists. Values are written
  * through `Setting_Value_Codec::persist()`, the same path a hand-saved setting
- * takes. Rules that belong to one feature hook `Filters_Settings::DEFAULTS_SEED`.
+ * takes. Rules that belong to one feature extend `Abstract_Seed_Rule` in
+ * `seed-rules/`, where they are found and registered automatically; any other
+ * code can hook `Filters_Settings::DEFAULTS_SEED` directly.
  *
  * @package FotoGrids\Settings
  * @since   1.1.3
@@ -36,13 +38,41 @@ final class Collection_Defaults_Seeder {
 	const OPTION = 'fotogrids_gallery_defaults';
 
 	/**
-	 * Register the creation hook.
+	 * Register the creation hook and every seed rule.
 	 *
 	 * @since  1.1.3
 	 * @return void
 	 */
 	public static function init(): void {
 		add_action( 'wp_insert_post', array( __CLASS__, 'on_insert_post' ), 10, 3 );
+		self::register_rules();
+	}
+
+	/**
+	 * Load every rule under `seed-rules/` and register each one.
+	 *
+	 * A rule is any concrete class those files declare that extends
+	 * `Abstract_Seed_Rule`.
+	 *
+	 * @since  1.1.3
+	 * @return void
+	 */
+	private static function register_rules(): void {
+		require_once __DIR__ . '/class-abstract-seed-rule.php';
+
+		$declared = get_declared_classes();
+
+		foreach ( glob( __DIR__ . '/seed-rules/class-*.php' ) ?: array() as $rule_file ) {
+			require_once $rule_file;
+		}
+
+		foreach ( array_diff( get_declared_classes(), $declared ) as $class ) {
+			if ( is_subclass_of( $class, Abstract_Seed_Rule::class )
+				&& ! ( new \ReflectionClass( $class ) )->isAbstract()
+			) {
+				$class::register();
+			}
+		}
 	}
 
 	/**
