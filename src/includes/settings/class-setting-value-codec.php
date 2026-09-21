@@ -95,6 +95,46 @@ final class Setting_Value_Codec {
 	}
 
 	/**
+	 * Sanitise a string setting value for storage by its control type.
+	 *
+	 * A `password_input` value is returned as ciphertext and never passes
+	 * through `sanitize_text_field()`, which strips characters that are valid
+	 * in a password. Every other control type is sanitised as plain text.
+	 *
+	 * @since  1.1.3
+	 * @param  mixed  $value      Raw value.
+	 * @param  string $field_type Catalog field control type, e.g. 'password_input'.
+	 * @return string
+	 */
+	public static function sanitize_text_value( $value, string $field_type = '' ): string {
+		$value = is_scalar( $value ) ? (string) $value : '';
+
+		if ( 'password_input' === $field_type ) {
+			return self::to_ciphertext( $value );
+		}
+
+		return sanitize_text_field( $value );
+	}
+
+	/**
+	 * Encrypt a password unless it is empty or already ciphertext.
+	 *
+	 * Re-encrypting ciphertext on every save grows the blob until PHP runs out
+	 * of memory, so an encrypted value is returned unchanged.
+	 *
+	 * @since  1.1.3
+	 * @param  string $value Plaintext or ciphertext.
+	 * @return string Ciphertext, or an empty string.
+	 */
+	private static function to_ciphertext( string $value ): string {
+		if ( '' === $value || Password_Crypto::is_encrypted( $value ) ) {
+			return $value;
+		}
+
+		return Password_Crypto::encrypt( $value );
+	}
+
+	/**
 	 * Resolve the catalog control type for a setting key.
 	 *
 	 * Returns '' when the key is not in the catalog or has no control type,
@@ -188,20 +228,16 @@ final class Setting_Value_Codec {
 		// means "clear the password" - we delete the meta key so
 		// password_is_set returns false.
 		//
-		// A value that is already ciphertext is stored as-is, never
-		// re-encrypted: re-encrypting on every save grows the blob until PHP
-		// runs out of memory.
 		if ( 'password_input' === $field_type ) {
 			$plaintext = (string) $setting_value;
 			if ( '' === $plaintext ) {
 				delete_post_meta( $post_id, $post_meta_key );
-			} elseif ( Password_Crypto::is_encrypted( $plaintext ) ) {
-				update_post_meta( $post_id, $post_meta_key, $plaintext );
-			} else {
-				$encrypted = Password_Crypto::encrypt( $plaintext );
-				if ( '' !== $encrypted ) {
-					update_post_meta( $post_id, $post_meta_key, $encrypted );
-				}
+				return;
+			}
+
+			$ciphertext = self::to_ciphertext( $plaintext );
+			if ( '' !== $ciphertext ) {
+				update_post_meta( $post_id, $post_meta_key, $ciphertext );
 			}
 			return;
 		}

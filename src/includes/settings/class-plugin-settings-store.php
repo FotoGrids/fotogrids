@@ -212,35 +212,15 @@ final class Plugin_Settings_Store {
 				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 			} elseif ( is_numeric( $default_value ) ) {
 				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
-			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
-				$sanitized[ $key ] = self::encrypt_default_password( is_scalar( $value ) ? (string) $value : '' );
 			} else {
-				$sanitized[ $key ] = sanitize_text_field( $value );
+				$sanitized[ $key ] = Setting_Value_Codec::sanitize_text_value(
+					$value,
+					Setting_Value_Codec::catalog_field_type( $key )
+				);
 			}
 		}
 
 		return $sanitized;
-	}
-
-	/**
-	 * Encrypt a default password for storage in the defaults option.
-	 *
-	 * Passwords must not pass through `sanitize_text_field()`, which strips
-	 * characters that are valid in a password. An empty value clears the
-	 * default. A value that is already ciphertext - the browser echoing back
-	 * what a previous save stored - is returned unchanged, because
-	 * re-encrypting on every save grows the blob until PHP runs out of memory.
-	 *
-	 * @since  1.1.3
-	 * @param  string $value Raw value from the request.
-	 * @return string Ciphertext, or an empty string.
-	 */
-	private static function encrypt_default_password( string $value ): string {
-		if ( '' === $value || \FotoGrids\Password_Crypto::is_encrypted( $value ) ) {
-			return $value;
-		}
-
-		return \FotoGrids\Password_Crypto::encrypt( $value );
 	}
 
 	/**
