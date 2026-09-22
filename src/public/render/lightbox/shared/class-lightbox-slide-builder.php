@@ -151,8 +151,7 @@ final class Lightbox_Slide_Builder {
 					? Image_Size_Manager::mobile_companion( $aid, (int) ( $full_src[1] ?? 0 ) )
 					: null;
 
-				$slide['full_mobile_url']   = null !== $mobile ? $mobile['url'] : '';
-				$slide['full_mobile_width'] = null !== $mobile ? $mobile['width'] : 0;
+				$slide['full_mobile_url'] = null !== $mobile ? $mobile['url'] : '';
 			}
 
 			if ( $include_exif ) {

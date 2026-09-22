@@ -191,6 +191,7 @@ function readSettings(galleryEl) {
 		dotsSpacing: d.fgLbBulletSpacing || '8px',
 		thumbLocation: d.fgLbThumbnailLocation || 'bottom',
 		thumbSize: d.fgLbThumbnailSize || 'normal',
+		mobileMax: parseInt(d.fgLbMobileMax, 10) || 767,
 		thumbSpacing: parseInt(d.fgLbThumbSpacing, 10) || 5,
 		thumbDrag: !galleryEl.hasAttribute('data-fg-lb-no-thumb-drag'),
 		thumbSwipe: !galleryEl.hasAttribute('data-fg-lb-no-thumb-swipe'),
@@ -246,16 +247,15 @@ function readSettings(galleryEl) {
 }
 
 /**
- * The full image URL to load for a slide: the mobile companion when it covers
- * the viewport's device pixels, otherwise the full image.
+ * The full image URL to load for a slide: the mobile companion at or below
+ * the mobile breakpoint, otherwise the full image.
  *
- * @param {{fullSrc: string, fullMobileSrc?: string, fullMobileWidth?: number}} item
+ * @param {{fullSrc: string, fullMobileSrc?: string}} item
+ * @param {number} mobileMax Mobile breakpoint in CSS pixels.
  * @returns {string}
  */
-function fullSrcForViewport(item) {
-	const devicePixels = window.innerWidth * (window.devicePixelRatio || 1);
-
-	if (item.fullMobileSrc && item.fullMobileWidth >= devicePixels) {
+function fullSrcForViewport(item, mobileMax) {
+	if (item.fullMobileSrc && window.innerWidth <= mobileMax) {
 		return item.fullMobileSrc;
 	}
 
@@ -292,7 +292,6 @@ function buildSlideFromTrigger(triggerEl) {
 		fullSrc:
 			triggerEl.href || (img ? img.dataset.fgFullSrc || img.src : ''),
 		fullMobileSrc: triggerEl.dataset.fgFullMobileSrc || '',
-		fullMobileWidth: parseInt(triggerEl.dataset.fgFullMobileW, 10) || 0,
 		thumbSrc: img ? img.src : '',
 		alt: img ? img.alt : '',
 		caption: triggerEl.dataset.fgCaption || '',
@@ -442,7 +441,6 @@ function buildSlideFromApi(apiSlide) {
 		sequenceIndex: null,
 		fullSrc: apiSlide.full_url || '',
 		fullMobileSrc: apiSlide.full_mobile_url || '',
-		fullMobileWidth: apiSlide.full_mobile_width || 0,
 		thumbSrc: apiSlide.thumb_url || '',
 		alt: apiSlide.alt || '',
 		caption: apiSlide.caption || '',
@@ -2444,7 +2442,7 @@ class FotoGridsLightbox {
 				}
 			};
 
-			const src = fullSrcForViewport(item);
+			const src = fullSrcForViewport(item, this.settings.mobileMax);
 
 			if (imgEl.complete && imgEl.src === src) {
 				onLoad();
@@ -2602,7 +2600,7 @@ class FotoGridsLightbox {
 			candidates.forEach((i) => {
 				if (i < 0 || i >= len) return;
 				const src = this.items[i]
-					? fullSrcForViewport(this.items[i])
+					? fullSrcForViewport(this.items[i], this.settings.mobileMax)
 					: '';
 				if (!src || this._preloadCache.has(src)) return;
 				this._preloadCache.add(src);

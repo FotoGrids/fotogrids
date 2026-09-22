@@ -98,7 +98,6 @@ final class Lightbox_Decorator implements Decorator {
 				: null;
 			if ( null !== $mobile ) {
 				$wrapper_attrs['data-fg-full-mobile-src'] = esc_url( $mobile['url'] );
-				$wrapper_attrs['data-fg-full-mobile-w']   = (string) $mobile['width'];
 			}
 
 			if ( '' !== $item_view->caption ) {
