@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FotoGrids 1.1.1\n"
+"Project-Id-Version: FotoGrids 1.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fotogrids\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-13T10:48:35+00:00\n"
+"POT-Creation-Date: 2026-09-20T14:53:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -43,20 +43,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:246
+#: fotogrids.php:244
 msgid "FotoGrids requires WordPress version 6.1 or higher."
 msgstr ""
 
-#: fotogrids.php:247
-#: fotogrids.php:256
+#: fotogrids.php:245
+#: fotogrids.php:254
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:255
+#: fotogrids.php:253
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:271
+#: fotogrids.php:269
 #: includes/class-admin-init.php:135
 #: includes/class-admin-init.php:136
 #: includes/tools/import-export/assets/ImportExportTool.jsx:45
@@ -64,11 +64,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:289
+#: fotogrids.php:287
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:314
+#: fotogrids.php:312
 #: assets/admin/src/components/dashboard/LearnSection.jsx:56
 msgid "Help Center"
 msgstr ""
@@ -377,7 +377,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:279
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-registrar.php:880
-#: assets/admin/plain/collection-settings.js:2267
+#: assets/admin/plain/collection-settings.js:2271
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -388,7 +388,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:280
 #: includes/metaboxes/class-metabox-registrar.php:882
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2391
+#: assets/admin/plain/collection-settings.js:2395
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -3962,13 +3962,12 @@ msgstr ""
 #: includes/class-admin-init.php:155
 #: includes/metaboxes/class-metabox-registrar.php:889
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2502
+#: assets/admin/plain/collection-settings.js:2506
 msgid "Upgrade to Pro"
 msgstr ""
 
 #: includes/class-admin-init.php:596
 #: includes/metaboxes/class-collection-save-pipeline.php:96
-#: includes/metaboxes/class-item-ajax-endpoints.php:658
 #: includes/rest/admin/admin-data.php:241
 #: includes/rest/admin/admin-data.php:277
 #: includes/rest/admin/admin-data.php:297
@@ -5096,7 +5095,6 @@ msgid "Invalid collection"
 msgstr ""
 
 #: includes/metaboxes/class-collection-save-pipeline.php:110
-#: includes/metaboxes/class-item-ajax-endpoints.php:672
 msgid "Cannot edit this gallery"
 msgstr ""
 
@@ -5111,29 +5109,9 @@ msgid "%s saved successfully"
 msgstr ""
 
 #. translators: %d: number of items updated.
-#: includes/metaboxes/class-item-ajax-endpoints.php:644
+#: includes/metaboxes/class-item-ajax-endpoints.php:547
 #, php-format
 msgid "Bulk action completed. Updated %d items."
-msgstr ""
-
-#: includes/metaboxes/class-item-ajax-endpoints.php:663
-msgid "Invalid gallery ID"
-msgstr ""
-
-#: includes/metaboxes/class-item-ajax-endpoints.php:668
-msgid "Invalid gallery"
-msgstr ""
-
-#: includes/metaboxes/class-item-ajax-endpoints.php:678
-msgid "Invalid item order data"
-msgstr ""
-
-#: includes/metaboxes/class-item-ajax-endpoints.php:687
-msgid "Items reordered successfully"
-msgstr ""
-
-#: includes/metaboxes/class-item-ajax-endpoints.php:693
-msgid "Failed to reorder items"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:208
@@ -5849,7 +5827,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:888
-#: assets/admin/plain/collection-settings.js:699
+#: assets/admin/plain/collection-settings.js:703
 msgid "Failed to load item data"
 msgstr ""
 
@@ -6305,8 +6283,7 @@ msgstr ""
 msgid "Add items"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:82
-#: includes/rest/admin/class-preview-endpoint.php:38
+#: includes/modules/PageBuilders/core/rest/preview-data.php:78
 #: includes/rest/gallery/gallery-data.php:63
 #: includes/rest/gallery/gallery-data.php:345
 #: includes/rest/gallery/gallery-data.php:561
@@ -6316,22 +6293,22 @@ msgstr ""
 msgid "Gallery not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:90
-#: includes/modules/PageBuilders/core/rest/preview-data.php:253
+#: includes/modules/PageBuilders/core/rest/preview-data.php:86
+#: includes/modules/PageBuilders/core/rest/preview-data.php:248
 msgid "Render pipeline is not available."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:243
+#: includes/modules/PageBuilders/core/rest/preview-data.php:238
 #: includes/rest/album/album-data.php:58
 msgid "Album not found."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/rest/preview-data.php:417
+#: includes/modules/PageBuilders/core/rest/preview-data.php:412
 msgid "No attachments to import."
 msgstr ""
 
 #. translators: %s: date imported
-#: includes/modules/PageBuilders/core/rest/preview-data.php:426
+#: includes/modules/PageBuilders/core/rest/preview-data.php:421
 #, php-format
 msgid "Imported gallery (%s)"
 msgstr ""
@@ -6828,14 +6805,6 @@ msgstr ""
 msgid "Untitled Gallery"
 msgstr ""
 
-#: includes/rest/admin/class-preview-request-validator.php:34
-msgid "Unsupported preview request version."
-msgstr ""
-
-#: includes/rest/admin/class-preview-request-validator.php:53
-msgid "Preview item order exceeds the maximum supported size."
-msgstr ""
-
 #: includes/rest/album/album-data.php:82
 msgid "Featured gallery must be a gallery."
 msgstr ""
@@ -7028,42 +6997,36 @@ msgstr ""
 
 #. translators: 1: tag ID, 2: item ID.
 #: includes/rest/items/save-item-data.php:205
-#: includes/rest/metadata/metadata-data.php:209
 #, php-format
 msgid "Failed to link tag ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: 1: tag name, 2: item ID.
 #: includes/rest/items/save-item-data.php:222
-#: includes/rest/metadata/metadata-data.php:222
 #, php-format
 msgid "Failed to add tag: %1$s to item %2$d"
 msgstr ""
 
 #. translators: 1: person ID, 2: item ID.
 #: includes/rest/items/save-item-data.php:246
-#: includes/rest/metadata/metadata-data.php:244
 #, php-format
 msgid "Failed to link person ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: person name.
 #: includes/rest/items/save-item-data.php:257
-#: includes/rest/metadata/metadata-data.php:253
 #, php-format
 msgid "Failed to add person: %s"
 msgstr ""
 
 #. translators: 1: location ID, 2: item ID.
 #: includes/rest/items/save-item-data.php:279
-#: includes/rest/metadata/metadata-data.php:276
 #, php-format
 msgid "Failed to link location ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: location name.
 #: includes/rest/items/save-item-data.php:290
-#: includes/rest/metadata/metadata-data.php:285
 #, php-format
 msgid "Failed to add location: %s"
 msgstr ""
@@ -7929,113 +7892,113 @@ msgstr ""
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:462
+#: assets/admin/plain/collection-settings.js:460
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:746
+#: assets/admin/plain/collection-settings.js:750
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:782
+#: assets/admin/plain/collection-settings.js:786
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:800
+#: assets/admin/plain/collection-settings.js:804
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:807
+#: assets/admin/plain/collection-settings.js:811
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:811
+#: assets/admin/plain/collection-settings.js:815
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1502
+#: assets/admin/plain/collection-settings.js:1506
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1503
+#: assets/admin/plain/collection-settings.js:1507
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1976
+#: assets/admin/plain/collection-settings.js:1980
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2024
-#: assets/admin/plain/collection-settings.js:2040
+#: assets/admin/plain/collection-settings.js:2028
+#: assets/admin/plain/collection-settings.js:2044
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2077
+#: assets/admin/plain/collection-settings.js:2081
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2098
+#: assets/admin/plain/collection-settings.js:2102
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2099
+#: assets/admin/plain/collection-settings.js:2103
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2106
-#: assets/admin/plain/collection-settings.js:2117
+#: assets/admin/plain/collection-settings.js:2110
+#: assets/admin/plain/collection-settings.js:2121
 msgid "Failed to update autosave setting"
-msgstr ""
-
-#: assets/admin/plain/collection-settings.js:2161
-#: assets/admin/plain/collection-settings.js:2171
-msgid "Configure Album defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2165
 #: assets/admin/plain/collection-settings.js:2175
+msgid "Configure Album defaults"
+msgstr ""
+
+#: assets/admin/plain/collection-settings.js:2169
+#: assets/admin/plain/collection-settings.js:2179
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2181
+#: assets/admin/plain/collection-settings.js:2185
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:222
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2206
+#: assets/admin/plain/collection-settings.js:2210
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2216
+#: assets/admin/plain/collection-settings.js:2220
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2220
+#: assets/admin/plain/collection-settings.js:2224
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2266
+#: assets/admin/plain/collection-settings.js:2270
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2293
+#: assets/admin/plain/collection-settings.js:2297
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2302
+#: assets/admin/plain/collection-settings.js:2306
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2412
+#: assets/admin/plain/collection-settings.js:2416
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2526
+#: assets/admin/plain/collection-settings.js:2530
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
