@@ -1,4 +1,4 @@
-.fotogrids-metadata-input {
+.fotogrids-item-edit-metadata-input {
 	display: flex;
 	gap: 4px;
 
@@ -28,7 +28,7 @@
 	}
 }
 
-.fotogrids-autocomplete-item {
+.fotogrids-item-edit-autocomplete-item {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -46,7 +46,7 @@
 	}
 }
 
-.fotogrids-metadata-list {
+.fotogrids-item-edit-metadata-list {
 	margin: 20px 0 0;
 	display: flex;
 	gap: 8px;

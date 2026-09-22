@@ -34,9 +34,9 @@ const FaceChip = ({ face, onTag, onAddNew, disabled }) => {
         : null;
 
     return (
-        <div className="fotogrids-face-chip">
-            <div className="fotogrids-face-chip__avatar">{initials}</div>
-            <span className="fotogrids-face-chip__name">
+        <div className="fotogrids-item-edit-face-chip">
+            <div className="fotogrids-item-edit-face-chip__avatar">{initials}</div>
+            <span className="fotogrids-item-edit-face-chip__name">
                 {face.name
                     ? <>{face.name}{confidencePct && <em> - {confidencePct}</em>}</>
                     : <em>{__('Unknown person', 'fotogrids')}</em>
@@ -45,7 +45,7 @@ const FaceChip = ({ face, onTag, onAddNew, disabled }) => {
             {face.name ? (
                 <button
                     type="button"
-                    className="fotogrids-face-chip__action"
+                    className="fotogrids-item-edit-face-chip__action"
                     disabled={disabled}
                     onClick={() => !disabled && onTag(face)}
                 >
@@ -54,7 +54,7 @@ const FaceChip = ({ face, onTag, onAddNew, disabled }) => {
             ) : (
                 <button
                     type="button"
-                    className="fotogrids-face-chip__action fotogrids-face-chip__action--muted"
+                    className="fotogrids-item-edit-face-chip__action fotogrids-item-edit-face-chip__action--muted"
                     disabled={disabled}
                     onClick={() => !disabled && onAddNew()}
                 >
@@ -106,14 +106,14 @@ const TabPeople = ({
         <div className="fotogrids-tab-people">
             {/* ── Pro: AI detected faces strip ── */}
             {isProActive && pendingFaces.length > 0 && (
-                <div className="fotogrids-faces-detected">
-                    <div className="fotogrids-faces-detected__header">
+                <div className="fotogrids-item-edit-faces">
+                    <div className="fotogrids-item-edit-faces__header">
                         <strong>{__('AI detected faces', 'fotogrids')}</strong>
-                        <span className="fotogrids-faces-detected__count">
+                        <span className="fotogrids-item-edit-faces__count">
                             {pendingFaces.length}
                         </span>
                     </div>
-                    <div className="fotogrids-faces-detected__chips">
+                    <div className="fotogrids-item-edit-faces__chips">
                         {pendingFaces.map((face, idx) => (
                             <FaceChip
                                 key={face.id ?? `unknown-${idx}`}
@@ -131,7 +131,7 @@ const TabPeople = ({
                             />
                         ))}
                     </div>
-                    <div className="fotogrids-faces-detected__divider" />
+                    <div className="fotogrids-item-edit-faces__divider" />
                 </div>
             )}
 

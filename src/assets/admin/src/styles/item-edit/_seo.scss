@@ -1,5 +1,5 @@
 // SEO tab: per-item checkup
-.fotogrids-seo-checkup {
+.fotogrids-item-edit-seo-checkup {
 	&__header {
 		display: flex;
 		align-items: baseline;
@@ -38,7 +38,7 @@
 	}
 }
 
-.fotogrids-seo-band {
+.fotogrids-item-edit-seo-band {
 	padding: 2px 8px;
 	border-radius: 10px;
 	font-size: 11px;
@@ -62,7 +62,7 @@
 	}
 }
 
-.fotogrids-seo-check {
+.fotogrids-item-edit-seo-check {
 	display: flex;
 	align-items: flex-start;
 	gap: 10px;
@@ -160,7 +160,7 @@
 }
 
 // SEO tab: resolved frontend output
-.fotogrids-seo-emits {
+.fotogrids-item-edit-seo-emits {
 	margin-top: 24px;
 
 	&__title {

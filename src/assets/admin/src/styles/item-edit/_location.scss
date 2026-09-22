@@ -1,5 +1,5 @@
 // Location tab: inline map SVG
-.fotogrids-location-map-wrap {
+.fotogrids-item-edit-location-map-wrap {
 	margin-top: 12px;
 	border: 1px solid #dcdcde;
 	border-radius: 6px;
@@ -7,14 +7,14 @@
 	background: #f0f4f8;
 }
 
-.fotogrids-location-map-svg {
+.fotogrids-item-edit-location-map-svg {
 	width: 100%;
 	height: auto;
 	display: block;
 	max-height: 140px;
 }
 
-.fotogrids-location-map-label {
+.fotogrids-item-edit-location-map-label {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -35,7 +35,7 @@
 }
 
 // Location tab: no-coords empty state
-.fotogrids-location-no-coords {
+.fotogrids-item-edit-location-no-coords {
 	display: flex;
 	align-items: center;
 	gap: 8px;
