@@ -121,8 +121,12 @@ textarea {
 	}
 }
 
-.fotogrids-input-with-icon .fotogrids-input {
-	padding-left: 40px;
+.fotogrids-input-with-icon {
+	input[type="text"].fotogrids-input,
+	input[type="url"].fotogrids-input,
+	textarea.fotogrids-input {
+		padding-left: 40px;
+	}
 }
 
 .fotogrids-input-icon--right {
