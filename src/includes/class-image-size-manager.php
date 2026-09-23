@@ -55,8 +55,8 @@ final class Image_Size_Manager {
 	 * Wire up the WordPress hooks.
 	 *
 	 * Call once from fotogrids_init() (runs on plugins_loaded, before init).
-	 * The actual add_image_size() calls must happen on or after 'init', so we
-	 * schedule them there.
+	 * The add_image_size() calls must happen on or after 'init', so they are
+	 * scheduled there.
 	 *
 	 * @since 1.0.0
 	 */
@@ -503,8 +503,7 @@ final class Image_Size_Manager {
 		}
 
 		if ( ! $include_hidden ) {
-			// The hidden companion is not in the custom registry, but filter
-			// any future hidden sizes here if needed.
+			// Drop the hidden full-mobile companion if it is present.
 			unset( $registry[ self::SLUG_FULL_MOBILE ] );
 		}
 

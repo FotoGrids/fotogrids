@@ -209,7 +209,7 @@ class Router {
 	 * active theme (Integrated mode).
 	 *
 	 * Resolution order:
-	 *   1. Bail unless this is a singular request for one of our CPTs.
+	 *   1. Bail unless this is a singular request for a FotoGrids CPT.
 	 *   2. Bail unless the post is published, or the current user can edit it
 	 *      (the latter enables draft preview for editors).
 	 *   3. Stash the resolved post on the Router so SEO_Conflict_Guard and
