@@ -278,8 +278,8 @@ const StatsPage = () => {
     const [ error,            setError            ] = useState( null );
     const [ refreshToken,     setRefreshToken     ] = useState( 0 );
 
-    // Canvas nodes are always in the DOM - we use a CSS overlay for the loading
-    // skeleton so refs are valid from first mount and never need to be re-created.
+    // Canvas nodes are always in the DOM and a CSS overlay shows the loading
+    // skeleton, so refs are valid from first mount and never re-created.
     const viewsChartRef    = useRef( null );
     const popularChartRef  = useRef( null );
     const viewsChartInst   = useRef( null );

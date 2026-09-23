@@ -38,8 +38,8 @@ const ResponsivenessTab = () => {
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState(null);
 
-    // Refresh from the canonical REST source on mount so we never rely solely
-    // on the localized seed.
+    // Refresh from the canonical REST source on mount rather than relying
+    // solely on the localized seed.
     useEffect(() => {
         let active = true;
         apiFetch({ path: '/fotogrids/v1/admin/general-settings' })
