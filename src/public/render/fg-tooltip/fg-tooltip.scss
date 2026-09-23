@@ -1,9 +1,5 @@
 /**
  * FotoGrids Tooltip Styles
- *
- * Source:  src/public/render/fg-tooltip/fg-tooltip.scss
- * Webpack: entry key 'fg-tooltip'  →  assets/css/fg-tooltip.css
- *
  * Intentionally theme-neutral - uses CSS custom properties so any surface
  * (lightbox, gallery overlay, etc.) can restyle without overrides.
  */
@@ -47,22 +43,10 @@
         transform  var(--fg-tt-duration) ease;
 
     // Arrow.
-    // CSS-triangle-via-borders: a zero-size box with three transparent
-    // borders and one coloured border. No rotated square, so the arrow has
-    // no overlap with the tooltip body - which means transparent --fg-tt-bg
-    // values render cleanly instead of doubling up where the square meets
-    // the tooltip.
-    //
-    // Direction is set by JS via data-dir on the tooltip element (see
-    // fg-tooltip.js position()). Default direction is "above" - the
-    // tooltip sits above the host, arrow drops down from the bottom.
-    // Arrow position along the cross-axis. JS sets --fg-tt-arrow-x (for
-    // above/below) or --fg-tt-arrow-y (for left/right) in pixels measured
-    // from the tooltip's top-left corner. This lets the arrow stay
-    // pointed at the host even when the tooltip body has been clamped
-    // away from the host centre near a viewport edge. When unset (first
-    // paint, or unusual layouts) it falls back to 50% so the arrow is
-    // centred on the tooltip body.
+    // A CSS triangle from borders rather than a rotated square, so a translucent
+    // --fg-tt-bg does not double up where arrow and body overlap. JS sets the
+    // direction via data-dir (default "above") and the cross-axis position via
+    // --fg-tt-arrow-x / --fg-tt-arrow-y, falling back to 50%.
     --fg-tt-arrow-x: 50%;
     --fg-tt-arrow-y: 50%;
 
@@ -139,16 +123,9 @@
     }
 
     // Content morph (text → interactive).
-    // When showInteractive() takes over an already-visible text tooltip
-    // the outer chrome (background, arrow, shadow) stays on screen while
-    // the inner content cross-fades and
-    // the outer container animates its size from the small text width
-    // to whatever the new interactive content needs.
-    //
-    // The outer container transitions width/height so the resize is
-    // smooth. The inner element has its own opacity transition.
-    // The fg-tooltip--swapping class triggers the fade-out leg
-    // (controlled from JS so timing is reliable across surfaces).
+    // Content morph (text → interactive): the outer chrome stays on screen and
+    // animates its size while the inner content cross-fades. JS adds
+    // .fg-tooltip--swapping for the fade-out leg.
     width:  auto;
     height: auto;
     transition:
