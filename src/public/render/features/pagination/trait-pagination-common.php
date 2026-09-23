@@ -10,6 +10,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Api\Setting_Helpers;
+use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Layout_Capabilities;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -148,6 +149,20 @@ trait Pagination_Common {
 			'data-fg-render-url'         => esc_url( rest_url( 'fotogrids/v1/gallery/render' ) ),
 			'data-fg-render-nonce'       => esc_attr( wp_create_nonce( 'wp_rest' ) ),
 		);
+
+		// Per-breakpoint page sizes let pagination-core.js re-request page 1
+		// when the visitor's breakpoint pages differently from the server
+		// render. Snap pagination sizes pages from the measured width instead.
+		if ( ! Context_Builder::is_snap_pagination_active( $render_context->settings ) ) {
+			$attrs['data-fg-page-sizes'] = implode(
+				' ',
+				array(
+					Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'desktop' ),
+					Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'tablet' ),
+					Page_Size_Resolver::resolve_for_breakpoint( $render_context->settings, 'mobile' ),
+				)
+			);
+		}
 
 		// Random sort seed - pagination-core.js sends this back with
 		// every paginated request so paginated/filtered draws share the

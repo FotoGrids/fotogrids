@@ -1210,8 +1210,9 @@ final class Context_Builder {
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $render_settings
+	 * @return bool
 	 */
-	private static function is_snap_pagination_active( array $render_settings ): bool {
+	public static function is_snap_pagination_active( array $render_settings ): bool {
 		if ( ( $render_settings['layout'] ?? '' ) !== 'justified' ) {
 			return false;
 		}
