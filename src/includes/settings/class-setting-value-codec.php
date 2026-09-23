@@ -185,7 +185,7 @@ final class Setting_Value_Codec {
 
 		// password_input fields are encrypted before storage so the raw
 		// password is never written to the DB in plain text. An empty value
-		// means "clear the password" - we delete the meta key so
+		// means "clear the password", so the meta key is deleted and
 		// password_is_set returns false.
 		//
 		// Guard: if the incoming value is already an encrypted blob (i.e. the

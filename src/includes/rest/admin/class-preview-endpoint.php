@@ -90,8 +90,8 @@ final class Preview_Endpoint {
 		// page-scope global (currently only loading-icon) attach it via
 		// wp_add_inline_script() inside an add_action('wp_footer',...) callback,
 		// because on a normal page wp_footer paints those globals before the
-		// footer scripts run. In a REST context wp_footer never fires, so we
-		// fire a dedicated FotoGrids-only action that those modules also hook,
+		// footer scripts run. In a REST context wp_footer never fires, so a
+		// dedicated FotoGrids-only action that those modules also hook is fired,
 		// then snapshot any inline 'before' / 'after' payloads off each
 		// enqueued JS handle. The client appends them around the matching
 		// script tag so the preview gets the same runtime as a real embed.
@@ -224,7 +224,7 @@ final class Preview_Endpoint {
 				return;
 			}
 			if ( isset( $visiting[ $handle ] ) ) {
-				// Dependency cycle - treat as already visited so we don't loop forever.
+				// Dependency cycle - treat as already visited to avoid looping.
 				return;
 			}
 			$visiting[ $handle ] = true;

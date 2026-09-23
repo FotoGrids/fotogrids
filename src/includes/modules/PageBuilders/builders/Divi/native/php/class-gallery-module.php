@@ -94,7 +94,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 	 * @param string      $content  Block inner content (unused).
 	 * @param \WP_Block   $block    Parsed block instance.
 	 * @param mixed       $elements Divi ModuleElements instance (unused; the
-	 *                              delegate the whole render to the shortcode
+	 *                              whole render is delegated to the shortcode
 	 *                              pipeline rather than composing Divi
 	 *                              elements).
 	 * @return string
