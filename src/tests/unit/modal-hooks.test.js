@@ -16,7 +16,7 @@ const h = wp.element.createElement;
 describe('useBodyScrollLock', () => {
 	afterEach(() => {
 		document.body.style.overflow = '';
-		document.body.style.paddingRight = '';
+		document.body.style.paddingInlineEnd = '';
 	});
 
 	const Host = ({ active }) => {

@@ -8,8 +8,8 @@
 .fotogrids-setup__progress {
 	position: absolute;
 	top: 0;
-	left: 0;
-	right: 0;
+	inset-inline-start: 0;
+	inset-inline-end: 0;
 	height: 4px;
 	background: transparent;
 	z-index: 1;
@@ -304,7 +304,7 @@
 	border: 1px solid var(--fg-border-secondary);
 	border-radius: 10px;
 	cursor: pointer;
-	text-align: left;
+	text-align: start;
 	transition:
 		border-color 0.15s ease,
 		background-color 0.15s ease,
@@ -405,7 +405,7 @@
 		border: 1px solid var(--fg-border-secondary);
 		border-radius: 10px;
 		cursor: pointer;
-		text-align: left;
+		text-align: start;
 		transition:
 			border-color 0.15s ease,
 			background-color 0.15s ease,
@@ -657,7 +657,7 @@
 	border: 1px solid var(--fg-border-secondary);
 	border-radius: 10px;
 	cursor: pointer;
-	text-align: left;
+	text-align: start;
 	transition:
 		border-color 0.15s ease,
 		transform 0.15s ease,
@@ -795,7 +795,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 10px;
-		margin-left: auto;
+		margin-inline-start: auto;
 	}
 }
 
@@ -833,7 +833,7 @@
 
 		&-actions {
 			justify-content: space-between;
-			margin-left: 0;
+			margin-inline-start: 0;
 		}
 	}
 }
