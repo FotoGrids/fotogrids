@@ -1003,7 +1003,7 @@ function CollectionSettings() {
 		// store (sharing, seo or watermark) rather than sibling fields. Same
 		// shape as condition (dependsOn + values); dependsOn may be a dotted
 		// key (e.g. "networks.facebook"). The optional `source` field selects
-		// which global store to read - defaults to 'sharing' for back-compat.
+		// which global store to read and defaults to 'sharing'.
 		// Absent condition_global always passes.
 		if (setting.condition_global) {
 			const GLOBAL_SOURCES = {
@@ -1291,7 +1291,7 @@ function CollectionSettings() {
 		// settings predicate matches. Used by the SEO tab to disappear when
 		// the site owner has chosen to defer to a third-party SEO plugin.
 		// Same shape as the setting-level predicate (source, dependsOn,
-		// values). source defaults to 'sharing' for back-compat.
+		// values); source defaults to 'sharing'.
 		if (group?.condition_global) {
 			const source =
 				group.condition_global.source === 'seo'
