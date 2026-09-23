@@ -134,8 +134,8 @@ const SetupWizardPage = () => {
 
     // Progress bar fill - 0% before any step, 100% on the final step.
     // Steps are 1-indexed; with N steps the visual fill points are
-    // 1/N .. N/N. We expose it as a CSS var so the SCSS can drive any
-    // transition it wants.
+    // 1/N .. N/N, exposed as a CSS var so the SCSS can drive any
+    // transition.
     const progressFill = `${ Math.round( ( stepIndex / TOTAL ) * 100 ) }%`;
 
     return (

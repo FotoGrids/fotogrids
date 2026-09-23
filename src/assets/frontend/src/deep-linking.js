@@ -20,8 +20,7 @@
 		typeof window.history.replaceState === 'function';
 
 	// The View Page sets the `fotogrids-view` class on <body> (see
-	// ViewCollections\Renderer::body_attrs), not on <html>. Check both
-	// to be defensive against future moves.
+	// ViewCollections\Renderer::body_attrs), not on <html>; both are checked.
 	const isViewPage = () =>
 		(document.body && document.body.classList.contains('fotogrids-view')) ||
 		document.documentElement.classList.contains('fotogrids-view');
