@@ -163,6 +163,18 @@ input[type="number"].fotogrids-range-number-input {
 	}
 }
 
+body.rtl .fotogrids-range-slider-min::-webkit-slider-runnable-track {
+	background: linear-gradient(
+		to left,
+		var(--fg-border-primary) 0%,
+		var(--fg-border-primary) var(--min-percent, 0%),
+		var(--fg-blue, var(--fg-blue)) var(--min-percent, 0%),
+		var(--fg-blue, var(--fg-blue)) var(--max-percent, 100%),
+		var(--fg-border-primary) var(--max-percent, 100%),
+		var(--fg-border-primary) 100%
+	);
+}
+
 .fotogrids-range-slider-max {
 	z-index: 2;
 

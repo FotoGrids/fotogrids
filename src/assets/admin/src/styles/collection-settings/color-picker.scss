@@ -234,10 +234,11 @@
 		transform: translate(-50%, -50%);
 		pointer-events: none;
 		top: 0;
-		inset-inline-start: 0;
+		left: 0;
 	}
 
 	&__sliders {
+		direction: ltr;
 		display: flex;
 		flex-direction: column;
 		gap: 16px;

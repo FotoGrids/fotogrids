@@ -115,8 +115,11 @@ function AlphaColorPicker({
 			Math.max(measuredWidth, triggerRect.width),
 			Math.max(0, viewportWidth - sidePadding * 2)
 		);
+		const isRtl =
+			window.getComputedStyle(triggerRef.current).direction === 'rtl';
+		const anchorLeft = isRtl ? triggerRect.right - width : triggerRect.left;
 		const left = Math.min(
-			Math.max(sidePadding, triggerRect.left),
+			Math.max(sidePadding, anchorLeft),
 			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
 
