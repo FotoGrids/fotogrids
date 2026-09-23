@@ -14,7 +14,8 @@
 	&__input[type="number"] {
 		width: 140px;
 		height: 38px;
-		padding: 0 40px 0 12px;
+		padding-block: 0;
+		padding-inline: 12px 40px;
 		font-size: 14px;
 		color: var(--fg-text-primary);
 		background: var(--fg-background-primary);
@@ -49,7 +50,7 @@
 
 	&__unit {
 		position: absolute;
-		right: 12px;
+		inset-inline-end: 12px;
 		top: 50%;
 		transform: translateY(-50%);
 		font-size: 12px;
@@ -384,7 +385,7 @@
 		transition:
 			color 0.12s ease,
 			border-color 0.12s ease;
-		border-right: 1px solid var(--fg-border-primary);
+		border-inline-end: 1px solid var(--fg-border-primary);
 
 		&:hover {
 			color: var(--fg-text-primary);

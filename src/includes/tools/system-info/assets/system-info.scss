@@ -108,7 +108,7 @@
         th,
         td {
             padding: 10px 16px;
-            text-align: left;
+            text-align: start;
             vertical-align: top;
             border-bottom: 1px solid var(--fg-border-secondary);
         }
@@ -152,7 +152,7 @@
         background: none;
         color: var(--fg-text-primary);
         font: inherit;
-        text-align: left;
+        text-align: start;
         cursor: pointer;
 
         &:hover,
