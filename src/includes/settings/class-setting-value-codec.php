@@ -188,11 +188,9 @@ final class Setting_Value_Codec {
 		// means "clear the password", so the meta key is deleted and
 		// password_is_set returns false.
 		//
-		// Guard: if the incoming value is already an encrypted blob (i.e. the
-		// browser echoed back the ciphertext that was loaded into the field
-		// on page load), skip re-encryption - just leave the stored value
-		// as-is. Re-encrypting on every save causes the blob to grow
-		// exponentially and eventually exhausts PHP's memory limit.
+		// An incoming value that is already an encrypted blob (the ciphertext
+		// echoed back from the field) is left as stored; re-encrypting it on
+		// every save would grow the blob without bound.
 		if ( 'password_input' === $field_type ) {
 			$plaintext = (string) $setting_value;
 			if ( '' === $plaintext ) {
