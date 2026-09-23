@@ -273,7 +273,8 @@ body[class*="fotogrids_page_fotogrids-dashboard"] {
 			position: absolute;
 			width: 720px;
 			height: 240px;
-			inset: 0;
+			inset-block-start: 0;
+			inset-inline-start: 0;
 			z-index: -1;
 			clip-path: polygon(0 0, 0% 100%, 100% 0);
 			background: white;
@@ -283,4 +284,8 @@ body[class*="fotogrids_page_fotogrids-dashboard"] {
 	#fotogrids-main-page.fotogrids-admin-page {
 		padding: 14px 32px 32px;
 	}
+}
+
+body.rtl[class*="fotogrids_page_fotogrids-dashboard"] #wpcontent::before {
+	clip-path: polygon(100% 0, 100% 100%, 0 0);
 }
