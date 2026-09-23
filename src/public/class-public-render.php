@@ -276,7 +276,7 @@ class Public_Render {
 	/**
 	 * Holds the full Render_Result of the most recent render in this request.
 	 * REST/AJAX handlers read it to return the per-render inline CSS/JS/JSON-LD
-	 * (which are no longer embedded in the markup) for the client to inject.
+	 * for the client to inject.
 	 *
 	 * @since 1.0.0
 	 * @var Render_Result|null
