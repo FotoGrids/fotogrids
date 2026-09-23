@@ -165,7 +165,7 @@
                     "visible_when_uninstalled": true
                 },
                 {
-                    "key": "navigation_back_button_show_Album_name",
+                    "key": "navigation_back_button_show_album_name",
                     "type": "toggle",
                     "label": "Show Album Name on Button",
                     "description": "When on, the button reads \"Back to {Album Name}\". When off, it just says \"Back\" - useful when the Album name is long or when the button needs to fit in a tight layout.",

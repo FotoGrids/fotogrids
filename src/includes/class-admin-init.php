@@ -1227,7 +1227,7 @@ class Admin_Init {
 			$id        = 'fotogrids-bulk-album-selector-' . $which;
 			$select_id = 'fotogrids-album-select-' . $which;
 			?>
-			<span id="<?php echo esc_attr( $id ); ?>" class="fotogrids-bulk-album-selector" style="display: none; margin-left: 6px;">
+			<span id="<?php echo esc_attr( $id ); ?>" class="fotogrids-bulk-album-selector" style="display: none; margin-inline-start: 6px;">
 				<label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
 					<?php esc_html_e( 'Select Album:', 'fotogrids' ); ?>
 				</label>

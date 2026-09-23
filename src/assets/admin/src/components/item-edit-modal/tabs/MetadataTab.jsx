@@ -78,7 +78,7 @@ const MetadataTab = ({
         <div className="fotogrids-tab-panel fg-is-active">
             <div className="fotogrids-metadata-section">
                 {!isHardFull && (
-                    <div className="fotogrids-metadata-input">
+                    <div className="fotogrids-item-edit-metadata-input">
                         {iconName ? (
                             <div className="fotogrids-input-with-icon">
                                 <Icon name={ iconName } className="fotogrids-input-icon" />
@@ -105,11 +105,11 @@ const MetadataTab = ({
 
                 {/* Autocomplete suggestions */}
                 {!isHardFull && currentInput && hasSuggestions && (
-                    <div className="fotogrids-autocomplete">
+                    <div className="fotogrids-item-edit-autocomplete">
                         {filteredSuggestions.map(item => (
                             <div
                                 key={item.id}
-                                className="fotogrids-autocomplete-item"
+                                className="fotogrids-item-edit-autocomplete-item"
                                 onClick={() => selectExistingMetadata(metadataKey, item)}
                             >
                                 {item.name}
@@ -132,7 +132,7 @@ const MetadataTab = ({
 
                 {/* Current items */}
                 {currentItems.length > 0 && (
-                    <div className="fotogrids-metadata-list">
+                    <div className="fotogrids-item-edit-metadata-list">
                         {currentItems.map(item => (
                             <span key={item.id} className={itemClassName}>
                                 {renderItemContent ? renderItemContent(item) : (

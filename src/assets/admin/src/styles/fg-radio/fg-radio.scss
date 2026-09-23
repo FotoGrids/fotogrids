@@ -24,7 +24,7 @@ $fg-radio-border: 1.5px;
 	gap: 4px;
 
 	.fg-radio__description {
-		margin-left: calc(#{$fg-radio-size-md} + 8px);
+		margin-inline-start: calc(#{$fg-radio-size-md} + 8px);
 		font-size: 12px;
 		font-weight: 400;
 		line-height: 1.5;
