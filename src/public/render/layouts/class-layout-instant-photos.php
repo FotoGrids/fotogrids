@@ -288,17 +288,6 @@ final class Layout_Instant_Photos implements Layout {
 	}
 
 	/**
-	 * Compute shadow x/y given a tile rotation and a "world-down" distance.
-	 *
-	 * CSS box-shadow draws in the rotated element's local space. To make the
-	 * shadow appear to fall straight down (light from above) in screen space
-	 * regardless of the tile's rotation, the offset is counter-rotated by
-	 * the negative of the tile angle.
-	 *
-	 * @since   1.0.0
-	 * @return  array{0: float, 1: float} [x, y] in CSS pixels.
-	 */
-	/**
 	 * Compute the counter-rotated translate offsets that lift a tile
 	 * straight up the page by $distance CSS pixels, regardless of the
 	 * tile's rotation.
@@ -318,11 +307,19 @@ final class Layout_Instant_Photos implements Layout {
 		return array( $x, $y );
 	}
 
+	/**
+	 * Compute shadow x/y given a tile rotation and a "world-down" distance.
+	 *
+	 * CSS box-shadow draws in the rotated element's local space. To make the
+	 * shadow appear to fall straight down (light from above) in screen space
+	 * regardless of the tile's rotation, the offset is counter-rotated by
+	 * the negative of the tile angle.
+	 *
+	 * @since   1.0.0
+	 * @return  array{0: float, 1: float} [x, y] in CSS pixels.
+	 */
 	private function shadow_offsets( float $rotation_deg, float $distance ): array {
 		$rad = deg2rad( -$rotation_deg );
-		// World-down vector is (0, distance). Rotating it by -rotation:
-		//   x = sin(-rot) * distance
-		//   y = cos(-rot) * distance
 		$x = sin( $rad ) * $distance;
 		$y = cos( $rad ) * $distance;
 		return array( $x, $y );
