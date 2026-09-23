@@ -201,11 +201,8 @@ final class Lightbox implements Feature {
 	}
 
 	public function supports( Render_Context $render_context ): bool {
-		// Lightbox shows full-size attachment media for the items inside a
-		// collection. Album items are themselves galleries (their click goes
-		// to a view-page or AJAX-swaps to the child gallery), so there is
-		// no "open this item in a lightbox" semantic. Opt out cleanly to
-		// avoid polluting album wrappers with data-fg-click + data-fg-lb-*.
+		// Album items are galleries with their own click behaviour, so albums get
+		// no lightbox attributes.
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
 			return false;
 		}
@@ -234,13 +231,9 @@ final class Lightbox implements Feature {
 		$attrs['data-fg-lb-theme'] = $theme;
 
 		// ── Colour palette ────────────────────────────────────────────────────
-		// The dark/light/custom palette is resolved by the shared
-		// Lightbox_Colors helper (also used by LightboxGrid). attrs() returns
-		// the always-on data-fg-lb-* colour map; the conditional colours
-		// (info-block bg/divider, image shadow) are emitted below because they
-		// depend on non-colour settings. $palette gives the resolved fallback
-		// values those conditional emissions need. JS uses these to build the
-		// full CSS variable block - no theme classes in SCSS.
+		// Resolved by the shared Lightbox_Colors helper (also used by LightboxGrid).
+		// attrs() is the always-on colour map; colours that depend on non-colour
+		// settings are emitted below from $palette.
 		$attrs   = array_merge( $attrs, \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::attrs( $s ) );
 		$palette = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::palette( $s );
 
