@@ -96,9 +96,8 @@ final class Layout_Instant_Photos implements Layout {
 		// first item id when no gallery id is present (e.g. previews).
 		$seed_base = $this->resolve_seed_base( $render_context );
 
-		// mt_srand mutates global PHP random state; capture nothing here and
-		// restore an entropy-fresh seed at the end so unrelated code that
-		// calls mt_rand() later in the same request isn't surprised.
+		// mt_srand mutates global PRNG state; it is re-seeded from entropy at the end
+		// so later mt_rand() callers in the same request are unaffected.
 		$items_html = '';
 		foreach ( $render_context->items as $item_view ) {
 			$decorated   = $this->decorate_item( $item_view, $seed_base, $max_rotation, $elevation_on, $sticker_on, $sticker_hide );
@@ -156,10 +155,8 @@ final class Layout_Instant_Photos implements Layout {
 			'--fg-hover-boost'     => (string) self::HOVER_BOOST_DEG,
 		);
 
-		// Sticker colour. Only emitted when sticker is actually rendered so
-		// we don't pollute the cascade for galleries that don't use it; user
-		// theme CSS can still override --fg-sticker-color directly when this
-		// var is absent because the CSS uses var(--fg-sticker-color, ...).
+		// Only emitted when the sticker renders; theme CSS can still set
+		// --fg-sticker-color, which the stylesheet reads with a fallback.
 		$elevation_on = (bool) ( $settings['instant_photo_elevation'] ?? true );
 		$sticker_on   = ! $elevation_on && (bool) ( $settings['instant_photo_sticker'] ?? false );
 		if ( $sticker_on ) {
@@ -239,13 +236,8 @@ final class Layout_Instant_Photos implements Layout {
 		$style['--fg-shadow-hover-blur'] = self::SHADOW_BLUR_HOVER . 'px';
 
 		if ( $elevation_on ) {
-			// Counter-rotated world-up lift. The CSS rotate happens AFTER
-			// the translate (because transforms chain right-to-left in
-			// matrix order: `transform: translate(x,y) rotate(r)` applies
-			// rotate first, then translate). To make the tile appear to
-			// shift straight up the page regardless of its tilt, we cancel
-			// out the rotation by pre-rotating the (0, -lift) vector by
-			// +rotation here.
+			// Counter-rotated lift: the (0, -lift) vector is pre-rotated by +rotation so
+			// the tile moves straight up the page despite its tilt.
 			$rest_lift  = $this->lift_offsets( $rotation, self::LIFT_REST );
 			$hover_lift = $this->lift_offsets( $rotation, self::LIFT_HOVER );
 
@@ -254,13 +246,8 @@ final class Layout_Instant_Photos implements Layout {
 			$style['--fg-lift-hover-x'] = $this->format_px( $hover_lift[0] );
 			$style['--fg-lift-hover-y'] = $this->format_px( $hover_lift[1] );
 
-			// Elevated shadow gap. When the tile lifts, the whole element
-			// (including its rest shadow) moves up with it - which kills
-			// the visual cue. To restore the "tile floating above its
-			// shadow" effect, we stamp a second pair of shadow offsets
-			// whose world-down distance includes the lift distance: as
-			// the tile rises N px, the shadow extends N px further below,
-			// producing a visible gap in world space.
+			// A second shadow pair extends world-down by the lift distance, so a raised
+			// tile shows a gap above its shadow.
 			$elev_shadow_rest  = $this->shadow_offsets( $rotation, self::SHADOW_DISTANCE_REST + self::LIFT_REST );
 			$elev_shadow_hover = $this->shadow_offsets( $rotation, self::SHADOW_DISTANCE_HOVER + self::LIFT_HOVER );
 
@@ -316,12 +303,8 @@ final class Layout_Instant_Photos implements Layout {
 	 * straight up the page by $distance CSS pixels, regardless of the
 	 * tile's rotation.
 	 *
-	 * The element's transform is `translate(x, y) rotate(r)` which, in
-	 * matrix order, rotates first and then translates. We want the
-	 * visible motion to be world-up (0, -distance) AFTER the rotate
-	 * has been applied. So in the element's local pre-rotate space the
-	 * translate vector must be the world-up vector pre-rotated by
-	 * +rotation:
+	 * The element's transform is `translate(x, y) rotate(r)`, which rotates first,
+	 * so the translate vector is the world-up vector pre-rotated by +rotation:
 	 *   x =  sin(rot) * distance
 	 *   y = -cos(rot) * distance
 	 *
@@ -347,10 +330,8 @@ final class Layout_Instant_Photos implements Layout {
 
 	/**
 	 * Resolve the active device's max-rotation value from the responsive
-	 * setting. We hand the per-device values straight through to CSS so
-	 * the active value is selected by the existing responsive plumbing,
-	 * but for randomisation we have to pick one bucket on the PHP side.
-	 * Desktop is the widest range and the most visible - use it.
+	 * setting. Per-device values go straight to CSS, but randomisation needs one
+	 * range on the PHP side; desktop, the widest and most visible, is used.
 	 *
 	 * @since   1.0.0
 	 */
