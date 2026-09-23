@@ -67,6 +67,7 @@ class Uninstaller {
 		self::remove_capabilities();
 		self::remove_options();
 		self::remove_post_meta();
+		self::remove_user_meta();
 		self::remove_transients();
 	}
 
@@ -191,6 +192,30 @@ class Uninstaller {
 				$wpdb->esc_like( 'fotogrids_' ) . '%',
 				$wpdb->esc_like( '_fotogrids_' ) . '%',
 				'_wp_attachment_item_alt' // TODO: Remove at 1.4.0
+			)
+		);
+	}
+
+	/**
+	 * Remove plugin user meta.
+	 *
+	 * Matches the `fotogrids_*` keys, which hold saved templates, and the
+	 * `_fotogrids_*` keys, which hold the review-prompt version. User meta is
+	 * not site-scoped, so this clears every user on the install.
+	 *
+	 * @since 1.1.3
+	 * @return void
+	 */
+	private static function remove_user_meta() {
+		global $wpdb;
+
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->usermeta}
+                 WHERE meta_key LIKE %s
+                    OR meta_key LIKE %s",
+				$wpdb->esc_like( 'fotogrids_' ) . '%',
+				$wpdb->esc_like( '_fotogrids_' ) . '%'
 			)
 		);
 	}

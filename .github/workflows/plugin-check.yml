@@ -45,8 +45,8 @@ jobs:
           find dist -mindepth 1 -maxdepth 1 ! -name fotogrids -exec cp -R {} dist/fotogrids/ \;
 
       - name: Run Plugin Check
-        # This action writes its own .wp-env.json into the workspace root, so
-        # keep it in a job that does not also use the project's wp-env setup.
+        # This action installs its own wp-env and writes its own .wp-env.json
+        # into the workspace root.
         #
         # Non-blocking for now: the report is worth reading on every PR, but
         # Plugin Check overlaps rules our phpcs.xml deliberately exempts, so it

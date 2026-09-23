@@ -13,8 +13,8 @@ updates:
       # Every @wordpress/* package below is a webpack external: the npm version is
       # never bundled, it only sets the API surface the build type-checks against.
       # That has to track the "Requires at least" WordPress version rather than the
-      # latest release, so major bumps are not routine updates. @wordpress/env and
-      # @wordpress/eslint-plugin are real dev tooling and are deliberately absent.
+      # latest release, so major bumps are not routine updates.
+      # @wordpress/eslint-plugin is real dev tooling and is deliberately absent.
       - dependency-name: "@wordpress/api-fetch"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/block-editor"
