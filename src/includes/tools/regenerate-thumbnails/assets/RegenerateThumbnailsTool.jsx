@@ -296,7 +296,7 @@ const RegenerateThumbnailsTool = () => {
     const fetchAllItems = useCallback(async () => {
         const all = [];
         let current = 1;
-        let pages = 1;
+        let pages;
 
         do {
             const params = new URLSearchParams({
