@@ -31,14 +31,9 @@ if ( ! defined( 'WPINC' ) ) {
  * the native Divi module is just another front door onto the same render
  * path used by shortcodes, Gutenberg and Elementor.
  *
- * Note on `implements`: we declare the interface by its fully-qualified
- * name via a class_alias-free `\ET\...` reference at registration time
- * rather than a `use` + `implements` clause, because this file is only
- * ever required when Divi 5 is active (guarded by the parent Module's
- * `is_active()`), and we don't want a hard compile-time dependency on a
- * Divi interface that wouldn't exist on a non-Divi site. See the parent
- * `Module::register_native_modules()` - it only requires this file when
- * the Divi 5 framework is present.
+ * This file is only required when the Divi 5 framework is present (see
+ * `Module::register_native_modules()`), so implementing Divi's interface
+ * directly is safe.
  *
  * @since 1.0.0
  */
@@ -86,9 +81,8 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 
 		// Divi calls load() from FrontEnd/Admin construction, which runs
 		// synchronously inside `et_setup_builder_5` on `init:0` - Divi 5
-		// (and ModuleRegistration) is fully loaded at this point. So we
-		// register immediately rather than deferring to a nested `init`
-		// callback (which would be re-entrant and fragile).
+		// (and ModuleRegistration) is fully loaded at this point, so registration
+		// happens immediately rather than in a nested, re-entrant `init` callback.
 		$register();
 	}
 
@@ -99,7 +93,7 @@ class Gallery_Module implements \ET\Builder\Framework\DependencyManagement\Inter
 	 * @param array       $attrs    Block attributes saved by the VB.
 	 * @param string      $content  Block inner content (unused).
 	 * @param \WP_Block   $block    Parsed block instance.
-	 * @param mixed       $elements Divi ModuleElements instance (unused - we
+	 * @param mixed       $elements Divi ModuleElements instance (unused; the
 	 *                              delegate the whole render to the shortcode
 	 *                              pipeline rather than composing Divi
 	 *                              elements).

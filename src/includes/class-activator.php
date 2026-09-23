@@ -71,8 +71,8 @@ class Activator {
 	 * Run a lifecycle hook across every registered Lifecycle_Module_Interface.
 	 *
 	 * Activation / deactivation / uninstall run in isolated requests where the
-	 * 'init' hook has not fired, so modules are not yet registered. We fire the
-	 * registration action here explicitly (its listeners are attached at
+	 * 'init' hook has not fired, so modules are not yet registered. The
+	 * registration action is fired here explicitly (its listeners are attached at
 	 * plugin-file load time) before iterating. No-op until a lifecycle module
 	 * exists.
 	 *
