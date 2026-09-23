@@ -320,8 +320,8 @@ final class Layout_Instant_Photos implements Layout {
 	 */
 	private function shadow_offsets( float $rotation_deg, float $distance ): array {
 		$rad = deg2rad( -$rotation_deg );
-		$x = sin( $rad ) * $distance;
-		$y = cos( $rad ) * $distance;
+		$x   = sin( $rad ) * $distance;
+		$y   = cos( $rad ) * $distance;
 		return array( $x, $y );
 	}
 
