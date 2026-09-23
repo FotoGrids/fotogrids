@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Lightbox\Classic;
 
 use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
@@ -99,6 +100,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-thumbnail-location    = "none" | "bottom" | "top" | "left" | "right"
  *   data-fg-lb-thumbnail-size        = "small" | "normal" | "large"
  *   data-fg-lb-overlay-blur          = "2"                    (px integer; 0 = none)
+ *   data-fg-lb-mobile-max            = "767"                  (px; the mobile image loads at or below this viewport width)
  *   data-fg-lb-preload-slides        = "2"                    (integer; slides to preload ahead and behind; absent = 2)
  *   data-fg-lb-info-panel            = "off"                  (present = info panel disabled; absent = enabled)
  *   data-fg-lb-info-default          = "closed"               (present = panel starts collapsed; absent = open)
@@ -570,6 +572,8 @@ final class Lightbox implements Feature {
 				$attrs['data-fg-lb-full-filter-hover'] = $full_filter_hover;
 			}
 		}
+
+		$attrs['data-fg-lb-mobile-max'] = (string) Breakpoint_Config::from_settings()->mobile_max_width;
 
 		return $attrs;
 	}

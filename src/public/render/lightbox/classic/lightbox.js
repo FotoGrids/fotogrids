@@ -191,6 +191,7 @@ function readSettings(galleryEl) {
 		dotsSpacing: d.fgLbBulletSpacing || '8px',
 		thumbLocation: d.fgLbThumbnailLocation || 'bottom',
 		thumbSize: d.fgLbThumbnailSize || 'normal',
+		mobileMax: parseInt(d.fgLbMobileMax, 10) || 767,
 		thumbSpacing: parseInt(d.fgLbThumbSpacing, 10) || 5,
 		thumbDrag: !galleryEl.hasAttribute('data-fg-lb-no-thumb-drag'),
 		thumbSwipe: !galleryEl.hasAttribute('data-fg-lb-no-thumb-swipe'),
@@ -246,6 +247,22 @@ function readSettings(galleryEl) {
 }
 
 /**
+ * The full image URL to load for a slide: the mobile companion at or below
+ * the mobile breakpoint, otherwise the full image.
+ *
+ * @param {{fullSrc: string, fullMobileSrc?: string}} item
+ * @param {number} mobileMax Mobile breakpoint in CSS pixels.
+ * @returns {string}
+ */
+function fullSrcForViewport(item, mobileMax) {
+	if (item.fullMobileSrc && window.innerWidth <= mobileMax) {
+		return item.fullMobileSrc;
+	}
+
+	return item.fullSrc;
+}
+
+/**
  * Collects item data from a gallery element.
  *
  * @param {HTMLElement} galleryEl
@@ -274,6 +291,7 @@ function buildSlideFromTrigger(triggerEl) {
 		sequenceIndex,
 		fullSrc:
 			triggerEl.href || (img ? img.dataset.fgFullSrc || img.src : ''),
+		fullMobileSrc: triggerEl.dataset.fgFullMobileSrc || '',
 		thumbSrc: img ? img.src : '',
 		alt: img ? img.alt : '',
 		caption: triggerEl.dataset.fgCaption || '',
@@ -296,6 +314,7 @@ function buildSlideFromTrigger(triggerEl) {
 		);
 		slide.thumbSrc = posterImg ? posterImg.src : slide.thumbSrc;
 		slide.fullSrc = posterImg ? posterImg.src : '';
+		slide.fullMobileSrc = '';
 		slide.alt = posterImg ? posterImg.alt : slide.alt;
 	}
 
@@ -421,6 +440,7 @@ function buildSlideFromApi(apiSlide) {
 		figureEl: null,
 		sequenceIndex: null,
 		fullSrc: apiSlide.full_url || '',
+		fullMobileSrc: apiSlide.full_mobile_url || '',
 		thumbSrc: apiSlide.thumb_url || '',
 		alt: apiSlide.alt || '',
 		caption: apiSlide.caption || '',
@@ -2422,14 +2442,16 @@ class FotoGridsLightbox {
 				}
 			};
 
-			if (imgEl.complete && imgEl.src === item.fullSrc) {
+			const src = fullSrcForViewport(item, this.settings.mobileMax);
+
+			if (imgEl.complete && imgEl.src === src) {
 				onLoad();
 				return;
 			}
 
 			imgEl.classList.add('fg-lb-img--loading');
 			imgEl.alt = item.alt;
-			imgEl.src = item.fullSrc;
+			imgEl.src = src;
 			imgEl.addEventListener('load', onLoad, { once: true });
 			imgEl.addEventListener('error', onLoad, { once: true });
 		};
@@ -2577,7 +2599,9 @@ class FotoGridsLightbox {
 
 			candidates.forEach((i) => {
 				if (i < 0 || i >= len) return;
-				const src = this.items[i]?.fullSrc;
+				const src = this.items[i]
+					? fullSrcForViewport(this.items[i], this.settings.mobileMax)
+					: '';
 				if (!src || this._preloadCache.has(src)) return;
 				this._preloadCache.add(src);
 				new Image().src = src;

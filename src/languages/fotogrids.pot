@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FotoGrids 1.1.1\n"
+"Project-Id-Version: FotoGrids 1.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fotogrids\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-13T10:48:35+00:00\n"
+"POT-Creation-Date: 2026-09-21T15:20:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -158,7 +158,7 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:160
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:12
 #: assets/admin/src/components/pages/StatsPage.jsx:204
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:277
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:282
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:25
 #: includes/tools/import-export/assets/ImportExportTool.jsx:18
 #: includes/tools/import-export/assets/ImportExportTool.jsx:106
@@ -377,7 +377,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:279
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-registrar.php:880
-#: assets/admin/plain/collection-settings.js:2267
+#: assets/admin/plain/collection-settings.js:2271
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -388,7 +388,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:280
 #: includes/metaboxes/class-metabox-registrar.php:882
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2391
+#: assets/admin/plain/collection-settings.js:2395
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -2523,7 +2523,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:532
 #: includes/diagnostics/class-system-report.php:625
 #: assets/admin/plain/render-settings/renderImageSize.js:52
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:290
 msgid "No"
 msgstr ""
 
@@ -3884,7 +3884,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:857
 #: includes/diagnostics/class-system-report.php:625
 #: assets/admin/plain/render-settings/renderImageSize.js:52
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:285
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:290
 msgid "Yes"
 msgstr ""
 
@@ -3962,7 +3962,7 @@ msgstr ""
 #: includes/class-admin-init.php:155
 #: includes/metaboxes/class-metabox-registrar.php:889
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2502
+#: assets/admin/plain/collection-settings.js:2506
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -5836,7 +5836,7 @@ msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:885
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:135
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:275
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:280
 msgid "Dimensions"
 msgstr ""
 
@@ -5849,7 +5849,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:888
-#: assets/admin/plain/collection-settings.js:699
+#: assets/admin/plain/collection-settings.js:703
 msgid "Failed to load item data"
 msgstr ""
 
@@ -6084,7 +6084,7 @@ msgid "Open in new tab"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:953
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:303
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:308
 msgid "Regenerate thumbnails"
 msgstr ""
 
@@ -7882,17 +7882,17 @@ msgid "Toggle filters"
 msgstr ""
 
 #. translators: heading shown when gallery requires login
-#: public/render/gates/collection-permissions/class-collection-permissions.php:122
+#: public/render/gates/collection-permissions/class-collection-permissions.php:124
 msgid "Login Required"
 msgstr ""
 
 #. translators: message shown when gallery is visible to registered users only
-#: public/render/gates/collection-permissions/class-collection-permissions.php:124
+#: public/render/gates/collection-permissions/class-collection-permissions.php:126
 msgid "This gallery is available to registered users only. Please log in to continue."
 msgstr ""
 
 #. translators: button label for login action when gallery access is restricted
-#: public/render/gates/collection-permissions/class-collection-permissions.php:126
+#: public/render/gates/collection-permissions/class-collection-permissions.php:128
 msgid "Log In"
 msgstr ""
 
@@ -7929,113 +7929,113 @@ msgstr ""
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:462
+#: assets/admin/plain/collection-settings.js:460
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:746
+#: assets/admin/plain/collection-settings.js:750
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:782
+#: assets/admin/plain/collection-settings.js:786
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:800
+#: assets/admin/plain/collection-settings.js:804
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:807
+#: assets/admin/plain/collection-settings.js:811
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:811
+#: assets/admin/plain/collection-settings.js:815
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1502
+#: assets/admin/plain/collection-settings.js:1506
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1503
+#: assets/admin/plain/collection-settings.js:1507
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1976
+#: assets/admin/plain/collection-settings.js:1980
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2024
-#: assets/admin/plain/collection-settings.js:2040
+#: assets/admin/plain/collection-settings.js:2028
+#: assets/admin/plain/collection-settings.js:2044
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2077
+#: assets/admin/plain/collection-settings.js:2081
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2098
+#: assets/admin/plain/collection-settings.js:2102
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2099
+#: assets/admin/plain/collection-settings.js:2103
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2106
-#: assets/admin/plain/collection-settings.js:2117
+#: assets/admin/plain/collection-settings.js:2110
+#: assets/admin/plain/collection-settings.js:2121
 msgid "Failed to update autosave setting"
-msgstr ""
-
-#: assets/admin/plain/collection-settings.js:2161
-#: assets/admin/plain/collection-settings.js:2171
-msgid "Configure Album defaults"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:2165
 #: assets/admin/plain/collection-settings.js:2175
+msgid "Configure Album defaults"
+msgstr ""
+
+#: assets/admin/plain/collection-settings.js:2169
+#: assets/admin/plain/collection-settings.js:2179
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2181
+#: assets/admin/plain/collection-settings.js:2185
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:222
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2206
+#: assets/admin/plain/collection-settings.js:2210
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2216
+#: assets/admin/plain/collection-settings.js:2220
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2220
+#: assets/admin/plain/collection-settings.js:2224
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2266
+#: assets/admin/plain/collection-settings.js:2270
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2293
+#: assets/admin/plain/collection-settings.js:2297
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2302
+#: assets/admin/plain/collection-settings.js:2306
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2412
+#: assets/admin/plain/collection-settings.js:2416
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2526
+#: assets/admin/plain/collection-settings.js:2530
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
@@ -8747,7 +8747,7 @@ msgid "Select all on this page"
 msgstr ""
 
 #: assets/admin/src/components/library/LibraryTabBase.jsx:289
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:274
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:279
 msgid "Slug"
 msgstr ""
 
@@ -9545,7 +9545,8 @@ msgid "The size used in the gallery grid. Changing these requires regenerating t
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:130
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:229
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:186
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:234
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:364
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:368
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:558
@@ -9582,78 +9583,78 @@ msgid "Lightbox image"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:183
-msgid "The full-size image shown in the Lightbox. Always proportional - never hard-cropped."
+msgid "The full-size image shown in the Lightbox. Always proportional - never hard-cropped. Changing these requires regenerating thumbnails for existing images."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:186
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:191
 msgid "Max width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:187
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:192
 msgid "A companion mobile size at half this width is generated automatically."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:199
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:204
 msgid "Mobile companion:"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:201
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:206
 msgid "generated automatically."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:208
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:213
 msgid "Max height"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:209
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:214
 msgid "Optional. Leave at 0 to keep images proportional."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:219
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:224
 msgid "0 = proportional (recommended)"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:225
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:230
 msgid "Layout-specific sizes"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:226
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:231
 msgid "Used by layouts where only one dimension is fixed - Masonry uses the width, Justified uses the height. The other dimension stays proportional, so these are never cropped. Changing these requires regenerating thumbnails for existing images."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:234
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:239
 msgid "Masonry thumbnail width"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:235
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:240
 msgid "Width in pixels for Masonry layouts. Height stays proportional to the original image."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:245
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:250
 msgid "Height is automatic."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:250
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:255
 msgid "Justified thumbnail height"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:251
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:256
 msgid "Height in pixels for Justified Rows layouts. Width stays proportional to the original image."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:261
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:266
 msgid "Width is automatic."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:268
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:273
 msgid "Gallery-custom sizes"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:269
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:274
 msgid "These sizes were created by individual gallery settings. They cannot be edited here."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:276
+#: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:281
 msgid "Crop"
 msgstr ""
 
