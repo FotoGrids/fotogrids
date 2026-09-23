@@ -610,9 +610,6 @@ final class Lightbox implements Feature {
 	 *   ../../assets/css/lightbox-styles.css → overlay styles (webpack: lightbox-styles entry)
 	 *   ../../assets/js/lightbox.js          → overlay JS    (webpack: lightbox entry)
 	 *
-	 * Both the JS and SCSS sources now live alongside this file in
-	 * public/render/lightbox/classic/ and are compiled by webpack from there.
-	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.
 	 * @return  Module_Assets
@@ -751,7 +748,7 @@ final class Lightbox implements Feature {
 			),
 		);
 
-		// Decode the token_select value (JSON string, PHP array, or legacy plain string).
+		// Decode the token_select value (JSON string, PHP array, or plain string).
 		$raw = $s[ $type_key ] ?? array();
 		if ( is_string( $raw ) ) {
 			$decoded = json_decode( $raw, true );

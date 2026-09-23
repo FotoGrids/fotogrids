@@ -76,10 +76,8 @@ final class Album_To_View_Page implements Decorator {
 	public function decorate_items( array $collection_items, Render_Context $render_context ): array {
 		$decorated = array();
 
-		// Visit-context: the album we're rendering IS the gallery's
-		// referring parent. Append fg_via=<album_id> to the link so the
-		// destination View Page can build a breadcrumb / back button that
-		// points back at *this* album, not the gallery's other albums (if any).
+		// The album being rendered is the gallery's referring parent: fg_via=<album_id>
+		// lets the View Page point its breadcrumb back at this album.
 		$via_album_id = $render_context->meta->album_id;
 
 		foreach ( $collection_items as $item_view ) {

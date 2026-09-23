@@ -198,7 +198,7 @@ final class Page_Buttons implements Feature {
 		// `--fg-pagination-distance` (margin above the bar).
 		$vars = $this->common_style_vars( $render_context );
 
-		// When truncation is off we render the full list - no sibling var needed.
+		// Truncation off: the full list renders, so no sibling var is needed.
 		if ( ! (bool) ( $render_context->settings['pages_truncate'] ?? true ) ) {
 			return $vars;
 		}
