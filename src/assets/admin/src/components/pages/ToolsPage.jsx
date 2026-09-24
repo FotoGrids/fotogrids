@@ -30,8 +30,8 @@ const ToolsPage = () => {
     const [error, setError] = useState(null);
 
     // Derive active tool from the URL param only - not from sessionStorage.
-    // The tool param is deep-link state: if it's not in the URL, we're on
-    // the grid view regardless of what was visited previously.
+    // The tool param is deep-link state: without it in the URL the grid view
+    // shows, whatever was visited before.
     const [activeTool, setActiveTool] = useState(() => {
         return new URLSearchParams( window.location.search ).get( 'tool' ) || null;
     });
@@ -85,7 +85,7 @@ const ToolsPage = () => {
     // Fix: on mount (and whenever activeTool changes), check immediately whether
     // the component is already registered. If it is, bump the revision counter
     // right away. Also keep the event listener for tools that load *after* mount
-    // (e.g. very large bundles or future lazy-loaded tools).
+    // (e.g. very large bundles).
     useEffect(() => {
         if (activeTool && ToolsComponents.get(activeTool)) {
             setComponentRevision(n => n + 1);

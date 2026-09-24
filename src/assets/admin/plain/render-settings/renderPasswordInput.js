@@ -60,11 +60,9 @@ const PasswordInputComponent = ({
 	const [revealState, setRevealState] = React.useState('idle');
 	const [revealedPassword, setRevealedPassword] = React.useState('');
 
-	// Track whether the user has actually typed in this field during the current
-	// session using a ref that is only set by handleChange, never by prop updates.
-	// This is more reliable than `value !== ''` because a stale encrypted blob
-	// could leak into `value` through the PHP→JS localization path if the
-	// server-side guard were ever bypassed - we never want to show that blob.
+	// Whether the user has typed in this field this session, set only by
+	// handleChange. More reliable than `value !== ''`, so an encrypted blob that
+	// reached `value` through localization is never shown.
 	const userHasTypedRef = React.useRef(false);
 
 	const settingState =
@@ -79,7 +77,7 @@ const PasswordInputComponent = ({
 
 	// The effective value shown in the input:
 	// - If the user has typed something this session: use `value` (from parent state).
-	// - If we fetched the saved password: use revealedPassword.
+	// - If the saved password was fetched: use revealedPassword.
 	// - Otherwise: empty (placeholder is shown instead).
 	const hasUserTyped = userHasTypedRef.current;
 	const displayValue = hasUserTyped
@@ -91,11 +89,9 @@ const PasswordInputComponent = ({
 	const isSavedAndUnchanged =
 		passwordIsSet && !hasUserTyped && revealState !== 'done';
 
-	// Placeholder depends on whether a password is already saved. When one is
-	// saved we show a FIXED-WIDTH dot mask rather than the real character count
-	// - revealing the true length would shrink an attacker's brute-force space,
-	// and this field is visible to every gallery editor (a wider audience than
-	// the permission-gated eye-reveal). The dot count is intentionally constant.
+	// Placeholder: a fixed-width dot mask when a password is saved, never the
+	// real length - this field is visible to every gallery editor, a wider
+	// audience than the permission-gated eye-reveal.
 	const SAVED_PASSWORD_MASK = '••••••••';
 	const placeholder = isSavedAndUnchanged
 		? SAVED_PASSWORD_MASK
@@ -112,7 +108,7 @@ const PasswordInputComponent = ({
 			return;
 		}
 
-		// If we already fetched the password, toggle visibility locally.
+		// If the password was already fetched, toggle visibility locally.
 		if (revealState === 'done') {
 			setShowPassword((prev) => !prev);
 			return;
@@ -152,8 +148,8 @@ const PasswordInputComponent = ({
 		}
 	};
 
-	// When the user types, mark that they've actively edited the field so we
-	// never fall back to the reveal-on-eye-click path for subsequent toggles.
+	// Typing marks the field as edited, so later toggles never fall back to the
+	// reveal-on-eye-click path.
 	const handleChange = (newValue) => {
 		if (!isDisabled) {
 			userHasTypedRef.current = true;
@@ -185,8 +181,8 @@ const PasswordInputComponent = ({
 		: __('Show password', 'fotogrids');
 
 	// Bind the shared FgTooltip to the eye button once it mounts. The button
-	// mounts after FgTooltip.init()'s first declarative pass, so we bind
-	// imperatively via a ref. FgTooltip.bind reads aria-label, which we keep
+	// mounts after FgTooltip.init()'s first declarative pass, so it is bound
+	// imperatively via a ref. FgTooltip.bind reads aria-label, which is kept
 	// current on every render; refresh() updates an already-visible tooltip
 	// after the label flips on toggle.
 	const toggleRef = React.useCallback(

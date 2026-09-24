@@ -26,7 +26,7 @@ const UpgradeModal = () => {
     const { benefits, strings, upgradeUrl, comparisonUrl } = readModalData();
 
     // Install the public window.FotoGridsUpgrade API exactly once per mount.
-    // openModal reads benefits live from the global so we don't capture a
+    // openModal reads benefits live from the global rather than capturing a
     // stale (possibly empty) closure value if the inline-script payload races
     // the React mount.
     useEffect(() => {
@@ -42,7 +42,7 @@ const UpgradeModal = () => {
 
             // forceUpdate ensures a fresh render that picks up
             // window.fotogridsUpgradeModal even if the inline script wrote it
-            // after our initial mount.
+            // after the initial mount.
             forceUpdate((n) => n + 1);
             setCurrentBenefit(benefitIndex);
             setIsOpen(true);

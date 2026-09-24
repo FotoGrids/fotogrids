@@ -390,7 +390,7 @@
 	// the only source for it in the browser. It arrives in two shapes:
 	// wp_localize_script casts every scalar to a string, so a page load gives
 	// '1' or '', while the editor's toggle writes the AJAX response back as a
-	// real boolean. Anything else means we cannot tell, and off is the safe
+	// real boolean. Anything else is ambiguous, and off is the safe
 	// answer - the user still gets the unsaved-changes badge.
 	function readAutosaveSetting() {
 		const raw = window.fotogridsAdmin?.autosave;

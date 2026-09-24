@@ -40,8 +40,8 @@ const PreviewTemplateModal = ({ template, onClose, onApply, applyLabel }) => {
 		}
 
 		// Accept messages from either the library subdomain or the main site:
-		// today library.fotogrids.com redirects to www, so the iframe's real
-		// origin is www; a future standalone library site is covered too.
+		// library.fotogrids.com redirects to www, so the iframe's real origin is
+		// www; a standalone library origin is accepted too.
 		// Override with window.fotogridsAdmin.libraryOrigins (array) if needed.
 		const allowedOrigins = window.fotogridsAdmin?.libraryOrigins || [
 			'https://library.fotogrids.com',

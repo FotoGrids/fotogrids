@@ -46,8 +46,8 @@ const PluginSettingsPage = () => {
 
     // URL builder for the wizard launcher tab - adds the setup-step param
     // to the current URL so the wizard opens *over* the Settings page,
-    // no navigation. We don't strip the existing tab / subtab params so
-    // closing the wizard returns the user to the tab they were on.
+    // no navigation. The existing tab / subtab params are kept, so closing the
+    // wizard returns the user to the tab they were on.
     const getSetupWizardUrl = () => {
         const url = new URL(window.location.href);
         const param = window.FotoGridsSetupQueryParam || 'fotogrids_setup_step';
@@ -66,7 +66,7 @@ const PluginSettingsPage = () => {
         return url.toString();
     };
 
-    // Resolve the active main tab from persisted state, normalising the legacy
+    // Resolve the active main tab from persisted state, normalising the
     // 'general' alias to 'responsiveness'.
     const resolveActiveTab = () => {
         if (!uiState) return 'media';
@@ -160,7 +160,7 @@ const PluginSettingsPage = () => {
         // wizard query param to the current URL so the wizard opens *on
         // top of* the Settings page, then dispatch a popstate so the
         // wizard component picks the change up without a full reload.
-        // Bail before we touch state or persist 'setup_wizard' as the
+        // Bail before touching state or persisting 'setup_wizard' as the
         // active tab.
         if (tabId === 'setup_wizard') {
             window.history.pushState({}, '', getSetupWizardUrl());

@@ -116,8 +116,8 @@ const ItemEditModal = ({
                 setOriginalVideoSettings({});
             }
 
-            // The Video tab only exists for video files; if we navigated away
-            // from a video while it was active, fall back to Details.
+            // The Video tab only exists for video files; when navigating away from a
+            // video while it was active, fall back to Details.
             if (activeTab === 'video' && itemData.item_type !== 'video_file') {
                 setActiveTab('details');
             }

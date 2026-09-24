@@ -12,7 +12,7 @@ const TELEMETRY_LEARN_MORE_URL = 'https://freemius.com/privacy/usage-tracking/';
 const PRIVACY_POLICY_URL = fgGoUrl('privacy', 'setup-wizard', 'privacy');
 
 // Permission categories shown in the "Learn more" modal. The same four
-// buckets Freemius's own opt-in screen surfaces, in our voice.
+// buckets Freemius's own opt-in screen surfaces, in the FotoGrids voice.
 const TELEMETRY_PERMISSIONS = [
 	{
 		id: 'profile',
@@ -88,7 +88,7 @@ const StepWelcome = ({ onStart, onSkip }) => {
 
 	const handleTelemetryToggle = (next) => {
 		// Optimistic flip - the request is fire-and-forget. If the save
-		// is refused we log a warning but don't roll the UI back; the
+		// is refused a warning is logged but the UI is not rolled back; the
 		// user's last interaction is the source of truth.
 		setOptedIn(next);
 		persistSetting('fotogrids_share_statistics', next);

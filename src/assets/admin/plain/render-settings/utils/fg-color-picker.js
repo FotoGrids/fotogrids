@@ -9,7 +9,7 @@
  *  - Hue slider
  *  - Alpha slider with checkerboard background
  *  - Text input with HEX / RGBA / HSLA format switcher
- *  - Button slot row (empty for now, populated by future features)
+ *  - Button slot row (currently empty)
  *  - Emits onChange(cssColorString) on every valid change
  *
  * Color model: internally works in HSV + alpha (0–1).
