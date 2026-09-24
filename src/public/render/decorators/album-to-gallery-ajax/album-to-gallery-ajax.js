@@ -40,16 +40,9 @@
      * Triggers that already have a click listener attached. WeakSet so we
      * don't pin detached DOM in memory.
      *
-     * A WeakSet is used here instead of a `data-` attribute. When
-     * restoreAlbum() replays the original innerHTML, the browser parses a
-     * brand-new tree of <a> elements - the old triggers (with their
-     * listeners) are gone. The
-     * `data-fg-album-ajax-bound` attribute survived the round-trip in the
-     * serialised HTML, so on a second click the trigger LOOKED bound, but
-     * actually had no listener - falling through to native nav.
-     *
-     * WeakSet identity is per live Element, so freshly parsed nodes never
-     * appear to be "already bound" and bindTrigger() always wires them up.
+     * A WeakSet rather than a data- attribute: restoreAlbum() re-parses the
+     * original HTML, so an attribute would survive onto new triggers that have
+     * no listener.
      *
      * @type {WeakSet<Element>}
      */
@@ -81,20 +74,13 @@
 
     /**
      * Inject <script> tags for any JS handles the render pipeline declared
-     * that aren't already in the document. Necessary because the host
-     * album page only enqueues the modules its OWN render needed - but a
-     * swapped-in gallery may need extra modules (lightbox.js, direct-link,
-     * external-link, sharing, lazy-load, stats, loading-icon, filter-ui,
-     * deep-linking, pagination layouts, etc.) that weren't enqueued
-     * upstream. Late-loaded modules self-scan the DOM on init so they
-     * still wire the swapped-in gallery even though they start after the
-     * MutationObserver fired.
+     * that aren't already in the document. The album page only enqueued the
+     * modules its own render needed; a swapped-in gallery can need more.
+     * Late-loaded modules scan the DOM on init, so they still wire it.
      *
      * @param {Record<string, {src: string, in_footer: boolean}>} jsData
-     *     handle → {src, in_footer} map. The in_footer flag is informative
-     *     only - script tags are appended async to <head> either way; the
-     *     browser fetches them in parallel and executes them in load order
-     *     (good enough for our modules since their init is idempotent).
+     *     handle → {src, in_footer} map. in_footer is ignored; scripts are
+     *     appended to <head> and execute in order.
      */
     function injectMissingScripts( jsData ) {
         if ( ! jsData || typeof jsData !== 'object' ) return;
@@ -121,12 +107,9 @@
     /**
      * Inject the combined Google Fonts stylesheet for the swapped-in gallery.
      *
-     * The render pipeline normally enqueues this via wp_footer, but this AJAX
-     * render happens in a separate REST request whose footer never reaches the
-     * already-loaded album page - so a gallery whose captions use a custom
-     * Google Font would render unstyled after the swap. The render response
-     * carries the combined fonts URL; we add the <link> once, keyed by the
-     * standard id so we never duplicate a sheet the page already has.
+     * The pipeline enqueues it via wp_footer, which never reaches the album page
+     * after an AJAX render, so the combined fonts URL from the response is added
+     * once, keyed by the standard id.
      *
      * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
      */
@@ -144,8 +127,7 @@
     }
 
     /**
-     * Inject the render's per-render inline CSS (the pipeline no longer embeds
-     * it in the markup). Scoped by the gallery instance id inside the CSS.
+     * Inject the render's per-render inline CSS, scoped by the gallery instance id.
      *
      * @param {string} css  Bare CSS (no <style> tags), or ''.
      */
@@ -321,7 +303,7 @@
     }
 
     /**
-     * Restore an album wrapper to its pre-swap state, if we have a snapshot.
+     * Restore an album wrapper to its pre-swap state, if a snapshot exists.
      * Used by Collection_Header's Back button when the visitor reached the
      * current gallery via an AJAX swap (rather than a full page load).
      *
@@ -342,12 +324,9 @@
 
         albumEl.innerHTML = original;
 
-        // The runtime's MutationObserver fires on .fotogrids-collection
-        // *insertions*, but here the album wrapper itself wasn't replaced -
-        // only its descendants. The runtime never re-runs onAlbum for
-        // this wrapper, so the restored trigger <a>s never get a listener
-        // through the normal path. Re-bind them explicitly so the user can
-        // drill into the same (or another) child gallery again.
+        // The runtime fires onAlbum only for inserted wrappers. This wrapper stays
+        // in place and only its children change, so the restored triggers are
+        // re-bound here.
         attach( albumEl );
 
         document.dispatchEvent( new CustomEvent( 'fotogrids:album_restored', {

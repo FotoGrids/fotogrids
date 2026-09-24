@@ -12,7 +12,7 @@
 	&__label {
 		position: absolute;
 		top: calc(-#{ui-size(font-size, md)} / 2);
-		left: ui-size(spacing, xl);
+		inset-inline-start: ui-size(spacing, xl);
 		background-color: ui-color(background, primary);
 		padding: 0 ui-size(padding, sm);
 		font-size: ui-size(font-size, sm);
@@ -75,7 +75,7 @@
 
 		&__label {
 			font-size: ui-size(font-size, xs);
-			left: ui-size(spacing, sm);
+			inset-inline-start: ui-size(spacing, sm);
 			padding: 0 ui-size(padding, xs);
 		}
 	}

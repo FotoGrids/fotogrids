@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Lightbox\Classic;
 
 use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
@@ -99,6 +100,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-thumbnail-location    = "none" | "bottom" | "top" | "left" | "right"
  *   data-fg-lb-thumbnail-size        = "small" | "normal" | "large"
  *   data-fg-lb-overlay-blur          = "2"                    (px integer; 0 = none)
+ *   data-fg-lb-mobile-max            = "767"                  (px; the mobile image loads at or below this viewport width)
  *   data-fg-lb-preload-slides        = "2"                    (integer; slides to preload ahead and behind; absent = 2)
  *   data-fg-lb-info-panel            = "off"                  (present = info panel disabled; absent = enabled)
  *   data-fg-lb-info-default          = "closed"               (present = panel starts collapsed; absent = open)
@@ -199,11 +201,8 @@ final class Lightbox implements Feature {
 	}
 
 	public function supports( Render_Context $render_context ): bool {
-		// Lightbox shows full-size attachment media for the items inside a
-		// collection. Album items are themselves galleries (their click goes
-		// to a view-page or AJAX-swaps to the child gallery), so there is
-		// no "open this item in a lightbox" semantic. Opt out cleanly to
-		// avoid polluting album wrappers with data-fg-click + data-fg-lb-*.
+		// Album items are galleries with their own click behaviour, so albums get
+		// no lightbox attributes.
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
 			return false;
 		}
@@ -232,13 +231,9 @@ final class Lightbox implements Feature {
 		$attrs['data-fg-lb-theme'] = $theme;
 
 		// ── Colour palette ────────────────────────────────────────────────────
-		// The dark/light/custom palette is resolved by the shared
-		// Lightbox_Colors helper (also used by LightboxGrid). attrs() returns
-		// the always-on data-fg-lb-* colour map; the conditional colours
-		// (info-block bg/divider, image shadow) are emitted below because they
-		// depend on non-colour settings. $palette gives the resolved fallback
-		// values those conditional emissions need. JS uses these to build the
-		// full CSS variable block - no theme classes in SCSS.
+		// Resolved by the shared Lightbox_Colors helper (also used by LightboxGrid).
+		// attrs() is the always-on colour map; colours that depend on non-colour
+		// settings are emitted below from $palette.
 		$attrs   = array_merge( $attrs, \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::attrs( $s ) );
 		$palette = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::palette( $s );
 
@@ -571,6 +566,8 @@ final class Lightbox implements Feature {
 			}
 		}
 
+		$attrs['data-fg-lb-mobile-max'] = (string) Breakpoint_Config::from_settings()->mobile_max_width;
+
 		return $attrs;
 	}
 
@@ -605,9 +602,6 @@ final class Lightbox implements Feature {
 	 *
 	 *   ../../assets/css/lightbox-styles.css → overlay styles (webpack: lightbox-styles entry)
 	 *   ../../assets/js/lightbox.js          → overlay JS    (webpack: lightbox entry)
-	 *
-	 * Both the JS and SCSS sources now live alongside this file in
-	 * public/render/lightbox/classic/ and are compiled by webpack from there.
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.
@@ -747,7 +741,7 @@ final class Lightbox implements Feature {
 			),
 		);
 
-		// Decode the token_select value (JSON string, PHP array, or legacy plain string).
+		// Decode the token_select value (JSON string, PHP array, or plain string).
 		$raw = $s[ $type_key ] ?? array();
 		if ( is_string( $raw ) ) {
 			$decoded = json_decode( $raw, true );

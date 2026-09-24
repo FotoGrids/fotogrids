@@ -109,7 +109,7 @@ final class Filters_Render {
 	 * Album_To_Gallery_Ajax). Lets host environments (page-builder
 	 * sub-modules, themes) inject or remove attributes - e.g. to suppress
 	 * a host builder's global lightbox that would otherwise hijack clicks
-	 * on our anchors - without the renderer needing to know which host is
+	 * on FotoGrids anchors - without the renderer needing to know which host is
 	 * mounting it. Dispatched through {@see \FotoGrids\Render\Internal\Hooks::apply_filter}
 	 * so flat/typed/scoped variants are available; call sites pass the
 	 * {@see ANCHOR_ATTRS_SUFFIX} bare suffix.

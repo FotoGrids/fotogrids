@@ -234,7 +234,7 @@ class Admin_Header {
 
 				function isInsideUpgradeModal(element) {
 					// Always skip the FotoGrids modal system. Modal portals
-					// mount these directly under <body>, not inside the legacy
+					// mount these directly under <body>, not inside the
 					// #fotogrids-upgrade-modal container, so the contains()
 					// check below would otherwise remove them as "promotional".
 					if (element.classList && (

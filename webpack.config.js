@@ -942,6 +942,9 @@ const diviNativeConfig = {
     ],
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+        alias: {
+            '@': path.resolve(__dirname, 'src/assets'),
+        },
     },
     output: {
         filename: '[name].js',

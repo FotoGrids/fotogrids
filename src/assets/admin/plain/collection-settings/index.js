@@ -10,8 +10,8 @@ window.FotoGridsSettings = window.FotoGridsSettings || {};
  * their catalog files through the `fotogrids/catalog/json_files` filter, and
  * the assembler merges them.
  *
- * The legacy approach (fetching each Free JSON file from the browser) couldn't
- * see Pro or third-party files because they live in different plugin directories.
+ * Fetching Free's JSON files from the browser would miss Pro and third-party
+ * files, which live in other plugin directories.
  *
  * @param {string} postType
  * @param {boolean} isDefaultsMode
@@ -77,7 +77,7 @@ const loadSettingsGroups = async (
 
 /**
  * Remove tabs / subtabs / settings marked as `hidden: true` by a `hide`
- * placement. We can't remove them server-side because hidden settings still
+ * placement. They cannot be removed server-side because hidden settings still
  * need their saved values respected at render time - the assembler just tags
  * them, and the UI layer drops them here.
  */

@@ -89,42 +89,42 @@ const TabSEO = ({ formData, itemData, setActiveTab, disabled = false, strings = 
 
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-seo-checkup">
-                <div className="fotogrids-seo-checkup__header">
-                    <h4 className="fotogrids-seo-checkup__title">{strings.seoCheckupTitle}</h4>
-                    <div className="fotogrids-seo-checkup__score">
-                        <span className={`fotogrids-seo-band fotogrids-seo-band--${band}`}>
+            <div className="fotogrids-item-edit-seo-checkup">
+                <div className="fotogrids-item-edit-seo-checkup__header">
+                    <h4 className="fotogrids-item-edit-seo-checkup__title">{strings.seoCheckupTitle}</h4>
+                    <div className="fotogrids-item-edit-seo-checkup__score">
+                        <span className={`fotogrids-item-edit-seo-band fotogrids-item-edit-seo-band--${band}`}>
                             {strings[BAND_KEYS[band]]}
                         </span>
-                        <span className="fotogrids-seo-checkup__count">{summary}</span>
+                        <span className="fotogrids-item-edit-seo-checkup__count">{summary}</span>
                     </div>
                 </div>
 
-                <ul className="fotogrids-seo-checkup__list">
+                <ul className="fotogrids-item-edit-seo-checkup__list">
                     {checks.map((item) => (
                         <li
                             key={item.id}
-                            className={`fotogrids-seo-check fotogrids-seo-check--${item.status}`}
+                            className={`fotogrids-item-edit-seo-check fotogrids-item-edit-seo-check--${item.status}`}
                         >
                             <Icon
                                 name={STATUS_ICONS[item.status] || 'info_circle'}
-                                className="fotogrids-seo-check__icon"
+                                className="fotogrids-item-edit-seo-check__icon"
                             />
-                            <div className="fotogrids-seo-check__body">
-                                <span className="fotogrids-seo-check__label">
+                            <div className="fotogrids-item-edit-seo-check__body">
+                                <span className="fotogrids-item-edit-seo-check__label">
                                     {strings[CHECK_LABEL_KEYS[item.id]]}
                                 </span>
-                                <span className="fotogrids-seo-check__message">
+                                <span className="fotogrids-item-edit-seo-check__message">
                                     {strings[messageKey(item.code)]}
                                 </span>
                             </div>
                             {item.detail && (
-                                <span className="fotogrids-seo-check__detail">{item.detail}</span>
+                                <span className="fotogrids-item-edit-seo-check__detail">{item.detail}</span>
                             )}
                             {item.tab && CHECK_PASS !== item.status && (
                                 <button
                                     type="button"
-                                    className="fotogrids-seo-check__fix"
+                                    className="fotogrids-item-edit-seo-check__fix"
                                     onClick={() => handleFix(item)}
                                 >
                                     {strings.seoCheckFix}
@@ -135,23 +135,23 @@ const TabSEO = ({ formData, itemData, setActiveTab, disabled = false, strings = 
                 </ul>
             </div>
 
-            <div className="fotogrids-seo-emits">
-                <h4 className="fotogrids-seo-emits__title">{strings.seoEmitsTitle}</h4>
-                <p className="fotogrids-seo-emits__description">{strings.seoEmitsDescription}</p>
+            <div className="fotogrids-item-edit-seo-emits">
+                <h4 className="fotogrids-item-edit-seo-emits__title">{strings.seoEmitsTitle}</h4>
+                <p className="fotogrids-item-edit-seo-emits__description">{strings.seoEmitsDescription}</p>
 
-                <div className="fotogrids-seo-emits__row">
-                    <code className="fotogrids-seo-emits__code">
+                <div className="fotogrids-item-edit-seo-emits__row">
+                    <code className="fotogrids-item-edit-seo-emits__code">
                         {`<img alt="${emittedAlt.value}">`}
                     </code>
-                    <span className="fotogrids-seo-emits__source">
+                    <span className="fotogrids-item-edit-seo-emits__source">
                         {strings[ALT_SOURCE_KEYS[emittedAlt.source]]}
                     </span>
                 </div>
 
                 {itemData?.filename && (
-                    <div className="fotogrids-seo-emits__row">
-                        <code className="fotogrids-seo-emits__code">{itemData.filename}</code>
-                        <span className="fotogrids-seo-emits__source">
+                    <div className="fotogrids-item-edit-seo-emits__row">
+                        <code className="fotogrids-item-edit-seo-emits__code">{itemData.filename}</code>
+                        <span className="fotogrids-item-edit-seo-emits__source">
                             {strings.seoEmitsFilenameSource}
                         </span>
                     </div>

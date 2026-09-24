@@ -36,7 +36,7 @@ class Widget_Gallery extends Widget_Base {
 	/**
 	 * Tell Elementor this widget's HTML is dynamic - do NOT cache it into
 	 * the template-content store and serve the cached copy on later page
-	 * loads. Our render is the entry point that populates Asset_Resolver
+	 * loads. render() is the entry point that populates Asset_Resolver
 	 * with the per-render CSS/JS handles, so it must run on every request
 	 * the widget appears on. Without this, the first save bakes the HTML
 	 * into the page cache and subsequent frontend hits ship stale HTML
@@ -48,8 +48,8 @@ class Widget_Gallery extends Widget_Base {
 
 	/**
 	 * Required companion to `$_has_template_content = false`. Elementor's
-	 * cache layer calls this when building the cached representation; we
-	 * return nothing so nothing gets cached. The real markup is produced
+	 * cache layer calls this when building the cached representation; it
+	 * returns nothing so nothing gets cached. The real markup is produced
 	 * by `render()` on each request.
 	 *
 	 * @since 1.0.0

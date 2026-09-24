@@ -67,7 +67,7 @@ interface Tool_Interface {
 	public function get_image_bg_color(): ?string;
 
 	/**
-	 * Logical grouping for future sidebar section headers.
+	 * Logical grouping for sidebar section headers.
 	 * Use 'maintenance', 'data', 'general', or a custom slug.
 	 *
 	 * @return string

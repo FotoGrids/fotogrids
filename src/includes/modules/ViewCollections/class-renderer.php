@@ -123,8 +123,7 @@ class Renderer {
 		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 
 		// Noindex chain (lowest to highest precedence):
-		//   1. legacy view settings (`noindex` / `index`) for backwards-
-		//      compatible behaviour with collections that pre-date the SEO tab
+		//   1. view settings `noindex` / `index`
 		//   2. the SEO tab's per-collection `fotogrids_noindex` toggle (true
 		//      forces noindex; false alone does NOT override a draft preview)
 		//   3. draft preview always wins - never index unsaved work
@@ -473,8 +472,8 @@ class Renderer {
 	/**
 	 * Cap a description string at a safe length for OG/social previews.
 	 *
-	 * Most platforms truncate around 200 characters in card previews. We
-	 * cap at 300 to give a generous buffer while keeping the tag small.
+	 * Most platforms truncate around 200 characters in card previews; the cap
+	 * of 300 leaves a buffer while keeping the tag small.
 	 *
 	 * @since 1.0.0
 	 * @param string $text
@@ -800,8 +799,8 @@ class Renderer {
 	 *
 	 * When sharing is enabled for the collection and the view_page
 	 * placement applies, the full resolved network set is used. Otherwise
-	 * we fall back to a copy-link-only config so every shareable page
-	 * still offers at least the copy button.
+	 * the config falls back to copy-link only, so every shareable page still
+	 * offers at least the copy button.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -888,7 +887,7 @@ class Renderer {
 		);
 
 		// Deep-linking is essential on the view page - the URL might
-		// carry ?fg-item={id} which we resolve into a lightbox open.
+		// carry ?fg-item={id}, which opens that item in the lightbox.
 		wp_enqueue_script(
 			'fotogrids-deep-linking',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
@@ -897,12 +896,9 @@ class Renderer {
 			true
 		);
 
-		// Sharing module - needed unconditionally because the View Page
-		// footer always shows at least a copy-link button via the
-		// Sharing module's attachFooterBars() (see share_html()). The
-		// Sharing_Decorator's render-pipeline assets() only enqueues
-		// this when sharing is enabled for the gallery being rendered;
-		// here we need it regardless of the gallery's sharing setting.
+		// Sharing module - always needed, because the View Page footer shows at
+		// least a copy-link button via attachFooterBars() (see share_html()),
+		// whatever the gallery's own sharing setting.
 		wp_enqueue_style(
 			'fotogrids-sharing',
 			FOTOGRIDS_PLUGIN_URL . 'public/render/decorators/sharing/sharing.css',

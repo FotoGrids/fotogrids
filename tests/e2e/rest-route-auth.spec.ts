@@ -11,11 +11,10 @@ import {
  * the render pipeline apply the same access rules as a rendered gallery, and
  * that the template preview requires an editor.
  *
- * Fixtures are created with WP-CLI: `npx wp-env run cli wp` by default, or the
- * command in WP_CLI when running against another site.
+ * Fixtures are created with WP-CLI, through the command in WP_CLI.
  */
 
-const BASE_URL = process.env.WP_BASE_URL ?? 'http://localhost:8888';
+const BASE_URL = process.env.WP_BASE_URL ?? 'http://127.0.0.1:8899';
 const ADMIN_USER = process.env.WP_ADMIN_USER ?? 'admin';
 const ADMIN_PASS = process.env.WP_ADMIN_PASS ?? 'password';
 const SUBSCRIBER_USER = 'fg-rest-subscriber';
@@ -88,25 +87,25 @@ echo 'FGFIXTURES' . wp_json_encode( array(
 /**
  * How to invoke wp-cli.
  *
- * WP_CLI, when set, is a single executable: the shim tests/harness/boot.sh
- * writes, which has the php, the install path and the working directory already
- * pinned. It is exec'd as one path rather than split on spaces, because the
- * path can contain them - LocalWP keeps its sites under `~/Local Sites/`.
+ * WP_CLI is a single executable: the shim tests/harness/boot.sh writes, which
+ * has the php, the install path and the working directory already pinned. It
+ * is exec'd as one path rather than split on spaces, because the path can
+ * contain them - LocalWP keeps its sites under `~/Local Sites/`.
  */
-function wpCli(): { cmd: string; args: string[] } {
-	if (process.env.WP_CLI) {
-		return { cmd: process.env.WP_CLI, args: [] };
+function wpCli(): string {
+	const cmd = process.env.WP_CLI;
+	if (!cmd) {
+		throw new Error(
+			'WP_CLI is not set. Boot a site with tests/harness/boot.sh and source tests/harness/.env first.'
+		);
 	}
-	return { cmd: 'npx', args: ['wp-env', 'run', 'cli', 'wp'] };
+	return cmd;
 }
 
 function createFixtures(): Fixtures {
-	const { cmd, args } = wpCli();
-	const output = execFileSync(
-		cmd,
-		[...args, 'eval', FIXTURE_PHP],
-		{ encoding: 'utf8' }
-	);
+	const output = execFileSync(wpCli(), ['eval', FIXTURE_PHP], {
+		encoding: 'utf8',
+	});
 	const match = output.match(/FGFIXTURES(\{.*\})/);
 	if (!match) {
 		throw new Error(`Fixture script printed no fixtures:\n${output}`);

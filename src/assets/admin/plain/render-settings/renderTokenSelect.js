@@ -21,7 +21,7 @@ const TokenSelectComponent = ({
 		useState,
 	} = wp.element;
 
-	// The setting stores JSON: ["caption","exif",...] or legacy comma-string;
+	// The setting stores JSON: ["caption","exif",...] or a comma-string;
 	// normalise to a plain JS array internally.
 	const parseValue = (raw) => {
 		if (Array.isArray(raw)) {
@@ -53,7 +53,7 @@ const TokenSelectComponent = ({
 
 	// Options - filter isGlobalDefault in defaults mode (same as button_group),
 	// then drop any option whose per-option `condition` evaluates false against
-	// the current settings. Per-option conditions let us hide dropdown choices
+	// the current settings. Per-option conditions hide dropdown choices
 	// that only make sense when another setting is on (e.g. an "Embedded"
 	// placement that requires AJAX navigation to be on).
 	const baseOptions = isDefaultsMode
@@ -153,7 +153,7 @@ const TokenSelectComponent = ({
 			Math.max(sidePadding, triggerRect.left),
 			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
-		// For top placement we anchor at the trigger's top edge and use
+		// For top placement the dropdown anchors at the trigger's top edge and uses
 		// transform: translateY(-100%) in the dropdown style so the gap
 		// above the trigger is exactly `desiredMargin` regardless of the
 		// dropdown's actual rendered height. Matches Select.jsx.
@@ -309,7 +309,7 @@ const TokenSelectComponent = ({
 	};
 
 	const handleDragLeave = (e) => {
-		// Only clear if we're truly leaving the tokens container.
+		// Only clear when truly leaving the tokens container.
 		if (!e.currentTarget.contains(e.relatedTarget)) {
 			setDragOverIndex(null);
 			dragInsertSlot.current = null;

@@ -45,9 +45,8 @@
  * `fotogrids:gallery_inserted`, letting every previously-loaded module wire
  * itself onto the new instance.
  *
- * Single source of truth for: the admin metabox gallery preview, the
- * Gutenberg block live preview, and future Elementor / Divi / Bricks
- * widgets.
+ * Single source of truth for the admin metabox gallery preview and the
+ * page-builder live previews.
  */
 
 // ---------------------------------------------------------------------------
@@ -260,11 +259,8 @@ export const ensureScriptsSequenced = async (
 
 /**
  * Inserts the rendered preview HTML into the container and re-runs any
- * inline <script> tags it contains. innerHTML does not execute scripts on
- * its own, so we replace each script element with a fresh clone - that path
- * does execute. The per-gallery loading-icon kickoff
- * (Loading_Icon::html_after) is the main consumer; without this step the
- * spinner never animates and the gallery appears stuck on loading.
+ * inline <script> tags it contains. innerHTML does not execute scripts, so
+ * each script element is replaced with a fresh clone, which does.
  *
  * @param {HTMLElement} container
  * @param {string} html

@@ -198,21 +198,13 @@ final class Page_Buttons implements Feature {
 		// `--fg-pagination-distance` (margin above the bar).
 		$vars = $this->common_style_vars( $render_context );
 
-		// When truncation is off we render the full list - no sibling var needed.
+		// Truncation off: the full list renders, so no sibling var is needed.
 		if ( ! (bool) ( $render_context->settings['pages_truncate'] ?? true ) ) {
 			return $vars;
 		}
 
-		// Sibling count is hardcoded - the user only chooses truncate on/off.
-		// Two on desktop/tablet matches the long-form Bootstrap/Material/GitHub
-		// pattern; one on mobile keeps the bar to ~5 chips + 2 ellipses at the
-		// worst case (current in the middle). Boundaries (first + last) are
-		// always 1 each, so the totals are:
-		//   - desktop/tablet: 1 + 1 + (2*2 + 1) + 1 + 1 = 9 slots worst case
-		//   - mobile:         1 + 1 + (2*1 + 1) + 1 + 1 = 7 slots worst case
-		//
-		// The Responsive_Var flows the mobile value through whatever
-		// mobile_breakpoint the user has configured - see Breakpoint_Config.
+		// Sibling count is fixed (2 on desktop/tablet, 1 on mobile); the user only
+		// toggles truncation. The mobile value follows the configured mobile_breakpoint.
 		$vars['--fg-pagination-siblings'] = new Responsive_Var(
 			'2',
 			'2',

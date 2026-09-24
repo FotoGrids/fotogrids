@@ -12,8 +12,8 @@
  *   • Build the POST body.
  *   • Fire-and-forget the request (no spinner - by design).
  *   • If the server reports a value mismatch or an error, log a
- *     warning. We don't surface it as a toast: the steps are advisory
- *     defaults, not destructive operations.
+ *     warning, not a toast: the steps are advisory defaults, not
+ *     destructive operations.
  *
  * @param {string} setting  Allowlisted option name (e.g. `fotogrids_user_persona`).
  * @param {string|boolean} value

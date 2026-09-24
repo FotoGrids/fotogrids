@@ -42,7 +42,7 @@
 		content: "";
 		position: absolute;
 		top: 0;
-		left: -100%;
+		inset-inline-start: -100%;
 		width: 100%;
 		height: 100%;
 		background-color: var(--next-bg-color, transparent);
@@ -52,7 +52,7 @@
 	}
 
 	&.transitioning:not(.slide-from-right)::before {
-		left: 0;
+		inset-inline-start: 0;
 		opacity: 1;
 	}
 
@@ -60,7 +60,7 @@
 		content: "";
 		position: absolute;
 		top: 0;
-		right: -100%;
+		inset-inline-end: -100%;
 		width: 100%;
 		height: 100%;
 		background-color: var(--next-bg-color, transparent);
@@ -70,7 +70,7 @@
 	}
 
 	&.transitioning.slide-from-right::after {
-		right: 0;
+		inset-inline-end: 0;
 		opacity: 1;
 	}
 

@@ -10,11 +10,11 @@
  *
  * All the heavy lifting (CSS handle dedup, JS sequencing, inline payload
  * execution, MutationObserver pickup) lives in the shared
- * `preview-asset-wiring.js` utility under the PageBuilders module - that
- * util is the single source of truth used by this metabox, the Gutenberg
- * block live preview, and any future Elementor / Divi / Bricks widgets.
+ * `utils/preview-asset-wiring.js` module - the single source of truth used
+ * by this metabox, the page-builder live previews and the native Divi 5
+ * modules.
  *
- * This component is now a thin React shell that:
+ * This component is a thin React shell that:
  *
  *   1. Resolves the REST URL + nonce from the localized globals.
  *   2. Fetches the preview payload for the current gallery id.

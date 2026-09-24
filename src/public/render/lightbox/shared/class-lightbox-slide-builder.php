@@ -22,10 +22,6 @@ if ( ! defined( 'WPINC' ) ) {
  *   - POST /fotogrids/v1/gallery/lightbox/slides (batch hydration on
  *     navigate-into-uncached-range).
  *
- * Future Pro hooks may add more fields (people, location, GPS) by
- * extending the returned array via a filter - but Free defines the
- * canonical contract here.
- *
  * @package FotoGrids\Render\Lightbox\Shared
  * @since   1.0.0
  */
@@ -145,6 +141,15 @@ final class Lightbox_Slide_Builder {
 				$slide['full_url']       = $poster;
 			}
 
+			if ( ! isset( $slide['item_type'] ) ) {
+				$full_src = wp_get_attachment_image_src( $aid, $full_resolved );
+				$mobile   = is_array( $full_src )
+					? Image_Size_Manager::mobile_companion( $aid, (int) ( $full_src[1] ?? 0 ) )
+					: null;
+
+				$slide['full_mobile_url'] = null !== $mobile ? $mobile['url'] : '';
+			}
+
 			if ( $include_exif ) {
 				$slide['exif'] = self::load_exif( $aid, $settings );
 			}
@@ -205,12 +210,6 @@ final class Lightbox_Slide_Builder {
 		return array( $thumb_slug, $full_slug );
 	}
 
-	/**
-	 * Batch-load external_url + link_target from fotogrids_item_meta.
-	 *
-	 * @param array<int, int> $ids
-	 * @return array<int, array{external_url: string, link_target: string}>
-	 */
 	/**
 	 * Build a lightbox slide dict for an embed post.
 	 *
@@ -285,6 +284,12 @@ final class Lightbox_Slide_Builder {
 		return is_array( $decoded ) ? $decoded : array();
 	}
 
+	/**
+	 * Batch-load external_url + link_target from fotogrids_item_meta.
+	 *
+	 * @param array<int, int> $ids
+	 * @return array<int, array{external_url: string, link_target: string}>
+	 */
 	private static function batch_load_link_meta( array $ids ): array {
 		if ( empty( $ids ) ) {
 			return array();

@@ -14,7 +14,7 @@
  *
  *   window.FotoGridsAdmin.permissions.registerPanelOverride('simple', C)
  *     Replace Panel 1 (Capability Settings) with a custom component, with
- *     the same props as above. Reserved for future Pro UX iterations.
+ *     the same props as above.
  *
  *   window.FotoGridsAdmin.permissions.getRegistry()
  *     Return the last-fetched registry payload, or null if Panel hasn't

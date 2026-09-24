@@ -478,8 +478,8 @@ function CollectionSettings() {
 
 	// Bind fg-tooltip to any [data-fg-tooltip] element rendered by this
 	// component (docs strip "Defaults" link, etc). fg-tooltip auto-inits on
-	// DOMContentLoaded but the React tree mounts later, so we re-run init
-	// after render. init() skips already-bound nodes so it's safe to spam.
+	// DOMContentLoaded but the React tree mounts later, so init re-runs after
+	// render. init() skips already-bound nodes, so repeat calls are safe.
 	useEffect(() => {
 		if (window.FgTooltip?.init) {
 			window.FgTooltip.init();
@@ -950,7 +950,7 @@ function CollectionSettings() {
 	};
 
 	// Normalise a token_select value to a plain array. The setting stores a
-	// JSON array (["caption",...]) or a legacy comma-separated string; mirrors
+	// JSON array (["caption",...]) or a comma-separated string; mirrors
 	// renderTokenSelect's parseValue so condition operators agree with the UI.
 	const parseTokenArray = (raw) => {
 		if (Array.isArray(raw)) {
@@ -983,7 +983,7 @@ function CollectionSettings() {
 	 *     snake_case predicate used by Pro and the new placement schema. When
 	 *     `depends_on_value` is omitted, the parent value is checked for
 	 *     truthiness. When given, equality is required.
-	 *  3. `setting.condition.dependsOn` + `values` - legacy camelCase predicate
+	 *  3. `setting.condition.dependsOn` + `values` - camelCase predicate
 	 *     used by Free's existing JSON files. `values` is either a single value
 	 *     or an array of accepted values; `dependsOn` may be a single key or an
 	 *     array of keys (all must match).
@@ -1003,7 +1003,7 @@ function CollectionSettings() {
 		// store (sharing, seo or watermark) rather than sibling fields. Same
 		// shape as condition (dependsOn + values); dependsOn may be a dotted
 		// key (e.g. "networks.facebook"). The optional `source` field selects
-		// which global store to read - defaults to 'sharing' for back-compat.
+		// which global store to read and defaults to 'sharing'.
 		// Absent condition_global always passes.
 		if (setting.condition_global) {
 			const GLOBAL_SOURCES = {
@@ -1080,10 +1080,10 @@ function CollectionSettings() {
 			return Boolean(parentValue);
 		}
 
-		// condition.dependsOn / values (legacy camelCase predicate)
+		// condition.dependsOn / values (camelCase predicate)
 		if (!setting.condition) return true;
 
-		// any / all composite predicates. Allow nesting so we can express OR/AND
+		// any / all composite predicates, nestable to express OR/AND
 		// trees on top of the leaf dependsOn predicate. Each child is itself a
 		// condition node (any | all | dependsOn+values).
 		const evaluateCondition = (condition) => {
@@ -1175,7 +1175,7 @@ function CollectionSettings() {
 			return false;
 		}
 
-		// array_includes: the stored token-select value (JSON array or legacy
+		// array_includes: the stored token-select value (JSON array or
 		// comma-separated string) contains at least one of the listed values.
 		// Used by token_select fields where multiple options can be active.
 		if (conditionOperator === 'array_includes') {
@@ -1186,7 +1186,7 @@ function CollectionSettings() {
 		}
 
 		// array_empty: the stored value is a token-select array (stored as a
-		// JSON array or a legacy comma-separated string); passes when it has no
+		// JSON array or a comma-separated string); passes when it has no
 		// elements. Used to surface a notice when a token_select is cleared.
 		if (conditionOperator === 'array_empty') {
 			return parseTokenArray(dependentValue).length === 0;
@@ -1278,7 +1278,7 @@ function CollectionSettings() {
 	 *
 	 *  - `group.hidden` (set by a `hide` placement) wins immediately.
 	 *  - `group.visible_when` (from a placement) is evaluated against settings.
-	 *  - Legacy `group.condition.dependsOn` + `values` is still honored.
+	 *  - `group.condition.dependsOn` + `values` is honoured too.
 	 */
 	const shouldDisplayTab = (group) => {
 		if (group?.hidden) return false;
@@ -1291,7 +1291,7 @@ function CollectionSettings() {
 		// settings predicate matches. Used by the SEO tab to disappear when
 		// the site owner has chosen to defer to a third-party SEO plugin.
 		// Same shape as the setting-level predicate (source, dependsOn,
-		// values). source defaults to 'sharing' for back-compat.
+		// values); source defaults to 'sharing'.
 		if (group?.condition_global) {
 			const source =
 				group.condition_global.source === 'seo'
@@ -2226,18 +2226,10 @@ function CollectionSettings() {
 														'fotogrids'
 													);
 
-										// The key embeds the active state so React
-										// remounts the <button> when the mode flips.
-										// FgTooltip's `bind()` captures both the label
-										// text and the direction in a closure at bind
-										// time, and there's no public `unbind()`.
-										// Without a remount the previously-bound (now-
-										// active) button keeps showing its old tooltip
-										// - even after we strip the data-attributes,
-										// because the listeners and the captured
-										// closure still reference the original copy.
-										// Forcing a remount drops the old listeners
-										// along with the DOM node.
+										// The key embeds the active state so React remounts the <button>
+										// when the mode flips: FgTooltip.bind() captures the label and
+										// direction at bind time and has no unbind(), so only a remount
+										// drops the old listeners.
 										const attrs = {
 											key: `${m}-${isActive ? 'active' : 'inactive'}`,
 											type: 'button',

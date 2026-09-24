@@ -197,14 +197,14 @@ final class Image_Filters implements Decorator {
 	 * Accepts either:
 	 *  - an already-decoded PHP array (from settings that went through json_decode)
 	 *  - a JSON-encoded string (e.g. '["grayscale","blur"]')
-	 *  - a legacy plain string (e.g. 'grayscale') for backwards compatibility
+	 *  - a plain string (e.g. 'grayscale')
 	 *
 	 * @param  mixed $raw
 	 * @return array<int, string>  Validated, ordered list of CSS filter names.
 	 */
 	private function decode_filter_types( $raw ): array {
 		if ( is_string( $raw ) ) {
-			// Try JSON first; fall back to treating it as a single legacy value.
+			// Try JSON first; otherwise treat it as a single value.
 			$decoded = json_decode( $raw, true );
 			$raw     = is_array( $decoded ) ? $decoded : array( $raw );
 		}

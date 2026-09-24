@@ -85,19 +85,12 @@ final class Preview_Endpoint {
 
 		$render_result = Render_Controller::factory()->render( $render_context );
 
-		// The render pipeline calls wp_register_script / wp_enqueue_script for
-		// every module's JS via Asset_Resolver::flush(). Modules that need a
-		// page-scope global (currently only loading-icon) attach it via
-		// wp_add_inline_script() inside an add_action('wp_footer',...) callback,
-		// because on a normal page wp_footer paints those globals before the
-		// footer scripts run. In a REST context wp_footer never fires, so we
-		// fire a dedicated FotoGrids-only action that those modules also hook,
-		// then snapshot any inline 'before' / 'after' payloads off each
-		// enqueued JS handle. The client appends them around the matching
-		// script tag so the preview gets the same runtime as a real embed.
-		// Using a custom action instead of do_action('wp_footer') keeps third-
-		// party footer callbacks (analytics, social pixels, etc.) out of the
-		// REST response cycle.
+		// Modules that need a page-scope global (loading-icon) attach it with
+		// wp_add_inline_script() from a wp_footer callback. wp_footer never fires
+		// in REST, so a FotoGrids-only action those modules also hook is fired
+		// instead (keeping third-party footer callbacks out of the response), and
+		// the inline 'before' / 'after' payloads of each enqueued handle are
+		// returned for the client to place around the matching script tag.
 		do_action( Actions_Render::LATE_ASSETS, $render_context );
 
 		$css_assets = Asset_Resolver::instance()->get_css_asset_urls();
@@ -224,7 +217,7 @@ final class Preview_Endpoint {
 				return;
 			}
 			if ( isset( $visiting[ $handle ] ) ) {
-				// Dependency cycle - treat as already visited so we don't loop forever.
+				// Dependency cycle - treat as already visited to avoid looping.
 				return;
 			}
 			$visiting[ $handle ] = true;

@@ -378,8 +378,8 @@ final class Metabox_Registrar {
 
 		// Source of truth for the cover image is WP's native post thumbnail.
 		// The runtime resolver (`Cover_Resolver::for_gallery()`) falls back to
-		// the first valid item when nothing is explicitly set, so we don't
-		// seed `_thumbnail_id` here - the UI shows a "no item is explicitly
+		// the first valid item when nothing is explicitly set, so `_thumbnail_id`
+		// is not seeded here - the UI shows a "no item is explicitly
 		// featured" state until the user clicks a star.
 		$featured_item_id = (int) get_post_thumbnail_id( $post->ID );
 
@@ -425,8 +425,7 @@ final class Metabox_Registrar {
 	 *
 	 * Handles both image and Media Library video attachments. Videos resolve
 	 * their grid thumbnail through the poster chain instead of an image URL, so
-	 * they survive a reload (previously they were dropped when
-	 * wp_get_attachment_image_url returned false for a video).
+	 * they survive a reload.
 	 *
 	 * @since 1.1.0
 	 * @param int $item_id          The attachment ID.
