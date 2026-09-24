@@ -7,7 +7,7 @@
  *   • the cross-module renderShareBar(config, context) function used by the
  *     lightbox to draw its own toolbar share bar
  *   • the network icons + labels
- *   • all share-bar styles (now in sharing.css, not injected from JS)
+ *   • all share-bar styles (sharing.css)
  *
  * Activation:
  *   • Per-gallery thumbnail bars: subscribes to FotoGrids.onGallery(); for
@@ -18,7 +18,7 @@
  *
  * Cross-module API:
  *   window.FotoGrids.modules.sharing.renderShareBar(config, context)
- *   window.FotoGridsSharing.renderShareBar(config, context)    // legacy
+ *   window.FotoGridsSharing.renderShareBar(config, context)    // global alias
  *
  * No imports - standalone vanilla JS compiled by webpack.
  */
@@ -61,23 +61,8 @@
         linkedin:  '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.8 0 0 .78 0 1.74v20.52C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.74V1.74C24 .78 23.2 0 22.22 0Z"/></svg>',
         whatsapp:  '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M.06 24l1.68-6.13A11.82 11.82 0 0 1 .16 11.9C.16 5.34 5.5 0 12.06 0a11.8 11.8 0 0 1 8.4 3.49 11.8 11.8 0 0 1 3.48 8.41c0 6.56-5.34 11.9-11.9 11.9a11.9 11.9 0 0 1-5.68-1.45L.06 24Zm6.6-3.8c1.67.99 3.27 1.58 5.4 1.58 5.45 0 9.9-4.43 9.9-9.88a9.85 9.85 0 0 0-9.9-9.9C6.6 2 2.16 6.43 2.16 11.9c0 2.24.65 3.92 1.75 5.68l-1 3.63 3.74-.98ZM17.6 14.6c-.07-.12-.27-.2-.56-.34-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.39-1.47a8.96 8.96 0 0 1-1.65-2.06c-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.69.25-1.28.18-1.4Z"/></svg>',
         telegram:  '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M23.91 3.79 20.3 20.84c-.25 1.21-.98 1.5-1.99.93l-5.5-4.05-2.66 2.56c-.3.3-.55.55-1.12.55l.4-5.65 10.32-9.32c.45-.4-.1-.62-.7-.22L6.1 13.4l-5.45-1.7c-1.18-.37-1.2-1.18.25-1.74L22.5 1.95c.97-.36 1.83.22 1.4 1.84Z"/></svg>',
-        // Reddit: official "alien" shape only, no brand-red background
-        // circle. The source path uses Reddit's original coordinate
-        // system (viewBox -269 361 72 72) where the alien is the inner
-        // content of the red circle and only fills ~55% of the canvas.
-        // To present it as a 0 0 72 72 icon that fills the space like
-        // every other network icon, we wrap the original path in a <g>
-        // that translates from the source coordinates into the new
-        // viewBox and uniformly scales the alien up so it occupies the
-        // padded interior of the 72x72 canvas.
-        //
-        //   Alien bbox in source coords: ~ (-253, 376) → (-213, 424)
-        //     → ~40 wide × 48 tall, centred around (-233, 400).
-        //   Target: fill a 60x60 interior of the 72x72 viewBox (6u pad)
-        //     centred around (36, 36).
-        //   Scale = 60 / 48 = 1.25 (taller axis dominates).
-        //   Translate (after scale) = (36 - 1.25 × -233, 36 - 1.25 × 400)
-        //                            = (327.25, -464).
+        // Reddit's alien uses its original coordinates (viewBox -269 361 72 72);
+        // the <g> transform scales it 1.25x and centres it in a 0 0 72 72 box.
         reddit:    '<svg viewBox="0 0 72 72" width="100%" height="100%" fill="currentColor" aria-hidden="true"><g transform="translate(327.25 -464) scale(1.25)"><path d="m-224.8 404.5c-2.1 0-3.7-1.7-3.7-3.7 0-2.1 1.7-3.8 3.7-3.8s3.7 1.7 3.7 3.8c.1 2-1.6 3.7-3.7 3.7m.7 6.2c-2.6 2.6-7.5 2.8-8.9 2.8s-6.3-.2-8.9-2.8c-.4-.4-.4-1 0-1.4s1-.4 1.4 0c1.6 1.6 5.1 2.2 7.5 2.2 2.5 0 5.9-.6 7.5-2.2.4-.4 1-.4 1.4 0s.4 1 0 1.4m-20.9-9.9c0-2.1 1.7-3.8 3.8-3.8s3.7 1.7 3.7 3.8-1.7 3.7-3.7 3.7c-2.1 0-3.8-1.7-3.8-3.7m36-3.8c0-2.9-2.4-5.3-5.3-5.3-1.4 0-2.7.6-3.6 1.5-3.6-2.6-8.5-4.3-14-4.5l2.4-11.3 7.8 1.7c.1 2 1.7 3.6 3.7 3.6 2.1 0 3.7-1.7 3.7-3.7 0-2.1-1.7-3.7-3.7-3.7-1.5 0-2.7.9-3.3 2.1l-8.7-1.9c-.2-.1-.5 0-.7.1s-.4.3-.4.6l-2.6 12.3v.2c-5.6.1-10.6 1.8-14.3 4.4-.9-.9-2.2-1.5-3.6-1.5-2.9 0-5.3 2.4-5.3 5.3 0 2.1 1.3 4 3.1 4.8-.1.5-.1 1.1-.1 1.6 0 8.1 9.4 14.6 21 14.6s21-6.5 21-14.6c0-.5 0-1.1-.1-1.6 1.7-.7 3-2.6 3-4.7"/></g></svg>',
         email:     '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7L10.1649 12.7154C10.8261 13.1783 11.1567 13.4097 11.5163 13.4993C11.8339 13.5785 12.1661 13.5785 12.4837 13.4993C12.8433 13.4097 13.1739 13.1783 13.8351 12.7154L22 7M6.8 20H17.2C18.8802 20 19.7202 20 20.362 19.673C20.9265 19.3854 21.3854 18.9265 21.673 18.362C22 17.7202 22 16.8802 22 15.2V8.8C22 7.11984 22 6.27976 21.673 5.63803C21.3854 5.07354 20.9265 4.6146 20.362 4.32698C19.7202 4 18.8802 4 17.2 4H6.8C5.11984 4 4.27976 4 3.63803 4.32698C3.07354 4.6146 2.6146 5.07354 2.32698 5.63803C2 6.27976 2 7.11984 2 8.8V15.2C2 16.8802 2 17.7202 2.32698 18.362C2.6146 18.9265 3.07354 19.3854 3.63803 19.673C4.27976 20 5.11984 20 6.8 20Z"/></svg>',
         copy_link: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.99999 13C10.4294 13.5741 10.9773 14.0491 11.6065 14.3929C12.2357 14.7367 12.9315 14.9411 13.6466 14.9923C14.3618 15.0435 15.0796 14.9403 15.7513 14.6897C16.4231 14.4392 17.0331 14.047 17.54 13.54L20.54 10.54C21.4508 9.59695 21.9547 8.33394 21.9434 7.02296C21.932 5.71198 21.4061 4.45791 20.4791 3.53087C19.552 2.60383 18.298 2.07799 16.987 2.0666C15.676 2.0552 14.413 2.55918 13.47 3.46997L11.75 5.17997M14 11C13.5705 10.4258 13.0226 9.95078 12.3934 9.60703C11.7642 9.26327 11.0685 9.05885 10.3533 9.00763C9.63819 8.95641 8.9204 9.0596 8.24864 9.31018C7.57688 9.56077 6.96687 9.9529 6.45999 10.46L3.45999 13.46C2.5492 14.403 2.04522 15.666 2.05662 16.977C2.06801 18.288 2.59385 19.542 3.52089 20.4691C4.44793 21.3961 5.702 21.9219 7.01298 21.9333C8.32396 21.9447 9.58697 21.4408 10.53 20.53L12.24 18.82"/></svg>',
@@ -151,7 +136,6 @@
         const target = settings.embedded_share_target || 'image';
         if ( target === 'image' && deepLink && itemId ) {
             const galleryEl = img.closest ? img.closest( '.fotogrids-collection.fotogrids-gallery' ) : null;
-            // Pipeline writes data-fg-gallery-id on the wrapper.
             let galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
             if ( galleryId ) {
                 return base + '#fg-' + galleryId + '-' + itemId;
@@ -164,16 +148,8 @@
      * Copy a string to the clipboard. Returns a Promise that resolves to
      * true on success, false on failure.
      *
-     * Tries the modern Clipboard API first - it's the only path that
-     * works in cross-origin iframes and is the future-proof option. But
-     * the modern API requires a secure context (HTTPS or localhost); on
-     * a plain HTTP dev environment `navigator.clipboard` is undefined.
-     * So we fall back to the legacy execCommand('copy') route, which
-     * works on plain HTTP back to IE.
-     *
-     * The legacy path needs a real textarea in the DOM and a Selection.
-     * We stash it off-screen, select its contents, run the copy, and
-     * remove it.
+     * Uses the Clipboard API where available (secure contexts only) and falls
+     * back to execCommand('copy') on a temporary textarea for plain HTTP.
      *
      * @param {string} text
      * @returns {Promise<boolean>}
@@ -209,9 +185,8 @@
      * @returns {boolean}
      */
     function legacyCopy( text ) {
-        // Pick the right parent. If a modal <dialog> is open we mount
-        // inside it (focus trap won't block the .select()). Otherwise
-        // fall back to <body>.
+        // Mounted inside an open modal <dialog> so its focus trap does not block
+        // .select(); otherwise on <body>.
         let openDialog = null;
         document.querySelectorAll( 'dialog[open]' ).forEach( function ( dlg ) {
             if ( ! openDialog ) openDialog = dlg;
@@ -226,16 +201,12 @@
         ta.style.top      = '0';
         ta.style.left     = '0';
         ta.style.opacity  = '0';
-        // pointer-events:none would prevent .focus() from selecting on
-        // some browsers; we hide via opacity only. The textarea is at
-        // top:0 left:0 which is fine for a 1-frame appearance.
+        // Hidden via opacity only: pointer-events:none stops .focus() from selecting
+        // in some browsers.
         parent.appendChild( ta );
 
-        // Preserve focus and selection so we can restore them after the copy.
-        // execCommand('copy') reads from window.getSelection(), so we focus
-        // the textarea, select its contents, copy, then restore. The focus
-        // restoration is critical - without it the share button's blur
-        // handler fires and hides its tooltip just after the click.
+        // execCommand('copy') reads the selection, so focus and selection are restored
+        // afterwards; otherwise the share button's blur handler hides its tooltip.
         const previouslyFocused = document.activeElement;
         const previousSelection = document.getSelection
             && document.getSelection().rangeCount > 0
@@ -377,10 +348,6 @@
         proxy.dataset.fgFullSrc = context.fullUrl || '';
         proxy.alt          = context.caption || '';
         if ( context.galleryEl ) {
-            // proxy.dataset.galleryId is what resolveShareUrl reads (via
-            // the proxy's own `closest()` override and indirectly through
-            // img.dataset.galleryId fallback paths). The pipeline writes
-            // data-fg-gallery-id on the wrapper, hence dataset.fgGalleryId.
             proxy.dataset.galleryId = context.galleryId
                 || ( context.galleryEl.dataset ? context.galleryEl.dataset.fgGalleryId : '' );
         }
@@ -439,11 +406,8 @@
                 const result = shareItem( proxy, networkKeyFor( network ) );
 
                 if ( network === 'copy_link' ) {
-                    // Tooltip feedback depends on whether the copy
-                    // actually landed in the clipboard. We default to
-                    // the failure message and flip to success on
-                    // resolution - that way a stuck/unresolved Promise
-                    // doesn't lie to the user.
+                    // Starts from the failure message and switches on success, so an unresolved
+                    // copy never reports success.
                     const successLabel = __( 'Link copied' );
                     const failureLabel = __( 'Copy failed' );
                     const baseLabel    = __( 'Copy link' );
@@ -470,9 +434,7 @@
                         } else if ( kind === 'failure' ) {
                             btn.classList.add( 'fotogrids-share-bar__btn--copy-failed' );
                         }
-                        // Note: don't call .bind() again - each bind()
-                        // adds a fresh set of event listeners on the
-                        // same host, leaking handlers across clicks.
+                        // bind() is not called again: each call adds another set of listeners.
                     };
 
                     Promise.resolve( result ).then( function ( ok ) {
@@ -513,7 +475,6 @@
             return;
         }
 
-        // Pipeline writes data-fg-gallery-id on the wrapper.
         let galleryId = galleryEl.dataset.fgGalleryId || '';
 
         galleryEl.querySelectorAll( '.fg-item' ).forEach( function ( figure ) {
@@ -585,8 +546,7 @@
         if ( window.FotoGrids && window.FotoGrids.modules ) {
             window.FotoGrids.modules.sharing = publicApi;
         }
-        // Legacy global preserved so the lightbox (which still reads
-        // window.FotoGridsSharing.renderShareBar) keeps working.
+        // Global alias read by the lightbox.
         window.FotoGridsSharing = publicApi;
 
         if ( window.FotoGrids && typeof window.FotoGrids.onGallery === 'function' ) {

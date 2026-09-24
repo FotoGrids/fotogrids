@@ -749,17 +749,12 @@
     color:      var(--fg-filter-count-active-color);
 }
 
-// Hidden items.
-//
-// Class-based hide (not style.display) so CSS transitions work and the layout
-// engine can be notified. Transitions use opacity + scale for a smooth effect.
-// pointer-events:none prevents hover/click while the item is fading out.
+// Hidden items are removed from flow.
 .fotogrids-collection.fotogrids-gallery .fg-item.fg-is-filtered-out {
     display:         none; // remove from flow; keeps layout clean without JS reflow
 }
 
-// If a layout wants animated filter transitions it can override display:none
-// with opacity/pointer-events instead. Opt-in per layout via a BEM modifier.
+// Layouts opt in to animated filter transitions with .fg-layout-animated-filter.
 .fotogrids-collection.fotogrids-gallery.fg-layout-animated-filter .fg-item.fg-is-filtered-out {
     display:         block;
     opacity:         0;
