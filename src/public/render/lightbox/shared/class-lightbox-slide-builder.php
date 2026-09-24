@@ -22,10 +22,6 @@ if ( ! defined( 'WPINC' ) ) {
  *   - POST /fotogrids/v1/gallery/lightbox/slides (batch hydration on
  *     navigate-into-uncached-range).
  *
- * Future Pro hooks may add more fields (people, location, GPS) by
- * extending the returned array via a filter - but Free defines the
- * canonical contract here.
- *
  * @package FotoGrids\Render\Lightbox\Shared
  * @since   1.0.0
  */
@@ -215,12 +211,6 @@ final class Lightbox_Slide_Builder {
 	}
 
 	/**
-	 * Batch-load external_url + link_target from fotogrids_item_meta.
-	 *
-	 * @param array<int, int> $ids
-	 * @return array<int, array{external_url: string, link_target: string}>
-	 */
-	/**
 	 * Build a lightbox slide dict for an embed post.
 	 *
 	 * @since 1.1.0
@@ -294,6 +284,12 @@ final class Lightbox_Slide_Builder {
 		return is_array( $decoded ) ? $decoded : array();
 	}
 
+	/**
+	 * Batch-load external_url + link_target from fotogrids_item_meta.
+	 *
+	 * @param array<int, int> $ids
+	 * @return array<int, array{external_url: string, link_target: string}>
+	 */
 	private static function batch_load_link_meta( array $ids ): array {
 		if ( empty( $ids ) ) {
 			return array();

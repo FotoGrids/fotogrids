@@ -12,9 +12,8 @@
  *     onGallery() callback against it - no manual gallery init here.
  *   • on failure: shows the inline error and clears the input.
  *
- * Also binds dynamically inserted forms via FotoGrids.onGallery()'s
- * MutationObserver path (we hook the same observer indirectly through
- * a delegated submit listener on document).
+ * Lock forms inserted later are handled by a delegated submit listener on
+ * document.
  *
  * No imports - standalone vanilla JS compiled by webpack.
  */
@@ -27,9 +26,8 @@
      * render pipeline collected during the unlock request but that are
      * not already present in the document.
      *
-     * The server returns a { handle: url } map. We use the handle as
-     * the <link> element's id attribute so duplicate injections are
-     * skipped cheaply.
+     * The server returns a { handle: url } map; each handle becomes its
+     * <link> id, so duplicates are skipped cheaply.
      *
      * @param {Record<string, string>} cssUrls  handle → absolute URL map
      */
@@ -80,12 +78,9 @@
     /**
      * Inject the combined Google Fonts stylesheet for the unlocked gallery.
      *
-     * On a normal page load the render pipeline enqueues this via wp_footer,
-     * but the unlock render happens in a separate REST request whose footer
-     * never reaches this already-loaded page - so a gallery whose captions use
-     * a custom Google Font would render unstyled. The unlock response carries
-     * the combined fonts URL; we add the <link> once, keyed by a fixed id so
-     * repeat unlocks on the same page don't duplicate it.
+     * The unlock render runs in a separate REST request whose wp_footer never
+     * reaches this page, so the combined fonts URL from the response is added
+     * once, keyed by a fixed id so repeat unlocks do not duplicate it.
      *
      * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
      */
@@ -106,7 +101,7 @@
     }
 
     /**
-     * Inject the render's per-render inline CSS (no longer embedded in markup).
+     * Inject the render's per-render inline CSS.
      *
      * @param {string} css  Bare CSS (no <style> tags), or ''.
      */
@@ -149,7 +144,7 @@
      *
      * The form submits via fetch() and swaps the DOM in place - it never
      * navigates - so browsers won't fire their native "save password?"
-     * prompt on their own. The Credential Management API lets us nudge it
+     * prompt on their own; the Credential Management API prompts explicitly
      * explicitly after a successful unlock. The credential is keyed on the
      * per-gallery username (the hidden .fg-lock-user field) so the browser
      * scopes the saved password to THIS gallery rather than the whole site.
@@ -205,8 +200,7 @@
 
         const galleryId = parseInt( form.dataset.galleryId || '0', 10 );
         const unlockUrl = form.dataset.unlockUrl || '';
-        // The lock form carries its own nonce in data-nonce - we don't
-        // rely on a global settings object here.
+        // The lock form carries its own nonce in data-nonce.
         const nonce    = form.dataset.nonce || '';
         const password = input ? input.value : '';
 
@@ -316,16 +310,13 @@
     function init() {
         bindAll();
 
-        // Catch lock forms inserted after the initial pass - we don't
-        // run our own MutationObserver (per the runtime contract); a
-        // delegated submit listener achieves the same with no observer.
+        // Lock forms inserted later are caught by a delegated submit listener rather
+        // than a MutationObserver.
         document.addEventListener( 'submit', function ( e ) {
             const form = e.target;
             if ( ! form || ! form.classList || ! form.classList.contains( 'fg-lock-form' ) ) return;
             if ( form.dataset.fotogridsLockBound === '1' ) return;
-            // Bind on the fly, then re-dispatch the submit event so the
-            // newly-bound handler picks it up. Simpler than handling the
-            // submit inline twice.
+            // Bind, then re-dispatch the submit so the new handler receives it.
             bindLockForm( form );
             e.preventDefault();
             unlockGallery( form );

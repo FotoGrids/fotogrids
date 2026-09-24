@@ -98,10 +98,8 @@
      * Handle a fotogrids:share event by sending a share ping. The event
      * fires from the Sharing module when the user clicks a share button.
      *
-     * We pick the first stats-enabled gallery on the page for the
-     * REST URL/nonce. The share's object_id is the item, not the
-     * gallery - but the nonce belongs to the request, not the gallery,
-     * so any gallery's nonce works.
+     * The REST URL and nonce come from the first stats-enabled gallery on the
+     * page; the nonce belongs to the request, so any gallery's works.
      *
      * @param {CustomEvent} e
      */
@@ -109,8 +107,7 @@
         const detail = e && e.detail;
         if ( ! detail || ! detail.itemId || ! detail.network ) return;
 
-        // Find any gallery on the page that has stats enabled so we can
-        // reuse its restUrl + nonce.
+        // Any stats-enabled gallery supplies the restUrl and nonce.
         const anyGallery = document.querySelector( '.fotogrids-collection.fotogrids-gallery[data-fg-stats]' );
         if ( ! anyGallery ) return;
         const cfg = readConfig( anyGallery );

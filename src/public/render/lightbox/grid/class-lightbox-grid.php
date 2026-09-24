@@ -215,11 +215,8 @@ final class Lightbox_Grid implements Feature {
 			$attrs[ $attr ] = $value;
 		}
 
-		// Share config (only when sharing is enabled for the gallery). The
-		// Sharing decorator already stamps data-fg-sharing on the wrapper
-		// when sharing is on; the grid JS reads that same attribute, so we
-		// don't duplicate it here - we only need to know whether to show the
-		// toolbar share button, which the JS derives from data-fg-sharing.
+		// Sharing: the grid JS reads data-fg-sharing, which the Sharing decorator
+		// already stamps when sharing is on.
 
 		return $attrs;
 	}
