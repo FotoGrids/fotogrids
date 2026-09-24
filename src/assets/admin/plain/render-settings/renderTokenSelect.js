@@ -21,25 +21,18 @@ const TokenSelectComponent = ({
 		useState,
 	} = wp.element;
 
-	// The setting stores JSON: ["caption","exif",...] or a comma-string;
-	// normalise to a plain JS array internally.
+	// The setting is an array or its JSON encoding: ["caption","exif",...].
 	const parseValue = (raw) => {
 		if (Array.isArray(raw)) {
 			return raw;
 		}
-		if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+		if (typeof raw === 'string') {
 			try {
 				const parsed = JSON.parse(raw);
 				return Array.isArray(parsed) ? parsed : [];
 			} catch (e) {
 				return [];
 			}
-		}
-		if (typeof raw === 'string' && raw.trim().length > 0) {
-			return raw
-				.split(',')
-				.map((s) => s.trim())
-				.filter(Boolean);
 		}
 		return [];
 	};
