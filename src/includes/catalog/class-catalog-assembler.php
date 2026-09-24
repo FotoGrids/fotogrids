@@ -69,8 +69,7 @@ if ( ! defined( 'WPINC' ) ) {
  *     nearest valid parent. A dev-mode warning is logged.
  *
  *  5. Files without any `placement` block default to `placement.mode = insert_tab`
- *     with `at_end` position. This is the legacy behavior - every Free catalog
- *     file is one top-level tab.
+ *     with `at_end` position, so each Free catalog file is one top-level tab.
  *
  * Group-level conditional visibility:
  *
@@ -206,7 +205,7 @@ final class Catalog_Assembler {
 	 * Apply one Catalog file's placement to the working tree.
 	 *
 	 * Dispatches on `placement.mode`. Files without an explicit placement
-	 * default to `insert_tab` with `at_end` position - the legacy behavior.
+	 * default to `insert_tab` with `at_end` position.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $catalog_file Decoded Catalog file contents.
@@ -564,8 +563,8 @@ final class Catalog_Assembler {
 	 * Apply a `hide` placement.
 	 *
 	 * Marks a tab, subtab, or setting as hidden by setting `hidden = true` on
-	 * the node. The JS renderer skips hidden nodes. We don't remove the node so
-	 * that saved values continue to render correctly.
+	 * the node. The JS renderer skips hidden nodes; the node is kept so saved
+	 * values continue to render correctly.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, mixed> $placement Placement descriptor.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Per-item legacy `wp_ajax_*` endpoints for the gallery item-edit modal.
+ * Per-item `wp_ajax_*` endpoints for the gallery item-edit modal.
  *
  * @package FotoGrids\Metaboxes
  * @since   1.0.0

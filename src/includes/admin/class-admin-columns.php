@@ -99,15 +99,6 @@ class Admin_Columns {
 	}
 
 	/**
-	 * Whitelist gallery columns to prevent other plugins from adding theirs
-	 *
-	 * Runs at priority 9999 so it executes after all other column filters.
-	 *
-	 * @since 1.0.0
-	 * @param array $columns Columns passed by previous filters
-	 * @return array Only allowed columns
-	 */
-	/**
 	 * Render shortcode column: input-looking div (selectable) + copy button with icon.
 	 * Icon is injected by JS from window.FotoGridsIcons; copy handled by shortcode-column-init.js.
 	 *
@@ -126,6 +117,15 @@ class Admin_Columns {
 		<?php
 	}
 
+	/**
+	 * Whitelist gallery columns to prevent other plugins from adding theirs
+	 *
+	 * Runs at priority 9999 so it executes after all other column filters.
+	 *
+	 * @since 1.0.0
+	 * @param array $columns Columns passed by previous filters
+	 * @return array Only allowed columns
+	 */
 	public static function gallery_columns_whitelist( $columns ) {
 		$allowed = array( 'cb', 'title', 'fotogrids_shortcode', 'fotogrids_album', 'fotogrids_layout', 'fotogrids_items', 'fotogrids_stats', 'date' );
 		return array_intersect_key( $columns, array_flip( $allowed ) );

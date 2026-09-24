@@ -343,7 +343,7 @@ final class Plugin_Settings_Store {
 	 * Snapshot of Freemius's current tracking state, used for debug
 	 * logging around `apply_share_statistics_consent` and
 	 * `resolve_share_statistics_state` so log lines pin down whether a
-	 * desync is on our side or Freemius's side.
+	 * desync is in FotoGrids or on the Freemius side.
 	 *
 	 * @return array<string,mixed>
 	 */
