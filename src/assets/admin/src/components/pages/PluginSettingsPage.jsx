@@ -66,12 +66,9 @@ const PluginSettingsPage = () => {
         return url.toString();
     };
 
-    // Resolve the active main tab from persisted state, normalising the
-    // 'general' alias to 'responsiveness'.
     const resolveActiveTab = () => {
         if (!uiState) return 'media';
-        const raw = uiState.getValue({ key: 'main-tab', fallback: 'media', urlParam: 'tab', allowed: TAB_IDS });
-        return raw === 'general' ? 'responsiveness' : raw;
+        return uiState.getValue({ key: 'main-tab', fallback: 'media', urlParam: 'tab', allowed: TAB_IDS });
     };
 
     // The subtab only applies to the Defaults tab. For any other tab it is
