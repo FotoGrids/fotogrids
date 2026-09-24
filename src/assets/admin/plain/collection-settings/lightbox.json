@@ -1320,7 +1320,7 @@
                                 },
                                 {
                                     "key": "lightbox_zoom_trigger",
-                                    "type": "token_select",
+                                    "type": "button_group",
                                     "label": "Zoom Trigger",
                                     "description": "How visitors activate zoom. Scroll and pinch always work regardless of this setting.",
                                     "default": "double_click",
