@@ -658,9 +658,8 @@ final class Context_Builder {
 	 * @return  Render_Behavior
 	 */
 	private function build_behavior( array $render_settings ): Render_Behavior {
-		// Admin saves as 'item_click_behavior'; 'click_behavior' is also read.
-		$click_behavior = is_string( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] ?? null )
-			? ( $render_settings['item_click_behavior'] ?? $render_settings['click_behavior'] )
+		$click_behavior = is_string( $render_settings['item_click_behavior'] ?? null )
+			? $render_settings['item_click_behavior']
 			: 'lightbox';
 
 		return new Render_Behavior(
