@@ -138,7 +138,7 @@ final class Context_Builder {
             // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 
-		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
+		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings, $gallery_id );
 
 		// Build a context shell (no items yet) so Module_Registry::active_modules()
 		// can call supports() on each registered sorter. The sorter receives this
@@ -316,7 +316,7 @@ final class Context_Builder {
 		$render_settings            = array_replace_recursive( $base_settings, $settings_overlay );
 		$render_settings            = self::coerce_layout_settings( $render_settings );
 		$warnings                   = array();
-		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
+		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings, $gallery_id );
 		$thumb_size                 = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
 		$collection_items           = $this->load_items( $collection_item_ids, $thumb_size, $full_size );
 		if ( ! empty( $item_overrides ) ) {
@@ -411,7 +411,7 @@ final class Context_Builder {
 			Collection_Kind::ALBUM,
 		);
 
-		[ $thumb_size ] = $this->resolve_size_settings( $render_settings );
+		[ $thumb_size ] = $this->resolve_size_settings( $render_settings, $album_id );
 		$thumb_size     = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
 
 		// Load gallery-summary items directly via Album_Item_Loader, bypassing
@@ -1051,9 +1051,10 @@ final class Context_Builder {
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, mixed> $render_settings
+	 * @param  int                  $collection_id   Gallery or album post ID the custom sizes are recorded against.
 	 * @return array{string, string}
 	 */
-	private function resolve_size_settings( array $render_settings ): array {
+	private function resolve_size_settings( array $render_settings, int $collection_id ): array {
 		$raw_thumb = is_string( $render_settings['thumbnail_size'] ?? null )
 			? $render_settings['thumbnail_size']
 			: Image_Size_Manager::SLUG_THUMBNAIL;
@@ -1071,7 +1072,7 @@ final class Context_Builder {
 			$alignment  = is_string( $render_settings['thumbnail_custom_size_crop_alignment'] ?? null )
 				? $render_settings['thumbnail_custom_size_crop_alignment']
 				: 'center';
-			$thumb_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
+			$thumb_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment, $collection_id );
 		}
 
 		// If custom full size, register it similarly
@@ -1083,7 +1084,7 @@ final class Context_Builder {
 			$alignment = is_string( $render_settings['full_image_custom_size_crop_alignment'] ?? null )
 				? $render_settings['full_image_custom_size_crop_alignment']
 				: 'center';
-			$full_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
+			$full_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment, $collection_id );
 		}
 
 		return array( $thumb_slug, $full_slug );

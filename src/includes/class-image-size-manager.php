@@ -62,6 +62,23 @@ final class Image_Size_Manager {
 	 */
 	public static function init(): void {
 		add_action( 'init', array( __CLASS__, 'add_image_sizes' ), 1 );
+		add_action( 'before_delete_post', array( __CLASS__, 'on_before_delete_post' ), 10, 2 );
+	}
+
+	/**
+	 * Drop a deleted gallery's or album's association from the custom size registry.
+	 *
+	 * @since 1.1.3
+	 * @param int      $post_id Post ID being deleted.
+	 * @param \WP_Post $post    Post object being deleted.
+	 * @return void
+	 */
+	public static function on_before_delete_post( int $post_id, \WP_Post $post ): void {
+		if ( 'fotogrids_gallery' !== $post->post_type && 'fotogrids_album' !== $post->post_type ) {
+			return;
+		}
+
+		self::remove_gallery_from_custom_sizes( $post_id );
 	}
 
 	/**
