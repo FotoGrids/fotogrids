@@ -741,11 +741,9 @@ final class Lightbox implements Feature {
 			),
 		);
 
-		// Decode the token_select value (JSON string, PHP array, or plain string).
 		$raw = $s[ $type_key ] ?? array();
 		if ( is_string( $raw ) ) {
-			$decoded = json_decode( $raw, true );
-			$raw     = is_array( $decoded ) ? $decoded : array( $raw );
+			$raw = json_decode( $raw, true );
 		}
 		if ( ! is_array( $raw ) ) {
 			return '';
