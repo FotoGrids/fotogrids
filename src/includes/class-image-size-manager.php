@@ -13,12 +13,12 @@ if ( ! defined( 'WPINC' ) ) {
  * Responsibilities:
  * - Registers plugin-managed WP image sizes at `init` (fotogrids_thumbnail,
  *   fotogrids_full, and the hidden fotogrids_full_mobile companion).
- * - Re-registers any gallery-custom sizes (fotogrids_custom_*) stored in the
- *   fotogrids_custom_sizes option, so they survive page loads.
+ * - Re-registers the gallery-custom sizes (fotogrids_custom_*) stored in the
+ *   fotogrids_custom_sizes option, which follows each collection's saved settings.
  * - Resolves a setting value (e.g. 'fotogrids_thumbnail', 'custom', 'large')
  *   to a WP size string that actually exists for a given attachment, with a
  *   graceful fallback chain.
- * - Computes deterministic slugs for gallery-custom sizes and persists them.
+ * - Computes deterministic slugs for gallery-custom sizes.
  *
  * @package FotoGrids
  * @since   1.0.0
@@ -35,6 +35,21 @@ final class Image_Size_Manager {
 	// Option keys
 	private const OPT_PLUGIN_SIZES = 'fotogrids_media_settings';
 	private const OPT_CUSTOM_SIZES = 'fotogrids_custom_sizes';
+
+	// Post meta keys of the collection settings that select a custom size.
+	private const SIZE_META_KEY_PREFIXES = array(
+		'fotogrids_thumbnail_size',
+		'fotogrids_thumbnail_custom_size_',
+		'fotogrids_full_image_size',
+		'fotogrids_full_image_custom_size_',
+	);
+
+	/**
+	 * Collections being deleted in this request, whose meta removal must not re-sync the registry.
+	 *
+	 * @var array<int, true>
+	 */
+	private static array $deleting = array();
 
 	// Fallback chains (per size role)
 	private const FALLBACK_THUMBNAIL = array( self::SLUG_THUMBNAIL, 'thumbnail', 'medium', 'full' );
@@ -63,6 +78,9 @@ final class Image_Size_Manager {
 	public static function init(): void {
 		add_action( 'init', array( __CLASS__, 'add_image_sizes' ), 1 );
 		add_action( 'before_delete_post', array( __CLASS__, 'on_before_delete_post' ), 10, 2 );
+		add_action( 'added_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
+		add_action( 'updated_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
+		add_action( 'deleted_post_meta', array( __CLASS__, 'on_post_meta_change' ), 10, 3 );
 	}
 
 	/**
@@ -78,6 +96,7 @@ final class Image_Size_Manager {
 			return;
 		}
 
+		self::$deleting[ $post_id ] = true;
 		self::remove_gallery_from_custom_sizes( $post_id );
 	}
 
@@ -156,7 +175,7 @@ final class Image_Size_Manager {
 	 * Resolve a setting value to a WP size slug that exists for the given attachment.
 	 *
 	 * For 'custom', the caller must first ensure the custom size is registered via
-	 * register_custom_size() and pass the resulting slug as $custom_slug.
+	 * resolve_setting_slugs() and pass the resulting slug as $custom_slug.
 	 *
 	 * @since  1.0.0
 	 * @param  int         $attachment_id  WP attachment post ID.
@@ -328,77 +347,144 @@ final class Image_Size_Manager {
 	}
 
 	/**
-	 * Register a gallery-custom size with WP and persist it to the custom size registry.
+	 * Custom sizes a set of collection settings asks for, keyed by role.
 	 *
-	 * Safe to call multiple times with the same parameters - add_image_size() is
-	 * idempotent and save_custom_size_registry() deduplicates.
-	 *
-	 * @since  1.0.0
-	 * @param  int    $width
-	 * @param  int    $height
-	 * @param  bool   $crop
-	 * @param  string $alignment  e.g. 'center', 'top-left', 'bottom-right'
-	 * @param  int    $gallery_id The gallery post ID that defined this custom size.
-	 * @return string The computed slug.
+	 * @since  1.1.3
+	 * @param  array<string, mixed> $settings     Collection settings.
+	 * @param  bool                 $include_full Whether to read the Lightbox image size as well as the thumbnail.
+	 * @return array<string, array{slug: string, width: int, height: int, crop: bool, alignment: string}>
 	 */
-	public static function register_custom_size(
-		int $width,
-		int $height,
-		bool $crop,
-		string $alignment = 'center',
-		int $gallery_id = 0
-	): string {
-		$slug       = self::compute_custom_slug( $width, $height, $crop );
-		$crop_param = self::build_crop_param( $crop, $alignment );
+	public static function custom_sizes_for( array $settings, bool $include_full = true ): array {
+		$sizes = array();
 
-		add_image_size( $slug, $width, $height, $crop_param );
+		if ( 'custom' === ( $settings['thumbnail_size'] ?? null ) ) {
+			$sizes['thumbnail'] = self::custom_size_spec(
+				max( 1, (int) ( $settings['thumbnail_custom_size_width'] ?? 400 ) ),
+				max( 0, (int) ( $settings['thumbnail_custom_size_height'] ?? 300 ) ),
+				(bool) ( $settings['thumbnail_custom_size_crop'] ?? true ),
+				$settings['thumbnail_custom_size_crop_alignment'] ?? null
+			);
+		}
 
-		self::save_custom_size_registry(
-			$slug,
-			array(
-				'width'     => $width,
-				'height'    => $height,
-				'crop'      => $crop,
-				'alignment' => $alignment,
-			),
-			$gallery_id
-		);
+		if ( $include_full && 'custom' === ( $settings['full_image_size'] ?? null ) ) {
+			$sizes['full'] = self::custom_size_spec(
+				max( 1, (int) ( $settings['full_image_custom_size_width'] ?? 1920 ) ),
+				max( 0, (int) ( $settings['full_image_custom_size_height'] ?? 0 ) ),
+				(bool) ( $settings['full_image_custom_size_crop'] ?? false ),
+				$settings['full_image_custom_size_crop_alignment'] ?? null
+			);
+		}
 
-		return $slug;
+		return $sizes;
 	}
 
 	/**
-	 * Persist a custom size entry to the fotogrids_custom_sizes option.
+	 * Resolve the thumbnail and Lightbox size slugs a set of collection settings selects.
 	 *
-	 * @since  1.0.0
-	 * @param  string $slug
-	 * @param  array{width: int, height: int, crop: bool, alignment: string} $config
-	 * @param  int    $gallery_id  Gallery post ID that uses this size. 0 = no association.
+	 * A custom size is registered for the current request only; the persistent
+	 * registry follows saved settings through sync_collection_sizes().
+	 *
+	 * @since  1.1.3
+	 * @param  array<string, mixed> $settings Collection settings.
+	 * @return array{string, string} [ thumbnail slug, Lightbox image slug ].
 	 */
-	public static function save_custom_size_registry( string $slug, array $config, int $gallery_id = 0 ): void {
-		$registry = get_option( self::OPT_CUSTOM_SIZES, array() );
-		if ( ! is_array( $registry ) ) {
-			$registry = array();
+	public static function resolve_setting_slugs( array $settings ): array {
+		$thumb_slug = is_string( $settings['thumbnail_size'] ?? null )
+			? $settings['thumbnail_size']
+			: self::SLUG_THUMBNAIL;
+		$full_slug  = is_string( $settings['full_image_size'] ?? null )
+			? $settings['full_image_size']
+			: self::SLUG_FULL;
+
+		foreach ( self::custom_sizes_for( $settings ) as $role => $size ) {
+			add_image_size(
+				$size['slug'],
+				$size['width'],
+				$size['height'],
+				self::build_crop_param( $size['crop'], $size['alignment'] )
+			);
+
+			if ( 'thumbnail' === $role ) {
+				$thumb_slug = $size['slug'];
+			} else {
+				$full_slug = $size['slug'];
+			}
 		}
 
-		$existing    = $registry[ $slug ] ?? array();
-		$gallery_ids = $existing['gallery_ids'] ?? array();
+		return array( $thumb_slug, $full_slug );
+	}
 
-		if ( $gallery_id > 0 && ! in_array( $gallery_id, $gallery_ids, true ) ) {
-			$gallery_ids[] = $gallery_id;
+	/**
+	 * Re-sync the custom size registry when a collection's image size settings change.
+	 *
+	 * Hooked to added_post_meta, updated_post_meta and deleted_post_meta, so every
+	 * writer of collection settings is covered.
+	 *
+	 * @since 1.1.3
+	 * @param int|int[] $meta_id   Meta ID, or IDs for a delete.
+	 * @param int       $object_id Post ID.
+	 * @param string    $meta_key  Meta key.
+	 * @return void
+	 */
+	public static function on_post_meta_change( $meta_id, $object_id, $meta_key ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		if ( ! is_string( $meta_key ) || ! self::is_size_meta_key( $meta_key ) || isset( self::$deleting[ (int) $object_id ] ) ) {
+			return;
 		}
 
-		$registry[ $slug ] = array_merge( $config, array( 'gallery_ids' => $gallery_ids ) );
+		self::sync_collection_sizes( (int) $object_id );
+	}
 
-		update_option( self::OPT_CUSTOM_SIZES, $registry, false );
+	/**
+	 * Rewrite a collection's entries in the custom size registry from its saved settings.
+	 *
+	 * @since 1.1.3
+	 * @param int $collection_id Gallery or album post ID.
+	 * @return void
+	 */
+	public static function sync_collection_sizes( int $collection_id ): void {
+		$post_type = get_post_type( $collection_id );
+		if ( 'fotogrids_gallery' !== $post_type && 'fotogrids_album' !== $post_type ) {
+			return;
+		}
+
+		$sizes = self::custom_sizes_for(
+			Galleries\Gallery_Repository::get_settings( $collection_id ),
+			'fotogrids_gallery' === $post_type
+		);
+
+		$original = get_option( self::OPT_CUSTOM_SIZES, array() );
+		$registry = self::detach_collection( is_array( $original ) ? $original : array(), $collection_id );
+
+		foreach ( $sizes as $size ) {
+			$gallery_ids   = $registry[ $size['slug'] ]['gallery_ids'] ?? array();
+			$gallery_ids[] = $collection_id;
+
+			$registry[ $size['slug'] ] = array(
+				'width'       => $size['width'],
+				'height'      => $size['height'],
+				'crop'        => $size['crop'],
+				'alignment'   => $size['alignment'],
+				'gallery_ids' => array_values( array_unique( $gallery_ids ) ),
+			);
+
+			add_image_size(
+				$size['slug'],
+				$size['width'],
+				$size['height'],
+				self::build_crop_param( $size['crop'], $size['alignment'] )
+			);
+		}
+
+		if ( $registry !== $original ) {
+			update_option( self::OPT_CUSTOM_SIZES, $registry, false );
+		}
 	}
 
 	/**
 	 * Remove a gallery's association from all custom sizes it contributed.
 	 *
-	 * When a gallery is deleted, call this to clean up stale gallery_ids
-	 * references. Sizes with no remaining gallery_ids are removed from the
-	 * registry (derivatives on disk are left untouched).
+	 * Sizes with no remaining gallery_ids are removed from the registry
+	 * (derivatives on disk are left untouched).
 	 *
 	 * @since  1.0.0
 	 * @param  int $gallery_id
@@ -409,24 +495,74 @@ final class Image_Size_Manager {
 			return;
 		}
 
-		$updated = false;
+		$updated = self::detach_collection( $registry, $gallery_id );
+		if ( $updated !== $registry ) {
+			update_option( self::OPT_CUSTOM_SIZES, $updated, false );
+		}
+	}
+
+	/**
+	 * Remove a collection ID from every registry entry, dropping entries it was the last user of.
+	 *
+	 * @since  1.1.3
+	 * @param  array<string, array<string, mixed>> $registry      Custom size registry.
+	 * @param  int                                 $collection_id Gallery or album post ID.
+	 * @return array<string, array<string, mixed>>
+	 */
+	private static function detach_collection( array $registry, int $collection_id ): array {
 		foreach ( $registry as $slug => $config ) {
 			$gallery_ids = $config['gallery_ids'] ?? array();
-			$new_ids     = array_values( array_filter( $gallery_ids, fn( $id ) => $id !== $gallery_id ) );
+			$new_ids     = array_values( array_filter( $gallery_ids, fn( $id ) => $id !== $collection_id ) );
 
-			if ( count( $new_ids ) !== count( $gallery_ids ) ) {
-				$updated = true;
-				if ( empty( $new_ids ) ) {
-					unset( $registry[ $slug ] );
-				} else {
-					$registry[ $slug ]['gallery_ids'] = $new_ids;
-				}
+			if ( count( $new_ids ) === count( $gallery_ids ) ) {
+				continue;
+			}
+
+			if ( empty( $new_ids ) ) {
+				unset( $registry[ $slug ] );
+			} else {
+				$registry[ $slug ]['gallery_ids'] = $new_ids;
 			}
 		}
 
-		if ( $updated ) {
-			update_option( self::OPT_CUSTOM_SIZES, $registry, false );
+		return $registry;
+	}
+
+	/**
+	 * Build one custom size entry.
+	 *
+	 * @since  1.1.3
+	 * @param  int   $width     Width in pixels.
+	 * @param  int   $height    Height in pixels; 0 is proportional.
+	 * @param  bool  $crop      Whether the size is cropped.
+	 * @param  mixed $alignment Crop alignment setting value.
+	 * @return array{slug: string, width: int, height: int, crop: bool, alignment: string}
+	 */
+	private static function custom_size_spec( int $width, int $height, bool $crop, $alignment ): array {
+		return array(
+			'slug'      => self::compute_custom_slug( $width, $height, $crop ),
+			'width'     => $width,
+			'height'    => $height,
+			'crop'      => $crop,
+			'alignment' => is_string( $alignment ) ? $alignment : 'center',
+		);
+	}
+
+	/**
+	 * Whether a post meta key holds a collection image size setting.
+	 *
+	 * @since  1.1.3
+	 * @param  string $meta_key Meta key.
+	 * @return bool
+	 */
+	private static function is_size_meta_key( string $meta_key ): bool {
+		foreach ( self::SIZE_META_KEY_PREFIXES as $prefix ) {
+			if ( 0 === strpos( $meta_key, $prefix ) ) {
+				return true;
+			}
 		}
+
+		return false;
 	}
 
 	/**

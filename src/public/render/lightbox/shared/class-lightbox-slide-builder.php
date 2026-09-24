@@ -67,7 +67,7 @@ final class Lightbox_Slide_Builder {
 			return array();
 		}
 
-		[ $thumb_size_slug, $full_size_slug ] = self::resolve_size_slugs( $settings );
+		[ $thumb_size_slug, $full_size_slug ] = Image_Size_Manager::resolve_setting_slugs( $settings );
 		$link_meta                            = self::batch_load_link_meta( $ids );
 		$tag_map                              = self::batch_load_tag_slugs( $ids, 'tag' );
 
@@ -168,46 +168,6 @@ final class Lightbox_Slide_Builder {
 		 * @param array<string, mixed>             $settings
 		 */
 		return (array) apply_filters( Filters_Lightbox::SLIDES, $slides, $ids, $settings );
-	}
-
-	/**
-	 * Resolves thumb + full size slugs from gallery settings, mirroring
-	 * Context_Builder::resolve_size_settings. Registers custom sizes
-	 * on the fly if needed.
-	 *
-	 * @return array{string, string} [thumb_slug, full_slug]
-	 */
-	private static function resolve_size_slugs( array $settings ): array {
-		$raw_thumb = is_string( $settings['thumbnail_size'] ?? null )
-			? $settings['thumbnail_size']
-			: Image_Size_Manager::SLUG_THUMBNAIL;
-		$raw_full  = is_string( $settings['full_image_size'] ?? null )
-			? $settings['full_image_size']
-			: Image_Size_Manager::SLUG_FULL;
-
-		$thumb_slug = $raw_thumb;
-		if ( 'custom' === $raw_thumb ) {
-			$w          = max( 1, (int) ( $settings['thumbnail_custom_size_width'] ?? 400 ) );
-			$h          = max( 0, (int) ( $settings['thumbnail_custom_size_height'] ?? 300 ) );
-			$crop       = (bool) ( $settings['thumbnail_custom_size_crop'] ?? true );
-			$alignment  = is_string( $settings['thumbnail_custom_size_crop_alignment'] ?? null )
-				? $settings['thumbnail_custom_size_crop_alignment']
-				: 'center';
-			$thumb_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
-		}
-
-		$full_slug = $raw_full;
-		if ( 'custom' === $raw_full ) {
-			$w         = max( 1, (int) ( $settings['full_image_custom_size_width'] ?? 1920 ) );
-			$h         = max( 0, (int) ( $settings['full_image_custom_size_height'] ?? 0 ) );
-			$crop      = (bool) ( $settings['full_image_custom_size_crop'] ?? false );
-			$alignment = is_string( $settings['full_image_custom_size_crop_alignment'] ?? null )
-				? $settings['full_image_custom_size_crop_alignment']
-				: 'center';
-			$full_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
-		}
-
-		return array( $thumb_slug, $full_slug );
 	}
 
 	/**
