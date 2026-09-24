@@ -114,11 +114,8 @@ final class Breadcrumb_Schema {
 			),
 		);
 
-		// The current gallery's URL helps deduplication / canonicalisation
-		// when the page URL doesn't match the gallery permalink (e.g.
-		// embedded on a Portfolio page). Google's guidance is mixed on
-		// including it for the leaf; we include it only when we have one
-		// because some validators complain about an empty leaf URL too.
+		// The leaf URL is included only when the gallery has a permalink; some
+		// validators reject an empty leaf URL.
 		if ( '' !== $gallery_permalink ) {
 			$schema['itemListElement'][1]['item'] = $gallery_permalink;
 		}

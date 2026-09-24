@@ -162,11 +162,8 @@ final class Loading_Icon implements Feature {
 	/**
 	 * No markup appended after the gallery wrapper.
 	 *
-	 * The loader animations were previously started by an inline <script>
-	 * emitted here. That script was removed so the gallery markup can pass
-	 * through wp_kses(); loading-icon.js now starts the animations per gallery
-	 * from the runtime's onGallery hook, using the icon map published by
-	 * publish_icon_map() during assets().
+	 * loading-icon.js starts the loader animations per gallery from the
+	 * runtime's onGallery hook, using the icon map from publish_icon_map().
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.

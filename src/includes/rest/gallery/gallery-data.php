@@ -462,17 +462,6 @@ class Gallery_Data {
 	}
 
 	/**
-	 * Produces the HMAC value stored in the unlock cookie.
-	 *
-	 * Ties the cookie to both the gallery ID and the current stored ciphertext,
-	 * so changing the gallery password automatically invalidates old cookies.
-	 *
-	 * @since  1.0.0
-	 * @param  int    $gallery_id Gallery ID.
-	 * @param  string $stored     Encrypted password from post meta.
-	 * @return string
-	 */
-	/**
 	 * Counts how many items in a gallery survive the given filters.
 	 *
 	 * Thin wrapper over Gallery_Item_Sequence::count() - the canonical
@@ -489,6 +478,17 @@ class Gallery_Data {
 		return \FotoGrids\Render\Internal\Gallery_Item_Sequence::count( $gallery_id, $settings, $filters );
 	}
 
+	/**
+	 * Produces the HMAC value stored in the unlock cookie.
+	 *
+	 * Ties the cookie to both the gallery ID and the current stored ciphertext,
+	 * so changing the gallery password automatically invalidates old cookies.
+	 *
+	 * @since  1.0.0
+	 * @param  int    $gallery_id Gallery ID.
+	 * @param  string $stored     Encrypted password from post meta.
+	 * @return string
+	 */
 	public static function make_unlock_cookie_value( int $gallery_id, string $stored ): string {
 		return hash_hmac( 'sha256', $gallery_id . '|' . $stored, wp_salt( 'auth' ) );
 	}

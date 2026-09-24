@@ -322,7 +322,7 @@
         // Capture phase so inline playback wins over any click-behaviour
         // module (lightbox, direct-link, external-link) that may also be
         // listening on the gallery. stopPropagation prevents those handlers
-        // from running once we've claimed the click for inline playback.
+        // from running once the click is claimed for inline playback.
         galleryElement.addEventListener('click', function (event) {
             const trigger = event.target.closest(PLAYER_SELECTOR);
             if (!trigger || !galleryElement.contains(trigger)) {

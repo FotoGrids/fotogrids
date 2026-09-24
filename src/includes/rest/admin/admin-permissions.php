@@ -117,8 +117,7 @@ class Admin_Permissions {
 	/**
 	 * Check if the user can manage plugin settings (general / advanced).
 	 *
-	 * Mirrors the capability gating the Settings page menu and the legacy
-	 * options.php save path used.
+	 * Mirrors the capability gating of the Settings page menu.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request object

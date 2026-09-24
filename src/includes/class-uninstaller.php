@@ -93,7 +93,7 @@ class Uninstaller {
 	}
 
 	/**
-	 * Check if we should delete plugin data
+	 * Whether plugin data should be deleted.
 	 */
 	private static function should_delete_data() {
 		$preserve_data = get_option( 'fotogrids_preserve_data_on_uninstall', true );

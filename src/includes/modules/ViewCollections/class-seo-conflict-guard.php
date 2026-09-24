@@ -129,8 +129,8 @@ class SEO_Conflict_Guard {
 	/**
 	 * Suppress All in One SEO's frontend output on this request.
 	 *
-	 * AIOSEO exposes per-surface disable filters; we cover OG, Twitter, the
-	 * page-level meta block, schema graph, and the robots header so the
+	 * AIOSEO exposes per-surface disable filters; OG, Twitter, the page-level
+	 * meta block, schema graph and the robots header are all disabled so the
 	 * FotoGrids markup is the only voice on the page.
 	 *
 	 * @since 1.0.0
