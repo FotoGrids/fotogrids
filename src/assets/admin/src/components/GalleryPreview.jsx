@@ -10,9 +10,9 @@
  *
  * All the heavy lifting (CSS handle dedup, JS sequencing, inline payload
  * execution, MutationObserver pickup) lives in the shared
- * `preview-asset-wiring.js` utility under the PageBuilders module - that
- * util is the single source of truth used by this metabox and the
- * page-builder live previews.
+ * `utils/preview-asset-wiring.js` module - the single source of truth used
+ * by this metabox, the page-builder live previews and the native Divi 5
+ * modules.
  *
  * This component is a thin React shell that:
  *
