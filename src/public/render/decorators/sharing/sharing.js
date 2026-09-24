@@ -319,7 +319,7 @@
      * and the view-page footer.
      *
      * @param {Object} config             Resolved sharing - { networks, button_style, button_size }.
-     * @param {Object} context            { id, fullUrl, caption, galleryId, galleryEl }.
+     * @param {Object} context            { id, fullUrl, caption, galleryEl }.
      * @param {Object} [options]          Optional layout overrides.
      * @param {string} [options.layout]   'grid' | 'row'. 'grid' adds a 2-column grid
      *                                    modifier (used inside the lightbox info panel and
@@ -347,10 +347,6 @@
         proxy.dataset.id   = context.id != null ? String( context.id ) : '';
         proxy.dataset.fgFullSrc = context.fullUrl || '';
         proxy.alt          = context.caption || '';
-        if ( context.galleryEl ) {
-            proxy.dataset.galleryId = context.galleryId
-                || ( context.galleryEl.dataset ? context.galleryEl.dataset.fgGalleryId : '' );
-        }
         proxy.closest = function ( sel ) {
             if ( ! context.galleryEl ) return null;
             if (
