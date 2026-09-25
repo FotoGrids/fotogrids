@@ -1,0 +1,116 @@
+/**
+ * Tests for src/assets/admin/src/components/dashboard/RecentlyEdited.jsx
+ */
+import React from 'react';
+import RecentlyEdited from '@/admin/src/components/dashboard/RecentlyEdited';
+import { renderElement, act } from '@tests/helpers/render-component';
+
+const ROWS = [
+	{
+		id: 12,
+		title: 'Summer Portraits',
+		untitled_label: 'Untitled Gallery',
+		type: 'fotogrids_gallery',
+		type_label: 'Gallery',
+		status: 'publish',
+		modified_formatted: 'September 24, 2026 10:00 am',
+		edit_url: 'https://example.test/wp-admin/post.php?post=12&action=edit',
+	},
+	{
+		id: 15,
+		title: '',
+		untitled_label: 'Untitled Album',
+		type: 'fotogrids_album',
+		type_label: 'Album',
+		status: 'draft',
+		modified_formatted: 'September 23, 2026 9:00 am',
+		edit_url: 'https://example.test/wp-admin/post.php?post=15&action=edit',
+	},
+];
+
+const flush = () =>
+	act(async () => {
+		await Promise.resolve();
+		await Promise.resolve();
+	});
+
+describe('dashboard RecentlyEdited', () => {
+	afterEach(() => {
+		wp.apiFetch.mockReset();
+	});
+
+	it('requests five rows including private posts', async () => {
+		wp.apiFetch.mockResolvedValue({ items: [] });
+
+		const { unmount } = renderElement(React.createElement(RecentlyEdited));
+		await flush();
+
+		expect(wp.apiFetch).toHaveBeenCalledWith(
+			expect.objectContaining({
+				path: '/fotogrids/v1/admin/recently-edited?limit=5&include_private=1',
+			})
+		);
+
+		unmount();
+	});
+
+	it('lists each row with its edit link, falling back to the untitled label', async () => {
+		wp.apiFetch.mockResolvedValue({ items: ROWS });
+
+		const { container, unmount } = renderElement(
+			React.createElement(RecentlyEdited)
+		);
+		await flush();
+
+		const links = Array.from(
+			container.querySelectorAll('.fg-abc-recently-edited-link')
+		);
+		expect(links.map((a) => a.getAttribute('href'))).toEqual(
+			ROWS.map((row) => row.edit_url)
+		);
+		expect(
+			Array.from(
+				container.querySelectorAll('.fg-abc-recently-edited-title')
+			).map((el) => el.textContent)
+		).toEqual(['Summer Portraits', 'Untitled Album #15']);
+
+		unmount();
+	});
+
+	it('marks only unpublished rows with a status label', async () => {
+		wp.apiFetch.mockResolvedValue({ items: ROWS });
+
+		const { container, unmount } = renderElement(
+			React.createElement(RecentlyEdited)
+		);
+		await flush();
+
+		const statuses = container.querySelectorAll(
+			'.fg-abc-recently-edited-status'
+		);
+		expect(statuses).toHaveLength(1);
+		expect(statuses[0].textContent).toBe('Draft');
+
+		unmount();
+	});
+
+	it('shows the empty message when the request fails', async () => {
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		wp.apiFetch.mockRejectedValue(new Error('offline'));
+
+		const { container, unmount } = renderElement(
+			React.createElement(RecentlyEdited)
+		);
+		await flush();
+
+		expect(
+			container.querySelector('.fg-abc-recently-edited-empty')
+		).not.toBeNull();
+		expect(
+			container.querySelector('.fg-abc-recently-edited-items')
+		).toBeNull();
+
+		console.error.mockRestore();
+		unmount();
+	});
+});

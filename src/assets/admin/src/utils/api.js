@@ -154,6 +154,29 @@ export const addItemsToGallery = (galleryId, itemIds) => {
 };
 
 /**
+ * Fetch the most recently edited galleries and albums
+ *
+ * @param {number} limit Number of rows to return.
+ * @return {Promise<Array>} Rows, newest first.
+ */
+export const fetchRecentlyEdited = (limit = 5) => {
+	if (!isApiAvailable()) {
+		return Promise.resolve([]);
+	}
+
+	return wp
+		.apiFetch({
+			path: `/fotogrids/v1/admin/recently-edited?limit=${limit}&include_private=1`,
+			method: 'GET',
+		})
+		.then((data) => data.items || [])
+		.catch((error) => {
+			console.error('Error fetching recently edited:', error);
+			return [];
+		});
+};
+
+/**
  * Fetch dashboard overview statistics
  */
 export const fetchDashboardStats = () => {

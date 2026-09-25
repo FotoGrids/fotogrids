@@ -6,12 +6,14 @@ import { fetchDashboardStats } from '../../utils/api';
 import { createGalleryFromImages } from '../../utils/gallery';
 
 import MainCTA from '../dashboard/MainCTA';
-import Checklist from '../dashboard/Checklist';
+import Checklist, { isSetupComplete } from '../dashboard/Checklist';
+import RecentlyEdited from '../dashboard/RecentlyEdited';
 import FileUploader from '../dashboard/FileUploader';
 import CreateOptions from '../dashboard/CreateOptions';
 import LearnSection from '../dashboard/LearnSection';
 import ProFeatures from '../dashboard/ProFeatures';
 import OverviewStats from '../dashboard/OverviewStats';
+import LoadingIcon from '../shared/LoadingIcon';
 
 const { __ } = wp.i18n;
 
@@ -65,6 +67,28 @@ const Dashboard = () => {
         }
     };
 
+    const setupProgress = {
+        galleriesTotal: stats.galleries_total,
+        galleriesPublished: stats.galleries_published,
+        settingsConfigured: stats.settings_configured
+    };
+
+    const renderSetupSlot = () => {
+        if (loading) {
+            return (
+                <div className="fotogrids-admin-block-card fg-abc-setup-loading">
+                    <LoadingIcon label={__('Loading setup progress', 'fotogrids')} />
+                </div>
+            );
+        }
+
+        if (isSetupComplete(setupProgress)) {
+            return <RecentlyEdited />;
+        }
+
+        return <Checklist {...setupProgress} />;
+    };
+
     return (
         <div className="fotogrids-dashboard">
             <div className="fotogrids-admin-blocks-grid">
@@ -73,11 +97,7 @@ const Dashboard = () => {
                     itemsCount={stats.items}
                 />
 
-                <Checklist
-                    galleriesTotal={stats.galleries_total}
-                    galleriesPublished={stats.galleries_published}
-                    settingsConfigured={stats.settings_configured}
-                />
+                {renderSetupSlot()}
 
                 <FileUploader onUploadComplete={handleUploadComplete} />
 

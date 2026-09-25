@@ -172,10 +172,117 @@
 			}
 		}
 
-		&.fg-abc-checklist {
+		&.fg-abc-checklist,
+		&.fg-abc-recently-edited,
+		&.fg-abc-setup-loading {
 			background: var(--fg-green);
 			color: white;
 			border: 0;
+		}
+
+		&.fg-abc-setup-loading,
+		.fg-abc-recently-edited-loading {
+			align-items: center;
+			justify-content: center;
+		}
+
+		&.fg-abc-setup-loading {
+			min-height: 200px;
+		}
+
+		&.fg-abc-recently-edited {
+			.fg-abc-recently-edited-loading {
+				display: flex;
+				flex: 1;
+				padding: 6px;
+			}
+
+			.fg-abc-recently-edited-empty {
+				padding: 0 6px;
+			}
+
+			.fg-abc-recently-edited-items {
+				list-style: none;
+				margin: 0;
+				padding: 0 6px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.fg-abc-recently-edited-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				margin: 0;
+				font-size: 13px;
+			}
+
+			.fg-abc-recently-edited-link {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				min-width: 0;
+				color: white;
+				text-decoration: none;
+				box-shadow: none;
+
+				&:hover,
+				&:focus {
+					text-decoration: underline;
+				}
+
+				&:focus {
+					outline: 1px solid white;
+					outline-offset: 3px;
+				}
+			}
+
+			.fg-abc-recently-edited-type,
+			.fg-abc-recently-edited-status {
+				flex: 0 0 auto;
+				font-size: 9px;
+				font-weight: 600;
+				line-height: 1.4;
+				text-transform: uppercase;
+				padding: 1px 4px;
+				border-radius: 3px;
+				background: rgba(0, 0, 0, 0.2);
+			}
+
+			.fg-abc-recently-edited-status {
+				background: transparent;
+				border: 1px solid rgba(white, 0.7);
+			}
+
+			.fg-abc-recently-edited-title {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.fg-abc-recently-edited-date {
+				flex: 0 0 auto;
+				color: rgba(white, 0.7);
+				font-size: 12px;
+			}
+
+			.fg-abc-recently-edited-all {
+				margin: 24px 6px 0;
+				color: white;
+				font-size: 13px;
+				font-weight: 600;
+
+				&:hover,
+				&:focus {
+					color: white;
+					text-decoration: none;
+				}
+			}
+		}
+
+		&.fg-abc-checklist {
 
 			.fg-abc-checklist-items {
 				list-style: none;
