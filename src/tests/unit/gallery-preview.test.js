@@ -36,6 +36,7 @@ describe('GalleryPreview', () => {
 			.toBe('Nothing to preview yet');
 		expect(view.container.querySelector('.fotogrids-preview-empty__text').textContent)
 			.toBe('Add some items to this gallery and its preview will appear here.');
+		expect(view.container.querySelectorAll('.fotogrids-preview-empty__art span')).toHaveLength(6);
 		expect(view.container.querySelector('.fotogrids-preview-container')).toBeNull();
 		expect(global.fetch).not.toHaveBeenCalled();
 	});
@@ -45,7 +46,8 @@ describe('GalleryPreview', () => {
 		view = renderElement(h(GalleryPreview, { galleryId: 7, hasItems: false, onAddItems }));
 
 		const button = view.container.querySelector('button');
-		expect(button.textContent).toBe('Add items');
+		expect(button.querySelector('.fg-button__label').textContent).toBe('Add items');
+		expect(button.querySelector('.fg-button__icon.fotogrids-icon--plus')).not.toBeNull();
 		act(() => {
 			button.click();
 		});

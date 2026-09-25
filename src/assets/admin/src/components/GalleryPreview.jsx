@@ -139,6 +139,9 @@ const GalleryPreview = ({ galleryId = null, hasItems = true, onAddItems = null }
 
         return (
             <div className="fotogrids-preview-placeholder fotogrids-preview-empty">
+                <div className="fotogrids-preview-empty__art" aria-hidden="true">
+                    {Array.from({ length: 6 }, (_, i) => <span key={i} />)}
+                </div>
                 <h3 className="fotogrids-preview-empty__title">
                     {strings.previewEmptyTitle || 'Nothing to preview yet'}
                 </h3>
@@ -146,7 +149,7 @@ const GalleryPreview = ({ galleryId = null, hasItems = true, onAddItems = null }
                     {strings.previewEmptyText || 'Add some items to this gallery and its preview will appear here.'}
                 </p>
                 {onAddItems && (
-                    <Button variant="primary" onClick={onAddItems}>
+                    <Button variant="primary" icon="plus" onClick={onAddItems}>
                         {strings.previewEmptyButton || 'Add items'}
                     </Button>
                 )}

@@ -263,10 +263,10 @@
 .fotogrids-preview-placeholder {
 	padding: 40px;
 	text-align: center;
-	background: #f9f9f9;
-	border: 2px dashed var(--fg-border-secondary);
+	background: var(--fg-background-secondary);
+	border: 1px dashed var(--fg-border-secondary);
 	border-radius: 8px;
-	color: #666;
+	color: var(--fg-text-tertiary);
 }
 
 .fotogrids-preview-empty {
@@ -274,6 +274,19 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 8px;
+
+	&__art {
+		display: grid;
+		grid-template-columns: repeat(3, 28px);
+		grid-auto-rows: 28px;
+		gap: 6px;
+		margin-bottom: 8px;
+
+		span {
+			background: var(--fg-background-tertiary);
+			border: 1px dashed var(--fg-border-secondary);
+		}
+	}
 
 	&__title {
 		margin: 0;
