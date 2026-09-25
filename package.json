@@ -1,6 +1,6 @@
 {
   "name": "fotogrids",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "FotoGrids WordPress gallery plugin with freemium Pro features",
   "main": "index.js",
   "scripts": {

@@ -4,7 +4,7 @@ Tags: gallery, album, lightbox, slider, portfolio
 Requires at least: 6.1
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -177,6 +177,29 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 
 == Changelog ==
 
+= 1.1.3 =
+
+**Improved**
+
+* **Right-to-left support in the admin.** Every FotoGrids admin screen now mirrors correctly in Hebrew, Arabic and other RTL languages.
+
+**Fixed**
+
+* **Fixed Lightbox image size selection.** The Lightbox now serves the size you set, and a lighter version on phones.
+* **Fixed saved defaults for new collections.** New galleries and albums now start with the defaults you saved.
+* **Fixed LinkedIn, WhatsApp, Telegram and Reddit share buttons.** They now open a share window and count in statistics.
+* **Fixed the Zoom Trigger setting.** Your chosen trigger now applies in the Lightbox.
+* **Fixed saving for three gallery settings:** Mini Lightbox padding, Preload Next Page and Show Album Name on Button.
+* **Fixed Regenerate All.** Tools > Regenerate Thumbnails now processes every listed image.
+* **Improved the SEO checkup title check.** Titles copied from camera filenames such as `DSC_1234` are now flagged.
+* **Fixed cache expiry with Redis and Memcached.** Cached galleries now respect their cache duration.
+* **More complete uninstall.** Saved templates and review-prompt data are now removed too.
+
+**Security and hardening**
+
+* **Stricter view permissions.** Every restricted view setting now requires at least a logged-in user.
+* **Encrypted default password.** A password saved in Settings > Defaults is now stored encrypted.
+
 = 1.1.2 =
 
 **New**
@@ -289,6 +312,9 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.1.3 =
+Fixes Lightbox image sizes, saved defaults for new galleries, four share buttons and cache expiry. Adds right-to-left admin support and stricter view permissions.
 
 = 1.1.2 =
 Now reads every EXIF field your camera records. Fixes autosave, video playback settings, alt text edits, and stale caching. Bug and security fixes.
