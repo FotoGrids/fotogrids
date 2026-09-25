@@ -147,6 +147,8 @@ class Regenerate_Thumbnails_Data {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public static function regenerate_attachment( \WP_REST_Request $request ) {
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
 		$attachment_id = (int) $request->get_param( 'attachment_id' );
 
 		$attachment_post = get_post( $attachment_id );
