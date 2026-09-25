@@ -163,9 +163,10 @@ final class PHP_Error_Capture {
 	/**
 	 * Decides whether an error belongs to FotoGrids and where it originated.
 	 *
-	 * The file an error is raised in is often a WordPress core file called by
-	 * plugin code, so the whole call stack is inspected and the first FotoGrids
-	 * frame is reported as the origin.
+	 * The call stack is walked outward from the line that raised the error,
+	 * skipping WordPress core and this class's own frames. The first remaining
+	 * frame decides ownership: a FotoGrids file is reported as the origin, and
+	 * any other plugin or theme file means the error is not ours.
 	 *
 	 * @since  1.0.0
 	 * @param  string $file File the error was raised in.
@@ -173,23 +174,34 @@ final class PHP_Error_Capture {
 	 * @return array{file: string, line: int}|null Null when the error is not ours.
 	 */
 	private static function attribute( string $file, int $line ): ?array {
-		if ( self::is_fotogrids_path( $file ) ) {
-			return array(
+		$frames = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, self::BACKTRACE_LIMIT ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- attributing an error to the calling plugin requires the stack; arguments are excluded so no values are captured.
+
+		array_unshift(
+			$frames,
+			array(
 				'file' => $file,
 				'line' => $line,
-			);
-		}
+			)
+		);
 
-		$frames = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, self::BACKTRACE_LIMIT ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- attributing an error to the calling plugin requires the stack; arguments are excluded so no values are captured.
+		$own_file = wp_normalize_path( __FILE__ );
 
 		foreach ( $frames as $frame ) {
 			$frame_file = (string) ( $frame['file'] ?? '' );
 
-			if ( '' !== $frame_file && self::is_fotogrids_path( $frame_file ) ) {
+			if ( '' === $frame_file || wp_normalize_path( $frame_file ) === $own_file ) {
+				continue;
+			}
+
+			if ( self::is_fotogrids_path( $frame_file ) ) {
 				return array(
 					'file' => $frame_file,
 					'line' => (int) ( $frame['line'] ?? 0 ),
 				);
+			}
+
+			if ( self::is_extension_path( $frame_file ) ) {
+				return null;
 			}
 		}
 
@@ -231,6 +243,33 @@ final class PHP_Error_Capture {
 
 		foreach ( self::related_paths() as $path ) {
 			if ( str_contains( $normalised, $path ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether a path belongs to a plugin, must-use plugin or theme.
+	 *
+	 * Called only for paths already known not to be FotoGrids.
+	 *
+	 * @since  1.1.4
+	 * @param  string $file Absolute filesystem path.
+	 * @return bool
+	 */
+	private static function is_extension_path( string $file ): bool {
+		$normalised = wp_normalize_path( $file );
+
+		foreach ( array( 'WP_CONTENT_DIR', 'WP_PLUGIN_DIR', 'WPMU_PLUGIN_DIR' ) as $constant ) {
+			if ( ! defined( $constant ) ) {
+				continue;
+			}
+
+			$dir = untrailingslashit( wp_normalize_path( (string) constant( $constant ) ) );
+
+			if ( '' !== $dir && str_starts_with( $normalised, $dir . '/' ) ) {
 				return true;
 			}
 		}
