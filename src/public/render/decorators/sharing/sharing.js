@@ -26,28 +26,37 @@
 ( function () {
     'use strict';
 
-    function __( s ) {
-        if ( window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function' ) {
-            return window.wp.i18n.__( s, 'fotogrids' );
-        }
-        return s;
-    }
+    /**
+     * English share-bar labels, used when the server-side translated map is absent.
+     */
+    const DEFAULT_LABELS = {
+        facebook:    'Facebook',
+        x:           'X',
+        pinterest:   'Pinterest',
+        linkedin:    'LinkedIn',
+        whatsapp:    'WhatsApp',
+        telegram:    'Telegram',
+        reddit:      'Reddit',
+        email:       'Email',
+        copy_link:   'Copy link',
+        share_on:    'Share on %s',
+        link_copied: 'Link copied',
+        copy_failed: 'Copy failed',
+    };
 
     /**
-     * Display labels keyed by the stored network id.
+     * Share-bar label for a key: the translated string from window.fotogrids.sharingLabels,
+     * falling back to English.
+     *
+     * @param {string} key Network id or string key.
+     * @returns {string}
      */
-    function networkLabels() {
-        return {
-            facebook:  __( 'Facebook' ),
-            x:         __( 'X' ),
-            pinterest: __( 'Pinterest' ),
-            linkedin:  __( 'LinkedIn' ),
-            whatsapp:  __( 'WhatsApp' ),
-            telegram:  __( 'Telegram' ),
-            reddit:    __( 'Reddit' ),
-            email:     __( 'Email' ),
-            copy_link: __( 'Copy link' ),
-        };
+    function label( key ) {
+        const translated = window.fotogrids && window.fotogrids.sharingLabels;
+        if ( translated && typeof translated[ key ] === 'string' && translated[ key ] !== '' ) {
+            return translated[ key ];
+        }
+        return DEFAULT_LABELS[ key ] || key;
     }
 
     /**
@@ -334,7 +343,6 @@
         const active = order.filter( function ( n ) { return config.networks[ n ]; } );
         if ( active.length === 0 ) return null;
 
-        const labels = networkLabels();
         const style  = config.button_style || 'icons_only';
         const size   = config.button_size || 'medium';
         const layout = ( options && options.layout === 'grid' ) ? 'grid' : 'row';
@@ -363,15 +371,11 @@
             return null;
         };
 
-        function labelFor( network ) {
-            return labels[ network ] || network;
-        }
-
         active.forEach( function ( network ) {
             const btn = document.createElement( 'button' );
             btn.type = 'button';
             btn.className = 'fotogrids-share-bar__btn fotogrids-share-bar__btn--' + network;
-            btn.setAttribute( 'aria-label', labelFor( network ) );
+            btn.setAttribute( 'aria-label', label( network ) );
             btn.dataset.network = network;
 
             const showIcon  = style !== 'labels_only';
@@ -386,13 +390,13 @@
             if ( showLabel ) {
                 const labelEl = document.createElement( 'span' );
                 labelEl.className = 'fotogrids-share-bar__label';
-                labelEl.textContent = labelFor( network );
+                labelEl.textContent = label( network );
                 btn.appendChild( labelEl );
             }
 
             const tooltip = ( network === 'copy_link' )
-                ? __( 'Copy link' )
-                : __( 'Share on %s' ).replace( '%s', labelFor( network ) );
+                ? label( 'copy_link' )
+                : label( 'share_on' ).replace( '%s', label( network ) );
             btn.dataset.fgTooltip    = tooltip;
             btn.dataset.fgTooltipDir = 'above';
             if ( ! showLabel ) {
@@ -408,9 +412,9 @@
                 if ( network === 'copy_link' ) {
                     // Starts from the failure message and switches on success, so an unresolved
                     // copy never reports success.
-                    const successLabel = __( 'Link copied' );
-                    const failureLabel = __( 'Copy failed' );
-                    const baseLabel    = __( 'Copy link' );
+                    const successLabel = label( 'link_copied' );
+                    const failureLabel = label( 'copy_failed' );
+                    const baseLabel    = label( 'copy_link' );
 
                     const showFeedback = function ( label, kind ) {
                         // FgTooltip.refresh() reads aria-label first, then

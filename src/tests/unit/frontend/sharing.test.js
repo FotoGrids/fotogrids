@@ -167,3 +167,39 @@ describe('sharing', () => {
 		expect(shares).toEqual([]);
 	});
 });
+
+describe('sharing labels', () => {
+	afterEach(() => {
+		document.body.innerHTML = '';
+		delete window.fotogrids;
+		delete window.FotoGridsSharing;
+	});
+
+	it('falls back to English when no translated labels are provided', () => {
+		const bar = renderBar(loadModule(), ['facebook', 'copy_link']);
+		const facebook = bar.querySelector('[data-network="facebook"]');
+		const copy = bar.querySelector('[data-network="copy_link"]');
+
+		expect(facebook.getAttribute('aria-label')).toBe('Facebook');
+		expect(facebook.dataset.fgTooltip).toBe('Share on Facebook');
+		expect(copy.dataset.fgTooltip).toBe('Copy link');
+	});
+
+	it('uses the translated labels from window.fotogrids.sharingLabels', () => {
+		window.fotogrids = {
+			sharingLabels: {
+				facebook: 'Фейсбук',
+				copy_link: 'Копировать ссылку',
+				share_on: 'Поделиться в %s',
+			},
+		};
+		const bar = renderBar(loadModule(), ['facebook', 'copy_link']);
+		const facebook = bar.querySelector('[data-network="facebook"]');
+		const copy = bar.querySelector('[data-network="copy_link"]');
+
+		expect(facebook.getAttribute('aria-label')).toBe('Фейсбук');
+		expect(facebook.dataset.fgTooltip).toBe('Поделиться в Фейсбук');
+		expect(copy.getAttribute('aria-label')).toBe('Копировать ссылку');
+		expect(copy.dataset.fgTooltip).toBe('Копировать ссылку');
+	});
+});

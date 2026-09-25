@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-25T15:13:13+00:00\n"
+"POT-Creation-Date: 2026-09-25T20:29:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -1535,6 +1535,7 @@ msgid "Elevation"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:293
+#: public/render/decorators/sharing/class-sharing-decorator.php:64
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:22
 msgid "Email"
 msgstr ""
@@ -1658,6 +1659,7 @@ msgid "FG Thumbnail"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:323
+#: public/render/decorators/sharing/class-sharing-decorator.php:57
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:15
 msgid "Facebook"
 msgstr ""
@@ -2335,6 +2337,7 @@ msgid "Linear"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:491
+#: public/render/decorators/sharing/class-sharing-decorator.php:60
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:18
 msgid "LinkedIn"
 msgstr ""
@@ -2746,6 +2749,7 @@ msgid "Pick how the trailing row of every intermediate page is handled."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:584
+#: public/render/decorators/sharing/class-sharing-decorator.php:59
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:17
 msgid "Pinterest"
 msgstr ""
@@ -2866,6 +2870,7 @@ msgid "Recommended size: 1200×630px."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:613
+#: public/render/decorators/sharing/class-sharing-decorator.php:63
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:21
 msgid "Reddit"
 msgstr ""
@@ -3411,6 +3416,7 @@ msgid "Target Row Height"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:744
+#: public/render/decorators/sharing/class-sharing-decorator.php:62
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:20
 msgid "Telegram"
 msgstr ""
@@ -3725,6 +3731,7 @@ msgid "Watermarks are disabled in FotoGrids settings. Turn them on under <a>Foto
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:819
+#: public/render/decorators/sharing/class-sharing-decorator.php:61
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:19
 msgid "WhatsApp"
 msgstr ""
@@ -4571,13 +4578,13 @@ msgstr ""
 
 #: includes/class-upgrade-modal.php:147
 #: assets/admin/plain/render-settings/renderPromo.js:98
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:56
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:49
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:355
 msgid "Upgrade Now"
 msgstr ""
 
 #: includes/class-upgrade-modal.php:148
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:64
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:57
 msgid "Free vs. Pro"
 msgstr ""
 
@@ -5819,6 +5826,7 @@ msgid "Copied!"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:877
+#: public/render/decorators/sharing/class-sharing-decorator.php:69
 msgid "Copy failed"
 msgstr ""
 
@@ -7835,6 +7843,24 @@ msgstr ""
 msgid "Focus Dim"
 msgstr ""
 
+#: public/render/decorators/sharing/class-sharing-decorator.php:58
+msgid "X"
+msgstr ""
+
+#: public/render/decorators/sharing/class-sharing-decorator.php:65
+msgid "Copy link"
+msgstr ""
+
+#. translators: %s: social network name, e.g. Facebook.
+#: public/render/decorators/sharing/class-sharing-decorator.php:67
+#, php-format
+msgid "Share on %s"
+msgstr ""
+
+#: public/render/decorators/sharing/class-sharing-decorator.php:68
+msgid "Link copied"
+msgstr ""
+
 #. translators: %s: album title
 #: public/render/features/collection-header/class-collection-header.php:383
 #, php-format
@@ -8264,7 +8290,7 @@ msgid "Could not retrieve the saved password. Please try again."
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderPromo.js:44
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:24
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:17
 #: assets/admin/src/components/pages/TemplatesPage.jsx:54
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:339
 #: assets/admin/src/components/templates/TemplateInfoModal.jsx:50
@@ -8530,11 +8556,43 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:26
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:19
 msgid "Unlock PRO Features"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:45
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:22
+msgid "Advanced Layouts"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:23
+msgid "SEO Optimization"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:24
+msgid "E-Commerce"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:25
+msgid "Custom Styling"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:26
+msgid "Priority Support"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:27
+msgid "Advanced Analytics"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:28
+msgid "Powerful Integrations"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:29
+msgid "Bulk Operations"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:38
 msgid "Plus many more powerful features designed to save time, optimize performance, and help you grow."
 msgstr ""
 

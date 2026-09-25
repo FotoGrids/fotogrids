@@ -44,6 +44,33 @@ final class Sharing_Decorator implements Decorator {
 	}
 
 	/**
+	 * Translated share-bar labels for the frontend sharing script.
+	 *
+	 * Keyed by stored network id plus the tooltip and copy-feedback strings.
+	 * `share_on` carries a `%s` placeholder for the network label.
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'facebook'    => __( 'Facebook', 'fotogrids' ),
+			'x'           => __( 'X', 'fotogrids' ),
+			'pinterest'   => __( 'Pinterest', 'fotogrids' ),
+			'linkedin'    => __( 'LinkedIn', 'fotogrids' ),
+			'whatsapp'    => __( 'WhatsApp', 'fotogrids' ),
+			'telegram'    => __( 'Telegram', 'fotogrids' ),
+			'reddit'      => __( 'Reddit', 'fotogrids' ),
+			'email'       => __( 'Email', 'fotogrids' ),
+			'copy_link'   => __( 'Copy link', 'fotogrids' ),
+			/* translators: %s: social network name, e.g. Facebook. */
+			'share_on'    => __( 'Share on %s', 'fotogrids' ),
+			'link_copied' => __( 'Link copied', 'fotogrids' ),
+			'copy_failed' => __( 'Copy failed', 'fotogrids' ),
+		);
+	}
+
+	/**
 	 * Active when sharing resolves to enabled for this collection.
 	 *
 	 * Opts out of album-as-collection renders. The item-level share
