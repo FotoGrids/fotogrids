@@ -15,7 +15,7 @@ root.
 | Tool      | Version           |
 | --------- | ----------------- |
 | PHP       | 7.4+              |
-| WordPress | 6.3+ (tested 6.8) |
+| WordPress | 6.3+ (tested 7.1) |
 | Node.js   | 18+               |
 | npm       | 8+                |
 | Composer  | 2+                |
