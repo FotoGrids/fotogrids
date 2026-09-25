@@ -2,8 +2,8 @@
  * Lightweight render helper for the plain render-settings components.
  *
  * These modules attach factory functions to window.FotoGridsRenderSettings and
- * return wp.element (React) elements. @testing-library/react is not installed,
- * so this helper drives react-dom's createRoot under act() directly.
+ * return wp.element (React) elements. This helper drives react-dom's createRoot
+ * under act() directly.
  */
 import { createRoot } from 'react-dom/client';
 import { act } from 'react';

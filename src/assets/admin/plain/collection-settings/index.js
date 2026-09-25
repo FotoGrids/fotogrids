@@ -40,11 +40,12 @@ const loadSettingsGroups = async (
 	const separator = endpoint.includes('?') ? '&' : '?';
 	const url = `${endpoint}${separator}post_type=${encodeURIComponent(
 		normalizedPostType
-	)}`;
+	)}&_locale=user`;
 
 	try {
 		const response = await fetch(url, {
 			headers: {
+				Accept: 'application/json',
 				'X-WP-Nonce':
 					window.wpApiSettings?.nonce ||
 					window.fotogridsSettings?.restNonce ||
