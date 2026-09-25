@@ -45,6 +45,7 @@ const loadSettingsGroups = async (
 	try {
 		const response = await fetch(url, {
 			headers: {
+				Accept: 'application/json',
 				'X-WP-Nonce':
 					window.wpApiSettings?.nonce ||
 					window.fotogridsSettings?.restNonce ||
