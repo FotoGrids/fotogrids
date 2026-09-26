@@ -1403,7 +1403,7 @@ function CollectionSettings() {
 		return null;
 	};
 
-	const renderSetting = (setting) => {
+	const renderSettingControl = (setting) => {
 		// Drop hidden nodes (set by a `hide` placement) and sections whose
 		// group-level `visible_when` predicate evaluates false.
 		if (
@@ -1997,6 +1997,27 @@ function CollectionSettings() {
 			].filter(Boolean)
 		);
 	};
+
+	// The control is built lazily inside the boundary so a throw in a renderer
+	// is caught by it; a boundary wrapped around an already-built tree is not
+	// enough, because that tree is built during this function's own render.
+	// Structural entries such as `side_by_side` carry no key of their own, and
+	// the boundary is an element even when the control renders nothing, so the
+	// children's keys stand in to keep every row keyed across renders.
+	const settingBoundaryKey = (setting) =>
+		setting.key ||
+		(Array.isArray(setting.settings)
+			? setting.settings.map((child) => child?.key).join('+')
+			: setting.type);
+
+	const renderSetting = (setting) =>
+		window.FotoGridsAdmin.withErrorBoundary(
+			{
+				key: settingBoundaryKey(setting),
+				label: `setting "${setting.key || setting.type}"`,
+			},
+			() => renderSettingControl(setting)
+		);
 
 	const renderDocumentationStrip = () => {
 		const defaultsUrl = window.fotogridsSettings?.defaultsUrl || '';
@@ -2997,7 +3018,13 @@ function initializeCollectionSettings() {
 		const tree = editable
 			? h(CollectionSettings)
 			: h(ReadonlyWrapper, null, h(CollectionSettings));
-		createRoot(container).render(tree);
+		createRoot(container).render(
+			h(
+				window.FotoGridsAdmin.ErrorBoundary,
+				{ label: 'collection settings' },
+				tree
+			)
+		);
 	} else {
 		setTimeout(initializeCollectionSettings, 100);
 	}

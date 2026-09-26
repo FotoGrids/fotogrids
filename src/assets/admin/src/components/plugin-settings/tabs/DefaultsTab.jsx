@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import apiFetch from '@wordpress/api-fetch';
 import { Panel, SaveBar } from '../../shared/settings';
+import ErrorBoundary from '../../shared/ErrorBoundary';
 
 const { __ } = wp.i18n;
 
@@ -100,7 +101,13 @@ const DefaultsTab = ({ type = 'gallery' }) => {
                 const root = createRoot(container);
                 rootRef.current = root;
                 const CollectionSettings = window.FotoGridsCollectionSettings.CollectionSettings;
-                root.render(React.createElement(CollectionSettings));
+                root.render(
+                    React.createElement(
+                        ErrorBoundary,
+                        { label: `${typeLabel} defaults` },
+                        React.createElement(CollectionSettings)
+                    )
+                );
                 return true;
             } catch (error) {
                 console.error(`FotoGrids: Error initializing ${typeLabel} defaults:`, error);

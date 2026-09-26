@@ -4,6 +4,7 @@
  * URL validation. These are the deeper handlers that the basic mount doesn't
  * reach.
  */
+import '@/admin/plain/error-boundary';
 import '@/admin/plain/render-settings/utils/post-type-placeholders';
 import '@/admin/plain/render-settings/utils/tooltip-utils';
 import '@/admin/plain/render-settings/renderToggle';
