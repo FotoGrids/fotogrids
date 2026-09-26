@@ -18,7 +18,9 @@ export const fetchGalleries = (searchTerm = '') => {
 	}
 
 	const params = new URLSearchParams();
-	if (searchTerm) params.append('search', searchTerm);
+	if (searchTerm) {
+		params.append('search', searchTerm);
+	}
 
 	return wp
 		.apiFetch({
@@ -40,7 +42,9 @@ export const fetchAlbums = (searchTerm = '') => {
 	}
 
 	const params = new URLSearchParams();
-	if (searchTerm) params.append('search', searchTerm);
+	if (searchTerm) {
+		params.append('search', searchTerm);
+	}
 
 	return wp
 		.apiFetch({

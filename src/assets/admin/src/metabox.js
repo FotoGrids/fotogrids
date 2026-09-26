@@ -42,11 +42,7 @@ function initializeCopyButtons() {
 
 function initializeGalleryMetabox() {
 	try {
-		if (typeof React === 'undefined') {
-			return;
-		}
-
-		if (typeof createRoot === 'undefined') {
+		if (typeof React === 'undefined' || typeof createRoot === 'undefined') {
 			return;
 		}
 

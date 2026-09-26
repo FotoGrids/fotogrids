@@ -31,6 +31,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { Button } from './shared/Button';
 import { applyPreviewResponse } from '../utils/preview-asset-wiring';
+import { buildRestUrl } from '../utils/rest-url';
 
 /**
  * Renders the live preview of a gallery, or an empty state when it has no items.
@@ -52,14 +53,6 @@ const GalleryPreview = ({ galleryId = null, hasItems = true, onAddItems = null }
         || window.fotogridsAdmin?.restNonce
         || (window.wpApiSettings?.nonce || '');
 
-    let restUrl = '/wp-json/fotogrids/v1/';
-    if (window.fotogridsAdmin?.apiUrl) {
-        restUrl = window.fotogridsAdmin.apiUrl + 'fotogrids/v1/';
-    } else if (window.fotogridsAdmin?.restUrl) {
-        restUrl = (window.wpApiSettings?.root || '/wp-json/') + window.fotogridsAdmin.restUrl;
-    } else if (window.wpApiSettings?.root) {
-        restUrl = window.wpApiSettings.root + 'fotogrids/v1/';
-    }
 
     const currentGalleryId = galleryId || window.fotogridsMetaBoxes?.postId || null;
 
@@ -81,7 +74,7 @@ const GalleryPreview = ({ galleryId = null, hasItems = true, onAddItems = null }
         const fetchPreview = async () => {
             try {
                 const response = await fetch(
-                    `${restUrl}preview/gallery/${currentGalleryId}`,
+                    buildRestUrl(`fotogrids/v1/preview/gallery/${currentGalleryId}`),
                     {
                         method: 'POST',
                         headers: {
@@ -124,7 +117,7 @@ const GalleryPreview = ({ galleryId = null, hasItems = true, onAddItems = null }
         };
 
         fetchPreview();
-    }, [currentGalleryId, hasItems, restUrl, restNonce, refreshKey]);
+    }, [currentGalleryId, hasItems, restNonce, refreshKey]);
 
     if (!currentGalleryId) {
         return (

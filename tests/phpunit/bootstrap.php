@@ -85,3 +85,13 @@ if ( ! function_exists( 'wp_kses' ) ) {
 		return strip_tags( (string) $string, array_keys( (array) $allowed_html ) );
 	}
 }
+
+if ( ! function_exists( 'esc_attr' ) ) {
+	/**
+	 * @param string $text Attribute value.
+	 * @return string
+	 */
+	function esc_attr( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- WordPress core function stubbed for the isolated test suite.
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
