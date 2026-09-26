@@ -50,7 +50,7 @@ namespace {
          */
         public function get_row( array $statement ) {
             ++$this->select_count;
-            $cache_key = (string) $statement['args'][0];
+            $cache_key = (string) $statement['args'][1];
             if ( ! isset( $this->rows[ $cache_key ] ) ) {
                 return null;
             }
@@ -62,8 +62,8 @@ namespace {
          * @return int
          */
         public function query( array $statement ): int {
-            // INSERT … VALUES ('gallery', %d, %s, %s, %s, %s): key, payload.
-            $this->rows[ (string) $statement['args'][1] ] = (string) $statement['args'][2];
+            // INSERT INTO %i … VALUES ('gallery', %d, %s, %s, %s, %s): table, id, key, payload.
+            $this->rows[ (string) $statement['args'][2] ] = (string) $statement['args'][3];
             return 1;
         }
     }
