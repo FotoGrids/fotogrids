@@ -677,7 +677,7 @@ final class Lightbox implements Feature {
 				),
 				'fotogrids-lightbox' => new Asset_Decl(
 					'../../assets/js/lightbox.js',
-					array( 'fotogrids-tooltip' ),
+					array( 'fotogrids-runtime', 'fotogrids-tooltip' ),
 					true,
 				),
 			)
