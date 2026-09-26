@@ -20,7 +20,6 @@ const buildConfirm =
 					if (reason !== 'confirm') resolve(false);
 				},
 			});
-			// eslint-disable-next-line no-param-reassign
 			opts.__handle = handle;
 		});
 

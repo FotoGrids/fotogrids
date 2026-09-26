@@ -97,7 +97,6 @@ function submitToFreemius(settings, reason) {
 			if (settings.debug) {
 				const text = await response.text();
 				if (!response.ok || text.trim() !== '1') {
-					// eslint-disable-next-line no-console
 					console.warn(
 						'[FotoGrids] Deactivation feedback not accepted:',
 						response.status,
@@ -108,7 +107,6 @@ function submitToFreemius(settings, reason) {
 		})
 		.catch((error) => {
 			if (settings.debug && error.name !== 'AbortError') {
-				// eslint-disable-next-line no-console
 				console.warn(
 					'[FotoGrids] Deactivation feedback failed:',
 					error
