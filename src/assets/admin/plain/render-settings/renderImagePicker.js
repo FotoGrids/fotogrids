@@ -50,7 +50,9 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 			setLoading(true);
 			wp.apiFetch({ path: `/wp/v2/media/${attachmentId}` })
 				.then((media) => {
-					if (!active) return;
+					if (!active) {
+						return;
+					}
 					const url =
 						media?.media_details?.sizes?.medium?.source_url ||
 						media?.media_details?.sizes?.thumbnail?.source_url ||

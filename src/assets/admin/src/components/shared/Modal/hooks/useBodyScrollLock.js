@@ -6,7 +6,9 @@ let originalPaddingInlineEnd = '';
 
 export const useBodyScrollLock = (active) => {
 	useEffect(() => {
-		if (!active) return undefined;
+		if (!active) {
+			return undefined;
+		}
 
 		if (lockCount === 0) {
 			const body = document.body;

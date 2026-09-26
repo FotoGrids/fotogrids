@@ -23,7 +23,9 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 	}, []);
 
 	useEffect(() => {
-		if (!entitySlug) return;
+		if (!entitySlug) {
+			return;
+		}
 		setLoading(true);
 
 		const library = window.fotogridsLibrary || {};
@@ -40,13 +42,17 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 
 		apiFetch({ path: `/${restBase}/${entitySlug}?${params}` })
 			.then((res) => {
-				if (!mountedRef.current) return;
+				if (!mountedRef.current) {
+					return;
+				}
 				setTopItems(Array.isArray(res.items) ? res.items : []);
 				setTotal(Number(res.total) || 0);
 				setLoading(false);
 			})
 			.catch(() => {
-				if (!mountedRef.current) return;
+				if (!mountedRef.current) {
+					return;
+				}
 				setLoading(false);
 			});
 	}, [entitySlug, limit]);
