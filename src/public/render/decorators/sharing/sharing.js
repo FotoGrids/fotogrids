@@ -6,7 +6,7 @@
  *   • the view-page footer share bar (when 'view_footer' placement is active)
  *   • the cross-module renderShareBar(config, context) function used by the
  *     lightbox to draw its own toolbar share bar
- *   • the network icons + labels
+ *   • the network icons
  *   • all share-bar styles (sharing.css)
  *
  * Activation:
@@ -25,30 +25,6 @@
 
 ( function () {
     'use strict';
-
-    function __( s ) {
-        if ( window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function' ) {
-            return window.wp.i18n.__( s, 'fotogrids' );
-        }
-        return s;
-    }
-
-    /**
-     * Display labels keyed by the stored network id.
-     */
-    function networkLabels() {
-        return {
-            facebook:  __( 'Facebook' ),
-            x:         __( 'X' ),
-            pinterest: __( 'Pinterest' ),
-            linkedin:  __( 'LinkedIn' ),
-            whatsapp:  __( 'WhatsApp' ),
-            telegram:  __( 'Telegram' ),
-            reddit:    __( 'Reddit' ),
-            email:     __( 'Email' ),
-            copy_link: __( 'Copy link' ),
-        };
-    }
 
     /**
      * Inline brand/glyph SVGs keyed by network id. Use currentColor so
@@ -318,7 +294,8 @@
      * context. Reused by the lightbox toolbar, the thumbnail decorator
      * and the view-page footer.
      *
-     * @param {Object} config             Resolved sharing - { networks, button_style, button_size }.
+     * @param {Object} config             Resolved sharing - { networks, button_style, button_size, labels }.
+     *                                    `labels` is the translated map from Sharing_Decorator::client_labels().
      * @param {Object} context            { id, fullUrl, caption, galleryId, galleryEl }.
      * @param {Object} [options]          Optional layout overrides.
      * @param {string} [options.layout]   'grid' | 'row'. 'grid' adds a 2-column grid
@@ -334,7 +311,7 @@
         const active = order.filter( function ( n ) { return config.networks[ n ]; } );
         if ( active.length === 0 ) return null;
 
-        const labels = networkLabels();
+        const labels = config.labels;
         const style  = config.button_style || 'icons_only';
         const size   = config.button_size || 'medium';
         const layout = ( options && options.layout === 'grid' ) ? 'grid' : 'row';
@@ -363,15 +340,11 @@
             return null;
         };
 
-        function labelFor( network ) {
-            return labels[ network ] || network;
-        }
-
         active.forEach( function ( network ) {
             const btn = document.createElement( 'button' );
             btn.type = 'button';
             btn.className = 'fotogrids-share-bar__btn fotogrids-share-bar__btn--' + network;
-            btn.setAttribute( 'aria-label', labelFor( network ) );
+            btn.setAttribute( 'aria-label', labels[ network ] );
             btn.dataset.network = network;
 
             const showIcon  = style !== 'labels_only';
@@ -386,13 +359,13 @@
             if ( showLabel ) {
                 const labelEl = document.createElement( 'span' );
                 labelEl.className = 'fotogrids-share-bar__label';
-                labelEl.textContent = labelFor( network );
+                labelEl.textContent = labels[ network ];
                 btn.appendChild( labelEl );
             }
 
             const tooltip = ( network === 'copy_link' )
-                ? __( 'Copy link' )
-                : __( 'Share on %s' ).replace( '%s', labelFor( network ) );
+                ? labels.copy_link
+                : labels.share_on.replace( '%s', labels[ network ] );
             btn.dataset.fgTooltip    = tooltip;
             btn.dataset.fgTooltipDir = 'above';
             if ( ! showLabel ) {
@@ -408,9 +381,9 @@
                 if ( network === 'copy_link' ) {
                     // Starts from the failure message and switches on success, so an unresolved
                     // copy never reports success.
-                    const successLabel = __( 'Link copied' );
-                    const failureLabel = __( 'Copy failed' );
-                    const baseLabel    = __( 'Copy link' );
+                    const successLabel = labels.link_copied;
+                    const failureLabel = labels.copy_failed;
+                    const baseLabel    = labels.copy_link;
 
                     const showFeedback = function ( label, kind ) {
                         // FgTooltip.refresh() reads aria-label first, then

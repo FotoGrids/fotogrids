@@ -832,6 +832,8 @@ class Renderer {
 			);
 		}
 
+		$config['labels'] = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
+
 		$html = '<div class="fotogrids-view__share" data-fg-share-footer="'
 			. esc_attr( wp_json_encode( $config ) ) . '"></div>';
 

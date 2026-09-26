@@ -41,6 +41,19 @@ final class Image_Zoom implements Decorator {
 
 	use Setting_Helpers;
 
+	/**
+	 * Translated zoom popover labels, emitted as `data-fg-zoom-labels`.
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'image' => __( 'Image', 'fotogrids' ),
+			'close' => __( 'Close', 'fotogrids' ),
+		);
+	}
+
 	public function id(): string {
 		return 'fotogrids/image-zoom';
 	}
@@ -124,6 +137,7 @@ final class Image_Zoom implements Decorator {
 			$attrs['data-fg-zoom-mode']          = $this->zoom_mode( $render_context );
 			$attrs['data-fg-zoom-close-button']  = $this->setting_to_bool( $settings['lightbox_mini_show_close'] ?? true ) ? '1' : '0';
 			$attrs['data-fg-zoom-click-outside'] = '1';
+			$attrs['data-fg-zoom-labels']        = (string) wp_json_encode( self::client_labels() );
 
 			// The mini overlay reads these to resolve the backdrop colour + blur
 			// in CSS rather than from inline styles.

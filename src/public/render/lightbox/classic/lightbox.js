@@ -197,7 +197,8 @@ function readSettings(galleryEl) {
 		infoBlockDivider: d.fgLbInfoBlockDivider || null,
 		creditSource: d.fgLbCreditSource || 'item_meta',
 		galleryId: parseInt(d.fgGalleryId, 10) || 0,
-		exifLabels: FotoGridsLightbox._parseExifLabels(d.fgLbExifLabels),
+		exifLabels: FotoGridsLightbox._parseLabelMap(d.fgLbExifLabels),
+		labels: FotoGridsLightbox._parseLabelMap(d.fgLbLabels),
 		exifFields: d.fgLbExifFields
 			? d.fgLbExifFields.split(' ').filter(Boolean)
 			: [],
@@ -952,10 +953,10 @@ class FotoGridsLightbox {
 		const fragment = document.createRange().createContextualFragment(`
             <div class="fg-lb-backdrop" aria-hidden="true"></div>
             <div class="fg-lb-shell">
-                <div class="fg-lb-toolbar" role="toolbar" aria-label="Lightbox controls">
+                <div class="fg-lb-toolbar" role="toolbar">
                     <div class="fg-lb-toolbar-start"></div>
                     <div class="fg-lb-toolbar-end">
-                        <button class="fg-lb-close" aria-label="Close lightbox" type="button">
+                        <button class="fg-lb-close" type="button">
                             ${FGLB_ICON_CLOSE}
                         </button>
                     </div>
@@ -966,9 +967,9 @@ class FotoGridsLightbox {
                         <div class="fg-lb-media-wrap">
                             <img class="fg-lb-img" src="" alt="" draggable="false" />
                             <div class="fg-lb-spinner" aria-hidden="true"></div>
-                            <button class="fg-lb-prev" aria-label="Previous item" type="button" hidden></button>
-                            <button class="fg-lb-next" aria-label="Next item"     type="button" hidden></button>
-                            <div class="fg-lb-dots" role="tablist" aria-label="Item navigation" hidden></div>
+                            <button class="fg-lb-prev" type="button" hidden></button>
+                            <button class="fg-lb-next" type="button" hidden></button>
+                            <div class="fg-lb-dots" role="tablist" hidden></div>
                         </div>
                         <div class="fg-lb-thumbs" hidden></div>
                     </div>
@@ -1725,10 +1726,7 @@ class FotoGridsLightbox {
 			dlg.setAttribute('data-fg-lb-progress-controls', '');
 		}
 
-		dlg.setAttribute(
-			'aria-label',
-			`Gallery lightbox - ${this.items.length} item${this.items.length === 1 ? '' : 's'}`
-		);
+		dlg.setAttribute('aria-label', s.labels.dialog);
 	}
 
 	/**
@@ -1746,6 +1744,24 @@ class FotoGridsLightbox {
 		const toolbarEnd = dlg.querySelector('.fg-lb-toolbar-end');
 		const content = dlg.querySelector('.fg-lb-content');
 		if (!toolbar || !toolbarStart || !toolbarEnd || !content) return;
+
+		const labels = s.labels;
+		toolbar.setAttribute('aria-label', labels.toolbar);
+		toolbarEnd
+			.querySelector('.fg-lb-close')
+			?.setAttribute('aria-label', labels.close);
+		dlg.querySelector('.fg-lb-prev')?.setAttribute(
+			'aria-label',
+			labels.previous_item
+		);
+		dlg.querySelector('.fg-lb-next')?.setAttribute(
+			'aria-label',
+			labels.next_item
+		);
+		dlg.querySelector('.fg-lb-dots')?.setAttribute(
+			'aria-label',
+			labels.item_navigation
+		);
 
 		// Info panel and its toggle are removed when the panel is disabled or has
 		// no blocks selected.
@@ -1786,7 +1802,9 @@ class FotoGridsLightbox {
 					);
 					toggleBtn.setAttribute(
 						'aria-label',
-						nowHidden ? 'Show info panel' : 'Hide info panel'
+						nowHidden
+							? this.settings.labels.show_info
+							: this.settings.labels.hide_info
 					);
 					toggleBtn.classList.toggle('fg-lb-btn--active', !nowHidden);
 					window.FgTooltip?.refresh(toggleBtn);
@@ -1805,7 +1823,7 @@ class FotoGridsLightbox {
 			);
 			toggleBtn.setAttribute(
 				'aria-label',
-				startClosed ? 'Show info panel' : 'Hide info panel'
+				startClosed ? labels.show_info : labels.hide_info
 			);
 			toggleBtn.classList.toggle('fg-lb-btn--active', !startClosed);
 		}
@@ -1818,7 +1836,6 @@ class FotoGridsLightbox {
 				shareBtn = document.createElement('button');
 				shareBtn.className = 'fg-lb-share';
 				shareBtn.type = 'button';
-				shareBtn.setAttribute('aria-label', 'Share');
 				shareBtn.setAttribute('aria-expanded', 'false');
 				shareBtn.innerHTML = FGLB_ICON_SHARE;
 				shareBtn.addEventListener('click', () =>
@@ -1828,6 +1845,7 @@ class FotoGridsLightbox {
 				toolbarEnd.insertBefore(shareBtn, closeBtn);
 				this._bindTooltip(shareBtn, { dir: 'below' });
 			}
+			shareBtn.setAttribute('aria-label', labels.share);
 		} else {
 			shareBtn?.remove();
 		}
@@ -1839,7 +1857,7 @@ class FotoGridsLightbox {
 				fsBtn = document.createElement('button');
 				fsBtn.className = 'fg-lb-fullscreen';
 				fsBtn.type = 'button';
-				fsBtn.setAttribute('aria-label', 'Enter fullscreen');
+				fsBtn.setAttribute('aria-label', labels.enter_fullscreen);
 				fsBtn.setAttribute('aria-pressed', 'false');
 				fsBtn.innerHTML = FGLB_ICON_FS_EXPAND;
 				fsBtn.addEventListener('click', () => {
@@ -1861,7 +1879,9 @@ class FotoGridsLightbox {
 					);
 					fsBtn.setAttribute(
 						'aria-label',
-						active ? 'Exit fullscreen' : 'Enter fullscreen'
+						active
+							? this.settings.labels.exit_fullscreen
+							: this.settings.labels.enter_fullscreen
 					);
 					fsBtn.innerHTML = active
 						? FGLB_ICON_FS_COLLAPSE
@@ -1890,7 +1910,7 @@ class FotoGridsLightbox {
 				zoomInBtn = document.createElement('button');
 				zoomInBtn.className = 'fg-lb-zoom-in';
 				zoomInBtn.type = 'button';
-				zoomInBtn.setAttribute('aria-label', 'Zoom in');
+				zoomInBtn.setAttribute('aria-label', labels.zoom_in);
 				zoomInBtn.innerHTML = FGLB_ICON_ZOOM_IN;
 				zoomInBtn.addEventListener('click', () => {
 					const max = this._effectiveZoomMax();
@@ -1909,7 +1929,7 @@ class FotoGridsLightbox {
 				zoomOutBtn = document.createElement('button');
 				zoomOutBtn.className = 'fg-lb-zoom-out';
 				zoomOutBtn.type = 'button';
-				zoomOutBtn.setAttribute('aria-label', 'Zoom out');
+				zoomOutBtn.setAttribute('aria-label', labels.zoom_out);
 				zoomOutBtn.innerHTML = FGLB_ICON_ZOOM_OUT;
 				zoomOutBtn.addEventListener('click', () => {
 					this._zoomScale = Math.max(
@@ -1987,7 +2007,7 @@ class FotoGridsLightbox {
 				playPauseBtn = document.createElement('button');
 				playPauseBtn.className = 'fg-lb-play-pause';
 				playPauseBtn.type = 'button';
-				playPauseBtn.setAttribute('aria-label', 'Pause auto-advance');
+				playPauseBtn.setAttribute('aria-label', labels.pause_auto);
 				playPauseBtn.setAttribute('aria-pressed', 'false');
 				playPauseBtn.innerHTML = FGLB_ICON_PAUSE; // playing on open → show pause bars
 				playPauseBtn.addEventListener('click', (e) => {
@@ -2020,13 +2040,13 @@ class FotoGridsLightbox {
 		if (paused) {
 			// Currently paused → show play triangle so user can resume
 			btn.innerHTML = FGLB_ICON_PLAY;
-			btn.setAttribute('aria-label', 'Resume auto-advance');
+			btn.setAttribute('aria-label', this.settings.labels.resume_auto);
 			btn.setAttribute('aria-pressed', 'true');
 			btn.classList.add('fg-lb-btn--active');
 		} else {
 			// Currently playing → show pause bars so user can pause
 			btn.innerHTML = FGLB_ICON_PAUSE;
-			btn.setAttribute('aria-label', 'Pause auto-advance');
+			btn.setAttribute('aria-label', this.settings.labels.pause_auto);
 			btn.setAttribute('aria-pressed', 'false');
 			btn.classList.remove('fg-lb-btn--active');
 		}
@@ -2086,7 +2106,9 @@ class FotoGridsLightbox {
 			btn.setAttribute('role', 'tab');
 			btn.setAttribute(
 				'aria-label',
-				`Item ${i + 1} of ${this.items.length}`
+				this.settings.labels.item_of
+					.replace('%1$d', i + 1)
+					.replace('%2$d', this.items.length)
 			);
 			container.appendChild(btn);
 		});
@@ -2134,7 +2156,10 @@ class FotoGridsLightbox {
 			btn.type = 'button';
 			btn.className = 'fg-lb-thumb';
 			btn.dataset.lbIndex = i;
-			btn.setAttribute('aria-label', `Go to item ${i + 1}`);
+			btn.setAttribute(
+				'aria-label',
+				this.settings.labels.go_to_item.replace('%d', i + 1)
+			);
 
 			const isVideo =
 				!!item &&
@@ -2216,7 +2241,12 @@ class FotoGridsLightbox {
 		// Reset zoom on every slide change so the new image starts at 1×.
 		if (s.zoom) this._resetZoom();
 
-		dlg.setAttribute('aria-label', `Item ${index + 1} of ${this._total}`);
+		dlg.setAttribute(
+			'aria-label',
+			s.labels.item_of
+				.replace('%1$d', index + 1)
+				.replace('%2$d', this._total)
+		);
 
 		// Slide not loaded yet: show the spinner and stop. _fetchSlideRange
 		// re-invokes _showItem once the slot is filled.
@@ -2418,7 +2448,10 @@ class FotoGridsLightbox {
 			'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
 		);
 		iframe.setAttribute('allowfullscreen', '');
-		iframe.setAttribute('title', item.title || item.alt || 'Video');
+		iframe.setAttribute(
+			'title',
+			item.title || item.alt || this.settings.labels.video
+		);
 		return iframe;
 	}
 
@@ -2448,12 +2481,12 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Parse the translated EXIF labels emitted alongside the field list.
+	 * Parse a JSON map of translated labels emitted by PHP on the gallery wrapper.
 	 *
-	 * @param {string|undefined} raw JSON map of field key → label.
-	 * @return {Object} Field key → label, empty when the attribute is absent.
+	 * @param {string|undefined} raw JSON map of key → label.
+	 * @return {Object} Key → label, empty when the attribute is absent.
 	 */
-	static _parseExifLabels(raw) {
+	static _parseLabelMap(raw) {
 		if (!raw) {
 			return {};
 		}
@@ -2926,11 +2959,15 @@ class FotoGridsLightbox {
 					return;
 				}
 				const rows = [];
-				if (fi.filename) rows.push(['File', fi.filename]);
-				if (fi.filesize) rows.push(['Size', fi.filesize]);
+				const labels = this.settings.labels;
+				if (fi.filename) rows.push([labels.file, fi.filename]);
+				if (fi.filesize) rows.push([labels.size, fi.filesize]);
 				if (fi.width && fi.height)
-					rows.push(['Dimensions', `${fi.width} × ${fi.height}`]);
-				if (fi.mime_type) rows.push(['Type', fi.mime_type]);
+					rows.push([
+						labels.dimensions,
+						`${fi.width} × ${fi.height}`,
+					]);
+				if (fi.mime_type) rows.push([labels.type, fi.mime_type]);
 				if (rows.length === 0) {
 					blockEl.remove();
 					return;
@@ -2998,7 +3035,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'Tags',
+						this.settings.labels.tags,
 						FotoGridsLightbox.BLOCK_ICONS.tags
 					)
 				);
@@ -3023,7 +3060,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'People',
+						this.settings.labels.people,
 						FotoGridsLightbox.BLOCK_ICONS.people
 					)
 				);
@@ -3043,7 +3080,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'Location',
+						this.settings.labels.location,
 						FotoGridsLightbox.BLOCK_ICONS.location
 					)
 				);
