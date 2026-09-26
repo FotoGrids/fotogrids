@@ -5,30 +5,39 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     groups:
-      # Keep routine dev-tooling bumps in a single PR to cut review noise.
+      # Routine dev-tooling bumps share one PR.
       dev-dependencies:
         dependency-type: development
+        update-types: ["minor", "patch"]
+      # Major versions of tools that have to move together arrive as one PR per
+      # family, so each PR installs on its own. Any other major arrives as a PR
+      # for that package alone.
+      babel-major:
+        patterns: ["@babel/*"]
+        update-types: ["major"]
+      jest-major:
+        patterns: ["jest", "jest-*", "babel-jest", "@jest/*", "@types/jest"]
+        update-types: ["major"]
+      eslint-major:
+        patterns: ["eslint", "eslint-*", "@wordpress/eslint-plugin", "@typescript-eslint/*"]
+        update-types: ["major"]
     ignore:
       # Every @wordpress/* package below is a webpack external: the npm version is
       # never bundled, it only sets the API surface the build type-checks against.
-      # That has to track the "Requires at least" WordPress version rather than the
-      # latest release, so major bumps are not routine updates.
+      # Each is pinned to the version the "Requires at least" WordPress release
+      # ships, so it moves only when that floor does.
       # @wordpress/eslint-plugin is real dev tooling and is deliberately absent.
       - dependency-name: "@wordpress/api-fetch"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/block-editor"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/blocks"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/components"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/data"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/element"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "@wordpress/i18n"
-        update-types: ["version-update:semver-major"]
       # react and react-dom are externals on the same terms, mapped to the React
       # and ReactDOM globals; WordPress core ships 18.3.1 as of 6.8. Their @types
       # packages track the runtime major and move with it.
@@ -40,15 +49,25 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@types/react-dom"
         update-types: ["version-update:semver-major"]
+      # ts-jest declares typescript ">=4.3 <7", so TypeScript 7 cannot install
+      # alongside the test toolchain.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: composer
     directory: "/"
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
 
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
