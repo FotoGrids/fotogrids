@@ -178,8 +178,9 @@ function captionTextFor( it, source ) {
  * Open the LightboxGrid overlay.
  *
  * @param {object} config
- *   items, galleryEl, clickMode, sharing, label, captions, fullCaptions,
- *   captionSource, openAt, maxWidth { desktop, tablet, mobile }.
+ *   items, galleryEl, clickMode, sharing, label, labels, captions,
+ *   fullCaptions, captionSource, openAt, maxWidth { desktop, tablet, mobile }.
+ *   `labels` is the translated map from Lightbox_Grid::client_labels().
  */
 function open( config ) {
     const items = Array.isArray( config.items ) ? config.items : [];
@@ -192,7 +193,8 @@ function open( config ) {
     overlay.className = 'fg-lb-grid';
     overlay.setAttribute( 'role', 'dialog' );
     overlay.setAttribute( 'aria-modal', 'true' );
-    overlay.setAttribute( 'aria-label', config.label || 'All photos' );
+    const labels = config.labels;
+    overlay.setAttribute( 'aria-label', config.label || labels.all_photos );
 
     // Theme: a single attribute drives the chrome palette; the CSS assigns the
     // --fg-lb-* variables per theme.
@@ -217,7 +219,8 @@ function open( config ) {
     const backBtn = document.createElement( 'button' );
     backBtn.type = 'button';
     backBtn.className = 'fg-lb-grid-btn fg-lb-grid-back';
-    backBtn.innerHTML = BACK_ICON + '<span>' + ( config.backLabel || 'Back' ) + '</span>';
+    backBtn.innerHTML = BACK_ICON + '<span></span>';
+    backBtn.querySelector( 'span' ).textContent = labels.back;
     backBtn.addEventListener( 'click', close );
     start.appendChild( backBtn );
 
@@ -239,7 +242,7 @@ function open( config ) {
     const closeZoomBtn = document.createElement( 'button' );
     closeZoomBtn.type = 'button';
     closeZoomBtn.className = 'fg-lb-grid-btn fg-lb-grid-zoom-close';
-    closeZoomBtn.setAttribute( 'aria-label', 'Close image' );
+    closeZoomBtn.setAttribute( 'aria-label', labels.close_image );
     closeZoomBtn.innerHTML = CLOSE_ICON;
     closeZoomBtn.addEventListener( 'click', closeZoom );
     zoomChrome.appendChild( counter );
@@ -270,7 +273,7 @@ function open( config ) {
             tile.type = 'button';
             tile.className = 'fg-lb-grid-tile fg-lb-grid-tile--' + row.type
                 + ( it.video ? ' fg-lb-grid-tile--video' : '' );
-            tile.setAttribute( 'aria-label', it.title || it.caption || ( 'Item ' + ( idx + 1 ) ) );
+            tile.setAttribute( 'aria-label', it.title || it.caption || labels.item.replace( '%d', idx + 1 ) );
 
             // The image lives inside an aspect-ratio frame that owns the
             // rounding + clipping, so the hover zoom scales the image within
@@ -310,14 +313,14 @@ function open( config ) {
     const prevBtn = document.createElement( 'button' );
     prevBtn.type = 'button';
     prevBtn.className = 'fg-lb-grid-nav fg-lb-grid-prev';
-    prevBtn.setAttribute( 'aria-label', 'Previous' );
+    prevBtn.setAttribute( 'aria-label', labels.previous );
     prevBtn.innerHTML = PREV_ICON;
     prevBtn.addEventListener( 'click', () => zoomBy( -1 ) );
 
     const nextBtn = document.createElement( 'button' );
     nextBtn.type = 'button';
     nextBtn.className = 'fg-lb-grid-nav fg-lb-grid-next';
-    nextBtn.setAttribute( 'aria-label', 'Next' );
+    nextBtn.setAttribute( 'aria-label', labels.next );
     nextBtn.innerHTML = NEXT_ICON;
     nextBtn.addEventListener( 'click', () => zoomBy( 1 ) );
 
@@ -391,7 +394,8 @@ function buildShareButton( config ) {
     shareBtn.type = 'button';
     shareBtn.className = 'fg-lb-grid-btn fg-lb-grid-share';
     shareBtn.setAttribute( 'aria-expanded', 'false' );
-    shareBtn.innerHTML = SHARE_ICON + '<span>' + ( config.shareLabel || 'Share' ) + '</span>';
+    shareBtn.innerHTML = SHARE_ICON + '<span></span>';
+    shareBtn.querySelector( 'span' ).textContent = config.labels.share;
 
     let popover = null;
     const buildPopover = () => {
@@ -692,7 +696,9 @@ function paintZoom() {
     view.zoomCap.textContent = text;
     view.zoomCap.style.display = text ? '' : 'none';
 
-    view.counter.textContent = ( view.zoomIndex + 1 ) + ' of ' + view.items.length;
+    view.counter.textContent = view.config.labels.item_of
+        .replace( '%1$d', view.zoomIndex + 1 )
+        .replace( '%2$d', view.items.length );
 
     const single = view.items.length <= 1;
     view.prevBtn.style.display = single ? 'none' : '';
@@ -704,6 +710,14 @@ function readItems( galleryEl ) {
         return JSON.parse( galleryEl.getAttribute( 'data-fg-grid-items' ) || '[]' );
     } catch ( err ) {
         return [];
+    }
+}
+
+function readLabels( galleryEl ) {
+    try {
+        return JSON.parse( galleryEl.getAttribute( 'data-fg-grid-labels' ) || '{}' );
+    } catch ( err ) {
+        return {};
     }
 }
 
@@ -755,6 +769,7 @@ function openForGallery( galleryEl, label, openAt ) {
         clickMode:     galleryEl.getAttribute( 'data-fg-grid-click' ) || '',
         sharing:       readSharing( galleryEl ),
         label,
+        labels:        readLabels( galleryEl ),
         captions:      galleryEl.getAttribute( 'data-fg-grid-captions' ) === '1',
         fullCaptions:  galleryEl.getAttribute( 'data-fg-grid-full-captions' ) === '1',
         captionSource: galleryEl.getAttribute( 'data-fg-grid-caption-source' ) || 'caption',
@@ -812,10 +827,7 @@ function attach( galleryEl ) {
         if ( btn ) {
             btn.addEventListener( 'click', ( e ) => {
                 e.preventDefault();
-                openForGallery(
-                    galleryEl,
-                    btn.getAttribute( 'data-fg-show-all-label' ) || 'All photos'
-                );
+                openForGallery( galleryEl, btn.getAttribute( 'data-fg-show-all-label' ) || '' );
             } );
         }
     }
@@ -825,7 +837,7 @@ function attach( galleryEl ) {
         if ( ! figure || ! galleryEl.contains( figure ) ) return;
         if ( e.target.closest( '[data-fg-show-all]' ) ) return;
         e.preventDefault();
-        openForGallery( galleryEl, 'All photos', itemIndexFor( galleryEl, figure ) );
+        openForGallery( galleryEl, '', itemIndexFor( galleryEl, figure ) );
     }, true );
 }
 
