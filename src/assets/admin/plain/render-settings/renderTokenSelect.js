@@ -53,10 +53,11 @@ const TokenSelectComponent = ({
 		? resolvedOptions.filter((o) => !o.isGlobalDefault)
 		: resolvedOptions;
 	const allOptions = baseOptions.filter((option) => {
-		if (!option || !option.condition) {
-			return true;
-		}
-		if (typeof isOptionVisible !== 'function') {
+		if (
+			!option ||
+			!option.condition ||
+			typeof isOptionVisible !== 'function'
+		) {
 			return true;
 		}
 		return isOptionVisible(option);

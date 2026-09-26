@@ -39,11 +39,11 @@ const isFreeTier = (config) => {
 };
 
 const withLegacyFreeFlag = (config) => {
-	if (!config || typeof config !== 'object') {
-		return config;
-	}
-
-	if (typeof config.free === 'boolean') {
+	if (
+		!config ||
+		typeof config !== 'object' ||
+		typeof config.free === 'boolean'
+	) {
 		return config;
 	}
 
@@ -382,10 +382,11 @@ function CollectionSettings() {
 
 	const switchTab = useCallback(
 		(tabId) => {
-			if (typeof tabId !== 'string' || tabId === '') {
-				return;
-			}
-			if (!SETTINGS_GROUPS[tabId]) {
+			if (
+				typeof tabId !== 'string' ||
+				tabId === '' ||
+				!SETTINGS_GROUPS[tabId]
+			) {
 				return;
 			}
 			setActiveTab(tabId);
@@ -1301,11 +1302,10 @@ function CollectionSettings() {
 	 *  - `group.condition.dependsOn` + `values` is honoured too.
 	 */
 	const shouldDisplayTab = (group) => {
-		if (group?.hidden) {
-			return false;
-		}
-
-		if (group?.visible_when && !evaluateVisibleWhen(group.visible_when)) {
+		if (
+			group?.hidden ||
+			(group?.visible_when && !evaluateVisibleWhen(group.visible_when))
+		) {
 			return false;
 		}
 
@@ -1406,18 +1406,12 @@ function CollectionSettings() {
 	const renderSetting = (setting) => {
 		// Drop hidden nodes (set by a `hide` placement) and sections whose
 		// group-level `visible_when` predicate evaluates false.
-		if (setting?.hidden) {
-			return null;
-		}
-
 		if (
-			setting?.visible_when &&
-			!evaluateVisibleWhen(setting.visible_when)
+			setting?.hidden ||
+			(setting?.visible_when &&
+				!evaluateVisibleWhen(setting.visible_when)) ||
+			!shouldDisplaySetting(setting)
 		) {
-			return null;
-		}
-
-		if (!shouldDisplaySetting(setting)) {
 			return null;
 		}
 
@@ -2023,10 +2017,10 @@ function CollectionSettings() {
 		// and mirror it into the localized globals so other components
 		// that re-render later see the new value.
 		const handleModeChange = (nextMode) => {
-			if (nextMode !== 'easy' && nextMode !== 'advanced') {
-				return;
-			}
-			if (nextMode === settingsMode) {
+			if (
+				(nextMode !== 'easy' && nextMode !== 'advanced') ||
+				nextMode === settingsMode
+			) {
 				return;
 			}
 
@@ -2361,11 +2355,7 @@ function CollectionSettings() {
 
 	const renderTabContent = (groupId) => {
 		const group = SETTINGS_GROUPS[groupId];
-		if (!group) {
-			return null;
-		}
-
-		if (!shouldDisplayTab(group)) {
+		if (!group || !shouldDisplayTab(group)) {
 			return null;
 		}
 

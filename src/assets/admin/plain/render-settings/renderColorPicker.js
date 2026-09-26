@@ -154,10 +154,12 @@ function AlphaColorPicker({
 	}, []);
 
 	useEffect(() => {
-		if (!open || !popoverPosition || !popoverRef.current) {
-			return;
-		}
-		if (pickerRef.current) {
+		if (
+			!open ||
+			!popoverPosition ||
+			!popoverRef.current ||
+			pickerRef.current
+		) {
 			return;
 		}
 
@@ -176,10 +178,7 @@ function AlphaColorPicker({
 	}, [open, popoverPosition, value, isDisabled, updateSetting, setting.key]);
 
 	useEffect(() => {
-		if (open) {
-			return;
-		}
-		if (!pickerRef.current) {
+		if (open || !pickerRef.current) {
 			return;
 		}
 
@@ -389,21 +388,12 @@ function isCompleteColor(str) {
 		return false;
 	}
 	const s = str.trim();
-	if (
+	return (
 		/^#[0-9A-Fa-f]{3}$/.test(s) ||
 		/^#[0-9A-Fa-f]{6}$/.test(s) ||
-		/^#[0-9A-Fa-f]{8}$/.test(s)
-	) {
-		return true;
-	}
-	if (/^rgba?\([^)]+\)$/.test(s)) {
-		return true;
-	}
-	if (/^hsla?\([^)]+\)$/.test(s)) {
-		return true;
-	}
-	if (/^[a-zA-Z]+$/.test(s)) {
-		return true;
-	}
-	return false;
+		/^#[0-9A-Fa-f]{8}$/.test(s) ||
+		/^rgba?\([^)]+\)$/.test(s) ||
+		/^hsla?\([^)]+\)$/.test(s) ||
+		/^[a-zA-Z]+$/.test(s)
+	);
 }
