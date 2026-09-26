@@ -197,7 +197,8 @@ function readSettings(galleryEl) {
 		infoBlockDivider: d.fgLbInfoBlockDivider || null,
 		creditSource: d.fgLbCreditSource || 'item_meta',
 		galleryId: parseInt(d.fgGalleryId, 10) || 0,
-		exifLabels: FotoGridsLightbox._parseExifLabels(d.fgLbExifLabels),
+		exifLabels: FotoGridsLightbox._parseLabelMap(d.fgLbExifLabels),
+		labels: FotoGridsLightbox._parseLabelMap(d.fgLbLabels),
 		exifFields: d.fgLbExifFields
 			? d.fgLbExifFields.split(' ').filter(Boolean)
 			: [],
@@ -952,10 +953,10 @@ class FotoGridsLightbox {
 		const fragment = document.createRange().createContextualFragment(`
             <div class="fg-lb-backdrop" aria-hidden="true"></div>
             <div class="fg-lb-shell">
-                <div class="fg-lb-toolbar" role="toolbar" aria-label="Lightbox controls">
+                <div class="fg-lb-toolbar" role="toolbar">
                     <div class="fg-lb-toolbar-start"></div>
                     <div class="fg-lb-toolbar-end">
-                        <button class="fg-lb-close" aria-label="Close lightbox" type="button">
+                        <button class="fg-lb-close" type="button">
                             ${FGLB_ICON_CLOSE}
                         </button>
                     </div>
@@ -1747,6 +1748,12 @@ class FotoGridsLightbox {
 		const content = dlg.querySelector('.fg-lb-content');
 		if (!toolbar || !toolbarStart || !toolbarEnd || !content) return;
 
+		const labels = s.labels;
+		toolbar.setAttribute('aria-label', labels.toolbar);
+		toolbarEnd
+			.querySelector('.fg-lb-close')
+			?.setAttribute('aria-label', labels.close);
+
 		// Info panel and its toggle are removed when the panel is disabled or has
 		// no blocks selected.
 		let infoEl = content.querySelector('.fg-lb-info');
@@ -1786,7 +1793,9 @@ class FotoGridsLightbox {
 					);
 					toggleBtn.setAttribute(
 						'aria-label',
-						nowHidden ? 'Show info panel' : 'Hide info panel'
+						nowHidden
+							? this.settings.labels.show_info
+							: this.settings.labels.hide_info
 					);
 					toggleBtn.classList.toggle('fg-lb-btn--active', !nowHidden);
 					window.FgTooltip?.refresh(toggleBtn);
@@ -1805,7 +1814,7 @@ class FotoGridsLightbox {
 			);
 			toggleBtn.setAttribute(
 				'aria-label',
-				startClosed ? 'Show info panel' : 'Hide info panel'
+				startClosed ? labels.show_info : labels.hide_info
 			);
 			toggleBtn.classList.toggle('fg-lb-btn--active', !startClosed);
 		}
@@ -1818,7 +1827,6 @@ class FotoGridsLightbox {
 				shareBtn = document.createElement('button');
 				shareBtn.className = 'fg-lb-share';
 				shareBtn.type = 'button';
-				shareBtn.setAttribute('aria-label', 'Share');
 				shareBtn.setAttribute('aria-expanded', 'false');
 				shareBtn.innerHTML = FGLB_ICON_SHARE;
 				shareBtn.addEventListener('click', () =>
@@ -1828,6 +1836,7 @@ class FotoGridsLightbox {
 				toolbarEnd.insertBefore(shareBtn, closeBtn);
 				this._bindTooltip(shareBtn, { dir: 'below' });
 			}
+			shareBtn.setAttribute('aria-label', labels.share);
 		} else {
 			shareBtn?.remove();
 		}
@@ -1839,7 +1848,7 @@ class FotoGridsLightbox {
 				fsBtn = document.createElement('button');
 				fsBtn.className = 'fg-lb-fullscreen';
 				fsBtn.type = 'button';
-				fsBtn.setAttribute('aria-label', 'Enter fullscreen');
+				fsBtn.setAttribute('aria-label', labels.enter_fullscreen);
 				fsBtn.setAttribute('aria-pressed', 'false');
 				fsBtn.innerHTML = FGLB_ICON_FS_EXPAND;
 				fsBtn.addEventListener('click', () => {
@@ -1861,7 +1870,9 @@ class FotoGridsLightbox {
 					);
 					fsBtn.setAttribute(
 						'aria-label',
-						active ? 'Exit fullscreen' : 'Enter fullscreen'
+						active
+							? this.settings.labels.exit_fullscreen
+							: this.settings.labels.enter_fullscreen
 					);
 					fsBtn.innerHTML = active
 						? FGLB_ICON_FS_COLLAPSE
@@ -1890,7 +1901,7 @@ class FotoGridsLightbox {
 				zoomInBtn = document.createElement('button');
 				zoomInBtn.className = 'fg-lb-zoom-in';
 				zoomInBtn.type = 'button';
-				zoomInBtn.setAttribute('aria-label', 'Zoom in');
+				zoomInBtn.setAttribute('aria-label', labels.zoom_in);
 				zoomInBtn.innerHTML = FGLB_ICON_ZOOM_IN;
 				zoomInBtn.addEventListener('click', () => {
 					const max = this._effectiveZoomMax();
@@ -1909,7 +1920,7 @@ class FotoGridsLightbox {
 				zoomOutBtn = document.createElement('button');
 				zoomOutBtn.className = 'fg-lb-zoom-out';
 				zoomOutBtn.type = 'button';
-				zoomOutBtn.setAttribute('aria-label', 'Zoom out');
+				zoomOutBtn.setAttribute('aria-label', labels.zoom_out);
 				zoomOutBtn.innerHTML = FGLB_ICON_ZOOM_OUT;
 				zoomOutBtn.addEventListener('click', () => {
 					this._zoomScale = Math.max(
@@ -1987,7 +1998,7 @@ class FotoGridsLightbox {
 				playPauseBtn = document.createElement('button');
 				playPauseBtn.className = 'fg-lb-play-pause';
 				playPauseBtn.type = 'button';
-				playPauseBtn.setAttribute('aria-label', 'Pause auto-advance');
+				playPauseBtn.setAttribute('aria-label', labels.pause_auto);
 				playPauseBtn.setAttribute('aria-pressed', 'false');
 				playPauseBtn.innerHTML = FGLB_ICON_PAUSE; // playing on open → show pause bars
 				playPauseBtn.addEventListener('click', (e) => {
@@ -2020,13 +2031,13 @@ class FotoGridsLightbox {
 		if (paused) {
 			// Currently paused → show play triangle so user can resume
 			btn.innerHTML = FGLB_ICON_PLAY;
-			btn.setAttribute('aria-label', 'Resume auto-advance');
+			btn.setAttribute('aria-label', this.settings.labels.resume_auto);
 			btn.setAttribute('aria-pressed', 'true');
 			btn.classList.add('fg-lb-btn--active');
 		} else {
 			// Currently playing → show pause bars so user can pause
 			btn.innerHTML = FGLB_ICON_PAUSE;
-			btn.setAttribute('aria-label', 'Pause auto-advance');
+			btn.setAttribute('aria-label', this.settings.labels.pause_auto);
 			btn.setAttribute('aria-pressed', 'false');
 			btn.classList.remove('fg-lb-btn--active');
 		}
@@ -2448,12 +2459,12 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Parse the translated EXIF labels emitted alongside the field list.
+	 * Parse a JSON map of translated labels emitted by PHP on the gallery wrapper.
 	 *
-	 * @param {string|undefined} raw JSON map of field key → label.
-	 * @return {Object} Field key → label, empty when the attribute is absent.
+	 * @param {string|undefined} raw JSON map of key → label.
+	 * @return {Object} Key → label, empty when the attribute is absent.
 	 */
-	static _parseExifLabels(raw) {
+	static _parseLabelMap(raw) {
 		if (!raw) {
 			return {};
 		}

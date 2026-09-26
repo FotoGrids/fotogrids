@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T09:29:37+00:00\n"
+"POT-Creation-Date: 2026-09-26T10:28:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -7958,6 +7958,50 @@ msgstr ""
 
 #: public/render/layouts/class-layout-featured-item.php:173
 msgid "Show all images"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:196
+msgid "Lightbox controls"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:197
+msgid "Close lightbox"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:198
+msgid "Show info panel"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:199
+msgid "Hide info panel"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:200
+msgid "Share"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:201
+msgid "Enter fullscreen"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:202
+msgid "Exit fullscreen"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:203
+msgid "Zoom in"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:204
+msgid "Zoom out"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:205
+msgid "Pause auto-advance"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:206
+msgid "Resume auto-advance"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:123

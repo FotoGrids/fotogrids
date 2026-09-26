@@ -128,6 +128,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-credit-source         = "exif"  (absent = "item_meta" default)
  *   data-fg-lb-exif-fields           = "camera aperture ..." (space-sep list of enabled EXIF field keys; absent = exif block disabled or display_exif off)
  *   data-fg-lb-exif-labels           = JSON map of those field keys to their translated labels
+ *   data-fg-lb-labels                = JSON map of translated toolbar labels (see client_labels())
  *
  * Image filter attributes (desktop breakpoint values only - lightbox is fullscreen):
  *   data-fg-lb-thumb-filter          = combined CSS filter string for lightbox thumbnail strip images
@@ -184,6 +185,28 @@ final class Lightbox implements Feature {
 		return self::$arrow_icons_cache;
 	}
 
+	/**
+	 * Translated lightbox toolbar labels, emitted as `data-fg-lb-labels`.
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'toolbar'          => __( 'Lightbox controls', 'fotogrids' ),
+			'close'            => __( 'Close lightbox', 'fotogrids' ),
+			'show_info'        => __( 'Show info panel', 'fotogrids' ),
+			'hide_info'        => __( 'Hide info panel', 'fotogrids' ),
+			'share'            => __( 'Share', 'fotogrids' ),
+			'enter_fullscreen' => __( 'Enter fullscreen', 'fotogrids' ),
+			'exit_fullscreen'  => __( 'Exit fullscreen', 'fotogrids' ),
+			'zoom_in'          => __( 'Zoom in', 'fotogrids' ),
+			'zoom_out'         => __( 'Zoom out', 'fotogrids' ),
+			'pause_auto'       => __( 'Pause auto-advance', 'fotogrids' ),
+			'resume_auto'      => __( 'Resume auto-advance', 'fotogrids' ),
+		);
+	}
+
 	public function id(): string {
 		return 'fotogrids/lightbox';
 	}
@@ -224,7 +247,10 @@ final class Lightbox implements Feature {
 	 */
 	public function wrapper_data_attrs( Render_Context $render_context ): array {
 		$s     = $render_context->settings;
-		$attrs = array( 'data-fg-click' => 'lightbox' );
+		$attrs = array(
+			'data-fg-click'     => 'lightbox',
+			'data-fg-lb-labels' => (string) wp_json_encode( self::client_labels() ),
+		);
 
 		// Theme
 		$theme                     = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::theme( $s );
