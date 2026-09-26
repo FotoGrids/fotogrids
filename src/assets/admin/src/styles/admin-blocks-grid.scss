@@ -223,12 +223,19 @@
 				&::before {
 					content: "";
 					position: absolute;
-					inset: 0 -7px;
+					inset: 0 -7px -1px;
 					z-index: -1;
 					border-radius: 4px;
 					background: rgba(white, 0.15);
 					opacity: 0;
 					pointer-events: none;
+				}
+
+				&:hover,
+				&:focus-within,
+				&:has(+ .fg-abc-recently-edited-row:hover),
+				&:has(+ .fg-abc-recently-edited-row:focus-within) {
+					border-bottom-color: transparent;
 				}
 
 				&:hover::before,
@@ -324,7 +331,7 @@
 			.fg-abc-recently-edited-actions {
 				display: flex;
 				flex-wrap: wrap;
-				gap: 8px;
+				gap: 4px;
 				margin: 24px 6px 0;
 			}
 		}

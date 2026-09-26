@@ -296,7 +296,7 @@
 
 		&:hover:not(:disabled) {
 			background-color: ui-color(button, primary-text);
-			color: var(--fg-text-secondary);
+			color: var(--fg-text-primary);
 			border-color: ui-color(button, primary-text);
 		}
 	}
