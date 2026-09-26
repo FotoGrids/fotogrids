@@ -6,9 +6,11 @@ updates:
       interval: weekly
     open-pull-requests-limit: 10
     groups:
-      # Keep routine dev-tooling bumps in a single PR to cut review noise.
+      # Routine dev-tooling bumps share one PR. Major versions stay out of the
+      # group and arrive as separate PRs, since each one is its own migration.
       dev-dependencies:
         dependency-type: development
+        update-types: ["minor", "patch"]
     ignore:
       # Every @wordpress/* package below is a webpack external: the npm version is
       # never bundled, it only sets the API surface the build type-checks against.
