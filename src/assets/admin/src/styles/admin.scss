@@ -265,7 +265,6 @@
 	text-align: center;
 	background: var(--fg-background-secondary);
 	border: 1px dashed var(--fg-border-secondary);
-	border-radius: 8px;
 	color: var(--fg-text-tertiary);
 }
 
@@ -283,8 +282,8 @@
 		margin-bottom: 8px;
 
 		span {
-			background: var(--fg-background-tertiary);
 			border: 1px dashed var(--fg-border-secondary);
+			border-radius: 4px;
 		}
 	}
 
