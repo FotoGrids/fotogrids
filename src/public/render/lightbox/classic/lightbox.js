@@ -967,9 +967,9 @@ class FotoGridsLightbox {
                         <div class="fg-lb-media-wrap">
                             <img class="fg-lb-img" src="" alt="" draggable="false" />
                             <div class="fg-lb-spinner" aria-hidden="true"></div>
-                            <button class="fg-lb-prev" aria-label="Previous item" type="button" hidden></button>
-                            <button class="fg-lb-next" aria-label="Next item"     type="button" hidden></button>
-                            <div class="fg-lb-dots" role="tablist" aria-label="Item navigation" hidden></div>
+                            <button class="fg-lb-prev" type="button" hidden></button>
+                            <button class="fg-lb-next" type="button" hidden></button>
+                            <div class="fg-lb-dots" role="tablist" hidden></div>
                         </div>
                         <div class="fg-lb-thumbs" hidden></div>
                     </div>
@@ -1726,10 +1726,7 @@ class FotoGridsLightbox {
 			dlg.setAttribute('data-fg-lb-progress-controls', '');
 		}
 
-		dlg.setAttribute(
-			'aria-label',
-			`Gallery lightbox - ${this.items.length} item${this.items.length === 1 ? '' : 's'}`
-		);
+		dlg.setAttribute('aria-label', s.labels.dialog);
 	}
 
 	/**
@@ -1753,6 +1750,18 @@ class FotoGridsLightbox {
 		toolbarEnd
 			.querySelector('.fg-lb-close')
 			?.setAttribute('aria-label', labels.close);
+		dlg.querySelector('.fg-lb-prev')?.setAttribute(
+			'aria-label',
+			labels.previous_item
+		);
+		dlg.querySelector('.fg-lb-next')?.setAttribute(
+			'aria-label',
+			labels.next_item
+		);
+		dlg.querySelector('.fg-lb-dots')?.setAttribute(
+			'aria-label',
+			labels.item_navigation
+		);
 
 		// Info panel and its toggle are removed when the panel is disabled or has
 		// no blocks selected.
@@ -2097,7 +2106,9 @@ class FotoGridsLightbox {
 			btn.setAttribute('role', 'tab');
 			btn.setAttribute(
 				'aria-label',
-				`Item ${i + 1} of ${this.items.length}`
+				this.settings.labels.item_of
+					.replace('%1$d', i + 1)
+					.replace('%2$d', this.items.length)
 			);
 			container.appendChild(btn);
 		});
@@ -2145,7 +2156,10 @@ class FotoGridsLightbox {
 			btn.type = 'button';
 			btn.className = 'fg-lb-thumb';
 			btn.dataset.lbIndex = i;
-			btn.setAttribute('aria-label', `Go to item ${i + 1}`);
+			btn.setAttribute(
+				'aria-label',
+				this.settings.labels.go_to_item.replace('%d', i + 1)
+			);
 
 			const isVideo =
 				!!item &&
@@ -2227,7 +2241,12 @@ class FotoGridsLightbox {
 		// Reset zoom on every slide change so the new image starts at 1×.
 		if (s.zoom) this._resetZoom();
 
-		dlg.setAttribute('aria-label', `Item ${index + 1} of ${this._total}`);
+		dlg.setAttribute(
+			'aria-label',
+			s.labels.item_of
+				.replace('%1$d', index + 1)
+				.replace('%2$d', this._total)
+		);
 
 		// Slide not loaded yet: show the spinner and stop. _fetchSlideRange
 		// re-invokes _showItem once the slot is filled.
@@ -2429,7 +2448,10 @@ class FotoGridsLightbox {
 			'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
 		);
 		iframe.setAttribute('allowfullscreen', '');
-		iframe.setAttribute('title', item.title || item.alt || 'Video');
+		iframe.setAttribute(
+			'title',
+			item.title || item.alt || this.settings.labels.video
+		);
 		return iframe;
 	}
 
@@ -2937,11 +2959,15 @@ class FotoGridsLightbox {
 					return;
 				}
 				const rows = [];
-				if (fi.filename) rows.push(['File', fi.filename]);
-				if (fi.filesize) rows.push(['Size', fi.filesize]);
+				const labels = this.settings.labels;
+				if (fi.filename) rows.push([labels.file, fi.filename]);
+				if (fi.filesize) rows.push([labels.size, fi.filesize]);
 				if (fi.width && fi.height)
-					rows.push(['Dimensions', `${fi.width} × ${fi.height}`]);
-				if (fi.mime_type) rows.push(['Type', fi.mime_type]);
+					rows.push([
+						labels.dimensions,
+						`${fi.width} × ${fi.height}`,
+					]);
+				if (fi.mime_type) rows.push([labels.type, fi.mime_type]);
 				if (rows.length === 0) {
 					blockEl.remove();
 					return;
@@ -3009,7 +3035,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'Tags',
+						this.settings.labels.tags,
 						FotoGridsLightbox.BLOCK_ICONS.tags
 					)
 				);
@@ -3034,7 +3060,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'People',
+						this.settings.labels.people,
 						FotoGridsLightbox.BLOCK_ICONS.people
 					)
 				);
@@ -3054,7 +3080,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'Location',
+						this.settings.labels.location,
 						FotoGridsLightbox.BLOCK_ICONS.location
 					)
 				);
