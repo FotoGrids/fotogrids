@@ -205,18 +205,29 @@
 				list-style: none;
 				margin: 0;
 				padding: 0 6px;
-				display: flex;
-				flex-direction: column;
-				gap: 8px;
+				display: grid;
+				grid-template-columns: max-content minmax(0, 1fr) max-content;
+				column-gap: 10px;
 			}
 
 			.fg-abc-recently-edited-row {
-				display: flex;
+				display: grid;
+				grid-column: 1 / -1;
+				grid-template-columns: subgrid;
 				align-items: center;
-				justify-content: space-between;
-				gap: 12px;
 				margin: 0;
+				padding: 7px 0;
 				font-size: 13px;
+				border-bottom: 1px solid rgba(white, 0.15);
+
+				&:first-child {
+					padding-top: 0;
+				}
+
+				&:last-child {
+					padding-bottom: 0;
+					border-bottom: 0;
+				}
 			}
 
 			.fg-abc-recently-edited-link {
@@ -241,18 +252,21 @@
 
 			.fg-abc-recently-edited-type,
 			.fg-abc-recently-edited-status {
-				flex: 0 0 auto;
 				font-size: 9px;
 				font-weight: 600;
 				line-height: 1.4;
 				text-transform: uppercase;
 				padding: 1px 4px;
 				border-radius: 3px;
+			}
+
+			.fg-abc-recently-edited-type {
+				text-align: center;
 				background: rgba(0, 0, 0, 0.2);
 			}
 
 			.fg-abc-recently-edited-status {
-				background: transparent;
+				flex: 0 0 auto;
 				border: 1px solid rgba(white, 0.7);
 			}
 
@@ -263,21 +277,41 @@
 			}
 
 			.fg-abc-recently-edited-date {
-				flex: 0 0 auto;
 				color: rgba(white, 0.7);
 				font-size: 12px;
+				text-align: end;
 			}
 
-			.fg-abc-recently-edited-all {
+			.fg-abc-recently-edited-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
 				margin: 24px 6px 0;
+			}
+
+			.fg-abc-recently-edited-button {
+				display: inline-flex;
+				align-items: center;
+				padding: 6px 16px;
+				border: 1px solid white;
+				border-radius: 6px;
+				background: transparent;
 				color: white;
 				font-size: 13px;
 				font-weight: 600;
+				line-height: 1.4;
+				text-decoration: none;
+				transition: all 0.2s;
 
 				&:hover,
 				&:focus {
-					color: white;
-					text-decoration: none;
+					background: white;
+					color: var(--fg-green);
+				}
+
+				&:focus {
+					outline: 1px solid white;
+					outline-offset: 2px;
 				}
 			}
 		}

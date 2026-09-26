@@ -15,10 +15,32 @@ const STATUS_LABELS = {
     private: __('Private', 'fotogrids')
 };
 
+/**
+ * Short, localised day-and-month label for a GMT MySQL datetime.
+ *
+ * The year is added only when it differs from the current one.
+ *
+ * @param {string} gmt Datetime in `YYYY-MM-DD HH:MM:SS` form, GMT.
+ * @return {string} Label such as "Sep 24", or an empty string when unparsable.
+ */
+export const formatShortDate = (gmt) => {
+    const date = new Date(`${String(gmt).replace(' ', 'T')}Z`);
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    const options = { month: 'short', day: 'numeric' };
+    if (date.getFullYear() !== new Date().getFullYear()) {
+        options.year = 'numeric';
+    }
+
+    return date.toLocaleDateString(document.documentElement.lang || undefined, options);
+};
+
 const RecentlyEditedRow = ({ item }) => (
     <li className="fg-abc-recently-edited-row">
+        <span className="fg-abc-recently-edited-type">{item.type_label}</span>
         <a className="fg-abc-recently-edited-link" href={item.edit_url}>
-            <span className="fg-abc-recently-edited-type">{item.type_label}</span>
             <span className="fg-abc-recently-edited-title">
                 {item.title || `${item.untitled_label} #${item.id}`}
             </span>
@@ -28,11 +50,13 @@ const RecentlyEditedRow = ({ item }) => (
                 </span>
             )}
         </a>
-        <span className="fg-abc-recently-edited-date">{item.modified_formatted}</span>
+        <span className="fg-abc-recently-edited-date" title={item.modified_formatted}>
+            {formatShortDate(item.modified_gmt)}
+        </span>
     </li>
 );
 
-const RecentlyEdited = () => {
+const RecentlyEdited = ({ hasAlbums = false }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -81,9 +105,16 @@ const RecentlyEdited = () => {
                 <h3>{__('Recently Edited', 'fotogrids')}</h3>
             </div>
             {body}
-            <a className="fg-abc-recently-edited-all" href="edit.php?post_type=fotogrids_gallery">
-                {__('View all galleries', 'fotogrids')}
-            </a>
+            <div className="fg-abc-recently-edited-actions">
+                <a className="fg-abc-recently-edited-button" href="edit.php?post_type=fotogrids_gallery">
+                    {__('View all galleries', 'fotogrids')}
+                </a>
+                {hasAlbums && (
+                    <a className="fg-abc-recently-edited-button" href="edit.php?post_type=fotogrids_album">
+                        {__('View all albums', 'fotogrids')}
+                    </a>
+                )}
+            </div>
         </div>
     );
 };

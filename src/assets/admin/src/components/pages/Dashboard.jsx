@@ -24,6 +24,7 @@ const Dashboard = () => {
         galleries_published: 0,
         settings_configured: false,
         albums: 0,
+        albums_total: 0,
         items: 0,
         views: 0,
         shares: 0
@@ -44,6 +45,7 @@ const Dashboard = () => {
                     galleries_published: data.galleries_published || 0,
                     settings_configured: data.settings_configured || false,
                     albums: data.albums || 0,
+                    albums_total: data.albums_total || 0,
                     items: data.items || 0,
                     views: data.views || 0,
                     shares: data.shares || 0
@@ -83,7 +85,7 @@ const Dashboard = () => {
         }
 
         if (isSetupComplete(setupProgress)) {
-            return <RecentlyEdited />;
+            return <RecentlyEdited hasAlbums={stats.albums_total > 0} />;
         }
 
         return <Checklist {...setupProgress} />;

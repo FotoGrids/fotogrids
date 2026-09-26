@@ -186,6 +186,7 @@ export const fetchDashboardStats = () => {
 		galleries_published: 0,
 		settings_configured: false,
 		albums: 0,
+		albums_total: 0,
 		items: 0,
 		views: 0,
 		shares: 0,

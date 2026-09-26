@@ -2,7 +2,9 @@
  * Tests for src/assets/admin/src/components/dashboard/RecentlyEdited.jsx
  */
 import React from 'react';
-import RecentlyEdited from '@/admin/src/components/dashboard/RecentlyEdited';
+import RecentlyEdited, {
+	formatShortDate,
+} from '@/admin/src/components/dashboard/RecentlyEdited';
 import { renderElement, act } from '@tests/helpers/render-component';
 
 const ROWS = [
@@ -13,6 +15,7 @@ const ROWS = [
 		type: 'fotogrids_gallery',
 		type_label: 'Gallery',
 		status: 'publish',
+		modified_gmt: '2026-09-24 10:00:00',
 		modified_formatted: 'September 24, 2026 10:00 am',
 		edit_url: 'https://example.test/wp-admin/post.php?post=12&action=edit',
 	},
@@ -23,6 +26,7 @@ const ROWS = [
 		type: 'fotogrids_album',
 		type_label: 'Album',
 		status: 'draft',
+		modified_gmt: '2026-09-23 09:00:00',
 		modified_formatted: 'September 23, 2026 9:00 am',
 		edit_url: 'https://example.test/wp-admin/post.php?post=15&action=edit',
 	},
@@ -112,5 +116,55 @@ describe('dashboard RecentlyEdited', () => {
 
 		console.error.mockRestore();
 		unmount();
+	});
+
+	it('links to the gallery list, and to the album list only when albums exist', async () => {
+		wp.apiFetch.mockResolvedValue({ items: ROWS });
+
+		const hrefs = (container) =>
+			Array.from(
+				container.querySelectorAll('.fg-abc-recently-edited-button')
+			).map((a) => a.getAttribute('href'));
+
+		const withoutAlbums = renderElement(React.createElement(RecentlyEdited));
+		await flush();
+		expect(hrefs(withoutAlbums.container)).toEqual([
+			'edit.php?post_type=fotogrids_gallery',
+		]);
+		withoutAlbums.unmount();
+
+		const withAlbums = renderElement(
+			React.createElement(RecentlyEdited, { hasAlbums: true })
+		);
+		await flush();
+		expect(hrefs(withAlbums.container)).toEqual([
+			'edit.php?post_type=fotogrids_gallery',
+			'edit.php?post_type=fotogrids_album',
+		]);
+		withAlbums.unmount();
+	});
+});
+
+describe('formatShortDate', () => {
+	beforeAll(() => {
+		jest.useFakeTimers({ now: new Date('2026-09-26T12:00:00Z') });
+	});
+
+	afterAll(() => {
+		jest.useRealTimers();
+	});
+
+	it('shows day and month for the current year', () => {
+		const label = formatShortDate('2026-09-24 10:00:00');
+		expect(label).toMatch(/24/);
+		expect(label).not.toMatch(/2026/);
+	});
+
+	it('adds the year for an earlier year', () => {
+		expect(formatShortDate('2025-06-15 10:00:00')).toMatch(/2025/);
+	});
+
+	it('returns an empty string for an unparsable value', () => {
+		expect(formatShortDate('')).toBe('');
 	});
 });
