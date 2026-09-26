@@ -14,18 +14,12 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// This is a WordPress block render template, include()d by the block renderer.
-// The variables below are file-scoped locals for this template (not plugin
-// globals); the sniff flags them only because a template's top level is
-// technically global scope.
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-
-$gallery_id = isset( $attributes['galleryId'] ) ? absint( $attributes['galleryId'] ) : 0;
-if ( $gallery_id <= 0 ) {
+$fotogrids_gallery_id = isset( $attributes['galleryId'] ) ? absint( $attributes['galleryId'] ) : 0;
+if ( $fotogrids_gallery_id <= 0 ) {
 	return; // Unconfigured block - emit nothing on the front end.
 }
 
-$wrapper_attributes = function_exists( 'get_block_wrapper_attributes' )
+$fotogrids_wrapper_attributes = function_exists( 'get_block_wrapper_attributes' )
 	? get_block_wrapper_attributes()
 	: '';
 
@@ -33,16 +27,15 @@ $wrapper_attributes = function_exists( 'get_block_wrapper_attributes' )
 // stays a single code path. _source = BLOCK tells the renderer this is
 // a block-host render (used by Request_Source-aware modules).
 if ( method_exists( '\FotoGrids\Public_Render', 'gallery_shortcode' ) ) {
-	$inner = \FotoGrids\Public_Render::gallery_shortcode(
+	$fotogrids_inner = \FotoGrids\Public_Render::gallery_shortcode(
 		array(
-			'id'      => $gallery_id,
+			'id'      => $fotogrids_gallery_id,
 			'_source' => 'block',
 		)
 	);
 
-	$fg_markup = '' !== $wrapper_attributes
-		? '<div ' . $wrapper_attributes . '>' . $inner . '</div>'
-		: $inner;
-	echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
+	$fotogrids_markup = '' !== $fotogrids_wrapper_attributes
+		? '<div ' . $fotogrids_wrapper_attributes . '>' . $fotogrids_inner . '</div>'
+		: $fotogrids_inner;
+	echo wp_kses( $fotogrids_markup, \FotoGrids\Kses::rules( $fotogrids_markup ) );
 }
-// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

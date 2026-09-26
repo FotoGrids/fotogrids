@@ -14,33 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Gallery_Data backs gallery REST endpoints over the custom
-	 * fotogrids_item_meta table. The WPDB sniffs below are suppressed
-	 * class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom table, no WP_Query / core
-	 *    API equivalent.
-	 *  - DirectDatabaseQuery.NoCaching: gallery render reads are served via
-	 *    FotoGrids_Cache at a higher layer; caching here too is a non-goal.
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: the interpolated $table is
-	 *    `$wpdb->prefix . 'fotogrids_item_meta'` (trusted literal). All
-	 *    user-supplied *values* go through $wpdb->prepare(); where SQL is
-	 *    built incrementally the prepare call is a separate statement from
-	 *    the get_*() call, which the sniff cannot follow.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Set or clear the gallery's featured item.
 	 *
@@ -572,8 +545,8 @@ class Gallery_Data {
 		global $wpdb;
 		$table = $wpdb->prefix . 'fotogrids_item_meta';
 
-		$sql    = "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC";
-		$params = array( $gallery_id );
+		$sql    = 'SELECT * FROM %i WHERE gallery_id = %d ORDER BY position ASC';
+		$params = array( $table, $gallery_id );
 
 		if ( $limit > 0 ) {
 			$sql     .= ' LIMIT %d';
@@ -585,8 +558,8 @@ class Gallery_Data {
 			}
 		}
 
-		$results = $wpdb->get_results(
-			$wpdb->prepare( $sql, $params ),
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $sql is assembled above from %i and %d placeholders only.
+			$wpdb->prepare( $sql, $params ), // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is assembled above from %i and %d placeholders only.
 			ARRAY_A
 		);
 
@@ -629,9 +602,10 @@ class Gallery_Data {
 		global $wpdb;
 
 		$table   = $wpdb->prefix . 'fotogrids_item_meta';
-		$results = $wpdb->get_results(
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
 			$wpdb->prepare(
-				"SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC",
+				'SELECT * FROM %i WHERE gallery_id = %d ORDER BY position ASC',
+				$table,
 				$gallery_id
 			),
 			ARRAY_A
@@ -715,18 +689,12 @@ class Gallery_Data {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'fotogrids_item_meta';
-		return (int) $wpdb->get_var(
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $table WHERE gallery_id = %d",
+				'SELECT COUNT(*) FROM %i WHERE gallery_id = %d',
+				$table,
 				$gallery_id
 			)
 		);
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

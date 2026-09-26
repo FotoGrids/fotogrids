@@ -20,35 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Import_Export_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Import_Export_Data is the admin-only, user-triggered REST tool for
-	 * exporting/importing the custom fotogrids_* tables. The WPDB sniffs
-	 * below are suppressed class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: these are custom tables with no
-	 *    WP_Query / core API equivalent. Several flagged statements are also
-	 *    transaction control (START TRANSACTION / COMMIT / ROLLBACK), which
-	 *    are not queries at all.
-	 *
-	 *  - DirectDatabaseQuery.NoCaching: this tool runs on explicit admin
-	 *    action (export/import), not on any render or request hot path, so
-	 *    object caching is a non-goal here - not deferred debt.
-	 *
-	 *  - PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name is built as `$wpdb->prefix . 'fotogrids_*'` (a trusted,
-	 *    hardcoded literal - WP placeholders cannot bind table identifiers).
-	 *    All user-supplied *values* are passed through $wpdb->prepare().
-	 * ---------------------------------------------------------------------
-	 */
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	// phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-	// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	const LOG_OPTION = 'fotogrids_import_export_log';
 	const LOG_MAX    = 50;
@@ -263,7 +235,7 @@ class Import_Export_Data {
 		if ( in_array( 'albums', $include_types, true ) || in_array( 'galleries', $include_types, true ) ) {
 			$table                  = $wpdb->prefix . 'fotogrids_gallery_albums';
 			$data['gallery_albums'] = $wpdb->get_results(
-				"SELECT gallery_id, album_id, position FROM {$table} ORDER BY album_id, position",
+				$wpdb->prepare( 'SELECT gallery_id, album_id, position FROM %i ORDER BY album_id, position', $table ),
 				ARRAY_A
 			) ?: array();
 		}
@@ -271,13 +243,13 @@ class Import_Export_Data {
 		if ( in_array( 'items', $include_types, true ) ) {
 			$table         = $wpdb->prefix . 'fotogrids_item_meta';
 			$data['items'] = $wpdb->get_results(
-				"SELECT * FROM {$table} ORDER BY gallery_id, position",
+				$wpdb->prepare( 'SELECT * FROM %i ORDER BY gallery_id, position', $table ),
 				ARRAY_A
 			) ?: array();
 
 			$meta_table            = $wpdb->prefix . 'fotogrids_item_metadata';
 			$data['item_metadata'] = $wpdb->get_results(
-				"SELECT * FROM {$meta_table}",
+				$wpdb->prepare( 'SELECT * FROM %i', $meta_table ),
 				ARRAY_A
 			) ?: array();
 		}
@@ -285,7 +257,7 @@ class Import_Export_Data {
 		if ( in_array( 'tags', $include_types, true ) ) {
 			$table        = $wpdb->prefix . 'fotogrids_tags';
 			$data['tags'] = $wpdb->get_results(
-				"SELECT * FROM {$table} ORDER BY type, name",
+				$wpdb->prepare( 'SELECT * FROM %i ORDER BY type, name', $table ),
 				ARRAY_A
 			) ?: array();
 		}
@@ -303,7 +275,7 @@ class Import_Export_Data {
 		if ( in_array( 'statistics', $include_types, true ) ) {
 			$table              = $wpdb->prefix . 'fotogrids_statistics';
 			$data['statistics'] = $wpdb->get_results(
-				"SELECT object_type, object_id, views, shares, last_viewed FROM {$table}",
+				$wpdb->prepare( 'SELECT object_type, object_id, views, shares, last_viewed FROM %i', $table ),
 				ARRAY_A
 			) ?: array();
 		}
@@ -649,7 +621,8 @@ class Import_Export_Data {
 
 			$exists = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT id FROM {$table} WHERE name = %s AND type = %s LIMIT 1",
+					'SELECT id FROM %i WHERE name = %s AND type = %s LIMIT 1',
+					$table,
 					$name,
 					$type
 				)
@@ -760,7 +733,8 @@ class Import_Export_Data {
 
 			$exists = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT id FROM {$table} WHERE gallery_id = %d AND album_id = %d LIMIT 1",
+					'SELECT id FROM %i WHERE gallery_id = %d AND album_id = %d LIMIT 1',
+					$table,
 					$gallery_id,
 					$album_id
 				)
@@ -803,7 +777,8 @@ class Import_Export_Data {
 			// Skip if this exact attachment is already in this gallery.
 			$exists = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT id FROM {$table} WHERE attachment_id = %d AND gallery_id = %d LIMIT 1",
+					'SELECT id FROM %i WHERE attachment_id = %d AND gallery_id = %d LIMIT 1',
+					$table,
 					$attachment_id,
 					$gallery_id
 				)
@@ -856,7 +831,8 @@ class Import_Export_Data {
 
 			$exists = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT id FROM {$table} WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d LIMIT 1",
+					'SELECT id FROM %i WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d LIMIT 1',
+					$table,
 					$attachment_id,
 					$metadata_type,
 					$metadata_id
@@ -997,9 +973,5 @@ class Import_Export_Data {
 		update_option( self::LOG_OPTION, $log, false );
 	}
 
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	// phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-	// phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

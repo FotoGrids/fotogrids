@@ -125,17 +125,11 @@ final class Context_Builder {
 		if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
 			$candidate    = (int) $meta_overrides['via_album_id'];
 			$via_album_id = $candidate > 0 ? $candidate : null;
-		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block wraps nonce-suppression pragmas; cannot collapse to elseif.
-			// Public breadcrumb context hint read from a normal front-end page
-			// view (no form submission, no state change), so nonce verification
-			// does not apply. The (int) cast is the sanitization, and the value
-			// is only validated/used as an album id by Breadcrumb_Resolver.
-            // phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			if ( isset( $_GET['fg_via'] ) ) {
-				$candidate    = (int) wp_unslash( $_GET['fg_via'] );
+		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block holds the fg_via query-var fallback for the override branch.
+			if ( isset( $_GET['fg_via'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only breadcrumb hint on a front-end page view.
+				$candidate    = (int) wp_unslash( $_GET['fg_via'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only breadcrumb hint; the (int) cast sanitizes it.
 				$via_album_id = $candidate > 0 ? $candidate : null;
 			}
-            // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 
 		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
@@ -848,17 +842,14 @@ final class Context_Builder {
 		global $wpdb;
 		$table = $wpdb->prefix . 'fotogrids_item_meta';
 
-		// $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal); all
-		// values are bound via $wpdb->prepare(). Custom table: direct query, no cache.
-        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$raw = $wpdb->get_var(
+		$raw = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
 			$wpdb->prepare(
-				"SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = %d LIMIT 1",
+				'SELECT custom_data FROM %i WHERE attachment_id = %d AND gallery_id = %d LIMIT 1',
+				$table,
 				$attachment_id,
 				$gallery_id
 			)
 		);
-        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( empty( $raw ) ) {
 			return array();
@@ -1318,16 +1309,11 @@ final class Context_Builder {
 
 		// Fetch global item rows (gallery_id = 0) only; these carry the
 		// external_url / link_target set via the item edit modal.
-		// $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal); the
-		// IN() list is built from generated %d placeholders and bound through
-		// $wpdb->prepare(). Custom table, so direct query + no object cache.
-        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-		$sql  = "SELECT attachment_id, external_url, link_target FROM {$table} WHERE gallery_id = 0 AND attachment_id IN ({$placeholders})";
-		$rows = $wpdb->get_results(
-			$wpdb->prepare( $sql, ...$attachment_ids ),
+		$sql  = "SELECT attachment_id, external_url, link_target FROM %i WHERE gallery_id = 0 AND attachment_id IN ({$placeholders})";
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
+			$wpdb->prepare( $sql, $table, ...$attachment_ids ), // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql holds a %i table and a generated list of %d tokens.
 			ARRAY_A
 		);
-        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
 		$result = array();
 		if ( is_array( $rows ) ) {

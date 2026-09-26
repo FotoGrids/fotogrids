@@ -31,28 +31,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Gallery_Repository {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Get a gallery post by ID, with post-type validation.
 	 *
@@ -207,7 +185,7 @@ final class Gallery_Repository {
 
 		global $wpdb;
 
-		$rows = $wpdb->get_col(
+		$rows = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reverse lookup on serialized post meta; no core API returns this shape.
 			$wpdb->prepare(
 				"SELECT post_id FROM {$wpdb->postmeta}
              WHERE meta_key = 'fotogrids_gallery_items'
@@ -293,10 +271,10 @@ final class Gallery_Repository {
 
 		// Bulk SELECT - one round-trip for all attachments in the gallery.
 		$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
-		$rows         = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE gallery_id = %d AND attachment_id IN ({$placeholders})",
-				array_merge( array( $gallery_id ), $item_ids )
+		$rows         = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders adds one %d per entry in $item_ids.
+				"SELECT * FROM %i WHERE gallery_id = %d AND attachment_id IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $placeholders is a generated list of %d tokens.
+				array_merge( array( $table, $gallery_id ), $item_ids )
 			),
 			ARRAY_A
 		);
@@ -352,12 +330,4 @@ final class Gallery_Repository {
 
 		return $items;
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }
