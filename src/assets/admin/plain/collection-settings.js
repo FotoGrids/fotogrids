@@ -1988,13 +1988,11 @@ function CollectionSettings() {
 				key: setting.key,
 				className: `fotogrids-setting ${isDisabled ? 'fotogrids-setting--disabled' : ''}`,
 			},
-			[
-				gatedControl,
-				window.FotoGridsRenderSettings?.renderConditionalMessage(
-					setting,
-					currentValue
-				),
-			].filter(Boolean)
+			gatedControl,
+			window.FotoGridsRenderSettings?.renderConditionalMessage(
+				setting,
+				currentValue
+			) || null
 		);
 	};
 
