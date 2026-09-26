@@ -29,28 +29,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Watermark_Regenerate_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Status: counts plus, for a single gallery, the per-item state list.
 	 *
@@ -171,8 +149,7 @@ final class Watermark_Regenerate_Data {
 	private static function all_gallery_attachment_ids(): array {
 		global $wpdb;
 
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$rows = $wpdb->get_col(
+		$rows = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Batch lookup; no core API returns this shape.
 			$wpdb->prepare(
 				"SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s",
 				'fotogrids_gallery_items'
@@ -232,12 +209,4 @@ final class Watermark_Regenerate_Data {
 
 		return array_values( array_unique( $images ) );
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

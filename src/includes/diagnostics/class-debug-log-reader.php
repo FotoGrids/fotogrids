@@ -59,7 +59,7 @@ final class Debug_Log_Reader {
 			return self::empty_result( '' );
 		}
 
-		// phpcs:disable WordPress.WP.AlternativeFunctions -- WP_Filesystem cannot seek, and reading a multi-gigabyte log whole to show its last lines is not an option.
+		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- WP_Filesystem cannot seek, and reading a multi-gigabyte log whole to show its last lines is not an option.
 		$size = (int) filesize( $path );
 
 		if ( $size <= 0 ) {
@@ -80,7 +80,7 @@ final class Debug_Log_Reader {
 
 		$chunk = stream_get_contents( $handle );
 		fclose( $handle );
-		// phpcs:enable WordPress.WP.AlternativeFunctions
+		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 		if ( ! is_string( $chunk ) || '' === trim( $chunk ) ) {
 			return self::empty_result( $path );

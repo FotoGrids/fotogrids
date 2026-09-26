@@ -14,31 +14,24 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// This is a WordPress block render template, include()d by the block renderer.
-// The variables below are file-scoped locals for this template (not plugin
-// globals); the sniff flags them only because a template's top level is
-// technically global scope.
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-
-$album_id = isset( $attributes['albumId'] ) ? absint( $attributes['albumId'] ) : 0;
-if ( $album_id <= 0 ) {
+$fotogrids_album_id = isset( $attributes['albumId'] ) ? absint( $attributes['albumId'] ) : 0;
+if ( $fotogrids_album_id <= 0 ) {
 	return;
 }
 
-$wrapper_attributes = function_exists( 'get_block_wrapper_attributes' )
+$fotogrids_wrapper_attributes = function_exists( 'get_block_wrapper_attributes' )
 	? get_block_wrapper_attributes()
 	: '';
 
 if ( method_exists( '\FotoGrids\Public_Render', 'album_shortcode' ) ) {
-	$inner = \FotoGrids\Public_Render::album_shortcode(
+	$fotogrids_inner = \FotoGrids\Public_Render::album_shortcode(
 		array(
-			'id' => $album_id,
+			'id' => $fotogrids_album_id,
 		)
 	);
 
-	$fg_markup = '' !== $wrapper_attributes
-		? '<div ' . $wrapper_attributes . '>' . $inner . '</div>'
-		: $inner;
-	echo wp_kses( $fg_markup, \FotoGrids\Kses::rules( $fg_markup ) );
+	$fotogrids_markup = '' !== $fotogrids_wrapper_attributes
+		? '<div ' . $fotogrids_wrapper_attributes . '>' . $fotogrids_inner . '</div>'
+		: $fotogrids_inner;
+	echo wp_kses( $fotogrids_markup, \FotoGrids\Kses::rules( $fotogrids_markup ) );
 }
-// phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound

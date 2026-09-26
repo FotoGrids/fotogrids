@@ -34,31 +34,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_Ajax_Endpoints {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Item_Ajax_Endpoints reads/writes the custom fotogrids_item_meta table
-	 * for the admin item editor. The WPDB sniffs below are suppressed
-	 * class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom table, no WP_Query / core
-	 *    API equivalent.
-	 *  - DirectDatabaseQuery.NoCaching: admin-side, user-action reads/writes;
-	 *    caching is a non-goal.
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: the interpolated $table is
-	 *    `$wpdb->prefix . 'fotogrids_item_meta'` (trusted literal), and the
-	 *    dynamic IN() list is built from generated %d placeholders. All
-	 *    user-supplied *values* go through $wpdb->prepare().
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Wire the 6 `wp_ajax_*` endpoints.
@@ -100,7 +76,8 @@ final class Item_Ajax_Endpoints {
 		$table       = $wpdb->prefix . 'fotogrids_item_meta';
 		$custom_meta = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE attachment_id = %d AND gallery_id = 0",
+				'SELECT * FROM %i WHERE attachment_id = %d AND gallery_id = 0',
+				$table,
 				$item_id
 			)
 		);
@@ -382,7 +359,8 @@ final class Item_Ajax_Endpoints {
 
 		$existing = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE attachment_id = %d AND gallery_id = 0",
+				'SELECT * FROM %i WHERE attachment_id = %d AND gallery_id = 0',
+				$table,
 				$item_id
 			)
 		);
@@ -442,8 +420,8 @@ final class Item_Ajax_Endpoints {
 		$table        = $wpdb->prefix . 'fotogrids_item_meta';
 		$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
 
-		$sql     = "SELECT attachment_id, external_url, link_target FROM {$table} WHERE attachment_id IN ({$placeholders})";
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $item_ids ), ARRAY_A );
+		$sql     = "SELECT attachment_id, external_url, link_target FROM %i WHERE attachment_id IN ({$placeholders})";
+		$results = $wpdb->get_results( $wpdb->prepare( $sql, array_merge( array( $table ), $item_ids ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql holds a generated list of %d placeholders.
 
 		$item_data = array();
 		foreach ( $results as $row ) {
@@ -503,7 +481,8 @@ final class Item_Ajax_Endpoints {
 
 		$exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE attachment_id = %d",
+				'SELECT COUNT(*) FROM %i WHERE attachment_id = %d',
+				$table,
 				$item_id
 			)
 		);
@@ -578,7 +557,8 @@ final class Item_Ajax_Endpoints {
 			foreach ( $item_ids as $item_id ) {
 				$exists = $wpdb->get_var(
 					$wpdb->prepare(
-						"SELECT COUNT(*) FROM {$table} WHERE attachment_id = %d",
+						'SELECT COUNT(*) FROM %i WHERE attachment_id = %d',
+						$table,
 						$item_id
 					)
 				);
@@ -694,10 +674,5 @@ final class Item_Ajax_Endpoints {
 		}
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

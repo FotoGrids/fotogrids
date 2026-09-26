@@ -43,15 +43,15 @@ namespace {
         }
 
         /**
-         * SELECT html … WHERE cache_key = %s AND expires_at > %s.
+         * SELECT html FROM %i WHERE cache_key = %s AND expires_at > %s: table, key, now.
          *
          * @param  array{sql: string, args: array<int, mixed>} $statement
          * @return object|null
          */
         public function get_row( array $statement ) {
             ++$this->select_count;
-            $cache_key = (string) $statement['args'][0];
-            $now       = (string) $statement['args'][1];
+            $cache_key = (string) $statement['args'][1];
+            $now       = (string) $statement['args'][2];
             $row       = $this->rows[ $cache_key ] ?? null;
             if ( null === $row || $row['expires_at'] <= $now ) {
                 return null;
@@ -60,15 +60,15 @@ namespace {
         }
 
         /**
-         * INSERT … VALUES ('gallery', %d, %s, %s, %s, %s): id, key, payload, cached_at, expires_at.
+         * INSERT INTO %i … VALUES ('gallery', %d, %s, %s, %s, %s): table, id, key, payload, cached_at, expires_at.
          *
          * @param  array{sql: string, args: array<int, mixed>} $statement
          * @return int
          */
         public function query( array $statement ): int {
-            $this->rows[ (string) $statement['args'][1] ] = array(
-                'html'       => (string) $statement['args'][2],
-                'expires_at' => (string) $statement['args'][4],
+            $this->rows[ (string) $statement['args'][2] ] = array(
+                'html'       => (string) $statement['args'][3],
+                'expires_at' => (string) $statement['args'][5],
             );
             return 1;
         }

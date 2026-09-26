@@ -36,28 +36,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Lightbox_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Fetch all lightbox panel data for a single attachment.
 	 *
@@ -80,9 +58,10 @@ class Lightbox_Data {
 
 		global $wpdb;
 		$table       = $wpdb->prefix . 'fotogrids_item_meta';
-		$custom_meta = $wpdb->get_row(
+		$custom_meta = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
 			$wpdb->prepare(
-				"SELECT description, credit, exif_data, location FROM {$table} WHERE attachment_id = %d AND gallery_id = 0",
+				'SELECT description, credit, exif_data, location FROM %i WHERE attachment_id = %d AND gallery_id = 0',
+				$table,
 				$item_id
 			)
 		);
@@ -251,12 +230,4 @@ class Lightbox_Data {
 
 		return '';
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

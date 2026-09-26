@@ -14,28 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Album_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-	// phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-	// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Set or clear the album's featured gallery.
 	 *
@@ -231,19 +209,12 @@ class Album_Data {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'fotogrids_item_meta';
-		return (int) $wpdb->get_var(
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $table WHERE gallery_id = %d",
+				'SELECT COUNT(*) FROM %i WHERE gallery_id = %d',
+				$table,
 				$gallery_id
 			)
 		);
 	}
-
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	// phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-	// phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-	// phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

@@ -27,30 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class FotoGrids_Cache {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * FotoGrids_Cache is the L2 data layer over the custom
-	 * fotogrids_render_cache table (with a composed Object_Cache as L1).
-	 * The WPDB sniffs below are suppressed class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom table, no WP_Query / core
-	 *    API equivalent.
-	 *  - DirectDatabaseQuery.NoCaching: this class IS the cache; wrapping its
-	 *    own table reads in another object cache is meaningless.
-	 *  - PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: the interpolated table name
-	 *    is `$wpdb->prefix . 'fotogrids_render_cache'` (a trusted literal --
-	 *    WP placeholders cannot bind table identifiers). All user-supplied
-	 *    *values* are passed through $wpdb->prepare().
-	 * ---------------------------------------------------------------------
-	 */
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	// phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-	// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	private const OBJECT_CACHE_GROUP = 'fotogrids_render';
 	private const OBJECT_CACHE_TTL   = 0;
@@ -210,9 +187,10 @@ class FotoGrids_Cache {
 		$table = $wpdb->prefix . 'fotogrids_render_cache';
 		$row   = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT html FROM {$table}
+				'SELECT html FROM %i
 				 WHERE cache_key = %s AND expires_at > %s
-				 LIMIT 1",
+				 LIMIT 1',
+				$table,
 				$cache_key,
 				current_time( 'mysql' )
 			)
@@ -277,9 +255,10 @@ class FotoGrids_Cache {
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
-				"INSERT INTO {$table} (object_type, object_id, cache_key, html, cached_at, expires_at)
+				"INSERT INTO %i (object_type, object_id, cache_key, html, cached_at, expires_at)
 				 VALUES ('gallery', %d, %s, %s, %s, %s)
 				 ON DUPLICATE KEY UPDATE html = VALUES(html), cached_at = VALUES(cached_at), expires_at = VALUES(expires_at)",
+				$table,
 				$gallery_id,
 				$cache_key,
 				$payload,
@@ -330,7 +309,8 @@ class FotoGrids_Cache {
 
 		$keys = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT cache_key FROM {$table} WHERE object_type = 'gallery' AND object_id = %d",
+				"SELECT cache_key FROM %i WHERE object_type = 'gallery' AND object_id = %d",
+				$table,
 				$gallery_id
 			)
 		);
@@ -361,7 +341,7 @@ class FotoGrids_Cache {
 		global $wpdb;
 
 		$table = $wpdb->prefix . 'fotogrids_render_cache';
-		$wpdb->query( "DELETE FROM `{$table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i', $table ) );
 
 		// Backend-agnostic group invalidation (orphans every namespaced L1 key)
 		// in place of wp_cache_flush_group(), which not all backends implement.
@@ -388,8 +368,9 @@ class FotoGrids_Cache {
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT MIN(cached_at) AS cached_at, MIN(expires_at) AS expires_at, COUNT(*) AS entry_count
-				 FROM {$table}
+				 FROM %i
 				 WHERE object_type = 'gallery' AND object_id = %d AND expires_at > %s",
+				$table,
 				$gallery_id,
 				current_time( 'mysql' )
 			)
@@ -424,7 +405,8 @@ class FotoGrids_Cache {
 		$table  = $wpdb->prefix . 'fotogrids_render_cache';
 		$result = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE expires_at <= %s",
+				'DELETE FROM %i WHERE expires_at <= %s',
+				$table,
 				current_time( 'mysql' )
 			)
 		);
@@ -615,9 +597,5 @@ class FotoGrids_Cache {
 		);
 	}
 
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-	// phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-	// phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

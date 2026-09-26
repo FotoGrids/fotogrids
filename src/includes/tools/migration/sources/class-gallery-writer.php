@@ -20,10 +20,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Writer {
 
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
 	/**
 	 * Create a FotoGrids gallery from a list of attachment ids.
 	 *
@@ -85,7 +81,7 @@ class Gallery_Writer {
 
 			$attachment = get_post( $attachment_id );
 
-			$wpdb->insert(
+			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table; no core API applies.
 				$table,
 				array(
 					'attachment_id' => $attachment_id,
