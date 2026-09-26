@@ -95,7 +95,7 @@ class FotoGrids_Cache {
 	public static function init(): void {
 		add_action( Actions_Item::ADDED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( Actions_Item::REMOVED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
-		add_action( Actions_Item::META_UPDATED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
+		add_action( Actions_Item::META_UPDATED, array( __CLASS__, 'on_attachment_edit' ), 10, 1 );
 		add_action( 'edit_attachment', array( __CLASS__, 'on_attachment_edit' ), 10, 1 );
 		add_filter( 'wp_update_attachment_metadata', array( __CLASS__, 'on_attachment_metadata_update' ), 10, 2 );
 		add_action( Actions_Gallery::REORDERED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
@@ -147,8 +147,9 @@ class FotoGrids_Cache {
 	/**
 	 * Flush every gallery containing an attachment that was just edited.
 	 *
-	 * Covers both the item editor (which updates the attachment post) and an
-	 * edit made directly in the WordPress media modal.
+	 * Covers the item editor (which updates the attachment post), an edit made
+	 * directly in the WordPress media modal, and any write to the item's
+	 * `fotogrids_item_meta` row.
 	 *
 	 * @since  1.1.2
 	 * @param  int|mixed $attachment_id

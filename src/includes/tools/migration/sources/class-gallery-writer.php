@@ -1,6 +1,7 @@
 <?php
 namespace FotoGrids\Tools\Migration\Sources;
 
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Hooks\Actions_Gallery;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -10,26 +11,22 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Gallery Writer
  *
- * Creates a FotoGrids gallery and its item rows from a normalised list of
- * attachment ids. Every migration source funnels through this writer so a
- * gallery imported from WordPress core, a competitor plugin, or a slider is
- * built the same way - a fotogrids_gallery CPT plus one fotogrids_item_meta
- * row per item.
+ * Creates a FotoGrids gallery from a normalised list of attachment ids. Every
+ * migration source funnels through this writer so a gallery imported from
+ * WordPress core, a competitor plugin, or a slider is built the same way - a
+ * fotogrids_gallery CPT whose `fotogrids_gallery_items` list holds the
+ * attachments in their original order.
  *
  * @since 1.0.0
  */
 class Gallery_Writer {
 
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
 	/**
 	 * Create a FotoGrids gallery from a list of attachment ids.
 	 *
 	 * Attachment ids that are not real attachments on this site are skipped.
-	 * Per-item caption and description default to the attachment's own caption
-	 * and description so existing metadata carries over.
+	 * Captions and descriptions are read from the attachments themselves, so
+	 * existing metadata carries over.
 	 *
 	 * @since 1.0.0
 	 * @param string             $title          Proposed gallery title.
@@ -63,18 +60,15 @@ class Gallery_Writer {
 	}
 
 	/**
-	 * Insert item rows for a gallery, preserving order.
+	 * Write a gallery's item list, preserving order.
 	 *
 	 * @since 1.0.0
 	 * @param int             $gallery_id     Target gallery id.
 	 * @param array<int, int> $attachment_ids Ordered attachment ids.
-	 * @return int Number of items inserted.
+	 * @return int Number of items added.
 	 */
 	private static function add_items( int $gallery_id, array $attachment_ids ): int {
-		global $wpdb;
-		$table    = $wpdb->prefix . 'fotogrids_item_meta';
-		$position = 0;
-		$inserted = 0;
+		$item_ids = array();
 
 		foreach ( $attachment_ids as $attachment_id ) {
 			$attachment_id = (int) $attachment_id;
@@ -83,24 +77,13 @@ class Gallery_Writer {
 				continue;
 			}
 
-			$attachment = get_post( $attachment_id );
-
-			$wpdb->insert(
-				$table,
-				array(
-					'attachment_id' => $attachment_id,
-					'gallery_id'    => $gallery_id,
-					'position'      => $position,
-					'item_type'     => 'image',
-					'caption'       => $attachment ? sanitize_text_field( $attachment->post_excerpt ) : '',
-					'description'   => $attachment ? wp_kses_post( $attachment->post_content ) : '',
-				)
-			);
-
-			++$position;
-			++$inserted;
+			if ( ! in_array( $attachment_id, $item_ids, true ) ) {
+				$item_ids[] = $attachment_id;
+			}
 		}
 
-		return $inserted;
+		Gallery_Repository::set_item_ids( $gallery_id, $item_ids );
+
+		return count( $item_ids );
 	}
 }

@@ -411,7 +411,7 @@ class Register_Gallery_Routes {
 							},
 						),
 						'limit'  => array(
-							'default'           => -1,
+							'default'           => 0,
 							'sanitize_callback' => 'absint',
 						),
 						'offset' => array(
