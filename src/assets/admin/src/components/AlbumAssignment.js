@@ -195,7 +195,11 @@ const AlbumAssignment = () => {
 										className:
 											'fotogrids-assigned-album-title',
 									},
-									collectionTitle(album.post_title, 'album', album.ID)
+									collectionTitle(
+										album.post_title,
+										'album',
+										album.ID
+									)
 								),
 								React.createElement(
 									'div',
@@ -298,7 +302,11 @@ const AlbumAssignment = () => {
 									React.createElement(
 										'div',
 										{ className: 'fotogrids-album-title' },
-										collectionTitle(album.title, 'album', album.id)
+										collectionTitle(
+											album.title,
+											'album',
+											album.id
+										)
 									),
 									React.createElement(
 										'div',
