@@ -34,28 +34,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Save_Item_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Save all item data - core fields plus structured metadata.
 	 *
@@ -101,7 +79,7 @@ class Save_Item_Data {
 
 		update_post_meta( $item_id, '_wp_attachment_image_alt', $alt );
 
-		// ── fotogrids_item_meta upsert ────────────────────────────────────────
+		// ── fotogrids_item_meta row ──────────────────────────────────────────
 		$credit       = sanitize_text_field( $request->get_param( 'credit' ) ?? '' );
 		$external_url = sanitize_url( $request->get_param( 'external_url' ) ?? '' );
 		$link_target  = sanitize_text_field( $request->get_param( 'link_target' ) ?? 'global' );
@@ -112,26 +90,13 @@ class Save_Item_Data {
 			$exif_data = array_map( 'sanitize_text_field', $exif_raw );
 		}
 
-		global $wpdb;
-		$meta_table = $wpdb->prefix . 'fotogrids_item_meta';
+		$existing = \FotoGrids\Galleries\Item_Meta::get( $item_id );
 
-		$existing = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT id, custom_data FROM {$meta_table} WHERE attachment_id = %d AND gallery_id = 0",
-				$item_id
-			)
-		);
-
-		$meta_row = array(
-			'attachment_id' => $item_id,
-			'gallery_id'    => 0,
-			'credit'        => $credit,
-			// Note: `location` VARCHAR column is deprecated; structured location
-			// data lives in fotogrids_item_metadata. Do not write it here.
-			'external_url'  => $external_url,
-			'link_target'   => $link_target,
-			'exif_data'     => ! empty( $exif_data ) ? wp_json_encode( $exif_data ) : null,
-			'updated_at'    => current_time( 'mysql', true ),
+		$fields = array(
+			'credit'       => $credit,
+			'external_url' => $external_url,
+			'link_target'  => $link_target,
+			'exif_data'    => ! empty( $exif_data ) ? $exif_data : null,
 		);
 
 		// Video settings (poster + playback) for Media Library video items are
@@ -141,42 +106,14 @@ class Save_Item_Data {
 			=== \FotoGrids\Render\Video\Video_Item_Helpers::type_for_attachment( $item_id );
 		$custom_data_json = self::merge_video_settings(
 			$request,
-			$existing->custom_data ?? null,
+			$existing['custom_data'] ?? null,
 			$is_video_file
 		);
-
-		if ( $existing ) {
-			if ( null !== $custom_data_json ) {
-				$meta_row['custom_data'] = $custom_data_json;
-			}
-			// wpdb maps formats positionally to the data array's key order.
-			$format = array_fill( 0, count( $meta_row ), null );
-			$i      = 0;
-			foreach ( $meta_row as $key => $value ) {
-				$format[ $i++ ] = ( 'attachment_id' === $key || 'gallery_id' === $key ) ? '%d' : '%s';
-			}
-			$wpdb->update(
-				$meta_table,
-				$meta_row,
-				array( 'id' => $existing->id ),
-				$format,
-				array( '%d' )
-			);
-		} else {
-			$meta_row['created_at'] = current_time( 'mysql', true );
-			if ( null !== $custom_data_json ) {
-				$meta_row['custom_data'] = $custom_data_json;
-			}
-			$format = array();
-			foreach ( $meta_row as $key => $value ) {
-				$format[] = ( 'attachment_id' === $key || 'gallery_id' === $key ) ? '%d' : '%s';
-			}
-			$wpdb->insert(
-				$meta_table,
-				$meta_row,
-				$format
-			);
+		if ( null !== $custom_data_json ) {
+			$fields['custom_data'] = $custom_data_json;
 		}
+
+		\FotoGrids\Galleries\Item_Meta::save( $item_id, $fields );
 
 		// ── Structured metadata (tags / people / locations) ───────────────────
 		$tags      = $request->get_param( 'tags' ) ?: array();
@@ -373,12 +310,4 @@ class Save_Item_Data {
 
 		return wp_json_encode( $existing );
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

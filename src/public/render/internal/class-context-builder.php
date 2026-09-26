@@ -737,7 +737,7 @@ final class Context_Builder {
 		array $link_meta,
 		string $thumb_size
 	): Item_View {
-		$custom_data = $this->load_item_custom_data( $attachment_id, 0 );
+		$custom_data = $this->load_item_custom_data( $attachment_id );
 		$poster_url  = Video_Poster_Resolver::resolve(
 			Video_Item_Helpers::TYPE_FILE,
 			$attachment_id,
@@ -837,34 +837,19 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Read and decode the custom_data JSON for a single item row.
+	 * Read and decode the custom_data JSON for an item.
 	 *
 	 * @since   1.1.0
-	 * @param   int $attachment_id Attachment ID (0 for embeds).
-	 * @param   int $gallery_id    Gallery scope for the row.
+	 * @param   int $attachment_id Attachment ID.
 	 * @return  array<string, mixed> Decoded custom_data, or empty array.
 	 */
-	private function load_item_custom_data( int $attachment_id, int $gallery_id ): array {
-		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-
-		// $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal); all
-		// values are bound via $wpdb->prepare(). Custom table: direct query, no cache.
-        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$raw = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = %d LIMIT 1",
-				$attachment_id,
-				$gallery_id
-			)
-		);
-        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
-		if ( empty( $raw ) ) {
+	private function load_item_custom_data( int $attachment_id ): array {
+		$row = \FotoGrids\Galleries\Item_Meta::get( $attachment_id );
+		if ( null === $row || empty( $row['custom_data'] ) ) {
 			return array();
 		}
 
-		$decoded = json_decode( (string) $raw, true );
+		$decoded = json_decode( (string) $row['custom_data'], true );
 		return is_array( $decoded ) ? $decoded : array();
 	}
 
@@ -899,8 +884,7 @@ final class Context_Builder {
 				}
 			}
 
-			// Batch-fetch external_url + link_target from fotogrids_item_meta.
-			// Uses gallery_id = 0 rows (global item data written by the item edit modal).
+			// Batch-fetch external_url + link_target for every item at once.
 			$item_link_meta = $this->batch_load_link_meta( $valid_ids );
 
 			foreach ( $valid_ids as $attachment_id ) {
@@ -1296,48 +1280,22 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Batch-fetches external_url and link_target from fotogrids_item_meta.
+	 * Batch-fetches external_url and link_target for the given items.
 	 *
-	 * Queries gallery_id = 0 rows, which are the global per-item records written
-	 * by the item edit modal. Returns a map of attachment_id → meta array so the
-	 * caller can look up each item in O(1).
+	 * Returns a map of attachment_id → meta array so the caller can look up
+	 * each item in O(1).
 	 *
 	 * @since   1.0.0
 	 * @param   array<int, int> $attachment_ids Attachment IDs to load.
 	 * @return  array<int, array{external_url: string, link_target: string}>
 	 */
 	private function batch_load_link_meta( array $attachment_ids ): array {
-		if ( empty( $attachment_ids ) ) {
-			return array();
-		}
-
-		global $wpdb;
-
-		$table        = $wpdb->prefix . 'fotogrids_item_meta';
-		$placeholders = implode( ',', array_fill( 0, count( $attachment_ids ), '%d' ) );
-
-		// Fetch global item rows (gallery_id = 0) only; these carry the
-		// external_url / link_target set via the item edit modal.
-		// $table is $wpdb->prefix.'fotogrids_item_meta' (trusted literal); the
-		// IN() list is built from generated %d placeholders and bound through
-		// $wpdb->prepare(). Custom table, so direct query + no object cache.
-        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-		$sql  = "SELECT attachment_id, external_url, link_target FROM {$table} WHERE gallery_id = 0 AND attachment_id IN ({$placeholders})";
-		$rows = $wpdb->get_results(
-			$wpdb->prepare( $sql, ...$attachment_ids ),
-			ARRAY_A
-		);
-        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.Security.DirectDB.UnescapedDBParameter, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-
 		$result = array();
-		if ( is_array( $rows ) ) {
-			foreach ( $rows as $row ) {
-				$aid            = (int) $row['attachment_id'];
-				$result[ $aid ] = array(
-					'external_url' => (string) ( $row['external_url'] ?? '' ),
-					'link_target'  => (string) ( $row['link_target'] ?? 'global' ),
-				);
-			}
+		foreach ( \FotoGrids\Galleries\Item_Meta::get_many( $attachment_ids ) as $aid => $row ) {
+			$result[ $aid ] = array(
+				'external_url' => (string) ( $row['external_url'] ?? '' ),
+				'link_target'  => (string) ( $row['link_target'] ?? 'global' ),
+			);
 		}
 
 		return $result;

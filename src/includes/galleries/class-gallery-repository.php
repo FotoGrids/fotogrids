@@ -24,8 +24,8 @@ if ( ! defined( 'WPINC' ) ) {
  * `_password_encrypted` key (consumed by the Password gate). The public
  * `password` key is always blanked out.
  *
- * `get_items()` issues ONE bulk SELECT against `fotogrids_item_meta` (not one
- * per attachment) and then assembles each item row from the resulting map.
+ * `get_items()` reads the item data for the whole gallery in one query through
+ * Item_Meta and assembles each item row from the resulting map.
  *
  * @since 1.0.0
  */
@@ -271,12 +271,11 @@ final class Gallery_Repository {
 	}
 
 	/**
-	 * Get a gallery's full item rows (attachment metadata + custom meta).
+	 * Get a gallery's full item rows (attachment fields + item data).
 	 *
-	 * Issues ONE bulk SELECT against `fotogrids_item_meta` (rather than one
-	 * SELECT per attachment), then assembles per-item rows from the result
-	 * map. Position falls back to the gallery's stored order when the custom
-	 * row is missing.
+	 * Only attachments are returned; embeds and missing posts are skipped.
+	 * Title, caption, description and alt come from the attachment post;
+	 * credit, location, EXIF, custom data and link settings from Item_Meta.
 	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id Gallery post ID.
@@ -288,28 +287,7 @@ final class Gallery_Repository {
 			return array();
 		}
 
-		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-
-		// Bulk SELECT - one round-trip for all attachments in the gallery.
-		$placeholders = implode( ',', array_fill( 0, count( $item_ids ), '%d' ) );
-		$rows         = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE gallery_id = %d AND attachment_id IN ({$placeholders})",
-				array_merge( array( $gallery_id ), $item_ids )
-			),
-			ARRAY_A
-		);
-
-		$custom_meta_by_attachment = array();
-		if ( is_array( $rows ) ) {
-			foreach ( $rows as $row ) {
-				$aid = (int) ( $row['attachment_id'] ?? 0 );
-				if ( $aid > 0 ) {
-					$custom_meta_by_attachment[ $aid ] = $row;
-				}
-			}
-		}
+		$item_meta = Item_Meta::get_many( $item_ids );
 
 		$items    = array();
 		$position = 0;
@@ -322,18 +300,18 @@ final class Gallery_Repository {
 				continue;
 			}
 
-			$custom_meta = $custom_meta_by_attachment[ $attachment_id ] ?? null;
+			$meta = $item_meta[ $attachment_id ] ?? array();
 
 			$items[] = array(
 				'id'           => $attachment_id,
 				'gallery_id'   => $gallery_id,
-				'position'     => $custom_meta ? (int) $custom_meta['position'] : $position,
-				'caption'      => $custom_meta ? $custom_meta['caption'] : $attachment->post_excerpt,
-				'description'  => $custom_meta ? $custom_meta['description'] : $attachment->post_content,
-				'credit'       => $custom_meta ? ( $custom_meta['credit'] ?? '' ) : '',
-				'location'     => $custom_meta ? $custom_meta['location'] : '',
-				'exif_data'    => ( $custom_meta && $custom_meta['exif_data'] ) ? json_decode( $custom_meta['exif_data'], true ) : null,
-				'custom_data'  => ( $custom_meta && $custom_meta['custom_data'] ) ? json_decode( $custom_meta['custom_data'], true ) : null,
+				'position'     => $position,
+				'caption'      => $attachment->post_excerpt,
+				'description'  => $attachment->post_content,
+				'credit'       => (string) ( $meta['credit'] ?? '' ),
+				'location'     => (string) ( $meta['location'] ?? '' ),
+				'exif_data'    => ! empty( $meta['exif_data'] ) ? json_decode( $meta['exif_data'], true ) : null,
+				'custom_data'  => ! empty( $meta['custom_data'] ) ? json_decode( $meta['custom_data'], true ) : null,
 				'url'          => wp_get_attachment_url( $attachment_id ),
 				'thumbnail'    => wp_get_attachment_image_url( $attachment_id, 'thumbnail' ),
 				'medium'       => wp_get_attachment_image_url( $attachment_id, 'medium' ),
@@ -341,16 +319,90 @@ final class Gallery_Repository {
 				'full'         => wp_get_attachment_url( $attachment_id ),
 				'alt'          => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 				'title'        => $attachment->post_title,
-				'external_url' => get_post_meta( $attachment_id, '_fotogrids_external_url', true ),
-				'link_target'  => get_post_meta( $attachment_id, '_fotogrids_link_target', true ),
+				'external_url' => (string) ( $meta['external_url'] ?? '' ),
+				'link_target'  => (string) ( $meta['link_target'] ?? '' ),
 			);
 
 			++$position;
 		}
 
-		usort( $items, static fn ( $a, $b ) => $a['position'] - $b['position'] );
-
 		return $items;
+	}
+
+	/**
+	 * Collect the distinct item IDs held by every gallery with one of the given statuses.
+	 *
+	 * @since 1.1.4
+	 * @param string[] $post_statuses Gallery post statuses to include.
+	 * @return int[] Item IDs (attachments and embeds), newest gallery first.
+	 */
+	public static function all_item_ids( array $post_statuses ): array {
+		$post_statuses = array_values( array_filter( array_map( 'sanitize_key', $post_statuses ) ) );
+		if ( empty( $post_statuses ) ) {
+			return array();
+		}
+
+		global $wpdb;
+		$placeholders = implode( ',', array_fill( 0, count( $post_statuses ), '%s' ) );
+
+		$lists = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT pm.meta_value FROM {$wpdb->postmeta} pm
+             INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+             WHERE pm.meta_key = 'fotogrids_gallery_items'
+               AND p.post_type = 'fotogrids_gallery'
+               AND p.post_status IN ({$placeholders})
+             ORDER BY p.post_date DESC, p.ID DESC",
+				$post_statuses
+			)
+		);
+
+		$item_ids = array();
+		foreach ( (array) $lists as $raw ) {
+			$decoded = json_decode( (string) $raw, true );
+			if ( ! is_array( $decoded ) ) {
+				continue;
+			}
+			foreach ( $decoded as $item_id ) {
+				$item_id = (int) $item_id;
+				if ( $item_id > 0 ) {
+					$item_ids[ $item_id ] = true;
+				}
+			}
+		}
+
+		return array_keys( $item_ids );
+	}
+
+	/**
+	 * Count the distinct, existing items held by galleries with the given statuses.
+	 *
+	 * An item that appears in several galleries counts once.
+	 *
+	 * @since 1.1.4
+	 * @param string[] $post_statuses Gallery post statuses to include.
+	 * @return int
+	 */
+	public static function count_all_items( array $post_statuses ): int {
+		$item_ids = self::all_item_ids( $post_statuses );
+		if ( empty( $item_ids ) ) {
+			return 0;
+		}
+
+		global $wpdb;
+		$count = 0;
+
+		foreach ( array_chunk( $item_ids, 1000 ) as $chunk ) {
+			$placeholders = implode( ',', array_fill( 0, count( $chunk ), '%d' ) );
+			$count       += (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type IN ('attachment', %s) AND ID IN ({$placeholders})",
+					array_merge( array( Embed_Store::POST_TYPE ), $chunk )
+				)
+			);
+		}
+
+		return $count;
 	}
 
     // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery

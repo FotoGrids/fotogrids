@@ -734,67 +734,6 @@ class Admin_Data {
 	}
 
 	/**
-	 * Get regeneration status for all gallery attachments.
-	 *
-	 * Returns per-attachment derivative status for fotogrids_thumbnail, fotogrids_full,
-	 * and any registered custom FotoGrids sizes.
-	 *
-	 * GET /wp-json/fotogrids/v1/admin/regen-thumbnails/status
-	 *
-	 * @since  1.0.0
-	 * @param  \WP_REST_Request $request
-	 * @return \WP_REST_Response
-	 */
-	public static function get_regen_thumbnails_status( $request ): \WP_REST_Response { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
-		global $wpdb;
-
-		// Collect all unique attachment IDs used across FotoGrids galleries.
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$attachment_ids = $wpdb->get_col( "SELECT DISTINCT attachment_id FROM {$table} WHERE attachment_id > 0" );
-
-		$plugin_sizes = array(
-			\FotoGrids\Image_Size_Manager::SLUG_THUMBNAIL,
-			\FotoGrids\Image_Size_Manager::SLUG_FULL,
-		);
-		$custom_sizes = array_keys( \FotoGrids\Image_Size_Manager::get_custom_sizes() );
-
-		$items = array();
-		foreach ( $attachment_ids as $attachment_id ) {
-			$attachment_id   = (int) $attachment_id;
-			$attachment_post = get_post( $attachment_id );
-			if ( ! $attachment_post ) {
-				continue;
-			}
-
-			$size_statuses = array();
-			foreach ( array_merge( $plugin_sizes, $custom_sizes ) as $slug ) {
-				$data                   = image_get_intermediate_size( $attachment_id, $slug );
-				$size_statuses[ $slug ] = array(
-					'exists' => ( false !== $data && ! empty( $data['file'] ) ),
-					'width'  => $data['width'] ?? null,
-					'height' => $data['height'] ?? null,
-				);
-			}
-
-			$items[] = array(
-				'attachment_id' => $attachment_id,
-				'filename'      => basename( get_attached_file( $attachment_id ) ?: '' ),
-				'thumb_url'     => wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) ?: '',
-				'sizes'         => $size_statuses,
-			);
-		}
-
-		return rest_ensure_response(
-			array(
-				'items'        => $items,
-				'plugin_sizes' => $plugin_sizes,
-				'custom_sizes' => $custom_sizes,
-			)
-		);
-	}
-
-	/**
 	 * Regenerate image derivatives for a single attachment.
 	 *
 	 * POST /wp-json/fotogrids/v1/admin/regen-thumbnails/regenerate
@@ -986,8 +925,7 @@ class Admin_Data {
 		$album_counts    = wp_count_posts( 'fotogrids_album' );
 		$albums_count    = $album_counts->publish;
 
-		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
-		$items_count = $wpdb->get_var( "SELECT COUNT(*) FROM `{$items_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
+		$items_count = \FotoGrids\Galleries\Gallery_Repository::count_all_items( array( 'publish' ) );
 
 		$stats_table  = $wpdb->prefix . 'fotogrids_statistics';
 		$totals       = $wpdb->get_row(

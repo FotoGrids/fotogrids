@@ -444,9 +444,7 @@ final class Metabox_Registrar {
 		$item_alt   = get_post_meta( $item_id, '_wp_attachment_image_alt', true );
 
 		if ( $is_video ) {
-			// Per-attachment item data (incl. any custom poster) is stored in
-			// the global gallery_id = 0 row, mirroring the item edit modal.
-			$custom_data = self::get_item_custom_data( $item_id, 0 );
+			$custom_data = self::get_item_custom_data( $item_id );
 			$poster      = \FotoGrids\Render\Video\Video_Poster_Resolver::resolve(
 				$item_type,
 				$item_id,
@@ -555,32 +553,19 @@ final class Metabox_Registrar {
 	}
 
 	/**
-	 * Read and decode the custom_data JSON for an item row.
+	 * Read and decode the custom_data JSON for an item.
 	 *
 	 * @since 1.1.0
-	 * @param int $attachment_id The attachment ID (0 for embeds).
-	 * @param int $gallery_id    The gallery scope for the row.
+	 * @param int $attachment_id The attachment ID.
 	 * @return array<string, mixed> Decoded custom_data, or empty array.
 	 */
-	private static function get_item_custom_data( int $attachment_id, int $gallery_id ): array {
-		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-
-		$raw = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT custom_data FROM {$table}
-                 WHERE attachment_id = %d AND gallery_id = %d
-                 LIMIT 1",
-				$attachment_id,
-				$gallery_id
-			)
-		);
-
-		if ( empty( $raw ) ) {
+	private static function get_item_custom_data( int $attachment_id ): array {
+		$row = \FotoGrids\Galleries\Item_Meta::get( $attachment_id );
+		if ( null === $row || empty( $row['custom_data'] ) ) {
 			return array();
 		}
 
-		$decoded = json_decode( (string) $raw, true );
+		$decoded = json_decode( (string) $row['custom_data'], true );
 		return is_array( $decoded ) ? $decoded : array();
 	}
 
