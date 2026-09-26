@@ -476,6 +476,30 @@ function readEstimatedTotal(galleryEl) {
 }
 
 /**
+ * Build a REST request URL from the localised REST root.
+ *
+ * Query parameters go through URLSearchParams so the separator is correct for
+ * both the pretty root (/wp-json/) and the plain-permalink root
+ * (/index.php?rest_route=/).
+ *
+ * @param {string} route  Route below the REST root, e.g. 'fotogrids/v1/lightbox/item/4'.
+ * @param {Object} [params] Query parameters; undefined, null and empty values are skipped.
+ * @returns {string}
+ */
+function buildRestUrl(route, params = {}) {
+	const url = new URL(
+		(window.fotogrids?.restUrl || '') + route,
+		window.location.href
+	);
+	Object.entries(params).forEach(([key, value]) => {
+		if (value !== undefined && value !== null && value !== '') {
+			url.searchParams.set(key, String(value));
+		}
+	});
+	return url.toString();
+}
+
+/**
  * Compose the filter map currently active for this gallery, by asking
  * the filters module (if loaded). Mirrors what pagination-core sends.
  *
@@ -1359,11 +1383,7 @@ class FotoGridsLightbox {
 			return this._inFlightFetches.get(key);
 		}
 
-		const url =
-			window.fotogrids && window.fotogrids.restUrl
-				? window.fotogrids.restUrl +
-					'fotogrids/v1/gallery/lightbox/slides'
-				: '/wp-json/fotogrids/v1/gallery/lightbox/slides';
+		const url = buildRestUrl('fotogrids/v1/gallery/lightbox/slides');
 		const nonce =
 			window.fotogrids?.restNonce ||
 			gEl.dataset.fgRenderNonce ||
@@ -2831,10 +2851,10 @@ class FotoGridsLightbox {
 				? s.creditSource
 				: 'item_meta';
 		const galleryId = s.galleryId || 0;
-		const url =
-			(window.wpApiSettings?.root || '/wp-json/') +
-			`fotogrids/v1/lightbox/item/${itemId}?credit_source=${creditSource}` +
-			(galleryId ? `&gallery_id=${galleryId}` : '');
+		const url = buildRestUrl(`fotogrids/v1/lightbox/item/${itemId}`, {
+			credit_source: creditSource,
+			gallery_id: galleryId || '',
+		});
 
 		const headers = { Accept: 'application/json' };
 		const nonce =

@@ -17,6 +17,7 @@ import { Button } from './shared/Button';
 import Icon from './shared/Icon.jsx';
 import UploadArea from './blocks/UploadArea';
 import { formatFileSize } from '../utils/format-file-size';
+import { buildRestUrl } from '../utils/rest-url';
 
 const isZip = (file) =>
     Boolean(file) && /\.zip$/i.test(file.name || '');
@@ -33,14 +34,13 @@ const isZip = (file) =>
  */
 const uploadArchive = (file, galleryId, onProgress) =>
     new Promise((resolve, reject) => {
-        const root = window.wpApiSettings?.root || '/wp-json/';
         const nonce = window.wpApiSettings?.nonce || '';
         const body = new FormData();
         body.append('file', file, file.name);
         body.append('gallery_id', galleryId);
 
         const request = new XMLHttpRequest();
-        request.open('POST', `${root}fotogrids/v1/media/import/zip`);
+        request.open('POST', buildRestUrl('fotogrids/v1/media/import/zip'));
         request.setRequestHeader('X-WP-Nonce', nonce);
 
         request.upload.addEventListener('progress', (event) => {

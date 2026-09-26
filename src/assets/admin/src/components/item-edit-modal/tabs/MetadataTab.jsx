@@ -32,7 +32,7 @@ const MetadataTab = ({
 
     const currentInput = metadataInput?.[metadataKey] || '';
     const currentItems = metadata[metadataKey] || [];
-    const availableItems = availableMetadata[metadataKey] || [];
+    const availableItems = Array.isArray(availableMetadata[metadataKey]) ? availableMetadata[metadataKey] : [];
 
     // "Replace" semantics: when maxItems === 1, the input stays visible so the
     // user can search and replace the existing value. Adding a second item via

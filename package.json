@@ -19,7 +19,7 @@
     "test:ci": "npm run test:ci:guards && npm run test:ci:jest",
     "test:ci:guards": "npm run test:ci:source-guards && npm run test:ci:render-guards && npm run test:ci:php-integration",
     "test:ci:jest": "npm run icons:build && jest --ci --coverage --watchAll=false",
-    "test:ci:source-guards": "bash tests/ci/grep-user-object-in-localize.sh && bash tests/ci/check-catalog-i18n.sh",
+    "test:ci:source-guards": "bash tests/ci/grep-user-object-in-localize.sh && bash tests/ci/grep-rest-url-concat.sh && bash tests/ci/check-catalog-i18n.sh",
     "test:ci:render-guards": "bash tests/ci/run-render-guards.sh",
     "test:ci:php-integration": "bash tests/ci/run-php-integration-tests.sh",
     "test:e2e": "playwright test",
