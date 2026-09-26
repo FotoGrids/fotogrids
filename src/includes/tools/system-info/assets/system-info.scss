@@ -104,6 +104,7 @@
     &__errors {
         width: 100%;
         border-collapse: collapse;
+        border: 1px solid var(--fg-border-secondary);
 
         th,
         td {
@@ -122,8 +123,8 @@
 
     &__level {
         display: inline-block;
-        padding: 1px 8px;
-        border-radius: 10px;
+        padding: 2px 6px;
+        border-radius: 3px;
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -137,7 +138,7 @@
 
         &--warning {
             background: var(--fg-yellow);
-            color: var(--fg-background-dark);
+            color: var(--fg-text-primary);
         }
     }
 
