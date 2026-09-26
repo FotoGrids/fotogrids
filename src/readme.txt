@@ -1,7 +1,7 @@
 === FotoGrids – Photo & Video Galleries, Lightboxes, Sliders & More ===
 Contributors: FotoGrids
 Tags: gallery, album, lightbox, slider, portfolio
-Requires at least: 6.1
+Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.1.3

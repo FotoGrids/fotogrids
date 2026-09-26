@@ -8,7 +8,7 @@
  * Author URI: https://www.fotogrids.com/about/
  * Text Domain: fotogrids
  * Domain Path: /languages
- * Requires at least: 6.1
+ * Requires at least: 6.3
  * Tested up to: 7.1
  * Requires PHP: 7.4
  * License: GPL v2 or later
@@ -242,10 +242,10 @@ add_action(
  * Plugin activation check
  */
 function fotogrids_activation_check() {
-	if ( version_compare( get_bloginfo( 'version' ), '6.1', '<' ) ) {
+	if ( version_compare( get_bloginfo( 'version' ), '6.3', '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
-			esc_html__( 'FotoGrids requires WordPress version 6.1 or higher.', 'fotogrids' ),
+			esc_html__( 'FotoGrids requires WordPress version 6.3 or higher.', 'fotogrids' ),
 			esc_html__( 'Plugin Activation Error', 'fotogrids' ),
 			array( 'back_link' => true )
 		);
