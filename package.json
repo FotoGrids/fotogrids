@@ -43,7 +43,7 @@
   "dependencies": {
     "@wordpress/api-fetch": "6.32.2",
     "@wordpress/block-editor": "12.3.15",
-    "@wordpress/blocks": "12.12.8",
+    "@wordpress/blocks": "12.35.0",
     "@wordpress/components": "25.1.12",
     "@wordpress/data": "9.5.6",
     "@wordpress/element": "5.12.2",
