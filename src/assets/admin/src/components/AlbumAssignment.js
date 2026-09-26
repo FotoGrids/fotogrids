@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { collectionTitle } from '../utils/collection-title';
 
 const FotoGridsIcons = window.FotoGridsIcons || {};
 const AlbumAssignment = () => {
@@ -194,7 +195,7 @@ const AlbumAssignment = () => {
 										className:
 											'fotogrids-assigned-album-title',
 									},
-									album.post_title
+									collectionTitle(album.post_title, 'album', album.ID)
 								),
 								React.createElement(
 									'div',
@@ -297,7 +298,7 @@ const AlbumAssignment = () => {
 									React.createElement(
 										'div',
 										{ className: 'fotogrids-album-title' },
-										album.title
+										collectionTitle(album.title, 'album', album.id)
 									),
 									React.createElement(
 										'div',

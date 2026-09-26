@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Tooltip from './Tooltip';
 import Icon from './shared/Icon';
+import { collectionTitle } from '../utils/collection-title';
 
 const AlbumGalleries = () => {
     const [loading, setLoading] = useState(false);
@@ -76,7 +77,7 @@ const AlbumGalleries = () => {
                     {isAssigned && <div className="fotogrids-gallery-drag">⋮⋮</div>}
                     <div className="fotogrids-gallery-items">{thumbContent}</div>
                     <div className="fotogrids-gallery-details">
-                        <strong className={`fotogrids-gallery-title ${g.title ? '' : 'fotogrids-text--error'}`}>{g.title || config.strings.galleryTitleMissing}</strong>
+                        <strong className={`fotogrids-gallery-title ${g.title ? '' : 'fotogrids-text--error'}`}>{collectionTitle(g.title, 'gallery', g.id)}</strong>
                         <span className="fotogrids-gallery-meta">
                             <span className={`fotogrids-gallery-meta__item fotogrids-gallery-meta__count ${g.item_count === 0 ? 'fotogrids-text--error' : ''}`}>{g.item_count === 0 ? config.strings.noItems : `${g.item_count} ${config.strings.items}`}</span>
                             <span className="fotogrids-gallery-meta__item fotogrids-gallery-meta__status">{g.status}</span>

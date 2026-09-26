@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T13:46:53+00:00\n"
+"POT-Creation-Date: 2026-09-26T17:22:38+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -43,20 +43,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:249
+#: fotogrids.php:251
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:250
-#: fotogrids.php:259
+#: fotogrids.php:252
+#: fotogrids.php:261
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:258
+#: fotogrids.php:260
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:274
+#: fotogrids.php:276
 #: includes/class-admin-init.php:134
 #: includes/class-admin-init.php:135
 #: includes/tools/import-export/assets/ImportExportTool.jsx:45
@@ -64,11 +64,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:292
+#: fotogrids.php:294
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:317
+#: fotogrids.php:319
 #: assets/admin/src/components/dashboard/LearnSection.jsx:56
 msgid "Help Center"
 msgstr ""
@@ -95,7 +95,7 @@ msgstr ""
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:421
 #: assets/admin/src/components/pages/TemplatesPage.jsx:428
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:39
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:40
 #: includes/tools/import-export/assets/ImportExportTool.jsx:107
 msgid "Album"
 msgstr ""
@@ -113,7 +113,7 @@ msgstr ""
 #: includes/admin/class-dashboard-widget.php:164
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:14
 #: assets/admin/src/components/library/LibraryTabBase.jsx:294
-#: assets/admin/src/components/pages/StatsPage.jsx:206
+#: assets/admin/src/components/pages/StatsPage.jsx:200
 #: includes/tools/import-export/assets/ImportExportTool.jsx:30
 #: includes/tools/import-export/assets/ImportExportTool.jsx:108
 msgid "Items"
@@ -125,7 +125,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:439
 #: includes/metaboxes/class-metabox-strings.php:263
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:16
-#: assets/admin/src/components/pages/StatsPage.jsx:208
+#: assets/admin/src/components/pages/StatsPage.jsx:202
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:104
 msgid "Interactions"
 msgstr ""
@@ -157,7 +157,7 @@ msgstr ""
 #: includes/class-post-types.php:328
 #: includes/diagnostics/class-system-report.php:160
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:12
-#: assets/admin/src/components/pages/StatsPage.jsx:204
+#: assets/admin/src/components/pages/StatsPage.jsx:198
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:282
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:25
 #: includes/tools/import-export/assets/ImportExportTool.jsx:18
@@ -185,7 +185,7 @@ msgid "Dismiss this message."
 msgstr ""
 
 #: includes/admin/class-admin-header.php:104
-#: includes/admin/class-dashboard-widget.php:269
+#: includes/admin/class-dashboard-widget.php:268
 msgid "Docs"
 msgstr ""
 
@@ -225,7 +225,7 @@ msgstr ""
 #: includes/class-admin-init.php:99
 #: includes/diagnostics/class-system-report.php:161
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:13
-#: assets/admin/src/components/pages/StatsPage.jsx:205
+#: assets/admin/src/components/pages/StatsPage.jsx:199
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:26
 #: includes/tools/import-export/assets/ImportExportTool.jsx:24
 #: includes/tools/import-export/assets/ImportExportTool.jsx:107
@@ -250,8 +250,8 @@ msgstr ""
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:422
 #: assets/admin/src/components/pages/TemplatesPage.jsx:427
-#: assets/admin/src/utils/gallery.js:15
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:40
+#: assets/admin/src/utils/gallery.js:16
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:41
 #: includes/tools/import-export/assets/ImportExportTool.jsx:106
 #: includes/tools/migration/assets/MigrationTool.jsx:105
 msgid "Gallery"
@@ -262,29 +262,29 @@ msgstr ""
 msgid "Recently Edited"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:254
+#: includes/admin/class-dashboard-widget.php:253
 #: assets/admin/src/components/dashboard/RecentlyEdited.jsx:109
 msgid "No recently edited galleries or albums."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:260
+#: includes/admin/class-dashboard-widget.php:259
 msgid "News & Updates"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:262
+#: includes/admin/class-dashboard-widget.php:261
 #: includes/metaboxes/class-metabox-registrar.php:647
 #: includes/metaboxes/class-metabox-registrar.php:712
 #: includes/metaboxes/class-metabox-strings.php:64
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:138
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:139
 msgid "Loading..."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:276
+#: includes/admin/class-dashboard-widget.php:275
 #: includes/class-upgrade-modal.php:61
 msgid "Support"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:285
+#: includes/admin/class-dashboard-widget.php:284
 msgid "Upgrade"
 msgstr ""
 
@@ -312,8 +312,8 @@ msgstr ""
 #: assets/admin/src/components/library/LibraryTabBase.jsx:153
 #: assets/admin/src/components/library/LibraryTabBase.jsx:878
 #: assets/admin/src/components/library/MergeDialog.jsx:158
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:66
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:170
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:67
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:171
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:322
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:432
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:656
@@ -428,7 +428,7 @@ msgid "1px line drawn between options. Set to transparent to hide."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:24
-#: assets/admin/src/components/pages/StatsPage.jsx:78
+#: assets/admin/src/components/pages/StatsPage.jsx:72
 msgid "30 Days"
 msgstr ""
 
@@ -437,7 +437,7 @@ msgid "365 Days"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:26
-#: assets/admin/src/components/pages/StatsPage.jsx:79
+#: assets/admin/src/components/pages/StatsPage.jsx:73
 msgid "90 Days"
 msgstr ""
 
@@ -3012,7 +3012,7 @@ msgid "Select users"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:644
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:118
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:119
 msgid "Selected"
 msgstr ""
 
@@ -4081,6 +4081,20 @@ msgstr ""
 msgid "Choose an album..."
 msgstr ""
 
+#. translators: %d: album ID.
+#: includes/class-collection-title.php:72
+#: assets/admin/src/utils/collection-title.js:28
+#, php-format,js-format
+msgid "Album #%d"
+msgstr ""
+
+#. translators: %d: gallery ID.
+#: includes/class-collection-title.php:76
+#: assets/admin/src/utils/collection-title.js:32
+#, php-format,js-format
+msgid "Gallery #%d"
+msgstr ""
+
 #: includes/class-debug-log.php:49
 msgid "Catalog & state resolver"
 msgstr ""
@@ -4838,8 +4852,8 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:367
 #: assets/admin/src/components/library/LibraryTabBase.jsx:284
 #: assets/admin/src/components/library/LibraryTabBase.jsx:836
-#: assets/admin/src/components/pages/StatsPage.jsx:150
-#: assets/admin/src/components/pages/StatsPage.jsx:167
+#: assets/admin/src/components/pages/StatsPage.jsx:144
+#: assets/admin/src/components/pages/StatsPage.jsx:161
 msgid "Name"
 msgstr ""
 
@@ -5332,10 +5346,6 @@ msgid "No items"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:717
-msgid "Gallery Title Missing"
-msgstr ""
-
-#: includes/metaboxes/class-metabox-registrar.php:718
 msgid "Drop item here"
 msgstr ""
 
@@ -6171,14 +6181,8 @@ msgstr ""
 msgid "- Select a gallery -"
 msgstr ""
 
-#. translators: %d: collection post ID.
-#: includes/modules/PageBuilders/builders/Divi/native/php/class-collection-options.php:79
-#, php-format
-msgid "(no title) #%d"
-msgstr ""
-
 #. translators: %s: post status label.
-#: includes/modules/PageBuilders/builders/Divi/native/php/class-collection-options.php:85
+#: includes/modules/PageBuilders/builders/Divi/native/php/class-collection-options.php:82
 #, php-format
 msgid "(%s)"
 msgstr ""
@@ -6189,19 +6193,18 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:102
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:178
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:101
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:102
 msgid "Edit album"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/controls/class-base-collection-picker.php:103
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:213
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:102
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:103
 msgid "Edit gallery"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:218
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:51
 msgid "FotoGrids Album"
@@ -6268,13 +6271,11 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select an album to display."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:252
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:52
 msgid "FotoGrids Gallery"
@@ -6311,7 +6312,6 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -6391,9 +6391,9 @@ msgid "Save current settings as Template"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:317
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:65
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:120
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:178
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:66
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:121
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:179
 msgid "Apply Template"
 msgstr ""
 
@@ -6432,7 +6432,7 @@ msgid "Template saved successfully"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:327
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:63
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:64
 msgid "Override existing settings?"
 msgstr ""
 
@@ -6454,7 +6454,7 @@ msgid "Save"
 msgstr ""
 
 #: includes/modules/Templates/Module.php:334
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:178
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:179
 msgid "Applying..."
 msgstr ""
 
@@ -6485,8 +6485,8 @@ msgid "Failed to load templates."
 msgstr ""
 
 #: includes/modules/Templates/Module.php:341
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:98
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:103
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:99
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:104
 msgid "Failed to apply template."
 msgstr ""
 
@@ -6518,8 +6518,8 @@ msgstr[1] ""
 #. translators: %d: number of galleries in the album.
 #. translators: %d: gallery count
 #: includes/modules/ViewCollections/class-renderer.php:737
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:58
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:133
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:59
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:134
 #, php-format,js-format
 msgid "%d gallery"
 msgid_plural "%d galleries"
@@ -6531,7 +6531,7 @@ msgstr[1] ""
 #: includes/modules/ViewCollections/class-renderer.php:739
 #: assets/admin/src/components/library/MergeDialog.jsx:98
 #: assets/admin/src/components/library/MergeDialog.jsx:135
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:138
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:139
 #, php-format,js-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -6847,16 +6847,6 @@ msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
 msgstr[0] ""
 msgstr[1] ""
-
-#: includes/rest/admin/admin-data.php:1533
-#: assets/admin/src/components/pages/StatsPage.jsx:39
-msgid "Untitled Album"
-msgstr ""
-
-#: includes/rest/admin/admin-data.php:1533
-#: assets/admin/src/components/pages/StatsPage.jsx:38
-msgid "Untitled Gallery"
-msgstr ""
 
 #: includes/rest/admin/class-preview-request-validator.php:34
 msgid "Unsupported preview request version."
@@ -7662,9 +7652,6 @@ msgid "From: %s"
 msgstr ""
 
 #: includes/tools/migration/sources/class-wp-core-source.php:118
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:155
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:78
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:126
 msgid "(no title)"
 msgstr ""
 
@@ -7910,18 +7897,18 @@ msgstr ""
 msgid "Load More"
 msgstr ""
 
-#: public/render/features/pagination/page-buttons/class-page-buttons.php:164
+#: public/render/features/pagination/page-buttons/class-page-buttons.php:132
 msgid "Gallery pagination"
 msgstr ""
 
-#: public/render/features/pagination/page-buttons/class-page-buttons.php:370
+#: public/render/features/pagination/page-buttons/class-page-buttons.php:334
 #: public/render/lightbox/grid/class-lightbox-grid.php:64
 #: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:45
 #: assets/admin/src/components/shared/Modal/parts/ModalNav.jsx:21
 msgid "Previous"
 msgstr ""
 
-#: public/render/features/pagination/page-buttons/class-page-buttons.php:377
+#: public/render/features/pagination/page-buttons/class-page-buttons.php:341
 #: public/render/lightbox/grid/class-lightbox-grid.php:65
 #: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:46
 #: assets/admin/src/components/shared/Modal/parts/ModalNav.jsx:22
@@ -8398,7 +8385,6 @@ msgid "Choose image"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderImagePicker.js:134
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:162
 msgid "Loading preview…"
 msgstr ""
@@ -8685,10 +8671,10 @@ msgid "Add Photos"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:15
-#: assets/admin/src/components/pages/StatsPage.jsx:160
-#: assets/admin/src/components/pages/StatsPage.jsx:179
-#: assets/admin/src/components/pages/StatsPage.jsx:207
-#: assets/admin/src/components/pages/StatsPage.jsx:313
+#: assets/admin/src/components/pages/StatsPage.jsx:154
+#: assets/admin/src/components/pages/StatsPage.jsx:173
+#: assets/admin/src/components/pages/StatsPage.jsx:201
+#: assets/admin/src/components/pages/StatsPage.jsx:307
 msgid "Views"
 msgstr ""
 
@@ -8738,12 +8724,12 @@ msgid "Plus many more powerful features designed to save time, optimize performa
 msgstr ""
 
 #: assets/admin/src/components/dashboard/RecentlyEdited.jsx:15
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:103
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:104
 msgid "Draft"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/RecentlyEdited.jsx:16
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:105
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:106
 msgid "Private"
 msgstr ""
 
@@ -9257,114 +9243,109 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:24
+#: assets/admin/src/components/pages/StatsPage.jsx:25
 msgid "<1%"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:40
+#: assets/admin/src/components/pages/StatsPage.jsx:50
 msgid "Untitled Item"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:51
-#: assets/admin/src/components/pages/StatsPage.jsx:58
-msgid "Untitled"
-msgstr ""
-
-#: assets/admin/src/components/pages/StatsPage.jsx:77
+#: assets/admin/src/components/pages/StatsPage.jsx:71
 msgid "7 Days"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:139
+#: assets/admin/src/components/pages/StatsPage.jsx:133
 msgid "Other galleries"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:156
-#: assets/admin/src/components/pages/StatsPage.jsx:173
+#: assets/admin/src/components/pages/StatsPage.jsx:150
+#: assets/admin/src/components/pages/StatsPage.jsx:167
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:191
 #: includes/tools/import-export/assets/ImportExportTool.jsx:656
 msgid "Type"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:161
+#: assets/admin/src/components/pages/StatsPage.jsx:155
 msgid "Last Viewed"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:194
+#: assets/admin/src/components/pages/StatsPage.jsx:188
 msgid "Shares"
 msgstr ""
 
 #. translators: 1: start date, 2: end date, 3: count in that period.
-#: assets/admin/src/components/pages/StatsPage.jsx:257
+#: assets/admin/src/components/pages/StatsPage.jsx:251
 #, js-format
 msgid "Compared to %1$s – %2$s (%3$s)"
 msgstr ""
 
 #. translators: %s: all-time count.
-#: assets/admin/src/components/pages/StatsPage.jsx:264
+#: assets/admin/src/components/pages/StatsPage.jsx:258
 #, js-format
 msgid "Total %s"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:326
+#: assets/admin/src/components/pages/StatsPage.jsx:320
 msgid "Previous period"
 msgstr ""
 
 #. translators: 1: view count, 2: share of total views as a percentage.
-#: assets/admin/src/components/pages/StatsPage.jsx:420
+#: assets/admin/src/components/pages/StatsPage.jsx:414
 #, js-format
 msgid "%1$s views (%2$d%%)"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:497
+#: assets/admin/src/components/pages/StatsPage.jsx:491
 msgid "Could not load statistics. Please refresh the page."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:522
+#: assets/admin/src/components/pages/StatsPage.jsx:516
 msgid "Time period"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:541
+#: assets/admin/src/components/pages/StatsPage.jsx:535
 msgid "Refresh stats"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:543
+#: assets/admin/src/components/pages/StatsPage.jsx:537
 #: includes/modules/PageBuilders/core/assets/src/components/PickerModal.jsx:239
 msgid "Refresh"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:555
+#: assets/admin/src/components/pages/StatsPage.jsx:549
 msgid "No statistics yet"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:558
+#: assets/admin/src/components/pages/StatsPage.jsx:552
 msgid "Your gallery stats will appear here once visitors start viewing your galleries."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:580
+#: assets/admin/src/components/pages/StatsPage.jsx:574
 msgid "Views Over Time"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:592
+#: assets/admin/src/components/pages/StatsPage.jsx:586
 msgid "Most Popular Galleries"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:599
+#: assets/admin/src/components/pages/StatsPage.jsx:593
 msgid "No gallery views in this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:613
+#: assets/admin/src/components/pages/StatsPage.jsx:607
 msgid "Recently Viewed"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:618
+#: assets/admin/src/components/pages/StatsPage.jsx:612
 msgid "Nothing was viewed in this period."
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:621
+#: assets/admin/src/components/pages/StatsPage.jsx:615
 msgid "Top Performing Content"
 msgstr ""
 
-#: assets/admin/src/components/pages/StatsPage.jsx:626
+#: assets/admin/src/components/pages/StatsPage.jsx:620
 msgid "No data available for this period."
 msgstr ""
 
@@ -10838,47 +10819,47 @@ msgstr ""
 msgid "Sort by %s"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:39
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:40
 msgid "Failed to load galleries/albums."
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:49
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:50
 msgid "Please select a target to apply the template."
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:55
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:56
 msgid "Applying this template will override all existing settings for {{targetName}}. Are you sure you want to proceed?"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:89
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:90
 msgid "Template applied successfully!"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:126
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:127
 msgid "Select an album to apply this template to:"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:127
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:128
 msgid "Select a gallery to apply this template to:"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:131
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:132
 msgid "Select Gallery"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:131
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:132
 msgid "Select Album"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:147
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:148
 msgid "- Select -"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:160
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:161
 msgid "Warning: Applying this template will overwrite all existing settings for"
 msgstr ""
 
-#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:162
+#: assets/admin/src/components/templates/ApplyTemplateModal.jsx:163
 msgid " Are you sure you want to proceed?"
 msgstr ""
 
@@ -11000,41 +10981,33 @@ msgstr ""
 msgid "What's New in FotoGrids"
 msgstr ""
 
-#: assets/admin/src/utils/gallery.js:39
+#: assets/admin/src/utils/gallery.js:40
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This gallery has nothing to preview yet."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This album has nothing to preview yet."
-msgstr ""
-
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:121
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:122
 msgid "1 gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:122
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:123
 #, js-format
 msgid "%d galleries"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:124
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:125
 msgid "1 item"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:125
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:126
 #, js-format
 msgid "%d items"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:302
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:303
 msgid "Select an album…"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:303
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:304
 msgid "Select a gallery…"
 msgstr ""
 
@@ -11057,7 +11030,7 @@ msgid "Change in the album editor"
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:172
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:109
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:110
 msgid "Change album"
 msgstr ""
 
@@ -11074,7 +11047,7 @@ msgid "Import failed."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:207
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:110
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:111
 msgid "Change gallery"
 msgstr ""
 
@@ -11117,16 +11090,16 @@ msgstr ""
 msgid "Create your first album"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:47
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:48
 msgid "No album selected yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:48
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:49
 msgid "No gallery selected yet."
 msgstr ""
 
 #. translators: %d: image count
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:63
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:64
 #, js-format
 msgid "%d image"
 msgid_plural "%d images"
@@ -11134,16 +11107,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: date
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:84
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:85
 #, js-format
 msgid "Updated %s"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:123
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:124
 msgid "Hide gallery settings used"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:124
+#: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:125
 msgid "Show gallery settings used"
 msgstr ""
 
@@ -11159,15 +11132,15 @@ msgstr ""
 msgid "Couldn’t load preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:62
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:63
 msgid "Created at:"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:65
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:66
 msgid "Last modified:"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:119
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:120
 msgid "Select"
 msgstr ""
 

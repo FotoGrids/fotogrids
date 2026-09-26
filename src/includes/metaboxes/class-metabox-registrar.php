@@ -714,7 +714,6 @@ final class Metabox_Registrar {
 					'error'                  => __( 'Error updating Album', 'fotogrids' ),
 					'items'                  => __( 'items', 'fotogrids' ),
 					'noItems'                => __( 'No items', 'fotogrids' ),
-					'galleryTitleMissing'    => __( 'Gallery Title Missing', 'fotogrids' ),
 					'dropItemHere'           => __( 'Drop item here', 'fotogrids' ),
 				),
 			)
