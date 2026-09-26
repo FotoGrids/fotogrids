@@ -31,10 +31,14 @@ function getSettings() {
  * @return {HTMLAnchorElement|null} The matched link, or null.
  */
 function matchDeactivateLink(target, pluginBasename) {
-	if (!pluginBasename) return null;
+	if (!pluginBasename) {
+		return null;
+	}
 
 	const link = target.closest && target.closest('a');
-	if (!link) return null;
+	if (!link) {
+		return null;
+	}
 
 	const slug = pluginBasename.split('/')[0];
 	if (link.id === `deactivate-${slug}`) {
@@ -97,7 +101,6 @@ function submitToFreemius(settings, reason) {
 			if (settings.debug) {
 				const text = await response.text();
 				if (!response.ok || text.trim() !== '1') {
-					// eslint-disable-next-line no-console
 					console.warn(
 						'[FotoGrids] Deactivation feedback not accepted:',
 						response.status,
@@ -108,7 +111,6 @@ function submitToFreemius(settings, reason) {
 		})
 		.catch((error) => {
 			if (settings.debug && error.name !== 'AbortError') {
-				// eslint-disable-next-line no-console
 				console.warn(
 					'[FotoGrids] Deactivation feedback failed:',
 					error
@@ -155,7 +157,9 @@ function openModal(settings, link) {
 
 function init() {
 	const settings = getSettings();
-	if (!settings) return;
+	if (!settings) {
+		return;
+	}
 
 	document.addEventListener(
 		'click',
@@ -164,7 +168,9 @@ function init() {
 				event.target,
 				settings.pluginBasename
 			);
-			if (!link) return;
+			if (!link) {
+				return;
+			}
 
 			event.preventDefault();
 			openModal(settings, link);
