@@ -589,29 +589,17 @@ class Public_Render {
 	 *     runs (e.g. "gallery not found"), so collection-base.css is
 	 *     never enqueued for those paths.
 	 *
-	 * The window.fotogrids localize payload is pre-registered against the
-	 * `fotogrids-runtime` handle here, even though the runtime asset
-	 * itself is enqueued by Asset_Resolver from Runtime_Bootstrap during
-	 * the render. wp_register_script() at this stage means the localize
-	 * data is associated with the handle so it prints when the script is
-	 * enqueued later in wp_footer.
+	 * The window.fotogrids payload is attached to the `fotogrids-runtime`
+	 * handle on every front-end page, so it prints wherever a gallery
+	 * enqueues the runtime - including galleries rendered outside the
+	 * post content, which has_fotogrids_content() cannot see.
 	 */
 	public static function enqueue_frontend_scripts() {
+		\FotoGrids\Render\Internal\Runtime\Runtime_Bootstrap::localize();
+
 		if ( ! self::has_fotogrids_content() ) {
 			return;
 		}
-
-		// Pre-register the runtime handle so wp_localize_script can attach
-		// its payload. Asset_Resolver will later call wp_register_script
-		// for the same handle; WordPress treats a duplicate registration
-		// as a no-op, so this is safe.
-		wp_register_script(
-			'fotogrids-runtime',
-			FOTOGRIDS_PLUGIN_URL . 'assets/js/fotogrids-runtime.js',
-			array(),
-			FOTOGRIDS_VERSION,
-			true
-		);
 
 		// fg-tooltip and deep-linking are NOT enqueued here anymore.
 		// • fg-tooltip is declared as a dep by Sharing_Decorator and
@@ -626,23 +614,6 @@ class Public_Render {
 			FOTOGRIDS_PLUGIN_URL . 'public/assets/fotogrids-errors.css',
 			array(),
 			FOTOGRIDS_VERSION
-		);
-
-		$sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
-
-		// window.fotogrids carries the sharing-related deep-link settings,
-		// the REST root and, for signed-in visitors only, a REST nonce.
-		// Per-render nonces in data attributes can come from the render
-		// cache, so they are not tied to the current visitor.
-		wp_localize_script(
-			'fotogrids-runtime',
-			'fotogrids',
-			array(
-				'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
-				'embedded_share_target' => $sharing['embedded_share_target'],
-				'restUrl'               => esc_url_raw( rest_url() ),
-				'restNonce'             => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
-			)
 		);
 	}
 
@@ -850,10 +821,9 @@ class Public_Render {
 	/**
 	 * Check if current page has FotoGrids content.
 	 *
-	 * Gates the pre-registration of `fotogrids-runtime` (so wp_localize_script
-	 * can attach the `window.fotogrids` payload) and the always-on
-	 * `fotogrids-errors.css` stylesheet. Per-render module CSS/JS is owned
-	 * by Asset_Resolver and ships regardless of this gate.
+	 * Gates the always-on `fotogrids-errors.css` stylesheet. Per-render
+	 * module CSS/JS is owned by Asset_Resolver and ships regardless of
+	 * this gate.
 	 *
 	 * Page-builder integrations (Elementor, Divi, Bricks, …) store their
 	 * widget trees outside `$post->post_content`, so the default

@@ -16,6 +16,7 @@ use FotoGrids\Render\Api\Request_Source;
 use FotoGrids\Render\Internal\Context_Builder;
 use FotoGrids\Render\Internal\Inline_Asset_Emitter;
 use FotoGrids\Render\Internal\Render_Controller;
+use FotoGrids\Render\Internal\Runtime\Runtime_Bootstrap;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -55,6 +56,8 @@ final class Preview_Renderer {
 		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return '';
 		}
+
+		Runtime_Bootstrap::localize();
 
 		$render_settings = class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
 			? (array) \FotoGrids\Galleries\Gallery_Repository::get_settings( $gallery_id )
@@ -101,6 +104,8 @@ final class Preview_Renderer {
 		if ( ! class_exists( Context_Builder::class ) || ! class_exists( Render_Controller::class ) ) {
 			return '';
 		}
+
+		Runtime_Bootstrap::localize();
 
 		$album_settings = class_exists( '\FotoGrids\Albums\Album_Repository' )
 			? (array) \FotoGrids\Albums\Album_Repository::get_settings( $album_id )
