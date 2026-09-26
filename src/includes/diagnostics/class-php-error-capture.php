@@ -161,12 +161,9 @@ final class PHP_Error_Capture {
 	}
 
 	/**
-	 * Decides whether an error belongs to FotoGrids and where it originated.
+	 * Finds the FotoGrids frame an error originated from.
 	 *
-	 * The call stack is walked outward from the line that raised the error,
-	 * skipping WordPress core and this class's own frames. The first remaining
-	 * frame decides ownership: a FotoGrids file is reported as the origin, and
-	 * any other plugin or theme file means the error is not ours.
+	 * The first stack frame outside WordPress core decides ownership.
 	 *
 	 * @since  1.0.0
 	 * @param  string $file File the error was raised in.
@@ -252,8 +249,6 @@ final class PHP_Error_Capture {
 
 	/**
 	 * Whether a path belongs to a plugin, must-use plugin or theme.
-	 *
-	 * Called only for paths already known not to be FotoGrids.
 	 *
 	 * @since  1.1.4
 	 * @param  string $file Absolute filesystem path.
