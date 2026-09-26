@@ -31,10 +31,14 @@ function getSettings() {
  * @return {HTMLAnchorElement|null} The matched link, or null.
  */
 function matchDeactivateLink(target, pluginBasename) {
-	if (!pluginBasename) return null;
+	if (!pluginBasename) {
+		return null;
+	}
 
 	const link = target.closest && target.closest('a');
-	if (!link) return null;
+	if (!link) {
+		return null;
+	}
 
 	const slug = pluginBasename.split('/')[0];
 	if (link.id === `deactivate-${slug}`) {
@@ -153,7 +157,9 @@ function openModal(settings, link) {
 
 function init() {
 	const settings = getSettings();
-	if (!settings) return;
+	if (!settings) {
+		return;
+	}
 
 	document.addEventListener(
 		'click',
@@ -162,7 +168,9 @@ function init() {
 				event.target,
 				settings.pluginBasename
 			);
-			if (!link) return;
+			if (!link) {
+				return;
+			}
 
 			event.preventDefault();
 			openModal(settings, link);

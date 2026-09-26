@@ -53,8 +53,12 @@ const TokenSelectComponent = ({
 		? resolvedOptions.filter((o) => !o.isGlobalDefault)
 		: resolvedOptions;
 	const allOptions = baseOptions.filter((option) => {
-		if (!option || !option.condition) return true;
-		if (typeof isOptionVisible !== 'function') return true;
+		if (!option || !option.condition) {
+			return true;
+		}
+		if (typeof isOptionVisible !== 'function') {
+			return true;
+		}
 		return isOptionVisible(option);
 	});
 
@@ -113,7 +117,9 @@ const TokenSelectComponent = ({
 	};
 
 	const updateDropdownPosition = useCallback(() => {
-		if (!triggerRef.current) return;
+		if (!triggerRef.current) {
+			return;
+		}
 
 		const triggerRect = triggerRef.current.getBoundingClientRect();
 		const viewportHeight =
@@ -165,7 +171,9 @@ const TokenSelectComponent = ({
 	}, []);
 
 	useEffect(() => {
-		if (!isOpen) return;
+		if (!isOpen) {
+			return;
+		}
 		updateDropdownPosition();
 		window.addEventListener('resize', updateDropdownPosition);
 		return () =>
@@ -173,17 +181,23 @@ const TokenSelectComponent = ({
 	}, [isOpen, updateDropdownPosition]);
 
 	useEffect(() => {
-		if (!isOpen) return;
+		if (!isOpen) {
+			return;
+		}
 
 		const handlePointerDown = (e) => {
 			const inTrigger =
 				triggerRef.current && triggerRef.current.contains(e.target);
 			const inDropdown =
 				dropdownRef.current && dropdownRef.current.contains(e.target);
-			if (!inTrigger && !inDropdown) setIsOpen(false);
+			if (!inTrigger && !inDropdown) {
+				setIsOpen(false);
+			}
 		};
 		const handleEscape = (e) => {
-			if (e.key === 'Escape') setIsOpen(false);
+			if (e.key === 'Escape') {
+				setIsOpen(false);
+			}
 		};
 
 		document.addEventListener('mousedown', handlePointerDown);
@@ -204,7 +218,9 @@ const TokenSelectComponent = ({
 
 	const toggleOption = useCallback(
 		(value) => {
-			if (isDisabled) return;
+			if (isDisabled) {
+				return;
+			}
 
 			setSelectedValues((prev) => {
 				const idx = prev.indexOf(value);
@@ -217,14 +233,18 @@ const TokenSelectComponent = ({
 				return next;
 			});
 
-			if (!keepOpen) setIsOpen(false);
+			if (!keepOpen) {
+				setIsOpen(false);
+			}
 		},
 		[isDisabled, keepOpen, setting.key, updateSetting]
 	);
 
 	const removeToken = useCallback(
 		(value) => {
-			if (isDisabled) return;
+			if (isDisabled) {
+				return;
+			}
 			setSelectedValues((prev) => {
 				const next = prev.filter((v) => v !== value);
 				updateSetting(setting.key, serializeValue(next));
@@ -249,7 +269,9 @@ const TokenSelectComponent = ({
 	// over a gap, the insertion marker, or a token child.
 	const getInsertionSlotFromPointer = (clientX) => {
 		const container = tokensRef.current;
-		if (!container) return null;
+		if (!container) {
+			return null;
+		}
 		const tokenEls = Array.from(
 			container.querySelectorAll('.fotogrids-token-select__token')
 		);
@@ -265,9 +287,13 @@ const TokenSelectComponent = ({
 	// Apply a reorder and commit. Kept outside any state-updater so the side
 	// effect (updateSetting) is not run during render reconciliation.
 	const commitReorder = (srcIndex, insertAt) => {
-		if (srcIndex === null || insertAt === null) return;
+		if (srcIndex === null || insertAt === null) {
+			return;
+		}
 		// No-op: dropping in the slot immediately before or after itself.
-		if (insertAt === srcIndex || insertAt === srcIndex + 1) return;
+		if (insertAt === srcIndex || insertAt === srcIndex + 1) {
+			return;
+		}
 
 		const next = [...selectedValues];
 		const [moved] = next.splice(srcIndex, 1);
@@ -277,7 +303,9 @@ const TokenSelectComponent = ({
 	};
 
 	const handleContainerDragOver = (e) => {
-		if (dragSrcIndex.current === null) return;
+		if (dragSrcIndex.current === null) {
+			return;
+		}
 		e.preventDefault();
 		e.dataTransfer.dropEffect = 'move';
 		const slot = getInsertionSlotFromPointer(e.clientX);
@@ -286,7 +314,9 @@ const TokenSelectComponent = ({
 	};
 
 	const handleContainerDrop = (e) => {
-		if (dragSrcIndex.current === null) return;
+		if (dragSrcIndex.current === null) {
+			return;
+		}
 		e.preventDefault();
 		const srcIndex = dragSrcIndex.current;
 		const insertAt =
@@ -327,8 +357,9 @@ const TokenSelectComponent = ({
 			!sortable ||
 			dragOverIndex !== slotIndex ||
 			dragSrcIndex.current === null
-		)
+		) {
 			return null;
+		}
 		return h('span', {
 			key: `marker-${slotIndex}`,
 			className: 'fotogrids-token-select__insert-marker',

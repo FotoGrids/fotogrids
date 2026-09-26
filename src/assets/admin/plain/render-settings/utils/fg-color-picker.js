@@ -117,7 +117,9 @@ function rgbToHex(r, g, b) {
 
 function rgbToHexAlpha(r, g, b, a) {
 	const hex = rgbToHex(r, g, b);
-	if (a >= 1) return hex;
+	if (a >= 1) {
+		return hex;
+	}
 	const aa = Math.round(a * 255)
 		.toString(16)
 		.padStart(2, '0')
@@ -132,7 +134,9 @@ function hsvToHsla(h, s, v, a) {
 }
 
 function parseCssColor(str) {
-	if (!str) return null;
+	if (!str) {
+		return null;
+	}
 	const s = str.trim();
 
 	if (s.startsWith('#')) {
@@ -142,9 +146,12 @@ function parseCssColor(str) {
 			a = parseInt(hex.slice(6, 8), 16) / 255;
 			hex = hex.slice(0, 6);
 		}
-		if (hex.length === 3)
+		if (hex.length === 3) {
 			hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-		if (hex.length !== 6) return null;
+		}
+		if (hex.length !== 6) {
+			return null;
+		}
 		const n = parseInt(hex, 16);
 		const r = (n >> 16) & 255,
 			g = (n >> 8) & 255,
@@ -193,7 +200,9 @@ function el(tag, attrs, ...children) {
 		}
 	}
 	for (const child of children) {
-		if (child == null) continue;
+		if (child == null) {
+			continue;
+		}
 		node.appendChild(
 			typeof child === 'string' ? document.createTextNode(child) : child
 		);
@@ -291,7 +300,9 @@ window.FGColorPicker.create = function (options) {
 	}
 
 	function onCanvasDrag(e) {
-		if (disabled) return;
+		if (disabled) {
+			return;
+		}
 		e.preventDefault();
 		const { s, v } = canvasRatioFromEvent(e);
 		// Preserve hue while dragging saturation/value; greyscale values lose hue in rgbToHsv.
@@ -303,7 +314,9 @@ window.FGColorPicker.create = function (options) {
 	}
 
 	function startCanvasDrag(e) {
-		if (disabled) return;
+		if (disabled) {
+			return;
+		}
 		onCanvasDrag(e);
 		const move = (ev) => onCanvasDrag(ev);
 		const up = () => {
@@ -429,7 +442,9 @@ window.FGColorPicker.create = function (options) {
 		if (parsed) {
 			// Preserve the current hue when saturation is near zero - rgbToHsv
 			// loses hue information for greys/whites (all channels equal).
-			if (parsed.s < 0.01) parsed.h = state.h;
+			if (parsed.s < 0.01) {
+				parsed.h = state.h;
+			}
 			state = parsed;
 			drawCanvas();
 			positionHandle();
@@ -446,7 +461,9 @@ window.FGColorPicker.create = function (options) {
 	});
 
 	function syncTextInput() {
-		if (suppressTextUpdate) return;
+		if (suppressTextUpdate) {
+			return;
+		}
 		const { r, g, b } = hsvToRgb(state.h, state.s, state.v);
 		if (format === 'HEX') {
 			textInput.value = rgbToHexAlpha(r, g, b, state.a);
@@ -464,7 +481,9 @@ window.FGColorPicker.create = function (options) {
 	}
 
 	function emit() {
-		if (typeof onChange !== 'function') return;
+		if (typeof onChange !== 'function') {
+			return;
+		}
 		onChange(hsvToRgba(state.h, state.s, state.v, state.a));
 	}
 
@@ -495,7 +514,9 @@ window.FGColorPicker.create = function (options) {
 
 	function setValue(cssStr) {
 		const parsed = parseCssColor(cssStr);
-		if (!parsed) return;
+		if (!parsed) {
+			return;
+		}
 		state = parsed;
 		drawCanvas();
 		positionHandle();

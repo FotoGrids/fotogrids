@@ -17,7 +17,9 @@ const buildConfirm =
 				},
 				onClose: (reason) => {
 					opts.onClose?.(reason);
-					if (reason !== 'confirm') resolve(false);
+					if (reason !== 'confirm') {
+						resolve(false);
+					}
 				},
 			});
 			opts.__handle = handle;
@@ -39,7 +41,9 @@ const buildPrompt =
 				},
 				onClose: (reason) => {
 					opts.onClose?.(reason);
-					if (reason !== 'confirm') resolve(null);
+					if (reason !== 'confirm') {
+						resolve(null);
+					}
 				},
 			});
 		});

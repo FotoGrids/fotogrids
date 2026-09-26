@@ -31,10 +31,14 @@
  */
 
 export const installPermissionsApi = () => {
-	if (typeof window === 'undefined') return;
+	if (typeof window === 'undefined') {
+		return;
+	}
 
 	window.FotoGridsAdmin = window.FotoGridsAdmin || {};
-	if (window.FotoGridsAdmin.permissions) return;
+	if (window.FotoGridsAdmin.permissions) {
+		return;
+	}
 
 	const namespace = {
 		_matrixOverride: null,

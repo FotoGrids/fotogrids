@@ -290,7 +290,9 @@ function CollectionSettings() {
 	});
 
 	const [activeTab, setActiveTab] = useState(() => {
-		if (!uiState) return 'layout';
+		if (!uiState) {
+			return 'layout';
+		}
 		return uiState.getValue({
 			key: 'main-tab',
 			fallback: 'layout',
@@ -298,7 +300,9 @@ function CollectionSettings() {
 		});
 	});
 	const [activeSubTabs, setActiveSubTabs] = useState(() => {
-		if (!uiState) return {};
+		if (!uiState) {
+			return {};
+		}
 		return uiState.getValue({ key: 'subtabs', fallback: {} });
 	});
 	const [settings, setSettings] = useState(
@@ -378,8 +382,12 @@ function CollectionSettings() {
 
 	const switchTab = useCallback(
 		(tabId) => {
-			if (typeof tabId !== 'string' || tabId === '') return;
-			if (!SETTINGS_GROUPS[tabId]) return;
+			if (typeof tabId !== 'string' || tabId === '') {
+				return;
+			}
+			if (!SETTINGS_GROUPS[tabId]) {
+				return;
+			}
 			setActiveTab(tabId);
 			if (uiState) {
 				uiState.setValue({
@@ -553,7 +561,9 @@ function CollectionSettings() {
 	}, []);
 
 	useEffect(() => {
-		if (!settingsLoaded) return;
+		if (!settingsLoaded) {
+			return;
+		}
 
 		setActiveSubTabs((prev) => {
 			const updated = { ...prev };
@@ -604,7 +614,9 @@ function CollectionSettings() {
 	}, [settingsLoaded, activeTab]);
 
 	useLayoutEffect(() => {
-		if (!settingsLoaded) return;
+		if (!settingsLoaded) {
+			return;
+		}
 
 		setActiveSubTabs((prev) => {
 			const updated = { ...prev };
@@ -792,7 +804,9 @@ function CollectionSettings() {
 	};
 
 	const validateUrl = (url) => {
-		if (!url.trim()) return { valid: true, message: '' };
+		if (!url.trim()) {
+			return { valid: true, message: '' };
+		}
 
 		try {
 			const urlObj = new URL(url);
@@ -1043,9 +1057,13 @@ function CollectionSettings() {
 				const ok = dependsOn.every((dep, i) =>
 					matches(readGlobal(dep), values[i])
 				);
-				if (!ok) return false;
+				if (!ok) {
+					return false;
+				}
 			} else if (dependsOn) {
-				if (!matches(readGlobal(dependsOn), values)) return false;
+				if (!matches(readGlobal(dependsOn), values)) {
+					return false;
+				}
 			}
 		}
 
@@ -1075,13 +1093,17 @@ function CollectionSettings() {
 		}
 
 		// condition.dependsOn / values (camelCase predicate)
-		if (!setting.condition) return true;
+		if (!setting.condition) {
+			return true;
+		}
 
 		// any / all composite predicates, nestable to express OR/AND
 		// trees on top of the leaf dependsOn predicate. Each child is itself a
 		// condition node (any | all | dependsOn+values).
 		const evaluateCondition = (condition) => {
-			if (!condition || typeof condition !== 'object') return true;
+			if (!condition || typeof condition !== 'object') {
+				return true;
+			}
 			if (Array.isArray(condition.any)) {
 				return condition.any.some((child) => evaluateCondition(child));
 			}
@@ -1245,10 +1267,14 @@ function CollectionSettings() {
 	 * @returns {boolean}
 	 */
 	const evaluateVisibleWhen = (predicate) => {
-		if (!predicate || typeof predicate !== 'object') return true;
+		if (!predicate || typeof predicate !== 'object') {
+			return true;
+		}
 
 		const watchedKey = predicate.setting;
-		if (typeof watchedKey !== 'string' || watchedKey === '') return true;
+		if (typeof watchedKey !== 'string' || watchedKey === '') {
+			return true;
+		}
 
 		const watchedValue = settings[watchedKey];
 
@@ -1275,7 +1301,9 @@ function CollectionSettings() {
 	 *  - `group.condition.dependsOn` + `values` is honoured too.
 	 */
 	const shouldDisplayTab = (group) => {
-		if (group?.hidden) return false;
+		if (group?.hidden) {
+			return false;
+		}
 
 		if (group?.visible_when && !evaluateVisibleWhen(group.visible_when)) {
 			return false;
@@ -1320,11 +1348,15 @@ function CollectionSettings() {
 				);
 			};
 			if (typeof dependsOn === 'string' && dependsOn !== '') {
-				if (!matches(readGlobal(dependsOn), values)) return false;
+				if (!matches(readGlobal(dependsOn), values)) {
+					return false;
+				}
 			}
 		}
 
-		if (!group.condition) return true;
+		if (!group.condition) {
+			return true;
+		}
 
 		// Delegate to shouldDisplaySetting so tabs honour the full predicate
 		// surface (any / all trees, condition_operator including not_in /
@@ -1338,7 +1370,9 @@ function CollectionSettings() {
 
 			if (group.settings) {
 				for (const setting of group.settings) {
-					if (setting.key === key) return setting;
+					if (setting.key === key) {
+						return setting;
+					}
 
 					if (setting.subTabs) {
 						for (const subTabId in setting.subTabs) {
@@ -1346,7 +1380,9 @@ function CollectionSettings() {
 							const subSetting = (subTab?.settings || []).find(
 								(s) => s.key === key
 							);
-							if (subSetting) return subSetting;
+							if (subSetting) {
+								return subSetting;
+							}
 						}
 					}
 				}
@@ -1358,7 +1394,9 @@ function CollectionSettings() {
 					const setting = (subTab?.settings || []).find(
 						(s) => s.key === key
 					);
-					if (setting) return setting;
+					if (setting) {
+						return setting;
+					}
 				}
 			}
 		}
@@ -1985,8 +2023,12 @@ function CollectionSettings() {
 		// and mirror it into the localized globals so other components
 		// that re-render later see the new value.
 		const handleModeChange = (nextMode) => {
-			if (nextMode !== 'easy' && nextMode !== 'advanced') return;
-			if (nextMode === settingsMode) return;
+			if (nextMode !== 'easy' && nextMode !== 'advanced') {
+				return;
+			}
+			if (nextMode === settingsMode) {
+				return;
+			}
 
 			const previousMode = settingsMode;
 			setSettingsMode(nextMode);
@@ -2319,9 +2361,13 @@ function CollectionSettings() {
 
 	const renderTabContent = (groupId) => {
 		const group = SETTINGS_GROUPS[groupId];
-		if (!group) return null;
+		if (!group) {
+			return null;
+		}
 
-		if (!shouldDisplayTab(group)) return null;
+		if (!shouldDisplayTab(group)) {
+			return null;
+		}
 
 		if (!isFreeTier(group) && !isProActive) {
 			const allSettings = group.settings || [];

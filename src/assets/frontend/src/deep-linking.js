@@ -69,11 +69,15 @@
 	 * Remove the deep-link identifier from the URL (on lightbox close).
 	 */
 	function clearDeepLink() {
-		if (!hasHistory) return;
+		if (!hasHistory) {
+			return;
+		}
 
 		if (isViewPage()) {
 			const url = new URL(window.location.href);
-			if (!url.searchParams.has('fg-item')) return;
+			if (!url.searchParams.has('fg-item')) {
+				return;
+			}
 			url.searchParams.delete('fg-item');
 			window.history.replaceState({}, '', url.toString());
 		} else if (window.location.hash.startsWith('#fg-')) {
@@ -156,10 +160,14 @@
 	 */
 	function openDeepLink(attempt) {
 		const link = parseDeepLink();
-		if (!link) return;
+		if (!link) {
+			return;
+		}
 
 		const target = resolveTarget(link);
-		if (!target) return;
+		if (!target) {
+			return;
+		}
 
 		if (target.trigger && window.FotoGridsLightbox) {
 			const lb = window.FotoGridsLightbox.instance;
@@ -190,7 +198,9 @@
 	 * @param {Event} event  fotogrids:lightbox:open or :navigate
 	 */
 	function syncUrlToLightbox(event) {
-		if (!hasHistory) return;
+		if (!hasHistory) {
+			return;
+		}
 		const detail = event.detail || {};
 		const item = detail.item;
 		const galleryEl =
@@ -201,7 +211,9 @@
 					)
 				: null);
 		const itemId = item && item.id ? item.id : null;
-		if (!itemId) return;
+		if (!itemId) {
+			return;
+		}
 
 		window.history.replaceState({}, '', buildDeepLink(galleryEl, itemId));
 	}
@@ -211,7 +223,9 @@
 	 * context regardless of which gallery stylesheet is present.
 	 */
 	function injectHighlightStyle() {
-		if (document.getElementById('fg-deep-link-style')) return;
+		if (document.getElementById('fg-deep-link-style')) {
+			return;
+		}
 		const style = document.createElement('style');
 		style.id = 'fg-deep-link-style';
 		style.textContent =

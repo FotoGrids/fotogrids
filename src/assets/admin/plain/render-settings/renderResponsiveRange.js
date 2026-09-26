@@ -61,18 +61,23 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		// linked state is derived from the data: unequal sides on any device mean
 		// the user unlinked them.
 		const sideValueFor = (deviceValue, side) => {
-			if (!deviceValue || typeof deviceValue !== 'object')
+			if (!deviceValue || typeof deviceValue !== 'object') {
 				return undefined;
+			}
 			const sv = deviceValue[side];
 			return sv && typeof sv === 'object' ? sv.value : sv;
 		};
 		const deviceHasEqualSides = (deviceValue) => {
-			if (!deviceValue || typeof deviceValue !== 'object') return true;
+			if (!deviceValue || typeof deviceValue !== 'object') {
+				return true;
+			}
 			const first = sideValueFor(deviceValue, 'top');
 			return sides.every((s) => sideValueFor(deviceValue, s) === first);
 		};
 		const allDevicesEqual = () => {
-			if (!currentValue || typeof currentValue !== 'object') return true;
+			if (!currentValue || typeof currentValue !== 'object') {
+				return true;
+			}
 			return ['desktop', 'tablet', 'mobile'].every((d) =>
 				deviceHasEqualSides(currentValue[d])
 			);
@@ -149,7 +154,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		};
 
 		const getDeviceUnit = (device) => {
-			if (!hasUnits) return null;
+			if (!hasUnits) {
+				return null;
+			}
 			const dv = responsiveValue[device].top;
 			return (
 				(typeof dv === 'object' && dv !== null ? dv.unit : null) ||
@@ -205,7 +212,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 		};
 
 		const updateUnit = (device, unit) => {
-			if (!hasUnits) return;
+			if (!hasUnits) {
+				return;
+			}
 			const newDeviceValue = {};
 			sides.forEach((side) => {
 				newDeviceValue[side] = {
@@ -397,7 +406,9 @@ window.FotoGridsRenderSettings.renderResponsiveRange = (
 													side
 												),
 												onChange: (e) => {
-													if (isDisabled) return;
+													if (isDisabled) {
+														return;
+													}
 													const _v = parseInt(
 														e.target.value
 													);
@@ -1559,7 +1570,9 @@ function renderTwoSided(setting, currentValue, isDisabled, ctx) {
 												max: range.max,
 												value: normalized[side],
 												onChange: (e) => {
-													if (isDisabled) return;
+													if (isDisabled) {
+														return;
+													}
 													const parsed = parseInt(
 														e.target.value,
 														10
