@@ -187,45 +187,33 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 
 	const removeItem = useCallback(
 		(itemId) => {
-			let needsClear = false;
-			let removedEmbed = null;
-			setItems((prevItems) => {
-				const itemToRemove = prevItems.find(
-					(item) => item.id === itemId
-				);
-				needsClear = !!itemToRemove?.featured;
-				const itemType = itemToRemove?.item_type || 'image';
-				if (
-					itemType === 'video_youtube' ||
-					itemType === 'video_vimeo'
-				) {
-					removedEmbed = itemToRemove;
-				}
-				const remainingItems = prevItems.filter(
-					(img) => img.id !== itemId
-				);
+			const itemToRemove = items.find((item) => item.id === itemId);
+			const itemType = itemToRemove?.item_type || 'image';
+			const isEmbed =
+				itemType === 'video_youtube' || itemType === 'video_vimeo';
 
-				// Embeds are not in the State manager's attachment list, so only
-				// attachment-backed items are removed from it.
+			setItems((prevItems) =>
+				prevItems.filter((item) => item.id !== itemId)
+			);
+
+			// Embeds persist as item_meta rows independent of gallery save, so
+			// removing one from the grid must delete its row via REST. They are
+			// not in the State manager's attachment list.
+			if (isEmbed) {
+				deleteEmbedItem(itemId);
+			} else {
 				const State = collectionState();
-				if (State && !removedEmbed) {
+				if (State) {
 					State.items.removeItem(String(itemId));
 				}
-
-				return remainingItems;
-			});
-			// Embeds persist as item_meta rows independent of gallery save, so
-			// removing one from the grid must delete its row via REST.
-			if (removedEmbed) {
-				deleteEmbedItem(itemId);
 			}
-			if (needsClear) {
+			if (itemToRemove?.featured) {
 				saveFeaturedItem(null);
 			}
 
 			notifyChange('items-remove');
 		},
-		[saveFeaturedItem, deleteEmbedItem]
+		[items, saveFeaturedItem, deleteEmbedItem]
 	);
 
 	const clearAllItems = useCallback(() => {
