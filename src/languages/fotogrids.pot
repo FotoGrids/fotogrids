@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T10:28:59+00:00\n"
+"POT-Creation-Date: 2026-09-26T10:35:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -8410,43 +8410,45 @@ msgstr ""
 #. translators: 1: pending count, 2: total count.
 #: assets/admin/plain/render-settings/renderWatermarkStatus.js:124
 #, js-format
-msgid "%1$d of %2$d items in this gallery aren’t watermarked"
-msgstr ""
+msgid "%1$d of %2$d items in this gallery isn’t watermarked"
+msgid_plural "%1$d of %2$d items in this gallery aren’t watermarked"
+msgstr[0] ""
+msgstr[1] ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:134
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:136
 msgid "out of date"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:135
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:137
 msgid "missing"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:146
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:148
 msgid "Hide items"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:147
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:149
 msgid "Show missing items"
 msgstr ""
 
 #. translators: %1$d: number of items processed; %2$d: total number of items.
 #. translators: 1: done count, 2: total count.
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:204
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:206
 #: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:120
 #, js-format
 msgid "Regenerating… %1$d of %2$d"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:211
-msgid "The site watermark is on for this gallery, but these images still serve clean copies."
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:213
+msgid "The site watermark is on for this gallery, but these images don’t have the current watermark yet."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:232
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:234
 #: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:136
 msgid "Regenerating…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:233
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:235
 msgid "Regenerate this gallery"
 msgstr ""
 
