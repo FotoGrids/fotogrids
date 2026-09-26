@@ -1536,6 +1536,7 @@ class Admin_Data {
 				'status'             => $post->post_status,
 				'modified'           => $post->post_modified,
 				'modified_gmt'       => $post->post_modified_gmt,
+				'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
 				'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
 				'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
 			);

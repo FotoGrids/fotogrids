@@ -15,7 +15,7 @@ const ROWS = [
 		type: 'fotogrids_gallery',
 		type_label: 'Gallery',
 		status: 'publish',
-		modified_gmt: '2026-09-24 10:00:00',
+		modified_timestamp: Date.UTC(2026, 8, 24, 10) / 1000,
 		modified_formatted: 'September 24, 2026 10:00 am',
 		edit_url: 'https://example.test/wp-admin/post.php?post=12&action=edit',
 	},
@@ -26,7 +26,7 @@ const ROWS = [
 		type: 'fotogrids_album',
 		type_label: 'Album',
 		status: 'draft',
-		modified_gmt: '2026-09-23 09:00:00',
+		modified_timestamp: Date.UTC(2026, 8, 23, 9) / 1000,
 		modified_formatted: 'September 23, 2026 9:00 am',
 		edit_url: 'https://example.test/wp-admin/post.php?post=15&action=edit',
 	},
@@ -147,39 +147,43 @@ describe('dashboard RecentlyEdited', () => {
 
 describe('formatEditedDate', () => {
 	const NOW = new Date('2026-09-26T12:00:00Z');
+	const at = (iso) => Date.parse(iso) / 1000;
 
 	it('shows minutes for an edit within the last hour', () => {
-		expect(formatEditedDate('2026-09-26 11:55:00', NOW)).toBe(
+		expect(formatEditedDate(at('2026-09-26T11:55:00Z'), NOW)).toBe(
 			'5 minutes ago'
 		);
 	});
 
 	it('never shows less than one minute', () => {
-		expect(formatEditedDate('2026-09-26 11:59:45', NOW)).toBe(
+		expect(formatEditedDate(at('2026-09-26T11:59:45Z'), NOW)).toBe(
 			'1 minute ago'
 		);
 	});
 
 	it('shows hours for an edit within the last day', () => {
-		expect(formatEditedDate('2026-09-26 09:10:00', NOW)).toBe(
+		expect(formatEditedDate(at('2026-09-26T09:10:00Z'), NOW)).toBe(
 			'2 hours ago'
 		);
-		expect(formatEditedDate('2026-09-25 12:30:00', NOW)).toBe(
+		expect(formatEditedDate(at('2026-09-25T12:30:00Z'), NOW)).toBe(
 			'23 hours ago'
 		);
 	});
 
 	it('shows day and month once the edit is a day old', () => {
-		const label = formatEditedDate('2026-09-24 10:00:00', NOW);
+		const label = formatEditedDate(at('2026-09-24T10:00:00Z'), NOW);
 		expect(label).toMatch(/24/);
 		expect(label).not.toMatch(/ago|2026/);
 	});
 
 	it('adds the year for an earlier year', () => {
-		expect(formatEditedDate('2025-06-15 10:00:00', NOW)).toMatch(/2025/);
+		expect(formatEditedDate(at('2025-06-15T10:00:00Z'), NOW)).toMatch(
+			/2025/
+		);
 	});
 
-	it('returns an empty string for an unparsable value', () => {
-		expect(formatEditedDate('', NOW)).toBe('');
+	it('returns an empty string when the timestamp is missing', () => {
+		expect(formatEditedDate(0, NOW)).toBe('');
+		expect(formatEditedDate(undefined, NOW)).toBe('');
 	});
 });

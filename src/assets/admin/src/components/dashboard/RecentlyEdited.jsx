@@ -29,16 +29,16 @@ const adminLocale = () => document.documentElement.lang || undefined;
  * "3 hours ago"); older ones as day and month, with the year only when it
  * differs from the current one.
  *
- * @param {string} gmt Datetime in `YYYY-MM-DD HH:MM:SS` form, GMT.
- * @param {Date}   now Reference time. Defaults to the current time.
- * @return {string} The label, or an empty string when the value is unparsable.
+ * @param {number} timestamp Unix timestamp in seconds.
+ * @param {Date}   now       Reference time. Defaults to the current time.
+ * @return {string} The label, or an empty string when the timestamp is missing.
  */
-export const formatEditedDate = (gmt, now = new Date()) => {
-    const date = new Date(`${String(gmt).replace(' ', 'T')}Z`);
-    if (Number.isNaN(date.getTime())) {
+export const formatEditedDate = (timestamp, now = new Date()) => {
+    if (!Number.isFinite(timestamp) || timestamp <= 0) {
         return '';
     }
 
+    const date = new Date(timestamp * 1000);
     const elapsed = now.getTime() - date.getTime();
     if (elapsed < DAY_MS) {
         const relative = new Intl.RelativeTimeFormat(adminLocale(), { numeric: 'always' });
@@ -58,20 +58,22 @@ export const formatEditedDate = (gmt, now = new Date()) => {
 
 const RecentlyEditedRow = ({ item }) => (
     <li className="fg-abc-recently-edited-row">
-        <span className="fg-abc-recently-edited-type">{item.type_label}</span>
         <a className="fg-abc-recently-edited-link" href={item.edit_url}>
-            <span className="fg-abc-recently-edited-title">
-                {item.title || `${item.untitled_label} #${item.id}`}
-            </span>
-            {STATUS_LABELS[item.status] && (
-                <span className="fg-abc-recently-edited-status">
-                    {STATUS_LABELS[item.status]}
+            <span className="fg-abc-recently-edited-type">{item.type_label}</span>
+            <span className="fg-abc-recently-edited-name">
+                <span className="fg-abc-recently-edited-title">
+                    {item.title || `${item.untitled_label} #${item.id}`}
                 </span>
-            )}
+                {STATUS_LABELS[item.status] && (
+                    <span className="fg-abc-recently-edited-status">
+                        {STATUS_LABELS[item.status]}
+                    </span>
+                )}
+            </span>
+            <span className="fg-abc-recently-edited-date" title={item.modified_formatted}>
+                {formatEditedDate(item.modified_timestamp)}
+            </span>
         </a>
-        <span className="fg-abc-recently-edited-date" title={item.modified_formatted}>
-            {formatEditedDate(item.modified_gmt)}
-        </span>
     </li>
 );
 

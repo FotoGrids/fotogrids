@@ -214,9 +214,7 @@
 				display: grid;
 				grid-column: 1 / -1;
 				grid-template-columns: subgrid;
-				align-items: center;
 				margin: 0;
-				padding: 7px 0;
 				font-size: 13px;
 				border-bottom: 1px solid rgba(white, 0.15);
 				position: relative;
@@ -233,12 +231,15 @@
 					pointer-events: none;
 				}
 
-				&:hover::before {
+				&:hover::before,
+				&:focus-within::before {
 					opacity: 1;
 				}
 
 				&:first-child {
-					padding-top: 0;
+					.fg-abc-recently-edited-link {
+						padding-top: 0;
+					}
 
 					&::before {
 						top: -7px;
@@ -246,8 +247,11 @@
 				}
 
 				&:last-child {
-					padding-bottom: 0;
 					border-bottom: 0;
+
+					.fg-abc-recently-edited-link {
+						padding-bottom: 0;
+					}
 
 					&::before {
 						bottom: -7px;
@@ -256,10 +260,11 @@
 			}
 
 			.fg-abc-recently-edited-link {
-				display: flex;
+				display: grid;
+				grid-column: 1 / -1;
+				grid-template-columns: subgrid;
 				align-items: center;
-				gap: 8px;
-				min-width: 0;
+				padding: 7px 0;
 				color: white;
 				text-decoration: none;
 				box-shadow: none;
@@ -267,16 +272,16 @@
 				&:hover,
 				&:focus {
 					color: white;
-
-					.fg-abc-recently-edited-title {
-						text-decoration: underline;
-					}
+					outline: none;
+					box-shadow: none;
 				}
+			}
 
-				&:focus {
-					outline: 1px solid white;
-					outline-offset: 3px;
-				}
+			.fg-abc-recently-edited-name {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				min-width: 0;
 			}
 
 			.fg-abc-recently-edited-type,
@@ -290,16 +295,17 @@
 			}
 
 			.fg-abc-recently-edited-type {
+				font-family: "Poppins", sans-serif;
 				font-size: 10px;
+				font-weight: 500;
+				letter-spacing: 0.04em;
 				padding: 2px 6px;
 				text-align: center;
 				background: rgba(0, 0, 0, 0.2);
 			}
 
 			.fg-abc-recently-edited-status {
-				display: inline-block;
 				flex: 0 0 auto;
-				text-decoration: none;
 				border: 1px solid rgba(white, 0.7);
 			}
 
