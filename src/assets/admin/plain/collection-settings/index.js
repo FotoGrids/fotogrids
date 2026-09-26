@@ -29,9 +29,7 @@ const loadSettingsGroups = async (
 				: postType;
 
 	const restBase =
-		window.fotogridsSettings?.restUrl ||
-		window.wpApiSettings?.root ||
-		'/wp-json/';
+		window.fotogridsSettings?.restUrl || window.wpApiSettings?.root || '';
 
 	const endpoint = restBase.includes('/fotogrids/v1/')
 		? `${restBase.replace(/\/$/, '')}/admin/catalog/entries`
