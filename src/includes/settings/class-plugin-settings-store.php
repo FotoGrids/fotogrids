@@ -212,13 +212,11 @@ final class Plugin_Settings_Store {
 				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 			} elseif ( is_numeric( $default_value ) ) {
 				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
-			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
-				// Passwords must not pass through sanitize_text_field(), which
-				// would strip characters that are valid in a password. Keep the
-				// value as-is; the per-collection save path encrypts it.
-				$sanitized[ $key ] = is_scalar( $value ) ? (string) $value : '';
 			} else {
-				$sanitized[ $key ] = sanitize_text_field( $value );
+				$sanitized[ $key ] = Setting_Value_Codec::sanitize_text_value(
+					$value,
+					Setting_Value_Codec::catalog_field_type( $key )
+				);
 			}
 		}
 

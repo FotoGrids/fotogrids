@@ -1401,12 +1401,12 @@ class FotoGridsLightbox {
 					typeof data.total === 'number' &&
 					data.total !== this._total
 				) {
-					if (data.total > this._total) {
-						this.items.length = data.total;
-					} else {
-						this.items.length = data.total;
-					}
+					this.items.length = data.total;
 					this._total = data.total;
+					this.index = Math.max(
+						0,
+						Math.min(this.index, this._total - 1)
+					);
 				}
 
 				data.slides.forEach((apiSlide, i) => {
@@ -3702,44 +3702,15 @@ class FotoGridsLightboxInit {
 	}
 
 	_init() {
-		document
-			.querySelectorAll(
-				'.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]'
-			)
-			.forEach((el) => this._activateGallery(el));
-
-		if ('MutationObserver' in window) {
-			this._observer = new MutationObserver((mutations) => {
-				for (const mutation of mutations) {
-					for (const node of mutation.addedNodes) {
-						if (!(node instanceof Element)) continue;
-
-						const candidates = [];
-						if (
-							node.matches(
-								'.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]'
-							)
-						) {
-							candidates.push(node);
-						}
-						node.querySelectorAll(
-							'.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]'
-						).forEach((el) => candidates.push(el));
-
-						candidates.forEach((el) => this._activateGallery(el));
-					}
-				}
-			});
-			this._observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-			});
+		if (
+			!window.FotoGrids ||
+			typeof window.FotoGrids.onGallery !== 'function'
+		) {
+			return;
 		}
-
-		document.addEventListener('fotogrids:gallery_inserted', (e) => {
-			const el = e.detail?.galleryElement;
-			if (el && el.dataset.fgClick === 'lightbox') {
-				this._activateGallery(el);
+		window.FotoGrids.onGallery((galleryEl) => {
+			if (galleryEl.dataset.fgClick === 'lightbox') {
+				this._activateGallery(galleryEl);
 			}
 		});
 	}

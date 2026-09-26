@@ -949,26 +949,20 @@ function CollectionSettings() {
 		}
 	};
 
-	// Normalise a token_select value to a plain array. The setting stores a
-	// JSON array (["caption",...]) or a comma-separated string; mirrors
-	// renderTokenSelect's parseValue so condition operators agree with the UI.
+	// Normalise a token_select value (an array or its JSON encoding) to a
+	// plain array; mirrors renderTokenSelect's parseValue so condition
+	// operators agree with the UI.
 	const parseTokenArray = (raw) => {
 		if (Array.isArray(raw)) {
 			return raw;
 		}
-		if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+		if (typeof raw === 'string') {
 			try {
 				const parsed = JSON.parse(raw);
 				return Array.isArray(parsed) ? parsed : [];
 			} catch {
 				return [];
 			}
-		}
-		if (typeof raw === 'string' && raw.trim().length > 0) {
-			return raw
-				.split(',')
-				.map((s) => s.trim())
-				.filter(Boolean);
 		}
 		return [];
 	};
