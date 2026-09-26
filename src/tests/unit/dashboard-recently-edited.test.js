@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import RecentlyEdited, {
-	formatShortDate,
+	formatEditedDate,
 } from '@/admin/src/components/dashboard/RecentlyEdited';
 import { renderElement, act } from '@tests/helpers/render-component';
 
@@ -123,7 +123,7 @@ describe('dashboard RecentlyEdited', () => {
 
 		const hrefs = (container) =>
 			Array.from(
-				container.querySelectorAll('.fg-abc-recently-edited-button')
+				container.querySelectorAll('.fg-abc-recently-edited-actions .fg-button')
 			).map((a) => a.getAttribute('href'));
 
 		const withoutAlbums = renderElement(React.createElement(RecentlyEdited));
@@ -145,26 +145,41 @@ describe('dashboard RecentlyEdited', () => {
 	});
 });
 
-describe('formatShortDate', () => {
-	beforeAll(() => {
-		jest.useFakeTimers({ now: new Date('2026-09-26T12:00:00Z') });
+describe('formatEditedDate', () => {
+	const NOW = new Date('2026-09-26T12:00:00Z');
+
+	it('shows minutes for an edit within the last hour', () => {
+		expect(formatEditedDate('2026-09-26 11:55:00', NOW)).toBe(
+			'5 minutes ago'
+		);
 	});
 
-	afterAll(() => {
-		jest.useRealTimers();
+	it('never shows less than one minute', () => {
+		expect(formatEditedDate('2026-09-26 11:59:45', NOW)).toBe(
+			'1 minute ago'
+		);
 	});
 
-	it('shows day and month for the current year', () => {
-		const label = formatShortDate('2026-09-24 10:00:00');
+	it('shows hours for an edit within the last day', () => {
+		expect(formatEditedDate('2026-09-26 09:10:00', NOW)).toBe(
+			'2 hours ago'
+		);
+		expect(formatEditedDate('2026-09-25 12:30:00', NOW)).toBe(
+			'23 hours ago'
+		);
+	});
+
+	it('shows day and month once the edit is a day old', () => {
+		const label = formatEditedDate('2026-09-24 10:00:00', NOW);
 		expect(label).toMatch(/24/);
-		expect(label).not.toMatch(/2026/);
+		expect(label).not.toMatch(/ago|2026/);
 	});
 
 	it('adds the year for an earlier year', () => {
-		expect(formatShortDate('2025-06-15 10:00:00')).toMatch(/2025/);
+		expect(formatEditedDate('2025-06-15 10:00:00', NOW)).toMatch(/2025/);
 	});
 
 	it('returns an empty string for an unparsable value', () => {
-		expect(formatShortDate('')).toBe('');
+		expect(formatEditedDate('', NOW)).toBe('');
 	});
 });

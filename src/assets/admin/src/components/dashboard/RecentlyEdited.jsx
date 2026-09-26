@@ -3,6 +3,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import Icon from '../shared/Icon';
+import { Button } from '../shared/Button';
 import LoadingIcon from '../shared/LoadingIcon';
 import { fetchRecentlyEdited } from '../../utils/api';
 
@@ -15,26 +16,44 @@ const STATUS_LABELS = {
     private: __('Private', 'fotogrids')
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
+
+const adminLocale = () => document.documentElement.lang || undefined;
+
 /**
- * Short, localised day-and-month label for a GMT MySQL datetime.
+ * Short, localised label for when a row was last edited.
  *
- * The year is added only when it differs from the current one.
+ * Edits within the last 24 hours read as relative time ("5 minutes ago",
+ * "3 hours ago"); older ones as day and month, with the year only when it
+ * differs from the current one.
  *
  * @param {string} gmt Datetime in `YYYY-MM-DD HH:MM:SS` form, GMT.
- * @return {string} Label such as "Sep 24", or an empty string when unparsable.
+ * @param {Date}   now Reference time. Defaults to the current time.
+ * @return {string} The label, or an empty string when the value is unparsable.
  */
-export const formatShortDate = (gmt) => {
+export const formatEditedDate = (gmt, now = new Date()) => {
     const date = new Date(`${String(gmt).replace(' ', 'T')}Z`);
     if (Number.isNaN(date.getTime())) {
         return '';
     }
 
+    const elapsed = now.getTime() - date.getTime();
+    if (elapsed < DAY_MS) {
+        const relative = new Intl.RelativeTimeFormat(adminLocale(), { numeric: 'always' });
+        if (elapsed < HOUR_MS) {
+            return relative.format(-Math.max(1, Math.floor(elapsed / MINUTE_MS)), 'minute');
+        }
+        return relative.format(-Math.floor(elapsed / HOUR_MS), 'hour');
+    }
+
     const options = { month: 'short', day: 'numeric' };
-    if (date.getFullYear() !== new Date().getFullYear()) {
+    if (date.getFullYear() !== now.getFullYear()) {
         options.year = 'numeric';
     }
 
-    return date.toLocaleDateString(document.documentElement.lang || undefined, options);
+    return date.toLocaleDateString(adminLocale(), options);
 };
 
 const RecentlyEditedRow = ({ item }) => (
@@ -51,7 +70,7 @@ const RecentlyEditedRow = ({ item }) => (
             )}
         </a>
         <span className="fg-abc-recently-edited-date" title={item.modified_formatted}>
-            {formatShortDate(item.modified_gmt)}
+            {formatEditedDate(item.modified_gmt)}
         </span>
     </li>
 );
@@ -106,13 +125,23 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
             </div>
             {body}
             <div className="fg-abc-recently-edited-actions">
-                <a className="fg-abc-recently-edited-button" href="edit.php?post_type=fotogrids_gallery">
+                <Button
+                    href="edit.php?post_type=fotogrids_gallery"
+                    variant="primary"
+                    style="outline"
+                    className="fg-button--invert"
+                >
                     {__('View all galleries', 'fotogrids')}
-                </a>
+                </Button>
                 {hasAlbums && (
-                    <a className="fg-abc-recently-edited-button" href="edit.php?post_type=fotogrids_album">
+                    <Button
+                        href="edit.php?post_type=fotogrids_album"
+                        variant="primary"
+                        style="outline"
+                        className="fg-button--invert"
+                    >
                         {__('View all albums', 'fotogrids')}
-                    </a>
+                    </Button>
                 )}
             </div>
         </div>

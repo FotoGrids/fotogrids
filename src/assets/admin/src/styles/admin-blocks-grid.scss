@@ -241,7 +241,11 @@
 
 				&:hover,
 				&:focus {
-					text-decoration: underline;
+					color: white;
+
+					.fg-abc-recently-edited-title {
+						text-decoration: underline;
+					}
 				}
 
 				&:focus {
@@ -261,12 +265,16 @@
 			}
 
 			.fg-abc-recently-edited-type {
+				font-size: 10px;
+				padding: 2px 6px;
 				text-align: center;
 				background: rgba(0, 0, 0, 0.2);
 			}
 
 			.fg-abc-recently-edited-status {
+				display: inline-block;
 				flex: 0 0 auto;
+				text-decoration: none;
 				border: 1px solid rgba(white, 0.7);
 			}
 
@@ -287,32 +295,6 @@
 				flex-wrap: wrap;
 				gap: 8px;
 				margin: 24px 6px 0;
-			}
-
-			.fg-abc-recently-edited-button {
-				display: inline-flex;
-				align-items: center;
-				padding: 6px 16px;
-				border: 1px solid white;
-				border-radius: 6px;
-				background: transparent;
-				color: white;
-				font-size: 13px;
-				font-weight: 600;
-				line-height: 1.4;
-				text-decoration: none;
-				transition: all 0.2s;
-
-				&:hover,
-				&:focus {
-					background: white;
-					color: var(--fg-green);
-				}
-
-				&:focus {
-					outline: 1px solid white;
-					outline-offset: 2px;
-				}
 			}
 		}
 
