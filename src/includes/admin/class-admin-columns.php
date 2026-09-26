@@ -154,7 +154,7 @@ class Admin_Columns {
 				if ( ! empty( $albums ) ) {
 					$album_links = array();
 					foreach ( $albums as $album ) {
-						$album_links[] = '<a href="' . get_edit_post_link( $album->ID ) . '">' . esc_html( $album->post_title ) . '</a>';
+						$album_links[] = '<a href="' . get_edit_post_link( $album->ID ) . '">' . esc_html( \FotoGrids\Collection_Title::label( $album ) ) . '</a>';
 					}
 					echo wp_kses_post( implode( ', ', $album_links ) );
 

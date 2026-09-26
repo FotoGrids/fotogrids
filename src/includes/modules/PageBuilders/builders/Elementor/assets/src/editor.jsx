@@ -23,6 +23,7 @@ import { createRoot } from 'react-dom/client';
 import { __ } from '@wordpress/i18n';
 
 import PickerModal from '../../../../core/assets/src/components/PickerModal';
+import { collectionTitle } from '@/admin/src/utils/collection-title';
 import '../../../../core/assets/src/collection.scss';
 import './editor.scss';
 
@@ -90,7 +91,7 @@ function buildOptionsHtml(items) {
         const groupLabel = `${escapeHtml(group.label)} (${group.items.length})`;
         html += `<optgroup label="${groupLabel}">`;
         for (const item of group.items) {
-            html += `<option value="${item.id}">${escapeHtml(item.title || `#${item.id}`)}</option>`;
+            html += `<option value="${item.id}">${escapeHtml(collectionTitle(item.title, item.kind, item.id))}</option>`;
         }
         html += '</optgroup>';
     }
@@ -152,7 +153,7 @@ function renderRow(option) {
         `<span class="fg-pb-elementor-picker__row">
             ${thumb}
             <span class="fg-pb-elementor-picker__row-body">
-                <span class="fg-pb-elementor-picker__title">${escapeHtml(item.title || __('(no title)', 'fotogrids'))}</span>
+                <span class="fg-pb-elementor-picker__title">${escapeHtml(collectionTitle(item.title, item.kind, item.id))}</span>
                 <span class="${metaClass}">${escapeHtml(itemCountLabel)}</span>
             </span>
             ${statusPill}

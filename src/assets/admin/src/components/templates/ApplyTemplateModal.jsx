@@ -3,6 +3,7 @@ import { Modal } from '../shared/Modal';
 import { Button } from '../shared/Button';
 import { FormField } from '../shared/FormField';
 import LoadingIcon from '../shared/LoadingIcon';
+import { collectionTitle } from '../../utils/collection-title';
 
 const { __ } = wp.i18n;
 
@@ -30,7 +31,7 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
             if (Array.isArray(response)) {
                 setTargets(response.map(item => ({
                     id: item.id,
-                    title: item.title || item.name || `#${item.id}`,
+                    title: collectionTitle(item.title || item.name, targetType, item.id),
                 })));
             }
         } catch (error) {

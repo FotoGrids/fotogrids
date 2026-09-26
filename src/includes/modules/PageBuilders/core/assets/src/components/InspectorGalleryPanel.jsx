@@ -14,6 +14,7 @@
 import React, { useState } from 'react';
 import { PanelBody, Button } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
+import { collectionTitle } from '@/admin/src/utils/collection-title';
 
 const formatDate = (iso) => {
     if (!iso) return '';
@@ -75,7 +76,7 @@ const InspectorGalleryPanel = ({
                     />
                 )}
                 <div className="fg-pb-inspector-summary__text">
-                    <strong>{item.title || __('(no title)', 'fotogrids')}</strong>
+                    <strong>{collectionTitle(item.title, kind, item.id)}</strong>
                     <div className="fg-pb-inspector-summary__meta">
                         <span>{countLabel}</span>
                         {item.updated_at && (
