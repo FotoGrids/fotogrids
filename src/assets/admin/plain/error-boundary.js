@@ -87,8 +87,8 @@ window.FotoGridsAdmin.ErrorBoundary = FotoGridsErrorBoundary;
  * body is caught too. A boundary placed around an already-built element tree is
  * not enough on its own, because that tree was built during the caller's render.
  *
- * @param {Object}   props  Boundary props, including `key` and `label`.
- * @param {Function} render Callback returning the element to guard.
+ * @param {Object}      props  Boundary props, including `key` and `label`.
+ * @param {()=>Object}  render Callback returning the element to guard.
  * @return {Object} The boundary element.
  */
 window.FotoGridsAdmin.withErrorBoundary = (props, render) =>

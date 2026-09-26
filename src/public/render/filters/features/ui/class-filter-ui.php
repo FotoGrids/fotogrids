@@ -45,16 +45,16 @@ final class Filter_Ui implements Feature {
 
 	use Setting_Helpers;
 
-	/** @var array<string, string> Allowed filter_ui_style values. */
+	/** @var array<int, string> Allowed filter_ui_style values. */
 	private const ALLOWED_STYLES = array( 'buttons', 'dropdowns', 'checkboxes' );
 
-	/** @var array<string, string> Allowed filter_ui_position values. */
+	/** @var array<int, string> Allowed filter_ui_position values. */
 	private const ALLOWED_POSITIONS = array( 'top', 'sidebar' );
 
-	/** @var array<string, string> Allowed filter_sidebar_side values. */
+	/** @var array<int, string> Allowed filter_sidebar_side values. */
 	private const ALLOWED_SIDEBAR_SIDES = array( 'left', 'right' );
 
-	/** @var array<string, string> Allowed filter_display_mode values. */
+	/** @var array<int, string> Allowed filter_display_mode values. */
 	private const ALLOWED_DISPLAY_MODES = array( 'always', 'toggle' );
 
 	public function id(): string {
@@ -87,13 +87,8 @@ final class Filter_Ui implements Feature {
 			return false;
 		}
 
-		// Ask the active layout whether it wants a filter bar around it.
-		// Single Item / Image Viewer / Slider / Carousel return
-		// capabilities()['filters'] = false because they render a single
-		// item (or handle navigation themselves) - filtering chrome on top
-		// would make no sense. Belt-and-braces: this also catches the case
-		// where a user toggled filtering on in a multi-item layout and
-		// then switched to one of these layouts.
+		// Layouts that show a single item or run their own navigation (Single Item,
+		// Image Viewer, Slider, Carousel) report capabilities()['filters'] = false.
 		if ( ! Layout_Capabilities::supports( $render_context, 'filters' ) ) {
 			return false;
 		}
@@ -257,9 +252,8 @@ final class Filter_Ui implements Feature {
 		$vars = array();
 
 		// ---- Spacing ----
-		// All four are responsive_range settings with px/em/rem units.
-		// resolve_responsive_value() reads the per-breakpoint {value, unit}
-		// object (or scalar) and falls back to px when no unit is stored.
+		// Responsive ranges; resolve_responsive_value() falls back to px when no
+		// unit is stored.
 		$responsive_specs = array(
 			'--fg-filter-wrapper-gap'   => 'filter_wrapper_gap',
 			'--fg-filter-bar-gap'       => 'filter_bar_gap',
@@ -319,10 +313,7 @@ final class Filter_Ui implements Feature {
 		}
 		$this->maybe_add_var( $vars, '--fg-filter-btn-radius', $this->unit_val( $s['filter_btn_radius'] ?? null, 'px' ) );
 
-		// filter_btn_font_size is a responsive_range with per-side units
-		// (px / em / rem). resolve_responsive_value() reads the stored unit
-		// off each breakpoint's {value, unit} object and falls back to px
-		// when the user hasn't picked one.
+		// Responsive range; falls back to px when no unit is stored.
 		$font_size    = $s['filter_btn_font_size'] ?? null;
 		$desktop_font = $this->resolve_responsive_value( $font_size, 'desktop', 'px' );
 		$tablet_font  = $this->resolve_responsive_value( $font_size, 'tablet', 'px' );
@@ -514,10 +505,7 @@ final class Filter_Ui implements Feature {
 		$this->maybe_add_var( $vars, '--fg-filter-count-active-bg', $s['filter_count_active_bg'] ?? null );
 		$this->maybe_add_var( $vars, '--fg-filter-count-active-color', $s['filter_count_active_color'] ?? null );
 
-		// filter_count_font_size is a responsive_range with per-side units
-		// (px / em / rem). resolve_responsive_value() reads the stored unit
-		// off each breakpoint's {value, unit} object and falls back to px
-		// when the user hasn't picked one.
+		// Responsive range; falls back to px when no unit is stored.
 		$count_font         = $s['filter_count_font_size'] ?? null;
 		$desktop_count_font = $this->resolve_responsive_value( $count_font, 'desktop', 'px' );
 		$tablet_count_font  = $this->resolve_responsive_value( $count_font, 'tablet', 'px' );
@@ -577,26 +565,12 @@ final class Filter_Ui implements Feature {
 	}
 
 	/**
-	 * Renders the "All" reset control (a button for buttons/checkboxes style,
-	 * or a first <option> for dropdowns - emitted at the wrapper level since
-	 * dropdowns have their own group-level "all" option).
-	 *
-	 * For the buttons and checkboxes styles an "All" button always appears
-	 * first and is active by default. For dropdowns the "All" state is
-	 * represented by "no option selected" - the select has no default option
-	 * and the JS treats an empty value as "show all". We still render a
-	 * standalone "All" reset button outside the groups for parity.
-	 *
-	 * @since  1.0.0
-	 */
-	/**
 	 * Renders the "Filters" toggle button shown when filter_display_mode is
 	 * 'toggle'. Clicking it expands/collapses the filter bar.
 	 *
-	 * The button lives outside .fotogrids-filters so it stays visible while
-	 * the bar itself is hidden. JS wires the click handler in
-	 * initializeFilters(); CSS hides .fotogrids-filters when it carries
-	 * data-fg-filter-collapsed="true".
+	 * The button is the first child of .fotogrids-filters, so it stays visible
+	 * while CSS hides the rest of a bar carrying data-fg-filter-collapsed="true".
+	 * JS wires the click handler in initializeFilters().
 	 *
 	 * @since 1.0.0
 	 */
@@ -619,6 +593,17 @@ final class Filter_Ui implements Feature {
 		);
 	}
 
+	/**
+	 * Renders the "All" reset control.
+	 *
+	 * Buttons and checkboxes get an "All" toggle that is active by default.
+	 * Dropdowns get a standalone reset button that clears every selection.
+	 *
+	 * @since  1.0.0
+	 * @param  string $style     Filter UI style.
+	 * @param  string $all_label Visible label.
+	 * @return string
+	 */
 	private function render_all_control( string $style, string $all_label ): string {
 		if ( 'dropdowns' === $style ) {
 			// For dropdowns the "All" action is a standalone reset button that

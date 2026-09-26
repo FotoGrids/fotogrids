@@ -40,6 +40,19 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Video_Lightbox_Mini implements Feature {
 
+	/**
+	 * Translated video overlay labels, emitted as `data-fg-video-mini-labels`.
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'video' => __( 'Video', 'fotogrids' ),
+			'close' => __( 'Close', 'fotogrids' ),
+		);
+	}
+
 	public function id(): string {
 		return 'fotogrids/video-lightbox-mini';
 	}
@@ -120,8 +133,9 @@ final class Video_Lightbox_Mini implements Feature {
 			: 'light';
 
 		return array(
-			'data-fg-mini-theme' => $theme,
-			'data-fg-mini-blur'  => $blur,
+			'data-fg-mini-theme'        => $theme,
+			'data-fg-mini-blur'         => $blur,
+			'data-fg-video-mini-labels' => (string) wp_json_encode( self::client_labels() ),
 		);
 	}
 

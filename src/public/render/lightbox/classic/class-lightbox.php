@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace FotoGrids\Render\Lightbox\Classic;
 
 use FotoGrids\Render\Api\Asset_Decl;
+use FotoGrids\Render\Api\Breakpoint_Config;
 use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
@@ -99,6 +100,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-thumbnail-location    = "none" | "bottom" | "top" | "left" | "right"
  *   data-fg-lb-thumbnail-size        = "small" | "normal" | "large"
  *   data-fg-lb-overlay-blur          = "2"                    (px integer; 0 = none)
+ *   data-fg-lb-mobile-max            = "767"                  (px; the mobile image loads at or below this viewport width)
  *   data-fg-lb-preload-slides        = "2"                    (integer; slides to preload ahead and behind; absent = 2)
  *   data-fg-lb-info-panel            = "off"                  (present = info panel disabled; absent = enabled)
  *   data-fg-lb-info-default          = "closed"               (present = panel starts collapsed; absent = open)
@@ -126,6 +128,7 @@ if ( ! defined( 'WPINC' ) ) {
  *   data-fg-lb-credit-source         = "exif"  (absent = "item_meta" default)
  *   data-fg-lb-exif-fields           = "camera aperture ..." (space-sep list of enabled EXIF field keys; absent = exif block disabled or display_exif off)
  *   data-fg-lb-exif-labels           = JSON map of those field keys to their translated labels
+ *   data-fg-lb-labels                = JSON map of translated lightbox labels (see client_labels())
  *
  * Image filter attributes (desktop breakpoint values only - lightbox is fullscreen):
  *   data-fg-lb-thumb-filter          = combined CSS filter string for lightbox thumbnail strip images
@@ -182,6 +185,47 @@ final class Lightbox implements Feature {
 		return self::$arrow_icons_cache;
 	}
 
+	/**
+	 * Translated lightbox labels, emitted as `data-fg-lb-labels`.
+	 *
+	 * `item_of` carries `%1$d` (position) and `%2$d` (total); `go_to_item`
+	 * carries `%d` (position).
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'toolbar'          => __( 'Lightbox controls', 'fotogrids' ),
+			'close'            => __( 'Close lightbox', 'fotogrids' ),
+			'show_info'        => __( 'Show info panel', 'fotogrids' ),
+			'hide_info'        => __( 'Hide info panel', 'fotogrids' ),
+			'share'            => __( 'Share', 'fotogrids' ),
+			'enter_fullscreen' => __( 'Enter fullscreen', 'fotogrids' ),
+			'exit_fullscreen'  => __( 'Exit fullscreen', 'fotogrids' ),
+			'zoom_in'          => __( 'Zoom in', 'fotogrids' ),
+			'zoom_out'         => __( 'Zoom out', 'fotogrids' ),
+			'pause_auto'       => __( 'Pause auto-advance', 'fotogrids' ),
+			'resume_auto'      => __( 'Resume auto-advance', 'fotogrids' ),
+			'dialog'           => __( 'Gallery lightbox', 'fotogrids' ),
+			'previous_item'    => __( 'Previous item', 'fotogrids' ),
+			'next_item'        => __( 'Next item', 'fotogrids' ),
+			'item_navigation'  => __( 'Item navigation', 'fotogrids' ),
+			/* translators: 1: item position, 2: total number of items. */
+			'item_of'          => __( 'Item %1$d of %2$d', 'fotogrids' ),
+			/* translators: %d: item position. */
+			'go_to_item'       => __( 'Go to item %d', 'fotogrids' ),
+			'video'            => __( 'Video', 'fotogrids' ),
+			'file'             => _x( 'File', 'file name label in the lightbox info panel', 'fotogrids' ),
+			'size'             => _x( 'Size', 'file size label in the lightbox info panel', 'fotogrids' ),
+			'dimensions'       => __( 'Dimensions', 'fotogrids' ),
+			'type'             => _x( 'Type', 'file type label in the lightbox info panel', 'fotogrids' ),
+			'tags'             => __( 'Tags', 'fotogrids' ),
+			'people'           => __( 'People', 'fotogrids' ),
+			'location'         => __( 'Location', 'fotogrids' ),
+		);
+	}
+
 	public function id(): string {
 		return 'fotogrids/lightbox';
 	}
@@ -199,11 +243,8 @@ final class Lightbox implements Feature {
 	}
 
 	public function supports( Render_Context $render_context ): bool {
-		// Lightbox shows full-size attachment media for the items inside a
-		// collection. Album items are themselves galleries (their click goes
-		// to a view-page or AJAX-swaps to the child gallery), so there is
-		// no "open this item in a lightbox" semantic. Opt out cleanly to
-		// avoid polluting album wrappers with data-fg-click + data-fg-lb-*.
+		// Album items are galleries with their own click behaviour, so albums get
+		// no lightbox attributes.
 		if ( Collection_Kind::ALBUM === $render_context->meta->collection_kind ) {
 			return false;
 		}
@@ -225,20 +266,19 @@ final class Lightbox implements Feature {
 	 */
 	public function wrapper_data_attrs( Render_Context $render_context ): array {
 		$s     = $render_context->settings;
-		$attrs = array( 'data-fg-click' => 'lightbox' );
+		$attrs = array(
+			'data-fg-click'     => 'lightbox',
+			'data-fg-lb-labels' => (string) wp_json_encode( self::client_labels() ),
+		);
 
 		// Theme
 		$theme                     = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::theme( $s );
 		$attrs['data-fg-lb-theme'] = $theme;
 
 		// ── Colour palette ────────────────────────────────────────────────────
-		// The dark/light/custom palette is resolved by the shared
-		// Lightbox_Colors helper (also used by LightboxGrid). attrs() returns
-		// the always-on data-fg-lb-* colour map; the conditional colours
-		// (info-block bg/divider, image shadow) are emitted below because they
-		// depend on non-colour settings. $palette gives the resolved fallback
-		// values those conditional emissions need. JS uses these to build the
-		// full CSS variable block - no theme classes in SCSS.
+		// Resolved by the shared Lightbox_Colors helper (also used by LightboxGrid).
+		// attrs() is the always-on colour map; colours that depend on non-colour
+		// settings are emitted below from $palette.
 		$attrs   = array_merge( $attrs, \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::attrs( $s ) );
 		$palette = \FotoGrids\Render\Lightbox\Shared\Lightbox_Colors::palette( $s );
 
@@ -571,6 +611,8 @@ final class Lightbox implements Feature {
 			}
 		}
 
+		$attrs['data-fg-lb-mobile-max'] = (string) Breakpoint_Config::from_settings()->mobile_max_width;
+
 		return $attrs;
 	}
 
@@ -606,9 +648,6 @@ final class Lightbox implements Feature {
 	 *   ../../assets/css/lightbox-styles.css → overlay styles (webpack: lightbox-styles entry)
 	 *   ../../assets/js/lightbox.js          → overlay JS    (webpack: lightbox entry)
 	 *
-	 * Both the JS and SCSS sources now live alongside this file in
-	 * public/render/lightbox/classic/ and are compiled by webpack from there.
-	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.
 	 * @return  Module_Assets
@@ -638,7 +677,7 @@ final class Lightbox implements Feature {
 				),
 				'fotogrids-lightbox' => new Asset_Decl(
 					'../../assets/js/lightbox.js',
-					array( 'fotogrids-tooltip' ),
+					array( 'fotogrids-runtime', 'fotogrids-tooltip' ),
 					true,
 				),
 			)
@@ -659,7 +698,7 @@ final class Lightbox implements Feature {
 	 *
 	 * @since   1.0.0
 	 * @param   mixed  $value   Raw setting value.
-	 * @param   string $default Fallback colour string.
+	 * @param   string $default_value Fallback colour string.
 	 * @return  string
 	 */
 	private function safe_color( $value, string $default_value ): string {
@@ -747,11 +786,9 @@ final class Lightbox implements Feature {
 			),
 		);
 
-		// Decode the token_select value (JSON string, PHP array, or legacy plain string).
 		$raw = $s[ $type_key ] ?? array();
 		if ( is_string( $raw ) ) {
-			$decoded = json_decode( $raw, true );
-			$raw     = is_array( $decoded ) ? $decoded : array( $raw );
+			$raw = json_decode( $raw, true );
 		}
 		if ( ! is_array( $raw ) ) {
 			return '';

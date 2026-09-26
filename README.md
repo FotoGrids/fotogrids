@@ -15,7 +15,7 @@ root.
 | Tool      | Version           |
 | --------- | ----------------- |
 | PHP       | 7.4+              |
-| WordPress | 6.1+ (tested 6.8) |
+| WordPress | 6.3+ (tested 7.1) |
 | Node.js   | 18+               |
 | npm       | 8+                |
 | Composer  | 2+                |
@@ -102,9 +102,17 @@ paren spacing). Run `npm run format` before committing JS/TS.
 | `composer lint:fix`    | `phpcbf` autofix for mechanical violations        |
 | `composer lint:compat` | PHP 7.4+ compatibility check                      |
 | `composer test:php`    | PHPUnit (WordPress-independent unit suite)        |
+| `composer analyse`     | PHPStan static analysis over `src/`               |
 
 PHPCS runs in the pre-commit hook (`composer setup-hooks`) and in CI. After
 editing any PHP under `src/`, run `composer lint` before committing.
+
+PHPStan runs in CI only. Its configuration is `phpstan.neon.dist`; it is
+pinned at level 3, which is the floor that catches a property read off a
+non-object - the shape a syntactically valid but semantically wrong edit
+usually takes. The Elementor and Divi bridges under
+`src/includes/modules/PageBuilders` are excluded until stubs exist for those
+page builders.
 
 ### Tests
 
@@ -152,7 +160,7 @@ GitHub Actions run on every pull request and on push to `main`
 | -------------- | ---------------------------------------------------------------- |
 | `lint.yml`     | `php -l` syntax matrix (7.4/8.1/8.3) + PHP_CodeSniffer           |
 | `ci.yml`       | ESLint + `tsc`; `npm run test:ci`; PHPUnit matrix; webpack build |
-| `e2e.yml`      | Playwright smoke test against a `wp-env` WordPress site          |
+| `e2e.yml`      | Playwright suite against a WordPress booted by `tests/harness/`  |
 | `security.yml` | `npm audit` + `composer audit`                                   |
 | `codeql.yml`   | CodeQL security-and-quality scan (JavaScript/TypeScript)         |
 

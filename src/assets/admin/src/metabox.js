@@ -43,11 +43,7 @@ function initializeCopyButtons() {
 
 function initializeGalleryMetabox() {
 	try {
-		if (typeof React === 'undefined') {
-			return;
-		}
-
-		if (typeof createRoot === 'undefined') {
+		if (typeof React === 'undefined' || typeof createRoot === 'undefined') {
 			return;
 		}
 
@@ -63,7 +59,6 @@ function initializeGalleryMetabox() {
 
 		const props = {
 			galleryItems: metaboxData.galleryItems || [],
-			canEditPosts: metaboxData.canEditPosts || false,
 			ajaxUrl: metaboxData.ajaxUrl || '',
 			nonce: metaboxData.nonce || '',
 			strings: metaboxData.strings || {},

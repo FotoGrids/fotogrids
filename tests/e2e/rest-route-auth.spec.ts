@@ -11,11 +11,10 @@ import {
  * the render pipeline apply the same access rules as a rendered gallery, and
  * that the template preview requires an editor.
  *
- * Fixtures are created with WP-CLI: `npx wp-env run cli wp` by default, or the
- * command in WP_CLI when running against another site.
+ * Fixtures are created with WP-CLI, through the command in WP_CLI.
  */
 
-const BASE_URL = process.env.WP_BASE_URL ?? 'http://localhost:8888';
+const BASE_URL = process.env.WP_BASE_URL ?? 'http://127.0.0.1:8899';
 const ADMIN_USER = process.env.WP_ADMIN_USER ?? 'admin';
 const ADMIN_PASS = process.env.WP_ADMIN_PASS ?? 'password';
 const SUBSCRIBER_USER = 'fg-rest-subscriber';
@@ -33,15 +32,30 @@ type Fixtures = {
 
 const FIXTURE_PHP = String.raw`
 require_once ABSPATH . 'wp-admin/includes/image.php';
+// Clear what an earlier run left behind. Seeding cleans up rather than tearing
+// down afterwards, so a crashed or interrupted run still starts from a known
+// state - and a test site does not accumulate a gallery list that gets slower
+// every time the suite is run.
+foreach ( get_posts( array(
+	'post_type'   => array( 'fotogrids_gallery', 'attachment' ),
+	'post_status' => 'any',
+	'numberposts' => -1,
+	'fields'      => 'ids',
+	'meta_key'    => '_fg_rest_auth_fixture',
+) ) as $stale ) {
+	wp_delete_post( $stale, true );
+}
 $png = base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' );
 $attachment = function ( $name ) use ( $png ) {
 	$upload = wp_upload_bits( $name . '.png', null, $png );
 	$id     = wp_insert_attachment( array( 'post_mime_type' => 'image/png', 'post_title' => $name, 'post_content' => 'Private description', 'post_status' => 'inherit' ), $upload['file'] );
+	update_post_meta( $id, '_fg_rest_auth_fixture', '1' );
 	wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $upload['file'] ) );
 	return $id;
 };
 $gallery = function ( $title, $items, $meta ) {
 	$id = wp_insert_post( array( 'post_type' => 'fotogrids_gallery', 'post_status' => 'publish', 'post_title' => $title ) );
+	update_post_meta( $id, '_fg_rest_auth_fixture', '1' );
 	update_post_meta( $id, 'fotogrids_gallery_items', wp_json_encode( $items ) );
 	foreach ( $meta as $key => $value ) {
 		update_post_meta( $id, $key, $value );
@@ -70,15 +84,28 @@ echo 'FGFIXTURES' . wp_json_encode( array(
 ) );
 `;
 
+/**
+ * How to invoke wp-cli.
+ *
+ * WP_CLI is a single executable: the shim tests/harness/boot.sh writes, which
+ * has the php, the install path and the working directory already pinned. It
+ * is exec'd as one path rather than split on spaces, because the path can
+ * contain them - LocalWP keeps its sites under `~/Local Sites/`.
+ */
+function wpCli(): string {
+	const cmd = process.env.WP_CLI;
+	if (!cmd) {
+		throw new Error(
+			'WP_CLI is not set. Boot a site with tests/harness/boot.sh and source tests/harness/.env first.'
+		);
+	}
+	return cmd;
+}
+
 function createFixtures(): Fixtures {
-	const cli = process.env.WP_CLI
-		? process.env.WP_CLI.split(' ')
-		: ['npx', 'wp-env', 'run', 'cli', 'wp'];
-	const output = execFileSync(
-		cli[0],
-		[...cli.slice(1), 'eval', FIXTURE_PHP],
-		{ encoding: 'utf8' }
-	);
+	const output = execFileSync(wpCli(), ['eval', FIXTURE_PHP], {
+		encoding: 'utf8',
+	});
 	const match = output.match(/FGFIXTURES(\{.*\})/);
 	if (!match) {
 		throw new Error(`Fixture script printed no fixtures:\n${output}`);

@@ -3,7 +3,7 @@
  * WP-Cron action hook identifiers.
  *
  * Dispatched by WordPress core's WP-Cron scheduler when `wp_schedule_event()`
- * fires, not by us. We listen via `add_action()` on the same hook name.
+ * fires; FotoGrids listens via `add_action()` on the same hook name.
  *
  * @package FotoGrids\Hooks
  * @since   1.0.0

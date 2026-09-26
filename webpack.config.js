@@ -259,7 +259,7 @@ const mainConfig = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                        presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'classic' }]],
                     },
                 },
             },
@@ -838,7 +838,7 @@ const diviNativeConfig = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                        presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'classic' }]],
                     },
                 },
             },
@@ -942,6 +942,9 @@ const diviNativeConfig = {
     ],
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '.json'],
+        alias: {
+            '@': path.resolve(__dirname, 'src/assets'),
+        },
     },
     output: {
         filename: '[name].js',

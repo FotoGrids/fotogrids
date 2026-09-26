@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Covers the recurring patterns for reading responsive setting values that the
  * admin UI stores in two shapes:
  *
- *   - Plain scalar:  $raw = 10  (legacy or PHP default)
+ *   - Plain scalar:  $raw = 10  (PHP default)
  *   - Unit object:   $raw = ['value' => 10, 'unit' => 'px']
  *
  * For responsive settings the outer layer is always a breakpoint keyed array:

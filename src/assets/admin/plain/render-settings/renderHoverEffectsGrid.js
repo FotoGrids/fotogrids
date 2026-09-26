@@ -319,10 +319,14 @@ window.FotoGridsRenderSettings.renderHoverEffectsGrid = (
 				className: 'fotogrids-hover-effects-grid__conflict',
 				key: 'conflict',
 			},
-			__(
-				'This effect controls the same styling on hover as your active setting: ',
-				'fotogrids'
-			) + names
+			wp.i18n.sprintf(
+				/* translators: %s: comma-separated list of setting names. */
+				__(
+					'This effect controls the same styling on hover as your active setting: %s',
+					'fotogrids'
+				),
+				names
+			)
 		);
 	};
 

@@ -3,7 +3,7 @@
  * Regenerates includes/catalog/catalog-strings.php from the settings catalog.
  *
  * @package FotoGrids\Scripts
- * @since   1.1.1
+ * @since   1.1.2
  */
 
 declare(strict_types=1);
@@ -145,7 +145,7 @@ $contents = <<<PHP
  * Run `npm run i18n:makepot` to regenerate.
  *
  * @package FotoGrids\Catalog
- * @since   1.1.1
+ * @since   1.1.2
  */
 
 declare(strict_types=1);

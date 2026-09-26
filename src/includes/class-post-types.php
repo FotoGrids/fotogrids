@@ -448,7 +448,7 @@ class Post_Types {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $post The post object
+	 * @param \WP_Post $post The post object
 	 */
 	public static function shortcode_meta_box( $post ) {
 		$post_id   = (int) $post->ID;
@@ -490,7 +490,7 @@ class Post_Types {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $post The album post object
+	 * @param \WP_Post $post The album post object
 	 */
 	public static function album_galleries_meta_box( $post ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		wp_nonce_field( 'fotogrids_album_galleries', 'fotogrids_album_galleries_nonce' );

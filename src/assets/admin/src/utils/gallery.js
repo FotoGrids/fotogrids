@@ -2,12 +2,15 @@
  * Gallery Helper Utilities
  */
 import { addItemsToGallery } from './api';
+import { navigateTo } from './navigate';
 
 /**
  * Create a gallery from image IDs
  */
 export const createGalleryFromImages = async (imageIds) => {
-	if (!imageIds || imageIds.length === 0) return null;
+	if (!imageIds || imageIds.length === 0) {
+		return null;
+	}
 
 	try {
 		const { __ } = wp.i18n;
@@ -26,7 +29,7 @@ export const createGalleryFromImages = async (imageIds) => {
 		if (galleryResponse && galleryResponse.id) {
 			await addItemsToGallery(galleryResponse.id, imageIds);
 
-			window.location.href = `post.php?post=${galleryResponse.id}&action=edit`;
+			navigateTo(`post.php?post=${galleryResponse.id}&action=edit`);
 
 			return galleryResponse;
 		}

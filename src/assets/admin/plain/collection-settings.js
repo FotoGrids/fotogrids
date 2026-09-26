@@ -39,11 +39,11 @@ const isFreeTier = (config) => {
 };
 
 const withLegacyFreeFlag = (config) => {
-	if (!config || typeof config !== 'object') {
-		return config;
-	}
-
-	if (typeof config.free === 'boolean') {
+	if (
+		!config ||
+		typeof config !== 'object' ||
+		typeof config.free === 'boolean'
+	) {
 		return config;
 	}
 
@@ -290,7 +290,9 @@ function CollectionSettings() {
 	});
 
 	const [activeTab, setActiveTab] = useState(() => {
-		if (!uiState) return 'layout';
+		if (!uiState) {
+			return 'layout';
+		}
 		return uiState.getValue({
 			key: 'main-tab',
 			fallback: 'layout',
@@ -298,7 +300,9 @@ function CollectionSettings() {
 		});
 	});
 	const [activeSubTabs, setActiveSubTabs] = useState(() => {
-		if (!uiState) return {};
+		if (!uiState) {
+			return {};
+		}
 		return uiState.getValue({ key: 'subtabs', fallback: {} });
 	});
 	const [settings, setSettings] = useState(
@@ -378,8 +382,13 @@ function CollectionSettings() {
 
 	const switchTab = useCallback(
 		(tabId) => {
-			if (typeof tabId !== 'string' || tabId === '') return;
-			if (!SETTINGS_GROUPS[tabId]) return;
+			if (
+				typeof tabId !== 'string' ||
+				tabId === '' ||
+				!SETTINGS_GROUPS[tabId]
+			) {
+				return;
+			}
 			setActiveTab(tabId);
 			if (uiState) {
 				uiState.setValue({
@@ -478,8 +487,8 @@ function CollectionSettings() {
 
 	// Bind fg-tooltip to any [data-fg-tooltip] element rendered by this
 	// component (docs strip "Defaults" link, etc). fg-tooltip auto-inits on
-	// DOMContentLoaded but the React tree mounts later, so we re-run init
-	// after render. init() skips already-bound nodes so it's safe to spam.
+	// DOMContentLoaded but the React tree mounts later, so init re-runs after
+	// render. init() skips already-bound nodes, so repeat calls are safe.
 	useEffect(() => {
 		if (window.FgTooltip?.init) {
 			window.FgTooltip.init();
@@ -553,7 +562,9 @@ function CollectionSettings() {
 	}, []);
 
 	useEffect(() => {
-		if (!settingsLoaded) return;
+		if (!settingsLoaded) {
+			return;
+		}
 
 		setActiveSubTabs((prev) => {
 			const updated = { ...prev };
@@ -604,7 +615,9 @@ function CollectionSettings() {
 	}, [settingsLoaded, activeTab]);
 
 	useLayoutEffect(() => {
-		if (!settingsLoaded) return;
+		if (!settingsLoaded) {
+			return;
+		}
 
 		setActiveSubTabs((prev) => {
 			const updated = { ...prev };
@@ -792,7 +805,9 @@ function CollectionSettings() {
 	};
 
 	const validateUrl = (url) => {
-		if (!url.trim()) return { valid: true, message: '' };
+		if (!url.trim()) {
+			return { valid: true, message: '' };
+		}
 
 		try {
 			const urlObj = new URL(url);
@@ -949,26 +964,20 @@ function CollectionSettings() {
 		}
 	};
 
-	// Normalise a token_select value to a plain array. The setting stores a
-	// JSON array (["caption",...]) or a legacy comma-separated string; mirrors
-	// renderTokenSelect's parseValue so condition operators agree with the UI.
+	// Normalise a token_select value (an array or its JSON encoding) to a
+	// plain array; mirrors renderTokenSelect's parseValue so condition
+	// operators agree with the UI.
 	const parseTokenArray = (raw) => {
 		if (Array.isArray(raw)) {
 			return raw;
 		}
-		if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+		if (typeof raw === 'string') {
 			try {
 				const parsed = JSON.parse(raw);
 				return Array.isArray(parsed) ? parsed : [];
 			} catch {
 				return [];
 			}
-		}
-		if (typeof raw === 'string' && raw.trim().length > 0) {
-			return raw
-				.split(',')
-				.map((s) => s.trim())
-				.filter(Boolean);
 		}
 		return [];
 	};
@@ -983,7 +992,7 @@ function CollectionSettings() {
 	 *     snake_case predicate used by Pro and the new placement schema. When
 	 *     `depends_on_value` is omitted, the parent value is checked for
 	 *     truthiness. When given, equality is required.
-	 *  3. `setting.condition.dependsOn` + `values` - legacy camelCase predicate
+	 *  3. `setting.condition.dependsOn` + `values` - camelCase predicate
 	 *     used by Free's existing JSON files. `values` is either a single value
 	 *     or an array of accepted values; `dependsOn` may be a single key or an
 	 *     array of keys (all must match).
@@ -1003,7 +1012,7 @@ function CollectionSettings() {
 		// store (sharing, seo or watermark) rather than sibling fields. Same
 		// shape as condition (dependsOn + values); dependsOn may be a dotted
 		// key (e.g. "networks.facebook"). The optional `source` field selects
-		// which global store to read - defaults to 'sharing' for back-compat.
+		// which global store to read and defaults to 'sharing'.
 		// Absent condition_global always passes.
 		if (setting.condition_global) {
 			const GLOBAL_SOURCES = {
@@ -1049,9 +1058,13 @@ function CollectionSettings() {
 				const ok = dependsOn.every((dep, i) =>
 					matches(readGlobal(dep), values[i])
 				);
-				if (!ok) return false;
+				if (!ok) {
+					return false;
+				}
 			} else if (dependsOn) {
-				if (!matches(readGlobal(dependsOn), values)) return false;
+				if (!matches(readGlobal(dependsOn), values)) {
+					return false;
+				}
 			}
 		}
 
@@ -1080,14 +1093,18 @@ function CollectionSettings() {
 			return Boolean(parentValue);
 		}
 
-		// condition.dependsOn / values (legacy camelCase predicate)
-		if (!setting.condition) return true;
+		// condition.dependsOn / values (camelCase predicate)
+		if (!setting.condition) {
+			return true;
+		}
 
-		// any / all composite predicates. Allow nesting so we can express OR/AND
+		// any / all composite predicates, nestable to express OR/AND
 		// trees on top of the leaf dependsOn predicate. Each child is itself a
 		// condition node (any | all | dependsOn+values).
 		const evaluateCondition = (condition) => {
-			if (!condition || typeof condition !== 'object') return true;
+			if (!condition || typeof condition !== 'object') {
+				return true;
+			}
 			if (Array.isArray(condition.any)) {
 				return condition.any.some((child) => evaluateCondition(child));
 			}
@@ -1175,7 +1192,7 @@ function CollectionSettings() {
 			return false;
 		}
 
-		// array_includes: the stored token-select value (JSON array or legacy
+		// array_includes: the stored token-select value (JSON array or
 		// comma-separated string) contains at least one of the listed values.
 		// Used by token_select fields where multiple options can be active.
 		if (conditionOperator === 'array_includes') {
@@ -1186,7 +1203,7 @@ function CollectionSettings() {
 		}
 
 		// array_empty: the stored value is a token-select array (stored as a
-		// JSON array or a legacy comma-separated string); passes when it has no
+		// JSON array or a comma-separated string); passes when it has no
 		// elements. Used to surface a notice when a token_select is cleared.
 		if (conditionOperator === 'array_empty') {
 			return parseTokenArray(dependentValue).length === 0;
@@ -1251,10 +1268,14 @@ function CollectionSettings() {
 	 * @returns {boolean}
 	 */
 	const evaluateVisibleWhen = (predicate) => {
-		if (!predicate || typeof predicate !== 'object') return true;
+		if (!predicate || typeof predicate !== 'object') {
+			return true;
+		}
 
 		const watchedKey = predicate.setting;
-		if (typeof watchedKey !== 'string' || watchedKey === '') return true;
+		if (typeof watchedKey !== 'string' || watchedKey === '') {
+			return true;
+		}
 
 		const watchedValue = settings[watchedKey];
 
@@ -1278,12 +1299,13 @@ function CollectionSettings() {
 	 *
 	 *  - `group.hidden` (set by a `hide` placement) wins immediately.
 	 *  - `group.visible_when` (from a placement) is evaluated against settings.
-	 *  - Legacy `group.condition.dependsOn` + `values` is still honored.
+	 *  - `group.condition.dependsOn` + `values` is honoured too.
 	 */
 	const shouldDisplayTab = (group) => {
-		if (group?.hidden) return false;
-
-		if (group?.visible_when && !evaluateVisibleWhen(group.visible_when)) {
+		if (
+			group?.hidden ||
+			(group?.visible_when && !evaluateVisibleWhen(group.visible_when))
+		) {
 			return false;
 		}
 
@@ -1291,7 +1313,7 @@ function CollectionSettings() {
 		// settings predicate matches. Used by the SEO tab to disappear when
 		// the site owner has chosen to defer to a third-party SEO plugin.
 		// Same shape as the setting-level predicate (source, dependsOn,
-		// values). source defaults to 'sharing' for back-compat.
+		// values); source defaults to 'sharing'.
 		if (group?.condition_global) {
 			const source =
 				group.condition_global.source === 'seo'
@@ -1326,11 +1348,15 @@ function CollectionSettings() {
 				);
 			};
 			if (typeof dependsOn === 'string' && dependsOn !== '') {
-				if (!matches(readGlobal(dependsOn), values)) return false;
+				if (!matches(readGlobal(dependsOn), values)) {
+					return false;
+				}
 			}
 		}
 
-		if (!group.condition) return true;
+		if (!group.condition) {
+			return true;
+		}
 
 		// Delegate to shouldDisplaySetting so tabs honour the full predicate
 		// surface (any / all trees, condition_operator including not_in /
@@ -1344,7 +1370,9 @@ function CollectionSettings() {
 
 			if (group.settings) {
 				for (const setting of group.settings) {
-					if (setting.key === key) return setting;
+					if (setting.key === key) {
+						return setting;
+					}
 
 					if (setting.subTabs) {
 						for (const subTabId in setting.subTabs) {
@@ -1352,7 +1380,9 @@ function CollectionSettings() {
 							const subSetting = (subTab?.settings || []).find(
 								(s) => s.key === key
 							);
-							if (subSetting) return subSetting;
+							if (subSetting) {
+								return subSetting;
+							}
 						}
 					}
 				}
@@ -1364,7 +1394,9 @@ function CollectionSettings() {
 					const setting = (subTab?.settings || []).find(
 						(s) => s.key === key
 					);
-					if (setting) return setting;
+					if (setting) {
+						return setting;
+					}
 				}
 			}
 		}
@@ -1374,18 +1406,12 @@ function CollectionSettings() {
 	const renderSettingControl = (setting) => {
 		// Drop hidden nodes (set by a `hide` placement) and sections whose
 		// group-level `visible_when` predicate evaluates false.
-		if (setting?.hidden) {
-			return null;
-		}
-
 		if (
-			setting?.visible_when &&
-			!evaluateVisibleWhen(setting.visible_when)
+			setting?.hidden ||
+			(setting?.visible_when &&
+				!evaluateVisibleWhen(setting.visible_when)) ||
+			!shouldDisplaySetting(setting)
 		) {
-			return null;
-		}
-
-		if (!shouldDisplaySetting(setting)) {
 			return null;
 		}
 
@@ -2000,8 +2026,12 @@ function CollectionSettings() {
 		// and mirror it into the localized globals so other components
 		// that re-render later see the new value.
 		const handleModeChange = (nextMode) => {
-			if (nextMode !== 'easy' && nextMode !== 'advanced') return;
-			if (nextMode === settingsMode) return;
+			if (
+				(nextMode !== 'easy' && nextMode !== 'advanced') ||
+				nextMode === settingsMode
+			) {
+				return;
+			}
 
 			const previousMode = settingsMode;
 			setSettingsMode(nextMode);
@@ -2235,18 +2265,10 @@ function CollectionSettings() {
 														'fotogrids'
 													);
 
-										// The key embeds the active state so React
-										// remounts the <button> when the mode flips.
-										// FgTooltip's `bind()` captures both the label
-										// text and the direction in a closure at bind
-										// time, and there's no public `unbind()`.
-										// Without a remount the previously-bound (now-
-										// active) button keeps showing its old tooltip
-										// - even after we strip the data-attributes,
-										// because the listeners and the captured
-										// closure still reference the original copy.
-										// Forcing a remount drops the old listeners
-										// along with the DOM node.
+										// The key embeds the active state so React remounts the <button>
+										// when the mode flips: FgTooltip.bind() captures the label and
+										// direction at bind time and has no unbind(), so only a remount
+										// drops the old listeners.
 										const attrs = {
 											key: `${m}-${isActive ? 'active' : 'inactive'}`,
 											type: 'button',
@@ -2342,9 +2364,9 @@ function CollectionSettings() {
 
 	const renderTabContent = (groupId) => {
 		const group = SETTINGS_GROUPS[groupId];
-		if (!group) return null;
-
-		if (!shouldDisplayTab(group)) return null;
+		if (!group || !shouldDisplayTab(group)) {
+			return null;
+		}
 
 		if (!isFreeTier(group) && !isProActive) {
 			const allSettings = group.settings || [];

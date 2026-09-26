@@ -128,9 +128,8 @@ final class Settings_Localizer {
 	 * `fotogrids_gallery_defaults` option for the defaults page) and decode
 	 * to the in-memory PHP shape that the JS payload expects.
 	 *
-	 * Mirrors the legacy `Admin_Helpers::get_collection_settings_localized_data`
-	 * behaviour exactly - including the "boolean stored as string '1' / '0'"
-	 * quirk that the JS toggle's `=== '1'` check depends on.
+	 * Keeps booleans as the strings '1' / '0', which the JS toggle's `=== '1'`
+	 * check depends on.
 	 *
 	 * @param array $defaults    Defaults array (drives the key list + type coercion).
 	 * @param int   $post_id     Post id (0 for defaults page).
@@ -221,8 +220,8 @@ final class Settings_Localizer {
 	 *
 	 * @param array $caller_value Caller-provided value (preferred when non-empty).
 	 * @param int   $post_id      Post id; reads `fotogrids_gallery_items` post meta
-	 *                            when caller didn't provide and we're not on the
-	 *                            defaults page.
+	 *                            when the caller didn't provide one and this is
+	 *                            not the defaults page.
 	 * @param bool  $is_defaults  Defaults-page mode.
 	 * @return array<int|string, mixed>
 	 */

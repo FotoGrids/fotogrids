@@ -181,8 +181,7 @@ final class Album_Item_Loader {
 
 	/**
 	 * Count items in a gallery; used as item_count meta on the album
-	 * item so a future decorator can render "12 items" badges without
-	 * re-querying.
+	 * item, so a count badge needs no further query.
 	 *
 	 * @since  1.0.0
 	 * @param  int $gallery_id Gallery post ID.

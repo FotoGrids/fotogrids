@@ -56,11 +56,11 @@ class FotoGrids_Cache {
 	private const OBJECT_CACHE_TTL   = 0;
 
 	/**
-	 * Envelope schema version. Entries below this are treated as a miss so a
-	 * gallery cached before the inline payloads existed re-renders instead of
-	 * replaying without its per-render CSS.
+	 * Envelope schema version. Entries below this are treated as a miss, so an
+	 * entry written without its inline payloads or its expiry re-renders
+	 * instead of being replayed.
 	 */
-	private const ENTRY_SCHEMA = 2;
+	private const ENTRY_SCHEMA = 3;
 
 	/**
 	 * Shared object-cache (L1) primitive for the render cache.
@@ -97,6 +97,7 @@ class FotoGrids_Cache {
 		add_action( Actions_Item::REMOVED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( Actions_Item::META_UPDATED, array( __CLASS__, 'on_item_mutation' ), 10, 2 );
 		add_action( 'edit_attachment', array( __CLASS__, 'on_attachment_edit' ), 10, 1 );
+		add_filter( 'wp_update_attachment_metadata', array( __CLASS__, 'on_attachment_metadata_update' ), 10, 2 );
 		add_action( Actions_Gallery::REORDERED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::SETTINGS_SAVED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
 		add_action( Actions_Gallery::DELETED, array( __CLASS__, 'on_gallery_mutation' ), 10, 1 );
@@ -155,6 +156,19 @@ class FotoGrids_Cache {
 	 */
 	public static function on_attachment_edit( $attachment_id ): void {
 		self::flush_for_item( (int) $attachment_id );
+	}
+
+	/**
+	 * Flush every gallery containing an attachment whose image sizes were just regenerated.
+	 *
+	 * @since  1.1.3
+	 * @param  array|mixed $data          Attachment metadata being saved.
+	 * @param  int|mixed   $attachment_id Attachment post ID.
+	 * @return array|mixed The metadata, unchanged.
+	 */
+	public static function on_attachment_metadata_update( $data, $attachment_id ) {
+		self::flush_for_item( (int) $attachment_id );
+		return $data;
 	}
 
 	// -------------------------------------------------------------------------
@@ -254,11 +268,12 @@ class FotoGrids_Cache {
 	): bool {
 		global $wpdb;
 
-		$payload = self::encode_entry( $html, $css, $js, $inline_css, $inline_js, $json_ld );
-		$table   = $wpdb->prefix . 'fotogrids_render_cache';
-		$now     = current_time( 'mysql' );
 		// Intentionally WP-local frame: expires_at is compared against current_time('mysql') (local) on read, so the write must match it.
-		$expires_at = gmdate( 'Y-m-d H:i:s', current_time( 'timestamp' ) + $duration_hours * HOUR_IN_SECONDS ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- local-frame TTL, see read-side comparisons.
+		$expires_ts = current_time( 'timestamp' ) + $duration_hours * HOUR_IN_SECONDS; // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- local-frame TTL, see read-side comparisons.
+		$expires_at = gmdate( 'Y-m-d H:i:s', $expires_ts );
+		$payload    = self::encode_entry( $html, $css, $js, $inline_css, $inline_js, $json_ld, $expires_ts );
+		$table      = $wpdb->prefix . 'fotogrids_render_cache';
+		$now        = current_time( 'mysql' );
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
@@ -396,10 +411,14 @@ class FotoGrids_Cache {
 	 *
 	 * Runs on the Actions_Cron::CACHE_PURGE schedule.
 	 *
+	 * The deleted-row count is published on Actions_Cache::PURGED_EXPIRED
+	 * rather than returned: this runs as an action callback, and WordPress
+	 * discards whatever an action callback returns.
+	 *
 	 * @since  1.0.0
-	 * @return int Number of rows deleted.
+	 * @return void
 	 */
-	public static function purge_expired(): int {
+	public static function purge_expired(): void {
 		global $wpdb;
 
 		$table  = $wpdb->prefix . 'fotogrids_render_cache';
@@ -415,8 +434,6 @@ class FotoGrids_Cache {
 		if ( $deleted > 0 ) {
 			do_action( Actions_Cache::PURGED_EXPIRED, $deleted );
 		}
-
-		return $deleted;
 	}
 
 	// -------------------------------------------------------------------------
@@ -535,6 +552,7 @@ class FotoGrids_Cache {
 	 * @param  string                                            $inline_css
 	 * @param  string                                            $inline_js
 	 * @param  string                                            $json_ld
+	 * @param  int                                               $expires_ts Expiry as a WP-local timestamp.
 	 * @return string
 	 */
 	private static function encode_entry(
@@ -543,7 +561,8 @@ class FotoGrids_Cache {
 		array $js,
 		string $inline_css,
 		string $inline_js,
-		string $json_ld
+		string $json_ld,
+		int $expires_ts
 	): string {
 		return wp_json_encode(
 			array(
@@ -554,6 +573,7 @@ class FotoGrids_Cache {
 				'inline_css' => $inline_css,
 				'inline_js'  => $inline_js,
 				'json_ld'    => $json_ld,
+				'expires_at' => $expires_ts,
 			),
 			JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 		);
@@ -562,10 +582,10 @@ class FotoGrids_Cache {
 	/**
 	 * Decode a stored entry back into its components.
 	 *
-	 * Returns false for any envelope below ENTRY_SCHEMA - raw-HTML rows and
-	 * schema-1 JSON envelopes both predate the inline payloads, so replaying
-	 * them would serve a gallery without its per-render CSS. Treating them as a
-	 * miss re-renders and rewrites the entry at the current schema.
+	 * Returns false for any envelope below ENTRY_SCHEMA, and for any envelope
+	 * whose expiry has passed. The expiry travels in the envelope because the
+	 * object cache (L1) is read before the table and keeps entries until they
+	 * are invalidated, so the table's expires_at column never reaches an L1 hit.
 	 *
 	 * @since  1.0.0
 	 * @param  string $stored
@@ -578,6 +598,10 @@ class FotoGrids_Cache {
 		}
 
 		if ( (int) ( $decoded['schema'] ?? 0 ) < self::ENTRY_SCHEMA ) {
+			return false;
+		}
+
+		if ( (int) ( $decoded['expires_at'] ?? 0 ) <= current_time( 'timestamp' ) ) { // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- same local frame as the expiry written by put().
 			return false;
 		}
 

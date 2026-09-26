@@ -234,7 +234,7 @@ class Admin_Data {
 	 * Get WordPress roles
 	 *
 	 * @param \WP_REST_Request $request Request object
-	 * @return \WP_REST_Response Array of roles with their capabilities
+	 * @return \WP_REST_Response|\WP_Error Array of roles with their capabilities
 	 */
 	public static function get_roles( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
 		if ( ! current_user_can( 'manage_fotogrids_settings' ) ) {
@@ -266,7 +266,7 @@ class Admin_Data {
 	 * Backs the `exif_fields` gallery setting and the item editor's EXIF tab,
 	 * so both name the same fields as `Exif_Extractor` reads.
 	 *
-	 * @since 1.2.0
+	 * @since 1.1.2
 	 * @param \WP_REST_Request $request Request object
 	 * @return \WP_REST_Response|\WP_Error Response object
 	 */
@@ -983,7 +983,8 @@ class Admin_Data {
 
 		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
 		$galleries_count = (int) $gallery_counts->publish;
-		$albums_count    = wp_count_posts( 'fotogrids_album' )->publish;
+		$album_counts    = wp_count_posts( 'fotogrids_album' );
+		$albums_count    = $album_counts->publish;
 
 		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
 		$items_count = $wpdb->get_var( "SELECT COUNT(*) FROM `{$items_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
@@ -1005,6 +1006,7 @@ class Admin_Data {
 				'galleries_published' => $galleries_count,
 				'settings_configured' => self::has_configured_settings(),
 				'albums'              => (int) $albums_count,
+				'albums_total'        => self::count_editable_posts( $album_counts ),
 				'items'               => (int) $items_count,
 				'views'               => (int) $views_count,
 				'shares'              => (int) $shares_count,
@@ -1534,6 +1536,7 @@ class Admin_Data {
 				'status'             => $post->post_status,
 				'modified'           => $post->post_modified,
 				'modified_gmt'       => $post->post_modified_gmt,
+				'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
 				'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
 				'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
 			);

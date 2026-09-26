@@ -11,7 +11,9 @@
         "wp-coding-standards/wpcs": "^3.1",
         "phpcompatibility/phpcompatibility-wp": "^2.1",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-        "phpunit/phpunit": "^9.6"
+        "phpunit/phpunit": "^9.6",
+        "phpstan/phpstan": "^2.1",
+        "szepeviktor/phpstan-wordpress": "^2.0"
     },
     "config": {
         "platform": {
@@ -27,6 +29,7 @@
         "lint:fix": "phpcbf --standard=src/phpcs.xml",
         "lint:compat": "phpcs --standard=PHPCompatibilityWP --runtime-set testVersion 7.4- --extensions=php --ignore=*/freemius/*,*/dist/*,*/node_modules/*,*/vendor/* src",
         "test:php": "phpunit --configuration phpunit.xml",
+        "analyse": "phpstan analyse --memory-limit=2G",
         "setup-hooks": "git config core.hooksPath .githooks && echo \"Git hooks installed (core.hooksPath -> .githooks).\""
     },
     "scripts-descriptions": {
@@ -35,6 +38,7 @@
         "lint:fix": "Auto-fix what PHP Code Beautifier can fix in place.",
         "lint:compat": "Check PHP 7.4+ compatibility of src/ with PHPCompatibilityWP.",
         "test:php": "Run the PHPUnit suite (configuration in phpunit.xml).",
+        "analyse": "Run PHPStan static analysis over src/ (configuration in phpstan.neon.dist).",
         "setup-hooks": "Point git at the committed .githooks/ directory (run once per clone)."
     }
 }

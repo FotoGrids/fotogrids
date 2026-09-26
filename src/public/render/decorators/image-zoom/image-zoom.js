@@ -61,6 +61,14 @@
         return attrs;
     }
 
+    function readLabels(galleryElement) {
+        try {
+            return JSON.parse(galleryElement.getAttribute('data-fg-zoom-labels') || '{}');
+        } catch (err) {
+            return {};
+        }
+    }
+
     function openPopover(galleryElement, itemElement) {
         const mini = window.FotoGrids
             && window.FotoGrids.modules
@@ -72,8 +80,10 @@
         if (!img) {
             return;
         }
+        const labels = readLabels(galleryElement);
         mini.open(img, {
-            label: img.alt || 'Image',
+            label: img.alt || labels.image,
+            closeLabel: labels.close,
             closeButton: galleryElement.getAttribute('data-fg-zoom-close-button') !== '0',
             clickOutsideToClose: galleryElement.getAttribute('data-fg-zoom-click-outside') !== '0',
             styleVars: readStyleVars(galleryElement),

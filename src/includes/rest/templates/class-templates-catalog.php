@@ -87,7 +87,7 @@ class Templates_Catalog {
 			return $remote['templates'];
 		}
 
-		// Service unreachable - serve whatever we last cached, else bundled.
+		// Service unreachable - serve the last cached catalog, else the bundled one.
 		$cached = get_transient( self::CACHE_KEY );
 		if ( is_array( $cached ) ) {
 			return $cached;
@@ -137,7 +137,7 @@ class Templates_Catalog {
 	 * Fetch and validate the remote catalog.
 	 *
 	 * @since 1.1.0
-	 * @return array{templates: array<int, array<string, mixed>>, generated: string}|null
+	 * @return array{templates: array<int, array<string, mixed>>, generated: string, flags: array<string, bool>}|null
 	 *         Payload on success, or null on failure.
 	 */
 	private static function fetch_remote() {

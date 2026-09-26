@@ -36,7 +36,7 @@ final class Filters_Catalog {
 	 * third-party extensions hook here to add the strings of the catalog files
 	 * they contribute, translated in their own text domain.
 	 *
-	 * @since 1.1.1
+	 * @since 1.1.2
 	 * @param array<string, string> $strings Catalog string to translation.
 	 */
 	public const STRINGS = 'fotogrids/catalog/strings';

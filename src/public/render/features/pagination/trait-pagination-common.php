@@ -27,8 +27,7 @@ if ( ! defined( 'WPINC' ) ) {
  *  - the standard assets() declaration (each method JS depends on
  *    `fotogrids-pagination-core` which depends on `fotogrids-runtime`).
  *
- * Used as a trait, not a base class, because the modules implement
- * `Feature` directly and PHP doesn't let us inherit from an interface.
+ * Used as a trait because the modules implement `Feature` directly.
  *
  * @package FotoGrids\Render\Features\Pagination
  * @since   1.0.0
@@ -51,12 +50,9 @@ trait Pagination_Common {
 			return false;
 		}
 
-		// Ask the active layout whether it wants pagination chrome around
-		// it. Layouts like Single Item, Image Viewer, Slider, and Carousel
-		// return capabilities()['paginates'] = false because they render
-		// a single item (or handle navigation inside themselves). Layouts
-		// that don't care (Grid, Masonry, Justified) return [], which the
-		// helper treats as permissive default true.
+		// Layouts that show a single item or run their own navigation (Single Item,
+		// Image Viewer, Slider, Carousel) report capabilities()['paginates'] = false;
+		// layouts that return [] are treated as paginating.
 		if ( ! Layout_Capabilities::supports( $render_context, 'paginates' ) ) {
 			return false;
 		}
@@ -76,9 +72,7 @@ trait Pagination_Common {
 	/**
 	 * Delegates to Page_Size_Resolver::resolve_page_size().
 	 *
-	 * Kept as a static method on the trait for API ergonomics inside the
-	 * module classes; calls the shared resolver under the hood so the
-	 * module classes and Context_Builder agree on the answer.
+	 * Kept on the trait so the modules and Context_Builder share one resolver.
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $settings
@@ -126,23 +120,16 @@ trait Pagination_Common {
 			?? (int) ceil( $total / max( 1, $page_size ) );
 		$current     = (int) ( $render_context->meta->requested_page ?? 1 );
 
-		// The REST URL + nonce for the JS to fetch additional pages.
-		// Mirrors how Album_To_Gallery_Ajax wires its <a> triggers - same
-		// endpoint, same nonce action ('wp_rest'). Written on the gallery
-		// wrapper itself so pagination-core.js can read it via
-		// `galleryEl.dataset.fgRenderUrl` / `dataset.fgRenderNonce`.
+		// REST URL + nonce for fetching further pages, read by pagination-core.js as
+		// dataset.fgRenderUrl / dataset.fgRenderNonce.
 		$attrs = array(
 			'data-fg-paginated'          => 'true',
 			'data-fg-pagination-method'  => $method,
 			'data-fg-page-size'          => (string) $page_size,
 			'data-fg-page-current'       => (string) $current,
 			'data-fg-page-total'         => (string) $total_pages,
-			// Authoritative total item count for the filtered+sorted
-			// sequence. Used by the lightbox to size its sparse slide
-			// cache correctly without estimating from
-			// total_pages * page_size (which over-counts when the last
-			// page is partial - a 49-item gallery with page_size=8
-			// would estimate 56).
+			// Exact filtered+sorted item count, so the lightbox sizes its sparse slide
+			// array without estimating from total_pages * page_size.
 			'data-fg-total-items'        => (string) $total,
 			'data-fg-pagination-preload' => $this->preload_enabled( $render_context ) ? 'true' : 'false',
 			'data-fg-render-url'         => esc_url( rest_url( 'fotogrids/v1/gallery/render' ) ),
@@ -168,15 +155,12 @@ trait Pagination_Common {
 	 * Covers two concerns, both shared across all three pagination methods:
 	 *
 	 *  1. `--fg-pagination-distance` - margin above the pagination bar,
-	 *     driven by `pagination_distance_from_items`. Falls back to the
-	 *     original `calc(var(--fg-pagination-base-size) * 2)` in
-	 *     pagination.css when absent.
+	 *     driven by `pagination_distance_from_items`. Falls back to
+	 *     `calc(var(--fg-pagination-base-size) * 2)` in pagination.css.
 	 *
 	 *  2. `--fg-pagination-button-*` - the Styling subtab inside
-	 *     `pagination_buttons_subtabs`. The same JSON tab now drives both
-	 *     the Load More button and the Page Buttons chips, so the
-	 *     resolved vars live on the trait and both method modules
-	 *     inherit them.
+	 *     `pagination_buttons_subtabs`, which drives both the Load More button
+	 *     and the Page Buttons chips.
 	 *
 	 * Each method's `style_vars()` should call this and merge its own
 	 * method-specific vars on top.
@@ -263,11 +247,7 @@ trait Pagination_Common {
 		$this->add_color_var( $vars, '--fg-pagination-button-hover-border-color', $s['pagination_button_hover_border_color'] ?? null );
 
 		// ---- Active (current-page) state ----
-		// Only meaningful for Page Buttons' numbered chips - Load More
-		// never has an active state. The CSS-side rule scopes to
-		// `.fg-pagination--pages .fg-pagination__btn.fg-is-active`, so
-		// emitting these vars on every method is harmless: load-more
-		// simply doesn't read them.
+		// Only Page Buttons has an active chip; Load More never reads these vars.
 		$this->add_color_var( $vars, '--fg-pagination-button-active-bg', $s['pagination_button_active_bg'] ?? null );
 		$this->add_color_var( $vars, '--fg-pagination-button-active-color', $s['pagination_button_active_color'] ?? null );
 		$this->add_color_var( $vars, '--fg-pagination-button-active-border-color', $s['pagination_button_active_border_color'] ?? null );

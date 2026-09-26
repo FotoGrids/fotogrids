@@ -20,9 +20,8 @@ if ( ! defined( 'WPINC' ) ) {
  * it through Catalog_Assembler, and returns the final tab/subtab/section tree
  * the JS settings panel renders.
  *
- * Replaces the legacy approach of fetching individual JSON files from the
- * browser - Pro/third-party files were never reachable that way because they
- * live in different plugin directories.
+ * Pro and third-party catalog files live in their own plugin directories,
+ * so the browser cannot fetch them as individual JSON files.
  *
  * @package FotoGrids\REST\Admin
  * @since   1.0.0
@@ -66,8 +65,8 @@ final class Catalog_Entries_Endpoint {
 	 * Drop top-level tabs whose `postTypes` array excludes the requested post type.
 	 *
 	 * The JS layer also applies per-setting and per-subtab postType filtering,
-	 * but tab-level filtering happens server-side so we don't ship tabs the user
-	 * can never see.
+	 * but tab-level filtering happens server-side so tabs the user can never
+	 * see are not shipped.
 	 *
 	 * @since   1.0.0
 	 * @param   array<string, array<string, mixed>> $tree Assembled tree.
@@ -95,7 +94,7 @@ final class Catalog_Entries_Endpoint {
 	 * the grid renders from the single source of truth (Free, Pro, third-party).
 	 *
 	 * @since   1.0.0
-	 * @param   array<string, array<string, mixed>> $tree Assembled tree (by reference).
+	 * @param   array<string, mixed> $tree Assembled tree (by reference).
 	 * @return  void
 	 */
 	private static function inject_hover_effect_options( array &$tree ): void {

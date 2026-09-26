@@ -1,33 +1,16 @@
 /**
- * FotoGrids Lightbox
- *
  * Singleton overlay lightbox for FotoGrids galleries.
  *
- * Architecture
- * ------------
- * One <dialog> element is created lazily on the first open() call and reused
- * for every subsequent gallery on the page. There is no per-gallery DOM
- * element. Settings are read from data-fg-lb-* attributes on the gallery
- * wrapper at open time so each gallery can have independent configuration.
+ * One <dialog> is created lazily on the first open() and reused for every
+ * gallery on the page. Per-gallery settings are read from data-fg-lb-*
+ * attributes on the gallery wrapper at open time and written as CSS variables
+ * into a single <style id="fg-lb-vars"> block inside the dialog.
  *
- * CSS variables - no inline styles
- * ---------------------------------
- * Per-gallery settings (theme, duration, colors, spacing) are written once
- * per open() into a <style id="fg-lb-vars"> block that lives inside the
- * <dialog>. All elements read those variables. Zero element.style mutations
- * happen at runtime - JS only toggles classes and updates the single <style>
- * block.
- *
- * Integration
- * -----------
- * The PHP Lightbox feature module writes:
- *   data-fg-click="lightbox"        on the .fotogrids-collection.fotogrids-gallery wrapper
- *   data-fg-lb-*                    per-gallery settings (see below)
- *   data-fg-lightbox-trigger  on the <a> that wraps each item's media
+ * Trigger markup (written by the PHP Lightbox feature module)
+ * -----------------------------------------------------------
+ *   data-fg-click="lightbox"        on the .fotogrids-gallery wrapper
+ *   data-fg-lightbox-trigger        on the <a> that wraps each item's media
  *   data-fg-caption / data-fg-title on the same <a>
- *
- * Source: src/public/render/lightbox/classic/lightbox.js
- * Webpack entry key: 'lightbox'  →  assets/js/lightbox.js
  *
  * Attribute contract (read from gallery wrapper, all optional with sane defaults)
  * -------------------------------------------------------------------------------
@@ -119,7 +102,7 @@ function readSettings(galleryEl) {
 
 	return {
 		theme: d.fgLbTheme || 'dark',
-		// Per-theme colour overrides - only present when theme=custom (emitted by PHP for all themes now).
+		// Theme colour overrides; null when the attribute is absent.
 		bg: d.fgLbBg || null,
 		toolbarBg: d.fgLbToolbarBg || null,
 		toolbarBtnBg: d.fgLbToolbarBtnBg || null,
@@ -191,6 +174,7 @@ function readSettings(galleryEl) {
 		dotsSpacing: d.fgLbBulletSpacing || '8px',
 		thumbLocation: d.fgLbThumbnailLocation || 'bottom',
 		thumbSize: d.fgLbThumbnailSize || 'normal',
+		mobileMax: parseInt(d.fgLbMobileMax, 10) || 767,
 		thumbSpacing: parseInt(d.fgLbThumbSpacing, 10) || 5,
 		thumbDrag: !galleryEl.hasAttribute('data-fg-lb-no-thumb-drag'),
 		thumbSwipe: !galleryEl.hasAttribute('data-fg-lb-no-thumb-swipe'),
@@ -213,7 +197,8 @@ function readSettings(galleryEl) {
 		infoBlockDivider: d.fgLbInfoBlockDivider || null,
 		creditSource: d.fgLbCreditSource || 'item_meta',
 		galleryId: parseInt(d.fgGalleryId, 10) || 0,
-		exifLabels: FotoGridsLightbox._parseExifLabels(d.fgLbExifLabels),
+		exifLabels: FotoGridsLightbox._parseLabelMap(d.fgLbExifLabels),
+		labels: FotoGridsLightbox._parseLabelMap(d.fgLbLabels),
 		exifFields: d.fgLbExifFields
 			? d.fgLbExifFields.split(' ').filter(Boolean)
 			: [],
@@ -246,15 +231,23 @@ function readSettings(galleryEl) {
 }
 
 /**
- * Collects item data from a gallery element.
+ * The full image URL to load for a slide: the mobile companion at or below
+ * the mobile breakpoint, otherwise the full image.
  *
- * @param {HTMLElement} galleryEl
- * @returns {Array<{triggerEl, fullSrc, thumbSrc, alt, caption, title, id}>}
+ * @param {{fullSrc: string, fullMobileSrc?: string}} item
+ * @param {number} mobileMax Mobile breakpoint in CSS pixels.
+ * @returns {string}
  */
+function fullSrcForViewport(item, mobileMax) {
+	if (item.fullMobileSrc && window.innerWidth <= mobileMax) {
+		return item.fullMobileSrc;
+	}
+
+	return item.fullSrc;
+}
+
 /**
  * Build a slide dict from a single `[data-fg-lightbox-trigger]` element.
- * Mirrors the legacy collectItems() per-item shape so downstream code
- * (renderItem, thumb strip, share bar) works unchanged.
  *
  * @param {Element} triggerEl
  * @returns {object}
@@ -274,6 +267,7 @@ function buildSlideFromTrigger(triggerEl) {
 		sequenceIndex,
 		fullSrc:
 			triggerEl.href || (img ? img.dataset.fgFullSrc || img.src : ''),
+		fullMobileSrc: triggerEl.dataset.fgFullMobileSrc || '',
 		thumbSrc: img ? img.src : '',
 		alt: img ? img.alt : '',
 		caption: triggerEl.dataset.fgCaption || '',
@@ -281,9 +275,8 @@ function buildSlideFromTrigger(triggerEl) {
 		id: triggerEl.dataset.fgItemId || '',
 	};
 
-	// Video items carry their playback data on the .fg-video node rather than
-	// an <img>. The poster (an <img class="fg-video-poster"> when present)
-	// becomes the slide's thumb so the thumb strip still shows something.
+	// Video items carry their data on .fg-video; the poster image, when
+	// present, serves as the slide's thumbnail.
 	const videoEl = triggerEl.querySelector('.fg-video');
 	if (videoEl) {
 		const posterImg = videoEl.querySelector('.fg-video-poster');
@@ -296,6 +289,7 @@ function buildSlideFromTrigger(triggerEl) {
 		);
 		slide.thumbSrc = posterImg ? posterImg.src : slide.thumbSrc;
 		slide.fullSrc = posterImg ? posterImg.src : '';
+		slide.fullMobileSrc = '';
 		slide.alt = posterImg ? posterImg.alt : slide.alt;
 	}
 
@@ -390,11 +384,10 @@ function buildVimeoEmbedSrc(embedId, settings) {
 }
 
 /**
- * Legacy collector - kept for non-paginated galleries where the DOM
- * holds the complete slide deck. Returns an array of slides, in DOM
- * order. For paginated galleries the lightbox uses a sparse-cache
- * model (see FotoGridsLightbox.open) and only seeds the cache via
- * buildSlideFromTrigger() per trigger.
+ * Collect every slide from a non-paginated gallery, in DOM order.
+ *
+ * @param {HTMLElement} galleryEl
+ * @returns {Array<object>}
  */
 function collectItems(galleryEl) {
 	return Array.from(
@@ -407,10 +400,7 @@ function collectItems(galleryEl) {
  * shape the lightbox internals expect - same field names as
  * buildSlideFromTrigger.
  *
- * The triggerEl + figureEl are intentionally absent (we don't have a
- * DOM reference for unloaded items); the lightbox handles that
- * gracefully (focus restoration on close picks the nearest available
- * trigger).
+ * triggerEl and figureEl are null because unloaded items have no DOM node.
  *
  * @param {object} apiSlide  Response from /gallery/lightbox/slides
  * @returns {object}
@@ -421,6 +411,7 @@ function buildSlideFromApi(apiSlide) {
 		figureEl: null,
 		sequenceIndex: null,
 		fullSrc: apiSlide.full_url || '',
+		fullMobileSrc: apiSlide.full_mobile_url || '',
 		thumbSrc: apiSlide.thumb_url || '',
 		alt: apiSlide.alt || '',
 		caption: apiSlide.caption || '',
@@ -457,9 +448,6 @@ function buildSlideFromApi(apiSlide) {
  *  2. The gallery uses Single Item layout with lightbox scope "gallery"
  *     (data-fg-lightbox-extended) - only one item is in the DOM but
  *     the user can still navigate the full gallery in the lightbox.
- *
- * Both attributes use the same downstream sparse-cache + REST flow,
- * so a single helper covers both.
  *
  * @param {Element} galleryEl
  * @returns {boolean}
@@ -506,13 +494,9 @@ function readActiveFilters(galleryEl) {
 /**
  * Per-theme colour defaults.
  *
- * These are the baseline values for dark and light themes. The custom theme
- * starts from the dark defaults and then each value is overridden by the
- * per-gallery colour settings emitted by PHP onto data-fg-lb-* attributes.
- *
- * All values are rgba() - no hex literals.
- * Values that reference the global brand token use the CSS var string directly
- * so the cascade resolves it at paint time rather than substituting a literal.
+ * The custom theme starts from the dark set and overrides each value present
+ * in the gallery's data-fg-lb-* colour attributes. Brand-token values are CSS
+ * var() references so they resolve at paint time.
  */
 const THEME_VARS = {
 	dark: {
@@ -616,20 +600,14 @@ const THEME_VARS = {
 /**
  * Returns the CSS text for the per-gallery <style> block.
  *
- * All per-gallery CSS custom properties are centralised here.
- * No JS code writes to element.style - everything flows through this block.
- *
- * Theme model: for dark/light, colour tokens come from THEME_VARS[theme].
- * For custom, we start from the dark baseline and substitute each value that
- * was explicitly set via the admin UI (present as a non-null field in s).
- * The result is always a complete set of tokens - no theme class needed.
+ * Dark and light take their colour tokens from THEME_VARS. Custom starts from
+ * the dark set and substitutes every non-null colour in the settings, so the
+ * output always carries a complete set of tokens.
  *
  * @param {object} s  Settings object from readSettings()
  * @returns {string}
  */
 function buildVarsCSS(s) {
-	// Resolve colour values: for custom theme, PHP emits per-setting attrs;
-	// for dark/light, use the static table. Either way, every token is set.
 	const base = THEME_VARS[s.theme] || THEME_VARS.dark;
 	const colors =
 		s.theme === 'custom'
@@ -794,16 +772,12 @@ function buildVarsCSS(s) {
 	return lines.join('\n');
 }
 
-const FGLB_ZOOM_MAX = 4; // Maximum zoom multiplier (change here to adjust ceiling)
+const FGLB_ZOOM_MAX = 4; // Maximum zoom multiplier
 const FGLB_ZOOM_STEP = 0.25; // Scale increment per button click or wheel tick
 const FGLB_ZOOM_MIN = 1; // Never zoom below 1× (fully zoomed-out)
 
-// Paginated-gallery lightbox: when the total filtered count is at or
-// below this threshold, open() bulk-fetches the entire sequence's
-// slide metadata in one request. Beyond this we fall back to
-// lookahead-only fetching around the current index. 200 items × ~500
-// bytes/slide = ~100 KB upfront - small enough to be a non-issue,
-// large enough to cover virtually every real-world gallery.
+// Paginated galleries at or below this item count fetch every slide on open
+// (~500 bytes per slide); larger ones fetch around the current index only.
 const FGLB_PRELOAD_ALL_THRESHOLD = 200;
 
 // Auto-progress controls
@@ -917,10 +891,8 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Bind a tooltip to a lightbox button, respecting the noTooltips setting.
-	 * Implements its own show/hide logic (rather than delegating to FgTooltip.bind)
-	 * so the noTooltips gate is checked at show time, not bind time - this works
-	 * correctly for both static buttons (created before open()) and dynamic ones.
+	 * Bind a tooltip to a lightbox button. The noTooltips setting is checked at
+	 * show time, so buttons can be bound before any gallery settings are loaded.
 	 *
 	 * @param {HTMLElement} el
 	 * @param {object}      [opts]
@@ -969,10 +941,8 @@ class FotoGridsLightbox {
 		dlg.appendChild(styleEl);
 		this._styleEl = styleEl;
 
-		// Focus sentinel - a zero-size, screen-reader-invisible element placed
-		// first in the dialog. showModal() and our open() both focus it so the
-		// browser's auto-focus never lands on a visible button (which would show
-		// a tooltip on open or fire that button's action if Space is pressed).
+		// Zero-size focus target placed first, so initial focus never lands on a
+		// button (which would show its tooltip or fire on Space).
 		const sentinel = document.createElement('span');
 		sentinel.className = 'fg-lb-focus-sentinel';
 		sentinel.tabIndex = -1; // focusable but not in tab order
@@ -980,34 +950,13 @@ class FotoGridsLightbox {
 		dlg.appendChild(sentinel);
 		this._focusSentinel = sentinel;
 
-		// Build the rest of the dialog HTML.
-		//
-		// Structure:
-		//   dialog
-		//     span           (focus sentinel)
-		//     style          (CSS vars, injected separately)
-		//     backdrop
-		//     shell
-		//       toolbar      (always first in shell → always at top)
-		//       content      (flex row or column depending on info location)
-		//         stage      (image area + navigation chrome)
-		//           media-wrap  (image, spinner, prev, next, dots - all overlaid)
-		//             img
-		//             spinner
-		//             prev / next
-		//             dots
-		//           thumbs   (strip - flex sibling of media-wrap)
-		//         info
-		//           info-panel
-		//           caption
-		//           title
 		const fragment = document.createRange().createContextualFragment(`
             <div class="fg-lb-backdrop" aria-hidden="true"></div>
             <div class="fg-lb-shell">
-                <div class="fg-lb-toolbar" role="toolbar" aria-label="Lightbox controls">
+                <div class="fg-lb-toolbar" role="toolbar">
                     <div class="fg-lb-toolbar-start"></div>
                     <div class="fg-lb-toolbar-end">
-                        <button class="fg-lb-close" aria-label="Close lightbox" type="button">
+                        <button class="fg-lb-close" type="button">
                             ${FGLB_ICON_CLOSE}
                         </button>
                     </div>
@@ -1018,9 +967,9 @@ class FotoGridsLightbox {
                         <div class="fg-lb-media-wrap">
                             <img class="fg-lb-img" src="" alt="" draggable="false" />
                             <div class="fg-lb-spinner" aria-hidden="true"></div>
-                            <button class="fg-lb-prev" aria-label="Previous item" type="button" hidden></button>
-                            <button class="fg-lb-next" aria-label="Next item"     type="button" hidden></button>
-                            <div class="fg-lb-dots" role="tablist" aria-label="Item navigation" hidden></div>
+                            <button class="fg-lb-prev" type="button" hidden></button>
+                            <button class="fg-lb-next" type="button" hidden></button>
+                            <div class="fg-lb-dots" role="tablist" hidden></div>
                         </div>
                         <div class="fg-lb-thumbs" hidden></div>
                     </div>
@@ -1029,17 +978,8 @@ class FotoGridsLightbox {
         `);
 		dlg.appendChild(fragment);
 
-		// Populate the image-loading spinner with the selected gallery icon.
-		//
-		// window.fotogridsLoadingIcon is injected by the Loading_Icon PHP feature
-		// module as a small inline script before this file runs. It carries the
-		// SVG string for exactly the one icon the gallery owner chose, so we never
-		// ship the full 38-icon library to the frontend.
-		//
-		// __FG_ID__ in the SVG's SMIL animation IDs must be replaced with a
-		// unique suffix each time we create a new dialog instance so multiple
-		// lightboxes on the same page (unlikely but possible) don't share IDs.
-		// We use a simple incrementing counter - enough for uniqueness here.
+		// window.fotogridsLoadingIcon carries the gallery's chosen spinner SVG. Its
+		// __FG_ID__ placeholders get a per-dialog suffix so SMIL IDs stay unique.
 		const spinnerEl = dlg.querySelector('.fg-lb-spinner');
 		if (spinnerEl && window.fotogridsLoadingIcon?.svg) {
 			const uid =
@@ -1052,9 +992,7 @@ class FotoGridsLightbox {
 			);
 		}
 
-		// Close on backdrop click - honoured only when the setting allows it.
-		// The backdrop div sits behind the shell; clicking it or the bare dialog
-		// edge (which also shows through) should close when enabled.
+		// Clicks on the backdrop or the bare dialog edge close when enabled.
 		dlg.addEventListener('click', (e) => {
 			if (
 				this.settings?.backdropClose &&
@@ -1073,9 +1011,6 @@ class FotoGridsLightbox {
 		prevBtn.addEventListener('click', () => this.navigate(-1));
 		nextBtn.addEventListener('click', () => this.navigate(+1));
 
-		// Bind tooltips to static toolbar / nav buttons.
-		// _bindTooltip() gates on this.settings.noTooltips at show-time so it is
-		// safe to call here before settings are loaded (dialog is created lazily).
 		this._bindTooltip(closeBtn, { dir: 'below' });
 		this._bindTooltip(prevBtn);
 		this._bindTooltip(nextBtn);
@@ -1110,14 +1045,8 @@ class FotoGridsLightbox {
 		);
 		mediaWrap.addEventListener('click', (e) => this._onZoomClick(e, false));
 
-		// Native <dialog> dispatches its own 'close' event when the user
-		// presses Escape (the browser handles Escape natively under
-		// showModal). Without this listener, our close() method never
-		// runs on ESC - so our custom fotogrids:lightbox:close event
-		// never fires, and deep-linking (which listens for it) never
-		// gets the cue to clear the URL. The _closeInProgress flag
-		// guards against the reentrancy that would otherwise occur
-		// when our close() also calls dialog.close().
+		// Escape closes a modal <dialog> natively without calling close(), so the
+		// fotogrids:lightbox:close event is routed from the dialog's own 'close'.
 		dlg.addEventListener('close', () => {
 			if (this._closeInProgress) return;
 			this.close();
@@ -1143,18 +1072,12 @@ class FotoGridsLightbox {
 		// Re-attach auto listeners for the new gallery's settings.
 		this._teardownAutoListeners();
 
-		// Slide sourcing: paginated galleries use a sparse-cache model
-		// backed by /gallery/lightbox/slides; non-paginated galleries
-		// continue using the legacy "DOM is the source of truth"
-		// model. The detection is wrapper-attribute driven so any
-		// future surface (e.g. a fullscreen tour) that emits
-		// data-fg-paginated reuses the same path.
+		// Paginated galleries use a sparse slide array filled from the REST
+		// endpoint; others take the DOM as the full list.
 		const visibleSlides = collectItems(galleryEl);
 
 		if (isGalleryPaginated(galleryEl)) {
-			// Seed the sparse cache from the visible slides at their
-			// global sequence indices. Other slots will be null until
-			// fetched.
+			// Seed the sparse array from the visible slides at their sequence indices.
 			const estimatedTotal = Math.max(
 				readEstimatedTotal(galleryEl),
 				visibleSlides.length
@@ -1168,10 +1091,7 @@ class FotoGridsLightbox {
 				}
 			});
 
-			// The `index` argument is interpreted as the index INTO
-			// visibleSlides (the legacy contract from the click
-			// handler). Translate it to the global sequence index of
-			// the actual clicked item.
+			// `index` is relative to visibleSlides; convert it to the sequence index.
 			const clickedSlide =
 				visibleSlides[
 					Math.max(0, Math.min(index, visibleSlides.length - 1))
@@ -1198,22 +1118,6 @@ class FotoGridsLightbox {
 		this._renderDots();
 		this._renderThumbs();
 
-		// Kick off slide fetching. Two strategies:
-		//
-		//  - Small galleries (<= FGLB_PRELOAD_ALL_THRESHOLD items) get
-		//    a single bulk fetch of the entire sequence on open. Slide
-		//    metadata is small (~500 bytes/item × 200 = 100 KB max),
-		//    so we trade a tiny upfront payload for a smooth navigation
-		//    experience: every thumb and every slide is ready before
-		//    the user can scroll/click.
-		//
-		//  - Larger galleries fall back to lookahead-only fetching
-		//    around this.index. Thumbs beyond the lookahead stay
-		//    pending until the user navigates near them.
-		//
-		// Without this, when the starting index falls within the
-		// already-seeded page-1 range (the common case), no fetch fires
-		// and thumbs 8..(total-1) never load.
 		if (this._total <= FGLB_PRELOAD_ALL_THRESHOLD) {
 			this._ensureSlides(
 				Math.floor(this._total / 2), // centre of range
@@ -1231,9 +1135,6 @@ class FotoGridsLightbox {
 			this.dialog.setAttribute('open', '');
 		}
 
-		// Focus the sentinel - a zero-size aria-hidden element - so the browser's
-		// auto-focus doesn't land on a real button (which would show a tooltip or
-		// fire on Space/Enter before the user has interacted).
 		this._focusSentinel?.focus({ preventScroll: true });
 
 		document.body.style.overflow = 'hidden';
@@ -1361,13 +1262,8 @@ class FotoGridsLightbox {
 	}
 
 	// -----------------------------------------------------------------
-	// Sparse-cache slide fetching (paginated galleries)
-	//
-	// For paginated galleries the lightbox holds a sparse this.items
-	// array of length `this._total`. Slots are null until fetched. The
-	// methods below fetch contiguous gaps from the
-	// /gallery/lightbox/slides REST endpoint and re-render whenever
-	// the current slot becomes available.
+	// Sparse-cache slide fetching (paginated galleries). this.items has
+	// length this._total; slots stay null until fetched.
 	// -----------------------------------------------------------------
 
 	/**
@@ -1431,8 +1327,7 @@ class FotoGridsLightbox {
 		while (cursor <= end) {
 			const gap = this._findGap(cursor, end - cursor + 1);
 			if (!gap) {
-				// No gap starting at cursor - advance past any filled
-				// slot.
+				// No gap starting at cursor; advance past the filled slot.
 				cursor++;
 				continue;
 			}
@@ -1502,23 +1397,19 @@ class FotoGridsLightbox {
 			.then((data) => {
 				if (!data || !Array.isArray(data.slides)) return;
 
-				// The server's `total` is authoritative - fix our
-				// sparse array length if our wrapper estimate was off.
+				// The server's total is authoritative; resize the sparse array to match.
 				if (
 					typeof data.total === 'number' &&
 					data.total !== this._total
 				) {
-					if (data.total > this._total) {
-						// Grow the array; older indices stay null.
-						this.items.length = data.total;
-					} else {
-						// Shrink - truncate.
-						this.items.length = data.total;
-					}
+					this.items.length = data.total;
 					this._total = data.total;
+					this.index = Math.max(
+						0,
+						Math.min(this.index, this._total - 1)
+					);
 				}
 
-				// Populate slots.
 				data.slides.forEach((apiSlide, i) => {
 					const slot = offset + i;
 					if (slot < 0 || slot >= this._total) return;
@@ -1556,13 +1447,10 @@ class FotoGridsLightbox {
 		try {
 			this._renderDots();
 			this._renderThumbs();
-			// _showItem(false) above already updates the counter for the
-			// current slide; but if the slot is still null we want the
-			// chrome to reflect the latest total anyway.
+			// Refreshes the counter even while the current slot is still null.
 			this._updateCounter && this._updateCounter();
 		} catch (e) {
-			// Defensive: a partial re-render after fetch should never
-			// bring down the lightbox.
+			// A failed partial re-render must not break the open lightbox.
 		}
 	}
 
@@ -1584,9 +1472,7 @@ class FotoGridsLightbox {
 			if (next === this.index) return;
 		}
 
-		// Kick off any required fetches around the new index so the
-		// slide data is on its way (or already arrived) by the time
-		// _showItem cares about it.
+		// Start fetching around the new index before rendering it.
 		this._ensureSlides(next, this._lookahead());
 
 		this._showItem(next, true);
@@ -1682,8 +1568,6 @@ class FotoGridsLightbox {
 	 * Write current zoom state into the per-gallery <style> block as CSS variables,
 	 * and update data-fg-lb-zoom-active / data-fg-lb-zoom-dragging on the dialog.
 	 *
-	 * Zero element.style mutations - consistent with the overall architecture.
-	 *
 	 * @param {boolean} [byUser=false] - true when triggered by a user gesture
 	 *                                   (button click, wheel, pinch, drag).
 	 *                                   Stops auto-progress when progressStop is on.
@@ -1704,8 +1588,7 @@ class FotoGridsLightbox {
 		const dlg = this.dialog;
 		const zoomed = this._zoomScale > FGLB_ZOOM_MIN;
 
-		// Append zoom vars to the per-gallery <style> block.
-		// buildVarsCSS() owns the block; we append a scoped .fg-lightbox rule.
+		// Zoom vars live in their own .fg-lb-img rule inside the per-gallery block.
 		const existing = this._styleEl.textContent;
 		const zoomVars = [
 			'.fg-lb-img {',
@@ -1755,7 +1638,6 @@ class FotoGridsLightbox {
 	 *
 	 * CSS variables go into the <style id="fg-lb-vars"> block via buildVarsCSS().
 	 * State classes (theme, transition, layout) go onto dlg.className.
-	 * Zero element.style calls.
 	 */
 	_applySettings() {
 		const dlg = this.dialog;
@@ -1807,7 +1689,6 @@ class FotoGridsLightbox {
 			contentEl.classList.add(`fg-lb-info-loc-${s.infoLocation}`);
 		}
 
-		// Fit-media is a class, not a style.
 		dlg.querySelector('.fg-lb-media-wrap').classList.toggle(
 			'fg-lb-fit-media',
 			s.fitMedia
@@ -1845,19 +1726,14 @@ class FotoGridsLightbox {
 			dlg.setAttribute('data-fg-lb-progress-controls', '');
 		}
 
-		dlg.setAttribute(
-			'aria-label',
-			`Gallery lightbox - ${this.items.length} item${this.items.length === 1 ? '' : 's'}`
-		);
+		dlg.setAttribute('aria-label', s.labels.dialog);
 	}
 
 	/**
 	 * Creates or removes dynamic DOM nodes (info panel, toolbar buttons) on each open().
 	 *
-	 * The dialog is a singleton reused across galleries, so anything that depends on
-	 * per-gallery settings must be created/removed here rather than baked into the
-	 * static template. Every node managed here is either added when needed or removed
-	 * when not - no hidden-but-present elements.
+	 * The dialog is reused across galleries, so every settings-dependent node is
+	 * added or removed here rather than hidden.
 	 *
 	 * @param {object} s Settings from readSettings()
 	 */
@@ -1869,11 +1745,26 @@ class FotoGridsLightbox {
 		const content = dlg.querySelector('.fg-lb-content');
 		if (!toolbar || !toolbarStart || !toolbarEnd || !content) return;
 
-		// Info panel + info-toggle button
-		// Removed when the panel is disabled or when an explicit empty block
-		// selection means the panel has no content to render. When enabled, the
-		// toggle button is always present and the panel's initial visibility
-		// follows the default-state setting.
+		const labels = s.labels;
+		toolbar.setAttribute('aria-label', labels.toolbar);
+		toolbarEnd
+			.querySelector('.fg-lb-close')
+			?.setAttribute('aria-label', labels.close);
+		dlg.querySelector('.fg-lb-prev')?.setAttribute(
+			'aria-label',
+			labels.previous_item
+		);
+		dlg.querySelector('.fg-lb-next')?.setAttribute(
+			'aria-label',
+			labels.next_item
+		);
+		dlg.querySelector('.fg-lb-dots')?.setAttribute(
+			'aria-label',
+			labels.item_navigation
+		);
+
+		// Info panel and its toggle are removed when the panel is disabled or has
+		// no blocks selected.
 		let infoEl = content.querySelector('.fg-lb-info');
 		let toggleBtn = toolbar.querySelector('.fg-lb-info-toggle');
 
@@ -1884,7 +1775,6 @@ class FotoGridsLightbox {
 			infoEl?.remove();
 			toggleBtn?.remove();
 		} else {
-			// Ensure the info panel element exists.
 			if (!infoEl) {
 				infoEl = document.createElement('div');
 				infoEl.className = 'fg-lb-info';
@@ -1912,7 +1802,9 @@ class FotoGridsLightbox {
 					);
 					toggleBtn.setAttribute(
 						'aria-label',
-						nowHidden ? 'Show info panel' : 'Hide info panel'
+						nowHidden
+							? this.settings.labels.show_info
+							: this.settings.labels.hide_info
 					);
 					toggleBtn.classList.toggle('fg-lb-btn--active', !nowHidden);
 					window.FgTooltip?.refresh(toggleBtn);
@@ -1931,7 +1823,7 @@ class FotoGridsLightbox {
 			);
 			toggleBtn.setAttribute(
 				'aria-label',
-				startClosed ? 'Show info panel' : 'Hide info panel'
+				startClosed ? labels.show_info : labels.hide_info
 			);
 			toggleBtn.classList.toggle('fg-lb-btn--active', !startClosed);
 		}
@@ -1944,7 +1836,6 @@ class FotoGridsLightbox {
 				shareBtn = document.createElement('button');
 				shareBtn.className = 'fg-lb-share';
 				shareBtn.type = 'button';
-				shareBtn.setAttribute('aria-label', 'Share');
 				shareBtn.setAttribute('aria-expanded', 'false');
 				shareBtn.innerHTML = FGLB_ICON_SHARE;
 				shareBtn.addEventListener('click', () =>
@@ -1954,18 +1845,19 @@ class FotoGridsLightbox {
 				toolbarEnd.insertBefore(shareBtn, closeBtn);
 				this._bindTooltip(shareBtn, { dir: 'below' });
 			}
+			shareBtn.setAttribute('aria-label', labels.share);
 		} else {
 			shareBtn?.remove();
 		}
 
-		// Fullscreen button - FGLB_ICON_FS_EXPAND / FGLB_ICON_FS_COLLAPSE defined at module level.
+		// Fullscreen button.
 		let fsBtn = toolbar.querySelector('.fg-lb-fullscreen');
 		if (s.fullscreen) {
 			if (!fsBtn) {
 				fsBtn = document.createElement('button');
 				fsBtn.className = 'fg-lb-fullscreen';
 				fsBtn.type = 'button';
-				fsBtn.setAttribute('aria-label', 'Enter fullscreen');
+				fsBtn.setAttribute('aria-label', labels.enter_fullscreen);
 				fsBtn.setAttribute('aria-pressed', 'false');
 				fsBtn.innerHTML = FGLB_ICON_FS_EXPAND;
 				fsBtn.addEventListener('click', () => {
@@ -1987,7 +1879,9 @@ class FotoGridsLightbox {
 					);
 					fsBtn.setAttribute(
 						'aria-label',
-						active ? 'Exit fullscreen' : 'Enter fullscreen'
+						active
+							? this.settings.labels.exit_fullscreen
+							: this.settings.labels.enter_fullscreen
 					);
 					fsBtn.innerHTML = active
 						? FGLB_ICON_FS_COLLAPSE
@@ -2016,7 +1910,7 @@ class FotoGridsLightbox {
 				zoomInBtn = document.createElement('button');
 				zoomInBtn.className = 'fg-lb-zoom-in';
 				zoomInBtn.type = 'button';
-				zoomInBtn.setAttribute('aria-label', 'Zoom in');
+				zoomInBtn.setAttribute('aria-label', labels.zoom_in);
 				zoomInBtn.innerHTML = FGLB_ICON_ZOOM_IN;
 				zoomInBtn.addEventListener('click', () => {
 					const max = this._effectiveZoomMax();
@@ -2035,7 +1929,7 @@ class FotoGridsLightbox {
 				zoomOutBtn = document.createElement('button');
 				zoomOutBtn.className = 'fg-lb-zoom-out';
 				zoomOutBtn.type = 'button';
-				zoomOutBtn.setAttribute('aria-label', 'Zoom out');
+				zoomOutBtn.setAttribute('aria-label', labels.zoom_out);
 				zoomOutBtn.innerHTML = FGLB_ICON_ZOOM_OUT;
 				zoomOutBtn.addEventListener('click', () => {
 					this._zoomScale = Math.max(
@@ -2056,15 +1950,13 @@ class FotoGridsLightbox {
 			zoomOutBtn?.remove();
 		}
 
-		// Progress bar - absolute stripe inside .fg-lb-shell.
-		// Created once and kept; visibility driven by CSS mode classes on .fg-lightbox.
+		// Auto-progress bar, placed first in .fg-lb-shell.
 		let progressBar = dlg.querySelector('.fg-lb-progress-bar');
 		if (s.progressStyle === 'bar' && s.autoProgress) {
 			if (!progressBar) {
 				progressBar = document.createElement('div');
 				progressBar.className = 'fg-lb-progress-bar';
 				progressBar.setAttribute('aria-hidden', 'true');
-				// Insert at the start of .fg-lb-shell so it sits above all siblings.
 				const shell = dlg.querySelector('.fg-lb-shell');
 				shell.insertBefore(progressBar, shell.firstChild);
 			}
@@ -2072,18 +1964,15 @@ class FotoGridsLightbox {
 			progressBar.remove();
 		}
 
-		// Progress spinner - SVG progress ring at the left end of the toolbar.
-		// Uses stroke-dashoffset animation on a <circle> - reliable fill from 0°
-		// to 360° with CSS animation, pauseable via class on .fg-lightbox.
+		// Auto-progress ring at the start of the toolbar, animated via stroke-dashoffset.
 		let progressSpinner = toolbar.querySelector('.fg-lb-progress-spinner');
 		if (s.progressStyle === 'spinner' && s.autoProgress) {
 			if (!progressSpinner) {
 				progressSpinner = document.createElement('div');
 				progressSpinner.className = 'fg-lb-progress-spinner';
 				progressSpinner.setAttribute('aria-hidden', 'true');
-				// The SVG viewBox is 32×32. The circle r=13 gives circumference ≈ 81.68.
-				// stroke-dasharray is set to that circumference via CSS var so SCSS can
-				// control the radius without keeping it in sync here.
+				// r=13 in a 32×32 viewBox gives a circumference of ≈ 81.68; SCSS sets
+				// the matching stroke-dasharray.
 				progressSpinner.innerHTML = `
                     <svg class="fg-lb-progress-ring" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                         <circle class="fg-lb-progress-ring-track" cx="16" cy="16" r="13"/>
@@ -2112,15 +2001,13 @@ class FotoGridsLightbox {
 		}
 
 		// Play/pause button - shown when progressControls is enabled.
-		// FGLB_ICON_PAUSE / FGLB_ICON_PLAY are module-level constants defined above the class.
-
 		let playPauseBtn = toolbar.querySelector('.fg-lb-play-pause');
 		if (s.autoProgress && s.progressControls) {
 			if (!playPauseBtn) {
 				playPauseBtn = document.createElement('button');
 				playPauseBtn.className = 'fg-lb-play-pause';
 				playPauseBtn.type = 'button';
-				playPauseBtn.setAttribute('aria-label', 'Pause auto-advance');
+				playPauseBtn.setAttribute('aria-label', labels.pause_auto);
 				playPauseBtn.setAttribute('aria-pressed', 'false');
 				playPauseBtn.innerHTML = FGLB_ICON_PAUSE; // playing on open → show pause bars
 				playPauseBtn.addEventListener('click', (e) => {
@@ -2150,18 +2037,16 @@ class FotoGridsLightbox {
 		const btn = this.dialog?.querySelector('.fg-lb-play-pause');
 		if (!btn) return;
 
-		// FGLB_ICON_PAUSE / FGLB_ICON_PLAY are module-level constants defined above the class.
-
 		if (paused) {
 			// Currently paused → show play triangle so user can resume
 			btn.innerHTML = FGLB_ICON_PLAY;
-			btn.setAttribute('aria-label', 'Resume auto-advance');
+			btn.setAttribute('aria-label', this.settings.labels.resume_auto);
 			btn.setAttribute('aria-pressed', 'true');
 			btn.classList.add('fg-lb-btn--active');
 		} else {
 			// Currently playing → show pause bars so user can pause
 			btn.innerHTML = FGLB_ICON_PAUSE;
-			btn.setAttribute('aria-label', 'Pause auto-advance');
+			btn.setAttribute('aria-label', this.settings.labels.pause_auto);
 			btn.setAttribute('aria-pressed', 'false');
 			btn.classList.remove('fg-lb-btn--active');
 		}
@@ -2221,7 +2106,9 @@ class FotoGridsLightbox {
 			btn.setAttribute('role', 'tab');
 			btn.setAttribute(
 				'aria-label',
-				`Item ${i + 1} of ${this.items.length}`
+				this.settings.labels.item_of
+					.replace('%1$d', i + 1)
+					.replace('%2$d', this.items.length)
 			);
 			container.appendChild(btn);
 		});
@@ -2260,9 +2147,7 @@ class FotoGridsLightbox {
 		// Thumb spacing flows through a CSS variable set in buildVarsCSS.
 		container.innerHTML = '';
 
-		// Inner track wrapper. The track holds the flex layout while
-		// the outer container handles overflow scrolling. See lightbox.scss
-		// for why this split exists (flexbox + centred + overflow gotcha).
+		// The track holds the flex layout; the outer container scrolls.
 		const track = document.createElement('div');
 		track.className = 'fg-lb-thumbs__track';
 
@@ -2271,7 +2156,10 @@ class FotoGridsLightbox {
 			btn.type = 'button';
 			btn.className = 'fg-lb-thumb';
 			btn.dataset.lbIndex = i;
-			btn.setAttribute('aria-label', `Go to item ${i + 1}`);
+			btn.setAttribute(
+				'aria-label',
+				this.settings.labels.go_to_item.replace('%d', i + 1)
+			);
 
 			const isVideo =
 				!!item &&
@@ -2281,10 +2169,6 @@ class FotoGridsLightbox {
 
 			if (thumbSrc) {
 				const img = document.createElement('img');
-				// Empty slot in the sparse cache - render a placeholder
-				// <img> so the strip's layout stays stable. _refreshChrome
-				// re-renders the strip once fetches resolve, filling in
-				// the real thumbSrc.
 				img.src = thumbSrc;
 				img.alt = '';
 				img.loading = 'lazy';
@@ -2297,6 +2181,8 @@ class FotoGridsLightbox {
 				ph.className = 'fg-lb-thumb-placeholder';
 				btn.appendChild(ph);
 			} else {
+				// Pending slot: an empty <img> keeps the strip stable until
+				// _refreshChrome re-renders it.
 				const img = document.createElement('img');
 				img.src = '';
 				img.alt = '';
@@ -2355,12 +2241,15 @@ class FotoGridsLightbox {
 		// Reset zoom on every slide change so the new image starts at 1×.
 		if (s.zoom) this._resetZoom();
 
-		dlg.setAttribute('aria-label', `Item ${index + 1} of ${this._total}`);
+		dlg.setAttribute(
+			'aria-label',
+			s.labels.item_of
+				.replace('%1$d', index + 1)
+				.replace('%2$d', this._total)
+		);
 
-		// Slide not yet loaded - show the lightbox spinner, update
-		// chrome to reflect the new index, and bail. Once the fetch
-		// resolves and populates this.items[index], _fetchSlideRange's
-		// success path re-invokes _showItem.
+		// Slide not loaded yet: show the spinner and stop. _fetchSlideRange
+		// re-invokes _showItem once the slot is filled.
 		if (!item) {
 			const imgElPending = dlg.querySelector('.fg-lb-img');
 			const spinnerPending = dlg.querySelector('.fg-lb-spinner');
@@ -2422,14 +2311,16 @@ class FotoGridsLightbox {
 				}
 			};
 
-			if (imgEl.complete && imgEl.src === item.fullSrc) {
+			const src = fullSrcForViewport(item, this.settings.mobileMax);
+
+			if (imgEl.complete && imgEl.src === src) {
 				onLoad();
 				return;
 			}
 
 			imgEl.classList.add('fg-lb-img--loading');
 			imgEl.alt = item.alt;
-			imgEl.src = item.fullSrc;
+			imgEl.src = src;
 			imgEl.addEventListener('load', onLoad, { once: true });
 			imgEl.addEventListener('error', onLoad, { once: true });
 		};
@@ -2484,7 +2375,7 @@ class FotoGridsLightbox {
 
 		const player = this._buildVideoPlayer(item);
 		if (!player) {
-			// Fall back to showing the poster if we couldn't build a player.
+			// No player could be built; show the poster instead.
 			if (imgEl) {
 				imgEl.classList.remove('fg-lb-img--hidden');
 				imgEl.src = item.fullSrc || item.thumbSrc || '';
@@ -2505,8 +2396,7 @@ class FotoGridsLightbox {
 	 */
 	_clearVideoPane() {
 		if (this._videoPane) {
-			// Pausing the <video> (or removing the <iframe>) halts playback and
-			// audio; removing the node is enough for both.
+			// Removing the node halts playback for both <video> and <iframe>.
 			this._videoPane.remove();
 			this._videoPane = null;
 		}
@@ -2558,7 +2448,10 @@ class FotoGridsLightbox {
 			'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
 		);
 		iframe.setAttribute('allowfullscreen', '');
-		iframe.setAttribute('title', item.title || item.alt || 'Video');
+		iframe.setAttribute(
+			'title',
+			item.title || item.alt || this.settings.labels.video
+		);
 		return iframe;
 	}
 
@@ -2577,7 +2470,9 @@ class FotoGridsLightbox {
 
 			candidates.forEach((i) => {
 				if (i < 0 || i >= len) return;
-				const src = this.items[i]?.fullSrc;
+				const src = this.items[i]
+					? fullSrcForViewport(this.items[i], this.settings.mobileMax)
+					: '';
 				if (!src || this._preloadCache.has(src)) return;
 				this._preloadCache.add(src);
 				new Image().src = src;
@@ -2586,12 +2481,12 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Parse the translated EXIF labels emitted alongside the field list.
+	 * Parse a JSON map of translated labels emitted by PHP on the gallery wrapper.
 	 *
-	 * @param {string|undefined} raw JSON map of field key → label.
-	 * @return {Object} Field key → label, empty when the attribute is absent.
+	 * @param {string|undefined} raw JSON map of key → label.
+	 * @return {Object} Key → label, empty when the attribute is absent.
 	 */
-	static _parseExifLabels(raw) {
+	static _parseLabelMap(raw) {
 		if (!raw) {
 			return {};
 		}
@@ -2702,18 +2597,6 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Render the info panel blocks for the given item.
-	 *
-	 * Called from _showItem() on every slide change. Clears and rebuilds
-	 * .fg-lb-info based on this.settings.infoBlocks. Blocks that only need
-	 * data from the item object (caption, share) are rendered immediately.
-	 * Blocks that need REST data (description, credit, file_info, exif, tags,
-	 * people, location) show a skeleton while the fetch is in progress, then
-	 * fill in on resolve.
-	 *
-	 * @param {{caption: string, title: string, id: string}} item
-	 */
-	/**
 	 * Resolve the sharing config for the current gallery, gated on the
 	 * 'lightbox' placement. Returns null when sharing does not apply.
 	 *
@@ -2763,10 +2646,8 @@ class FotoGridsLightbox {
 			? Object.assign({}, config, overrides)
 			: config;
 
-		// Both lightbox usages (info-panel block and the toolbar popover) want
-		// the 2-column grid layout. The popover later adds its own
-		// --lightbox-popover class which overrides the grid to a 3-up compact
-		// grid, so requesting 'grid' here is safe for both.
+		// Both lightbox share surfaces use the grid layout; the popover's own
+		// modifier class narrows it to a compact grid.
 		const bar = window.FotoGridsSharing.renderShareBar(
 			effectiveConfig,
 			{
@@ -2774,7 +2655,6 @@ class FotoGridsLightbox {
 				fullUrl: item.fullSrc || '',
 				caption: item.caption || item.alt || '',
 				galleryEl: this.galleryEl,
-				// Pipeline writes data-fg-gallery-id on the wrapper.
 				galleryId: this.galleryEl.dataset.fgGalleryId || '',
 			},
 			{ layout: 'grid' }
@@ -2790,11 +2670,8 @@ class FotoGridsLightbox {
 	/**
 	 * Toggle the lightbox toolbar share popover.
 	 *
-	 * Visually this is the fg-tooltip element switched into interactive
-	 * mode - same chrome (rounded pill, arrow), positioned above the share
-	 * toolbar button, but with the share grid inside instead of plain text.
-	 * Dismissal: click outside, Escape, or click the share button again
-	 * (showInteractive handles toggle for us).
+	 * Rendered as the fg-tooltip in interactive mode. Dismissed by an outside
+	 * click, Escape, or a second click on the share button.
 	 *
 	 * @param {HTMLElement} btn  The toolbar share button.
 	 * @returns {void}
@@ -2807,9 +2684,7 @@ class FotoGridsLightbox {
 			return;
 		}
 
-		// Smaller everything inside the tooltip - the toolbar popover should
-		// feel proportional to the toolbar button, not the full-size view
-		// page footer bar.
+		// Compact, icon-only buttons sized to the toolbar.
 		const bar = this._buildLightboxShareBar(this.items[this.index] || {}, {
 			button_size: 'small',
 			button_style: 'icons_only',
@@ -2824,6 +2699,15 @@ class FotoGridsLightbox {
 		btn.classList.toggle('fg-lb-btn--active', opened);
 	}
 
+	/**
+	 * Render the info panel blocks for the given item.
+	 *
+	 * Rebuilds .fg-lb-info from this.settings.infoBlocks on every slide change.
+	 * REST-backed blocks (description, credit, file_info, exif, tags, people,
+	 * location) start empty and are filled once the item data resolves.
+	 *
+	 * @param {object|null} item
+	 */
 	_renderInfoBlocks(item) {
 		const infoEl = this.dialog?.querySelector('.fg-lb-info');
 		if (!infoEl) return;
@@ -2834,8 +2718,7 @@ class FotoGridsLightbox {
 		// Explicit empty selection - the panel renders nothing.
 		if (Array.isArray(s.infoBlocks) && s.infoBlocks.length === 0) return;
 
-		// No item yet (sparse slide cache still fetching) - clear and
-		// leave empty. We'll be invoked again when the slide arrives.
+		// Slide still loading: clear the panel; it re-renders when the slide arrives.
 		if (!item) {
 			infoEl.innerHTML = '';
 			return;
@@ -2879,8 +2762,6 @@ class FotoGridsLightbox {
 		for (let i = 0; i < blocks.length; i++) {
 			const blockId = blocks[i];
 
-			// title / caption / description are folded into one text block,
-			// emitted once at the position of the first of the three.
 			if (TEXT_BLOCKS.includes(blockId)) {
 				if (i === firstTextIndex) {
 					this._renderTextBlock(infoEl, blocks, item);
@@ -2900,20 +2781,13 @@ class FotoGridsLightbox {
 				blockEl.appendChild(shareBar);
 				infoEl.appendChild(blockEl);
 			} else if (restBlocks.has(blockId)) {
-				// REST-fetched block - render nothing until data arrives.
-				// The empty container stays in the DOM (with data-fg-lb-block)
-				// so _fillInfoBlocksFromData can find it by selector,
-				// but it has no visible children so users don't see a
-				// skeleton flash on fast fetches. If the block ends up
-				// having no data, _fillInfoBlocksFromData removes it
-				// (and _fillInfoBlocksNoData handles the no-id case).
+				// REST-backed block: an empty container, filled or removed once
+				// the item data arrives.
 				infoEl.appendChild(blockEl);
 			} else {
-				// Extension block - an add-on may register a renderer for a
-				// non-core block id (e.g. rating, download) via
-				// FotoGrids.modules.lightboxInfoBlocks[id] = (el, item, lightbox).
-				// The container is appended only if the renderer produces
-				// content, so an unknown id with no renderer is a no-op.
+				// Add-ons render extra block ids through
+				// FotoGrids.modules.lightboxInfoBlocks[id] = (el, item, lightbox);
+				// the block is appended only if the renderer adds content.
 				const registry =
 					window.FotoGrids &&
 					window.FotoGrids.modules &&
@@ -2945,11 +2819,8 @@ class FotoGridsLightbox {
 			if (cached !== null) {
 				this._fillInfoBlocksFromData(infoEl, blocks, cached);
 			}
-			// If null: fetch is in progress - a previous _renderInfoBlocks call for
-			// the same item is already waiting; we won't get the result here.
-			// This can happen if the user navigates away and back before the fetch
-			// resolves. We accept the skeleton stays and will be filled if the user
-			// is still on this item when the fetch completes.
+			// null means a fetch for this item is in flight; it fills the panel
+			// on resolve if the item is still current.
 			return;
 		}
 
@@ -3088,11 +2959,15 @@ class FotoGridsLightbox {
 					return;
 				}
 				const rows = [];
-				if (fi.filename) rows.push(['File', fi.filename]);
-				if (fi.filesize) rows.push(['Size', fi.filesize]);
+				const labels = this.settings.labels;
+				if (fi.filename) rows.push([labels.file, fi.filename]);
+				if (fi.filesize) rows.push([labels.size, fi.filesize]);
 				if (fi.width && fi.height)
-					rows.push(['Dimensions', `${fi.width} × ${fi.height}`]);
-				if (fi.mime_type) rows.push(['Type', fi.mime_type]);
+					rows.push([
+						labels.dimensions,
+						`${fi.width} × ${fi.height}`,
+					]);
+				if (fi.mime_type) rows.push([labels.type, fi.mime_type]);
 				if (rows.length === 0) {
 					blockEl.remove();
 					return;
@@ -3160,7 +3035,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'Tags',
+						this.settings.labels.tags,
 						FotoGridsLightbox.BLOCK_ICONS.tags
 					)
 				);
@@ -3185,7 +3060,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'People',
+						this.settings.labels.people,
 						FotoGridsLightbox.BLOCK_ICONS.people
 					)
 				);
@@ -3205,7 +3080,7 @@ class FotoGridsLightbox {
 				blockEl.innerHTML = '';
 				blockEl.appendChild(
 					FotoGridsLightbox._makeBlockHeader(
-						'Location',
+						this.settings.labels.location,
 						FotoGridsLightbox.BLOCK_ICONS.location
 					)
 				);
@@ -3216,7 +3091,7 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Clear skeletons when no REST data is available (fetch failed or no item ID).
+	 * Remove REST-backed blocks when no data is available (fetch failed or no item ID).
 	 *
 	 * @param {HTMLElement} infoEl
 	 * @param {string[]}    blocks
@@ -3267,8 +3142,6 @@ class FotoGridsLightbox {
 	 * Always clears any running timer first. Restarts the progress indicator
 	 * animation from zero. Attaches pause listeners on the first call for this
 	 * gallery open; subsequent calls (after navigation) reuse the same listeners.
-	 *
-	 * Call this: on open(), after navigating to a new slide.
 	 */
 	_startAuto() {
 		this._clearAutoTimer();
@@ -3331,8 +3204,8 @@ class FotoGridsLightbox {
 	/**
 	 * Pause auto-advance (user-initiated: hover, caption hover, or click).
 	 *
-	 * Records how much time was remaining so _resumeAuto() can pick up exactly
-	 * where we left off. Freezes the progress indicator in place.
+	 * Records the remaining time so _resumeAuto() continues from the same point,
+	 * and freezes the progress indicator.
 	 */
 	_pauseAuto() {
 		if (this._autoPaused) return;
@@ -3350,7 +3223,7 @@ class FotoGridsLightbox {
 	}
 
 	/**
-	 * Resume from a paused state, continuing from exactly where we left off.
+	 * Resume from a paused state with the remaining duration.
 	 *
 	 * Restarts the timer with the remaining duration and resumes the indicator
 	 * animation (does not restart it from zero - progress is preserved).
@@ -3501,17 +3374,9 @@ class FotoGridsLightbox {
 		this._autoPaused = false;
 	}
 
-	/* Animation duration is set once in buildVarsCSS() as --fg-lb-progress-duration
-       and read by SCSS. No inline styles here - only class/attribute toggles.
-
-       Class model on .fg-lightbox:
-         (no class)                  → animation not started
-         .fg-lb-progress--active     → animation running
-         .fg-lb-progress--paused     → animation paused (both classes present)
-
-       Restart sequence: remove --active (kills animation), force reflow,
-       re-add --active. The reflow between removal and addition is what makes
-       the browser treat it as a brand-new animation rather than a continuation. */
+	// Progress indicator state is a class on the animated element: --running
+	// plays, --paused freezes, neither resets. The duration comes from
+	// --fg-lb-progress-duration, set in buildVarsCSS().
 
 	_restartProgressIndicator() {
 		const s = this.settings;
@@ -3520,9 +3385,8 @@ class FotoGridsLightbox {
 		const el = this._progressAnimEl();
 		if (!el) return;
 
-		// Remove both state classes - this strips animation-name entirely,
-		// cutting the animation. The reflow confirms the cleared state on THIS
-		// element before --running is added, so the browser starts fresh from 0.
+		// Clearing both classes and forcing a reflow before re-adding --running
+		// restarts the animation from 0.
 		el.classList.remove(
 			'fg-lb-progress--running',
 			'fg-lb-progress--paused'
@@ -3628,8 +3492,8 @@ class FotoGridsLightbox {
 				x: this._zoomOffset.x,
 				y: this._zoomOffset.y,
 			};
-			// No setPointerCapture - same reason as swipe: capturing on the dialog
-			// redirects synthesised click/dblclick to the dialog, breaking zoom exit.
+			// No setPointerCapture: capturing on the dialog retargets the
+			// synthesised click/dblclick to it, which breaks zoom.
 			this._applyZoom(true); // sets data-fg-lb-zoom-dragging → cursor:grabbing
 			return;
 		}
@@ -3640,10 +3504,8 @@ class FotoGridsLightbox {
 			startY: e.clientY,
 			dx: 0,
 		};
-		// No setPointerCapture here - capturing on the dialog redirects synthesised
-		// click events to the dialog element instead of the hit-tested child (e.g. the
-		// image), breaking click/dblclick zoom. Swipe tracking doesn't need capture
-		// because the lightbox is fullscreen and the pointer stays within it.
+		// No setPointerCapture for the same reason; the pointer cannot leave the
+		// fullscreen dialog anyway.
 	}
 
 	_onPointerMove(e) {
@@ -3877,44 +3739,15 @@ class FotoGridsLightboxInit {
 	}
 
 	_init() {
-		document
-			.querySelectorAll(
-				'.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]'
-			)
-			.forEach((el) => this._activateGallery(el));
-
-		if ('MutationObserver' in window) {
-			this._observer = new MutationObserver((mutations) => {
-				for (const mutation of mutations) {
-					for (const node of mutation.addedNodes) {
-						if (!(node instanceof Element)) continue;
-
-						const candidates = [];
-						if (
-							node.matches(
-								'.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]'
-							)
-						) {
-							candidates.push(node);
-						}
-						node.querySelectorAll(
-							'.fotogrids-collection.fotogrids-gallery[data-fg-click="lightbox"]'
-						).forEach((el) => candidates.push(el));
-
-						candidates.forEach((el) => this._activateGallery(el));
-					}
-				}
-			});
-			this._observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-			});
+		if (
+			!window.FotoGrids ||
+			typeof window.FotoGrids.onGallery !== 'function'
+		) {
+			return;
 		}
-
-		document.addEventListener('fotogrids:gallery_inserted', (e) => {
-			const el = e.detail?.galleryElement;
-			if (el && el.dataset.fgClick === 'lightbox') {
-				this._activateGallery(el);
+		window.FotoGrids.onGallery((galleryEl) => {
+			if (galleryEl.dataset.fgClick === 'lightbox') {
+				this._activateGallery(galleryEl);
 			}
 		});
 	}

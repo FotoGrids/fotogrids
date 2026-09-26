@@ -1,10 +1,10 @@
 === FotoGrids – Photo & Video Galleries, Lightboxes, Sliders & More ===
 Contributors: FotoGrids
 Tags: gallery, album, lightbox, slider, portfolio
-Requires at least: 6.1
+Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,10 @@ From drag-and-drop simplicity to REST API power, FotoGrids is built to handle an
 * **Bloggers & creators** - beautiful galleries the same day you publish, no code required.
 * **Online shops** - display products beautifully, then sell them with Pro.
 
+= 🌐 Help us translate =
+
+Help bring FotoGrids to your language - pick your locale at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise.
+
 = 🔥 FotoGrids Pro =
 
 The free version is a full kit on its own. **Pro layers on the rest** - more layouts, more analytics insights, more control and conversion tools.
@@ -154,6 +158,10 @@ Yes. Every layout and the lightbox are fully responsive and built for touch.
 
 Yes. FotoGrids includes an import tool. It can import from your existing WordPress Media Library today, and the tool lists other popular gallery plugins with importers being added over upcoming releases (shown as "Coming soon" until available). See our [documentation](https://go.fotogrids.com/docs/?utm_source=readme&utm_medium=wporg&utm_campaign=docs&utm_content=faq) for step-by-step guides.
 
+= Can I help translate FotoGrids? =
+
+Please do - FotoGrids is not yet available in any language other than English. Pick your language at [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/fotogrids/) and suggest translations for the strings you recognise. No development setup, and no need to finish the whole plugin in one sitting.
+
 = Where can I get support? =
 
 Free users can post in the [WordPress.org support forum](https://wordpress.org/support/plugin/fotogrids/). Pro users get priority support at [fotogrids.com](https://go.fotogrids.com/support/?utm_source=readme&utm_medium=wporg&utm_campaign=support).
@@ -168,6 +176,55 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 6. Statistics dashboard showing views and shares.
 
 == Changelog ==
+
+= 1.1.3 =
+
+**Improved**
+
+* **Right-to-left support in the admin.** Every FotoGrids admin screen now mirrors correctly in Hebrew, Arabic and other RTL languages.
+
+**Fixed**
+
+* **Fixed Lightbox image size selection.** The Lightbox now serves the size you set, and a lighter version on phones.
+* **Fixed saved defaults for new collections.** New galleries and albums now start with the defaults you saved.
+* **Fixed LinkedIn, WhatsApp, Telegram and Reddit share buttons.** They now open a share window and count in statistics.
+* **Fixed the Zoom Trigger setting.** Your chosen trigger now applies in the Lightbox.
+* **Fixed saving for three gallery settings:** Mini Lightbox padding, Preload Next Page and Show Album Name on Button.
+* **Fixed Regenerate All.** Tools > Regenerate Thumbnails now processes every listed image.
+* **Improved the SEO checkup title check.** Titles copied from camera filenames such as `DSC_1234` are now flagged.
+* **Fixed cache expiry with Redis and Memcached.** Cached galleries now respect their cache duration.
+* **More complete uninstall.** Saved templates and review-prompt data are now removed too.
+
+**Security and hardening**
+
+* **Stricter view permissions.** Every restricted view setting now requires at least a logged-in user.
+* **Encrypted default password.** A password saved in Settings > Defaults is now stored encrypted.
+
+= 1.1.2 =
+
+**New**
+
+* **Every EXIF field your camera records.** FotoGrids used to read four - camera, aperture, shutter speed, ISO - through a WordPress helper that carries no lens, flash, white balance, metering or GPS at all. Tags now come from the file directly, through a 22-field registry shared by the settings panel, the item editor and the lightbox. The Exif tab's four checkboxes become one sortable list, and that order is the order the lightbox renders them.
+
+**Improved**
+
+* **The settings vocabulary is now translatable.** 759 of the 853 strings in the gallery and album settings panel were missing from the translation template, because they live in JSON the string extractor never read. The whole vocabulary is now extracted and translated server-side.
+* **Importing now asks before it discards edits.** From Folder, From ZIP and Video Embed threw a part-filled form away on any exit, with nothing recoverable. Each now asks first.
+* **The render cache cleans up after itself.** Expired rows were filtered out on read but never deleted, so the table grew without bound; a daily purge now runs. Deactivating or uninstalling also clears FotoGrids' scheduled events, which it previously left behind.
+
+**Fixed**
+
+* **Autosave is now applied in settings.** The editor read the setting from three places that do not exist, so it never saw what you had chosen, and switching it off did not stick. The toggle and the editor now read and write one source, and the setting applies.
+* **Saving Gallery Defaults turned off other settings.** One click on Save Defaults cleared autosave, Google Fonts, usage-data sharing and the general, permission and integration settings - the form posted to a WordPress settings group that owns seven options while carrying a field for one, and WordPress writes every option in a posted group. Defaults now saves over REST.
+* **Video playback settings were not affecting the player.** Autoplay, mute, loop and controls never reached it, and autoplay was forced on regardless of the toggle.
+* **Alt text now uses the WordPress alt field.** FotoGrids kept its own copy, seeded once when an item was first added to a gallery and never refreshed, while the lightbox and the collection renderer read WordPress' - so an alt edit updated the grid while the front end served the old text indefinitely. There is one alt field now, WordPress', everywhere.
+* **Editing an item didn't refresh the cached gallery.** The cache listened for an event nothing fires, so logged-out visitors kept the pre-edit render until it expired.
+* **Uninstall left data behind** - gallery, album and embed posts, and four meta keys on attachments. The cleanup queries also passed `_` to SQL `LIKE` unescaped, where it matches any single character.
+
+**Security and hardening**
+
+* **An admin screen carried more user data than it needed.** The whole `WP_User` object was being passed to `wp_localize_script`, putting the current user's account record into the page source of every FotoGrids admin screen. Nothing read it, so it is removed, with a build guard and an end-to-end test against a recurrence.
+* **Three REST routes returned data without checking who was asking.** `GET /lightbox/item/{id}` served any attachment's metadata to anyone, and `POST /gallery/lightbox/slides` checked only that a gallery was published - so slide data for password-protected and registered-users-only galleries was public. All three are now authorised at the route level.
 
 = 1.1.1 =
 
@@ -255,6 +312,12 @@ Free users can post in the [WordPress.org support forum](https://wordpress.org/s
 * React-based admin interface and REST API.
 
 == Upgrade Notice ==
+
+= 1.1.3 =
+Fixes Lightbox image sizes, saved defaults for new galleries, four share buttons and cache expiry. Adds right-to-left admin support and stricter view permissions.
+
+= 1.1.2 =
+Now reads every EXIF field your camera records. Fixes autosave, video playback settings, alt text edits, and stale caching. Bug and security fixes.
 
 = 1.1.0 =
 Fixes EXIF and XMP data going missing on large photos, makes gallery uploads much faster, and adds a System Info tool for support. Verified against WordPress 7.1.

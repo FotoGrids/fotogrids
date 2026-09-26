@@ -78,9 +78,8 @@ function setup( collectionEl ) {
             settings.transitionDurationCustom
         );
 
-    // Stamp the resolved duration so the CSS transitions run at the chosen
-    // speed (the CSS reads --fg-viewer-duration with a 300ms fallback). The
-    // auto-height frame animates at the same pace as the image swap.
+    // Stamp the resolved duration; the CSS reads --fg-viewer-duration with a
+    // 300ms fallback, and the auto-height frame animates at the same pace.
     collectionEl.style.setProperty( '--fg-viewer-duration', durationMs + 'ms' );
     collectionEl.style.setProperty( '--fg-viewer-height-duration', durationMs + 'ms' );
     collectionEl.style.setProperty( '--fg-viewer-easing', resolveEasingCss( settings.easing ) );
@@ -130,11 +129,8 @@ function setup( collectionEl ) {
         }
     };
 
-    /* Reflect the active item's caption title in the bar (right of the
-       counter). The PHP item renderer stamps data-fg-caption-title on each
-       item when a title is present; items with no title clear the element.
-       CSS truncates with an ellipsis when the title is wider than the space
-       left between the counter and the next arrow. */
+    /* Reflect the active item's data-fg-caption-title in the bar; CSS truncates
+       it with an ellipsis when it overflows. */
     const updateTitle = ( index ) => {
         if ( ! titleEl ) return;
         const item  = items[ index ];
@@ -144,11 +140,9 @@ function setup( collectionEl ) {
         titleEl.classList.toggle( 'fg-viewer-title--empty', title === '' );
     };
 
-    /* Fit-to-image auto height. Measure the active item's media at the current
-       track width and stamp the resulting height on --fg-viewer-auto-height so
-       the frame fits the image (CSS caps it at the configured max and animates
-       the change). Only runs when autoHeightFit is true (None ratio + auto
-       mode); otherwise the frame height is owned by CSS. */
+    /* Fit-to-image auto height: stamp the active media's height at the current
+       track width on --fg-viewer-auto-height (CSS caps and animates it). Only
+       runs when autoHeightFit is true. */
     const measureMediaEl = ( item ) => {
         if ( ! item ) return null;
         return item.querySelector( '.fg-item-media img, .fg-item-media .fg-video-poster, .fg-item-media .fg-video' );
@@ -174,9 +168,8 @@ function setup( collectionEl ) {
         const mediaEl = measureMediaEl( item );
         if ( ! mediaEl ) return;
 
-        // If the image hasn't loaded yet its natural size is 0 - defer the
-        // measure until it loads so we don't stamp a collapsed height. A
-        // deferred first measure still lands without animation.
+        // Natural size is 0 until the image loads, so the measure waits for it.
+        // A deferred first measure still lands without animation.
         if ( mediaEl.tagName === 'IMG' && ! mediaEl.complete ) {
             mediaEl.addEventListener(
                 'load',
@@ -195,11 +188,8 @@ function setup( collectionEl ) {
 
         const fitHeight = trackWidth * ( size.h / size.w );
 
-        // Resolve the cap (max-height + viewport ceiling) to a pixel value here
-        // and clamp in JS, then set a concrete px height on the elements. A
-        // plain length animates cleanly; a CSS min()/calc() that wraps a custom
-        // property does NOT transition (the browser treats it as discrete), so
-        // doing the clamp in JS is what actually makes the frame slide.
+        // The cap is resolved and clamped here because a CSS min()/calc() over a
+        // custom property does not transition, while a plain px height does.
         const capPx    = resolveHeightCapPx();
         const targetPx = Math.round( capPx > 0 ? Math.min( fitHeight, capPx ) : fitHeight );
 
@@ -216,9 +206,7 @@ function setup( collectionEl ) {
         trackEl.style.height = targetPx + 'px';
 
         if ( skipAnim ) {
-            // Force a reflow so the no-transition height lands before we drop
-            // the class, otherwise the class removal re-enables the transition
-            // on this very change.
+            // Reflow so the height lands before the class is removed.
             void stageEl.offsetHeight;
             stageEl.classList.remove( 'fg-viewer-no-anim' );
             trackEl.classList.remove( 'fg-viewer-no-anim' );
@@ -227,10 +215,8 @@ function setup( collectionEl ) {
         autoHeightPrimed = true;
     };
 
-    /* Resolve the height ceiling (the smaller of the configured max-height and
-       the viewport cap) to a pixel number. --fg-height-max defaults to 100vh
-       when the user set no max, so both inputs can be vh - getComputedStyle on
-       a probe element converts whatever units to px for us. */
+    /* Resolve the height ceiling (the smaller of max-height and the viewport
+       cap) to px; a probe element converts any unit via getComputedStyle. */
     const resolveHeightCapPx = () => {
         const cs = getComputedStyle( collectionEl );
 
@@ -307,10 +293,9 @@ function setup( collectionEl ) {
         return { bar, prev, counter, title, next };
     };
 
-    /* Apply the active item to the DOM. The transition direction
-       (data-fg-dir) is derived from whether we moved forward or back so
-       the horizontal / vertical slides travel the right way. Looping
-       wrap-around is treated as the natural direction of the action. */
+    /* Apply the active item to the DOM. data-fg-dir follows the direction of
+       travel so slides move the right way; loop wrap-around counts as the
+       natural direction of the action. */
     const applyActive = ( next, prev ) => {
         let dir = next >= prev ? 'next' : 'prev';
         // Wrap-around: last → first reads as "next"; first → last as "prev".

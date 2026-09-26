@@ -106,7 +106,7 @@ final class Caption_Content_Builder {
 	 *
 	 * @since  1.0.0
 	 * @param  mixed  $raw     Raw setting value.
-	 * @param  string $default Fallback when value is absent or unrecognised.
+	 * @param  string $default_value Fallback when value is absent or unrecognised.
 	 * @return string
 	 */
 	private function scalar_source( $raw, string $default_value ): string {
@@ -148,7 +148,7 @@ final class Caption_Content_Builder {
 	 *
 	 * @since  1.0.0
 	 * @param  mixed $raw     Raw setting value.
-	 * @param  int   $default Fallback when value is absent.
+	 * @param  int   $default_value Fallback when value is absent.
 	 * @return int
 	 */
 	private function responsive_int( $raw, int $default_value ): int {

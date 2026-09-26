@@ -37,7 +37,7 @@ const AUTOSAVE_DELAY = 2000;
 
 // `fotogridsAdmin.autosave` is a string on page load - wp_localize_script casts
 // every scalar - and a real boolean once a toggle has written the AJAX response
-// back. Anything else means we cannot tell, and off is the safe answer.
+// back. Anything else is ambiguous, and off is the safe answer.
 const autosaveIsOn = () => {
     const raw = window.fotogridsAdmin?.autosave;
     return true === raw || '1' === raw;
@@ -98,8 +98,8 @@ const SaveBar = ({
     // A sentinel sits directly after the bar. While the bar is pinned to the
     // bottom of the viewport the sentinel is scrolled out of view (not
     // intersecting); once the user reaches the end of the content the sentinel
-    // comes into view and the bar settles into its natural position. We mirror
-    // that into an `fg-is-sticky` class on the bar.
+    // comes into view and the bar settles into its natural position; that
+    // state is mirrored into an `fg-is-sticky` class on the bar.
     const sentinelRef = useRef(null);
     const [isStuck, setIsStuck] = useState(false);
 

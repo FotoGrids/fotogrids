@@ -152,12 +152,12 @@ final class Preview_Renderer {
 	 *
 	 * Mirrors {@see \FotoGrids\Modules\PageBuilders\REST\Preview_Data::flip_to_preview_context}
 	 * - duplicated rather than imported because that class lives behind
-	 * the REST autoload boundary and we want this renderer usable from
+	 * the REST autoload boundary, and this renderer must be usable from
 	 * `init`-time widget code that runs before REST is bootstrapped.
 	 *
 	 * @since 1.0.0
 	 * @param Render_Context $context
-	 * @param Request_Source $source
+	 * @param value-of<Request_Source::ALL> $source
 	 * @return Render_Context
 	 */
 	private static function flip_to_preview_context( Render_Context $context, string $source ): Render_Context {
@@ -213,7 +213,7 @@ final class Preview_Renderer {
 			$button_lbl  = esc_html__( 'Add items', 'fotogrids' );
 		}
 
-		// We render the CTA as a <button> rather than an <a> because the
+		// The CTA is a <button> rather than an <a> because the
 		// page-builder preview iframe blocks `target="_blank"` and
 		// `window.open()` calls. The click handler postMessages the URL
 		// up to the parent editor window, which opens it (see the
@@ -229,11 +229,9 @@ final class Preview_Renderer {
 			);
 		}
 
-		// Inline, scoped styles - keeps the empty-state self-contained so
-		// it works in the page-builder preview iframe (which doesn't
-		// enqueue the editor stylesheet) and in any future host. Browsers
-		// dedupe duplicate <style> blocks effectively; the cost is
-		// negligible.
+		// Inline, scoped styles keep the empty state self-contained inside the
+		// page-builder preview iframe, which doesn't enqueue the editor
+		// stylesheet.
 		$styles = '<style>'
 			. '.fg-pb-empty-state{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:32px 24px;border:1px dashed rgba(0,0,0,.18);border-radius:8px;background:rgba(0,0,0,.02);color:#1d2327;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.5;}'
 			. '.fg-pb-empty-state__title{font-size:15px;font-weight:600;}'

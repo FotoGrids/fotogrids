@@ -62,11 +62,9 @@ final class Preview_Data {
 	 * the front-of-site, then flips `is_preview = true` on the meta so
 	 * preview-aware modules (password gate, etc.) take the admin path.
 	 *
-	 * Using `build_for_public()` here - rather than `build_for_preview()`
-	 * which the legacy admin Preview_Endpoint relied on - gives the
-	 * preview the full sorter + filter + pagination behaviour. Without
-	 * that, paginated galleries rendered all items but still showed the
-	 * load-more chrome.
+	 * `build_for_public()` rather than `build_for_preview()` gives the preview
+	 * the full sorter + filter + pagination behaviour, so paginated galleries
+	 * render the correct page and chrome.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request Request.
@@ -97,9 +95,8 @@ final class Preview_Data {
 			? (array) \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id )
 			: array();
 
-		// Per-host preview-feature toggles (Gutenberg block / metabox /
-		// future page-builder hosts). Applied as settings overrides so
-		// the renderer behaves accordingly.
+		// Per-host preview-feature toggles (Gutenberg block, metabox, page
+		// builders), applied as settings overrides.
 		//
 		//   click_behavior=false  -> override item_click_behavior with
 		//                            'nothing' so no decorator wires
@@ -143,11 +140,11 @@ final class Preview_Data {
 	 * markers merged in.
 	 *
 	 * Render_Context::with() explicitly forbids replacing the meta field,
-	 * so we reach for the underlying constructor instead.
+	 * so the underlying constructor is used instead.
 	 *
 	 * @since 1.0.0
 	 * @param \FotoGrids\Render\Api\Render_Context $context
-	 * @param \FotoGrids\Render\Api\Request_Source $source
+	 * @param value-of<\FotoGrids\Render\Api\Request_Source::ALL> $source
 	 * @return \FotoGrids\Render\Api\Render_Context
 	 */
 	private static function flip_to_preview_context(
@@ -201,8 +198,8 @@ final class Preview_Data {
 	 * Read the per-host preview feature toggles off the REST request.
 	 *
 	 * Defaults and normalisation are delegated to {@see Preview_Options}
-	 * so every builder (Gutenberg via REST, Elementor via direct PHP,
-	 * future Divi / Bricks) speaks the same vocabulary.
+	 * so every builder (Gutenberg via REST, Elementor and Divi via direct
+	 * PHP) speaks the same vocabulary.
 	 *
 	 * Both toggles are eventually applied:
 	 *   - click_behavior=false overrides item_click_behavior server-side

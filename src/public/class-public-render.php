@@ -276,7 +276,7 @@ class Public_Render {
 	/**
 	 * Holds the full Render_Result of the most recent render in this request.
 	 * REST/AJAX handlers read it to return the per-render inline CSS/JS/JSON-LD
-	 * (which are no longer embedded in the markup) for the client to inject.
+	 * for the client to inject.
 	 *
 	 * @since 1.0.0
 	 * @var Render_Result|null
@@ -315,14 +315,14 @@ class Public_Render {
 	 * envelope.
 	 *
 	 * @since 1.0.0
-	 * @param int                  $gallery_id     Gallery ID.
-	 * @param array<string, mixed> $meta_overrides Optional Render_Meta overrides:
-	 *                                             requested_page, requested_per_page,
-	 *                                             breakpoint, partial.
-	 * @param Request_Source       $source         Request source (defaults to ALBUM_AJAX
-	 *                                             because the existing /gallery/render
-	 *                                             callers use it that way; the REST handler
-	 *                                             can override).
+	 * @param int                            $gallery_id     Gallery ID.
+	 * @param array<string, mixed>           $meta_overrides Optional Render_Meta overrides:
+	 *                                                       requested_page, requested_per_page,
+	 *                                                       breakpoint, partial.
+	 * @param value-of<Request_Source::ALL>  $source         Request source (defaults to
+	 *                                                       ALBUM_AJAX because the existing
+	 *                                                       /gallery/render callers use it that
+	 *                                                       way; the REST handler can override).
 	 * @return string Rendered HTML (or empty string when the gallery cannot be rendered).
 	 */
 	public static function render_gallery_for_rest( int $gallery_id, array $meta_overrides = array(), string $source = Request_Source::ALBUM_AJAX ): string {

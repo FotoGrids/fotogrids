@@ -22,13 +22,11 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Elementor sub-module of Page Builders.
  *
- * Registers FotoGrids Elementor widgets (gallery + album). v1 ships a minimal
- * widget per collection type: a single picker control that selects a
- * published gallery/album by ID, with the actual render delegated to the
- * existing shortcode pipeline (Public_Render::gallery_shortcode /
- * album_shortcode). This keeps the render path identical to Gutenberg and
- * the [fotogrids_*] shortcodes, so every decorator/feature/layout module
- * works automatically inside Elementor.
+ * Registers FotoGrids Elementor widgets (gallery + album): one picker
+ * control that selects a published gallery/album by ID, with the render
+ * delegated to the shortcode pipeline (Public_Render::gallery_shortcode /
+ * album_shortcode), so every decorator/feature/layout module works inside
+ * Elementor as it does in Gutenberg and the [fotogrids_*] shortcodes.
  *
  * Activation gates on whether Elementor is loaded. The sub-module is safe
  * to require unconditionally - init() exits early if Elementor isn't present.
@@ -65,12 +63,10 @@ final class Module {
 	public const EDITOR_STYLE_HANDLE = 'fotogrids-pb-elementor-editor';
 
 	/**
-	 * Whether the Elementor plugin is present and loaded. We check for the
-	 * `\Elementor\Plugin` class rather than `did_action( 'elementor/loaded' )`
-	 * because our init runs from inside Module_Registry's `init:5` dispatch,
-	 * which is earlier than `elementor/loaded`. The class is defined the
-	 * moment Elementor's own plugin file is required, which happens at
-	 * `plugins_loaded`, so the class-exists check is reliable here.
+	 * Whether the Elementor plugin is present and loaded. Checks the
+	 * `\Elementor\Plugin` class rather than `did_action( 'elementor/loaded' )`:
+	 * this runs from Module_Registry's `init:5` dispatch, before
+	 * `elementor/loaded`, and the class exists from `plugins_loaded`.
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -109,27 +105,18 @@ final class Module {
 		// the control types above.
 		add_action( 'elementor/editor/before_enqueue_scripts', array( self::class, 'enqueue_editor_assets' ) );
 
-		// Opt every Elementor-built page that contains a FotoGrids widget
-		// into the page-global asset bootstrap (runtime localize +
-		// errors stylesheet). Without this hook Public_Render's
-		// `has_fotogrids_content()` would miss us - Elementor stores its
-		// widget tree in post meta, not post_content.
+		// Opt every Elementor-built page that contains a FotoGrids widget into
+		// the page-global asset bootstrap. Elementor stores its widget tree in
+		// post meta, which has_fotogrids_content() does not scan.
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_elementor' ), 10, 2 );
 
-		// Suppress Elementor's global lightbox over FotoGrids anchors.
-		// Elementor scans every `<a>` whose href looks like an image and
-		// hijacks the click - we need to stamp `data-elementor-open-lightbox="no"`
-		// on the anchor itself (ancestor opt-out doesn't cascade into
-		// arbitrary widget HTML). The renderer doesn't know about
-		// Elementor; this filter is the decoupling point.
+		// Elementor's global lightbox hijacks any <a> whose href looks like an
+		// image; the opt-out has to sit on each anchor, since an ancestor opt-out
+		// does not cascade into widget HTML.
 		add_filter( Filters_Render::ANCHOR_ATTRS, array( self::class, 'disable_elementor_lightbox' ), 10, 2 );
 
-		// Inside Elementor's preview iframe neither `wp_head` nor
-		// `wp_footer` fire in the normal way - Elementor's preview pipeline
-		// owns the chrome. Force the renderer to emit its CSS+JS inline
-		// immediately so widget HTML and its assets reach the iframe
-		// together. The renderer doesn't know about Elementor; it just
-		// asks "should I inline?" and our hook answers.
+		// wp_head / wp_footer do not fire normally inside Elementor's preview
+		// iframe, so the renderer emits CSS+JS inline with the widget HTML.
 		add_filter( Filters_Render::SHOULD_INLINE_ASSETS, array( self::class, 'inline_assets_in_preview' ) );
 	}
 
@@ -138,8 +125,8 @@ final class Module {
 	 * serialized widget tree.
 	 *
 	 * Elementor stores its layout as JSON in the `_elementor_data` post
-	 * meta. We do a cheap substring scan for the widget names rather
-	 * than json_decode-ing the whole tree on every front-end request.
+	 * meta. A substring scan for the widget names avoids json_decode-ing the
+	 * whole tree on every front-end request.
 	 *
 	 * @since 1.0.0
 	 * @param bool         $detected Previous detection result.
@@ -237,10 +224,7 @@ final class Module {
 				'wp-element',
 				'wp-components',
 				'wp-i18n',
-				// `window.FotoGridsIcons` payload - see the Gutenberg
-				// sub-module for the full rationale; Button uses the
-				// shared <Icon /> component which reads from this
-				// global.
+				// `window.FotoGridsIcons`, read by the shared <Icon /> component.
 				\FotoGrids\Modules\PageBuilders\Module::FG_ICONS_SCRIPT_HANDLE,
 			),
 			FOTOGRIDS_VERSION,
@@ -345,10 +329,9 @@ final class Module {
 	 *   2. `Plugin::$instance->preview->is_preview_mode()` - Elementor's
 	 *      own canonical check, available once Elementor has booted.
 	 *
-	 * Either is sufficient; we OR them so the earliest-firing path still
-	 * lights up. Returning `true` short-circuits the renderer's default
-	 * `did_action('wp_head')` heuristic which is unreliable inside the
-	 * preview iframe.
+	 * Either is sufficient, so both are checked. Returning `true` overrides
+	 * the renderer's `did_action('wp_head')` heuristic, which is unreliable
+	 * inside the preview iframe.
 	 *
 	 * @since 1.0.0
 	 * @param bool $should_inline Existing filter value.

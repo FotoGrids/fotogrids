@@ -27,11 +27,7 @@ const SETUP_QUERY_PARAM = 'fotogrids_setup_step';
  */
 function renderComponent(containerId, Component) {
 	const container = document.getElementById(containerId);
-	if (!container) {
-		return;
-	}
-
-	if (!createRoot) {
+	if (!container || !createRoot) {
 		return;
 	}
 

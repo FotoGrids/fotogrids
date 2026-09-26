@@ -222,14 +222,9 @@ final class Layout_Featured_Item implements Layout {
 			),
 		);
 
-		// Lightbox spans the FULL gallery. Featured Item only renders the
-		// featured image + N grid tiles inline, but opening the lightbox from
-		// any of them must walk every item. We stamp the lightbox-extended
-		// markers directly here - unconditionally on click=lightbox, ignoring
-		// the lightbox_scope setting - because for this layout "single" scope
-		// would otherwise trap the lightbox in the tiny inline subset. The
-		// lightbox JS reads data-fg-lightbox-extended + data-fg-total-items
-		// and lazy-fetches the rest via the render URL.
+		// The lightbox spans the full gallery even though only the featured image and
+		// N tiles render inline, so the lightbox-extended markers are stamped here
+		// unconditionally on click=lightbox, regardless of lightbox_scope.
 		if ( ( $render_context->behavior->click_behavior ?? '' ) === 'lightbox' ) {
 			$total = (int) ( $render_context->meta->total_item_count ?? 0 );
 			if ( $total > 1 ) {
@@ -402,21 +397,12 @@ final class Layout_Featured_Item implements Layout {
 			'uses_item_spacing' => true,
 			'paginates'         => false,
 			'filters'           => false,
-			// NB: we deliberately do NOT use the `lightbox_extends` capability
-			// here. That adapter only fires when lightbox_scope === 'gallery',
-			// but Featured Item must span the full gallery even under "single"
-			// scope. wrapper_data_attrs() stamps the extended markers directly
-			// and unconditionally instead.
+			// Not the `lightbox_extends` capability: it only applies under
+			// lightbox_scope === 'gallery', and wrapper_data_attrs() stamps the markers
+			// for every scope.
 		);
 	}
 
-	/**
-	 * Resolve the configured grid item count (4 / 6 / 9, default 6).
-	 *
-	 * @since 1.0.0
-	 * @param Render_Context $render_context Render context.
-	 * @return int
-	 */
 	/**
 	 * Return an array setting as-is, or decode it when it arrives as a JSON
 	 * string. Responsive / four-sided settings are stored as JSON in post
@@ -442,6 +428,13 @@ final class Layout_Featured_Item implements Layout {
 		return $value;
 	}
 
+	/**
+	 * Resolve the configured grid item count (4 / 6 / 9, default 6).
+	 *
+	 * @since 1.0.0
+	 * @param Render_Context $render_context Render context.
+	 * @return int
+	 */
 	private static function grid_count( Render_Context $render_context ): int {
 		$raw = (int) ( $render_context->settings['featured_thumbs_count'] ?? 6 );
 		return in_array( $raw, array( 4, 6, 9 ), true ) ? $raw : 6;

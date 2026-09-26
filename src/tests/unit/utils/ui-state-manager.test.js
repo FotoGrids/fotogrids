@@ -142,6 +142,22 @@ describe('utils/ui-state-manager', () => {
 			).toBe('url-value');
 		});
 
+		it('returns the fallback when the URL param is not allowed', () => {
+			const ns = window.FotoGridsUiState.createNamespace({
+				area: 'a',
+				postId: 1,
+			});
+			window.history.replaceState({}, '', '/wp-admin/?tab=bogus');
+			expect(
+				ns.getValue({
+					key: 'main-tab',
+					fallback: 'manage',
+					urlParam: 'tab',
+					allowed: ['manage', 'preview'],
+				})
+			).toBe('manage');
+		});
+
 		it('writes a string value to the URL when urlParam is given', () => {
 			const ns = window.FotoGridsUiState.createNamespace({
 				area: 'a',
