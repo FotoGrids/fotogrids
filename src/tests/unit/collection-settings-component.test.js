@@ -516,4 +516,44 @@ describe('CollectionSettings component', () => {
 			handle.container.querySelectorAll('.fotogrids-settings-tab').length
 		).toBe(4);
 	});
+
+	it('keys a structural setting that carries no key of its own', async () => {
+		// `side_by_side` wrappers in the catalog have no `key`. The boundary is
+		// an element even when the control renders nothing, so without a
+		// fallback key React reports the row as an unkeyed list child.
+		const errors = [];
+		jest.spyOn(console, 'error').mockImplementation((...args) => {
+			errors.push(String(args[0]));
+		});
+
+		window.FotoGridsSettings.loadSettingsGroups = jest.fn(() =>
+			Promise.resolve({
+				layout: {
+					id: 'layout',
+					label: 'General',
+					icon: 'settings',
+					free: true,
+					settings: [
+						{ key: 'enabled', type: 'toggle', label: 'Enabled' },
+						{
+							type: 'side_by_side',
+							settings: [
+								{ key: 'title', type: 'text_input', label: 'Title' },
+							],
+						},
+					],
+				},
+			})
+		);
+
+		const handle = mountSettings();
+		await flush();
+
+		expect(
+			errors.filter((e) => e.includes('unique "key" prop'))
+		).toEqual([]);
+		expect(
+			handle.container.querySelector('.fotogrids-gallery-settings')
+		).not.toBeNull();
+	});
 });
