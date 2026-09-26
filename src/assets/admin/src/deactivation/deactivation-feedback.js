@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { navigateTo } from '../utils/navigate';
 import ReasonsForm from './ReasonsForm.jsx';
 
 const SETTINGS_KEY = 'fotogridsDeactivation';
@@ -117,14 +118,10 @@ function submitToFreemius(settings, reason) {
 		.finally(() => clearTimeout(timer));
 }
 
-function navigate(url) {
-	window.location.assign(url);
-}
-
 function openModal(settings, link) {
 	const api = window.FotoGridsAdmin && window.FotoGridsAdmin.modal;
 	if (!api) {
-		navigate(link.href);
+		navigateTo(link.href);
 		return;
 	}
 
@@ -138,11 +135,11 @@ function openModal(settings, link) {
 				onSubmit: async (reason) => {
 					await submitToFreemius(settings, reason);
 					close('programmatic');
-					navigate(link.href);
+					navigateTo(link.href);
 				},
 				onSkip: () => {
 					close('programmatic');
-					navigate(link.href);
+					navigateTo(link.href);
 				},
 				onCancel: () => close('cancel'),
 				// ReasonsForm is rendered inside a separate bundle's Modal, so
