@@ -38,6 +38,7 @@ updates:
       - dependency-name: "@wordpress/data"
       - dependency-name: "@wordpress/element"
       - dependency-name: "@wordpress/i18n"
+      - dependency-name: "@wordpress/media-utils"
       # react and react-dom are externals on the same terms, mapped to the React
       # and ReactDOM globals; WordPress core ships 18.3.1 as of 6.8. Their @types
       # packages track the runtime major and move with it.

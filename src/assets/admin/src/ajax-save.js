@@ -272,9 +272,15 @@
 		const postIdField = document.getElementById('post_ID');
 		const postTypeField = document.querySelector('input[name="post_type"]');
 
-		if (nonceField) formData.append('nonce', nonceField.value);
-		if (postIdField) formData.append('post_id', postIdField.value);
-		if (postTypeField) formData.append('post_type', postTypeField.value);
+		if (nonceField) {
+			formData.append('nonce', nonceField.value);
+		}
+		if (postIdField) {
+			formData.append('post_id', postIdField.value);
+		}
+		if (postTypeField) {
+			formData.append('post_type', postTypeField.value);
+		}
 
 		const gallerySettings = {};
 		const galleryInputs = document.querySelectorAll(
@@ -414,7 +420,9 @@
 	}
 
 	function initAutosave() {
-		if (!State) return;
+		if (!State) {
+			return;
+		}
 
 		State.autosave.set(readAutosaveSetting());
 
@@ -487,7 +495,9 @@
 	}
 
 	function updateUnsavedChangesDisplay() {
-		if (!State) return;
+		if (!State) {
+			return;
+		}
 
 		const hasChanges = State.unsavedChanges.has();
 		const shouldShow = hasChanges && !autosaveActive();
@@ -524,7 +534,9 @@
 
 	function initFormChangeTracking() {
 		const form = document.getElementById('post');
-		if (!form || !State) return;
+		if (!form || !State) {
+			return;
+		}
 
 		let initialFormState = {};
 		const updateInitialState = () => {

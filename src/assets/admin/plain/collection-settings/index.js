@@ -84,7 +84,9 @@ const filterHidden = (groups) => {
 	const filtered = {};
 
 	Object.entries(groups).forEach(([tabId, tabNode]) => {
-		if (tabNode?.hidden) return;
+		if (tabNode?.hidden) {
+			return;
+		}
 
 		const clonedTab = { ...tabNode };
 
@@ -92,7 +94,9 @@ const filterHidden = (groups) => {
 			const filteredSubTabs = {};
 			Object.entries(clonedTab.subTabs).forEach(
 				([subTabId, subTabNode]) => {
-					if (subTabNode?.hidden) return;
+					if (subTabNode?.hidden) {
+						return;
+					}
 					filteredSubTabs[subTabId] =
 						filterHiddenSettings(subTabNode);
 				}
@@ -113,7 +117,9 @@ const filterHidden = (groups) => {
 };
 
 const filterHiddenSettings = (subTabNode) => {
-	if (!Array.isArray(subTabNode?.settings)) return subTabNode;
+	if (!Array.isArray(subTabNode?.settings)) {
+		return subTabNode;
+	}
 	return {
 		...subTabNode,
 		settings: subTabNode.settings.filter((setting) => !setting?.hidden),
@@ -125,11 +131,15 @@ const filterHiddenSettings = (subTabNode) => {
  * that shouldn't appear on the global defaults screen).
  */
 const filterForDefaultsMode = (groups, isDefaultsMode) => {
-	if (!isDefaultsMode) return groups;
+	if (!isDefaultsMode) {
+		return groups;
+	}
 
 	const filtered = {};
 	Object.entries(groups).forEach(([tabId, tabNode]) => {
-		if (tabNode?.hideInDefaults === true) return;
+		if (tabNode?.hideInDefaults === true) {
+			return;
+		}
 		filtered[tabId] = tabNode;
 	});
 
