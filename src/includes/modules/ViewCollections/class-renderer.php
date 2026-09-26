@@ -832,6 +832,8 @@ class Renderer {
 			);
 		}
 
+		$config['labels'] = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
+
 		$html = '<div class="fotogrids-view__share" data-fg-share-footer="'
 			. esc_attr( wp_json_encode( $config ) ) . '"></div>';
 
@@ -953,8 +955,8 @@ class Renderer {
 
 		$sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
 
-		// window.fotogrids carries the sharing deep-link settings and
-		// share-bar labels - same shape as the public render path.
+		// window.fotogrids carries only the sharing-related deep-link
+		// settings - same shape as the public render path.
 		wp_localize_script(
 			'fotogrids-runtime',
 			'fotogrids',
@@ -962,7 +964,6 @@ class Renderer {
 				'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
 				'embedded_share_target' => $sharing['embedded_share_target'],
 				'restNonce'             => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
-				'sharingLabels'         => \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels(),
 			)
 		);
 	}

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-25T20:29:30+00:00\n"
+"POT-Creation-Date: 2026-09-26T09:22:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -4578,13 +4578,13 @@ msgstr ""
 
 #: includes/class-upgrade-modal.php:147
 #: assets/admin/plain/render-settings/renderPromo.js:98
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:49
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:73
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:355
 msgid "Upgrade Now"
 msgstr ""
 
 #: includes/class-upgrade-modal.php:148
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:57
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:81
 msgid "Free vs. Pro"
 msgstr ""
 
@@ -8560,39 +8560,39 @@ msgstr ""
 msgid "Unlock PRO Features"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:22
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:24
 msgid "Advanced Layouts"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:23
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:28
 msgid "SEO Optimization"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:24
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:32
 msgid "E-Commerce"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:25
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:36
 msgid "Custom Styling"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:26
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:40
 msgid "Priority Support"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:27
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:44
 msgid "Advanced Analytics"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:28
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:48
 msgid "Powerful Integrations"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:29
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:52
 msgid "Bulk Operations"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/ProFeatures.jsx:38
+#: assets/admin/src/components/dashboard/ProFeatures.jsx:62
 msgid "Plus many more powerful features designed to save time, optimize performance, and help you grow."
 msgstr ""
 

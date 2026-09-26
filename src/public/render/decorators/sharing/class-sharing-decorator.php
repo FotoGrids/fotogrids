@@ -44,7 +44,7 @@ final class Sharing_Decorator implements Decorator {
 	}
 
 	/**
-	 * Translated share-bar labels for the frontend sharing script.
+	 * Translated share-bar labels, carried in every share config as `labels`.
 	 *
 	 * Keyed by stored network id plus the tooltip and copy-feedback strings.
 	 * `share_on` carries a `%s` placeholder for the network label.
@@ -119,6 +119,7 @@ final class Sharing_Decorator implements Decorator {
 			'placements'   => $resolved['placements'],
 			'button_style' => $resolved['button_style'],
 			'button_size'  => $resolved['button_size'],
+			'labels'       => self::client_labels(),
 		);
 
 		return array( 'data-fg-sharing' => wp_json_encode( $payload ) );
