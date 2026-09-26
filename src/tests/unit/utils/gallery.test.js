@@ -2,19 +2,14 @@
  * Tests for src/assets/admin/src/utils/gallery.js
  */
 import { createGalleryFromImages } from '@/admin/src/utils/gallery';
+import { navigateTo } from '@/admin/src/utils/navigate';
+
+jest.mock('@/admin/src/utils/navigate', () => ({ navigateTo: jest.fn() }));
 
 describe('utils/gallery', () => {
-	let originalHref;
-
 	beforeEach(() => {
 		global.wp.apiFetch.mockReset();
-		originalHref = window.location.href;
-		delete window.location;
-		window.location = { href: '' };
-	});
-
-	afterEach(() => {
-		window.location = { href: originalHref };
+		navigateTo.mockClear();
 	});
 
 	it('returns null for empty input', async () => {
@@ -42,7 +37,7 @@ describe('utils/gallery', () => {
 			method: 'POST',
 			data: { item_ids: [1, 2, 3] },
 		});
-		expect(window.location.href).toBe('post.php?post=42&action=edit');
+		expect(navigateTo).toHaveBeenCalledWith('post.php?post=42&action=edit');
 	});
 
 	it('throws a friendly error when gallery creation returns no id', async () => {
