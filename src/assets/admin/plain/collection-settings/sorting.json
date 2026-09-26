@@ -202,7 +202,7 @@
             "icon": "bulb",
             "full_width": true,
             "button_label": "Read more on how caching affects random order",
-            "button_url": "https://www.fotogrids.com/docs/performance-and-seo/random-sort-and-caching/",
+            "button_url": "https://www.fotogrids.com/docs/performance-and-seo/random-sort-and-caching/?utm_source=plugin&utm_medium=collection-settings&utm_campaign=docs&utm_content=random-sort-caching",
             "condition": {
                 "dependsOn": "default_sort_order",
                 "values": [

@@ -155,16 +155,35 @@ describe('embed-api', () => {
 		});
 	});
 
-	describe('rest config fallbacks', () => {
-		it('uses the site-relative root when wpApiSettings is absent', async () => {
+	describe('rest config', () => {
+		afterEach(() => {
+			delete window.fotogridsAdmin;
+		});
+
+		it('reads the REST root from fotogridsAdmin.apiUrl', async () => {
 			delete window.wpApiSettings;
+			window.fotogridsAdmin = { apiUrl: 'https://example.com/wp-json/' };
 			global.fetch.mockResolvedValue(okResponse({}));
 
 			await deleteEmbed({ embedId: 1, strings: {} });
 
 			const [url, init] = lastRequest();
-			expect(url).toBe('/wp-json/fotogrids/v1/items/embed/1');
+			expect(url).toBe('https://example.com/wp-json/fotogrids/v1/items/embed/1');
 			expect(init.headers['X-WP-Nonce']).toBe('');
+		});
+
+		it('builds a valid URL on a plain-permalink root', async () => {
+			window.fotogridsAdmin = {
+				apiUrl: 'https://example.com/index.php?rest_route=/',
+			};
+			global.fetch.mockResolvedValue(okResponse({}));
+
+			await deleteEmbed({ embedId: 1, strings: {} });
+
+			const [url] = lastRequest();
+			expect(new URL(url).searchParams.get('rest_route')).toBe(
+				'/fotogrids/v1/items/embed/1'
+			);
 		});
 	});
 });

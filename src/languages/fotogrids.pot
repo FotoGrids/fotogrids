@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T18:56:52+00:00\n"
+"POT-Creation-Date: 2026-09-26T20:00:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -379,7 +379,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:278
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-strings.php:283
-#: assets/admin/plain/collection-settings.js:2302
+#: assets/admin/plain/collection-settings.js:2300
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -390,7 +390,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:279
 #: includes/metaboxes/class-metabox-strings.php:285
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2426
+#: assets/admin/plain/collection-settings.js:2424
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -3976,7 +3976,7 @@ msgstr ""
 #: includes/class-admin-init.php:154
 #: includes/metaboxes/class-metabox-strings.php:292
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2537
+#: assets/admin/plain/collection-settings.js:2535
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -5817,7 +5817,7 @@ msgid "Add some items to this gallery and its preview will appear here."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:261
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:218
 msgid "Add items"
 msgstr ""
 
@@ -6315,23 +6315,23 @@ msgstr ""
 msgid "Select a gallery to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:207
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:212
 msgid "This album has no galleries yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:208
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
 msgid "Add one or more galleries so this album has something to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:209
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:214
 msgid "Add galleries"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:211
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:216
 msgid "This gallery has no items yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:212
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:217
 msgid "Add images, videos, or other media so this gallery has something to display."
 msgstr ""
 
@@ -8131,81 +8131,81 @@ msgstr ""
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2015
+#: assets/admin/plain/collection-settings.js:2013
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2067
-#: assets/admin/plain/collection-settings.js:2083
+#: assets/admin/plain/collection-settings.js:2065
+#: assets/admin/plain/collection-settings.js:2081
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2120
+#: assets/admin/plain/collection-settings.js:2118
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2141
+#: assets/admin/plain/collection-settings.js:2139
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2142
+#: assets/admin/plain/collection-settings.js:2140
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2149
-#: assets/admin/plain/collection-settings.js:2160
+#: assets/admin/plain/collection-settings.js:2147
+#: assets/admin/plain/collection-settings.js:2158
 msgid "Failed to update autosave setting"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2204
-#: assets/admin/plain/collection-settings.js:2214
+#: assets/admin/plain/collection-settings.js:2202
+#: assets/admin/plain/collection-settings.js:2212
 msgid "Configure Album defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2208
-#: assets/admin/plain/collection-settings.js:2218
+#: assets/admin/plain/collection-settings.js:2206
+#: assets/admin/plain/collection-settings.js:2216
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2224
+#: assets/admin/plain/collection-settings.js:2222
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:219
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2249
+#: assets/admin/plain/collection-settings.js:2247
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2259
+#: assets/admin/plain/collection-settings.js:2257
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2263
+#: assets/admin/plain/collection-settings.js:2261
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2301
+#: assets/admin/plain/collection-settings.js:2299
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2328
+#: assets/admin/plain/collection-settings.js:2326
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2337
+#: assets/admin/plain/collection-settings.js:2335
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2447
+#: assets/admin/plain/collection-settings.js:2445
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2561
+#: assets/admin/plain/collection-settings.js:2559
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
@@ -8413,7 +8413,7 @@ msgstr ""
 
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
 #: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:162
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:165
 msgid "Loading preview…"
 msgstr ""
 
@@ -11165,11 +11165,11 @@ msgstr ""
 msgid "Failed to fetch preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:131
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:134
 msgid "Failed to load preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:167
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:170
 msgid "Couldn’t load preview."
 msgstr ""
 
