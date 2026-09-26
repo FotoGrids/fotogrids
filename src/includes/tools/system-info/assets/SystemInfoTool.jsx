@@ -233,7 +233,7 @@ const ErrorTable = ({ type, title, emptyText, about }) => {
 			title={title}
 			titleTag="h3"
 			description={about}
-			noBodyPadding={items.length > 0}
+			equalBodyPadding
 			action={
 				items.length > 0 ? (
 					<Button
