@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T09:22:20+00:00\n"
+"POT-Creation-Date: 2026-09-26T09:29:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: includes/class-admin-init.php:70
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
-#: includes/metaboxes/class-metabox-registrar.php:947
+#: includes/metaboxes/class-metabox-registrar.php:950
 #: includes/modules/PageBuilders/builders/Elementor/Module.php:166
 #: assets/admin/src/components/setup-wizard/StepWelcome.jsx:120
 msgid "FotoGrids"
@@ -123,7 +123,7 @@ msgstr ""
 #: includes/admin/class-admin-columns.php:215
 #: includes/admin/class-dashboard-widget.php:172
 #: includes/catalog/catalog-strings.php:439
-#: includes/metaboxes/class-metabox-registrar.php:870
+#: includes/metaboxes/class-metabox-registrar.php:873
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:16
 #: assets/admin/src/components/pages/StatsPage.jsx:208
 #: assets/admin/src/components/templates/TemplateOverviewModal.jsx:104
@@ -376,7 +376,7 @@ msgstr ""
 
 #: includes/admin/class-settings-localizer.php:278
 #: includes/catalog/catalog-strings.php:49
-#: includes/metaboxes/class-metabox-registrar.php:879
+#: includes/metaboxes/class-metabox-registrar.php:882
 #: assets/admin/plain/collection-settings.js:2257
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
@@ -386,7 +386,7 @@ msgid "Advanced"
 msgstr ""
 
 #: includes/admin/class-settings-localizer.php:279
-#: includes/metaboxes/class-metabox-registrar.php:881
+#: includes/metaboxes/class-metabox-registrar.php:884
 #: assets/admin/plain/collection-settings.js:115
 #: assets/admin/plain/collection-settings.js:2381
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
@@ -1481,7 +1481,7 @@ msgid "E-commerce"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:279
-#: includes/metaboxes/class-metabox-registrar.php:933
+#: includes/metaboxes/class-metabox-registrar.php:936
 msgid "EXIF"
 msgstr ""
 
@@ -1641,7 +1641,7 @@ msgid "Existing images may need regenerating"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:319
-#: includes/metaboxes/class-metabox-registrar.php:955
+#: includes/metaboxes/class-metabox-registrar.php:958
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:411
 msgid "External URL"
 msgstr ""
@@ -2455,7 +2455,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:517
 #: includes/diagnostics/class-system-report.php:54
 #: includes/diagnostics/class-system-report.php:354
-#: includes/metaboxes/class-metabox-registrar.php:939
+#: includes/metaboxes/class-metabox-registrar.php:942
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:28
 msgid "Media"
 msgstr ""
@@ -2507,7 +2507,7 @@ msgid "Networks"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:529
-#: includes/metaboxes/class-metabox-registrar.php:961
+#: includes/metaboxes/class-metabox-registrar.php:964
 #: assets/admin/plain/render-settings/renderBulkModal.js:202
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:204
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:573
@@ -2940,7 +2940,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:629
 #: includes/class-upgrade-modal.php:34
-#: includes/metaboxes/class-metabox-registrar.php:878
+#: includes/metaboxes/class-metabox-registrar.php:881
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:34
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:143
 msgid "SEO"
@@ -2951,7 +2951,7 @@ msgid "Sale Badges & Pricing"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:631
-#: includes/metaboxes/class-metabox-registrar.php:960
+#: includes/metaboxes/class-metabox-registrar.php:963
 #: assets/admin/plain/render-settings/renderBulkModal.js:191
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:196
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:569
@@ -3476,7 +3476,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:758
 #: includes/diagnostics/class-system-report.php:55
 #: includes/diagnostics/class-system-report.php:382
-#: includes/metaboxes/class-metabox-registrar.php:949
+#: includes/metaboxes/class-metabox-registrar.php:952
 #: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:345
 #: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:349
 msgid "Theme"
@@ -3967,7 +3967,7 @@ msgstr ""
 
 #: includes/class-admin-init.php:153
 #: includes/class-admin-init.php:154
-#: includes/metaboxes/class-metabox-registrar.php:888
+#: includes/metaboxes/class-metabox-registrar.php:891
 #: includes/modules/Templates/Module.php:322
 #: assets/admin/plain/collection-settings.js:2492
 msgid "Upgrade to Pro"
@@ -5797,335 +5797,348 @@ msgid "Gallery preview functionality will be implemented here."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:869
+msgid "Nothing to preview yet"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:870
+msgid "Add some items to this gallery and its preview will appear here."
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:871
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
+msgid "Add items"
+msgstr ""
+
+#: includes/metaboxes/class-metabox-registrar.php:872
 #: includes/modules/Templates/Module.php:332
 msgid "Saving..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:871
+#: includes/metaboxes/class-metabox-registrar.php:874
 msgid "Set as featured item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:872
+#: includes/metaboxes/class-metabox-registrar.php:875
 msgid "Clear featured item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:873
+#: includes/metaboxes/class-metabox-registrar.php:876
 msgid "Featured item set"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:874
+#: includes/metaboxes/class-metabox-registrar.php:877
 msgid "Featured item cleared"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:875
+#: includes/metaboxes/class-metabox-registrar.php:878
 msgid "Error saving featured item"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:876
+#: includes/metaboxes/class-metabox-registrar.php:879
 msgid "Copied!"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:877
+#: includes/metaboxes/class-metabox-registrar.php:880
 #: public/render/decorators/sharing/class-sharing-decorator.php:69
 msgid "Copy failed"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:880
+#: includes/metaboxes/class-metabox-registrar.php:883
 msgid "Add"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:882
+#: includes/metaboxes/class-metabox-registrar.php:885
 msgid "Filename"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:883
+#: includes/metaboxes/class-metabox-registrar.php:886
 msgid "File Size"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:884
+#: includes/metaboxes/class-metabox-registrar.php:887
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:135
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:280
 msgid "Dimensions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:885
+#: includes/metaboxes/class-metabox-registrar.php:888
 msgid "File Type"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:886
+#: includes/metaboxes/class-metabox-registrar.php:889
 msgid "Not Available"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:887
+#: includes/metaboxes/class-metabox-registrar.php:890
 #: assets/admin/plain/collection-settings.js:703
 msgid "Failed to load item data"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:889
+#: includes/metaboxes/class-metabox-registrar.php:892
 msgid "Checks for this image"
 msgstr ""
 
 #. translators: 1: number of passing checks, 2: total number of checks.
-#: includes/metaboxes/class-metabox-registrar.php:891
+#: includes/metaboxes/class-metabox-registrar.php:894
 #, php-format
 msgid "%1$d of %2$d ready"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:892
+#: includes/metaboxes/class-metabox-registrar.php:895
 msgid "Bad"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:893
+#: includes/metaboxes/class-metabox-registrar.php:896
 msgid "Needs improvement"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:894
+#: includes/metaboxes/class-metabox-registrar.php:897
 msgid "Good"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:895
+#: includes/metaboxes/class-metabox-registrar.php:898
 msgid "Fix"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:896
+#: includes/metaboxes/class-metabox-registrar.php:899
 msgid "File weight"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:897
+#: includes/metaboxes/class-metabox-registrar.php:900
 msgid "Empty. Screen readers and search engines have nothing to work from."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:898
+#: includes/metaboxes/class-metabox-registrar.php:901
 msgid "Very short. A few descriptive words carry more than one."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:899
+#: includes/metaboxes/class-metabox-registrar.php:902
 msgid "Over 125 characters. Screen readers cut long alt text off."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:900
+#: includes/metaboxes/class-metabox-registrar.php:903
 msgid "Same as the title. Describe what is in the frame instead."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:901
+#: includes/metaboxes/class-metabox-registrar.php:904
 msgid "Describes the image and fits the usual length."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:902
+#: includes/metaboxes/class-metabox-registrar.php:905
 msgid "A camera default. Rename files descriptively before uploading."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:903
+#: includes/metaboxes/class-metabox-registrar.php:906
 msgid "No descriptive words. The filename is part of the image URL, so rename before uploading."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:904
+#: includes/metaboxes/class-metabox-registrar.php:907
 msgid "Only one descriptive word. Two or three that name the subject read better in the URL."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:905
+#: includes/metaboxes/class-metabox-registrar.php:908
 msgid "Nothing in common with the title, alt text or caption, so it probably does not describe this photo."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:906
+#: includes/metaboxes/class-metabox-registrar.php:909
 msgid "Descriptive words in the image URL."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:907
+#: includes/metaboxes/class-metabox-registrar.php:910
 msgid "No filename available for this item."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:908
+#: includes/metaboxes/class-metabox-registrar.php:911
 msgid "Empty. The title is the fallback when there is no alt text."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:909
+#: includes/metaboxes/class-metabox-registrar.php:912
 msgid "Still the filename WordPress filled in. Write a readable title."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:910
+#: includes/metaboxes/class-metabox-registrar.php:913
 msgid "Readable title set."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:911
+#: includes/metaboxes/class-metabox-registrar.php:914
 msgid "Empty. Captions show in the Lightbox and add context around the image."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:912
+#: includes/metaboxes/class-metabox-registrar.php:915
 msgid "Caption set."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:913
+#: includes/metaboxes/class-metabox-registrar.php:916
 msgid "Empty. Room for the longer context a caption cannot hold."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:914
+#: includes/metaboxes/class-metabox-registrar.php:917
 msgid "Description set."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:915
+#: includes/metaboxes/class-metabox-registrar.php:918
 msgid "Empty. A credit keeps attribution attached to the image."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:916
+#: includes/metaboxes/class-metabox-registrar.php:919
 msgid "Taken from the EXIF copyright field."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:917
+#: includes/metaboxes/class-metabox-registrar.php:920
 msgid "Credit set."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:918
+#: includes/metaboxes/class-metabox-registrar.php:921
 msgid "Heavy for a gallery image. Large files slow the page on mobile."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:919
+#: includes/metaboxes/class-metabox-registrar.php:922
 msgid "Larger than most screens need. Resize before uploading."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:920
+#: includes/metaboxes/class-metabox-registrar.php:923
 msgid "Sensible size for the web."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:921
+#: includes/metaboxes/class-metabox-registrar.php:924
 msgid "File size not available for this item."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:922
+#: includes/metaboxes/class-metabox-registrar.php:925
 msgid "What the gallery emits"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:923
+#: includes/metaboxes/class-metabox-registrar.php:926
 msgid "The values this image renders with on the frontend."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:924
+#: includes/metaboxes/class-metabox-registrar.php:927
 msgid "From Alt Text"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:925
+#: includes/metaboxes/class-metabox-registrar.php:928
 msgid "From Title, because Alt Text is empty"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:926
+#: includes/metaboxes/class-metabox-registrar.php:929
 msgid "Empty, because Alt Text and Title are both unset"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:927
+#: includes/metaboxes/class-metabox-registrar.php:930
 msgid "In the image URL"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:928
+#: includes/metaboxes/class-metabox-registrar.php:931
 msgid "Doing this by hand for every photo adds up. Pro writes alt text and titles for a whole gallery in one pass, then marks each image up with structured data and lists it in an XML sitemap so it can rank on its own."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:929
+#: includes/metaboxes/class-metabox-registrar.php:932
 msgid "Smart location suggestions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:930
+#: includes/metaboxes/class-metabox-registrar.php:933
 msgid "with map integration"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:931
+#: includes/metaboxes/class-metabox-registrar.php:934
 #: assets/admin/src/components/item-edit-modal/tabs/TabPeople.jsx:91
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:188
 msgid "AI Facial Recognition"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:932
+#: includes/metaboxes/class-metabox-registrar.php:935
 msgid "- automatically detect and tag people"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:935
+#: includes/metaboxes/class-metabox-registrar.php:938
 msgid "Per-image EXIF overrides"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:936
+#: includes/metaboxes/class-metabox-registrar.php:939
 msgid "Add tags..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:937
+#: includes/metaboxes/class-metabox-registrar.php:940
 msgid "Add people..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:938
+#: includes/metaboxes/class-metabox-registrar.php:941
 msgid "Add location..."
 msgstr ""
 
 #. translators: 1: number of generated image sizes, 2: total number of registered image sizes.
-#: includes/metaboxes/class-metabox-registrar.php:941
+#: includes/metaboxes/class-metabox-registrar.php:944
 #, php-format
 msgid "%1$s of %2$s sizes available"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:942
+#: includes/metaboxes/class-metabox-registrar.php:945
 msgid "Size variants are only generated for images."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:943
+#: includes/metaboxes/class-metabox-registrar.php:946
 msgid "Not generated"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:944
+#: includes/metaboxes/class-metabox-registrar.php:947
 msgid "File missing"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:945
+#: includes/metaboxes/class-metabox-registrar.php:948
 msgid "Source too small"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:946
+#: includes/metaboxes/class-metabox-registrar.php:949
 msgid "cropped"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:948
+#: includes/metaboxes/class-metabox-registrar.php:951
 msgid "WordPress"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:950
+#: includes/metaboxes/class-metabox-registrar.php:953
 msgid "Copy URL"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:951
+#: includes/metaboxes/class-metabox-registrar.php:954
 msgid "Open in new tab"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:952
+#: includes/metaboxes/class-metabox-registrar.php:955
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:308
 msgid "Regenerate thumbnails"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:953
+#: includes/metaboxes/class-metabox-registrar.php:956
 msgid "Image URL copied"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:954
+#: includes/metaboxes/class-metabox-registrar.php:957
 msgid "Item Interactions"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:956
+#: includes/metaboxes/class-metabox-registrar.php:959
 msgid "URL to redirect to when this item is clicked."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:957
+#: includes/metaboxes/class-metabox-registrar.php:960
 #: assets/admin/plain/render-settings/renderBulkModal.js:155
 msgid "Link Target"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:958
+#: includes/metaboxes/class-metabox-registrar.php:961
 msgid "How the external link should open."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:959
+#: includes/metaboxes/class-metabox-registrar.php:962
 msgid "Use Gallery Default"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:962
+#: includes/metaboxes/class-metabox-registrar.php:965
 msgid "External URLs are not in use"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:963
+#: includes/metaboxes/class-metabox-registrar.php:966
 msgid "This gallery does not open items using their external URL, so the link below is saved but never followed. Set Item Click Behavior to External URL in the gallery settings to turn it on."
 msgstr ""
 
@@ -6307,10 +6320,6 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/class-preview-renderer.php:212
 msgid "Add images, videos, or other media so this gallery has something to display."
-msgstr ""
-
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
-msgid "Add items"
 msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:80
