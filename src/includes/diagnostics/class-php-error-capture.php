@@ -173,6 +173,15 @@ final class PHP_Error_Capture {
 	private static function attribute( string $file, int $line ): ?array {
 		$frames = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, self::BACKTRACE_LIMIT ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- attributing an error to the calling plugin requires the stack; arguments are excluded so no values are captured.
 
+		// Frames up to the one PHP invoked at the error location belong to the
+		// error handler chain, which may include other plugins' handlers.
+		foreach ( $frames as $index => $frame ) {
+			if ( ( $frame['file'] ?? '' ) === $file && (int) ( $frame['line'] ?? 0 ) === $line ) {
+				$frames = array_slice( $frames, $index + 1 );
+				break;
+			}
+		}
+
 		array_unshift(
 			$frames,
 			array(
