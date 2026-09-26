@@ -13,6 +13,7 @@ import NumberField from './shared/NumberField.jsx';
 import Select      from './shared/Select.jsx';
 import FormField   from './shared/FormField/FormField.jsx';
 import FormFields  from './shared/FormField/FormFields.jsx';
+import { buildRestUrl } from '../utils/rest-url';
 
 function extractYouTubeId( url ) {
     if ( ! url ) return null;
@@ -301,10 +302,9 @@ const VideoEmbedModal = ( { isOpen, onClose, onAdd, onUpdate, editItem = null, s
         setResolving( true );
 
         try {
-            const restBase  = window.wpApiSettings?.root  || '/wp-json/';
             const restNonce = window.wpApiSettings?.nonce || '';
 
-            const res  = await fetch( `${ restBase }fotogrids/v1/items/resolve-embed`, {
+            const res  = await fetch( buildRestUrl( 'fotogrids/v1/items/resolve-embed' ), {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': restNonce },
                 body:    JSON.stringify( { source: canonicalSource( form.source ), url } ),

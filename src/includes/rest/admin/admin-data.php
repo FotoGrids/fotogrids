@@ -983,7 +983,8 @@ class Admin_Data {
 
 		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
 		$galleries_count = (int) $gallery_counts->publish;
-		$albums_count    = wp_count_posts( 'fotogrids_album' )->publish;
+		$album_counts    = wp_count_posts( 'fotogrids_album' );
+		$albums_count    = $album_counts->publish;
 
 		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
 		$items_count = $wpdb->get_var( "SELECT COUNT(*) FROM `{$items_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
@@ -1005,6 +1006,7 @@ class Admin_Data {
 				'galleries_published' => $galleries_count,
 				'settings_configured' => self::has_configured_settings(),
 				'albums'              => (int) $albums_count,
+				'albums_total'        => self::count_editable_posts( $album_counts ),
 				'items'               => (int) $items_count,
 				'views'               => (int) $views_count,
 				'shares'              => (int) $shares_count,
@@ -1534,6 +1536,7 @@ class Admin_Data {
 				'status'             => $post->post_status,
 				'modified'           => $post->post_modified,
 				'modified_gmt'       => $post->post_modified_gmt,
+				'modified_timestamp' => (int) get_post_timestamp( $post, 'modified' ),
 				'modified_formatted' => date_i18n( $datetime_format, strtotime( $post->post_modified ) ),
 				'edit_url'           => get_edit_post_link( $post->ID, 'raw' ),
 			);

@@ -1,0 +1,36 @@
+.fotogrids-item-edit-metadata-input {
+	display: flex;
+	gap: 4px;
+
+	.fotogrids-input-with-icon {
+		flex: 1;
+
+		input[type="text"] {
+			height: 40px;
+		}
+	}
+}
+
+.fotogrids-item-edit-autocomplete-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 12px;
+	cursor: pointer;
+	border-bottom: 1px solid #f0f0f0;
+	transition: background-color 0.2s ease;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&:hover {
+		background-color: #f6f7f7;
+	}
+}
+
+.fotogrids-item-edit-metadata-list {
+	margin: 20px 0 0;
+	display: flex;
+	gap: 8px;
+}

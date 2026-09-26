@@ -23,8 +23,8 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Persists collection settings on both the legacy `save_post` path and the
- * modern `wp_ajax_fotogrids_save_collection` path.
+ * Persists collection settings on both the `save_post` path and the
+ * `wp_ajax_fotogrids_save_collection` path.
  *
  * Owns the permission gate (`Permission_Gate::settings_cap_for`) and the
  * Edit_Gate filter; per-key (de)serialisation is delegated to
@@ -246,9 +246,8 @@ final class Collection_Save_Pipeline {
 	 * @return array{settings: array<string,mixed>, gated: array<int,array<string,mixed>>, skipped_for_permissions?: string[]}
 	 */
 	private static function persist_settings_with_gate( int $post_id, array $request_data ): array {
-		// Use gallery defaults as the iteration source - they are a superset
-		// of album defaults for setting keys. This mirrors the legacy
-		// behaviour of Meta_Boxes::save_collection_settings_with_gate.
+		// Gallery defaults are the iteration source: their setting keys are a
+		// superset of the album defaults.
 		$defaults = Collection_Defaults::resolve_gallery();
 		$incoming = array();
 		$existing = array();

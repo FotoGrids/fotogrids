@@ -4,22 +4,20 @@
  * Manages the data-fg-media-state attribute on .fg-item elements.
  *
  * This script owns both starting and stopping the loader animations:
- *  1. For every gallery (initial DOM, DOMContentLoaded, the runtime's
- *     onGallery hook, and the MutationObserver for dynamic inserts) it starts
- *     the WAAPI loader animation on each .fg-item's loader svg, keyed by the
- *     gallery's data-fg-loading-icon, and stores the handles in
+ *  1. For every collection (initial DOM, DOMContentLoaded, and the runtime's
+ *     onCollection hook, which also reports collections inserted later) it
+ *     starts the WAAPI loader animation on each .fg-item's loader svg, keyed
+ *     by the collection's data-fg-loading-icon, and stores the handles in
  *     window.fgLoaderHandles (a WeakMap keyed by .fg-item).
- *  2. Wire load/error listeners on every <img> inside each gallery.
+ *  2. Wire load/error listeners on every <img> inside each collection, and on
+ *     the items announced by fotogrids:items_inserted (pagination, random
+ *     re-sort).
  *  3. When an image settles, cancel its loader's WAAPI handles and set
  *     data-fg-media-state="loaded" so CSS hides the loader and reveals the
  *     image.
  *
- * Animations were previously started by an inline <script> emitted inside the
- * gallery markup (Loading_Icon::html_after). That script was removed so the
- * markup can pass through wp_kses(); starting the animations here from the
- * onGallery hook is the runtime-contract-compliant replacement. The icon map
- * (window.fotogridsLoadingIcons) is published via wp_add_inline_script before
- * this file, so it is always defined when the passes below run.
+ * The icon map (window.fotogridsLoadingIcons) is published via
+ * wp_add_inline_script before this file runs.
  *
  * Individually per image, so heavy galleries reveal each thumbnail as it
  * arrives. Pointer-events on the clickable wrapper (<a>) are blocked via CSS
@@ -35,10 +33,7 @@
     const STATE_LOADED = 'loaded';
 
     /**
-     * Returns the global WeakMap where inline scripts store animation handles.
-     * Creates it if it doesn't exist yet (handles the race where loading-icon.js
-     * evaluates before a gallery's inline script, which shouldn't happen in
-     * footer-script placement but is defensive).
+     * Returns the global WeakMap of animation handles, creating it on first use.
      *
      * @returns {WeakMap<Element, Array>}
      */
@@ -140,8 +135,7 @@
 
     /**
      * Starts loader animations for every item in a collection, using the icon
-     * configured on that collection. Replaces the per-gallery inline <script>
-     * that Loading_Icon::html_after used to emit.
+     * configured on that collection.
      *
      * @param {Element} container A .fotogrids-collection element.
      */
@@ -158,18 +152,9 @@
     /**
      * Wires load/error listeners onto a single <img> element.
      *
-     * If the image is already complete (cached hit or footer-script timing),
-     * marks it loaded immediately. The inline per-gallery script has already
-     * started the animation, so cancelling here is safe - the animation ran
-     * for 0ms and the user sees a clean instant reveal.
-     *
-     * Callers that want already-complete images to be revealed progressively
-     * (initial-load pass) pass `deferImmediate: true`, which schedules the
-     * markLoaded call onto its own animation frame. Per-item callers (the
-     * MutationObserver path for paginated arrivals) pass nothing - images
-     * inserted dynamically aren't complete yet, and even when they cache-hit
-     * they're spaced out across separate insertions, so deferring would just
-     * add latency.
+     * If the image is already complete, marks it loaded immediately. The initial
+     * pass sets `deferImmediate: true` to schedule markLoaded on its own animation
+     * frame so cached images reveal progressively; dynamic inserts pass nothing.
      *
      * @param {HTMLImageElement} img
      * @param {{ deferImmediate?: boolean }} [opts]
@@ -186,14 +171,8 @@
         // (complete but no natural size). Both go through markLoaded.
         if ( img.complete ) {
             if ( deferImmediate ) {
-                // Don't synchronously cancel the loader animation that the
-                // inline html_after script just started. We need at least
-                // one paint between animation start and animation cancel
-                // for the user to see the loader. Without this, the entire
-                // initial-load wireGallery loop runs to completion before
-                // the browser paints anything, batching all images into a
-                // single reveal AND cancelling every animation before it
-                // ever ran a visible frame.
+                // Defer to the next frame so the loader paints at least once and
+                // the initial pass does not reveal every cached image in one batch.
                 requestAnimationFrame( function () { markLoaded( item ); } );
             } else {
                 markLoaded( item );
@@ -210,14 +189,9 @@
         img.addEventListener( 'load',  onSettle );
         img.addEventListener( 'error', onSettle );
 
-        // Race guard: the image can finish loading in the window between the
-        // img.complete check above and addEventListener here - its load event
-        // then fires with no listener attached and is lost forever, leaving
-        // the item stuck in data-fg-media-state="loading". This is easy to hit
-        // on pages where other work (lazy-load wiring, the image-zoom lens's
-        // full-size background fetch, watermark URL rewrites) shifts decode
-        // timing. Re-check after binding: if it already completed, settle now.
-        // onSettle removes its own listeners, so this can't double-fire.
+        // Re-check after binding: the image may have finished between the complete
+        // check and addEventListener, which would leave it stuck in "loading".
+        // onSettle removes its own listeners, so this cannot double-fire.
         if ( img.complete ) {
             onSettle();
         }
@@ -230,20 +204,11 @@
      *
      * Two modes:
      *
-     *   - INITIAL pass (init() → wireGallery): every image is wired with
-     *     deferImmediate=true AND staggered across animation frames so
-     *     already-complete images reveal one per frame instead of all at
-     *     once. This is the only path that runs against the parser-painted
-     *     initial slice, where many images may already be cached/complete
-     *     by footer-script time. Without staggering, the synchronous loop
-     *     locks the main thread and the browser flushes every
-     *     data-fg-media-state="loaded" mutation in a single paint, which
-     *     looks (and is) batched.
+     *   - Initial pass (init() → wireGallery): images are wired with
+     *     deferImmediate=true and staggered across animation frames, so cached
+     *     images reveal progressively instead of in one batched paint.
      *
-     *   - DYNAMIC pass (MutationObserver → wireGallery for late-inserted
-     *     wrappers, or wireImage for a single .fg-item arrival): no
-     *     staggering. Inserted items aren't complete yet, so the load
-     *     listener path handles streaming naturally.
+     *   - Dynamic pass: no staggering; inserted images are not complete yet.
      *
      * @param {Element} container A .fotogrids-collection element.
      * @param {{ initial?: boolean }} [opts]
@@ -268,10 +233,7 @@
         // images progressively as their markLoaded mutation lands.
         let i = 0;
         function step() {
-            // Process a small batch per frame so very large galleries don't
-            // take forever to finish initial wiring on slow devices. One
-            // image per frame would push a 60-image gallery to ~1s of frames
-            // even if every image is already loaded.
+            // Small batches per frame keep large galleries from wiring for seconds.
             const BATCH = 4;
             const end = Math.min( i + BATCH, imgs.length );
             for ( ; i < end; i++ ) {
@@ -301,84 +263,60 @@
     }
 
     /**
-     * MutationObserver - handles galleries inserted after page load
-     * (album AJAX loads, password-unlock swaps, dynamic insertions).
+     * Starts the loader animation and wires the image of a single .fg-item
+     * added to an existing collection.
      *
-     * Dynamically inserted items don't have a prior inline script, so
-     * we start animations here for those items.
+     * @param {Element} item       The .fg-item element.
+     * @param {Element} collection Its .fotogrids-collection element.
      */
-    function observeDynamic() {
-        if ( ! ( 'MutationObserver' in window ) ) {
+    function wireItem( item, collection ) {
+        startItemAnimation( item, resolveAnimateFn( collection ) );
+        const img = item.querySelector( '.fg-item-media img' );
+        if ( img ) {
+            wireImage( img );
+        }
+    }
+
+    /**
+     * Handles fotogrids:items_inserted, dispatched (bubbling) on a collection
+     * whenever items are appended to or swapped into it.
+     *
+     * @param {CustomEvent} event
+     */
+    function onItemsInserted( event ) {
+        const detail     = event.detail || {};
+        const collection = detail.galleryEl
+            || ( event.target instanceof Element ? event.target.closest( '.fotogrids-collection' ) : null );
+        if ( ! collection || ! Array.isArray( detail.items ) ) {
             return;
         }
 
-        const observer = new MutationObserver( function ( mutations ) {
-            mutations.forEach( function ( mutation ) {
-                mutation.addedNodes.forEach( function ( node ) {
-                    if ( ! ( node instanceof Element ) ) {
-                        return;
-                    }
-
-                    // Newly inserted gallery wrapper - start animations + wire
-                    // images inside it (wireGallery starts the animations).
-                    if ( node.matches( '.fotogrids-collection' ) ) {
-                        wireGallery( node );
-                    }
-
-                    // Galleries nested inside an inserted subtree.
-                    node.querySelectorAll( '.fotogrids-collection' ).forEach( function ( gallery ) {
-                        wireGallery( gallery );
-                    } );
-
-                    // Individual .fg-item appended into an existing gallery
-                    // (e.g. pagination load-more).
-                    if ( node.matches( '.fg-item' ) ) {
-                        const gallery = node.closest( '.fotogrids-collection' );
-                        if ( gallery ) {
-                            startItemAnimation( node, resolveAnimateFn( gallery ) );
-                        }
-                        const img = node.querySelector( '.fg-item-media img' );
-                        if ( img ) {
-                            wireImage( img );
-                        }
-                    }
-                } );
+        detail.items.forEach( function ( node ) {
+            if ( ! ( node instanceof Element ) ) {
+                return;
+            }
+            if ( node.matches( '.fg-item' ) ) {
+                wireItem( node, collection );
+            }
+            node.querySelectorAll( '.fg-item' ).forEach( function ( item ) {
+                wireItem( item, collection );
             } );
         } );
-
-        observer.observe( document.body, { childList: true, subtree: true } );
     }
 
-    // Wire galleries at several points and let idempotency sort it out.
-    //
-    // The script is enqueued in_footer:true, so USUALLY the gallery markup
-    // is already parsed and queryable when this evaluates - so we call
-    // init() synchronously, which also avoids waiting on DOMContentLoaded
-    // (that event doesn't fire until every in-flight <img> settles, which on
-    // a cold cache batches all reveals into one late paint).
-    //
-    // BUT "footer script runs after the gallery is in the DOM" is not
-    // guaranteed across all themes/page builders. With some builders the
-    // footer script can run before the builder has finished committing the
-    // gallery node, so a single synchronous init() wires nothing and the
-    // items sit forever in data-fg-media-state="loading". We therefore ALSO
-    // run init() on DOMContentLoaded and (when present) via the FotoGrids
-    // runtime's onGallery hook. Re-running is safe: wireImage() short-circuits
-    // already-loaded items and its load listener removes itself, so an item
-    // is never double-processed.
+    // Wired from several points and made safe by idempotency: synchronously (the
+    // footer script usually runs after the gallery markup), on DOMContentLoaded,
+    // and through the runtime's onCollection hook, because some page builders
+    // commit the gallery only after footer scripts have run.
     init();
     if ( document.readyState === 'loading' ) {
         document.addEventListener( 'DOMContentLoaded', init );
     }
-    if ( window.FotoGrids && typeof window.FotoGrids.onGallery === 'function' ) {
-        window.FotoGrids.onGallery( function ( galleryEl ) {
-            wireGallery( galleryEl, { initial: true } );
+    if ( window.FotoGrids && typeof window.FotoGrids.onCollection === 'function' ) {
+        window.FotoGrids.onCollection( function ( collectionEl ) {
+            wireGallery( collectionEl, { initial: true } );
         } );
     }
-    if ( document.readyState === 'loading' ) {
-        document.addEventListener( 'DOMContentLoaded', observeDynamic );
-    } else {
-        observeDynamic();
-    }
+    document.addEventListener( 'fotogrids:items_inserted', onItemsInserted );
 
 } )();

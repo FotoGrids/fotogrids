@@ -71,7 +71,7 @@
         text-align: center;
 
         .components-button {
-            margin-left: 12px;
+            margin-inline-start: 12px;
         }
     }
 
@@ -160,7 +160,7 @@
     &__badge {
         position: absolute;
         top: 8px;
-        right: 8px;
+        inset-inline-end: 8px;
         background: #1d2327;
         color: #fff;
         font-size: 10px;
@@ -435,7 +435,7 @@
     &__label {
         font-weight: 600;
         color: #1d2327;
-        margin-right: 8px;
+        margin-inline-end: 8px;
     }
 
     &__value {

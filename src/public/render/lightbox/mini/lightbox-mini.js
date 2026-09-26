@@ -41,6 +41,7 @@
      * @param {HTMLElement} contentNode The node to display (player, img, etc.).
      * @param {Object}      [options]   Options:
      *   label               - accessible dialog label.
+     *   closeLabel          - accessible label of the close button.
      *   closeButton         - show the close button (default true).
      *   clickOutsideToClose - close when the backdrop is clicked (default true).
      *   styleVars           - map of CSS custom properties set on the overlay
@@ -96,7 +97,7 @@
             closeBtn = document.createElement('button');
             closeBtn.type = 'button';
             closeBtn.className = 'fg-lb-mini-close';
-            closeBtn.setAttribute('aria-label', 'Close');
+            closeBtn.setAttribute('aria-label', opts.closeLabel);
             closeBtn.innerHTML = '&times;';
             closeBtn.addEventListener('click', close);
             stage.appendChild(closeBtn);

@@ -123,8 +123,7 @@ class Renderer {
 		$seo = \FotoGrids\Settings\SEO_Settings_Store::resolve( (int) $this->post->ID );
 
 		// Noindex chain (lowest to highest precedence):
-		//   1. legacy view settings (`noindex` / `index`) for backwards-
-		//      compatible behaviour with collections that pre-date the SEO tab
+		//   1. view settings `noindex` / `index`
 		//   2. the SEO tab's per-collection `fotogrids_noindex` toggle (true
 		//      forces noindex; false alone does NOT override a draft preview)
 		//   3. draft preview always wins - never index unsaved work
@@ -473,8 +472,8 @@ class Renderer {
 	/**
 	 * Cap a description string at a safe length for OG/social previews.
 	 *
-	 * Most platforms truncate around 200 characters in card previews. We
-	 * cap at 300 to give a generous buffer while keeping the tag small.
+	 * Most platforms truncate around 200 characters in card previews; the cap
+	 * of 300 leaves a buffer while keeping the tag small.
 	 *
 	 * @since 1.0.0
 	 * @param string $text
@@ -800,8 +799,8 @@ class Renderer {
 	 *
 	 * When sharing is enabled for the collection and the view_page
 	 * placement applies, the full resolved network set is used. Otherwise
-	 * we fall back to a copy-link-only config so every shareable page
-	 * still offers at least the copy button.
+	 * the config falls back to copy-link only, so every shareable page still
+	 * offers at least the copy button.
 	 *
 	 * @since 1.0.0
 	 * @return string
@@ -832,6 +831,8 @@ class Renderer {
 				'button_size'  => 'medium',
 			);
 		}
+
+		$config['labels'] = \FotoGrids\Render\Decorators\Sharing\Sharing_Decorator::client_labels();
 
 		$html = '<div class="fotogrids-view__share" data-fg-share-footer="'
 			. esc_attr( wp_json_encode( $config ) ) . '"></div>';
@@ -875,8 +876,8 @@ class Renderer {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		// Pre-register fotogrids-runtime so wp_localize_script can attach the
-		// shared settings payload. The runtime asset itself is enqueued by
+		// Pre-register fotogrids-runtime; Runtime_Bootstrap::localize() attaches
+		// the window.fotogrids payload to it. The runtime asset itself is enqueued by
 		// Asset_Resolver during the gallery/album render that happens inside
 		// this view page; this registration just makes the handle known.
 		wp_register_script(
@@ -888,7 +889,7 @@ class Renderer {
 		);
 
 		// Deep-linking is essential on the view page - the URL might
-		// carry ?fg-item={id} which we resolve into a lightbox open.
+		// carry ?fg-item={id}, which opens that item in the lightbox.
 		wp_enqueue_script(
 			'fotogrids-deep-linking',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/deep-linking.js',
@@ -897,12 +898,9 @@ class Renderer {
 			true
 		);
 
-		// Sharing module - needed unconditionally because the View Page
-		// footer always shows at least a copy-link button via the
-		// Sharing module's attachFooterBars() (see share_html()). The
-		// Sharing_Decorator's render-pipeline assets() only enqueues
-		// this when sharing is enabled for the gallery being rendered;
-		// here we need it regardless of the gallery's sharing setting.
+		// Sharing module - always needed, because the View Page footer shows at
+		// least a copy-link button via attachFooterBars() (see share_html()),
+		// whatever the gallery's own sharing setting.
 		wp_enqueue_style(
 			'fotogrids-sharing',
 			FOTOGRIDS_PLUGIN_URL . 'public/render/decorators/sharing/sharing.css',
@@ -953,20 +951,6 @@ class Renderer {
 			array(),
 			FOTOGRIDS_VERSION,
 			true
-		);
-
-		$sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
-
-		// window.fotogrids carries only the sharing-related deep-link
-		// settings - same shape as the public render path.
-		wp_localize_script(
-			'fotogrids-runtime',
-			'fotogrids',
-			array(
-				'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
-				'embedded_share_target' => $sharing['embedded_share_target'],
-				'restNonce'             => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
-			)
 		);
 	}
 

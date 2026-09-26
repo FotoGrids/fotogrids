@@ -10,8 +10,8 @@ window.FotoGridsSettings = window.FotoGridsSettings || {};
  * their catalog files through the `fotogrids/catalog/json_files` filter, and
  * the assembler merges them.
  *
- * The legacy approach (fetching each Free JSON file from the browser) couldn't
- * see Pro or third-party files because they live in different plugin directories.
+ * Fetching Free's JSON files from the browser would miss Pro and third-party
+ * files, which live in other plugin directories.
  *
  * @param {string} postType
  * @param {boolean} isDefaultsMode
@@ -29,9 +29,7 @@ const loadSettingsGroups = async (
 				: postType;
 
 	const restBase =
-		window.fotogridsSettings?.restUrl ||
-		window.wpApiSettings?.root ||
-		'/wp-json/';
+		window.fotogridsSettings?.restUrl || window.wpApiSettings?.root || '';
 
 	const endpoint = restBase.includes('/fotogrids/v1/')
 		? `${restBase.replace(/\/$/, '')}/admin/catalog/entries`
@@ -40,11 +38,12 @@ const loadSettingsGroups = async (
 	const separator = endpoint.includes('?') ? '&' : '?';
 	const url = `${endpoint}${separator}post_type=${encodeURIComponent(
 		normalizedPostType
-	)}`;
+	)}&_locale=user`;
 
 	try {
 		const response = await fetch(url, {
 			headers: {
+				Accept: 'application/json',
 				'X-WP-Nonce':
 					window.wpApiSettings?.nonce ||
 					window.fotogridsSettings?.restNonce ||
@@ -77,7 +76,7 @@ const loadSettingsGroups = async (
 
 /**
  * Remove tabs / subtabs / settings marked as `hidden: true` by a `hide`
- * placement. We can't remove them server-side because hidden settings still
+ * placement. They cannot be removed server-side because hidden settings still
  * need their saved values respected at render time - the assembler just tags
  * them, and the UI layer drops them here.
  */
@@ -85,7 +84,9 @@ const filterHidden = (groups) => {
 	const filtered = {};
 
 	Object.entries(groups).forEach(([tabId, tabNode]) => {
-		if (tabNode?.hidden) return;
+		if (tabNode?.hidden) {
+			return;
+		}
 
 		const clonedTab = { ...tabNode };
 
@@ -93,7 +94,9 @@ const filterHidden = (groups) => {
 			const filteredSubTabs = {};
 			Object.entries(clonedTab.subTabs).forEach(
 				([subTabId, subTabNode]) => {
-					if (subTabNode?.hidden) return;
+					if (subTabNode?.hidden) {
+						return;
+					}
 					filteredSubTabs[subTabId] =
 						filterHiddenSettings(subTabNode);
 				}
@@ -114,7 +117,9 @@ const filterHidden = (groups) => {
 };
 
 const filterHiddenSettings = (subTabNode) => {
-	if (!Array.isArray(subTabNode?.settings)) return subTabNode;
+	if (!Array.isArray(subTabNode?.settings)) {
+		return subTabNode;
+	}
 	return {
 		...subTabNode,
 		settings: subTabNode.settings.filter((setting) => !setting?.hidden),
@@ -126,11 +131,15 @@ const filterHiddenSettings = (subTabNode) => {
  * that shouldn't appear on the global defaults screen).
  */
 const filterForDefaultsMode = (groups, isDefaultsMode) => {
-	if (!isDefaultsMode) return groups;
+	if (!isDefaultsMode) {
+		return groups;
+	}
 
 	const filtered = {};
 	Object.entries(groups).forEach(([tabId, tabNode]) => {
-		if (tabNode?.hideInDefaults === true) return;
+		if (tabNode?.hideInDefaults === true) {
+			return;
+		}
 		filtered[tabId] = tabNode;
 	});
 

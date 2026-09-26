@@ -11,6 +11,8 @@
 @use "./fg-modal/fg-modal.scss" as *;
 @use "./SearchBar/SearchBar.scss" as *;
 @use "./item-edit/item-edit.scss" as *;
+@use "./pro-notice/pro-notice.scss" as *;
+@use "./media-preview/media-preview.scss" as *;
 @use "./video-embed/video-embed.scss" as *;
 @use "./media-import/media-import.scss" as *;
 @use "./blocks.scss" as *;
@@ -106,8 +108,8 @@
 			content: "";
 			position: absolute;
 			bottom: -1px;
-			left: 0;
-			right: 0;
+			inset-inline-start: 0;
+			inset-inline-end: 0;
 			height: 1px;
 			background: $tabbar-bg-white;
 		}
@@ -171,7 +173,7 @@
 .fotogrids-add-new-menu {
 	position: absolute;
 	top: 100%;
-	left: 0;
+	inset-inline-start: 0;
 	margin-top: 4px;
 	background: $tabbar-bg-white;
 	border: 1px solid $tabbar-border-light;
@@ -198,7 +200,7 @@
 	border: none;
 	border-bottom: 1px solid $tabbar-border-light;
 	background: none;
-	text-align: left;
+	text-align: start;
 	cursor: pointer;
 	transition: background-color 0.2s ease;
 	position: relative;
@@ -261,10 +263,39 @@
 .fotogrids-preview-placeholder {
 	padding: 40px;
 	text-align: center;
-	background: #f9f9f9;
-	border: 2px dashed var(--fg-border-secondary);
-	border-radius: 8px;
-	color: #666;
+	background: var(--fg-background-secondary);
+	border: 1px dashed var(--fg-border-secondary);
+	color: var(--fg-text-tertiary);
+}
+
+.fotogrids-preview-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+
+	&__art {
+		display: grid;
+		grid-template-columns: repeat(3, 32px);
+		grid-auto-rows: 32px;
+		gap: 4px;
+		margin-bottom: 16px;
+
+		span {
+			border: 1px dashed var(--fg-border-secondary);
+			border-radius: 4px;
+		}
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 15px;
+		color: var(--fg-text-primary);
+	}
+
+	&__text {
+		margin: 0 0 16px;
+	}
 }
 
 .fotogrids-items-bulk-f {
@@ -288,8 +319,8 @@
 body[class*="fotogrids_page_"],
 body[class*="post-type-fotogrids_"] {
 	#wpcontent {
-		padding-left: 0;
-		padding-right: 0;
+		padding-inline-start: 0;
+		padding-inline-end: 0;
 		position: relative;
 	}
 
@@ -370,7 +401,7 @@ body[class*="post-type-fotogrids_"] {
 		content: "⟳";
 		display: inline-block;
 		animation: spin 1s linear infinite;
-		margin-right: 0.5rem;
+		margin-inline-end: 0.5rem;
 		font-size: 1.2rem;
 	}
 }

@@ -104,8 +104,8 @@ function AlphaColorPicker({
 			? popoverRef.current.getBoundingClientRect().width
 			: fallbackWidth;
 		// Only used to decide above-vs-below placement. The actual vertical
-		// anchor below does NOT depend on this - we anchor at the trigger top
-		// and use transform: translateY(-100%) so the gap is always exactly
+		// anchor below does NOT depend on this - the popover anchors at the trigger
+		// top and uses transform: translateY(-100%), so the gap is always exactly
 		// desiredMargin regardless of the popover's rendered height.
 		const measuredHeight = popoverRef.current
 			? popoverRef.current.getBoundingClientRect().height
@@ -115,8 +115,11 @@ function AlphaColorPicker({
 			Math.max(measuredWidth, triggerRect.width),
 			Math.max(0, viewportWidth - sidePadding * 2)
 		);
+		const isRtl =
+			window.getComputedStyle(triggerRef.current).direction === 'rtl';
+		const anchorLeft = isRtl ? triggerRect.right - width : triggerRect.left;
 		const left = Math.min(
-			Math.max(sidePadding, triggerRect.left),
+			Math.max(sidePadding, anchorLeft),
 			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
 
@@ -151,8 +154,14 @@ function AlphaColorPicker({
 	}, []);
 
 	useEffect(() => {
-		if (!open || !popoverPosition || !popoverRef.current) return;
-		if (pickerRef.current) return;
+		if (
+			!open ||
+			!popoverPosition ||
+			!popoverRef.current ||
+			pickerRef.current
+		) {
+			return;
+		}
 
 		const instance = window.FGColorPicker.create({
 			value,
@@ -169,8 +178,9 @@ function AlphaColorPicker({
 	}, [open, popoverPosition, value, isDisabled, updateSetting, setting.key]);
 
 	useEffect(() => {
-		if (open) return;
-		if (!pickerRef.current) return;
+		if (open || !pickerRef.current) {
+			return;
+		}
 
 		pickerRef.current.destroy();
 		pickerRef.current = null;
@@ -178,7 +188,9 @@ function AlphaColorPicker({
 
 	useEffect(
 		() => () => {
-			if (!pickerRef.current) return;
+			if (!pickerRef.current) {
+				return;
+			}
 			pickerRef.current.destroy();
 			pickerRef.current = null;
 		},
@@ -195,7 +207,9 @@ function AlphaColorPicker({
 	}, [open, value]);
 
 	useEffect(() => {
-		if (!open) return;
+		if (!open) {
+			return;
+		}
 
 		const handleClick = (e) => {
 			const clickedInsideTrigger =
@@ -208,7 +222,9 @@ function AlphaColorPicker({
 			}
 		};
 		const handleKey = (e) => {
-			if (e.key === 'Escape') setOpen(false);
+			if (e.key === 'Escape') {
+				setOpen(false);
+			}
 		};
 		const handleLayoutShift = () => {
 			updatePopoverPosition();
@@ -232,7 +248,9 @@ function AlphaColorPicker({
 	const [focused, setFocused] = useState(false);
 
 	const toggleOpen = useCallback(() => {
-		if (!isDisabled) setOpen((o) => !o);
+		if (!isDisabled) {
+			setOpen((o) => !o);
+		}
 	}, [isDisabled]);
 
 	const inputClassName = [
@@ -366,16 +384,16 @@ function AlphaColorPicker({
 }
 
 function isCompleteColor(str) {
-	if (!str || typeof str !== 'string') return false;
+	if (!str || typeof str !== 'string') {
+		return false;
+	}
 	const s = str.trim();
-	if (
+	return (
 		/^#[0-9A-Fa-f]{3}$/.test(s) ||
 		/^#[0-9A-Fa-f]{6}$/.test(s) ||
-		/^#[0-9A-Fa-f]{8}$/.test(s)
-	)
-		return true;
-	if (/^rgba?\([^)]+\)$/.test(s)) return true;
-	if (/^hsla?\([^)]+\)$/.test(s)) return true;
-	if (/^[a-zA-Z]+$/.test(s)) return true;
-	return false;
+		/^#[0-9A-Fa-f]{8}$/.test(s) ||
+		/^rgba?\([^)]+\)$/.test(s) ||
+		/^hsla?\([^)]+\)$/.test(s) ||
+		/^[a-zA-Z]+$/.test(s)
+	);
 }

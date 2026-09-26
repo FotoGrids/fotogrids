@@ -3,12 +3,12 @@
  * Plugin Name: FotoGrids
  * Plugin URI: https://www.fotogrids.com
  * Description: The most robust and beautiful WordPress gallery plugin. Create stunning photo galleries and albums with drag-and-drop ease, modern responsive layouts, powerful lightbox, and detailed analytics. Perfect for photographers, artists, and businesses.
- * Version: 1.1.2
+ * Version: 1.1.3
  * Author: FotoGrids
  * Author URI: https://www.fotogrids.com/about/
  * Text Domain: fotogrids
  * Domain Path: /languages
- * Requires at least: 6.1
+ * Requires at least: 6.3
  * Tested up to: 7.1
  * Requires PHP: 7.4
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'FOTOGRIDS_VERSION', '1.1.2' );
+define( 'FOTOGRIDS_VERSION', '1.1.3' );
 define( 'FOTOGRIDS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FOTOGRIDS_PLUGIN_FILE', __FILE__ );
@@ -82,6 +82,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-watermark-settings-
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-seo-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-view-settings-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-edit-gate.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/settings/class-collection-defaults-seeder.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-request-validator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-preview-endpoint.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/rest/admin/class-catalog-field-states-endpoint.php';
@@ -102,6 +103,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-repository
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-items.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-embed-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-strings.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-registrar.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoints.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-collection-save-pipeline.php';
@@ -142,6 +144,7 @@ function fotogrids_init() {
 	FotoGrids\FotoGrids_Cache::init();
 	FotoGrids\License_Manager::init();
 	FotoGrids\Image_Size_Manager::init();
+	FotoGrids\Settings\Collection_Defaults_Seeder::init();
 	FotoGrids\Usage_Reporter::init();
 	FotoGrids\Watermark\Watermark_Hooks::init();
 
@@ -240,10 +243,10 @@ add_action(
  * Plugin activation check
  */
 function fotogrids_activation_check() {
-	if ( version_compare( get_bloginfo( 'version' ), '6.1', '<' ) ) {
+	if ( version_compare( get_bloginfo( 'version' ), '6.3', '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
-			esc_html__( 'FotoGrids requires WordPress version 6.1 or higher.', 'fotogrids' ),
+			esc_html__( 'FotoGrids requires WordPress version 6.3 or higher.', 'fotogrids' ),
 			esc_html__( 'Plugin Activation Error', 'fotogrids' ),
 			array( 'back_link' => true )
 		);

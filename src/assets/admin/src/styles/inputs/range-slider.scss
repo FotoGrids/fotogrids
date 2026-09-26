@@ -163,6 +163,18 @@ input[type="number"].fotogrids-range-number-input {
 	}
 }
 
+body.rtl .fotogrids-range-slider-min::-webkit-slider-runnable-track {
+	background: linear-gradient(
+		to left,
+		var(--fg-border-primary) 0%,
+		var(--fg-border-primary) var(--min-percent, 0%),
+		var(--fg-blue, var(--fg-blue)) var(--min-percent, 0%),
+		var(--fg-blue, var(--fg-blue)) var(--max-percent, 100%),
+		var(--fg-border-primary) var(--max-percent, 100%),
+		var(--fg-border-primary) 100%
+	);
+}
+
 .fotogrids-range-slider-max {
 	z-index: 2;
 
@@ -185,8 +197,8 @@ input[type="number"].fotogrids-range-number-input {
 		&::before {
 			content: "";
 			position: absolute;
-			left: 0;
-			right: 0;
+			inset-inline-start: 0;
+			inset-inline-end: 0;
 			top: 50%;
 			transform: translateY(-50%);
 			height: 4px;
@@ -198,8 +210,8 @@ input[type="number"].fotogrids-range-number-input {
 		&::after {
 			content: "";
 			position: absolute;
-			left: var(--min-percent, 0%);
-			right: calc(100% - var(--max-percent, 100%));
+			inset-inline-start: var(--min-percent, 0%);
+			inset-inline-end: calc(100% - var(--max-percent, 100%));
 			top: 50%;
 			transform: translateY(-50%);
 			height: 4px;
@@ -269,7 +281,8 @@ input[type="number"].fotogrids-range-number-input {
 		width: 72px;
 		max-width: 100%;
 		height: 40px;
-		padding: 0 32px 0 12px;
+		padding-block: 0;
+		padding-inline: 12px 32px;
 		border: 1px solid var(--fg-border-primary);
 		border-radius: 4px;
 		background: white;
@@ -300,12 +313,12 @@ input[type="number"].fotogrids-range-number-input {
 
 	&__value {
 		flex: 1;
-		text-align: left;
+		text-align: start;
 	}
 
 	&__arrow {
 		position: absolute;
-		right: 8px;
+		inset-inline-end: 8px;
 		font-size: 10px;
 		color: #646970;
 		transition: transform 0.2s ease;
@@ -351,7 +364,7 @@ input[type="number"].fotogrids-range-number-input {
 		background: white;
 		font-size: 13px;
 		color: #2c3338;
-		text-align: left;
+		text-align: start;
 		cursor: pointer;
 		display: flex;
 		align-items: center;

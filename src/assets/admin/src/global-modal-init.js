@@ -49,12 +49,18 @@ function initializeModalRoot() {
 }
 
 function initializeUpgradeModal() {
-	if (window.fotogridsIsPro === true) return;
-	if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage)
+	if (
+		window.fotogridsIsPro === true ||
+		!window.fotogridsAdmin ||
+		!window.fotogridsAdmin.isFotoGridsPage
+	) {
 		return;
+	}
 
 	const container = document.getElementById(UPGRADE_MODAL_ID);
-	if (!container) return;
+	if (!container) {
+		return;
+	}
 
 	mountReactRoot(container, React.createElement(UpgradeModal));
 }
@@ -73,8 +79,13 @@ function renderWhatsNew(isOpen) {
 function initializeWhatsNew() {
 	document.addEventListener('click', (event) => {
 		const target = event.target;
-		if (!target || typeof target.closest !== 'function') return;
-		if (!target.closest(WHATS_NEW_TRIGGER)) return;
+		if (
+			!target ||
+			typeof target.closest !== 'function' ||
+			!target.closest(WHATS_NEW_TRIGGER)
+		) {
+			return;
+		}
 
 		event.preventDefault();
 		renderWhatsNew(true);

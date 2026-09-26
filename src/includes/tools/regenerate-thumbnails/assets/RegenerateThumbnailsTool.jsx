@@ -293,22 +293,55 @@ const RegenerateThumbnailsTool = () => {
         setActiveTab('log');
     }, []);
 
+    const fetchAllItems = useCallback(async () => {
+        const all = [];
+        let current = 1;
+        let pages;
+
+        do {
+            const params = new URLSearchParams({
+                include_unused: includeUnused ? '1' : '0',
+                page: String(current),
+                per_page: '200',
+            });
+            const data = await apiFetch({
+                path: `/fotogrids/v1/admin/tools/regenerate-thumbnails/status?${params.toString()}`,
+            });
+            all.push(...(data.items || []));
+            pages = data.total_pages || 1;
+            current++;
+        } while (current <= pages && !cancelledRef.current);
+
+        return all;
+    }, [includeUnused]);
+
     const handleRegenAll = useCallback(async () => {
         if (items.length === 0) return;
         revealLogAndStart();
         cancelledRef.current = false;
         setRegenActive(true);
-        setRegenProgress({ done: 0, total: items.length });
+        setRegenProgress({ done: 0, total });
 
-        for (let i = 0; i < items.length; i++) {
+        let queue;
+        try {
+            queue = await fetchAllItems();
+        } catch (err) {
+            setError(err?.message || __('Failed to load status.', 'fotogrids'));
+            setRegenActive(false);
+            return;
+        }
+
+        setRegenProgress({ done: 0, total: queue.length });
+
+        for (let i = 0; i < queue.length; i++) {
             if (cancelledRef.current) break;
-            await regenerateOne(items[i]);
-            setRegenProgress({ done: i + 1, total: items.length });
+            await regenerateOne(queue[i]);
+            setRegenProgress({ done: i + 1, total: queue.length });
         }
 
         setRegenActive(false);
         setRegenItemId(null);
-    }, [items, regenerateOne, revealLogAndStart]);
+    }, [items, total, fetchAllItems, regenerateOne, revealLogAndStart]);
 
     const handleRegenSingle = useCallback(async (item) => {
         revealLogAndStart();
