@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T09:35:12+00:00\n"
+"POT-Creation-Date: 2026-09-26T11:34:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -91,7 +91,7 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:166
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1533
+#: includes/rest/admin/admin-data.php:1535
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:421
 #: assets/admin/src/components/pages/TemplatesPage.jsx:428
@@ -246,7 +246,7 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:167
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1533
+#: includes/rest/admin/admin-data.php:1535
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:422
 #: assets/admin/src/components/pages/TemplatesPage.jsx:427
@@ -258,10 +258,12 @@ msgid "Gallery"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:231
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:105
 msgid "Recently Edited"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:254
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:88
 msgid "No recently edited galleries or albums."
 msgstr ""
 
@@ -3974,12 +3976,12 @@ msgstr ""
 #: includes/rest/admin/admin-data.php:297
 #: includes/rest/admin/admin-data.php:866
 #: includes/rest/admin/admin-data.php:979
-#: includes/rest/admin/admin-data.php:1141
-#: includes/rest/admin/admin-data.php:1205
-#: includes/rest/admin/admin-data.php:1289
-#: includes/rest/admin/admin-data.php:1347
-#: includes/rest/admin/admin-data.php:1472
-#: includes/rest/admin/admin-data.php:1553
+#: includes/rest/admin/admin-data.php:1143
+#: includes/rest/admin/admin-data.php:1207
+#: includes/rest/admin/admin-data.php:1291
+#: includes/rest/admin/admin-data.php:1349
+#: includes/rest/admin/admin-data.php:1474
+#: includes/rest/admin/admin-data.php:1555
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -6180,7 +6182,7 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:588
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:218
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:51
 msgid "FotoGrids Album"
@@ -6247,13 +6249,14 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:389
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:482
 msgid "Select an album to display."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:870
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:252
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:52
 msgid "FotoGrids Gallery"
@@ -6290,7 +6293,8 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:671
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:764
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -6815,24 +6819,24 @@ msgstr ""
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1427
+#: includes/rest/admin/admin-data.php:1429
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1452
+#: includes/rest/admin/admin-data.php:1454
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/rest/admin/admin-data.php:1531
+#: includes/rest/admin/admin-data.php:1533
 #: assets/admin/src/components/pages/StatsPage.jsx:39
 msgid "Untitled Album"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1531
+#: includes/rest/admin/admin-data.php:1533
 #: assets/admin/src/components/pages/StatsPage.jsx:38
 msgid "Untitled Gallery"
 msgstr ""
@@ -8242,7 +8246,8 @@ msgid "Choose image"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderImagePicker.js:134
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:395
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:677
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:162
 msgid "Loading preview…"
 msgstr ""
@@ -8403,29 +8408,29 @@ msgstr ""
 msgid "or drag and drop files here"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:34
+#: assets/admin/src/components/dashboard/Checklist.jsx:33
 msgid "Plugin installed and activated"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:38
+#: assets/admin/src/components/dashboard/Checklist.jsx:37
 msgid "Dashboard page visited"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:42
+#: assets/admin/src/components/dashboard/Checklist.jsx:41
 #: assets/admin/src/components/setup-wizard/StepCreateGallery.jsx:113
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:92
 msgid "Create your first gallery"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:47
+#: assets/admin/src/components/dashboard/Checklist.jsx:46
 msgid "Configure display settings"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:52
+#: assets/admin/src/components/dashboard/Checklist.jsx:51
 msgid "Publish gallery on your site"
 msgstr ""
 
-#: assets/admin/src/components/dashboard/Checklist.jsx:65
+#: assets/admin/src/components/dashboard/Checklist.jsx:79
 msgid "Complete Your Setup"
 msgstr ""
 
@@ -8455,7 +8460,7 @@ msgid "Create Gallery"
 msgstr ""
 
 #: assets/admin/src/components/dashboard/FileUploader.jsx:46
-#: assets/admin/src/components/pages/Dashboard.jsx:64
+#: assets/admin/src/components/pages/Dashboard.jsx:68
 msgid "Failed to create gallery."
 msgstr ""
 
@@ -8547,6 +8552,28 @@ msgstr ""
 
 #: assets/admin/src/components/dashboard/ProFeatures.jsx:45
 msgid "Plus many more powerful features designed to save time, optimize performance, and help you grow."
+msgstr ""
+
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:14
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:103
+msgid "Draft"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:15
+#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:105
+msgid "Private"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:82
+msgid "Loading recently edited galleries and albums"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:110
+msgid "View all galleries"
+msgstr ""
+
+#: assets/admin/src/components/dashboard/RecentlyEdited.jsx:114
+msgid "View all albums"
 msgstr ""
 
 #: assets/admin/src/components/item-edit-modal/tabs/TabLocation.jsx:26
@@ -8978,8 +9005,12 @@ msgstr ""
 msgid "Merge"
 msgstr ""
 
-#: assets/admin/src/components/pages/Dashboard.jsx:61
+#: assets/admin/src/components/pages/Dashboard.jsx:65
 msgid "Gallery created successfully!"
+msgstr ""
+
+#: assets/admin/src/components/pages/Dashboard.jsx:82
+msgid "Loading setup progress"
 msgstr ""
 
 #: assets/admin/src/components/pages/LibraryPage.jsx:62
@@ -10795,12 +10826,14 @@ msgstr ""
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This gallery has nothing to preview yet."
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:425
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:443
+msgid "This album has nothing to preview yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-msgid "This album has nothing to preview yet."
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:707
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:725
+msgid "This gallery has nothing to preview yet."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:121
@@ -10956,14 +10989,6 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:65
 msgid "Last modified:"
-msgstr ""
-
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:103
-msgid "Draft"
-msgstr ""
-
-#: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:105
-msgid "Private"
 msgstr ""
 
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:119
