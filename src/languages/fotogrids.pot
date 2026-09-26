@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T10:35:00+00:00\n"
+"POT-Creation-Date: 2026-09-26T11:24:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -2373,6 +2373,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:499
 #: includes/metaboxes/class-metabox-registrar.php:763
 #: includes/rest/metadata/library-data.php:69
+#: public/render/lightbox/classic/class-lightbox.php:225
 msgid "Location"
 msgstr ""
 
@@ -2721,6 +2722,7 @@ msgstr ""
 #: includes/catalog/catalog-strings.php:577
 #: includes/metaboxes/class-metabox-registrar.php:762
 #: includes/rest/metadata/library-data.php:59
+#: public/render/lightbox/classic/class-lightbox.php:224
 msgid "People"
 msgstr ""
 
@@ -3406,6 +3408,7 @@ msgstr ""
 #: includes/metaboxes/class-metabox-registrar.php:761
 #: includes/rest/metadata/library-data.php:50
 #: public/render/filters/sources/tags/class-tags-filter-source.php:46
+#: public/render/lightbox/classic/class-lightbox.php:223
 #: includes/tools/import-export/assets/ImportExportTool.jsx:40
 #: includes/tools/import-export/assets/ImportExportTool.jsx:109
 msgid "Tags"
@@ -3665,6 +3668,8 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:803
 #: includes/metaboxes/class-metabox-registrar.php:818
+#: public/render/lightbox/classic/class-lightbox.php:218
+#: public/render/video/class-video-lightbox-mini.php:51
 msgid "Video"
 msgstr ""
 
@@ -4572,6 +4577,9 @@ msgstr ""
 
 #: includes/class-upgrade-modal.php:146
 #: includes/metaboxes/class-metabox-registrar.php:756
+#: public/render/decorators/image-zoom/class-image-zoom.php:53
+#: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:47
+#: public/render/video/class-video-lightbox-mini.php:52
 #: assets/admin/src/components/shared/Modal/parts/ModalHeaderClose.jsx:22
 msgid "Close"
 msgstr ""
@@ -5401,10 +5409,12 @@ msgid "Save Changes"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:757
+#: public/render/lightbox/classic/class-lightbox.php:211
 msgid "Previous item"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:758
+#: public/render/lightbox/classic/class-lightbox.php:212
 msgid "Next item"
 msgstr ""
 
@@ -5856,6 +5866,7 @@ msgid "File Size"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:887
+#: public/render/lightbox/classic/class-lightbox.php:221
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:135
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:280
 msgid "Dimensions"
@@ -7852,6 +7863,12 @@ msgstr ""
 msgid "Focus Dim"
 msgstr ""
 
+#: public/render/decorators/image-zoom/class-image-zoom.php:52
+#: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:126
+#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:205
+msgid "Image"
+msgstr ""
+
 #: public/render/decorators/sharing/class-sharing-decorator.php:58
 msgid "X"
 msgstr ""
@@ -7877,6 +7894,7 @@ msgid "Back to %s"
 msgstr ""
 
 #: public/render/features/collection-header/class-collection-header.php:385
+#: public/render/lightbox/grid/class-lightbox-grid.php:61
 #: assets/admin/src/components/pages/SetupWizardPage.jsx:205
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:217
 msgid "Back"
@@ -7895,11 +7913,15 @@ msgid "Gallery pagination"
 msgstr ""
 
 #: public/render/features/pagination/page-buttons/class-page-buttons.php:370
+#: public/render/lightbox/grid/class-lightbox-grid.php:64
+#: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:45
 #: assets/admin/src/components/shared/Modal/parts/ModalNav.jsx:21
 msgid "Previous"
 msgstr ""
 
 #: public/render/features/pagination/page-buttons/class-page-buttons.php:377
+#: public/render/lightbox/grid/class-lightbox-grid.php:65
+#: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:46
 #: assets/admin/src/components/shared/Modal/parts/ModalNav.jsx:22
 msgid "Next"
 msgstr ""
@@ -7960,48 +7982,115 @@ msgstr ""
 msgid "Show all images"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:196
+#: public/render/lightbox/classic/class-lightbox.php:199
 msgid "Lightbox controls"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:197
+#: public/render/lightbox/classic/class-lightbox.php:200
 msgid "Close lightbox"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:198
+#: public/render/lightbox/classic/class-lightbox.php:201
 msgid "Show info panel"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:199
+#: public/render/lightbox/classic/class-lightbox.php:202
 msgid "Hide info panel"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:200
+#: public/render/lightbox/classic/class-lightbox.php:203
+#: public/render/lightbox/grid/class-lightbox-grid.php:62
 msgid "Share"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:201
+#: public/render/lightbox/classic/class-lightbox.php:204
 msgid "Enter fullscreen"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:202
+#: public/render/lightbox/classic/class-lightbox.php:205
 msgid "Exit fullscreen"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:203
+#: public/render/lightbox/classic/class-lightbox.php:206
 msgid "Zoom in"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:204
+#: public/render/lightbox/classic/class-lightbox.php:207
 msgid "Zoom out"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:205
+#: public/render/lightbox/classic/class-lightbox.php:208
 msgid "Pause auto-advance"
 msgstr ""
 
-#: public/render/lightbox/classic/class-lightbox.php:206
+#: public/render/lightbox/classic/class-lightbox.php:209
 msgid "Resume auto-advance"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:210
+msgid "Gallery lightbox"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:213
+msgid "Item navigation"
+msgstr ""
+
+#. translators: 1: item position, 2: total number of items.
+#: public/render/lightbox/classic/class-lightbox.php:215
+#, php-format
+msgid "Item %1$d of %2$d"
+msgstr ""
+
+#. translators: %d: item position.
+#: public/render/lightbox/classic/class-lightbox.php:217
+#, php-format
+msgid "Go to item %d"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:219
+msgctxt "file name label in the lightbox info panel"
+msgid "File"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:220
+msgctxt "file size label in the lightbox info panel"
+msgid "Size"
+msgstr ""
+
+#: public/render/lightbox/classic/class-lightbox.php:222
+msgctxt "file type label in the lightbox info panel"
+msgid "Type"
+msgstr ""
+
+#: public/render/lightbox/grid/class-lightbox-grid.php:60
+msgid "All photos"
+msgstr ""
+
+#: public/render/lightbox/grid/class-lightbox-grid.php:63
+msgid "Close image"
+msgstr ""
+
+#. translators: %d: item position.
+#: public/render/lightbox/grid/class-lightbox-grid.php:67
+#, php-format
+msgid "Item %d"
+msgstr ""
+
+#. translators: 1: item position, 2: total number of items.
+#: public/render/lightbox/grid/class-lightbox-grid.php:69
+#: assets/admin/src/components/library/LibraryTabBase.jsx:793
+#, php-format,js-format
+msgid "%1$d of %2$d"
+msgstr ""
+
+#: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:44
+msgid "Image viewer"
+msgstr ""
+
+#. translators: %d: image position.
+#: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:49
+#, php-format
+msgid "Go to image %d"
 msgstr ""
 
 #: assets/admin/plain/collection-settings.js:123
@@ -8286,11 +8375,6 @@ msgstr ""
 
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:126
 msgid "Tile"
-msgstr ""
-
-#: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:126
-#: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:205
-msgid "Image"
 msgstr ""
 
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:280
@@ -8986,11 +9070,6 @@ msgid "%d entry"
 msgid_plural "%d entries"
 msgstr[0] ""
 msgstr[1] ""
-
-#: assets/admin/src/components/library/LibraryTabBase.jsx:793
-#, js-format
-msgid "%1$d of %2$d"
-msgstr ""
 
 #: assets/admin/src/components/library/LibraryTabBase.jsx:811
 msgid "Delete selected entries?"
