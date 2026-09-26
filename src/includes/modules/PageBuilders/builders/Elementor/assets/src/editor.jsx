@@ -287,7 +287,9 @@ function buildControlView(kind) {
 
             try {
                 const items = await fetchItems(kind);
-                if (this.pickerDestroyed) return;
+                if (this.pickerDestroyed) {
+                    return;
+                }
                 $select.data('fg-items', items);
 
                 // Annotate each item with its kind so the row renderer
@@ -330,7 +332,9 @@ function buildControlView(kind) {
 
             const $ = window.jQuery;
             const items = await fetchItems(kind);
-            if (this.pickerDestroyed) return;
+            if (this.pickerDestroyed) {
+                return;
+            }
             for (const it of items) it.kind = kind;
             this.ui.select.data('fg-items', items);
             this.ui.select.html(buildOptionsHtml(items));
