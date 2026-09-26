@@ -48,7 +48,7 @@ const WatermarkStatusComponent = ({
 	const fetchStatus = async () => {
 		try {
 			const response = await request(
-				`admin/watermark/status?gallery_id=${postId}`,
+				`admin/watermark/status${restUrl.includes('?') ? '&' : '?'}gallery_id=${postId}`,
 				'GET'
 			);
 			if (!response.ok) {
@@ -121,8 +121,10 @@ const WatermarkStatusComponent = ({
 
 	const title = wp.i18n.sprintf(
 		/* translators: 1: pending count, 2: total count. */
-		__(
+		wp.i18n._n(
+			'%1$d of %2$d items in this gallery isn’t watermarked',
 			'%1$d of %2$d items in this gallery aren’t watermarked',
+			pending,
 			'fotogrids'
 		),
 		pending,
@@ -209,7 +211,7 @@ const WatermarkStatusComponent = ({
 									progress.total
 								)
 							: __(
-									'The site watermark is on for this gallery, but these images still serve clean copies.',
+									'The site watermark is on for this gallery, but these images don’t have the current watermark yet.',
 									'fotogrids'
 								)
 					),
