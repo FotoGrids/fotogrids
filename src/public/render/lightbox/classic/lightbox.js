@@ -1401,12 +1401,12 @@ class FotoGridsLightbox {
 					typeof data.total === 'number' &&
 					data.total !== this._total
 				) {
-					if (data.total > this._total) {
-						this.items.length = data.total;
-					} else {
-						this.items.length = data.total;
-					}
+					this.items.length = data.total;
 					this._total = data.total;
+					this.index = Math.max(
+						0,
+						Math.min(this.index, this._total - 1)
+					);
 				}
 
 				data.slides.forEach((apiSlide, i) => {
