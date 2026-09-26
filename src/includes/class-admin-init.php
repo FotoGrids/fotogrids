@@ -190,7 +190,7 @@ class Admin_Init {
 		wp_enqueue_script(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/admin.js',
-			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
+			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'wp-media-utils', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
 			FOTOGRIDS_VERSION,
 			true
 		);
