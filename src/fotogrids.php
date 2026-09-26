@@ -103,6 +103,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-repository
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-items.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-embed-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-strings.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-registrar.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-item-ajax-endpoints.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-collection-save-pipeline.php';
