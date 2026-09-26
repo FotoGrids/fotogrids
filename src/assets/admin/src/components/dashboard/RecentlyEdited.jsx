@@ -129,6 +129,7 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
                     href="edit.php?post_type=fotogrids_gallery"
                     variant="primary"
                     style="outline"
+                    size="sm"
                     className="fg-button--invert"
                 >
                     {__('View all galleries', 'fotogrids')}
@@ -138,6 +139,7 @@ const RecentlyEdited = ({ hasAlbums = false }) => {
                         href="edit.php?post_type=fotogrids_album"
                         variant="primary"
                         style="outline"
+                        size="sm"
                         className="fg-button--invert"
                     >
                         {__('View all albums', 'fotogrids')}
