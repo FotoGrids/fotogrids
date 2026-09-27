@@ -15,42 +15,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Metadata_Manager {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Metadata_Manager is the dedicated data layer for the custom
-	 * fotogrids_tags and fotogrids_item_metadata tables. The WPDB sniffs
-	 * below are suppressed class-wide with the following justifications:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: these are custom tables with no
-	 *    WP_Query / core API equivalent; direct $wpdb access is required.
-	 *
-	 *  - DirectDatabaseQuery.NoCaching: the one hot read on the frontend
-	 *    render path, get_item_metadata(), IS object-cached (see the cache
-	 *    helpers below, with per-item and version-bump invalidation wired
-	 *    into every write path). The remaining reads are admin-side, low
-	 *    frequency, and often carry search/pagination args that would churn
-	 *    cache keys for near-zero hit rate, so caching them is an intentional
-	 *    non-goal rather than an oversight.
-	 *
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name in this class is built as `$wpdb->prefix . 'fotogrids_*'`
-	 *    (a trusted, hardcoded literal - WP placeholders cannot bind table
-	 *    identifiers). All user-supplied *values* are passed through
-	 *    $wpdb->prepare(); where SQL is assembled incrementally the prepare
-	 *    call is a separate statement from the get_*()/query() call, which
-	 *    the sniff cannot follow. ORDER BY columns are allowlisted via
-	 *    in_array() and the direction is forced to ASC|DESC.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Get allowed metadata types
@@ -110,8 +75,8 @@ class Metadata_Manager {
 		global $wpdb;
 
 		$table  = $wpdb->prefix . 'fotogrids_tags';
-		$sql    = "SELECT * FROM {$table} WHERE type = %s";
-		$params = array( $type );
+		$sql    = 'SELECT * FROM %i WHERE type = %s';
+		$params = array( $table, $type );
 
 		if ( ! empty( $search ) ) {
 			$sql     .= ' AND name LIKE %s';
@@ -121,9 +86,9 @@ class Metadata_Manager {
 		$sql     .= ' ORDER BY usage_count DESC, name ASC LIMIT %d';
 		$params[] = absint( $limit );
 
-		$sql = $wpdb->prepare( $sql, $params );
+		$sql = $wpdb->prepare( $sql, $params ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is assembled above from literal fragments; every value is in $params.
 
-		return $wpdb->get_results( $sql );
+		return $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is the prepare() result from the line above.
 	}
 
 	/**
@@ -184,7 +149,8 @@ class Metadata_Manager {
 
 		$existing = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s)",
+				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s)',
+				$table,
 				$type,
 				$name,
 				$slug
@@ -226,7 +192,8 @@ class Metadata_Manager {
 		if ( $result ) {
 			return $wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM {$table} WHERE id = %d",
+					'SELECT * FROM %i WHERE id = %d',
+					$table,
 					$wpdb->insert_id
 				)
 			);
@@ -301,7 +268,8 @@ class Metadata_Manager {
 
 		$existing = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM {$table} WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d",
+				'SELECT id FROM %i WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d',
+				$table,
 				$attachment_id,
 				$type,
 				$metadata_id
@@ -526,11 +494,13 @@ class Metadata_Manager {
 
 		$metadata = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT t.*, m.metadata_type
-             FROM {$tags_table} t
-             INNER JOIN {$metadata_table} m ON t.id = m.metadata_id
+				'SELECT t.*, m.metadata_type
+             FROM %i t
+             INNER JOIN %i m ON t.id = m.metadata_id
              WHERE m.attachment_id = %d
-             ORDER BY m.metadata_type, t.name ASC",
+             ORDER BY m.metadata_type, t.name ASC',
+				$tags_table,
+				$metadata_table,
 				$attachment_id
 			)
 		);
@@ -564,7 +534,8 @@ class Metadata_Manager {
 
 		$metadata = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT metadata_type, metadata_id FROM {$table} WHERE attachment_id = %d",
+				'SELECT metadata_type, metadata_id FROM %i WHERE attachment_id = %d',
+				$table,
 				$attachment_id
 			)
 		);
@@ -602,7 +573,8 @@ class Metadata_Manager {
 
 		return $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE {$table} SET usage_count = usage_count + 1 WHERE id = %d AND type = %s",
+				'UPDATE %i SET usage_count = usage_count + 1 WHERE id = %d AND type = %s',
+				$table,
 				$id,
 				$type
 			)
@@ -627,7 +599,8 @@ class Metadata_Manager {
 
 		return $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE {$table} SET usage_count = GREATEST(usage_count - 1, 0) WHERE id = %d AND type = %s",
+				'UPDATE %i SET usage_count = GREATEST(usage_count - 1, 0) WHERE id = %d AND type = %s',
+				$table,
 				$id,
 				$type
 			)
@@ -654,13 +627,14 @@ class Metadata_Manager {
 
 		return $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table}
+				'SELECT * FROM %i
              WHERE type = %s AND LOWER(name) LIKE LOWER(%s)
              ORDER BY
                 CASE WHEN LOWER(name) = LOWER(%s) THEN 1 ELSE 2 END,
                 usage_count DESC,
                 name ASC
-             LIMIT %d",
+             LIMIT %d',
+				$table,
 				$type,
 				$search_term,
 				$name,
@@ -686,7 +660,8 @@ class Metadata_Manager {
 		$table = $wpdb->prefix . 'fotogrids_tags';
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE id = %d",
+				'SELECT * FROM %i WHERE id = %d',
+				$table,
 				(int) $id
 			)
 		);
@@ -711,8 +686,8 @@ class Metadata_Manager {
 		global $wpdb;
 		$table = $wpdb->prefix . 'fotogrids_tags';
 
-		$sql    = "SELECT COUNT(*) FROM {$table} WHERE type = %s";
-		$params = array( $type );
+		$sql    = 'SELECT COUNT(*) FROM %i WHERE type = %s';
+		$params = array( $table, $type );
 
 		if ( ! empty( $search ) ) {
 			$sql     .= ' AND name LIKE %s';
@@ -723,7 +698,7 @@ class Metadata_Manager {
 			$sql .= ' AND usage_count = 0';
 		}
 
-		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $params ) );
+		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
 	}
 
 	/**
@@ -765,8 +740,8 @@ class Metadata_Manager {
 		$orderby         = in_array( $args['orderby'], $orderby_allowed, true ) ? $args['orderby'] : 'name';
 		$order           = strtolower( $args['order'] ) === 'desc' ? 'DESC' : 'ASC';
 
-		$sql    = "SELECT * FROM {$table} WHERE type = %s";
-		$params = array( $type );
+		$sql    = 'SELECT * FROM %i WHERE type = %s';
+		$params = array( $table, $type );
 
 		if ( ! empty( $args['search'] ) ) {
 			$sql     .= ' AND name LIKE %s';
@@ -787,7 +762,7 @@ class Metadata_Manager {
 		$params[] = $per_page;
 		$params[] = $offset;
 
-		return $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
+		return $wpdb->get_results( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above; values go through prepare() and ORDER BY terms are allowlisted.
 	}
 
 	/**
@@ -820,7 +795,8 @@ class Metadata_Manager {
 
 		$conflict = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM {$table} WHERE type = %s AND id != %d AND (LOWER(name) = LOWER(%s) OR slug = %s) LIMIT 1",
+				'SELECT id FROM %i WHERE type = %s AND id != %d AND (LOWER(name) = LOWER(%s) OR slug = %s) LIMIT 1',
+				$table,
 				$row->type,
 				(int) $id,
 				$name,
@@ -985,7 +961,8 @@ class Metadata_Manager {
 			// Find every attachment currently linked to source.
 			$attachment_ids = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT attachment_id FROM {$links_table} WHERE metadata_type = %s AND metadata_id = %d",
+					'SELECT attachment_id FROM %i WHERE metadata_type = %s AND metadata_id = %d',
+					$links_table,
 					$type,
 					$source_id
 				)
@@ -996,7 +973,8 @@ class Metadata_Manager {
 
 				$already_linked = (int) $wpdb->get_var(
 					$wpdb->prepare(
-						"SELECT id FROM {$links_table} WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d",
+						'SELECT id FROM %i WHERE attachment_id = %d AND metadata_type = %s AND metadata_id = %d',
+						$links_table,
 						$attachment_id,
 						$type,
 						(int) $target_id
@@ -1070,7 +1048,8 @@ class Metadata_Manager {
 
 		$count = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$links_table} WHERE metadata_type = %s AND metadata_id = %d",
+				'SELECT COUNT(*) FROM %i WHERE metadata_type = %s AND metadata_id = %d',
+				$links_table,
 				$type,
 				(int) $id
 			)
@@ -1107,14 +1086,14 @@ class Metadata_Manager {
 			return 0;
 		}
 
-		$sql    = "SELECT id, type FROM {$tags_table}";
-		$params = array();
+		$sql    = 'SELECT id, type FROM %i';
+		$params = array( $tags_table );
 		if ( null !== $type ) {
 			$sql     .= ' WHERE type = %s';
 			$params[] = $type;
 		}
 
-		$rows = $params ? $wpdb->get_results( $wpdb->prepare( $sql, $params ) ) : $wpdb->get_results( $sql );
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
 
 		$touched = 0;
 		foreach ( $rows as $row ) {
@@ -1125,10 +1104,5 @@ class Metadata_Manager {
 		return $touched;
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

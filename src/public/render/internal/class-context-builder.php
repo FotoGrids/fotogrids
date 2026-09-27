@@ -125,17 +125,11 @@ final class Context_Builder {
 		if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
 			$candidate    = (int) $meta_overrides['via_album_id'];
 			$via_album_id = $candidate > 0 ? $candidate : null;
-		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block wraps nonce-suppression pragmas; cannot collapse to elseif.
-			// Public breadcrumb context hint read from a normal front-end page
-			// view (no form submission, no state change), so nonce verification
-			// does not apply. The (int) cast is the sanitization, and the value
-			// is only validated/used as an album id by Breadcrumb_Resolver.
-            // phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			if ( isset( $_GET['fg_via'] ) ) {
-				$candidate    = (int) wp_unslash( $_GET['fg_via'] );
+		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block holds the fg_via query-var fallback for the override branch.
+			if ( isset( $_GET['fg_via'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only breadcrumb hint on a front-end page view.
+				$candidate    = (int) wp_unslash( $_GET['fg_via'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only breadcrumb hint; the (int) cast sanitizes it.
 				$via_album_id = $candidate > 0 ? $candidate : null;
 			}
-            // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 
 		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );

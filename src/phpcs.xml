@@ -33,7 +33,7 @@
         hard gate yet. Minimum supported versions are declared for the relevant
         version-aware sniffs.
     -->
-    <config name="minimum_wp_version" value="6.1"/>
+    <config name="minimum_wp_version" value="6.3"/>
     <config name="testVersion" value="7.4-"/>
 
     <!--
