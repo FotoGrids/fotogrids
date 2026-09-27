@@ -228,11 +228,11 @@
                 },
                 {
                     "subtitle": "Smart AI-Powered Sorting",
-                    "message": "Let AI determine the best order for your {postType.lower.plural} based on relevance, popularity, and user engagement patterns."
+                    "message": "Let AI determine the best order for your {postType.plural.lower} based on relevance, popularity, and user engagement patterns."
                 },
                 {
                     "subtitle": "Metadata-Based Sorting",
-                    "message": "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.lower.plural} that adapt to your content."
+                    "message": "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.plural.lower} that adapt to your content."
                 }
             ],
             "tier_required": "pro_starter",
