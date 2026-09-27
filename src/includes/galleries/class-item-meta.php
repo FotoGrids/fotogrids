@@ -180,7 +180,7 @@ final class Item_Meta {
 			return false;
 		}
 
-		do_action( Actions_Item::META_UPDATED, $attachment_id, $fields );
+		do_action( Actions_Item::META_UPDATED, $attachment_id, self::GALLERY_ID, $fields );
 
 		return true;
 	}

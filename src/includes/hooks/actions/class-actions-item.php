@@ -23,10 +23,11 @@ final class Actions_Item {
 	 * Fires after an attachment is added to a gallery.
 	 *
 	 * @since 1.0.0
-	 * @param int         $attachment_id Attachment ID added.
-	 * @param int         $gallery_id    Gallery ID.
-	 * @param string|null $source        Embed source identifier; passed only
-	 *                                   by the embed REST endpoint.
+	 * @param int          $attachment_id  Attachment ID added.
+	 * @param int          $gallery_id     Gallery ID.
+	 * @param array|string $meta_or_source Data passed to the deprecated `$meta`
+	 *                                     argument of Gallery_Items::add(), or
+	 *                                     the embed source identifier.
 	 */
 	public const ADDED = 'fotogrids/actions/item/added';
 
@@ -44,6 +45,7 @@ final class Actions_Item {
 	 *
 	 * @since 1.0.0
 	 * @param int   $attachment_id Attachment ID.
+	 * @param int   $gallery_id    Always 0; item data is shared by every gallery.
 	 * @param array $fields        The fields written, column => value.
 	 */
 	public const META_UPDATED = 'fotogrids/actions/item/meta/updated';
