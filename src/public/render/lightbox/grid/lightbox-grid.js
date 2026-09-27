@@ -49,10 +49,10 @@ function buildScopeStyle( scope, config ) {
         lines.push( sel + ' { --fg-lb-grid-aspect: ' + aspect + '; }' );
     }
     lines.push(
-        '@media (max-width: 1024px) { ' + sel + ' { --fg-lb-grid-max-width: ' + ( mw.tablet || '80vw' ) + '; } }'
+        window.FotoGrids.scopeCss( 'tablet', sel, '--fg-lb-grid-max-width: ' + ( mw.tablet || '80vw' ) + ';' )
     );
     lines.push(
-        '@media (max-width: 600px) { ' + sel + ' { --fg-lb-grid-max-width: ' + ( mw.mobile || '90vw' ) + '; } }'
+        window.FotoGrids.scopeCss( 'mobile', sel, '--fg-lb-grid-max-width: ' + ( mw.mobile || '90vw' ) + ';' )
     );
 
     const style = document.createElement( 'style' );

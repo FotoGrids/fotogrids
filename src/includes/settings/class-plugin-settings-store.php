@@ -96,11 +96,16 @@ final class Plugin_Settings_Store {
 	/**
 	 * Sanitise and persist general settings.
 	 *
+	 * A change flushes the render cache, which holds the breakpoints in
+	 * cached CSS and markup.
+	 *
 	 * @param mixed $value Raw input.
 	 * @return array<string, mixed> The stored, merged settings.
 	 */
 	public static function save_general( $value ): array {
-		update_option( self::OPTION_GENERAL, self::sanitize_general( $value ) );
+		if ( update_option( self::OPTION_GENERAL, self::sanitize_general( $value ) ) ) {
+			\FotoGrids\FotoGrids_Cache::flush_all();
+		}
 		return self::get_general();
 	}
 
