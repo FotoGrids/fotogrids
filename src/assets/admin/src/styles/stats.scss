@@ -304,15 +304,18 @@
 
 .fg-stats-charts {
 	display: grid;
-	grid-template-columns: 2fr 1fr;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
 	gap: 20px;
 
 	@media (max-width: 1024px) {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 	}
 }
 
+// Chart.js writes a fixed pixel width onto its canvas. Without min-width: 0 that
+// width becomes the card's minimum, so the card cannot shrink and the chart never redraws smaller.
 .fg-stats-card {
+	min-width: 0;
 	background: $tabbar-bg-white;
 	border: 1px solid $tabbar-border-light;
 	border-radius: 10px;
@@ -595,7 +598,7 @@ table.fg-stats-table.widefat {
 
 	.fg-stats-charts,
 	.fg-stats-tables {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 12px;
 	}
 }
