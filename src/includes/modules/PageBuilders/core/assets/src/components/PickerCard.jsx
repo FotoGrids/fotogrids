@@ -9,6 +9,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 
 import { Button } from '@/admin/src/components/shared/Button';
 import Icon from '@/admin/src/components/shared/Icon';
+import { collectionTitle } from '@/admin/src/utils/collection-title';
 
 const formatRelative = (iso) => {
     if (!iso) return '';
@@ -123,7 +124,7 @@ const PickerCard = ({
             </div>
             <div className="fg-pb-picker-card__body">
                 <h3 id={titleId} className="fg-pb-picker-card__title">
-                    {item.title || __('(no title)', 'fotogrids')}
+                    {collectionTitle(item.title, kind, item.id)}
                 </h3>
                 <div className="fg-pb-picker-card__meta">
                     <span className="fg-pb-picker-card__count">
