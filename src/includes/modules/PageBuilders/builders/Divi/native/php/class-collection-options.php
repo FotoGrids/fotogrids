@@ -73,10 +73,7 @@ final class Collection_Options {
 		);
 
 		foreach ( $posts as $post ) {
-			$title = '' !== $post->post_title
-				? $post->post_title
-				/* translators: %d: collection post ID. */
-				: sprintf( esc_html__( '(no title) #%d', 'fotogrids' ), (int) $post->ID );
+			$title = \FotoGrids\Collection_Title::label( $post );
 
 			if ( 'publish' !== $post->post_status ) {
 				$obj = get_post_status_object( $post->post_status );

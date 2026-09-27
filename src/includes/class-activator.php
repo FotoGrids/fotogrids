@@ -239,9 +239,11 @@ class Activator {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
+		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
+
 		do_action( Actions_System::ACTIVATE );
 
-		update_option( 'fotogrids_db_version', '1.4' );
+		update_option( 'fotogrids_db_version', '1.5' );
 	}
 
 	/**
@@ -256,7 +258,7 @@ class Activator {
 	 */
 	public static function maybe_upgrade() {
 		$current = get_option( 'fotogrids_db_version', '0' );
-		if ( version_compare( $current, '1.4', '<' ) ) {
+		if ( version_compare( $current, '1.5', '<' ) ) {
 			self::create_tables();
 		}
 

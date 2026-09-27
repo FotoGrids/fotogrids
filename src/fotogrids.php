@@ -46,6 +46,7 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-activator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-deactivator.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-post-types.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-collection-title.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-rest.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-statistics.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-usage-reporter.php';
@@ -101,6 +102,8 @@ require_once FOTOGRIDS_PLUGIN_DIR . 'includes/assets/class-loading-icon-library.
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/assets/class-collection-settings-assets.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-repository.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-gallery-items.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-item-meta.php';
+require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-item-meta-consolidation.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-embed-store.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/galleries/class-cover-resolver.php';
 require_once FOTOGRIDS_PLUGIN_DIR . 'includes/metaboxes/class-metabox-strings.php';
@@ -139,6 +142,7 @@ function fotogrids_init() {
 
 	FotoGrids\Kses::register();
 	FotoGrids\Post_Types::init();
+	FotoGrids\Collection_Title::init();
 	FotoGrids\REST::init();
 	FotoGrids\Gallery_Album_Relations::init();
 	FotoGrids\FotoGrids_Cache::init();
