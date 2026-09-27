@@ -231,19 +231,26 @@ function readSettings(galleryEl) {
 }
 
 /**
- * The full image URL to load for a slide: the mobile companion at or below
- * the mobile breakpoint, otherwise the full image.
+ * The full image URL for a slide: the mobile companion on the mobile
+ * breakpoint, otherwise the full image.
  *
  * @param {{fullSrc: string, fullMobileSrc?: string}} item
- * @param {number} mobileMax Mobile breakpoint in CSS pixels.
+ * @param {number} mobileMax Mobile breakpoint in CSS pixels; the fallback
+ *        when the runtime is absent.
  * @returns {string}
  */
 function fullSrcForViewport(item, mobileMax) {
-	if (item.fullMobileSrc && window.innerWidth <= mobileMax) {
-		return item.fullMobileSrc;
+	if (!item.fullMobileSrc) {
+		return item.fullSrc;
 	}
 
-	return item.fullSrc;
+	const onMobile =
+		window.FotoGrids &&
+		typeof window.FotoGrids.activeBreakpoint === 'function'
+			? window.FotoGrids.activeBreakpoint() === 'mobile'
+			: window.innerWidth <= mobileMax;
+
+	return onMobile ? item.fullMobileSrc : item.fullSrc;
 }
 
 /**
