@@ -32,21 +32,29 @@ export const modalRegistry = {
 	update(id, next = {}) {
 		let changed = false;
 		entries = entries.map((entry) => {
-			if (entry.id !== id) return entry;
+			if (entry.id !== id) {
+				return entry;
+			}
 			changed = true;
 			return { ...entry, options: { ...entry.options, ...next } };
 		});
-		if (changed) notify();
+		if (changed) {
+			notify();
+		}
 	},
 
 	close(id) {
 		const before = entries.length;
 		entries = entries.filter((entry) => entry.id !== id);
-		if (entries.length !== before) notify();
+		if (entries.length !== before) {
+			notify();
+		}
 	},
 
 	closeAll() {
-		if (entries.length === 0) return;
+		if (entries.length === 0) {
+			return;
+		}
 		entries = [];
 		notify();
 	},

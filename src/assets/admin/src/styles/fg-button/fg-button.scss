@@ -295,7 +295,8 @@
 		border-color: ui-color(button, primary-text-light);
 
 		&:hover:not(:disabled) {
-			color: ui-color(button, primary-text);
+			background-color: ui-color(button, primary-text);
+			color: var(--fg-text-primary);
 			border-color: ui-color(button, primary-text);
 		}
 	}

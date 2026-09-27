@@ -4,12 +4,14 @@
  * Manages the data-fg-media-state attribute on .fg-item elements.
  *
  * This script owns both starting and stopping the loader animations:
- *  1. For every gallery (initial DOM, DOMContentLoaded, the runtime's
- *     onGallery hook, and the MutationObserver for dynamic inserts) it starts
- *     the WAAPI loader animation on each .fg-item's loader svg, keyed by the
- *     gallery's data-fg-loading-icon, and stores the handles in
+ *  1. For every collection (initial DOM, DOMContentLoaded, and the runtime's
+ *     onCollection hook, which also reports collections inserted later) it
+ *     starts the WAAPI loader animation on each .fg-item's loader svg, keyed
+ *     by the collection's data-fg-loading-icon, and stores the handles in
  *     window.fgLoaderHandles (a WeakMap keyed by .fg-item).
- *  2. Wire load/error listeners on every <img> inside each gallery.
+ *  2. Wire load/error listeners on every <img> inside each collection, and on
+ *     the items announced by fotogrids:items_inserted (pagination, random
+ *     re-sort).
  *  3. When an image settles, cancel its loader's WAAPI handles and set
  *     data-fg-media-state="loaded" so CSS hides the loader and reveals the
  *     image.
@@ -206,8 +208,7 @@
      *     deferImmediate=true and staggered across animation frames, so cached
      *     images reveal progressively instead of in one batched paint.
      *
-     *   - Dynamic pass (MutationObserver → wireGallery or wireImage): no
-     *     staggering; inserted images are not complete yet.
+     *   - Dynamic pass: no staggering; inserted images are not complete yet.
      *
      * @param {Element} container A .fotogrids-collection element.
      * @param {{ initial?: boolean }} [opts]
@@ -262,68 +263,60 @@
     }
 
     /**
-     * MutationObserver - handles galleries inserted after page load
-     * (album AJAX loads, password-unlock swaps, dynamic insertions).
+     * Starts the loader animation and wires the image of a single .fg-item
+     * added to an existing collection.
+     *
+     * @param {Element} item       The .fg-item element.
+     * @param {Element} collection Its .fotogrids-collection element.
      */
-    function observeDynamic() {
-        if ( ! ( 'MutationObserver' in window ) ) {
+    function wireItem( item, collection ) {
+        startItemAnimation( item, resolveAnimateFn( collection ) );
+        const img = item.querySelector( '.fg-item-media img' );
+        if ( img ) {
+            wireImage( img );
+        }
+    }
+
+    /**
+     * Handles fotogrids:items_inserted, dispatched (bubbling) on a collection
+     * whenever items are appended to or swapped into it.
+     *
+     * @param {CustomEvent} event
+     */
+    function onItemsInserted( event ) {
+        const detail     = event.detail || {};
+        const collection = detail.galleryEl
+            || ( event.target instanceof Element ? event.target.closest( '.fotogrids-collection' ) : null );
+        if ( ! collection || ! Array.isArray( detail.items ) ) {
             return;
         }
 
-        const observer = new MutationObserver( function ( mutations ) {
-            mutations.forEach( function ( mutation ) {
-                mutation.addedNodes.forEach( function ( node ) {
-                    if ( ! ( node instanceof Element ) ) {
-                        return;
-                    }
-
-                    // Newly inserted gallery wrapper - start animations + wire
-                    // images inside it (wireGallery starts the animations).
-                    if ( node.matches( '.fotogrids-collection' ) ) {
-                        wireGallery( node );
-                    }
-
-                    // Galleries nested inside an inserted subtree.
-                    node.querySelectorAll( '.fotogrids-collection' ).forEach( function ( gallery ) {
-                        wireGallery( gallery );
-                    } );
-
-                    // Individual .fg-item appended into an existing gallery
-                    // (e.g. pagination load-more).
-                    if ( node.matches( '.fg-item' ) ) {
-                        const gallery = node.closest( '.fotogrids-collection' );
-                        if ( gallery ) {
-                            startItemAnimation( node, resolveAnimateFn( gallery ) );
-                        }
-                        const img = node.querySelector( '.fg-item-media img' );
-                        if ( img ) {
-                            wireImage( img );
-                        }
-                    }
-                } );
+        detail.items.forEach( function ( node ) {
+            if ( ! ( node instanceof Element ) ) {
+                return;
+            }
+            if ( node.matches( '.fg-item' ) ) {
+                wireItem( node, collection );
+            }
+            node.querySelectorAll( '.fg-item' ).forEach( function ( item ) {
+                wireItem( item, collection );
             } );
         } );
-
-        observer.observe( document.body, { childList: true, subtree: true } );
     }
 
     // Wired from several points and made safe by idempotency: synchronously (the
     // footer script usually runs after the gallery markup), on DOMContentLoaded,
-    // and through the runtime's onGallery hook, because some page builders commit
-    // the gallery only after footer scripts have run.
+    // and through the runtime's onCollection hook, because some page builders
+    // commit the gallery only after footer scripts have run.
     init();
     if ( document.readyState === 'loading' ) {
         document.addEventListener( 'DOMContentLoaded', init );
     }
-    if ( window.FotoGrids && typeof window.FotoGrids.onGallery === 'function' ) {
-        window.FotoGrids.onGallery( function ( galleryEl ) {
-            wireGallery( galleryEl, { initial: true } );
+    if ( window.FotoGrids && typeof window.FotoGrids.onCollection === 'function' ) {
+        window.FotoGrids.onCollection( function ( collectionEl ) {
+            wireGallery( collectionEl, { initial: true } );
         } );
     }
-    if ( document.readyState === 'loading' ) {
-        document.addEventListener( 'DOMContentLoaded', observeDynamic );
-    } else {
-        observeDynamic();
-    }
+    document.addEventListener( 'fotogrids:items_inserted', onItemsInserted );
 
 } )();

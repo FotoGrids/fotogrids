@@ -11,13 +11,16 @@ window.FotoGridsRenderSettings.renderSettingSubTabs = (
 		shouldDisplaySetting,
 	}
 ) => {
-	if (!setting.subTabs) return null;
+	if (!setting.subTabs) {
+		return null;
+	}
 
 	const { createElement: h } = wp.element;
 
 	const availableSubTabs = Object.values(setting.subTabs).filter((subTab) => {
-		if (!subTab.condition || typeof shouldDisplaySetting !== 'function')
+		if (!subTab.condition || typeof shouldDisplaySetting !== 'function') {
 			return true;
+		}
 		return shouldDisplaySetting({ condition: subTab.condition });
 	});
 

@@ -73,10 +73,12 @@ export const ensurePreviewCssAssets = (cssAssets, ownerDocument = document) => {
 	}
 
 	Object.entries(cssAssets).forEach(([handle, href]) => {
-		if (!handle || typeof href !== 'string' || !href) {
-			return;
-		}
-		if (loadedCssHandles.has(handle)) {
+		if (
+			!handle ||
+			typeof href !== 'string' ||
+			!href ||
+			loadedCssHandles.has(handle)
+		) {
 			return;
 		}
 		if (

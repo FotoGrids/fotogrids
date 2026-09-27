@@ -102,7 +102,9 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 	 * present, and mark the gallery dirty.
 	 */
 	const appendItems = useCallback((newItems) => {
-		if (!Array.isArray(newItems) || newItems.length === 0) return;
+		if (!Array.isArray(newItems) || newItems.length === 0) {
+			return;
+		}
 
 		setItems((prevItems) => {
 			const existingIds = new Set(prevItems.map((img) => img.id));
@@ -127,7 +129,9 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 
 	const handleUploadComplete = useCallback(
 		async (uploadedIds) => {
-			if (!uploadedIds || uploadedIds.length === 0) return;
+			if (!uploadedIds || uploadedIds.length === 0) {
+				return;
+			}
 
 			const newItems = [];
 			for (const id of uploadedIds) {

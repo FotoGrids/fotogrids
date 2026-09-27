@@ -23,6 +23,21 @@ const ALL_NETWORKS = [
 
 const SHARE_TARGET = 'http://localhost/#fg-7-42';
 
+const LABELS = {
+	facebook: 'Facebook',
+	x: 'X',
+	pinterest: 'Pinterest',
+	linkedin: 'LinkedIn',
+	whatsapp: 'WhatsApp',
+	telegram: 'Telegram',
+	reddit: 'Reddit',
+	email: 'Email',
+	copy_link: 'Copy link',
+	share_on: 'Share on %s',
+	link_copied: 'Link copied',
+	copy_failed: 'Copy failed',
+};
+
 function loadModule() {
 	jest.isolateModules(() => {
 		require(MODULE);
@@ -45,7 +60,7 @@ function renderBar(api, networks, { caption = 'Harbour at dawn' } = {}) {
 	});
 	const galleryEl = makeGallery();
 	const bar = api.renderShareBar(
-		{ networks: enabled, button_style: 'icons_only' },
+		{ networks: enabled, button_style: 'icons_only', labels: LABELS },
 		{
 			id: 42,
 			fullUrl: 'https://example.com/wp-content/uploads/harbour.jpg',
@@ -165,5 +180,37 @@ describe('sharing', () => {
 		await expect(api.shareItem(proxy, 'myspace')).resolves.toBe(false);
 		expect(window.open).not.toHaveBeenCalled();
 		expect(shares).toEqual([]);
+	});
+});
+
+describe('sharing labels', () => {
+	afterEach(() => {
+		document.body.innerHTML = '';
+		delete window.FotoGridsSharing;
+	});
+
+	it('renders the labels carried in the share config', () => {
+		const galleryEl = makeGallery();
+		const bar = loadModule().renderShareBar(
+			{
+				networks: { facebook: true, copy_link: true },
+				button_style: 'icons_and_labels',
+				labels: {
+					...LABELS,
+					facebook: 'Фейсбук',
+					copy_link: 'Копировать ссылку',
+					share_on: 'Поделиться в %s',
+				},
+			},
+			{ id: 42, fullUrl: '', caption: '', galleryEl, galleryId: '7' }
+		);
+		const facebook = bar.querySelector('[data-network="facebook"]');
+		const copy = bar.querySelector('[data-network="copy_link"]');
+
+		expect(facebook.getAttribute('aria-label')).toBe('Фейсбук');
+		expect(facebook.textContent).toBe('Фейсбук');
+		expect(facebook.dataset.fgTooltip).toBe('Поделиться в Фейсбук');
+		expect(copy.getAttribute('aria-label')).toBe('Копировать ссылку');
+		expect(copy.dataset.fgTooltip).toBe('Копировать ссылку');
 	});
 });

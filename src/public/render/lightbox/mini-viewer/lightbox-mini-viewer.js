@@ -131,7 +131,8 @@ function navigate( delta ) {
  *
  * @param {object} config
  *   items, index, galleryEl, theme, close, arrows, bullets, overlay (backdrop),
- *   blur, border, shadow, radius, captions, captionSource, loop.
+ *   blur, border, shadow, radius, captions, captionSource, loop, labels.
+ *   `labels` is the translated map from Lightbox_Mini_Viewer::client_labels().
  */
 function open( config ) {
     const items = Array.isArray( config.items ) ? config.items : [];
@@ -145,7 +146,8 @@ function open( config ) {
     overlay.className = 'fg-lb-mv';
     overlay.setAttribute( 'role', 'dialog' );
     overlay.setAttribute( 'aria-modal', 'true' );
-    overlay.setAttribute( 'aria-label', 'Image viewer' );
+    const labels = config.labels;
+    overlay.setAttribute( 'aria-label', labels.dialog );
 
     // Theme drives the palette in CSS; blur level maps to a px value in CSS.
     overlay.setAttribute( 'data-fg-mv-theme', config.theme === 'light' ? 'light' : 'dark' );
@@ -191,14 +193,14 @@ function open( config ) {
         const prev = document.createElement( 'button' );
         prev.type = 'button';
         prev.className = 'fg-lb-mv-nav fg-lb-mv-prev';
-        prev.setAttribute( 'aria-label', 'Previous' );
+        prev.setAttribute( 'aria-label', labels.previous );
         prev.innerHTML = PREV_ICON;
         prev.addEventListener( 'click', () => navigate( -1 ) );
 
         const next = document.createElement( 'button' );
         next.type = 'button';
         next.className = 'fg-lb-mv-nav fg-lb-mv-next';
-        next.setAttribute( 'aria-label', 'Next' );
+        next.setAttribute( 'aria-label', labels.next );
         next.innerHTML = NEXT_ICON;
         next.addEventListener( 'click', () => navigate( 1 ) );
 
@@ -210,7 +212,7 @@ function open( config ) {
         const closeBtn = document.createElement( 'button' );
         closeBtn.type = 'button';
         closeBtn.className = 'fg-lb-mv-close';
-        closeBtn.setAttribute( 'aria-label', 'Close' );
+        closeBtn.setAttribute( 'aria-label', labels.close );
         closeBtn.innerHTML = CLOSE_ICON;
         closeBtn.addEventListener( 'click', close );
         stage.appendChild( closeBtn );
@@ -223,7 +225,7 @@ function open( config ) {
             const b = document.createElement( 'button' );
             b.type = 'button';
             b.className = 'fg-lb-mv-bullet';
-            b.setAttribute( 'aria-label', 'Go to image ' + ( i + 1 ) );
+            b.setAttribute( 'aria-label', labels.go_to_image.replace( '%d', i + 1 ) );
             b.addEventListener( 'click', () => { state.index = i; render(); } );
             bullets.appendChild( b );
         } );
@@ -253,6 +255,14 @@ function readItems( galleryEl ) {
     }
 }
 
+function readLabels( galleryEl ) {
+    try {
+        return JSON.parse( galleryEl.getAttribute( 'data-fg-mini-labels' ) || '{}' );
+    } catch ( err ) {
+        return {};
+    }
+}
+
 function configFor( galleryEl, index ) {
     return {
         items:         readItems( galleryEl ),
@@ -270,6 +280,7 @@ function configFor( galleryEl, index ) {
         radius:        galleryEl.getAttribute( 'data-fg-mini-radius' ) === '1',
         captions:      galleryEl.getAttribute( 'data-fg-mini-captions' ) === '1',
         captionSource: galleryEl.getAttribute( 'data-fg-mini-caption-source' ) || 'caption',
+        labels:        readLabels( galleryEl ),
         loop:          true,
     };
 }

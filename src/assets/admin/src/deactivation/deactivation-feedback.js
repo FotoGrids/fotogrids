@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { navigateTo } from '../utils/navigate';
 import ReasonsForm from './ReasonsForm.jsx';
 
 const SETTINGS_KEY = 'fotogridsDeactivation';
@@ -30,10 +31,14 @@ function getSettings() {
  * @return {HTMLAnchorElement|null} The matched link, or null.
  */
 function matchDeactivateLink(target, pluginBasename) {
-	if (!pluginBasename) return null;
+	if (!pluginBasename) {
+		return null;
+	}
 
 	const link = target.closest && target.closest('a');
-	if (!link) return null;
+	if (!link) {
+		return null;
+	}
 
 	const slug = pluginBasename.split('/')[0];
 	if (link.id === `deactivate-${slug}`) {
@@ -96,7 +101,6 @@ function submitToFreemius(settings, reason) {
 			if (settings.debug) {
 				const text = await response.text();
 				if (!response.ok || text.trim() !== '1') {
-					// eslint-disable-next-line no-console
 					console.warn(
 						'[FotoGrids] Deactivation feedback not accepted:',
 						response.status,
@@ -107,7 +111,6 @@ function submitToFreemius(settings, reason) {
 		})
 		.catch((error) => {
 			if (settings.debug && error.name !== 'AbortError') {
-				// eslint-disable-next-line no-console
 				console.warn(
 					'[FotoGrids] Deactivation feedback failed:',
 					error
@@ -117,14 +120,10 @@ function submitToFreemius(settings, reason) {
 		.finally(() => clearTimeout(timer));
 }
 
-function navigate(url) {
-	window.location.assign(url);
-}
-
 function openModal(settings, link) {
 	const api = window.FotoGridsAdmin && window.FotoGridsAdmin.modal;
 	if (!api) {
-		navigate(link.href);
+		navigateTo(link.href);
 		return;
 	}
 
@@ -138,11 +137,11 @@ function openModal(settings, link) {
 				onSubmit: async (reason) => {
 					await submitToFreemius(settings, reason);
 					close('programmatic');
-					navigate(link.href);
+					navigateTo(link.href);
 				},
 				onSkip: () => {
 					close('programmatic');
-					navigate(link.href);
+					navigateTo(link.href);
 				},
 				onCancel: () => close('cancel'),
 				// ReasonsForm is rendered inside a separate bundle's Modal, so
@@ -158,7 +157,9 @@ function openModal(settings, link) {
 
 function init() {
 	const settings = getSettings();
-	if (!settings) return;
+	if (!settings) {
+		return;
+	}
 
 	document.addEventListener(
 		'click',
@@ -167,7 +168,9 @@ function init() {
 				event.target,
 				settings.pluginBasename
 			);
-			if (!link) return;
+			if (!link) {
+				return;
+			}
 
 			event.preventDefault();
 			openModal(settings, link);

@@ -298,8 +298,9 @@ const GalleryMetabox = ({
                 <div className={`fotogrids-gallery-tab-content ${activeTab === 'preview' ? 'fotogrids-gallery-tab-content--active' : ''}`}>
                     {activeTab === 'preview' && (
                         <GalleryPreview
-                            items={items}
                             galleryId={window.fotogridsMetaBoxes?.postId || null}
+                            hasItems={items.length > 0}
+                            onAddItems={() => handleTabSwitch('manage')}
                         />
                     )}
                 </div>

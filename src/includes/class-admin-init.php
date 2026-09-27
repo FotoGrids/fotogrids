@@ -190,7 +190,7 @@ class Admin_Init {
 		wp_enqueue_script(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/admin.js',
-			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
+			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'wp-media-utils', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
 			FOTOGRIDS_VERSION,
 			true
 		);
@@ -234,6 +234,13 @@ class Admin_Init {
 		wp_enqueue_style(
 			'fotogrids-jetbrains-mono',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/fonts/jetbrains-mono/jetbrains-mono.css',
+			array(),
+			FOTOGRIDS_VERSION
+		);
+
+		wp_enqueue_style(
+			'fotogrids-error-boundary',
+			FOTOGRIDS_PLUGIN_URL . 'assets/css/error-boundary.css',
 			array(),
 			FOTOGRIDS_VERSION
 		);
@@ -1079,7 +1086,7 @@ class Admin_Init {
 			$album_name = '';
 			if ( $album_id ) {
 				$album      = get_post( $album_id );
-				$album_name = $album ? $album->post_title : __( 'Unknown Album', 'fotogrids' );
+				$album_name = $album ? Collection_Title::label( $album ) : __( 'Unknown Album', 'fotogrids' );
 			}
 
 			if ( $assigned > 0 ) {
@@ -1232,7 +1239,7 @@ class Admin_Init {
 					<option value=""><?php esc_html_e( 'Choose an album...', 'fotogrids' ); ?></option>
 					<?php foreach ( $albums as $album ) : ?>
 						<option value="<?php echo esc_attr( $album->ID ); ?>">
-							<?php echo esc_html( $album->post_title ); ?>
+							<?php echo esc_html( Collection_Title::label( $album ) ); ?>
 						</option>
 					<?php endforeach; ?>
 				</select>

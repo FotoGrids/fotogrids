@@ -239,8 +239,7 @@ class Dashboard_Widget {
 										<?php if ( '' !== $item['title'] ) : ?>
 											<?php echo esc_html( $item['title'] ); ?>
 										<?php else : ?>
-											<span class="fotogrids-dw-untitled"><?php echo esc_html( $item['untitled_label'] ); ?></span>
-											<?php printf( '#%d', (int) $item['id'] ); ?>
+											<span class="fotogrids-dw-untitled"><?php echo esc_html( $item['placeholder'] ); ?></span>
 										<?php endif; ?>
 										<span class="dashicons dashicons-edit"></span>
 									</a>
@@ -304,12 +303,7 @@ class Dashboard_Widget {
 		$album_counts = wp_count_posts( 'fotogrids_album' );
 		$albums_count = (int) ( array_sum( (array) $album_counts ) ?? 0 );
 
-		$items_table = $wpdb->prefix . 'fotogrids_item_meta';
-		$items_count = 0;
-
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $items_table ) ) === $items_table ) {
-			$items_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$items_table}`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input.
-		}
+		$items_count = \FotoGrids\Galleries\Gallery_Repository::count_all_items( array( 'publish', 'future', 'draft', 'pending', 'private' ) );
 
 		$total_views = 0;
 		$stats_table = $wpdb->prefix . 'fotogrids_statistics';

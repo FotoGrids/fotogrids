@@ -1,6 +1,8 @@
 <?php
 namespace FotoGrids\Tools\ImportExport;
 
+use FotoGrids\Galleries\Item_Meta;
+use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -780,61 +782,62 @@ class Import_Export_Data {
 	}
 
 	/**
-	 * Import gallery items.
-	 * Items whose attachment_id doesn't exist on this site are skipped.
+	 * Import item rows.
 	 * Returns [imported_count, skipped_count].
 	 */
 	private static function import_items( array $items, array $gallery_id_map ): array {
-		global $wpdb;
-		$table    = $wpdb->prefix . 'fotogrids_item_meta';
 		$imported = 0;
 		$skipped  = 0;
+		$lists    = array();
 
 		foreach ( $items as $item ) {
 			$attachment_id = (int) ( $item['attachment_id'] ?? 0 );
-			$old_gallery   = (int) ( $item['gallery_id'] ?? 0 );
-			$gallery_id    = $gallery_id_map[ $old_gallery ] ?? $old_gallery;
 
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
 				++$skipped;
 				continue;
 			}
 
-			// Skip if this exact attachment is already in this gallery.
-			$exists = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT id FROM {$table} WHERE attachment_id = %d AND gallery_id = %d LIMIT 1",
-					$attachment_id,
-					$gallery_id
-				)
-			);
-			if ( $exists ) {
+			$old_gallery = (int) ( $item['gallery_id'] ?? 0 );
+			if ( $old_gallery > 0 && isset( $gallery_id_map[ $old_gallery ] ) ) {
+				$lists[ (int) $gallery_id_map[ $old_gallery ] ][] = array( (int) ( $item['position'] ?? 0 ), $attachment_id );
+			}
+
+			if ( null !== Item_Meta::get( $attachment_id ) ) {
 				++$skipped;
 				continue;
 			}
 
-			$wpdb->insert(
-				$table,
+			$saved = Item_Meta::save(
+				$attachment_id,
 				array(
-					'attachment_id' => $attachment_id,
-					'gallery_id'    => $gallery_id,
-					'position'      => (int) ( $item['position'] ?? 0 ),
-					'item_type'     => sanitize_text_field( $item['item_type'] ?? 'image' ),
-					'caption'       => sanitize_text_field( $item['caption'] ?? '' ),
-					'description'   => wp_kses_post( $item['description'] ?? '' ),
-					'credit'        => sanitize_text_field( $item['credit'] ?? '' ),
-					'location'      => sanitize_text_field( $item['location'] ?? '' ),
-					'external_url'  => esc_url_raw( $item['external_url'] ?? '' ),
-					'link_target'   => sanitize_text_field( $item['link_target'] ?? '' ),
-					'exif_data'     => is_array( $item['exif_data'] ?? null )
-						? wp_json_encode( $item['exif_data'] )
-						: ( $item['exif_data'] ?? null ),
-					'custom_data'   => is_array( $item['custom_data'] ?? null )
-						? wp_json_encode( $item['custom_data'] )
-						: ( $item['custom_data'] ?? null ),
+					'item_type'    => sanitize_text_field( $item['item_type'] ?? 'image' ),
+					'caption'      => sanitize_text_field( $item['caption'] ?? '' ),
+					'description'  => wp_kses_post( $item['description'] ?? '' ),
+					'credit'       => sanitize_text_field( $item['credit'] ?? '' ),
+					'location'     => sanitize_text_field( $item['location'] ?? '' ),
+					'external_url' => esc_url_raw( $item['external_url'] ?? '' ),
+					'link_target'  => sanitize_text_field( $item['link_target'] ?? '' ),
+					'exif_data'    => $item['exif_data'] ?? null,
+					'custom_data'  => $item['custom_data'] ?? null,
 				)
 			);
-			++$imported;
+
+			if ( $saved ) {
+				++$imported;
+			} else {
+				++$skipped;
+			}
+		}
+
+		foreach ( $lists as $gallery_id => $entries ) {
+			usort(
+				$entries,
+				static function ( array $a, array $b ): int {
+					return $a[0] - $b[0];
+				}
+			);
+			Item_Meta_Consolidation::restore_list( $gallery_id, array_column( $entries, 1 ) );
 		}
 
 		return array( $imported, $skipped );

@@ -19,7 +19,9 @@ const wrapConfirm =
 				},
 				onClose: (reason) => {
 					opts.onClose?.(reason);
-					if (reason !== 'confirm') resolve(false);
+					if (reason !== 'confirm') {
+						resolve(false);
+					}
 				},
 			});
 		});
@@ -40,7 +42,9 @@ const wrapPrompt =
 				},
 				onClose: (reason) => {
 					opts.onClose?.(reason);
-					if (reason !== 'confirm') resolve(null);
+					if (reason !== 'confirm') {
+						resolve(null);
+					}
 				},
 			});
 		});
@@ -82,10 +86,14 @@ const wrapAlert =
  *   tab-changed detail: { modalId, fromTab, toTab }
  */
 export const installPublicApi = () => {
-	if (typeof window === 'undefined') return;
+	if (typeof window === 'undefined') {
+		return;
+	}
 
 	window.FotoGridsAdmin = window.FotoGridsAdmin || {};
-	if (window.FotoGridsAdmin.modal) return;
+	if (window.FotoGridsAdmin.modal) {
+		return;
+	}
 
 	window.FotoGridsAdmin.modal = {
 		open: (opts) => modalRegistry.open(opts),

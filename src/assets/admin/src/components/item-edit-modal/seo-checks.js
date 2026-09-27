@@ -201,19 +201,13 @@ const meaningfulTokens = (value) =>
 		.toLowerCase()
 		.split(/[-_.\s]+/)
 		.filter((token) => {
-			if (token.length < 3) {
-				return false;
-			}
-
 			if (
+				token.length < 3 ||
 				/^\d+$/.test(token) ||
 				/^\d+x\d+$/.test(token) ||
-				/^v\d+$/.test(token)
+				/^v\d+$/.test(token) ||
+				/^[0-9a-f]{8,}$/.test(token)
 			) {
-				return false;
-			}
-
-			if (/^[0-9a-f]{8,}$/.test(token)) {
 				return false;
 			}
 

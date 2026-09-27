@@ -185,6 +185,7 @@ const mainConfig = {
         'global-modal-init': './src/assets/admin/src/global-modal-init.js',
         'admin-header': './src/assets/admin/src/admin-header.js',
         'upgrade-modal': './src/assets/admin/src/styles/upgrade-modal.scss',
+        'error-boundary': './src/assets/admin/src/styles/error-boundary.scss',
         // Aggregated shared-component stylesheet for every surface that
         // uses FG components outside the FotoGrids admin pages
         // (Gutenberg + Elementor editors today, Divi/Bricks tomorrow).
@@ -259,7 +260,7 @@ const mainConfig = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                        presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'classic' }]],
                     },
                 },
             },
@@ -838,7 +839,7 @@ const diviNativeConfig = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react'],
+                        presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'classic' }]],
                     },
                 },
             },
