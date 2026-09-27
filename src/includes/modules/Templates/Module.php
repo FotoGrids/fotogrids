@@ -283,9 +283,9 @@ class Module extends Abstract_Module {
 			true
 		);
 
-		// The page reads the licence state while it mounts. fotogridsSettings is
-		// attached to the admin bundle's handle, which this script no longer
-		// waits for, so the flag travels with the page bundle instead.
+		// The page reads the licence state while it mounts; the flag travels with
+		// the page bundle because this script does not depend on the admin bundle
+		// that carries fotogridsSettings.
 		wp_localize_script(
 			'fotogrids-module-templates-page',
 			'fotogridsTemplatesPage',

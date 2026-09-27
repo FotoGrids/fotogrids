@@ -24,8 +24,7 @@ class Admin_Init {
 		add_action( 'admin_init', array( __CLASS__, 'maybe_upgrade_redirect' ), 1 );
 
 		// Allow wp_safe_redirect() to reach the external hosts FotoGrids links
-		// out to (review page, upgrade/marketing). Keeps redirects on the
-		// safe-redirect path while permitting our own known destinations.
+		// out to (review page, upgrade/marketing).
 		add_filter( 'allowed_redirect_hosts', array( __CLASS__, 'allowed_redirect_hosts' ) );
 
 		add_action( 'admin_head', array( __CLASS__, 'suppress_admin_notices' ) );
@@ -191,7 +190,7 @@ class Admin_Init {
 		wp_enqueue_script(
 			'fotogrids-admin',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/admin.js',
-			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
+			array( 'wp-element', 'wp-components', 'wp-data', 'wp-api-fetch', 'wp-i18n', 'wp-media-utils', 'fotogrids-icons', 'fotogrids-ui-state-manager' ),
 			FOTOGRIDS_VERSION,
 			true
 		);
@@ -235,6 +234,13 @@ class Admin_Init {
 		wp_enqueue_style(
 			'fotogrids-jetbrains-mono',
 			FOTOGRIDS_PLUGIN_URL . 'assets/admin/fonts/jetbrains-mono/jetbrains-mono.css',
+			array(),
+			FOTOGRIDS_VERSION
+		);
+
+		wp_enqueue_style(
+			'fotogrids-error-boundary',
+			FOTOGRIDS_PLUGIN_URL . 'assets/css/error-boundary.css',
 			array(),
 			FOTOGRIDS_VERSION
 		);
@@ -522,7 +528,7 @@ class Admin_Init {
 	 *
 	 * Recursively sanitises an arbitrary settings array: scalar values are
 	 * passed through sanitize_text_field() and nested arrays are walked. Used
-	 * for option groups that do not (yet) have a typed per-key sanitizer of
+	 * for option groups that do not have a typed per-key sanitizer of
 	 * their own. Non-array input collapses to an empty array.
 	 *
 	 * @since  1.0.0
@@ -556,7 +562,7 @@ class Admin_Init {
 	 *
 	 * Toggle uses a hidden input that is always present in POST with value
 	 * '1' (on) or '0' (off), so absence-from-POST is not a valid signal.
-	 * We cast the raw value directly.
+	 * The raw value is cast directly.
 	 *
 	 * @since  1.0.0
 	 * @param  mixed $value Raw option value from options.php.
@@ -669,11 +675,10 @@ class Admin_Init {
 			$sanitized_value = $sanitized_bool ? '1' : '0';
 
 			global $wpdb;
-			// Direct existence check on the core options table: we must know
-			// whether the row already exists to choose add_option() (to force
-			// autoload='yes' on first create) vs update_option(), which
-			// get_option() cannot distinguish from a falsey stored value. The
-			// query is prepared; no object cache applies to this one-off check.
+			// The row's existence decides add_option() (to force autoload='yes' on
+			// first create) vs update_option(); get_option() cannot tell a missing
+			// row from a falsey stored value. The query is prepared; no object cache
+			// applies to this one-off check.
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$option_exists = $wpdb->get_var(
 				$wpdb->prepare(
@@ -736,9 +741,8 @@ class Admin_Init {
 	 */
 	private static function resolve_share_statistics_state(): bool {
 		$option_raw = get_option( 'fotogrids_share_statistics', null );
-		// Tolerant cast: historically this option was written as `'1'` /
-		// `'0'` strings, and `(bool) '0'` is `true` in PHP. Treat
-		// '', '0', 0, false, null all as off.
+		// Tolerant cast: `(bool) '0'` is true in PHP, so '', '0', 0, false and
+		// null all read as off.
 		$option_bool = ! (
 			null === $option_raw ||
 			false === $option_raw ||
@@ -830,7 +834,7 @@ class Admin_Init {
 	 * Render is owned by the Templates module. The menu item stays here so
 	 * submenu ordering is centralized, but the page body is delegated to the
 	 * module's render_page(). Falls back to the shared renderer if the module
-	 * is unavailable (defensive - should not happen in normal operation).
+	 * is unavailable.
 	 */
 	public static function templates_page() {
 		$entry = \FotoGrids\Modules\Module_Registry::get_by_id( 'templates' );
@@ -930,7 +934,7 @@ class Admin_Init {
 	 */
 	private static function get_menu_icon() {
 		// Custom SVG icon as base64 data URI. WP admin forces the menu-icon
-		// colour via core CSS, so we hand it the neutral admin grey.
+		// colour via core CSS, so the icon uses the neutral admin grey.
 		$svg = \FotoGrids\Svg::fotogrids_icon( array( 'fill' => '#a7aaad' ) );
 		return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Benign data encoding, not code obfuscation.
 	}
@@ -1082,7 +1086,7 @@ class Admin_Init {
 			$album_name = '';
 			if ( $album_id ) {
 				$album      = get_post( $album_id );
-				$album_name = $album ? $album->post_title : __( 'Unknown Album', 'fotogrids' );
+				$album_name = $album ? Collection_Title::label( $album ) : __( 'Unknown Album', 'fotogrids' );
 			}
 
 			if ( $assigned > 0 ) {
@@ -1227,7 +1231,7 @@ class Admin_Init {
 			$id        = 'fotogrids-bulk-album-selector-' . $which;
 			$select_id = 'fotogrids-album-select-' . $which;
 			?>
-			<span id="<?php echo esc_attr( $id ); ?>" class="fotogrids-bulk-album-selector" style="display: none; margin-left: 6px;">
+			<span id="<?php echo esc_attr( $id ); ?>" class="fotogrids-bulk-album-selector" style="display: none; margin-inline-start: 6px;">
 				<label for="<?php echo esc_attr( $select_id ); ?>" class="screen-reader-text">
 					<?php esc_html_e( 'Select Album:', 'fotogrids' ); ?>
 				</label>
@@ -1235,7 +1239,7 @@ class Admin_Init {
 					<option value=""><?php esc_html_e( 'Choose an album...', 'fotogrids' ); ?></option>
 					<?php foreach ( $albums as $album ) : ?>
 						<option value="<?php echo esc_attr( $album->ID ); ?>">
-							<?php echo esc_html( $album->post_title ); ?>
+							<?php echo esc_html( Collection_Title::label( $album ) ); ?>
 						</option>
 					<?php endforeach; ?>
 				</select>
@@ -1319,10 +1323,7 @@ class Admin_Init {
 						return;
 					}
 
-					// Determine which row submitted: WordPress disables the
-					// non-submitting row's hidden inputs via the bulk action
-					// logic, but to be safe, prefer the row whose action is
-					// assign_to_album.
+					// Prefer the row whose action is assign_to_album.
 					var activeWhich = topVal === 'assign_to_album' ? 'top' : 'bottom';
 					var activeSelect = document.querySelector('select[data-fg-album-select="' + activeWhich + '"]');
 					var albumId = activeSelect ? activeSelect.value : '';

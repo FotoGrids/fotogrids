@@ -225,11 +225,11 @@
 		padding: ui-size(padding, base) ui-size(padding, md);
 
 		&.notice-success {
-			border-left-color: ui-color(border, success);
+			border-inline-start-color: ui-color(border, success);
 		}
 
 		&.notice-error {
-			border-left-color: ui-color(border, error);
+			border-inline-start-color: ui-color(border, error);
 		}
 
 		p {
@@ -248,7 +248,7 @@
 
 	.spinner {
 		float: none;
-		margin-right: ui-size(margin, base);
+		margin-inline-end: ui-size(margin, base);
 	}
 }
 

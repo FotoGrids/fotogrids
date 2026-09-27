@@ -15,8 +15,8 @@ window.FotoGridsRenderSettings = window.FotoGridsRenderSettings || {};
  *   }
  *
  * The stored value is the attachment ID (integer) or 0 when nothing is
- * selected. We render the thumbnail via the WP REST media endpoint on
- * demand so the picker doesn't need a bootstrap payload.
+ * selected. The thumbnail comes from the WP REST media endpoint on demand,
+ * so the picker needs no bootstrap payload.
  */
 window.FotoGridsRenderSettings.renderImagePicker = (
 	setting,
@@ -50,7 +50,9 @@ window.FotoGridsRenderSettings.renderImagePicker = (
 			setLoading(true);
 			wp.apiFetch({ path: `/wp/v2/media/${attachmentId}` })
 				.then((media) => {
-					if (!active) return;
+					if (!active) {
+						return;
+					}
 					const url =
 						media?.media_details?.sizes?.medium?.source_url ||
 						media?.media_details?.sizes?.thumbnail?.source_url ||

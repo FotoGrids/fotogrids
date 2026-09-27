@@ -215,8 +215,8 @@ class Tools_Registry {
 	private static function sort_tools(): void {
 		$priority = self::SOURCE_PRIORITY;
 
-		// PHP's uasort is not guaranteed stable before 8.0; we implement
-		// a stable sort by tagging each entry with its insertion index.
+		// uasort is not guaranteed stable before PHP 8.0, so each entry is tagged
+		// with its insertion index.
 		$indexed = array();
 		$i       = 0;
 		foreach ( self::$tools as $id => $entry ) {

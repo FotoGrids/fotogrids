@@ -25,7 +25,7 @@
 	 * Whether a piece of text points at a FotoGrids asset.
 	 *
 	 * @param {string} text Filename or stack trace.
-	 * @return {boolean} True when it references one of our script paths.
+	 * @return {boolean} True when it references one of the FotoGrids script paths.
 	 */
 	function isOurs(text) {
 		if (!text) {

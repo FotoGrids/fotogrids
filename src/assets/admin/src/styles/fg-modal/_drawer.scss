@@ -2,8 +2,8 @@
 	.fg-modal__dialog {
 		top: 0;
 		bottom: 0;
-		left: auto;
-		right: 0;
+		inset-inline-start: auto;
+		inset-inline-end: 0;
 		transform: none;
 		width: var(--fg-modal-drawer-width, 440px);
 		height: 100%;
@@ -15,10 +15,28 @@
 	}
 
 	&.fg-modal--drawer-left .fg-modal__dialog {
-		right: auto;
-		left: 0;
+		inset-inline-end: auto;
+		inset-inline-start: 0;
 		box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
 		animation-name: fg-modal-drawer-in-left;
+	}
+}
+
+body.rtl .fg-modal--drawer {
+	.fg-modal__dialog {
+		box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: fg-modal-drawer-in-left;
+		}
+	}
+
+	&.fg-modal--drawer-left .fg-modal__dialog {
+		box-shadow: -4px 0 24px rgba(0, 0, 0, 0.25);
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: fg-modal-drawer-in;
+		}
 	}
 }
 

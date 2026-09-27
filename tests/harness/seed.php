@@ -11,9 +11,9 @@
  *
  * Prints `FGFIXTURES` followed by a JSON map of fixture key to the ids it owns.
  *
- * Fixtures are built through the plugin's own APIs - Gallery_Items,
- * Gallery_Repository, Embed_Store, Metadata_Manager, Gallery_Album_Relations -
- * and never by writing rows directly. A fixture assembled by hand would encode
+ * Fixtures are built through the plugin's own APIs - Gallery_Repository,
+ * Embed_Store, Metadata_Manager, Gallery_Album_Relations - and never by
+ * writing rows directly. A fixture assembled by hand would encode
  * this file's idea of the schema rather than the plugin's, and would keep
  * passing after the plugin's own writers changed.
  *
@@ -26,7 +26,6 @@
  */
 
 use FotoGrids\Galleries\Embed_Store;
-use FotoGrids\Galleries\Gallery_Items;
 use FotoGrids\Galleries\Gallery_Repository;
 
 if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
@@ -385,15 +384,10 @@ function fg_seed_gallery( string $key, string $title, array $item_ids = array(),
 	}
 
 	if ( $item_ids ) {
+		// This list is both membership and display order, and item metadata is
+		// now one row per attachment rather than per gallery, so there is
+		// nothing further to write here.
 		Gallery_Repository::set_item_ids( $id, $item_ids );
-
-		// The id list is the display order; the item_meta rows are what the
-		// render path reads. Gallery_Items::add writes the per-gallery row.
-		foreach ( $item_ids as $position => $item_id ) {
-			if ( 'attachment' === get_post_type( $item_id ) ) {
-				Gallery_Items::add( $id, (int) $item_id, array( 'position' => $position ) );
-			}
-		}
 	}
 
 	fg_seed_mark( $id, $key );
@@ -553,11 +547,6 @@ function fg_seed_purge( ?string $key = null ): int {
 	$owned = fg_seed_owned( $key );
 
 	foreach ( $owned as $post_id ) {
-		if ( 'fotogrids_gallery' === get_post_type( $post_id ) ) {
-			foreach ( Gallery_Repository::get_item_ids( $post_id ) as $item_id ) {
-				Gallery_Items::remove( $post_id, (int) $item_id );
-			}
-		}
 		if ( Embed_Store::is_embed( $post_id ) ) {
 			Embed_Store::delete( $post_id );
 			continue;

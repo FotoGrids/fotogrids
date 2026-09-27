@@ -122,7 +122,10 @@ const LivePreview = ({
                     return;
                 }
 
-                await applyPreviewResponse(containerRef.current, data);
+                await applyPreviewResponse(containerRef.current, data, {
+                    ownerWindow:
+                        containerRef.current.ownerDocument?.defaultView || window,
+                });
             } catch (err) {
                 if (seq !== requestSeqRef.current) {
                     return;

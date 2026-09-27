@@ -6,6 +6,7 @@ import Segmented from '../shared/Segmented';
 import Select from '../shared/Select';
 import NumberField from '../shared/NumberField';
 import TemplateOverviewModal from './TemplateOverviewModal';
+import { buildRestUrl } from '../../utils/rest-url';
 import ApplyTemplateModal from './ApplyTemplateModal';
 
 const { __ } = wp.i18n;
@@ -40,8 +41,8 @@ const PreviewTemplateModal = ({ template, onClose, onApply, applyLabel }) => {
 		}
 
 		// Accept messages from either the library subdomain or the main site:
-		// today library.fotogrids.com redirects to www, so the iframe's real
-		// origin is www; a future standalone library site is covered too.
+		// library.fotogrids.com redirects to www, so the iframe's real origin is
+		// www; a standalone library origin is accepted too.
 		// Override with window.fotogridsAdmin.libraryOrigins (array) if needed.
 		const allowedOrigins = window.fotogridsAdmin?.libraryOrigins || [
 			'https://library.fotogrids.com',
@@ -102,10 +103,9 @@ const PreviewTemplateModal = ({ template, onClose, onApply, applyLabel }) => {
 		}
 
 		// Local render (user templates, offline fallback, Pro-installed path).
-		const baseUrl =
-			window.fotogridsAdmin?.apiUrl ||
-			window.location.origin + '/wp-json/';
-		const previewUrl = new URL('fotogrids/v1/templates/preview', baseUrl);
+		const previewUrl = new URL(
+			buildRestUrl('fotogrids/v1/templates/preview')
+		);
 
 		const restNonce =
 			window.fotogridsAdmin?.restNonce || wpApiSettings?.nonce || '';

@@ -28,12 +28,7 @@
         let pagination = window.FotoGrids.modules.pagination;
         let s = pagination.state( gEl );
 
-        // Reconcile the rendered chip list with the current totalPages.
-        // PHP renders 1..N chips for the unfiltered count; once a filter
-        // is applied the server returns a new totalPages reflecting the
-        // filtered set, and the chip list must match - otherwise we
-        // either leave stale chips for pages that no longer exist or
-        // are missing chips for newly-reachable pages.
+        // Filters change the server's totalPages; rebuild the chip list to match.
         rebuildChips( nav, s.totalPages );
 
         // Prev / Next disabled state.
@@ -68,16 +63,10 @@
     /**
      * Reconcile the rendered numbered-chip list with `totalPages`.
      *
-     * PHP renders chips 1..N for the unfiltered gallery total. When
-     * filters mutate the active set the server returns a different
-     * totalPages, so we add or remove chips to match before any
-     * active-state / truncation pass runs.
-     *
-     * Mirrors the PHP markup in Page_Buttons::render_number_buttons() -
-     * same element + class structure, same data attrs - so styling and
-     * the click delegation in attach() keep working unchanged. Ellipsis
-     * chips (.fg-pagination__ellipsis-item) are excluded so they get
-     * cleared and rebuilt by applyTruncation() on the same pass.
+     * PHP renders chips 1..N for the unfiltered total; filters can change
+     * totalPages, so chips are added or removed to match. The markup mirrors
+     * Page_Buttons::render_number_buttons(). Ellipsis chips are left to
+     * applyTruncation().
      *
      * @param {Element} nav
      * @param {number}  totalPages
@@ -123,9 +112,8 @@
     /**
      * Apply page-bar truncation (boundary + siblings + ellipses).
      *
-     * When the wrapper's data-fg-pages-truncate is "0" we keep every page
-     * button visible - bail fast after clearing any leftover ellipses /
-     * trim flags from a previous sync.
+     * When data-fg-pages-truncate is "0" every page button stays visible, after
+     * clearing ellipses and trim flags left by a previous sync.
      *
      * When truncation is on, the visible set is:
      *   - boundary pages on each end: { 1, N }
@@ -133,8 +121,8 @@
      * Anything outside that set is hidden via .fg-is-trimmed and gaps are
      * filled with disabled-button ellipsis chips wrapped in
      * .fg-pagination__number-item <li>s (same wrapper class as the real
-     * chips, plus a .fg-pagination__ellipsis-item marker so we can find
-     * and remove them on the next sync).
+     * chips, plus a .fg-pagination__ellipsis-item marker for removal on the
+     * next sync).
      *
      * `siblings` is read off the computed --fg-pagination-siblings CSS
      * variable, so the per-breakpoint @media block emitted by PHP
@@ -150,18 +138,13 @@
         let list = nav.querySelector( '.fg-pagination__numbers' );
         if ( ! list ) return;
 
-        // Clear any ellipsis chips inserted on a previous sync so we can
-        // rebuild them cleanly against the new current page / total. The
-        // marker class .fg-pagination__ellipsis-item only sits on chips
-        // we created at runtime - PHP never emits it - so this is safe.
+        // Remove ellipsis chips from the previous sync; PHP never emits
+        // .fg-pagination__ellipsis-item.
         list.querySelectorAll( '.fg-pagination__ellipsis-item' ).forEach( function ( el ) {
             el.remove();
         } );
 
-        // Only collect the real numbered chips; any leftover ellipsis-
-        // items would have been removed in the cleanup above, but the
-        // :not() guards against future markup changes where the cleanup
-        // doesn't reach (e.g. server-side prerendered ellipses).
+        // Real numbered chips only.
         const numberItems = Array.prototype.slice.call(
             list.querySelectorAll( '.fg-pagination__number-item:not(.fg-pagination__ellipsis-item)' )
         );
@@ -207,10 +190,8 @@
             visible[ p ] = true;
         }
 
-        // Toggle .fg-is-trimmed on each <li> wrapper to match the visible
-        // set. We mark the wrapper (not the inner <button>) so the whole
-        // list-item drops out of the flex flow, including its gap, rather
-        // than leaving an empty zero-width <li> behind.
+        // The <li> wrapper is trimmed rather than the <button>, so the item and its
+        // gap leave the flex flow.
         numberItems.forEach( function ( item ) {
             let btn = item.querySelector( '.fg-pagination__number' );
             if ( ! btn ) return;
@@ -222,13 +203,8 @@
             }
         } );
 
-        // Insert ellipsis chips wherever two consecutive visible pages
-        // aren't actually adjacent in the page sequence. The ellipsis
-        // renders as a disabled .fg-pagination__btn inside the same
-        // .fg-pagination__number-item wrapper as the numbered chips, so
-        // its height/padding/font/baseline line up exactly with the
-        // surrounding buttons. CSS strips the interactive states so it
-        // reads as a gap indicator rather than a clickable target.
+        // Ellipsis chips fill gaps between non-adjacent visible pages. They are
+        // disabled buttons in the same <li> wrapper, so they line up with the numbers.
         const visibleItems = numberItems.filter( function ( item ) {
             return ! item.classList.contains( 'fg-is-trimmed' );
         } );
@@ -319,11 +295,7 @@
         // "next" walking past the end of the current page).
         pagination.onChange( gEl, function () { syncBar( gEl, nav ); } );
 
-        // Filter change → swap to the new filter state. Restores from
-        // cache instantly when available; falls back to a server fetch
-        // for never-before-seen combinations. syncBar re-renders the
-        // pagination chrome (active state, ellipsis trimming) against
-        // whatever the new state is.
+        // Filter change: swap to the new filter state, then re-sync the bar.
         gEl.addEventListener( 'fotogrids:filters_changed', function () {
             nav.classList.add( 'fg-is-loading' );
             pagination

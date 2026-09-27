@@ -212,13 +212,11 @@ final class Plugin_Settings_Store {
 				$sanitized[ $key ] = ( '1' === $value || 'true' === $value || true === $value || 'on' === $value );
 			} elseif ( is_numeric( $default_value ) ) {
 				$sanitized[ $key ] = is_numeric( $value ) ? $value : $default_value;
-			} elseif ( 'password_input' === \FotoGrids\Settings\Setting_Value_Codec::catalog_field_type( $key ) ) {
-				// Passwords must not pass through sanitize_text_field(), which
-				// would strip characters that are valid in a password. Keep the
-				// value as-is; the per-collection save path encrypts it.
-				$sanitized[ $key ] = is_scalar( $value ) ? (string) $value : '';
 			} else {
-				$sanitized[ $key ] = sanitize_text_field( $value );
+				$sanitized[ $key ] = Setting_Value_Codec::sanitize_text_value(
+					$value,
+					Setting_Value_Codec::catalog_field_type( $key )
+				);
 			}
 		}
 
@@ -343,7 +341,7 @@ final class Plugin_Settings_Store {
 	 * Snapshot of Freemius's current tracking state, used for debug
 	 * logging around `apply_share_statistics_consent` and
 	 * `resolve_share_statistics_state` so log lines pin down whether a
-	 * desync is on our side or Freemius's side.
+	 * desync is in FotoGrids or on the Freemius side.
 	 *
 	 * @return array<string,mixed>
 	 */

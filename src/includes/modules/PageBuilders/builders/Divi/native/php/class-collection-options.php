@@ -18,8 +18,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Builds the `value => label` option map injected into the native
  * `divi/select` field at module-registration time.
  *
- * The select's `props.options` in `module.json` ships empty (`{}`); we
- * populate it server-side by overriding `attributes` in
+ * The select's `props.options` in `module.json` ships empty (`{}`) and is
+ * populated server-side by overriding `attributes` in
  * `ModuleRegistration::register_module()`'s `$args` (which win the merge
  * over the JSON metadata). This is the supported, decoupled way to feed a
  * dynamic option list without depending on Divi's internal field-options
@@ -73,10 +73,7 @@ final class Collection_Options {
 		);
 
 		foreach ( $posts as $post ) {
-			$title = '' !== $post->post_title
-				? $post->post_title
-				/* translators: %d: collection post ID. */
-				: sprintf( esc_html__( '(no title) #%d', 'fotogrids' ), (int) $post->ID );
+			$title = \FotoGrids\Collection_Title::label( $post );
 
 			if ( 'publish' !== $post->post_status ) {
 				$obj = get_post_status_object( $post->post_status );

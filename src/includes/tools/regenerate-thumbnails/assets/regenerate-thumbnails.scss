@@ -46,7 +46,8 @@
 
     &__progress-bar {
         position: absolute;
-        inset: 0 auto 0 0;
+        inset-block: 0;
+        inset-inline: 0 auto;
         background: var(--fg-interactive-selected-bg-darker);
         transition: width 0.2s ease-out;
     }
@@ -173,7 +174,7 @@
     @at-root {
         th#{&}__col-size--multi,
         td#{&}__col-size--multi {
-            text-align: left;
+            text-align: start;
             white-space: nowrap;
             width: 140px;
             vertical-align: middle;
@@ -229,7 +230,7 @@
     }
 
     &__row-status-dims {
-        margin-left: 4px;
+        margin-inline-start: 4px;
         font-size: 11px;
         font-weight: 400;
         color: var(--fg-text-secondary);
@@ -417,7 +418,7 @@
     }
 
     &__log-entry-source {
-        margin-left: auto;
+        margin-inline-start: auto;
         font-size: 11px;
         color: var(--fg-text-tertiary);
     }
@@ -435,12 +436,14 @@
             width: 1%;
             white-space: nowrap;
             text-align: center;
-            padding: 12px 0 12px 24px;
+            padding-block: 12px;
+            padding-inline: 24px 0;
         }
 
         td#{&}__log-size-trailing-cell {
             width: auto;
-            padding: 12px 24px 12px 0;
+            padding-block: 12px;
+            padding-inline: 0 24px;
         }
     }
 

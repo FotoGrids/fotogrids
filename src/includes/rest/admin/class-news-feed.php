@@ -281,6 +281,16 @@ class News_Feed {
 		}
 
 		$url = isset( $entry['link'] ) ? (string) $entry['link'] : ( isset( $entry['url'] ) ? (string) $entry['url'] : '' );
+		if ( '' !== $url ) {
+			$url = add_query_arg(
+				array(
+					'utm_source'   => 'plugin',
+					'utm_medium'   => 'news',
+					'utm_campaign' => 'blog',
+				),
+				$url
+			);
+		}
 
 		$date      = isset( $entry['date'] ) ? (string) $entry['date'] : '';
 		$timestamp = $date ? strtotime( $date ) : false;

@@ -22,10 +22,6 @@ if ( ! defined( 'WPINC' ) ) {
  *   - POST /fotogrids/v1/gallery/lightbox/slides (batch hydration on
  *     navigate-into-uncached-range).
  *
- * Future Pro hooks may add more fields (people, location, GPS) by
- * extending the returned array via a filter - but Free defines the
- * canonical contract here.
- *
  * @package FotoGrids\Render\Lightbox\Shared
  * @since   1.0.0
  */
@@ -145,6 +141,15 @@ final class Lightbox_Slide_Builder {
 				$slide['full_url']       = $poster;
 			}
 
+			if ( ! isset( $slide['item_type'] ) ) {
+				$full_src = wp_get_attachment_image_src( $aid, $full_resolved );
+				$mobile   = is_array( $full_src )
+					? Image_Size_Manager::mobile_companion( $aid, (int) ( $full_src[1] ?? 0 ) )
+					: null;
+
+				$slide['full_mobile_url'] = null !== $mobile ? $mobile['url'] : '';
+			}
+
 			if ( $include_exif ) {
 				$slide['exif'] = self::load_exif( $aid, $settings );
 			}
@@ -206,12 +211,6 @@ final class Lightbox_Slide_Builder {
 	}
 
 	/**
-	 * Batch-load external_url + link_target from fotogrids_item_meta.
-	 *
-	 * @param array<int, int> $ids
-	 * @return array<int, array{external_url: string, link_target: string}>
-	 */
-	/**
 	 * Build a lightbox slide dict for an embed post.
 	 *
 	 * @since 1.1.0
@@ -267,51 +266,28 @@ final class Lightbox_Slide_Builder {
 	 * @return array<string, mixed>
 	 */
 	private static function load_custom_data( int $aid ): array {
-		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-
-		$raw = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = 0 LIMIT 1",
-				$aid
-			)
-		);
-
-		if ( empty( $raw ) ) {
+		$row = \FotoGrids\Galleries\Item_Meta::get( $aid );
+		if ( null === $row || empty( $row['custom_data'] ) ) {
 			return array();
 		}
 
-		$decoded = json_decode( (string) $raw, true );
+		$decoded = json_decode( (string) $row['custom_data'], true );
 		return is_array( $decoded ) ? $decoded : array();
 	}
 
+	/**
+	 * Batch-load external_url + link_target from each item's Item_Meta row.
+	 *
+	 * @param array<int, int> $ids
+	 * @return array<int, array{external_url: string, link_target: string}>
+	 */
 	private static function batch_load_link_meta( array $ids ): array {
-		if ( empty( $ids ) ) {
-			return array();
-		}
-		global $wpdb;
-		$table        = $wpdb->prefix . 'fotogrids_item_meta';
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-
-        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT attachment_id, external_url, link_target FROM {$table} WHERE gallery_id = 0 AND attachment_id IN ({$placeholders})",
-				...$ids
-			),
-			ARRAY_A
-		);
-        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
 		$out = array();
-		if ( is_array( $rows ) ) {
-			foreach ( $rows as $row ) {
-				$aid         = (int) $row['attachment_id'];
-				$out[ $aid ] = array(
-					'external_url' => (string) ( $row['external_url'] ?? '' ),
-					'link_target'  => (string) ( $row['link_target'] ?? 'global' ),
-				);
-			}
+		foreach ( \FotoGrids\Galleries\Item_Meta::get_many( $ids ) as $aid => $row ) {
+			$out[ $aid ] = array(
+				'external_url' => (string) ( $row['external_url'] ?? '' ),
+				'link_target'  => (string) ( $row['link_target'] ?? 'global' ),
+			);
 		}
 		return $out;
 	}

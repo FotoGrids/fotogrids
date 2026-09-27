@@ -272,9 +272,15 @@
 		const postIdField = document.getElementById('post_ID');
 		const postTypeField = document.querySelector('input[name="post_type"]');
 
-		if (nonceField) formData.append('nonce', nonceField.value);
-		if (postIdField) formData.append('post_id', postIdField.value);
-		if (postTypeField) formData.append('post_type', postTypeField.value);
+		if (nonceField) {
+			formData.append('nonce', nonceField.value);
+		}
+		if (postIdField) {
+			formData.append('post_id', postIdField.value);
+		}
+		if (postTypeField) {
+			formData.append('post_type', postTypeField.value);
+		}
 
 		const gallerySettings = {};
 		const galleryInputs = document.querySelectorAll(
@@ -390,7 +396,7 @@
 	// the only source for it in the browser. It arrives in two shapes:
 	// wp_localize_script casts every scalar to a string, so a page load gives
 	// '1' or '', while the editor's toggle writes the AJAX response back as a
-	// real boolean. Anything else means we cannot tell, and off is the safe
+	// real boolean. Anything else is ambiguous, and off is the safe
 	// answer - the user still gets the unsaved-changes badge.
 	function readAutosaveSetting() {
 		const raw = window.fotogridsAdmin?.autosave;
@@ -414,7 +420,9 @@
 	}
 
 	function initAutosave() {
-		if (!State) return;
+		if (!State) {
+			return;
+		}
 
 		State.autosave.set(readAutosaveSetting());
 
@@ -487,7 +495,9 @@
 	}
 
 	function updateUnsavedChangesDisplay() {
-		if (!State) return;
+		if (!State) {
+			return;
+		}
 
 		const hasChanges = State.unsavedChanges.has();
 		const shouldShow = hasChanges && !autosaveActive();
@@ -524,7 +534,9 @@
 
 	function initFormChangeTracking() {
 		const form = document.getElementById('post');
-		if (!form || !State) return;
+		if (!form || !State) {
+			return;
+		}
 
 		let initialFormState = {};
 		const updateInitialState = () => {

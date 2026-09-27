@@ -65,7 +65,7 @@ final class Permission_Definition {
 	 *              because they are not real WP caps).
 	 * 'advanced' - Panel 2 only (matrix rows).
 	 * 'both'     - Panel 2 always; also appears in Panel 1 with a simplified
-	 *              presentation (currently unused, reserved for future).
+	 *              presentation (not used by any definition).
 	 * 'none'     - Registered but never rendered. Used for atomic caps that
 	 *              exist so the activator can grant them and map_meta_cap can
 	 *              resolve them, but that the matrix represents through a

@@ -44,11 +44,18 @@ describe('renderTokenSelect', () => {
 		).toHaveLength(2);
 	});
 
-	it('parses a legacy comma-string value into chips', () => {
-		const { container } = mount(build('caption,tags', false));
+	it('accepts an array value', () => {
+		const { container } = mount(build(['caption', 'tags'], false));
 		expect(
 			container.querySelectorAll('.fotogrids-token-select__token')
 		).toHaveLength(2);
+	});
+
+	it('treats a non-JSON string as an empty selection', () => {
+		const { container } = mount(build('caption,tags', false));
+		expect(
+			container.querySelectorAll('.fotogrids-token-select__token')
+		).toHaveLength(0);
 	});
 
 	it('shows a placeholder when nothing is selected', () => {

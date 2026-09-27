@@ -19,9 +19,11 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Collection view permissions.
  *
- * Blocks guest visitors when the gallery's "who can view" policy is set to
- * registered users only. Returns a ghost-grid placeholder with a login CTA
- * overlay via Gate_Renderer.
+ * Blocks guest visitors whenever the gallery's "who can view" policy is
+ * anything other than "all". The free plugin enforces the registered-user
+ * floor for every restricted policy; the Pro add-on replaces this gate to
+ * resolve the narrower role policies. Returns a ghost-grid placeholder with
+ * a login CTA overlay via Gate_Renderer.
  *
  * @package FotoGrids\Render\Gates\Collection_Permissions
  * @since   1.0.0
@@ -43,7 +45,7 @@ final class Collection_Permissions implements Gate {
 	}
 
 	/**
-	 * Returns true when Free should enforce a view policy.
+	 * Returns true when the collection carries a restricted view policy.
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.
@@ -54,11 +56,11 @@ final class Collection_Permissions implements Gate {
 			return false;
 		}
 
-		return $this->view_policy( $render_context ) === 'registered_users';
+		return 'all' !== $this->view_policy( $render_context );
 	}
 
 	/**
-	 * Blocks guests when the policy requires registration.
+	 * Blocks guests when the view policy is restricted.
 	 *
 	 * @since   1.0.0
 	 * @param   Render_Context $render_context Render context.

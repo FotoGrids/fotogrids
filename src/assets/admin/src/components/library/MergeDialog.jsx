@@ -11,8 +11,8 @@ const apiFetch = wp.apiFetch;
  * Merge dialog: choose a target entry from this entity type and merge the
  * currently-selected sources into it.
  *
- * Target selection is autocomplete-style - the user types and we hit the
- * library list endpoint (which already supports search), excluding sources.
+ * Target selection is autocomplete-style: typing queries the library list
+ * endpoint (which already supports search), excluding sources.
  */
 const MergeDialog = ({ entityType, selectedIds, items, onCancel, onMerge, restBase }) => {
     const sources = useMemo(

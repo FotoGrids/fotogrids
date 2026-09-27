@@ -2,7 +2,9 @@
  * Tests for src/assets/admin/src/components/dashboard/Checklist.jsx
  */
 import React from 'react';
-import Checklist from '@/admin/src/components/dashboard/Checklist';
+import Checklist, {
+	isSetupComplete,
+} from '@/admin/src/components/dashboard/Checklist';
 import { renderElement } from '@tests/helpers/render-component';
 
 const rows = (container) =>
@@ -103,5 +105,34 @@ describe('dashboard Checklist', () => {
 		expect(width(container)).toBe('100%');
 
 		unmount();
+	});
+});
+
+describe('isSetupComplete', () => {
+	it('is false until every step is done', () => {
+		expect(
+			isSetupComplete({
+				galleriesTotal: 2,
+				galleriesPublished: 0,
+				settingsConfigured: true,
+			})
+		).toBe(false);
+		expect(
+			isSetupComplete({
+				galleriesTotal: 2,
+				galleriesPublished: 1,
+				settingsConfigured: false,
+			})
+		).toBe(false);
+	});
+
+	it('is true once a gallery is published and settings are saved', () => {
+		expect(
+			isSetupComplete({
+				galleriesTotal: 2,
+				galleriesPublished: 1,
+				settingsConfigured: true,
+			})
+		).toBe(true);
 	});
 });

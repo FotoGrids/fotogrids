@@ -28,32 +28,46 @@ const ChecklistItem = ({ completed, href, label }) => {
     );
 };
 
+const buildSteps = ({ galleriesTotal, galleriesPublished, settingsConfigured }) => [
+    {
+        label: __('Plugin installed and activated', 'fotogrids'),
+        completed: true
+    },
+    {
+        label: __('Dashboard page visited', 'fotogrids'),
+        completed: true
+    },
+    {
+        label: __('Create your first gallery', 'fotogrids'),
+        completed: galleriesTotal > 0,
+        href: 'post-new.php?post_type=fotogrids_gallery'
+    },
+    {
+        label: __('Configure display settings', 'fotogrids'),
+        completed: settingsConfigured,
+        href: 'admin.php?page=fotogrids-settings&tab=defaults'
+    },
+    {
+        label: __('Publish gallery on your site', 'fotogrids'),
+        completed: galleriesPublished > 0,
+        href: 'edit.php?post_type=fotogrids_gallery'
+    }
+];
+
+/**
+ * Whether every setup step is complete.
+ *
+ * @param {Object}  props                    Overview stats.
+ * @param {number}  props.galleriesTotal     Galleries in any editable status.
+ * @param {number}  props.galleriesPublished Published galleries.
+ * @param {boolean} props.settingsConfigured Whether any Setup settings are saved.
+ * @return {boolean} True when the checklist has nothing left to do.
+ */
+export const isSetupComplete = (props) =>
+    buildSteps(props).every((step) => step.completed);
+
 const Checklist = ({ galleriesTotal, galleriesPublished, settingsConfigured }) => {
-    const steps = [
-        {
-            label: __('Plugin installed and activated', 'fotogrids'),
-            completed: true
-        },
-        {
-            label: __('Dashboard page visited', 'fotogrids'),
-            completed: true
-        },
-        {
-            label: __('Create your first gallery', 'fotogrids'),
-            completed: galleriesTotal > 0,
-            href: 'post-new.php?post_type=fotogrids_gallery'
-        },
-        {
-            label: __('Configure display settings', 'fotogrids'),
-            completed: settingsConfigured,
-            href: 'admin.php?page=fotogrids-settings&tab=defaults'
-        },
-        {
-            label: __('Publish gallery on your site', 'fotogrids'),
-            completed: galleriesPublished > 0,
-            href: 'edit.php?post_type=fotogrids_gallery'
-        }
-    ];
+    const steps = buildSteps({ galleriesTotal, galleriesPublished, settingsConfigured });
 
     const completedSteps = steps.filter((step) => step.completed).length;
     const progressPercent = Math.min(100, (completedSteps / steps.length) * 100);

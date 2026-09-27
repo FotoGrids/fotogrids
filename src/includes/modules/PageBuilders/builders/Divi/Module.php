@@ -25,24 +25,21 @@ if ( ! defined( 'WPINC' ) ) {
  * Ships two native Divi 5 modules (gallery + album) built on Divi 5's
  * module API: a TypeScript/React Visual Builder bundle plus a PHP render
  * callback, registered through `ModuleRegistration::register_module()`.
- * Unlike the legacy `ET_Builder_Module` path (removed), native modules do
- * NOT carry the "Legacy" badge and edit natively inside the Visual
- * Builder.
+ * Native modules edit directly inside the Visual Builder.
  *
  * The render callback delegates to the existing shortcode pipeline
  * (`Public_Render::gallery_shortcode()` / `album_shortcode()`) stamped
  * with `Request_Source::DIVI`, so every decorator / feature / layout
- * module works inside Divi with no further glue - identical in spirit to
- * the Elementor and Gutenberg sub-modules.
+ * module works inside Divi with no further glue, as in the Elementor and
+ * Gutenberg sub-modules.
  *
  * Block names (Divi 5 modules are WP blocks under the hood):
  *   - `fotogrids/fotogrids-gallery`
  *   - `fotogrids/fotogrids-album`
  *
  * Activation gates on Divi 5's module framework being present
- * (`ET\Builder\Packages\ModuleLibrary\ModuleRegistration`). Divi 4-only
- * sites get nothing - by design; the legacy fallback was intentionally
- * dropped.
+ * (`ET\Builder\Packages\ModuleLibrary\ModuleRegistration`). Divi 4 is not
+ * supported.
  *
  * This sub-module does not register itself with `Module_Registry`. The
  * parent PageBuilders module owns the registry slot and dispatches
@@ -91,10 +88,9 @@ final class Module {
 	private const NATIVE_DIR = __DIR__ . '/native';
 
 	/**
-	 * Whether Divi 5's native module framework is present. We check for
-	 * `ModuleRegistration` specifically (not `ET_Builder_Element`, which
-	 * also exists in Divi 4 compat mode) so native registration is only
-	 * attempted when Divi 5's block-module pipeline is actually available.
+	 * Whether Divi 5's native module framework is present. Checks
+	 * `ModuleRegistration` rather than `ET_Builder_Element`, which also exists
+	 * in Divi 4 compat mode.
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -119,20 +115,10 @@ final class Module {
 			return;
 		}
 
-		// NOTE on timing: the two Divi-bootstrap-sensitive hooks
-		// (`divi_module_library_modules_dependency_tree` and the VB asset
-		// registration) are NOT attached here. Divi fires the dependency
-		// tree from `et_setup_builder_5` on `init` priority 0, and this
-		// `init()` runs from Module_Registry::boot() on `init` priority 5
-		// - five levels too late, so an `add_action` here would miss the
-		// dispatch entirely and the modules would never register. Those
-		// hooks are attached in {@see boot_early()}, called from the
-		// plugin bootstrap on `plugins_loaded` (before `init`). See the
-		// wiring in fotogrids.php.
-
-		// The render-pipeline filters below DO belong here - they fire
-		// later in the request (during a gallery render), well after
-		// `init`, so `init:5` registration is in time.
+		// The dependency-tree and VB asset hooks are attached in boot_early() on
+		// plugins_loaded: Divi fires them from `init` priority 0, before this
+		// init:5 dispatch. The render-pipeline filters below fire during a gallery
+		// render, so init:5 is in time for them.
 
 		// The module's frontend stylesheet (layout chrome for the rendered
 		// gallery wrapper) ships on every page - cheap, and the gallery's
@@ -159,31 +145,17 @@ final class Module {
 	 * Attach the Divi-bootstrap-sensitive hooks early (on `plugins_loaded`).
 	 *
 	 * Divi fires `divi_module_library_modules_dependency_tree` from
-	 * `et_setup_builder_5` on `init` priority 0. To be on that bus, our
-	 * listener must be registered before `init` runs at all - hence this
-	 * method is called from the plugin bootstrap on `plugins_loaded`,
-	 * NOT from the `init:5` module dispatch.
-	 *
-	 * Safe to call unconditionally - exits early when Divi 5 isn't present.
-	 * Idempotent enough for a single bootstrap call.
+	 * `et_setup_builder_5` on `init` priority 0, so the listener is attached from
+	 * the plugin bootstrap on `plugins_loaded` rather than the init:5 dispatch.
+	 * Safe to call unconditionally; exits early when Divi 5 isn't present.
 	 *
 	 * @since 1.0.0
 	 * @return void
 	 */
 	public static function boot_early(): void {
-		// IMPORTANT timing note: this runs on `plugins_loaded`, which is
-		// BEFORE the Divi *theme* loads its builder framework (themes load
-		// on `after_setup_theme`, and Divi boots Divi 5 from
-		// `et_setup_builder_5` on `init` priority 0). So we must NOT gate
-		// on `is_active()` here - `ModuleRegistration` / `ET_Builder_Element`
-		// don't exist yet and the check would always fail.
-		//
-		// Instead we attach the hooks unconditionally. They're harmless
-		// when Divi is absent: `divi_module_library_modules_dependency_tree`
-		// only ever fires if Divi 5 is present, and `register_vb_package`
-		// self-guards on the Divi classes/functions. The Divi-presence
-		// check happens INSIDE the callbacks, which run at `init:0` and
-		// later - by which point Divi has loaded.
+		// Runs before the Divi theme loads its builder framework, so is_active()
+		// cannot be checked yet. The hooks are attached unconditionally and each
+		// callback checks for Divi itself.
 
 		// Native modules' PHP render side. The dependency-tree action is
 		// Divi-only, so attaching its listener is a no-op when Divi isn't
@@ -193,40 +165,26 @@ final class Module {
 			array( self::class, 'register_native_modules' )
 		);
 
-		// Visual Builder bundle registration (canonical D5 mechanism).
-		//
-		// CRITICAL timing: register on `et_fb_framework_loaded` - the SAME
-		// hook Divi uses for its own package registrations
-		// (`PackageBuildManager::register_divi_package_builds`). This fires
-		// BEFORE `PackageBuildManager::enqueue_scripts` captures the
-		// app-window script list. The previously-used
-		// `divi_visual_builder_assets_before_enqueue_scripts` hook fires
-		// from *inside* enqueue_scripts and proved too late for the script
-		// (the style happened to survive by ordering luck, the script did
-		// not - confirmed via enqueue-state diagnostics). Self-guards on
-		// Divi's PackageBuildManager + VB-active checks.
+		// Visual Builder bundle registration on `et_fb_framework_loaded`, the hook
+		// Divi uses for its own packages. It fires before
+		// PackageBuildManager::enqueue_scripts captures the app-window script list.
 		add_action( 'et_fb_framework_loaded', array( self::class, 'register_vb_package' ) );
 		// Fallback: also attach to the before-enqueue hook in case
 		// `et_fb_framework_loaded` has already fired in some flow. The
 		// method is idempotent (PackageBuildManager keyed by name).
 		add_action( 'divi_visual_builder_assets_before_enqueue_scripts', array( self::class, 'register_vb_package' ) );
 
-		// DETERMINISTIC fallback: enqueue the bundle ourselves via plain
-		// `wp_enqueue_script` directly into the app window, AFTER Divi's
-		// own PackageBuildManager::enqueue_scripts (priority 10) has run
-		// and registered its package handles. PackageBuildManager's
-		// register_package_build proved unreliable at landing our handle
-		// in $wp_scripts on this Divi build regardless of registration
-		// hook timing, so we don't depend on it. Priority 20 ensures our
-		// deps (`divi-module-library`, `divi-hooks`) are registered first.
+		// Direct wp_enqueue_script into the app window at priority 20, after
+		// PackageBuildManager::enqueue_scripts (priority 10) has registered the
+		// `divi-module-library` and `divi-hooks` deps; register_package_build does
+		// not reliably land the handle in $wp_scripts.
 		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_vb_bundle_directly' ), 20 );
 	}
 
 	/**
 	 * Deterministically enqueue the VB bundle via plain wp_enqueue_script.
 	 *
-	 * Bypasses Divi's PackageBuildManager (which never landed our handle
-	 * in $wp_scripts on this build). Runs on the app-window request only,
+	 * Bypasses Divi's PackageBuildManager. Runs on the app-window request only,
 	 * after Divi has registered its own package handles.
 	 *
 	 * @since 1.0.0
@@ -247,8 +205,8 @@ final class Module {
 
 		global $wp_scripts;
 		$deps = array();
-		// Only declare deps that are actually registered, so WordPress
-		// doesn't silently drop our script over a missing dependency.
+		// Only registered deps are declared, so WordPress does not drop the
+		// script over a missing dependency.
 		foreach ( array( 'divi-module-library', 'divi-hooks' ) as $dep ) {
 			if ( isset( $wp_scripts->registered[ $dep ] ) ) {
 				$deps[] = $dep;
@@ -308,7 +266,7 @@ final class Module {
 	 * way a third-party D5 module ships its builder JS: it loads into the
 	 * builder's app window with Divi's own packages (`divi-module-library`,
 	 * `divi-vendor-wp-hooks`) declared as deps. The bundle externalises
-	 * `@divi/*` off those globals, so it carries only our `edit`
+	 * `@divi/*` off those globals, so it carries only the FotoGrids `edit`
 	 * components + `registerModule` wiring.
 	 *
 	 * Gated on `et_builder_d5_enabled() && et_core_is_fb_enabled()` so it
@@ -336,13 +294,8 @@ final class Module {
 				'version' => FOTOGRIDS_VERSION,
 				'script'  => array(
 					'src'                => $base_url . 'build/bundle.js',
-					// NOTE: the wp-hooks dependency handle is `divi-hooks`
-					// in this Divi version (the example repo's
-					// `divi-vendor-wp-hooks` does not exist here, and an
-					// unregistered dep makes WordPress silently DROP the
-					// script - which is exactly why the bundle never
-					// loaded). Verified against PackageBuildManager's
-					// registered handle list.
+					// The wp-hooks handle is `divi-hooks` in Divi 5; an unregistered
+					// dep makes WordPress drop the script.
 					'deps'               => array(
 						'divi-module-library',
 						'divi-hooks',
@@ -366,9 +319,8 @@ final class Module {
 			)
 		);
 
-		// Bridge the REST base + nonce + deep-links the edit components
-		// need. Attached to Divi's module-library script so it's present
-		// before our registerModule callback runs.
+		// REST base, nonce and deep links for the edit components, attached to
+		// Divi's module-library script so they exist before registerModule runs.
 		wp_localize_script(
 			'divi-module-library',
 			'fotogridsPbDivi',
@@ -415,13 +367,9 @@ final class Module {
 			'albumCreateUrl'   => admin_url( 'post-new.php?post_type=fotogrids_album' ),
 			'galleryEditBase'  => admin_url( 'post.php?action=edit&post=' ),
 			'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
-			// The VB `divi/select` reads its options from the static
-			// module.json shipped in the JS bundle (where they're empty).
-			// PHP-side `register_module` attribute injection only affects
-			// the server render. So we pass the live option maps here and
-			// the bundle injects them into each module's metadata before
-			// calling `registerModule`. Shape matches divi/select:
-			// `value => { label }`.
+			// divi/select reads options from the bundle's static module.json, where
+			// they are empty; the live option maps are passed here and injected
+			// before registerModule. Shape: `value => { label }`.
 			'galleryOptions'   => Native\Collection_Options::map( 'gallery' ),
 			'albumOptions'     => Native\Collection_Options::map( 'album' ),
 		);

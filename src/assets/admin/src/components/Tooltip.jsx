@@ -63,7 +63,7 @@ const Tooltip = ( { children, content, position = 'top' } ) => {
         setCoords( { top, left } );
     }, [ position ] );
 
-    // Re-measure after the bubble is painted so we have real dimensions.
+    // Re-measure after the bubble is painted, when real dimensions exist.
     useEffect( () => {
         if ( visible ) {
             recalcPosition();

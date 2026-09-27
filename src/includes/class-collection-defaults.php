@@ -653,6 +653,7 @@ class Collection_Defaults {
 			'filter_buttons'                               => false,
 			'pagination_type'                              => 'paginated',
 			'pagination_method'                            => 'load_more',
+			'preload_next_page'                            => false,
 			'default_sort_order'                           => 'manual',
 			'random_mode'                                  => 'refetch',
 			'date_sort_type'                               => 'date_created',
@@ -989,6 +990,20 @@ class Collection_Defaults {
 			'lightbox_grid_theme'                          => 'dark',
 			'lightbox_grid_custom_btn_colors'              => false,
 			'lightbox_grid_aspect_ratio'                   => '4/3',
+			'lightbox_mini_padding'                        => array(
+				'desktop' => array(
+					'value' => 24,
+					'unit'  => 'px',
+				),
+				'tablet'  => array(
+					'value' => 24,
+					'unit'  => 'px',
+				),
+				'mobile'  => array(
+					'value' => 24,
+					'unit'  => 'px',
+				),
+			),
 			'lightbox_lite_caption_location'               => array( 'grid', 'full' ),
 			'lightbox_grid_max_width'                      => array(
 				'desktop' => array(

@@ -8,10 +8,6 @@
  * Subscribes to FotoGrids.onGallery - runs once per gallery and idles if
  * the gallery has no filter bar.
  *
- * Replaces the monolithic FotoGridsGallery.initializeFilters() (+ all the
- * private _initFilter*, _applyFilters, _recalculateCounts, _syncFilterUI
- * methods) from frontend/src/index.js.
- *
  * No imports - standalone vanilla JS compiled by webpack.
  */
 
@@ -57,9 +53,7 @@
             } );
         }
 
-        // Optional toggle button (lives as a sibling of .fotogrids-filters
-        // inside the gallery wrapper, rendered only when
-        // filter_display_mode === 'toggle').
+        // Optional toggle button, rendered when filter_display_mode === 'toggle'.
         const toggleBtn = this.galleryEl.querySelector( '[data-fg-filter-toggle]' );
         if ( toggleBtn ) {
             const container = this.filterContainer;
@@ -376,14 +370,8 @@
             }
         } );
 
-        // Counts deliberately NOT recomputed. The server renders each
-        // filter option with the count of items in the FULL gallery
-        // that carry that value (see Metadata_Filter_Source::get_options).
-        // Recomputing here would shift the numbers based on whatever is
-        // currently visible - and with pagination, "currently visible"
-        // is just page 1, so counts would degrade as filters interact.
-        // Stable counts give users a reliable picture of how many items
-        // each filter would yield.
+        // Counts are not recomputed: the server renders each option with its count
+        // across the full gallery, which stays meaningful when only one page is loaded.
     };
 
     /**
@@ -496,10 +484,8 @@
     function registerController( galleryEl, controller ) {
         controllersByGallery.set( galleryEl, controller );
 
-        // Track the last-seen filter fingerprint so we only fire the
-        // change event when filters actually change. Without this, the
-        // "All" reset button (and every benign re-apply) would re-trigger
-        // a server fetch even though the filter state was unchanged.
+        // Last-seen fingerprint, so the change event fires only when the filters
+        // actually change rather than on every re-apply or redundant "All" click.
         let lastFingerprint = fingerprintActive( buildActiveMap( controller ) );
 
         const originalApply = controller._apply;
@@ -510,9 +496,7 @@
             const currentFp  = fingerprintActive( currentMap );
 
             if ( currentFp === lastFingerprint ) {
-                // No actual change - likely a benign re-paint (e.g. user
-                // clicked "All" while already cleared, or re-selected
-                // an already-active value). Skip notifications.
+                // No change (e.g. "All" while already cleared); skip notifications.
                 return;
             }
             lastFingerprint = currentFp;
@@ -628,7 +612,7 @@
             window.FotoGrids.onGallery( attach, 20 );
         }
 
-        // Preserved legacy event so Pro extensions get their hook point.
+        // Hook point for extensions once the filters API is ready.
         document.dispatchEvent( new CustomEvent( 'fotogrids/filters/ready', { bubbles: false } ) );
     }
 

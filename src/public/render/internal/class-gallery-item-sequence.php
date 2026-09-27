@@ -133,7 +133,7 @@ final class Gallery_Item_Sequence {
 	/**
 	 * Builds a Render_Context shell suitable for sorter + filter_source
 	 * supports() / sort() / matches() calls. Items are stub Item_Views with
-	 * only the id field populated - none of the predicates we run need
+	 * only the id field populated; the sorter and filter predicates need no
 	 * image URLs or captions.
 	 *
 	 * @param array<int, int>                    $ids

@@ -33,7 +33,9 @@ export const useModalStack = (id, active) => {
 	const [depth, setDepth] = useState(0);
 
 	useEffect(() => {
-		if (!active) return undefined;
+		if (!active) {
+			return undefined;
+		}
 
 		push(id);
 

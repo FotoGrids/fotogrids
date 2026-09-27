@@ -17,11 +17,6 @@
     'use strict';
 
     /**
-     * Attach observer to a single gallery.
-     *
-     * @param {Element} gEl
-     */
-    /**
      * Start the WAAPI loader animation on the endless-scroll bar's SVG,
      * using the same animate fn the gallery's per-item loaders use.
      * No-op if already running or icon map isn't loaded.
@@ -63,6 +58,11 @@
         loaderEl.dataset.fgLoaderAnimRunning = '0';
     }
 
+    /**
+     * Attach observer to a single gallery.
+     *
+     * @param {Element} gEl
+     */
     function attach( gEl ) {
         if ( gEl.dataset.fgPaginationMethod !== 'endless_scroll' ) return;
         if ( gEl.dataset.fgEndlessScrollBound === '1' ) return;
@@ -78,11 +78,8 @@
             && window.FotoGrids.modules.pagination;
         if ( ! pagination ) return;
 
-        // Start/stop the loader animation explicitly around each fetch. A
-        // class-watching MutationObserver coalesces the add+remove of
-        // .fotogrids-gallery--is-paginating on fast responses, so the
-        // animation could miss its start. Driving it from the fetch
-        // lifecycle is deterministic.
+        // The loader is driven from the fetch lifecycle: a class-watching observer
+        // can coalesce the class toggle on fast responses and miss the start.
         function startLoader() {
             if ( loaderEl ) startLoaderAnimation( loaderEl );
         }
@@ -91,20 +88,9 @@
             if ( loaderEl ) stopLoaderAnimation( loaderEl );
         }
 
-        // Pacing model: one page per scroll gesture.
-        //
-        // After each fetch resolves, the sentinel is unobserved so the
-        // observer doesn't immediately re-fire (which would cascade-load
-        // every remaining page when the appended items aren't tall
-        // enough to push the sentinel out of the 200px rootMargin).
-        //
-        // We re-observe on the next scroll event. That makes each user
-        // scroll gesture trigger at most one page load - the canonical
-        // "infinite scroll" behaviour.
-        //
-        // inFlight guards against rare double-fires during the fetch
-        // round-trip (the unobserve happens synchronously before the
-        // fetch resolves, but defence-in-depth never hurts).
+        // One page per scroll gesture: the sentinel is unobserved after each fetch and
+        // re-observed on the next scroll, so short pages cannot cascade-load the rest.
+        // inFlight guards against double-fires during the round-trip.
 
         let inFlight = false;
         let observerActive = false;
@@ -134,8 +120,7 @@
                 }
 
                 inFlight = true;
-                // Stop observing while we fetch. Re-observation happens
-                // on the next scroll event (one page per gesture).
+                // Unobserved during the fetch; re-armed on the next scroll.
                 deactivateObserver();
                 startLoader();
 
@@ -153,10 +138,7 @@
                     } );
             } );
         }, {
-            // 200px lead-in so the next page starts loading just before
-            // the user reaches the bottom. Combined with the "one page
-            // per scroll gesture" pacing this gives a snappy reveal
-            // without cascading.
+            // 200px lead-in so the next page starts loading just before the bottom.
             rootMargin: '200px 0px',
             threshold:  0,
         } );
@@ -164,20 +146,15 @@
         // Initial activation.
         activateObserver();
 
-        // Each scroll gesture re-arms the observer (if we'd unobserved
-        // it after the previous fetch). Uses { passive: true } so we
-        // don't fight against smooth-scroll. The listener is on window
-        // because the sentinel's intersection root is the viewport.
+        // Each scroll re-arms the observer. Passive, and on window because the
+        // sentinel's intersection root is the viewport.
         window.addEventListener( 'scroll', function () {
             if ( exhausted || inFlight ) return;
             activateObserver();
         }, { passive: true } );
 
-        // Filter change → swap to the new filter state. Restores from
-        // cache instantly when available; falls back to a server fetch
-        // when seeing the filter combo for the first time. Re-arms the
-        // observer in case it had been deactivated after has_more became
-        // false on a previous state.
+        // Filter change: swap to the new filter state and re-arm the observer, which
+        // may have stopped when has_more became false.
         gEl.addEventListener( 'fotogrids:filters_changed', function () {
             inFlight = true;
             deactivateObserver();

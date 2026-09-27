@@ -10,7 +10,9 @@ const FOCUSABLE_SELECTOR = [
 ].join(',');
 
 const getFocusable = (root) => {
-	if (!root) return [];
+	if (!root) {
+		return [];
+	}
 	const activeElement = root.ownerDocument.activeElement;
 	return Array.from(root.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
 		(el) => el.offsetParent !== null || el === activeElement
@@ -31,7 +33,9 @@ export const useFocusTrap = (containerRef, active, initialFocusRef = null) => {
 	const previouslyFocused = useRef(null);
 
 	useEffect(() => {
-		if (!active || !containerRef.current) return undefined;
+		if (!active || !containerRef.current) {
+			return undefined;
+		}
 
 		previouslyFocused.current =
 			containerRef.current.ownerDocument.activeElement;
@@ -44,7 +48,9 @@ export const useFocusTrap = (containerRef, active, initialFocusRef = null) => {
 		target?.focus();
 
 		const handleKeyDown = (event) => {
-			if (event.key !== 'Tab') return;
+			if (event.key !== 'Tab') {
+				return;
+			}
 			const focusables = getFocusable(containerRef.current);
 			if (focusables.length === 0) {
 				event.preventDefault();

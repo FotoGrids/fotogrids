@@ -104,11 +104,12 @@
     &__errors {
         width: 100%;
         border-collapse: collapse;
+        border: 1px solid var(--fg-border-secondary);
 
         th,
         td {
             padding: 10px 16px;
-            text-align: left;
+            text-align: start;
             vertical-align: top;
             border-bottom: 1px solid var(--fg-border-secondary);
         }
@@ -122,8 +123,8 @@
 
     &__level {
         display: inline-block;
-        padding: 1px 8px;
-        border-radius: 10px;
+        padding: 2px 6px;
+        border-radius: 3px;
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -137,7 +138,7 @@
 
         &--warning {
             background: var(--fg-yellow);
-            color: var(--fg-background-dark);
+            color: var(--fg-text-primary);
         }
     }
 
@@ -152,7 +153,7 @@
         background: none;
         color: var(--fg-text-primary);
         font: inherit;
-        text-align: left;
+        text-align: start;
         cursor: pointer;
 
         &:hover,

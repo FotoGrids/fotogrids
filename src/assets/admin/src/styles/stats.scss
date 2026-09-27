@@ -378,13 +378,6 @@
 	}
 }
 
-.fg-stats-table-container {
-	background: $tabbar-bg-white;
-	border: 1px solid $tabbar-border-light;
-	border-radius: 8px;
-	padding: 24px;
-}
-
 .fg-stats-table {
 	&__title {
 		margin: 0 0 16px;
@@ -444,8 +437,8 @@ table.fg-stats-table.widefat {
 	// divider, and at 1025-1300px viewports each table is only ~400px wide.
 	.fg-stats-table__th--metric,
 	.fg-stats-table__cell--metric {
-		padding-left: 8px;
-		padding-right: 8px;
+		padding-inline-start: 8px;
+		padding-inline-end: 8px;
 	}
 
 	.fg-stats-table__sort {
@@ -501,19 +494,19 @@ table.fg-stats-table.widefat {
 		align-items: center;
 
 		&__value {
-			padding-right: 6px;
+			padding-inline-end: 6px;
 			font-weight: 600;
 			font-variant-numeric: tabular-nums;
-			text-align: right;
+			text-align: end;
 		}
 
 		&__share {
-			padding-left: 6px;
-			border-left: 1px solid $tabbar-border-light;
+			padding-inline-start: 6px;
+			border-inline-start: 1px solid $tabbar-border-light;
 			color: $tabbar-text-secondary;
 			font-size: 12px;
 			font-variant-numeric: tabular-nums;
-			text-align: left;
+			text-align: start;
 		}
 	}
 

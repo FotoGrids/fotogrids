@@ -140,16 +140,11 @@ final class Module_Registry {
 				continue;
 			}
 
-			// NOTE: we deliberately do NOT gate init() by request context here.
-			// init() only *registers* WordPress hooks (rest_api_init,
-			// add_meta_boxes, save_post, etc.), and WordPress already fires
-			// each of those callbacks only in its proper context. Gating init()
-			// by a context snapshot taken at 'init' is unsafe for REST: a REST
-			// request does not have REST_REQUEST defined yet at 'init', so it
-			// would look like 'frontend' and a module declaring ['admin','rest']
-			// would never register its routes (=> rest_no_route). get_contexts()
-			// remains declarative metadata used by enqueue_all() and the
-			// manifest; modules that need finer gating self-gate inside init().
+			// init() is not gated by request context: it only registers hooks that
+			// WordPress fires in their proper context, and REST_REQUEST is not yet
+			// defined at 'init', so a context gate would drop REST routes.
+			// get_contexts() stays declarative metadata for enqueue_all() and the
+			// manifest; modules needing finer gating self-gate inside init().
 			if ( ! self::dependencies_active( $module ) ) {
 				\FotoGrids\Debug_Log::write(
 					'module_registry',

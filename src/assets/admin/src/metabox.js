@@ -6,6 +6,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import GalleryMetabox from './components/GalleryMetabox.jsx';
 import { attachCopyButtons } from './utils/copy-to-clipboard.js';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 function initializeIcons() {
 	if (typeof window.FotoGridsIcons === 'undefined') {
@@ -42,11 +43,7 @@ function initializeCopyButtons() {
 
 function initializeGalleryMetabox() {
 	try {
-		if (typeof React === 'undefined') {
-			return;
-		}
-
-		if (typeof createRoot === 'undefined') {
+		if (typeof React === 'undefined' || typeof createRoot === 'undefined') {
 			return;
 		}
 
@@ -62,14 +59,19 @@ function initializeGalleryMetabox() {
 
 		const props = {
 			galleryItems: metaboxData.galleryItems || [],
-			canEditPosts: metaboxData.canEditPosts || false,
 			ajaxUrl: metaboxData.ajaxUrl || '',
 			nonce: metaboxData.nonce || '',
 			strings: metaboxData.strings || {},
 		};
 
 		const root = createRoot(container);
-		root.render(React.createElement(GalleryMetabox, props));
+		root.render(
+			React.createElement(
+				ErrorBoundary,
+				{ label: 'gallery-metabox' },
+				React.createElement(GalleryMetabox, props)
+			)
+		);
 	} catch (error) {
 		const container = document.getElementById(
 			'fotogrids-gallery-metabox-root'

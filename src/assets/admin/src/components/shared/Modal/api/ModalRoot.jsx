@@ -67,8 +67,8 @@ const renderEntry = (entry) => {
         default:
             // For type === 'custom' (or any unknown), options.render is a
             // function (close) => React element, or options.children is a
-            // plain element. Either way we mount inside a vanilla Modal so
-            // the caller controls the inside but the shell stays consistent.
+            // plain element. Either way it mounts inside a vanilla Modal, so the
+            // caller controls the inside while the shell stays consistent.
             return (
                 <Modal
                     key={ id }

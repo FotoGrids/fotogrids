@@ -102,8 +102,8 @@ const MaintenanceTab = () => {
         }
     };
 
-    // Confirm modal config keyed by the pending action. Lets us drive one
-    // shared <Modal> instead of mounting a separate one per row.
+    // Confirm modal config keyed by the pending action, so one shared <Modal>
+    // serves every row.
     const confirmConfig = {
         reset: {
             title: __('Reset all settings?', 'fotogrids'),

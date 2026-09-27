@@ -109,14 +109,8 @@ abstract class Metadata_Filter_Source implements Filter_Source {
 	}
 
 	public function get_options( Render_Context $render_context ): array {
-		// Query against the FULL gallery's item set, not the (possibly
-		// sliced) $render_context->items. Otherwise the filter bar only
-		// shows tags found on page 1, hiding tags that live on later
-		// pages and giving wrong item counts.
-		//
-		// The unsliced IDs come from Gallery_Repository::get_item_ids().
-		// For album-as-collection renders we'd want a different lookup,
-		// but supports() in this base bails on albums anyway.
+		// Query the full gallery's item set, not the sliced page, so the bar lists
+		// every tag with correct counts. supports() excludes albums.
 		$gallery_id = (int) $render_context->meta->gallery_id;
 		$all_ids    = $gallery_id > 0 && class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
 			? \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $gallery_id )
@@ -196,8 +190,8 @@ abstract class Metadata_Filter_Source implements Filter_Source {
 
 	/**
 	 * Per-(instance, source) cache of attachment_id → [slug, …].
-	 * Two different sources can be active for the same gallery, so we
-	 * key by both source id and instance id.
+	 * Two sources can be active for the same gallery, so entries are keyed by
+	 * both source id and instance id.
 	 *
 	 * @return array<int, array<int, string>>
 	 */

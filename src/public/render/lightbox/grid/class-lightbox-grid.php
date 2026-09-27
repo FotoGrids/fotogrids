@@ -46,6 +46,30 @@ final class Lightbox_Grid implements Feature {
 
 	use Setting_Helpers;
 
+	/**
+	 * Translated grid lightbox labels, emitted as `data-fg-grid-labels`.
+	 *
+	 * `item` carries `%d` (position); `item_of` carries `%1$d` (position) and
+	 * `%2$d` (total).
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'all_photos'  => __( 'All photos', 'fotogrids' ),
+			'back'        => __( 'Back', 'fotogrids' ),
+			'share'       => __( 'Share', 'fotogrids' ),
+			'close_image' => __( 'Close image', 'fotogrids' ),
+			'previous'    => __( 'Previous', 'fotogrids' ),
+			'next'        => __( 'Next', 'fotogrids' ),
+			/* translators: %d: item position. */
+			'item'        => __( 'Item %d', 'fotogrids' ),
+			/* translators: 1: item position, 2: total number of items. */
+			'item_of'     => __( '%1$d of %2$d', 'fotogrids' ),
+		);
+	}
+
 	public function id(): string {
 		return 'fotogrids/lightbox-grid';
 	}
@@ -149,9 +173,10 @@ final class Lightbox_Grid implements Feature {
 		$is_featured = 'featured-item' === $render_context->layout->layout_id;
 
 		$attrs = array(
-			'data-fg-grid-items' => wp_json_encode( $items ),
+			'data-fg-grid-items'  => wp_json_encode( $items ),
 			// The gallery's click behaviour, so grid tiles replay it.
-			'data-fg-grid-click' => (string) $render_context->behavior->click_behavior,
+			'data-fg-grid-click'  => (string) $render_context->behavior->click_behavior,
+			'data-fg-grid-labels' => (string) wp_json_encode( self::client_labels() ),
 		);
 
 		// On Featured Item the grid opens from the "Show all" button; on the
@@ -215,11 +240,8 @@ final class Lightbox_Grid implements Feature {
 			$attrs[ $attr ] = $value;
 		}
 
-		// Share config (only when sharing is enabled for the gallery). The
-		// Sharing decorator already stamps data-fg-sharing on the wrapper
-		// when sharing is on; the grid JS reads that same attribute, so we
-		// don't duplicate it here - we only need to know whether to show the
-		// toolbar share button, which the JS derives from data-fg-sharing.
+		// Sharing: the grid JS reads data-fg-sharing, which the Sharing decorator
+		// already stamps when sharing is on.
 
 		return $attrs;
 	}

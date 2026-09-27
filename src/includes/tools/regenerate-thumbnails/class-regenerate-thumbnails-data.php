@@ -79,8 +79,8 @@ class Regenerate_Thumbnails_Data {
 
 		[ $attachment_ids, $total ] = self::collect_attachment_ids( $include_unused, $page, $per_page );
 
-		// Look up which attachment IDs are used in galleries so we can mark
-		// unused rows in the table when include_unused is on.
+		// Attachment IDs used in galleries, to mark unused rows when
+		// include_unused is on.
 		$used_ids = $include_unused ? self::get_used_attachment_ids() : array();
 
 		// Per-attachment set of layout IDs used by the galleries containing it.
@@ -167,8 +167,8 @@ class Regenerate_Thumbnails_Data {
 			);
 		}
 
-		// Capture original source dimensions BEFORE regenerating so we can
-		// infer reasons for missing sizes (most common: source is too small).
+		// Source dimensions are captured before regenerating to explain missing
+		// sizes (most often the source is too small).
 		$source_dims = self::get_source_dimensions( $attachment_id, $file );
 
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $file );

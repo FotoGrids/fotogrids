@@ -19,9 +19,9 @@ const FG_RED        = '#f01e32';
  * Row 2: [Most-tagged People bar - spans 2 cols] [Frequency donut]
  *
  * "In Galleries" = number of distinct gallery_ids among topItems where
- * usage_count > 0. We don't have per-person gallery-count from the REST
- * list endpoint, so we show the count of people that appear in at least one
- * item as a proxy (usage_count > 0) and label it clearly.
+ * usage_count > 0. The REST list endpoint has no per-person gallery count,
+ * so the count of people appearing in at least one item (usage_count > 0)
+ * is shown as a proxy and labelled clearly.
  */
 const LibraryPeopleHeader = ({ entityType, total: externalTotal }) => {
     const { topItems, total: fetchedTotal, loading } = useLibraryStats({

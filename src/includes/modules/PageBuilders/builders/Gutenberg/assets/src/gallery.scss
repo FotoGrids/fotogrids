@@ -9,7 +9,7 @@
 .fg-pb-block__tag {
     position: absolute;
     top: 8px;
-    left: 8px;
+    inset-inline-start: 8px;
     z-index: 2;
     background: rgba(29, 35, 39, .85);
     color: #fff;

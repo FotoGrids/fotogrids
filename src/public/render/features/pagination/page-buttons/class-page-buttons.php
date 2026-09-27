@@ -9,6 +9,7 @@ use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
 use FotoGrids\Render\Api\Responsive_Var;
 use FotoGrids\Render\Features\Pagination\Pagination_Common;
+use FotoGrids\Render\Internal\Arrow_Icons;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -52,8 +53,7 @@ final class Page_Buttons implements Feature {
 
 	/**
 	 * Allowed icon style values. Mirrors lightbox_arrow_icon options exactly,
-	 * with 'none' added on top. SVG pairs are loaded from the lightbox feature's
-	 * arrow-icons.json (single source of truth).
+	 * with 'none' added on top. SVG pairs come from Arrow_Icons.
 	 *
 	 * @var array<int, string>
 	 */
@@ -68,38 +68,6 @@ final class Page_Buttons implements Feature {
 		'arrow_circle_broken',
 		'arrow_block',
 	);
-
-	/** @var array<string, array{prev: string, next: string}>|null */
-	private static ?array $arrow_icons_cache = null;
-
-	/**
-	 * Loads arrow SVG pairs from the lightbox feature's arrow-icons.json,
-	 * cached for the request. Same JSON as Lightbox::arrow_icons() so the
-	 * two surfaces stay visually in sync without duplicating the SVGs.
-	 *
-	 * @return array<string, array{prev: string, next: string}>
-	 */
-	private static function arrow_icons(): array {
-		if ( null !== self::$arrow_icons_cache ) {
-			return self::$arrow_icons_cache;
-		}
-		$path = __DIR__ . '/../../lightbox/arrow-icons.json';
-		if ( file_exists( $path ) ) {
-			$decoded = json_decode( file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reading a bundled local plugin file (not a remote URL); WP_Filesystem is unnecessary here.
-			if ( is_array( $decoded ) ) {
-				self::$arrow_icons_cache = $decoded;
-				return self::$arrow_icons_cache;
-			}
-		}
-		// Fallback: bare chevrons so the pager always has something.
-		self::$arrow_icons_cache = array(
-			'chevron' => array(
-				'prev' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-				'next' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-			),
-		);
-		return self::$arrow_icons_cache;
-	}
 
 	public function id(): string {
 		return 'fotogrids/pagination/page-buttons';
@@ -198,21 +166,13 @@ final class Page_Buttons implements Feature {
 		// `--fg-pagination-distance` (margin above the bar).
 		$vars = $this->common_style_vars( $render_context );
 
-		// When truncation is off we render the full list - no sibling var needed.
+		// Truncation off: the full list renders, so no sibling var is needed.
 		if ( ! (bool) ( $render_context->settings['pages_truncate'] ?? true ) ) {
 			return $vars;
 		}
 
-		// Sibling count is hardcoded - the user only chooses truncate on/off.
-		// Two on desktop/tablet matches the long-form Bootstrap/Material/GitHub
-		// pattern; one on mobile keeps the bar to ~5 chips + 2 ellipses at the
-		// worst case (current in the middle). Boundaries (first + last) are
-		// always 1 each, so the totals are:
-		//   - desktop/tablet: 1 + 1 + (2*2 + 1) + 1 + 1 = 9 slots worst case
-		//   - mobile:         1 + 1 + (2*1 + 1) + 1 + 1 = 7 slots worst case
-		//
-		// The Responsive_Var flows the mobile value through whatever
-		// mobile_breakpoint the user has configured - see Breakpoint_Config.
+		// Sibling count is fixed (2 on desktop/tablet, 1 on mobile); the user only
+		// toggles truncation. The mobile value follows the configured mobile_breakpoint.
 		$vars['--fg-pagination-siblings'] = new Responsive_Var(
 			'2',
 			'2',
@@ -314,9 +274,9 @@ final class Page_Buttons implements Feature {
 	 * Returns the inline SVG for the chosen icon, oriented correctly for
 	 * prev or next. Returns empty string for 'none'.
 	 *
-	 * SVG pairs come from the lightbox feature's arrow-icons.json so the
-	 * arrow styles offered for pagination match the lightbox 1:1. The SVGs
-	 * are already oriented per side (prev/next) - no CSS flip needed.
+	 * SVG pairs come from Arrow_Icons, which reads the lightbox's
+	 * arrow-icons.json, so the pagination styles match the lightbox 1:1.
+	 * The SVGs are already oriented per side (prev/next) - no CSS flip needed.
 	 *
 	 * The raw SVG markup is wrapped in a span carrying the class +
 	 * data-fg-icon attribute so CSS can size/style icons consistently. We
@@ -332,11 +292,7 @@ final class Page_Buttons implements Feature {
 			return '';
 		}
 
-		$icons = self::arrow_icons();
-		$pair  = $icons[ $icon ] ?? $icons['chevron'] ?? null;
-		if ( ! is_array( $pair ) ) {
-			return '';
-		}
+		$pair = Arrow_Icons::pair( $icon );
 
 		$svg = 'next' === $side ? ( $pair['next'] ?? '' ) : ( $pair['prev'] ?? '' );
 		if ( '' === $svg ) {

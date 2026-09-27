@@ -10,13 +10,13 @@ const TabInteractions = ({ formData, handleInputChange, strings = {}, disabled =
 
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-interactions-section">
+            <div className="fotogrids-item-edit-interactions">
                 <h4>{strings.itemInteractions}</h4>
 
                 {showNotice && (
-                    <div className="fotogrids-edit-item-notice fotogrids-edit-item-notice--warning">
-                        <Icon name="alert_circle" className="fotogrids-edit-item-notice__icon" />
-                        <div className="fotogrids-edit-item-notice__body">
+                    <div className="fotogrids-item-edit-notice fotogrids-item-edit-notice--warning">
+                        <Icon name="alert_circle" className="fotogrids-item-edit-notice__icon" />
+                        <div className="fotogrids-item-edit-notice__body">
                             <strong>
                                 {strings.externalUrlIgnoredTitle}
                             </strong>
@@ -25,8 +25,8 @@ const TabInteractions = ({ formData, handleInputChange, strings = {}, disabled =
                     </div>
                 )}
 
-                <div className="fotogrids-external-url-section">
-                    <div className="fotogrids-field-group">
+                <div className="fotogrids-item-edit-external-url">
+                    <div className="fotogrids-item-edit-field-group">
                         <label htmlFor="fotogrids-item-external-url">
                             {strings.externalUrl}
                         </label>
@@ -42,7 +42,7 @@ const TabInteractions = ({ formData, handleInputChange, strings = {}, disabled =
                             {strings.externalUrlDesc}
                         </p>
                     </div>
-                    <div className="fotogrids-field-group">
+                    <div className="fotogrids-item-edit-field-group">
                         <label htmlFor="fotogrids-item-link-target">
                             {strings.linkTarget}
                         </label>

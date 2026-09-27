@@ -37,6 +37,10 @@ module.exports = {
         '^.+\\.(png|jpg|jpeg|gif|webp|svg)$': '<rootDir>/src/tests/setup/fileTransform.js'
     },
 
+    transformIgnorePatterns: [
+        '/node_modules/(?!(.*/node_modules/)?uuid/)'
+    ],
+
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/assets/$1',
         '^@tests/(.*)$': '<rootDir>/src/tests/$1',
