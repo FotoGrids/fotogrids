@@ -7,7 +7,15 @@
  * operation.
  */
 import useGalleryItems from '@/admin/src/components/gallery-metabox/hooks/useGalleryItems';
+import { deleteEmbed } from '@/admin/src/components/gallery-metabox/api/embed-api';
 import { renderElement, act } from '@tests/helpers/render-component';
+
+jest.mock('@/admin/src/components/gallery-metabox/api/embed-api', () => ({
+	...jest.requireActual(
+		'@/admin/src/components/gallery-metabox/api/embed-api'
+	),
+	deleteEmbed: jest.fn(() => Promise.resolve()),
+}));
 
 const h = wp.element.createElement;
 
@@ -49,6 +57,7 @@ describe('useGalleryItems', () => {
 		window.FotoGridsCollectionState = stateManager;
 		window.fotogridsMetaBoxes = { postId: 12 };
 		window.fotogridsToast = { error: jest.fn(), success: jest.fn() };
+		deleteEmbed.mockClear();
 		wp.apiFetch.mockReset();
 		wp.apiFetch.mockResolvedValue({});
 		global.fetch.mockReset();
@@ -216,6 +225,35 @@ describe('useGalleryItems', () => {
 
 			expect(window.fotogridsToast.error).toHaveBeenCalledWith('boom');
 		});
+
+		it('saves the clicked item when another update is already queued', async () => {
+			mount([image(1), image(2), image(3)]);
+
+			await act(async () => {
+				api.removeItem(3);
+				await api.setFeatured(2);
+			});
+
+			expect(api.items.map((i) => [i.id, i.featured])).toEqual([
+				[1, false],
+				[2, true],
+			]);
+			expect(wp.apiFetch).toHaveBeenCalledTimes(1);
+			expect(wp.apiFetch).toHaveBeenCalledWith(
+				expect.objectContaining({ data: { item_id: 2 } })
+			);
+		});
+
+		it('ignores a video embed', async () => {
+			mount([image(1), image(2, { item_type: 'video_youtube' })]);
+
+			await act(async () => {
+				await api.setFeatured(2);
+			});
+
+			expect(api.items.map((i) => i.featured)).toEqual([false, false]);
+			expect(wp.apiFetch).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('removeItem', () => {
@@ -237,9 +275,56 @@ describe('useGalleryItems', () => {
 			});
 
 			expect(api.items).toEqual([]);
+			expect(deleteEmbed).toHaveBeenCalledTimes(1);
+			expect(deleteEmbed).toHaveBeenCalledWith(
+				expect.objectContaining({ embedId: 1 })
+			);
 			expect(stateManager.items.removeItem).not.toHaveBeenCalled();
 		});
 
+		it('deletes every embed removed in the same batch', async () => {
+			mount([
+				image(1, { item_type: 'video_youtube' }),
+				image(2, { item_type: 'video_vimeo' }),
+				image(3),
+			]);
+
+			await act(async () => {
+				api.removeItem(1);
+				api.removeItem(2);
+			});
+
+			expect(api.items.map((i) => i.id)).toEqual([3]);
+			expect(deleteEmbed).toHaveBeenCalledTimes(2);
+			expect(deleteEmbed.mock.calls.map(([arg]) => arg.embedId)).toEqual([
+				1, 2,
+			]);
+		});
+
+		it('does not delete anything over REST for an image', async () => {
+			mount([image(1), image(2)]);
+
+			await act(async () => {
+				api.removeItem(1);
+			});
+
+			expect(deleteEmbed).not.toHaveBeenCalled();
+		});
+
+		it('clears the featured choice when the featured item is removed', async () => {
+			mount([image(1, { featured: true }), image(2)]);
+
+			await act(async () => {
+				api.removeItem(2);
+				api.removeItem(1);
+			});
+
+			expect(api.items).toEqual([]);
+			expect(wp.apiFetch).toHaveBeenCalledTimes(1);
+			expect(wp.apiFetch).toHaveBeenCalledWith(
+				expect.objectContaining({ data: { item_id: null } })
+			);
+		});
 	});
 
 	describe('clearAllItems', () => {
@@ -253,6 +338,33 @@ describe('useGalleryItems', () => {
 			expect(api.items).toEqual([]);
 			expect(stateManager.items.setItems).toHaveBeenCalledWith([]);
 			expect(changeEvents).toContain('items-remove-all');
+		});
+
+		it('deletes every embed over REST and leaves attachments alone', async () => {
+			mount([
+				image(1),
+				image(2, { item_type: 'video_youtube' }),
+				image(3, { item_type: 'video_vimeo' }),
+			]);
+
+			await act(async () => {
+				api.clearAllItems();
+			});
+
+			expect(api.items).toEqual([]);
+			expect(deleteEmbed.mock.calls.map(([arg]) => arg.embedId)).toEqual([
+				2, 3,
+			]);
+		});
+
+		it('sends no DELETE when the grid holds only images', async () => {
+			mount([image(1), image(2)]);
+
+			await act(async () => {
+				api.clearAllItems();
+			});
+
+			expect(deleteEmbed).not.toHaveBeenCalled();
 		});
 	});
 

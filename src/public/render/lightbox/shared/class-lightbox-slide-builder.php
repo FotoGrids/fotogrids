@@ -27,28 +27,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Lightbox_Slide_Builder {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Build slide dicts for an ordered list of attachment IDs.
 	 *
@@ -67,7 +45,7 @@ final class Lightbox_Slide_Builder {
 			return array();
 		}
 
-		[ $thumb_size_slug, $full_size_slug ] = self::resolve_size_slugs( $settings );
+		[ $thumb_size_slug, $full_size_slug ] = Image_Size_Manager::resolve_setting_slugs( $settings );
 		$link_meta                            = self::batch_load_link_meta( $ids );
 		$tag_map                              = self::batch_load_tag_slugs( $ids, 'tag' );
 
@@ -171,46 +149,6 @@ final class Lightbox_Slide_Builder {
 	}
 
 	/**
-	 * Resolves thumb + full size slugs from gallery settings, mirroring
-	 * Context_Builder::resolve_size_settings. Registers custom sizes
-	 * on the fly if needed.
-	 *
-	 * @return array{string, string} [thumb_slug, full_slug]
-	 */
-	private static function resolve_size_slugs( array $settings ): array {
-		$raw_thumb = is_string( $settings['thumbnail_size'] ?? null )
-			? $settings['thumbnail_size']
-			: Image_Size_Manager::SLUG_THUMBNAIL;
-		$raw_full  = is_string( $settings['full_image_size'] ?? null )
-			? $settings['full_image_size']
-			: Image_Size_Manager::SLUG_FULL;
-
-		$thumb_slug = $raw_thumb;
-		if ( 'custom' === $raw_thumb ) {
-			$w          = max( 1, (int) ( $settings['thumbnail_custom_size_width'] ?? 400 ) );
-			$h          = max( 0, (int) ( $settings['thumbnail_custom_size_height'] ?? 300 ) );
-			$crop       = (bool) ( $settings['thumbnail_custom_size_crop'] ?? true );
-			$alignment  = is_string( $settings['thumbnail_custom_size_crop_alignment'] ?? null )
-				? $settings['thumbnail_custom_size_crop_alignment']
-				: 'center';
-			$thumb_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
-		}
-
-		$full_slug = $raw_full;
-		if ( 'custom' === $raw_full ) {
-			$w         = max( 1, (int) ( $settings['full_image_custom_size_width'] ?? 1920 ) );
-			$h         = max( 0, (int) ( $settings['full_image_custom_size_height'] ?? 0 ) );
-			$crop      = (bool) ( $settings['full_image_custom_size_crop'] ?? false );
-			$alignment = is_string( $settings['full_image_custom_size_crop_alignment'] ?? null )
-				? $settings['full_image_custom_size_crop_alignment']
-				: 'center';
-			$full_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
-		}
-
-		return array( $thumb_slug, $full_slug );
-	}
-
-	/**
 	 * Build a lightbox slide dict for an embed post.
 	 *
 	 * @since 1.1.0
@@ -307,26 +245,25 @@ final class Lightbox_Slide_Builder {
 		global $wpdb;
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
 
-		// Trusted prefix table names; the IN() list is generated %d placeholders,
-		// so the prepare() arg count is correct (two %s + the expanded $ids) --
-		// the sniff just cannot count the dynamic list.
-        // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-		$rows = $wpdb->get_results(
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders is a generated list of %d tokens.
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table; no core API or object cache applies.
 			$wpdb->prepare(
 				"SELECT im.attachment_id, t.slug
-                 FROM {$wpdb->prefix}fotogrids_item_metadata im
-                 INNER JOIN {$wpdb->prefix}fotogrids_tags t
+                 FROM %i im
+                 INNER JOIN %i t
                      ON t.id = im.metadata_id AND t.type = %s
                  WHERE im.metadata_type = %s
                    AND im.attachment_id IN ($placeholders)
                  ORDER BY t.name ASC",
+				$wpdb->prefix . 'fotogrids_item_metadata',
+				$wpdb->prefix . 'fotogrids_tags',
 				$type,
 				$type,
 				...$ids
 			),
 			ARRAY_A
 		);
-        // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
 		$out = array();
 		if ( is_array( $rows ) ) {
@@ -370,12 +307,4 @@ final class Lightbox_Slide_Builder {
 
 		return \FotoGrids\Exif\Exif_Extractor::extract( $aid, $enabled );
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

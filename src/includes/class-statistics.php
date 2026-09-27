@@ -15,33 +15,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Statistics {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Statistics is the data layer for the custom fotogrids_statistics
-	 * table(s). The WPDB sniffs below are suppressed class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom tables with no WP_Query /
-	 *    core API equivalent; direct $wpdb access is required.
-	 *  - DirectDatabaseQuery.NoCaching: counters are written on view/share
-	 *    events and read for admin reporting; caching a constantly-mutating
-	 *    counter would be counterproductive, so it is an intentional non-goal.
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal - WP
-	 *    placeholders cannot bind table identifiers). All user-supplied
-	 *    *values* are passed through $wpdb->prepare(); where SQL is built
-	 *    incrementally the prepare call is a separate statement from the
-	 *    get_*()/query() call, which the sniff cannot follow.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Increment a statistic counter
@@ -74,11 +48,14 @@ class Statistics {
 
 		$updated = $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE $table
-             SET $field = $field + %d,
+				'UPDATE %i
+             SET %i = %i + %d,
                  last_viewed = NOW(),
                  updated_at = NOW()
-             WHERE object_type = %s AND object_id = %d",
+             WHERE object_type = %s AND object_id = %d',
+				$table,
+				$field,
+				$field,
 				$amount,
 				$object_type,
 				$object_id
@@ -137,9 +114,10 @@ class Statistics {
 		if ( 'views' === $field ) {
 			$wpdb->query(
 				$wpdb->prepare(
-					"INSERT INTO $daily_table (object_type, object_id, viewed_date, views, shares)
+					'INSERT INTO %i (object_type, object_id, viewed_date, views, shares)
                  VALUES (%s, %d, %s, %d, 0)
-                 ON DUPLICATE KEY UPDATE views = views + %d",
+                 ON DUPLICATE KEY UPDATE views = views + %d',
+					$daily_table,
 					$object_type,
 					$object_id,
 					$today,
@@ -150,9 +128,10 @@ class Statistics {
 		} else {
 			$wpdb->query(
 				$wpdb->prepare(
-					"INSERT INTO $daily_table (object_type, object_id, viewed_date, views, shares)
+					'INSERT INTO %i (object_type, object_id, viewed_date, views, shares)
                  VALUES (%s, %d, %s, 0, %d)
-                 ON DUPLICATE KEY UPDATE shares = shares + %d",
+                 ON DUPLICATE KEY UPDATE shares = shares + %d',
+					$daily_table,
 					$object_type,
 					$object_id,
 					$today,
@@ -177,7 +156,8 @@ class Statistics {
 
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM $table WHERE object_type = %s AND object_id = %d",
+				'SELECT * FROM %i WHERE object_type = %s AND object_id = %d',
+				$table,
 				$object_type,
 				$object_id
 			),
@@ -212,7 +192,7 @@ class Statistics {
 		$limit = (int) $limit;
 
 		$where_date = '';
-		$params     = array( $object_type );
+		$params     = array( $table, $object_type );
 
 		if ( $days > 0 ) {
 			$where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
@@ -222,12 +202,12 @@ class Statistics {
 		$params[] = $limit;
 
 		$sql = "SELECT object_id, views, shares, last_viewed
-                FROM $table
+                FROM %i
                 WHERE object_type = %s $where_date
                 ORDER BY views DESC
                 LIMIT %d";
 
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
+		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
 
 		$enriched = array();
 		foreach ( $results as $row ) {
@@ -255,7 +235,7 @@ class Statistics {
 		$limit = (int) $limit;
 
 		$where_date = '';
-		$params     = array( $object_type );
+		$params     = array( $table, $object_type );
 
 		if ( $days > 0 ) {
 			$where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
@@ -265,12 +245,12 @@ class Statistics {
 		$params[] = $limit;
 
 		$sql = "SELECT object_id, views, shares, last_viewed
-                FROM $table
+                FROM %i
                 WHERE object_type = %s $where_date
                 ORDER BY shares DESC
                 LIMIT %d";
 
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
+		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
 
 		$enriched = array();
 		foreach ( $results as $row ) {
@@ -294,11 +274,14 @@ class Statistics {
 		$table = $wpdb->prefix . 'fotogrids_statistics';
 
 		$result = $wpdb->get_row(
-			"SELECT
+			$wpdb->prepare(
+				'SELECT
                 SUM(views) as total_views,
                 SUM(shares) as total_shares,
                 COUNT(DISTINCT object_id) as total_objects
-             FROM $table",
+             FROM %i',
+				$table
+			),
 			ARRAY_A
 		);
 
@@ -322,7 +305,8 @@ class Statistics {
 
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM $table WHERE last_viewed < DATE_SUB(NOW(), INTERVAL %d DAY)",
+				'DELETE FROM %i WHERE last_viewed < DATE_SUB(NOW(), INTERVAL %d DAY)',
+				$table,
 				$days
 			)
 		);
@@ -393,12 +377,7 @@ class Statistics {
 		self::cleanup_old_data( $days_to_keep );
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
 
 add_action( 'init', array( 'FotoGrids\Statistics', 'init_cleanup_schedule' ) );

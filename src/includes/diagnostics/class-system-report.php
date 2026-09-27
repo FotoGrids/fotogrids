@@ -199,7 +199,7 @@ final class System_Report {
 
 		foreach ( self::plugin_tables() as $suffix ) {
 			$table  = $wpdb->prefix . $suffix;
-			$status = $wpdb->get_row(
+			$status = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- A diagnostic report must read live table status.
 				$wpdb->prepare( 'SHOW TABLE STATUS LIKE %s', $wpdb->esc_like( $table ) ),
 				ARRAY_A
 			);
@@ -473,8 +473,7 @@ final class System_Report {
 	private static function count_table_rows( string $table ): int {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and never user input; a diagnostic report must not read a cached value.
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- A diagnostic report must not read a cached value.
 	}
 
 	/**

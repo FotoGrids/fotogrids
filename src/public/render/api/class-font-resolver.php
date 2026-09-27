@@ -281,14 +281,12 @@ final class Font_Resolver {
 
 		// Version is intentionally null: $url is an external Google Fonts URL
 		// that carries its own versioning; appending ?ver= would be wrong.
-		// phpcs:disable WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		wp_enqueue_style(
 			'fotogrids-google-fonts',
 			$url,
 			array(),
-			null // No version - Google Fonts URLs are self-versioning.
+			null // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Google Fonts URLs are self-versioning.
 		);
-		// phpcs:enable WordPress.WP.EnqueuedResourceParameters.MissingVersion
 
 		$this->stylesheet_printed = true;
 	}
@@ -323,9 +321,7 @@ final class Font_Resolver {
 		// is registered, enqueued, and printed through WordPress here (rather than
 		// echoed as a raw <link>). Version is null because Google Fonts URLs carry
 		// their own versioning.
-		// phpcs:disable WordPress.WP.EnqueuedResourceParameters.MissingVersion
-		wp_register_style( 'fotogrids-google-fonts', $url, array(), null );
-		// phpcs:enable WordPress.WP.EnqueuedResourceParameters.MissingVersion
+		wp_register_style( 'fotogrids-google-fonts', $url, array(), null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Google Fonts URLs are self-versioning.
 		wp_enqueue_style( 'fotogrids-google-fonts' );
 		wp_print_styles( 'fotogrids-google-fonts' );
 	}

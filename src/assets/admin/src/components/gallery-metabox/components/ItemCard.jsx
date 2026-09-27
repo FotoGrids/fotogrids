@@ -5,6 +5,7 @@
 import React from 'react';
 import Icon from '../../shared/Icon.jsx';
 import Tooltip from '../../Tooltip.jsx';
+import { isEmbedItem } from '../api/embed-api';
 
 /**
  * Renders one item tile with its featured toggle, edit and remove controls,
@@ -49,19 +50,21 @@ const ItemCard = ({ item, strings, onOpen, onToggleFeatured, onRemove }) => {
                     <Icon name="play" />
                 </span>
             )}
-            <div className={`fotogrids-item-featured ${item.featured ? 'is-featured' : ''}`}>
-                <Tooltip content={item.featured ? strings.clearFeatured : strings.setAsFeatured} position="top">
-                    <button
-                        type="button"
-                        className="fotogrids-item-featured-button"
-                        onClick={() => onToggleFeatured(item.id)}
-                        aria-pressed={!!item.featured}
-                        aria-label={item.featured ? strings.clearFeatured : strings.setAsFeatured}
-                    >
-                        <Icon name="star" />
-                    </button>
-                </Tooltip>
-            </div>
+            {!isEmbedItem(item) && (
+                <div className={`fotogrids-item-featured ${item.featured ? 'is-featured' : ''}`}>
+                    <Tooltip content={item.featured ? strings.clearFeatured : strings.setAsFeatured} position="top">
+                        <button
+                            type="button"
+                            className="fotogrids-item-featured-button"
+                            onClick={() => onToggleFeatured(item.id)}
+                            aria-pressed={!!item.featured}
+                            aria-label={item.featured ? strings.clearFeatured : strings.setAsFeatured}
+                        >
+                            <Icon name="star" />
+                        </button>
+                    </Tooltip>
+                </div>
+            )}
             <div className="fotogrids-item-controls">
                 <Tooltip content={strings.editItem} position="top">
                     <button
