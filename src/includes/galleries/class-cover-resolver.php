@@ -259,25 +259,19 @@ final class Cover_Resolver {
 	}
 
 	/**
-	 * Read the global custom_data row for a video attachment (for its poster).
+	 * Read the custom_data for a video attachment (for its poster).
 	 *
 	 * @since 1.1.0
 	 * @param int $attachment_id Attachment ID.
 	 * @return array<string, mixed>
 	 */
 	private static function attachment_custom_data( int $attachment_id ): array {
-		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-		$raw   = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT custom_data FROM {$table} WHERE attachment_id = %d AND gallery_id = 0 LIMIT 1",
-				$attachment_id
-			)
-		);
-		if ( empty( $raw ) ) {
+		$row = \FotoGrids\Galleries\Item_Meta::get( $attachment_id );
+		if ( null === $row || empty( $row['custom_data'] ) ) {
 			return array();
 		}
-		$decoded = json_decode( (string) $raw, true );
+
+		$decoded = json_decode( (string) $row['custom_data'], true );
 		return is_array( $decoded ) ? $decoded : array();
 	}
 

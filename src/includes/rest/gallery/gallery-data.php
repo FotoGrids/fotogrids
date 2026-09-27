@@ -14,33 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Gallery_Data backs gallery REST endpoints over the custom
-	 * fotogrids_item_meta table. The WPDB sniffs below are suppressed
-	 * class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom table, no WP_Query / core
-	 *    API equivalent.
-	 *  - DirectDatabaseQuery.NoCaching: gallery render reads are served via
-	 *    FotoGrids_Cache at a higher layer; caching here too is a non-goal.
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: the interpolated $table is
-	 *    `$wpdb->prefix . 'fotogrids_item_meta'` (trusted literal). All
-	 *    user-supplied *values* go through $wpdb->prepare(); where SQL is
-	 *    built incrementally the prepare call is a separate statement from
-	 *    the get_*() call, which the sniff cannot follow.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Set or clear the gallery's featured item.
 	 *
@@ -569,47 +542,26 @@ class Gallery_Data {
 			return new \WP_Error( 'gallery_not_available', __( 'Gallery is not available.', 'fotogrids' ), array( 'status' => 403 ) );
 		}
 
-		global $wpdb;
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-
-		$sql    = "SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC";
-		$params = array( $gallery_id );
-
+		$rows = \FotoGrids\Galleries\Gallery_Repository::get_items( $gallery_id );
 		if ( $limit > 0 ) {
-			$sql     .= ' LIMIT %d';
-			$params[] = $limit;
-
-			if ( $offset > 0 ) {
-				$sql     .= ' OFFSET %d';
-				$params[] = $offset;
-			}
+			$rows = array_slice( $rows, max( 0, $offset ), $limit );
 		}
 
-		$results = $wpdb->get_results(
-			$wpdb->prepare( $sql, $params ),
-			ARRAY_A
-		);
-
 		$items = array();
-		foreach ( $results as $row ) {
-			$attachment_id = (int) $row['attachment_id'];
-			$attachment    = get_post( $attachment_id );
-
-			if ( $attachment ) {
-				$items[] = array(
-					'id'          => $attachment_id,
-					'position'    => (int) $row['position'],
-					'caption'     => $row['caption'],
-					'description' => $row['description'],
-					'url'         => wp_get_attachment_url( $attachment_id ),
-					'thumbnail'   => wp_get_attachment_image_url( $attachment_id, 'thumbnail' ),
-					'medium'      => wp_get_attachment_image_url( $attachment_id, 'medium' ),
-					'large'       => wp_get_attachment_image_url( $attachment_id, 'large' ),
-					'full'        => wp_get_attachment_url( $attachment_id ),
-					'alt'         => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
-					'title'       => $attachment->post_title,
-				);
-			}
+		foreach ( $rows as $row ) {
+			$items[] = array(
+				'id'          => $row['id'],
+				'position'    => $row['position'],
+				'caption'     => $row['caption'],
+				'description' => $row['description'],
+				'url'         => $row['url'],
+				'thumbnail'   => $row['thumbnail'],
+				'medium'      => $row['medium'],
+				'large'       => $row['large'],
+				'full'        => $row['full'],
+				'alt'         => $row['alt'],
+				'title'       => $row['title'],
+			);
 		}
 
 		return rest_ensure_response( $items );
@@ -626,37 +578,21 @@ class Gallery_Data {
 	 * @return array Array of item data with attachment information
 	 */
 	private static function get_gallery_items( $gallery_id ) {
-		global $wpdb;
-
-		$table   = $wpdb->prefix . 'fotogrids_item_meta';
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM $table WHERE gallery_id = %d ORDER BY position ASC",
-				$gallery_id
-			),
-			ARRAY_A
-		);
-
 		$items = array();
-		foreach ( $results as $row ) {
-			$attachment_id = (int) $row['attachment_id'];
-			$attachment    = get_post( $attachment_id );
-
-			if ( $attachment ) {
-				$items[] = array(
-					'id'          => $attachment_id,
-					'position'    => (int) $row['position'],
-					'caption'     => $row['caption'],
-					'description' => $row['description'],
-					'location'    => $row['location'],
-					'url'         => wp_get_attachment_url( $attachment_id ),
-					'thumbnail'   => wp_get_attachment_image_url( $attachment_id, 'thumbnail' ),
-					'medium'      => wp_get_attachment_image_url( $attachment_id, 'medium' ),
-					'large'       => wp_get_attachment_image_url( $attachment_id, 'large' ),
-					'full'        => wp_get_attachment_url( $attachment_id ),
-					'alt'         => get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
-				);
-			}
+		foreach ( \FotoGrids\Galleries\Gallery_Repository::get_items( (int) $gallery_id ) as $row ) {
+			$items[] = array(
+				'id'          => $row['id'],
+				'position'    => $row['position'],
+				'caption'     => $row['caption'],
+				'description' => $row['description'],
+				'location'    => $row['location'],
+				'url'         => $row['url'],
+				'thumbnail'   => $row['thumbnail'],
+				'medium'      => $row['medium'],
+				'large'       => $row['large'],
+				'full'        => $row['full'],
+				'alt'         => $row['alt'],
+			);
 		}
 
 		return $items;
@@ -712,21 +648,6 @@ class Gallery_Data {
 	 * @return int The number of items in the gallery
 	 */
 	private static function get_gallery_item_count( $gallery_id ) {
-		global $wpdb;
-
-		$table = $wpdb->prefix . 'fotogrids_item_meta';
-		return (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $table WHERE gallery_id = %d",
-				$gallery_id
-			)
-		);
+		return \FotoGrids\Galleries\Gallery_Repository::get_item_count( (int) $gallery_id );
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }
