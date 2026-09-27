@@ -307,6 +307,33 @@ describe('useGalleryItems', () => {
 			expect(stateManager.items.setItems).toHaveBeenCalledWith([]);
 			expect(changeEvents).toContain('items-remove-all');
 		});
+
+		it('deletes every embed over REST and leaves attachments alone', async () => {
+			mount([
+				image(1),
+				image(2, { item_type: 'video_youtube' }),
+				image(3, { item_type: 'video_vimeo' }),
+			]);
+
+			await act(async () => {
+				api.clearAllItems();
+			});
+
+			expect(api.items).toEqual([]);
+			expect(deleteEmbed.mock.calls.map(([arg]) => arg.embedId)).toEqual([
+				2, 3,
+			]);
+		});
+
+		it('sends no DELETE when the grid holds only images', async () => {
+			mount([image(1), image(2)]);
+
+			await act(async () => {
+				api.clearAllItems();
+			});
+
+			expect(deleteEmbed).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('reorderItems', () => {

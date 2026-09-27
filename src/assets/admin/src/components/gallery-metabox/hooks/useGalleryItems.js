@@ -29,6 +29,15 @@ const notifyChange = (source) => {
 };
 
 /**
+ * Whether a grid item is a video embed rather than an attachment.
+ *
+ * @param {Object|undefined} item Grid item.
+ * @return {boolean} True for YouTube and Vimeo embeds.
+ */
+const isEmbedItem = (item) =>
+	item?.item_type === 'video_youtube' || item?.item_type === 'video_vimeo';
+
+/**
  * Owns the gallery's item list and every operation that mutates it, keeping
  * the shared collection-state manager and the save pipeline in step.
  *
@@ -188,9 +197,7 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 	const removeItem = useCallback(
 		(itemId) => {
 			const itemToRemove = items.find((item) => item.id === itemId);
-			const itemType = itemToRemove?.item_type || 'image';
-			const isEmbed =
-				itemType === 'video_youtube' || itemType === 'video_vimeo';
+			const isEmbed = isEmbedItem(itemToRemove);
 
 			setItems((prevItems) =>
 				prevItems.filter((item) => item.id !== itemId)
@@ -217,6 +224,7 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 	);
 
 	const clearAllItems = useCallback(() => {
+		items.filter(isEmbedItem).forEach((item) => deleteEmbedItem(item.id));
 		setItems([]);
 		saveFeaturedItem(null);
 		const State = collectionState();
@@ -224,7 +232,7 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 			State.items.setItems([]);
 		}
 		notifyChange('items-remove-all');
-	}, [saveFeaturedItem]);
+	}, [items, saveFeaturedItem, deleteEmbedItem]);
 
 	// Order has no endpoint of its own: it rides the gallery save through the
 	// hidden `fotogrids_gallery_items[]` inputs each tile renders.
