@@ -49,7 +49,9 @@ const useLocalFolderUpload = ({
 	const [error, setError] = useState(null);
 
 	useEffect(() => {
-		if (isOpen) return;
+		if (isOpen) {
+			return;
+		}
 
 		setFiles([]);
 		setFolderName('');
@@ -76,7 +78,9 @@ const useLocalFolderUpload = ({
 	);
 
 	const startUpload = useCallback(() => {
-		if (files.length === 0) return;
+		if (files.length === 0) {
+			return;
+		}
 
 		const uploaded = new Set();
 		let failed = 0;
@@ -85,7 +89,9 @@ const useLocalFolderUpload = ({
 			const done = uploaded.size + failed;
 			setCounts({ done, total: files.length });
 
-			if (done < files.length) return;
+			if (done < files.length) {
+				return;
+			}
 
 			setUploading(false);
 			setCounts({ done: 0, total: 0 });
@@ -109,7 +115,9 @@ const useLocalFolderUpload = ({
 				allowedTypes: ['image'],
 				onFileChange: (attachments) => {
 					(attachments || []).forEach((attachment) => {
-						if (attachment?.id) uploaded.add(attachment.id);
+						if (attachment?.id) {
+							uploaded.add(attachment.id);
+						}
 					});
 					settle();
 				},

@@ -65,7 +65,7 @@ const FotoGridsGalleryEdit = (props: FotoGridsGalleryEditProps): ReactElement =>
     }
 
     const cfg     = window.fotogridsPbDivi || ({} as any);
-    const restUrl = cfg.restUrl || '/wp-json/fotogrids/v1/';
+    const restUrl = cfg.restUrl || '';
     const nonce   = cfg.restNonce || '';
     const url     = `${restUrl}preview/gallery/${encodeURIComponent(galleryId)}`;
 

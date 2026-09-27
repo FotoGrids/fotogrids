@@ -29,7 +29,9 @@ const AlbumAssignment = () => {
 	}, [allAlbums, assignedAlbums]);
 
 	const filteredAlbums = useMemo(() => {
-		if (!searchTerm) return availableAlbums;
+		if (!searchTerm) {
+			return availableAlbums;
+		}
 		return availableAlbums.filter((album) =>
 			album.title.toLowerCase().includes(searchTerm.toLowerCase())
 		);

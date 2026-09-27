@@ -6,6 +6,8 @@
  * gallery's item list.
  */
 
+import { buildRestUrl } from '../../../utils/rest-url';
+
 /**
  * Maps the modal's UI-facing source to the canonical item_type identifier the
  * embed endpoints expect.
@@ -18,10 +20,7 @@ export const toCanonicalSource = (source) =>
 
 const EMBED_ROUTE = 'fotogrids/v1/items/embed';
 
-const restConfig = () => ({
-	base: window.wpApiSettings?.root || '/wp-json/',
-	nonce: window.wpApiSettings?.nonce || '',
-});
+const restNonce = () => window.wpApiSettings?.nonce || '';
 
 /**
  * Surfaces a failed response as a toast and throws it.
@@ -49,9 +48,9 @@ const throwResponseError = async (response) => {
  * @throws {Error} When the request fails.
  */
 export const createEmbed = async ({ embedForm, galleryId }) => {
-	const { base, nonce } = restConfig();
+	const nonce = restNonce();
 
-	const response = await fetch(`${base}${EMBED_ROUTE}`, {
+	const response = await fetch(buildRestUrl(EMBED_ROUTE), {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -80,19 +79,22 @@ export const createEmbed = async ({ embedForm, galleryId }) => {
  * @throws {Error} When the request fails.
  */
 export const updateEmbed = async ({ embedForm }) => {
-	const { base, nonce } = restConfig();
+	const nonce = restNonce();
 
-	const response = await fetch(`${base}${EMBED_ROUTE}/${embedForm.id}`, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-WP-Nonce': nonce,
-		},
-		body: JSON.stringify({
-			...embedForm,
-			source: toCanonicalSource(embedForm.source),
-		}),
-	});
+	const response = await fetch(
+		buildRestUrl(`${EMBED_ROUTE}/${embedForm.id}`),
+		{
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-WP-Nonce': nonce,
+			},
+			body: JSON.stringify({
+				...embedForm,
+				source: toCanonicalSource(embedForm.source),
+			}),
+		}
+	);
 
 	if (!response.ok) {
 		await throwResponseError(response);
@@ -111,13 +113,16 @@ export const updateEmbed = async ({ embedForm }) => {
  * @return {Promise<void>}
  */
 export const deleteEmbed = async ({ embedId, strings }) => {
-	const { base, nonce } = restConfig();
+	const nonce = restNonce();
 
 	try {
-		const response = await fetch(`${base}${EMBED_ROUTE}/${embedId}`, {
-			method: 'DELETE',
-			headers: { 'X-WP-Nonce': nonce },
-		});
+		const response = await fetch(
+			buildRestUrl(`${EMBED_ROUTE}/${embedId}`),
+			{
+				method: 'DELETE',
+				headers: { 'X-WP-Nonce': nonce },
+			}
+		);
 		if (!response.ok) {
 			const err = await response.json().catch(() => ({}));
 			throw new Error(err.message || `HTTP ${response.status}`);

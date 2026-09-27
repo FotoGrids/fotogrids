@@ -6,6 +6,7 @@ import Segmented from '../shared/Segmented';
 import Select from '../shared/Select';
 import NumberField from '../shared/NumberField';
 import TemplateOverviewModal from './TemplateOverviewModal';
+import { buildRestUrl } from '../../utils/rest-url';
 import ApplyTemplateModal from './ApplyTemplateModal';
 
 const { __ } = wp.i18n;
@@ -102,10 +103,9 @@ const PreviewTemplateModal = ({ template, onClose, onApply, applyLabel }) => {
 		}
 
 		// Local render (user templates, offline fallback, Pro-installed path).
-		const baseUrl =
-			window.fotogridsAdmin?.apiUrl ||
-			window.location.origin + '/wp-json/';
-		const previewUrl = new URL('fotogrids/v1/templates/preview', baseUrl);
+		const previewUrl = new URL(
+			buildRestUrl('fotogrids/v1/templates/preview')
+		);
 
 		const restNonce =
 			window.fotogridsAdmin?.restNonce || wpApiSettings?.nonce || '';

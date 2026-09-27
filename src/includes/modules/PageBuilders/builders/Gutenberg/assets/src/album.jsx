@@ -77,7 +77,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
     });
 
     const config = readPbConfig();
-    const restUrl = config.restUrl || '/wp-json/fotogrids/v1/';
+    const restUrl = config.restUrl || '';
     const restNonce = config.restNonce || '';
     const createNewUrl = config.albumCreateUrl || '';
     const editBase = config.albumEditBase || '';

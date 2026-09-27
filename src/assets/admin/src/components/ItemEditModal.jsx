@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ItemPreviewPane, ItemEditTabs } from './item-edit-modal/ModalBody';
 import { Modal } from './shared/Modal';
 import { Button } from './shared/Button';
+import { buildRestUrl } from '../utils/rest-url';
 
 /**
  * Metadata type registry.
@@ -155,7 +156,10 @@ const ItemEditModal = ({
 
     const loadItemMetadata = async () => {
         try {
-            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/item/${itemId}?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`);
+            const response = await fetch(buildRestUrl(`fotogrids/v1/metadata/item/${itemId}`, { _wpnonce: window.wpApiSettings?.nonce }));
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
             const data = await response.json();
 
             const initialMetadata = {
@@ -178,23 +182,23 @@ const ItemEditModal = ({
 
     const loadAvailableMetadata = async () => {
         try {
-            const [tagsResponse, peopleResponse, locationsResponse] = await Promise.all([
-                fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/tags?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`),
-                fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/people?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`),
-                fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/locations?_wpnonce=${encodeURIComponent(window.wpApiSettings.nonce)}`)
+            const nonce = window.wpApiSettings?.nonce;
+            const readList = async (type) => {
+                const response = await fetch(buildRestUrl(`fotogrids/v1/metadata/${type}`, { _wpnonce: nonce }));
+                if (!response.ok) {
+                    return [];
+                }
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            };
+
+            const [tags, people, locations] = await Promise.all([
+                readList('tags'),
+                readList('people'),
+                readList('locations')
             ]);
 
-            const [tagsData, peopleData, locationsData] = await Promise.all([
-                tagsResponse.json(),
-                peopleResponse.json(),
-                locationsResponse.json()
-            ]);
-
-            setAvailableMetadata({
-                tags: tagsData || [],
-                people: peopleData || [],
-                locations: locationsData || []
-            });
+            setAvailableMetadata({ tags, people, locations });
         } catch (error) {
             console.warn('Failed to load available metadata:', error);
         }

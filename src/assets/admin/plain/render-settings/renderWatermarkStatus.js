@@ -69,8 +69,9 @@ const WatermarkStatusComponent = ({
 	}, [postId]);
 
 	const regenerate = async (ids) => {
-		if (isDisabled || running || !Array.isArray(ids) || ids.length === 0)
+		if (isDisabled || running || !Array.isArray(ids) || ids.length === 0) {
 			return;
+		}
 
 		setRunning(true);
 		setProgress({ done: 0, total: ids.length });

@@ -8,7 +8,9 @@ import { navigateTo } from './navigate';
  * Create a gallery from image IDs
  */
 export const createGalleryFromImages = async (imageIds) => {
-	if (!imageIds || imageIds.length === 0) return null;
+	if (!imageIds || imageIds.length === 0) {
+		return null;
+	}
 
 	try {
 		const { __ } = wp.i18n;

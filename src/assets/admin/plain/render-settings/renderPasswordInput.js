@@ -99,7 +99,9 @@ const PasswordInputComponent = ({
 
 	// Eye-button handler.
 	const handleEyeClick = async () => {
-		if (isDisabled) return;
+		if (isDisabled) {
+			return;
+		}
 
 		// If the user has already typed something, or no saved password exists,
 		// just toggle visibility locally - nothing to fetch.

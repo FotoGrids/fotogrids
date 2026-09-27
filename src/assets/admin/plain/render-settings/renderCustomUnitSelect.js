@@ -61,7 +61,9 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 
 	const computePlacement = useCallback(() => {
 		const button = selectRef.current;
-		if (!button) return;
+		if (!button) {
+			return;
+		}
 
 		const rect = button.getBoundingClientRect();
 		const spaceBelow = window.innerHeight - rect.bottom;
@@ -80,7 +82,9 @@ window.FotoGridsRenderSettings.CustomUnitSelect = function CustomUnitSelect(
 	}, [dropdownHeight]);
 
 	useEffect(() => {
-		if (!isOpen) return undefined;
+		if (!isOpen) {
+			return undefined;
+		}
 
 		// A click inside either the trigger or the (portalled) dropdown is
 		// "inside"; the dropdown is no longer a DOM descendant of the trigger
