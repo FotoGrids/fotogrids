@@ -21,12 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_Meta_Consolidation {
 
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Columns merged from gallery-scoped rows into the item's row.
@@ -75,7 +70,8 @@ final class Item_Meta_Consolidation {
 
 		$gallery_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT DISTINCT gallery_id FROM {$table} WHERE gallery_id > %d",
+				'SELECT DISTINCT gallery_id FROM %i WHERE gallery_id > %d',
+				$table,
 				Item_Meta::GALLERY_ID
 			)
 		);
@@ -84,7 +80,8 @@ final class Item_Meta_Consolidation {
 		foreach ( (array) $gallery_ids as $gallery_id ) {
 			$attachment_ids = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT attachment_id FROM {$table} WHERE gallery_id = %d ORDER BY position ASC, id ASC",
+					'SELECT attachment_id FROM %i WHERE gallery_id = %d ORDER BY position ASC, id ASC',
+					$table,
 					(int) $gallery_id
 				)
 			);
@@ -150,7 +147,8 @@ final class Item_Meta_Consolidation {
 		do {
 			$attachment_ids = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT DISTINCT attachment_id FROM {$table} WHERE gallery_id IS NULL OR gallery_id <> %d LIMIT %d",
+					'SELECT DISTINCT attachment_id FROM %i WHERE gallery_id IS NULL OR gallery_id <> %d LIMIT %d',
+					$table,
 					Item_Meta::GALLERY_ID,
 					self::BATCH_SIZE
 				)
@@ -183,7 +181,7 @@ final class Item_Meta_Consolidation {
 		$table = Item_Meta::table();
 
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( "SELECT * FROM {$table} WHERE attachment_id = %d", $attachment_id ),
+			$wpdb->prepare( 'SELECT * FROM %i WHERE attachment_id = %d', $table, $attachment_id ),
 			ARRAY_A
 		);
 		if ( empty( $rows ) ) {
@@ -236,7 +234,8 @@ final class Item_Meta_Consolidation {
 
 		$wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE attachment_id = %d AND id <> %d",
+				'DELETE FROM %i WHERE attachment_id = %d AND id <> %d',
+				$table,
 				$attachment_id,
 				(int) $keep['id']
 			)
@@ -259,10 +258,5 @@ final class Item_Meta_Consolidation {
 		return 'link_target' !== $field || 'global' !== $value;
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

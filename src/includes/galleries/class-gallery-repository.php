@@ -28,28 +28,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Gallery_Repository {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Get a gallery post by ID, with post-type validation.
 	 *
@@ -204,7 +182,7 @@ final class Gallery_Repository {
 
 		global $wpdb;
 
-		$rows = $wpdb->get_col(
+		$rows = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Reverse lookup on serialized post meta; no core API returns this shape.
 			$wpdb->prepare(
 				"SELECT post_id FROM {$wpdb->postmeta}
              WHERE meta_key = 'fotogrids_gallery_items'
@@ -338,7 +316,8 @@ final class Gallery_Repository {
 		global $wpdb;
 		$placeholders = implode( ',', array_fill( 0, count( $post_statuses ), '%s' ) );
 
-		$lists = $wpdb->get_col(
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- $placeholders is a generated list of %s tokens.
+		$lists = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Batch lookup; no core API returns this shape.
 			$wpdb->prepare(
 				"SELECT pm.meta_value FROM {$wpdb->postmeta} pm
              INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
@@ -349,6 +328,7 @@ final class Gallery_Repository {
 				$post_statuses
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
 		$item_ids = array();
 		foreach ( (array) $lists as $raw ) {
@@ -385,9 +365,9 @@ final class Gallery_Repository {
 
 		foreach ( array_chunk( $item_ids, 1000 ) as $chunk ) {
 			$placeholders = implode( ',', array_fill( 0, count( $chunk ), '%d' ) );
-			$count       += (int) $wpdb->get_var(
+			$count       += (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Batch lookup; no core API returns this shape.
 				$wpdb->prepare(
-					"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type IN ('attachment', %s) AND ID IN ({$placeholders})",
+					"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type IN ('attachment', %s) AND ID IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $placeholders is a generated list of %d tokens.
 					array_merge( array( Embed_Store::POST_TYPE ), $chunk )
 				)
 			);
@@ -395,12 +375,4 @@ final class Gallery_Repository {
 
 		return $count;
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

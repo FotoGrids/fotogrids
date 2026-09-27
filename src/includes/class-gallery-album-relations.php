@@ -14,34 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Gallery_Album_Relations {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Gallery_Album_Relations is the data layer for the custom
-	 * fotogrids_gallery_albums join table. The WPDB sniffs below are
-	 * suppressed class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom table with no WP_Query /
-	 *    core API equivalent; direct $wpdb access (incl. JOINs to wp_posts)
-	 *    is required.
-	 *  - DirectDatabaseQuery.NoCaching: relationship reads back admin list
-	 *    views; caching is a non-goal at this layer.
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: the interpolated
-	 *    $table_name is `$wpdb->prefix . 'fotogrids_gallery_albums'` (a
-	 *    trusted literal - WP placeholders cannot bind table identifiers),
-	 *    and ORDER BY clauses are built from a fixed allowlist. All
-	 *    user-supplied *values* are passed through $wpdb->prepare(), which
-	 *    on the flagged lines is a separate statement from the get_*() call.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Table name for gallery-album relationships
@@ -198,18 +171,21 @@ class Gallery_Album_Relations {
 			$order_clause = 'ORDER BY p.post_date ' . $args['order'];
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order_clause is assembled above from fixed column names.
 		$sql = $wpdb->prepare(
 			"SELECT p.*, ga.position, ga.created_at as relationship_created
              FROM {$wpdb->posts} p
-             INNER JOIN $table_name ga ON p.ID = ga.gallery_id
+             INNER JOIN %i ga ON p.ID = ga.gallery_id
              WHERE ga.album_id = %d
              AND p.post_type = 'fotogrids_gallery'
              AND p.post_status IN ('publish', 'private', 'draft')
              $order_clause",
+			$table_name,
 			$album_id
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		$galleries = $wpdb->get_results( $sql );
+		$galleries = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared above; $order_clause uses fixed column names.
 
 		if ( $args['include_meta'] && ! empty( $galleries ) ) {
 			foreach ( $galleries as $gallery ) {
@@ -257,18 +233,21 @@ class Gallery_Album_Relations {
 			$order_clause = 'ORDER BY p.post_date ' . $args['order'];
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order_clause is assembled above from fixed column names.
 		$sql = $wpdb->prepare(
 			"SELECT p.*, ga.position, ga.created_at as relationship_created
              FROM {$wpdb->posts} p
-             INNER JOIN $table_name ga ON p.ID = ga.album_id
+             INNER JOIN %i ga ON p.ID = ga.album_id
              WHERE ga.gallery_id = %d
              AND p.post_type = 'fotogrids_album'
              AND p.post_status IN ('publish', 'private', 'draft')
              $order_clause",
+			$table_name,
 			$gallery_id
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		$albums = $wpdb->get_results( $sql );
+		$albums = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is prepared above; $order_clause uses fixed column names.
 
 		if ( $args['include_meta'] && ! empty( $albums ) ) {
 			foreach ( $albums as $album ) {
@@ -412,7 +391,8 @@ class Gallery_Album_Relations {
 
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM $table_name WHERE gallery_id = %d AND album_id = %d",
+				'SELECT id FROM %i WHERE gallery_id = %d AND album_id = %d',
+				$table_name,
 				$gallery_id,
 				$album_id
 			)
@@ -434,7 +414,8 @@ class Gallery_Album_Relations {
 
 		$max_position = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT MAX(position) FROM $table_name WHERE album_id = %d",
+				'SELECT MAX(position) FROM %i WHERE album_id = %d',
+				$table_name,
 				$album_id
 			)
 		);
@@ -520,7 +501,8 @@ class Gallery_Album_Relations {
 
 		$count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $table_name WHERE album_id = %d",
+				'SELECT COUNT(*) FROM %i WHERE album_id = %d',
+				$table_name,
 				$album_id
 			)
 		);
@@ -566,10 +548,5 @@ class Gallery_Album_Relations {
 		}
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
