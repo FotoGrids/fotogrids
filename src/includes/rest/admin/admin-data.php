@@ -1141,7 +1141,7 @@ class Admin_Data {
                  WHERE object_type = 'gallery'
                    AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
                  GROUP BY object_id
-                 ORDER BY total_views DESC
+                 ORDER BY total_views DESC, object_id ASC
                  LIMIT 10",
 					$daily_table,
 					$days - 1
@@ -1166,7 +1166,7 @@ class Admin_Data {
                  FROM %i
                  WHERE object_type = 'gallery'
                  GROUP BY object_id
-                 ORDER BY total_views DESC
+                 ORDER BY total_views DESC, object_id ASC
                  LIMIT 10",
 					$stats_table
 				),
@@ -1294,7 +1294,7 @@ class Admin_Data {
                  FROM %i
                  WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
                  GROUP BY object_type, object_id
-                 ORDER BY views DESC
+                 ORDER BY views DESC, object_type ASC, object_id ASC
                  LIMIT 20',
 					$daily_table,
 					$days - 1
@@ -1316,7 +1316,7 @@ class Admin_Data {
 				$wpdb->prepare(
 					'SELECT object_type, object_id, views, shares
                  FROM %i
-                 ORDER BY views DESC
+                 ORDER BY views DESC, object_type ASC, object_id ASC
                  LIMIT 20',
 					$stats_table
 				),
