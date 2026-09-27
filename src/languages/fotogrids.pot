@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-27T11:02:32+00:00\n"
+"POT-Creation-Date: 2026-09-27T13:06:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -43,20 +43,20 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:251
+#: fotogrids.php:253
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:252
-#: fotogrids.php:261
+#: fotogrids.php:254
+#: fotogrids.php:263
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:260
+#: fotogrids.php:262
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:276
+#: fotogrids.php:278
 #: includes/class-admin-init.php:134
 #: includes/class-admin-init.php:135
 #: includes/tools/import-export/assets/ImportExportTool.jsx:45
@@ -64,11 +64,11 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:294
+#: fotogrids.php:296
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:319
+#: fotogrids.php:321
 #: assets/admin/src/components/dashboard/LearnSection.jsx:56
 msgid "Help Center"
 msgstr ""
@@ -91,7 +91,7 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:166
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1535
+#: includes/rest/admin/admin-data.php:1473
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:421
 #: assets/admin/src/components/pages/TemplatesPage.jsx:428
@@ -246,7 +246,7 @@ msgstr ""
 #: includes/metaboxes/class-collection-save-pipeline.php:167
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1535
+#: includes/rest/admin/admin-data.php:1473
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:422
 #: assets/admin/src/components/pages/TemplatesPage.jsx:427
@@ -272,8 +272,8 @@ msgid "News & Updates"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:261
-#: includes/metaboxes/class-metabox-registrar.php:647
-#: includes/metaboxes/class-metabox-registrar.php:712
+#: includes/metaboxes/class-metabox-registrar.php:632
+#: includes/metaboxes/class-metabox-registrar.php:697
 #: includes/metaboxes/class-metabox-strings.php:64
 #: assets/admin/src/components/templates/ApplyTemplateModal.jsx:139
 msgid "Loading..."
@@ -1743,7 +1743,7 @@ msgid "Filter by camera settings (ISO, aperture, shutter speed), file properties
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:343
-msgid "Filter {postType.lower.plural} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
+msgid "Filter {postType.plural.lower} by recognized people or locations. Perfect for event photography, family albums, and location-based collections."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:344
@@ -2254,7 +2254,7 @@ msgid "Lens"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:471
-msgid "Let AI determine the best order for your {postType.lower.plural} based on relevance, popularity, and user engagement patterns."
+msgid "Let AI determine the best order for your {postType.plural.lower} based on relevance, popularity, and user engagement patterns."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:472
@@ -3298,7 +3298,7 @@ msgid "Sort by multiple fields simultaneously (e.g., date then title), or use cu
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:714
-msgid "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.lower.plural} that adapt to your content."
+msgid "Sort by tags, people, locations, and other metadata to create dynamic, context-aware {postType.plural.lower} that adapt to your content."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:715
@@ -3982,18 +3982,18 @@ msgstr ""
 
 #: includes/class-admin-init.php:602
 #: includes/metaboxes/class-collection-save-pipeline.php:96
-#: includes/metaboxes/class-item-ajax-endpoints.php:658
+#: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:241
 #: includes/rest/admin/admin-data.php:277
 #: includes/rest/admin/admin-data.php:297
-#: includes/rest/admin/admin-data.php:866
-#: includes/rest/admin/admin-data.php:979
-#: includes/rest/admin/admin-data.php:1143
-#: includes/rest/admin/admin-data.php:1207
-#: includes/rest/admin/admin-data.php:1291
-#: includes/rest/admin/admin-data.php:1349
-#: includes/rest/admin/admin-data.php:1474
-#: includes/rest/admin/admin-data.php:1556
+#: includes/rest/admin/admin-data.php:805
+#: includes/rest/admin/admin-data.php:918
+#: includes/rest/admin/admin-data.php:1081
+#: includes/rest/admin/admin-data.php:1145
+#: includes/rest/admin/admin-data.php:1229
+#: includes/rest/admin/admin-data.php:1287
+#: includes/rest/admin/admin-data.php:1412
+#: includes/rest/admin/admin-data.php:1494
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -4208,12 +4208,12 @@ msgstr ""
 
 #: includes/class-post-types.php:123
 #: includes/metaboxes/class-metabox-registrar.php:345
-#: includes/metaboxes/class-metabox-registrar.php:711
+#: includes/metaboxes/class-metabox-registrar.php:696
 msgid "Edit Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:124
-#: includes/metaboxes/class-metabox-registrar.php:710
+#: includes/metaboxes/class-metabox-registrar.php:695
 msgid "View Gallery"
 msgstr ""
 
@@ -5114,6 +5114,12 @@ msgstr ""
 msgid "%s m"
 msgstr ""
 
+#. translators: %s: Method name.
+#: includes/galleries/class-gallery-items.php:64
+#, php-format
+msgid "Use %s instead."
+msgstr ""
+
 #: includes/metaboxes/class-collection-save-pipeline.php:92
 msgid "Security check failed"
 msgstr ""
@@ -5127,7 +5133,7 @@ msgid "Invalid collection"
 msgstr ""
 
 #: includes/metaboxes/class-collection-save-pipeline.php:110
-#: includes/metaboxes/class-item-ajax-endpoints.php:672
+#: includes/metaboxes/class-item-ajax-endpoints.php:481
 msgid "Cannot edit this gallery"
 msgstr ""
 
@@ -5142,28 +5148,28 @@ msgid "%s saved successfully"
 msgstr ""
 
 #. translators: %d: number of items updated.
-#: includes/metaboxes/class-item-ajax-endpoints.php:644
+#: includes/metaboxes/class-item-ajax-endpoints.php:453
 #, php-format
 msgid "Bulk action completed. Updated %d items."
 msgstr ""
 
-#: includes/metaboxes/class-item-ajax-endpoints.php:663
+#: includes/metaboxes/class-item-ajax-endpoints.php:472
 msgid "Invalid gallery ID"
 msgstr ""
 
-#: includes/metaboxes/class-item-ajax-endpoints.php:668
+#: includes/metaboxes/class-item-ajax-endpoints.php:477
 msgid "Invalid gallery"
 msgstr ""
 
-#: includes/metaboxes/class-item-ajax-endpoints.php:678
+#: includes/metaboxes/class-item-ajax-endpoints.php:487
 msgid "Invalid item order data"
 msgstr ""
 
-#: includes/metaboxes/class-item-ajax-endpoints.php:687
+#: includes/metaboxes/class-item-ajax-endpoints.php:496
 msgid "Items reordered successfully"
 msgstr ""
 
-#: includes/metaboxes/class-item-ajax-endpoints.php:693
+#: includes/metaboxes/class-item-ajax-endpoints.php:502
 msgid "Failed to reorder items"
 msgstr ""
 
@@ -5233,119 +5239,119 @@ msgstr ""
 msgid "You have unsaved changes. Are you sure you want to leave?"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:610
+#: includes/metaboxes/class-metabox-registrar.php:595
 msgid "You're viewing these settings in read-only mode. Ask a site administrator if changes are needed."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:640
+#: includes/metaboxes/class-metabox-registrar.php:625
 msgid "Search albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:641
+#: includes/metaboxes/class-metabox-registrar.php:626
 msgid "No available albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:642
+#: includes/metaboxes/class-metabox-registrar.php:627
 msgid "No more albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:643
+#: includes/metaboxes/class-metabox-registrar.php:628
 msgid "Create New Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:644
+#: includes/metaboxes/class-metabox-registrar.php:629
 msgid "Assigned to"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:645
+#: includes/metaboxes/class-metabox-registrar.php:630
 msgid "Not assigned to any"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:646
+#: includes/metaboxes/class-metabox-registrar.php:631
 msgid "albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:648
+#: includes/metaboxes/class-metabox-registrar.php:633
 msgid "Error loading albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:649
+#: includes/metaboxes/class-metabox-registrar.php:634
 msgid "Album assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:656
+#: includes/metaboxes/class-metabox-registrar.php:641
 msgid "Loading albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:697
+#: includes/metaboxes/class-metabox-registrar.php:682
 msgid "Assigned Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:698
+#: includes/metaboxes/class-metabox-registrar.php:683
 msgid "Available Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:699
+#: includes/metaboxes/class-metabox-registrar.php:684
 msgid "Search Galleries..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:700
+#: includes/metaboxes/class-metabox-registrar.php:685
 msgid "No Galleries assigned to this Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:701
+#: includes/metaboxes/class-metabox-registrar.php:686
 msgid "No available Galleries found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:702
+#: includes/metaboxes/class-metabox-registrar.php:687
 msgid "Drag to reorder Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:703
+#: includes/metaboxes/class-metabox-registrar.php:688
 msgid "Remove from Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:704
+#: includes/metaboxes/class-metabox-registrar.php:689
 msgid "Add to Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:705
+#: includes/metaboxes/class-metabox-registrar.php:690
 msgid "Set as featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:706
+#: includes/metaboxes/class-metabox-registrar.php:691
 msgid "Clear featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:707
+#: includes/metaboxes/class-metabox-registrar.php:692
 msgid "Featured Gallery set"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:708
+#: includes/metaboxes/class-metabox-registrar.php:693
 msgid "Featured Gallery cleared"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:709
+#: includes/metaboxes/class-metabox-registrar.php:694
 msgid "Error saving featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:713
+#: includes/metaboxes/class-metabox-registrar.php:698
 msgid "Gallery assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:714
+#: includes/metaboxes/class-metabox-registrar.php:699
 msgid "Error updating Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:715
+#: includes/metaboxes/class-metabox-registrar.php:700
 msgid "items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:716
+#: includes/metaboxes/class-metabox-registrar.php:701
 msgid "No items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:717
+#: includes/metaboxes/class-metabox-registrar.php:702
 msgid "Drop item here"
 msgstr ""
 
@@ -6337,9 +6343,9 @@ msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:80
 #: includes/rest/admin/class-preview-endpoint.php:38
-#: includes/rest/gallery/gallery-data.php:63
-#: includes/rest/gallery/gallery-data.php:345
-#: includes/rest/gallery/gallery-data.php:561
+#: includes/rest/gallery/gallery-data.php:36
+#: includes/rest/gallery/gallery-data.php:318
+#: includes/rest/gallery/gallery-data.php:534
 #: includes/rest/gallery/gallery-permissions.php:64
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
@@ -6352,7 +6358,7 @@ msgid "Render pipeline is not available."
 msgstr ""
 
 #: includes/modules/PageBuilders/core/rest/preview-data.php:240
-#: includes/rest/album/album-data.php:58
+#: includes/rest/album/album-data.php:36
 msgid "Album not found."
 msgstr ""
 
@@ -6814,34 +6820,34 @@ msgstr ""
 msgid "The defaults could not be saved."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:813
+#: includes/rest/admin/admin-data.php:752
 #: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:156
 msgid "Attachment not found."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:822
+#: includes/rest/admin/admin-data.php:761
 #: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:165
 msgid "Attachment file not found on disk."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:897
+#: includes/rest/admin/admin-data.php:836
 msgid "Unable to fetch Google Fonts metadata."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:906
+#: includes/rest/admin/admin-data.php:845
 msgid "Google Fonts metadata endpoint returned an unexpected response."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:949
+#: includes/rest/admin/admin-data.php:888
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1429
+#: includes/rest/admin/admin-data.php:1367
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1454
+#: includes/rest/admin/admin-data.php:1392
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
@@ -6856,19 +6862,19 @@ msgstr ""
 msgid "Preview item order exceeds the maximum supported size."
 msgstr ""
 
-#: includes/rest/album/album-data.php:82
+#: includes/rest/album/album-data.php:60
 msgid "Featured gallery must be a gallery."
 msgstr ""
 
-#: includes/rest/album/album-data.php:98
+#: includes/rest/album/album-data.php:76
 msgid "Gallery is not part of this album."
 msgstr ""
 
-#: includes/rest/album/album-data.php:131
+#: includes/rest/album/album-data.php:109
 msgid "Album not found"
 msgstr ""
 
-#: includes/rest/album/album-data.php:139
+#: includes/rest/album/album-data.php:117
 msgid "Album is not published"
 msgstr ""
 
@@ -6880,41 +6886,41 @@ msgstr ""
 msgid "You do not have permission to edit this album."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:87
+#: includes/rest/gallery/gallery-data.php:60
 msgid "Featured item must be an attachment."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:96
+#: includes/rest/gallery/gallery-data.php:69
 msgid "Item is not part of this gallery."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:131
-#: includes/rest/gallery/gallery-data.php:190
-#: includes/rest/gallery/gallery-data.php:225
+#: includes/rest/gallery/gallery-data.php:104
+#: includes/rest/gallery/gallery-data.php:163
+#: includes/rest/gallery/gallery-data.php:198
 msgid "Gallery not found"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:143
-#: includes/rest/gallery/gallery-data.php:233
+#: includes/rest/gallery/gallery-data.php:116
+#: includes/rest/gallery/gallery-data.php:206
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:244
+#: includes/rest/gallery/gallery-data.php:217
 msgid "Incorrect password."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:336
+#: includes/rest/gallery/gallery-data.php:309
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:353
+#: includes/rest/gallery/gallery-data.php:326
 #: includes/rest/gallery/gallery-permissions.php:72
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:569
+#: includes/rest/gallery/gallery-data.php:542
 msgid "Gallery is not available."
 msgstr ""
 
@@ -7041,54 +7047,54 @@ msgstr ""
 msgid "The embed item_meta row ID to delete."
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:73
-#: includes/rest/lightbox/lightbox-data.php:76
+#: includes/rest/items/save-item-data.php:51
+#: includes/rest/lightbox/lightbox-data.php:54
 msgid "Item not found."
 msgstr ""
 
 #. translators: 1: tag ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:205
+#: includes/rest/items/save-item-data.php:142
 #: includes/rest/metadata/metadata-data.php:209
 #, php-format
 msgid "Failed to link tag ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: 1: tag name, 2: item ID.
-#: includes/rest/items/save-item-data.php:222
+#: includes/rest/items/save-item-data.php:159
 #: includes/rest/metadata/metadata-data.php:222
 #, php-format
 msgid "Failed to add tag: %1$s to item %2$d"
 msgstr ""
 
 #. translators: 1: person ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:246
+#: includes/rest/items/save-item-data.php:183
 #: includes/rest/metadata/metadata-data.php:244
 #, php-format
 msgid "Failed to link person ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: person name.
-#: includes/rest/items/save-item-data.php:257
+#: includes/rest/items/save-item-data.php:194
 #: includes/rest/metadata/metadata-data.php:253
 #, php-format
 msgid "Failed to add person: %s"
 msgstr ""
 
 #. translators: 1: location ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:279
+#: includes/rest/items/save-item-data.php:216
 #: includes/rest/metadata/metadata-data.php:276
 #, php-format
 msgid "Failed to link location ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: location name.
-#: includes/rest/items/save-item-data.php:290
+#: includes/rest/items/save-item-data.php:227
 #: includes/rest/metadata/metadata-data.php:285
 #, php-format
 msgid "Failed to add location: %s"
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:311
+#: includes/rest/items/save-item-data.php:248
 msgid "Item saved successfully."
 msgstr ""
 
@@ -7465,27 +7471,27 @@ msgstr ""
 msgid "an existing %s"
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:143
+#: includes/tools/import-export/class-import-export-data.php:145
 msgid "No file content provided."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:178
+#: includes/tools/import-export/class-import-export-data.php:180
 msgid "Phase must be \"analyse\" or \"execute\"."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:414
+#: includes/tools/import-export/class-import-export-data.php:416
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids JSON export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:431
+#: includes/tools/import-export/class-import-export-data.php:433
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids XML export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:468
+#: includes/tools/import-export/class-import-export-data.php:470
 msgid "Unrecognised export format."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:475
+#: includes/tools/import-export/class-import-export-data.php:477
 msgid "The file does not appear to be a FotoGrids export (missing meta block)."
 msgstr ""
 
@@ -7544,7 +7550,7 @@ msgstr ""
 msgid "Galleries stored as FooGallery posts, with album support."
 msgstr ""
 
-#: includes/tools/migration/sources/class-gallery-writer.php:42
+#: includes/tools/migration/sources/class-gallery-writer.php:33
 #: includes/tools/migration/sources/class-wp-core-source.php:347
 msgid "Imported gallery"
 msgstr ""

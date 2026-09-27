@@ -23,13 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Item_Meta {
 
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * The `gallery_id` value every item row carries.
@@ -79,7 +73,8 @@ final class Item_Meta {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE attachment_id = %d AND gallery_id = %d ORDER BY id ASC LIMIT 1",
+				'SELECT * FROM %i WHERE attachment_id = %d AND gallery_id = %d ORDER BY id ASC LIMIT 1',
+				$table,
 				$attachment_id,
 				self::GALLERY_ID
 			),
@@ -107,9 +102,9 @@ final class Item_Meta {
 		$placeholders = implode( ',', array_fill( 0, count( $attachment_ids ), '%d' ) );
 
 		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE gallery_id = %d AND attachment_id IN ({$placeholders}) ORDER BY id ASC",
-				array_merge( array( self::GALLERY_ID ), $attachment_ids )
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders adds one %d per entry in $attachment_ids.
+				"SELECT * FROM %i WHERE gallery_id = %d AND attachment_id IN ({$placeholders}) ORDER BY id ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $placeholders is a generated list of %d tokens.
+				array_merge( array( $table, self::GALLERY_ID ), $attachment_ids )
 			),
 			ARRAY_A
 		);
@@ -161,7 +156,8 @@ final class Item_Meta {
 
 		$existing_id = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM {$table} WHERE attachment_id = %d AND gallery_id = %d ORDER BY id ASC LIMIT 1",
+				'SELECT id FROM %i WHERE attachment_id = %d AND gallery_id = %d ORDER BY id ASC LIMIT 1',
+				$table,
 				$attachment_id,
 				self::GALLERY_ID
 			)
@@ -185,11 +181,5 @@ final class Item_Meta {
 		return true;
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

@@ -18,6 +18,15 @@ import { buildRestUrl } from '../../../utils/rest-url';
 export const toCanonicalSource = (source) =>
 	source === 'vimeo' ? 'video_vimeo' : 'video_youtube';
 
+/**
+ * Whether a grid item is a YouTube or Vimeo embed rather than an attachment.
+ *
+ * @param {Object|undefined} item Grid item.
+ * @return {boolean} True for YouTube and Vimeo embeds.
+ */
+export const isEmbedItem = (item) =>
+	item?.item_type === 'video_youtube' || item?.item_type === 'video_vimeo';
+
 const EMBED_ROUTE = 'fotogrids/v1/items/embed';
 
 const restNonce = () => window.wpApiSettings?.nonce || '';
