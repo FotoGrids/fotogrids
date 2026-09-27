@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-26T13:46:53+00:00\n"
+"POT-Creation-Date: 2026-09-26T20:00:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -250,7 +250,7 @@ msgstr ""
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:422
 #: assets/admin/src/components/pages/TemplatesPage.jsx:427
-#: assets/admin/src/utils/gallery.js:15
+#: assets/admin/src/utils/gallery.js:18
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:40
 #: includes/tools/import-export/assets/ImportExportTool.jsx:106
 #: includes/tools/migration/assets/MigrationTool.jsx:105
@@ -307,7 +307,7 @@ msgstr ""
 #: includes/admin/class-deactivation-feedback.php:152
 #: includes/metaboxes/class-metabox-strings.php:90
 #: includes/modules/Templates/Module.php:333
-#: assets/admin/plain/render-settings/renderBulkModal.js:240
+#: assets/admin/plain/render-settings/renderBulkModal.js:242
 #: assets/admin/src/components/library/LibraryTabBase.jsx:113
 #: assets/admin/src/components/library/LibraryTabBase.jsx:153
 #: assets/admin/src/components/library/LibraryTabBase.jsx:878
@@ -379,7 +379,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:278
 #: includes/catalog/catalog-strings.php:49
 #: includes/metaboxes/class-metabox-strings.php:283
-#: assets/admin/plain/collection-settings.js:2257
+#: assets/admin/plain/collection-settings.js:2300
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
@@ -390,7 +390,7 @@ msgstr ""
 #: includes/admin/class-settings-localizer.php:279
 #: includes/metaboxes/class-metabox-strings.php:285
 #: assets/admin/plain/collection-settings.js:115
-#: assets/admin/plain/collection-settings.js:2381
+#: assets/admin/plain/collection-settings.js:2424
 #: assets/admin/plain/render-settings/renderColorPicker.js:26
 #: assets/admin/plain/render-settings/renderGroup.js:19
 #: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:268
@@ -400,7 +400,7 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderPasswordInput.js:76
 #: assets/admin/plain/render-settings/renderRange.js:23
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:39
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1388
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1399
 #: assets/admin/plain/render-settings/renderSelect.js:61
 #: assets/admin/plain/render-settings/renderTextInput.js:18
 #: assets/admin/plain/render-settings/renderToggle.js:20
@@ -818,7 +818,7 @@ msgid "Border Width"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:119
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:282
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:291
 msgid "Bottom"
 msgstr ""
 
@@ -1301,7 +1301,7 @@ msgid "Decorative tape strip across the top of each item."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:235
-#: assets/admin/plain/render-settings/renderColorPicker.js:316
+#: assets/admin/plain/render-settings/renderColorPicker.js:331
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:555
 #: assets/admin/plain/render-settings/renderFontFamily.js:345
 #: assets/admin/plain/render-settings/renderFontWeight.js:40
@@ -1902,7 +1902,7 @@ msgid "Hard Crop"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:383
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1372
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1383
 #: assets/admin/src/components/shared/settings/DimensionsField.jsx:29
 msgid "Height"
 msgstr ""
@@ -2244,7 +2244,7 @@ msgid "Lead with a featured photo beside a compact grid, reveal everything on Sh
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:469
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:283
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:292
 msgid "Left"
 msgstr ""
 
@@ -2511,7 +2511,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:529
 #: includes/metaboxes/class-metabox-strings.php:409
-#: assets/admin/plain/render-settings/renderBulkModal.js:202
+#: assets/admin/plain/render-settings/renderBulkModal.js:204
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:204
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:573
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:657
@@ -2918,7 +2918,7 @@ msgid "Retain Statistics"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:623
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:281
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:290
 msgid "Right"
 msgstr ""
 
@@ -2956,7 +2956,7 @@ msgstr ""
 
 #: includes/catalog/catalog-strings.php:631
 #: includes/metaboxes/class-metabox-strings.php:408
-#: assets/admin/plain/render-settings/renderBulkModal.js:191
+#: assets/admin/plain/render-settings/renderBulkModal.js:193
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:196
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:569
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:615
@@ -3588,7 +3588,7 @@ msgid "Toolbar Background"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:783
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:280
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:289
 msgid "Top"
 msgstr ""
 
@@ -3856,7 +3856,7 @@ msgid "Whole Gallery"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:848
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1371
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1382
 #: assets/admin/src/components/shared/settings/DimensionsField.jsx:28
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:251
 msgid "Width"
@@ -3976,11 +3976,11 @@ msgstr ""
 #: includes/class-admin-init.php:154
 #: includes/metaboxes/class-metabox-strings.php:292
 #: includes/modules/Templates/Module.php:322
-#: assets/admin/plain/collection-settings.js:2492
+#: assets/admin/plain/collection-settings.js:2535
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:595
+#: includes/class-admin-init.php:602
 #: includes/metaboxes/class-collection-save-pipeline.php:96
 #: includes/metaboxes/class-item-ajax-endpoints.php:658
 #: includes/rest/admin/admin-data.php:241
@@ -3997,37 +3997,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:624
+#: includes/class-admin-init.php:631
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:634
+#: includes/class-admin-init.php:641
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:644
-#: includes/class-admin-init.php:702
+#: includes/class-admin-init.php:651
+#: includes/class-admin-init.php:709
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:707
+#: includes/class-admin-init.php:714
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:950
+#: includes/class-admin-init.php:957
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:951
+#: includes/class-admin-init.php:958
 msgid "Remove from All Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1082
+#: includes/class-admin-init.php:1089
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1088
+#: includes/class-admin-init.php:1095
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4035,8 +4035,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1101
-#: includes/class-admin-init.php:1115
+#: includes/class-admin-init.php:1108
+#: includes/class-admin-init.php:1122
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4044,7 +4044,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from all albums.
-#: includes/class-admin-init.php:1134
+#: includes/class-admin-init.php:1141
 #, php-format
 msgid "%d gallery removed from all albums."
 msgid_plural "%d galleries removed from all albums."
@@ -4052,32 +4052,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1146
-#: includes/class-admin-init.php:1160
+#: includes/class-admin-init.php:1153
+#: includes/class-admin-init.php:1167
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1178
-#: includes/class-admin-init.php:1369
+#: includes/class-admin-init.php:1185
+#: includes/class-admin-init.php:1376
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1181
+#: includes/class-admin-init.php:1188
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1184
+#: includes/class-admin-init.php:1191
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1229
+#: includes/class-admin-init.php:1236
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1232
+#: includes/class-admin-init.php:1239
 msgid "Choose an album..."
 msgstr ""
 
@@ -4402,7 +4402,7 @@ msgstr ""
 
 #: includes/class-post-types.php:384
 #: includes/metaboxes/class-metabox-registrar.php:296
-#: assets/admin/plain/render-settings/renderImagePicker.js:100
+#: assets/admin/plain/render-settings/renderImagePicker.js:102
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:225
 msgid "Replace image"
 msgstr ""
@@ -4414,8 +4414,8 @@ msgstr ""
 
 #: includes/class-post-types.php:387
 #: includes/metaboxes/class-metabox-strings.php:200
-#: assets/admin/plain/render-settings/renderImagePicker.js:167
-#: assets/admin/plain/render-settings/renderTokenSelect.js:392
+#: assets/admin/plain/render-settings/renderImagePicker.js:169
+#: assets/admin/plain/render-settings/renderTokenSelect.js:424
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:234
 msgid "Remove"
 msgstr ""
@@ -5170,7 +5170,7 @@ msgid "Album Assignment"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-registrar.php:294
-#: assets/admin/plain/render-settings/renderImagePicker.js:79
+#: assets/admin/plain/render-settings/renderImagePicker.js:81
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:98
 msgid "Use this image"
 msgstr ""
@@ -5817,7 +5817,7 @@ msgid "Add some items to this gallery and its preview will appear here."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:261
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:218
 msgid "Add items"
 msgstr ""
 
@@ -5883,7 +5883,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:291
-#: assets/admin/plain/collection-settings.js:703
+#: assets/admin/plain/collection-settings.js:716
 msgid "Failed to load item data"
 msgstr ""
 
@@ -6135,7 +6135,7 @@ msgid "URL to redirect to when this item is clicked."
 msgstr ""
 
 #: includes/metaboxes/class-metabox-strings.php:405
-#: assets/admin/plain/render-settings/renderBulkModal.js:155
+#: assets/admin/plain/render-settings/renderBulkModal.js:157
 msgid "Link Target"
 msgstr ""
 
@@ -6315,23 +6315,23 @@ msgstr ""
 msgid "Select a gallery to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:207
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:212
 msgid "This album has no galleries yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:208
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:213
 msgid "Add one or more galleries so this album has something to display."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:209
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:214
 msgid "Add galleries"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:211
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:216
 msgid "This gallery has no items yet"
 msgstr ""
 
-#: includes/modules/PageBuilders/core/class-preview-renderer.php:212
+#: includes/modules/PageBuilders/core/class-preview-renderer.php:217
 msgid "Add images, videos, or other media so this gallery has something to display."
 msgstr ""
 
@@ -7910,18 +7910,18 @@ msgstr ""
 msgid "Load More"
 msgstr ""
 
-#: public/render/features/pagination/page-buttons/class-page-buttons.php:164
+#: public/render/features/pagination/page-buttons/class-page-buttons.php:132
 msgid "Gallery pagination"
 msgstr ""
 
-#: public/render/features/pagination/page-buttons/class-page-buttons.php:370
+#: public/render/features/pagination/page-buttons/class-page-buttons.php:334
 #: public/render/lightbox/grid/class-lightbox-grid.php:64
 #: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:45
 #: assets/admin/src/components/shared/Modal/parts/ModalNav.jsx:21
 msgid "Previous"
 msgstr ""
 
-#: public/render/features/pagination/page-buttons/class-page-buttons.php:377
+#: public/render/features/pagination/page-buttons/class-page-buttons.php:341
 #: public/render/lightbox/grid/class-lightbox-grid.php:65
 #: public/render/lightbox/mini-viewer/class-lightbox-mini-viewer.php:46
 #: assets/admin/src/components/shared/Modal/parts/ModalNav.jsx:22
@@ -8099,149 +8099,161 @@ msgstr ""
 msgid "Locked: renew your license to edit this setting."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:460
+#: assets/admin/plain/collection-settings.js:469
 msgid "Image Zoom (Popover, Click mode) conflicts with opening the lightbox on click. Resolve the highlighted conflict before saving."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:750
+#: assets/admin/plain/collection-settings.js:763
 msgid "Failed to save URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:786
+#: assets/admin/plain/collection-settings.js:799
 msgid "Bulk action failed"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:804
+#: assets/admin/plain/collection-settings.js:819
 msgid "Invalid protocol. Use http, https, mailto, or tel."
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:811
+#: assets/admin/plain/collection-settings.js:826
 msgid "Valid URL"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:815
+#: assets/admin/plain/collection-settings.js:830
 msgid "Invalid URL format"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1500
+#: assets/admin/plain/collection-settings.js:1532
 msgid "(Locked)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1501
+#: assets/admin/plain/collection-settings.js:1533
 msgid "(Pro)"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:1974
+#: assets/admin/plain/collection-settings.js:2013
 msgid "Need help? Check out our <a>documentation</a>"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2022
-#: assets/admin/plain/collection-settings.js:2038
+#: assets/admin/plain/collection-settings.js:2065
+#: assets/admin/plain/collection-settings.js:2081
 msgid "Failed to update setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2075
+#: assets/admin/plain/collection-settings.js:2118
 msgid "Failed to save autosave setting - value mismatch"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2096
+#: assets/admin/plain/collection-settings.js:2139
 msgid "Autosave enabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2097
+#: assets/admin/plain/collection-settings.js:2140
 msgid "Autosave disabled"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2104
-#: assets/admin/plain/collection-settings.js:2115
+#: assets/admin/plain/collection-settings.js:2147
+#: assets/admin/plain/collection-settings.js:2158
 msgid "Failed to update autosave setting"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2159
-#: assets/admin/plain/collection-settings.js:2169
+#: assets/admin/plain/collection-settings.js:2202
+#: assets/admin/plain/collection-settings.js:2212
 msgid "Configure Album defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2163
-#: assets/admin/plain/collection-settings.js:2173
+#: assets/admin/plain/collection-settings.js:2206
+#: assets/admin/plain/collection-settings.js:2216
 msgid "Configure Gallery defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2179
+#: assets/admin/plain/collection-settings.js:2222
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:30
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:219
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:187
 msgid "Defaults"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2204
+#: assets/admin/plain/collection-settings.js:2247
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:65
 msgid "Setup mode"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2214
+#: assets/admin/plain/collection-settings.js:2257
 msgid "Switch to Advanced for fine-grained controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2218
+#: assets/admin/plain/collection-settings.js:2261
 msgid "Switch to Easy to show only the essential controls"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2256
+#: assets/admin/plain/collection-settings.js:2299
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:20
 msgid "Easy"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2283
+#: assets/admin/plain/collection-settings.js:2326
 #: assets/admin/src/components/plugin-settings/tabs/AdvancedTab.jsx:151
 msgid "Autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2292
+#: assets/admin/plain/collection-settings.js:2335
 msgid "Toggle autosave"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2402
+#: assets/admin/plain/collection-settings.js:2445
 msgid "Unlock these powerful features:"
 msgstr ""
 
-#: assets/admin/plain/collection-settings.js:2516
+#: assets/admin/plain/collection-settings.js:2559
 #: assets/admin/plain/render-settings/renderPromo.js:81
 #: assets/admin/src/components/library/LibraryLocationsHeader.jsx:196
 #: assets/admin/src/components/library/LibraryPeopleHeader.jsx:201
 msgid "Learn more"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:54
+#: assets/admin/plain/error-boundary.js:53
+msgid "This part of the screen failed to load."
+msgstr ""
+
+#: assets/admin/plain/error-boundary.js:65
+msgid "Reload page"
+msgstr ""
+
+#: assets/admin/plain/error-boundary.js:71
+msgid "Error details"
+msgstr ""
+
+#: assets/admin/plain/render-settings/renderBulkModal.js:56
 msgid "Apply URL to All Items"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:55
+#: assets/admin/plain/render-settings/renderBulkModal.js:57
 #: assets/admin/plain/render-settings/renderExternalUrlManager.js:302
 msgid "Clear All URLs"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:99
+#: assets/admin/plain/render-settings/renderBulkModal.js:101
 msgid "URL to apply to all items"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:108
+#: assets/admin/plain/render-settings/renderBulkModal.js:110
 msgid "Enter URL (e.g., https://example.com)"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:180
+#: assets/admin/plain/render-settings/renderBulkModal.js:182
 msgid "Global Default"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:216
+#: assets/admin/plain/render-settings/renderBulkModal.js:218
 msgid "Are you sure you want to clear all URLs? This action cannot be undone."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:252
+#: assets/admin/plain/render-settings/renderBulkModal.js:254
 msgid "Apply to All"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderBulkModal.js:253
+#: assets/admin/plain/render-settings/renderBulkModal.js:255
 msgid "Clear All"
 msgstr ""
 
@@ -8254,44 +8266,44 @@ msgstr ""
 msgid "Loading options…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:86
-#: assets/admin/plain/render-settings/renderCacheStatus.js:106
+#: assets/admin/plain/render-settings/renderCacheStatus.js:88
+#: assets/admin/plain/render-settings/renderCacheStatus.js:108
 msgid "Could not clear the cache. Please try again."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:98
+#: assets/admin/plain/render-settings/renderCacheStatus.js:100
 msgid "Cache cleared."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:116
+#: assets/admin/plain/render-settings/renderCacheStatus.js:119
 msgid "-"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:134
+#: assets/admin/plain/render-settings/renderCacheStatus.js:138
 msgid "Loading cache status…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:142
+#: assets/admin/plain/render-settings/renderCacheStatus.js:146
 msgid "Could not load cache status."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:150
+#: assets/admin/plain/render-settings/renderCacheStatus.js:154
 msgid "No cache exists for this gallery yet."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:167
+#: assets/admin/plain/render-settings/renderCacheStatus.js:171
 msgid "Cached at"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:183
+#: assets/admin/plain/render-settings/renderCacheStatus.js:187
 msgid "Expires at"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:250
+#: assets/admin/plain/render-settings/renderCacheStatus.js:254
 msgid "Clearing…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderCacheStatus.js:251
+#: assets/admin/plain/render-settings/renderCacheStatus.js:255
 msgid "Clear Cache"
 msgstr ""
 
@@ -8304,14 +8316,14 @@ msgstr ""
 #: assets/admin/plain/render-settings/renderPasswordInput.js:75
 #: assets/admin/plain/render-settings/renderRange.js:22
 #: assets/admin/plain/render-settings/renderResponsiveRange.js:38
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1387
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1398
 #: assets/admin/plain/render-settings/renderSelect.js:60
 #: assets/admin/plain/render-settings/renderTextInput.js:17
 #: assets/admin/plain/render-settings/renderToggle.js:19
 msgid "Locked"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderColorPicker.js:289
+#: assets/admin/plain/render-settings/renderColorPicker.js:304
 msgid "Pick color"
 msgstr ""
 
@@ -8387,19 +8399,21 @@ msgstr ""
 msgid "Animates:"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:322
-msgid "This effect controls the same styling on hover as your active setting: "
+#. translators: %s: comma-separated list of setting names.
+#: assets/admin/plain/render-settings/renderHoverEffectsGrid.js:324
+#, js-format
+msgid "This effect controls the same styling on hover as your active setting: %s"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderImagePicker.js:75
-#: assets/admin/plain/render-settings/renderImagePicker.js:101
+#: assets/admin/plain/render-settings/renderImagePicker.js:77
+#: assets/admin/plain/render-settings/renderImagePicker.js:103
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:225
 msgid "Choose image"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderImagePicker.js:134
+#: assets/admin/plain/render-settings/renderImagePicker.js:136
 #: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:162
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:165
 msgid "Loading preview…"
 msgstr ""
 
@@ -8412,19 +8426,19 @@ msgstr ""
 msgid "Crop:"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderPasswordInput.js:180
+#: assets/admin/plain/render-settings/renderPasswordInput.js:182
 msgid "Hide password"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderPasswordInput.js:181
+#: assets/admin/plain/render-settings/renderPasswordInput.js:183
 msgid "Show password"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderPasswordInput.js:209
+#: assets/admin/plain/render-settings/renderPasswordInput.js:211
 msgid "You don't have permission to view saved passwords."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderPasswordInput.js:220
+#: assets/admin/plain/render-settings/renderPasswordInput.js:222
 msgid "Could not retrieve the saved password. Please try again."
 msgstr ""
 
@@ -8437,46 +8451,46 @@ msgstr ""
 msgid "PRO"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:260
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:712
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:269
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:723
 #: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:20
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:185
 msgid "Desktop"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:265
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:717
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:274
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:728
 #: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:123
 #: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:25
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:190
 msgid "Tablet"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:270
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:722
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:279
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:733
 #: assets/admin/src/components/plugin-settings/tabs/ResponsivenessTab.jsx:109
 #: assets/admin/src/components/shared/settings/BreakpointPreview.jsx:30
 #: assets/admin/src/components/templates/PreviewTemplateModal.jsx:195
 msgid "Mobile"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:927
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:938
 msgid "Min"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:986
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:997
 msgid "Max"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1614
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1627
 msgid "Width follows the track while alignment is Stretch."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1681
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1694
 msgid "Unlink values"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderResponsiveRange.js:1682
+#: assets/admin/plain/render-settings/renderResponsiveRange.js:1695
 msgid "Link values"
 msgstr ""
 
@@ -8485,56 +8499,56 @@ msgstr ""
 msgid "Search…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderTokenSelect.js:584
+#: assets/admin/plain/render-settings/renderTokenSelect.js:616
 msgid "Select items…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:99
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:100
 msgid "Watermarks updated for this gallery."
 msgstr ""
 
 #. translators: 1: pending count, 2: total count.
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:124
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:125
 #, js-format
 msgid "%1$d of %2$d items in this gallery isn’t watermarked"
 msgid_plural "%1$d of %2$d items in this gallery aren’t watermarked"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:136
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:137
 msgid "out of date"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:137
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:138
 msgid "missing"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:148
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:149
 msgid "Hide items"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:149
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:150
 msgid "Show missing items"
 msgstr ""
 
 #. translators: %1$d: number of items processed; %2$d: total number of items.
 #. translators: 1: done count, 2: total count.
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:206
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:207
 #: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:120
 #, js-format
 msgid "Regenerating… %1$d of %2$d"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:213
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:214
 msgid "The site watermark is on for this gallery, but these images don’t have the current watermark yet."
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:234
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:235
 #: assets/admin/src/components/plugin-settings/watermark/WatermarkRegenerate.jsx:136
 msgid "Regenerating…"
 msgstr ""
 
-#: assets/admin/plain/render-settings/renderWatermarkStatus.js:235
+#: assets/admin/plain/render-settings/renderWatermarkStatus.js:236
 msgid "Regenerate this gallery"
 msgstr ""
 
@@ -9602,7 +9616,7 @@ msgstr ""
 msgid "Enable data deletion"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:147
+#: assets/admin/src/components/plugin-settings/tabs/DefaultsTab.jsx:154
 msgid "Save defaults"
 msgstr ""
 
@@ -11000,7 +11014,7 @@ msgstr ""
 msgid "What's New in FotoGrids"
 msgstr ""
 
-#: assets/admin/src/utils/gallery.js:39
+#: assets/admin/src/utils/gallery.js:42
 msgid "Images uploaded but failed to create gallery. You can manually create a gallery."
 msgstr ""
 
@@ -11030,11 +11044,11 @@ msgstr ""
 msgid "%d items"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:302
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:305
 msgid "Select an album…"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:303
+#: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:306
 msgid "Select a gallery…"
 msgstr ""
 
@@ -11151,11 +11165,11 @@ msgstr ""
 msgid "Failed to fetch preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:131
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:134
 msgid "Failed to load preview."
 msgstr ""
 
-#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:167
+#: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:170
 msgid "Couldn’t load preview."
 msgstr ""
 
