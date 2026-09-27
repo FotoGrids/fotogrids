@@ -159,11 +159,10 @@
 
     /**
      * Classifies the device rather than the window: a phone stays mobile in
-     * landscape, and a narrowed desktop window stays desktop.
-     *
-     * A browser reporting itself as mobile through User-Agent Client Hints is
-     * a phone. A device whose primary pointer is not coarse is a desktop.
-     * Anything else is placed by the short side of its screen.
+     * landscape, and a narrowed desktop window stays desktop. A User-Agent
+     * Client Hints mobile flag means a phone; a primary pointer that is not
+     * coarse means a desktop; anything else is placed by the short side of
+     * its screen.
      *
      * @param {{ mobile: number, tablet: number }} config
      * @return {string}
@@ -559,8 +558,8 @@
     // during their own init.
     window.FotoGrids = publicApi;
 
-    // The runtime loads in the footer, after the wrappers it serves, so the
-    // device class can be applied without waiting for DOMContentLoaded.
+    // The runtime loads after the wrappers it serves, so the device class
+    // applies without waiting for DOMContentLoaded.
     applyBreakpointAttribute();
 
     if ( document.readyState === 'loading' ) {

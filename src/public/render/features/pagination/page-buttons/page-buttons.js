@@ -23,9 +23,8 @@
      *
      * @param {Element} gEl
      * @param {Element} nav
-     * @param {boolean} [reflow] True when the page change re-paged the
-     *        server render for the visitor's breakpoint; the gallery is
-     *        not scrolled into view for it.
+     * @param {boolean} [reflow] True when the page change re-paged the server
+     *        render for the visitor's breakpoint, which does not scroll.
      */
     function syncBar( gEl, nav, reflow ) {
         let pagination = window.FotoGrids.modules.pagination;

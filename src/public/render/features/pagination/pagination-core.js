@@ -135,9 +135,9 @@
     }
 
     /**
-     * The breakpoint the items on screen were paged at. The server renders
-     * page 1 at desktop; later requests that extend the current view must use
-     * the same breakpoint, or their offsets would not line up with it.
+     * The breakpoint the items on screen were paged at. The server renders page
+     * 1 at desktop, and a request that extends the current view must page at
+     * the same breakpoint for its offsets to line up.
      *
      * @param {Element} galleryEl
      * @returns {string}
@@ -320,9 +320,8 @@
      *        keyed against this value rather than the current active
      *        fingerprint, which can change during overlapping requests.
      * @param {string} [breakpoint] Breakpoint the page was requested at.
-     * @param {boolean} [reflow] True when the page replaces the server
-     *        render for the visitor's breakpoint rather than following a
-     *        visitor action.
+     * @param {boolean} [reflow] True when the page re-pages the server render
+     *        for the visitor's breakpoint rather than following a visitor action.
      */
     function applyPage( galleryEl, payload, mode, capturedFingerprint, breakpoint, reflow ) {
         injectMissingStyles( payload.css || {} );
@@ -630,8 +629,8 @@
 
         galleryEl.classList.add( 'fotogrids-gallery--is-paginating' );
 
-        // A replace repaints the whole view, so it can move to the visitor's
-        // breakpoint. An append extends the current view and keeps its own.
+        // A replace repaints the whole view and can move to the visitor's
+        // breakpoint; an append extends the current view and keeps its own.
         const breakpoint = 'replace' === mode ? activeBreakpoint() : viewBreakpoint( galleryEl );
         const reflow     = !! ( opts && opts.reflow );
 
@@ -698,9 +697,8 @@
     }
 
     /**
-     * Records a page 1 another module fetched and painted at the given
-     * breakpoint, so later requests line up with it and the pagination
-     * chrome reflects its page count.
+     * Records a page 1 another module fetched and painted, so later requests
+     * page at the same breakpoint and the chrome shows its page count.
      *
      * @param {Element} galleryEl
      * @param {{page:number,total_pages:number,page_size:number,has_more:boolean}} payload
@@ -766,17 +764,10 @@
             return;
         }
 
-        // For every gallery that already has a paginated wrapper:
-        //   1. (cache strategy only) Snapshot the initial server-
-        //      rendered slice into the filter-view cache under the
-        //      current (likely empty) filter fingerprint. This makes
-        //      "filter, then un-filter" restore the original view
-        //      instantly without a fetch.
-        //   2. Re-request page 1 when the visitor's breakpoint pages the
-        //      gallery differently from the server's desktop render. A
-        //      random-sort refetch already requests page 1 at the visitor's
-        //      breakpoint and reports it through adopt().
-        //   3. Otherwise kick off a preload if preload_next_page is enabled.
+        // Per paginated gallery: snapshot the server-rendered slice into the
+        // filter-view cache (cache strategy only), then either re-page to the
+        // visitor's breakpoint or preload the next page. A random-sort refetch
+        // already requests page 1 at that breakpoint and reports it via adopt().
         window.FotoGrids.onGallery( function ( gEl ) {
             if ( gEl.dataset.fgPaginated !== 'true' ) return;
             if ( strategyFor( gEl ) !== 'server' ) {

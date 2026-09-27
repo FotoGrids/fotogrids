@@ -71,8 +71,8 @@ final class Breakpoint_Config {
 	 *
 	 * Viewport detection emits a max-width @media block. Device detection
 	 * scopes the rule under html[data-fg-breakpoint], which the runtime sets
-	 * from the device class, and keeps the max-width block as the fallback
-	 * for the moment before the runtime has run.
+	 * from the device class, keeping the max-width block as the fallback until
+	 * the runtime has run.
 	 *
 	 * @since  1.1.3
 	 * @param  string $breakpoint   'tablet' or 'mobile'.
