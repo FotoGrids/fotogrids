@@ -42,9 +42,6 @@ final class Actions_Item {
 	/**
 	 * Fires after an item's row in `fotogrids_item_meta` is written.
 	 *
-	 * Item data is shared by every gallery the item belongs to, so the action
-	 * carries no gallery ID.
-	 *
 	 * @since 1.0.0
 	 * @param int   $attachment_id Attachment ID.
 	 * @param array $fields        The fields written, column => value.

@@ -11,11 +11,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Gallery Writer
  *
- * Creates a FotoGrids gallery from a normalised list of attachment ids. Every
- * migration source funnels through this writer so a gallery imported from
- * WordPress core, a competitor plugin, or a slider is built the same way - a
- * fotogrids_gallery CPT whose `fotogrids_gallery_items` list holds the
- * attachments in their original order.
+ * Creates a FotoGrids gallery from an ordered list of attachment ids.
  *
  * @since 1.0.0
  */
@@ -25,8 +21,6 @@ class Gallery_Writer {
 	 * Create a FotoGrids gallery from a list of attachment ids.
 	 *
 	 * Attachment ids that are not real attachments on this site are skipped.
-	 * Captions and descriptions are read from the attachments themselves, so
-	 * existing metadata carries over.
 	 *
 	 * @since 1.0.0
 	 * @param string             $title          Proposed gallery title.

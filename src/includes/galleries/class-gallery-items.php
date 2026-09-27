@@ -20,10 +20,6 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Mutating operations on a gallery's item set.
  *
- * A gallery's items and their order are the `fotogrids_gallery_items` post
- * meta list. Per-item data is shared across galleries and lives in Item_Meta,
- * so adding, removing or reordering items never touches it.
- *
  * Each method fires its corresponding `Actions_Item::*` / `Actions_Gallery::*`
  * action on success so listeners (statistics, cache invalidation, search
  * indexers, etc.) don't have to wrap individual call sites.
@@ -93,10 +89,7 @@ final class Gallery_Items {
 	/**
 	 * Reorder a gallery's items.
 	 *
-	 * Items named in `$item_order` move to the front in that order; items in
-	 * the gallery but missing from `$item_order` keep their relative order
-	 * after them. IDs not in the gallery are ignored. Fires
-	 * `Actions_Gallery::REORDERED`.
+	 * Items missing from `$item_order` keep their relative order after it.
 	 *
 	 * @since 1.0.0
 	 * @param int               $gallery_id Gallery post ID.

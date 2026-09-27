@@ -783,9 +783,6 @@ class Import_Export_Data {
 
 	/**
 	 * Import item rows.
-	 * Rows whose attachment_id doesn't exist on this site, or that already has
-	 * a row, are skipped. Rows scoped to a gallery (files exported before 1.1.4)
-	 * also rebuild that gallery's item list when it has none.
 	 * Returns [imported_count, skipped_count].
 	 */
 	private static function import_items( array $items, array $gallery_id_map ): array {

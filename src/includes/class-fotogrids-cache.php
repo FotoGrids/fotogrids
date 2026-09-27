@@ -147,10 +147,6 @@ class FotoGrids_Cache {
 	/**
 	 * Flush every gallery containing an attachment that was just edited.
 	 *
-	 * Covers the item editor (which updates the attachment post), an edit made
-	 * directly in the WordPress media modal, and any write to the item's
-	 * `fotogrids_item_meta` row.
-	 *
 	 * @since  1.1.2
 	 * @param  int|mixed $attachment_id
 	 * @return void

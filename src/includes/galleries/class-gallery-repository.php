@@ -24,9 +24,6 @@ if ( ! defined( 'WPINC' ) ) {
  * `_password_encrypted` key (consumed by the Password gate). The public
  * `password` key is always blanked out.
  *
- * `get_items()` reads the item data for the whole gallery in one query through
- * Item_Meta and assembles each item row from the resulting map.
- *
  * @since 1.0.0
  */
 final class Gallery_Repository {
@@ -273,10 +270,6 @@ final class Gallery_Repository {
 	/**
 	 * Get a gallery's full item rows (attachment fields + item data).
 	 *
-	 * Only attachments are returned; embeds and missing posts are skipped.
-	 * Title, caption, description and alt come from the attachment post;
-	 * credit, location, EXIF, custom data and link settings from Item_Meta.
-	 *
 	 * @since 1.0.0
 	 * @param int $gallery_id Gallery post ID.
 	 * @return array<int, array<string, mixed>> Item rows in display order.
@@ -376,8 +369,6 @@ final class Gallery_Repository {
 
 	/**
 	 * Count the distinct, existing items held by galleries with the given statuses.
-	 *
-	 * An item that appears in several galleries counts once.
 	 *
 	 * @since 1.1.4
 	 * @param string[] $post_statuses Gallery post statuses to include.

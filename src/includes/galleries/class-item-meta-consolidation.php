@@ -17,27 +17,10 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Brings existing data in line with the Item_Meta convention.
  *
- * Earlier versions also wrote rows scoped to a single gallery
- * (`gallery_id` = the gallery's post ID), and the migration tool created
- * galleries whose items existed only as such rows. run() rebuilds those
- * galleries' item lists, merges every gallery-scoped row into the item's
- * single row, and deletes the gallery-scoped rows. It is idempotent.
- *
  * @since 1.1.4
  */
 final class Item_Meta_Consolidation {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * -- a trusted identifier that WP placeholders cannot bind. All values
-	 * are passed through $wpdb->prepare(). Custom tables have no core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
     // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
@@ -68,9 +51,6 @@ final class Item_Meta_Consolidation {
 	/**
 	 * Run the consolidation.
 	 *
-	 * Flushes the render cache when anything changed, so no gallery keeps
-	 * serving markup built from the old rows.
-	 *
 	 * @since  1.1.4
 	 * @return void
 	 */
@@ -85,10 +65,6 @@ final class Item_Meta_Consolidation {
 
 	/**
 	 * Rebuild the item list of galleries whose items exist only as table rows.
-	 *
-	 * Applies to galleries that have no `fotogrids_gallery_items` list and have
-	 * never been saved from the gallery editor (no `_edit_last`), so a gallery
-	 * a user emptied is left empty.
 	 *
 	 * @since  1.1.4
 	 * @return int Number of galleries whose list was rebuilt.
@@ -124,9 +100,7 @@ final class Item_Meta_Consolidation {
 	/**
 	 * Give a gallery an item list built from gallery-scoped rows.
 	 *
-	 * Only a gallery with no `fotogrids_gallery_items` list that has never been
-	 * saved from the gallery editor (no `_edit_last`) is changed, so a gallery a
-	 * user emptied stays empty. IDs that are not attachments are dropped.
+	 * Skips galleries that already have a list or were saved in the editor.
 	 *
 	 * @since  1.1.4
 	 * @param  int             $gallery_id     Gallery post ID.
@@ -163,10 +137,6 @@ final class Item_Meta_Consolidation {
 
 	/**
 	 * Merge every gallery-scoped row into its item's row and delete it.
-	 *
-	 * The item's existing row keeps its non-empty values; empty ones are filled
-	 * from the most recently updated gallery-scoped row that has a value. An
-	 * item with no row gets its most recent gallery-scoped row converted.
 	 *
 	 * @since  1.1.4
 	 * @return int Number of items whose rows were merged.

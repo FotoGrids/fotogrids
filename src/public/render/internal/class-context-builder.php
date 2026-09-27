@@ -1282,9 +1282,6 @@ final class Context_Builder {
 	/**
 	 * Batch-fetches external_url and link_target for the given items.
 	 *
-	 * Returns a map of attachment_id → meta array so the caller can look up
-	 * each item in O(1).
-	 *
 	 * @since   1.0.0
 	 * @param   array<int, int> $attachment_ids Attachment IDs to load.
 	 * @return  array<int, array{external_url: string, link_target: string}>

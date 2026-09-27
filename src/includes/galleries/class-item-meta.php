@@ -19,30 +19,10 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Reads and writes the one `fotogrids_item_meta` row each item has.
  *
- * Item data describes the media item itself, so it is shared by every gallery
- * the item belongs to: each attachment has at most one row, stored with
- * `gallery_id = 0`. Gallery membership and order are not stored here; they
- * live in the gallery's `fotogrids_gallery_items` post meta (see
- * Gallery_Repository::get_item_ids()). Title, caption, description and alt
- * text live on the attachment post.
- *
  * @since 1.1.4
  */
 final class Item_Meta {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * -- a trusted identifier that WP placeholders cannot bind. All values
-	 * are passed through $wpdb->prepare(); where SQL uses a generated %d IN()
-	 * list, the prepare call is a separate statement the sniff cannot follow.
-	 * Custom tables have no core-API equivalent and no object-cache layer
-	 * applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
     // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
     // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
@@ -59,7 +39,7 @@ final class Item_Meta {
 	public const GALLERY_ID = 0;
 
 	/**
-	 * Columns save() accepts. `exif_data` and `custom_data` take arrays.
+	 * Columns save() accepts.
 	 *
 	 * @since 1.1.4
 	 */
@@ -147,9 +127,6 @@ final class Item_Meta {
 
 	/**
 	 * Create or update an item's row with the given fields.
-	 *
-	 * Fields not listed in FIELDS are ignored. Fires `Actions_Item::META_UPDATED`
-	 * after a successful write.
 	 *
 	 * @since  1.1.4
 	 * @param  int                  $attachment_id Attachment ID.
