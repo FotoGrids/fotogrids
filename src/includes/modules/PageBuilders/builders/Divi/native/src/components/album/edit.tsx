@@ -17,7 +17,7 @@ import { moduleClassnames } from './module-classnames';
 // merges localize into window.fotogrids + injects HTML (running inline
 // kickoff scripts), all into the container's owner document/window.
 // @ts-ignore - plain JS module, no types.
-import { applyPreviewResponse } from '../../lib/preview-asset-wiring';
+import { applyPreviewResponse } from '@/admin/src/utils/preview-asset-wiring';
 
 declare global {
   interface Window {
@@ -65,7 +65,7 @@ const FotoGridsAlbumEdit = (props: FotoGridsAlbumEditProps): ReactElement => {
     }
 
     const cfg     = window.fotogridsPbDivi || ({} as any);
-    const restUrl = cfg.restUrl || '/wp-json/fotogrids/v1/';
+    const restUrl = cfg.restUrl || '';
     const nonce   = cfg.restNonce || '';
     const url     = `${restUrl}preview/album/${encodeURIComponent(albumId)}`;
 

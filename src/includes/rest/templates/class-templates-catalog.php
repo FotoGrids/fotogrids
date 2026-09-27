@@ -87,7 +87,7 @@ class Templates_Catalog {
 			return $remote['templates'];
 		}
 
-		// Service unreachable - serve whatever we last cached, else bundled.
+		// Service unreachable - serve the last cached catalog, else the bundled one.
 		$cached = get_transient( self::CACHE_KEY );
 		if ( is_array( $cached ) ) {
 			return $cached;

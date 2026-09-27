@@ -111,7 +111,7 @@ const RenderSelectComponent = ({
 			Math.max(sidePadding, viewportWidth - width - sidePadding)
 		);
 
-		// For top placement we anchor at the trigger's top edge and use
+		// For top placement the dropdown anchors at the trigger's top edge and uses
 		// transform: translateY(-100%) in the dropdown style so the gap
 		// above the trigger is exactly `desiredMargin` regardless of the
 		// dropdown's actual rendered height. Matches Select.jsx.

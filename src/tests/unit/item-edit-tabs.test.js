@@ -39,7 +39,7 @@ describe('TabInteractions', () => {
 			})
 		);
 
-		const notice = container.querySelector('.fotogrids-edit-item-notice');
+		const notice = container.querySelector('.fotogrids-item-edit-notice');
 		expect(notice).not.toBeNull();
 		expect(notice.textContent).toContain(
 			'Set Item Click Behavior to External URL.'
@@ -59,7 +59,7 @@ describe('TabInteractions', () => {
 		);
 
 		expect(
-			container.querySelector('.fotogrids-edit-item-notice')
+			container.querySelector('.fotogrids-item-edit-notice')
 		).toBeNull();
 		unmount();
 	});
@@ -84,7 +84,7 @@ describe('TabInteractions', () => {
 		});
 
 		expect(
-			container.querySelector('.fotogrids-edit-item-notice')
+			container.querySelector('.fotogrids-item-edit-notice')
 		).not.toBeNull();
 		unmount();
 	});
@@ -139,12 +139,12 @@ describe('TabMedia', () => {
 		);
 
 		const cards = container.querySelectorAll(
-			'.fotogrids-edit-item-media-size'
+			'.fotogrids-item-edit-media-size'
 		);
 		expect(cards).toHaveLength(3);
 		expect(cards[0].textContent).toContain('thumbnail');
 		expect(
-			container.querySelector('.fotogrids-edit-item-media-sizes__summary')
+			container.querySelector('.fotogrids-item-edit-media-sizes__summary')
 				.textContent
 		).toBe('2 of 3 sizes available');
 		unmount();
@@ -156,12 +156,12 @@ describe('TabMedia', () => {
 		);
 
 		const missing = container.querySelector(
-			'.fotogrids-edit-item-media-size--unavailable'
+			'.fotogrids-item-edit-media-size--unavailable'
 		);
 		expect(missing).not.toBeNull();
 		expect(missing.textContent).toContain('Source too small');
 		expect(
-			missing.querySelector('.fotogrids-edit-item-media-size__actions')
+			missing.querySelector('.fotogrids-item-edit-media-size__actions')
 		).toBeNull();
 		unmount();
 	});
@@ -202,7 +202,7 @@ describe('TabMedia', () => {
 			'Regenerate thumbnails'
 		);
 		expect(
-			links[0].closest('.fotogrids-edit-item-media-size').textContent
+			links[0].closest('.fotogrids-item-edit-media-size').textContent
 		).toContain('large');
 		unmount();
 	});
@@ -217,7 +217,7 @@ describe('TabMedia', () => {
 		);
 
 		expect(
-			container.querySelector('.fotogrids-edit-item-media-sizes__empty')
+			container.querySelector('.fotogrids-item-edit-media-sizes__empty')
 				.textContent
 		).toBe('Size variants are only generated for images.');
 		unmount();

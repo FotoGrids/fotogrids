@@ -33,7 +33,7 @@ const normalize = (raw) => ({ ...DEFAULTS, ...(raw || {}) });
  *    standard WP hooks. Five behavioural toggles control the post-style
  *    integration (title block, featured image, comments, archives,
  *    previous/next navigation).
- *  - Standalone: the legacy theme-less shell. Accent colour, light/dark theme,
+ *  - Standalone: the theme-less shell. Accent colour, light/dark theme,
  *    max width and the inline page header live here.
  *
  * Only the group relevant to the active layout mode is rendered; the other

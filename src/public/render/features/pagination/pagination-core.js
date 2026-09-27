@@ -7,12 +7,9 @@
  *   - prefetch(galleryEl, page)
  *   - onChange(galleryEl, cb)     - subscribe to page changes
  *
- * The three per-method JS files (endless-scroll, load-more, page-buttons)
- * each import nothing - they just read `FotoGrids.modules.pagination` and
- * wire their own UI to it. Cross-method coordination (e.g. preload_next_page)
- * lives in this file.
- *
- * No imports - standalone vanilla JS compiled by webpack as an entry.
+ * The per-method modules (endless-scroll, load-more, page-buttons) read
+ * `FotoGrids.modules.pagination` and wire their own UI to it. Cross-method
+ * coordination such as preload_next_page lives here.
  */
 
 ( function () {
@@ -38,32 +35,24 @@
      *   }
      *
      * Lives in JS memory only - cleared on page navigation/refresh.
-     * Per [[user feedback]]: per-page-load cache, no localStorage.
      *
      * @type {WeakMap<Element, Map<string, object>>}
      */
     const filterViewCache = new WeakMap();
 
     /**
-     * Per-gallery "last known filter fingerprint" so we know which cache
-     * slot to write into when a paint completes. Updated by setActiveFilterFingerprint().
+     * Per-gallery last-known filter fingerprint: the cache slot a completed paint
+     * is written to. Updated by setActiveFilterFingerprint().
      *
      * @type {WeakMap<Element, string>}
      */
     const activeFingerprint = new WeakMap();
 
     /**
-     * Per-gallery monotonic request token. Bumped every time we kick off
-     * a fetch via goToPage/swapToFilterState; the token captured at fetch
-     * time is checked when the response lands. If a newer fetch has
-     * superseded this one, its DOM/cache write is dropped.
-     *
-     * Without this, rapid filter toggles produce overlapping in-flight
-     * fetches whose responses can interleave - the later-arriving response
-     * for an earlier filter wins, painting stale items AND poisoning the
-     * cache slot of whichever filter is "active" at apply time. That's
-     * the source of the "sometimes correct, sometimes wrong" totalPages
-     * symptom on the bar.
+     * Per-gallery monotonic request token, bumped on every goToPage /
+     * swapToFilterState fetch. A response whose token has been superseded is
+     * not written to the DOM or the cache, so overlapping filter toggles cannot
+     * paint stale items.
      *
      * @type {WeakMap<Element, number>}
      */
@@ -82,17 +71,10 @@
     /**
      * Filter-handling strategy.
      *
-     *   'server' (default) - every filter change goes through a server
-     *                        fetch. The server's total_pages is the only
-     *                        thing that ever writes data-fg-page-total.
-     *                        Single source of truth, no cache poisoning
-     *                        possible.
-     *   'cache'            - original behaviour: snapshot every paint into
-     *                        a per-fingerprint cache, restore from cache
-     *                        on filter revisits, fall back to server fetch
-     *                        on cache miss. Kept as a fallback so we can
-     *                        flip back without a code change if the
-     *                        per-toggle round trip is felt as too sluggish.
+     *   'server' (default) - every filter change fetches from the server; its
+     *                        total_pages is the only writer of data-fg-page-total.
+     *   'cache'            - every paint is snapshotted per filter fingerprint and
+     *                        restored on revisits, fetching only on a cache miss.
      *
      * Toggle via:
      *   - data-fg-filter-strategy="cache" on the gallery wrapper (per-gallery)
@@ -290,8 +272,8 @@
      * @param {'replace'|'append'} mode
      * @param {string} [capturedFingerprint] Fingerprint captured at fetch
      *        time. When provided, the snapshot taken after this paint is
-     *        keyed against THIS value (not `activeFingerprint.get(...)`
-     *        which can move under us during overlapping requests).
+     *        keyed against this value rather than the current active
+     *        fingerprint, which can change during overlapping requests.
      */
     function applyPage( galleryEl, payload, mode, capturedFingerprint ) {
         injectMissingStyles( payload.css || {} );
@@ -301,11 +283,8 @@
             throw new Error( 'pagination/no-items-root' );
         }
 
-        // Parse the response. The layout module wraps items in a root
-        // element (e.g. <div class="fg-grid-track" data-fg-items-root>),
-        // and "items_only" returns that whole wrapper. We must unwrap
-        // it before appending - otherwise we'd nest a second
-        // .fg-grid-track inside the existing one.
+        // items_only returns the layout's items root (e.g. .fg-grid-track with
+        // data-fg-items-root); it is unwrapped so appending does not nest a second one.
         const template = document.createElement( 'template' );
         template.innerHTML = payload.html;
 
@@ -342,17 +321,9 @@
             detail:  { items: inserted, galleryEl: galleryEl },
         } ) );
 
-        // Snapshot the current view into the filter-view cache so a
-        // future filter toggle that returns to this state can paint
-        // instantly from cache. Use the fingerprint captured at FETCH
-        // time - not whatever activeFingerprint holds now - so an
-        // earlier-arriving response can't be filed under a later
-        // filter's slot.
-        //
-        // Skipped entirely under the 'server' strategy: there's no
-        // value in building cache state that swapToFilterState will
-        // never read, and a stale snapshot here is exactly the class
-        // of bug we're removing.
+        // Snapshot into the filter-view cache under the fingerprint captured at fetch
+        // time, so an early response cannot be filed under a later filter. Skipped
+        // under the 'server' strategy, which never reads the cache.
         if ( strategyFor( galleryEl ) !== 'server' ) {
             if ( typeof capturedFingerprint === 'string' ) {
                 snapshotCurrentViewAs( galleryEl, capturedFingerprint );
@@ -424,7 +395,7 @@
 
     /**
      * Snapshot the gallery's current view into the cache, keyed by the
-     * fingerprint we last set as "active". Called after every applyPage()
+     * fingerprint last set as active. Called after every applyPage()
      * so the snapshot always reflects the latest loaded state.
      *
      * If the active fingerprint isn't set yet (first paint), seed it
@@ -542,12 +513,7 @@
     function swapToFilterState( galleryEl ) {
         const newFp = currentFingerprint( galleryEl );
 
-        // Server-authoritative strategy: skip the cache entirely. The
-        // server's total_pages becomes the only writer of
-        // data-fg-page-total - no cache slot can carry stale state
-        // because nothing reads the cache. The fingerprint+token race
-        // guard inside goToPage stays active as defence-in-depth, but
-        // is no longer load-bearing.
+        // 'server' strategy: always fetch; nothing reads the cache.
         if ( strategyFor( galleryEl ) === 'server' ) {
             activeFingerprint.set( galleryEl, newFp );
             return goToPage( galleryEl, 1, { mode: 'replace', fingerprint: newFp } ).then( function ( result ) {
@@ -555,34 +521,19 @@
             } );
         }
 
-        // 'cache' strategy - original behaviour.
-        //
-        // DO NOT snapshot here. By the time this fires, filter-ui has
-        // already mutated the DOM (added fg-is-filtered-out classes to
-        // non-matching items in preparation for the new filter state).
-        // Snapshotting now would overwrite the clean previous-state
-        // snapshot with one carrying stale filter classes.
-        //
-        // We rely on two snapshot moments that ARE clean:
-        //   1. The onGallery init hook captures the unfiltered initial
-        //      paint into cache[''].
-        //   2. applyPage() captures every server-fetched paint into
-        //      cache[<the fingerprint that was active during fetch>].
-        // Both run while the DOM is in its canonical state for that
-        // fingerprint.
+        // 'cache' strategy. No snapshot here: filter-ui has already marked items for
+        // the new state, so the DOM is no longer clean. Clean snapshots come from the
+        // onGallery init (cache['']) and from applyPage() under the fingerprint that
+        // was active at fetch time.
         const restored = restoreCachedView( galleryEl, newFp );
 
         if ( restored ) {
             return Promise.resolve( { page: restored.page, hasMore: restored.hasMore, fromCache: true } );
         }
 
-        // Cache miss - set the active fingerprint to the new value so
-        // the post-fetch snapshot (taken by applyPage) lands in the
-        // right cache slot. We also pass the captured fingerprint
-        // into goToPage so its snapshot is keyed against the exact
-        // filter state that was active when the fetch was issued -
-        // robust against another swapToFilterState firing while this
-        // fetch is in flight.
+        // Cache miss: make the new fingerprint active and pass it to goToPage, so the
+        // post-fetch snapshot lands in the right slot even if another swap starts
+        // while this fetch is in flight.
         activeFingerprint.set( galleryEl, newFp );
 
         return goToPage( galleryEl, 1, { mode: 'replace', fingerprint: newFp } ).then( function ( result ) {
@@ -610,11 +561,8 @@
     function goToPage( galleryEl, page, opts ) {
         const mode = ( opts && opts.mode ) || 'replace';
 
-        // Capture the filter fingerprint and a fresh request token at the
-        // moment we kick the fetch off. If a later goToPage/swapToFilterState
-        // bumps the token before this response lands, we drop the result -
-        // both the DOM write and the cache snapshot - so the late response
-        // can't poison a newer filter's view.
+        // Capture the fingerprint and a fresh request token; a response superseded
+        // by a later request is not applied.
         const capturedFp    = ( opts && typeof opts.fingerprint === 'string' )
             ? opts.fingerprint
             : currentFingerprint( galleryEl );
@@ -625,9 +573,8 @@
         return fetchPage( galleryEl, page )
             .then( function ( payload ) {
                 if ( ! isCurrentToken( galleryEl, capturedToken ) ) {
-                    // Superseded by a newer request. Surface the payload
-                    // so awaiting callers still resolve, but don't touch
-                    // the DOM or cache - the newer request owns those.
+                    // Superseded by a newer request: resolve callers with the payload but
+                    // leave the DOM and cache to the newer request.
                     return { page: payload.page, hasMore: payload.has_more, stale: true };
                 }
                 applyPage( galleryEl, payload, mode, capturedFp );

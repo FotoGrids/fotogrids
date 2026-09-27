@@ -6,6 +6,7 @@ import StatCard from '../shared/StatCard';
 import StatsTable from '../shared/StatsTable';
 import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
+import { collectionPlaceholder } from '../../utils/collection-title';
 
 const { __, sprintf } = wp.i18n;
 
@@ -34,31 +35,24 @@ const TypeBadge = ( { type } ) => {
     );
 };
 
-const UNTITLED_LABELS = {
-    gallery: __( 'Untitled Gallery', 'fotogrids' ),
-    album:   __( 'Untitled Album',   'fotogrids' ),
-    item:    __( 'Untitled Item',    'fotogrids' ),
-};
-
 /**
  * Build the placeholder shown in place of an empty object title.
  *
  * @param {string} type Object type (gallery, album, item).
  * @param {number} id   Object ID.
- * @returns {string} Placeholder label, e.g. "Untitled Gallery #123".
+ * @returns {string} Placeholder label, e.g. "Gallery #123".
  */
 const untitledLabel = ( type, id ) => {
-    const base = UNTITLED_LABELS[ type ] || __( 'Untitled', 'fotogrids' );
+    if ( 'gallery' === type || 'album' === type ) {
+        return collectionPlaceholder( type, id );
+    }
+
+    const base = __( 'Untitled Item', 'fotogrids' );
     return id ? `${ base } #${ id }` : base;
 };
 
 const UntitledTitle = ( { type, id } ) => (
-    <>
-        <span className="fg-stats-untitled">
-            { UNTITLED_LABELS[ type ] || __( 'Untitled', 'fotogrids' ) }
-        </span>
-        { id ? ` #${ id }` : '' }
-    </>
+    <span className="fg-stats-untitled">{ untitledLabel( type, id ) }</span>
 );
 
 const TitleCell = ( { title, row } ) => {
@@ -278,8 +272,8 @@ const StatsPage = () => {
     const [ error,            setError            ] = useState( null );
     const [ refreshToken,     setRefreshToken     ] = useState( 0 );
 
-    // Canvas nodes are always in the DOM - we use a CSS overlay for the loading
-    // skeleton so refs are valid from first mount and never need to be re-created.
+    // Canvas nodes are always in the DOM and a CSS overlay shows the loading
+    // skeleton, so refs are valid from first mount and never re-created.
     const viewsChartRef    = useRef( null );
     const popularChartRef  = useRef( null );
     const viewsChartInst   = useRef( null );

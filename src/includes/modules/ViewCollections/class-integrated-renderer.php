@@ -50,14 +50,14 @@ class Integrated_Renderer {
 	private const POST_TYPES = array( 'fotogrids_gallery', 'fotogrids_album' );
 
 	/**
-	 * Per-request cache: have we already enqueued for this post?
+	 * Per-request cache: posts whose assets are already enqueued.
 	 *
 	 * @var int 0 when not yet enqueued, post id when enqueued.
 	 */
 	private static int $enqueued_for = 0;
 
 	/**
-	 * Per-request cache: have we already recorded the view stat?
+	 * Per-request cache: posts whose view stat is already recorded.
 	 *
 	 * @var int 0 when not yet tracked, post id when tracked.
 	 */
@@ -74,9 +74,8 @@ class Integrated_Renderer {
 	 * @return void
 	 */
 	public static function init(): void {
-		// CPT-level support (comments) needs to be added at registration time.
-		// We hook it on `init` after the CPTs are registered (priority 11 in
-		// Post_Types::register_cpts; we run at 20 to be safe).
+		// Comments support is added on `init` priority 20, after
+		// Post_Types::register_cpts runs at 11.
 		add_action( 'init', array( __CLASS__, 'register_cpt_support' ), 20 );
 
 		// Singular-request hooks. All gated on `should_run()`, which checks
@@ -195,8 +194,8 @@ class Integrated_Renderer {
 	 * Replace the post content with the rendered gallery/album.
 	 *
 	 * Runs on `the_content` (priority 20, after most theme/builder filters).
-	 * The post body is typically empty on view-page CPTs, but we replace it
-	 * unconditionally because the gallery markup IS the page content.
+	 * The post body is usually empty on view-page CPTs; it is replaced
+	 * unconditionally because the gallery markup is the page content.
 	 *
 	 * Optional decorations:
 	 *   - Draft-preview notice (for editors viewing unpublished collections).
@@ -315,7 +314,7 @@ class Integrated_Renderer {
 	 *
 	 * Runs at wp_head priority 5 so SEO plugins (which typically run at 1-3)
 	 * still emit first; FotoGrids' SEO_Conflict_Guard handles suppression
-	 * when the user wants us to take over.
+	 * when FotoGrids is set to take over.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -374,8 +373,8 @@ class Integrated_Renderer {
 	 *
 	 * Mirrors the registration/enqueue list in
 	 * `ViewCollections\Renderer::enqueue_assets()`, which runs from the
-	 * standalone shell template. In integrated mode we have to hook
-	 * `wp_enqueue_scripts` ourselves because the theme owns the template.
+	 * standalone shell template. In integrated mode the theme owns the
+	 * template, so this hooks `wp_enqueue_scripts` directly.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -390,8 +389,8 @@ class Integrated_Renderer {
 			return;
 		}
 
-		// Idempotency: `wp_enqueue_scripts` can fire more than once across
-		// odd theme code paths. Skip if we've already serviced this post.
+		// `wp_enqueue_scripts` can fire more than once in some themes; posts
+		// already serviced are skipped.
 		if ( self::$enqueued_for === (int) $post->ID ) {
 			return;
 		}
@@ -470,9 +469,9 @@ class Integrated_Renderer {
 	 * Force `comments_open` to match the integrated comments setting.
 	 *
 	 * `add_post_type_support('comments')` makes the form available; the
-	 * `comments_open` filter is what themes actually consult. We respect the
-	 * per-post `comment_status` only when comments are enabled site-wide for
-	 * view pages.
+	 * `comments_open` filter is what themes actually consult. The per-post
+	 * `comment_status` is respected only when comments are enabled site-wide
+	 * for view pages.
 	 *
 	 * @since 1.0.0
 	 * @param bool $open    Resolved open state.
@@ -587,12 +586,7 @@ class Integrated_Renderer {
 			return $where . ' AND 1 = 0';
 		}
 
-		// Scope: drop any pre-existing post_type constraint and replace it
-		// with one that pins navigation to the current CPT. WordPress's
-		// default `get_adjacent_post` builds `WHERE p.post_type = 'post'`
-		// (or whatever the current post_type is, depending on WP version);
-		// we normalise by stripping all `p.post_type = '…'` clauses and
-		// adding our own.
+		// Replace any post_type constraint with one pinned to the current CPT.
 		$where  = (string) preg_replace( "/\\s+AND\\s+p\\.post_type\\s*=\\s*'[^']+'/", '', $where );
 		$where .= $wpdb->prepare( ' AND p.post_type = %s', $post->post_type );
 

@@ -63,9 +63,9 @@ final class Module {
 	public const STYLE_HANDLE_COLLECTION = 'fotogrids-pb-collection';
 
 	/**
-	 * Whether to register the Gutenberg blocks. Always true on WordPress
-	 * 5.0+, which is below our minimum. Method exists for symmetry with
-	 * future builders whose activation depends on host-plugin presence.
+	 * Whether to register the Gutenberg blocks. Always true on every
+	 * supported WordPress version; kept for symmetry with builders whose
+	 * activation depends on a host plugin.
 	 *
 	 * @since 1.0.0
 	 * @return bool
@@ -79,7 +79,7 @@ final class Module {
 	 *
 	 * The parent PageBuilders module dispatches init() from inside the
 	 * 'init' action (priority 5 - that's when Module_Registry::boot()
-	 * fires). We need to defer the actual asset + block registration to
+	 * fires). Asset and block registration are deferred to
 	 * priority 20 so:
 	 *   - wp_register_script() runs after WordPress' default-scripts
 	 *     bootstrapping (which is fine at any priority, but consistent).
@@ -222,7 +222,7 @@ final class Module {
 	 *
 	 * `register_block_type()` reads the JSON, pairs it with the
 	 * server-side `render.php` (because each block.json sits next to a
-	 * `render.php` named exactly that), and respects our pre-registered
+	 * `render.php` named exactly that), and respects the pre-registered
 	 * `editorScript` / `editorStyle` handles.
 	 *
 	 * @since 1.0.0
@@ -275,8 +275,7 @@ final class Module {
 	/**
 	 * No-op. Block scripts are enqueued automatically by
 	 * `register_block_type()` from the `block.json` `editorScript`
-	 * registration - we don't need to enqueue from the module's
-	 * `enqueue_assets()`.
+	 * registration, so the module's `enqueue_assets()` does not enqueue them.
 	 *
 	 * @since 1.0.0
 	 * @param string $hook Current admin page hook suffix.

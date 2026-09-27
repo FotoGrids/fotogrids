@@ -7,6 +7,11 @@
 
 const BASENAME = 'fotogrids/fotogrids.php';
 
+const mockNavigateTo = jest.fn();
+jest.mock('@/admin/src/utils/navigate', () => ({
+	navigateTo: (url) => mockNavigateTo(url),
+}));
+
 function loadModule() {
 	jest.isolateModules(() => {
 		require('@/admin/src/deactivation/deactivation-feedback');
@@ -24,8 +29,6 @@ function deactivateLink() {
 }
 
 describe('deactivation-feedback', () => {
-	let assignSpy;
-
 	beforeEach(() => {
 		document.body.innerHTML = '';
 		window.fotogridsDeactivation = {
@@ -38,10 +41,7 @@ describe('deactivation-feedback', () => {
 			debug: false,
 			reasons: [{ id: 1, text: 'Too complex' }],
 		};
-		const loc = new URL(window.location.href);
-		assignSpy = jest.fn();
-		delete window.location;
-		window.location = { href: loc.href, assign: assignSpy };
+		mockNavigateTo.mockClear();
 		global.fetch = jest.fn(() =>
 			Promise.resolve({ ok: true, text: () => Promise.resolve('1') })
 		);
@@ -61,7 +61,7 @@ describe('deactivation-feedback', () => {
 		loadModule();
 		const link = deactivateLink();
 		link.click();
-		expect(assignSpy).toHaveBeenCalledWith(link.href);
+		expect(mockNavigateTo).toHaveBeenCalledWith(link.href);
 	});
 
 	it('opens the feedback modal when the modal API exists', () => {
@@ -74,7 +74,7 @@ describe('deactivation-feedback', () => {
 			expect.objectContaining({ type: 'custom' })
 		);
 		// the click is intercepted, so navigation is deferred to the modal flow
-		expect(assignSpy).not.toHaveBeenCalled();
+		expect(mockNavigateTo).not.toHaveBeenCalled();
 	});
 
 	it('ignores clicks that are not the deactivate link', () => {
@@ -86,7 +86,7 @@ describe('deactivation-feedback', () => {
 		document.body.appendChild(other);
 		other.click();
 		expect(open).not.toHaveBeenCalled();
-		expect(assignSpy).not.toHaveBeenCalled();
+		expect(mockNavigateTo).not.toHaveBeenCalled();
 	});
 
 	it('matches a deactivate link by encoded href when id differs', () => {
@@ -124,7 +124,7 @@ describe('deactivation-feedback', () => {
 			expect.objectContaining({ method: 'POST' })
 		);
 		expect(close).toHaveBeenCalledWith('programmatic');
-		expect(assignSpy).toHaveBeenCalledWith(link.href);
+		expect(mockNavigateTo).toHaveBeenCalledWith(link.href);
 	});
 
 	it('onSkip closes and navigates without posting', () => {
@@ -133,14 +133,14 @@ describe('deactivation-feedback', () => {
 		props.onSkip();
 		expect(global.fetch).not.toHaveBeenCalled();
 		expect(close).toHaveBeenCalledWith('programmatic');
-		expect(assignSpy).toHaveBeenCalledWith(link.href);
+		expect(mockNavigateTo).toHaveBeenCalledWith(link.href);
 	});
 
 	it('onCancel closes without navigating', () => {
 		const { props, close } = openAndGetFormProps();
 		props.onCancel();
 		expect(close).toHaveBeenCalledWith('cancel');
-		expect(assignSpy).not.toHaveBeenCalled();
+		expect(mockNavigateTo).not.toHaveBeenCalled();
 	});
 
 	it('onClose closes via the header close button', () => {
@@ -164,7 +164,7 @@ describe('deactivation-feedback', () => {
 		await props.onSubmit({ id: 2, details: '', snooze: false });
 		for (let i = 0; i < 6; i++) await Promise.resolve();
 		// the failed post is swallowed; deactivation still proceeds
-		expect(assignSpy).toHaveBeenCalledWith(link.href);
+		expect(mockNavigateTo).toHaveBeenCalledWith(link.href);
 		warn.mockRestore();
 	});
 });

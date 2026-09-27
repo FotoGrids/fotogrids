@@ -49,18 +49,18 @@ const TabVideo = ({ itemData, videoSettings, onChange, disabled = false, strings
 
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-video-section">
-                <div className="fotogrids-field-group">
+            <div className="fotogrids-item-edit-video">
+                <div className="fotogrids-item-edit-field-group">
                     <label>{strings.posterImage || 'Poster Image'}</label>
-                    <div className="fotogrids-video-poster-row">
-                        <div className="fotogrids-video-poster-preview">
+                    <div className="fotogrids-item-edit-video-poster-row">
+                        <div className="fotogrids-item-edit-video-poster-preview">
                             {posterUrl ? (
                                 <img src={posterUrl} alt={strings.posterImage || 'Poster'} />
                             ) : (
-                                <div className="fotogrids-video-poster-preview__empty" />
+                                <div className="fotogrids-item-edit-video-poster-preview__empty" />
                             )}
                         </div>
-                        <div className="fotogrids-video-poster-actions">
+                        <div className="fotogrids-item-edit-video-poster-actions">
                             <Button variant="secondary" onClick={choosePoster} disabled={disabled}>
                                 {strings.choosePoster || 'Choose Poster'}
                             </Button>
@@ -77,7 +77,7 @@ const TabVideo = ({ itemData, videoSettings, onChange, disabled = false, strings
                     </p>
                 </div>
 
-                <div className="fotogrids-field-group">
+                <div className="fotogrids-item-edit-field-group">
                     <Toggle
                         id="fotogrids-video-autoplay"
                         label={strings.autoplay || 'Autoplay'}
@@ -88,7 +88,7 @@ const TabVideo = ({ itemData, videoSettings, onChange, disabled = false, strings
                     />
                 </div>
 
-                <div className="fotogrids-field-group">
+                <div className="fotogrids-item-edit-field-group">
                     <Toggle
                         id="fotogrids-video-mute"
                         label={strings.mute || 'Mute'}
@@ -98,7 +98,7 @@ const TabVideo = ({ itemData, videoSettings, onChange, disabled = false, strings
                     />
                 </div>
 
-                <div className="fotogrids-field-group">
+                <div className="fotogrids-item-edit-field-group">
                     <Toggle
                         id="fotogrids-video-loop"
                         label={strings.loop || 'Loop'}
@@ -108,7 +108,7 @@ const TabVideo = ({ itemData, videoSettings, onChange, disabled = false, strings
                     />
                 </div>
 
-                <div className="fotogrids-field-group">
+                <div className="fotogrids-item-edit-field-group">
                     <Toggle
                         id="fotogrids-video-controls"
                         label={strings.playerControls || 'Player Controls'}

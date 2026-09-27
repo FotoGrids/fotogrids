@@ -25,7 +25,6 @@ if ( ! defined( 'WPINC' ) ) {
  *   - builders/Gutenberg/  - the Gutenberg blocks (gallery + album)
  *   - builders/Elementor/  - Elementor widgets (gallery + album)
  *   - builders/Divi/       - Divi modules (gallery + album)
- *   - builders/Bricks/     - FUTURE
  *
  * Each sub-module decides its own activation (e.g. the Elementor and Divi
  * sub-modules only boot when their builder is present). Gutenberg always
@@ -33,9 +32,8 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * The shared `core/` REST endpoints (`/preview/gallery/{id}`,
  * `/preview/album/{id}`, `/picker/items`) are registered once here, regardless
- * of which builders are active - any builder, present or future, consumes
- * them. Endpoints self-register on `rest_api_init` so module boot timing is
- * decoupled from REST timing.
+ * of which builders are active. Endpoints self-register on `rest_api_init`
+ * so module boot timing is decoupled from REST timing.
  *
  * @since 1.0.0
  */
@@ -48,8 +46,8 @@ class Module extends Abstract_Module {
 	 * Registered by this module once on `init` (and again
 	 * defensively on every enqueue hook a builder editor might fire
 	 * on) so every builder sub-module that uses FG components - the
-	 * Gutenberg block editor, the Elementor editor, future Divi /
-	 * Bricks - declares ONE style dep and gets the whole library.
+	 * Gutenberg block editor, the Elementor editor, Divi - declares ONE style
+	 * dep and gets the whole library.
 	 *
 	 * Adding a new shared component: drop its SCSS in the matching
 	 * `styles/fg-foo/` folder, add an `@use` line to
@@ -123,7 +121,7 @@ class Module extends Abstract_Module {
 		// MUST exist at the moment `wp_enqueue_style` / `wp_enqueue_script`
 		// reference them, otherwise WP refuses to enqueue the dependent
 		// asset (Elementor's `elementor/editor/before_enqueue_scripts`
-		// can fire before our hooks resolve, so a single `init:6`
+		// can fire before these hooks resolve, so a single `init:6`
 		// registration is not safe). All registrations are guarded with
 		// `wp_*_is( ..., 'registered' )` so repeat calls are no-ops.
 		$register_shared = array( $this, 'register_shared_assets' );
@@ -218,15 +216,14 @@ class Module extends Abstract_Module {
 	 * Enqueue admin assets for the block editor screens.
 	 *
 	 * Per-builder sub-modules handle their own block-editor enqueues. This
-	 * method is reserved for future shared admin chrome (e.g. a picker that
-	 * mounts in a non-block-editor surface).
+	 * method is the hook for shared admin chrome across builders.
 	 *
 	 * @since 1.0.0
 	 * @param string $hook Current admin page hook suffix.
 	 * @return void
 	 */
 	public function enqueue_assets( string $hook ): void {
-		// Delegated to per-builder sub-modules for now.
+		// Delegated to per-builder sub-modules.
 		Builders\Gutenberg\Module::enqueue_assets( $hook );
 	}
 }

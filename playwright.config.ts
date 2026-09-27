@@ -9,7 +9,7 @@ import { defineConfig, devices } from '@playwright/test';
  * source that file before running. Pointing WP_BASE_URL at a site of your own
  * works too.
  */
-const baseURL = process.env.WP_BASE_URL ?? 'http://localhost:8888';
+const baseURL = process.env.WP_BASE_URL ?? 'http://127.0.0.1:8899';
 
 export default defineConfig({
 	testDir: './tests/e2e',

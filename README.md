@@ -15,7 +15,7 @@ root.
 | Tool      | Version           |
 | --------- | ----------------- |
 | PHP       | 7.4+              |
-| WordPress | 6.1+ (tested 6.8) |
+| WordPress | 6.3+ (tested 7.1) |
 | Node.js   | 18+               |
 | npm       | 8+                |
 | Composer  | 2+                |
@@ -160,7 +160,7 @@ GitHub Actions run on every pull request and on push to `main`
 | -------------- | ---------------------------------------------------------------- |
 | `lint.yml`     | `php -l` syntax matrix (7.4/8.1/8.3) + PHP_CodeSniffer           |
 | `ci.yml`       | ESLint + `tsc`; `npm run test:ci`; PHPUnit matrix; webpack build |
-| `e2e.yml`      | Playwright smoke test against a `wp-env` WordPress site          |
+| `e2e.yml`      | Playwright suite against a WordPress booted by `tests/harness/`  |
 | `security.yml` | `npm audit` + `composer audit`                                   |
 | `codeql.yml`   | CodeQL security-and-quality scan (JavaScript/TypeScript)         |
 

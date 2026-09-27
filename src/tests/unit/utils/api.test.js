@@ -11,6 +11,7 @@ import {
 	deleteAlbum,
 	addItemsToGallery,
 	fetchDashboardStats,
+	fetchRecentlyEdited,
 } from '@/admin/src/utils/api';
 
 describe('utils/api', () => {
@@ -264,6 +265,7 @@ describe('utils/api', () => {
 			galleries_published: 0,
 			settings_configured: false,
 			albums: 0,
+			albums_total: 0,
 			items: 0,
 			views: 0,
 			shares: 0,
@@ -290,6 +292,31 @@ describe('utils/api', () => {
 			global.wp.apiFetch.mockRejectedValue(new Error('boom'));
 			jest.spyOn(console, 'error').mockImplementation(() => {});
 			await expect(fetchDashboardStats()).resolves.toEqual(zero);
+			console.error.mockRestore();
+		});
+	});
+
+	describe('fetchRecentlyEdited', () => {
+		it('resolves an empty list when API unavailable', async () => {
+			const saved = global.wp.apiFetch;
+			global.wp.apiFetch = undefined;
+			await expect(fetchRecentlyEdited()).resolves.toEqual([]);
+			global.wp.apiFetch = saved;
+		});
+
+		it('requests the limit with private posts and returns the rows', async () => {
+			global.wp.apiFetch.mockResolvedValue({ items: [{ id: 3 }] });
+			await expect(fetchRecentlyEdited(5)).resolves.toEqual([{ id: 3 }]);
+			expect(global.wp.apiFetch).toHaveBeenCalledWith({
+				path: '/fotogrids/v1/admin/recently-edited?limit=5&include_private=1',
+				method: 'GET',
+			});
+		});
+
+		it('swallows errors and returns an empty list', async () => {
+			global.wp.apiFetch.mockRejectedValue(new Error('boom'));
+			jest.spyOn(console, 'error').mockImplementation(() => {});
+			await expect(fetchRecentlyEdited()).resolves.toEqual([]);
 			console.error.mockRestore();
 		});
 	});

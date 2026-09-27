@@ -17,8 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
  *
  *   1. If a `via_album_id` was supplied (?fg_via on the URL, or the REST
  *      meta override coming out of an Album → Gallery AJAX swap) AND that
- *      album really contains the current gallery, that album wins. The
- *      visitor told us where they came from; we trust them.
+ *      album really contains the current gallery, that album wins.
  *
  *   2. Otherwise, fall back to the canonical relationship table. If the
  *      gallery belongs to *exactly one* album, that album becomes the
@@ -29,9 +28,8 @@ if ( ! defined( 'WPINC' ) ) {
  *      single parent to point back to. Returns null. Collection_Header's
  *      supports() check then renders nothing.
  *
- * The resolver is the single source of truth for this rule. Collection_Header,
- * Breadcrumb_Schema, and any future caller (Pro SEO integration, third-party
- * breadcrumb plugin) MUST use this helper rather than re-deriving the rule.
+ * Collection_Header and Breadcrumb_Schema use this resolver rather than
+ * re-deriving the rule.
  *
  * @package FotoGrids\Render\Features\Collection_Header
  * @since   1.0.0
@@ -83,17 +81,13 @@ final class Breadcrumb_Resolver {
 			return null;
 		}
 
-		// Load the full list of albums this gallery belongs to *once*. We
-		// need it for both branches: the visit-context branch validates
-		// that the supplied album actually contains the gallery; the
-		// canonical-fallback branch counts the list.
+		// Loaded once: the visit-context branch checks membership and the
+		// fallback branch counts the list.
 		$albums = Gallery_Album_Relations::get_albums_for_gallery(
 			$gallery_id,
 			array(
 				'include_meta' => false,
-				// We only need IDs for the contains-check + count, so
-				// keep the query as lean as possible. include_meta:false
-				// skips the per-album cover/status enrichment.
+				// IDs only; include_meta:false skips the per-album enrichment.
 			)
 		);
 

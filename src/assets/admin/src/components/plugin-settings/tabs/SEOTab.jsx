@@ -58,7 +58,7 @@ const SEOTab = () => {
     // Resolve a thumbnail URL for whatever `default_og_image_id` happens to
     // be when the tab loads (or after a save round-trip). The picker stores
     // only the attachment ID; the preview asks the WP REST media endpoint
-    // for a thumbnail URL on demand so we don't have to bootstrap it.
+    // for a thumbnail URL on demand, so nothing needs bootstrapping.
     useEffect(() => {
         const id = settings.default_og_image_id;
         if (!id) {

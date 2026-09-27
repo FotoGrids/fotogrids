@@ -232,9 +232,17 @@ class Admin_Header {
 					'[class*="premium"]'
 				];
 
+				function isProtectedElement(element) {
+					// closest() matches the element itself as well as its ancestors.
+					if (element.closest && element.closest('.fotogrids-error-boundary')) {
+						return true;
+					}
+					return isInsideUpgradeModal(element);
+				}
+
 				function isInsideUpgradeModal(element) {
 					// Always skip the FotoGrids modal system. Modal portals
-					// mount these directly under <body>, not inside the legacy
+					// mount these directly under <body>, not inside the
 					// #fotogrids-upgrade-modal container, so the contains()
 					// check below would otherwise remove them as "promotional".
 					if (element.classList && (
@@ -272,7 +280,7 @@ class Admin_Header {
 						if (mutation.type === 'childList') {
 							mutation.addedNodes.forEach(function(node) {
 								if (node.nodeType === Node.ELEMENT_NODE) {
-									if (isInsideUpgradeModal(node)) {
+									if (isProtectedElement(node)) {
 										return;
 									}
 
@@ -293,7 +301,7 @@ class Admin_Header {
 											const childElements = node.querySelectorAll && node.querySelectorAll(selector);
 											if (childElements && childElements.length > 0) {
 												childElements.forEach(function(childElement) {
-													if (!isInsideUpgradeModal(childElement)) {
+													if (!isProtectedElement(childElement)) {
 														childElement.remove();
 													}
 												});

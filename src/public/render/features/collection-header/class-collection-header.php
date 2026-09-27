@@ -225,11 +225,8 @@ final class Collection_Header implements Feature, Inline_Assets {
 				),
 			),
 			array(
-				// Tiny behaviour bundle whose only job is to make the
-				// in-place "Back" button restore the AJAX-swapped album
-				// wrapper instead of navigating. Declares the runtime
-				// as a dep so onGallery() is callable and
-				// FotoGrids.modules.albumAjax is reachable.
+				// Makes the in-place Back button restore an AJAX-swapped album wrapper
+				// instead of navigating.
 				'fotogrids-collection-header' => new Asset_Decl(
 					'../../assets/js/collection-header.js',
 					array( 'fotogrids-runtime' ),
@@ -286,10 +283,8 @@ final class Collection_Header implements Feature, Inline_Assets {
 		// A "direct visit" is one without a visit-context hint - the
 		// visitor landed on the gallery's permalink (or had it embedded
 		// somewhere) without coming through ?fg_via or an AJAX swap.
-		// Breadcrumb_Resolver still produced a parent album via the
-		// single-album-fallback rule, but that's a *canonical* link not
-		// a *visit-context* link. The per-album toggle decides whether
-		// we want to render anything in that case.
+		// A parent found by the single-album fallback is a canonical link, not a
+		// visit-context one; the per-album toggle decides whether it renders.
 		$is_direct_visit = null === $render_context->via_album_id;
 		if ( $is_direct_visit && ! $show_on_direct_visit_setting ) {
 			return null;
@@ -414,8 +409,7 @@ final class Collection_Header implements Feature, Inline_Assets {
 	private function render_breadcrumb_html( string $album_permalink, string $album_title, string $gallery_title ): string {
 		/**
 		 * Filter the SVG markup used as the breadcrumb separator. Return a
-		 * full `<svg>...</svg>` string. Used by Pro / third-party plugins
-		 * (and by future per-collection style options) to swap the chevron
+		 * full `<svg>...</svg>` string, e.g. to swap the chevron
 		 * for a slash, dot, arrow, or custom icon. Stick with currentColor +
 		 * `aria-hidden="true"` so the visual + a11y story stays intact.
 		 *

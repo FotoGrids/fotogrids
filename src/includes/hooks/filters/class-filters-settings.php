@@ -47,6 +47,16 @@ final class Filters_Settings {
 	public const DEFAULTS_ALBUM = 'fotogrids/settings/defaults/album';
 
 	/**
+	 * Saved defaults about to be written into a newly created collection.
+	 *
+	 * @since 1.1.3
+	 * @param array  $values    Setting key => saved default value.
+	 * @param int    $post_id   The new collection's post ID.
+	 * @param string $post_type The new collection's post type.
+	 */
+	public const DEFAULTS_SEED = 'fotogrids/settings/defaults/seed';
+
+	/**
 	 * Per-key sanitisation override for collection settings.
 	 *
 	 * @since 1.0.0

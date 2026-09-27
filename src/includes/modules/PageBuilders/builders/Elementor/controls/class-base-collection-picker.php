@@ -45,7 +45,7 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
 	 * Returns a scalar (empty string) rather than an array because
 	 * Elementor's `Controls_Manager::add_control_to_stack` does
 	 * `array_merge( $control_default_value, $control_data['default'] )`
-	 * when the control's default is an array - and our widgets pass a
+	 * when the control's default is an array - and the widgets pass a
 	 * scalar (the post ID) for `default`. Mismatched shapes fatal there.
 	 * The "kind" doesn't need to live in the value; it's a property of
 	 * the control type itself, exposed via {@see get_default_settings()}
@@ -70,12 +70,10 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
 			'show_label'  => true,
 			'separator'   => 'default',
 			'description' => '',
-			// Tells our editor.js which REST surface to query and which
-			// PickerModal `kind` prop to use. The Marionette view reads
-			// this off `data.kind`. The PHP `content_template` also
-			// reads `$this->get_kind()` directly so the data-attribute
-			// we render is correct even on the very first paint before
-			// the JS view has hydrated.
+			// Tells editor.js which REST surface to query and which PickerModal
+			// `kind` to use; the Marionette view reads it off `data.kind`. The PHP
+			// `content_template` reads `$this->get_kind()` directly, so the
+			// attribute is correct on first paint, before the JS view hydrates.
 			'kind'        => $this->get_kind(),
 		);
 	}
@@ -85,7 +83,7 @@ abstract class Base_Collection_Picker extends \Elementor\Base_Data_Control {
 	 *
 	 * Mounting hierarchy:
 	 *   - `.elementor-control-input-wrapper`
-	 *     - `.fg-pb-elementor-picker` ← root our editor.js looks for
+	 *     - `.fg-pb-elementor-picker` ← root editor.js looks for
 	 *       - `<select>` ← jQuery Select2 hydrates this in JS
 	 *       - `<button>` Browse-all
 	 *       - `<a>` Edit-link (hidden when nothing selected)

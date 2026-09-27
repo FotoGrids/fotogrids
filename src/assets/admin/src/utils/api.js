@@ -18,7 +18,9 @@ export const fetchGalleries = (searchTerm = '') => {
 	}
 
 	const params = new URLSearchParams();
-	if (searchTerm) params.append('search', searchTerm);
+	if (searchTerm) {
+		params.append('search', searchTerm);
+	}
 
 	return wp
 		.apiFetch({
@@ -40,7 +42,9 @@ export const fetchAlbums = (searchTerm = '') => {
 	}
 
 	const params = new URLSearchParams();
-	if (searchTerm) params.append('search', searchTerm);
+	if (searchTerm) {
+		params.append('search', searchTerm);
+	}
 
 	return wp
 		.apiFetch({
@@ -154,6 +158,29 @@ export const addItemsToGallery = (galleryId, itemIds) => {
 };
 
 /**
+ * Fetch the most recently edited galleries and albums
+ *
+ * @param {number} limit Number of rows to return.
+ * @return {Promise<Array>} Rows, newest first.
+ */
+export const fetchRecentlyEdited = (limit = 5) => {
+	if (!isApiAvailable()) {
+		return Promise.resolve([]);
+	}
+
+	return wp
+		.apiFetch({
+			path: `/fotogrids/v1/admin/recently-edited?limit=${limit}&include_private=1`,
+			method: 'GET',
+		})
+		.then((data) => data.items || [])
+		.catch((error) => {
+			console.error('Error fetching recently edited:', error);
+			return [];
+		});
+};
+
+/**
  * Fetch dashboard overview statistics
  */
 export const fetchDashboardStats = () => {
@@ -163,6 +190,7 @@ export const fetchDashboardStats = () => {
 		galleries_published: 0,
 		settings_configured: false,
 		albums: 0,
+		albums_total: 0,
 		items: 0,
 		views: 0,
 		shares: 0,

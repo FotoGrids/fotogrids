@@ -86,13 +86,9 @@ final class Permission_Check {
 				: current_user_can( $capability );
 		}
 
-		// Master-cap fallback. `manage_fotogrids` is documented as the master
-		// capability that grants every other FotoGrids permission. Honour that
-		// here so newly-added atomic caps work for admins on existing installs
-		// even before the role-grant migration in Activator runs, and so the
-		// contract holds regardless of cap-grant drift. Skip when the cap
-		// being checked IS manage_fotogrids (avoids infinite recursion) and
-		// when it isn't a FotoGrids cap at all.
+		// Master-cap fallback: `manage_fotogrids` grants every other FotoGrids
+		// permission. Skipped when the cap being checked is manage_fotogrids
+		// itself (avoids recursion) or is not a FotoGrids cap.
 		if ( ! $allowed
 			&& 'manage_fotogrids' !== $capability
 			&& self::is_fotogrids_capability( $capability )

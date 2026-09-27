@@ -6,8 +6,8 @@ const { __ } = wp.i18n;
 /**
  * Read the localised capabilities snapshot. Returns null if the bag isn't
  * present (uncommon - this would mean class-admin-init hasn't run, e.g. a
- * non-admin page) which we treat as "allowed" so we don't accidentally lock
- * unrelated surfaces.
+ * non-admin page), which is treated as "allowed" so unrelated surfaces are
+ * never locked by accident.
  */
 const userHasCap = (cap) => {
     const bag = window.fotogridsAdmin?.capabilities;

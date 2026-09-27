@@ -67,7 +67,7 @@ const TemplateArt = () => (
  *
  * Props
  * ─────
- * onClose  fn()  Tells the wizard shell to close itself. We call this
+ * onClose  fn()  Tells the wizard shell to close itself. Called
  *                before issuing the navigation so the close fires
  *                synchronously while the click is in-flight.
  */

@@ -20,9 +20,8 @@ if ( ! defined( 'WPINC' ) ) {
  *
  * Mirrors `Sharing_Settings_Store`: one global option holds the plugin-wide
  * defaults; collection settings layer overrides on top via the `resolve()`
- * helper. Consumers (the view-page renderer, the future embedded-gallery
- * scanner, the conflict guard) read through `resolve($collection_id)` and
- * never touch the option directly.
+ * helper. Consumers (the view-page renderer, the conflict guard) read
+ * through `resolve($collection_id)` and never touch the option directly.
  *
  * Inherit-by-default model: when a per-collection override field is empty
  * or its source is set to "inherit", the global default wins. Site owners

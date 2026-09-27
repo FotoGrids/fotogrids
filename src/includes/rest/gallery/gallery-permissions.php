@@ -102,25 +102,6 @@ class Gallery_Permissions {
 	}
 
 	/**
-	 * Permission check for reading a gallery's saved (decrypted) password.
-	 *
-	 * Controlled by the fotogrids/security/can_view_gallery_password filter.
-	 * Default is false - nobody can view stored passwords unless the site
-	 * owner explicitly grants permission via the filter.
-	 *
-	 * Example - allow administrators:
-	 *   add_filter(
-	 *       'fotogrids/security/can_view_gallery_password',
-	 *       fn( $can, $gallery_id, $user_id ) => current_user_can( 'manage_options' ),
-	 *       10,
-	 *       3
-	 *   );
-	 *
-	 * @since 1.0.0
-	 * @param \WP_REST_Request $request The REST API request object
-	 * @return bool|\WP_Error True if allowed, WP_Error if not.
-	 */
-	/**
 	 * Permission check for reading gallery cache status.
 	 *
 	 * @since 1.0.0
@@ -170,6 +151,25 @@ class Gallery_Permissions {
 		return true;
 	}
 
+	/**
+	 * Permission check for reading a gallery's saved (decrypted) password.
+	 *
+	 * Controlled by the fotogrids/security/can_view_gallery_password filter.
+	 * Default is false - nobody can view stored passwords unless the site
+	 * owner explicitly grants permission via the filter.
+	 *
+	 * Example - allow administrators:
+	 *   add_filter(
+	 *       'fotogrids/security/can_view_gallery_password',
+	 *       fn( $can, $gallery_id, $user_id ) => current_user_can( 'manage_options' ),
+	 *       10,
+	 *       3
+	 *   );
+	 *
+	 * @since 1.0.0
+	 * @param \WP_REST_Request $request The REST API request object
+	 * @return bool|\WP_Error True if allowed, WP_Error if not.
+	 */
 	public static function check_gallery_password_read( $request ) {
 		$gallery_id = absint( $request['id'] );
 		$user_id    = get_current_user_id();

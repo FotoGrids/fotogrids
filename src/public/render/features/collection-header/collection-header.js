@@ -16,10 +16,8 @@
  * button stays a plain <a href>, and the browser handles it natively.
  *
  * The album AJAX module exposes its `restore(albumEl)` / `isSwapped(albumEl)`
- * helpers via FotoGrids.modules.albumAjax. We probe that namespace at
- * click-time (not init) because the AJAX module may not be loaded on the
- * current page - e.g. a View Page render where there's no album wrapper
- * anywhere.
+ * helpers via FotoGrids.modules.albumAjax. It is looked up at click time
+ * because the AJAX module is not loaded on every page.
  *
  * No imports - standalone vanilla JS compiled by webpack.
  */
@@ -40,7 +38,7 @@
 
     /**
      * Intercept a Back button click. Returns nothing - calls
-     * event.preventDefault() and triggers the restore when we can, otherwise
+     * event.preventDefault() and triggers the restore when possible, otherwise
      * lets the link navigate normally.
      *
      * @param {Element} backLink  The .fg-back-button anchor.

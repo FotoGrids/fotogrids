@@ -65,7 +65,9 @@ const CacheStatusComponent = ({
 	}, [postId]);
 
 	const handleFlush = async () => {
-		if (isDisabled || flushState === 'loading') return;
+		if (isDisabled || flushState === 'loading') {
+			return;
+		}
 
 		setFlushState('loading');
 		try {
@@ -113,7 +115,9 @@ const CacheStatusComponent = ({
 	};
 
 	const formatDate = (isoString) => {
-		if (!isoString) return __('-', 'fotogrids');
+		if (!isoString) {
+			return __('-', 'fotogrids');
+		}
 		try {
 			return new Date(isoString).toLocaleString();
 		} catch (_err) {

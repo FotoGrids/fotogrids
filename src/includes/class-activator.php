@@ -71,8 +71,8 @@ class Activator {
 	 * Run a lifecycle hook across every registered Lifecycle_Module_Interface.
 	 *
 	 * Activation / deactivation / uninstall run in isolated requests where the
-	 * 'init' hook has not fired, so modules are not yet registered. We fire the
-	 * registration action here explicitly (its listeners are attached at
+	 * 'init' hook has not fired, so modules are not yet registered. The
+	 * registration action is fired here explicitly (its listeners are attached at
 	 * plugin-file load time) before iterating. No-op until a lifecycle module
 	 * exists.
 	 *
@@ -239,9 +239,11 @@ class Activator {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 
+		\FotoGrids\Galleries\Item_Meta_Consolidation::run();
+
 		do_action( Actions_System::ACTIVATE );
 
-		update_option( 'fotogrids_db_version', '1.4' );
+		update_option( 'fotogrids_db_version', '1.5' );
 	}
 
 	/**
@@ -256,7 +258,7 @@ class Activator {
 	 */
 	public static function maybe_upgrade() {
 		$current = get_option( 'fotogrids_db_version', '0' );
-		if ( version_compare( $current, '1.4', '<' ) ) {
+		if ( version_compare( $current, '1.5', '<' ) ) {
 			self::create_tables();
 		}
 

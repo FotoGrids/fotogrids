@@ -135,9 +135,8 @@
 
         const kind = collectionKind( collectionElement );
 
-        // The render pipeline writes data-fg-gallery-id on every wrapper
-        // (Render_Controller::build_wrapper). Read that, not the legacy
-        // data-gallery-id which the pipeline doesn't emit.
+        // The pipeline writes data-fg-gallery-id on every wrapper
+        // (Render_Controller::build_wrapper); data-gallery-id is never emitted.
         const record = {
             element:   collectionElement,
             galleryId: collectionElement.dataset.fgGalleryId || null,
@@ -216,7 +215,7 @@
     }
 
     /**
-     * Fires fotogrids:gallery_inserted (preserved legacy event) and then
+     * Fires fotogrids:gallery_inserted and then
      * initializes the collection. Skips already-initialized elements.
      *
      * @param {Element} collectionElement

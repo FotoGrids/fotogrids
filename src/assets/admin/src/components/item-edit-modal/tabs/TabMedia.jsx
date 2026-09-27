@@ -49,7 +49,7 @@ const TabMedia = ({ itemData, loading, strings = {}, disabled = false }) => {
     if (loading) {
         return (
             <div className="fotogrids-tab-panel fg-is-active">
-                <div className="fotogrids-edit-item-media-sizes__empty">{strings.loading}</div>
+                <div className="fotogrids-item-edit-media-sizes__empty">{strings.loading}</div>
             </div>
         );
     }
@@ -57,7 +57,7 @@ const TabMedia = ({ itemData, loading, strings = {}, disabled = false }) => {
     if (0 === sizes.length) {
         return (
             <div className="fotogrids-tab-panel fg-is-active">
-                <div className="fotogrids-edit-item-media-sizes__empty">
+                <div className="fotogrids-item-edit-media-sizes__empty">
                     {strings.mediaSizesEmpty}
                 </div>
             </div>
@@ -66,14 +66,14 @@ const TabMedia = ({ itemData, loading, strings = {}, disabled = false }) => {
 
     return (
         <div className="fotogrids-tab-panel fg-is-active">
-            <div className="fotogrids-edit-item-media-sizes">
-                <p className="fotogrids-edit-item-media-sizes__summary">
+            <div className="fotogrids-item-edit-media-sizes">
+                <p className="fotogrids-item-edit-media-sizes__summary">
                     {strings.mediaSizesSummary
                         ?.replace('%1$s', String(availableCount))
                         .replace('%2$s', String(sizes.length))}
                 </p>
 
-                <div className="fotogrids-edit-item-media-sizes__grid">
+                <div className="fotogrids-item-edit-media-sizes__grid">
                     {sizes.map((size) => {
                         const isAvailable = 'generated' === size.status;
                         const canRegenerate = REGENERABLE_STATUSES.includes(size.status);
@@ -86,9 +86,9 @@ const TabMedia = ({ itemData, loading, strings = {}, disabled = false }) => {
                         return (
                             <div
                                 key={size.name}
-                                className={`fotogrids-edit-item-media-size ${ isAvailable ? '' : 'fotogrids-edit-item-media-size--unavailable' }`.trim()}
+                                className={`fotogrids-item-edit-media-size ${ isAvailable ? '' : 'fotogrids-item-edit-media-size--unavailable' }`.trim()}
                             >
-                                <div className="fotogrids-edit-item-media-size__thumb">
+                                <div className="fotogrids-item-edit-media-size__thumb">
                                     {isAvailable && previewUrl ? (
                                         <img src={previewUrl} alt="" loading="lazy" />
                                     ) : (
@@ -96,28 +96,28 @@ const TabMedia = ({ itemData, loading, strings = {}, disabled = false }) => {
                                     )}
                                 </div>
 
-                                <div className="fotogrids-edit-item-media-size__meta">
-                                    <span className="fotogrids-edit-item-media-size__label">{size.label}</span>
-                                    <span className="fotogrids-edit-item-media-size__slug">
+                                <div className="fotogrids-item-edit-media-size__meta">
+                                    <span className="fotogrids-item-edit-media-size__label">{size.label}</span>
+                                    <span className="fotogrids-item-edit-media-size__slug">
                                         <code>{size.name}</code>
                                         {sourceLabel(size.source, strings) && (
-                                            <em className="fotogrids-edit-item-media-size__source">
+                                            <em className="fotogrids-item-edit-media-size__source">
                                                 {sourceLabel(size.source, strings)}
                                             </em>
                                         )}
                                     </span>
-                                    <span className="fotogrids-edit-item-media-size__dims">
+                                    <span className="fotogrids-item-edit-media-size__dims">
                                         {size.width || '?'} × {size.height || '?'}
                                         {size.crop ? ` · ${ strings.mediaSizeCropped }` : ''}
                                         {size.filesize ? ` · ${ size.filesize }` : ''}
                                     </span>
                                     {badge && (
-                                        <span className="fotogrids-edit-item-media-size__badge">{badge}</span>
+                                        <span className="fotogrids-item-edit-media-size__badge">{badge}</span>
                                     )}
                                 </div>
 
                                 {(canRegenerate || canOpen) && (
-                                    <div className="fotogrids-edit-item-media-size__actions">
+                                    <div className="fotogrids-item-edit-media-size__actions">
                                         {canRegenerate && (
                                             <Tooltip content={strings.regenerateThumbnails}>
                                                 <Button

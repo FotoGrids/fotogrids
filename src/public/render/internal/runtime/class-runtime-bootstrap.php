@@ -101,4 +101,49 @@ final class Runtime_Bootstrap implements Feature {
 			),
 		);
 	}
+
+	/**
+	 * Registers the runtime handle and attaches the window.fotogrids payload.
+	 *
+	 * The payload prints with fotogrids-runtime wherever the render pipeline
+	 * enqueues or inline-prints the handle. Runs once per request.
+	 *
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public static function localize(): void {
+		static $localized = false;
+
+		if ( $localized ) {
+			return;
+		}
+		$localized = true;
+
+		// Asset_Resolver will later call wp_register_script for the same
+		// handle; WordPress treats a duplicate registration as a no-op.
+		wp_register_script(
+			'fotogrids-runtime',
+			FOTOGRIDS_PLUGIN_URL . 'assets/js/fotogrids-runtime.js',
+			array(),
+			FOTOGRIDS_VERSION,
+			true
+		);
+
+		$sharing = \FotoGrids\Settings\Sharing_Settings_Store::get();
+
+		// window.fotogrids carries the sharing-related deep-link settings,
+		// the REST root and, for signed-in visitors only, a REST nonce.
+		// Per-render nonces in data attributes can come from the render
+		// cache, so they are not tied to the current visitor.
+		wp_localize_script(
+			'fotogrids-runtime',
+			'fotogrids',
+			array(
+				'deep_linking_enabled'  => (bool) $sharing['deep_linking_enabled'],
+				'embedded_share_target' => $sharing['embedded_share_target'],
+				'restUrl'               => esc_url_raw( rest_url() ),
+				'restNonce'             => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
+			)
+		);
+	}
 }

@@ -25,11 +25,11 @@
 	position: relative;
 	font-size: 13px;
 	font-weight: 500;
-	border-right: 1px solid var(--fg-border-primary);
+	border-inline-end: 1px solid var(--fg-border-primary);
 	background: transparent;
 
 	&:last-child {
-		border-right: none;
+		border-inline-end: none;
 	}
 
 	&:hover {
@@ -44,8 +44,8 @@
 			content: "";
 			position: absolute;
 			bottom: -1px;
-			left: 0;
-			right: 0;
+			inset-inline-start: 0;
+			inset-inline-end: 0;
 			height: 1px;
 			background: #fff;
 		}

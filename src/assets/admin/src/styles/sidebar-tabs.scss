@@ -51,7 +51,7 @@
 		background: none;
 		border: 0;
 		cursor: pointer;
-		text-align: left;
+		text-align: start;
 		transition: color 0.12s ease;
 		padding-inline-start: 6px;
 		padding-block-end: 12px;
@@ -222,8 +222,8 @@
 		overflow: visible;
 
 		.fotogrids-sidebar-layout__panel__head {
-			padding-left: 0;
-			padding-right: 0;
+			padding-inline-start: 0;
+			padding-inline-end: 0;
 			border-bottom: 0;
 		}
 

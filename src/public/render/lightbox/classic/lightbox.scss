@@ -1,12 +1,6 @@
 /**
  * FotoGrids Lightbox Styles
  *
- * Source:  src/public/render/features/lightbox/lightbox.scss
- * Webpack: entry key 'lightbox-styles'  →  assets/css/lightbox-styles.css
- *
- * Served as the lightbox overlay CSS via the fotogrids-lightbox handle registered
- * by the PHP Lightbox feature module (Asset_Decl path ../../assets/css/lightbox-styles.css).
- *
  * Class naming convention: all lightbox overlay elements use fg-lb-* prefixes.
  * Gallery wrapper state is expressed via data-fg-click / data-fg-lb-* attributes.
  *
@@ -499,9 +493,7 @@
 //   .fg-lb-progress--running → animation-name set, play-state: running
 //   .fg-lb-progress--paused  → animation-name set, play-state: paused (frozen mid-run)
 //
-// Restart (JS): remove whichever class is present → el.offsetWidth → add --running.
-// The reflow between removal and re-add is what makes the browser treat it as a
-// new animation rather than a continuation.
+// Restart (JS): remove the class, force a reflow, then add --running.
 
 .fg-lb-progress-bar {
 	display: none;
@@ -1127,16 +1119,8 @@
 }
 
 // Share bar inside the info panel.
-// The share bar (a fotogrids-share-bar element) lives inside the 'share'
-// info block. Its colour treatment must inherit from the info panel's
-// theme tokens - NOT from sharing.css's neutral defaults - so the bar
-// reads correctly against whatever info-block background the user has
-// configured (boxed/divided/plain × dark/light theme overrides).
-//
-// Overriding the share-bar's own custom properties keeps the cascade with
-// sharing.css authoritative on layout and this file authoritative on
-// per-context colour. This lives here (not in sharing.css) so the
-// lightbox theme tokens stay the single source of truth.
+// Its colour properties are overridden from the lightbox theme tokens so the
+// bar reads against the configured info-block background.
 .fg-lb-info .fotogrids-share-bar--lightbox {
 	--fg-sb-btn-color: var(--fg-lb-color-info-text);
 	--fg-sb-btn-bg: var(--fg-lb-color-info-block-bg);
@@ -1149,19 +1133,9 @@
 //   .fg-lb-thumbs        - the scrollable viewport (also a flex container)
 //   .fg-lb-thumbs__track - the flex track that holds the thumb buttons
 //
-// Both are flex containers. The outer one's `justify-content: center`
-// (the natural flex behaviour) does NOT play well with overflow - when
-// content overflows, the leftmost items spill out of reach. The fix
-// is `margin: auto` on the inner track:
-//
-//  - When track width <= viewport width: `margin: auto` absorbs the free
-//    space symmetrically → track is centred.
-//  - When track width >  viewport width: there's no free space for
-//    `margin: auto` to absorb → margins collapse to 0 → track starts at
-//    the viewport edge and scrolls freely in BOTH directions.
-//
-// This is the canonical flexbox idiom for "center if it fits, scroll if
-// it doesn't" - works the same on every modern browser.
+// margin: auto on the inner track centres it when it fits and collapses to 0
+// when it overflows, so the strip scrolls fully both ways (justify-content:
+// center on the outer container would clip the start).
 
 .fg-lb-thumbs {
 	flex-shrink: 0;

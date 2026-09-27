@@ -24,8 +24,8 @@
     'use strict';
 
     /**
-     * Per-gallery observer state. We create the observers once per
-     * gallery and reuse them for late-inserted items.
+     * Per-gallery observer state, created once per gallery and reused for
+     * late-inserted items.
      *
      * @type {WeakMap<Element, { native: IntersectionObserver|null, dataSrc: IntersectionObserver|null }>}
      */

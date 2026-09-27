@@ -2,21 +2,23 @@ import { useEffect } from 'react';
 
 let lockCount = 0;
 let originalOverflow = '';
-let originalPaddingRight = '';
+let originalPaddingInlineEnd = '';
 
 export const useBodyScrollLock = (active) => {
 	useEffect(() => {
-		if (!active) return undefined;
+		if (!active) {
+			return undefined;
+		}
 
 		if (lockCount === 0) {
 			const body = document.body;
 			originalOverflow = body.style.overflow;
-			originalPaddingRight = body.style.paddingRight;
+			originalPaddingInlineEnd = body.style.paddingInlineEnd;
 
 			const scrollbarWidth =
 				window.innerWidth - document.documentElement.clientWidth;
 			if (scrollbarWidth > 0) {
-				body.style.paddingRight = `${scrollbarWidth}px`;
+				body.style.paddingInlineEnd = `${scrollbarWidth}px`;
 			}
 			body.style.overflow = 'hidden';
 		}
@@ -26,7 +28,7 @@ export const useBodyScrollLock = (active) => {
 			lockCount = Math.max(0, lockCount - 1);
 			if (lockCount === 0) {
 				document.body.style.overflow = originalOverflow;
-				document.body.style.paddingRight = originalPaddingRight;
+				document.body.style.paddingInlineEnd = originalPaddingInlineEnd;
 			}
 		};
 	}, [active]);

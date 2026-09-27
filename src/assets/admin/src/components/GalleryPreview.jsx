@@ -10,11 +10,11 @@
  *
  * All the heavy lifting (CSS handle dedup, JS sequencing, inline payload
  * execution, MutationObserver pickup) lives in the shared
- * `preview-asset-wiring.js` utility under the PageBuilders module - that
- * util is the single source of truth used by this metabox, the Gutenberg
- * block live preview, and any future Elementor / Divi / Bricks widgets.
+ * `utils/preview-asset-wiring.js` module - the single source of truth used
+ * by this metabox, the page-builder live previews and the native Divi 5
+ * modules.
  *
- * This component is now a thin React shell that:
+ * This component is a thin React shell that:
  *
  *   1. Resolves the REST URL + nonce from the localized globals.
  *   2. Fetches the preview payload for the current gallery id.
@@ -29,9 +29,20 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
+import { Button } from './shared/Button';
 import { applyPreviewResponse } from '../utils/preview-asset-wiring';
+import { buildRestUrl } from '../utils/rest-url';
 
-const GalleryPreview = ({ galleryId = null }) => {
+/**
+ * Renders the live preview of a gallery, or an empty state when it has no items.
+ *
+ * @param {Object}   props
+ * @param {number}   props.galleryId  Gallery post id.
+ * @param {boolean}  props.hasItems   Whether the gallery has at least one item.
+ * @param {Function} props.onAddItems Called by the empty state's Add items button.
+ * @return {JSX.Element}
+ */
+const GalleryPreview = ({ galleryId = null, hasItems = true, onAddItems = null }) => {
     const previewRef = useRef(null);
     const requestSeqRef = useRef(0);
     const [loading, setLoading] = useState(false);
@@ -42,14 +53,6 @@ const GalleryPreview = ({ galleryId = null }) => {
         || window.fotogridsAdmin?.restNonce
         || (window.wpApiSettings?.nonce || '');
 
-    let restUrl = '/wp-json/fotogrids/v1/';
-    if (window.fotogridsAdmin?.apiUrl) {
-        restUrl = window.fotogridsAdmin.apiUrl + 'fotogrids/v1/';
-    } else if (window.fotogridsAdmin?.restUrl) {
-        restUrl = (window.wpApiSettings?.root || '/wp-json/') + window.fotogridsAdmin.restUrl;
-    } else if (window.wpApiSettings?.root) {
-        restUrl = window.wpApiSettings.root + 'fotogrids/v1/';
-    }
 
     const currentGalleryId = galleryId || window.fotogridsMetaBoxes?.postId || null;
 
@@ -60,7 +63,7 @@ const GalleryPreview = ({ galleryId = null }) => {
     }, []);
 
     useEffect(() => {
-        if (!currentGalleryId) {
+        if (!currentGalleryId || !hasItems) {
             return;
         }
 
@@ -71,7 +74,7 @@ const GalleryPreview = ({ galleryId = null }) => {
         const fetchPreview = async () => {
             try {
                 const response = await fetch(
-                    `${restUrl}preview/gallery/${currentGalleryId}`,
+                    buildRestUrl(`fotogrids/v1/preview/gallery/${currentGalleryId}`),
                     {
                         method: 'POST',
                         headers: {
@@ -114,12 +117,35 @@ const GalleryPreview = ({ galleryId = null }) => {
         };
 
         fetchPreview();
-    }, [currentGalleryId, restUrl, restNonce, refreshKey]);
+    }, [currentGalleryId, hasItems, restNonce, refreshKey]);
 
     if (!currentGalleryId) {
         return (
             <div className="fotogrids-preview-placeholder">
                 <p>{window.fotogridsMetaBoxes?.strings?.previewPlaceholder || 'Gallery preview will appear here.'}</p>
+            </div>
+        );
+    }
+
+    if (!hasItems) {
+        const strings = window.fotogridsMetaBoxes?.strings || {};
+
+        return (
+            <div className="fotogrids-preview-placeholder fotogrids-preview-empty">
+                <div className="fotogrids-preview-empty__art" aria-hidden="true">
+                    {Array.from({ length: 6 }, (_, i) => <span key={i} />)}
+                </div>
+                <h3 className="fotogrids-preview-empty__title">
+                    {strings.previewEmptyTitle || 'Nothing to preview yet'}
+                </h3>
+                <p className="fotogrids-preview-empty__text">
+                    {strings.previewEmptyText || 'Add some items to this gallery and its preview will appear here.'}
+                </p>
+                {onAddItems && (
+                    <Button variant="primary" icon="plus" onClick={onAddItems}>
+                        {strings.previewEmptyButton || 'Add items'}
+                    </Button>
+                )}
             </div>
         );
     }

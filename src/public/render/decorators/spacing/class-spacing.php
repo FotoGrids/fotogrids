@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * `--fg-padding` CSS custom properties scoped to the gallery wrapper.
  *
  * The actual rules that read these variables live in `base/collection-base.css`
- * gated by `[data-fg-spacing]` so we only paint when the decorator is active.
+ * gated by `[data-fg-spacing]`, so they apply only when the decorator is active.
  * That avoids forcing `margin: 0 0 0 0` over a theme's defaults when the user
  * hasn't configured spacing.
  *

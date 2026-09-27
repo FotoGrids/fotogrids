@@ -55,18 +55,6 @@ function resolveColumnCount( collectionEl, containerWidth, gap ) {
 }
 
 /**
- * Place items into rows (row-major). For each item: pick the currently
- * shortest column, set the item's left/top, advance that column's
- * height. Returns the final per-column heights so the caller can size
- * the track.
- *
- * @param {HTMLElement[]} items
- * @param {number[]} columnLefts
- * @param {number[]} columnWidths
- * @param {number} gap
- * @return {number[]} columnHeights after placement.
- */
-/**
  * Compute the height an item occupies at a given column width.
  *
  * The media height is derived from the image's intrinsic aspect ratio (natural
@@ -114,6 +102,18 @@ function measureItemHeight( item, columnWidth ) {
     return height;
 }
 
+/**
+ * Place items into rows (row-major). For each item: pick the currently
+ * shortest column, set the item's left/top, advance that column's
+ * height. Returns the final per-column heights so the caller can size
+ * the track.
+ *
+ * @param {HTMLElement[]} items
+ * @param {number[]} columnLefts
+ * @param {number[]} columnWidths
+ * @param {number} gap
+ * @return {number[]} columnHeights after placement.
+ */
 function placeRowMajor( items, columnLefts, columnWidths, gap ) {
     const columnHeights = new Array( columnLefts.length ).fill( 0 );
 

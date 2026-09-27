@@ -17,6 +17,7 @@ import { ModalRoot, installPublicApi } from './components/shared/Modal';
 import { installPermissionsApi } from './components/shared/installPermissionsApi';
 import UpgradeModal from './components/upgrade-to-pro/UpgradeModal.jsx';
 import WhatsNewPanel from './components/whats-new/WhatsNewPanel.jsx';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 const MODAL_ROOT_ID = 'fotogrids-modal-root';
 const UPGRADE_MODAL_ID = 'fotogrids-upgrade-modal';
@@ -33,30 +34,42 @@ function ensureContainer(id) {
 	return container;
 }
 
-function mountReactRoot(container, element) {
+function mountReactRoot(container, element, label) {
+	const guarded = React.createElement(ErrorBoundary, { label }, element);
+
 	if (container._reactRootContainer) {
-		container._reactRootContainer.render(element);
+		container._reactRootContainer.render(guarded);
 		return;
 	}
 	const root = createRoot(container);
 	container._reactRootContainer = root;
-	root.render(element);
+	root.render(guarded);
 }
 
 function initializeModalRoot() {
 	const container = ensureContainer(MODAL_ROOT_ID);
-	mountReactRoot(container, React.createElement(ModalRoot));
+	mountReactRoot(container, React.createElement(ModalRoot), 'modal-root');
 }
 
 function initializeUpgradeModal() {
-	if (window.fotogridsIsPro === true) return;
-	if (!window.fotogridsAdmin || !window.fotogridsAdmin.isFotoGridsPage)
+	if (
+		window.fotogridsIsPro === true ||
+		!window.fotogridsAdmin ||
+		!window.fotogridsAdmin.isFotoGridsPage
+	) {
 		return;
+	}
 
 	const container = document.getElementById(UPGRADE_MODAL_ID);
-	if (!container) return;
+	if (!container) {
+		return;
+	}
 
-	mountReactRoot(container, React.createElement(UpgradeModal));
+	mountReactRoot(
+		container,
+		React.createElement(UpgradeModal),
+		'upgrade-modal'
+	);
 }
 
 function renderWhatsNew(isOpen) {
@@ -66,15 +79,21 @@ function renderWhatsNew(isOpen) {
 		React.createElement(WhatsNewPanel, {
 			isOpen,
 			onClose: () => renderWhatsNew(false),
-		})
+		}),
+		'news-panel'
 	);
 }
 
 function initializeWhatsNew() {
 	document.addEventListener('click', (event) => {
 		const target = event.target;
-		if (!target || typeof target.closest !== 'function') return;
-		if (!target.closest(WHATS_NEW_TRIGGER)) return;
+		if (
+			!target ||
+			typeof target.closest !== 'function' ||
+			!target.closest(WHATS_NEW_TRIGGER)
+		) {
+			return;
+		}
 
 		event.preventDefault();
 		renderWhatsNew(true);

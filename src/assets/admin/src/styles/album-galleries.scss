@@ -90,11 +90,11 @@
 		padding: 8px 12px;
 
 		&.notice-success {
-			border-left-color: var(--fg-green);
+			border-inline-start-color: var(--fg-green);
 		}
 
 		&.notice-error {
-			border-left-color: var(--fg-red);
+			border-inline-start-color: var(--fg-red);
 		}
 
 		p {
@@ -149,7 +149,7 @@
 	.fotogrids-gallery-drag {
 		cursor: move;
 		color: #999;
-		margin-right: 10px;
+		margin-inline-end: 10px;
 		font-size: 16px;
 		line-height: 1;
 		user-select: none;
@@ -205,7 +205,7 @@
 		width: 70px;
 		height: 60px;
 		flex-shrink: 0;
-		margin-right: 12px;
+		margin-inline-end: 12px;
 
 		&:hover .fotogrids-gallery-thumb {
 			&.fgg-stack-0 {
@@ -323,7 +323,7 @@
 
 	.fotogrids-gallery-actions {
 		flex-shrink: 0;
-		margin-left: 10px;
+		margin-inline-start: 10px;
 		display: flex;
 		align-items: center;
 		gap: 4px;
@@ -383,6 +383,6 @@
 
 	.spinner {
 		float: none;
-		margin-right: 8px;
+		margin-inline-end: 8px;
 	}
 }

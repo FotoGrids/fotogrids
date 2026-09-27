@@ -48,8 +48,8 @@ class Metadata_Permissions {
 	/**
 	 * Read permission for library endpoints - same gate as manage.
 	 *
-	 * Library listings expose usage counts and stored metadata, which we want
-	 * to keep behind the management capability.
+	 * Library listings expose usage counts and stored metadata, so they stay
+	 * behind the management capability.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request

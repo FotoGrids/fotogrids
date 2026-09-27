@@ -169,6 +169,44 @@ describe('getItemSeoChecks', () => {
 
 			expect(check.code).toBe('title_from_filename');
 		});
+
+		it.each([
+			['DSC_1234', 'DSC_1234.jpg'],
+			['IMG_4471', 'IMG_4471.jpg'],
+			['PXL_20240101', 'PXL_20240101.jpg'],
+			['beach-2', 'beach-2.jpg'],
+			['DSC_1234', 'DSC_1234-1.jpg'],
+		])('warns when the title %s is the stem of %s', (title, filename) => {
+			const check = byId(
+				getItemSeoChecks(
+					{
+						...goodForm,
+						alt: 'Fishing boats at the quay wall',
+						title,
+					},
+					{ ...goodItem, filename }
+				),
+				'title'
+			);
+
+			expect(check.code).toBe('title_from_filename');
+		});
+
+		it('accepts a title carrying a counter the filename does not have', () => {
+			const check = byId(
+				getItemSeoChecks(
+					{
+						...goodForm,
+						alt: 'Fishing boats at the quay wall',
+						title: 'beach-2',
+					},
+					{ ...goodItem, filename: 'beach.jpg' }
+				),
+				'title'
+			);
+
+			expect(check.code).toBe('title_ok');
+		});
 	});
 
 	describe('credit', () => {

@@ -38,6 +38,7 @@
  */
 .fotogrids-loading-mark {
 	position: relative;
+	direction: ltr;
 	display: block;
 	aspect-ratio: 1 / 1;
 
@@ -142,4 +143,13 @@
 	.fotogrids-loading-mark__bar {
 		animation: none;
 	}
+}
+
+.fotogrids-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 20px;
+	font-size: 16px;
+	color: #666;
 }

@@ -248,7 +248,7 @@ class Library_Data {
 		$name = $request->get_param( 'name' );
 		$name = null === $name ? $row->name : trim( (string) $name );
 
-		// Reconstruct meta. We preserve unrelated keys.
+		// Reconstruct meta, preserving unrelated keys.
 		$meta          = null;
 		$existing_meta = ! empty( $row->meta ) ? json_decode( $row->meta, true ) : array();
 		if ( ! is_array( $existing_meta ) ) {

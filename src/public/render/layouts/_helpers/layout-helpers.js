@@ -2,7 +2,7 @@
  * FotoGrids - Shared layout helpers.
  *
  * Pure ES module imported by the per-layout JS bundles (justified, masonry,
- * any future JS-positioned layout). Exports primitives for reading
+ * and other JS-positioned layouts). Exports primitives for reading
  * intrinsic image dimensions, computing CSS-resolved values, and a
  * `createLayoutAttach` factory that wires up the standard set of
  * per-collection events every JS layout needs to subscribe to.

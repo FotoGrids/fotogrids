@@ -59,8 +59,10 @@ const Select = ({
         const placement = availableBelow >= minPanelHeight || availableBelow >= availableAbove ? 'bottom' : 'top';
         const maxHeight = Math.max(120, placement === 'bottom' ? availableBelow : availableAbove);
         const width = Math.min(Math.max(triggerRect.width, 120), viewportWidth - sidePadding * 2);
+        const isRtl = window.getComputedStyle(selectRef.current).direction === 'rtl';
+        const anchorLeft = isRtl ? triggerRect.right - width : triggerRect.left;
         const left = Math.min(
-            Math.max(sidePadding, triggerRect.left),
+            Math.max(sidePadding, anchorLeft),
             Math.max(sidePadding, viewportWidth - width - sidePadding)
         );
         setDropdownPosition({

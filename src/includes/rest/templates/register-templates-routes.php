@@ -168,7 +168,7 @@ class Register_Templates_Routes {
 	 * @return bool True if served, false otherwise
 	 */
 	public static function serve_template_preview_html( $served, $result, $request, $server ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
-		// Only handle our preview endpoint
+		// Only handle the FotoGrids preview endpoint.
 		if ( $request->get_route() !== '/fotogrids/v1/templates/preview' ) {
 			return $served;
 		}

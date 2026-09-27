@@ -44,7 +44,7 @@ const LockIcon = () => (
  * @param {object}  props
  * @param {string}  props.tier   tier_required value from settings JSON
  *                               ("pro_starter" | "pro_plus" | "agency").
- * @param {string}  [props.state]  "teaser" | "locked" (reserved for future copy variants).
+ * @param {string}  [props.state]  "teaser" | "locked".
  * @param {string}  [props.position]  Tooltip position, forwarded to <Tooltip>.
  */
 const ProBadge = ( { tier, state, position = 'top' } ) => {

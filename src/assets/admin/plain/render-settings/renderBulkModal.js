@@ -12,7 +12,9 @@ window.FotoGridsRenderSettings.renderBulkModal = ({
 	executeBulkAction,
 	__,
 }) => {
-	if (!showBulkModal) return null;
+	if (!showBulkModal) {
+		return null;
+	}
 
 	const { createElement: h } = wp.element;
 

@@ -8,13 +8,6 @@ import { fgGoUrl } from '../../utils/go-url';
 
 const { __ } = wp.i18n;
 
-const generateProFeatureKey = (str) => {
-	return str
-		.replace(/([a-z])([A-Z])/g, '$1-$2')
-		.replace(/[\s_]+/g, '-')
-		.toLowerCase();
-};
-
 const ProFeatures = () => {
 	return (
 		<div className="fotogrids-admin-block-card fg-abc-upgrade">
@@ -26,18 +19,42 @@ const ProFeatures = () => {
 				<h3>{__('Unlock PRO Features', 'fotogrids')}</h3>
 				<div className="pro-feature-list">
 					{[
-						'Advanced Layouts',
-						'SEO Optimization',
-						'E-Commerce',
-						'Custom Styling',
-						'Priority Support',
-						'Advanced Analytics',
-						'Powerful Integrations',
-						'Bulk Operations',
+						{
+							key: 'advanced-layouts',
+							label: __('Advanced Layouts', 'fotogrids'),
+						},
+						{
+							key: 'seo-optimization',
+							label: __('SEO Optimization', 'fotogrids'),
+						},
+						{
+							key: 'e-commerce',
+							label: __('E-Commerce', 'fotogrids'),
+						},
+						{
+							key: 'custom-styling',
+							label: __('Custom Styling', 'fotogrids'),
+						},
+						{
+							key: 'priority-support',
+							label: __('Priority Support', 'fotogrids'),
+						},
+						{
+							key: 'advanced-analytics',
+							label: __('Advanced Analytics', 'fotogrids'),
+						},
+						{
+							key: 'powerful-integrations',
+							label: __('Powerful Integrations', 'fotogrids'),
+						},
+						{
+							key: 'bulk-operations',
+							label: __('Bulk Operations', 'fotogrids'),
+						},
 					].map((feature) => (
-						<div key={generateProFeatureKey(feature)}>
+						<div key={feature.key}>
 							<Icon name="check_badge_g" />
-							{__(feature, 'fotogrids')}
+							{feature.label}
 						</div>
 					))}
 				</div>

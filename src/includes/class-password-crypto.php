@@ -133,7 +133,7 @@ final class Password_Crypto {
 	 * Verifies a submitted password against a stored encrypted value.
 	 *
 	 * Uses a constant-time comparison (hash_equals) to prevent timing attacks.
-	 * This is safe because we compare fixed-length HMAC digests of both values
+	 * This is safe because it compares fixed-length HMAC digests of both values
 	 * rather than variable-length strings directly.
 	 *
 	 * @since  1.0.0

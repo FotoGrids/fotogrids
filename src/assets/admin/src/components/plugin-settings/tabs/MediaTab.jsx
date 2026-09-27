@@ -180,7 +180,12 @@ const MediaTab = () => {
 
             <SettingsPanel
                 title={__('Lightbox image', 'fotogrids')}
-                description={__('The full-size image shown in the Lightbox. Always proportional - never hard-cropped.', 'fotogrids')}
+                description={__('The full-size image shown in the Lightbox. Always proportional - never hard-cropped. Changing these requires regenerating thumbnails for existing images.', 'fotogrids')}
+                action={
+                    <Button href={regenUrl} variant="secondary" size="xs">
+                        {__('Regenerate', 'fotogrids')}
+                    </Button>
+                }
             >
                 <PanelRow
                     title={__('Max width', 'fotogrids')}

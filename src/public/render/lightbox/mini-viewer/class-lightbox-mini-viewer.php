@@ -31,6 +31,25 @@ if ( ! defined( 'WPINC' ) ) {
  */
 final class Lightbox_Mini_Viewer implements Feature {
 
+	/**
+	 * Translated mini viewer labels, emitted as `data-fg-mini-labels`.
+	 *
+	 * `go_to_image` carries `%d` (image position).
+	 *
+	 * @since  1.1.4
+	 * @return array<string, string>
+	 */
+	public static function client_labels(): array {
+		return array(
+			'dialog'      => __( 'Image viewer', 'fotogrids' ),
+			'previous'    => __( 'Previous', 'fotogrids' ),
+			'next'        => __( 'Next', 'fotogrids' ),
+			'close'       => __( 'Close', 'fotogrids' ),
+			/* translators: %d: image position. */
+			'go_to_image' => __( 'Go to image %d', 'fotogrids' ),
+		);
+	}
+
 	public function id(): string {
 		return 'fotogrids/lightbox-mini-viewer';
 	}
@@ -119,6 +138,7 @@ final class Lightbox_Mini_Viewer implements Feature {
 			'data-fg-mini-border'  => empty( $settings['lightbox_mini_show_border'] ) ? '0' : '1',
 			'data-fg-mini-shadow'  => empty( $settings['lightbox_mini_show_shadow'] ) ? '0' : '1',
 			'data-fg-mini-radius'  => empty( $settings['lightbox_mini_show_radius'] ) ? '0' : '1',
+			'data-fg-mini-labels'  => (string) wp_json_encode( self::client_labels() ),
 		);
 
 		if ( ! empty( $settings['lightbox_lite_caption_show'] ) ) {

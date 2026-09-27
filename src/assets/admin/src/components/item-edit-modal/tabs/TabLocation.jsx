@@ -18,11 +18,11 @@ const GeoMapPlaceholder = ({ location }) => {
     const y = ((90 - lat) / 180) * 150;
 
     return (
-        <div className="fotogrids-location-map-wrap">
+        <div className="fotogrids-item-edit-location-map-wrap">
             <svg
                 viewBox="0 0 300 150"
                 xmlns="http://www.w3.org/2000/svg"
-                className="fotogrids-location-map-svg"
+                className="fotogrids-item-edit-location-map-svg"
                 aria-label={__('Location map', 'fotogrids')}
             >
                 <rect width="300" height="150" fill="#f0f4f8" rx="4" />
@@ -38,9 +38,9 @@ const GeoMapPlaceholder = ({ location }) => {
                 <circle cx={x} cy={y} r="5"  fill="#3c46f0" opacity="0.85" />
                 <title>{`${location.name} (${lat.toFixed(4)}, ${lng.toFixed(4)})`}</title>
             </svg>
-            <div className="fotogrids-location-map-label">
-                <span className="fotogrids-location-map-label__name">{location.name}</span>
-                <span className="fotogrids-location-map-label__coords">
+            <div className="fotogrids-item-edit-location-map-label">
+                <span className="fotogrids-item-edit-location-map-label__name">{location.name}</span>
+                <span className="fotogrids-item-edit-location-map-label__coords">
                     {lat.toFixed(4)}, {lng.toFixed(4)}
                 </span>
             </div>
@@ -100,12 +100,12 @@ const TabLocation = ({
 
             {/* ── No-coords empty state for set location without coords ── */}
             {currentLocation && (currentLocation.latitude == null || currentLocation.longitude == null) && (
-                <div className="fotogrids-location-no-coords">
-                    <span className="fotogrids-location-no-coords__icon"></span>
+                <div className="fotogrids-item-edit-location-no-coords">
+                    <span className="fotogrids-item-edit-location-no-coords__icon"></span>
                     <span>{__('No coordinates for this location.', 'fotogrids')}</span>
                     <a
                         href={`${window.fotogridsAdmin?.adminUrl || '#'}admin.php?page=fotogrids-library&tab=locations`}
-                        className="fotogrids-location-no-coords__link"
+                        className="fotogrids-item-edit-location-no-coords__link"
                         target="_blank"
                         rel="noopener noreferrer"
                     >

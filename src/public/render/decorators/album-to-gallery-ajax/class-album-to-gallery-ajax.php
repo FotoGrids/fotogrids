@@ -149,14 +149,8 @@ final class Album_To_Gallery_Ajax implements Decorator {
 				'fotogrids-album-to-gallery-ajax' => new Asset_Decl(
 					'decorators/album-to-gallery-ajax/album-to-gallery-ajax.css',
 				),
-				// Pre-enqueue the collection-header CSS too. The AJAX-swapped
-				// gallery will carry the back button / breadcrumb chrome, and
-				// the swap response only injects *missing* CSS handles into the
-				// host page - but the JS bundle that wires the Back button is
-				// never injected by the swap flow (the REST response carries
-				// CSS URLs but not JS). Loading both up-front, on any page that
-				// can do an AJAX swap, guarantees the chrome's CSS and JS are
-				// already present when the swapped content lands.
+				// Collection-header CSS is loaded up front: a swapped-in gallery carries the
+				// Back button chrome, and the swap response injects missing CSS but never JS.
 				'fotogrids-collection-header'     => new Asset_Decl(
 					'features/collection-header/collection-header.css',
 				),
