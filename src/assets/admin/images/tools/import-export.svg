@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 304.92 125.72">
   <rect x=".14" y=".14" width="125.44" height="125.44" rx="13.44" ry="13.44" style="fill: rgba(255, 255, 255, .1);"/>
-  <rect x=".7" y=".7" width="124.32" height="124.32" rx="12.88" ry="12.88" style="fill: none; stroke: rgba(255, 255, 255, .55); stroke-miterlimit: 4.48; stroke-width: 1.4px;"/>
-  <path d="M19.18,15.82h38.08c1.86,0,3.36,1.5,3.36,3.36h0c0,1.86-1.5,3.36-3.36,3.36H19.18c-1.86,0-3.36-1.5-3.36-3.36h0c0-1.86,1.5-3.36,3.36-3.36Z" style="fill: rgba(255, 255, 255, .85);"/>
-  <rect x="15.82" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .9);"/>
-  <rect x="15.82" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .3);"/>
-  <rect x="65.1" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .3);"/>
-  <rect x="65.1" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .3);"/>
+  <rect x=".7" y=".7" width="124.32" height="124.32" rx="12.88" ry="12.88" style="fill: none; stroke: rgba(255, 255, 255, .9); stroke-miterlimit: 4.48; stroke-width: 1.4px;"/>
+  <path d="M19.18,15.82h38.08c1.86,0,3.36,1.5,3.36,3.36h0c0,1.86-1.5,3.36-3.36,3.36H19.18c-1.86,0-3.36-1.5-3.36-3.36h0c0-1.86,1.5-3.36,3.36-3.36Z" style="fill: rgba(255, 255, 255, 1);"/>
+  <rect x="15.82" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, 1);"/>
+  <rect x="15.82" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .2);"/>
+  <rect x="65.1" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .35);"/>
+  <rect x="65.1" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .5);"/>
   <rect x="179.34" y=".14" width="125.44" height="125.44" rx="13.44" ry="13.44" style="fill: rgba(255, 255, 255, .1);"/>
-  <rect x="179.9" y=".7" width="124.32" height="124.32" rx="12.88" ry="12.88" style="fill: none; stroke: rgba(255, 255, 255, .55); stroke-miterlimit: 4.48; stroke-width: 1.4px;"/>
-  <path d="M198.38,15.82h38.08c1.86,0,3.36,1.5,3.36,3.36h0c0,1.86-1.5,3.36-3.36,3.36h-38.08c-1.86,0-3.36-1.5-3.36-3.36h0c0-1.86,1.5-3.36,3.36-3.36Z" style="fill: rgba(255, 255, 255, .85);"/>
-  <rect x="195.02" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .3);"/>
-  <rect x="195.02" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .3);"/>
-  <rect x="244.3" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .3);"/>
-  <rect x="244.3" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .9);"/>
+  <rect x="179.9" y=".7" width="124.32" height="124.32" rx="12.88" ry="12.88" style="fill: none; stroke: rgba(255, 255, 255, .9); stroke-miterlimit: 4.48; stroke-width: 1.4px;"/>
+  <path d="M198.38,15.82h38.08c1.86,0,3.36,1.5,3.36,3.36h0c0,1.86-1.5,3.36-3.36,3.36h-38.08c-1.86,0-3.36-1.5-3.36-3.36h0c0-1.86,1.5-3.36,3.36-3.36Z" style="fill: rgba(255, 255, 255, 1);"/>
+  <rect x="195.02" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .2);"/>
+  <rect x="195.02" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .35);"/>
+  <rect x="244.3" y="35.98" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, .5);"/>
+  <rect x="244.3" y="76.3" width="44.8" height="33.6" rx="5.6" ry="5.6" style="fill: rgba(255, 255, 255, 1);"/>
   <path d="M139.54,50.54h25.84M156.42,41.58l8.96,8.96-8.96,8.96" style="fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3.08px;"/>
-  <path d="M165.38,77.42h-25.84M148.5,68.46l-8.96,8.96,8.96,8.96" style="fill: none; stroke: rgba(255, 255, 255, .7); stroke-linecap: round; stroke-linejoin: round; stroke-width: 3.08px;"/>
+  <path d="M165.38,77.42h-25.84M148.5,68.46l-8.96,8.96,8.96,8.96" style="fill: none; stroke: rgba(255, 255, 255, .5); stroke-linecap: round; stroke-linejoin: round; stroke-width: 3.08px;"/>
 </svg>
