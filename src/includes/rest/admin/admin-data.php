@@ -1530,7 +1530,7 @@ class Admin_Data {
 			$items[] = array(
 				'id'                 => $post->ID,
 				'title'              => trim( $post->post_title ),
-				'untitled_label'     => $is_album ? __( 'Untitled Album', 'fotogrids' ) : __( 'Untitled Gallery', 'fotogrids' ),
+				'placeholder'        => \FotoGrids\Collection_Title::placeholder( $post ),
 				'type'               => $post->post_type,
 				'type_label'         => $is_album ? __( 'Album', 'fotogrids' ) : __( 'Gallery', 'fotogrids' ),
 				'status'             => $post->post_status,

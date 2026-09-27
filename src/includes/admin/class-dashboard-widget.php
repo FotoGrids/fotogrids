@@ -239,8 +239,7 @@ class Dashboard_Widget {
 										<?php if ( '' !== $item['title'] ) : ?>
 											<?php echo esc_html( $item['title'] ); ?>
 										<?php else : ?>
-											<span class="fotogrids-dw-untitled"><?php echo esc_html( $item['untitled_label'] ); ?></span>
-											<?php printf( '#%d', (int) $item['id'] ); ?>
+											<span class="fotogrids-dw-untitled"><?php echo esc_html( $item['placeholder'] ); ?></span>
 										<?php endif; ?>
 										<span class="dashicons dashicons-edit"></span>
 									</a>
