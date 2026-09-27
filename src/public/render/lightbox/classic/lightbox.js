@@ -231,13 +231,12 @@ function readSettings(galleryEl) {
 }
 
 /**
- * The full image URL to load for a slide: the mobile companion when the
- * visitor is on the mobile breakpoint, otherwise the full image. The runtime
- * answers under the site's detection mode; the width comparison is the
- * fallback for when it is not on the page.
+ * The full image URL for a slide: the mobile companion on the mobile
+ * breakpoint, otherwise the full image.
  *
  * @param {{fullSrc: string, fullMobileSrc?: string}} item
- * @param {number} mobileMax Mobile breakpoint in CSS pixels.
+ * @param {number} mobileMax Mobile breakpoint in CSS pixels; the fallback
+ *        when the runtime is absent.
  * @returns {string}
  */
 function fullSrcForViewport(item, mobileMax) {

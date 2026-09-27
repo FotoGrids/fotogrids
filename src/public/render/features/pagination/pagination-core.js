@@ -135,9 +135,8 @@
     }
 
     /**
-     * The breakpoint the items on screen were paged at. The server renders page
-     * 1 at desktop, and a request that extends the current view must page at
-     * the same breakpoint for its offsets to line up.
+     * The breakpoint the items on screen were paged at. An append must reuse
+     * it, or its offsets will not line up with them.
      *
      * @param {Element} galleryEl
      * @returns {string}
@@ -147,9 +146,7 @@
     }
 
     /**
-     * The visitor's breakpoint as the runtime classifies it.
-     *
-     * @returns {string}
+     * @returns {string} The visitor's breakpoint, per the runtime.
      */
     function activeBreakpoint() {
         return ( window.FotoGrids && typeof window.FotoGrids.activeBreakpoint === 'function' )
@@ -158,8 +155,7 @@
     }
 
     /**
-     * Reads the per-breakpoint page sizes the server wrote to
-     * data-fg-page-sizes ("<desktop> <tablet> <mobile>").
+     * Reads data-fg-page-sizes ("<desktop> <tablet> <mobile>").
      *
      * @param {Element} galleryEl
      * @returns {{desktop:number,tablet:number,mobile:number}|null}
@@ -341,6 +337,18 @@
         // If the top-level element of the response is itself an items
         // root, unwrap it. Otherwise, just take all top-level children.
         const topLevel = Array.prototype.slice.call( template.content.children );
+
+        // A gate can claim the render - a gallery unlocked for this page view
+        // only, say - and its lock screen must not be painted into the items
+        // root. Anything that is not items leaves the current view alone.
+        const isItems = topLevel.length > 0 && (
+            topLevel.every( function ( el ) { return el.dataset && el.dataset.fgItemsRoot === 'true'; } )
+            || !! template.content.querySelector( '.fg-item' )
+        );
+        if ( ! isItems ) {
+            throw new Error( 'pagination/not-items' );
+        }
+
         let sourceChildren = [];
         if ( topLevel.length === 1 && topLevel[ 0 ].dataset && topLevel[ 0 ].dataset.fgItemsRoot === 'true' ) {
             sourceChildren = Array.prototype.slice.call( topLevel[ 0 ].children );
@@ -369,8 +377,7 @@
             detail:  { items: inserted, galleryEl: galleryEl },
         } ) );
 
-        // State is written before the snapshot below so the cached view records
-        // the page and breakpoint it actually holds.
+        // Before the snapshot, so the cached view records what it holds.
         writeState( galleryEl, {
             page:       payload.page,
             totalPages: payload.total_pages,
@@ -629,8 +636,8 @@
 
         galleryEl.classList.add( 'fotogrids-gallery--is-paginating' );
 
-        // A replace repaints the whole view and can move to the visitor's
-        // breakpoint; an append extends the current view and keeps its own.
+        // A replace repaints everything, so it can move breakpoint; an append
+        // extends the current view and keeps its own.
         const breakpoint = 'replace' === mode ? activeBreakpoint() : viewBreakpoint( galleryEl );
         const reflow     = !! ( opts && opts.reflow );
 
@@ -682,8 +689,7 @@
     }
 
     /**
-     * Whether the visitor's breakpoint pages the gallery differently from
-     * the view on screen.
+     * Whether the visitor's breakpoint pages differently from the view.
      *
      * @param {Element} galleryEl
      * @returns {boolean}
@@ -698,7 +704,7 @@
 
     /**
      * Records a page 1 another module fetched and painted, so later requests
-     * page at the same breakpoint and the chrome shows its page count.
+     * page at the same breakpoint.
      *
      * @param {Element} galleryEl
      * @param {{page:number,total_pages:number,page_size:number,has_more:boolean}} payload
@@ -764,10 +770,9 @@
             return;
         }
 
-        // Per paginated gallery: snapshot the server-rendered slice into the
-        // filter-view cache (cache strategy only), then either re-page to the
-        // visitor's breakpoint or preload the next page. A random-sort refetch
-        // already requests page 1 at that breakpoint and reports it via adopt().
+        // Per paginated gallery: snapshot the server slice (cache strategy
+        // only), then re-page to the visitor's breakpoint or preload the next
+        // page. A random-sort refetch re-pages instead, and calls adopt().
         window.FotoGrids.onGallery( function ( gEl ) {
             if ( gEl.dataset.fgPaginated !== 'true' ) return;
             if ( strategyFor( gEl ) !== 'server' ) {

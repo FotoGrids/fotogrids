@@ -164,6 +164,23 @@ describe('pagination breakpoints', () => {
 		expect(requestBody()).toMatchObject({ page: 2, breakpoint: 'desktop' });
 	});
 
+	it('leaves the view alone when a gate claims the render', async () => {
+		installRuntime('mobile');
+		const gallery = makeGallery();
+		stubFetch({
+			...MOBILE_PAGE,
+			html: '<div id="fg-5-1" class="fotogrids-gate"><div class="fg-gate-card"></div></div>',
+		});
+
+		loadModule();
+		window.FotoGrids.boot();
+		await flush();
+
+		expect(gallery.querySelectorAll('.fg-item').length).toBe(1);
+		expect(gallery.querySelector('.fg-gate-card')).toBeNull();
+		expect(gallery.dataset.fgViewBreakpoint).toBeUndefined();
+	});
+
 	it('adopts a page 1 another module fetched', () => {
 		installRuntime('mobile');
 		const gallery = makeGallery();

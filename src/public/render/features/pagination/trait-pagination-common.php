@@ -137,9 +137,8 @@ trait Pagination_Common {
 			'data-fg-render-nonce'       => esc_attr( wp_create_nonce( 'wp_rest' ) ),
 		);
 
-		// Per-breakpoint page sizes let pagination-core.js re-request page 1
-		// when the visitor's breakpoint pages differently from the server
-		// render. Snap pagination sizes pages from the measured width instead.
+		// pagination-core.js re-pages page 1 against these. Snap pagination
+		// sizes its pages from the measured width instead.
 		if ( ! Context_Builder::is_snap_pagination_active( $render_context->settings ) ) {
 			$attrs['data-fg-page-sizes'] = implode(
 				' ',

@@ -17,8 +17,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Plain strings are emitted in the base rule.  Responsive_Var instances
  * are bucketed by breakpoint and emitted as at most two scoped blocks
  * (tablet, mobile) - the count is bounded by breakpoints, never by the
- * number of properties or decorators. Breakpoint_Config::scope() decides
- * how each block is scoped for the configured detection mode.
+ * number of properties or decorators. Breakpoint_Config::scope() scopes each
+ * block for the configured detection mode.
  *
  * Output shape with viewport detection, for instance #fg-123-1 (instance_id pattern is
  * "fg-{collection_id}-{seq}", written into the wrapper's id attribute):

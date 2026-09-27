@@ -64,25 +64,21 @@
 
 
     /**
-     * Breakpoint widths and detection mode used before any wrapper has
-     * supplied the site's configuration. Mirrors Breakpoint_Config.
+     * Used until a wrapper supplies the site's configuration.
      *
      * @type {{ mobile: number, tablet: number, detect: string }}
      */
     const DEFAULT_BREAKPOINTS = { mobile: 767, tablet: 1024, detect: 'viewport' };
 
     /**
-     * The site's breakpoint configuration, read once from the first wrapper
-     * carrying data-fg-breakpoints. Null until a wrapper has been seen.
-     *
      * @type {{ mobile: number, tablet: number, detect: string }|null}
      */
     let breakpointConfig = null;
 
 
     /**
-     * Returns the site's breakpoint configuration. Every wrapper carries the
-     * same site-level values, so the first one found is authoritative.
+     * The site's breakpoint configuration. Every wrapper carries the same
+     * values, so the first one found answers for the page.
      *
      * @return {{ mobile: number, tablet: number, detect: string }}
      */
@@ -110,10 +106,8 @@
     }
 
     /**
-     * Evaluates a media query, or returns null where matchMedia is missing.
-     *
      * @param {string} query
-     * @return {boolean|null}
+     * @return {boolean|null} Null where matchMedia is missing.
      */
     function mediaMatches( query ) {
         if ( typeof window.matchMedia !== 'function' ) {
@@ -123,8 +117,6 @@
     }
 
     /**
-     * Places a width against the configured breakpoints.
-     *
      * @param {number} width
      * @param {{ mobile: number, tablet: number }} config
      * @return {string} 'desktop', 'tablet' or 'mobile'.
@@ -140,8 +132,8 @@
     }
 
     /**
-     * Classifies the viewport with the same max-width conditions the
-     * server-emitted @media blocks use.
+     * Classifies the window, using the same max-width conditions as the
+     * server-emitted @media blocks.
      *
      * @param {{ mobile: number, tablet: number }} config
      * @return {string}
@@ -158,37 +150,35 @@
     }
 
     /**
-     * Classifies the device rather than the window: a phone stays mobile in
-     * landscape, and a narrowed desktop window stays desktop. A User-Agent
-     * Client Hints mobile flag means a phone; a primary pointer that is not
-     * coarse means a desktop; anything else is placed by the short side of
-     * its screen.
+     * Classifies the device rather than the window, by the short side of its
+     * screen, so a phone stays mobile in landscape and a narrowed desktop
+     * window stays desktop.
      *
      * @param {{ mobile: number, tablet: number }} config
      * @return {string}
      */
     function deviceBreakpoint( config ) {
-        const uaData = window.navigator && window.navigator.userAgentData;
-        if ( uaData && true === uaData.mobile ) {
-            return 'mobile';
-        }
-
         if ( ! mediaMatches( '(pointer: coarse)' ) ) {
             return 'desktop';
         }
 
         const screen = window.screen;
         const shortSide = screen ? Math.min( screen.width || 0, screen.height || 0 ) : 0;
-        if ( shortSide <= 0 ) {
-            return viewportBreakpoint( config );
+        if ( shortSide > 0 ) {
+            return breakpointForWidth( shortSide, config );
         }
 
-        return breakpointForWidth( shortSide, config );
+        // Tablets report mobile: true as often as phones do, so this only
+        // decides when the screen size is unreadable.
+        const uaData = window.navigator && window.navigator.userAgentData;
+        if ( uaData && true === uaData.mobile ) {
+            return 'mobile';
+        }
+
+        return viewportBreakpoint( config );
     }
 
     /**
-     * Returns the visitor's breakpoint under the configured detection mode.
-     *
      * @return {string} 'desktop', 'tablet' or 'mobile'.
      */
     function activeBreakpoint() {
@@ -197,9 +187,8 @@
     }
 
     /**
-     * Writes the device class to html[data-fg-breakpoint], which the
-     * device-mode rules emitted by Breakpoint_Config::scope() select on.
-     * Viewport detection leaves the attribute unset.
+     * Writes the device class to html[data-fg-breakpoint], which the rules
+     * Breakpoint_Config::scope() emits in device mode select on.
      */
     function applyBreakpointAttribute() {
         const config = readBreakpoints();
@@ -210,9 +199,7 @@
     }
 
     /**
-     * Wraps a declaration block so it applies at the given breakpoint and
-     * every narrower one. The client-side counterpart of
-     * Breakpoint_Config::scope(), for modules that build CSS at runtime.
+     * The client-side counterpart of Breakpoint_Config::scope().
      *
      * @param {string} breakpoint   'tablet' or 'mobile'.
      * @param {string} selector
@@ -508,17 +495,14 @@
         },
 
         /**
-         * Returns the visitor's breakpoint under the site's configured
-         * breakpoints and detection mode.
+         * The visitor's breakpoint under the site's detection mode.
          *
          * @return {string} 'desktop', 'tablet' or 'mobile'.
          */
         activeBreakpoint: activeBreakpoint,
 
         /**
-         * Returns a copy of the site's breakpoint configuration.
-         *
-         * @return {{ mobile: number, tablet: number, detect: string }}
+         * @return {{ mobile: number, tablet: number, detect: string }} A copy.
          */
         getBreakpoints: function () {
             const config = readBreakpoints();
@@ -526,8 +510,7 @@
         },
 
         /**
-         * Wraps a declaration block so it applies at the given breakpoint
-         * and every narrower one, under the configured detection mode.
+         * Scopes declarations to a breakpoint and every narrower one.
          *
          * @param {string} breakpoint   'tablet' or 'mobile'.
          * @param {string} selector
@@ -558,8 +541,7 @@
     // during their own init.
     window.FotoGrids = publicApi;
 
-    // The runtime loads after the wrappers it serves, so the device class
-    // applies without waiting for DOMContentLoaded.
+    // The runtime loads after the wrappers, so this need not wait for DOMReady.
     applyBreakpointAttribute();
 
     if ( document.readyState === 'loading' ) {

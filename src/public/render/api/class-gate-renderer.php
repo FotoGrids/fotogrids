@@ -93,8 +93,7 @@ final class Gate_Renderer {
 	 * Sets --fg-cols / --fg-gap on the instance selector for the ghost grid,
 	 * mirroring the gallery's real layout across the three configured
 	 * breakpoints. Gates pass the result to Gate_Result::block() as inline_css
-	 * so it is enqueued / returned separately from the markup rather than
-	 * embedded as a <style>.
+	 * so it travels separately from the markup.
 	 *
 	 * @since  1.0.0
 	 * @param  Render_Context $render_context Render context for this gallery.
@@ -112,8 +111,12 @@ final class Gate_Renderer {
 		$gap_tablet  = self::resolve_gap( $layout->responsive_spacing['tablet'] ?? array() );
 		$gap_mobile  = self::resolve_gap( $layout->responsive_spacing['mobile'] ?? array() );
 
-		$selector    = '#' . esc_attr( $instance_id );
-		$breakpoints = Breakpoint_Config::from_settings();
+		$selector = '#' . esc_attr( $instance_id );
+
+		// A blocked render ships no runtime, so there is no device class to
+		// select on: the ghost grid scopes by width whatever the detection mode.
+		$configured  = Breakpoint_Config::from_settings();
+		$breakpoints = new Breakpoint_Config( $configured->tablet_max_width, $configured->mobile_max_width );
 
 		return sprintf( '%s{--fg-cols:%d;--fg-gap:%s}', $selector, $cols_desktop, esc_attr( $gap_desktop ) ) . "\n"
 			. $breakpoints->scope( 'tablet', $selector, sprintf( "        --fg-cols: %d;\n        --fg-gap: %s;\n", $cols_tablet, esc_attr( $gap_tablet ) ) )

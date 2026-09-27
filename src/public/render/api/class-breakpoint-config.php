@@ -37,9 +37,8 @@ final class Breakpoint_Config {
 	 * @param int  $mobile_max_width  Viewport width (px) at which the mobile
 	 *                                breakpoint activates (max-width condition).
 	 * @param bool $detect_by_browser When true, the breakpoint follows the
-	 *                                device class the frontend runtime writes
-	 *                                to html[data-fg-breakpoint] instead of
-	 *                                the viewport width.
+	 *                                device class at html[data-fg-breakpoint]
+	 *                                rather than the viewport width.
 	 */
 	public function __construct(
 		int $tablet_max_width,
@@ -52,8 +51,7 @@ final class Breakpoint_Config {
 	}
 
 	/**
-	 * Wrapper data attributes that hand the configuration to the frontend
-	 * runtime, which classifies the visitor against the same widths.
+	 * The configuration, for the frontend runtime to read off a wrapper.
 	 *
 	 * @since  1.1.3
 	 * @return array<string, string>
@@ -66,13 +64,11 @@ final class Breakpoint_Config {
 	}
 
 	/**
-	 * Wraps a declaration block so it applies at the given breakpoint and
-	 * every narrower one.
+	 * Scopes declarations to a breakpoint and every narrower one.
 	 *
 	 * Viewport detection emits a max-width @media block. Device detection
-	 * scopes the rule under html[data-fg-breakpoint], which the runtime sets
-	 * from the device class, keeping the max-width block as the fallback until
-	 * the runtime has run.
+	 * selects on html[data-fg-breakpoint], which the runtime sets, and keeps
+	 * the @media block as the fallback until it has.
 	 *
 	 * @since  1.1.3
 	 * @param  string $breakpoint   'tablet' or 'mobile'.

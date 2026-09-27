@@ -96,8 +96,8 @@ final class Plugin_Settings_Store {
 	/**
 	 * Sanitise and persist general settings.
 	 *
-	 * A change flushes the render cache, because cached renders carry the
-	 * breakpoint widths and detection mode in their CSS and wrapper markup.
+	 * A change flushes the render cache, which holds the breakpoints in
+	 * cached CSS and markup.
 	 *
 	 * @param mixed $value Raw input.
 	 * @return array<string, mixed> The stored, merged settings.

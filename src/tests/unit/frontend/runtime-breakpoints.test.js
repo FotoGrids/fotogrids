@@ -148,9 +148,20 @@ describe('runtime breakpoints', () => {
 			).toBe('tablet');
 		});
 
-		it('trusts a mobile User-Agent Client Hint', () => {
+		it('places a tablet by its screen, not its mobile User-Agent hint', () => {
 			addWrapper({ detect: 'device' });
-			stubMedia({ width: 1280, coarse: false });
+			stubMedia({ width: 810, coarse: true });
+			stubScreen(810, 1080);
+			window.navigator.userAgentData = { mobile: true };
+			loadRuntime();
+
+			expect(window.FotoGrids.activeBreakpoint()).toBe('tablet');
+		});
+
+		it('falls back to the mobile User-Agent hint when the screen is unreadable', () => {
+			addWrapper({ detect: 'device' });
+			stubMedia({ width: 1280, coarse: true });
+			stubScreen(0, 0);
 			window.navigator.userAgentData = { mobile: true };
 			loadRuntime();
 

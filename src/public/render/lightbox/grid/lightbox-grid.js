@@ -31,8 +31,7 @@ function svgIcon( paths ) {
 /**
  * Build a scoped <style> element carrying the per-gallery max content width
  * (responsive) and tile aspect ratio. Keeping these in real CSS (rather than
- * inline custom properties) keeps the responsive breakpoints declarative;
- * the runtime scopes them to the site's configured breakpoints.
+ * inline custom properties) keeps the responsive breakpoints declarative.
  *
  * @param {string} scope  Unique scope token (matches data-fg-scope).
  * @param {object} config
