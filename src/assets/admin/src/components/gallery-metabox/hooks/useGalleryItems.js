@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { deleteEmbed } from '../api/embed-api';
+import { deleteEmbed, isEmbedItem } from '../api/embed-api';
 
 /**
  * The shared collection-state manager, published by the admin bootstrap before
@@ -27,15 +27,6 @@ const notifyChange = (source) => {
 		})
 	);
 };
-
-/**
- * Whether a grid item is a video embed rather than an attachment.
- *
- * @param {Object|undefined} item Grid item.
- * @return {boolean} True for YouTube and Vimeo embeds.
- */
-const isEmbedItem = (item) =>
-	item?.item_type === 'video_youtube' || item?.item_type === 'video_vimeo';
 
 /**
  * Owns the gallery's item list and every operation that mutates it, keeping
@@ -171,22 +162,21 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 
 	const setFeatured = useCallback(
 		async (itemId) => {
-			let nextItemId = null;
-			setItems((prevItems) => {
-				const clickedItem = prevItems.find(
-					(item) => item.id === itemId
-				);
-				const wasFeatured = !!clickedItem?.featured;
-				nextItemId = wasFeatured ? null : itemId;
+			const clickedItem = items.find((item) => item.id === itemId);
+			if (!clickedItem || isEmbedItem(clickedItem)) {
+				return;
+			}
+			const nextItemId = clickedItem.featured ? null : itemId;
 
-				return prevItems.map((item) => ({
+			setItems((prevItems) =>
+				prevItems.map((item) => ({
 					...item,
 					featured: nextItemId !== null && item.id === nextItemId,
-				}));
-			});
+				}))
+			);
 			await saveFeaturedItem(nextItemId);
 		},
-		[saveFeaturedItem]
+		[items, saveFeaturedItem]
 	);
 
 	const deleteEmbedItem = useCallback(

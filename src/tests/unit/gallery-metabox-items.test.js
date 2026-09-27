@@ -11,6 +11,9 @@ import { deleteEmbed } from '@/admin/src/components/gallery-metabox/api/embed-ap
 import { renderElement, act } from '@tests/helpers/render-component';
 
 jest.mock('@/admin/src/components/gallery-metabox/api/embed-api', () => ({
+	...jest.requireActual(
+		'@/admin/src/components/gallery-metabox/api/embed-api'
+	),
 	deleteEmbed: jest.fn(() => Promise.resolve()),
 }));
 
@@ -221,6 +224,35 @@ describe('useGalleryItems', () => {
 			});
 
 			expect(window.fotogridsToast.error).toHaveBeenCalledWith('boom');
+		});
+
+		it('saves the clicked item when another update is already queued', async () => {
+			mount([image(1), image(2), image(3)]);
+
+			await act(async () => {
+				api.removeItem(3);
+				await api.setFeatured(2);
+			});
+
+			expect(api.items.map((i) => [i.id, i.featured])).toEqual([
+				[1, false],
+				[2, true],
+			]);
+			expect(wp.apiFetch).toHaveBeenCalledTimes(1);
+			expect(wp.apiFetch).toHaveBeenCalledWith(
+				expect.objectContaining({ data: { item_id: 2 } })
+			);
+		});
+
+		it('ignores a video embed', async () => {
+			mount([image(1), image(2, { item_type: 'video_youtube' })]);
+
+			await act(async () => {
+				await api.setFeatured(2);
+			});
+
+			expect(api.items.map((i) => i.featured)).toEqual([false, false]);
+			expect(wp.apiFetch).not.toHaveBeenCalled();
 		});
 	});
 
