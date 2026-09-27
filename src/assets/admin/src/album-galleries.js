@@ -13,7 +13,7 @@ function initializeAlbumGalleries() {
 		root.render(
 			React.createElement(
 				ErrorBoundary,
-				{ label: 'album galleries' },
+				{ label: 'album-galleries' },
 				React.createElement(AlbumGalleries)
 			)
 		);

@@ -1,0 +1,49 @@
+/**
+ * Fallback shown by the shared admin error boundary in place of a subtree
+ * that threw during render.
+ */
+
+@use "./colors.scss" as *;
+
+.fotogrids-error-boundary {
+	margin: 8px 0;
+	padding: 12px 14px;
+	border: 1px solid var(--fg-border-primary);
+	border-left: 4px solid var(--fg-border-error);
+	border-radius: 2px;
+	background: var(--fg-background-primary);
+	color: var(--fg-text-primary);
+	font-size: 13px;
+	line-height: 1.6;
+
+	&__message {
+		margin: 0 0 10px;
+		font-weight: 600;
+	}
+
+	&__actions {
+		margin: 0;
+	}
+
+	&__details {
+		margin-top: 10px;
+
+		summary {
+			color: var(--fg-text-secondary);
+			cursor: pointer;
+		}
+
+		pre {
+			overflow: auto;
+			max-height: 220px;
+			margin: 8px 0 0;
+			padding: 8px;
+			border-radius: 2px;
+			background: var(--fg-background-secondary);
+			color: var(--fg-text-secondary);
+			font-size: 11px;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+	}
+}

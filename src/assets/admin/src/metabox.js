@@ -68,7 +68,7 @@ function initializeGalleryMetabox() {
 		root.render(
 			React.createElement(
 				ErrorBoundary,
-				{ label: 'gallery metabox' },
+				{ label: 'gallery-metabox' },
 				React.createElement(GalleryMetabox, props)
 			)
 		);

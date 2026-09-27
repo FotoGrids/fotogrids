@@ -48,7 +48,7 @@ function mountReactRoot(container, element, label) {
 
 function initializeModalRoot() {
 	const container = ensureContainer(MODAL_ROOT_ID);
-	mountReactRoot(container, React.createElement(ModalRoot), 'modal root');
+	mountReactRoot(container, React.createElement(ModalRoot), 'modal-root');
 }
 
 function initializeUpgradeModal() {
@@ -68,7 +68,7 @@ function initializeUpgradeModal() {
 	mountReactRoot(
 		container,
 		React.createElement(UpgradeModal),
-		'upgrade modal'
+		'upgrade-modal'
 	);
 }
 
@@ -80,7 +80,7 @@ function renderWhatsNew(isOpen) {
 			isOpen,
 			onClose: () => renderWhatsNew(false),
 		}),
-		"what's new panel"
+		'news-panel'
 	);
 }
 

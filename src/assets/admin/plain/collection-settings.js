@@ -1998,23 +1998,19 @@ function CollectionSettings() {
 		);
 	};
 
-	// The control is built lazily inside the boundary so a throw in a renderer
-	// is caught by it; a boundary wrapped around an already-built tree is not
-	// enough, because that tree is built during this function's own render.
-	// Structural entries such as `side_by_side` carry no key of their own, and
-	// the boundary is an element even when the control renders nothing, so the
-	// children's keys stand in to keep every row keyed across renders.
+	// Structural entries such as `side_by_side` carry no key of their own.
 	const settingBoundaryKey = (setting) =>
 		setting.key ||
 		(Array.isArray(setting.settings)
 			? setting.settings.map((child) => child?.key).join('+')
 			: setting.type);
 
+	// Built lazily inside the boundary so a throw in a renderer is caught.
 	const renderSetting = (setting) =>
 		window.FotoGridsAdmin.withErrorBoundary(
 			{
 				key: settingBoundaryKey(setting),
-				label: `setting "${setting.key || setting.type}"`,
+				label: `setting:${setting.key || setting.type}`,
 			},
 			() => renderSettingControl(setting)
 		);
@@ -3021,7 +3017,7 @@ function initializeCollectionSettings() {
 		createRoot(container).render(
 			h(
 				window.FotoGridsAdmin.ErrorBoundary,
-				{ label: 'collection settings' },
+				{ label: 'collection-settings' },
 				tree
 			)
 		);

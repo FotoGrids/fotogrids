@@ -16,7 +16,7 @@ function initializeAlbumAssignment() {
 	root.render(
 		React.createElement(
 			ErrorBoundary,
-			{ label: 'album assignment' },
+			{ label: 'album-assignment' },
 			React.createElement(AlbumAssignment)
 		)
 	);

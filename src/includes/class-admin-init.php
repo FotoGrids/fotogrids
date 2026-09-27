@@ -240,7 +240,7 @@ class Admin_Init {
 
 		wp_enqueue_style(
 			'fotogrids-error-boundary',
-			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/error-boundary.css',
+			FOTOGRIDS_PLUGIN_URL . 'assets/css/error-boundary.css',
 			array(),
 			FOTOGRIDS_VERSION
 		);

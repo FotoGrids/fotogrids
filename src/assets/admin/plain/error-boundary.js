@@ -1,10 +1,6 @@
 /**
- * Shared admin error boundary.
- *
- * Registers `window.FotoGridsAdmin.ErrorBoundary` and
- * `window.FotoGridsAdmin.withErrorBoundary`, so every admin React root - the
- * webpack bundles and the plain settings script alike - contains a render
- * error to the subtree that threw instead of unmounting the whole root.
+ * Shared admin error boundary, registered on `window.FotoGridsAdmin` for the
+ * webpack bundles and the plain settings script alike.
  */
 
 class FotoGridsErrorBoundary extends wp.element.Component {
@@ -41,9 +37,8 @@ class FotoGridsErrorBoundary extends wp.element.Component {
 		const { createElement: h } = wp.element;
 		const { __ } = wp.i18n;
 
-		// The admin header strips any inserted element matching `.notice`,
-		// `.error`, `.updated` or a promotional class substring, so the
-		// fallback carries plugin-owned class names only.
+		// The admin header strips inserted `.notice` / `.error` / `.updated`
+		// elements, so the fallback carries plugin-owned classes only.
 		return h(
 			'div',
 			{ className: 'fotogrids-error-boundary' },
@@ -81,11 +76,8 @@ window.FotoGridsAdmin = window.FotoGridsAdmin || {};
 window.FotoGridsAdmin.ErrorBoundary = FotoGridsErrorBoundary;
 
 /**
- * Wrap a deferred render call in an error boundary.
- *
- * The callback runs inside the boundary's own child, so a throw in the callback
- * body is caught too. A boundary placed around an already-built element tree is
- * not enough on its own, because that tree was built during the caller's render.
+ * Wrap a deferred render call in an error boundary. The callback runs inside
+ * the boundary's own child, so a throw in the callback body is caught too.
  *
  * @param {Object}      props  Boundary props, including `key` and `label`.
  * @param {()=>Object}  render Callback returning the element to guard.

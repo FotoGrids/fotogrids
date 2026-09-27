@@ -104,7 +104,7 @@ const DefaultsTab = ({ type = 'gallery' }) => {
                 root.render(
                     React.createElement(
                         ErrorBoundary,
-                        { label: `${typeLabel} defaults` },
+                        { label: `${typeLabel}-defaults` },
                         React.createElement(CollectionSettings)
                     )
                 );

@@ -179,14 +179,12 @@ final class Collection_Settings_Assets {
 	}
 
 	/**
-	 * The shared admin error boundary. Registers
-	 * `window.FotoGridsAdmin.ErrorBoundary`, which the settings panel wraps
-	 * around its root and around every individual setting.
+	 * The shared admin error boundary and its fallback styles.
 	 */
 	private static function enqueue_error_boundary(): void {
 		wp_enqueue_style(
 			'fotogrids-error-boundary',
-			FOTOGRIDS_PLUGIN_URL . 'assets/admin/plain/error-boundary.css',
+			FOTOGRIDS_PLUGIN_URL . 'assets/css/error-boundary.css',
 			array(),
 			FOTOGRIDS_VERSION
 		);
