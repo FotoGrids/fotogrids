@@ -2,6 +2,7 @@
 namespace FotoGrids\Tools\ImportExport;
 
 use FotoGrids\Galleries\Item_Meta;
+use FotoGrids\Galleries\Item_Meta_Consolidation;
 use FotoGrids\Hooks\Actions_Gallery;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -554,7 +555,7 @@ class Import_Export_Data {
 
 			$item_attachment_map = array(); // old_attachment_id => new_attachment_id (1:1 on same site)
 			if ( in_array( 'items', $include, true ) && ! empty( $data['items'] ) ) {
-				[ $imp, $skip ]    = self::import_items( $data['items'] );
+				[ $imp, $skip ]    = self::import_items( $data['items'], $gallery_id_map );
 				$imported['items'] = $imp;
 				$skipped['items']  = $skip;
 			}
@@ -783,11 +784,14 @@ class Import_Export_Data {
 	/**
 	 * Import item rows.
 	 * Rows whose attachment_id doesn't exist on this site, or that already has
-	 * a row, are skipped. Returns [imported_count, skipped_count].
+	 * a row, are skipped. Rows scoped to a gallery (files exported before 1.1.4)
+	 * also rebuild that gallery's item list when it has none.
+	 * Returns [imported_count, skipped_count].
 	 */
-	private static function import_items( array $items ): array {
+	private static function import_items( array $items, array $gallery_id_map ): array {
 		$imported = 0;
 		$skipped  = 0;
+		$lists    = array();
 
 		foreach ( $items as $item ) {
 			$attachment_id = (int) ( $item['attachment_id'] ?? 0 );
@@ -795,6 +799,11 @@ class Import_Export_Data {
 			if ( ! $attachment_id || get_post_type( $attachment_id ) !== 'attachment' ) {
 				++$skipped;
 				continue;
+			}
+
+			$old_gallery = (int) ( $item['gallery_id'] ?? 0 );
+			if ( $old_gallery > 0 && isset( $gallery_id_map[ $old_gallery ] ) ) {
+				$lists[ (int) $gallery_id_map[ $old_gallery ] ][] = array( (int) ( $item['position'] ?? 0 ), $attachment_id );
 			}
 
 			if ( null !== Item_Meta::get( $attachment_id ) ) {
@@ -822,6 +831,16 @@ class Import_Export_Data {
 			} else {
 				++$skipped;
 			}
+		}
+
+		foreach ( $lists as $gallery_id => $entries ) {
+			usort(
+				$entries,
+				static function ( array $a, array $b ): int {
+					return $a[0] - $b[0];
+				}
+			);
+			Item_Meta_Consolidation::restore_list( $gallery_id, array_column( $entries, 1 ) );
 		}
 
 		return array( $imported, $skipped );

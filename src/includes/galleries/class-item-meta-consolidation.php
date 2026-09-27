@@ -68,12 +68,19 @@ final class Item_Meta_Consolidation {
 	/**
 	 * Run the consolidation.
 	 *
+	 * Flushes the render cache when anything changed, so no gallery keeps
+	 * serving markup built from the old rows.
+	 *
 	 * @since  1.1.4
 	 * @return void
 	 */
 	public static function run(): void {
-		self::restore_gallery_lists();
-		self::merge_rows();
+		$restored = self::restore_gallery_lists();
+		$merged   = self::merge_rows();
+
+		if ( $restored + $merged > 0 ) {
+			\FotoGrids\FotoGrids_Cache::flush_all();
+		}
 	}
 
 	/**
@@ -84,9 +91,9 @@ final class Item_Meta_Consolidation {
 	 * a user emptied is left empty.
 	 *
 	 * @since  1.1.4
-	 * @return void
+	 * @return int Number of galleries whose list was rebuilt.
 	 */
-	private static function restore_gallery_lists(): void {
+	private static function restore_gallery_lists(): int {
 		global $wpdb;
 		$table = Item_Meta::table();
 
@@ -97,38 +104,61 @@ final class Item_Meta_Consolidation {
 			)
 		);
 
+		$restored = 0;
 		foreach ( (array) $gallery_ids as $gallery_id ) {
-			$gallery_id = (int) $gallery_id;
-
-			if ( 'fotogrids_gallery' !== get_post_type( $gallery_id ) ) {
-				continue;
-			}
-			if ( metadata_exists( 'post', $gallery_id, 'fotogrids_gallery_items' ) ) {
-				continue;
-			}
-			if ( metadata_exists( 'post', $gallery_id, '_edit_last' ) ) {
-				continue;
-			}
-
 			$attachment_ids = $wpdb->get_col(
 				$wpdb->prepare(
 					"SELECT attachment_id FROM {$table} WHERE gallery_id = %d ORDER BY position ASC, id ASC",
-					$gallery_id
+					(int) $gallery_id
 				)
 			);
 
-			$item_ids = array();
-			foreach ( (array) $attachment_ids as $attachment_id ) {
-				$attachment_id = (int) $attachment_id;
-				if ( 'attachment' === get_post_type( $attachment_id ) && ! in_array( $attachment_id, $item_ids, true ) ) {
-					$item_ids[] = $attachment_id;
-				}
-			}
-
-			if ( ! empty( $item_ids ) ) {
-				Gallery_Repository::set_item_ids( $gallery_id, $item_ids );
+			if ( self::restore_list( (int) $gallery_id, (array) $attachment_ids ) ) {
+				++$restored;
 			}
 		}
+
+		return $restored;
+	}
+
+	/**
+	 * Give a gallery an item list built from gallery-scoped rows.
+	 *
+	 * Only a gallery with no `fotogrids_gallery_items` list that has never been
+	 * saved from the gallery editor (no `_edit_last`) is changed, so a gallery a
+	 * user emptied stays empty. IDs that are not attachments are dropped.
+	 *
+	 * @since  1.1.4
+	 * @param  int             $gallery_id     Gallery post ID.
+	 * @param  array<int, int> $attachment_ids Attachment IDs in display order.
+	 * @return bool True when the list was written.
+	 */
+	public static function restore_list( int $gallery_id, array $attachment_ids ): bool {
+		if ( 'fotogrids_gallery' !== get_post_type( $gallery_id ) ) {
+			return false;
+		}
+		if ( metadata_exists( 'post', $gallery_id, 'fotogrids_gallery_items' ) ) {
+			return false;
+		}
+		if ( metadata_exists( 'post', $gallery_id, '_edit_last' ) ) {
+			return false;
+		}
+
+		$item_ids = array();
+		foreach ( $attachment_ids as $attachment_id ) {
+			$attachment_id = (int) $attachment_id;
+			if ( 'attachment' === get_post_type( $attachment_id ) && ! in_array( $attachment_id, $item_ids, true ) ) {
+				$item_ids[] = $attachment_id;
+			}
+		}
+
+		if ( empty( $item_ids ) ) {
+			return false;
+		}
+
+		Gallery_Repository::set_item_ids( $gallery_id, $item_ids );
+
+		return true;
 	}
 
 	/**
@@ -139,9 +169,9 @@ final class Item_Meta_Consolidation {
 	 * item with no row gets its most recent gallery-scoped row converted.
 	 *
 	 * @since  1.1.4
-	 * @return void
+	 * @return int Number of items whose rows were merged.
 	 */
-	private static function merge_rows(): void {
+	private static function merge_rows(): int {
 		global $wpdb;
 		$table = Item_Meta::table();
 
@@ -167,6 +197,8 @@ final class Item_Meta_Consolidation {
 				self::merge_item( $attachment_id );
 			}
 		} while ( $progressed );
+
+		return count( $seen );
 	}
 
 	/**
