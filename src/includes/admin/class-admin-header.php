@@ -233,9 +233,7 @@ class Admin_Header {
 				];
 
 				function isProtectedElement(element) {
-					if (element.classList && element.classList.contains('fotogrids-error-boundary')) {
-						return true;
-					}
+					// closest() matches the element itself as well as its ancestors.
 					if (element.closest && element.closest('.fotogrids-error-boundary')) {
 						return true;
 					}
