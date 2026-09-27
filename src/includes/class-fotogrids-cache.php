@@ -373,7 +373,7 @@ class FotoGrids_Cache {
 			)
 		);
 
-		if ( ! $row || (int) 0 === $row->entry_count ) {
+		if ( ! $row || 0 === (int) $row->entry_count ) {
 			return null;
 		}
 
