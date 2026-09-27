@@ -353,7 +353,7 @@ final class Metabox_Registrar {
 			wp_enqueue_script(
 				'fotogrids-album-assignment',
 				FOTOGRIDS_PLUGIN_URL . 'assets/js/album-assignment.js',
-				array( 'wp-element', 'wp-api-fetch', 'fotogrids-ajax-save' ),
+				array( 'wp-element', 'wp-i18n', 'wp-api-fetch', 'fotogrids-ajax-save' ),
 				FOTOGRIDS_VERSION,
 				true
 			);
@@ -669,7 +669,7 @@ final class Metabox_Registrar {
 		wp_enqueue_script(
 			'fotogrids-album-galleries',
 			FOTOGRIDS_PLUGIN_URL . 'assets/js/album-galleries.js',
-			array( 'wp-element', 'wp-api-fetch' ),
+			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
 			FOTOGRIDS_VERSION,
 			true
 		);
@@ -714,7 +714,6 @@ final class Metabox_Registrar {
 					'error'                  => __( 'Error updating Album', 'fotogrids' ),
 					'items'                  => __( 'items', 'fotogrids' ),
 					'noItems'                => __( 'No items', 'fotogrids' ),
-					'galleryTitleMissing'    => __( 'Gallery Title Missing', 'fotogrids' ),
 					'dropItemHere'           => __( 'Drop item here', 'fotogrids' ),
 				),
 			)

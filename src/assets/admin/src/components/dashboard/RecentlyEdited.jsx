@@ -62,7 +62,7 @@ const RecentlyEditedRow = ({ item }) => (
             <span className="fg-abc-recently-edited-type">{item.type_label}</span>
             <span className="fg-abc-recently-edited-name">
                 <span className="fg-abc-recently-edited-title">
-                    {item.title || `${item.untitled_label} #${item.id}`}
+                    {item.title || item.placeholder}
                 </span>
                 {STATUS_LABELS[item.status] && (
                     <span className="fg-abc-recently-edited-status">

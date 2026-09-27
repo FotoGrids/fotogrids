@@ -11,7 +11,7 @@ const ROWS = [
 	{
 		id: 12,
 		title: 'Summer Portraits',
-		untitled_label: 'Untitled Gallery',
+		placeholder: 'Gallery #12',
 		type: 'fotogrids_gallery',
 		type_label: 'Gallery',
 		status: 'publish',
@@ -22,7 +22,7 @@ const ROWS = [
 	{
 		id: 15,
 		title: '',
-		untitled_label: 'Untitled Album',
+		placeholder: 'Album #15',
 		type: 'fotogrids_album',
 		type_label: 'Album',
 		status: 'draft',
@@ -58,7 +58,7 @@ describe('dashboard RecentlyEdited', () => {
 		unmount();
 	});
 
-	it('lists each row with its edit link, falling back to the untitled label', async () => {
+	it('lists each row with its edit link, falling back to the placeholder', async () => {
 		wp.apiFetch.mockResolvedValue({ items: ROWS });
 
 		const { container, unmount } = renderElement(
@@ -76,7 +76,7 @@ describe('dashboard RecentlyEdited', () => {
 			Array.from(
 				container.querySelectorAll('.fg-abc-recently-edited-title')
 			).map((el) => el.textContent)
-		).toEqual(['Summer Portraits', 'Untitled Album #15']);
+		).toEqual(['Summer Portraits', 'Album #15']);
 
 		unmount();
 	});
