@@ -34,12 +34,13 @@ final class Gallery_Items {
 	 * Fires `Actions_Item::ADDED` on success.
 	 *
 	 * @since 1.0.0
-	 * @param int $gallery_id    Gallery post ID.
-	 * @param int $attachment_id Attachment ID.
+	 * @param int                  $gallery_id    Gallery post ID.
+	 * @param int                  $attachment_id Attachment ID.
+	 * @param array<string, mixed> $meta          Deprecated since 1.1.4. Use Item_Meta::save().
 	 * @return bool True on success; false when the gallery or attachment does
 	 *              not exist or the attachment is already in the gallery.
 	 */
-	public static function add( int $gallery_id, int $attachment_id ): bool {
+	public static function add( int $gallery_id, int $attachment_id, array $meta = array() ): bool {
 		if ( ! Gallery_Repository::get( $gallery_id ) ) {
 			return false;
 		}
@@ -55,7 +56,17 @@ final class Gallery_Items {
 		$item_ids[] = $attachment_id;
 		Gallery_Repository::set_item_ids( $gallery_id, $item_ids );
 
-		do_action( Actions_Item::ADDED, $attachment_id, $gallery_id );
+		if ( ! empty( $meta ) ) {
+			_deprecated_argument(
+				__METHOD__,
+				'1.1.4',
+				/* translators: %s: Method name. */
+				sprintf( esc_html__( 'Use %s instead.', 'fotogrids' ), 'FotoGrids\\Galleries\\Item_Meta::save()' )
+			);
+			Item_Meta::save( $attachment_id, $meta );
+		}
+
+		do_action( Actions_Item::ADDED, $attachment_id, $gallery_id, $meta );
 
 		return true;
 	}
@@ -84,6 +95,22 @@ final class Gallery_Items {
 		do_action( Actions_Item::REMOVED, $attachment_id, $gallery_id );
 
 		return true;
+	}
+
+	/**
+	 * Update an item's data.
+	 *
+	 * @since      1.0.0
+	 * @deprecated 1.1.4 Use Item_Meta::save(). Item data is shared by every gallery.
+	 * @param int                  $gallery_id    Unused.
+	 * @param int                  $attachment_id Attachment ID.
+	 * @param array<string, mixed> $meta          Fields to write.
+	 * @return bool True on success.
+	 */
+	public static function update_meta( int $gallery_id, int $attachment_id, array $meta ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Kept for the deprecated signature.
+		_deprecated_function( __METHOD__, '1.1.4', 'FotoGrids\\Galleries\\Item_Meta::save()' );
+
+		return Item_Meta::save( $attachment_id, $meta );
 	}
 
 	/**
