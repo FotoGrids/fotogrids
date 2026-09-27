@@ -245,6 +245,8 @@ final class Render_Controller {
 				$active_modules['sidecars'][] = $sidecar_module->id();
 			}
 
+			$wrapper_data_attrs = array_merge( $wrapper_data_attrs, $this->breakpoints->wrapper_attrs() );
+
 			$layout_css_classes = Hooks::apply_filter( 'wrapper_css_classes', $layout_css_classes, $render );
 			$wrapper_data_attrs = Hooks::apply_filter( 'wrapper_data_attrs', $wrapper_data_attrs, $render );
 			$css_variables      = Hooks::apply_filter( 'css_variables', $css_variables, $render );
