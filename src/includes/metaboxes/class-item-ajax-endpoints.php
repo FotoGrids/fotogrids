@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace FotoGrids\Metaboxes;
 
 use FotoGrids\Exif\Exif_Extractor;
-use FotoGrids\Galleries\Gallery_Items;
 use FotoGrids\Galleries\Item_Meta;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -19,13 +18,12 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Five `wp_ajax_*` endpoints driving the per-item edit + bulk-URL UI.
+ * Four `wp_ajax_*` endpoints driving the per-item edit + bulk-URL UI.
  *
  *   fotogrids_get_item_data           - read item data for the edit modal
  *   fotogrids_get_item_urls           - read external_url / link_target for many items
  *   fotogrids_update_item_url         - write external_url for one item
  *   fotogrids_bulk_update_item_urls   - bulk apply/clear external_url
- *   fotogrids_reorder_gallery_items   - drag-reorder a gallery's items
  *
  * Eventually candidates to move to REST routes under `includes/rest/items/`;
  * see the refactor plan for that follow-up.
@@ -35,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
 final class Item_Ajax_Endpoints {
 
 	/**
-	 * Wire the 5 `wp_ajax_*` endpoints.
+	 * Wire the 4 `wp_ajax_*` endpoints.
 	 *
 	 * @since 1.0.0
 	 */
@@ -44,7 +42,6 @@ final class Item_Ajax_Endpoints {
 		add_action( 'wp_ajax_fotogrids_get_item_urls', array( __CLASS__, 'get_item_urls' ) );
 		add_action( 'wp_ajax_fotogrids_update_item_url', array( __CLASS__, 'update_item_url' ) );
 		add_action( 'wp_ajax_fotogrids_bulk_update_item_urls', array( __CLASS__, 'bulk_update_item_urls' ) );
-		add_action( 'wp_ajax_fotogrids_reorder_gallery_items', array( __CLASS__, 'reorder_gallery_items' ) );
 	}
 
 	/**
@@ -453,53 +450,5 @@ final class Item_Ajax_Endpoints {
 				'message' => sprintf( __( 'Bulk action completed. Updated %d items.', 'fotogrids' ), $updated ),
 			)
 		);
-	}
-
-	/**
-	 * Reorder a gallery's items via drag-and-drop in the metabox.
-	 *
-	 * @since 1.0.0
-	 */
-	public static function reorder_gallery_items(): void {
-		check_ajax_referer( 'fotogrids_item_edit', 'nonce' );
-
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'fotogrids' ) ) );
-		}
-
-		$gallery_id = intval( $_POST['gallery_id'] ?? 0 );
-		if ( ! $gallery_id ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid gallery ID', 'fotogrids' ) ) );
-		}
-
-		$post = get_post( $gallery_id );
-		if ( ! $post || 'fotogrids_gallery' !== $post->post_type ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid gallery', 'fotogrids' ) ) );
-		}
-
-		if ( ! current_user_can( 'edit_post', $gallery_id ) ) {
-			wp_send_json_error( array( 'message' => __( 'Cannot edit this gallery', 'fotogrids' ) ) );
-		}
-
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Decoded JSON is validated as an array below, then every element is cast to a positive int via array_map( 'absint', ... ).
-		$item_order = isset( $_POST['item_order'] ) ? json_decode( wp_unslash( $_POST['item_order'] ), true ) : array();
-		if ( ! is_array( $item_order ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid item order data', 'fotogrids' ) ) );
-		}
-		$item_order = array_map( 'absint', $item_order );
-
-		$result = Gallery_Items::reorder( (int) $gallery_id, $item_order );
-
-		if ( $result ) {
-			wp_send_json_success(
-				array(
-					'message'    => __( 'Items reordered successfully', 'fotogrids' ),
-					'gallery_id' => $gallery_id,
-					'item_order' => $item_order,
-				)
-			);
-		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to reorder items', 'fotogrids' ) ) );
-		}
 	}
 }
