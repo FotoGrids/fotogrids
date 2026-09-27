@@ -61,6 +61,13 @@ class System_Info_Tool extends Abstract_Tool {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function get_image(): ?string {
+		return FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/tools/system-info.svg';
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get_image_bg_color(): ?string {
 		return 'var(--fg-interactive-selected-bg)';
 	}
