@@ -7,17 +7,11 @@ import { apiAnonymous, apiAs, roles } from './support/roles';
  * render pipeline apply the same access rules as a rendered gallery, and that
  * the template preview requires an editor.
  *
- * `readonly`: every collection here is a seeded fixture, and unlocking a
- * password gallery writes only to the visitor's own cookie jar. Nothing on the
- * site changes, so this runs at full parallelism.
+ * Readonly: every collection is a seeded fixture, and unlocking a password
+ * gallery writes only to the visitor's own cookie jar.
  */
 
-/**
- * A REST route as a query string rather than a path.
- *
- * `?rest_route=` works whatever the permalink structure is, which keeps these
- * checks about authorisation rather than about rewrite rules.
- */
+/** A REST route as a query string: `?rest_route=` ignores permalink structure. */
 function route( path: string, query: Record< string, string | number > = {} ) {
 	const params = new URLSearchParams( { rest_route: path } );
 	for ( const [ key, value ] of Object.entries( query ) ) {

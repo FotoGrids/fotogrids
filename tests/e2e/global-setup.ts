@@ -14,24 +14,17 @@ import {
 } from './support/roles';
 
 /**
- * Prepares the site once, before any project runs.
- *
- * Two things every spec would otherwise repeat. The fixture sets, so no spec
- * builds its own state; and a signed-in session per role, because reaching
- * wp-admin through the login form costs about six seconds and doing that per
- * test is what makes role coverage look expensive.
+ * Prepares the site once, before any project runs: the fixture sets, and a
+ * signed-in session per role.
  */
 
 const PASSWORD = 'fg-role-password';
 
 /**
- * Run the seeder, so a spec can rely on the sets existing.
+ * Build the fixture sets. Idempotent.
  *
- * FG_SEED_SETS narrows it to a comma-separated list. Seeding is idempotent and
- * takes half a second once a site is warm, but a cold CI runner builds every
- * set from nothing - and F-huge alone is 40MB and twenty seconds. CI therefore
- * names the sets the suite actually reads; a spec asking for one that was not
- * seeded fails with a message listing what was.
+ * FG_SEED_SETS narrows it to a comma-separated list of set names; a cold runner
+ * builds every named set from nothing, and F-huge alone is 40MB.
  */
 function seed(): void {
 	const script = path.resolve( 'tests/harness/seed.sh' );
@@ -42,10 +35,8 @@ function seed(): void {
 }
 
 /**
- * Create the four non-administrator roles, and give all five a known password.
- *
- * Idempotent: the password is set every time rather than only on creation, so a
- * site where someone changed it by hand still yields a working session.
+ * Create the four non-administrator roles with a known password. Idempotent:
+ * the password is set on every run, not only at creation.
  */
 function ensureUsers( adminUser: string ): Record< Role, string > {
 	const logins: Record< string, string > = { administrator: adminUser };
@@ -57,9 +48,8 @@ function ensureUsers( adminUser: string ): Record< Role, string > {
 		logins[ role ] = `fg-${ role }`;
 	}
 
-	// The administrator is left alone: boot.sh already set its password, and
-	// resetting it here would invalidate the credentials this function was
-	// handed.
+	// The administrator is left alone; resetting its password would invalidate
+	// the credentials passed in.
 	const php = Object.entries( logins )
 		.filter( ( [ role ] ) => role !== 'administrator' )
 		.map(
@@ -89,10 +79,9 @@ if ( ! is_wp_error( $user ) ) {
 /**
  * Sign in through the login form and keep the cookies.
  *
- * WordPress issues the auth cookie only once the test cookie has landed, so the
- * GET before the POST is load-bearing rather than tidiness - and on a site
- * still warming up the first attempt can come back with the login page anyway,
- * which is why this retries rather than failing the whole run.
+ * The GET before the POST sets the test cookie WordPress requires before it
+ * will issue an auth cookie. A freshly installed site can still answer the
+ * first attempt with the login page, hence the retry.
  */
 async function captureSession(
 	baseURL: string,

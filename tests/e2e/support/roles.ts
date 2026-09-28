@@ -6,10 +6,6 @@ import type { APIRequestContext, PlaywrightWorkerArgs } from '@playwright/test';
 /**
  * The five roles the suite signs in as, and where global setup leaves their
  * sessions.
- *
- * Signing in through the login form costs about six seconds. Doing it once per
- * role in global setup and reloading the cookies turns a role test into a
- * context load, which is what makes role coverage affordable at all.
  */
 
 export const ROLES = [
@@ -48,8 +44,7 @@ let cached: RoleFile | null = null;
 /**
  * The sessions global setup captured.
  *
- * @throws When global setup has not run, rather than letting a spec fail later
- *         with an unauthenticated request and a confusing status code.
+ * @throws When global setup has not run.
  */
 export function roles(): RoleFile {
 	if ( cached ) {
@@ -70,9 +65,8 @@ export function roles(): RoleFile {
 /**
  * Where a role's cookies live.
  *
- * Built from the role name rather than read out of roles.json, so a spec can
- * call it at module scope - `test.use()` runs while the file is being loaded,
- * before anything has had a chance to read a file.
+ * Built from the role name rather than read out of roles.json, so it is safe at
+ * module scope, where `test.use()` runs.
  */
 export function storageStateFor( role: Role ): string {
 	return path.join( authDir(), `${ role }.json` );
@@ -80,11 +74,8 @@ export function storageStateFor( role: Role ): string {
 
 /**
  * An API context carrying a role's cookies, plus the REST nonce that goes with
- * them.
- *
- * WordPress authenticates a cookie-based REST request only when it also carries
- * a valid `X-WP-Nonce`; without it the request is treated as anonymous, which
- * reads as a permission bug rather than a missing header.
+ * them. WordPress treats a cookie-authenticated REST request with no valid
+ * `X-WP-Nonce` as anonymous.
  */
 export async function apiAs(
 	playwright: PlaywrightWorkerArgs[ 'playwright' ],
@@ -109,12 +100,9 @@ export async function apiAnonymous(
 }
 
 /**
- * How to invoke wp-cli.
- *
- * WP_CLI is a single executable: the shim tests/harness/boot.sh writes, which
- * has the php, the install path and the working directory already pinned. It is
- * exec'd as one path rather than split on spaces, because the path can contain
- * them - LocalWP keeps its sites under `~/Local Sites/`.
+ * How to invoke wp-cli: the shim boot.sh writes, with php, install path and
+ * working directory pinned. Exec'd as one path, never split on spaces - LocalWP
+ * keeps its sites under `~/Local Sites/`.
  */
 export function wpCli(): string {
 	const cmd = process.env.WP_CLI;
