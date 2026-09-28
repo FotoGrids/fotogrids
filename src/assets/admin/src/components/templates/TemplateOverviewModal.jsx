@@ -31,7 +31,9 @@ const buildCatalogIndex = (groups) => {
 
 	const walk = (nodes, tab) => {
 		nodes.forEach((node) => {
-			if (!node || typeof node !== 'object') return;
+			if (!node || typeof node !== 'object') {
+				return;
+			}
 
 			const { key, type } = node;
 			if (key && type && !CONTAINER_TYPES.has(type)) {
@@ -55,9 +57,13 @@ const buildCatalogIndex = (groups) => {
 	};
 
 	Object.values(groups || {}).forEach((tabNode) => {
-		if (!tabNode || typeof tabNode !== 'object') return;
+		if (!tabNode || typeof tabNode !== 'object') {
+			return;
+		}
 		const tab = { id: tabNode.id, label: tabNode.label };
-		if (!tab.id) return;
+		if (!tab.id) {
+			return;
+		}
 		tabOrder.push(tab);
 		if (Array.isArray(tabNode.settings)) {
 			walk(tabNode.settings, tab);
@@ -230,7 +236,9 @@ const TemplateOverviewModal = ({ template, isPro, isOpen, onClose }) => {
 	// groups settings into the real admin tabs. Falls back to prefix grouping
 	// when the settings bundle isn't available.
 	useEffect(() => {
-		if (!isOpen) return undefined;
+		if (!isOpen) {
+			return undefined;
+		}
 
 		const loader = window.FotoGridsSettings?.loadSettingsGroups;
 		if (typeof loader !== 'function') {
@@ -248,14 +256,18 @@ const TemplateOverviewModal = ({ template, isPro, isOpen, onClose }) => {
 		setStatus('loading');
 		loader(postType, false)
 			.then((groups) => {
-				if (!active) return;
+				if (!active) {
+					return;
+				}
 				const built = buildCatalogIndex(groups);
 				catalogCache[postType] = built;
 				setCatalog(built);
 				setStatus('ready');
 			})
 			.catch(() => {
-				if (active) setStatus('error');
+				if (active) {
+					setStatus('error');
+				}
 			});
 
 		return () => {

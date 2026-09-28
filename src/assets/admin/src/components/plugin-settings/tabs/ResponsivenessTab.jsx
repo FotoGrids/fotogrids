@@ -49,7 +49,9 @@ const ResponsivenessTab = () => {
 		let active = true;
 		apiFetch({ path: '/fotogrids/v1/admin/general-settings' })
 			.then((data) => {
-				if (!active || !data?.settings) return;
+				if (!active || !data?.settings) {
+					return;
+				}
 				const s = {
 					mobile_breakpoint: Number(data.settings.mobile_breakpoint),
 					tablet_breakpoint: Number(data.settings.tablet_breakpoint),

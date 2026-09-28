@@ -67,7 +67,9 @@ function buildScopeStyle(scope, padding) {
 }
 
 function close() {
-	if (!overlay) return;
+	if (!overlay) {
+		return;
+	}
 	overlay.remove();
 	overlay = null;
 	state = null;
@@ -84,13 +86,19 @@ function close() {
 }
 
 function captionTextFor(it, source) {
-	if (source === 'title') return it.title || '';
-	if (source === 'description') return it.description || '';
+	if (source === 'title') {
+		return it.title || '';
+	}
+	if (source === 'description') {
+		return it.description || '';
+	}
 	return it.caption || '';
 }
 
 function render() {
-	if (!state || !overlay) return;
+	if (!state || !overlay) {
+		return;
+	}
 	const { items, index, config } = state;
 	const it = items[index];
 
@@ -117,13 +125,19 @@ function render() {
 	if (!config.loop) {
 		const prev = overlay.querySelector('.fg-lb-mv-prev');
 		const next = overlay.querySelector('.fg-lb-mv-next');
-		if (prev) prev.disabled = index <= 0;
-		if (next) next.disabled = index >= items.length - 1;
+		if (prev) {
+			prev.disabled = index <= 0;
+		}
+		if (next) {
+			next.disabled = index >= items.length - 1;
+		}
 	}
 }
 
 function navigate(delta) {
-	if (!state) return;
+	if (!state) {
+		return;
+	}
 	const { items, config } = state;
 	let next = state.index + delta;
 	if (config.loop) {
@@ -145,7 +159,9 @@ function navigate(delta) {
  */
 function open(config) {
 	const items = Array.isArray(config.items) ? config.items : [];
-	if (items.length === 0) return;
+	if (items.length === 0) {
+		return;
+	}
 	close();
 
 	lastFocus = document.activeElement;
@@ -182,9 +198,15 @@ function open(config) {
 
 	const figure = document.createElement('div');
 	let figureClass = 'fg-lb-mv-figure';
-	if (config.border) figureClass += ' fg-lb-mv-figure--border';
-	if (config.shadow) figureClass += ' fg-lb-mv-figure--shadow';
-	if (config.radius) figureClass += ' fg-lb-mv-figure--radius';
+	if (config.border) {
+		figureClass += ' fg-lb-mv-figure--border';
+	}
+	if (config.shadow) {
+		figureClass += ' fg-lb-mv-figure--shadow';
+	}
+	if (config.radius) {
+		figureClass += ' fg-lb-mv-figure--radius';
+	}
 	figure.className = figureClass;
 
 	const img = document.createElement('img');
@@ -256,9 +278,13 @@ function open(config) {
 	document.documentElement.style.overflow = 'hidden';
 
 	keyHandler = (e) => {
-		if (e.key === 'Escape') close();
-		else if (e.key === 'ArrowLeft' && config.arrows) navigate(-1);
-		else if (e.key === 'ArrowRight' && config.arrows) navigate(1);
+		if (e.key === 'Escape') {
+			close();
+		} else if (e.key === 'ArrowLeft' && config.arrows) {
+			navigate(-1);
+		} else if (e.key === 'ArrowRight' && config.arrows) {
+			navigate(1);
+		}
 	};
 	document.addEventListener('keydown', keyHandler);
 
@@ -307,15 +333,23 @@ function configFor(galleryEl, index) {
 }
 
 function attach(galleryEl) {
-	if (galleryEl.dataset.fgMiniReady === '1') return;
-	if (galleryEl.dataset.fgLightboxVariant !== 'mini') return;
+	if (galleryEl.dataset.fgMiniReady === '1') {
+		return;
+	}
+	if (galleryEl.dataset.fgLightboxVariant !== 'mini') {
+		return;
+	}
 	galleryEl.dataset.fgMiniReady = '1';
 
 	galleryEl.addEventListener('click', (e) => {
 		const figure = e.target.closest('.fg-item');
-		if (!figure || !galleryEl.contains(figure)) return;
+		if (!figure || !galleryEl.contains(figure)) {
+			return;
+		}
 		const trigger = figure.querySelector('[data-fg-lightbox-trigger]');
-		if (!trigger) return;
+		if (!trigger) {
+			return;
+		}
 		e.preventDefault();
 
 		const items = readItems(galleryEl);
@@ -323,7 +357,9 @@ function attach(galleryEl) {
 			figure.getAttribute('data-fg-item-id') ||
 			trigger.getAttribute('data-fg-item-id');
 		let idx = items.findIndex((it) => String(it.id) === String(id));
-		if (idx < 0) idx = 0;
+		if (idx < 0) {
+			idx = 0;
+		}
 		open(configFor(galleryEl, idx));
 	});
 }

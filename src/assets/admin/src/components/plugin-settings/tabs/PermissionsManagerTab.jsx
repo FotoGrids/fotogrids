@@ -45,7 +45,9 @@ const GROUP_LABELS = {
  * partially-granted role never reads as fully granted.
  */
 const roleHasPermission = (def, role) => {
-	if (!role) return false;
+	if (!role) {
+		return false;
+	}
 	if (def.underlying_caps && def.underlying_caps.length > 0) {
 		return def.underlying_caps.every(
 			(cap) => role.capabilities[cap] === true
@@ -67,7 +69,9 @@ const resolveLowestRole = (logical, rolesByKey) => {
 
 	const ladderHasAll = (roleKey) => {
 		const role = rolesByKey[roleKey];
-		if (!role) return false;
+		if (!role) {
+			return false;
+		}
 		return logical.underlying_caps.every(
 			(cap) => role.capabilities[cap] === true
 		);
@@ -77,7 +81,9 @@ const resolveLowestRole = (logical, rolesByKey) => {
 	// "lowest". If the higher roles don't all hold every cap too, it's custom.
 	for (let i = ROLE_LADDER.length - 1; i >= 0; i -= 1) {
 		const roleKey = ROLE_LADDER[i];
-		if (!rolesByKey[roleKey]) continue;
+		if (!rolesByKey[roleKey]) {
+			continue;
+		}
 		if (ladderHasAll(roleKey)) {
 			// Validate inheritance - every role above must also have all caps.
 			const higher = ROLE_LADDER.slice(0, i);
@@ -111,7 +117,9 @@ const PermissionsManagerTab = () => {
 	// Pro can also augment Panel 1 via registerPanelOverride('simple', C).
 	useEffect(() => {
 		const namespace = window.FotoGridsAdmin?.permissions;
-		if (!namespace) return;
+		if (!namespace) {
+			return;
+		}
 		setOverrideMatrix(() => namespace._matrixOverride || null);
 		setOverridePanelOne(() => namespace._simplePanelOverride || null);
 
@@ -164,7 +172,9 @@ const PermissionsManagerTab = () => {
 	}, [loadRegistry]);
 
 	const rolesByKey = useMemo(() => {
-		if (!registry?.roles) return {};
+		if (!registry?.roles) {
+			return {};
+		}
 		const map = {};
 		registry.roles.forEach((r) => {
 			map[r.key] = r;
@@ -258,7 +268,9 @@ const PermissionsManagerTab = () => {
 		);
 	}
 
-	if (!registry) return null;
+	if (!registry) {
+		return null;
+	}
 
 	// Panel 1: Capability Settings - logical, lowest-role dropdowns.
 	const renderSimplePanel = () => {
@@ -333,7 +345,9 @@ const PermissionsManagerTab = () => {
 								disabled={isSaving}
 								onChange={(e) => {
 									const v = e.target.value;
-									if (v === '__custom__') return;
+									if (v === '__custom__') {
+										return;
+									}
 									handleSimpleChange(def.key, v);
 								}}
 							>
@@ -368,7 +382,9 @@ const PermissionsManagerTab = () => {
 
 		const grouped = registry.advanced.reduce((acc, def) => {
 			const g = def.group || 'plugin';
-			if (!acc[g]) acc[g] = [];
+			if (!acc[g]) {
+				acc[g] = [];
+			}
 			acc[g].push(def);
 			return acc;
 		}, {});
@@ -396,7 +412,9 @@ const PermissionsManagerTab = () => {
 							e.preventDefault();
 							const url =
 								window.fotogridsUpgradeModal?.urls?.upgrade;
-							if (url) window.open(url, '_blank');
+							if (url) {
+								window.open(url, '_blank');
+							}
 						}}
 					>
 						{__('Upgrade Now', 'fotogrids')}

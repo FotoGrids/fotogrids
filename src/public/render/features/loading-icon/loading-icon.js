@@ -95,7 +95,9 @@
 			let icon = icons[name];
 			if (!icon) {
 				const keys = Object.keys(icons);
-				if (keys.length) icon = icons[keys[0]];
+				if (keys.length) {
+					icon = icons[keys[0]];
+				}
 			}
 			if (icon && typeof icon.animate === 'function') {
 				return icon.animate;

@@ -180,11 +180,15 @@ const PickerModal = ({
 			if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
 				event.preventDefault();
 				const next = items[Math.min(items.length - 1, idx + 1)];
-				if (next) setHighlightId(next.id);
+				if (next) {
+					setHighlightId(next.id);
+				}
 			} else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
 				event.preventDefault();
 				const prev = items[Math.max(0, idx - 1)];
-				if (prev) setHighlightId(prev.id);
+				if (prev) {
+					setHighlightId(prev.id);
+				}
 			} else if (event.key === 'Enter') {
 				const highlighted = items.find((it) => it.id === highlightId);
 				if (highlighted) {

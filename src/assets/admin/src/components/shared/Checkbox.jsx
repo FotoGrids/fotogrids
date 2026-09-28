@@ -62,7 +62,9 @@ const Checkbox = ({
 		.join(' ');
 
 	const handleChange = (event) => {
-		if (!onChange) return;
+		if (!onChange) {
+			return;
+		}
 		onChange(event.target.checked, event);
 	};
 

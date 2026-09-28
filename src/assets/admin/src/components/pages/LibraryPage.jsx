@@ -35,7 +35,9 @@ const LibraryPage = () => {
 	const fallbackTab = library.initialTab || allowedTabIds[0] || 'tags';
 
 	const [activeTab, setActiveTab] = useState(() => {
-		if (!uiState) return fallbackTab;
+		if (!uiState) {
+			return fallbackTab;
+		}
 		return uiState.getValue({
 			key: 'tab',
 			fallback: fallbackTab,
@@ -46,7 +48,9 @@ const LibraryPage = () => {
 
 	useEffect(() => {
 		const handlePopState = () => {
-			if (!uiState) return;
+			if (!uiState) {
+				return;
+			}
 			setActiveTab(
 				uiState.getValue({
 					key: 'tab',

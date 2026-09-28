@@ -46,7 +46,9 @@ const MaintenanceTab = () => {
 	const [result, setResult] = useState(null);
 
 	const closeModal = useCallback(() => {
-		if (running) return;
+		if (running) {
+			return;
+		}
 		setPending(null);
 	}, [running]);
 
@@ -172,7 +174,9 @@ const MaintenanceTab = () => {
 		let active = true;
 		apiFetch({ path: '/fotogrids/v1/admin/maintenance/debug-channels' })
 			.then((data) => {
-				if (!active) return;
+				if (!active) {
+					return;
+				}
 				const channels = Array.isArray(data?.channels)
 					? data.channels
 					: [];
@@ -186,7 +190,9 @@ const MaintenanceTab = () => {
 				setDebugLoaded(true);
 			})
 			.catch(() => {
-				if (active) setDebugLoaded(true);
+				if (active) {
+					setDebugLoaded(true);
+				}
 			});
 
 		return () => {
@@ -198,7 +204,9 @@ const MaintenanceTab = () => {
 		// Compare as sorted sets so order changes don't show as dirty.
 		const a = [...enabled].sort();
 		const b = [...savedEnabled].sort();
-		if (a.length !== b.length) return true;
+		if (a.length !== b.length) {
+			return true;
+		}
 		return a.some((slug, index) => slug !== b[index]);
 	}, [enabled, savedEnabled]);
 
@@ -206,7 +214,9 @@ const MaintenanceTab = () => {
 		setDebugStatus(null);
 		setEnabled((prev) => {
 			if (nextValue) {
-				if (prev.includes(slug)) return prev;
+				if (prev.includes(slug)) {
+					return prev;
+				}
 				return [...prev, slug];
 			}
 			return prev.filter((existing) => existing !== slug);

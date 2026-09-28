@@ -175,7 +175,7 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 					{loading ? (
 						<div className="fotogrids-loading">
 							<LoadingIcon size={20} />
-							<span>{__('Loading...', 'fotogrids')}</span>
+							<span>{__('Loading…', 'fotogrids')}</span>
 						</div>
 					) : (
 						<select
@@ -228,7 +228,7 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 					busy={applying}
 				>
 					{applying
-						? __('Applying...', 'fotogrids')
+						? __('Applying…', 'fotogrids')
 						: __('Apply Template', 'fotogrids')}
 				</Button>
 			</Modal.Footer>

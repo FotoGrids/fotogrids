@@ -15,7 +15,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#3c46f0"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="6.2"
@@ -25,7 +25,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#3c46f0"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="11.4"
@@ -35,7 +35,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#3c46f0"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="1"
@@ -45,7 +45,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#f01e32"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="6.2"
@@ -55,7 +55,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#f01e32"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="11.4"
@@ -65,7 +65,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#323232"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="1"
@@ -75,7 +75,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#ffb914"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="6.2"
@@ -85,7 +85,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#323232"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 		<rect
 			x="11.4"
@@ -95,7 +95,7 @@ export const component = (): ReactElement => (
 			rx="0.6"
 			fill="none"
 			stroke="#323232"
-			stroke-width="0.9"
+			strokeWidth="0.9"
 		/>
 	</>
 );

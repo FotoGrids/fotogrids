@@ -109,7 +109,9 @@ const ZipImportModal = ({
 	 * all of which reach the modal through this handler.
 	 */
 	const requestClose = useCallback(() => {
-		if (busy) return;
+		if (busy) {
+			return;
+		}
 
 		if (hasUnsavedWork) {
 			setConfirmingClose(true);
@@ -138,7 +140,9 @@ const ZipImportModal = ({
 	);
 
 	const handleUpload = useCallback(async () => {
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 
 		setBusy(true);
 		setError(null);

@@ -18,10 +18,18 @@ export const ItemPreviewPane = ({ itemData, loading, formData, strings }) => {
 	useEffect(() => {
 		if (!loading && itemData && !hasError) {
 			const items = [];
-			if (itemData.filename) items.push('filename');
-			if (itemData.filesize) items.push('filesize');
-			if (itemData.width && itemData.height) items.push('dimensions');
-			if (itemData.mime_type) items.push('mime_type');
+			if (itemData.filename) {
+				items.push('filename');
+			}
+			if (itemData.filesize) {
+				items.push('filesize');
+			}
+			if (itemData.width && itemData.height) {
+				items.push('dimensions');
+			}
+			if (itemData.mime_type) {
+				items.push('mime_type');
+			}
 
 			items.forEach((item, index) => {
 				setTimeout(() => {

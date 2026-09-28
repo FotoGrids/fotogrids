@@ -41,9 +41,13 @@ const readStepFromUrl = () => {
 	try {
 		const url = new URL(window.location.href);
 		const raw = url.searchParams.get(STEP_QUERY_PARAM);
-		if (raw === null) return null;
+		if (raw === null) {
+			return null;
+		}
 		const n = parseInt(raw, 10);
-		if (isNaN(n) || n < 1 || n > TOTAL) return null;
+		if (isNaN(n) || n < 1 || n > TOTAL) {
+			return null;
+		}
 		return n;
 	} catch (_e) {
 		return null;
@@ -87,7 +91,9 @@ const SetupWizardPage = () => {
 	}, []);
 
 	useEffect(() => {
-		if (stepIndex === null) return undefined;
+		if (stepIndex === null) {
+			return undefined;
+		}
 
 		writeStepToUrl(stepIndex);
 

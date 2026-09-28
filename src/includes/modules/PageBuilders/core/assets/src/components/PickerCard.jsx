@@ -12,9 +12,13 @@ import Icon from '@/admin/src/components/shared/Icon';
 import { collectionTitle } from '@/admin/src/utils/collection-title';
 
 const formatRelative = (iso) => {
-	if (!iso) return '';
+	if (!iso) {
+		return '';
+	}
 	const date = new Date(iso);
-	if (Number.isNaN(date.getTime())) return '';
+	if (Number.isNaN(date.getTime())) {
+		return '';
+	}
 	const formatter = new Intl.DateTimeFormat(
 		document.documentElement.lang || undefined,
 		{ year: 'numeric', month: 'short', day: 'numeric' }
@@ -56,7 +60,9 @@ const PickerCard = ({
 	// a few seconds - the post is fresh and was never re-saved) we show
 	// "Created at:" instead.
 	const dateLabel = (() => {
-		if (!item.updated_at) return null;
+		if (!item.updated_at) {
+			return null;
+		}
 		if (item.created_at) {
 			const created = new Date(item.created_at).getTime();
 			const updated = new Date(item.updated_at).getTime();

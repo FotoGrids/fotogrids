@@ -23,7 +23,9 @@ const RESIZE_DEBOUNCE_MS = 120;
  */
 export function aspectRatioFor(itemEl) {
 	const img = itemEl.querySelector('img');
-	if (!img) return 1.5;
+	if (!img) {
+		return 1.5;
+	}
 
 	const attrW = parseInt(img.getAttribute('width'), 10);
 	const attrH = parseInt(img.getAttribute('height'), 10);
@@ -50,12 +52,18 @@ export function waitForDimensions(items) {
 	const pending = [];
 	for (let i = 0; i < items.length; i++) {
 		const img = items[i].querySelector('img');
-		if (!img) continue;
+		if (!img) {
+			continue;
+		}
 
 		const attrW = parseInt(img.getAttribute('width'), 10);
 		const attrH = parseInt(img.getAttribute('height'), 10);
-		if (attrW > 0 && attrH > 0) continue;
-		if (img.complete && img.naturalWidth > 0) continue;
+		if (attrW > 0 && attrH > 0) {
+			continue;
+		}
+		if (img.complete && img.naturalWidth > 0) {
+			continue;
+		}
 
 		pending.push(
 			new Promise((resolve) => {
@@ -85,7 +93,9 @@ export function waitForDimensions(items) {
  */
 export function readTrackGap(trackEl) {
 	const raw = window.getComputedStyle(trackEl).gap;
-	if (!raw) return 0;
+	if (!raw) {
+		return 0;
+	}
 	const parsed = parseFloat(raw);
 	return isNaN(parsed) ? 0 : parsed;
 }
@@ -102,7 +112,9 @@ export function readTrackGap(trackEl) {
  */
 export function readCssNumber(el, name, fallback) {
 	const raw = window.getComputedStyle(el).getPropertyValue(name);
-	if (!raw) return fallback;
+	if (!raw) {
+		return fallback;
+	}
 	const parsed = parseFloat(raw);
 	return isNaN(parsed) || parsed <= 0 ? fallback : parsed;
 }
@@ -118,7 +130,9 @@ export function readCssNumber(el, name, fallback) {
  */
 export function readCssLength(el, name, fallback) {
 	const raw = window.getComputedStyle(el).getPropertyValue(name);
-	if (!raw) return fallback;
+	if (!raw) {
+		return fallback;
+	}
 	const parsed = parseFloat(raw);
 	return isNaN(parsed) || parsed < 0 ? fallback : parsed;
 }
@@ -134,7 +148,9 @@ export function readCssLength(el, name, fallback) {
  */
 export function readCssInteger(el, name, fallback) {
 	const raw = window.getComputedStyle(el).getPropertyValue(name);
-	if (!raw) return fallback;
+	if (!raw) {
+		return fallback;
+	}
 	const parsed = parseInt(raw, 10);
 	return isNaN(parsed) || parsed <= 0 ? fallback : parsed;
 }
@@ -244,7 +260,9 @@ export function createLayoutAttach(opts) {
 
 	function scheduleLayout(trackEl) {
 		const state = trackState.get(trackEl);
-		if (!state) return;
+		if (!state) {
+			return;
+		}
 		if (state.resizeTimer !== null) {
 			window.clearTimeout(state.resizeTimer);
 		}
@@ -263,12 +281,18 @@ export function createLayoutAttach(opts) {
 	}
 
 	return function attach(collectionEl) {
-		if (!collectionEl.matches(collectionSelector)) return;
-		if (collectionEl.dataset[readyKey] === '1') return;
+		if (!collectionEl.matches(collectionSelector)) {
+			return;
+		}
+		if (collectionEl.dataset[readyKey] === '1') {
+			return;
+		}
 		collectionEl.dataset[readyKey] = '1';
 
 		const trackEl = collectionEl.querySelector(trackSelector);
-		if (!trackEl) return;
+		if (!trackEl) {
+			return;
+		}
 
 		const state = { resizeTimer: null, observer: null, lastWidth: 0 };
 		trackState.set(trackEl, state);
@@ -298,7 +322,9 @@ export function createLayoutAttach(opts) {
 			state.observer = new window.ResizeObserver((entries) => {
 				for (let i = 0; i < entries.length; i++) {
 					const width = entries[i].contentRect.width;
-					if (Math.abs(width - state.lastWidth) < 1) continue;
+					if (Math.abs(width - state.lastWidth) < 1) {
+						continue;
+					}
 					state.lastWidth = width;
 					scheduleLayout(trackEl);
 				}
@@ -337,7 +363,9 @@ export function createLayoutAttach(opts) {
  */
 export function bootLayout(attach, priority = 10) {
 	function init() {
-		if (!window.FotoGrids) return;
+		if (!window.FotoGrids) {
+			return;
+		}
 		if (typeof window.FotoGrids.onCollection === 'function') {
 			window.FotoGrids.onCollection(attach, priority);
 		} else if (typeof window.FotoGrids.onGallery === 'function') {

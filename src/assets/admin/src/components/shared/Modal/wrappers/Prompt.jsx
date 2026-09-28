@@ -36,13 +36,17 @@ const Prompt = ({
 	const busy = busyProp || internalBusy;
 
 	useEffect(() => {
-		if (isOpen) setValue(initialValue);
+		if (isOpen) {
+			setValue(initialValue);
+		}
 	}, [isOpen, initialValue]);
 
 	const isValid = !required || value.trim().length > 0;
 
 	const handleSubmit = useCallback(async () => {
-		if (!isValid || busy) return;
+		if (!isValid || busy) {
+			return;
+		}
 		if (typeof onSubmit !== 'function') {
 			onClose?.('confirm');
 			return;
@@ -52,7 +56,6 @@ const Prompt = ({
 			await onSubmit(value);
 			onClose?.('confirm');
 		} catch (err) {
-			// eslint-disable-next-line no-console
 			console.error('[Prompt] onSubmit rejected:', err);
 		} finally {
 			setInternalBusy(false);
@@ -60,7 +63,9 @@ const Prompt = ({
 	}, [isValid, busy, onSubmit, onClose, value]);
 
 	const handleCancel = useCallback(() => {
-		if (busy) return;
+		if (busy) {
+			return;
+		}
 		onClose?.('cancel');
 	}, [busy, onClose]);
 

@@ -30,7 +30,6 @@ function initializeTemplatesPage() {
 		container._reactRootContainer = root;
 		root.render(React.createElement(TemplatesPage));
 	} catch (error) {
-		// eslint-disable-next-line no-console
 		console.error('FotoGrids: Error rendering Templates page:', error);
 	}
 }

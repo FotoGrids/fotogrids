@@ -73,7 +73,9 @@ const SidebarTabsNav = ({
 	};
 
 	const renderGroupLabel = (group) => {
-		if (!group.label) return null;
+		if (!group.label) {
+			return null;
+		}
 
 		// Actionable label: render as a button so it is keyboard-focusable
 		// and announced as a control. Falls back to a static div otherwise.
@@ -128,7 +130,9 @@ const SidebarTabsNav = ({
 			)}
 			{groups.map((group) => {
 				const groupTabs = tabs.filter((tab) => tab.group === group.id);
-				if (groupTabs.length === 0) return null;
+				if (groupTabs.length === 0) {
+					return null;
+				}
 
 				return (
 					<div

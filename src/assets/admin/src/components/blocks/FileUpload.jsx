@@ -34,7 +34,9 @@ const FileUpload = ({
 
 	const handleFiles = (fileList) => {
 		const file = fileList[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 
 		setIsReading(true);
 		setError(null);

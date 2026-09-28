@@ -10,7 +10,9 @@ const ModalTabsPanel = ({
 	...rest
 }) => {
 	const ctx = useModalContext();
-	if (id !== activeId) return null;
+	if (id !== activeId) {
+		return null;
+	}
 
 	const classes = [
 		'fg-modal__tabs-panel',

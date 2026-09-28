@@ -17,9 +17,13 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { collectionTitle } from '@/admin/src/utils/collection-title';
 
 const formatDate = (iso) => {
-	if (!iso) return '';
+	if (!iso) {
+		return '';
+	}
 	const date = new Date(iso);
-	if (Number.isNaN(date.getTime())) return '';
+	if (Number.isNaN(date.getTime())) {
+		return '';
+	}
 	return new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
 		year: 'numeric',
 		month: 'short',

@@ -268,12 +268,16 @@ const OVERVIEW_CARDS = [
  * @returns {number|null} Signed percentage, rounded to whole numbers.
  */
 const periodDelta = (trend, key) => {
-	if (!trend) return null;
+	if (!trend) {
+		return null;
+	}
 
 	const previous = trend[`${key}_previous`];
 	const current = trend[key];
 
-	if (!previous) return null;
+	if (!previous) {
+		return null;
+	}
 
 	return Math.round(((current - previous) / previous) * 100);
 };
@@ -361,12 +365,16 @@ const StatsPage = () => {
 
 	// Depends on `loading` so it fires as soon as the load cycle completes.
 	useEffect(() => {
-		if (loading) return;
+		if (loading) {
+			return;
+		}
 		if (typeof Chart === 'undefined') {
 			console.error('FotoGrids Stats: Chart.js is not available');
 			return;
 		}
-		if (!viewsChartRef.current) return;
+		if (!viewsChartRef.current) {
+			return;
+		}
 
 		if (!viewsChartInst.current) {
 			viewsChartInst.current = new Chart(viewsChartRef.current, {
@@ -431,11 +439,19 @@ const StatsPage = () => {
 	}, [loading, viewsData]);
 
 	useEffect(() => {
-		if (loading) return;
-		if (typeof Chart === 'undefined') return;
-		if (!popularChartRef.current) return;
+		if (loading) {
+			return;
+		}
+		if (typeof Chart === 'undefined') {
+			return;
+		}
+		if (!popularChartRef.current) {
+			return;
+		}
 		// No data → canvas is hidden, nothing to draw.
-		if (popularGalleries.data.length === 0) return;
+		if (popularGalleries.data.length === 0) {
+			return;
+		}
 
 		const slices = buildPopularSlices(
 			popularGalleries.labels,
@@ -538,7 +554,9 @@ const StatsPage = () => {
 						}),
 					]);
 
-				if (cancelled) return;
+				if (cancelled) {
+					return;
+				}
 
 				setOverview({
 					trend: overviewRes?.trend ?? null,
@@ -578,7 +596,9 @@ const StatsPage = () => {
 					);
 				}
 			} finally {
-				if (!cancelled) setLoading(false);
+				if (!cancelled) {
+					setLoading(false);
+				}
 			}
 		};
 

@@ -212,7 +212,9 @@ function position(host) {
 function showImmediately(host, label) {
 	// An open interactive popover owns the tooltip; hovering a child with its
 	// own text tooltip must not replace the popover content.
-	if (interactiveMode) return;
+	if (interactiveMode) {
+		return;
+	}
 
 	const el = getTooltipEl(host);
 	el.textContent = label;
@@ -233,7 +235,9 @@ function showImmediately(host, label) {
  * open - see below.
  */
 function reallyHide() {
-	if (!tooltipEl) return;
+	if (!tooltipEl) {
+		return;
+	}
 
 	// Cancel a pending morph so a stale finishOpen cannot reopen the tooltip.
 	if (interactiveSwapTimer !== null) {
@@ -265,7 +269,9 @@ function reallyHide() {
  * mouseleave handler cannot close it.
  */
 function hideImmediately() {
-	if (interactiveMode) return;
+	if (interactiveMode) {
+		return;
+	}
 	reallyHide();
 }
 
@@ -274,7 +280,9 @@ function hideImmediately() {
  * since the user may be scrolling inside them.
  */
 function hideOnScrollOrResize() {
-	if (!tooltipEl) return;
+	if (!tooltipEl) {
+		return;
+	}
 
 	if (interactiveMode && activeHost) {
 		// Keep the popover anchored to its host as the page scrolls.
@@ -287,7 +295,9 @@ function hideOnScrollOrResize() {
 
 function scheduleShow(host, label) {
 	// No hover-driven shows while an interactive popover is open.
-	if (interactiveMode) return;
+	if (interactiveMode) {
+		return;
+	}
 	clearTimeout(hideTimer);
 	clearTimeout(showTimer);
 	showTimer = setTimeout(() => showImmediately(host, label), SHOW_DELAY_MS);
@@ -296,7 +306,9 @@ function scheduleShow(host, label) {
 function scheduleHide() {
 	// Interactive mode: hover dismissal is OFF; popover closes only via
 	// outside-click or Escape. Skip silently.
-	if (interactiveMode) return;
+	if (interactiveMode) {
+		return;
+	}
 	clearTimeout(showTimer);
 	hideTimer = setTimeout(hideImmediately, HIDE_DELAY_MS);
 }
@@ -321,8 +333,9 @@ function scheduleHide() {
  * @returns {boolean}  True if newly opened, false if it toggled closed.
  */
 function showInteractive(host, contentEl, opts) {
-	if (!(host instanceof Element) || !(contentEl instanceof Element))
+	if (!(host instanceof Element) || !(contentEl instanceof Element)) {
 		return false;
+	}
 
 	// A second call on the same host closes the popover, bypassing the
 	// interactive guard in hideImmediately().
@@ -393,12 +406,16 @@ function showInteractive(host, contentEl, opts) {
 		// Matches the CSS fg-tt-swap-duration; 0ms when the styles are missing.
 		const SWAP_MS = 120;
 		// Tracked so close-during-morph cancels a stale finishOpen.
-		if (interactiveSwapTimer !== null) clearTimeout(interactiveSwapTimer);
+		if (interactiveSwapTimer !== null) {
+			clearTimeout(interactiveSwapTimer);
+		}
 		interactiveSwapTimer = setTimeout(() => {
 			interactiveSwapTimer = null;
 			el.classList.remove('fg-f-tooltip--swapping');
 			// Skip finishOpen if the popover was closed during the morph.
-			if (!interactiveMode || activeHost !== host) return;
+			if (!interactiveMode || activeHost !== host) {
+				return;
+			}
 			finishOpen();
 		}, SWAP_MS);
 	} else {
@@ -424,10 +441,16 @@ function hideInteractive() {
 function setupInteractiveDismissal() {
 	// Capture phase, so the check runs before handlers inside the popover.
 	interactiveOutsideClick = (e) => {
-		if (!tooltipEl || !activeHost) return;
+		if (!tooltipEl || !activeHost) {
+			return;
+		}
 		const target = e.target;
-		if (tooltipEl.contains(target)) return; // click inside popover - ignore
-		if (activeHost.contains(target)) return; // click on host - ignore (host toggles)
+		if (tooltipEl.contains(target)) {
+			return;
+		} // click inside popover - ignore
+		if (activeHost.contains(target)) {
+			return;
+		} // click on host - ignore (host toggles)
 		reallyHide();
 	};
 
@@ -486,7 +509,9 @@ function teardownInteractive() {
  *                                      Stored on the host as data-fg-tooltip-dir so position() honours it.
  */
 function bind(host, label, opts) {
-	if (!(host instanceof Element)) return;
+	if (!(host instanceof Element)) {
+		return;
+	}
 
 	// Store forced direction so position() can read it.
 	if (opts?.dir) {
@@ -506,12 +531,16 @@ function bind(host, label, opts) {
 
 	const onEnter = () => {
 		const l = getLabel();
-		if (l) scheduleShow(host, l);
+		if (l) {
+			scheduleShow(host, l);
+		}
 	};
 	const onLeave = () => scheduleHide();
 	const onFocus = () => {
 		const l = getLabel();
-		if (l) showImmediately(host, l);
+		if (l) {
+			showImmediately(host, l);
+		}
 	};
 	const onBlur = () => hideImmediately();
 
@@ -532,7 +561,9 @@ function bind(host, label, opts) {
  * @param {HTMLElement} host
  */
 function refresh(host) {
-	if (activeHost !== host || !tooltipEl || tooltipEl.hidden) return;
+	if (activeHost !== host || !tooltipEl || tooltipEl.hidden) {
+		return;
+	}
 	const label =
 		host.getAttribute('aria-label') || host.getAttribute('title') || '';
 	if (label) {

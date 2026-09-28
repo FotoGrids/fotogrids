@@ -68,20 +68,26 @@ const collectCoreGalleryAttachmentIds = (attributes, innerBlocks) => {
 	if (Array.isArray(attributes?.ids)) {
 		attributes.ids.forEach((id) => {
 			const n = parseInt(id, 10);
-			if (n > 0 && !ids.includes(n)) ids.push(n);
+			if (n > 0 && !ids.includes(n)) {
+				ids.push(n);
+			}
 		});
 	}
 	if (Array.isArray(attributes?.images)) {
 		attributes.images.forEach((image) => {
 			const n = parseInt(image?.id, 10);
-			if (n > 0 && !ids.includes(n)) ids.push(n);
+			if (n > 0 && !ids.includes(n)) {
+				ids.push(n);
+			}
 		});
 	}
 	if (Array.isArray(innerBlocks)) {
 		innerBlocks.forEach((block) => {
 			if (block?.name === 'core/image') {
 				const n = parseInt(block?.attributes?.id, 10);
-				if (n > 0 && !ids.includes(n)) ids.push(n);
+				if (n > 0 && !ids.includes(n)) {
+					ids.push(n);
+				}
 			}
 		});
 	}

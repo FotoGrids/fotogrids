@@ -11,8 +11,12 @@ const ModalHeaderClose = ({
 }) => {
 	const ctx = useModalContext();
 	const handleClick = (event) => {
-		if (typeof onClick === 'function') onClick(event);
-		if (!event.defaultPrevented) ctx?.requestClose?.('close-button');
+		if (typeof onClick === 'function') {
+			onClick(event);
+		}
+		if (!event.defaultPrevented) {
+			ctx?.requestClose?.('close-button');
+		}
 	};
 
 	return (

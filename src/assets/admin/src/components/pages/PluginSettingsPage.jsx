@@ -145,7 +145,9 @@ const PluginSettingsPage = () => {
 	};
 
 	const resolveActiveTab = () => {
-		if (!uiState) return 'media';
+		if (!uiState) {
+			return 'media';
+		}
 		return uiState.getValue({
 			key: 'main-tab',
 			fallback: 'media',
@@ -158,7 +160,9 @@ const PluginSettingsPage = () => {
 	// always 'gallery' (the default) regardless of what the URL or session may
 	// still carry, so a stale subtab can never leak into a non-defaults tab.
 	const resolveDefaultsSubTab = (tabId) => {
-		if (!uiState || tabId !== 'defaults') return 'gallery';
+		if (!uiState || tabId !== 'defaults') {
+			return 'gallery';
+		}
 		return uiState.getValue({
 			key: 'defaults-subtab',
 			fallback: 'gallery',
@@ -174,7 +178,9 @@ const PluginSettingsPage = () => {
 
 	useEffect(() => {
 		const handlePopState = () => {
-			if (!uiState) return;
+			if (!uiState) {
+				return;
+			}
 			const tabId = resolveActiveTab();
 			setActiveTab(tabId);
 			setActiveDefaultsSubTab(resolveDefaultsSubTab(tabId));
@@ -188,7 +194,9 @@ const PluginSettingsPage = () => {
 		const urlParams = new URLSearchParams(window.location.search);
 		const fieldParam = urlParams.get('field');
 
-		if (!fieldParam) return;
+		if (!fieldParam) {
+			return;
+		}
 
 		const scrollToField = () => {
 			const fieldElement = document.getElementById(fieldParam);

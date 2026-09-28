@@ -53,7 +53,9 @@ function resolveColumnCount(collectionEl, containerWidth, gap) {
 
 	const colMin = readCssNumber(collectionEl, '--fg-col-min', 240);
 	const slot = colMin + gap;
-	if (slot <= 0) return 1;
+	if (slot <= 0) {
+		return 1;
+	}
 	const cols = Math.floor((containerWidth + gap) / slot);
 	return Math.max(1, cols);
 }
@@ -189,10 +191,14 @@ function getCollectionEl(trackEl) {
 
 function layout(trackEl) {
 	const collectionEl = getCollectionEl(trackEl);
-	if (!collectionEl) return;
+	if (!collectionEl) {
+		return;
+	}
 
 	const containerWidth = trackEl.clientWidth;
-	if (containerWidth <= 0) return;
+	if (containerWidth <= 0) {
+		return;
+	}
 
 	const items = visibleItems(trackEl);
 	if (items.length === 0) {
@@ -240,10 +246,14 @@ function layout(trackEl) {
 
 	let maxHeight = 0;
 	for (let c = 0; c < columnHeights.length; c++) {
-		if (columnHeights[c] > maxHeight) maxHeight = columnHeights[c];
+		if (columnHeights[c] > maxHeight) {
+			maxHeight = columnHeights[c];
+		}
 	}
 	// Each column counted a trailing gap after the last item - subtract one.
-	if (maxHeight > 0) maxHeight -= gap;
+	if (maxHeight > 0) {
+		maxHeight -= gap;
+	}
 	trackEl.style.height = Math.round(maxHeight) + 'px';
 
 	collectionEl.dataset.fgContainerWidth = String(Math.round(containerWidth));

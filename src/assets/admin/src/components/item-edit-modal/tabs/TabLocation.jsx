@@ -11,7 +11,9 @@ const { __ } = wp.i18n;
 const GeoMapPlaceholder = ({ location }) => {
 	const lat = parseFloat(location.latitude);
 	const lng = parseFloat(location.longitude);
-	if (isNaN(lat) || isNaN(lng)) return null;
+	if (isNaN(lat) || isNaN(lng)) {
+		return null;
+	}
 
 	// Equirectangular projection: x ∈ [0,300], y ∈ [0,150]
 	const x = ((lng + 180) / 360) * 300;

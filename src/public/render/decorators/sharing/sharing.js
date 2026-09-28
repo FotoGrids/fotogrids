@@ -57,8 +57,12 @@
 	 * @returns {string}
 	 */
 	function networkKeyFor(network) {
-		if (network === 'x') return 'twitter';
-		if (network === 'copy_link') return 'copy';
+		if (network === 'x') {
+			return 'twitter';
+		}
+		if (network === 'copy_link') {
+			return 'copy';
+		}
 		return network;
 	}
 
@@ -76,7 +80,7 @@
 				bubbles: true,
 				detail: {
 					itemId: itemId != null ? String(itemId) : '',
-					network: network,
+					network,
 				},
 			})
 		);
@@ -96,7 +100,7 @@
 	 */
 	function resolveShareUrl(img) {
 		const settings = window.fotogridsSharing || window.fotogrids || {};
-		let itemId = img.dataset ? img.dataset.id || '' : '';
+		const itemId = img.dataset ? img.dataset.id || '' : '';
 		const base = window.location.href.split('#')[0];
 		// The View Page sets `fotogrids-view` on <body>, not <html>.
 		const isViewPage =
@@ -108,7 +112,7 @@
 		if (isViewPage) {
 			if (deepLink && itemId) {
 				try {
-					let url = new URL(window.location.href);
+					const url = new URL(window.location.href);
 					url.searchParams.set('fg-item', String(itemId));
 					url.hash = '';
 					return url.toString();
@@ -124,7 +128,7 @@
 			const galleryEl = img.closest
 				? img.closest('.fotogrids-collection.fotogrids-gallery')
 				: null;
-			let galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
+			const galleryId = galleryEl ? galleryEl.dataset.fgGalleryId : '';
 			if (galleryId) {
 				return base + '#fg-' + galleryId + '-' + itemId;
 			}
@@ -186,7 +190,9 @@
 		// .select(); otherwise on <body>.
 		let openDialog = null;
 		document.querySelectorAll('dialog[open]').forEach(function (dlg) {
-			if (!openDialog) openDialog = dlg;
+			if (!openDialog) {
+				openDialog = dlg;
+			}
 		});
 		const parent = openDialog || document.body;
 
@@ -365,7 +371,9 @@
 	 * @returns {HTMLElement|null}
 	 */
 	function renderShareBar(config, context, options) {
-		if (!config || !config.networks) return null;
+		if (!config || !config.networks) {
+			return null;
+		}
 
 		const order = [
 			'facebook',
@@ -381,14 +389,16 @@
 		const active = order.filter(function (n) {
 			return config.networks[n];
 		});
-		if (active.length === 0) return null;
+		if (active.length === 0) {
+			return null;
+		}
 
 		const labels = config.labels;
 		const style = config.button_style || 'icons_only';
 		const size = config.button_size || 'medium';
 		const layout = options && options.layout === 'grid' ? 'grid' : 'row';
 
-		let bar = document.createElement('div');
+		const bar = document.createElement('div');
 		bar.className =
 			'fotogrids-share-bar fotogrids-share-bar--' +
 			style +
@@ -410,7 +420,9 @@
 					: '');
 		}
 		proxy.closest = function (sel) {
-			if (!context.galleryEl) return null;
+			if (!context.galleryEl) {
+				return null;
+			}
 			if (
 				sel === '.fotogrids-gallery' ||
 				sel === '.fotogrids-collection' ||
@@ -533,7 +545,9 @@
 	 */
 	function attachThumbnailBars(galleryEl) {
 		const raw = galleryEl.dataset.fgSharing;
-		if (!raw) return;
+		if (!raw) {
+			return;
+		}
 
 		let config;
 		try {
@@ -550,23 +564,27 @@
 			return;
 		}
 
-		let galleryId = galleryEl.dataset.fgGalleryId || '';
+		const galleryId = galleryEl.dataset.fgGalleryId || '';
 
 		galleryEl.querySelectorAll('.fg-item').forEach(function (figure) {
-			if (figure.querySelector('.fotogrids-share-bar')) return;
+			if (figure.querySelector('.fotogrids-share-bar')) {
+				return;
+			}
 			const img = figure.querySelector('img');
-			if (!img) return;
+			if (!img) {
+				return;
+			}
 
 			const triggerEl = figure.querySelector('[data-fg-item-id]');
-			let itemId =
+			const itemId =
 				img.dataset.id || (triggerEl ? triggerEl.dataset.fgItemId : '');
 
-			let bar = renderShareBar(config, {
+			const bar = renderShareBar(config, {
 				id: itemId,
 				fullUrl: img.dataset.fgFullSrc || img.src,
 				caption: img.alt || '',
-				galleryEl: galleryEl,
-				galleryId: galleryId,
+				galleryEl,
+				galleryId,
 			});
 
 			if (bar) {
@@ -585,7 +603,9 @@
 		document
 			.querySelectorAll('[data-fg-share-footer]')
 			.forEach(function (container) {
-				if (container.querySelector('.fotogrids-share-bar')) return;
+				if (container.querySelector('.fotogrids-share-bar')) {
+					return;
+				}
 
 				let config;
 				try {
@@ -593,9 +613,11 @@
 				} catch (e) {
 					return;
 				}
-				if (!config || !config.enabled) return;
+				if (!config || !config.enabled) {
+					return;
+				}
 
-				let bar = renderShareBar(
+				const bar = renderShareBar(
 					config,
 					{
 						id: '',
@@ -614,10 +636,10 @@
 	}
 
 	const publicApi = {
-		renderShareBar: renderShareBar,
-		shareItem: shareItem,
-		resolveShareUrl: resolveShareUrl,
-		networkKeyFor: networkKeyFor,
+		renderShareBar,
+		shareItem,
+		resolveShareUrl,
+		networkKeyFor,
 	};
 
 	function init() {

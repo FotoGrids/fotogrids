@@ -30,10 +30,14 @@ const PanelRow = ({
 }) => {
 	const LabelTag = htmlFor ? 'label' : 'span';
 	const renderDescription = (value) => {
-		if (typeof value !== 'string') return value;
+		if (typeof value !== 'string') {
+			return value;
+		}
 
 		const parts = value.split(/`([^`]+)`/g);
-		if (parts.length === 1) return value;
+		if (parts.length === 1) {
+			return value;
+		}
 
 		return parts.map((part, index) =>
 			index % 2 === 1 ? (

@@ -22,25 +22,35 @@
 	 * @param {Element} gEl
 	 */
 	function attach(gEl) {
-		if (gEl.dataset.fgPaginationMethod !== 'load_more') return;
-		if (gEl.dataset.fgLoadMoreBound === '1') return;
+		if (gEl.dataset.fgPaginationMethod !== 'load_more') {
+			return;
+		}
+		if (gEl.dataset.fgLoadMoreBound === '1') {
+			return;
+		}
 		gEl.dataset.fgLoadMoreBound = '1';
 
 		const bar = gEl.querySelector('[data-fg-pagination-role="load-more"]');
 		const button =
 			bar &&
 			bar.querySelector('[data-fg-pagination-trigger="load-more"]');
-		if (!button) return;
+		if (!button) {
+			return;
+		}
 
 		const pagination =
 			window.FotoGrids &&
 			window.FotoGrids.modules &&
 			window.FotoGrids.modules.pagination;
-		if (!pagination) return;
+		if (!pagination) {
+			return;
+		}
 
 		button.addEventListener('click', (event) => {
 			event.preventDefault();
-			if (button.disabled) return;
+			if (button.disabled) {
+				return;
+			}
 
 			const s = pagination.state(gEl);
 			if (!s.hasMore) {
@@ -96,8 +106,9 @@
 		if (
 			!window.FotoGrids ||
 			typeof window.FotoGrids.onGallery !== 'function'
-		)
+		) {
 			return;
+		}
 		window.FotoGrids.onGallery(attach, 20);
 	}
 

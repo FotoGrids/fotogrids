@@ -15,8 +15,12 @@ const ModalTabs = ({
 	const ctx = useModalContext();
 
 	const handleClick = (tab) => {
-		if (tab.disabled || disabled) return;
-		if (activeId === tab.id) return;
+		if (tab.disabled || disabled) {
+			return;
+		}
+		if (activeId === tab.id) {
+			return;
+		}
 		onChange?.(tab.id);
 		if (emitEvents) {
 			emit('tab-changed', {

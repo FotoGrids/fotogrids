@@ -20,7 +20,9 @@ const ModalHeader = ({
 	const trailing = [];
 
 	React.Children.forEach(children, (child, index) => {
-		if (!child) return;
+		if (!child) {
+			return;
+		}
 		const zone = child.type && child.type.__fgModalHeaderZone;
 		const target = zone === 'trailing' ? trailing : leading;
 		target.push(React.cloneElement(child, { key: child.key ?? index }));

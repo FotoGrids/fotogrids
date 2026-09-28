@@ -57,11 +57,12 @@ const ToolsPage = () => {
 					const exists = (data || []).some((t) => t.id === urlParam);
 					if (!exists) {
 						setActiveTool(null);
-						if (uiState)
+						if (uiState) {
 							uiState.clearValue({
 								key: 'tool',
 								urlParam: 'tool',
 							});
+						}
 					} else {
 						setActiveTool(urlParam);
 					}
@@ -116,13 +117,16 @@ const ToolsPage = () => {
 
 	const handleToolChange = (toolId) => {
 		setActiveTool(toolId);
-		if (uiState)
+		if (uiState) {
 			uiState.setValue({ key: 'tool', value: toolId, urlParam: 'tool' });
+		}
 	};
 
 	const backToGrid = () => {
 		setActiveTool(null);
-		if (uiState) uiState.clearValue({ key: 'tool', urlParam: 'tool' });
+		if (uiState) {
+			uiState.clearValue({ key: 'tool', urlParam: 'tool' });
+		}
 	};
 
 	const getTabHref = (toolId) => {
@@ -132,8 +136,12 @@ const ToolsPage = () => {
 	};
 
 	const accessStateLabel = (tool) => {
-		if (tool.access_state === 'teaser') return tool.tier_required;
-		if (tool.access_state === 'locked') return tool.tier_required;
+		if (tool.access_state === 'teaser') {
+			return tool.tier_required;
+		}
+		if (tool.access_state === 'locked') {
+			return tool.tier_required;
+		}
 		return null;
 	};
 
@@ -167,7 +175,9 @@ const ToolsPage = () => {
 		// Unknown tool id - silently fall back to grid.
 		if (!currentTool) {
 			setActiveTool(null);
-			if (uiState) uiState.clearValue({ key: 'tool', urlParam: 'tool' });
+			if (uiState) {
+				uiState.clearValue({ key: 'tool', urlParam: 'tool' });
+			}
 		}
 
 		// All tools live under a single group whose actionable label doubles

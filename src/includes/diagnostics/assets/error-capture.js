@@ -88,9 +88,9 @@
 
 		report({
 			message: event.message || 'Unknown error',
-			file: file,
+			file,
 			line: event.lineno || 0,
-			stack: stack,
+			stack,
 			url: window.location.href,
 		});
 	});
@@ -109,7 +109,7 @@
 				((reason && reason.message) || String(reason)),
 			file: '',
 			line: 0,
-			stack: stack,
+			stack,
 			url: window.location.href,
 		});
 	});

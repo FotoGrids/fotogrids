@@ -47,10 +47,15 @@
 	function handleBackClick(backLink, event) {
 		// Honour modifier clicks - middle/ctrl/cmd/shift/alt should
 		// always navigate natively (open in new tab etc).
-		if (event.defaultPrevented) return;
-		if (event.button !== 0) return;
-		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+		if (event.defaultPrevented) {
 			return;
+		}
+		if (event.button !== 0) {
+			return;
+		}
+		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+			return;
+		}
 
 		// Walk up to the album wrapper that owns this gallery (if any).
 		// .fotogrids-album is unambiguous - it only appears on album
@@ -83,7 +88,9 @@
 	 * @param {Element} backLink
 	 */
 	function bindBackLink(backLink) {
-		if (boundBackLinks.has(backLink)) return;
+		if (boundBackLinks.has(backLink)) {
+			return;
+		}
 		boundBackLinks.add(backLink);
 
 		backLink.addEventListener('click', (event) => {
@@ -99,7 +106,9 @@
 	 * @param {Element} galleryEl
 	 */
 	function attach(galleryEl) {
-		if (!galleryEl || !galleryEl.querySelectorAll) return;
+		if (!galleryEl || !galleryEl.querySelectorAll) {
+			return;
+		}
 		galleryEl.querySelectorAll('.fg-back-button').forEach(bindBackLink);
 	}
 

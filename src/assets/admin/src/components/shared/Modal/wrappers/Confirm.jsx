@@ -61,13 +61,17 @@ const Confirm = ({
 	const busy = busyProp || internalBusy;
 
 	useEffect(() => {
-		if (!isOpen) setConfirmText('');
+		if (!isOpen) {
+			setConfirmText('');
+		}
 	}, [isOpen]);
 
 	const meetsRequireText = !requireText || confirmText.trim() === requireText;
 
 	const handleConfirm = useCallback(async () => {
-		if (!meetsRequireText || busy) return;
+		if (!meetsRequireText || busy) {
+			return;
+		}
 		emit('confirmed', { id: null, type: 'confirm', variant });
 		if (typeof onConfirm !== 'function') {
 			onClose?.('confirm');
@@ -79,7 +83,7 @@ const Confirm = ({
 			onClose?.('confirm');
 		} catch (err) {
 			// Leave the modal open; caller is expected to surface the error.
-			// eslint-disable-next-line no-console
+
 			console.error('[Confirm] onConfirm rejected:', err);
 		} finally {
 			setInternalBusy(false);
@@ -87,7 +91,9 @@ const Confirm = ({
 	}, [meetsRequireText, busy, onConfirm, onClose, variant]);
 
 	const handleCancel = useCallback(() => {
-		if (busy) return;
+		if (busy) {
+			return;
+		}
 		onClose?.('cancel');
 	}, [busy, onClose]);
 
@@ -130,7 +136,9 @@ const Confirm = ({
 							value={confirmText}
 							onChange={(e) => setConfirmText(e.target.value)}
 							onKeyDown={(e) => {
-								if (e.key === 'Enter') handleConfirm();
+								if (e.key === 'Enter') {
+									handleConfirm();
+								}
 							}}
 							placeholder={requireText}
 							autoComplete="off"

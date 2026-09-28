@@ -123,7 +123,9 @@ const TabPeople = ({
 			const input = document.querySelector(
 				'.fotogrids-tab-panel .fotogrids-input'
 			);
-			if (input) input.focus();
+			if (input) {
+				input.focus();
+			}
 		}, 50);
 	};
 

@@ -68,7 +68,9 @@ const MergeDialog = ({
 	);
 
 	const handleConfirm = () => {
-		if (!target) return;
+		if (!target) {
+			return;
+		}
 		setBusy(true);
 		setError(null);
 		onMerge({ targetId: target.id, sourceIds: selectedIds }).catch(

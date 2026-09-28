@@ -58,7 +58,9 @@ const Modal = ({
 
 	const requestClose = useCallback(
 		(reason = 'programmatic') => {
-			if (preventClose) return;
+			if (preventClose) {
+				return;
+			}
 			if (typeof onClose === 'function') {
 				onClose(reason);
 				emit('closed', { id, type, reason });
@@ -68,11 +70,17 @@ const Modal = ({
 	);
 
 	useEffect(() => {
-		if (!isOpen || !closeOnEsc) return undefined;
+		if (!isOpen || !closeOnEsc) {
+			return undefined;
+		}
 		const handler = (event) => {
-			if (event.key !== 'Escape') return;
+			if (event.key !== 'Escape') {
+				return;
+			}
 			// Only the top modal in the stack handles Esc.
-			if (getTopModalId() !== id) return;
+			if (getTopModalId() !== id) {
+				return;
+			}
 			event.stopPropagation();
 			requestClose('esc');
 		};
@@ -100,13 +108,17 @@ const Modal = ({
 		[id, requestClose, sidebarCollapsible, sidebarCollapsed, type]
 	);
 
-	if (!isOpen) return null;
+	if (!isOpen) {
+		return null;
+	}
 
 	const overlayChildren = [];
 	const dialogChildren = [];
 
 	React.Children.forEach(children, (child, index) => {
-		if (!child) return;
+		if (!child) {
+			return;
+		}
 		const isOverlayChild = child.type && child.type.__fgModalOverlayChild;
 		const target = isOverlayChild ? overlayChildren : dialogChildren;
 		target.push(React.cloneElement(child, { key: child.key ?? index }));
@@ -130,8 +142,12 @@ const Modal = ({
 		.join(' ');
 
 	const handleOverlayClick = (event) => {
-		if (event.target !== event.currentTarget) return;
-		if (!closeOnOverlay) return;
+		if (event.target !== event.currentTarget) {
+			return;
+		}
+		if (!closeOnOverlay) {
+			return;
+		}
 		requestClose('overlay');
 	};
 

@@ -130,8 +130,11 @@ const OtherSizesCell = ({ slugs, sizes }) => {
 		const list = slugs.map((slug) => {
 			const status = sizes?.[slug];
 			const exists = !!status?.exists;
-			if (exists) existingCount++;
-			else missingCount++;
+			if (exists) {
+				existingCount++;
+			} else {
+				missingCount++;
+			}
 			return { slug, exists };
 		});
 		return {
@@ -324,7 +327,9 @@ const RegenerateThumbnailsTool = () => {
 
 				setItems((prev) =>
 					prev.map((it) => {
-						if (it.attachment_id !== attachmentId) return it;
+						if (it.attachment_id !== attachmentId) {
+							return it;
+						}
 						return { ...it, sizes: result.sizes };
 					})
 				);
@@ -374,7 +379,9 @@ const RegenerateThumbnailsTool = () => {
 	}, [includeUnused]);
 
 	const handleRegenAll = useCallback(async () => {
-		if (items.length === 0) return;
+		if (items.length === 0) {
+			return;
+		}
 		revealLogAndStart();
 		cancelledRef.current = false;
 		setRegenActive(true);
@@ -392,7 +399,9 @@ const RegenerateThumbnailsTool = () => {
 		setRegenProgress({ done: 0, total: queue.length });
 
 		for (let i = 0; i < queue.length; i++) {
-			if (cancelledRef.current) break;
+			if (cancelledRef.current) {
+				break;
+			}
 			await regenerateOne(queue[i]);
 			setRegenProgress({ done: i + 1, total: queue.length });
 		}
@@ -418,16 +427,21 @@ const RegenerateThumbnailsTool = () => {
 	}, []);
 
 	const niceSlug = (slug) => {
-		if (slug === 'fotogrids_thumbnail')
+		if (slug === 'fotogrids_thumbnail') {
 			return __('FotoGrids Thumbnails', 'fotogrids');
-		if (slug === 'fotogrids_full')
+		}
+		if (slug === 'fotogrids_full') {
 			return __('FotoGrids Full Image', 'fotogrids');
-		if (slug === 'fotogrids_full_mobile')
+		}
+		if (slug === 'fotogrids_full_mobile') {
 			return __('FotoGrids Full Image (Mobile)', 'fotogrids');
-		if (slug === 'fotogrids_masonry')
+		}
+		if (slug === 'fotogrids_masonry') {
 			return __('FotoGrids Masonry (variable height)', 'fotogrids');
-		if (slug === 'fotogrids_justified')
+		}
+		if (slug === 'fotogrids_justified') {
 			return __('FotoGrids Justified (variable width)', 'fotogrids');
+		}
 		return slug.replace(/^fotogrids_custom_/, '').replace(/_/g, ' ');
 	};
 

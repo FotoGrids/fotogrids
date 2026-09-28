@@ -100,7 +100,9 @@ const SharingTab = () => {
 		let active = true;
 		apiFetch({ path: '/fotogrids/v1/admin/sharing-settings' })
 			.then((data) => {
-				if (!active || !data?.settings) return;
+				if (!active || !data?.settings) {
+					return;
+				}
 				const s = normalize(data.settings);
 				setSettings(s);
 				setSaved(s);

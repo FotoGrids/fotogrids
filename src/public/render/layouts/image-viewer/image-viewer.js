@@ -79,7 +79,9 @@ function setup(collectionEl) {
 	const containerEl = collectionEl.querySelector('.fg-viewer-container');
 	const stageEl = collectionEl.querySelector('.fg-viewer-stage');
 	const trackEl = collectionEl.querySelector('.fg-viewer-track');
-	if (!containerEl || !stageEl || !trackEl) return;
+	if (!containerEl || !stageEl || !trackEl) {
+		return;
+	}
 
 	const settings = readSettings(collectionEl);
 
@@ -126,11 +128,15 @@ function setup(collectionEl) {
 	let titleEl = null;
 
 	const pauseAutoplayBriefly = () => {
-		if (autoplayApi) autoplayApi.pause();
+		if (autoplayApi) {
+			autoplayApi.pause();
+		}
 	};
 
 	const updateArrowDisabled = () => {
-		if (!prevBtn || !nextBtn || !indexState) return;
+		if (!prevBtn || !nextBtn || !indexState) {
+			return;
+		}
 		if (settings.hideArrowsAtEnds && !settings.loop) {
 			const prevInactive = !indexState.hasPrev();
 			const nextInactive = !indexState.hasNext();
@@ -157,7 +163,9 @@ function setup(collectionEl) {
 	/* Reflect the active item's data-fg-caption-title in the bar; CSS truncates
        it with an ellipsis when it overflows. */
 	const updateTitle = (index) => {
-		if (!titleEl) return;
+		if (!titleEl) {
+			return;
+		}
 		const item = items[index];
 		const title = item
 			? item.getAttribute('data-fg-caption-title') || ''
@@ -171,14 +179,18 @@ function setup(collectionEl) {
        track width on --fg-viewer-auto-height (CSS caps and animates it). Only
        runs when autoHeightFit is true. */
 	const measureMediaEl = (item) => {
-		if (!item) return null;
+		if (!item) {
+			return null;
+		}
 		return item.querySelector(
 			'.fg-item-media img, .fg-item-media .fg-video-poster, .fg-item-media .fg-video'
 		);
 	};
 
 	const naturalSize = (mediaEl) => {
-		if (!mediaEl) return null;
+		if (!mediaEl) {
+			return null;
+		}
 		// <img> exposes naturalWidth/Height; video posters are <img> too. For
 		// anything without intrinsic dimensions, fall back to its rendered box.
 		const nw = mediaEl.naturalWidth || mediaEl.offsetWidth || 0;
@@ -191,11 +203,15 @@ function setup(collectionEl) {
 	let autoHeightPrimed = false;
 
 	const applyAutoHeight = (index, animate = true) => {
-		if (!autoHeightFit) return;
+		if (!autoHeightFit) {
+			return;
+		}
 
 		const item = items[index];
 		const mediaEl = measureMediaEl(item);
-		if (!mediaEl) return;
+		if (!mediaEl) {
+			return;
+		}
 
 		// Natural size is 0 until the image loads, so the measure waits for it.
 		// A deferred first measure still lands without animation.
@@ -211,11 +227,15 @@ function setup(collectionEl) {
 		}
 
 		const size = naturalSize(mediaEl);
-		if (!size) return;
+		if (!size) {
+			return;
+		}
 
 		// Height the image takes when laid out full-width in the track.
 		const trackWidth = trackEl.clientWidth;
-		if (trackWidth <= 0) return;
+		if (trackWidth <= 0) {
+			return;
+		}
 
 		const fitHeight = trackWidth * (size.h / size.w);
 
@@ -255,12 +275,17 @@ function setup(collectionEl) {
 
 		const toPx = (raw) => {
 			const v = (raw || '').trim();
-			if (v === '') return 0;
-			if (v.endsWith('px')) return parseFloat(v) || 0;
+			if (v === '') {
+				return 0;
+			}
+			if (v.endsWith('px')) {
+				return parseFloat(v) || 0;
+			}
 			// vh / other units: 100vh of the viewport, else fall back to the
 			// computed length via a throwaway probe.
-			if (v.endsWith('vh'))
+			if (v.endsWith('vh')) {
 				return ((parseFloat(v) || 0) / 100) * window.innerHeight;
+			}
 			const probe = document.createElement('div');
 			probe.style.cssText =
 				'position:absolute;visibility:hidden;height:' + v;
@@ -276,7 +301,9 @@ function setup(collectionEl) {
 		const maxPx = toPx(maxRaw);
 		const capPx = toPx(capRaw) || window.innerHeight;
 
-		if (maxPx > 0 && capPx > 0) return Math.min(maxPx, capPx);
+		if (maxPx > 0 && capPx > 0) {
+			return Math.min(maxPx, capPx);
+		}
 		return maxPx > 0 ? maxPx : capPx;
 	};
 
@@ -341,8 +368,11 @@ function setup(collectionEl) {
 		let dir = next >= prev ? 'next' : 'prev';
 		// Wrap-around: last → first reads as "next"; first → last as "prev".
 		if (settings.loop && total > 1) {
-			if (prev === total - 1 && next === 0) dir = 'next';
-			else if (prev === 0 && next === total - 1) dir = 'prev';
+			if (prev === total - 1 && next === 0) {
+				dir = 'next';
+			} else if (prev === 0 && next === total - 1) {
+				dir = 'prev';
+			}
 		}
 		collectionEl.setAttribute('data-fg-dir', dir);
 
@@ -460,10 +490,14 @@ function setup(collectionEl) {
 			}
 		},
 		onHome: () => {
-			if (indexState) indexState.goTo(0);
+			if (indexState) {
+				indexState.goTo(0);
+			}
 		},
 		onEnd: () => {
-			if (indexState) indexState.goTo(indexState.total() - 1);
+			if (indexState) {
+				indexState.goTo(indexState.total() - 1);
+			}
 		},
 	});
 
@@ -476,7 +510,9 @@ function setup(collectionEl) {
 		createSwipeDetector(stageEl, {
 			directionLock: lock,
 			onSwipe: (direction) => {
-				if (!indexState) return;
+				if (!indexState) {
+					return;
+				}
 				if (direction === 'left' || direction === 'up') {
 					indexState.next();
 					pauseAutoplayBriefly();
@@ -496,8 +532,12 @@ function setup(collectionEl) {
 }
 
 function attach(collectionEl) {
-	if (!collectionEl.matches('[data-fg-layout="image-viewer"]')) return;
-	if (collectionEl.dataset.fgViewerReady === '1') return;
+	if (!collectionEl.matches('[data-fg-layout="image-viewer"]')) {
+		return;
+	}
+	if (collectionEl.dataset.fgViewerReady === '1') {
+		return;
+	}
 	collectionEl.dataset.fgViewerReady = '1';
 	setup(collectionEl);
 }

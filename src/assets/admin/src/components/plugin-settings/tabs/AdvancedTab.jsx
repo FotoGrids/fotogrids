@@ -55,7 +55,9 @@ const AdvancedTab = () => {
 		let active = true;
 		apiFetch({ path: '/fotogrids/v1/admin/advanced-settings' })
 			.then((data) => {
-				if (!active || !data?.settings) return;
+				if (!active || !data?.settings) {
+					return;
+				}
 				const s = {
 					autosave: data.settings.autosave === true,
 					share_statistics: data.settings.share_statistics === true,

@@ -70,7 +70,9 @@ const TemplatesMetabox = () => {
 
 	const renderProSaveDescription = (str) => {
 		const parts = (str || '').split('{pro_badge}');
-		if (parts.length === 1) return str;
+		if (parts.length === 1) {
+			return str;
+		}
 		return (
 			<>
 				{parts[0]}

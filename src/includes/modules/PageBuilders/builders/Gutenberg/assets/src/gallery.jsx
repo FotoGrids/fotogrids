@@ -115,7 +115,9 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 					);
 				}
 				const data = await response.json();
-				if (cancelled) return;
+				if (cancelled) {
+					return;
+				}
 				setAttributes({
 					galleryId: data.gallery_id,
 					_pendingImportAttachmentIds: [],
@@ -123,12 +125,16 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 				});
 				setRefreshKey((k) => k + 1);
 			} catch (err) {
-				if (cancelled) return;
+				if (cancelled) {
+					return;
+				}
 				setImportError(
 					err.message || __('Import failed.', 'fotogrids')
 				);
 			} finally {
-				if (!cancelled) setImporting(false);
+				if (!cancelled) {
+					setImporting(false);
+				}
 			}
 		};
 		run();
@@ -180,9 +186,13 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 		fetch(url.toString(), { headers: { 'X-WP-Nonce': restNonce } })
 			.then((r) => (r.ok ? r.json() : null))
 			.then((data) => {
-				if (!data || !Array.isArray(data.items)) return;
+				if (!data || !Array.isArray(data.items)) {
+					return;
+				}
 				const match = data.items.find((it) => it.id === galleryId);
-				if (match) setItem(match);
+				if (match) {
+					setItem(match);
+				}
 			})
 			.catch(() => {});
 	}, [galleryId, restUrl, restNonce]);
@@ -195,7 +205,9 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 	};
 
 	const settingsSummary = useMemo(() => {
-		if (!item) return [];
+		if (!item) {
+			return [];
+		}
 		const summary = [];
 		if (item.layout) {
 			summary.push({

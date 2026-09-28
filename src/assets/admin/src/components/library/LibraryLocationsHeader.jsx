@@ -42,8 +42,9 @@ const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
 	const isProActive = Boolean(window.fotogridsSettings?.isProActive);
 
 	useEffect(() => {
-		if (loading || typeof Chart === 'undefined' || topItems.length === 0)
+		if (loading || typeof Chart === 'undefined' || topItems.length === 0) {
 			return;
+		}
 
 		const barCtx = barChartRef.current;
 		if (barCtx) {

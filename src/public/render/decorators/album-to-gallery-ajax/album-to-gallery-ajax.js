@@ -56,13 +56,19 @@
 	 * @param {Record<string, string>} cssUrls  handle → absolute URL map
 	 */
 	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') return;
+		if (!cssUrls || typeof cssUrls !== 'object') {
+			return;
+		}
 
 		Object.keys(cssUrls).forEach(function (handle) {
-			let url = cssUrls[handle];
-			if (!handle || !url) return;
+			const url = cssUrls[handle];
+			if (!handle || !url) {
+				return;
+			}
 			const linkId = 'fotogrids-css-' + handle;
-			if (document.getElementById(linkId)) return;
+			if (document.getElementById(linkId)) {
+				return;
+			}
 
 			const link = document.createElement('link');
 			link.rel = 'stylesheet';
@@ -83,18 +89,26 @@
 	 *     appended to <head> and execute in order.
 	 */
 	function injectMissingScripts(jsData) {
-		if (!jsData || typeof jsData !== 'object') return;
+		if (!jsData || typeof jsData !== 'object') {
+			return;
+		}
 
 		Object.keys(jsData).forEach(function (handle) {
 			const entry = jsData[handle];
-			let url = entry && entry.src ? entry.src : '';
-			if (!handle || !url) return;
+			const url = entry && entry.src ? entry.src : '';
+			if (!handle || !url) {
+				return;
+			}
 			const scriptId = 'fotogrids-js-' + handle;
-			if (document.getElementById(scriptId)) return;
+			if (document.getElementById(scriptId)) {
+				return;
+			}
 			// Also skip if WordPress already enqueued this handle the
 			// normal way (id="<handle>-js"), to avoid loading the same
 			// module twice.
-			if (document.getElementById(handle + '-js')) return;
+			if (document.getElementById(handle + '-js')) {
+				return;
+			}
 
 			const script = document.createElement('script');
 			script.id = scriptId;
@@ -114,10 +128,14 @@
 	 * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
 	 */
 	function injectFontStylesheet(fontsUrl) {
-		if (!fontsUrl || typeof fontsUrl !== 'string') return;
+		if (!fontsUrl || typeof fontsUrl !== 'string') {
+			return;
+		}
 
 		const linkId = 'fotogrids-google-fonts-css';
-		if (document.getElementById(linkId)) return;
+		if (document.getElementById(linkId)) {
+			return;
+		}
 
 		const link = document.createElement('link');
 		link.rel = 'stylesheet';
@@ -132,7 +150,9 @@
 	 * @param {string} css  Bare CSS (no <style> tags), or ''.
 	 */
 	function injectInlineCss(css) {
-		if (!css || typeof css !== 'string') return;
+		if (!css || typeof css !== 'string') {
+			return;
+		}
 		const style = document.createElement('style');
 		style.className = 'fotogrids-inline-css';
 		style.textContent = css;
@@ -146,7 +166,9 @@
 	 * @param {string} js  Bare JS (no <script> tags), or ''.
 	 */
 	function injectInlineJs(js) {
-		if (!js || typeof js !== 'string') return;
+		if (!js || typeof js !== 'string') {
+			return;
+		}
 		const script = document.createElement('script');
 		script.textContent = js;
 		document.head.appendChild(script);
@@ -158,7 +180,9 @@
 	 * @param {string} jsonLd  Bare JSON-LD document, or ''.
 	 */
 	function injectJsonLd(jsonLd) {
-		if (!jsonLd || typeof jsonLd !== 'string') return;
+		if (!jsonLd || typeof jsonLd !== 'string') {
+			return;
+		}
 		const script = document.createElement('script');
 		script.type = 'application/ld+json';
 		script.textContent = jsonLd;
@@ -184,10 +208,15 @@
 	 */
 	function handleTriggerClick(trigger, event) {
 		// Honour modifier clicks - middle/ctrl/cmd/shift = native navigation.
-		if (event.defaultPrevented) return;
-		if (event.button !== 0) return;
-		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+		if (event.defaultPrevented) {
 			return;
+		}
+		if (event.button !== 0) {
+			return;
+		}
+		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+			return;
+		}
 
 		const galleryId = parseInt(trigger.dataset.fgGalleryId || '0', 10);
 		const renderUrl = trigger.dataset.fgRenderUrl || '';
@@ -262,8 +291,8 @@
 					new CustomEvent('fotogrids:album_swapped', {
 						bubbles: true,
 						detail: {
-							albumEl: albumEl,
-							galleryId: galleryId,
+							albumEl,
+							galleryId,
 						},
 					})
 				);
@@ -271,7 +300,7 @@
 			.catch(function () {
 				// Whatever went wrong, navigate to the gallery's view page
 				// - that's the URL the <a> would have used by default.
-				let href = trigger.getAttribute('href');
+				const href = trigger.getAttribute('href');
 				if (href && href !== '#') {
 					window.location.href = href;
 				}
@@ -287,7 +316,9 @@
 	 * @param {Element} trigger
 	 */
 	function bindTrigger(trigger) {
-		if (boundTriggers.has(trigger)) return;
+		if (boundTriggers.has(trigger)) {
+			return;
+		}
 		boundTriggers.add(trigger);
 
 		trigger.addEventListener('click', function (event) {
@@ -337,7 +368,7 @@
 		document.dispatchEvent(
 			new CustomEvent('fotogrids:album_restored', {
 				bubbles: true,
-				detail: { albumEl: albumEl },
+				detail: { albumEl },
 			})
 		);
 

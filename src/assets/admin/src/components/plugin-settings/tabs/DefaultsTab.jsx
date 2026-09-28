@@ -78,7 +78,9 @@ const DefaultsTab = ({ type = 'gallery' }) => {
 	};
 
 	useEffect(() => {
-		if (!containerRef.current) return;
+		if (!containerRef.current) {
+			return;
+		}
 
 		const container = containerRef.current;
 		const typeLabel = type === 'gallery' ? 'gallery' : 'album';

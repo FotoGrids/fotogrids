@@ -66,8 +66,12 @@ const LibraryTableRow = memo(
 									})
 								}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter') onSaveEdit();
-									if (e.key === 'Escape') onCancelEdit();
+									if (e.key === 'Enter') {
+										onSaveEdit();
+									}
+									if (e.key === 'Escape') {
+										onCancelEdit();
+									}
 								}}
 								autoFocus
 								__nextHasNoMarginBottom
@@ -371,7 +375,9 @@ const LibraryTableHead = memo(
 		const { __ } = wp.i18n;
 
 		const sortIndicator = (column) => {
-			if (orderby !== column) return null;
+			if (orderby !== column) {
+				return null;
+			}
 			return (
 				<span
 					className="fotogrids-library-sort__indicator"
@@ -513,14 +519,18 @@ const LibraryTabBase = ({ entityType, config }) => {
 			path: `/${restBase}/${entityType.slug}?${params.toString()}`,
 		})
 			.then((response) => {
-				if (reqId !== reqIdRef.current) return; // stale
+				if (reqId !== reqIdRef.current) {
+					return;
+				} // stale
 				setItems(Array.isArray(response.items) ? response.items : []);
 				setTotal(Number(response.total) || 0);
 				setLoading(false);
 				setSelectedIds(new Set());
 			})
 			.catch((err) => {
-				if (reqId !== reqIdRef.current) return;
+				if (reqId !== reqIdRef.current) {
+					return;
+				}
 				setError(
 					err?.message || __('Failed to load entries.', 'fotogrids')
 				);
@@ -570,7 +580,9 @@ const LibraryTabBase = ({ entityType, config }) => {
 
 	const toggleSelectAll = useCallback(() => {
 		setSelectedIds((prev) => {
-			if (prev.size === items.length) return new Set();
+			if (prev.size === items.length) {
+				return new Set();
+			}
 			return new Set(items.map((i) => i.id));
 		});
 	}, [items]);
@@ -588,7 +600,9 @@ const LibraryTabBase = ({ entityType, config }) => {
 	);
 
 	const flashNotice = useCallback((status, message) => {
-		if (!window.fotogridsToast) return;
+		if (!window.fotogridsToast) {
+			return;
+		}
 		if (status === 'success') {
 			window.fotogridsToast.success(message);
 		} else if (status === 'error') {
@@ -622,7 +636,9 @@ const LibraryTabBase = ({ entityType, config }) => {
 	}, []);
 
 	const saveEdit = useCallback(() => {
-		if (!editingId) return;
+		if (!editingId) {
+			return;
+		}
 
 		const body = { name: editingDraft.name };
 		if (entityType.type === 'location') {
@@ -695,7 +711,9 @@ const LibraryTabBase = ({ entityType, config }) => {
 	}, []);
 
 	const confirmDelete = useCallback(() => {
-		if (!deleteTarget) return;
+		if (!deleteTarget) {
+			return;
+		}
 		const id = deleteTarget.id;
 		const name = deleteTarget.name;
 		const typeLabel = (
@@ -746,7 +764,9 @@ const LibraryTabBase = ({ entityType, config }) => {
 
 	const confirmBulkDelete = () => {
 		const ids = Array.from(selectedIds);
-		if (ids.length === 0) return;
+		if (ids.length === 0) {
+			return;
+		}
 
 		apiFetch({
 			path: `/${restBase}/${entityType.slug}`,
@@ -813,10 +833,12 @@ const LibraryTabBase = ({ entityType, config }) => {
 	const submitCreate = () => {
 		const body = { name: createDraft.name };
 		if (entityType.type === 'location') {
-			if (createDraft.latitude !== '')
+			if (createDraft.latitude !== '') {
 				body.latitude = Number(createDraft.latitude);
-			if (createDraft.longitude !== '')
+			}
+			if (createDraft.longitude !== '') {
 				body.longitude = Number(createDraft.longitude);
+			}
 		}
 		if (entityType.type === 'person' && createDraft.details) {
 			body.details = createDraft.details;

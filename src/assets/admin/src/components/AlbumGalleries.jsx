@@ -407,7 +407,9 @@ const AlbumGalleries = () => {
 	const handleDrop = (e, targetGallery) => {
 		e.preventDefault();
 		setDragOverState(null);
-		if (!draggedItem || draggedItem.ID === targetGallery.ID) return;
+		if (!draggedItem || draggedItem.ID === targetGallery.ID) {
+			return;
+		}
 
 		const currentIndex = assignedGalleries.findIndex(
 			(g) => g.ID === draggedItem.ID

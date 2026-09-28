@@ -35,10 +35,14 @@
 	 */
 	function readConfig(galleryEl) {
 		const raw = galleryEl.dataset.fgStats;
-		if (!raw) return null;
+		if (!raw) {
+			return null;
+		}
 		try {
 			const cfg = JSON.parse(raw);
-			if (!cfg.enabled) return null;
+			if (!cfg.enabled) {
+				return null;
+			}
 			return cfg;
 		} catch (e) {
 			return null;
@@ -81,13 +85,19 @@
 	 * @param {Element} galleryEl
 	 */
 	function trackView(galleryEl) {
-		if (galleryEl.dataset.fgStatsViewSent === '1') return;
+		if (galleryEl.dataset.fgStatsViewSent === '1') {
+			return;
+		}
 		const cfg = readConfig(galleryEl);
-		if (!cfg) return;
+		if (!cfg) {
+			return;
+		}
 
 		const objectType = cfg.objectType || 'gallery';
 		const objectId = parseInt(cfg.objectId || '0', 10);
-		if (!objectId) return;
+		if (!objectId) {
+			return;
+		}
 
 		galleryEl.dataset.fgStatsViewSent = '1';
 
@@ -106,13 +116,19 @@
 	 */
 	function trackItemView(e) {
 		const detail = e && e.detail;
-		if (!detail || !detail.galleryEl || !detail.item) return;
+		if (!detail || !detail.galleryEl || !detail.item) {
+			return;
+		}
 
 		const cfg = readConfig(detail.galleryEl);
-		if (!cfg) return;
+		if (!cfg) {
+			return;
+		}
 
 		const itemId = parseInt(detail.item.id, 10);
-		if (!itemId) return;
+		if (!itemId) {
+			return;
+		}
 
 		ping(cfg.restUrl + 'stats/view', cfg.nonce, {
 			object_type: 'item',
@@ -131,18 +147,26 @@
 	 */
 	function trackShare(e) {
 		const detail = e && e.detail;
-		if (!detail || !detail.itemId || !detail.network) return;
+		if (!detail || !detail.itemId || !detail.network) {
+			return;
+		}
 
 		// Any stats-enabled gallery supplies the restUrl and nonce.
 		const anyGallery = document.querySelector(
 			'.fotogrids-collection.fotogrids-gallery[data-fg-stats]'
 		);
-		if (!anyGallery) return;
+		if (!anyGallery) {
+			return;
+		}
 		const cfg = readConfig(anyGallery);
-		if (!cfg) return;
+		if (!cfg) {
+			return;
+		}
 
 		const itemId = parseInt(detail.itemId, 10);
-		if (!itemId) return;
+		if (!itemId) {
+			return;
+		}
 
 		ping(cfg.restUrl + 'stats/share', cfg.nonce, {
 			object_type: 'item',

@@ -189,7 +189,9 @@ const StepWelcome = ({ onStart, onSkip }) => {
 						size="lg"
 						onClick={(e) => {
 							e.preventDefault();
-							if (typeof onStart === 'function') onStart();
+							if (typeof onStart === 'function') {
+								onStart();
+							}
 						}}
 					>
 						{__('Start Setup', 'fotogrids')}
@@ -200,7 +202,9 @@ const StepWelcome = ({ onStart, onSkip }) => {
 						size="md"
 						onClick={(e) => {
 							e.preventDefault();
-							if (typeof onSkip === 'function') onSkip();
+							if (typeof onSkip === 'function') {
+								onSkip();
+							}
 						}}
 					>
 						{__('Skip for Now', 'fotogrids')}

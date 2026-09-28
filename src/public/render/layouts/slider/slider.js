@@ -113,7 +113,9 @@ function readItemsPerView(collectionEl) {
  * has ceil(T / N) pages - each next() advances by one viewport-width.
  */
 function pageCount(total, itemsPerView) {
-	if (total <= 0 || itemsPerView <= 0) return 0;
+	if (total <= 0 || itemsPerView <= 0) {
+		return 0;
+	}
 	return Math.ceil(total / itemsPerView);
 }
 
@@ -163,7 +165,9 @@ function scrollToPage(scrollerEl, page, durationMs, easing, onComplete) {
  */
 function currentPageFromScroll(scrollerEl, pageTotal) {
 	const w = scrollerEl.clientWidth;
-	if (w <= 0) return 0;
+	if (w <= 0) {
+		return 0;
+	}
 	if (
 		pageTotal > 0 &&
 		scrollerEl.scrollLeft >= maxScrollLeft(scrollerEl) - 1
@@ -180,7 +184,9 @@ function setup(collectionEl) {
 		'.fg-carousel-track-wrapper'
 	);
 	const trackEl = collectionEl.querySelector('.fg-carousel-track');
-	if (!containerEl || !viewportEl || !trackWrapperEl || !trackEl) return;
+	if (!containerEl || !viewportEl || !trackWrapperEl || !trackEl) {
+		return;
+	}
 
 	const settings = readSettings(collectionEl);
 
@@ -211,7 +217,9 @@ function setup(collectionEl) {
 	let suppressFallbackTimer = 0;
 
 	const pauseAutoplayBriefly = () => {
-		if (autoplayApi) autoplayApi.pause();
+		if (autoplayApi) {
+			autoplayApi.pause();
+		}
 	};
 
 	const goToPage = (page) => {
@@ -240,7 +248,9 @@ function setup(collectionEl) {
 	};
 
 	const updateArrowDisabled = () => {
-		if (!arrowsApi || !indexState) return;
+		if (!arrowsApi || !indexState) {
+			return;
+		}
 		if (settings.hideArrowsAtEnds && !settings.loop) {
 			const prevInactive = !indexState.hasPrev();
 			const nextInactive = !indexState.hasNext();
@@ -347,9 +357,15 @@ function setup(collectionEl) {
 
 		indexState.onChange((next) => {
 			goToPage(next);
-			if (bulletsApi) bulletsApi.setCurrent(next);
-			if (counterApi) counterApi.setCurrent(next);
-			if (thumbsApi) thumbsApi.setCurrent(next);
+			if (bulletsApi) {
+				bulletsApi.setCurrent(next);
+			}
+			if (counterApi) {
+				counterApi.setCurrent(next);
+			}
+			if (thumbsApi) {
+				thumbsApi.setCurrent(next);
+			}
 			updateArrowDisabled();
 		});
 
@@ -376,8 +392,12 @@ function setup(collectionEl) {
 	trackWrapperEl.addEventListener(
 		'scroll',
 		() => {
-			if (suppressScrollListener) return;
-			if (!indexState) return;
+			if (suppressScrollListener) {
+				return;
+			}
+			if (!indexState) {
+				return;
+			}
 			clearTimeout(scrollSyncTimer);
 			scrollSyncTimer = window.setTimeout(() => {
 				const page = currentPageFromScroll(
@@ -409,10 +429,14 @@ function setup(collectionEl) {
 			}
 		},
 		onHome: () => {
-			if (indexState) indexState.goTo(0);
+			if (indexState) {
+				indexState.goTo(0);
+			}
 		},
 		onEnd: () => {
-			if (indexState) indexState.goTo(indexState.total() - 1);
+			if (indexState) {
+				indexState.goTo(indexState.total() - 1);
+			}
 		},
 	});
 
@@ -474,7 +498,9 @@ function setup(collectionEl) {
  */
 function thumbSrcFor(itemEl) {
 	const img = itemEl.querySelector('img');
-	if (!img) return '';
+	if (!img) {
+		return '';
+	}
 	return img.dataset.fgThumbSrc || img.getAttribute('src') || '';
 }
 
@@ -555,7 +581,9 @@ function renderThumbnails(containerEl, collectionEl, items, indexState) {
 		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	const centerOnActive = (activeBtn) => {
-		if (!activeBtn) return;
+		if (!activeBtn) {
+			return;
+		}
 		const isVertical =
 			wrap.scrollHeight > wrap.clientHeight &&
 			wrap.scrollWidth <= wrap.clientWidth;
@@ -602,14 +630,20 @@ function renderThumbnails(containerEl, collectionEl, items, indexState) {
 	return {
 		setCurrent: updateActive,
 		destroy: () => {
-			if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+			if (wrap.parentNode) {
+				wrap.parentNode.removeChild(wrap);
+			}
 		},
 	};
 }
 
 function attach(collectionEl) {
-	if (!collectionEl.matches('[data-fg-layout="slider"]')) return;
-	if (collectionEl.dataset.fgCarouselReady === '1') return;
+	if (!collectionEl.matches('[data-fg-layout="slider"]')) {
+		return;
+	}
+	if (collectionEl.dataset.fgCarouselReady === '1') {
+		return;
+	}
 	collectionEl.dataset.fgCarouselReady = '1';
 	setup(collectionEl);
 }

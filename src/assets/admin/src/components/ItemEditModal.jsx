@@ -147,7 +147,9 @@ const ItemEditModal = ({
 	}, [itemId]);
 
 	useEffect(() => {
-		if (!originalData || !originalMetadata) return;
+		if (!originalData || !originalMetadata) {
+			return;
+		}
 
 		const formDataChanged = Object.keys(originalData).some(
 			(key) => originalData[key] !== formData[key]
@@ -225,7 +227,9 @@ const ItemEditModal = ({
 	};
 
 	const addMetadataItem = async (type, value) => {
-		if (!value.trim()) return;
+		if (!value.trim()) {
+			return;
+		}
 
 		try {
 			const response = await fetch(

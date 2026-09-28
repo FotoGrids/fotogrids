@@ -16,7 +16,9 @@ import FormFields from './shared/FormField/FormFields.jsx';
 import { buildRestUrl } from '../utils/rest-url';
 
 function extractYouTubeId(url) {
-	if (!url) return null;
+	if (!url) {
+		return null;
+	}
 	const patterns = [
 		/[?&]v=([a-zA-Z0-9_-]{11})/,
 		/youtu\.be\/([a-zA-Z0-9_-]{11})/,
@@ -25,13 +27,17 @@ function extractYouTubeId(url) {
 	];
 	for (const re of patterns) {
 		const m = url.match(re);
-		if (m) return m[1];
+		if (m) {
+			return m[1];
+		}
 	}
 	return null;
 }
 
 function extractVimeoId(url) {
-	if (!url) return null;
+	if (!url) {
+		return null;
+	}
 	const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
 	return m ? m[1] : null;
 }
@@ -267,7 +273,9 @@ const VideoEmbedModal = ({
 	 * which reach the modal through this handler.
 	 */
 	const handleClose = useCallback(() => {
-		if (adding) return;
+		if (adding) {
+			return;
+		}
 
 		if (hasUnsavedWork) {
 			setConfirmingClose(true);
@@ -308,7 +316,9 @@ const VideoEmbedModal = ({
 	const resolveUrl = useCallback(
 		async (rawUrl) => {
 			const url = rawUrl.trim();
-			if (!url) return;
+			if (!url) {
+				return;
+			}
 
 			const isYT = form.source === 'youtube';
 			const isValid = isYT
@@ -347,7 +357,9 @@ const VideoEmbedModal = ({
 					}
 				);
 
-				if (!res.ok) throw new Error(`HTTP ${res.status}`);
+				if (!res.ok) {
+					throw new Error(`HTTP ${res.status}`);
+				}
 				const json = await res.json();
 
 				if (json.video_id) {
@@ -408,7 +420,9 @@ const VideoEmbedModal = ({
 	);
 
 	const handleAdd = useCallback(async () => {
-		if (!form.videoId) return;
+		if (!form.videoId) {
+			return;
+		}
 		setAdding(true);
 
 		// Build the wire payload: identity fields plus a normalised
@@ -630,8 +644,9 @@ const VideoEmbedModal = ({
 								}
 							}}
 							onBlur={() => {
-								if (urlDraft && !form.videoId)
+								if (urlDraft && !form.videoId) {
 									resolveUrl(urlDraft);
+								}
 							}}
 							placeholder={
 								form.source === 'youtube'

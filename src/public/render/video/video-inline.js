@@ -368,7 +368,7 @@
 		window.FotoGrids.modules = window.FotoGrids.modules || {};
 		window.FotoGrids.modules.videoInline = {
 			play: playInline,
-			prepare: prepare,
+			prepare,
 		};
 	}
 

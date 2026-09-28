@@ -280,8 +280,8 @@
 	 * @param {number}   priority
 	 */
 	function insertCallback(queueName, cb, priority) {
-		let q = queues[queueName];
-		q.push({ cb: cb, priority: priority, seq: callbackSeq++ });
+		const q = queues[queueName];
+		q.push({ cb, priority, seq: callbackSeq++ });
 		q.sort(function (a, b) {
 			if (a.priority !== b.priority) {
 				return a.priority - b.priority;
@@ -299,7 +299,7 @@
 	 * @param {Element} collectionElement
 	 */
 	function runQueue(queueName, collectionElement) {
-		let q = queues[queueName];
+		const q = queues[queueName];
 		for (let i = 0; i < q.length; i++) {
 			try {
 				q[i].cb(collectionElement);
@@ -339,7 +339,7 @@
 		const record = {
 			element: collectionElement,
 			galleryId: collectionElement.dataset.fgGalleryId || null,
-			kind: kind,
+			kind,
 		};
 		instances.push(record);
 
@@ -356,7 +356,7 @@
 				detail: {
 					galleryElement: collectionElement,
 					galleryId: record.galleryId,
-					kind: kind,
+					kind,
 					instance: record,
 				},
 			})
@@ -540,7 +540,7 @@
 		 *
 		 * @return {Array<{ element: Element, galleryId: string|null, kind: string }>}
 		 */
-		getInstances: function () {
+		getInstances() {
 			return instances.slice();
 		},
 
@@ -549,12 +549,12 @@
 		 *
 		 * @return {string} 'desktop', 'tablet' or 'mobile'.
 		 */
-		activeBreakpoint: activeBreakpoint,
+		activeBreakpoint,
 
 		/**
 		 * @return {{ mobile: number, tablet: number, detect: string }} A copy.
 		 */
-		getBreakpoints: function () {
+		getBreakpoints() {
 			const config = readBreakpoints();
 			return {
 				mobile: config.mobile,
@@ -571,7 +571,7 @@
 		 * @param {string} declarations Declarations without braces.
 		 * @return {string}
 		 */
-		scopeCss: scopeCss,
+		scopeCss,
 
 		/**
 		 * Namespace where feature modules register their cross-module APIs.

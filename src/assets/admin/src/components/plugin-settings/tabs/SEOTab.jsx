@@ -46,7 +46,9 @@ const SEOTab = () => {
 		let active = true;
 		apiFetch({ path: '/fotogrids/v1/admin/seo-settings' })
 			.then((data) => {
-				if (!active || !data?.settings) return;
+				if (!active || !data?.settings) {
+					return;
+				}
 				const s = normalize(data.settings);
 				setSettings(s);
 				setSaved(s);
@@ -70,7 +72,9 @@ const SEOTab = () => {
 		let active = true;
 		apiFetch({ path: `/wp/v2/media/${id}` })
 			.then((media) => {
-				if (!active) return;
+				if (!active) {
+					return;
+				}
 				const url =
 					media?.media_details?.sizes?.medium?.source_url ||
 					media?.source_url ||

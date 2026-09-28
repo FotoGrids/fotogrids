@@ -31,8 +31,9 @@ const LibraryTagsHeader = ({ entityType, total: externalTotal }) => {
 	const donutInstance = useRef(null);
 
 	useEffect(() => {
-		if (loading || typeof Chart === 'undefined' || topItems.length === 0)
+		if (loading || typeof Chart === 'undefined' || topItems.length === 0) {
 			return;
+		}
 
 		const maxUsage = topItems[0]?.usage_count || 1;
 

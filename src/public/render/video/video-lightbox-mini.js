@@ -164,8 +164,8 @@
 		mini.open(player, {
 			label: labels.video,
 			closeLabel: labels.close,
-			styleVars: styleVars,
-			dataAttrs: dataAttrs,
+			styleVars,
+			dataAttrs,
 		});
 	}
 

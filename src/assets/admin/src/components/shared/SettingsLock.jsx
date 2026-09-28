@@ -11,7 +11,9 @@ const { __ } = wp.i18n;
  */
 const userHasCap = (cap) => {
 	const bag = window.fotogridsAdmin?.capabilities;
-	if (!bag) return true;
+	if (!bag) {
+		return true;
+	}
 	return bag[cap] === true;
 };
 

@@ -41,7 +41,9 @@ const UpgradeModal = () => {
 				benefitIndex = liveBenefits.findIndex(
 					(benefit) => benefit.key === benefitKey
 				);
-				if (benefitIndex === -1) benefitIndex = 0;
+				if (benefitIndex === -1) {
+					benefitIndex = 0;
+				}
 			} else if (typeof benefitKey === 'number') {
 				benefitIndex = Math.max(
 					0,
@@ -188,11 +190,15 @@ const UpgradeModal = () => {
 	};
 
 	const handleUpgrade = () => {
-		if (upgradeUrl) window.open(upgradeUrl, '_blank');
+		if (upgradeUrl) {
+			window.open(upgradeUrl, '_blank');
+		}
 	};
 
 	const handleComparison = () => {
-		if (comparisonUrl) window.open(comparisonUrl, '_blank');
+		if (comparisonUrl) {
+			window.open(comparisonUrl, '_blank');
+		}
 	};
 
 	if (benefits.length === 0 && !isOpen) {

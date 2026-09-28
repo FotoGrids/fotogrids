@@ -38,9 +38,13 @@ const compareValues = (a, b) => {
 	const aEmpty = a === null || a === undefined || a === '';
 	const bEmpty = b === null || b === undefined || b === '';
 
-	if (aEmpty || bEmpty) return aEmpty && bEmpty ? 0 : aEmpty ? 1 : -1;
+	if (aEmpty || bEmpty) {
+		return aEmpty && bEmpty ? 0 : aEmpty ? 1 : -1;
+	}
 
-	if (typeof a === 'number' && typeof b === 'number') return a - b;
+	if (typeof a === 'number' && typeof b === 'number') {
+		return a - b;
+	}
 
 	return String(a).localeCompare(String(b), undefined, { numeric: true });
 };
@@ -57,7 +61,9 @@ const StatsTable = ({
 	const [sort, setSort] = useState(defaultSort);
 
 	const sortedRows = useMemo(() => {
-		if (!sort || !Array.isArray(rows)) return rows;
+		if (!sort || !Array.isArray(rows)) {
+			return rows;
+		}
 		if (
 			defaultSort &&
 			sort.key === defaultSort.key &&
@@ -67,7 +73,9 @@ const StatsTable = ({
 		}
 
 		const col = columns.find((c) => c.key === sort.key);
-		if (!col) return rows;
+		if (!col) {
+			return rows;
+		}
 
 		const read = col.sortValue || ((row) => row[col.key]);
 

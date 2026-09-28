@@ -27,7 +27,7 @@
 	}
 
 	FilterController.prototype.init = function () {
-		let style = this.galleryEl.dataset.fgFilterStyle || 'buttons';
+		const style = this.galleryEl.dataset.fgFilterStyle || 'buttons';
 
 		// Multi-select within a single source. Default true to match the
 		// PHP default for `filtering_multiple_enabled`. Dropdowns are
@@ -43,8 +43,10 @@
 		}
 
 		// Global "All" reset button.
-		let allBtn = this.filterContainer.querySelector('[data-fg-filter-all]');
-		let self = this;
+		const allBtn = this.filterContainer.querySelector(
+			'[data-fg-filter-all]'
+		);
+		const self = this;
 		if (allBtn) {
 			allBtn.addEventListener('click', function () {
 				self.state.clear();
@@ -75,16 +77,17 @@
 	};
 
 	FilterController.prototype._initButtons = function () {
-		let self = this;
-		let groups = this.filterContainer.querySelectorAll('.fg-filter-group');
+		const self = this;
+		const groups =
+			this.filterContainer.querySelectorAll('.fg-filter-group');
 
 		groups.forEach(function (group) {
-			let sourceId = group.dataset.fgFilterSource;
+			const sourceId = group.dataset.fgFilterSource;
 			const buttons = group.querySelectorAll('[data-fg-filter]');
 
 			buttons.forEach(function (btn) {
 				btn.addEventListener('click', function () {
-					let value = btn.dataset.fgFilter;
+					const value = btn.dataset.fgFilter;
 
 					if (self.multiple) {
 						let state = self.state.get(sourceId);
@@ -128,7 +131,9 @@
 			group.addEventListener('keydown', function (e) {
 				const focused = document.activeElement;
 				const idx = btns.indexOf(focused);
-				if (idx === -1) return;
+				if (idx === -1) {
+					return;
+				}
 				if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
 					e.preventDefault();
 					btns[(idx + 1) % btns.length].focus();
@@ -141,17 +146,24 @@
 	};
 
 	FilterController.prototype._initDropdowns = function () {
-		let self = this;
-		let groups = this.filterContainer.querySelectorAll('.fg-filter-group');
+		const self = this;
+		const groups =
+			this.filterContainer.querySelectorAll('.fg-filter-group');
 
 		groups.forEach(function (group) {
-			let sourceId = group.dataset.fgFilterSource;
-			let dropdown = group.querySelector('.fg-filter-dropdown');
-			if (!dropdown) return;
+			const sourceId = group.dataset.fgFilterSource;
+			const dropdown = group.querySelector('.fg-filter-dropdown');
+			if (!dropdown) {
+				return;
+			}
 
-			let trigger = dropdown.querySelector('.fg-filter-dropdown-trigger');
+			const trigger = dropdown.querySelector(
+				'.fg-filter-dropdown-trigger'
+			);
 			const list = dropdown.querySelector('.fg-filter-dropdown-list');
-			if (!trigger || !list) return;
+			if (!trigger || !list) {
+				return;
+			}
 
 			const open = function () {
 				list.classList.add('fg-is-open');
@@ -193,13 +205,15 @@
 			});
 
 			document.addEventListener('click', function (e) {
-				if (!dropdown.contains(e.target)) close();
+				if (!dropdown.contains(e.target)) {
+					close();
+				}
 			});
 
 			list.querySelectorAll('.fg-filter-dropdown-option').forEach(
 				function (option) {
 					option.addEventListener('click', function () {
-						let value =
+						const value =
 							option.dataset.fgFilter != null
 								? option.dataset.fgFilter
 								: '';
@@ -256,7 +270,9 @@
 						} else if (e.key === 'ArrowDown') {
 							e.preventDefault();
 							const next = option.nextElementSibling;
-							if (next) next.focus();
+							if (next) {
+								next.focus();
+							}
 						} else if (e.key === 'ArrowUp') {
 							e.preventDefault();
 							const prev = option.previousElementSibling;
@@ -282,18 +298,21 @@
 					const first = list.querySelector(
 						'.fg-filter-dropdown-option'
 					);
-					if (first) first.focus();
+					if (first) {
+						first.focus();
+					}
 				}
 			});
 		});
 	};
 
 	FilterController.prototype._initCheckboxes = function () {
-		let self = this;
-		let groups = this.filterContainer.querySelectorAll('.fg-filter-group');
+		const self = this;
+		const groups =
+			this.filterContainer.querySelectorAll('.fg-filter-group');
 
 		groups.forEach(function (group) {
-			let sourceId = group.dataset.fgFilterSource;
+			const sourceId = group.dataset.fgFilterSource;
 			const checkboxes = group.querySelectorAll('[data-fg-filter]');
 
 			checkboxes.forEach(function (cb) {
@@ -366,16 +385,18 @@
 			return;
 		}
 
-		let self = this;
+		const self = this;
 		items.forEach(function (item) {
 			let visible = true;
 
 			self.state.forEach(function (activeValues, sourceId) {
-				if (!visible) return;
-				let group = self.galleryEl.querySelector(
+				if (!visible) {
+					return;
+				}
+				const group = self.galleryEl.querySelector(
 					'.fg-filter-group[data-fg-filter-source="' + sourceId + '"]'
 				);
-				let attrKey =
+				const attrKey =
 					(group && group.dataset.fgFilterAttr) || 'data-fg-tags';
 				const dsKey = attrToDatasetKey(attrKey);
 				const rawValue = item.dataset[dsKey] || '';
@@ -386,7 +407,9 @@
 
 				let sourceMatch = false;
 				activeValues.forEach(function (v) {
-					if (tokens.has(v)) sourceMatch = true;
+					if (tokens.has(v)) {
+						sourceMatch = true;
+					}
 				});
 
 				if (!sourceMatch) {
@@ -413,25 +436,30 @@
 	FilterController.prototype._syncUi = function () {
 		const hasActive = this.state.size > 0;
 
-		let allBtn = this.filterContainer.querySelector('[data-fg-filter-all]');
+		const allBtn = this.filterContainer.querySelector(
+			'[data-fg-filter-all]'
+		);
 		if (allBtn) {
 			allBtn.classList.toggle('fg-is-active', !hasActive);
 			allBtn.setAttribute('aria-pressed', String(!hasActive));
 		}
 
-		let style = this.galleryEl.dataset.fgFilterStyle || 'buttons';
-		let self = this;
-		let groups = this.filterContainer.querySelectorAll('.fg-filter-group');
+		const style = this.galleryEl.dataset.fgFilterStyle || 'buttons';
+		const self = this;
+		const groups =
+			this.filterContainer.querySelectorAll('.fg-filter-group');
 
 		groups.forEach(function (group) {
-			let sourceId = group.dataset.fgFilterSource;
+			const sourceId = group.dataset.fgFilterSource;
 			const activeVals = self.state.get(sourceId) || new Set();
 
 			if (style === 'dropdowns') {
-				let dropdown = group.querySelector('.fg-filter-dropdown');
-				if (!dropdown) return;
+				const dropdown = group.querySelector('.fg-filter-dropdown');
+				if (!dropdown) {
+					return;
+				}
 
-				let trigger = dropdown.querySelector(
+				const trigger = dropdown.querySelector(
 					'.fg-filter-dropdown-trigger'
 				);
 				const valueLabel =
@@ -483,14 +511,18 @@
 									CSS.escape(val) +
 									'"]'
 							);
-							if (!opt) return;
+							if (!opt) {
+								return;
+							}
 							const t =
 								(opt.firstChild &&
 									opt.firstChild.textContent &&
 									opt.firstChild.textContent.trim()) ||
 								(opt.textContent && opt.textContent.trim()) ||
 								'';
-							if (t) labels.push(t);
+							if (t) {
+								labels.push(t);
+							}
 						});
 						text = labels.join(', ');
 					}
@@ -516,11 +548,15 @@
 
 	function attach(galleryEl) {
 		const filterContainer = galleryEl.querySelector('.fotogrids-filters');
-		if (!filterContainer) return;
+		if (!filterContainer) {
+			return;
+		}
 
 		// Idempotent - the runtime calls every onGallery callback once per
 		// gallery, but defensive against duplicate calls (third-party code).
-		if (filterContainer.dataset.fgFiltersReady === 'true') return;
+		if (filterContainer.dataset.fgFiltersReady === 'true') {
+			return;
+		}
 		filterContainer.dataset.fgFiltersReady = 'true';
 
 		const controller = new FilterController(galleryEl, filterContainer);
@@ -571,7 +607,7 @@
 			galleryEl.dispatchEvent(
 				new CustomEvent('fotogrids:filters_changed', {
 					bubbles: true,
-					detail: { galleryEl: galleryEl, filters: currentMap },
+					detail: { galleryEl, filters: currentMap },
 				})
 			);
 		};
@@ -609,16 +645,22 @@
 	function buildActiveMap(controller) {
 		const out = {};
 		controller.state.forEach(function (values, sourceId) {
-			if (values.size === 0) return;
-			let group = controller.galleryEl.querySelector(
+			if (values.size === 0) {
+				return;
+			}
+			const group = controller.galleryEl.querySelector(
 				'.fg-filter-group[data-fg-filter-source="' + sourceId + '"]'
 			);
-			let attrKey = group && group.dataset.fgFilterAttr;
-			if (!attrKey) return;
+			const attrKey = group && group.dataset.fgFilterAttr;
+			if (!attrKey) {
+				return;
+			}
 			// Convert 'data-fg-tags' → 'tags' (last segment after fg-).
 			const m = attrKey.match(/^data-fg-(.+)$/);
 			const argKey = m ? m[1] : '';
-			if (!argKey) return;
+			if (!argKey) {
+				return;
+			}
 			out[argKey] = Array.from(values);
 		});
 		return out;
@@ -626,8 +668,12 @@
 
 	function exposeFiltersApi() {
 		const FG = window.FotoGrids;
-		if (!FG) return false;
-		if (!FG.modules) FG.modules = {};
+		if (!FG) {
+			return false;
+		}
+		if (!FG.modules) {
+			FG.modules = {};
+		}
 		FG.modules.filters = {
 			/**
 			 * Get the active filter map for a gallery, in REST arg shape:
@@ -636,7 +682,7 @@
 			 * @param {Element} galleryEl
 			 * @returns {Object.<string, string[]>}
 			 */
-			getActive: function (galleryEl) {
+			getActive(galleryEl) {
 				const ctrl = controllersByGallery.get(galleryEl);
 				return ctrl ? buildActiveMap(ctrl) : {};
 			},
@@ -648,7 +694,7 @@
 			 * @param {Element}  galleryEl
 			 * @param {function} cb
 			 */
-			onChange: function (galleryEl, cb) {
+			onChange(galleryEl, cb) {
 				if (!changeListeners.has(galleryEl)) {
 					changeListeners.set(galleryEl, []);
 				}

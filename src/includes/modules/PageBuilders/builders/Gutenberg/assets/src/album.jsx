@@ -130,9 +130,13 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 		fetch(url.toString(), { headers: { 'X-WP-Nonce': restNonce } })
 			.then((r) => (r.ok ? r.json() : null))
 			.then((data) => {
-				if (!data || !Array.isArray(data.items)) return;
+				if (!data || !Array.isArray(data.items)) {
+					return;
+				}
 				const match = data.items.find((it) => it.id === albumId);
-				if (match) setItem(match);
+				if (match) {
+					setItem(match);
+				}
 			})
 			.catch(() => {});
 	}, [albumId, restUrl, restNonce]);
@@ -157,7 +161,9 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 	};
 
 	const settingsSummary = useMemo(() => {
-		if (!item) return [];
+		if (!item) {
+			return [];
+		}
 		const summary = [];
 		if (item.layout) {
 			summary.push({

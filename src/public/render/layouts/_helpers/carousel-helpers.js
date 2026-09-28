@@ -44,15 +44,20 @@ export function createIndexState(opts) {
 			try {
 				subs[i](index, prev);
 			} catch (e) {
-				if (window.console)
+				if (window.console) {
 					console.warn('carousel-helpers indexState cb threw', e);
+				}
 			}
 		}
 	};
 
 	const setIndex = (next) => {
-		if (total === 0) return false;
-		if (next === index) return false;
+		if (total === 0) {
+			return false;
+		}
+		if (next === index) {
+			return false;
+		}
 		const prev = index;
 		index = next;
 		fire(prev);
@@ -69,19 +74,33 @@ export function createIndexState(opts) {
 			}
 		},
 		next() {
-			if (total === 0) return false;
-			if (index < total - 1) return setIndex(index + 1);
-			if (loop) return setIndex(0);
+			if (total === 0) {
+				return false;
+			}
+			if (index < total - 1) {
+				return setIndex(index + 1);
+			}
+			if (loop) {
+				return setIndex(0);
+			}
 			return false;
 		},
 		prev() {
-			if (total === 0) return false;
-			if (index > 0) return setIndex(index - 1);
-			if (loop) return setIndex(total - 1);
+			if (total === 0) {
+				return false;
+			}
+			if (index > 0) {
+				return setIndex(index - 1);
+			}
+			if (loop) {
+				return setIndex(total - 1);
+			}
 			return false;
 		},
 		goTo(n) {
-			if (total === 0) return false;
+			if (total === 0) {
+				return false;
+			}
 			const target = Math.max(0, Math.min(total - 1, n | 0));
 			return setIndex(target);
 		},
@@ -91,7 +110,9 @@ export function createIndexState(opts) {
 			subs.push(cb);
 			return () => {
 				const i = subs.indexOf(cb);
-				if (i !== -1) subs.splice(i, 1);
+				if (i !== -1) {
+					subs.splice(i, 1);
+				}
 			};
 		},
 	};
@@ -153,7 +174,9 @@ export function resolveVisibilityClasses(visibility) {
  * @return {() => void} Cancel.
  */
 export function scrollToDuration(el, targetLeft, durationMs, opts) {
-	if (!el) return () => {};
+	if (!el) {
+		return () => {};
+	}
 
 	const onComplete =
 		opts && typeof opts.onComplete === 'function' ? opts.onComplete : null;
@@ -164,14 +187,18 @@ export function scrollToDuration(el, targetLeft, durationMs, opts) {
 
 	if (reduceMotion || durationMs <= 0) {
 		el.scrollLeft = targetLeft;
-		if (onComplete) onComplete();
+		if (onComplete) {
+			onComplete();
+		}
 		return () => {};
 	}
 
 	const startLeft = el.scrollLeft;
 	const delta = targetLeft - startLeft;
 	if (delta === 0) {
-		if (onComplete) onComplete();
+		if (onComplete) {
+			onComplete();
+		}
 		return () => {};
 	}
 
@@ -191,7 +218,9 @@ export function scrollToDuration(el, targetLeft, durationMs, opts) {
 	let frameId = 0;
 
 	const step = (now) => {
-		if (cancelled) return;
+		if (cancelled) {
+			return;
+		}
 		const elapsed = now - startTs;
 		const t = Math.min(1, elapsed / durationMs);
 		el.scrollLeft = startLeft + delta * easing(t);
@@ -199,7 +228,9 @@ export function scrollToDuration(el, targetLeft, durationMs, opts) {
 			frameId = requestAnimationFrame(step);
 		} else {
 			restoreSnap();
-			if (onComplete) onComplete();
+			if (onComplete) {
+				onComplete();
+			}
 		}
 	};
 
@@ -286,7 +317,9 @@ export function createAutoplay(opts) {
 	const isPaused = () => pausedByHover || pausedByVis || pausedByInter;
 
 	const tick = () => {
-		if (!running || isPaused()) return;
+		if (!running || isPaused()) {
+			return;
+		}
 		try {
 			onTick();
 		} catch (e) {}
@@ -295,7 +328,9 @@ export function createAutoplay(opts) {
 
 	const scheduleNext = () => {
 		clearTimeout(timerId);
-		if (!running || isPaused() || delay <= 0) return;
+		if (!running || isPaused() || delay <= 0) {
+			return;
+		}
 		timerId = window.setTimeout(tick, delay);
 	};
 
@@ -341,7 +376,9 @@ export function createAutoplay(opts) {
 
 	return {
 		start() {
-			if (running) return;
+			if (running) {
+				return;
+			}
 			running = true;
 			scheduleNext();
 		},
@@ -396,7 +433,9 @@ export function createAutoplay(opts) {
  * @return {() => void} Destroy.
  */
 export function createSwipeDetector(el, opts) {
-	if (!el) return () => {};
+	if (!el) {
+		return () => {};
+	}
 
 	const onSwipe =
 		typeof opts.onSwipe === 'function' ? opts.onSwipe : () => {};
@@ -408,24 +447,34 @@ export function createSwipeDetector(el, opts) {
 	let active = false;
 
 	const onTouchStart = (e) => {
-		if (!e.touches || e.touches.length !== 1) return;
+		if (!e.touches || e.touches.length !== 1) {
+			return;
+		}
 		active = true;
 		startX = e.touches[0].clientX;
 		startY = e.touches[0].clientY;
 	};
 
 	const onTouchEnd = (e) => {
-		if (!active) return;
+		if (!active) {
+			return;
+		}
 		active = false;
 		const t = (e.changedTouches && e.changedTouches[0]) || null;
-		if (!t) return;
+		if (!t) {
+			return;
+		}
 		const dx = t.clientX - startX;
 		const dy = t.clientY - startY;
 		const adx = Math.abs(dx);
 		const ady = Math.abs(dy);
 
-		if (directionLock === 'horizontal' && ady > adx) return;
-		if (directionLock === 'vertical' && adx > ady) return;
+		if (directionLock === 'horizontal' && ady > adx) {
+			return;
+		}
+		if (directionLock === 'vertical' && adx > ady) {
+			return;
+		}
 
 		if (adx >= threshold && adx > ady) {
 			onSwipe(dx < 0 ? 'left' : 'right', adx);
@@ -464,7 +513,9 @@ export function createSwipeDetector(el, opts) {
  * @return {() => void} Destroy.
  */
 export function createKeyboardNav(el, opts) {
-	if (!el) return () => {};
+	if (!el) {
+		return () => {};
+	}
 
 	const onPrev = typeof opts.onPrev === 'function' ? opts.onPrev : null;
 	const onNext = typeof opts.onNext === 'function' ? opts.onNext : null;
@@ -476,8 +527,9 @@ export function createKeyboardNav(el, opts) {
 		if (
 			!el.contains(document.activeElement) &&
 			document.activeElement !== el
-		)
+		) {
 			return;
+		}
 
 		const horizontal =
 			orientation === 'horizontal' || orientation === 'both';
@@ -541,8 +593,12 @@ export function createKeyboardNav(el, opts) {
  * @return {() => void} Destroy.
  */
 export function createIntersectionPauser(opts) {
-	if (!opts || !opts.el) return () => {};
-	if (typeof window.IntersectionObserver !== 'function') return () => {};
+	if (!opts || !opts.el) {
+		return () => {};
+	}
+	if (typeof window.IntersectionObserver !== 'function') {
+		return () => {};
+	}
 
 	const onEnter =
 		typeof opts.onEnter === 'function' ? opts.onEnter : () => {};
@@ -552,8 +608,11 @@ export function createIntersectionPauser(opts) {
 	const observer = new IntersectionObserver(
 		(entries) => {
 			for (let i = 0; i < entries.length; i++) {
-				if (entries[i].isIntersecting) onEnter();
-				else onLeave();
+				if (entries[i].isIntersecting) {
+					onEnter();
+				} else {
+					onLeave();
+				}
 			}
 		},
 		{ threshold: opts.threshold || 0.1 }
@@ -582,7 +641,9 @@ export function createIntersectionPauser(opts) {
  * @return {() => void} Destroy.
  */
 export function createPointerDrag(el, opts) {
-	if (!el) return () => {};
+	if (!el) {
+		return () => {};
+	}
 	const options = opts || {};
 	const threshold = options.threshold || 4;
 	const onDragStart =
@@ -602,8 +663,12 @@ export function createPointerDrag(el, opts) {
 	let didExceedThreshold = false;
 
 	const onPointerDown = (e) => {
-		if (e.pointerType === 'touch') return;
-		if (e.button !== 0) return;
+		if (e.pointerType === 'touch') {
+			return;
+		}
+		if (e.button !== 0) {
+			return;
+		}
 		isDragging = true;
 		startX = e.clientX;
 		startScroll = el.scrollLeft;
@@ -613,7 +678,9 @@ export function createPointerDrag(el, opts) {
 	};
 
 	const onPointerMove = (e) => {
-		if (!isDragging || e.pointerId !== pointerId) return;
+		if (!isDragging || e.pointerId !== pointerId) {
+			return;
+		}
 		const delta = e.clientX - startX;
 		totalDelta = delta;
 		if (!didExceedThreshold && Math.abs(delta) > threshold) {
@@ -626,7 +693,9 @@ export function createPointerDrag(el, opts) {
 			try {
 				el.setPointerCapture(e.pointerId);
 			} catch (err) {}
-			if (onDragStart) onDragStart();
+			if (onDragStart) {
+				onDragStart();
+			}
 		}
 		if (didExceedThreshold) {
 			el.scrollLeft = startScroll - delta;
@@ -635,7 +704,9 @@ export function createPointerDrag(el, opts) {
 	};
 
 	const onPointerEnd = (e) => {
-		if (!isDragging || e.pointerId !== pointerId) return;
+		if (!isDragging || e.pointerId !== pointerId) {
+			return;
+		}
 		isDragging = false;
 		if (didExceedThreshold) {
 			try {
@@ -644,12 +715,16 @@ export function createPointerDrag(el, opts) {
 		}
 		el.style.scrollSnapType = '';
 		el.style.cursor = '';
-		if (didExceedThreshold && onDragEnd) onDragEnd(totalDelta);
+		if (didExceedThreshold && onDragEnd) {
+			onDragEnd(totalDelta);
+		}
 		pointerId = null;
 	};
 
 	const onClick = (e) => {
-		if (!didExceedThreshold) return;
+		if (!didExceedThreshold) {
+			return;
+		}
 		didExceedThreshold = false;
 		if (
 			ignoreClickSelector &&
@@ -743,7 +818,9 @@ export function renderArrows(opts) {
 		destroy() {
 			prev.removeEventListener('click', onPrevClick);
 			next.removeEventListener('click', onNextClick);
-			if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+			if (wrap.parentNode) {
+				wrap.parentNode.removeChild(wrap);
+			}
 		},
 	};
 }
@@ -804,7 +881,9 @@ export function renderBullets(opts) {
 		wrap,
 		setCurrent(i) {
 			const next = Math.max(0, Math.min(buttons.length - 1, i | 0));
-			if (next === current) return;
+			if (next === current) {
+				return;
+			}
 			if (buttons[current]) {
 				buttons[current].classList.remove(activeCls);
 				buttons[current].removeAttribute('aria-current');
@@ -824,7 +903,9 @@ export function renderBullets(opts) {
 					);
 				}
 			}
-			if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+			if (wrap.parentNode) {
+				wrap.parentNode.removeChild(wrap);
+			}
 		},
 	};
 }
@@ -862,12 +943,16 @@ export function renderCounter(opts) {
 		wrap,
 		setCurrent(i) {
 			const next = Math.max(0, Math.min(opts.total - 1, i | 0));
-			if (next === current) return;
+			if (next === current) {
+				return;
+			}
 			current = next;
 			wrap.textContent = format(current, opts.total);
 		},
 		destroy() {
-			if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+			if (wrap.parentNode) {
+				wrap.parentNode.removeChild(wrap);
+			}
 		},
 	};
 }

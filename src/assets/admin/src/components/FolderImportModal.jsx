@@ -71,13 +71,17 @@ const FolderImportModal = ({
 	// set on the DOM node directly.
 	useEffect(() => {
 		const input = directoryInputRef.current;
-		if (!input) return;
+		if (!input) {
+			return;
+		}
 		input.setAttribute('webkitdirectory', '');
 		input.setAttribute('directory', '');
 	}, [activeTab, isOpen]);
 
 	useEffect(() => {
-		if (isOpen) return;
+		if (isOpen) {
+			return;
+		}
 
 		setSelected([]);
 		setImportError(null);
@@ -112,7 +116,9 @@ const FolderImportModal = ({
 	}, [allVisibleSelected, visiblePaths]);
 
 	const handleImport = useCallback(async () => {
-		if (selected.length === 0) return;
+		if (selected.length === 0) {
+			return;
+		}
 
 		setImporting(true);
 		setImportError(null);
@@ -131,7 +137,7 @@ const FolderImportModal = ({
 				// Chunks are deliberately sequential: each one generates image
 				// sizes server-side, and running them in parallel is what
 				// pushes shared hosts into a memory limit.
-				// eslint-disable-next-line no-await-in-loop
+
 				const response = await wp.apiFetch({
 					path: '/fotogrids/v1/media/import/folder',
 					method: 'POST',
@@ -181,7 +187,9 @@ const FolderImportModal = ({
 	 * Cancel, all of which reach the modal through this handler.
 	 */
 	const requestClose = useCallback(() => {
-		if (busy) return;
+		if (busy) {
+			return;
+		}
 
 		if (hasUnsavedWork) {
 			setConfirmingClose(true);

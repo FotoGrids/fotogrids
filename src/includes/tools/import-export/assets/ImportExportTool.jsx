@@ -88,8 +88,12 @@ const TABS = [
 ];
 
 function formatBytes(bytes) {
-	if (bytes < 1024) return bytes + ' B';
-	if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+	if (bytes < 1024) {
+		return bytes + ' B';
+	}
+	if (bytes < 1048576) {
+		return (bytes / 1024).toFixed(1) + ' KB';
+	}
 	return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
@@ -287,7 +291,9 @@ const ExportPanel = ({ onOperationStart, onOperationEnd }) => {
 	};
 
 	const handleExport = async () => {
-		if (include.size === 0) return;
+		if (include.size === 0) {
+			return;
+		}
 		setBusy(true);
 		setError(null);
 		onOperationStart(
@@ -800,7 +806,9 @@ const ImportExportTool = () => {
 	const handleOperationEnd = useCallback(() => setOperationMessage(null), []);
 
 	useEffect(() => {
-		if (!operationMessage) return;
+		if (!operationMessage) {
+			return;
+		}
 		const handler = (e) => {
 			e.preventDefault();
 			e.returnValue = '';

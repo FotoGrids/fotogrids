@@ -44,7 +44,9 @@ const Select = ({
 	}, [value, options, groups]);
 
 	const updateDropdownPosition = useCallback(() => {
-		if (!selectRef.current) return;
+		if (!selectRef.current) {
+			return;
+		}
 
 		const triggerRect = selectRef.current.getBoundingClientRect();
 		const viewportHeight =
@@ -109,7 +111,9 @@ const Select = ({
 	}, [isOpen, updateDropdownPosition]);
 
 	useEffect(() => {
-		if (!isOpen) return;
+		if (!isOpen) {
+			return;
+		}
 
 		const handleClickOutside = (event) => {
 			const inTrigger =
@@ -122,7 +126,9 @@ const Select = ({
 			}
 		};
 		const handleEscape = (e) => {
-			if (e.key === 'Escape') setIsOpen(false);
+			if (e.key === 'Escape') {
+				setIsOpen(false);
+			}
 		};
 
 		document.addEventListener('mousedown', handleClickOutside);

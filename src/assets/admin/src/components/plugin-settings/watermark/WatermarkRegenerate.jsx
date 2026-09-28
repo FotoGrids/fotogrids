@@ -50,7 +50,9 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 				counts: { ...EMPTY.counts, ...(data?.counts || {}) },
 			};
 			setStatus(next);
-			if (onChange) onChange(next);
+			if (onChange) {
+				onChange(next);
+			}
 			return next;
 		} catch (e) {
 			setError(true);
@@ -62,7 +64,9 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 		let active = true;
 		setLoading(true);
 		fetchStatus().finally(() => {
-			if (active) setLoading(false);
+			if (active) {
+				setLoading(false);
+			}
 		});
 		return () => {
 			active = false;
@@ -70,7 +74,9 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 	}, [fetchStatus, refreshKey]);
 
 	const regenerate = async (ids) => {
-		if (!Array.isArray(ids) || ids.length === 0) return;
+		if (!Array.isArray(ids) || ids.length === 0) {
+			return;
+		}
 
 		setRunning(true);
 		setError(false);

@@ -41,7 +41,9 @@
 		if ('IntersectionObserver' in window) {
 			state.native = new IntersectionObserver((entries, observer) => {
 				entries.forEach((entry) => {
-					if (!entry.isIntersecting) return;
+					if (!entry.isIntersecting) {
+						return;
+					}
 					const img = entry.target;
 					if (img.complete) {
 						img.classList.add('fotogrids-lazy-loaded');
@@ -56,7 +58,9 @@
 
 			state.dataSrc = new IntersectionObserver((entries, observer) => {
 				entries.forEach((entry) => {
-					if (!entry.isIntersecting) return;
+					if (!entry.isIntersecting) {
+						return;
+					}
 					const img = entry.target;
 					img.src = img.dataset.src;
 					img.removeAttribute('data-src');
@@ -82,7 +86,9 @@
 		const scopes = Array.isArray(scope) ? scope : [scope];
 
 		scopes.forEach((root) => {
-			if (!root || !root.querySelectorAll) return;
+			if (!root || !root.querySelectorAll) {
+				return;
+			}
 
 			const nativeLazyImages = root.querySelectorAll(
 				'img[loading="lazy"]:not(.fotogrids-lazy-loaded)'
@@ -91,12 +97,16 @@
 
 			if (state.native && state.dataSrc) {
 				nativeLazyImages.forEach((img) => {
-					if (img.dataset.fgLazyBound === '1') return;
+					if (img.dataset.fgLazyBound === '1') {
+						return;
+					}
 					img.dataset.fgLazyBound = '1';
 					state.native.observe(img);
 				});
 				dataSrcImages.forEach((img) => {
-					if (img.dataset.fgLazyBound === '1') return;
+					if (img.dataset.fgLazyBound === '1') {
+						return;
+					}
 					img.dataset.fgLazyBound = '1';
 					state.dataSrc.observe(img);
 				});
@@ -124,15 +134,21 @@
 	 * @param {Element} galleryEl
 	 */
 	function attach(galleryEl) {
-		if (!galleryEl.matches('[data-fg-lazy]')) return;
-		if (galleryEl.dataset.fgLazyReady === '1') return;
+		if (!galleryEl.matches('[data-fg-lazy]')) {
+			return;
+		}
+		if (galleryEl.dataset.fgLazyReady === '1') {
+			return;
+		}
 		galleryEl.dataset.fgLazyReady = '1';
 
 		bindImages(galleryEl, galleryEl);
 
 		galleryEl.addEventListener('fotogrids:items_inserted', (event) => {
 			const items = event.detail && event.detail.items;
-			if (!items || !items.length) return;
+			if (!items || !items.length) {
+				return;
+			}
 			bindImages(galleryEl, items);
 		});
 	}

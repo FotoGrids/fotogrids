@@ -122,12 +122,16 @@ function escapeHtml(s) {
  * picker-item record from a side-table on the <select>.
  */
 function renderRow(option) {
-	if (!option.id) return option.text;
+	if (!option.id) {
+		return option.text;
+	}
 	const $ = window.jQuery;
 	const $select = $(option.element).closest('select');
 	const items = $select.data('fg-items') || [];
 	const item = items.find((it) => String(it.id) === String(option.id));
-	if (!item) return option.text;
+	if (!item) {
+		return option.text;
+	}
 
 	const itemCountLabel =
 		item.kind === 'album'
@@ -257,7 +261,6 @@ function openPickerModal(kind, currentId) {
  */
 function buildControlView(kind) {
 	if (!CONTROL_VIEW_PARENT) {
-		// eslint-disable-next-line no-console
 		console.warn(
 			'[FotoGrids] Elementor BaseData control view unavailable; skipping.'
 		);
@@ -311,7 +314,9 @@ function buildControlView(kind) {
 
 				// Annotate each item with its kind so the row renderer
 				// can choose the right pluralisation without re-passing.
-				for (const item of items) item.kind = kind;
+				for (const item of items) {
+					item.kind = kind;
+				}
 
 				$select.html(buildOptionsHtml(items));
 
@@ -333,7 +338,6 @@ function buildControlView(kind) {
 
 				updateEditLink(this.$el, currentVal, kind);
 			} catch (err) {
-				// eslint-disable-next-line no-console
 				console.error('[FotoGrids] picker load failed', err);
 			}
 		},
@@ -341,7 +345,9 @@ function buildControlView(kind) {
 			event.preventDefault();
 			const currentVal = this.getControlValue();
 			const item = await openPickerModal(kind, currentVal);
-			if (!item) return;
+			if (!item) {
+				return;
+			}
 
 			// Selection from the modal may include items not currently
 			// in the cache (newly created, freshly published). Drop the
@@ -353,7 +359,9 @@ function buildControlView(kind) {
 			if (this.pickerDestroyed) {
 				return;
 			}
-			for (const it of items) it.kind = kind;
+			for (const it of items) {
+				it.kind = kind;
+			}
 			this.ui.select.data('fg-items', items);
 			this.ui.select.html(buildOptionsHtml(items));
 			this.ui.select.val(String(item.id)).trigger('change.select2');
@@ -421,16 +429,22 @@ if (window.elementor) {
  * document (via `elementor.$previewContents`) too.
  */
 function bindPaginationGuard(targetDocument) {
-	if (!targetDocument || targetDocument.__fgPbGuardBound) return;
+	if (!targetDocument || targetDocument.__fgPbGuardBound) {
+		return;
+	}
 	targetDocument.__fgPbGuardBound = true;
 
 	targetDocument.addEventListener(
 		'click',
 		(event) => {
 			const target = event.target;
-			if (!target || !target.closest) return;
+			if (!target || !target.closest) {
+				return;
+			}
 			const frozen = target.closest('.is-fg-pb-pagination-frozen');
-			if (!frozen) return;
+			if (!frozen) {
+				return;
+			}
 			if (target.closest('.fg-pagination, .fg-pagination__btn')) {
 				event.stopPropagation();
 				event.stopImmediatePropagation();
@@ -451,7 +465,9 @@ bindPaginationGuard(document);
  * also poll briefly as belt-and-braces for older Elementor builds.
  */
 function tryBindIframe() {
-	if (!window.elementor) return false;
+	if (!window.elementor) {
+		return false;
+	}
 	const $contents = window.elementor.$previewContents;
 	if ($contents && $contents.length) {
 		const previewDoc = $contents[0];
@@ -497,10 +513,15 @@ document.addEventListener('click', (event) => {
 // window.open). It postMessages the URL up here; we open it from the
 // editor window where popup permissions are normal.
 function isAllowedEmptyStateMessage(event) {
-	if (!event || typeof event.data !== 'object' || event.data === null)
+	if (!event || typeof event.data !== 'object' || event.data === null) {
 		return false;
-	if (event.data.type !== 'fg-pb-empty-state:open') return false;
-	if (typeof event.data.url !== 'string') return false;
+	}
+	if (event.data.type !== 'fg-pb-empty-state:open') {
+		return false;
+	}
+	if (typeof event.data.url !== 'string') {
+		return false;
+	}
 	// Same-origin only - the preview iframe shares the editor's origin.
 	try {
 		const url = new URL(event.data.url, window.location.origin);
@@ -511,6 +532,8 @@ function isAllowedEmptyStateMessage(event) {
 }
 
 window.addEventListener('message', (event) => {
-	if (!isAllowedEmptyStateMessage(event)) return;
+	if (!isAllowedEmptyStateMessage(event)) {
+		return;
+	}
 	window.open(event.data.url, '_blank', 'noopener,noreferrer');
 });

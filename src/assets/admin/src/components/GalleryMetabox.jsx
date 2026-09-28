@@ -37,7 +37,9 @@ const GalleryMetabox = ({
 		postId: window.fotogridsMetaBoxes?.postId || 0,
 	});
 	const [activeTab, setActiveTab] = useState(() => {
-		if (!uiState) return 'manage';
+		if (!uiState) {
+			return 'manage';
+		}
 		return uiState.getValue({
 			key: 'main-tab',
 			fallback: 'manage',
@@ -108,12 +110,11 @@ const GalleryMetabox = ({
 					setCurrentItemData(data.data);
 					setCurrentItemId(itemId);
 					return true;
-				} else {
-					if (window.fotogridsToast) {
-						window.fotogridsToast.error(strings.errorLoadingItem);
-					}
-					return false;
 				}
+				if (window.fotogridsToast) {
+					window.fotogridsToast.error(strings.errorLoadingItem);
+				}
+				return false;
 			} catch (error) {
 				console.error('Error loading item data:', error);
 				if (window.fotogridsToast) {

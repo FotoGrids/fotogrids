@@ -26,7 +26,9 @@ import {
 function readTolerance(collectionEl) {
 	const raw = collectionEl.getAttribute('data-fg-justified-tolerance');
 	const parsed = parseInt(raw, 10);
-	if (isNaN(parsed)) return 0.25;
+	if (isNaN(parsed)) {
+		return 0.25;
+	}
 	return Math.max(0, Math.min(100, parsed)) / 100;
 }
 
@@ -66,7 +68,9 @@ function buildRows(items, containerWidth, gap, targetHeight) {
 	const availableWidth = (count) =>
 		containerWidth - Math.max(0, count - 1) * gap;
 	const rowHeightFor = (aspectSum, count) => {
-		if (aspectSum <= 0 || count <= 0) return targetHeight;
+		if (aspectSum <= 0 || count <= 0) {
+			return targetHeight;
+		}
 		return availableWidth(count) / aspectSum;
 	};
 
@@ -121,7 +125,9 @@ function applyRow(row, containerWidth, gap, targetHeight, stretch) {
 	const totalGap = Math.max(0, row.length - 1) * gap;
 	const availableWidth = containerWidth - totalGap;
 	let totalAspect = row.reduce((sum, entry) => sum + entry.aspect, 0);
-	if (totalAspect <= 0) totalAspect = 1;
+	if (totalAspect <= 0) {
+		totalAspect = 1;
+	}
 
 	const rowHeight = stretch ? availableWidth / totalAspect : targetHeight;
 	const intHeight = Math.round(rowHeight);
@@ -150,7 +156,9 @@ function applyRow(row, containerWidth, gap, targetHeight, stretch) {
 }
 
 function applyMaxRowsCutoff(rows, cutoffRow) {
-	if (cutoffRow <= 0) return;
+	if (cutoffRow <= 0) {
+		return;
+	}
 	for (let i = 0; i < rows.length; i++) {
 		const hidden = i >= cutoffRow;
 		for (let j = 0; j < rows[i].length; j++) {
@@ -165,13 +173,19 @@ function getCollectionEl(trackEl) {
 
 function layout(trackEl) {
 	const collectionEl = getCollectionEl(trackEl);
-	if (!collectionEl) return;
+	if (!collectionEl) {
+		return;
+	}
 
 	const containerWidth = trackEl.clientWidth;
-	if (containerWidth <= 0) return;
+	if (containerWidth <= 0) {
+		return;
+	}
 
 	const items = visibleItems(trackEl);
-	if (items.length === 0) return;
+	if (items.length === 0) {
+		return;
+	}
 
 	const gap = readTrackGap(trackEl);
 	const targetHeight = readCssNumber(
@@ -187,7 +201,9 @@ function layout(trackEl) {
 		pageTrailingRow === 'fill' && hasNextPage(collectionEl);
 
 	const rows = buildRows(items, containerWidth, gap, targetHeight);
-	if (rows.length === 0) return;
+	if (rows.length === 0) {
+		return;
+	}
 
 	const lastIndex = rows.length - 1;
 	const minHeight = targetHeight * (1 - tolerance);

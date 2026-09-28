@@ -57,7 +57,9 @@ function readSettings(collectionEl) {
  * The fill/spin duration is owned by CSS via --fg-si-progress-duration.
  */
 function buildProgress(settings) {
-	if (settings.progressStyle === 'none') return null;
+	if (settings.progressStyle === 'none') {
+		return null;
+	}
 
 	const el = document.createElement('div');
 	el.className = 'fg-si-progress fg-si-progress--' + settings.progressStyle;
@@ -78,7 +80,9 @@ function buildProgress(settings) {
 
 function setup(collectionEl) {
 	const trackEl = collectionEl.querySelector('.fg-single-item-track');
-	if (!trackEl) return;
+	if (!trackEl) {
+		return;
+	}
 
 	const items = visibleItems(trackEl);
 
@@ -112,7 +116,9 @@ function setup(collectionEl) {
 	}
 
 	const restartProgress = () => {
-		if (!progressEl) return;
+		if (!progressEl) {
+			return;
+		}
 		progressEl.classList.remove(
 			'fg-si-progress--paused',
 			'fg-si-progress--run'
@@ -124,7 +130,9 @@ function setup(collectionEl) {
 	};
 
 	const pauseProgress = () => {
-		if (progressEl) progressEl.classList.add('fg-si-progress--paused');
+		if (progressEl) {
+			progressEl.classList.add('fg-si-progress--paused');
+		}
 	};
 
 	const applyActive = (next, prev) => {
@@ -170,9 +178,15 @@ function setup(collectionEl) {
 }
 
 function attach(collectionEl) {
-	if (!collectionEl.matches('[data-fg-layout="single-item"]')) return;
-	if (collectionEl.getAttribute('data-fg-si-auto-progress') !== '1') return;
-	if (collectionEl.dataset.fgSingleItemReady === '1') return;
+	if (!collectionEl.matches('[data-fg-layout="single-item"]')) {
+		return;
+	}
+	if (collectionEl.getAttribute('data-fg-si-auto-progress') !== '1') {
+		return;
+	}
+	if (collectionEl.dataset.fgSingleItemReady === '1') {
+		return;
+	}
 	collectionEl.dataset.fgSingleItemReady = '1';
 	setup(collectionEl);
 }

@@ -56,7 +56,9 @@ const Textarea = ({
 		.join(' ');
 
 	const handleChange = (event) => {
-		if (!onChange) return;
+		if (!onChange) {
+			return;
+		}
 		onChange(event.target.value, event);
 	};
 

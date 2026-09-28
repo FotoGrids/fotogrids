@@ -284,7 +284,7 @@
 				body: JSON.stringify({
 					gallery_id: galleryId,
 					page: 1,
-					breakpoint: breakpoint,
+					breakpoint,
 					partial: 'items_only',
 					random_seed: seed,
 				}),

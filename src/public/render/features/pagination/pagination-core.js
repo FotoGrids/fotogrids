@@ -91,7 +91,9 @@
 			galleryEl &&
 			galleryEl.dataset &&
 			galleryEl.dataset.fgFilterStrategy;
-		if (attr === 'server' || attr === 'cache') return attr;
+		if (attr === 'server' || attr === 'cache') {
+			return attr;
+		}
 		return defaultFilterStrategy;
 	}
 
@@ -110,9 +112,9 @@
 		const pageSize = parseInt(ds.fgPageSize || '0', 10);
 
 		return {
-			page: page,
-			totalPages: totalPages,
-			pageSize: pageSize,
+			page,
+			totalPages,
+			pageSize,
 			method: ds.fgPaginationMethod || 'load_more',
 			preload: ds.fgPaginationPreload === 'true',
 			hasMore: page < totalPages,
@@ -166,7 +168,9 @@
 	 */
 	function readPageSizes(galleryEl) {
 		const raw = galleryEl.dataset.fgPageSizes;
-		if (!raw) return null;
+		if (!raw) {
+			return null;
+		}
 		const parts = raw
 			.trim()
 			.split(/\s+/)
@@ -178,8 +182,9 @@
 			parts.some(function (n) {
 				return !(n > 0);
 			})
-		)
+		) {
 			return null;
+		}
 		return { desktop: parts[0], tablet: parts[1], mobile: parts[2] };
 	}
 
@@ -195,7 +200,9 @@
 	 */
 	function resolveItemsRoot(galleryEl) {
 		const explicit = galleryEl.querySelector('[data-fg-items-root="true"]');
-		if (explicit) return explicit;
+		if (explicit) {
+			return explicit;
+		}
 
 		// Fallback: first child that isn't a known chrome element.
 		const chromeSelectors = [
@@ -210,7 +217,9 @@
 			const isChrome = chromeSelectors.some(function (sel) {
 				return el.matches(sel);
 			});
-			if (!isChrome) return el;
+			if (!isChrome) {
+				return el;
+			}
 		}
 		return null;
 	}
@@ -223,12 +232,18 @@
 	 * @param {Record<string,string>} cssUrls
 	 */
 	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') return;
+		if (!cssUrls || typeof cssUrls !== 'object') {
+			return;
+		}
 		Object.keys(cssUrls).forEach(function (handle) {
-			let url = cssUrls[handle];
-			if (!handle || !url) return;
+			const url = cssUrls[handle];
+			if (!handle || !url) {
+				return;
+			}
 			const linkId = 'fotogrids-css-' + handle;
-			if (document.getElementById(linkId)) return;
+			if (document.getElementById(linkId)) {
+				return;
+			}
 			const link = document.createElement('link');
 			link.rel = 'stylesheet';
 			link.id = linkId;
@@ -257,7 +272,7 @@
 		galleryEl.dispatchEvent(
 			new CustomEvent('fotogrids:page_changed', {
 				bubbles: true,
-				detail: detail,
+				detail,
 			})
 		);
 	}
@@ -272,7 +287,7 @@
 	 * @returns {Promise<object>}
 	 */
 	function fetchPage(galleryEl, page, breakpoint) {
-		let url =
+		const url =
 			galleryEl.dataset.fgRenderUrl ||
 			(window.fotogrids && window.fotogrids.renderUrl) ||
 			'';
@@ -320,10 +335,10 @@
 			credentials: 'same-origin',
 			body: JSON.stringify({
 				gallery_id: galleryId,
-				page: page,
+				page,
 				breakpoint: requestBreakpoint,
 				partial: 'items_only',
-				filters: filters,
+				filters,
 				random_seed: randomSeed,
 				container_width: containerWidth > 0 ? containerWidth : 0,
 			}),
@@ -359,7 +374,7 @@
 	) {
 		injectMissingStyles(payload.css || {});
 
-		let root = resolveItemsRoot(galleryEl);
+		const root = resolveItemsRoot(galleryEl);
 		if (!root) {
 			throw new Error('pagination/no-items-root');
 		}
@@ -369,7 +384,7 @@
 		const template = document.createElement('template');
 		template.innerHTML = payload.html;
 
-		let inserted = [];
+		const inserted = [];
 
 		// If the top-level element of the response is itself an items
 		// root, unwrap it. Otherwise, just take all top-level children.
@@ -418,7 +433,7 @@
 		galleryEl.dispatchEvent(
 			new CustomEvent('fotogrids:items_inserted', {
 				bubbles: true,
-				detail: { items: inserted, galleryEl: galleryEl },
+				detail: { items: inserted, galleryEl },
 			})
 		);
 
@@ -427,7 +442,7 @@
 			page: payload.page,
 			totalPages: payload.total_pages,
 			pageSize: payload.page_size,
-			breakpoint: breakpoint,
+			breakpoint,
 		});
 
 		// Snapshot into the filter-view cache under the fingerprint captured at fetch
@@ -442,9 +457,9 @@
 		}
 
 		notify(galleryEl, {
-			galleryEl: galleryEl,
+			galleryEl,
 			page: payload.page,
-			mode: mode,
+			mode,
 			hasMore: payload.has_more,
 			reflow: !!reflow,
 		});
@@ -492,7 +507,9 @@
 			window.FotoGrids &&
 			window.FotoGrids.modules &&
 			window.FotoGrids.modules.filters;
-		if (!fmod) return '';
+		if (!fmod) {
+			return '';
+		}
 		const map = fmod.getActive ? fmod.getActive(galleryEl) : {};
 		return fmod.fingerprint ? fmod.fingerprint(map) : '';
 	}
@@ -515,14 +532,16 @@
 	 * @param {Element} galleryEl
 	 */
 	function snapshotCurrentView(galleryEl) {
-		let root = resolveItemsRoot(galleryEl);
-		if (!root) return;
+		const root = resolveItemsRoot(galleryEl);
+		if (!root) {
+			return;
+		}
 
 		if (!activeFingerprint.has(galleryEl)) {
 			activeFingerprint.set(galleryEl, currentFingerprint(galleryEl));
 		}
 		const fp = activeFingerprint.get(galleryEl);
-		let s = readState(galleryEl);
+		const s = readState(galleryEl);
 
 		ensureCacheBucket(galleryEl).set(fp, {
 			html: root.innerHTML,
@@ -545,9 +564,11 @@
 	 * @param {string}  fp
 	 */
 	function snapshotCurrentViewAs(galleryEl, fp) {
-		let root = resolveItemsRoot(galleryEl);
-		if (!root) return;
-		let s = readState(galleryEl);
+		const root = resolveItemsRoot(galleryEl);
+		if (!root) {
+			return;
+		}
+		const s = readState(galleryEl);
 		ensureCacheBucket(galleryEl).set(fp, {
 			html: root.innerHTML,
 			page: s.page,
@@ -569,17 +590,23 @@
 	 */
 	function restoreCachedView(galleryEl, fingerprint) {
 		const bucket = filterViewCache.get(galleryEl);
-		if (!bucket) return null;
+		if (!bucket) {
+			return null;
+		}
 		const snap = bucket.get(fingerprint);
-		if (!snap) return null;
+		if (!snap) {
+			return null;
+		}
 
-		let root = resolveItemsRoot(galleryEl);
-		if (!root) return null;
+		const root = resolveItemsRoot(galleryEl);
+		if (!root) {
+			return null;
+		}
 
 		// Take the new items list to dispatch in fotogrids:items_inserted
 		// so lazy-load, loading-icon, etc. re-bind on the restored DOM.
 		root.innerHTML = snap.html;
-		let inserted = Array.prototype.slice.call(root.children);
+		const inserted = Array.prototype.slice.call(root.children);
 
 		writeState(galleryEl, {
 			page: snap.page,
@@ -590,7 +617,7 @@
 		activeFingerprint.set(galleryEl, fingerprint);
 
 		notify(galleryEl, {
-			galleryEl: galleryEl,
+			galleryEl,
 			page: snap.page,
 			mode: 'replace',
 			hasMore: snap.hasMore,
@@ -600,7 +627,7 @@
 		galleryEl.dispatchEvent(
 			new CustomEvent('fotogrids:items_inserted', {
 				bubbles: true,
-				detail: { items: inserted, galleryEl: galleryEl },
+				detail: { items: inserted, galleryEl },
 			})
 		);
 
@@ -736,7 +763,6 @@
 				return { page: payload.page, hasMore: payload.has_more };
 			})
 			.catch(function (err) {
-				/* eslint-disable-next-line no-console */
 				console.warn('[fotogrids] pagination failed:', err);
 				throw err;
 			})
@@ -787,7 +813,9 @@
 	 */
 	function needsReflow(galleryEl) {
 		const sizes = readPageSizes(galleryEl);
-		if (!sizes) return false;
+		if (!sizes) {
+			return false;
+		}
 		const active = activeBreakpoint();
 		const view = viewBreakpoint(galleryEl);
 		return active !== view && sizes[active] !== sizes[view];
@@ -802,15 +830,17 @@
 	 * @param {string}  breakpoint
 	 */
 	function adopt(galleryEl, payload, breakpoint) {
-		if (!payload || !(payload.total_pages > 0)) return;
+		if (!payload || !(payload.total_pages > 0)) {
+			return;
+		}
 		writeState(galleryEl, {
 			page: payload.page || 1,
 			totalPages: payload.total_pages,
 			pageSize: payload.page_size,
-			breakpoint: breakpoint,
+			breakpoint,
 		});
 		notify(galleryEl, {
-			galleryEl: galleryEl,
+			galleryEl,
 			page: payload.page || 1,
 			mode: 'replace',
 			hasMore: !!payload.has_more,
@@ -820,22 +850,26 @@
 
 	function expose() {
 		const FG = window.FotoGrids;
-		if (!FG) return false;
-		if (!FG.modules) FG.modules = {};
+		if (!FG) {
+			return false;
+		}
+		if (!FG.modules) {
+			FG.modules = {};
+		}
 		FG.modules.pagination = {
-			state: state,
-			goToPage: goToPage,
-			prefetch: prefetch,
-			onChange: onChange,
-			swapToFilterState: swapToFilterState,
-			adopt: adopt,
+			state,
+			goToPage,
+			prefetch,
+			onChange,
+			swapToFilterState,
+			adopt,
 			/**
 			 * Set the global filter strategy. Per-gallery overrides via
 			 * data-fg-filter-strategy still win.
 			 *
 			 * @param {'server'|'cache'} s
 			 */
-			setFilterStrategy: function (s) {
+			setFilterStrategy(s) {
 				if (s === 'server' || s === 'cache') {
 					defaultFilterStrategy = s;
 				}
@@ -847,7 +881,7 @@
 			 * @param {Element} galleryEl
 			 * @returns {'server'|'cache'}
 			 */
-			getFilterStrategy: function (galleryEl) {
+			getFilterStrategy(galleryEl) {
 				return strategyFor(galleryEl);
 			},
 		};
@@ -867,7 +901,9 @@
 		// only), then re-page to the visitor's breakpoint or preload the next
 		// page. A random-sort refetch re-pages instead, and calls adopt().
 		window.FotoGrids.onGallery(function (gEl) {
-			if (gEl.dataset.fgPaginated !== 'true') return;
+			if (gEl.dataset.fgPaginated !== 'true') {
+				return;
+			}
 			if (strategyFor(gEl) !== 'server') {
 				snapshotCurrentView(gEl);
 			}
@@ -882,7 +918,7 @@
 				);
 				return;
 			}
-			let s = readState(gEl);
+			const s = readState(gEl);
 			if (s.preload && s.hasMore) {
 				schedulePreload(gEl, s.page + 1);
 			}

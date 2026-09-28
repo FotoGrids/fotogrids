@@ -27,8 +27,8 @@
 	 *        render for the visitor's breakpoint, which does not scroll.
 	 */
 	function syncBar(gEl, nav, reflow) {
-		let pagination = window.FotoGrids.modules.pagination;
-		let s = pagination.state(gEl);
+		const pagination = window.FotoGrids.modules.pagination;
+		const s = pagination.state(gEl);
 
 		// Filters change the server's totalPages; rebuild the chip list to match.
 		rebuildChips(nav, s.totalPages);
@@ -36,13 +36,17 @@
 		// Prev / Next disabled state.
 		const prev = nav.querySelector('[data-fg-pagination-trigger="prev"]');
 		const next = nav.querySelector('[data-fg-pagination-trigger="next"]');
-		if (prev) prev.disabled = s.page <= 1;
-		if (next) next.disabled = s.page >= s.totalPages;
+		if (prev) {
+			prev.disabled = s.page <= 1;
+		}
+		if (next) {
+			next.disabled = s.page >= s.totalPages;
+		}
 
 		// Active number.
 		nav.querySelectorAll('[data-fg-pagination-trigger="page"]').forEach(
 			function (btn) {
-				let n = parseInt(btn.dataset.fgPaginationPage || '0', 10);
+				const n = parseInt(btn.dataset.fgPaginationPage || '0', 10);
 				if (n === s.page) {
 					btn.classList.add('fg-is-active');
 					btn.setAttribute('aria-current', 'page');
@@ -76,9 +80,13 @@
 	 * @param {number}  totalPages
 	 */
 	function rebuildChips(nav, totalPages) {
-		let list = nav.querySelector('.fg-pagination__numbers');
-		if (!list) return;
-		if (!totalPages || totalPages < 1) totalPages = 1;
+		const list = nav.querySelector('.fg-pagination__numbers');
+		if (!list) {
+			return;
+		}
+		if (!totalPages || totalPages < 1) {
+			totalPages = 1;
+		}
 
 		// Drop any ellipsis chips first - applyTruncation() will rebuild
 		// them after rebuildChips() finishes. Leaving them in would
@@ -103,7 +111,7 @@
 			const li = document.createElement('li');
 			li.className = 'fg-pagination__number-item';
 
-			let btn = document.createElement('button');
+			const btn = document.createElement('button');
 			btn.type = 'button';
 			btn.className = 'fg-pagination__btn fg-pagination__number';
 			btn.setAttribute('data-fg-pagination-trigger', 'page');
@@ -141,8 +149,10 @@
 	 * @param {number}  total
 	 */
 	function applyTruncation(gEl, nav, current, total) {
-		let list = nav.querySelector('.fg-pagination__numbers');
-		if (!list) return;
+		const list = nav.querySelector('.fg-pagination__numbers');
+		if (!list) {
+			return;
+		}
 
 		// Remove ellipsis chips from the previous sync; PHP never emits
 		// .fg-pagination__ellipsis-item.
@@ -158,7 +168,9 @@
 				'.fg-pagination__number-item:not(.fg-pagination__ellipsis-item)'
 			)
 		);
-		if (numberItems.length === 0) return;
+		if (numberItems.length === 0) {
+			return;
+		}
 
 		// Helper: clear .fg-is-trimmed on every <li> wrapper. Used for
 		// both the "truncate off" branch and the "short bar" branch.
@@ -179,7 +191,9 @@
 			'--fg-pagination-siblings'
 		);
 		let siblings = parseInt(rawSiblings, 10);
-		if (isNaN(siblings) || siblings < 0) siblings = 1;
+		if (isNaN(siblings) || siblings < 0) {
+			siblings = 1;
+		}
 
 		// Worst-case visible count (current in the middle):
 		//   1 + ellipsis + siblings + current + siblings + ellipsis + last
@@ -205,9 +219,11 @@
 		// The <li> wrapper is trimmed rather than the <button>, so the item and its
 		// gap leave the flex flow.
 		numberItems.forEach(function (item) {
-			let btn = item.querySelector('.fg-pagination__number');
-			if (!btn) return;
-			let n = parseInt(btn.dataset.fgPaginationPage || '0', 10);
+			const btn = item.querySelector('.fg-pagination__number');
+			if (!btn) {
+				return;
+			}
+			const n = parseInt(btn.dataset.fgPaginationPage || '0', 10);
 			if (visible[n]) {
 				item.classList.remove('fg-is-trimmed');
 			} else {
@@ -262,10 +278,14 @@
 	 */
 	function resolveTargetPage(target, s) {
 		const trigger = target.dataset.fgPaginationTrigger;
-		if (trigger === 'prev') return Math.max(1, s.page - 1);
-		if (trigger === 'next') return Math.min(s.totalPages, s.page + 1);
+		if (trigger === 'prev') {
+			return Math.max(1, s.page - 1);
+		}
+		if (trigger === 'next') {
+			return Math.min(s.totalPages, s.page + 1);
+		}
 		if (trigger === 'page') {
-			let n = parseInt(target.dataset.fgPaginationPage || '0', 10);
+			const n = parseInt(target.dataset.fgPaginationPage || '0', 10);
 			return n > 0 ? n : null;
 		}
 		return null;
@@ -277,30 +297,42 @@
 	 * @param {Element} gEl
 	 */
 	function attach(gEl) {
-		if (gEl.dataset.fgPaginationMethod !== 'pages') return;
-		if (gEl.dataset.fgPageButtonsBound === '1') return;
+		if (gEl.dataset.fgPaginationMethod !== 'pages') {
+			return;
+		}
+		if (gEl.dataset.fgPageButtonsBound === '1') {
+			return;
+		}
 		gEl.dataset.fgPageButtonsBound = '1';
 
 		const nav = gEl.querySelector('[data-fg-pagination-role="pages"]');
-		if (!nav) return;
+		if (!nav) {
+			return;
+		}
 
-		let pagination =
+		const pagination =
 			window.FotoGrids &&
 			window.FotoGrids.modules &&
 			window.FotoGrids.modules.pagination;
-		if (!pagination) return;
+		if (!pagination) {
+			return;
+		}
 
 		// Initial sync (also primes the scroll-on-next-change guard).
 		syncBar(gEl, nav);
 
 		nav.addEventListener('click', function (event) {
-			let btn = event.target.closest('[data-fg-pagination-trigger]');
-			if (!btn || btn.disabled) return;
+			const btn = event.target.closest('[data-fg-pagination-trigger]');
+			if (!btn || btn.disabled) {
+				return;
+			}
 			event.preventDefault();
 
-			let s = pagination.state(gEl);
+			const s = pagination.state(gEl);
 			const page = resolveTargetPage(btn, s);
-			if (page === null || page === s.page) return;
+			if (page === null || page === s.page) {
+				return;
+			}
 
 			nav.classList.add('fg-is-loading');
 
@@ -340,8 +372,9 @@
 		if (
 			!window.FotoGrids ||
 			typeof window.FotoGrids.onGallery !== 'function'
-		)
+		) {
 			return;
+		}
 		window.FotoGrids.onGallery(attach, 20);
 	}
 

@@ -97,7 +97,9 @@ const BUTTON_COLOR_VARS = {
  * @param {object}      colors Map of config field -> colour string.
  */
 function applyButtonColors(el, colors) {
-	if (!colors) return;
+	if (!colors) {
+		return;
+	}
 	Object.keys(BUTTON_COLOR_VARS).forEach((field) => {
 		const value = colors[field];
 		if (value) {
@@ -116,7 +118,9 @@ const NEXT_ICON = svgIcon('<path d="M9 18l6-6-6-6"/>');
 const CLOSE_ICON = svgIcon('<path d="M18 6L6 18"/><path d="M6 6l12 12"/>');
 
 function close() {
-	if (!overlay) return;
+	if (!overlay) {
+		return;
+	}
 	const el = overlay;
 	overlay = null;
 	view = null;
@@ -131,13 +135,17 @@ function close() {
 	el.classList.remove('fg-is-open');
 	let removed = false;
 	const remove = () => {
-		if (removed) return;
+		if (removed) {
+			return;
+		}
 		removed = true;
 		el.removeEventListener('transitionend', onEnd);
 		el.remove();
 	};
 	const onEnd = (e) => {
-		if (e.target === el && e.propertyName === 'opacity') remove();
+		if (e.target === el && e.propertyName === 'opacity') {
+			remove();
+		}
 	};
 	el.addEventListener('transitionend', onEnd);
 	setTimeout(remove, 350);
@@ -183,8 +191,12 @@ function groupRows(items) {
  * @return {string}
  */
 function captionTextFor(it, source) {
-	if (source === 'title') return it.title || '';
-	if (source === 'description') return it.description || '';
+	if (source === 'title') {
+		return it.title || '';
+	}
+	if (source === 'description') {
+		return it.description || '';
+	}
 	return it.caption || '';
 }
 
@@ -198,7 +210,9 @@ function captionTextFor(it, source) {
  */
 function open(config) {
 	const items = Array.isArray(config.items) ? config.items : [];
-	if (items.length === 0) return;
+	if (items.length === 0) {
+		return;
+	}
 	close();
 
 	lastFocus = document.activeElement;
@@ -370,7 +384,9 @@ function open(config) {
 
 	// Fade the overlay in on the next frame.
 	requestAnimationFrame(() => {
-		if (overlay) overlay.classList.add('fg-is-open');
+		if (overlay) {
+			overlay.classList.add('fg-is-open');
+		}
 	});
 
 	view = {
@@ -396,11 +412,17 @@ function open(config) {
 
 	keyHandler = (e) => {
 		if (e.key === 'Escape') {
-			if (view && view.zoomIndex >= 0) closeZoom();
-			else close();
+			if (view && view.zoomIndex >= 0) {
+				closeZoom();
+			} else {
+				close();
+			}
 		} else if (view && view.zoomIndex >= 0) {
-			if (e.key === 'ArrowLeft') zoomBy(-1);
-			else if (e.key === 'ArrowRight') zoomBy(1);
+			if (e.key === 'ArrowLeft') {
+				zoomBy(-1);
+			} else if (e.key === 'ArrowRight') {
+				zoomBy(1);
+			}
 		}
 	};
 	document.addEventListener('keydown', keyHandler);
@@ -452,7 +474,9 @@ function buildShareButton(config) {
 			},
 			{ layout: 'grid' }
 		);
-		if (!bar) return null;
+		if (!bar) {
+			return null;
+		}
 		const pop = document.createElement('div');
 		pop.className = 'fg-lb-grid-share-popover';
 		pop.appendChild(bar);
@@ -497,7 +521,9 @@ function buildShareButton(config) {
  */
 function tileRect(index) {
 	const media = view && view.tilesByIndex[index];
-	if (!media) return null;
+	if (!media) {
+		return null;
+	}
 	const r = media.getBoundingClientRect();
 	return r.width > 0 && r.height > 0 ? r : null;
 }
@@ -569,9 +595,13 @@ function positionCaption(box) {
  * @param {number} index
  */
 function openZoom(index) {
-	if (!view || view.animating) return;
+	if (!view || view.animating) {
+		return;
+	}
 	const from = tileRect(index);
-	if (!from) return;
+	if (!from) {
+		return;
+	}
 
 	view.zoomIndex = index;
 	view.sourceTile = view.tilesByIndex[index];
@@ -580,11 +610,15 @@ function openZoom(index) {
 	// Hide the originating tile image so it doesn't peek behind the morph.
 	const tileEl =
 		view.sourceTile && view.sourceTile.closest('.fg-lb-grid-tile');
-	if (tileEl) tileEl.classList.add('fg-is-source');
+	if (tileEl) {
+		tileEl.classList.add('fg-is-source');
+	}
 
 	const clip = view.clip;
 	const start = () => {
-		if (!view) return;
+		if (!view) {
+			return;
+		}
 		const natW = view.zoomImg.naturalWidth || from.width;
 		const natH = view.zoomImg.naturalHeight || from.height;
 		const target = fullBox(natW, natH);
@@ -610,10 +644,14 @@ function openZoom(index) {
 
 		let done = false;
 		const onEnd = () => {
-			if (done) return;
+			if (done) {
+				return;
+			}
 			done = true;
 			clip.removeEventListener('transitionend', onEnd);
-			if (view) view.animating = false;
+			if (view) {
+				view.animating = false;
+			}
 		};
 		clip.addEventListener('transitionend', onEnd);
 		setTimeout(onEnd, 500);
@@ -639,7 +677,9 @@ function openZoom(index) {
  * view is shown.
  */
 function closeZoom() {
-	if (!view || view.zoomIndex < 0 || view.animating) return;
+	if (!view || view.zoomIndex < 0 || view.animating) {
+		return;
+	}
 	const media = view.tilesByIndex[view.zoomIndex];
 	if (media && typeof media.scrollIntoView === 'function') {
 		media.scrollIntoView({ block: 'nearest' });
@@ -652,12 +692,16 @@ function closeZoom() {
 	view.zoomCap.style.display = 'none';
 
 	const teardown = () => {
-		if (!view) return;
+		if (!view) {
+			return;
+		}
 		view.animating = false;
 		view.zoomIndex = -1;
 		view.sourceTile = null;
 		// 1) Reveal the destination tile image while the clip still covers it.
-		if (tileEl) tileEl.classList.remove('fg-is-source');
+		if (tileEl) {
+			tileEl.classList.remove('fg-is-source');
+		}
 		// 2) Next frame, once the tile image has painted, drop the clip and the
 		//    zoom state together - so the hand-off never shows a gap (no flash).
 		requestAnimationFrame(() => {
@@ -696,7 +740,9 @@ function closeZoom() {
 
 		let done = false;
 		const onEnd = () => {
-			if (done) return;
+			if (done) {
+				return;
+			}
 			done = true;
 			clip.removeEventListener('transitionend', onEnd);
 			teardown();
@@ -713,14 +759,18 @@ function closeZoom() {
  * @param {number} delta
  */
 function zoomBy(delta) {
-	if (!view || view.zoomIndex < 0 || view.animating) return;
+	if (!view || view.zoomIndex < 0 || view.animating) {
+		return;
+	}
 	const n = view.items.length;
 	view.zoomIndex = (view.zoomIndex + delta + n) % n;
 
 	const fig = view.figure;
 	fig.classList.add('fg-is-swapping');
 	const swap = () => {
-		if (!view) return;
+		if (!view) {
+			return;
+		}
 		paintZoom();
 		const apply = () => {
 			const natW = view.zoomImg.naturalWidth || 16;
@@ -742,7 +792,9 @@ function zoomBy(delta) {
 
 /** Paint the current zoom item into the clip + counter (no morph). */
 function paintZoom() {
-	if (!view || view.zoomIndex < 0) return;
+	if (!view || view.zoomIndex < 0) {
+		return;
+	}
 	const it = view.items[view.zoomIndex];
 	view.zoomImg.src = it.full || it.thumb || '';
 	view.zoomImg.alt = it.alt || '';
@@ -865,26 +917,34 @@ function itemIndexFor(galleryEl, figure) {
 		(trigger && trigger.getAttribute('data-fg-item-id'));
 	if (id) {
 		const byId = items.findIndex((it) => String(it.id) === String(id));
-		if (byId >= 0) return byId;
+		if (byId >= 0) {
+			return byId;
+		}
 	}
 
 	const seq = figure.getAttribute('data-fg-sequence-index');
 	if (seq !== null && seq !== '') {
 		const n = parseInt(seq, 10);
-		if (!Number.isNaN(n) && n >= 0 && n < items.length) return n;
+		if (!Number.isNaN(n) && n >= 0 && n < items.length) {
+			return n;
+		}
 	}
 
 	return 0;
 }
 
 function attach(galleryEl) {
-	if (galleryEl.dataset.fgGridReady === '1') return;
+	if (galleryEl.dataset.fgGridReady === '1') {
+		return;
+	}
 
 	const isFeatured = galleryEl.matches('[data-fg-layout="featured-item"]');
 	const openOnItem =
 		galleryEl.getAttribute('data-fg-grid-open-on-item') === '1';
 
-	if (!isFeatured && !openOnItem) return;
+	if (!isFeatured && !openOnItem) {
+		return;
+	}
 
 	galleryEl.dataset.fgGridReady = '1';
 
@@ -905,8 +965,12 @@ function attach(galleryEl) {
 		'click',
 		(e) => {
 			const figure = e.target.closest('.fg-item');
-			if (!figure || !galleryEl.contains(figure)) return;
-			if (e.target.closest('[data-fg-show-all]')) return;
+			if (!figure || !galleryEl.contains(figure)) {
+				return;
+			}
+			if (e.target.closest('[data-fg-show-all]')) {
+				return;
+			}
 			e.preventDefault();
 			openForGallery(galleryEl, '', itemIndexFor(galleryEl, figure));
 		},

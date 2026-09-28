@@ -85,7 +85,9 @@ const SearchBar = ({
 
 	const handleChange = useCallback(
 		(event) => {
-			if (typeof onChange === 'function') onChange(event.target.value);
+			if (typeof onChange === 'function') {
+				onChange(event.target.value);
+			}
 		},
 		[onChange]
 	);
@@ -96,7 +98,9 @@ const SearchBar = ({
 		} else if (typeof onChange === 'function') {
 			onChange('');
 		}
-		if (inputRef.current) inputRef.current.focus();
+		if (inputRef.current) {
+			inputRef.current.focus();
+		}
 	}, [onChange, onClose]);
 
 	const hasValue = value !== '' && value != null;

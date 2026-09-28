@@ -32,14 +32,20 @@
 	 * @param {Record<string, string>} cssUrls  handle → absolute URL map
 	 */
 	function injectMissingStyles(cssUrls) {
-		if (!cssUrls || typeof cssUrls !== 'object') return;
+		if (!cssUrls || typeof cssUrls !== 'object') {
+			return;
+		}
 
 		Object.keys(cssUrls).forEach(function (handle) {
-			let url = cssUrls[handle];
-			if (!handle || !url) return;
+			const url = cssUrls[handle];
+			if (!handle || !url) {
+				return;
+			}
 
 			const linkId = 'fotogrids-css-' + handle;
-			if (document.getElementById(linkId)) return;
+			if (document.getElementById(linkId)) {
+				return;
+			}
 
 			const link = document.createElement('link');
 			link.rel = 'stylesheet';
@@ -57,15 +63,23 @@
 	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
 	 */
 	function injectMissingScripts(jsData) {
-		if (!jsData || typeof jsData !== 'object') return;
+		if (!jsData || typeof jsData !== 'object') {
+			return;
+		}
 
 		Object.keys(jsData).forEach(function (handle) {
 			const entry = jsData[handle];
-			let url = entry && entry.src ? entry.src : '';
-			if (!handle || !url) return;
+			const url = entry && entry.src ? entry.src : '';
+			if (!handle || !url) {
+				return;
+			}
 			const scriptId = 'fotogrids-js-' + handle;
-			if (document.getElementById(scriptId)) return;
-			if (document.getElementById(handle + '-js')) return;
+			if (document.getElementById(scriptId)) {
+				return;
+			}
+			if (document.getElementById(handle + '-js')) {
+				return;
+			}
 
 			const script = document.createElement('script');
 			script.id = scriptId;
@@ -85,13 +99,17 @@
 	 * @param {string} fontsUrl  Combined Google Fonts stylesheet URL, or ''.
 	 */
 	function injectFontStylesheet(fontsUrl) {
-		if (!fontsUrl || typeof fontsUrl !== 'string') return;
+		if (!fontsUrl || typeof fontsUrl !== 'string') {
+			return;
+		}
 
 		// Both the wp_enqueue_style handle and the wp_footer fallback emit the
 		// <link> with this id, so one check covers a font sheet already present
 		// from the original page render, a prior unlock, or another gallery.
 		const linkId = 'fotogrids-google-fonts-css';
-		if (document.getElementById(linkId)) return;
+		if (document.getElementById(linkId)) {
+			return;
+		}
 
 		const link = document.createElement('link');
 		link.rel = 'stylesheet';
@@ -106,7 +124,9 @@
 	 * @param {string} css  Bare CSS (no <style> tags), or ''.
 	 */
 	function injectInlineCss(css) {
-		if (!css || typeof css !== 'string') return;
+		if (!css || typeof css !== 'string') {
+			return;
+		}
 		const style = document.createElement('style');
 		style.className = 'fotogrids-inline-css';
 		style.textContent = css;
@@ -120,7 +140,9 @@
 	 * @param {string} js  Bare JS (no <script> tags), or ''.
 	 */
 	function injectInlineJs(js) {
-		if (!js || typeof js !== 'string') return;
+		if (!js || typeof js !== 'string') {
+			return;
+		}
 		const script = document.createElement('script');
 		script.textContent = js;
 		document.head.appendChild(script);
@@ -132,7 +154,9 @@
 	 * @param {string} jsonLd  Bare JSON-LD document, or ''.
 	 */
 	function injectJsonLd(jsonLd) {
-		if (!jsonLd || typeof jsonLd !== 'string') return;
+		if (!jsonLd || typeof jsonLd !== 'string') {
+			return;
+		}
 		const script = document.createElement('script');
 		script.type = 'application/ld+json';
 		script.textContent = jsonLd;
@@ -208,9 +232,15 @@
 			return;
 		}
 
-		if (card) card.classList.add('is-loading');
-		if (submitBtn) submitBtn.disabled = true;
-		if (errorEl) errorEl.classList.remove('is-visible');
+		if (card) {
+			card.classList.add('is-loading');
+		}
+		if (submitBtn) {
+			submitBtn.disabled = true;
+		}
+		if (errorEl) {
+			errorEl.classList.remove('is-visible');
+		}
 
 		fetch(unlockUrl, {
 			method: 'POST',
@@ -219,18 +249,20 @@
 				'X-WP-Nonce': nonce,
 			},
 			credentials: 'same-origin',
-			body: JSON.stringify({ password: password }),
+			body: JSON.stringify({ password }),
 		})
 			.then(function (response) {
 				return response.json().then(function (data) {
-					return { ok: response.ok, data: data };
+					return { ok: response.ok, data };
 				});
 			})
 			.then(function (result) {
 				const data = result.data;
 
 				if (!result.ok || !data || !data.success) {
-					if (errorEl) errorEl.classList.add('is-visible');
+					if (errorEl) {
+						errorEl.classList.add('is-visible');
+					}
 					if (input) {
 						input.value = '';
 						input.focus();
@@ -284,17 +316,23 @@
 				document.dispatchEvent(
 					new CustomEvent('fotogrids:gallery_unlocked', {
 						bubbles: true,
-						detail: { galleryId: galleryId },
+						detail: { galleryId },
 					})
 				);
 			})
 			.catch(function () {
-				if (errorEl) errorEl.classList.add('is-visible');
+				if (errorEl) {
+					errorEl.classList.add('is-visible');
+				}
 			})
 			.then(function () {
 				// finally - restore form state
-				if (card) card.classList.remove('is-loading');
-				if (submitBtn) submitBtn.disabled = false;
+				if (card) {
+					card.classList.remove('is-loading');
+				}
+				if (submitBtn) {
+					submitBtn.disabled = false;
+				}
 			});
 	}
 
@@ -324,9 +362,12 @@
 					!form ||
 					!form.classList ||
 					!form.classList.contains('fg-lock-form')
-				)
+				) {
 					return;
-				if (form.dataset.fotogridsLockBound === '1') return;
+				}
+				if (form.dataset.fotogridsLockBound === '1') {
+					return;
+				}
 				// Bind, then re-dispatch the submit so the new handler receives it.
 				bindLockForm(form);
 				e.preventDefault();

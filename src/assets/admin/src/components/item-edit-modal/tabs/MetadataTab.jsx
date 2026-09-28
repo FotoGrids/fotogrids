@@ -45,8 +45,12 @@ const MetadataTab = ({
 
 	const filteredSuggestions = availableItems
 		.filter((item) => {
-			if (!item || !item.name) return false;
-			if (!currentInput) return false;
+			if (!item || !item.name) {
+				return false;
+			}
+			if (!currentInput) {
+				return false;
+			}
 			const matchesInput = item.name
 				.toLowerCase()
 				.includes(currentInput.toLowerCase());
