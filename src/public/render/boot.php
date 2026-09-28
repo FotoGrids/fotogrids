@@ -146,6 +146,9 @@ add_action(
 		// Stats fires view + share pings to the REST API. Gated by the
 		// enable_statistics setting (default true) and never active in previews.
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Stats\Stats::class );
+		// Deep Linking opens #fg-{galleryId}-{itemId} URLs. Gated by the site-level
+		// deep_linking_enabled setting, independently of social sharing.
+		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Deep_Linking\Deep_Linking::class );
 		// Inline video playback - active when video_playback_mode is "inline".
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Video\Video_Inline::class );
 		// Minimal video lightbox - active when video_playback_mode is "lightbox"

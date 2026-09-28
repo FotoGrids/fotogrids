@@ -39,7 +39,7 @@ describe('deep-linking', () => {
 		document.body.innerHTML = '';
 		document.head.innerHTML = '';
 		document.body.className = '';
-		window.fotogrids = {};
+		window.fotogrids = { deep_linking_enabled: '1' };
 		delete window.FotoGridsLightbox;
 		setHash('');
 	});
@@ -112,8 +112,8 @@ describe('deep-linking', () => {
 		expect(figure.classList.contains('fg-deep-link-highlight')).toBe(true);
 	});
 
-	it('respects deep_linking_enabled=false (no auto-open)', () => {
-		window.fotogrids = { deep_linking_enabled: false };
+	it('does not auto-open when deep linking is disabled', () => {
+		window.fotogrids = { deep_linking_enabled: '' };
 		const { figure } = makeGallery(7, 42);
 		figure.scrollIntoView = jest.fn();
 		setHash('#fg-7-42');

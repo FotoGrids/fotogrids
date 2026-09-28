@@ -237,6 +237,11 @@
 	}
 
 	function init() {
+		// wp_localize_script delivers the flag as "1" or "".
+		if (!settings.deep_linking_enabled) {
+			return;
+		}
+
 		injectHighlightStyle();
 
 		document.addEventListener('fotogrids:lightbox:open', syncUrlToLightbox);
@@ -246,9 +251,7 @@
 		);
 		document.addEventListener('fotogrids:lightbox:close', clearDeepLink);
 
-		if (settings.deep_linking_enabled !== false) {
-			openDeepLink();
-		}
+		openDeepLink();
 	}
 
 	if (document.readyState === 'loading') {

@@ -232,37 +232,43 @@ const SharingTab = () => {
                             />
                         </PanelRow>
                     </SettingsPanel>
+                </>
+            )}
 
-                    <SettingsPanel
-                        title={__('Deep linking', 'fotogrids')}
-                        titleTag="h3"
-                        description={__('Give each image a shareable link that reopens the gallery on that image.', 'fotogrids')}
+            <SettingsPanel
+                title={__('Deep linking', 'fotogrids')}
+                titleTag="h3"
+                description={__('Give each image a shareable link that reopens the gallery on that image.', 'fotogrids')}
+            >
+                <PanelRow
+                    title={__('Enable deep linking', 'fotogrids')}
+                    description={__('A link to a specific image opens the Lightbox on that image, and the address bar follows the image being viewed.', 'fotogrids')}
+                >
+                    <Toggle
+                        checked={settings.deep_linking_enabled}
+                        onChange={(v) => update('deep_linking_enabled', v)}
+                    />
+                </PanelRow>
+                {enabled && settings.deep_linking_enabled && (
+                    <PanelRow
+                        title={__('Embedded galleries share', 'fotogrids')}
+                        description={__('When a gallery is embedded in a page, choose what an image share links to.', 'fotogrids')}
                     >
-                        <PanelRow
-                            title={__('Enable deep linking', 'fotogrids')}
-                            description={__('Sharing an image links to that specific image, not just the page.', 'fotogrids')}
-                        >
-                            <Toggle
-                                checked={settings.deep_linking_enabled}
-                                onChange={(v) => update('deep_linking_enabled', v)}
-                            />
-                        </PanelRow>
-                        <PanelRow
-                            title={__('Embedded galleries share', 'fotogrids')}
-                            description={__('When a gallery is embedded in a page, choose what an image share links to.', 'fotogrids')}
-                        >
-                            <Segmented
-                                ariaLabel={__('Embedded share target', 'fotogrids')}
-                                value={settings.embedded_share_target}
-                                onChange={(v) => update('embedded_share_target', v)}
-                                options={[
-                                    { value: 'image', label: __('The specific image', 'fotogrids') },
-                                    { value: 'page', label: __('The page', 'fotogrids') },
-                                ]}
-                            />
-                        </PanelRow>
-                    </SettingsPanel>
+                        <Segmented
+                            ariaLabel={__('Embedded share target', 'fotogrids')}
+                            value={settings.embedded_share_target}
+                            onChange={(v) => update('embedded_share_target', v)}
+                            options={[
+                                { value: 'image', label: __('The specific image', 'fotogrids') },
+                                { value: 'page', label: __('The page', 'fotogrids') },
+                            ]}
+                        />
+                    </PanelRow>
+                )}
+            </SettingsPanel>
 
+            {enabled && (
+                <>
                     <SettingsPanel
                         title={__('Advanced', 'fotogrids')}
                         titleTag="h3"
