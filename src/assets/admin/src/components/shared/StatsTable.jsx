@@ -61,13 +61,12 @@ const StatsTable = ({
 	const [sort, setSort] = useState(defaultSort);
 
 	const sortedRows = useMemo(() => {
-		if (!sort || !Array.isArray(rows)) {
-			return rows;
-		}
 		if (
-			defaultSort &&
-			sort.key === defaultSort.key &&
-			sort.direction === defaultSort.direction
+			!sort ||
+			!Array.isArray(rows) ||
+			(defaultSort &&
+				sort.key === defaultSort.key &&
+				sort.direction === defaultSort.direction)
 		) {
 			return rows;
 		}

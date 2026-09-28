@@ -52,10 +52,7 @@ export function createIndexState(opts) {
 	};
 
 	const setIndex = (next) => {
-		if (total === 0) {
-			return false;
-		}
-		if (next === index) {
+		if (total === 0 || next === index) {
 			return false;
 		}
 		const prev = index;
@@ -469,10 +466,10 @@ export function createSwipeDetector(el, opts) {
 		const adx = Math.abs(dx);
 		const ady = Math.abs(dy);
 
-		if (directionLock === 'horizontal' && ady > adx) {
-			return;
-		}
-		if (directionLock === 'vertical' && adx > ady) {
+		if (
+			(directionLock === 'horizontal' && ady > adx) ||
+			(directionLock === 'vertical' && adx > ady)
+		) {
 			return;
 		}
 
@@ -593,10 +590,11 @@ export function createKeyboardNav(el, opts) {
  * @return {() => void} Destroy.
  */
 export function createIntersectionPauser(opts) {
-	if (!opts || !opts.el) {
-		return () => {};
-	}
-	if (typeof window.IntersectionObserver !== 'function') {
+	if (
+		!opts ||
+		!opts.el ||
+		typeof window.IntersectionObserver !== 'function'
+	) {
 		return () => {};
 	}
 
@@ -663,10 +661,7 @@ export function createPointerDrag(el, opts) {
 	let didExceedThreshold = false;
 
 	const onPointerDown = (e) => {
-		if (e.pointerType === 'touch') {
-			return;
-		}
-		if (e.button !== 0) {
+		if (e.pointerType === 'touch' || e.button !== 0) {
 			return;
 		}
 		isDragging = true;

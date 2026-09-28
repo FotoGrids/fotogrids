@@ -337,10 +337,10 @@
 
 	function attach(collectionEl) {
 		const mode = collectionEl.getAttribute(MODE_ATTR);
-		if (MODE_REFETCH !== mode && MODE_REORDER !== mode) {
-			return;
-		}
-		if ('1' === collectionEl.dataset.fgRandomSortReady) {
+		if (
+			(MODE_REFETCH !== mode && MODE_REORDER !== mode) ||
+			'1' === collectionEl.dataset.fgRandomSortReady
+		) {
 			return;
 		}
 		collectionEl.dataset.fgRandomSortReady = '1';

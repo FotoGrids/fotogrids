@@ -58,10 +58,10 @@ export function waitForDimensions(items) {
 
 		const attrW = parseInt(img.getAttribute('width'), 10);
 		const attrH = parseInt(img.getAttribute('height'), 10);
-		if (attrW > 0 && attrH > 0) {
-			continue;
-		}
-		if (img.complete && img.naturalWidth > 0) {
+		if (
+			(attrW > 0 && attrH > 0) ||
+			(img.complete && img.naturalWidth > 0)
+		) {
 			continue;
 		}
 
@@ -281,10 +281,10 @@ export function createLayoutAttach(opts) {
 	}
 
 	return function attach(collectionEl) {
-		if (!collectionEl.matches(collectionSelector)) {
-			return;
-		}
-		if (collectionEl.dataset[readyKey] === '1') {
+		if (
+			!collectionEl.matches(collectionSelector) ||
+			collectionEl.dataset[readyKey] === '1'
+		) {
 			return;
 		}
 		collectionEl.dataset[readyKey] = '1';

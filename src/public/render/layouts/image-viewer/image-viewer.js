@@ -532,10 +532,10 @@ function setup(collectionEl) {
 }
 
 function attach(collectionEl) {
-	if (!collectionEl.matches('[data-fg-layout="image-viewer"]')) {
-		return;
-	}
-	if (collectionEl.dataset.fgViewerReady === '1') {
+	if (
+		!collectionEl.matches('[data-fg-layout="image-viewer"]') ||
+		collectionEl.dataset.fgViewerReady === '1'
+	) {
 		return;
 	}
 	collectionEl.dataset.fgViewerReady = '1';

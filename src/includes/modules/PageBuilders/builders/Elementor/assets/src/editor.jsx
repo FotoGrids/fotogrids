@@ -513,13 +513,13 @@ document.addEventListener('click', (event) => {
 // window.open). It postMessages the URL up here; we open it from the
 // editor window where popup permissions are normal.
 function isAllowedEmptyStateMessage(event) {
-	if (!event || typeof event.data !== 'object' || event.data === null) {
-		return false;
-	}
-	if (event.data.type !== 'fg-pb-empty-state:open') {
-		return false;
-	}
-	if (typeof event.data.url !== 'string') {
+	if (
+		!event ||
+		typeof event.data !== 'object' ||
+		event.data === null ||
+		event.data.type !== 'fg-pb-empty-state:open' ||
+		typeof event.data.url !== 'string'
+	) {
 		return false;
 	}
 	// Same-origin only - the preview iframe shares the editor's origin.

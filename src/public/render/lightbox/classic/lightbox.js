@@ -1264,10 +1264,7 @@ class FotoGridsLightbox {
 	}
 
 	close() {
-		if (!this.dialog) {
-			return;
-		}
-		if (this._closeInProgress) {
+		if (!this.dialog || this._closeInProgress) {
 			return;
 		}
 		this._closeInProgress = true;
@@ -1358,10 +1355,7 @@ class FotoGridsLightbox {
 	 * @returns {{offset:number, limit:number}|null}
 	 */
 	_findGap(from, maxLen) {
-		if (from < 0 || from >= this._total) {
-			return null;
-		}
-		if (this.items[from] != null) {
+		if (from < 0 || from >= this._total || this.items[from] != null) {
 			return null;
 		}
 		let end = from;
@@ -3393,10 +3387,7 @@ class FotoGridsLightbox {
 		// Hover-out and other automatic triggers are blocked when the user has
 		// manually navigated with progressStop on. The play button calls
 		// _playBtnResume() instead, which bypasses this guard.
-		if (this._autoStoppedByUser) {
-			return;
-		}
-		if (!this._autoPaused) {
+		if (this._autoStoppedByUser || !this._autoPaused) {
 			return;
 		}
 		this._autoPaused = false;
@@ -3659,10 +3650,7 @@ class FotoGridsLightbox {
 	}
 
 	_onPointerDown(e) {
-		if (e.button !== 0) {
-			return;
-		}
-		if (e.target.closest('button, a')) {
+		if (e.button !== 0 || e.target.closest('button, a')) {
 			return;
 		}
 
@@ -3787,10 +3775,7 @@ class FotoGridsLightbox {
 	}
 
 	_onTouchStart(e) {
-		if (!this.settings?.zoom) {
-			return;
-		}
-		if (e.touches.length !== 2) {
+		if (!this.settings?.zoom || e.touches.length !== 2) {
 			return;
 		}
 
@@ -3804,10 +3789,7 @@ class FotoGridsLightbox {
 	}
 
 	_onTouchMove(e) {
-		if (!this.settings?.zoom) {
-			return;
-		}
-		if (e.touches.length !== 2) {
+		if (!this.settings?.zoom || e.touches.length !== 2) {
 			return;
 		}
 
@@ -3866,19 +3848,16 @@ class FotoGridsLightbox {
 	 */
 	_onZoomClick(e, isDbl) {
 		const s = this.settings;
-		if (!s?.zoom) {
-			return;
-		}
-		if (e.target.closest('button, a')) {
+		if (!s?.zoom || e.target.closest('button, a')) {
 			return;
 		}
 
 		const trigger = s.zoomTrigger;
 
-		if (trigger === 'wheel_pinch') {
-			return;
-		}
-		if (trigger === 'double_click' && !isDbl) {
+		if (
+			trigger === 'wheel_pinch' ||
+			(trigger === 'double_click' && !isDbl)
+		) {
 			return;
 		}
 		if (trigger === 'click' && isDbl) {
@@ -3964,11 +3943,7 @@ class FotoGridsLightboxInit {
 		// but the classic overlay only owns the click when the variant is full.
 		// Mini and grid galleries have their own modules claim the click.
 		const variant = galleryEl.dataset.fgLightboxVariant;
-		if (variant && variant !== 'full') {
-			return;
-		}
-
-		if (this._wired.has(galleryEl)) {
+		if ((variant && variant !== 'full') || this._wired.has(galleryEl)) {
 			return;
 		}
 		this._wired.add(galleryEl);

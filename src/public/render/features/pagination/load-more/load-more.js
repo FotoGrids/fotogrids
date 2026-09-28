@@ -22,10 +22,10 @@
 	 * @param {Element} gEl
 	 */
 	function attach(gEl) {
-		if (gEl.dataset.fgPaginationMethod !== 'load_more') {
-			return;
-		}
-		if (gEl.dataset.fgLoadMoreBound === '1') {
+		if (
+			gEl.dataset.fgPaginationMethod !== 'load_more' ||
+			gEl.dataset.fgLoadMoreBound === '1'
+		) {
 			return;
 		}
 		gEl.dataset.fgLoadMoreBound = '1';

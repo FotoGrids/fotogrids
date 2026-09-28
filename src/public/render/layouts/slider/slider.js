@@ -392,10 +392,7 @@ function setup(collectionEl) {
 	trackWrapperEl.addEventListener(
 		'scroll',
 		() => {
-			if (suppressScrollListener) {
-				return;
-			}
-			if (!indexState) {
+			if (suppressScrollListener || !indexState) {
 				return;
 			}
 			clearTimeout(scrollSyncTimer);
@@ -638,10 +635,10 @@ function renderThumbnails(containerEl, collectionEl, items, indexState) {
 }
 
 function attach(collectionEl) {
-	if (!collectionEl.matches('[data-fg-layout="slider"]')) {
-		return;
-	}
-	if (collectionEl.dataset.fgCarouselReady === '1') {
+	if (
+		!collectionEl.matches('[data-fg-layout="slider"]') ||
+		collectionEl.dataset.fgCarouselReady === '1'
+	) {
 		return;
 	}
 	collectionEl.dataset.fgCarouselReady = '1';

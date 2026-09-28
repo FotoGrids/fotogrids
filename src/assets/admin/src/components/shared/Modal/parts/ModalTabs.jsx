@@ -15,10 +15,7 @@ const ModalTabs = ({
 	const ctx = useModalContext();
 
 	const handleClick = (tab) => {
-		if (tab.disabled || disabled) {
-			return;
-		}
-		if (activeId === tab.id) {
+		if (tab.disabled || disabled || activeId === tab.id) {
 			return;
 		}
 		onChange?.(tab.id);

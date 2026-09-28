@@ -77,10 +77,10 @@
 	 * @param {Element} gEl
 	 */
 	function attach(gEl) {
-		if (gEl.dataset.fgPaginationMethod !== 'endless_scroll') {
-			return;
-		}
-		if (gEl.dataset.fgEndlessScrollBound === '1') {
+		if (
+			gEl.dataset.fgPaginationMethod !== 'endless_scroll' ||
+			gEl.dataset.fgEndlessScrollBound === '1'
+		) {
 			return;
 		}
 		gEl.dataset.fgEndlessScrollBound = '1';

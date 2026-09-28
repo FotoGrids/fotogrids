@@ -136,10 +136,7 @@ const ToolsPage = () => {
 	};
 
 	const accessStateLabel = (tool) => {
-		if (tool.access_state === 'teaser') {
-			return tool.tier_required;
-		}
-		if (tool.access_state === 'locked') {
+		if (tool.access_state === 'teaser' || tool.access_state === 'locked') {
 			return tool.tier_required;
 		}
 		return null;

@@ -178,13 +178,11 @@ function setup(collectionEl) {
 }
 
 function attach(collectionEl) {
-	if (!collectionEl.matches('[data-fg-layout="single-item"]')) {
-		return;
-	}
-	if (collectionEl.getAttribute('data-fg-si-auto-progress') !== '1') {
-		return;
-	}
-	if (collectionEl.dataset.fgSingleItemReady === '1') {
+	if (
+		!collectionEl.matches('[data-fg-layout="single-item"]') ||
+		collectionEl.getAttribute('data-fg-si-auto-progress') !== '1' ||
+		collectionEl.dataset.fgSingleItemReady === '1'
+	) {
 		return;
 	}
 	collectionEl.dataset.fgSingleItemReady = '1';

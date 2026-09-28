@@ -74,10 +74,10 @@
 				return;
 			}
 			const scriptId = 'fotogrids-js-' + handle;
-			if (document.getElementById(scriptId)) {
-				return;
-			}
-			if (document.getElementById(handle + '-js')) {
+			if (
+				document.getElementById(scriptId) ||
+				document.getElementById(handle + '-js')
+			) {
 				return;
 			}
 
@@ -361,11 +361,9 @@
 				if (
 					!form ||
 					!form.classList ||
-					!form.classList.contains('fg-lock-form')
+					!form.classList.contains('fg-lock-form') ||
+					form.dataset.fotogridsLockBound === '1'
 				) {
-					return;
-				}
-				if (form.dataset.fotogridsLockBound === '1') {
 					return;
 				}
 				// Bind, then re-dispatch the submit so the new handler receives it.

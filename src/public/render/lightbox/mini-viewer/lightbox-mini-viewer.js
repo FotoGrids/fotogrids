@@ -333,10 +333,10 @@ function configFor(galleryEl, index) {
 }
 
 function attach(galleryEl) {
-	if (galleryEl.dataset.fgMiniReady === '1') {
-		return;
-	}
-	if (galleryEl.dataset.fgLightboxVariant !== 'mini') {
+	if (
+		galleryEl.dataset.fgMiniReady === '1' ||
+		galleryEl.dataset.fgLightboxVariant !== 'mini'
+	) {
 		return;
 	}
 	galleryEl.dataset.fgMiniReady = '1';

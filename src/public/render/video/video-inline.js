@@ -342,10 +342,11 @@
 			'click',
 			function (event) {
 				const trigger = event.target.closest(PLAYER_SELECTOR);
-				if (!trigger || !galleryElement.contains(trigger)) {
-					return;
-				}
-				if (trigger.getAttribute('data-fg-playing') === '1') {
+				if (
+					!trigger ||
+					!galleryElement.contains(trigger) ||
+					trigger.getAttribute('data-fg-playing') === '1'
+				) {
 					return;
 				}
 				event.preventDefault();

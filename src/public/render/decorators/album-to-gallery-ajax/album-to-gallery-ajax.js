@@ -208,13 +208,14 @@
 	 */
 	function handleTriggerClick(trigger, event) {
 		// Honour modifier clicks - middle/ctrl/cmd/shift = native navigation.
-		if (event.defaultPrevented) {
-			return;
-		}
-		if (event.button !== 0) {
-			return;
-		}
-		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+		if (
+			event.defaultPrevented ||
+			event.button !== 0 ||
+			event.metaKey ||
+			event.ctrlKey ||
+			event.shiftKey ||
+			event.altKey
+		) {
 			return;
 		}
 

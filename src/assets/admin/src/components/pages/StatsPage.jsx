@@ -439,13 +439,11 @@ const StatsPage = () => {
 	}, [loading, viewsData]);
 
 	useEffect(() => {
-		if (loading) {
-			return;
-		}
-		if (typeof Chart === 'undefined') {
-			return;
-		}
-		if (!popularChartRef.current) {
+		if (
+			loading ||
+			typeof Chart === 'undefined' ||
+			!popularChartRef.current
+		) {
 			return;
 		}
 		// No data → canvas is hidden, nothing to draw.

@@ -134,10 +134,10 @@
 	 * @param {Element} galleryEl
 	 */
 	function attach(galleryEl) {
-		if (!galleryEl.matches('[data-fg-lazy]')) {
-			return;
-		}
-		if (galleryEl.dataset.fgLazyReady === '1') {
+		if (
+			!galleryEl.matches('[data-fg-lazy]') ||
+			galleryEl.dataset.fgLazyReady === '1'
+		) {
 			return;
 		}
 		galleryEl.dataset.fgLazyReady = '1';

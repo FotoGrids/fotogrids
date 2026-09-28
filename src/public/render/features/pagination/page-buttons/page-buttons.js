@@ -297,10 +297,10 @@
 	 * @param {Element} gEl
 	 */
 	function attach(gEl) {
-		if (gEl.dataset.fgPaginationMethod !== 'pages') {
-			return;
-		}
-		if (gEl.dataset.fgPageButtonsBound === '1') {
+		if (
+			gEl.dataset.fgPaginationMethod !== 'pages' ||
+			gEl.dataset.fgPageButtonsBound === '1'
+		) {
 			return;
 		}
 		gEl.dataset.fgPageButtonsBound = '1';

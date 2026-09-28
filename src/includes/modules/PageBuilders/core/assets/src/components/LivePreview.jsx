@@ -76,10 +76,7 @@ const LivePreview = ({
 	}, [pagination]);
 
 	useEffect(() => {
-		if (!id || !restUrl) {
-			return undefined;
-		}
-		if (kind !== 'gallery' && kind !== 'album') {
+		if (!id || !restUrl || (kind !== 'gallery' && kind !== 'album')) {
 			return undefined;
 		}
 

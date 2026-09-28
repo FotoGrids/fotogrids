@@ -965,10 +965,11 @@ function attach(galleryEl) {
 		'click',
 		(e) => {
 			const figure = e.target.closest('.fg-item');
-			if (!figure || !galleryEl.contains(figure)) {
-				return;
-			}
-			if (e.target.closest('[data-fg-show-all]')) {
+			if (
+				!figure ||
+				!galleryEl.contains(figure) ||
+				e.target.closest('[data-fg-show-all]')
+			) {
 				return;
 			}
 			e.preventDefault();

@@ -142,10 +142,7 @@ const Modal = ({
 		.join(' ');
 
 	const handleOverlayClick = (event) => {
-		if (event.target !== event.currentTarget) {
-			return;
-		}
-		if (!closeOnOverlay) {
+		if (event.target !== event.currentTarget || !closeOnOverlay) {
 			return;
 		}
 		requestClose('overlay');
