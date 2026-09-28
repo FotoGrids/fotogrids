@@ -320,6 +320,34 @@ describe('random-sort', () => {
 			expect(orderOf(root)).toEqual(['x', 'y']);
 		});
 
+		it("requests the visitor's breakpoint and hands the page to pagination", async () => {
+			const { collection } = makeCollection(['a', 'b', 'c'], {
+				mode: 'refetch',
+			});
+			collection.dataset.fgPaginated = 'true';
+			const payload = {
+				html: itemsMarkup(['x', 'y']),
+				page: 1,
+				total_pages: 4,
+				page_size: 2,
+				has_more: true,
+			};
+			const server = stubFetch(payload);
+			window.FotoGrids.activeBreakpoint = () => 'mobile';
+			const adopt = jest.fn();
+			window.FotoGrids.modules = { pagination: { adopt } };
+
+			loadModule();
+			window.FotoGrids.boot();
+
+			const body = JSON.parse(window.fetch.mock.calls[0][1].body);
+			expect(body.breakpoint).toBe('mobile');
+
+			await server.settle();
+
+			expect(adopt).toHaveBeenCalledWith(collection, payload, 'mobile');
+		});
+
 		it('leaves the server order alone when the wrapper carries no render URL', () => {
 			window.fetch = jest.fn();
 			const { root } = makeCollection(['a', 'b', 'c'], {

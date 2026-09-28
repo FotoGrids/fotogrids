@@ -65,9 +65,36 @@ window.FotoGrids.getInstances();
 // sharing module to render a share bar in the toolbar).
 window.FotoGrids.modules; // { sharing?, stats?, lazyLoad?, ... }
 
+// The visitor's breakpoint ('desktop' | 'tablet' | 'mobile') under the
+// site's configured breakpoints and detection mode.
+window.FotoGrids.activeBreakpoint();
+
+// A copy of the site's breakpoint configuration:
+// { mobile: 767, tablet: 1024, detect: 'viewport' | 'device' }.
+window.FotoGrids.getBreakpoints();
+
+// Wraps declarations so they apply at a breakpoint and every narrower one.
+// For modules that build CSS at runtime; mirrors Breakpoint_Config::scope().
+window.FotoGrids.scopeCss('tablet', '.my-scope', '--my-var: 2;');
+
 // Runtime version. Bumped if the contract changes.
 window.FotoGrids.version;
 ```
+
+## Breakpoints
+
+Breakpoints are site-level (Settings → Responsiveness). `Render_Controller`
+writes them onto every wrapper as `data-fg-breakpoints="<mobile> <tablet>"`
+and `data-fg-breakpoint-detect="viewport|device"`; the runtime reads the first
+wrapper it finds.
+
+- **Viewport** detection classifies by window width, with the same
+  `max-width` conditions as the server-emitted `@media` blocks.
+- **Device** detection classifies the device: User-Agent Client Hints
+  `mobile`, then a coarse primary pointer, then the short side of the screen.
+  The runtime writes the result to `html[data-fg-breakpoint]`, and the
+  server-emitted rules select on that attribute. Until the attribute is set,
+  `max-width` fallbacks apply.
 
 ## Picking the right subscription
 
@@ -129,7 +156,8 @@ the same callback fires for static and dynamically-inserted collections.
 
 ## What the runtime does NOT do
 
-- It does not read per-collection settings. Settings come from each module's
+- It does not read per-collection settings, only the site-level breakpoint
+  configuration. Settings come from each module's
   own `wp_localize_script` payload, or from `data-*` attributes the
   module's PHP class writes onto the wrapper.
 - It does not call `fetch()` to the REST API. Stats tracking lives in

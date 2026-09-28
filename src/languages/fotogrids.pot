@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-27T13:06:05+00:00\n"
+"POT-Creation-Date: 2026-09-27T20:52:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -87,11 +87,11 @@ msgid "Shortcode"
 msgstr ""
 
 #: includes/admin/class-admin-columns.php:91
-#: includes/admin/class-dashboard-widget.php:209
+#: includes/admin/class-dashboard-widget.php:187
 #: includes/metaboxes/class-collection-save-pipeline.php:166
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1473
+#: includes/rest/admin/admin-data.php:1470
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:421
 #: assets/admin/src/components/pages/TemplatesPage.jsx:428
@@ -110,7 +110,7 @@ msgid "Layout"
 msgstr ""
 
 #: includes/admin/class-admin-columns.php:93
-#: includes/admin/class-dashboard-widget.php:164
+#: includes/admin/class-dashboard-widget.php:142
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:14
 #: assets/admin/src/components/library/LibraryTabBase.jsx:294
 #: assets/admin/src/components/pages/StatsPage.jsx:200
@@ -121,7 +121,6 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:94
 #: includes/admin/class-admin-columns.php:215
-#: includes/admin/class-dashboard-widget.php:172
 #: includes/catalog/catalog-strings.php:439
 #: includes/metaboxes/class-metabox-strings.php:263
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:16
@@ -151,7 +150,7 @@ msgid "shares"
 msgstr ""
 
 #: includes/admin/class-admin-columns.php:214
-#: includes/admin/class-dashboard-widget.php:148
+#: includes/admin/class-dashboard-widget.php:126
 #: includes/class-admin-init.php:89
 #: includes/class-admin-init.php:90
 #: includes/class-post-types.php:328
@@ -185,7 +184,7 @@ msgid "Dismiss this message."
 msgstr ""
 
 #: includes/admin/class-admin-header.php:104
-#: includes/admin/class-dashboard-widget.php:268
+#: includes/admin/class-dashboard-widget.php:246
 msgid "Docs"
 msgstr ""
 
@@ -201,26 +200,26 @@ msgstr ""
 msgid "Security check failed."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:55
+#: includes/admin/class-dashboard-widget.php:33
 msgid "FotoGrids Overview"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:112
+#: includes/admin/class-dashboard-widget.php:90
 msgid "Unable to load news and updates."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:113
+#: includes/admin/class-dashboard-widget.php:91
 #: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:116
 msgid "No news available at this time."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:114
+#: includes/admin/class-dashboard-widget.php:92
 #: includes/metaboxes/class-metabox-strings.php:151
 #: assets/admin/src/components/whats-new/WhatsNewPanel.jsx:53
 msgid "New"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:156
+#: includes/admin/class-dashboard-widget.php:134
 #: includes/class-admin-init.php:98
 #: includes/class-admin-init.php:99
 #: includes/diagnostics/class-system-report.php:161
@@ -232,21 +231,25 @@ msgstr ""
 msgid "Albums"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:189
+#: includes/admin/class-dashboard-widget.php:150
+msgid "Engagement"
+msgstr ""
+
+#: includes/admin/class-dashboard-widget.php:167
 #: includes/class-admin-init.php:80
 #: includes/class-admin-init.php:81
 msgid "Dashboard"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:199
+#: includes/admin/class-dashboard-widget.php:177
 msgid "Create New"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:206
+#: includes/admin/class-dashboard-widget.php:184
 #: includes/metaboxes/class-collection-save-pipeline.php:167
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1473
+#: includes/rest/admin/admin-data.php:1470
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:422
 #: assets/admin/src/components/pages/TemplatesPage.jsx:427
@@ -257,34 +260,34 @@ msgstr ""
 msgid "Gallery"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:231
+#: includes/admin/class-dashboard-widget.php:209
 #: assets/admin/src/components/dashboard/RecentlyEdited.jsx:126
 msgid "Recently Edited"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:253
+#: includes/admin/class-dashboard-widget.php:231
 #: assets/admin/src/components/dashboard/RecentlyEdited.jsx:109
 msgid "No recently edited galleries or albums."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:259
+#: includes/admin/class-dashboard-widget.php:237
 msgid "News & Updates"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:261
-#: includes/metaboxes/class-metabox-registrar.php:632
-#: includes/metaboxes/class-metabox-registrar.php:697
+#: includes/admin/class-dashboard-widget.php:239
+#: includes/metaboxes/class-metabox-registrar.php:610
+#: includes/metaboxes/class-metabox-registrar.php:675
 #: includes/metaboxes/class-metabox-strings.php:64
 #: assets/admin/src/components/templates/ApplyTemplateModal.jsx:139
 msgid "Loading..."
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:275
+#: includes/admin/class-dashboard-widget.php:253
 #: includes/class-upgrade-modal.php:61
 msgid "Support"
 msgstr ""
 
-#: includes/admin/class-dashboard-widget.php:284
+#: includes/admin/class-dashboard-widget.php:262
 msgid "Upgrade"
 msgstr ""
 
@@ -2527,7 +2530,7 @@ msgid "Next Button Text"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:532
-#: includes/diagnostics/class-system-report.php:625
+#: includes/diagnostics/class-system-report.php:624
 #: assets/admin/plain/render-settings/renderImageSize.js:52
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:290
 msgid "No"
@@ -2545,8 +2548,8 @@ msgstr ""
 #: includes/diagnostics/class-system-report.php:288
 #: includes/diagnostics/class-system-report.php:314
 #: includes/diagnostics/class-system-report.php:346
-#: includes/diagnostics/class-system-report.php:526
-#: includes/diagnostics/class-system-report.php:557
+#: includes/diagnostics/class-system-report.php:525
+#: includes/diagnostics/class-system-report.php:556
 #: public/render/decorators/hover/class-hover-effects-catalog.php:58
 msgid "None"
 msgstr ""
@@ -3896,7 +3899,7 @@ msgid "XMP Rights"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:857
-#: includes/diagnostics/class-system-report.php:625
+#: includes/diagnostics/class-system-report.php:624
 #: assets/admin/plain/render-settings/renderImageSize.js:52
 #: assets/admin/src/components/plugin-settings/tabs/MediaTab.jsx:290
 msgid "Yes"
@@ -3983,17 +3986,17 @@ msgstr ""
 #: includes/class-admin-init.php:602
 #: includes/metaboxes/class-collection-save-pipeline.php:96
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
-#: includes/rest/admin/admin-data.php:241
-#: includes/rest/admin/admin-data.php:277
-#: includes/rest/admin/admin-data.php:297
-#: includes/rest/admin/admin-data.php:805
-#: includes/rest/admin/admin-data.php:918
-#: includes/rest/admin/admin-data.php:1081
-#: includes/rest/admin/admin-data.php:1145
-#: includes/rest/admin/admin-data.php:1229
-#: includes/rest/admin/admin-data.php:1287
-#: includes/rest/admin/admin-data.php:1412
-#: includes/rest/admin/admin-data.php:1494
+#: includes/rest/admin/admin-data.php:219
+#: includes/rest/admin/admin-data.php:255
+#: includes/rest/admin/admin-data.php:275
+#: includes/rest/admin/admin-data.php:783
+#: includes/rest/admin/admin-data.php:896
+#: includes/rest/admin/admin-data.php:1060
+#: includes/rest/admin/admin-data.php:1125
+#: includes/rest/admin/admin-data.php:1217
+#: includes/rest/admin/admin-data.php:1279
+#: includes/rest/admin/admin-data.php:1409
+#: includes/rest/admin/admin-data.php:1491
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -4143,30 +4146,30 @@ msgstr ""
 msgid "Gallery and album rendering, including error context."
 msgstr ""
 
-#: includes/class-metadata-manager.php:811
-#: includes/class-metadata-manager.php:874
+#: includes/class-metadata-manager.php:786
+#: includes/class-metadata-manager.php:850
 #: includes/rest/metadata/library-data.php:245
 #: includes/rest/metadata/library-data.php:311
 msgid "Entry not found."
 msgstr ""
 
-#: includes/class-metadata-manager.php:816
+#: includes/class-metadata-manager.php:791
 msgid "Name cannot be empty."
 msgstr ""
 
-#: includes/class-metadata-manager.php:833
+#: includes/class-metadata-manager.php:809
 msgid "Another entry with this name already exists. Use Merge if you want to combine them."
 msgstr ""
 
-#: includes/class-metadata-manager.php:899
+#: includes/class-metadata-manager.php:875
 msgid "Failed to delete entry."
 msgstr ""
 
-#: includes/class-metadata-manager.php:962
+#: includes/class-metadata-manager.php:938
 msgid "Invalid metadata type."
 msgstr ""
 
-#: includes/class-metadata-manager.php:967
+#: includes/class-metadata-manager.php:943
 msgid "Target entry not found."
 msgstr ""
 
@@ -4207,13 +4210,13 @@ msgid "New Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:123
-#: includes/metaboxes/class-metabox-registrar.php:345
-#: includes/metaboxes/class-metabox-registrar.php:696
+#: includes/metaboxes/class-metabox-registrar.php:323
+#: includes/metaboxes/class-metabox-registrar.php:674
 msgid "Edit Gallery"
 msgstr ""
 
 #: includes/class-post-types.php:124
-#: includes/metaboxes/class-metabox-registrar.php:695
+#: includes/metaboxes/class-metabox-registrar.php:673
 msgid "View Gallery"
 msgstr ""
 
@@ -4320,7 +4323,7 @@ msgid "New Album"
 msgstr ""
 
 #: includes/class-post-types.php:192
-#: includes/metaboxes/class-metabox-registrar.php:346
+#: includes/metaboxes/class-metabox-registrar.php:324
 msgid "Edit Album"
 msgstr ""
 
@@ -4402,7 +4405,7 @@ msgid "Album Shortcode"
 msgstr ""
 
 #: includes/class-post-types.php:338
-#: includes/metaboxes/class-metabox-registrar.php:293
+#: includes/metaboxes/class-metabox-registrar.php:271
 msgid "Featured / Share Image"
 msgstr ""
 
@@ -4415,14 +4418,14 @@ msgid "Used as the gallery cover and social-share image. If left empty, FotoGrid
 msgstr ""
 
 #: includes/class-post-types.php:384
-#: includes/metaboxes/class-metabox-registrar.php:296
+#: includes/metaboxes/class-metabox-registrar.php:274
 #: assets/admin/plain/render-settings/renderImagePicker.js:102
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:225
 msgid "Replace image"
 msgstr ""
 
 #: includes/class-post-types.php:384
-#: includes/metaboxes/class-metabox-registrar.php:295
+#: includes/metaboxes/class-metabox-registrar.php:273
 msgid "Set featured image"
 msgstr ""
 
@@ -4883,22 +4886,22 @@ msgstr ""
 msgid "Active plugins (%d)"
 msgstr ""
 
-#: includes/diagnostics/class-system-report.php:489
+#: includes/diagnostics/class-system-report.php:488
 msgid "Post type not registered"
 msgstr ""
 
 #. translators: 1: published count, 2: draft count.
-#: includes/diagnostics/class-system-report.php:498
+#: includes/diagnostics/class-system-report.php:497
 #, php-format
 msgid "%1$d published, %2$d draft"
 msgstr ""
 
-#: includes/diagnostics/class-system-report.php:512
+#: includes/diagnostics/class-system-report.php:511
 msgid "Unavailable"
 msgstr ""
 
 #. translators: %s: comma-separated channel names with their forced value.
-#: includes/diagnostics/class-system-report.php:531
+#: includes/diagnostics/class-system-report.php:530
 #, php-format
 msgid " — set by constant: %s"
 msgstr ""
@@ -5173,185 +5176,185 @@ msgstr ""
 msgid "Failed to reorder items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:208
+#: includes/metaboxes/class-metabox-registrar.php:186
 msgid "Gallery Items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:235
+#: includes/metaboxes/class-metabox-registrar.php:213
 msgid "Gallery Settings"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:236
+#: includes/metaboxes/class-metabox-registrar.php:214
 msgid "Album Settings"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:250
+#: includes/metaboxes/class-metabox-registrar.php:228
 msgid "Album Assignment"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:294
+#: includes/metaboxes/class-metabox-registrar.php:272
 #: assets/admin/plain/render-settings/renderImagePicker.js:81
 #: assets/admin/src/components/plugin-settings/tabs/SEOTab.jsx:98
 msgid "Use this image"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:335
+#: includes/metaboxes/class-metabox-registrar.php:313
 msgid "Saving gallery..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:336
+#: includes/metaboxes/class-metabox-registrar.php:314
 msgid "Gallery saved successfully!"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:337
+#: includes/metaboxes/class-metabox-registrar.php:315
 msgid "Save failed. Please try again."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:338
+#: includes/metaboxes/class-metabox-registrar.php:316
 msgid "Please fix validation errors before saving."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:339
+#: includes/metaboxes/class-metabox-registrar.php:317
 msgid "Fix Errors"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:340
+#: includes/metaboxes/class-metabox-registrar.php:318
 msgid "Please fix validation errors before saving"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:341
+#: includes/metaboxes/class-metabox-registrar.php:319
 msgid "You have unsaved changes"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:342
+#: includes/metaboxes/class-metabox-registrar.php:320
 msgid "Last saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:343
+#: includes/metaboxes/class-metabox-registrar.php:321
 msgid "Quick Save"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:344
+#: includes/metaboxes/class-metabox-registrar.php:322
 msgid "Quick Save Gallery (Ctrl+S)"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:347
+#: includes/metaboxes/class-metabox-registrar.php:325
 msgid "You have unsaved changes. Are you sure you want to leave?"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:595
+#: includes/metaboxes/class-metabox-registrar.php:573
 msgid "You're viewing these settings in read-only mode. Ask a site administrator if changes are needed."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:625
+#: includes/metaboxes/class-metabox-registrar.php:603
 msgid "Search albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:626
+#: includes/metaboxes/class-metabox-registrar.php:604
 msgid "No available albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:627
+#: includes/metaboxes/class-metabox-registrar.php:605
 msgid "No more albums found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:628
+#: includes/metaboxes/class-metabox-registrar.php:606
 msgid "Create New Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:629
+#: includes/metaboxes/class-metabox-registrar.php:607
 msgid "Assigned to"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:630
+#: includes/metaboxes/class-metabox-registrar.php:608
 msgid "Not assigned to any"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:631
+#: includes/metaboxes/class-metabox-registrar.php:609
 msgid "albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:633
+#: includes/metaboxes/class-metabox-registrar.php:611
 msgid "Error loading albums"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:634
+#: includes/metaboxes/class-metabox-registrar.php:612
 msgid "Album assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:641
+#: includes/metaboxes/class-metabox-registrar.php:619
 msgid "Loading albums..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:682
+#: includes/metaboxes/class-metabox-registrar.php:660
 msgid "Assigned Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:683
+#: includes/metaboxes/class-metabox-registrar.php:661
 msgid "Available Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:684
+#: includes/metaboxes/class-metabox-registrar.php:662
 msgid "Search Galleries..."
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:685
+#: includes/metaboxes/class-metabox-registrar.php:663
 msgid "No Galleries assigned to this Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:686
+#: includes/metaboxes/class-metabox-registrar.php:664
 msgid "No available Galleries found"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:687
+#: includes/metaboxes/class-metabox-registrar.php:665
 msgid "Drag to reorder Galleries"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:688
+#: includes/metaboxes/class-metabox-registrar.php:666
 msgid "Remove from Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:689
+#: includes/metaboxes/class-metabox-registrar.php:667
 msgid "Add to Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:690
+#: includes/metaboxes/class-metabox-registrar.php:668
 msgid "Set as featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:691
+#: includes/metaboxes/class-metabox-registrar.php:669
 msgid "Clear featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:692
+#: includes/metaboxes/class-metabox-registrar.php:670
 msgid "Featured Gallery set"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:693
+#: includes/metaboxes/class-metabox-registrar.php:671
 msgid "Featured Gallery cleared"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:694
+#: includes/metaboxes/class-metabox-registrar.php:672
 msgid "Error saving featured Gallery"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:698
+#: includes/metaboxes/class-metabox-registrar.php:676
 msgid "Gallery assignments saved"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:699
+#: includes/metaboxes/class-metabox-registrar.php:677
 msgid "Error updating Album"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:700
+#: includes/metaboxes/class-metabox-registrar.php:678
 msgid "items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:701
+#: includes/metaboxes/class-metabox-registrar.php:679
 msgid "No items"
 msgstr ""
 
-#: includes/metaboxes/class-metabox-registrar.php:702
+#: includes/metaboxes/class-metabox-registrar.php:680
 msgid "Drop item here"
 msgstr ""
 
@@ -6501,7 +6504,7 @@ msgid "Failed to save template."
 msgstr ""
 
 #: includes/modules/ViewCollections/class-integrated-renderer.php:233
-#: includes/modules/ViewCollections/templates/view-collection.php:64
+#: includes/modules/ViewCollections/templates/view-collection.php:59
 msgid "Draft preview - this collection is not published yet."
 msgstr ""
 
@@ -6745,109 +6748,109 @@ msgstr ""
 msgid "Open and run the %s tool."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:54
-#: includes/rest/admin/admin-data.php:132
+#: includes/rest/admin/admin-data.php:32
+#: includes/rest/admin/admin-data.php:110
 msgid "Invalid gallery IDs provided."
 msgstr ""
 
 #. translators: %d: number of galleries added to the album.
-#: includes/rest/admin/admin-data.php:79
+#: includes/rest/admin/admin-data.php:57
 #, php-format
 msgid "%d gallery added to album."
 msgid_plural "%d galleries added to album."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/rest/admin/admin-data.php:107
-#: includes/rest/admin/admin-data.php:221
+#: includes/rest/admin/admin-data.php:85
+#: includes/rest/admin/admin-data.php:199
 msgid "Gallery removed from album."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:113
-#: includes/rest/admin/admin-data.php:227
+#: includes/rest/admin/admin-data.php:91
+#: includes/rest/admin/admin-data.php:205
 msgid "Failed to remove gallery from album."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:143
+#: includes/rest/admin/admin-data.php:121
 msgid "Gallery order updated."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:149
+#: includes/rest/admin/admin-data.php:127
 msgid "Failed to reorder galleries."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:168
+#: includes/rest/admin/admin-data.php:146
 msgid "Invalid album IDs provided."
 msgstr ""
 
 #. translators: %d: number of albums the gallery was added to.
-#: includes/rest/admin/admin-data.php:193
+#: includes/rest/admin/admin-data.php:171
 #, php-format
 msgid "Gallery added to %d album."
 msgid_plural "Gallery added to %d albums."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/rest/admin/admin-data.php:331
+#: includes/rest/admin/admin-data.php:309
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:360
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:471
 msgid "FotoGrids Thumbnails"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:333
+#: includes/rest/admin/admin-data.php:311
 msgid "FotoGrids Full Size"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:335
+#: includes/rest/admin/admin-data.php:313
 msgid "FotoGrids Full Size (Mobile)"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:337
+#: includes/rest/admin/admin-data.php:315
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:363
 msgid "FotoGrids Masonry (variable height)"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:339
+#: includes/rest/admin/admin-data.php:317
 #: includes/tools/regenerate-thumbnails/assets/RegenerateThumbnailsTool.jsx:364
 msgid "FotoGrids Justified (variable width)"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:369
+#: includes/rest/admin/admin-data.php:347
 msgid "Full Size"
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:682
+#: includes/rest/admin/admin-data.php:660
 msgid "The defaults could not be saved."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:752
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:156
+#: includes/rest/admin/admin-data.php:730
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:136
 msgid "Attachment not found."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:761
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:165
+#: includes/rest/admin/admin-data.php:739
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:145
 msgid "Attachment file not found on disk."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:836
+#: includes/rest/admin/admin-data.php:814
 msgid "Unable to fetch Google Fonts metadata."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:845
+#: includes/rest/admin/admin-data.php:823
 msgid "Google Fonts metadata endpoint returned an unexpected response."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:888
+#: includes/rest/admin/admin-data.php:866
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1367
+#: includes/rest/admin/admin-data.php:1364
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1392
+#: includes/rest/admin/admin-data.php:1389
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
@@ -7471,27 +7474,27 @@ msgstr ""
 msgid "an existing %s"
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:145
+#: includes/tools/import-export/class-import-export-data.php:117
 msgid "No file content provided."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:180
+#: includes/tools/import-export/class-import-export-data.php:152
 msgid "Phase must be \"analyse\" or \"execute\"."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:416
+#: includes/tools/import-export/class-import-export-data.php:388
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids JSON export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:433
+#: includes/tools/import-export/class-import-export-data.php:405
 msgid "The file could not be parsed. Please ensure it is a valid FotoGrids XML export."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:470
+#: includes/tools/import-export/class-import-export-data.php:442
 msgid "Unrecognised export format."
 msgstr ""
 
-#: includes/tools/import-export/class-import-export-data.php:477
+#: includes/tools/import-export/class-import-export-data.php:449
 msgid "The file does not appear to be a FotoGrids export (missing meta block)."
 msgstr ""
 
@@ -7667,27 +7670,27 @@ msgstr ""
 msgid "%1$s (gallery %2$d)"
 msgstr ""
 
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:288
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:268
 msgid "Image size is no longer registered."
 msgstr ""
 
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:295
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:275
 msgid "Source dimensions unknown - image may be corrupt or unreadable."
 msgstr ""
 
 #. translators: 1: source dims, 2: target dims
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:309
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:289
 #, php-format
 msgid "Source (%1$s) is smaller than the cropped target (%2$s)."
 msgstr ""
 
 #. translators: 1: source dims, 2: target dims
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:319
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:299
 #, php-format
 msgid "Source (%1$s) is not larger than the target (%2$s) on either axis."
 msgstr ""
 
-#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:326
+#: includes/tools/regenerate-thumbnails/class-regenerate-thumbnails-data.php:306
 msgid "Image editor did not produce this size - likely a write or memory error."
 msgstr ""
 
@@ -7710,7 +7713,7 @@ msgstr ""
 msgid "Check your site environment and FotoGrids setup at a glance. Copy the report into a support request so nothing needs chasing up."
 msgstr ""
 
-#: includes/watermark/class-watermark-regenerate-data.php:134
+#: includes/watermark/class-watermark-regenerate-data.php:112
 msgid "Attachment is not an image."
 msgstr ""
 
