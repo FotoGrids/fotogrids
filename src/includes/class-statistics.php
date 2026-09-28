@@ -46,17 +46,21 @@ class Statistics {
 			return false;
 		}
 
+		$now = current_time( 'mysql', true );
+
 		$updated = $wpdb->query(
 			$wpdb->prepare(
 				'UPDATE %i
              SET %i = %i + %d,
-                 last_viewed = NOW(),
-                 updated_at = NOW()
+                 last_viewed = %s,
+                 updated_at = %s
              WHERE object_type = %s AND object_id = %d',
 				$table,
 				$field,
 				$field,
 				$amount,
+				$now,
+				$now,
 				$object_type,
 				$object_id
 			)
@@ -72,9 +76,9 @@ class Statistics {
 				'object_id'   => $object_id,
 				'views'       => ( 'views' === $field ) ? $amount : 0,
 				'shares'      => ( 'shares' === $field ) ? $amount : 0,
-				'last_viewed' => current_time( 'mysql', true ),
-				'created_at'  => current_time( 'mysql', true ),
-				'updated_at'  => current_time( 'mysql', true ),
+				'last_viewed' => $now,
+				'created_at'  => $now,
+				'updated_at'  => $now,
 			);
 
 			$inserted = $wpdb->insert(
@@ -219,9 +223,9 @@ class Statistics {
 
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				'DELETE FROM %i WHERE last_viewed < DATE_SUB(NOW(), INTERVAL %d DAY)',
+				'DELETE FROM %i WHERE last_viewed < %s',
 				$table,
-				$days
+				gmdate( 'Y-m-d H:i:s', time() - ( (int) $days * DAY_IN_SECONDS ) )
 			)
 		);
 
