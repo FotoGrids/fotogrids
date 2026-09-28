@@ -263,17 +263,27 @@ class Renderer {
 				: $this->collection_description();
 
 			// Image: explicit per-collection custom image wins; otherwise the
-			// collection cover, which itself resolves the Featured / Share Image
-			// first, then the in-gallery Featured Item / featured child gallery,
-			// then the first item; finally the plugin-wide fallback.
+			// collection cover (image or video/embed poster), which itself
+			// resolves the Featured / Share Image first, then the in-gallery
+			// Featured Item / featured child gallery, then the first item;
+			// finally the plugin-wide fallback.
 			$image_id = 0;
 			if ( 'custom' === $seo['og_image_source'] && $seo['og_image_custom_id'] > 0 ) {
 				$image_id = (int) $seo['og_image_custom_id'];
 			}
+			$poster_url = '';
 			if ( $image_id <= 0 ) {
-				$image_id = \FotoGrids\Galleries\Cover_Resolver::for_collection( (int) $this->post->ID );
+				$descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
+					(int) $this->post->ID,
+					'large'
+				);
+				if ( 'attachment' === $descriptor['kind'] && wp_attachment_is_image( $descriptor['id'] ) ) {
+					$image_id = (int) $descriptor['id'];
+				} else {
+					$poster_url = $descriptor['url'];
+				}
 			}
-			if ( $image_id <= 0 && $seo['og_image_fallback_id'] > 0 ) {
+			if ( $image_id <= 0 && '' === $poster_url && $seo['og_image_fallback_id'] > 0 ) {
 				$image_id = (int) $seo['og_image_fallback_id'];
 			}
 
@@ -288,22 +298,15 @@ class Renderer {
 				);
 			}
 
-			// Poster fallback: an embed-only or video-only collection has no
-			// image attachment cover, so use its resolved poster URL for OG.
-			if ( empty( $image['url'] ) ) {
-				$descriptor = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection(
-					(int) $this->post->ID,
-					'large'
+			// A video or embed cover has no image attachment; its poster URL is the image.
+			if ( '' !== $poster_url ) {
+				$image = array(
+					'id'     => 0,
+					'url'    => $poster_url,
+					'width'  => 0,
+					'height' => 0,
+					'alt'    => '',
 				);
-				if ( '' !== $descriptor['url'] ) {
-					$image = array(
-						'id'     => 0,
-						'url'    => $descriptor['url'],
-						'width'  => 0,
-						'height' => 0,
-						'alt'    => '',
-					);
-				}
 			}
 		}
 
