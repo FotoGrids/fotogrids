@@ -229,10 +229,16 @@ const ItemEditModal = ({
             // For replace-type keys (maxItems === 1, e.g. locations), replace
             // the existing entry rather than appending.
             const REPLACE_TYPES = ['locations'];
-            setMetadata(prev => ({
-                ...prev,
-                [type]: REPLACE_TYPES.includes(type) ? [newItem] : [...prev[type], newItem]
-            }));
+            setMetadata(prev => {
+                if (prev[type].some(item => item.id === newItem.id)) {
+                    return prev;
+                }
+
+                return {
+                    ...prev,
+                    [type]: REPLACE_TYPES.includes(type) ? [newItem] : [...prev[type], newItem]
+                };
+            });
 
             setAvailableMetadata(prev => ({
                 ...prev,

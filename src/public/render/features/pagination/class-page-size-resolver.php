@@ -38,6 +38,22 @@ final class Page_Size_Resolver {
 	 * @return int
 	 */
 	public static function resolve_page_size( array $settings, ?Render_Context $render_context = null ): int {
+		$breakpoint = null !== $render_context
+			? (string) ( $render_context->meta->breakpoint ?? 'desktop' )
+			: 'desktop';
+
+		return self::resolve_for_breakpoint( $settings, $breakpoint );
+	}
+
+	/**
+	 * Resolves items_per_page for a named breakpoint.
+	 *
+	 * @since  1.1.3
+	 * @param  array<string, mixed> $settings   Render context settings.
+	 * @param  string               $breakpoint 'desktop', 'tablet' or 'mobile'.
+	 * @return int
+	 */
+	public static function resolve_for_breakpoint( array $settings, string $breakpoint ): int {
 		$raw = $settings['items_per_page'] ?? null;
 		if ( null === $raw ) {
 			return 24;
@@ -51,10 +67,6 @@ final class Page_Size_Resolver {
 		if ( ! is_array( $raw ) ) {
 			return 24;
 		}
-
-		$breakpoint = null !== $render_context
-			? (string) ( $render_context->meta->breakpoint ?? 'desktop' )
-			: 'desktop';
 
 		// The saved shape is { desktop: <int>, tablet: <int>, mobile: <int> }
 		// (the resolved per-breakpoint values from the responsive_range

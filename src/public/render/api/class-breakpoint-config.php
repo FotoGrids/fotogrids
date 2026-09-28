@@ -36,10 +36,9 @@ final class Breakpoint_Config {
 	 *                                breakpoint activates (max-width condition).
 	 * @param int  $mobile_max_width  Viewport width (px) at which the mobile
 	 *                                breakpoint activates (max-width condition).
-	 * @param bool $detect_by_browser When true, alternate @media conditions
-	 *                                (e.g. pointer: coarse) may be used instead
-	 *                                of pure viewport-width queries. Currently
-	 *                                carried forward for future use.
+	 * @param bool $detect_by_browser When true, the breakpoint follows the
+	 *                                device class at html[data-fg-breakpoint]
+	 *                                rather than the viewport width.
 	 */
 	public function __construct(
 		int $tablet_max_width,
@@ -49,6 +48,53 @@ final class Breakpoint_Config {
 		$this->tablet_max_width  = $tablet_max_width;
 		$this->mobile_max_width  = $mobile_max_width;
 		$this->detect_by_browser = $detect_by_browser;
+	}
+
+	/**
+	 * The configuration, for the frontend runtime to read off a wrapper.
+	 *
+	 * @since  1.1.3
+	 * @return array<string, string>
+	 */
+	public function wrapper_attrs(): array {
+		return array(
+			'data-fg-breakpoints'       => $this->mobile_max_width . ' ' . $this->tablet_max_width,
+			'data-fg-breakpoint-detect' => $this->detect_by_browser ? 'device' : 'viewport',
+		);
+	}
+
+	/**
+	 * Scopes declarations to a breakpoint and every narrower one.
+	 *
+	 * Viewport detection emits a max-width @media block. Device detection
+	 * selects on html[data-fg-breakpoint], which the runtime sets, and keeps
+	 * the @media block as the fallback until it has.
+	 *
+	 * @since  1.1.3
+	 * @param  string $breakpoint   'tablet' or 'mobile'.
+	 * @param  string $selector     Selector the declarations belong to.
+	 * @param  string $declarations Declarations, one per line, without braces.
+	 * @return string
+	 */
+	public function scope( string $breakpoint, string $selector, string $declarations ): string {
+		$width = 'mobile' === $breakpoint ? $this->mobile_max_width : $this->tablet_max_width;
+
+		if ( ! $this->detect_by_browser ) {
+			return '@media (max-width: ' . $width . "px) {\n"
+				. '    ' . $selector . " {\n" . $declarations . "    }\n"
+				. "}\n";
+		}
+
+		$classes   = 'mobile' === $breakpoint ? array( 'mobile' ) : array( 'tablet', 'mobile' );
+		$selectors = array();
+		foreach ( $classes as $class ) {
+			$selectors[] = 'html[data-fg-breakpoint="' . $class . '"] ' . $selector;
+		}
+
+		return implode( ', ', $selectors ) . " {\n" . $declarations . "}\n"
+			. '@media (max-width: ' . $width . "px) {\n"
+			. '    html:not([data-fg-breakpoint]) ' . $selector . " {\n" . $declarations . "    }\n"
+			. "}\n";
 	}
 
 	/**

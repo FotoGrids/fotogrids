@@ -181,7 +181,8 @@
             ? Array.prototype.slice.call( topLevel[ 0 ].children )
             : topLevel;
 
-        if ( 0 === incoming.length ) {
+        // A gate can claim the render; its lock screen is not a set of items.
+        if ( 0 === incoming.length || ! template.content.querySelector( '.fg-item' ) ) {
             return;
         }
 
@@ -196,6 +197,24 @@
             bubbles: true,
             detail: { items: inserted, galleryEl: collectionEl },
         } ) );
+    }
+
+    /**
+     * Hands the swapped-in page 1 to pagination, so it pages later requests
+     * at the same breakpoint.
+     *
+     * @param {Element} collectionEl
+     * @param {object}  payload
+     * @param {string}  breakpoint
+     */
+    function adoptIntoPagination( collectionEl, payload, breakpoint ) {
+        const pagination = window.FotoGrids
+            && window.FotoGrids.modules
+            && window.FotoGrids.modules.pagination;
+        if ( 'true' !== collectionEl.dataset.fgPaginated || ! pagination || typeof pagination.adopt !== 'function' ) {
+            return;
+        }
+        pagination.adopt( collectionEl, payload, breakpoint );
     }
 
     /**
@@ -262,6 +281,7 @@
                 // the visitor is already looking at the server order.
                 if ( ! settled ) {
                     applyItems( collectionEl, root, payload );
+                    adoptIntoPagination( collectionEl, payload, breakpoint );
                 }
             } )
             .catch( function () {
