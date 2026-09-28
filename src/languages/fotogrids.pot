@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-27T20:52:56+00:00\n"
+"POT-Creation-Date: 2026-09-28T05:58:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -4146,30 +4146,30 @@ msgstr ""
 msgid "Gallery and album rendering, including error context."
 msgstr ""
 
-#: includes/class-metadata-manager.php:786
-#: includes/class-metadata-manager.php:850
+#: includes/class-metadata-manager.php:794
+#: includes/class-metadata-manager.php:858
 #: includes/rest/metadata/library-data.php:245
 #: includes/rest/metadata/library-data.php:311
 msgid "Entry not found."
 msgstr ""
 
-#: includes/class-metadata-manager.php:791
+#: includes/class-metadata-manager.php:799
 msgid "Name cannot be empty."
 msgstr ""
 
-#: includes/class-metadata-manager.php:809
+#: includes/class-metadata-manager.php:817
 msgid "Another entry with this name already exists. Use Merge if you want to combine them."
 msgstr ""
 
-#: includes/class-metadata-manager.php:875
+#: includes/class-metadata-manager.php:883
 msgid "Failed to delete entry."
 msgstr ""
 
-#: includes/class-metadata-manager.php:938
+#: includes/class-metadata-manager.php:946
 msgid "Invalid metadata type."
 msgstr ""
 
-#: includes/class-metadata-manager.php:943
+#: includes/class-metadata-manager.php:951
 msgid "Target entry not found."
 msgstr ""
 
@@ -6347,8 +6347,8 @@ msgstr ""
 #: includes/modules/PageBuilders/core/rest/preview-data.php:80
 #: includes/rest/admin/class-preview-endpoint.php:38
 #: includes/rest/gallery/gallery-data.php:36
-#: includes/rest/gallery/gallery-data.php:318
-#: includes/rest/gallery/gallery-data.php:534
+#: includes/rest/gallery/gallery-data.php:327
+#: includes/rest/gallery/gallery-data.php:543
 #: includes/rest/gallery/gallery-permissions.php:64
 #: includes/rest/gallery/lightbox-slides-data.php:50
 #: includes/rest/items/embed-data.php:133
@@ -6897,33 +6897,37 @@ msgstr ""
 msgid "Item is not part of this gallery."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:104
-#: includes/rest/gallery/gallery-data.php:163
-#: includes/rest/gallery/gallery-data.php:198
+#: includes/rest/gallery/gallery-data.php:80
+msgid "The featured item could not be saved."
+msgstr ""
+
+#: includes/rest/gallery/gallery-data.php:113
+#: includes/rest/gallery/gallery-data.php:172
+#: includes/rest/gallery/gallery-data.php:207
 msgid "Gallery not found"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:116
-#: includes/rest/gallery/gallery-data.php:206
+#: includes/rest/gallery/gallery-data.php:125
+#: includes/rest/gallery/gallery-data.php:215
 msgid "Gallery is not published"
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:217
+#: includes/rest/gallery/gallery-data.php:226
 msgid "Incorrect password."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:309
+#: includes/rest/gallery/gallery-data.php:318
 #: includes/rest/gallery/lightbox-slides-data.php:41
 msgid "A gallery_id is required."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:326
+#: includes/rest/gallery/gallery-data.php:335
 #: includes/rest/gallery/gallery-permissions.php:72
 #: includes/rest/gallery/lightbox-slides-data.php:58
 msgid "Gallery is not published."
 msgstr ""
 
-#: includes/rest/gallery/gallery-data.php:542
+#: includes/rest/gallery/gallery-data.php:551
 msgid "Gallery is not available."
 msgstr ""
 
