@@ -36,7 +36,6 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 	const [running, setRunning] = useState(false);
 	const [done, setDone] = useState(0);
 	const [total, setTotal] = useState(0);
-	const [error, setError] = useState(false);
 
 	const statusPath =
 		galleryId > 0 ? `${STATUS_PATH}?gallery_id=${galleryId}` : STATUS_PATH;
@@ -55,7 +54,6 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 			}
 			return next;
 		} catch (e) {
-			setError(true);
 			return EMPTY;
 		}
 	}, [statusPath, onChange]);
@@ -79,7 +77,6 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 		}
 
 		setRunning(true);
-		setError(false);
 		setDone(0);
 		setTotal(ids.length);
 
@@ -90,8 +87,8 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 					method: 'POST',
 					data: { attachment_id: ids[i] },
 				});
-			} catch (e) {
-				setError(true);
+			} catch {
+				// A failed item stays pending; the status refresh below reports it.
 			}
 			setDone(i + 1);
 		}

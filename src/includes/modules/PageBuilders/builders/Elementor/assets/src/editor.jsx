@@ -20,7 +20,7 @@
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import PickerModal from '../../../../core/assets/src/components/PickerModal';
 import { collectionTitle } from '@/admin/src/utils/collection-title';
@@ -135,12 +135,21 @@ function renderRow(option) {
 
 	const itemCountLabel =
 		item.kind === 'album'
-			? item.item_count === 1
-				? __('1 gallery', 'fotogrids')
-				: __('%d galleries', 'fotogrids').replace('%d', item.item_count)
-			: item.item_count === 1
-				? __('1 item', 'fotogrids')
-				: __('%d items', 'fotogrids').replace('%d', item.item_count);
+			? sprintf(
+					/* translators: %d: number of galleries. */
+					_n(
+						'%d gallery',
+						'%d galleries',
+						item.item_count,
+						'fotogrids'
+					),
+					item.item_count
+				)
+			: sprintf(
+					/* translators: %d: number of items. */
+					_n('%d item', '%d items', item.item_count, 'fotogrids'),
+					item.item_count
+				);
 
 	const statusPill =
 		item.status && item.status !== 'publish'
@@ -302,7 +311,6 @@ function buildControlView(kind) {
 		},
 		async onReady() {
 			const $select = this.ui.select;
-			const $ = window.jQuery;
 			const currentVal = this.getControlValue();
 
 			try {
@@ -354,7 +362,6 @@ function buildControlView(kind) {
 			// cache so the next render rebuilds from REST.
 			invalidateCache(kind);
 
-			const $ = window.jQuery;
 			const items = await fetchItems(kind);
 			if (this.pickerDestroyed) {
 				return;

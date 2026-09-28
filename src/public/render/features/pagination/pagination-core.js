@@ -15,9 +15,6 @@
 (function () {
 	'use strict';
 
-	/** Per-gallery state. Keyed by gallery wrapper element (WeakMap). */
-	const galleryState = new WeakMap();
-
 	/** Per-gallery change listeners. Keyed by gallery wrapper element. */
 	const listeners = new WeakMap();
 

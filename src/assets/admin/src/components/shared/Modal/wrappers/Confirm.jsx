@@ -4,33 +4,36 @@ import Button from '../../Button/Button';
 import Icon from '../../Icon';
 import { emit } from '../api/events';
 
+const __ =
+	(typeof window !== 'undefined' && window.wp?.i18n?.__) || ((text) => text);
+
 const VARIANT_DEFAULTS = {
 	info: {
 		icon: 'info_circle',
 		confirmVariant: 'primary',
-		confirmLabel: 'OK',
+		confirmLabel: __('OK', 'fotogrids'),
 	},
 	question: {
 		icon: 'help_circle',
 		confirmVariant: 'primary',
-		confirmLabel: 'Continue',
+		confirmLabel: __('Continue', 'fotogrids'),
 	},
 	warning: {
 		icon: 'alert_bubble',
 		confirmVariant: 'warning',
-		confirmLabel: 'Continue',
+		confirmLabel: __('Continue', 'fotogrids'),
 	},
-	danger: { icon: 'trash', confirmVariant: 'danger', confirmLabel: 'Delete' },
+	danger: {
+		icon: 'trash',
+		confirmVariant: 'danger',
+		confirmLabel: __('Delete', 'fotogrids'),
+	},
 	success: {
 		icon: 'check_circle',
 		confirmVariant: 'success',
-		confirmLabel: 'OK',
+		confirmLabel: __('OK', 'fotogrids'),
 	},
 };
-
-const t = (s) =>
-	(typeof window !== 'undefined' && window.wp?.i18n?.__?.(s, 'fotogrids')) ||
-	s;
 
 const format = (template, value) => {
 	const sprintf = typeof window !== 'undefined' && window.wp?.i18n?.sprintf;
@@ -128,7 +131,11 @@ const Confirm = ({
 				{requireText && (
 					<div className="fg-confirm__require-text">
 						<label htmlFor={requireInputId}>
-							{format(t('Type %s to continue'), requireText)}
+							{format(
+								/* translators: %s: the text the user must type. */
+								__('Type %s to continue', 'fotogrids'),
+								requireText
+							)}
 						</label>
 						<input
 							id={requireInputId}
@@ -157,7 +164,7 @@ const Confirm = ({
 						onClick={handleCancel}
 						disabled={busy}
 					>
-						{cancelLabel || t('Cancel')}
+						{cancelLabel || __('Cancel', 'fotogrids')}
 					</Button>
 				)}
 				<Button
@@ -166,7 +173,7 @@ const Confirm = ({
 					busy={busy}
 					disabled={!meetsRequireText}
 				>
-					{confirmLabel || t(defaults.confirmLabel)}
+					{confirmLabel || defaults.confirmLabel}
 				</Button>
 			</Modal.Footer>
 		</Modal>
