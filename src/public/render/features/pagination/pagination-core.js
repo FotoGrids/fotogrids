@@ -15,9 +15,6 @@
 (function () {
 	'use strict';
 
-	/** Per-gallery state. Keyed by gallery wrapper element (WeakMap). */
-	const galleryState = new WeakMap();
-
 	/** Per-gallery change listeners. Keyed by gallery wrapper element. */
 	const listeners = new WeakMap();
 
@@ -795,8 +792,8 @@
 	/**
 	 * Subscribe to page-change notifications for a specific gallery.
 	 *
-	 * @param {Element}  galleryEl
-	 * @param {Function} cb
+	 * @param {Element}                  galleryEl
+	 * @param {(detail: Object) => void} cb
 	 */
 	function onChange(galleryEl, cb) {
 		if (!listeners.has(galleryEl)) {

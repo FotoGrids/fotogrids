@@ -62,12 +62,12 @@ const POSITIONS = [
  * Shares the fotogrids-alignment-grid visual treatment used by the
  * schema-driven collection-settings renderer.
  *
- * @param {Object}   props
- * @param {string}   props.value      One of the nine position values.
- * @param {Function} props.onChange   Called with the chosen position value.
- * @param {string}   [props.ariaLabel] Accessible name for the radiogroup.
- * @param {boolean}  [props.disabled]
- * @param {string}   [props.className]
+ * @param {Object}                     props
+ * @param {string}                     props.value       One of the nine position values.
+ * @param {(position: string) => void} props.onChange    Called with the chosen position value.
+ * @param {string}                     [props.ariaLabel] Accessible name for the radiogroup.
+ * @param {boolean}                    [props.disabled]
+ * @param {string}                     [props.className]
  */
 const AlignmentGrid = ({
 	value,

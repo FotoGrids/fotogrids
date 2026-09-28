@@ -8,12 +8,12 @@ import Icon from './Icon.jsx';
  * The active tab receives `aria-selected="true"` and the `fg-is-active`
  * modifier, matching the convention used across the admin UI.
  *
- * @param {Object}   props
- * @param {Array}    props.tabs           [{ id: string, label: string, icon?: string }]
- *                                        `icon` is a FotoGridsIcons name - renders left of the label.
- * @param {string}   props.activeTab      The `id` of the currently active tab.
- * @param {Function} props.onTabChange    Called with the tab `id` when a tab is clicked.
- * @param {string}   [props.className]    Extra class(es) on the wrapper element.
+ * @param {Object}               props
+ * @param {Array}                props.tabs           [{ id: string, label: string, icon?: string }]
+ *                                                    `icon` is a FotoGridsIcons name - renders left of the label.
+ * @param {string}               props.activeTab      The `id` of the currently active tab.
+ * @param {(id: string) => void} props.onTabChange    Called with the tab `id` when a tab is clicked.
+ * @param {string}               [props.className]    Extra class(es) on the wrapper element.
  */
 const TabBar = ({ tabs = [], activeTab, onTabChange, className = '' }) => {
 	const wrapperClass = ['fotogrids-tab-bar', className]

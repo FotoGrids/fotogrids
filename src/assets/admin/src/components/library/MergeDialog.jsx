@@ -86,6 +86,7 @@ const MergeDialog = ({
 			<Modal.Header>
 				<Modal.HeaderTitle>
 					{sprintf(
+						/* translators: %s: plural entry type, e.g. "tags". */
 						__('Merge %s', 'fotogrids'),
 						(entityType.label_plural || '').toLowerCase()
 					)}
@@ -95,6 +96,7 @@ const MergeDialog = ({
 			<Modal.Body>
 				<p>
 					{sprintf(
+						/* translators: %d: number of source entries. */
 						_n(
 							'You selected %d source entry. Choose the entry to merge it into.',
 							'You selected %d source entries. Choose the entry to merge them into.',
@@ -113,6 +115,7 @@ const MergeDialog = ({
 								{' '}
 								(
 								{sprintf(
+									/* translators: %d: number of items. */
 									_n(
 										'%d item',
 										'%d items',
@@ -168,6 +171,7 @@ const MergeDialog = ({
 										{' '}
 										(
 										{sprintf(
+											/* translators: %d: number of items. */
 											_n(
 												'%d item',
 												'%d items',
@@ -187,6 +191,7 @@ const MergeDialog = ({
 				{target && (
 					<Notice status="info" isDismissible={false}>
 						{sprintf(
+							/* translators: 1: number of linked items, 2: target entry name. */
 							__(
 								'All %1$d linked items will be re-pointed to "%2$s", and the source entries will be deleted.',
 								'fotogrids'

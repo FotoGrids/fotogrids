@@ -213,11 +213,11 @@ function el(tag, attrs, ...children) {
 /**
  * Creates a color picker widget.
  *
- * @param {object} options
- * @param {string}   options.value      Initial CSS color string.
- * @param {Function} options.onChange   Called with CSS string on every change.
- * @param {boolean}  [options.disabled] If true, all controls are inert.
- * @returns {{ element: HTMLElement, setValue: Function, destroy: Function }}
+ * @param {object}                  options
+ * @param {string}                  options.value      Initial CSS color string.
+ * @param {(color: string) => void} options.onChange   Called with CSS string on every change.
+ * @param {boolean}                 [options.disabled] If true, all controls are inert.
+ * @returns {{ element: HTMLElement, setValue: (color: string) => void, destroy: () => void }}
  */
 window.FGColorPicker.create = function (options) {
 	const {

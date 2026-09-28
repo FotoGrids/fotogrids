@@ -7,17 +7,17 @@ import React from 'react';
  * Moved from shared/settings/ to shared/ - this is a general-purpose form
  * primitive with no conceptual tie to settings pages.
  *
- * @param {Object}                 props
- * @param {string}                 [props.id]
- * @param {number}                 props.value
- * @param {Function}               props.onChange   Called with the parsed integer (NaN-safe → min or 0).
- * @param {number}                 [props.min]
- * @param {number}                 [props.max]
- * @param {number}                 [props.step]
- * @param {string}                 [props.unit]     Suffix shown inside the field, e.g. "px".
- * @param {string|React.ReactNode} [props.help]     Helper text under the field.
- * @param {boolean}                [props.disabled]
- * @param {string}                 [props.className]
+ * @param {Object}                  props
+ * @param {string}                  [props.id]
+ * @param {number}                  props.value
+ * @param {(value: number) => void} props.onChange    Called with the parsed integer (NaN-safe → min or 0).
+ * @param {number}                  [props.min]
+ * @param {number}                  [props.max]
+ * @param {number}                  [props.step]
+ * @param {string}                  [props.unit]      Suffix shown inside the field, e.g. "px".
+ * @param {string|React.ReactNode}  [props.help]      Helper text under the field.
+ * @param {boolean}                 [props.disabled]
+ * @param {string}                  [props.className]
  */
 const NumberField = ({
 	id,

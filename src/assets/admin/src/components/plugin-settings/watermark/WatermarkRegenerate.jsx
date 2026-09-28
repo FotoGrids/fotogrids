@@ -25,10 +25,10 @@ const EMPTY = {
  * Reusable across the Plugin Settings → Watermark tab (no galleryId) and the
  * per-gallery surface (galleryId set).
  *
- * @param {Object}   props
- * @param {number}   [props.galleryId]   Scope to one gallery when set.
- * @param {Function} [props.onChange]    Called with the latest status after any refresh.
- * @param {*}        [props.refreshKey]  Change this to force a status re-fetch (e.g. after a save).
+ * @param {Object}                   props
+ * @param {number}                   [props.galleryId]   Scope to one gallery when set.
+ * @param {(status: Object) => void} [props.onChange]    Called with the latest status after any refresh.
+ * @param {unknown}                  [props.refreshKey]  Change this to force a status re-fetch (e.g. after a save).
  */
 const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 	const [status, setStatus] = useState(EMPTY);
@@ -36,7 +36,6 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 	const [running, setRunning] = useState(false);
 	const [done, setDone] = useState(0);
 	const [total, setTotal] = useState(0);
-	const [error, setError] = useState(false);
 
 	const statusPath =
 		galleryId > 0 ? `${STATUS_PATH}?gallery_id=${galleryId}` : STATUS_PATH;
@@ -55,7 +54,6 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 			}
 			return next;
 		} catch (e) {
-			setError(true);
 			return EMPTY;
 		}
 	}, [statusPath, onChange]);
@@ -79,7 +77,6 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 		}
 
 		setRunning(true);
-		setError(false);
 		setDone(0);
 		setTotal(ids.length);
 
@@ -90,8 +87,8 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 					method: 'POST',
 					data: { attachment_id: ids[i] },
 				});
-			} catch (e) {
-				setError(true);
+			} catch {
+				// A failed item stays pending; the status refresh below reports it.
 			}
 			setDone(i + 1);
 		}

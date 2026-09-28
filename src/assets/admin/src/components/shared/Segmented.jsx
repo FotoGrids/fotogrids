@@ -9,15 +9,15 @@ import Icon from './Icon';
  * Moved from shared/settings/ to shared/ - this is a general-purpose UI
  * primitive with no conceptual tie to settings pages.
  *
- * @param {Object}   props
- * @param {Array}    props.options    [{ value, label, icon? }] - icon is a FotoGridsIcons name.
- * @param {*}        props.value      Currently selected value.
- * @param {Function} props.onChange   Called with the chosen value.
- * @param {string}   [props.ariaLabel]
- * @param {boolean}  [props.disabled]
- * @param {string}   [props.className]
- * @param {string}   [props.size]      'default' or 'small' (tighter padding, smaller text).
- * @param {string}   [props.variant]   'default' or 'rounded' (pill-shaped track and options).
+ * @param {Object}                         props
+ * @param {Array}                          props.options     [{ value, label, icon? }] - icon is a FotoGridsIcons name.
+ * @param {string|number}                  props.value       Currently selected value.
+ * @param {(value: string|number) => void} props.onChange    Called with the chosen value.
+ * @param {string}                         [props.ariaLabel]
+ * @param {boolean}                        [props.disabled]
+ * @param {string}                         [props.className]
+ * @param {string}                         [props.size]      'default' or 'small' (tighter padding, smaller text).
+ * @param {string}                         [props.variant]   'default' or 'rounded' (pill-shaped track and options).
  */
 const Segmented = ({
 	options = [],
