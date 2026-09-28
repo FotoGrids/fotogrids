@@ -15,7 +15,7 @@
  *     warning, not a toast: the steps are advisory defaults, not
  *     destructive operations.
  *
- * @param {string} setting  Allowlisted option name (e.g. `fotogrids_user_persona`).
+ * @param {string}         setting  Allowlisted option name (e.g. `fotogrids_user_persona`).
  * @param {string|boolean} value
  * @returns {Promise<{ ok: boolean, value?: unknown }>}
  */

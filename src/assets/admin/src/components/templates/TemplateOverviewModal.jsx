@@ -151,8 +151,8 @@ const isColorValue = (value) =>
  * Render a single setting value as readable content, using the catalog meta
  * (option labels, control type) when available.
  *
- * @param {unknown}      value Raw setting value.
- * @param {Object} meta  Catalog entry for the key, or undefined.
+ * @param {unknown} value Raw setting value.
+ * @param {Object}  meta  Catalog entry for the key, or undefined.
  * @return {React.ReactNode}
  */
 const formatValue = (value, meta) => {

@@ -117,7 +117,7 @@
 	 * so markLoaded can cancel them. No-op when the item already has handles
 	 * (idempotent across the multiple wiring passes) or has no loader svg.
 	 *
-	 * @param {Element}  item
+	 * @param {Element}                          item
 	 * @param {(svg: SVGElement) => Animation[]} animateFn
 	 */
 	function startItemAnimation(item, animateFn) {

@@ -36,9 +36,9 @@ import { buildRestUrl } from '../utils/rest-url';
 /**
  * Renders the live preview of a gallery, or an empty state when it has no items.
  *
- * @param {Object}   props
- * @param {number}   props.galleryId  Gallery post id.
- * @param {boolean}  props.hasItems   Whether the gallery has at least one item.
+ * @param {Object}     props
+ * @param {number}     props.galleryId  Gallery post id.
+ * @param {boolean}    props.hasItems   Whether the gallery has at least one item.
  * @param {() => void} props.onAddItems Called by the empty state's Add items button.
  * @return {JSX.Element}
  */

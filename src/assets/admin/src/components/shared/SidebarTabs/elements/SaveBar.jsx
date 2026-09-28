@@ -18,13 +18,13 @@ const { __ } = wp.i18n;
  * @param {boolean}         props.dirty             Whether there are unsaved changes.
  * @param {boolean}         [props.saving]          Save in progress (disables the button).
  * @param {string}          [props.status]          'saved' | 'error' | null - transient feedback.
- * @param {() => void}        props.onSave            Save handler.
+ * @param {() => void}      props.onSave            Save handler.
  * @param {boolean}         [props.disabled]        Blocks saving while the form is invalid; Discard stays available.
- * @param {() => void}        [props.onDiscard]       Discard handler. Hidden if omitted.
+ * @param {() => void}      [props.onDiscard]       Discard handler. Hidden if omitted.
  * @param {string}          [props.savedHint]       Sub-text shown when clean, e.g. "just now".
  * @param {string}          [props.saveLabel]       Primary button label.
  * @param {React.ReactNode} [props.extraAction]     Optional secondary action.
- * @param {unknown}               [props.watch]           The value being edited. When Autosave is on
+ * @param {unknown}         [props.watch]           The value being edited. When Autosave is on
  *                                                  the save is debounced from the last change to
  *                                                  this, so a half-typed field is never written.
  *                                                  Omit it and the debounce runs from the moment

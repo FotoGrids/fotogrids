@@ -9,11 +9,11 @@ import MediaUpload from '../../blocks/MediaUpload.jsx';
 /**
  * Renders the four ways to get the first items into an empty gallery.
  *
- * @param {Object}   props
- * @param {Object}   props.strings          Localised strings.
+ * @param {Object}                  props
+ * @param {Object}                  props.strings          Localised strings.
  * @param {(ids: number[]) => void} props.onUploadComplete Receives attachment ids after a direct upload.
- * @param {() => void} props.onFromLibrary    Opens the media library.
- * @param {() => void} props.onVideoEmbed     Opens the video embed modal.
+ * @param {() => void}              props.onFromLibrary    Opens the media library.
+ * @param {() => void}              props.onVideoEmbed     Opens the video embed modal.
  * @return {JSX.Element}
  */
 const ItemsEmptyState = ({

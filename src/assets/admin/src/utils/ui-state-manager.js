@@ -150,8 +150,8 @@
 		 * in that list, the fallback is returned instead.
 		 *
 		 * @param {Object}        opts
-		 * @param {string}        opts.key      Storage control key.
-		 * @param {unknown}             opts.fallback Default value when nothing is persisted.
+		 * @param {string}        opts.key         Storage control key.
+		 * @param {unknown}       opts.fallback    Default value when nothing is persisted.
 		 * @param {string}        [opts.urlParam]  URL search param name to read from.
 		 * @param {Array}         [opts.allowed]   List of valid values; invalid stored value falls back.
 		 * @returns {unknown}
@@ -200,8 +200,8 @@
 		 * Also writes to the URL if urlParam is provided.
 		 *
 		 * @param {Object}  opts
-		 * @param {string}  opts.key       Storage control key.
-		 * @param {unknown}       opts.value     Value to store.
+		 * @param {string}  opts.key         Storage control key.
+		 * @param {unknown} opts.value       Value to store.
 		 * @param {string}  [opts.urlParam]  URL search param name to write.
 		 */
 		function setValue(opts) {

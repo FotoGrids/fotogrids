@@ -10,20 +10,20 @@
  *  - The hidden <input ref> (passed in so the consumer can trigger clicks)
  *  - The onFiles callback (called with a FileList on drop or input change)
  *
- * @param {Object}       props
- * @param {boolean}      [props.isDragging]       Drop zone is active.
- * @param {boolean}      [props.isUploading]      Upload in progress.
- * @param {number}       [props.uploadProgress]   0–100.
- * @param {string|null}  [props.error]            Error message to display.
- * @param {string}       [props.title]            Main label, e.g. "Select files to upload".
- * @param {string}       [props.subtitle]         Secondary label, e.g. "or drag and drop files here".
- * @param {string}       [props.hint]             Small muted line, e.g. "Supported: .json, .xml".
- * @param {string}       [props.accept]           Passed to <input accept>.
- * @param {boolean}      [props.multiple]         Allow multiple files.
- * @param {(files: FileList) => void}     props.onFiles            Called with FileList on drop or input change.
- * @param {(dragging: boolean) => void}     [props.onDragChange]     Called with true/false as drag state changes.
- * @param {Object}       props.inputRef           React ref for the hidden file input.
- * @param {string}       [props.inputId]          HTML id for the hidden input.
+ * @param {Object}                      props
+ * @param {boolean}                     [props.isDragging]       Drop zone is active.
+ * @param {boolean}                     [props.isUploading]      Upload in progress.
+ * @param {number}                      [props.uploadProgress]   0–100.
+ * @param {string|null}                 [props.error]            Error message to display.
+ * @param {string}                      [props.title]            Main label, e.g. "Select files to upload".
+ * @param {string}                      [props.subtitle]         Secondary label, e.g. "or drag and drop files here".
+ * @param {string}                      [props.hint]             Small muted line, e.g. "Supported: .json, .xml".
+ * @param {string}                      [props.accept]           Passed to <input accept>.
+ * @param {boolean}                     [props.multiple]         Allow multiple files.
+ * @param {(files: FileList) => void}   props.onFiles            Called with FileList on drop or input change.
+ * @param {(dragging: boolean) => void} [props.onDragChange]     Called with true/false as drag state changes.
+ * @param {Object}                      props.inputRef           React ref for the hidden file input.
+ * @param {string}                      [props.inputId]          HTML id for the hidden input.
  */
 import React from 'react';
 import Icon from '../shared/Icon';

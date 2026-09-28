@@ -8,9 +8,9 @@ import ItemCard from './ItemCard.jsx';
 /**
  * Renders the items grid. The element id is what useItemDragSort binds to.
  *
- * @param {Object}   props
- * @param {Array}    props.items             Items in grid order.
- * @param {Object}   props.strings           Localised strings.
+ * @param {Object}               props
+ * @param {Array}                props.items             Items in grid order.
+ * @param {Object}               props.strings           Localised strings.
  * @param {(id: number) => void} props.onOpenItem        Opens the item editor.
  * @param {(id: number) => void} props.onToggleFeatured  Sets or clears the featured item.
  * @param {(id: number) => void} props.onRemoveItem      Removes an item from the gallery.

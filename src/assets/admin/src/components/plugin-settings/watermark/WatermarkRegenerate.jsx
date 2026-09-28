@@ -25,10 +25,10 @@ const EMPTY = {
  * Reusable across the Plugin Settings → Watermark tab (no galleryId) and the
  * per-gallery surface (galleryId set).
  *
- * @param {Object}   props
- * @param {number}   [props.galleryId]   Scope to one gallery when set.
+ * @param {Object}                   props
+ * @param {number}                   [props.galleryId]   Scope to one gallery when set.
  * @param {(status: Object) => void} [props.onChange]    Called with the latest status after any refresh.
- * @param {unknown}        [props.refreshKey]  Change this to force a status re-fetch (e.g. after a save).
+ * @param {unknown}                  [props.refreshKey]  Change this to force a status re-fetch (e.g. after a save).
  */
 const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 	const [status, setStatus] = useState(EMPTY);

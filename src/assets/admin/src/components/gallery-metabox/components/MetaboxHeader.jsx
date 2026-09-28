@@ -9,14 +9,14 @@ import AddNewDropdown from './AddNewDropdown.jsx';
 /**
  * Renders the Manage / Preview tabs and, on the Manage tab, the item actions.
  *
- * @param {Object}   props
- * @param {string}   props.activeTab          Currently selected tab id.
- * @param {Object}   props.strings            Localised strings.
- * @param {(tab: string) => void} props.onTabSwitch        Switches tab.
- * @param {boolean}  props.addDropdownOpen    Whether the Add New menu is showing.
- * @param {() => void} props.onAddDropdownToggle Toggles the Add New menu.
- * @param {(action: string) => void} props.onAddOption        Receives the chosen Add New action.
- * @param {() => void} props.onClearAll         Opens the remove-all confirmation.
+ * @param {Object}                   props
+ * @param {string}                   props.activeTab           Currently selected tab id.
+ * @param {Object}                   props.strings             Localised strings.
+ * @param {(tab: string) => void}    props.onTabSwitch         Switches tab.
+ * @param {boolean}                  props.addDropdownOpen     Whether the Add New menu is showing.
+ * @param {() => void}               props.onAddDropdownToggle Toggles the Add New menu.
+ * @param {(action: string) => void} props.onAddOption         Receives the chosen Add New action.
+ * @param {() => void}               props.onClearAll          Opens the remove-all confirmation.
  * @return {JSX.Element}
  */
 const MetaboxHeader = ({

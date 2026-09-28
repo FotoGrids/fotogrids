@@ -11,9 +11,9 @@ import { isEmbedItem } from '../api/embed-api';
  * Renders one item tile with its featured toggle, edit and remove controls,
  * and the hidden input that carries the item id into the gallery save.
  *
- * @param {Object}   props
- * @param {Object}   props.item              The item to render.
- * @param {Object}   props.strings           Localised strings.
+ * @param {Object}               props
+ * @param {Object}               props.item              The item to render.
+ * @param {Object}               props.strings           Localised strings.
  * @param {(id: number) => void} props.onOpen            Opens the item editor.
  * @param {(id: number) => void} props.onToggleFeatured  Sets or clears the featured item.
  * @param {(id: number) => void} props.onRemove          Removes the item from the gallery.

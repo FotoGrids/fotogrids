@@ -11,9 +11,9 @@ const { __ } = wp.i18n;
  * the shell (SetupWizardPage) so it can drive the Continue gating; this
  * component is purely presentational.
  *
- * @param {Object}            props
- * @param {string|null}       props.picked    Currently selected persona id, or null.
- * @param {(id: string) => void}          props.onPick    Called with the persona id when a card is clicked.
+ * @param {Object}               props
+ * @param {string|null}          props.picked    Currently selected persona id, or null.
+ * @param {(id: string) => void} props.onPick    Called with the persona id when a card is clicked.
  */
 const PERSONAS = [
 	{

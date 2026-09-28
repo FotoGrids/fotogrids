@@ -795,7 +795,7 @@
 	/**
 	 * Subscribe to page-change notifications for a specific gallery.
 	 *
-	 * @param {Element}  galleryEl
+	 * @param {Element}                  galleryEl
 	 * @param {(detail: Object) => void} cb
 	 */
 	function onChange(galleryEl, cb) {

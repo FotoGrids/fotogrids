@@ -11,9 +11,9 @@ import { useEffect, useRef } from 'react';
  * Listeners are re-bound whenever `items` changes, because React replaces the
  * item nodes on re-render.
  *
- * @param {Object}   options
- * @param {Array}    options.items     Current items in grid order.
- * @param {Object}   options.strings   Localised strings; supplies the placeholder drop text.
+ * @param {Object}                  options
+ * @param {Array}                   options.items     Current items in grid order.
+ * @param {Object}                  options.strings   Localised strings; supplies the placeholder drop text.
  * @param {(ids: number[]) => void} options.onReorder Called with the new array of item ids after a drop.
  * @return {void}
  */

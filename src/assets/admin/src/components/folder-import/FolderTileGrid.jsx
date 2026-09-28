@@ -3,12 +3,12 @@
  *
  * Selectable thumbnails for the importable images of one uploads folder.
  *
- * @param {Object}   props
- * @param {Array}    props.files            `{ name, path, thumbnail, size, attachment_id }`.
- * @param {string[]} props.selected         Paths currently selected.
- * @param {boolean}  [props.disabled]       Block selection while work is in flight.
+ * @param {Object}                 props
+ * @param {Array}                  props.files            `{ name, path, thumbnail, size, attachment_id }`.
+ * @param {string[]}               props.selected         Paths currently selected.
+ * @param {boolean}                [props.disabled]       Block selection while work is in flight.
  * @param {(path: string) => void} props.onToggle         Called with the path of the tile clicked.
- * @param {string}   [props.newBadgeLabel]  Badge shown on files not yet in the library.
+ * @param {string}                 [props.newBadgeLabel]  Badge shown on files not yet in the library.
  */
 
 import React from 'react';

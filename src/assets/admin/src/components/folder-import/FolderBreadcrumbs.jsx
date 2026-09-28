@@ -3,12 +3,12 @@
  *
  * Trail from the uploads root to the folder being browsed.
  *
- * @param {Object}   props
- * @param {Array}    props.crumbs       `{ label, path }` entries, root first.
- * @param {string}   props.currentPath  Path of the folder on screen.
- * @param {boolean}  [props.disabled]   Block navigation while work is in flight.
+ * @param {Object}                 props
+ * @param {Array}                  props.crumbs       `{ label, path }` entries, root first.
+ * @param {string}                 props.currentPath  Path of the folder on screen.
+ * @param {boolean}                [props.disabled]   Block navigation while work is in flight.
  * @param {(path: string) => void} props.onNavigate   Called with the path of the crumb clicked.
- * @param {string}   [props.label]      Accessible name for the nav landmark.
+ * @param {string}                 [props.label]      Accessible name for the nav landmark.
  */
 
 import React from 'react';

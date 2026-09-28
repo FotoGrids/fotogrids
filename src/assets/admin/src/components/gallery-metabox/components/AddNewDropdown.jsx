@@ -16,11 +16,11 @@ const ADD_OPTIONS = [
 /**
  * Renders the Add New toggle and its menu of item sources.
  *
- * @param {Object}   props
- * @param {boolean}  props.isOpen   Whether the menu is showing.
- * @param {() => void} props.onToggle Toggles the menu.
+ * @param {Object}                   props
+ * @param {boolean}                  props.isOpen   Whether the menu is showing.
+ * @param {() => void}               props.onToggle Toggles the menu.
  * @param {(action: string) => void} props.onSelect Receives the chosen action key.
- * @param {Object}   props.strings  Localised strings.
+ * @param {Object}                   props.strings  Localised strings.
  * @return {JSX.Element}
  */
 const AddNewDropdown = ({ isOpen, onToggle, onSelect, strings }) => (

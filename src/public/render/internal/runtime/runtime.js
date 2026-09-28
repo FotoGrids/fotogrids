@@ -275,9 +275,9 @@
 	/**
 	 * Inserts a callback into the named queue, kept sorted by (priority, seq).
 	 *
-	 * @param {string}   queueName One of 'gallery', 'album', 'collection'.
+	 * @param {string}                     queueName One of 'gallery', 'album', 'collection'.
 	 * @param {(element: Element) => void} cb
-	 * @param {number}   priority
+	 * @param {number}                     priority
 	 */
 	function insertCallback(queueName, cb, priority) {
 		const q = queues[queueName];
@@ -507,8 +507,8 @@
 		 * Lower priority runs first. Same priority preserves registration
 		 * order.
 		 *
-		 * @param {(element: Element) => void} cb       Receives (galleryElement).
-		 * @param {number} [priority] Default 10.
+		 * @param {(element: Element) => void} cb         Receives (galleryElement).
+		 * @param {number}                     [priority] Default 10.
 		 */
 		onGallery: makeSubscriber('gallery'),
 
@@ -518,8 +518,8 @@
 		 *
 		 * Same replay-on-late-subscribe semantics as onGallery.
 		 *
-		 * @param {(element: Element) => void} cb       Receives (albumElement).
-		 * @param {number} [priority] Default 10.
+		 * @param {(element: Element) => void} cb         Receives (albumElement).
+		 * @param {number}                     [priority] Default 10.
 		 */
 		onAlbum: makeSubscriber('album'),
 
@@ -530,8 +530,8 @@
 		 * needs to run against both kinds; most modules want onGallery or
 		 * onAlbum instead.
 		 *
-		 * @param {(element: Element) => void} cb       Receives (collectionElement).
-		 * @param {number} [priority] Default 10.
+		 * @param {(element: Element) => void} cb         Receives (collectionElement).
+		 * @param {number}                     [priority] Default 10.
 		 */
 		onCollection: makeSubscriber('collection'),
 
