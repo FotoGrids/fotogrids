@@ -53,7 +53,7 @@ final class Breakpoint_Config {
 	/**
 	 * The configuration, for the frontend runtime to read off a wrapper.
 	 *
-	 * @since  1.1.3
+	 * @since  1.1.4
 	 * @return array<string, string>
 	 */
 	public function wrapper_attrs(): array {
@@ -70,7 +70,7 @@ final class Breakpoint_Config {
 	 * selects on html[data-fg-breakpoint], which the runtime sets, and keeps
 	 * the @media block as the fallback until it has.
 	 *
-	 * @since  1.1.3
+	 * @since  1.1.4
 	 * @param  string $breakpoint   'tablet' or 'mobile'.
 	 * @param  string $selector     Selector the declarations belong to.
 	 * @param  string $declarations Declarations, one per line, without braces.

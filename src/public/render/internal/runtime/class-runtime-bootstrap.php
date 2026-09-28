@@ -108,7 +108,7 @@ final class Runtime_Bootstrap implements Feature {
 	 * The payload prints with fotogrids-runtime wherever the render pipeline
 	 * enqueues or inline-prints the handle. Runs once per request.
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.4
 	 * @return void
 	 */
 	public static function localize(): void {

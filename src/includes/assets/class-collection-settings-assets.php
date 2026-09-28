@@ -180,6 +180,8 @@ final class Collection_Settings_Assets {
 
 	/**
 	 * The shared admin error boundary and its fallback styles.
+	 *
+	 * @since 1.1.4
 	 */
 	private static function enqueue_error_boundary(): void {
 		wp_enqueue_style(

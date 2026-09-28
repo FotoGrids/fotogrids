@@ -48,7 +48,7 @@ final class Page_Size_Resolver {
 	/**
 	 * Resolves items_per_page for a named breakpoint.
 	 *
-	 * @since  1.1.3
+	 * @since  1.1.4
 	 * @param  array<string, mixed> $settings   Render context settings.
 	 * @param  string               $breakpoint 'desktop', 'tablet' or 'mobile'.
 	 * @return int
