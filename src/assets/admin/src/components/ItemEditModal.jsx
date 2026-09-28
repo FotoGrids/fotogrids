@@ -27,464 +27,524 @@ import useMetadataSuggestions from './item-edit-modal/useMetadataSuggestions';
 const _metadataTypeRegistry = [];
 
 window.FotoGridsAdmin = window.FotoGridsAdmin || {};
-window.FotoGridsAdmin.registerMetadataType = ( registration ) => {
-    if ( ! registration?.key || typeof registration.serialize !== 'function' || typeof registration.deserialize !== 'function' ) {
-        console.warn( '[FotoGrids] registerMetadataType: invalid registration - key, serialize, and deserialize are required.', registration );
-        return;
-    }
-    if ( _metadataTypeRegistry.some( r => r.key === registration.key ) ) {
-        console.warn( `[FotoGrids] registerMetadataType: type "${ registration.key }" is already registered.` );
-        return;
-    }
-    _metadataTypeRegistry.push( registration );
+window.FotoGridsAdmin.registerMetadataType = (registration) => {
+	if (
+		!registration?.key ||
+		typeof registration.serialize !== 'function' ||
+		typeof registration.deserialize !== 'function'
+	) {
+		console.warn(
+			'[FotoGrids] registerMetadataType: invalid registration - key, serialize, and deserialize are required.',
+			registration
+		);
+		return;
+	}
+	if (_metadataTypeRegistry.some((r) => r.key === registration.key)) {
+		console.warn(
+			`[FotoGrids] registerMetadataType: type "${registration.key}" is already registered.`
+		);
+		return;
+	}
+	_metadataTypeRegistry.push(registration);
 };
 
 const ItemEditModal = ({
-    itemId,
-    itemData,
-    loading,
-    items,
-    onClose,
-    onNavigate,
-    strings
+	itemId,
+	itemData,
+	loading,
+	items,
+	onClose,
+	onNavigate,
+	strings,
 }) => {
-    const [activeTab, setActiveTab] = useState('details');
-    const [formData, setFormData] = useState({
-        title: '',
-        alt: '',
-        caption: '',
-        description: '',
-        credit: '',
-        external_url: '',
-        link_target: 'global',
-        exif: {}
-    });
-    const [metadata, setMetadata] = useState({
-        tags: [],
-        people: [],
-        locations: []
-    });
-    const [metadataInput, setMetadataInput] = useState({
-        tags: '',
-        people: '',
-        locations: ''
-    });
-    const availableMetadata = {
-        tags: useMetadataSuggestions('tags', metadataInput.tags),
-        people: useMetadataSuggestions('people', metadataInput.people),
-        locations: useMetadataSuggestions('locations', metadataInput.locations)
-    };
-    const [saving, setSaving] = useState(false);
-    const [originalData, setOriginalData] = useState(null);
-    const [originalMetadata, setOriginalMetadata] = useState(null);
-    const [hasChanges, setHasChanges] = useState(false);
-    const [discardPrompt, setDiscardPrompt] = useState({ open: false, action: null });
-    const [saveSuccess, setSaveSuccess] = useState(false);
-    const [videoSettings, setVideoSettings] = useState({});
-    const [originalVideoSettings, setOriginalVideoSettings] = useState({});
+	const [activeTab, setActiveTab] = useState('details');
+	const [formData, setFormData] = useState({
+		title: '',
+		alt: '',
+		caption: '',
+		description: '',
+		credit: '',
+		external_url: '',
+		link_target: 'global',
+		exif: {},
+	});
+	const [metadata, setMetadata] = useState({
+		tags: [],
+		people: [],
+		locations: [],
+	});
+	const [metadataInput, setMetadataInput] = useState({
+		tags: '',
+		people: '',
+		locations: '',
+	});
+	const availableMetadata = {
+		tags: useMetadataSuggestions('tags', metadataInput.tags),
+		people: useMetadataSuggestions('people', metadataInput.people),
+		locations: useMetadataSuggestions('locations', metadataInput.locations),
+	};
+	const [saving, setSaving] = useState(false);
+	const [originalData, setOriginalData] = useState(null);
+	const [originalMetadata, setOriginalMetadata] = useState(null);
+	const [hasChanges, setHasChanges] = useState(false);
+	const [discardPrompt, setDiscardPrompt] = useState({
+		open: false,
+		action: null,
+	});
+	const [videoSettings, setVideoSettings] = useState({});
+	const [originalVideoSettings, setOriginalVideoSettings] = useState({});
 
-    useEffect(() => {
-        if (itemData) {
-            const initialFormData = {
-                title: itemData.title || '',
-                alt: itemData.alt || '',
-                caption: itemData.caption || '',
-                description: itemData.description || '',
-                credit: itemData.credit || '',
-                external_url: itemData.external_url || '',
-                link_target: itemData.link_target || 'global',
-                exif: itemData.exif || {}
-            };
-            setFormData(initialFormData);
-            setOriginalData(initialFormData);
-            setHasChanges(false);
-            setSaveSuccess(false);
+	useEffect(() => {
+		if (itemData) {
+			const initialFormData = {
+				title: itemData.title || '',
+				alt: itemData.alt || '',
+				caption: itemData.caption || '',
+				description: itemData.description || '',
+				credit: itemData.credit || '',
+				external_url: itemData.external_url || '',
+				link_target: itemData.link_target || 'global',
+				exif: itemData.exif || {},
+			};
+			setFormData(initialFormData);
+			setOriginalData(initialFormData);
+			setHasChanges(false);
 
-            // Seed video settings from custom_data for Media Library videos.
-            if (itemData.item_type === 'video_file') {
-                const cd = itemData.custom_data || {};
-                const initialVideo = {
-                    autoplay:   !!cd.autoplay,
-                    mute:       !!cd.mute,
-                    loop:       !!cd.loop,
-                    controls:   cd.controls === undefined ? true : !!cd.controls,
-                    poster_id:  cd.poster_id || 0,
-                    poster_url: cd.poster_url || '',
-                    poster_preview: itemData.poster_url || cd.poster_url || '',
-                };
-                setVideoSettings(initialVideo);
-                setOriginalVideoSettings(initialVideo);
-            } else {
-                setVideoSettings({});
-                setOriginalVideoSettings({});
-            }
+			// Seed video settings from custom_data for Media Library videos.
+			if (itemData.item_type === 'video_file') {
+				const cd = itemData.custom_data || {};
+				const initialVideo = {
+					autoplay: !!cd.autoplay,
+					mute: !!cd.mute,
+					loop: !!cd.loop,
+					controls: cd.controls === undefined ? true : !!cd.controls,
+					poster_id: cd.poster_id || 0,
+					poster_url: cd.poster_url || '',
+					poster_preview: itemData.poster_url || cd.poster_url || '',
+				};
+				setVideoSettings(initialVideo);
+				setOriginalVideoSettings(initialVideo);
+			} else {
+				setVideoSettings({});
+				setOriginalVideoSettings({});
+			}
 
-            // The Video tab only exists for video files; when navigating away from a
-            // video while it was active, fall back to Details.
-            if (activeTab === 'video' && itemData.item_type !== 'video_file') {
-                setActiveTab('details');
-            }
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [itemData]);
+			// The Video tab only exists for video files; when navigating away from a
+			// video while it was active, fall back to Details.
+			if (activeTab === 'video' && itemData.item_type !== 'video_file') {
+				setActiveTab('details');
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [itemData]);
 
-    useEffect(() => {
-        if (itemId) {
-            loadItemMetadata();
-        }
-    }, [itemId]);
+	useEffect(() => {
+		if (itemId) {
+			loadItemMetadata();
+		}
+	}, [itemId]);
 
-    useEffect(() => {
-        if (!originalData || !originalMetadata) return;
+	useEffect(() => {
+		if (!originalData || !originalMetadata) {
+			return;
+		}
 
-        const formDataChanged = Object.keys(originalData).some(key =>
-            originalData[key] !== formData[key]
-        );
+		const formDataChanged = Object.keys(originalData).some(
+			(key) => originalData[key] !== formData[key]
+		);
 
-        const metadataChanged =
-            (originalMetadata.tags.length !== metadata.tags.length) ||
-            originalMetadata.tags.some(tag => !metadata.tags.find(t => t.id === tag.id)) ||
-            (originalMetadata.people.length !== metadata.people.length) ||
-            originalMetadata.people.some(person => !metadata.people.find(p => p.id === person.id)) ||
-            (originalMetadata.locations[0]?.id !== metadata.locations[0]?.id);
+		const metadataChanged =
+			originalMetadata.tags.length !== metadata.tags.length ||
+			originalMetadata.tags.some(
+				(tag) => !metadata.tags.find((t) => t.id === tag.id)
+			) ||
+			originalMetadata.people.length !== metadata.people.length ||
+			originalMetadata.people.some(
+				(person) => !metadata.people.find((p) => p.id === person.id)
+			) ||
+			originalMetadata.locations[0]?.id !== metadata.locations[0]?.id;
 
-        const videoChanged = ['autoplay', 'mute', 'loop', 'controls', 'poster_id', 'poster_url'].some(
-            key => (originalVideoSettings[key] ?? '') !== (videoSettings[key] ?? '')
-        );
+		const videoChanged = [
+			'autoplay',
+			'mute',
+			'loop',
+			'controls',
+			'poster_id',
+			'poster_url',
+		].some(
+			(key) =>
+				(originalVideoSettings[key] ?? '') !==
+				(videoSettings[key] ?? '')
+		);
 
-        setHasChanges(formDataChanged || metadataChanged || videoChanged);
-    }, [formData, originalData, metadata, originalMetadata, videoSettings, originalVideoSettings]);
+		setHasChanges(formDataChanged || metadataChanged || videoChanged);
+	}, [
+		formData,
+		originalData,
+		metadata,
+		originalMetadata,
+		videoSettings,
+		originalVideoSettings,
+	]);
 
-    const loadItemMetadata = async () => {
-        try {
-            const response = await fetch(buildRestUrl(`fotogrids/v1/metadata/item/${itemId}`, { _wpnonce: window.wpApiSettings?.nonce }));
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            const data = await response.json();
+	const loadItemMetadata = async () => {
+		try {
+			const response = await fetch(
+				buildRestUrl(`fotogrids/v1/metadata/item/${itemId}`, {
+					_wpnonce: window.wpApiSettings?.nonce,
+				})
+			);
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}`);
+			}
+			const data = await response.json();
 
-            const initialMetadata = {
-                tags: data.tags || [],
-                people: data.people || [],
-                locations: data.locations || []
-            };
+			const initialMetadata = {
+				tags: data.tags || [],
+				people: data.people || [],
+				locations: data.locations || [],
+			};
 
-            // Allow registered extension types to hydrate their own state slices.
-            _metadataTypeRegistry.forEach(({ key, deserialize }) => {
-                initialMetadata[key] = deserialize(data);
-            });
+			// Allow registered extension types to hydrate their own state slices.
+			_metadataTypeRegistry.forEach(({ key, deserialize }) => {
+				initialMetadata[key] = deserialize(data);
+			});
 
-            setMetadata(initialMetadata);
-            setOriginalMetadata(initialMetadata);
-        } catch (error) {
-            console.warn('Failed to load item metadata:', error);
-        }
-    };
+			setMetadata(initialMetadata);
+			setOriginalMetadata(initialMetadata);
+		} catch (error) {
+			console.warn('Failed to load item metadata:', error);
+		}
+	};
 
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
+	const handleInputChange = (field, value) => {
+		setFormData((prev) => ({
+			...prev,
+			[field]: value,
+		}));
+	};
 
-    const addMetadataItem = async (type, value) => {
-        if (!value.trim()) return;
+	const addMetadataItem = async (type, value) => {
+		if (!value.trim()) {
+			return;
+		}
 
-        try {
-            const response = await fetch(`${window.wpApiSettings.root}fotogrids/v1/metadata/${type}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.wpApiSettings.nonce
-                },
-                body: JSON.stringify({ name: value.trim() })
-            });
+		try {
+			const response = await fetch(
+				`${window.wpApiSettings.root}fotogrids/v1/metadata/${type}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-WP-Nonce': window.wpApiSettings.nonce,
+					},
+					body: JSON.stringify({ name: value.trim() }),
+				}
+			);
 
-            const newItem = await response.json();
+			const newItem = await response.json();
 
-            // For replace-type keys (maxItems === 1, e.g. locations), replace
-            // the existing entry rather than appending.
-            const REPLACE_TYPES = ['locations'];
-            setMetadata(prev => {
-                if (prev[type].some(item => item.id === newItem.id)) {
-                    return prev;
-                }
+			// For replace-type keys (maxItems === 1, e.g. locations), replace
+			// the existing entry rather than appending.
+			const REPLACE_TYPES = ['locations'];
+			setMetadata((prev) => {
+				if (prev[type].some((item) => item.id === newItem.id)) {
+					return prev;
+				}
 
-                return {
-                    ...prev,
-                    [type]: REPLACE_TYPES.includes(type) ? [newItem] : [...prev[type], newItem]
-                };
-            });
+				return {
+					...prev,
+					[type]: REPLACE_TYPES.includes(type)
+						? [newItem]
+						: [...prev[type], newItem],
+				};
+			});
 
-            setMetadataInput(prev => ({ ...prev, [type]: '' }));
-        } catch (error) {
-            console.warn(`Failed to add ${type}:`, error);
-        }
-    };
+			setMetadataInput((prev) => ({ ...prev, [type]: '' }));
+		} catch (error) {
+			console.warn(`Failed to add ${type}:`, error);
+		}
+	};
 
-    const removeMetadataItem = (type, itemId) => {
-        setMetadata(prev => ({
-            ...prev,
-            [type]: prev[type].filter(item => item.id !== itemId)
-        }));
-    };
+	const removeMetadataItem = (type, itemId) => {
+		setMetadata((prev) => ({
+			...prev,
+			[type]: prev[type].filter((item) => item.id !== itemId),
+		}));
+	};
 
-    const selectExistingMetadata = (type, item) => {
-        // For single-item types (locations), replace rather than append.
-        const isSingleType = type === 'locations';
-        const alreadySelected = metadata[type].some(existing => existing.id === item.id);
+	const selectExistingMetadata = (type, item) => {
+		// For single-item types (locations), replace rather than append.
+		const isSingleType = type === 'locations';
+		const alreadySelected = metadata[type].some(
+			(existing) => existing.id === item.id
+		);
 
-        if (!alreadySelected) {
-            setMetadata(prev => ({
-                ...prev,
-                [type]: isSingleType ? [item] : [...prev[type], item]
-            }));
-        }
+		if (!alreadySelected) {
+			setMetadata((prev) => ({
+				...prev,
+				[type]: isSingleType ? [item] : [...prev[type], item],
+			}));
+		}
 
-        setMetadataInput(prev => ({ ...prev, [type]: '' }));
-    };
+		setMetadataInput((prev) => ({ ...prev, [type]: '' }));
+	};
 
-    const handleSave = async () => {
-        setSaving(true);
+	const handleSave = async () => {
+		setSaving(true);
 
-        try {
-            const payload = {
-                ...formData,
-                tags: metadata.tags.map(tag => tag.id),
-                people: metadata.people.map(person => ({
-                    id: person.id,
-                    name: person.name || '',
-                    details: person.details || ''
-                })),
-                locations: metadata.locations.map(loc => ({
-                    id: loc.id,
-                    name: loc.name || '',
-                    latitude: loc.latitude || null,
-                    longitude: loc.longitude || null
-                }))
-            };
+		try {
+			const payload = {
+				...formData,
+				tags: metadata.tags.map((tag) => tag.id),
+				people: metadata.people.map((person) => ({
+					id: person.id,
+					name: person.name || '',
+					details: person.details || '',
+				})),
+				locations: metadata.locations.map((loc) => ({
+					id: loc.id,
+					name: loc.name || '',
+					latitude: loc.latitude || null,
+					longitude: loc.longitude || null,
+				})),
+			};
 
-            // Allow registered extension types to append their own payload fields.
-            _metadataTypeRegistry.forEach(({ key, serialize }) => {
-                payload[key] = serialize(metadata);
-            });
+			// Allow registered extension types to append their own payload fields.
+			_metadataTypeRegistry.forEach(({ key, serialize }) => {
+				payload[key] = serialize(metadata);
+			});
 
-            // Video items send their poster + playback settings for custom_data.
-            if (itemData?.item_type === 'video_file') {
-                payload.video_settings = {
-                    autoplay:   !!videoSettings.autoplay,
-                    mute:       !!videoSettings.mute,
-                    loop:       !!videoSettings.loop,
-                    controls:   videoSettings.controls === undefined ? true : !!videoSettings.controls,
-                    poster_id:  videoSettings.poster_id || 0,
-                    poster_url: videoSettings.poster_url || '',
-                };
-            }
+			// Video items send their poster + playback settings for custom_data.
+			if (itemData?.item_type === 'video_file') {
+				payload.video_settings = {
+					autoplay: !!videoSettings.autoplay,
+					mute: !!videoSettings.mute,
+					loop: !!videoSettings.loop,
+					controls:
+						videoSettings.controls === undefined
+							? true
+							: !!videoSettings.controls,
+					poster_id: videoSettings.poster_id || 0,
+					poster_url: videoSettings.poster_url || '',
+				};
+			}
 
-            const response = await fetch(
-                `${window.wpApiSettings.root}fotogrids/v1/items/${itemId}/save`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': window.wpApiSettings.nonce
-                    },
-                    body: JSON.stringify(payload)
-                }
-            );
+			const response = await fetch(
+				`${window.wpApiSettings.root}fotogrids/v1/items/${itemId}/save`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-WP-Nonce': window.wpApiSettings.nonce,
+					},
+					body: JSON.stringify(payload),
+				}
+			);
 
-            const data = await response.json();
+			const data = await response.json();
 
-            if (response.ok && data.success) {
-                setOriginalData({ ...formData });
-                setOriginalMetadata({
-                    tags: [...metadata.tags],
-                    people: [...metadata.people],
-                    locations: [...metadata.locations]
-                });
-                setOriginalVideoSettings({ ...videoSettings });
+			if (response.ok && data.success) {
+				setOriginalData({ ...formData });
+				setOriginalMetadata({
+					tags: [...metadata.tags],
+					people: [...metadata.people],
+					locations: [...metadata.locations],
+				});
+				setOriginalVideoSettings({ ...videoSettings });
 
-                setHasChanges(false);
-                setSaving(false);
-                setSaveSuccess(true);
+				setHasChanges(false);
+				setSaving(false);
 
-                if (window.fotogridsToast) {
-                    window.fotogridsToast.success(
-                        strings.itemSavedSuccessfully || data.message || 'Item saved successfully!'
-                    );
-                }
-            } else {
-                setSaving(false);
+				if (window.fotogridsToast) {
+					window.fotogridsToast.success(
+						strings.itemSavedSuccessfully ||
+							data.message ||
+							'Item saved successfully!'
+					);
+				}
+			} else {
+				setSaving(false);
 
-                const errorMessage = data.message || strings.errorSaving;
-                if (window.fotogridsToast) {
-                    window.fotogridsToast.error(errorMessage);
-                } else {
-                    alert(errorMessage);
-                }
-            }
-        } catch (error) {
-            setSaving(false);
+				const errorMessage = data.message || strings.errorSaving;
+				if (window.fotogridsToast) {
+					window.fotogridsToast.error(errorMessage);
+				} else {
+					// eslint-disable-next-line no-alert -- fallback when the toast script has not loaded.
+					alert(errorMessage);
+				}
+			}
+		} catch (error) {
+			setSaving(false);
 
-            if (window.fotogridsToast) {
-                window.fotogridsToast.error(strings.errorSaving);
-            } else {
-                alert(strings.errorSaving);
-            }
-        }
-    };
+			if (window.fotogridsToast) {
+				window.fotogridsToast.error(strings.errorSaving);
+			} else {
+				// eslint-disable-next-line no-alert -- fallback when the toast script has not loaded.
+				alert(strings.errorSaving);
+			}
+		}
+	};
 
-    const closeModal = () => {
-        setHasChanges(false);
-        onClose();
-    };
+	const closeModal = () => {
+		setHasChanges(false);
+		onClose();
+	};
 
-    const navigateTo = (direction) => {
-        setHasChanges(false);
-        onNavigate(direction);
-    };
+	const navigateTo = (direction) => {
+		setHasChanges(false);
+		onNavigate(direction);
+	};
 
-    /**
-     * Close the modal, asking first when there are unsaved changes.
-     * Covers the overlay, Esc, the header close button and the footer Close
-     * button, all of which reach the modal through this handler.
-     */
-    const handleClose = () => {
-        if (saving) {
-            return;
-        }
+	/**
+	 * Close the modal, asking first when there are unsaved changes.
+	 * Covers the overlay, Esc, the header close button and the footer Close
+	 * button, all of which reach the modal through this handler.
+	 */
+	const handleClose = () => {
+		if (saving) {
+			return;
+		}
 
-        if (hasChanges) {
-            setDiscardPrompt({ open: true, action: 'close' });
-            return;
-        }
+		if (hasChanges) {
+			setDiscardPrompt({ open: true, action: 'close' });
+			return;
+		}
 
-        closeModal();
-    };
+		closeModal();
+	};
 
-    const handleNavigate = (direction) => {
-        if (saving) {
-            return;
-        }
+	const handleNavigate = (direction) => {
+		if (saving) {
+			return;
+		}
 
-        if (hasChanges) {
-            setDiscardPrompt({ open: true, action: direction });
-            return;
-        }
+		if (hasChanges) {
+			setDiscardPrompt({ open: true, action: direction });
+			return;
+		}
 
-        navigateTo(direction);
-    };
+		navigateTo(direction);
+	};
 
-    const discardChanges = () => {
-        const { action } = discardPrompt;
-        setDiscardPrompt((prompt) => ({ ...prompt, open: false }));
+	const discardChanges = () => {
+		const { action } = discardPrompt;
+		setDiscardPrompt((prompt) => ({ ...prompt, open: false }));
 
-        if (action === 'close') {
-            closeModal();
-        } else if (action) {
-            navigateTo(action);
-        }
-    };
+		if (action === 'close') {
+			closeModal();
+		} else if (action) {
+			navigateTo(action);
+		}
+	};
 
-    const currentIndex = items.findIndex(img => img.id === itemId);
-    const hasMultipleItems = items.length > 1;
+	const hasMultipleItems = items.length > 1;
 
-    return (
-        <>
-        <Modal
-            isOpen
-            onClose={handleClose}
-            size="lg"
-            hasSidebar
-            preventClose={saving}
-            type="item-edit"
-        >
-            <Modal.Header>
-                <Modal.HeaderTitle>{strings.editItem || 'Edit Item'}</Modal.HeaderTitle>
-            </Modal.Header>
+	return (
+		<>
+			<Modal
+				isOpen
+				onClose={handleClose}
+				size="lg"
+				hasSidebar
+				preventClose={saving}
+				type="item-edit"
+			>
+				<Modal.Header>
+					<Modal.HeaderTitle>
+						{strings.editItem || 'Edit Item'}
+					</Modal.HeaderTitle>
+				</Modal.Header>
 
-            <Modal.Body padding={false}>
-                <Modal.Sidebar>
-                    <ItemPreviewPane
-                        itemData={itemData}
-                        loading={loading}
-                        formData={formData}
-                        strings={strings}
-                    />
-                </Modal.Sidebar>
+				<Modal.Body padding={false}>
+					<Modal.Sidebar>
+						<ItemPreviewPane
+							itemData={itemData}
+							loading={loading}
+							formData={formData}
+							strings={strings}
+						/>
+					</Modal.Sidebar>
 
-                <Modal.Main>
-                    <ItemEditTabs
-                        itemData={itemData}
-                        loading={loading}
-                        formData={formData}
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                        handleInputChange={handleInputChange}
-                        metadata={metadata}
-                        availableMetadata={availableMetadata}
-                        metadataInput={metadataInput}
-                        setMetadataInput={setMetadataInput}
-                        addMetadataItem={addMetadataItem}
-                        removeMetadataItem={removeMetadataItem}
-                        selectExistingMetadata={selectExistingMetadata}
-                        videoSettings={videoSettings}
-                        setVideoSettings={setVideoSettings}
-                        strings={strings}
-                    />
-                </Modal.Main>
-            </Modal.Body>
+					<Modal.Main>
+						<ItemEditTabs
+							itemData={itemData}
+							loading={loading}
+							formData={formData}
+							activeTab={activeTab}
+							setActiveTab={setActiveTab}
+							handleInputChange={handleInputChange}
+							metadata={metadata}
+							availableMetadata={availableMetadata}
+							metadataInput={metadataInput}
+							setMetadataInput={setMetadataInput}
+							addMetadataItem={addMetadataItem}
+							removeMetadataItem={removeMetadataItem}
+							selectExistingMetadata={selectExistingMetadata}
+							videoSettings={videoSettings}
+							setVideoSettings={setVideoSettings}
+							strings={strings}
+						/>
+					</Modal.Main>
+				</Modal.Body>
 
-            <Modal.Footer>
-                {!loading && itemData && (
-                    <Button
-                        variant="primary"
-                        onClick={handleSave}
-                        disabled={!hasChanges}
-                        busy={saving}
-                    >
-                        {strings.saveChanges || 'Save Changes'}
-                    </Button>
-                )}
-                <Button variant="secondary" onClick={handleClose} disabled={saving}>
-                    {strings.close || 'Close'}
-                </Button>
-            </Modal.Footer>
+				<Modal.Footer>
+					{!loading && itemData && (
+						<Button
+							variant="primary"
+							onClick={handleSave}
+							disabled={!hasChanges}
+							busy={saving}
+						>
+							{strings.saveChanges || 'Save Changes'}
+						</Button>
+					)}
+					<Button
+						variant="secondary"
+						onClick={handleClose}
+						disabled={saving}
+					>
+						{strings.close || 'Close'}
+					</Button>
+				</Modal.Footer>
 
-            {hasMultipleItems && (
-                <>
-                    <Modal.Nav
-                        direction="prev"
-                        onClick={() => handleNavigate('prev')}
-                        ariaLabel={strings.prevItem || 'Previous item'}
-                    />
-                    <Modal.Nav
-                        direction="next"
-                        onClick={() => handleNavigate('next')}
-                        ariaLabel={strings.nextItem || 'Next item'}
-                    />
-                </>
-            )}
-        </Modal>
+				{hasMultipleItems && (
+					<>
+						<Modal.Nav
+							direction="prev"
+							onClick={() => handleNavigate('prev')}
+							ariaLabel={strings.prevItem || 'Previous item'}
+						/>
+						<Modal.Nav
+							direction="next"
+							onClick={() => handleNavigate('next')}
+							ariaLabel={strings.nextItem || 'Next item'}
+						/>
+					</>
+				)}
+			</Modal>
 
-        <Confirm
-            isOpen={discardPrompt.open}
-            onClose={() => setDiscardPrompt((prompt) => ({ ...prompt, open: false }))}
-            onConfirm={discardChanges}
-            variant="warning"
-            headerIcon={false}
-            title={strings.unsavedChangesTitle}
-            message={discardPrompt.action === 'close'
-                ? strings.unsavedChangesConfirm
-                : strings.unsavedChangesNavigate}
-            confirmLabel={strings.unsavedChangesDiscard}
-            confirmVariant="secondary"
-            cancelLabel={strings.unsavedChangesKeepEditing}
-            cancelVariant="primary"
-        />
-        </>
-    );
+			<Confirm
+				isOpen={discardPrompt.open}
+				onClose={() =>
+					setDiscardPrompt((prompt) => ({ ...prompt, open: false }))
+				}
+				onConfirm={discardChanges}
+				variant="warning"
+				headerIcon={false}
+				title={strings.unsavedChangesTitle}
+				message={
+					discardPrompt.action === 'close'
+						? strings.unsavedChangesConfirm
+						: strings.unsavedChangesNavigate
+				}
+				confirmLabel={strings.unsavedChangesDiscard}
+				confirmVariant="secondary"
+				cancelLabel={strings.unsavedChangesKeepEditing}
+				cancelVariant="primary"
+			/>
+		</>
+	);
 };
 
 export default ItemEditModal;

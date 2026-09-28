@@ -27,116 +27,131 @@
  */
 import React from 'react';
 import Icon from '../shared/Icon';
+import { activateOnKey } from '../../utils/activate-on-key';
 
 const { __ } = wp.i18n;
 
 const UploadArea = ({
-    isDragging = false,
-    isUploading = false,
-    uploadProgress = 0,
-    error = null,
-    title,
-    subtitle,
-    hint,
-    accept,
-    multiple = true,
-    onFiles,
-    onDragChange,
-    inputRef,
-    inputId = 'fotogrids-upload-input',
+	isDragging = false,
+	isUploading = false,
+	uploadProgress = 0,
+	error = null,
+	title,
+	subtitle,
+	hint,
+	accept,
+	multiple = true,
+	onFiles,
+	onDragChange,
+	inputRef,
+	inputId = 'fotogrids-upload-input',
 }) => {
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onDragChange?.(true);
-    };
+	const handleDragOver = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		onDragChange?.(true);
+	};
 
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onDragChange?.(false);
-    };
+	const handleDragLeave = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		onDragChange?.(false);
+	};
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onDragChange?.(false);
-        if (onFiles && e.dataTransfer.files.length > 0) {
-            onFiles(e.dataTransfer.files);
-        }
-    };
+	const handleDrop = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		onDragChange?.(false);
+		if (onFiles && e.dataTransfer.files.length > 0) {
+			onFiles(e.dataTransfer.files);
+		}
+	};
 
-    const handleInputChange = (e) => {
-        if (onFiles && e.target.files.length > 0) {
-            onFiles(e.target.files);
-            e.target.value = '';
-        }
-    };
+	const handleInputChange = (e) => {
+		if (onFiles && e.target.files.length > 0) {
+			onFiles(e.target.files);
+			e.target.value = '';
+		}
+	};
 
-    const handleClick = () => {
-        if (inputRef?.current && !isUploading) {
-            inputRef.current.click();
-        }
-    };
+	const handleClick = () => {
+		if (inputRef?.current && !isUploading) {
+			inputRef.current.click();
+		}
+	};
 
-    const baseClass = 'fotogrids-upload-area';
-    const zoneClass = [
-        baseClass,
-        isDragging  ? `${baseClass}--dragging`  : '',
-        isUploading ? `${baseClass}--uploading` : '',
-    ].filter(Boolean).join(' ');
+	const baseClass = 'fotogrids-upload-area';
+	const zoneClass = [
+		baseClass,
+		isDragging ? `${baseClass}--dragging` : '',
+		isUploading ? `${baseClass}--uploading` : '',
+	]
+		.filter(Boolean)
+		.join(' ');
 
-    return (
-        <div className={`${baseClass}-wrapper`}>
-            <div
-                className={zoneClass}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={handleClick}
-                style={{ cursor: isUploading ? 'not-allowed' : 'pointer' }}
-            >
-                <input
-                    ref={inputRef}
-                    id={inputId}
-                    type="file"
-                    multiple={multiple}
-                    accept={accept}
-                    style={{ display: 'none' }}
-                    onChange={handleInputChange}
-                />
+	return (
+		<div className={`${baseClass}-wrapper`}>
+			<div
+				className={zoneClass}
+				onDragOver={handleDragOver}
+				onDragEnter={handleDragOver}
+				onDragLeave={handleDragLeave}
+				onDrop={handleDrop}
+				onClick={handleClick}
+				onKeyDown={activateOnKey(handleClick)}
+				role="button"
+				tabIndex={isUploading ? -1 : 0}
+				aria-disabled={isUploading || undefined}
+				style={{ cursor: isUploading ? 'not-allowed' : 'pointer' }}
+			>
+				<input
+					ref={inputRef}
+					id={inputId}
+					type="file"
+					multiple={multiple}
+					accept={accept}
+					style={{ display: 'none' }}
+					onChange={handleInputChange}
+				/>
 
-                {isUploading ? (
-                    <div className={`${baseClass}__progress`}>
-                        <div className={`${baseClass}__progress-bar`}>
-                            <div
-                                className={`${baseClass}__progress-fill`}
-                                style={{ width: `${uploadProgress}%` }}
-                            />
-                        </div>
-                        <p>{__('Uploading…', 'fotogrids')} {uploadProgress}%</p>
-                    </div>
-                ) : (
-                    <>
-                        <div className={`${baseClass}__icon`}>
-                            <Icon name="folder" className={`${baseClass}__icon-folder`} />
-                            <Icon name="plus" className={`${baseClass}__icon-plus`} />
-                        </div>
-                        {title    && <h4>{title}</h4>}
-                        {subtitle && <p>{subtitle}</p>}
-                        {hint     && <p className={`${baseClass}__hint`}>{hint}</p>}
-                    </>
-                )}
-            </div>
+				{isUploading ? (
+					<div className={`${baseClass}__progress`}>
+						<div className={`${baseClass}__progress-bar`}>
+							<div
+								className={`${baseClass}__progress-fill`}
+								style={{ width: `${uploadProgress}%` }}
+							/>
+						</div>
+						<p>
+							{__('Uploading…', 'fotogrids')} {uploadProgress}%
+						</p>
+					</div>
+				) : (
+					<>
+						<div className={`${baseClass}__icon`}>
+							<Icon
+								name="folder"
+								className={`${baseClass}__icon-folder`}
+							/>
+							<Icon
+								name="plus"
+								className={`${baseClass}__icon-plus`}
+							/>
+						</div>
+						{title && <h4>{title}</h4>}
+						{subtitle && <p>{subtitle}</p>}
+						{hint && <p className={`${baseClass}__hint`}>{hint}</p>}
+					</>
+				)}
+			</div>
 
-            {error && (
-                <div className={`${baseClass}__error notice notice-error`}>
-                    <p>{error}</p>
-                </div>
-            )}
-        </div>
-    );
+			{error && (
+				<div className={`${baseClass}__error notice notice-error`}>
+					<p>{error}</p>
+				</div>
+			)}
+		</div>
+	);
 };
 
 export default UploadArea;

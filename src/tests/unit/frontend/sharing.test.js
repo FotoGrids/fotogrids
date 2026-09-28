@@ -86,6 +86,7 @@ describe('sharing', () => {
 		document.body.innerHTML = '';
 		window.history.replaceState({}, '', '/');
 		delete window.fotogridsSharing;
+		window.fotogrids = { ...window.fotogrids, deep_linking_enabled: '1' };
 		jest.spyOn(window, 'open').mockImplementation(() => null);
 		shares = [];
 		onShare = (e) => shares.push(e.detail);
@@ -137,6 +138,16 @@ describe('sharing', () => {
 		expect(shares).toEqual([{ itemId: '42', network: 'copy' }]);
 
 		delete navigator.clipboard;
+	});
+
+	it('shares the page URL when deep linking is disabled', () => {
+		window.fotogrids.deep_linking_enabled = '';
+		click(renderBar(api, ['facebook']), 'facebook');
+
+		expect(window.open.mock.calls[0][0]).toContain(
+			encodeURIComponent('http://localhost/')
+		);
+		expect(window.open.mock.calls[0][0]).not.toContain('fg-7-42');
 	});
 
 	describe('share-intent URLs', () => {

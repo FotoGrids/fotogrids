@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-28T05:58:29+00:00\n"
+"POT-Creation-Date: 2026-09-28T08:12:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -88,10 +88,10 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:91
 #: includes/admin/class-dashboard-widget.php:187
-#: includes/metaboxes/class-collection-save-pipeline.php:166
+#: includes/metaboxes/class-collection-save-pipeline.php:162
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:95
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:103
-#: includes/rest/admin/admin-data.php:1470
+#: includes/rest/admin/admin-data.php:1485
 #: public/render/features/collection-header/class-breadcrumb-schema.php:103
 #: public/render/features/collection-header/class-collection-header.php:421
 #: assets/admin/src/components/pages/TemplatesPage.jsx:428
@@ -246,10 +246,10 @@ msgid "Create New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:184
-#: includes/metaboxes/class-collection-save-pipeline.php:167
+#: includes/metaboxes/class-collection-save-pipeline.php:163
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:106
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:127
-#: includes/rest/admin/admin-data.php:1470
+#: includes/rest/admin/admin-data.php:1485
 #: public/render/features/collection-header/class-breadcrumb-schema.php:109
 #: public/render/features/collection-header/class-collection-header.php:422
 #: assets/admin/src/components/pages/TemplatesPage.jsx:427
@@ -384,7 +384,7 @@ msgstr ""
 #: includes/metaboxes/class-metabox-strings.php:283
 #: assets/admin/plain/collection-settings.js:2310
 #: assets/admin/src/components/pages/PluginSettingsPage.jsx:36
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:267
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:237
 #: assets/admin/src/components/plugin-settings/tabs/WatermarkTab.jsx:316
 #: assets/admin/src/components/setup-wizard/StepComplexity.jsx:28
 msgid "Advanced"
@@ -1028,7 +1028,7 @@ msgid "Change the vertical alignment of the caption inside the overlay."
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:169
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:280
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:250
 msgid "Check out {title} - {url}"
 msgstr ""
 
@@ -1250,7 +1250,7 @@ msgid "Custom Thumbnail Size"
 msgstr ""
 
 #: includes/catalog/catalog-strings.php:223
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:271
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:241
 msgid "Custom share text"
 msgstr ""
 
@@ -3984,19 +3984,19 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #: includes/class-admin-init.php:602
-#: includes/metaboxes/class-collection-save-pipeline.php:96
+#: includes/metaboxes/class-collection-save-pipeline.php:97
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
 #: includes/rest/admin/admin-data.php:255
 #: includes/rest/admin/admin-data.php:275
 #: includes/rest/admin/admin-data.php:783
 #: includes/rest/admin/admin-data.php:896
-#: includes/rest/admin/admin-data.php:1060
-#: includes/rest/admin/admin-data.php:1125
-#: includes/rest/admin/admin-data.php:1217
-#: includes/rest/admin/admin-data.php:1279
-#: includes/rest/admin/admin-data.php:1409
-#: includes/rest/admin/admin-data.php:1491
+#: includes/rest/admin/admin-data.php:1074
+#: includes/rest/admin/admin-data.php:1141
+#: includes/rest/admin/admin-data.php:1233
+#: includes/rest/admin/admin-data.php:1294
+#: includes/rest/admin/admin-data.php:1424
+#: includes/rest/admin/admin-data.php:1506
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -5123,29 +5123,29 @@ msgstr ""
 msgid "Use %s instead."
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:92
+#: includes/metaboxes/class-collection-save-pipeline.php:93
 msgid "Security check failed"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:101
+#: includes/metaboxes/class-collection-save-pipeline.php:102
 msgid "Invalid post ID"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:106
+#: includes/metaboxes/class-collection-save-pipeline.php:107
 msgid "Invalid collection"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:110
+#: includes/metaboxes/class-collection-save-pipeline.php:111
 #: includes/metaboxes/class-item-ajax-endpoints.php:481
 msgid "Cannot edit this gallery"
 msgstr ""
 
-#: includes/metaboxes/class-collection-save-pipeline.php:142
+#: includes/metaboxes/class-collection-save-pipeline.php:143
 msgid "Failed to update gallery"
 msgstr ""
 
 #. translators: %s: collection type (Gallery or Album).
-#: includes/metaboxes/class-collection-save-pipeline.php:172
+#: includes/metaboxes/class-collection-save-pipeline.php:168
 #, php-format
 msgid "%s saved successfully"
 msgstr ""
@@ -6509,7 +6509,7 @@ msgid "Draft preview - this collection is not published yet."
 msgstr ""
 
 #. translators: 1: gallery count, 2: album title
-#: includes/modules/ViewCollections/class-renderer.php:454
+#: includes/modules/ViewCollections/class-renderer.php:457
 #, php-format
 msgid "%1$d gallery in %2$s."
 msgid_plural "%1$d galleries in %2$s."
@@ -6517,7 +6517,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: item count, 2: gallery title
-#: includes/modules/ViewCollections/class-renderer.php:466
+#: includes/modules/ViewCollections/class-renderer.php:469
 #, php-format
 msgid "%1$d photo in %2$s."
 msgid_plural "%1$d photos in %2$s."
@@ -6526,7 +6526,7 @@ msgstr[1] ""
 
 #. translators: %d: number of galleries in the album.
 #. translators: %d: gallery count
-#: includes/modules/ViewCollections/class-renderer.php:737
+#: includes/modules/ViewCollections/class-renderer.php:740
 #: includes/modules/PageBuilders/core/assets/src/components/InspectorGalleryPanel.jsx:59
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:134
 #, php-format,js-format
@@ -6537,7 +6537,7 @@ msgstr[1] ""
 
 #. translators: %d: number of items in the gallery.
 #. translators: %d: item count
-#: includes/modules/ViewCollections/class-renderer.php:739
+#: includes/modules/ViewCollections/class-renderer.php:742
 #: assets/admin/src/components/library/MergeDialog.jsx:98
 #: assets/admin/src/components/library/MergeDialog.jsx:135
 #: includes/modules/PageBuilders/core/assets/src/components/PickerCard.jsx:139
@@ -6845,12 +6845,12 @@ msgstr ""
 msgid "Google Fonts metadata response was empty."
 msgstr ""
 
-#: includes/rest/admin/admin-data.php:1364
+#: includes/rest/admin/admin-data.php:1379
 msgid "Invalid item IDs provided."
 msgstr ""
 
 #. translators: %d: number of items added to the gallery.
-#: includes/rest/admin/admin-data.php:1389
+#: includes/rest/admin/admin-data.php:1404
 #, php-format
 msgid "%d item added to gallery."
 msgid_plural "%d items added to gallery."
@@ -7980,7 +7980,7 @@ msgstr ""
 msgid "Incorrect password. Please try again."
 msgstr ""
 
-#: public/render/layouts/class-layout-featured-item.php:173
+#: public/render/layouts/class-layout-featured-item.php:174
 msgid "Show all images"
 msgstr ""
 
@@ -10152,52 +10152,52 @@ msgstr ""
 msgid "Button size"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:237
-msgid "Deep linking"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:239
-msgid "Give each image a shareable link that reopens the gallery on that image."
-msgstr ""
-
 #: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:242
-msgid "Enable deep linking"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:243
-msgid "Sharing an image links to that specific image, not just the page."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:251
-msgid "Embedded galleries share"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:252
-msgid "When a gallery is embedded in a page, choose what an image share links to."
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:255
-msgid "Embedded share target"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:259
-msgid "The specific image"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:260
-msgid "The page"
-msgstr ""
-
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:272
 msgid "Text included when sharing. Use {title} and {url} as placeholders."
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:285
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:255
 msgid "Track share clicks"
 msgstr ""
 
-#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:286
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:256
 msgid "Record when visitors click a share button, for statistics."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:268
+msgid "Deep linking"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:270
+msgid "Give each image a shareable link that reopens the gallery on that image."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:273
+msgid "Enable deep linking"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:274
+msgid "A link to a specific image opens the Lightbox on that image, and the address bar follows the image being viewed."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:283
+msgid "Embedded galleries share"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:284
+msgid "When a gallery is embedded in a page, choose what an image share links to."
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:287
+msgid "Embedded share target"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:291
+msgid "The specific image"
+msgstr ""
+
+#: assets/admin/src/components/plugin-settings/tabs/SharingTab.jsx:292
+msgid "The page"
 msgstr ""
 
 #: assets/admin/src/components/plugin-settings/tabs/ViewPagesTab.jsx:168

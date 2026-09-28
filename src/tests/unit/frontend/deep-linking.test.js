@@ -39,7 +39,7 @@ describe('deep-linking', () => {
 		document.body.innerHTML = '';
 		document.head.innerHTML = '';
 		document.body.className = '';
-		window.fotogrids = {};
+		window.fotogrids = { deep_linking_enabled: '1' };
 		delete window.FotoGridsLightbox;
 		setHash('');
 	});
@@ -58,6 +58,25 @@ describe('deep-linking', () => {
 		const { figure } = makeGallery(7, 42);
 		figure.scrollIntoView = jest.fn();
 		setHash('#fg-7-42');
+		loadModule();
+		expect(figure.classList.contains('fg-deep-link-highlight')).toBe(true);
+		expect(figure.scrollIntoView).toHaveBeenCalled();
+	});
+
+	it('highlights an item whose media carries only data-id', () => {
+		const gallery = document.createElement('div');
+		gallery.className = 'fotogrids-collection fotogrids-gallery';
+		gallery.dataset.fgGalleryId = '8';
+		const figure = document.createElement('figure');
+		figure.className = 'fg-item';
+		const img = document.createElement('img');
+		img.dataset.id = '51';
+		figure.appendChild(img);
+		gallery.appendChild(figure);
+		document.body.appendChild(gallery);
+		figure.scrollIntoView = jest.fn();
+
+		setHash('#fg-8-51');
 		loadModule();
 		expect(figure.classList.contains('fg-deep-link-highlight')).toBe(true);
 		expect(figure.scrollIntoView).toHaveBeenCalled();
@@ -112,8 +131,8 @@ describe('deep-linking', () => {
 		expect(figure.classList.contains('fg-deep-link-highlight')).toBe(true);
 	});
 
-	it('respects deep_linking_enabled=false (no auto-open)', () => {
-		window.fotogrids = { deep_linking_enabled: false };
+	it('does not auto-open when deep linking is disabled', () => {
+		window.fotogrids = { deep_linking_enabled: '' };
 		const { figure } = makeGallery(7, 42);
 		figure.scrollIntoView = jest.fn();
 		setHash('#fg-7-42');

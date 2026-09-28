@@ -44,7 +44,9 @@ export default function ReasonsForm({
 	const placeholder = selectedReason ? selectedReason.placeholder : '';
 
 	const handleSubmit = async () => {
-		if (busy) return;
+		if (busy) {
+			return;
+		}
 		setBusy(true);
 		await onSubmit({
 			id: selectedId,
@@ -62,7 +64,9 @@ export default function ReasonsForm({
 					<Modal.HeaderClose
 						onClick={(event) => {
 							event.preventDefault();
-							if (!busy && onClose) onClose();
+							if (!busy && onClose) {
+								onClose();
+							}
 						}}
 					/>
 				</Modal.HeaderActions>

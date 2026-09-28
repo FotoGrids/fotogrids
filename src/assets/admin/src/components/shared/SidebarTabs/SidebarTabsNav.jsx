@@ -27,104 +27,125 @@ import Icon from '../Icon';
  * @param {string}   [props.ariaLabel] Accessible label for the <nav>.
  */
 const SidebarTabsNav = ({
-    tabs,
-    groups,
-    activeTab,
-    onTabChange,
-    getTabHref,
-    ariaLabel,
+	tabs,
+	groups,
+	activeTab,
+	onTabChange,
+	getTabHref,
+	ariaLabel,
 }) => {
-    const renderTab = (tab) => {
-        const isActive = activeTab === tab.id;
-        const href = typeof getTabHref === 'function' ? getTabHref(tab.id) : undefined;
+	const renderTab = (tab) => {
+		const isActive = activeTab === tab.id;
+		const href =
+			typeof getTabHref === 'function' ? getTabHref(tab.id) : undefined;
 
-        const handleClick = (e) => {
-            // Preserve modifier-click (open in new tab) when an href is present.
-            if (href && (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)) {
-                return;
-            }
-            e.preventDefault();
-            onTabChange(tab.id);
-        };
+		const handleClick = (e) => {
+			// Preserve modifier-click (open in new tab) when an href is present.
+			if (
+				href &&
+				(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)
+			) {
+				return;
+			}
+			e.preventDefault();
+			onTabChange(tab.id);
+		};
 
-        return (
-            <a
-                key={tab.id}
-                href={href || '#'}
-                className={`fotogrids-sidebar-tabs__item ${isActive ? 'fg-is-active' : ''}`}
-                aria-current={isActive ? 'page' : undefined}
-                onClick={handleClick}
-            >
-                {tab.icon && (
-                    <Icon name={tab.icon} className="fotogrids-sidebar-tabs__icon" />
-                )}
-                <span className="fotogrids-sidebar-tabs__label">{tab.label}</span>
-            </a>
-        );
-    };
+		return (
+			<a
+				key={tab.id}
+				href={href || '#'}
+				className={`fotogrids-sidebar-tabs__item ${isActive ? 'fg-is-active' : ''}`}
+				aria-current={isActive ? 'page' : undefined}
+				onClick={handleClick}
+			>
+				{tab.icon && (
+					<Icon
+						name={tab.icon}
+						className="fotogrids-sidebar-tabs__icon"
+					/>
+				)}
+				<span className="fotogrids-sidebar-tabs__label">
+					{tab.label}
+				</span>
+			</a>
+		);
+	};
 
-    const renderGroupLabel = (group) => {
-        if (!group.label) return null;
+	const renderGroupLabel = (group) => {
+		if (!group.label) {
+			return null;
+		}
 
-        // Actionable label: render as a button so it is keyboard-focusable
-        // and announced as a control. Falls back to a static div otherwise.
-        if (typeof group.onClick === 'function') {
-            return (
-                <button
-                    type="button"
-                    className="fotogrids-sidebar-tabs__group-label fotogrids-sidebar-tabs__group-label--action"
-                    onClick={() => group.onClick(group)}
-                >
-                    {group.icon && (
-                        <Icon name={group.icon} className="fotogrids-sidebar-tabs__group-label-icon" />
-                    )}
-                    <span className="fotogrids-sidebar-tabs__group-label-text">{group.label}</span>
-                </button>
-            );
-        }
+		// Actionable label: render as a button so it is keyboard-focusable
+		// and announced as a control. Falls back to a static div otherwise.
+		if (typeof group.onClick === 'function') {
+			return (
+				<button
+					type="button"
+					className="fotogrids-sidebar-tabs__group-label fotogrids-sidebar-tabs__group-label--action"
+					onClick={() => group.onClick(group)}
+				>
+					{group.icon && (
+						<Icon
+							name={group.icon}
+							className="fotogrids-sidebar-tabs__group-label-icon"
+						/>
+					)}
+					<span className="fotogrids-sidebar-tabs__group-label-text">
+						{group.label}
+					</span>
+				</button>
+			);
+		}
 
-        return (
-            <div className="fotogrids-sidebar-tabs__group-label">
-                {group.label}
-            </div>
-        );
-    };
+		return (
+			<div className="fotogrids-sidebar-tabs__group-label">
+				{group.label}
+			</div>
+		);
+	};
 
-    // Flat list when no groups are supplied.
-    if (!Array.isArray(groups) || groups.length === 0) {
-        return (
-            <nav className="fotogrids-sidebar-tabs__nav" aria-label={ariaLabel}>
-                {tabs.map(renderTab)}
-            </nav>
-        );
-    }
+	// Flat list when no groups are supplied.
+	if (!Array.isArray(groups) || groups.length === 0) {
+		return (
+			<nav className="fotogrids-sidebar-tabs__nav" aria-label={ariaLabel}>
+				{tabs.map(renderTab)}
+			</nav>
+		);
+	}
 
-    // Grouped list. Any tab without a matching group falls through to an
-    // implicit "ungrouped" bucket rendered first, so nothing silently vanishes.
-    const ungrouped = tabs.filter(
-        (tab) => !tab.group || !groups.some((g) => g.id === tab.group)
-    );
+	// Grouped list. Any tab without a matching group falls through to an
+	// implicit "ungrouped" bucket rendered first, so nothing silently vanishes.
+	const ungrouped = tabs.filter(
+		(tab) => !tab.group || !groups.some((g) => g.id === tab.group)
+	);
 
-    return (
-        <nav className="fotogrids-sidebar-tabs__nav" aria-label={ariaLabel}>
-            {ungrouped.length > 0 && (
-                <div className="fotogrids-sidebar-tabs__group">
-                    {ungrouped.map(renderTab)}
-                </div>
-            )}
-            {groups.map((group) => {
-                const groupTabs = tabs.filter((tab) => tab.group === group.id);
-                if (groupTabs.length === 0) return null;
+	return (
+		<nav className="fotogrids-sidebar-tabs__nav" aria-label={ariaLabel}>
+			{ungrouped.length > 0 && (
+				<div className="fotogrids-sidebar-tabs__group">
+					{ungrouped.map(renderTab)}
+				</div>
+			)}
+			{groups.map((group) => {
+				const groupTabs = tabs.filter((tab) => tab.group === group.id);
+				if (groupTabs.length === 0) {
+					return null;
+				}
 
-                return (
-                    <div className="fotogrids-sidebar-tabs__group" key={group.id}>
-                        {renderGroupLabel(group)}
-                        {groupTabs.map(renderTab)}
-                    </div>
-                );
-            })}
-        </nav>
-    );
+				return (
+					<div
+						className="fotogrids-sidebar-tabs__group"
+						key={group.id}
+					>
+						{renderGroupLabel(group)}
+						{groupTabs.map(renderTab)}
+					</div>
+				);
+			})}
+		</nav>
+	);
 };
 
 export default SidebarTabsNav;

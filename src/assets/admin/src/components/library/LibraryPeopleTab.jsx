@@ -10,10 +10,10 @@ import LibraryPeopleHeader from './LibraryPeopleHeader';
  * LibraryTabBase branches on entityType.type === 'person'.
  */
 const LibraryPeopleTab = ({ entityType }) => (
-    <>
-        <LibraryPeopleHeader entityType={entityType} />
-        <LibraryTabBase entityType={entityType} />
-    </>
+	<>
+		<LibraryPeopleHeader entityType={entityType} />
+		<LibraryTabBase entityType={entityType} />
+	</>
 );
 
 export default LibraryPeopleTab;

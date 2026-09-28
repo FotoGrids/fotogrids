@@ -23,9 +23,13 @@ let keyHandler = null;
 let lastFocus = null;
 let view = null;
 
-function svgIcon( paths ) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-        + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>';
+function svgIcon(paths) {
+	return (
+		'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+		'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+		paths +
+		'</svg>'
+	);
 }
 
 /**
@@ -37,27 +41,35 @@ function svgIcon( paths ) {
  * @param {object} config
  * @return {HTMLStyleElement}
  */
-function buildScopeStyle( scope, config ) {
-    const sel = '.fg-lb-grid[data-fg-scope="' + scope + '"]';
-    const mw = config.maxWidth || {};
-    const aspect = config.aspect ? config.aspect.replace( '/', ' / ' ) : '';
+function buildScopeStyle(scope, config) {
+	const sel = '.fg-lb-grid[data-fg-scope="' + scope + '"]';
+	const mw = config.maxWidth || {};
+	const aspect = config.aspect ? config.aspect.replace('/', ' / ') : '';
 
-    const lines = [
-        sel + ' { --fg-lb-grid-max-width: ' + ( mw.desktop || '60vw' ) + '; }',
-    ];
-    if ( aspect ) {
-        lines.push( sel + ' { --fg-lb-grid-aspect: ' + aspect + '; }' );
-    }
-    lines.push(
-        window.FotoGrids.scopeCss( 'tablet', sel, '--fg-lb-grid-max-width: ' + ( mw.tablet || '80vw' ) + ';' )
-    );
-    lines.push(
-        window.FotoGrids.scopeCss( 'mobile', sel, '--fg-lb-grid-max-width: ' + ( mw.mobile || '90vw' ) + ';' )
-    );
+	const lines = [
+		sel + ' { --fg-lb-grid-max-width: ' + (mw.desktop || '60vw') + '; }',
+	];
+	if (aspect) {
+		lines.push(sel + ' { --fg-lb-grid-aspect: ' + aspect + '; }');
+	}
+	lines.push(
+		window.FotoGrids.scopeCss(
+			'tablet',
+			sel,
+			'--fg-lb-grid-max-width: ' + (mw.tablet || '80vw') + ';'
+		)
+	);
+	lines.push(
+		window.FotoGrids.scopeCss(
+			'mobile',
+			sel,
+			'--fg-lb-grid-max-width: ' + (mw.mobile || '90vw') + ';'
+		)
+	);
 
-    const style = document.createElement( 'style' );
-    style.textContent = lines.join( '\n' );
-    return style;
+	const style = document.createElement('style');
+	style.textContent = lines.join('\n');
+	return style;
 }
 
 /**
@@ -66,15 +78,15 @@ function buildScopeStyle( scope, config ) {
  * Lightbox_Grid feature.
  */
 const BUTTON_COLOR_VARS = {
-    bg:                '--fg-lb-toolbar-btn-bg',
-    color:             '--fg-lb-toolbar-btn-color',
-    borderColor:       '--fg-lb-toolbar-btn-border-color',
-    hoverBg:           '--fg-lb-toolbar-btn-hover-bg',
-    hoverColor:        '--fg-lb-toolbar-btn-hover',
-    hoverBorderColor:  '--fg-lb-toolbar-btn-hover-border-color',
-    focusBg:           '--fg-lb-toolbar-btn-focus-bg',
-    focusColor:        '--fg-lb-toolbar-btn-focus-color',
-    focusBorderColor:  '--fg-lb-toolbar-btn-focus-border-color',
+	bg: '--fg-lb-toolbar-btn-bg',
+	color: '--fg-lb-toolbar-btn-color',
+	borderColor: '--fg-lb-toolbar-btn-border-color',
+	hoverBg: '--fg-lb-toolbar-btn-hover-bg',
+	hoverColor: '--fg-lb-toolbar-btn-hover',
+	hoverBorderColor: '--fg-lb-toolbar-btn-hover-border-color',
+	focusBg: '--fg-lb-toolbar-btn-focus-bg',
+	focusColor: '--fg-lb-toolbar-btn-focus-color',
+	focusBorderColor: '--fg-lb-toolbar-btn-focus-border-color',
 };
 
 /**
@@ -84,54 +96,64 @@ const BUTTON_COLOR_VARS = {
  * @param {HTMLElement} el     The overlay element.
  * @param {object}      colors Map of config field -> colour string.
  */
-function applyButtonColors( el, colors ) {
-    if ( ! colors ) return;
-    Object.keys( BUTTON_COLOR_VARS ).forEach( ( field ) => {
-        const value = colors[ field ];
-        if ( value ) {
-            el.style.setProperty( BUTTON_COLOR_VARS[ field ], value );
-        }
-    } );
+function applyButtonColors(el, colors) {
+	if (!colors) {
+		return;
+	}
+	Object.keys(BUTTON_COLOR_VARS).forEach((field) => {
+		const value = colors[field];
+		if (value) {
+			el.style.setProperty(BUTTON_COLOR_VARS[field], value);
+		}
+	});
 }
 
-const BACK_ICON  = svgIcon( '<path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>' );
-const SHARE_ICON = svgIcon( '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>'
-    + '<circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>' );
-const PREV_ICON  = svgIcon( '<path d="M15 18l-6-6 6-6"/>' );
-const NEXT_ICON  = svgIcon( '<path d="M9 18l6-6-6-6"/>' );
-const CLOSE_ICON = svgIcon( '<path d="M18 6L6 18"/><path d="M6 6l12 12"/>' );
+const BACK_ICON = svgIcon('<path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>');
+const SHARE_ICON = svgIcon(
+	'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>' +
+		'<circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>'
+);
+const PREV_ICON = svgIcon('<path d="M15 18l-6-6 6-6"/>');
+const NEXT_ICON = svgIcon('<path d="M9 18l6-6-6-6"/>');
+const CLOSE_ICON = svgIcon('<path d="M18 6L6 18"/><path d="M6 6l12 12"/>');
 
 function close() {
-    if ( ! overlay ) return;
-    const el = overlay;
-    overlay = null;
-    view = null;
-    document.body.style.overflow = '';
-    document.documentElement.style.overflow = '';
-    if ( keyHandler ) {
-        document.removeEventListener( 'keydown', keyHandler );
-        keyHandler = null;
-    }
+	if (!overlay) {
+		return;
+	}
+	const el = overlay;
+	overlay = null;
+	view = null;
+	document.body.style.overflow = '';
+	document.documentElement.style.overflow = '';
+	if (keyHandler) {
+		document.removeEventListener('keydown', keyHandler);
+		keyHandler = null;
+	}
 
-    // Fade the overlay out, then remove it.
-    el.classList.remove( 'fg-is-open' );
-    let removed = false;
-    const remove = () => {
-        if ( removed ) return;
-        removed = true;
-        el.removeEventListener( 'transitionend', onEnd );
-        el.remove();
-    };
-    const onEnd = ( e ) => {
-        if ( e.target === el && e.propertyName === 'opacity' ) remove();
-    };
-    el.addEventListener( 'transitionend', onEnd );
-    setTimeout( remove, 350 );
+	// Fade the overlay out, then remove it.
+	el.classList.remove('fg-is-open');
+	let removed = false;
+	const remove = () => {
+		if (removed) {
+			return;
+		}
+		removed = true;
+		el.removeEventListener('transitionend', onEnd);
+		el.remove();
+	};
+	const onEnd = (e) => {
+		if (e.target === el && e.propertyName === 'opacity') {
+			remove();
+		}
+	};
+	el.addEventListener('transitionend', onEnd);
+	setTimeout(remove, 350);
 
-    if ( lastFocus && typeof lastFocus.focus === 'function' ) {
-        lastFocus.focus( { preventScroll: true } );
-    }
-    lastFocus = null;
+	if (lastFocus && typeof lastFocus.focus === 'function') {
+		lastFocus.focus({ preventScroll: true });
+	}
+	lastFocus = null;
 }
 
 /**
@@ -140,25 +162,25 @@ function close() {
  * @param {Array} items
  * @return {Array<{type: string, items: Array, indices: Array}>}
  */
-function groupRows( items ) {
-    const rows = [];
-    let i = 0;
-    while ( i < items.length ) {
-        rows.push( { type: 'single', items: [ items[ i ] ], indices: [ i ] } );
-        i += 1;
-        if ( i < items.length ) {
-            const pair = [ items[ i ] ];
-            const pairIdx = [ i ];
-            i += 1;
-            if ( i < items.length ) {
-                pair.push( items[ i ] );
-                pairIdx.push( i );
-                i += 1;
-            }
-            rows.push( { type: 'pair', items: pair, indices: pairIdx } );
-        }
-    }
-    return rows;
+function groupRows(items) {
+	const rows = [];
+	let i = 0;
+	while (i < items.length) {
+		rows.push({ type: 'single', items: [items[i]], indices: [i] });
+		i += 1;
+		if (i < items.length) {
+			const pair = [items[i]];
+			const pairIdx = [i];
+			i += 1;
+			if (i < items.length) {
+				pair.push(items[i]);
+				pairIdx.push(i);
+				i += 1;
+			}
+			rows.push({ type: 'pair', items: pair, indices: pairIdx });
+		}
+	}
+	return rows;
 }
 
 /**
@@ -168,10 +190,14 @@ function groupRows( items ) {
  * @param {string} source 'caption' | 'title' | 'description'.
  * @return {string}
  */
-function captionTextFor( it, source ) {
-    if ( source === 'title' ) return it.title || '';
-    if ( source === 'description' ) return it.description || '';
-    return it.caption || '';
+function captionTextFor(it, source) {
+	if (source === 'title') {
+		return it.title || '';
+	}
+	if (source === 'description') {
+		return it.description || '';
+	}
+	return it.caption || '';
 }
 
 /**
@@ -182,202 +208,231 @@ function captionTextFor( it, source ) {
  *   fullCaptions, captionSource, openAt, maxWidth { desktop, tablet, mobile }.
  *   `labels` is the translated map from Lightbox_Grid::client_labels().
  */
-function open( config ) {
-    const items = Array.isArray( config.items ) ? config.items : [];
-    if ( items.length === 0 ) return;
-    close();
+function open(config) {
+	const items = Array.isArray(config.items) ? config.items : [];
+	if (items.length === 0) {
+		return;
+	}
+	close();
 
-    lastFocus = document.activeElement;
+	lastFocus = document.activeElement;
 
-    overlay = document.createElement( 'div' );
-    overlay.className = 'fg-lb-grid';
-    overlay.setAttribute( 'role', 'dialog' );
-    overlay.setAttribute( 'aria-modal', 'true' );
-    const labels = config.labels;
-    overlay.setAttribute( 'aria-label', config.label || labels.all_photos );
+	overlay = document.createElement('div');
+	overlay.className = 'fg-lb-grid';
+	overlay.setAttribute('role', 'dialog');
+	overlay.setAttribute('aria-modal', 'true');
+	const labels = config.labels;
+	overlay.setAttribute('aria-label', config.label || labels.all_photos);
 
-    // Theme: a single attribute drives the chrome palette; the CSS assigns the
-    // --fg-lb-* variables per theme.
-    overlay.setAttribute( 'data-fg-lb-theme', config.theme === 'light' ? 'light' : 'dark' );
+	// Theme: a single attribute drives the chrome palette; the CSS assigns the
+	// --fg-lb-* variables per theme.
+	overlay.setAttribute(
+		'data-fg-lb-theme',
+		config.theme === 'light' ? 'light' : 'dark'
+	);
 
-    // Optional per-state custom toolbar button colours override the theme
-    // palette via inline custom properties on the overlay.
-    applyButtonColors( overlay, config.buttonColors );
+	// Optional per-state custom toolbar button colours override the theme
+	// palette via inline custom properties on the overlay.
+	applyButtonColors(overlay, config.buttonColors);
 
-    // Per-gallery sizing (max content width + tile aspect) is scoped through a
-    // generated id so the values live in real CSS rather than inline styles.
-    const scope = 'fg-lb-grid-' + ( Math.random().toString( 36 ).slice( 2, 9 ) );
-    overlay.setAttribute( 'data-fg-scope', scope );
-    overlay.appendChild( buildScopeStyle( scope, config ) );
+	// Per-gallery sizing (max content width + tile aspect) is scoped through a
+	// generated id so the values live in real CSS rather than inline styles.
+	const scope = 'fg-lb-grid-' + Math.random().toString(36).slice(2, 9);
+	overlay.setAttribute('data-fg-scope', scope);
+	overlay.appendChild(buildScopeStyle(scope, config));
 
-    /* Toolbar */
-    const toolbar = document.createElement( 'div' );
-    toolbar.className = 'fg-lb-grid-toolbar';
+	/* Toolbar */
+	const toolbar = document.createElement('div');
+	toolbar.className = 'fg-lb-grid-toolbar';
 
-    const start = document.createElement( 'div' );
-    start.className = 'fg-lb-grid-toolbar-start';
-    const backBtn = document.createElement( 'button' );
-    backBtn.type = 'button';
-    backBtn.className = 'fg-lb-grid-btn fg-lb-grid-back';
-    backBtn.innerHTML = BACK_ICON + '<span></span>';
-    backBtn.querySelector( 'span' ).textContent = labels.back;
-    backBtn.addEventListener( 'click', close );
-    start.appendChild( backBtn );
+	const start = document.createElement('div');
+	start.className = 'fg-lb-grid-toolbar-start';
+	const backBtn = document.createElement('button');
+	backBtn.type = 'button';
+	backBtn.className = 'fg-lb-grid-btn fg-lb-grid-back';
+	backBtn.innerHTML = BACK_ICON + '<span></span>';
+	backBtn.querySelector('span').textContent = labels.back;
+	backBtn.addEventListener('click', close);
+	start.appendChild(backBtn);
 
-    const end = document.createElement( 'div' );
-    end.className = 'fg-lb-grid-toolbar-end';
+	const end = document.createElement('div');
+	end.className = 'fg-lb-grid-toolbar-end';
 
-    // Grid-mode toolbar end: the share button (when sharing is enabled).
-    const gridChrome = document.createElement( 'div' );
-    gridChrome.className = 'fg-lb-grid-chrome fg-lb-grid-chrome--grid';
-    if ( config.sharing && config.sharing.enabled ) {
-        gridChrome.appendChild( buildShareButton( config ) );
-    }
+	// Grid-mode toolbar end: the share button (when sharing is enabled).
+	const gridChrome = document.createElement('div');
+	gridChrome.className = 'fg-lb-grid-chrome fg-lb-grid-chrome--grid';
+	if (config.sharing && config.sharing.enabled) {
+		gridChrome.appendChild(buildShareButton(config));
+	}
 
-    // Zoom-mode toolbar end: counter + close. Hidden until a tile is zoomed.
-    const zoomChrome = document.createElement( 'div' );
-    zoomChrome.className = 'fg-lb-grid-chrome fg-lb-grid-chrome--zoom';
-    const counter = document.createElement( 'span' );
-    counter.className = 'fg-lb-grid-counter';
-    const closeZoomBtn = document.createElement( 'button' );
-    closeZoomBtn.type = 'button';
-    closeZoomBtn.className = 'fg-lb-grid-btn fg-lb-grid-zoom-close';
-    closeZoomBtn.setAttribute( 'aria-label', labels.close_image );
-    closeZoomBtn.innerHTML = CLOSE_ICON;
-    closeZoomBtn.addEventListener( 'click', closeZoom );
-    zoomChrome.appendChild( counter );
-    zoomChrome.appendChild( closeZoomBtn );
+	// Zoom-mode toolbar end: counter + close. Hidden until a tile is zoomed.
+	const zoomChrome = document.createElement('div');
+	zoomChrome.className = 'fg-lb-grid-chrome fg-lb-grid-chrome--zoom';
+	const counter = document.createElement('span');
+	counter.className = 'fg-lb-grid-counter';
+	const closeZoomBtn = document.createElement('button');
+	closeZoomBtn.type = 'button';
+	closeZoomBtn.className = 'fg-lb-grid-btn fg-lb-grid-zoom-close';
+	closeZoomBtn.setAttribute('aria-label', labels.close_image);
+	closeZoomBtn.innerHTML = CLOSE_ICON;
+	closeZoomBtn.addEventListener('click', closeZoom);
+	zoomChrome.appendChild(counter);
+	zoomChrome.appendChild(closeZoomBtn);
 
-    end.appendChild( gridChrome );
-    end.appendChild( zoomChrome );
-    toolbar.appendChild( start );
-    toolbar.appendChild( end );
+	end.appendChild(gridChrome);
+	end.appendChild(zoomChrome);
+	toolbar.appendChild(start);
+	toolbar.appendChild(end);
 
-    /* Content */
-    const content = document.createElement( 'div' );
-    content.className = 'fg-lb-grid-content';
-    const inner = document.createElement( 'div' );
-    inner.className = 'fg-lb-grid-inner';
+	/* Content */
+	const content = document.createElement('div');
+	content.className = 'fg-lb-grid-content';
+	const inner = document.createElement('div');
+	inner.className = 'fg-lb-grid-inner';
 
-    const showCaptions = config.captions === true;
-    const captionSource = config.captionSource || 'caption';
-    const tilesByIndex = [];
+	const showCaptions = config.captions === true;
+	const captionSource = config.captionSource || 'caption';
+	const tilesByIndex = [];
 
-    const rows = groupRows( items );
-    rows.forEach( ( row ) => {
-        const rowEl = document.createElement( 'div' );
-        rowEl.className = 'fg-lb-grid-row fg-lb-grid-row--' + row.type;
-        row.items.forEach( ( it, n ) => {
-            const idx = row.indices[ n ];
-            const tile = document.createElement( 'button' );
-            tile.type = 'button';
-            tile.className = 'fg-lb-grid-tile fg-lb-grid-tile--' + row.type
-                + ( it.video ? ' fg-lb-grid-tile--video' : '' );
-            tile.setAttribute( 'aria-label', it.title || it.caption || labels.item.replace( '%d', idx + 1 ) );
+	const rows = groupRows(items);
+	rows.forEach((row) => {
+		const rowEl = document.createElement('div');
+		rowEl.className = 'fg-lb-grid-row fg-lb-grid-row--' + row.type;
+		row.items.forEach((it, n) => {
+			const idx = row.indices[n];
+			const tile = document.createElement('button');
+			tile.type = 'button';
+			tile.className =
+				'fg-lb-grid-tile fg-lb-grid-tile--' +
+				row.type +
+				(it.video ? ' fg-lb-grid-tile--video' : '');
+			tile.setAttribute(
+				'aria-label',
+				it.title || it.caption || labels.item.replace('%d', idx + 1)
+			);
 
-            // The image lives inside an aspect-ratio frame that owns the
-            // rounding + clipping, so the hover zoom scales the image within
-            // its frame rather than growing the whole tile.
-            const media = document.createElement( 'span' );
-            media.className = 'fg-lb-grid-tile-media';
-            const img = document.createElement( 'img' );
-            img.src = it.full || it.thumb || '';
-            img.alt = it.alt || '';
-            img.loading = 'lazy';
-            media.appendChild( img );
-            tile.appendChild( media );
+			// The image lives inside an aspect-ratio frame that owns the
+			// rounding + clipping, so the hover zoom scales the image within
+			// its frame rather than growing the whole tile.
+			const media = document.createElement('span');
+			media.className = 'fg-lb-grid-tile-media';
+			const img = document.createElement('img');
+			img.src = it.full || it.thumb || '';
+			img.alt = it.alt || '';
+			img.loading = 'lazy';
+			media.appendChild(img);
+			tile.appendChild(media);
 
-            if ( showCaptions ) {
-                const text = captionTextFor( it, captionSource );
-                if ( text ) {
-                    const cap = document.createElement( 'span' );
-                    cap.className = 'fg-lb-grid-tile-caption';
-                    cap.textContent = text;
-                    tile.appendChild( cap );
-                }
-            }
+			if (showCaptions) {
+				const text = captionTextFor(it, captionSource);
+				if (text) {
+					const cap = document.createElement('span');
+					cap.className = 'fg-lb-grid-tile-caption';
+					cap.textContent = text;
+					tile.appendChild(cap);
+				}
+			}
 
-            tile.addEventListener( 'click', () => openZoom( idx ) );
-            rowEl.appendChild( tile );
-            tilesByIndex[ idx ] = media;
-        } );
-        inner.appendChild( rowEl );
-    } );
+			tile.addEventListener('click', () => openZoom(idx));
+			rowEl.appendChild(tile);
+			tilesByIndex[idx] = media;
+		});
+		inner.appendChild(rowEl);
+	});
 
-    content.appendChild( inner );
+	content.appendChild(inner);
 
-    /* Zoom stage (built once, populated on demand) */
-    const stage = document.createElement( 'div' );
-    stage.className = 'fg-lb-grid-stage';
+	/* Zoom stage (built once, populated on demand) */
+	const stage = document.createElement('div');
+	stage.className = 'fg-lb-grid-stage';
 
-    const prevBtn = document.createElement( 'button' );
-    prevBtn.type = 'button';
-    prevBtn.className = 'fg-lb-grid-nav fg-lb-grid-prev';
-    prevBtn.setAttribute( 'aria-label', labels.previous );
-    prevBtn.innerHTML = PREV_ICON;
-    prevBtn.addEventListener( 'click', () => zoomBy( -1 ) );
+	const prevBtn = document.createElement('button');
+	prevBtn.type = 'button';
+	prevBtn.className = 'fg-lb-grid-nav fg-lb-grid-prev';
+	prevBtn.setAttribute('aria-label', labels.previous);
+	prevBtn.innerHTML = PREV_ICON;
+	prevBtn.addEventListener('click', () => zoomBy(-1));
 
-    const nextBtn = document.createElement( 'button' );
-    nextBtn.type = 'button';
-    nextBtn.className = 'fg-lb-grid-nav fg-lb-grid-next';
-    nextBtn.setAttribute( 'aria-label', labels.next );
-    nextBtn.innerHTML = NEXT_ICON;
-    nextBtn.addEventListener( 'click', () => zoomBy( 1 ) );
+	const nextBtn = document.createElement('button');
+	nextBtn.type = 'button';
+	nextBtn.className = 'fg-lb-grid-nav fg-lb-grid-next';
+	nextBtn.setAttribute('aria-label', labels.next);
+	nextBtn.innerHTML = NEXT_ICON;
+	nextBtn.addEventListener('click', () => zoomBy(1));
 
-    const figure = document.createElement( 'div' );
-    figure.className = 'fg-lb-grid-zoom-figure';
-    const clip = document.createElement( 'div' );
-    clip.className = 'fg-lb-grid-zoom-clip';
-    const zoomImg = document.createElement( 'img' );
-    clip.appendChild( zoomImg );
-    figure.appendChild( clip );
-    const zoomCap = document.createElement( 'div' );
-    zoomCap.className = 'fg-lb-grid-zoom-caption';
-    figure.appendChild( zoomCap );
+	const figure = document.createElement('div');
+	figure.className = 'fg-lb-grid-zoom-figure';
+	const clip = document.createElement('div');
+	clip.className = 'fg-lb-grid-zoom-clip';
+	const zoomImg = document.createElement('img');
+	clip.appendChild(zoomImg);
+	figure.appendChild(clip);
+	const zoomCap = document.createElement('div');
+	zoomCap.className = 'fg-lb-grid-zoom-caption';
+	figure.appendChild(zoomCap);
 
-    stage.appendChild( prevBtn );
-    stage.appendChild( figure );
-    stage.appendChild( nextBtn );
+	stage.appendChild(prevBtn);
+	stage.appendChild(figure);
+	stage.appendChild(nextBtn);
 
-    overlay.appendChild( toolbar );
-    overlay.appendChild( content );
-    overlay.appendChild( stage );
-    document.body.appendChild( overlay );
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
+	overlay.appendChild(toolbar);
+	overlay.appendChild(content);
+	overlay.appendChild(stage);
+	document.body.appendChild(overlay);
+	document.body.style.overflow = 'hidden';
+	document.documentElement.style.overflow = 'hidden';
 
-    // Fade the overlay in on the next frame.
-    requestAnimationFrame( () => {
-        if ( overlay ) overlay.classList.add( 'fg-is-open' );
-    } );
+	// Fade the overlay in on the next frame.
+	requestAnimationFrame(() => {
+		if (overlay) {
+			overlay.classList.add('fg-is-open');
+		}
+	});
 
-    view = {
-        config, items, content, stage, toolbar, counter, figure, clip,
-        zoomImg, zoomCap, prevBtn, nextBtn, tilesByIndex,
-        zoomIndex: -1,
-        sourceTile: null,
-        animating: false,
-        fullCaptions: config.fullCaptions === true,
-        captionSource,
-    };
+	view = {
+		config,
+		items,
+		content,
+		stage,
+		toolbar,
+		counter,
+		figure,
+		clip,
+		zoomImg,
+		zoomCap,
+		prevBtn,
+		nextBtn,
+		tilesByIndex,
+		zoomIndex: -1,
+		sourceTile: null,
+		animating: false,
+		fullCaptions: config.fullCaptions === true,
+		captionSource,
+	};
 
-    keyHandler = ( e ) => {
-        if ( e.key === 'Escape' ) {
-            if ( view && view.zoomIndex >= 0 ) closeZoom();
-            else close();
-        } else if ( view && view.zoomIndex >= 0 ) {
-            if ( e.key === 'ArrowLeft' ) zoomBy( -1 );
-            else if ( e.key === 'ArrowRight' ) zoomBy( 1 );
-        }
-    };
-    document.addEventListener( 'keydown', keyHandler );
+	keyHandler = (e) => {
+		if (e.key === 'Escape') {
+			if (view && view.zoomIndex >= 0) {
+				closeZoom();
+			} else {
+				close();
+			}
+		} else if (view && view.zoomIndex >= 0) {
+			if (e.key === 'ArrowLeft') {
+				zoomBy(-1);
+			} else if (e.key === 'ArrowRight') {
+				zoomBy(1);
+			}
+		}
+	};
+	document.addEventListener('keydown', keyHandler);
 
-    const openAt = config.openAt;
-    if ( typeof openAt === 'number' && tilesByIndex[ openAt ] ) {
-        tilesByIndex[ openAt ].scrollIntoView( { block: 'center' } );
-    }
+	const openAt = config.openAt;
+	if (typeof openAt === 'number' && tilesByIndex[openAt]) {
+		tilesByIndex[openAt].scrollIntoView({ block: 'center' });
+	}
 
-    backBtn.focus();
+	backBtn.focus();
 }
 
 /**
@@ -386,70 +441,75 @@ function open( config ) {
  * @param {object} config
  * @return {HTMLElement}
  */
-function buildShareButton( config ) {
-    const shareWrap = document.createElement( 'div' );
-    shareWrap.className = 'fg-lb-grid-share-wrap';
+function buildShareButton(config) {
+	const shareWrap = document.createElement('div');
+	shareWrap.className = 'fg-lb-grid-share-wrap';
 
-    const shareBtn = document.createElement( 'button' );
-    shareBtn.type = 'button';
-    shareBtn.className = 'fg-lb-grid-btn fg-lb-grid-share';
-    shareBtn.setAttribute( 'aria-expanded', 'false' );
-    shareBtn.innerHTML = SHARE_ICON + '<span></span>';
-    shareBtn.querySelector( 'span' ).textContent = config.labels.share;
+	const shareBtn = document.createElement('button');
+	shareBtn.type = 'button';
+	shareBtn.className = 'fg-lb-grid-btn fg-lb-grid-share';
+	shareBtn.setAttribute('aria-expanded', 'false');
+	shareBtn.innerHTML = SHARE_ICON + '<span></span>';
+	shareBtn.querySelector('span').textContent = config.labels.share;
 
-    let popover = null;
-    const buildPopover = () => {
-        const sharingMod = window.FotoGrids
-            && window.FotoGrids.modules
-            && window.FotoGrids.modules.sharing;
-        if ( ! sharingMod || typeof sharingMod.renderShareBar !== 'function' ) {
-            return null;
-        }
-        const bar = sharingMod.renderShareBar(
-            config.sharing,
-            {
-                id:        '',
-                fullUrl:   window.location.href,
-                caption:   '',
-                galleryId: config.galleryEl ? config.galleryEl.getAttribute( 'data-fg-gallery-id' ) : '',
-                galleryEl: config.galleryEl || null,
-            },
-            { layout: 'grid' }
-        );
-        if ( ! bar ) return null;
-        const pop = document.createElement( 'div' );
-        pop.className = 'fg-lb-grid-share-popover';
-        pop.appendChild( bar );
-        return pop;
-    };
+	let popover = null;
+	const buildPopover = () => {
+		const sharingMod =
+			window.FotoGrids &&
+			window.FotoGrids.modules &&
+			window.FotoGrids.modules.sharing;
+		if (!sharingMod || typeof sharingMod.renderShareBar !== 'function') {
+			return null;
+		}
+		const bar = sharingMod.renderShareBar(
+			config.sharing,
+			{
+				id: '',
+				fullUrl: window.location.href,
+				caption: '',
+				galleryId: config.galleryEl
+					? config.galleryEl.getAttribute('data-fg-gallery-id')
+					: '',
+				galleryEl: config.galleryEl || null,
+			},
+			{ layout: 'grid' }
+		);
+		if (!bar) {
+			return null;
+		}
+		const pop = document.createElement('div');
+		pop.className = 'fg-lb-grid-share-popover';
+		pop.appendChild(bar);
+		return pop;
+	};
 
-    shareBtn.addEventListener( 'click', ( e ) => {
-        e.stopPropagation();
-        if ( popover ) {
-            popover.remove();
-            popover = null;
-            shareBtn.setAttribute( 'aria-expanded', 'false' );
-            return;
-        }
-        popover = buildPopover();
-        if ( popover ) {
-            shareWrap.appendChild( popover );
-            shareBtn.setAttribute( 'aria-expanded', 'true' );
-        } else if ( navigator.share ) {
-            navigator.share( { url: window.location.href } ).catch( () => {} );
-        }
-    } );
+	shareBtn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		if (popover) {
+			popover.remove();
+			popover = null;
+			shareBtn.setAttribute('aria-expanded', 'false');
+			return;
+		}
+		popover = buildPopover();
+		if (popover) {
+			shareWrap.appendChild(popover);
+			shareBtn.setAttribute('aria-expanded', 'true');
+		} else if (navigator.share) {
+			navigator.share({ url: window.location.href }).catch(() => {});
+		}
+	});
 
-    document.addEventListener( 'click', ( e ) => {
-        if ( popover && ! shareWrap.contains( e.target ) ) {
-            popover.remove();
-            popover = null;
-            shareBtn.setAttribute( 'aria-expanded', 'false' );
-        }
-    } );
+	document.addEventListener('click', (e) => {
+		if (popover && !shareWrap.contains(e.target)) {
+			popover.remove();
+			popover = null;
+			shareBtn.setAttribute('aria-expanded', 'false');
+		}
+	});
 
-    shareWrap.appendChild( shareBtn );
-    return shareWrap;
+	shareWrap.appendChild(shareBtn);
+	return shareWrap;
 }
 
 /**
@@ -459,11 +519,13 @@ function buildShareButton( config ) {
  * @param {number} index
  * @return {DOMRect|null}
  */
-function tileRect( index ) {
-    const media = view && view.tilesByIndex[ index ];
-    if ( ! media ) return null;
-    const r = media.getBoundingClientRect();
-    return ( r.width > 0 && r.height > 0 ) ? r : null;
+function tileRect(index) {
+	const media = view && view.tilesByIndex[index];
+	if (!media) {
+		return null;
+	}
+	const r = media.getBoundingClientRect();
+	return r.width > 0 && r.height > 0 ? r : null;
 }
 
 /**
@@ -476,26 +538,26 @@ function tileRect( index ) {
  * @param {number} natH Natural image height.
  * @return {{left:number, top:number, width:number, height:number}}
  */
-function fullBox( natW, natH ) {
-    const toolbarBottom = view.toolbar.getBoundingClientRect().bottom;
-    const padX = Math.min( 0.04 * window.innerWidth, 48 );
-    const padBottom = 64; // room for the caption + arrows.
-    const availW = window.innerWidth - 2 * padX;
-    const availH = window.innerHeight - toolbarBottom - padBottom;
-    const ratio = ( natW > 0 && natH > 0 ) ? natW / natH : 16 / 9;
+function fullBox(natW, natH) {
+	const toolbarBottom = view.toolbar.getBoundingClientRect().bottom;
+	const padX = Math.min(0.04 * window.innerWidth, 48);
+	const padBottom = 64; // room for the caption + arrows.
+	const availW = window.innerWidth - 2 * padX;
+	const availH = window.innerHeight - toolbarBottom - padBottom;
+	const ratio = natW > 0 && natH > 0 ? natW / natH : 16 / 9;
 
-    let w = availW;
-    let h = w / ratio;
-    if ( h > availH ) {
-        h = availH;
-        w = h * ratio;
-    }
-    return {
-        left: Math.round( ( window.innerWidth - w ) / 2 ),
-        top: Math.round( toolbarBottom ),
-        width: Math.round( w ),
-        height: Math.round( h ),
-    };
+	let w = availW;
+	let h = w / ratio;
+	if (h > availH) {
+		h = availH;
+		w = h * ratio;
+	}
+	return {
+		left: Math.round((window.innerWidth - w) / 2),
+		top: Math.round(toolbarBottom),
+		width: Math.round(w),
+		height: Math.round(h),
+	};
 }
 
 /**
@@ -503,14 +565,14 @@ function fullBox( natW, natH ) {
  *
  * @param {{left:number, top:number, width:number, height:number}} box
  */
-function setClipBox( box ) {
-    const clip = view.clip;
-    clip.style.position = 'fixed';
-    clip.style.left = box.left + 'px';
-    clip.style.top = box.top + 'px';
-    clip.style.width = box.width + 'px';
-    clip.style.height = box.height + 'px';
-    clip.style.margin = '0';
+function setClipBox(box) {
+	const clip = view.clip;
+	clip.style.position = 'fixed';
+	clip.style.left = box.left + 'px';
+	clip.style.top = box.top + 'px';
+	clip.style.width = box.width + 'px';
+	clip.style.height = box.height + 'px';
+	clip.style.margin = '0';
 }
 
 /**
@@ -518,10 +580,10 @@ function setClipBox( box ) {
  *
  * @param {{left:number, top:number, width:number, height:number}} box
  */
-function positionCaption( box ) {
-    const cap = view.zoomCap;
-    cap.style.left = '0';
-    cap.style.top = ( box.top + box.height + 12 ) + 'px';
+function positionCaption(box) {
+	const cap = view.zoomCap;
+	cap.style.left = '0';
+	cap.style.top = box.top + box.height + 12 + 'px';
 }
 
 /**
@@ -532,58 +594,82 @@ function positionCaption( box ) {
  *
  * @param {number} index
  */
-function openZoom( index ) {
-    if ( ! view || view.animating ) return;
-    const from = tileRect( index );
-    if ( ! from ) return;
+function openZoom(index) {
+	if (!view || view.animating) {
+		return;
+	}
+	const from = tileRect(index);
+	if (!from) {
+		return;
+	}
 
-    view.zoomIndex = index;
-    view.sourceTile = view.tilesByIndex[ index ];
-    paintZoom();
-    overlay.classList.add( 'fg-is-zooming' );
-    // Hide the originating tile image so it doesn't peek behind the morph.
-    const tileEl = view.sourceTile && view.sourceTile.closest( '.fg-lb-grid-tile' );
-    if ( tileEl ) tileEl.classList.add( 'fg-is-source' );
+	view.zoomIndex = index;
+	view.sourceTile = view.tilesByIndex[index];
+	paintZoom();
+	overlay.classList.add('fg-is-zooming');
+	// Hide the originating tile image so it doesn't peek behind the morph.
+	const tileEl =
+		view.sourceTile && view.sourceTile.closest('.fg-lb-grid-tile');
+	if (tileEl) {
+		tileEl.classList.add('fg-is-source');
+	}
 
-    const clip = view.clip;
-    const start = () => {
-        if ( ! view ) return;
-        const natW = view.zoomImg.naturalWidth || from.width;
-        const natH = view.zoomImg.naturalHeight || from.height;
-        const target = fullBox( natW, natH );
-        positionCaption( target );
+	const clip = view.clip;
+	const start = () => {
+		if (!view) {
+			return;
+		}
+		const natW = view.zoomImg.naturalWidth || from.width;
+		const natH = view.zoomImg.naturalHeight || from.height;
+		const target = fullBox(natW, natH);
+		positionCaption(target);
 
-        // Start at the tile rect with no transition...
-        clip.style.transition = 'none';
-        setClipBox( { left: from.left, top: from.top, width: from.width, height: from.height } );
-        // ...force layout, then animate the real box to the full preview.
-        void clip.offsetWidth;
-        view.animating = true;
-        clip.style.transition = 'left var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),'
-            + 'top var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),'
-            + 'width var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),'
-            + 'height var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease)';
-        setClipBox( target );
+		// Start at the tile rect with no transition...
+		clip.style.transition = 'none';
+		setClipBox({
+			left: from.left,
+			top: from.top,
+			width: from.width,
+			height: from.height,
+		});
+		// ...force layout, then animate the real box to the full preview.
+		void clip.offsetWidth;
+		view.animating = true;
+		clip.style.transition =
+			'left var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),' +
+			'top var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),' +
+			'width var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),' +
+			'height var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease)';
+		setClipBox(target);
 
-        let done = false;
-        const onEnd = () => {
-            if ( done ) return;
-            done = true;
-            clip.removeEventListener( 'transitionend', onEnd );
-            if ( view ) view.animating = false;
-        };
-        clip.addEventListener( 'transitionend', onEnd );
-        setTimeout( onEnd, 500 );
-    };
+		let done = false;
+		const onEnd = () => {
+			if (done) {
+				return;
+			}
+			done = true;
+			clip.removeEventListener('transitionend', onEnd);
+			if (view) {
+				view.animating = false;
+			}
+		};
+		clip.addEventListener('transitionend', onEnd);
+		setTimeout(onEnd, 500);
+	};
 
-    if ( view.zoomImg.complete && view.zoomImg.naturalWidth > 0 ) {
-        start();
-    } else {
-        let ran = false;
-        const run = () => { if ( ! ran ) { ran = true; start(); } };
-        view.zoomImg.addEventListener( 'load', run, { once: true } );
-        requestAnimationFrame( run );
-    }
+	if (view.zoomImg.complete && view.zoomImg.naturalWidth > 0) {
+		start();
+	} else {
+		let ran = false;
+		const run = () => {
+			if (!ran) {
+				ran = true;
+				start();
+			}
+		};
+		view.zoomImg.addEventListener('load', run, { once: true });
+		requestAnimationFrame(run);
+	}
 }
 
 /**
@@ -591,64 +677,79 @@ function openZoom( index ) {
  * view is shown.
  */
 function closeZoom() {
-    if ( ! view || view.zoomIndex < 0 || view.animating ) return;
-    const media = view.tilesByIndex[ view.zoomIndex ];
-    if ( media && typeof media.scrollIntoView === 'function' ) {
-        media.scrollIntoView( { block: 'nearest' } );
-    }
-    const to = tileRect( view.zoomIndex );
-    const clip = view.clip;
-    const tileEl = media && media.closest( '.fg-lb-grid-tile' );
+	if (!view || view.zoomIndex < 0 || view.animating) {
+		return;
+	}
+	const media = view.tilesByIndex[view.zoomIndex];
+	if (media && typeof media.scrollIntoView === 'function') {
+		media.scrollIntoView({ block: 'nearest' });
+	}
+	const to = tileRect(view.zoomIndex);
+	const clip = view.clip;
+	const tileEl = media && media.closest('.fg-lb-grid-tile');
 
-    // The caption disappears instantly on the way out.
-    view.zoomCap.style.display = 'none';
+	// The caption disappears instantly on the way out.
+	view.zoomCap.style.display = 'none';
 
-    const teardown = () => {
-        if ( ! view ) return;
-        view.animating = false;
-        view.zoomIndex = -1;
-        view.sourceTile = null;
-        // 1) Reveal the destination tile image while the clip still covers it.
-        if ( tileEl ) tileEl.classList.remove( 'fg-is-source' );
-        // 2) Next frame, once the tile image has painted, drop the clip and the
-        //    zoom state together - so the hand-off never shows a gap (no flash).
-        requestAnimationFrame( () => {
-            overlay.classList.remove( 'fg-is-zooming', 'fg-is-closing' );
-            clip.removeAttribute( 'style' );
-            overlay.querySelectorAll( '.fg-lb-grid-tile.fg-is-source' )
-                .forEach( ( el ) => el.classList.remove( 'fg-is-source' ) );
-        } );
-    };
+	const teardown = () => {
+		if (!view) {
+			return;
+		}
+		view.animating = false;
+		view.zoomIndex = -1;
+		view.sourceTile = null;
+		// 1) Reveal the destination tile image while the clip still covers it.
+		if (tileEl) {
+			tileEl.classList.remove('fg-is-source');
+		}
+		// 2) Next frame, once the tile image has painted, drop the clip and the
+		//    zoom state together - so the hand-off never shows a gap (no flash).
+		requestAnimationFrame(() => {
+			overlay.classList.remove('fg-is-zooming', 'fg-is-closing');
+			clip.removeAttribute('style');
+			overlay
+				.querySelectorAll('.fg-lb-grid-tile.fg-is-source')
+				.forEach((el) => el.classList.remove('fg-is-source'));
+		});
+	};
 
-    if ( ! to ) {
-        teardown();
-        return;
-    }
+	if (!to) {
+		teardown();
+		return;
+	}
 
-    view.animating = true;
+	view.animating = true;
 
-    // Closing keeps the clip + arrows in the zoom layer while fading the grid
-    // back in underneath (fg-is-closing), then hands off at the end.
-    overlay.classList.add( 'fg-is-closing' );
+	// Closing keeps the clip + arrows in the zoom layer while fading the grid
+	// back in underneath (fg-is-closing), then hands off at the end.
+	overlay.classList.add('fg-is-closing');
 
-    // Animate the real box from the current full preview to the tile rect.
-    clip.style.transition = 'left var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),'
-        + 'top var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),'
-        + 'width var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),'
-        + 'height var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease)';
-    requestAnimationFrame( () => {
-        setClipBox( { left: to.left, top: to.top, width: to.width, height: to.height } );
+	// Animate the real box from the current full preview to the tile rect.
+	clip.style.transition =
+		'left var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),' +
+		'top var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),' +
+		'width var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease),' +
+		'height var(--fg-lb-grid-morph) var(--fg-lb-grid-morph-ease)';
+	requestAnimationFrame(() => {
+		setClipBox({
+			left: to.left,
+			top: to.top,
+			width: to.width,
+			height: to.height,
+		});
 
-        let done = false;
-        const onEnd = () => {
-            if ( done ) return;
-            done = true;
-            clip.removeEventListener( 'transitionend', onEnd );
-            teardown();
-        };
-        clip.addEventListener( 'transitionend', onEnd );
-        setTimeout( onEnd, 500 );
-    } );
+		let done = false;
+		const onEnd = () => {
+			if (done) {
+				return;
+			}
+			done = true;
+			clip.removeEventListener('transitionend', onEnd);
+			teardown();
+		};
+		clip.addEventListener('transitionend', onEnd);
+		setTimeout(onEnd, 500);
+	});
 }
 
 /**
@@ -657,76 +758,86 @@ function closeZoom() {
  *
  * @param {number} delta
  */
-function zoomBy( delta ) {
-    if ( ! view || view.zoomIndex < 0 || view.animating ) return;
-    const n = view.items.length;
-    view.zoomIndex = ( view.zoomIndex + delta + n ) % n;
+function zoomBy(delta) {
+	if (!view || view.zoomIndex < 0 || view.animating) {
+		return;
+	}
+	const n = view.items.length;
+	view.zoomIndex = (view.zoomIndex + delta + n) % n;
 
-    const fig = view.figure;
-    fig.classList.add( 'fg-is-swapping' );
-    const swap = () => {
-        if ( ! view ) return;
-        paintZoom();
-        const apply = () => {
-            const natW = view.zoomImg.naturalWidth || 16;
-            const natH = view.zoomImg.naturalHeight || 9;
-            const box = fullBox( natW, natH );
-            view.clip.style.transition = 'none';
-            setClipBox( box );
-            positionCaption( box );
-            requestAnimationFrame( () => fig.classList.remove( 'fg-is-swapping' ) );
-        };
-        if ( view.zoomImg.complete && view.zoomImg.naturalWidth > 0 ) {
-            apply();
-        } else {
-            view.zoomImg.addEventListener( 'load', apply, { once: true } );
-        }
-    };
-    setTimeout( swap, 150 );
+	const fig = view.figure;
+	fig.classList.add('fg-is-swapping');
+	const swap = () => {
+		if (!view) {
+			return;
+		}
+		paintZoom();
+		const apply = () => {
+			const natW = view.zoomImg.naturalWidth || 16;
+			const natH = view.zoomImg.naturalHeight || 9;
+			const box = fullBox(natW, natH);
+			view.clip.style.transition = 'none';
+			setClipBox(box);
+			positionCaption(box);
+			requestAnimationFrame(() => fig.classList.remove('fg-is-swapping'));
+		};
+		if (view.zoomImg.complete && view.zoomImg.naturalWidth > 0) {
+			apply();
+		} else {
+			view.zoomImg.addEventListener('load', apply, { once: true });
+		}
+	};
+	setTimeout(swap, 150);
 }
 
 /** Paint the current zoom item into the clip + counter (no morph). */
 function paintZoom() {
-    if ( ! view || view.zoomIndex < 0 ) return;
-    const it = view.items[ view.zoomIndex ];
-    view.zoomImg.src = it.full || it.thumb || '';
-    view.zoomImg.alt = it.alt || '';
+	if (!view || view.zoomIndex < 0) {
+		return;
+	}
+	const it = view.items[view.zoomIndex];
+	view.zoomImg.src = it.full || it.thumb || '';
+	view.zoomImg.alt = it.alt || '';
 
-    const text = view.fullCaptions ? captionTextFor( it, view.captionSource ) : '';
-    view.zoomCap.textContent = text;
-    view.zoomCap.style.display = text ? '' : 'none';
+	const text = view.fullCaptions
+		? captionTextFor(it, view.captionSource)
+		: '';
+	view.zoomCap.textContent = text;
+	view.zoomCap.style.display = text ? '' : 'none';
 
-    view.counter.textContent = view.config.labels.item_of
-        .replace( '%1$d', view.zoomIndex + 1 )
-        .replace( '%2$d', view.items.length );
+	view.counter.textContent = view.config.labels.item_of
+		.replace('%1$d', view.zoomIndex + 1)
+		.replace('%2$d', view.items.length);
 
-    const single = view.items.length <= 1;
-    view.prevBtn.style.display = single ? 'none' : '';
-    view.nextBtn.style.display = single ? 'none' : '';
+	const single = view.items.length <= 1;
+	view.prevBtn.style.display = single ? 'none' : '';
+	view.nextBtn.style.display = single ? 'none' : '';
 }
 
-function readItems( galleryEl ) {
-    try {
-        return JSON.parse( galleryEl.getAttribute( 'data-fg-grid-items' ) || '[]' );
-    } catch ( err ) {
-        return [];
-    }
+function readItems(galleryEl) {
+	try {
+		return JSON.parse(galleryEl.getAttribute('data-fg-grid-items') || '[]');
+	} catch (err) {
+		return [];
+	}
 }
 
-function readLabels( galleryEl ) {
-    try {
-        return JSON.parse( galleryEl.getAttribute( 'data-fg-grid-labels' ) || '{}' );
-    } catch ( err ) {
-        return {};
-    }
+function readLabels(galleryEl) {
+	try {
+		return JSON.parse(
+			galleryEl.getAttribute('data-fg-grid-labels') || '{}'
+		);
+	} catch (err) {
+		return {};
+	}
 }
 
-function readSharing( galleryEl ) {
-    try {
-        return JSON.parse( galleryEl.getAttribute( 'data-fg-sharing' ) || 'null' );
-    } catch ( err ) {
-        return null;
-    }
+function readSharing(galleryEl) {
+	try {
+		return JSON.parse(galleryEl.getAttribute('data-fg-sharing') || 'null');
+	} catch (err) {
+		return null;
+	}
 }
 
 /**
@@ -736,53 +847,58 @@ function readSharing( galleryEl ) {
  * @param {HTMLElement} galleryEl
  * @return {object|null}
  */
-function readButtonColors( galleryEl ) {
-    const attrs = {
-        bg:               'data-fg-grid-btn-bg',
-        color:            'data-fg-grid-btn-color',
-        borderColor:      'data-fg-grid-btn-border-color',
-        hoverBg:          'data-fg-grid-btn-hover-bg',
-        hoverColor:       'data-fg-grid-btn-hover-color',
-        hoverBorderColor: 'data-fg-grid-btn-hover-border-color',
-        focusBg:          'data-fg-grid-btn-focus-bg',
-        focusColor:       'data-fg-grid-btn-focus-color',
-        focusBorderColor: 'data-fg-grid-btn-focus-border-color',
-    };
+function readButtonColors(galleryEl) {
+	const attrs = {
+		bg: 'data-fg-grid-btn-bg',
+		color: 'data-fg-grid-btn-color',
+		borderColor: 'data-fg-grid-btn-border-color',
+		hoverBg: 'data-fg-grid-btn-hover-bg',
+		hoverColor: 'data-fg-grid-btn-hover-color',
+		hoverBorderColor: 'data-fg-grid-btn-hover-border-color',
+		focusBg: 'data-fg-grid-btn-focus-bg',
+		focusColor: 'data-fg-grid-btn-focus-color',
+		focusBorderColor: 'data-fg-grid-btn-focus-border-color',
+	};
 
-    const colors = {};
-    let found = false;
-    Object.keys( attrs ).forEach( ( field ) => {
-        const value = galleryEl.getAttribute( attrs[ field ] );
-        if ( value ) {
-            colors[ field ] = value;
-            found = true;
-        }
-    } );
+	const colors = {};
+	let found = false;
+	Object.keys(attrs).forEach((field) => {
+		const value = galleryEl.getAttribute(attrs[field]);
+		if (value) {
+			colors[field] = value;
+			found = true;
+		}
+	});
 
-    return found ? colors : null;
+	return found ? colors : null;
 }
 
-function openForGallery( galleryEl, label, openAt ) {
-    open( {
-        items:         readItems( galleryEl ),
-        galleryEl,
-        clickMode:     galleryEl.getAttribute( 'data-fg-grid-click' ) || '',
-        sharing:       readSharing( galleryEl ),
-        label,
-        labels:        readLabels( galleryEl ),
-        captions:      galleryEl.getAttribute( 'data-fg-grid-captions' ) === '1',
-        fullCaptions:  galleryEl.getAttribute( 'data-fg-grid-full-captions' ) === '1',
-        captionSource: galleryEl.getAttribute( 'data-fg-grid-caption-source' ) || 'caption',
-        openAt:        typeof openAt === 'number' ? openAt : null,
-        theme:         galleryEl.getAttribute( 'data-fg-lb-theme' ) || 'dark',
-        buttonColors:  readButtonColors( galleryEl ),
-        aspect:        galleryEl.getAttribute( 'data-fg-grid-aspect' ) || '',
-        maxWidth: {
-            desktop: galleryEl.getAttribute( 'data-fg-grid-maxw-desktop' ) || '60vw',
-            tablet:  galleryEl.getAttribute( 'data-fg-grid-maxw-tablet' ) || '80vw',
-            mobile:  galleryEl.getAttribute( 'data-fg-grid-maxw-mobile' ) || '90vw',
-        },
-    } );
+function openForGallery(galleryEl, label, openAt) {
+	open({
+		items: readItems(galleryEl),
+		galleryEl,
+		clickMode: galleryEl.getAttribute('data-fg-grid-click') || '',
+		sharing: readSharing(galleryEl),
+		label,
+		labels: readLabels(galleryEl),
+		captions: galleryEl.getAttribute('data-fg-grid-captions') === '1',
+		fullCaptions:
+			galleryEl.getAttribute('data-fg-grid-full-captions') === '1',
+		captionSource:
+			galleryEl.getAttribute('data-fg-grid-caption-source') || 'caption',
+		openAt: typeof openAt === 'number' ? openAt : null,
+		theme: galleryEl.getAttribute('data-fg-lb-theme') || 'dark',
+		buttonColors: readButtonColors(galleryEl),
+		aspect: galleryEl.getAttribute('data-fg-grid-aspect') || '',
+		maxWidth: {
+			desktop:
+				galleryEl.getAttribute('data-fg-grid-maxw-desktop') || '60vw',
+			tablet:
+				galleryEl.getAttribute('data-fg-grid-maxw-tablet') || '80vw',
+			mobile:
+				galleryEl.getAttribute('data-fg-grid-maxw-mobile') || '90vw',
+		},
+	});
 }
 
 /**
@@ -792,60 +908,82 @@ function openForGallery( galleryEl, label, openAt ) {
  * @param {HTMLElement} figure
  * @return {number}
  */
-function itemIndexFor( galleryEl, figure ) {
-    const items = readItems( galleryEl );
+function itemIndexFor(galleryEl, figure) {
+	const items = readItems(galleryEl);
 
-    const trigger = figure.querySelector( '[data-fg-lightbox-trigger]' );
-    const id = figure.getAttribute( 'data-fg-item-id' )
-        || ( trigger && trigger.getAttribute( 'data-fg-item-id' ) );
-    if ( id ) {
-        const byId = items.findIndex( ( it ) => String( it.id ) === String( id ) );
-        if ( byId >= 0 ) return byId;
-    }
+	const trigger = figure.querySelector('[data-fg-lightbox-trigger]');
+	const id =
+		figure.getAttribute('data-fg-item-id') ||
+		(trigger && trigger.getAttribute('data-fg-item-id'));
+	if (id) {
+		const byId = items.findIndex((it) => String(it.id) === String(id));
+		if (byId >= 0) {
+			return byId;
+		}
+	}
 
-    const seq = figure.getAttribute( 'data-fg-sequence-index' );
-    if ( seq !== null && seq !== '' ) {
-        const n = parseInt( seq, 10 );
-        if ( ! Number.isNaN( n ) && n >= 0 && n < items.length ) return n;
-    }
+	const seq = figure.getAttribute('data-fg-sequence-index');
+	if (seq !== null && seq !== '') {
+		const n = parseInt(seq, 10);
+		if (!Number.isNaN(n) && n >= 0 && n < items.length) {
+			return n;
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
-function attach( galleryEl ) {
-    if ( galleryEl.dataset.fgGridReady === '1' ) return;
+function attach(galleryEl) {
+	if (galleryEl.dataset.fgGridReady === '1') {
+		return;
+	}
 
-    const isFeatured = galleryEl.matches( '[data-fg-layout="featured-item"]' );
-    const openOnItem = galleryEl.getAttribute( 'data-fg-grid-open-on-item' ) === '1';
+	const isFeatured = galleryEl.matches('[data-fg-layout="featured-item"]');
+	const openOnItem =
+		galleryEl.getAttribute('data-fg-grid-open-on-item') === '1';
 
-    if ( ! isFeatured && ! openOnItem ) return;
+	if (!isFeatured && !openOnItem) {
+		return;
+	}
 
-    galleryEl.dataset.fgGridReady = '1';
+	galleryEl.dataset.fgGridReady = '1';
 
-    if ( isFeatured ) {
-        const btn = galleryEl.querySelector( '[data-fg-show-all]' );
-        if ( btn ) {
-            btn.addEventListener( 'click', ( e ) => {
-                e.preventDefault();
-                openForGallery( galleryEl, btn.getAttribute( 'data-fg-show-all-label' ) || '' );
-            } );
-        }
-    }
+	if (isFeatured) {
+		const btn = galleryEl.querySelector('[data-fg-show-all]');
+		if (btn) {
+			btn.addEventListener('click', (e) => {
+				e.preventDefault();
+				openForGallery(
+					galleryEl,
+					btn.getAttribute('data-fg-show-all-label') || ''
+				);
+			});
+		}
+	}
 
-    galleryEl.addEventListener( 'click', ( e ) => {
-        const figure = e.target.closest( '.fg-item' );
-        if ( ! figure || ! galleryEl.contains( figure ) ) return;
-        if ( e.target.closest( '[data-fg-show-all]' ) ) return;
-        e.preventDefault();
-        openForGallery( galleryEl, '', itemIndexFor( galleryEl, figure ) );
-    }, true );
+	galleryEl.addEventListener(
+		'click',
+		(e) => {
+			const figure = e.target.closest('.fg-item');
+			if (
+				!figure ||
+				!galleryEl.contains(figure) ||
+				e.target.closest('[data-fg-show-all]')
+			) {
+				return;
+			}
+			e.preventDefault();
+			openForGallery(galleryEl, '', itemIndexFor(galleryEl, figure));
+		},
+		true
+	);
 }
 
 function init() {
-    window.FotoGrids = window.FotoGrids || {};
-    window.FotoGrids.modules = window.FotoGrids.modules || {};
-    window.FotoGrids.modules.lightboxGrid = { open, close };
+	window.FotoGrids = window.FotoGrids || {};
+	window.FotoGrids.modules = window.FotoGrids.modules || {};
+	window.FotoGrids.modules.lightboxGrid = { open, close };
 }
 
 init();
-bootLayout( attach, 10 );
+bootLayout(attach, 10);

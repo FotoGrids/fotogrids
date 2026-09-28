@@ -8,10 +8,10 @@ import LibraryTagsHeader from './LibraryTagsHeader';
  * table/search/bulk-actions via LibraryTabBase.
  */
 const LibraryTagsTab = ({ entityType }) => (
-    <>
-        <LibraryTagsHeader entityType={entityType} />
-        <LibraryTabBase entityType={entityType} />
-    </>
+	<>
+		<LibraryTagsHeader entityType={entityType} />
+		<LibraryTabBase entityType={entityType} />
+	</>
 );
 
 export default LibraryTagsTab;

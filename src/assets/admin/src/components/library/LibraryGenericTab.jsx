@@ -7,6 +7,8 @@ import LibraryTabBase from './LibraryTabBase';
  * tab component. The shared LibraryTabBase still handles them as long as
  * they expose the standard fields (id / name / slug / usage_count).
  */
-const LibraryGenericTab = ({ entityType }) => <LibraryTabBase entityType={entityType} />;
+const LibraryGenericTab = ({ entityType }) => (
+	<LibraryTabBase entityType={entityType} />
+);
 
 export default LibraryGenericTab;
