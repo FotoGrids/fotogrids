@@ -605,9 +605,8 @@ class Public_Render {
 		// • fg-tooltip is declared as a dep by Sharing_Decorator and
 		//   Lightbox features; Asset_Resolver pulls it in when either is
 		//   active on the page.
-		// • deep-linking is declared by Sharing_Decorator (task 16). On
-		//   the View Page it's pulled in directly by Renderer::enqueue_assets
-		//   because a ?fg-item URL can arrive even when sharing is off.
+		// • deep-linking is declared by the Deep_Linking feature. On the
+		//   View Page it's pulled in directly by Renderer::enqueue_assets.
 
 		wp_enqueue_style(
 			'fotogrids-errors',
