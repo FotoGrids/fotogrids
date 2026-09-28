@@ -121,6 +121,25 @@ All media is generated at seed time, so nothing binary is committed. The MP4 in
 `F-mixed` is a container with no stream: enough for the render path, which reads
 the mime type and the URL, and not enough to play.
 
+## Throwaway collections
+
+`collection.php` builds a collection a single spec owns, for the `scoped`
+project:
+
+    wp eval-file collection.php op=render items=4,5,6 settings='{"layout":"masonry"}'
+    wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
+    wp eval-file collection.php op=purge
+
+`op=render` prints `{"id":41,"url":"..."}` - the gallery and a post that embeds
+it through the shortcode. Settings are validated against the catalog and written
+through the same codec the save pipeline uses, then the gallery's render cache is
+dropped; without that flush the next render replays the HTML built before the
+change.
+
+Everything it creates carries `_fg_scoped`, and global setup purges those before
+seeding, so a failed run leaves its collections behind to look at and the next
+run starts clean. `tests/e2e/support/collections.ts` is the interface specs use.
+
 ## Role sessions
 
 Global setup also creates `fg-editor`, `fg-author`, `fg-contributor` and
