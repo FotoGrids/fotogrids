@@ -93,7 +93,7 @@
         // The View Page sets `fotogrids-view` on <body>, not <html>.
         const isViewPage = ( document.body && document.body.classList.contains( 'fotogrids-view' ) )
             || document.documentElement.classList.contains( 'fotogrids-view' );
-        const deepLink   = settings.deep_linking_enabled !== false;
+        const deepLink   = !! settings.deep_linking_enabled;
 
         if ( isViewPage ) {
             if ( deepLink && itemId ) {

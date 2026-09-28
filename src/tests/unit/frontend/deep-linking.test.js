@@ -63,6 +63,25 @@ describe('deep-linking', () => {
 		expect(figure.scrollIntoView).toHaveBeenCalled();
 	});
 
+	it('highlights an item whose media carries only data-id', () => {
+		const gallery = document.createElement('div');
+		gallery.className = 'fotogrids-collection fotogrids-gallery';
+		gallery.dataset.fgGalleryId = '8';
+		const figure = document.createElement('figure');
+		figure.className = 'fg-item';
+		const img = document.createElement('img');
+		img.dataset.id = '51';
+		figure.appendChild(img);
+		gallery.appendChild(figure);
+		document.body.appendChild(gallery);
+		figure.scrollIntoView = jest.fn();
+
+		setHash('#fg-8-51');
+		loadModule();
+		expect(figure.classList.contains('fg-deep-link-highlight')).toBe(true);
+		expect(figure.scrollIntoView).toHaveBeenCalled();
+	});
+
 	it('opens the lightbox when a trigger and lightbox manager exist', () => {
 		const { gallery } = makeGallery(3, 9, { withTrigger: true });
 		const open = jest.fn();

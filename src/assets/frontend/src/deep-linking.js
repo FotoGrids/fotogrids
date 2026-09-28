@@ -105,8 +105,9 @@
 		}
 
 		for (const galleryEl of galleries) {
+			// Items without a click action carry only the media's data-id.
 			const itemEl = galleryEl.querySelector(
-				`[data-fg-item-id="${link.itemId}"]`
+				`[data-fg-item-id="${link.itemId}"], [data-id="${link.itemId}"]`
 			);
 			if (itemEl) {
 				const figure = itemEl.closest('.fg-item') || itemEl;
