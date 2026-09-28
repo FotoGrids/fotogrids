@@ -30,8 +30,8 @@ const SKELETON_ROWS = 5;
  * Empty values always sort last regardless of direction, so untitled or
  * never-viewed rows do not crowd the top of a descending sort.
  *
- * @param {*} a First value.
- * @param {*} b Second value.
+ * @param {string|number|null|undefined} a First value.
+ * @param {string|number|null|undefined} b Second value.
  * @returns {number} Standard comparator result.
  */
 const compareValues = (a, b) => {

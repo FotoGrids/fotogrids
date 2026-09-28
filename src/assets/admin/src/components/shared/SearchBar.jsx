@@ -1,7 +1,7 @@
 /**
  * SearchBar - shared, FotoGrids-branded search input.
  *
- * Designed as a drop-in replacement for @wordpress/components SearchControl:
+ * Designed as a drop-in replacement for `@wordpress/components` SearchControl:
  * same prop surface (value, onChange, placeholder, label, help,
  * hideLabelFromVision, onClose, size), with FotoGrids styling and a few
  * extras (`width`, `onKeyDown`, `autoFocus`, native pass-throughs).

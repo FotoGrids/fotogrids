@@ -4,11 +4,11 @@
  * Uploads a ZIP archive, extracts the images inside it into the Media Library,
  * and adds them to the gallery.
  *
- * @param {Object}   props
- * @param {boolean}  props.isOpen       Modal visibility.
- * @param {Function} props.onClose      Called when the modal should close.
- * @param {Function} props.onAddItems   Called with an array of gallery item objects.
- * @param {Object}   [props.strings]    Localized labels.
+ * @param {Object}                    props
+ * @param {boolean}                   props.isOpen       Modal visibility.
+ * @param {() => void}                props.onClose      Called when the modal should close.
+ * @param {(items: Object[]) => void} props.onAddItems   Called with an array of gallery item objects.
+ * @param {Object}                    [props.strings]    Localized labels.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -26,9 +26,9 @@ const isZip = (file) => Boolean(file) && /\.zip$/i.test(file.name || '');
  * apiFetch has no progress channel, and archives are large enough that a
  * static spinner reads as a hang.
  *
- * @param {File}     file
- * @param {number}   galleryId  The gallery the import belongs to.
- * @param {Function} onProgress Called with a 0-100 percentage.
+ * @param {File}                      file
+ * @param {number}                    galleryId  The gallery the import belongs to.
+ * @param {(percent: number) => void} onProgress Called with a 0-100 percentage.
  * @return {Promise<Object>}
  */
 const uploadArchive = (file, galleryId, onProgress) =>

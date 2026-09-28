@@ -6,18 +6,18 @@ const { __ } = wp.i18n;
 /**
  * DimensionsField - a Width × Height pair built from two NumberFields.
  *
- * @param {Object}   props
- * @param {number}   props.width
- * @param {number}   props.height
- * @param {Function} props.onWidthChange
- * @param {Function} props.onHeightChange
- * @param {string}   [props.unit]            Defaults to "px".
- * @param {string}   [props.widthLabel]
- * @param {string}   [props.heightLabel]
- * @param {string}   [props.idPrefix]        Used to build the two input ids.
- * @param {number}   [props.min]
- * @param {number}   [props.max]
- * @param {boolean}  [props.disabled]
+ * @param {Object}                  props
+ * @param {number}                  props.width
+ * @param {number}                  props.height
+ * @param {(value: number) => void} props.onWidthChange
+ * @param {(value: number) => void} props.onHeightChange
+ * @param {string}                  [props.unit]            Defaults to "px".
+ * @param {string}                  [props.widthLabel]
+ * @param {string}                  [props.heightLabel]
+ * @param {string}                  [props.idPrefix]        Used to build the two input ids.
+ * @param {number}                  [props.min]
+ * @param {number}                  [props.max]
+ * @param {boolean}                 [props.disabled]
  */
 const DimensionsField = ({
 	width,
