@@ -77,7 +77,7 @@ class Lightbox_Slides_Data {
 		$total     = count( $sequence );
 		$slice_ids = array_slice( $sequence, $offset, $limit );
 		$slides    = ! empty( $slice_ids )
-			? \FotoGrids\Render\Lightbox\Shared\Lightbox_Slide_Builder::build_many( $slice_ids, $settings )
+			? \FotoGrids\Render\Lightbox\Shared\Lightbox_Slide_Builder::build_many( $slice_ids, $settings, (int) $gallery_id )
 			: array();
 
 		return rest_ensure_response(

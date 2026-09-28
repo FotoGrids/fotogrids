@@ -133,7 +133,37 @@ class Metadata_Manager {
 	}
 
 	/**
+	 * Find an entry by name, case-insensitively or by slug.
+	 *
+	 * @since  1.1.5
+	 * @param  string $type Metadata type.
+	 * @param  string $name Entry name.
+	 * @return object|null Row, or null when no entry matches.
+	 */
+	public static function find_metadata( $type, $name ) {
+		$name = trim( (string) $name );
+		if ( '' === $name || ! self::validate_type( $type ) ) {
+			return null;
+		}
+
+		global $wpdb;
+
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s) LIMIT 1',
+				$wpdb->prefix . 'fotogrids_tags',
+				$type,
+				$name,
+				sanitize_title( $name )
+			)
+		);
+	}
+
+	/**
 	 * Add or get existing metadata entry
+	 *
+	 * An existing entry keeps every meta value it already has; `$meta` only
+	 * fills keys it lacks.
 	 *
 	 * @param string $type Metadata type
 	 * @param string $name Metadata name
@@ -155,20 +185,14 @@ class Metadata_Manager {
 		$slug  = sanitize_title( $name );
 		$table = $wpdb->prefix . 'fotogrids_tags';
 
-		$existing = $wpdb->get_row(
-			$wpdb->prepare(
-				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s)',
-				$table,
-				$type,
-				$name,
-				$slug
-			)
-		);
+		$existing = self::find_metadata( $type, $name );
 
 		if ( $existing ) {
-			if ( null !== $meta ) {
-				$meta_json = wp_json_encode( $meta );
-				if ( $existing->meta !== $meta_json ) {
+			if ( is_array( $meta ) && ! empty( $meta ) ) {
+				$current = self::decode_meta( $existing->meta );
+				$merged  = $current + $meta;
+				if ( $merged !== $current ) {
+					$meta_json = wp_json_encode( $merged );
 					$wpdb->update(
 						$table,
 						array( 'meta' => $meta_json ),
@@ -177,6 +201,7 @@ class Metadata_Manager {
 						array( '%d' )
 					);
 					$existing->meta = $meta_json;
+					\FotoGrids\Cache\Metadata_Cache::forget_all();
 				}
 			}
 			return $existing;
@@ -244,17 +269,154 @@ class Metadata_Manager {
 	 * @return object|false Location object or false on error
 	 */
 	public static function add_or_get_location( $name, $latitude = null, $longitude = null ) {
-		$meta = null;
-		if ( null !== $latitude || null !== $longitude ) {
-			$meta = array();
-			if ( null !== $latitude ) {
-				$meta['latitude'] = $latitude;
-			}
-			if ( null !== $longitude ) {
-				$meta['longitude'] = $longitude;
+		$coordinates = self::normalize_coordinates( $latitude, $longitude );
+		if ( is_wp_error( $coordinates ) ) {
+			return false;
+		}
+		return self::add_or_get_metadata( 'location', $name, $coordinates );
+	}
+
+	/**
+	 * Validate a latitude/longitude pair.
+	 *
+	 * Both values empty means no coordinates. Values are rounded to six
+	 * decimal places.
+	 *
+	 * @since  1.1.5
+	 * @param  mixed $latitude  Latitude in decimal degrees, or empty.
+	 * @param  mixed $longitude Longitude in decimal degrees, or empty.
+	 * @return array{latitude: float, longitude: float}|null|\WP_Error
+	 */
+	public static function normalize_coordinates( $latitude, $longitude ) {
+		$lat_empty = null === $latitude || ( is_string( $latitude ) && '' === trim( $latitude ) );
+		$lng_empty = null === $longitude || ( is_string( $longitude ) && '' === trim( $longitude ) );
+
+		if ( $lat_empty && $lng_empty ) {
+			return null;
+		}
+
+		if ( $lat_empty || $lng_empty ) {
+			return self::coordinates_error( __( 'Enter both latitude and longitude, or leave both empty.', 'fotogrids' ) );
+		}
+
+		if ( ! is_numeric( $latitude ) || abs( (float) $latitude ) > 90 ) {
+			return self::coordinates_error( __( 'Latitude must be a number from -90 to 90.', 'fotogrids' ) );
+		}
+
+		if ( ! is_numeric( $longitude ) || abs( (float) $longitude ) > 180 ) {
+			return self::coordinates_error( __( 'Longitude must be a number from -180 to 180.', 'fotogrids' ) );
+		}
+
+		return array(
+			'latitude'  => round( (float) $latitude, 6 ),
+			'longitude' => round( (float) $longitude, 6 ),
+		);
+	}
+
+	/**
+	 * Read the coordinates stored in a location's meta.
+	 *
+	 * @since  1.1.5
+	 * @param  string|array|null $meta Stored meta, as JSON or decoded.
+	 * @return array{latitude: float|null, longitude: float|null} Both null unless both are stored.
+	 */
+	public static function coordinates_from_meta( $meta ) {
+		$meta = is_array( $meta ) ? $meta : self::decode_meta( $meta );
+
+		if ( ! isset( $meta['latitude'], $meta['longitude'] ) || ! is_numeric( $meta['latitude'] ) || ! is_numeric( $meta['longitude'] ) ) {
+			return array(
+				'latitude'  => null,
+				'longitude' => null,
+			);
+		}
+
+		return array(
+			'latitude'  => (float) $meta['latitude'],
+			'longitude' => (float) $meta['longitude'],
+		);
+	}
+
+	/**
+	 * Shape a metadata row for a REST response.
+	 *
+	 * Decodes `meta` and lifts each type's fields to the top level:
+	 * `latitude`/`longitude` for locations, `details` for people.
+	 *
+	 * @since  1.1.5
+	 * @param  object $row Row from the tags table.
+	 * @return array<string, mixed>
+	 */
+	public static function format_for_response( $row ) {
+		$meta = self::decode_meta( $row->meta ?? null );
+
+		$out = array(
+			'id'          => (int) $row->id,
+			'type'        => $row->type,
+			'name'        => $row->name,
+			'slug'        => $row->slug,
+			'usage_count' => (int) $row->usage_count,
+			'created_at'  => $row->created_at,
+			'meta'        => empty( $meta ) ? null : $meta,
+		);
+
+		if ( 'location' === $row->type ) {
+			$out += self::coordinates_from_meta( $meta );
+		} elseif ( 'person' === $row->type ) {
+			$out['details'] = isset( $meta['details'] ) ? (string) $meta['details'] : '';
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Clean imported meta before it is stored.
+	 *
+	 * A location keeps its coordinates only when they pass
+	 * normalize_coordinates(); otherwise both are dropped.
+	 *
+	 * @since  1.1.5
+	 * @param  string            $type Metadata type.
+	 * @param  string|array|null $meta Meta as JSON or decoded.
+	 * @return string|null JSON for the `meta` column, or null when empty.
+	 */
+	public static function prepare_imported_meta( $type, $meta ) {
+		$meta = is_array( $meta ) ? $meta : self::decode_meta( $meta );
+
+		if ( 'location' === $type ) {
+			$coordinates = self::normalize_coordinates( $meta['latitude'] ?? null, $meta['longitude'] ?? null );
+			unset( $meta['latitude'], $meta['longitude'] );
+			if ( is_array( $coordinates ) ) {
+				$meta = array_merge( $meta, $coordinates );
 			}
 		}
-		return self::add_or_get_metadata( 'location', $name, $meta );
+
+		return empty( $meta ) ? null : wp_json_encode( $meta );
+	}
+
+	/**
+	 * Decode a stored meta value.
+	 *
+	 * @since  1.1.5
+	 * @param  string|null $meta JSON from the `meta` column.
+	 * @return array<string, mixed> Empty when absent or not a JSON object.
+	 */
+	private static function decode_meta( $meta ) {
+		if ( ! is_string( $meta ) || '' === $meta ) {
+			return array();
+		}
+		$decoded = json_decode( $meta, true );
+		return is_array( $decoded ) ? $decoded : array();
+	}
+
+	/**
+	 * Build the error returned for invalid coordinates.
+	 *
+	 * @since  1.1.5
+	 * @param  string $message Translated message.
+	 * @return \WP_Error
+	 */
+	private static function coordinates_error( $message ) {
+		return new \WP_Error( 'fotogrids_invalid_coordinates', $message, array( 'status' => 400 ) );
 	}
 
 	/**
@@ -707,6 +869,26 @@ class Metadata_Manager {
 		}
 
 		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql is assembled above with every value passed through prepare().
+	}
+
+	/**
+	 * Count locations that store coordinates.
+	 *
+	 * @since  1.1.5
+	 * @return int
+	 */
+	public static function count_locations_with_coordinates() {
+		global $wpdb;
+
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM %i WHERE type = %s AND meta LIKE %s AND meta LIKE %s',
+				$wpdb->prefix . 'fotogrids_tags',
+				'location',
+				'%' . $wpdb->esc_like( '"latitude":' ) . '%',
+				'%' . $wpdb->esc_like( '"longitude":' ) . '%'
+			)
+		);
 	}
 
 	/**

@@ -9,8 +9,8 @@ use FotoGrids\Render\Api\Collection_Kind;
 use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
-use FotoGrids\Hooks\Filters_Data;
 use FotoGrids\Render\Api\Setting_Helpers;
+use FotoGrids\Render\Lightbox\Shared\Lightbox_Info_Scope;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -152,8 +152,6 @@ if ( ! defined( 'WPINC' ) ) {
 final class Lightbox implements Feature {
 
 	use Setting_Helpers;
-
-	private const DEFAULT_INFO_BLOCKS = array( 'title', 'caption', 'description', 'file_info', 'exif', 'share', 'credit', 'tags', 'people', 'location' );
 
 	/** @var array<string, array{prev: string, next: string}>|null */
 	private static ?array $arrow_icons_cache = null;
@@ -546,9 +544,8 @@ final class Lightbox implements Feature {
 		// selection from an absent attribute. An empty selection means the
 		// panel is not rendered.
 		if ( $info_panel_enabled ) {
-			$info_blocks_raw                 = $s['lightbox_info_blocks'] ?? self::DEFAULT_INFO_BLOCKS;
-			$info_blocks_raw                 = is_array( $info_blocks_raw ) ? $info_blocks_raw : array();
-			$info_blocks_clean               = array_values( array_filter( array_map( 'strval', $info_blocks_raw ) ) );
+			$info_scope                      = new Lightbox_Info_Scope( $s, (int) $render_context->meta->gallery_id );
+			$info_blocks_clean               = $info_scope->blocks();
 			$attrs['data-fg-lb-info-blocks'] = implode( ' ', $info_blocks_clean );
 
 			// Credit source - only relevant when credit block is enabled.
@@ -559,30 +556,15 @@ final class Lightbox implements Feature {
 				}
 			}
 
-			// EXIF fields - which fields are enabled for display in the EXIF block.
-			// Only emitted when the exif block is enabled and display_exif is on.
-			if ( in_array( 'exif', $info_blocks_clean, true ) && $this->setting_to_bool( $s['display_exif'] ?? false ) ) {
-				$enabled_fields = \FotoGrids\Exif\Exif_Fields::sanitize_keys(
-					\FotoGrids\Exif\Exif_Extractor::parse_field_setting( $s['exif_fields'] ?? array() )
+			$enabled_fields = $info_scope->exif_fields();
+			if ( ! empty( $enabled_fields ) ) {
+				$attrs['data-fg-lb-exif-fields'] = implode( ' ', $enabled_fields );
+				$attrs['data-fg-lb-exif-labels'] = (string) wp_json_encode(
+					array_intersect_key(
+						\FotoGrids\Exif\Exif_Fields::labels(),
+						array_flip( $enabled_fields )
+					)
 				);
-				// Add-ons extend the emitted EXIF field list (mirrors
-				// Exif_Extractor::enabled_fields_for_gallery()).
-				$enabled_fields = (array) apply_filters(
-					Filters_Data::EXIF_ENABLED_FIELDS,
-					$enabled_fields,
-					$s,
-					$render_context->meta->gallery_id
-				);
-				$enabled_fields = \FotoGrids\Exif\Exif_Fields::sanitize_keys( $enabled_fields );
-				if ( ! empty( $enabled_fields ) ) {
-					$attrs['data-fg-lb-exif-fields'] = implode( ' ', $enabled_fields );
-					$attrs['data-fg-lb-exif-labels'] = (string) wp_json_encode(
-						array_intersect_key(
-							\FotoGrids\Exif\Exif_Fields::labels(),
-							array_flip( $enabled_fields )
-						)
-					);
-				}
 			}
 		}
 

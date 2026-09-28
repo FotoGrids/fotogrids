@@ -181,6 +181,11 @@ final class Exif_Reader {
 			return $tags;
 		}
 
+		// Front-end and REST requests do not load the admin image functions.
+		if ( ! function_exists( 'wp_read_image_metadata' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
+
 		$image_meta = wp_read_image_metadata( $file_path );
 
 		if ( ! is_array( $image_meta ) ) {
