@@ -62,6 +62,9 @@ class Metadata_Manager {
 	/**
 	 * Get metadata by type with optional search and limit
 	 *
+	 * With a search term, an exact name match ranks first and names starting
+	 * with the term rank next; otherwise results are ordered by usage.
+	 *
 	 * @param string $type Metadata type (tag, people, location, etc.)
 	 * @param string $search Optional search term
 	 * @param int $limit Optional limit (default: 20)
@@ -78,12 +81,17 @@ class Metadata_Manager {
 		$sql    = 'SELECT * FROM %i WHERE type = %s';
 		$params = array( $table, $type );
 
+		$order = 'usage_count DESC, name ASC';
+
 		if ( ! empty( $search ) ) {
 			$sql     .= ' AND name LIKE %s';
+			$order    = 'LOWER(name) = LOWER(%s) DESC, name LIKE %s DESC, ' . $order;
 			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
+			$params[] = $search;
+			$params[] = $wpdb->esc_like( $search ) . '%';
 		}
 
-		$sql     .= ' ORDER BY usage_count DESC, name ASC LIMIT %d';
+		$sql     .= ' ORDER BY ' . $order . ' LIMIT %d';
 		$params[] = absint( $limit );
 
 		$sql = $wpdb->prepare( $sql, $params ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql is assembled above from literal fragments; every value is in $params.
