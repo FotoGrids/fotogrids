@@ -1,116 +1,104 @@
 /**
- * Tests for public/render/features/stats/stats.js (IIFE; wires its listeners
- * on import).
- *
- * Every slide the lightbox shows records one item view, through the stats
- * config of the gallery the lightbox belongs to.
+ * Tests that public/render/features/stats/stats.js sends one view ping per
+ * gallery and per album wrapper, through the real runtime.
  */
 
-const MODULE = '../../../public/render/features/stats/stats';
+const RUNTIME = '../../../public/render/internal/runtime/runtime';
+const STATS = '../../../public/render/features/stats/stats';
 
-const STATS_CONFIG = {
-	enabled: true,
-	restUrl: 'http://localhost/wp-json/fotogrids/v1/',
-	nonce: 'abc123',
-	objectType: 'gallery',
-	objectId: 7,
-};
+function loadWithRuntime() {
+	jest.isolateModules(() => {
+		require(RUNTIME);
+	});
+	jest.isolateModules(() => {
+		require(STATS);
+	});
+}
 
-function makeGallery(config) {
-	const gallery = document.createElement('div');
-	gallery.className = 'fotogrids-collection fotogrids-gallery';
-	gallery.dataset.fgGalleryId = '7';
-	if (config) {
-		gallery.dataset.fgStats = JSON.stringify(config);
+function makeCollection(kind, objectId, stats = true) {
+	const el = document.createElement('div');
+	el.className = `fotogrids-collection fotogrids-${kind}`;
+	el.dataset.fgGalleryId = kind === 'gallery' ? String(objectId) : '0';
+	if (kind === 'album') {
+		el.dataset.fgAlbumId = String(objectId);
 	}
-	document.body.appendChild(gallery);
-	return gallery;
-}
-
-function fireLightbox(galleryEl, name, detail) {
-	galleryEl.dispatchEvent(
-		new window.CustomEvent(`fotogrids:lightbox:${name}`, {
-			bubbles: true,
-			detail: { galleryEl, ...detail },
-		})
-	);
-}
-
-function itemViewCalls() {
-	return global.fetch.mock.calls
-		.map(([url, init]) => ({ url, init, body: JSON.parse(init.body) }))
-		.filter(({ body }) => body.object_type === 'item');
-}
-
-describe('stats: lightbox item views', () => {
-	beforeAll(() => {
-		global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
-		jest.isolateModules(() => {
-			require(MODULE);
-		});
-	});
-
-	beforeEach(() => {
-		global.fetch.mockClear();
-		document.body.innerHTML = '';
-	});
-
-	it('records a view for the item the lightbox opens on', () => {
-		const gallery = makeGallery(STATS_CONFIG);
-
-		fireLightbox(gallery, 'open', { index: 0, item: { id: '42' } });
-
-		const calls = itemViewCalls();
-		expect(calls).toHaveLength(1);
-		expect(calls[0].url).toBe(
-			'http://localhost/wp-json/fotogrids/v1/stats/view'
+	if (stats) {
+		el.setAttribute(
+			'data-fg-stats',
+			JSON.stringify({
+				enabled: true,
+				restUrl: 'https://example.com/wp-json/fotogrids/v1/',
+				nonce: 'abc',
+				objectType: kind,
+				objectId,
+			})
 		);
-		expect(calls[0].init.method).toBe('POST');
-		expect(calls[0].init.headers['X-WP-Nonce']).toBe('abc123');
-		expect(calls[0].body).toEqual({ object_type: 'item', object_id: 42 });
+	}
+	document.body.appendChild(el);
+	return el;
+}
+
+function viewBodies() {
+	return global.fetch.mock.calls
+		.filter(([url]) => url.endsWith('stats/view'))
+		.map(([, opts]) => JSON.parse(opts.body));
+}
+
+beforeEach(() => {
+	document.body.innerHTML = '';
+	delete window.FotoGrids;
+	global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
+});
+
+afterEach(() => {
+	delete global.fetch;
+});
+
+describe('stats view tracking', () => {
+	it('sends one album view for an album wrapper', () => {
+		makeCollection('album', 42);
+		loadWithRuntime();
+
+		expect(viewBodies()).toEqual([{ object_type: 'album', object_id: 42 }]);
 	});
 
-	it('records a view for each slide navigated to', () => {
-		const gallery = makeGallery(STATS_CONFIG);
+	it('sends one gallery view for a gallery wrapper', () => {
+		makeCollection('gallery', 7);
+		loadWithRuntime();
 
-		fireLightbox(gallery, 'open', { index: 0, item: { id: '42' } });
-		fireLightbox(gallery, 'navigate', {
-			index: 1,
-			item: { id: '43' },
-			direction: 'next',
-		});
-		fireLightbox(gallery, 'navigate', {
-			index: 0,
-			item: { id: '42' },
-			direction: 'prev',
-		});
-
-		expect(itemViewCalls().map(({ body }) => body.object_id)).toEqual([
-			42, 43, 42,
+		expect(viewBodies()).toEqual([
+			{ object_type: 'gallery', object_id: 7 },
 		]);
 	});
 
-	it('records nothing for a gallery with statistics disabled', () => {
-		const gallery = makeGallery({ ...STATS_CONFIG, enabled: false });
+	it('sends a view for every collection on the page', () => {
+		makeCollection('album', 42);
+		makeCollection('gallery', 7);
+		loadWithRuntime();
 
-		fireLightbox(gallery, 'open', { index: 0, item: { id: '42' } });
-
-		expect(itemViewCalls()).toHaveLength(0);
+		expect(viewBodies()).toEqual(
+			expect.arrayContaining([
+				{ object_type: 'album', object_id: 42 },
+				{ object_type: 'gallery', object_id: 7 },
+			])
+		);
+		expect(viewBodies()).toHaveLength(2);
 	});
 
-	it('records nothing for a gallery without a stats config', () => {
-		const gallery = makeGallery(null);
+	it('does not send a second view for the same wrapper', () => {
+		makeCollection('album', 42);
+		loadWithRuntime();
+		jest.isolateModules(() => {
+			require(STATS);
+		});
 
-		fireLightbox(gallery, 'open', { index: 0, item: { id: '42' } });
-
-		expect(itemViewCalls()).toHaveLength(0);
+		expect(viewBodies()).toHaveLength(1);
 	});
 
-	it('records nothing for a slide without an item id', () => {
-		const gallery = makeGallery(STATS_CONFIG);
+	it('skips collections without a stats config', () => {
+		makeCollection('album', 42, false);
+		loadWithRuntime();
 
-		fireLightbox(gallery, 'open', { index: 0, item: { id: '' } });
-
-		expect(itemViewCalls()).toHaveLength(0);
+		expect(viewBodies()).toHaveLength(0);
 	});
 });
