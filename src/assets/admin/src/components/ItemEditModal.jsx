@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ItemPreviewPane, ItemEditTabs } from './item-edit-modal/ModalBody';
-import { Modal } from './shared/Modal';
+import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import { buildRestUrl } from '../utils/rest-url';
 import useMetadataSuggestions from './item-edit-modal/useMetadataSuggestions';
@@ -78,6 +78,7 @@ const ItemEditModal = ({
     const [originalData, setOriginalData] = useState(null);
     const [originalMetadata, setOriginalMetadata] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
+    const [discardPrompt, setDiscardPrompt] = useState({ open: false, action: null });
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [videoSettings, setVideoSettings] = useState({});
     const [originalVideoSettings, setOriginalVideoSettings] = useState({});
@@ -334,22 +335,32 @@ const ItemEditModal = ({
         }
     };
 
+    const closeModal = () => {
+        setHasChanges(false);
+        onClose();
+    };
+
+    const navigateTo = (direction) => {
+        setHasChanges(false);
+        onNavigate(direction);
+    };
+
+    /**
+     * Close the modal, asking first when there are unsaved changes.
+     * Covers the overlay, Esc, the header close button and the footer Close
+     * button, all of which reach the modal through this handler.
+     */
     const handleClose = () => {
         if (saving) {
             return;
         }
 
         if (hasChanges) {
-            const confirmMessage = strings.unsavedChangesConfirm ||
-                'You have unsaved changes. Are you sure you want to close without saving?';
-
-            if (!window.confirm(confirmMessage)) {
-                return;
-            }
+            setDiscardPrompt({ open: true, action: 'close' });
+            return;
         }
 
-        setHasChanges(false);
-        onClose();
+        closeModal();
     };
 
     const handleNavigate = (direction) => {
@@ -358,22 +369,29 @@ const ItemEditModal = ({
         }
 
         if (hasChanges) {
-            const confirmMessage = strings.unsavedChangesNavigate ||
-                'You have unsaved changes. Are you sure you want to navigate away without saving?';
-
-            if (!window.confirm(confirmMessage)) {
-                return;
-            }
+            setDiscardPrompt({ open: true, action: direction });
+            return;
         }
 
-        setHasChanges(false);
-        onNavigate(direction);
+        navigateTo(direction);
+    };
+
+    const discardChanges = () => {
+        const { action } = discardPrompt;
+        setDiscardPrompt((prompt) => ({ ...prompt, open: false }));
+
+        if (action === 'close') {
+            closeModal();
+        } else if (action) {
+            navigateTo(action);
+        }
     };
 
     const currentIndex = items.findIndex(img => img.id === itemId);
     const hasMultipleItems = items.length > 1;
 
     return (
+        <>
         <Modal
             isOpen
             onClose={handleClose}
@@ -449,6 +467,23 @@ const ItemEditModal = ({
                 </>
             )}
         </Modal>
+
+        <Confirm
+            isOpen={discardPrompt.open}
+            onClose={() => setDiscardPrompt((prompt) => ({ ...prompt, open: false }))}
+            onConfirm={discardChanges}
+            variant="warning"
+            headerIcon={false}
+            title={strings.unsavedChangesTitle}
+            message={discardPrompt.action === 'close'
+                ? strings.unsavedChangesConfirm
+                : strings.unsavedChangesNavigate}
+            confirmLabel={strings.unsavedChangesDiscard}
+            confirmVariant="secondary"
+            cancelLabel={strings.unsavedChangesKeepEditing}
+            cancelVariant="primary"
+        />
+        </>
     );
 };
 

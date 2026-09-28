@@ -19,8 +19,8 @@ class Gallery_Data {
 	 *
 	 * Body: { item_id: int | null }. When null, the explicit choice is
 	 * cleared (the runtime cover resolver falls back to the first valid
-	 * item). When set, the item must be an attachment AND still listed
-	 * in the gallery's `fotogrids_gallery_items`.
+	 * item). When set, the item must be an attachment (image or video file)
+	 * AND still listed in the gallery's `fotogrids_gallery_items`.
 	 *
 	 * @since 1.0.0
 	 * @param \WP_REST_Request $request
@@ -71,7 +71,16 @@ class Gallery_Data {
 			);
 		}
 
-		set_post_thumbnail( $gallery_id, $item_id );
+		// set_post_thumbnail() refuses attachments without an image src, which rejects video files.
+		$saved = (int) get_post_meta( $gallery_id, '_thumbnail_id', true ) === $item_id
+			|| update_post_meta( $gallery_id, '_thumbnail_id', $item_id );
+		if ( ! $saved ) {
+			return new \WP_Error(
+				'fotogrids_featured_item_not_saved',
+				__( 'The featured item could not be saved.', 'fotogrids' ),
+				array( 'status' => 500 )
+			);
+		}
 
 		return rest_ensure_response(
 			array(

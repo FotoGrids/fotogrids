@@ -1175,7 +1175,6 @@ class FotoGridsLightbox {
 			this._startAuto();
 		}
 
-		this._trackView(this.items[this.index]);
 		this._fire('open', { index: this.index, item: this.items[this.index] });
 	}
 
@@ -1231,7 +1230,6 @@ class FotoGridsLightbox {
 			this._startAuto();
 		}
 
-		this._trackView(this.items[this.index]);
 		this._fire('open', { index: this.index, item: this.items[this.index] });
 	}
 
@@ -3721,25 +3719,6 @@ class FotoGridsLightbox {
 			this._clampZoomOffset();
 			this._applyZoom(true);
 		}
-	}
-
-	_trackView(item) {
-		const cfg = window.fotogrids || {};
-		if (!cfg.stats_tracking || !item || !item.id) return;
-
-		fetch(`${cfg.restUrl}stats/view`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': cfg.nonce,
-			},
-			body: JSON.stringify({
-				object_type: 'item',
-				object_id: parseInt(item.id, 10),
-			}),
-		}).catch((err) => {
-			console.warn('FotoGrids: Error tracking item view:', err);
-		});
 	}
 
 	_fire(name, detail) {

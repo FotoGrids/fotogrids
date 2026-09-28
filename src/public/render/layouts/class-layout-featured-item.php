@@ -132,7 +132,8 @@ final class Layout_Featured_Item implements Layout {
 
 	/**
 	 * Resolve the index (in the rendered item list) of the featured image.
-	 * Uses Cover_Resolver's attachment id; falls back to the first item.
+	 * Uses the id of Cover_Resolver's poster-aware cover, so a featured video
+	 * or embed leads too; falls back to the first item.
 	 *
 	 * @since 1.0.0
 	 * @param Render_Context                      $render_context Render context.
@@ -142,10 +143,10 @@ final class Layout_Featured_Item implements Layout {
 	private function resolve_featured_index( Render_Context $render_context, array $items ): int {
 		$gallery_id = (int) ( $render_context->meta->gallery_id ?? 0 );
 		if ( $gallery_id > 0 && class_exists( '\FotoGrids\Galleries\Cover_Resolver' ) ) {
-			$featured_attachment = \FotoGrids\Galleries\Cover_Resolver::for_collection( $gallery_id );
-			if ( $featured_attachment > 0 ) {
+			$featured_id = \FotoGrids\Galleries\Cover_Resolver::descriptor_for_collection( $gallery_id )['id'];
+			if ( $featured_id > 0 ) {
 				foreach ( $items as $i => $item_view ) {
-					if ( (int) $item_view->id === $featured_attachment ) {
+					if ( (int) $item_view->id === $featured_id ) {
 						return $i;
 					}
 				}
