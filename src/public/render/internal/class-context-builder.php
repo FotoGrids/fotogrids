@@ -125,20 +125,14 @@ final class Context_Builder {
 		if ( array_key_exists( 'via_album_id', $meta_overrides ) ) {
 			$candidate    = (int) $meta_overrides['via_album_id'];
 			$via_album_id = $candidate > 0 ? $candidate : null;
-		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block wraps nonce-suppression pragmas; cannot collapse to elseif.
-			// Public breadcrumb context hint read from a normal front-end page
-			// view (no form submission, no state change), so nonce verification
-			// does not apply. The (int) cast is the sanitization, and the value
-			// is only validated/used as an album id by Breadcrumb_Resolver.
-            // phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			if ( isset( $_GET['fg_via'] ) ) {
-				$candidate    = (int) wp_unslash( $_GET['fg_via'] );
+		} else { // phpcs:ignore Universal.ControlStructures.DisallowLonelyIf.Found -- else block holds the fg_via query-var fallback for the override branch.
+			if ( isset( $_GET['fg_via'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only breadcrumb hint on a front-end page view.
+				$candidate    = (int) wp_unslash( $_GET['fg_via'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only breadcrumb hint; the (int) cast sanitizes it.
 				$via_album_id = $candidate > 0 ? $candidate : null;
 			}
-            // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 
-		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
+		[ $thumb_size, $full_size ] = Image_Size_Manager::resolve_setting_slugs( $render_settings );
 
 		// Build a context shell (no items yet) so Module_Registry::active_modules()
 		// can call supports() on each registered sorter. The sorter receives this
@@ -316,7 +310,7 @@ final class Context_Builder {
 		$render_settings            = array_replace_recursive( $base_settings, $settings_overlay );
 		$render_settings            = self::coerce_layout_settings( $render_settings );
 		$warnings                   = array();
-		[ $thumb_size, $full_size ] = $this->resolve_size_settings( $render_settings );
+		[ $thumb_size, $full_size ] = Image_Size_Manager::resolve_setting_slugs( $render_settings );
 		$thumb_size                 = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
 		$collection_items           = $this->load_items( $collection_item_ids, $thumb_size, $full_size );
 		if ( ! empty( $item_overrides ) ) {
@@ -411,7 +405,7 @@ final class Context_Builder {
 			Collection_Kind::ALBUM,
 		);
 
-		[ $thumb_size ] = $this->resolve_size_settings( $render_settings );
+		[ $thumb_size ] = Image_Size_Manager::resolve_setting_slugs( $render_settings );
 		$thumb_size     = $this->apply_layout_thumb_size( $thumb_size, $render_settings );
 
 		// Load gallery-summary items directly via Album_Item_Loader, bypassing
@@ -1027,52 +1021,6 @@ final class Context_Builder {
 	}
 
 	/**
-	 * Extract and resolve image size slugs from render settings.
-	 *
-	 * Handles custom sizes by registering them on the fly if needed.
-	 * Returns a two-element array: [ $thumb_size_slug, $full_size_slug ].
-	 *
-	 * @since  1.0.0
-	 * @param  array<string, mixed> $render_settings
-	 * @return array{string, string}
-	 */
-	private function resolve_size_settings( array $render_settings ): array {
-		$raw_thumb = is_string( $render_settings['thumbnail_size'] ?? null )
-			? $render_settings['thumbnail_size']
-			: Image_Size_Manager::SLUG_THUMBNAIL;
-
-		$raw_full = is_string( $render_settings['full_image_size'] ?? null )
-			? $render_settings['full_image_size']
-			: Image_Size_Manager::SLUG_FULL;
-
-		// If custom thumbnail size, register it and get the deterministic slug
-		$thumb_slug = $raw_thumb;
-		if ( 'custom' === $raw_thumb ) {
-			$w          = max( 1, (int) ( $render_settings['thumbnail_custom_size_width'] ?? 400 ) );
-			$h          = max( 0, (int) ( $render_settings['thumbnail_custom_size_height'] ?? 300 ) );
-			$crop       = (bool) ( $render_settings['thumbnail_custom_size_crop'] ?? true );
-			$alignment  = is_string( $render_settings['thumbnail_custom_size_crop_alignment'] ?? null )
-				? $render_settings['thumbnail_custom_size_crop_alignment']
-				: 'center';
-			$thumb_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
-		}
-
-		// If custom full size, register it similarly
-		$full_slug = $raw_full;
-		if ( 'custom' === $raw_full ) {
-			$w         = max( 1, (int) ( $render_settings['full_image_custom_size_width'] ?? 1920 ) );
-			$h         = max( 0, (int) ( $render_settings['full_image_custom_size_height'] ?? 0 ) );
-			$crop      = (bool) ( $render_settings['full_image_custom_size_crop'] ?? false );
-			$alignment = is_string( $render_settings['full_image_custom_size_crop_alignment'] ?? null )
-				? $render_settings['full_image_custom_size_crop_alignment']
-				: 'center';
-			$full_slug = Image_Size_Manager::register_custom_size( $w, $h, $crop, $alignment );
-		}
-
-		return array( $thumb_slug, $full_slug );
-	}
-
-	/**
 	 * Asks the active layout module for its preferred thumbnail size and
 	 * swaps in for it.
 	 *
@@ -1156,8 +1104,9 @@ final class Context_Builder {
 	 *
 	 * @since 1.0.0
 	 * @param array<string, mixed> $render_settings
+	 * @return bool
 	 */
-	private static function is_snap_pagination_active( array $render_settings ): bool {
+	public static function is_snap_pagination_active( array $render_settings ): bool {
 		if ( ( $render_settings['layout'] ?? '' ) !== 'justified' ) {
 			return false;
 		}

@@ -231,19 +231,26 @@ function readSettings(galleryEl) {
 }
 
 /**
- * The full image URL to load for a slide: the mobile companion at or below
- * the mobile breakpoint, otherwise the full image.
+ * The full image URL for a slide: the mobile companion on the mobile
+ * breakpoint, otherwise the full image.
  *
  * @param {{fullSrc: string, fullMobileSrc?: string}} item
- * @param {number} mobileMax Mobile breakpoint in CSS pixels.
+ * @param {number} mobileMax Mobile breakpoint in CSS pixels; the fallback
+ *        when the runtime is absent.
  * @returns {string}
  */
 function fullSrcForViewport(item, mobileMax) {
-	if (item.fullMobileSrc && window.innerWidth <= mobileMax) {
-		return item.fullMobileSrc;
+	if (!item.fullMobileSrc) {
+		return item.fullSrc;
 	}
 
-	return item.fullSrc;
+	const onMobile =
+		window.FotoGrids &&
+		typeof window.FotoGrids.activeBreakpoint === 'function'
+			? window.FotoGrids.activeBreakpoint() === 'mobile'
+			: window.innerWidth <= mobileMax;
+
+	return onMobile ? item.fullMobileSrc : item.fullSrc;
 }
 
 /**
@@ -1168,7 +1175,6 @@ class FotoGridsLightbox {
 			this._startAuto();
 		}
 
-		this._trackView(this.items[this.index]);
 		this._fire('open', { index: this.index, item: this.items[this.index] });
 	}
 
@@ -1224,7 +1230,6 @@ class FotoGridsLightbox {
 			this._startAuto();
 		}
 
-		this._trackView(this.items[this.index]);
 		this._fire('open', { index: this.index, item: this.items[this.index] });
 	}
 
@@ -3714,25 +3719,6 @@ class FotoGridsLightbox {
 			this._clampZoomOffset();
 			this._applyZoom(true);
 		}
-	}
-
-	_trackView(item) {
-		const cfg = window.fotogrids || {};
-		if (!cfg.stats_tracking || !item || !item.id) return;
-
-		fetch(`${cfg.restUrl}stats/view`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': cfg.nonce,
-			},
-			body: JSON.stringify({
-				object_type: 'item',
-				object_id: parseInt(item.id, 10),
-			}),
-		}).catch((err) => {
-			console.warn('FotoGrids: Error tracking item view:', err);
-		});
 	}
 
 	_fire(name, detail) {

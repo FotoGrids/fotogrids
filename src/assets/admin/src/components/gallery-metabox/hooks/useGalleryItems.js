@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { deleteEmbed } from '../api/embed-api';
+import { deleteEmbed, isEmbedItem } from '../api/embed-api';
 
 /**
  * The shared collection-state manager, published by the admin bootstrap before
@@ -162,22 +162,21 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 
 	const setFeatured = useCallback(
 		async (itemId) => {
-			let nextItemId = null;
-			setItems((prevItems) => {
-				const clickedItem = prevItems.find(
-					(item) => item.id === itemId
-				);
-				const wasFeatured = !!clickedItem?.featured;
-				nextItemId = wasFeatured ? null : itemId;
+			const clickedItem = items.find((item) => item.id === itemId);
+			if (!clickedItem || isEmbedItem(clickedItem)) {
+				return;
+			}
+			const nextItemId = clickedItem.featured ? null : itemId;
 
-				return prevItems.map((item) => ({
+			setItems((prevItems) =>
+				prevItems.map((item) => ({
 					...item,
 					featured: nextItemId !== null && item.id === nextItemId,
-				}));
-			});
+				}))
+			);
 			await saveFeaturedItem(nextItemId);
 		},
-		[saveFeaturedItem]
+		[items, saveFeaturedItem]
 	);
 
 	const deleteEmbedItem = useCallback(
@@ -187,48 +186,35 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 
 	const removeItem = useCallback(
 		(itemId) => {
-			let needsClear = false;
-			let removedEmbed = null;
-			setItems((prevItems) => {
-				const itemToRemove = prevItems.find(
-					(item) => item.id === itemId
-				);
-				needsClear = !!itemToRemove?.featured;
-				const itemType = itemToRemove?.item_type || 'image';
-				if (
-					itemType === 'video_youtube' ||
-					itemType === 'video_vimeo'
-				) {
-					removedEmbed = itemToRemove;
-				}
-				const remainingItems = prevItems.filter(
-					(img) => img.id !== itemId
-				);
+			const itemToRemove = items.find((item) => item.id === itemId);
+			const isEmbed = isEmbedItem(itemToRemove);
 
-				// Embeds are not in the State manager's attachment list, so only
-				// attachment-backed items are removed from it.
+			setItems((prevItems) =>
+				prevItems.filter((item) => item.id !== itemId)
+			);
+
+			// Embeds persist as item_meta rows independent of gallery save, so
+			// removing one from the grid must delete its row via REST. They are
+			// not in the State manager's attachment list.
+			if (isEmbed) {
+				deleteEmbedItem(itemId);
+			} else {
 				const State = collectionState();
-				if (State && !removedEmbed) {
+				if (State) {
 					State.items.removeItem(String(itemId));
 				}
-
-				return remainingItems;
-			});
-			// Embeds persist as item_meta rows independent of gallery save, so
-			// removing one from the grid must delete its row via REST.
-			if (removedEmbed) {
-				deleteEmbedItem(itemId);
 			}
-			if (needsClear) {
+			if (itemToRemove?.featured) {
 				saveFeaturedItem(null);
 			}
 
 			notifyChange('items-remove');
 		},
-		[saveFeaturedItem, deleteEmbedItem]
+		[items, saveFeaturedItem, deleteEmbedItem]
 	);
 
 	const clearAllItems = useCallback(() => {
+		items.filter(isEmbedItem).forEach((item) => deleteEmbedItem(item.id));
 		setItems([]);
 		saveFeaturedItem(null);
 		const State = collectionState();
@@ -236,7 +222,7 @@ const useGalleryItems = ({ galleryItems, strings }) => {
 			State.items.setItems([]);
 		}
 		notifyChange('items-remove-all');
-	}, [saveFeaturedItem]);
+	}, [items, saveFeaturedItem, deleteEmbedItem]);
 
 	// Order has no endpoint of its own: it rides the gallery save through the
 	// hidden `fotogrids_gallery_items[]` inputs each tile renders.

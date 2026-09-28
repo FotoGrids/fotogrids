@@ -12,28 +12,6 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Dashboard_Widget {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * This class is part of the FotoGrids custom-table data layer. Every
-	 * interpolated table name is built as `$wpdb->prefix . 'fotogrids_*'`
-	 * (or a WP core table such as $wpdb->posts) -- a trusted identifier that
-	 * WP placeholders cannot bind. All user-supplied *values* are passed
-	 * through $wpdb->prepare(); where SQL is assembled incrementally or uses
-	 * a generated %d IN() list, the prepare call is a separate statement the
-	 * sniff cannot follow. Custom tables have no WP_Query / core-API
-	 * equivalent and no object-cache layer applies at this level.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
-
 	/**
 	 * Initialize the dashboard widget
 	 */
@@ -167,10 +145,10 @@ class Dashboard_Widget {
 				'color' => 'yellow',
 			),
 			array(
-				'key'   => 'interactions',
+				'key'   => 'engagement',
 				'icon'  => 'click',
-				'label' => __( 'Interactions', 'fotogrids' ),
-				'value' => $stats['views'],
+				'label' => __( 'Engagement', 'fotogrids' ),
+				'value' => $stats['engagement'],
 				'url'   => admin_url( 'admin.php?page=fotogrids-stats' ),
 				'color' => 'grey',
 			),
@@ -290,33 +268,29 @@ class Dashboard_Widget {
 	}
 
 	/**
-	 * Get statistics
+	 * Published gallery, album and item counts, plus all-time engagement (views and shares).
 	 *
 	 * @return array Statistics data
 	 */
 	private static function get_stats() {
 		global $wpdb;
 
-		$gallery_counts  = wp_count_posts( 'fotogrids_gallery' );
-		$galleries_count = (int) ( array_sum( (array) $gallery_counts ) ?? 0 );
+		$galleries_count = (int) wp_count_posts( 'fotogrids_gallery' )->publish;
+		$albums_count    = (int) wp_count_posts( 'fotogrids_album' )->publish;
+		$items_count     = \FotoGrids\Galleries\Gallery_Repository::count_all_items( array( 'publish' ) );
 
-		$album_counts = wp_count_posts( 'fotogrids_album' );
-		$albums_count = (int) ( array_sum( (array) $album_counts ) ?? 0 );
-
-		$items_count = \FotoGrids\Galleries\Gallery_Repository::count_all_items( array( 'publish', 'future', 'draft', 'pending', 'private' ) );
-
-		$total_views = 0;
+		$engagement  = 0;
 		$stats_table = $wpdb->prefix . 'fotogrids_statistics';
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $stats_table ) ) === $stats_table ) {
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $stats_table ) ) === $stats_table ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table-existence check; no core API applies.
 			$stats_totals = \FotoGrids\Statistics::get_totals();
-			$total_views  = (int) ( $stats_totals['total_views'] ?? 0 );
+			$engagement   = (int) $stats_totals['total_views'] + (int) $stats_totals['total_shares'];
 		}
 
 		return array(
-			'galleries' => $galleries_count,
-			'albums'    => $albums_count,
-			'items'     => $items_count,
-			'views'     => $total_views,
+			'galleries'  => $galleries_count,
+			'albums'     => $albums_count,
+			'items'      => $items_count,
+			'engagement' => $engagement,
 		);
 	}
 
@@ -346,12 +320,4 @@ class Dashboard_Widget {
 	private static function get_logo_svg() {
 		return \FotoGrids\Svg::fotogrids_icon( array( 'size' => 20 ) );
 	}
-
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
 }

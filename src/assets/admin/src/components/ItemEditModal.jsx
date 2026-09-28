@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ItemPreviewPane, ItemEditTabs } from './item-edit-modal/ModalBody';
-import { Modal } from './shared/Modal';
+import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
 import { buildRestUrl } from '../utils/rest-url';
+import useMetadataSuggestions from './item-edit-modal/useMetadataSuggestions';
 
 /**
  * Metadata type registry.
@@ -63,20 +64,21 @@ const ItemEditModal = ({
         people: [],
         locations: []
     });
-    const [availableMetadata, setAvailableMetadata] = useState({
-        tags: [],
-        people: [],
-        locations: []
-    });
     const [metadataInput, setMetadataInput] = useState({
         tags: '',
         people: '',
         locations: ''
     });
+    const availableMetadata = {
+        tags: useMetadataSuggestions('tags', metadataInput.tags),
+        people: useMetadataSuggestions('people', metadataInput.people),
+        locations: useMetadataSuggestions('locations', metadataInput.locations)
+    };
     const [saving, setSaving] = useState(false);
     const [originalData, setOriginalData] = useState(null);
     const [originalMetadata, setOriginalMetadata] = useState(null);
     const [hasChanges, setHasChanges] = useState(false);
+    const [discardPrompt, setDiscardPrompt] = useState({ open: false, action: null });
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [videoSettings, setVideoSettings] = useState({});
     const [originalVideoSettings, setOriginalVideoSettings] = useState({});
@@ -129,7 +131,6 @@ const ItemEditModal = ({
     useEffect(() => {
         if (itemId) {
             loadItemMetadata();
-            loadAvailableMetadata();
         }
     }, [itemId]);
 
@@ -180,30 +181,6 @@ const ItemEditModal = ({
         }
     };
 
-    const loadAvailableMetadata = async () => {
-        try {
-            const nonce = window.wpApiSettings?.nonce;
-            const readList = async (type) => {
-                const response = await fetch(buildRestUrl(`fotogrids/v1/metadata/${type}`, { _wpnonce: nonce }));
-                if (!response.ok) {
-                    return [];
-                }
-                const data = await response.json();
-                return Array.isArray(data) ? data : [];
-            };
-
-            const [tags, people, locations] = await Promise.all([
-                readList('tags'),
-                readList('people'),
-                readList('locations')
-            ]);
-
-            setAvailableMetadata({ tags, people, locations });
-        } catch (error) {
-            console.warn('Failed to load available metadata:', error);
-        }
-    };
-
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
             ...prev,
@@ -229,17 +206,16 @@ const ItemEditModal = ({
             // For replace-type keys (maxItems === 1, e.g. locations), replace
             // the existing entry rather than appending.
             const REPLACE_TYPES = ['locations'];
-            setMetadata(prev => ({
-                ...prev,
-                [type]: REPLACE_TYPES.includes(type) ? [newItem] : [...prev[type], newItem]
-            }));
+            setMetadata(prev => {
+                if (prev[type].some(item => item.id === newItem.id)) {
+                    return prev;
+                }
 
-            setAvailableMetadata(prev => ({
-                ...prev,
-                [type]: prev[type].some(item => item.id === newItem.id)
-                    ? prev[type]
-                    : [...prev[type], newItem]
-            }));
+                return {
+                    ...prev,
+                    [type]: REPLACE_TYPES.includes(type) ? [newItem] : [...prev[type], newItem]
+                };
+            });
 
             setMetadataInput(prev => ({ ...prev, [type]: '' }));
         } catch (error) {
@@ -359,22 +335,32 @@ const ItemEditModal = ({
         }
     };
 
+    const closeModal = () => {
+        setHasChanges(false);
+        onClose();
+    };
+
+    const navigateTo = (direction) => {
+        setHasChanges(false);
+        onNavigate(direction);
+    };
+
+    /**
+     * Close the modal, asking first when there are unsaved changes.
+     * Covers the overlay, Esc, the header close button and the footer Close
+     * button, all of which reach the modal through this handler.
+     */
     const handleClose = () => {
         if (saving) {
             return;
         }
 
         if (hasChanges) {
-            const confirmMessage = strings.unsavedChangesConfirm ||
-                'You have unsaved changes. Are you sure you want to close without saving?';
-
-            if (!window.confirm(confirmMessage)) {
-                return;
-            }
+            setDiscardPrompt({ open: true, action: 'close' });
+            return;
         }
 
-        setHasChanges(false);
-        onClose();
+        closeModal();
     };
 
     const handleNavigate = (direction) => {
@@ -383,22 +369,29 @@ const ItemEditModal = ({
         }
 
         if (hasChanges) {
-            const confirmMessage = strings.unsavedChangesNavigate ||
-                'You have unsaved changes. Are you sure you want to navigate away without saving?';
-
-            if (!window.confirm(confirmMessage)) {
-                return;
-            }
+            setDiscardPrompt({ open: true, action: direction });
+            return;
         }
 
-        setHasChanges(false);
-        onNavigate(direction);
+        navigateTo(direction);
+    };
+
+    const discardChanges = () => {
+        const { action } = discardPrompt;
+        setDiscardPrompt((prompt) => ({ ...prompt, open: false }));
+
+        if (action === 'close') {
+            closeModal();
+        } else if (action) {
+            navigateTo(action);
+        }
     };
 
     const currentIndex = items.findIndex(img => img.id === itemId);
     const hasMultipleItems = items.length > 1;
 
     return (
+        <>
         <Modal
             isOpen
             onClose={handleClose}
@@ -474,6 +467,23 @@ const ItemEditModal = ({
                 </>
             )}
         </Modal>
+
+        <Confirm
+            isOpen={discardPrompt.open}
+            onClose={() => setDiscardPrompt((prompt) => ({ ...prompt, open: false }))}
+            onConfirm={discardChanges}
+            variant="warning"
+            headerIcon={false}
+            title={strings.unsavedChangesTitle}
+            message={discardPrompt.action === 'close'
+                ? strings.unsavedChangesConfirm
+                : strings.unsavedChangesNavigate}
+            confirmLabel={strings.unsavedChangesDiscard}
+            confirmVariant="secondary"
+            cancelLabel={strings.unsavedChangesKeepEditing}
+            cancelVariant="primary"
+        />
+        </>
     );
 };
 

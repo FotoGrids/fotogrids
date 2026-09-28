@@ -14,29 +14,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Admin_Data {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Admin_Data backs admin-only REST endpoints over the custom fotogrids_*
-	 * tables. The WPDB sniffs below are suppressed class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom tables with no WP_Query /
-	 *    core API equivalent; direct $wpdb access is required.
-	 *  - DirectDatabaseQuery.NoCaching: admin dashboard reads triggered on
-	 *    explicit navigation, not a render hot path; caching is a non-goal.
-	 *  - PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal - WP
-	 *    placeholders cannot bind table identifiers). All user-supplied
-	 *    *values* are passed through $wpdb->prepare().
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Add galleries to album
@@ -929,7 +907,7 @@ class Admin_Data {
 
 		$stats_table  = $wpdb->prefix . 'fotogrids_statistics';
 		$totals       = $wpdb->get_row(
-			"SELECT SUM(views) AS views, SUM(shares) AS shares FROM $stats_table",
+			$wpdb->prepare( 'SELECT SUM(views) AS views, SUM(shares) AS shares FROM %i', $stats_table ),
 			ARRAY_A
 		);
 		$views_count  = isset( $totals['views'] ) ? (int) $totals['views'] : 0;
@@ -973,29 +951,33 @@ class Admin_Data {
 		global $wpdb;
 		$daily_table = $wpdb->prefix . 'fotogrids_statistics_daily';
 
+		$today          = self::site_date( 0 )->format( 'Y-m-d' );
+		$current_start  = self::site_date( $days - 1 )->format( 'Y-m-d' );
+		$previous_first = self::site_date( ( 2 * $days ) - 1 );
+
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT
-                    SUM(CASE WHEN viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN views  ELSE 0 END) AS views_current,
-                    SUM(CASE WHEN viewed_date <  DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN views  ELSE 0 END) AS views_previous,
-                    SUM(CASE WHEN viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN shares ELSE 0 END) AS shares_current,
-                    SUM(CASE WHEN viewed_date <  DATE_SUB(CURDATE(), INTERVAL %d DAY) THEN shares ELSE 0 END) AS shares_previous
-                 FROM $daily_table
-                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
-                   AND viewed_date <= CURDATE()",
-				$days - 1,
-				$days - 1,
-				$days - 1,
-				$days - 1,
-				( 2 * $days ) - 1
+				'SELECT
+                    SUM(CASE WHEN viewed_date >= %s THEN views  ELSE 0 END) AS views_current,
+                    SUM(CASE WHEN viewed_date <  %s THEN views  ELSE 0 END) AS views_previous,
+                    SUM(CASE WHEN viewed_date >= %s THEN shares ELSE 0 END) AS shares_current,
+                    SUM(CASE WHEN viewed_date <  %s THEN shares ELSE 0 END) AS shares_previous
+                 FROM %i
+                 WHERE viewed_date >= %s
+                   AND viewed_date <= %s',
+				$current_start,
+				$current_start,
+				$current_start,
+				$current_start,
+				$daily_table,
+				$previous_first->format( 'Y-m-d' ),
+				$today
 			),
 			ARRAY_A
 		);
 
-		// Formatted with gmdate to match the window the SQL above selected and
-		// the axis labels in get_views_data().
-		$previous_start = gmdate( 'M j', strtotime( '-' . ( ( 2 * $days ) - 1 ) . ' days' ) );
-		$previous_end   = gmdate( 'M j', strtotime( '-' . $days . ' days' ) );
+		$previous_start = $previous_first->format( 'M j' );
+		$previous_end   = self::site_date( $days )->format( 'M j' );
 
 		return array(
 			'days'            => $days,
@@ -1006,6 +988,17 @@ class Admin_Data {
 			'previous_start'  => $previous_start,
 			'previous_end'    => $previous_end,
 		);
+	}
+
+	/**
+	 * Returns the site-local date a given number of days before today.
+	 *
+	 * @since 1.1.4
+	 * @param int $days_ago Days before today.
+	 * @return \DateTimeImmutable
+	 */
+	private static function site_date( int $days_ago ): \DateTimeImmutable {
+		return ( new \DateTimeImmutable( 'today', wp_timezone() ) )->modify( '-' . $days_ago . ' days' );
 	}
 
 	/**
@@ -1094,13 +1087,15 @@ class Admin_Data {
 		// represented.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT viewed_date, SUM(views) AS daily_views
-             FROM $daily_table
-             WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
-               AND viewed_date <= CURDATE()
+				'SELECT viewed_date, SUM(views) AS daily_views
+             FROM %i
+             WHERE viewed_date >= %s
+               AND viewed_date <= %s
              GROUP BY viewed_date
-             ORDER BY viewed_date ASC",
-				( 2 * $days ) - 1
+             ORDER BY viewed_date ASC',
+				$daily_table,
+				self::site_date( ( 2 * $days ) - 1 )->format( 'Y-m-d' ),
+				self::site_date( 0 )->format( 'Y-m-d' )
 			),
 			ARRAY_A
 		);
@@ -1115,13 +1110,14 @@ class Admin_Data {
 		$previous = array();
 
 		for ( $i = $days - 1; $i >= 0; $i-- ) {
-			$date     = gmdate( 'Y-m-d', strtotime( "-$i days" ) );
-			$labels[] = gmdate( 'M j', strtotime( "-$i days" ) );
+			$day      = self::site_date( $i );
+			$date     = $day->format( 'Y-m-d' );
+			$labels[] = $day->format( 'M j' );
 			$data[]   = $views_by_date[ $date ] ?? 0;
 
 			// Same weekday offset one window earlier, so the two lines compare
 			// like for like.
-			$prior_date = gmdate( 'Y-m-d', strtotime( '-' . ( $i + $days ) . ' days' ) );
+			$prior_date = self::site_date( $i + $days )->format( 'Y-m-d' );
 			$previous[] = $views_by_date[ $prior_date ] ?? 0;
 		}
 
@@ -1157,13 +1153,14 @@ class Admin_Data {
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT object_id, SUM(views) AS total_views
-                 FROM $daily_table
+                 FROM %i
                  WHERE object_type = 'gallery'
-                   AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                   AND viewed_date >= %s
                  GROUP BY object_id
-                 ORDER BY total_views DESC
+                 ORDER BY total_views DESC, object_id ASC
                  LIMIT 10",
-					$days - 1
+					$daily_table,
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				),
 				ARRAY_A
 			);
@@ -1171,27 +1168,34 @@ class Admin_Data {
 			$total_views = (int) $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT SUM(views)
-                 FROM $daily_table
+                 FROM %i
                  WHERE object_type = 'gallery'
-                   AND viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)",
-					$days - 1
+                   AND viewed_date >= %s",
+					$daily_table,
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				)
 			);
 		} else {
 			$results = $wpdb->get_results(
-				"SELECT object_id, SUM(views) AS total_views
-                 FROM $stats_table
+				$wpdb->prepare(
+					"SELECT object_id, SUM(views) AS total_views
+                 FROM %i
                  WHERE object_type = 'gallery'
                  GROUP BY object_id
-                 ORDER BY total_views DESC
+                 ORDER BY total_views DESC, object_id ASC
                  LIMIT 10",
+					$stats_table
+				),
 				ARRAY_A
 			);
 
 			$total_views = (int) $wpdb->get_var(
-				"SELECT SUM(views)
-                 FROM $stats_table
-                 WHERE object_type = 'gallery'"
+				$wpdb->prepare(
+					"SELECT SUM(views)
+                 FROM %i
+                 WHERE object_type = 'gallery'",
+					$stats_table
+				)
 			);
 		}
 
@@ -1237,21 +1241,25 @@ class Admin_Data {
 		if ( $days > 0 ) {
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT object_type, object_id, views, last_viewed
-                 FROM $stats_table
-                 WHERE last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)
+					'SELECT object_type, object_id, views, last_viewed
+                 FROM %i
+                 WHERE last_viewed >= %s
                  ORDER BY last_viewed DESC
-                 LIMIT 20",
-					$days
+                 LIMIT 20',
+					$stats_table,
+					gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) )
 				),
 				ARRAY_A
 			);
 		} else {
 			$results = $wpdb->get_results(
-				"SELECT object_type, object_id, views, last_viewed
-                 FROM $stats_table
+				$wpdb->prepare(
+					'SELECT object_type, object_id, views, last_viewed
+                 FROM %i
                  ORDER BY last_viewed DESC
-                 LIMIT 20",
+                 LIMIT 20',
+					$stats_table
+				),
 				ARRAY_A
 			);
 		}
@@ -1266,8 +1274,7 @@ class Admin_Data {
 					'title'       => $post->post_title,
 					'type'        => $result['object_type'],
 					'views'       => (int) $result['views'],
-					// strtotime() on the stored MySQL datetime yields a server-local epoch; current_time('timestamp') matches that frame for human_time_diff().
-					'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] ), current_time( 'timestamp' ) ) . ' ago', // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- intentional local-frame pairing.
+					'last_viewed' => human_time_diff( strtotime( $result['last_viewed'] . ' UTC' ), time() ) . ' ago',
 					'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
 				);
 			}
@@ -1297,36 +1304,41 @@ class Admin_Data {
 		if ( $days > 0 ) {
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT object_type, object_id,
+					'SELECT object_type, object_id,
                         SUM(views) AS views, SUM(shares) AS shares
-                 FROM $daily_table
-                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+                 FROM %i
+                 WHERE viewed_date >= %s
                  GROUP BY object_type, object_id
-                 ORDER BY views DESC
-                 LIMIT 20",
-					$days - 1
+                 ORDER BY views DESC, object_type ASC, object_id ASC
+                 LIMIT 20',
+					$daily_table,
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				),
 				ARRAY_A
 			);
 
 			$total_views = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT SUM(views)
-                 FROM $daily_table
-                 WHERE viewed_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)",
-					$days - 1
+					'SELECT SUM(views)
+                 FROM %i
+                 WHERE viewed_date >= %s',
+					$daily_table,
+					self::site_date( $days - 1 )->format( 'Y-m-d' )
 				)
 			);
 		} else {
 			$results = $wpdb->get_results(
-				"SELECT object_type, object_id, views, shares
-                 FROM $stats_table
-                 ORDER BY views DESC
-                 LIMIT 20",
+				$wpdb->prepare(
+					'SELECT object_type, object_id, views, shares
+                 FROM %i
+                 ORDER BY views DESC, object_type ASC, object_id ASC
+                 LIMIT 20',
+					$stats_table
+				),
 				ARRAY_A
 			);
 
-			$total_views = (int) $wpdb->get_var( "SELECT SUM(views) FROM $stats_table" );
+			$total_views = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT SUM(views) FROM %i', $stats_table ) );
 		}
 
 		$content = array();
@@ -1504,9 +1516,5 @@ class Admin_Data {
 		);
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

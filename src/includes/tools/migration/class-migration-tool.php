@@ -43,6 +43,10 @@ class Migration_Tool extends Abstract_Tool {
 		return 'import';
 	}
 
+	public function get_image(): ?string {
+		return FOTOGRIDS_PLUGIN_URL . 'assets/admin/images/tools/migration.svg';
+	}
+
 	public function get_image_bg_color(): ?string {
 		return 'var(--fg-blue-dark)';
 	}

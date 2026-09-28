@@ -15,33 +15,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Statistics {
 
-	/*
-	 * ---------------------------------------------------------------------
-	 * PHPCS: WPDB direct-query sniffs disabled for this class.
-	 * ---------------------------------------------------------------------
-	 * Statistics is the data layer for the custom fotogrids_statistics
-	 * table(s). The WPDB sniffs below are suppressed class-wide:
-	 *
-	 *  - DirectDatabaseQuery.DirectQuery: custom tables with no WP_Query /
-	 *    core API equivalent; direct $wpdb access is required.
-	 *  - DirectDatabaseQuery.NoCaching: counters are written on view/share
-	 *    events and read for admin reporting; caching a constantly-mutating
-	 *    counter would be counterproductive, so it is an intentional non-goal.
-	 *  - PreparedSQL.NotPrepared / PreparedSQL.InterpolatedNotPrepared /
-	 *    Security.DirectDB.UnescapedDBParameter: every interpolated table
-	 *    name is `$wpdb->prefix . 'fotogrids_*'` (a trusted literal - WP
-	 *    placeholders cannot bind table identifiers). All user-supplied
-	 *    *values* are passed through $wpdb->prepare(); where SQL is built
-	 *    incrementally the prepare call is a separate statement from the
-	 *    get_*()/query() call, which the sniff cannot follow.
-	 * ---------------------------------------------------------------------
-	 */
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:disable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom-table data layer; no core API or object cache applies.
 
 	/**
 	 * Increment a statistic counter
@@ -72,14 +46,21 @@ class Statistics {
 			return false;
 		}
 
+		$now = current_time( 'mysql', true );
+
 		$updated = $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE $table
-             SET $field = $field + %d,
-                 last_viewed = NOW(),
-                 updated_at = NOW()
-             WHERE object_type = %s AND object_id = %d",
+				'UPDATE %i
+             SET %i = %i + %d,
+                 last_viewed = %s,
+                 updated_at = %s
+             WHERE object_type = %s AND object_id = %d',
+				$table,
+				$field,
+				$field,
 				$amount,
+				$now,
+				$now,
 				$object_type,
 				$object_id
 			)
@@ -95,9 +76,9 @@ class Statistics {
 				'object_id'   => $object_id,
 				'views'       => ( 'views' === $field ) ? $amount : 0,
 				'shares'      => ( 'shares' === $field ) ? $amount : 0,
-				'last_viewed' => current_time( 'mysql', true ),
-				'created_at'  => current_time( 'mysql', true ),
-				'updated_at'  => current_time( 'mysql', true ),
+				'last_viewed' => $now,
+				'created_at'  => $now,
+				'updated_at'  => $now,
 			);
 
 			$inserted = $wpdb->insert(
@@ -137,9 +118,10 @@ class Statistics {
 		if ( 'views' === $field ) {
 			$wpdb->query(
 				$wpdb->prepare(
-					"INSERT INTO $daily_table (object_type, object_id, viewed_date, views, shares)
+					'INSERT INTO %i (object_type, object_id, viewed_date, views, shares)
                  VALUES (%s, %d, %s, %d, 0)
-                 ON DUPLICATE KEY UPDATE views = views + %d",
+                 ON DUPLICATE KEY UPDATE views = views + %d',
+					$daily_table,
 					$object_type,
 					$object_id,
 					$today,
@@ -150,9 +132,10 @@ class Statistics {
 		} else {
 			$wpdb->query(
 				$wpdb->prepare(
-					"INSERT INTO $daily_table (object_type, object_id, viewed_date, views, shares)
+					'INSERT INTO %i (object_type, object_id, viewed_date, views, shares)
                  VALUES (%s, %d, %s, 0, %d)
-                 ON DUPLICATE KEY UPDATE shares = shares + %d",
+                 ON DUPLICATE KEY UPDATE shares = shares + %d',
+					$daily_table,
 					$object_type,
 					$object_id,
 					$today,
@@ -177,7 +160,8 @@ class Statistics {
 
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM $table WHERE object_type = %s AND object_id = %d",
+				'SELECT * FROM %i WHERE object_type = %s AND object_id = %d',
+				$table,
 				$object_type,
 				$object_id
 			),
@@ -198,92 +182,6 @@ class Statistics {
 	}
 
 	/**
-	 * Get top performing objects by views
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $limit Number of results to return
-	 * @param int $days Number of days to look back (0 for all time)
-	 * @return array Array of objects with statistics
-	 */
-	public static function get_top_by_views( $object_type, $limit = 10, $days = 0 ) {
-		global $wpdb;
-
-		$table = $wpdb->prefix . 'fotogrids_statistics';
-		$limit = (int) $limit;
-
-		$where_date = '';
-		$params     = array( $object_type );
-
-		if ( $days > 0 ) {
-			$where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
-			$params[]   = $days;
-		}
-
-		$params[] = $limit;
-
-		$sql = "SELECT object_id, views, shares, last_viewed
-                FROM $table
-                WHERE object_type = %s $where_date
-                ORDER BY views DESC
-                LIMIT %d";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-
-		$enriched = array();
-		foreach ( $results as $row ) {
-			$object_data = self::get_object_data( $object_type, $row['object_id'] );
-			if ( $object_data ) {
-				$enriched[] = array_merge( $row, $object_data );
-			}
-		}
-
-		return $enriched;
-	}
-
-	/**
-	 * Get top performing objects by shares
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $limit Number of results to return
-	 * @param int $days Number of days to look back (0 for all time)
-	 * @return array Array of objects with statistics
-	 */
-	public static function get_top_by_shares( $object_type, $limit = 10, $days = 0 ) {
-		global $wpdb;
-
-		$table = $wpdb->prefix . 'fotogrids_statistics';
-		$limit = (int) $limit;
-
-		$where_date = '';
-		$params     = array( $object_type );
-
-		if ( $days > 0 ) {
-			$where_date = ' AND last_viewed >= DATE_SUB(NOW(), INTERVAL %d DAY)';
-			$params[]   = $days;
-		}
-
-		$params[] = $limit;
-
-		$sql = "SELECT object_id, views, shares, last_viewed
-                FROM $table
-                WHERE object_type = %s $where_date
-                ORDER BY shares DESC
-                LIMIT %d";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
-
-		$enriched = array();
-		foreach ( $results as $row ) {
-			$object_data = self::get_object_data( $object_type, $row['object_id'] );
-			if ( $object_data ) {
-				$enriched[] = array_merge( $row, $object_data );
-			}
-		}
-
-		return $enriched;
-	}
-
-	/**
 	 * Get total statistics
 	 *
 	 * @return array Total views and shares across all objects
@@ -294,11 +192,14 @@ class Statistics {
 		$table = $wpdb->prefix . 'fotogrids_statistics';
 
 		$result = $wpdb->get_row(
-			"SELECT
+			$wpdb->prepare(
+				'SELECT
                 SUM(views) as total_views,
                 SUM(shares) as total_shares,
                 COUNT(DISTINCT object_id) as total_objects
-             FROM $table",
+             FROM %i',
+				$table
+			),
 			ARRAY_A
 		);
 
@@ -322,58 +223,13 @@ class Statistics {
 
 		$deleted = $wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM $table WHERE last_viewed < DATE_SUB(NOW(), INTERVAL %d DAY)",
-				$days
+				'DELETE FROM %i WHERE last_viewed < %s',
+				$table,
+				gmdate( 'Y-m-d H:i:s', time() - ( (int) $days * DAY_IN_SECONDS ) )
 			)
 		);
 
 		return $deleted;
-	}
-
-	/**
-	 * Get object data based on type and ID
-	 *
-	 * @param string $object_type Type of object
-	 * @param int $object_id ID of the object
-	 * @return array|null Object data or null if not found
-	 */
-	private static function get_object_data( $object_type, $object_id ) {
-		switch ( $object_type ) {
-			case 'gallery':
-				$post = get_post( $object_id );
-				if ( $post && 'fotogrids_gallery' === $post->post_type ) {
-					return array(
-						'title'     => $post->post_title,
-						'url'       => get_permalink( $post->ID ),
-						'thumbnail' => \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'thumbnail' ),
-					);
-				}
-				break;
-
-			case 'album':
-				$post = get_post( $object_id );
-				if ( $post && 'fotogrids_album' === $post->post_type ) {
-					return array(
-						'title'     => $post->post_title,
-						'url'       => get_permalink( $post->ID ),
-						'thumbnail' => \FotoGrids\Galleries\Cover_Resolver::url_for_collection( $post->ID, 'thumbnail' ),
-					);
-				}
-				break;
-
-			case 'item':
-				$attachment = get_post( $object_id );
-				if ( $attachment && 'attachment' === $attachment->post_type ) {
-					return array(
-						'title'     => $attachment->post_title,
-						'url'       => wp_get_attachment_url( $object_id ),
-						'thumbnail' => wp_get_attachment_image_url( $object_id, 'thumbnail' ),
-					);
-				}
-				break;
-		}
-
-		return null;
 	}
 
 	/**
@@ -393,12 +249,7 @@ class Statistics {
 		self::cleanup_old_data( $days_to_keep );
 	}
 
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
-    // phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-    // phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
-    // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:enable WordPress.Security.DirectDB.UnescapedDBParameter
-    // phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter
+	// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
 
 add_action( 'init', array( 'FotoGrids\Statistics', 'init_cleanup_schedule' ) );

@@ -16,7 +16,7 @@
 ( function () {
     'use strict';
 
-    const VERSION = '1.1.0';
+    const VERSION = '1.2.0';
 
     /**
      * Three independent callback queues, one per public subscription API.
@@ -61,6 +61,168 @@
      * @type {MutationObserver|null}
      */
     let collectionObserver = null;
+
+
+    /**
+     * Used until a wrapper supplies the site's configuration.
+     *
+     * @type {{ mobile: number, tablet: number, detect: string }}
+     */
+    const DEFAULT_BREAKPOINTS = { mobile: 767, tablet: 1024, detect: 'viewport' };
+
+    /**
+     * @type {{ mobile: number, tablet: number, detect: string }|null}
+     */
+    let breakpointConfig = null;
+
+
+    /**
+     * The site's breakpoint configuration. Every wrapper carries the same
+     * values, so the first one found answers for the page.
+     *
+     * @return {{ mobile: number, tablet: number, detect: string }}
+     */
+    function readBreakpoints() {
+        if ( breakpointConfig ) {
+            return breakpointConfig;
+        }
+
+        const el = document.querySelector( '.fotogrids-collection[data-fg-breakpoints]' );
+        if ( ! el ) {
+            return DEFAULT_BREAKPOINTS;
+        }
+
+        const widths = el.getAttribute( 'data-fg-breakpoints' ).trim().split( /\s+/ );
+        const mobile = parseInt( widths[ 0 ], 10 );
+        const tablet = parseInt( widths[ 1 ], 10 );
+
+        breakpointConfig = {
+            mobile: mobile > 0 ? mobile : DEFAULT_BREAKPOINTS.mobile,
+            tablet: tablet > 0 ? tablet : DEFAULT_BREAKPOINTS.tablet,
+            detect: el.getAttribute( 'data-fg-breakpoint-detect' ) === 'device' ? 'device' : 'viewport',
+        };
+
+        return breakpointConfig;
+    }
+
+    /**
+     * @param {string} query
+     * @return {boolean|null} Null where matchMedia is missing.
+     */
+    function mediaMatches( query ) {
+        if ( typeof window.matchMedia !== 'function' ) {
+            return null;
+        }
+        return window.matchMedia( query ).matches;
+    }
+
+    /**
+     * @param {number} width
+     * @param {{ mobile: number, tablet: number }} config
+     * @return {string} 'desktop', 'tablet' or 'mobile'.
+     */
+    function breakpointForWidth( width, config ) {
+        if ( width <= config.mobile ) {
+            return 'mobile';
+        }
+        if ( width <= config.tablet ) {
+            return 'tablet';
+        }
+        return 'desktop';
+    }
+
+    /**
+     * Classifies the window, using the same max-width conditions as the
+     * server-emitted @media blocks.
+     *
+     * @param {{ mobile: number, tablet: number }} config
+     * @return {string}
+     */
+    function viewportBreakpoint( config ) {
+        const isMobile = mediaMatches( '(max-width: ' + config.mobile + 'px)' );
+        if ( null === isMobile ) {
+            return breakpointForWidth( window.innerWidth || document.documentElement.clientWidth || 0, config );
+        }
+        if ( isMobile ) {
+            return 'mobile';
+        }
+        return mediaMatches( '(max-width: ' + config.tablet + 'px)' ) ? 'tablet' : 'desktop';
+    }
+
+    /**
+     * Classifies the device rather than the window, by the short side of its
+     * screen, so a phone stays mobile in landscape and a narrowed desktop
+     * window stays desktop.
+     *
+     * @param {{ mobile: number, tablet: number }} config
+     * @return {string}
+     */
+    function deviceBreakpoint( config ) {
+        if ( ! mediaMatches( '(pointer: coarse)' ) ) {
+            return 'desktop';
+        }
+
+        const screen = window.screen;
+        const shortSide = screen ? Math.min( screen.width || 0, screen.height || 0 ) : 0;
+        if ( shortSide > 0 ) {
+            return breakpointForWidth( shortSide, config );
+        }
+
+        // Tablets report mobile: true as often as phones do, so this only
+        // decides when the screen size is unreadable.
+        const uaData = window.navigator && window.navigator.userAgentData;
+        if ( uaData && true === uaData.mobile ) {
+            return 'mobile';
+        }
+
+        return viewportBreakpoint( config );
+    }
+
+    /**
+     * @return {string} 'desktop', 'tablet' or 'mobile'.
+     */
+    function activeBreakpoint() {
+        const config = readBreakpoints();
+        return config.detect === 'device' ? deviceBreakpoint( config ) : viewportBreakpoint( config );
+    }
+
+    /**
+     * Writes the device class to html[data-fg-breakpoint], which the rules
+     * Breakpoint_Config::scope() emits in device mode select on.
+     */
+    function applyBreakpointAttribute() {
+        const config = readBreakpoints();
+        if ( config.detect !== 'device' || config === DEFAULT_BREAKPOINTS ) {
+            return;
+        }
+        document.documentElement.setAttribute( 'data-fg-breakpoint', deviceBreakpoint( config ) );
+    }
+
+    /**
+     * The client-side counterpart of Breakpoint_Config::scope().
+     *
+     * @param {string} breakpoint   'tablet' or 'mobile'.
+     * @param {string} selector
+     * @param {string} declarations Declarations without braces.
+     * @return {string}
+     */
+    function scopeCss( breakpoint, selector, declarations ) {
+        const config = readBreakpoints();
+        const width = breakpoint === 'mobile' ? config.mobile : config.tablet;
+        const media = '@media (max-width: ' + width + 'px) { ';
+
+        if ( config.detect !== 'device' ) {
+            return media + selector + ' { ' + declarations + ' } }';
+        }
+
+        const classes = breakpoint === 'mobile' ? [ 'mobile' ] : [ 'tablet', 'mobile' ];
+        const selectors = classes.map( function ( name ) {
+            return 'html[data-fg-breakpoint="' + name + '"] ' + selector;
+        } );
+
+        return selectors.join( ', ' ) + ' { ' + declarations + ' }\n'
+            + media + 'html:not([data-fg-breakpoint]) ' + selector + ' { ' + declarations + ' } }';
+    }
 
 
     /**
@@ -132,6 +294,8 @@
             return;
         }
         initialized.add( collectionElement );
+
+        applyBreakpointAttribute();
 
         const kind = collectionKind( collectionElement );
 
@@ -331,6 +495,31 @@
         },
 
         /**
+         * The visitor's breakpoint under the site's detection mode.
+         *
+         * @return {string} 'desktop', 'tablet' or 'mobile'.
+         */
+        activeBreakpoint: activeBreakpoint,
+
+        /**
+         * @return {{ mobile: number, tablet: number, detect: string }} A copy.
+         */
+        getBreakpoints: function () {
+            const config = readBreakpoints();
+            return { mobile: config.mobile, tablet: config.tablet, detect: config.detect };
+        },
+
+        /**
+         * Scopes declarations to a breakpoint and every narrower one.
+         *
+         * @param {string} breakpoint   'tablet' or 'mobile'.
+         * @param {string} selector
+         * @param {string} declarations Declarations without braces.
+         * @return {string}
+         */
+        scopeCss: scopeCss,
+
+        /**
          * Namespace where feature modules register their cross-module APIs.
          * Populated by modules; the runtime itself never reads or writes
          * properties on this object.
@@ -351,6 +540,9 @@
     // the page (defer) can already call onGallery()/onAlbum()/onCollection()
     // during their own init.
     window.FotoGrids = publicApi;
+
+    // The runtime loads after the wrappers, so this need not wait for DOMReady.
+    applyBreakpointAttribute();
 
     if ( document.readyState === 'loading' ) {
         document.addEventListener( 'DOMContentLoaded', boot );
