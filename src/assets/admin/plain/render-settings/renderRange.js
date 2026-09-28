@@ -123,12 +123,13 @@ window.FotoGridsRenderSettings.renderRange = (
 								value,
 								onChange: (e) => {
 									const v = parseInt(e.target.value);
-									!isDisabled &&
+									if (!isDisabled) {
 										updateValue(
 											Number.isFinite(v)
 												? v
 												: (setting.default ?? 0)
 										);
+									}
 								},
 								disabled: isDisabled,
 								className: 'fotogrids-range-number-input',

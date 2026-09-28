@@ -475,7 +475,7 @@ LibraryTableHead.displayName = 'LibraryTableHead';
  * via the `config` prop. Keeping it shared means a bug-fix in one place
  * applies to every tab.
  */
-const LibraryTabBase = ({ entityType, config }) => {
+const LibraryTabBase = ({ entityType }) => {
 	const library = window.fotogridsLibrary || {};
 	const restBase = library.restBase || 'fotogrids/v1/library';
 	const canManage = Boolean(library.canManage);

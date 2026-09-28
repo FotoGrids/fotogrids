@@ -1521,7 +1521,9 @@ class FotoGridsLightbox {
 			this._renderDots();
 			this._renderThumbs();
 			// Refreshes the counter even while the current slot is still null.
-			this._updateCounter && this._updateCounter();
+			if (this._updateCounter) {
+				this._updateCounter();
+			}
 		} catch (e) {
 			// A failed partial re-render must not break the open lightbox.
 		}
@@ -2997,7 +2999,7 @@ class FotoGridsLightbox {
 					this._fillInfoBlocksFromData(infoEl, blocks, data);
 				}
 			})
-			.catch((err) => {
+			.catch(() => {
 				this._itemDataCache.set(itemId, {}); // Don't retry.
 				if (this.items[this.index]?.id === item.id) {
 					this._fillInfoBlocksNoData(infoEl, blocks);
