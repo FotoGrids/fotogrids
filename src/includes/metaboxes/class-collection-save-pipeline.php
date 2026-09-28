@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FotoGrids\Metaboxes;
 
 use FotoGrids\Collection_Defaults;
+use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Post_Types;
 use FotoGrids\Hooks\Actions_Gallery;
 use FotoGrids\Permissions\Permission_Check;
@@ -70,15 +71,15 @@ final class Collection_Save_Pipeline {
 			return;
 		}
 
-		if ( isset( $_POST['fotogrids_gallery_items'] ) && is_array( $_POST['fotogrids_gallery_items'] ) ) {
-			$gallery_items = array_map( 'intval', $_POST['fotogrids_gallery_items'] );
-			update_post_meta( $post_id, 'fotogrids_gallery_items', wp_json_encode( $gallery_items ) );
-		} else {
-			delete_post_meta( $post_id, 'fotogrids_gallery_items' );
-		}
+		self::persist_item_order( (int) $post_id, $_POST );
 
 		// $_POST is sanitised per key/type inside (allowlist + Setting_Value_Codec).
 		self::persist_settings_with_gate( (int) $post_id, $_POST );
+
+		// The AJAX save runs this handler through wp_update_post() and fires the action itself.
+		if ( ! wp_doing_ajax() ) {
+			do_action( Actions_Gallery::SETTINGS_SAVED, (int) $post_id );
+		}
 	}
 
 	/**
@@ -144,12 +145,7 @@ final class Collection_Save_Pipeline {
 		}
 
 		if ( 'fotogrids_gallery' === $post->post_type ) {
-			if ( isset( $_POST['fotogrids_gallery_items'] ) && is_array( $_POST['fotogrids_gallery_items'] ) ) {
-				$gallery_items = array_map( 'intval', $_POST['fotogrids_gallery_items'] );
-				update_post_meta( $post_id, 'fotogrids_gallery_items', wp_json_encode( $gallery_items ) );
-			} else {
-				delete_post_meta( $post_id, 'fotogrids_gallery_items' );
-			}
+			self::persist_item_order( $post_id, $_POST );
 		}
 
 		// Both callees read only their known keys from the request payload and
@@ -184,6 +180,36 @@ final class Collection_Save_Pipeline {
 				'skipped_for_permissions' => $gated_result['skipped_for_permissions'] ?? array(),
 			)
 		);
+	}
+
+	/**
+	 * Persist a gallery's item list from the save request.
+	 *
+	 * Fires `Actions_Gallery::REORDERED` when the relative order of the items
+	 * kept by the save differs from the stored order. Adding or removing items
+	 * alone does not count as a reorder.
+	 *
+	 * @since 1.1.4
+	 * @param int   $post_id      Gallery post ID.
+	 * @param array $request_data Raw request payload (nonce already verified by caller).
+	 * @return void
+	 */
+	private static function persist_item_order( int $post_id, array $request_data ): void {
+		if ( ! isset( $request_data['fotogrids_gallery_items'] ) || ! is_array( $request_data['fotogrids_gallery_items'] ) ) {
+			delete_post_meta( $post_id, 'fotogrids_gallery_items' );
+			return;
+		}
+
+		$previous = Gallery_Repository::get_item_ids( $post_id );
+		$item_ids = array_values( array_map( 'intval', $request_data['fotogrids_gallery_items'] ) );
+		Gallery_Repository::set_item_ids( $post_id, $item_ids );
+
+		$previous_kept = array_values( array_intersect( $previous, $item_ids ) );
+		$current_kept  = array_values( array_intersect( $item_ids, $previous ) );
+
+		if ( $previous_kept !== $current_kept ) {
+			do_action( Actions_Gallery::REORDERED, $post_id, $item_ids );
+		}
 	}
 
 	/**
