@@ -232,6 +232,35 @@ const SharingTab = () => {
                             />
                         </PanelRow>
                     </SettingsPanel>
+
+                    <SettingsPanel
+                        title={__('Advanced', 'fotogrids')}
+                        titleTag="h3"
+                    >
+                        <PanelRow
+                            title={__('Custom share text', 'fotogrids')}
+                            description={__('Text included when sharing. Use {title} and {url} as placeholders.', 'fotogrids')}
+                            htmlFor="fg-sharing-custom-text"
+                        >
+                            <input
+                                id="fg-sharing-custom-text"
+                                type="text"
+                                className="fotogrids-text-input"
+                                value={settings.custom_text}
+                                placeholder={__('Check out {title} - {url}', 'fotogrids')}
+                                onChange={(e) => update('custom_text', e.target.value)}
+                            />
+                        </PanelRow>
+                        <PanelRow
+                            title={__('Track share clicks', 'fotogrids')}
+                            description={__('Record when visitors click a share button, for statistics.', 'fotogrids')}
+                        >
+                            <Toggle
+                                checked={settings.track_clicks}
+                                onChange={(v) => update('track_clicks', v)}
+                            />
+                        </PanelRow>
+                    </SettingsPanel>
                 </>
             )}
 
@@ -266,39 +295,6 @@ const SharingTab = () => {
                     </PanelRow>
                 )}
             </SettingsPanel>
-
-            {enabled && (
-                <>
-                    <SettingsPanel
-                        title={__('Advanced', 'fotogrids')}
-                        titleTag="h3"
-                    >
-                        <PanelRow
-                            title={__('Custom share text', 'fotogrids')}
-                            description={__('Text included when sharing. Use {title} and {url} as placeholders.', 'fotogrids')}
-                            htmlFor="fg-sharing-custom-text"
-                        >
-                            <input
-                                id="fg-sharing-custom-text"
-                                type="text"
-                                className="fotogrids-text-input"
-                                value={settings.custom_text}
-                                placeholder={__('Check out {title} - {url}', 'fotogrids')}
-                                onChange={(e) => update('custom_text', e.target.value)}
-                            />
-                        </PanelRow>
-                        <PanelRow
-                            title={__('Track share clicks', 'fotogrids')}
-                            description={__('Record when visitors click a share button, for statistics.', 'fotogrids')}
-                        >
-                            <Toggle
-                                checked={settings.track_clicks}
-                                onChange={(v) => update('track_clicks', v)}
-                            />
-                        </PanelRow>
-                    </SettingsPanel>
-                </>
-            )}
 
             <SaveBar
                 dirty={dirty}
