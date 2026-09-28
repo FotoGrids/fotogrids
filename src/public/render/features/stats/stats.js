@@ -3,14 +3,14 @@
  *
  * Fires view and share pings to the REST API.
  *
- * Per-gallery activation: the Stats feature module writes
- * data-fg-stats="{...}" onto every gallery wrapper for which
- * enable_statistics resolves to true. Galleries without that attribute
+ * Per-collection activation: the Stats feature module writes
+ * data-fg-stats="{...}" onto every gallery and album wrapper for which
+ * enable_statistics resolves to true. Collections without that attribute
  * are silently skipped, so a page can mix tracked and untracked
- * galleries.
+ * collections.
  *
- *   View:  subscribes to FotoGrids.onGallery and fires one ping per
- *          gallery on the first init.
+ *   View:  subscribes to FotoGrids.onCollection and fires one ping per
+ *          gallery or album on the first init.
  *   Share: listens for the document-level `fotogrids:share` event
  *          (dispatched by the Sharing module when a user shares an
  *          item) and fires the share ping. Sharing itself never calls
@@ -68,7 +68,7 @@
 
     /**
      * Fire a view ping. Called once per collection wrapper via the
-     * runtime's onGallery callback.
+     * runtime's onCollection callback.
      *
      * The config carries the explicit objectType ('gallery' or 'album')
      * and objectId - written by the Stats feature module's PHP based on
@@ -124,8 +124,8 @@
     }
 
     function init() {
-        if ( window.FotoGrids && typeof window.FotoGrids.onGallery === 'function' ) {
-            window.FotoGrids.onGallery( trackView, 50 );
+        if ( window.FotoGrids && typeof window.FotoGrids.onCollection === 'function' ) {
+            window.FotoGrids.onCollection( trackView, 50 );
         }
         document.addEventListener( 'fotogrids:share', trackShare );
     }
