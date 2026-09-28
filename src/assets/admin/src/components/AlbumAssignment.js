@@ -15,7 +15,7 @@ const AlbumAssignment = () => {
 			setAssignedAlbums(config.assignedAlbums || []);
 			setAllAlbums(config.allAlbums || []);
 		}
-	}, []);
+	}, [config]);
 
 	// Derive available albums during render - avoids useEffect sync and two-phase updates
 	// that were causing removeChild errors when item moved from available to assigned

@@ -188,6 +188,7 @@ const PluginSettingsPage = () => {
 
 		window.addEventListener('popstate', handlePopState);
 		return () => window.removeEventListener('popstate', handlePopState);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- registers the popstate listener once; the resolvers read the URL when called.
 	}, []);
 
 	useEffect(() => {

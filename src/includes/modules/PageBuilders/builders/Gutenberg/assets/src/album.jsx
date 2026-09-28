@@ -139,6 +139,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 				}
 			})
 			.catch(() => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the selected album; item is read only to skip reloading it.
 	}, [albumId, restUrl, restNonce]);
 
 	const onSelectFromPicker = (picked) => {

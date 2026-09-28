@@ -142,6 +142,7 @@ const ItemEditModal = ({
 		if (itemId) {
 			loadItemMetadata();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- loads metadata once per item.
 	}, [itemId]);
 
 	useEffect(() => {

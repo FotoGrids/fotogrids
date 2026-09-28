@@ -36,11 +36,14 @@ const FontWeightComponent = ({
 			? defaultOptionValue
 			: currentValue;
 
-	const defaultOption = {
-		label: __('Default', 'fotogrids'),
-		value: defaultOptionValue,
-		fontWeight: '',
-	};
+	const defaultOption = useMemo(
+		() => ({
+			label: __('Default', 'fotogrids'),
+			value: defaultOptionValue,
+			fontWeight: '',
+		}),
+		[defaultOptionValue, __]
+	);
 
 	const selectedOption = useMemo(() => {
 		if (resolvedValue === defaultOptionValue) {
@@ -59,7 +62,7 @@ const FontWeightComponent = ({
 			value: resolvedValue,
 			fontWeight: resolvedValue,
 		};
-	}, [resolvedValue]);
+	}, [resolvedValue, defaultOption, defaultOptionValue]);
 
 	return window.FotoGridsRenderSettings.renderSelect({
 		setting,

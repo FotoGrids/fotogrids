@@ -68,6 +68,7 @@ const Toast = ({ toast, onDismiss }) => {
 				}
 			};
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- starts the countdown once per toast.
 	}, [toast.id]);
 
 	useEffect(() => {

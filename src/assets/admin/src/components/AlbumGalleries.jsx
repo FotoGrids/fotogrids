@@ -189,7 +189,7 @@ const AlbumGalleries = () => {
 			setAllGalleries(config.allGalleries || []);
 			setFeaturedGalleryId(config.featuredGalleryId ?? null);
 		}
-	}, []);
+	}, [config]);
 
 	useEffect(() => {
 		if (allGalleries.length > 0) {
