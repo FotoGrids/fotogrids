@@ -7,7 +7,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Modal, Confirm } from './shared/Modal';
 import { Button } from './shared/Button';
-import Icon from './shared/Icon.jsx';
 import Toggle from './shared/Toggle.jsx';
 import NumberField from './shared/NumberField.jsx';
 import Select from './shared/Select.jsx';

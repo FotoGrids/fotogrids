@@ -4,7 +4,6 @@ import Icon from './shared/Icon';
 import { collectionTitle } from '../utils/collection-title';
 
 const AlbumGalleries = () => {
-	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [assignedGalleries, setAssignedGalleries] = useState([]);
 	const [allGalleries, setAllGalleries] = useState([]);

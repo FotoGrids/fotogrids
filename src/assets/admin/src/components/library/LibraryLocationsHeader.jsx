@@ -9,9 +9,6 @@ const { __ } = wp.i18n;
 
 const FG_BLUE = '#3c46f0';
 const FG_BLUE_SOFT = 'rgba(60,70,240,0.08)';
-const FG_GREEN = '#46b450';
-const FG_YELLOW = '#ffb914';
-const FG_RED = '#f01e32';
 
 /**
  * Locations tab header - stat cards + 3-col × 2-row chart grid.

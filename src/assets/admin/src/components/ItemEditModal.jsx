@@ -91,7 +91,6 @@ const ItemEditModal = ({
 		open: false,
 		action: null,
 	});
-	const [saveSuccess, setSaveSuccess] = useState(false);
 	const [videoSettings, setVideoSettings] = useState({});
 	const [originalVideoSettings, setOriginalVideoSettings] = useState({});
 
@@ -110,7 +109,6 @@ const ItemEditModal = ({
 			setFormData(initialFormData);
 			setOriginalData(initialFormData);
 			setHasChanges(false);
-			setSaveSuccess(false);
 
 			// Seed video settings from custom_data for Media Library videos.
 			if (itemData.item_type === 'video_file') {
@@ -357,7 +355,6 @@ const ItemEditModal = ({
 
 				setHasChanges(false);
 				setSaving(false);
-				setSaveSuccess(true);
 
 				if (window.fotogridsToast) {
 					window.fotogridsToast.success(
@@ -441,7 +438,6 @@ const ItemEditModal = ({
 		}
 	};
 
-	const currentIndex = items.findIndex((img) => img.id === itemId);
 	const hasMultipleItems = items.length > 1;
 
 	return (

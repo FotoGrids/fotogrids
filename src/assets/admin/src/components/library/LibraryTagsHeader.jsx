@@ -35,8 +35,6 @@ const LibraryTagsHeader = ({ entityType, total: externalTotal }) => {
 			return;
 		}
 
-		const maxUsage = topItems[0]?.usage_count || 1;
-
 		const barCtx = barChartRef.current;
 		if (barCtx) {
 			if (barInstance.current) {
