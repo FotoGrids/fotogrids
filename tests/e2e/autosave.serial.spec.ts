@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { loginAsAdmin } from './helpers';
+import { storageStateFor } from './support/roles';
+
+test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 /**
  * Autosave is on by default, so the Add New screen has to stay inert until the
@@ -56,7 +58,6 @@ async function changeAFotoGridsSetting(page: Page) {
 }
 
 test('opening Add New and waiting creates nothing', async ({ page }) => {
-	await loginAsAdmin(page);
 	const before = await galleryTitles(page);
 
 	await openAddNew(page);
@@ -66,7 +67,6 @@ test('opening Add New and waiting creates nothing', async ({ page }) => {
 });
 
 test('a settings change on Add New creates nothing', async ({ page }) => {
-	await loginAsAdmin(page);
 	const before = await galleryTitles(page);
 
 	await openAddNew(page);
@@ -81,7 +81,6 @@ test('a settings change on Add New creates nothing', async ({ page }) => {
 test('an unsaved gallery still warns about unsaved changes', async ({
 	page,
 }) => {
-	await loginAsAdmin(page);
 	await openAddNew(page);
 
 	await changeAFotoGridsSetting(page);

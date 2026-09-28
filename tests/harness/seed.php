@@ -33,7 +33,7 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 }
 
 /** Bumped when a fixture definition changes, so seeded sites rebuild. */
-const FG_SEED_VERSION = '1';
+const FG_SEED_VERSION = '2';
 
 /** Marks every post this file creates, so it can find and remove its own work. */
 const FG_SEED_MARKER = '_fg_fixture';
@@ -964,6 +964,14 @@ function fg_seed_catalogue(): array {
 		},
 
 		'F-orphan' => function () {
+			// An attachment in no gallery, for the access checks that ask what
+			// happens to an item no collection vouches for.
+			$item = fg_seed_attachment(
+				fg_seed_draw( 900, 600, 'jpeg', array( 'seed' => 1500 ) ),
+				'F-orphan',
+				array( 'alt' => 'Belongs to no gallery' )
+			);
+
 			$embed = Embed_Store::create(
 				array(
 					'item_type'     => 'video_youtube',
@@ -976,8 +984,11 @@ function fg_seed_catalogue(): array {
 			);
 			fg_seed_mark( $embed, 'F-orphan' );
 
-			// Deliberately not appended to any gallery.
-			return array( 'embed' => $embed );
+			// Neither is appended to any gallery.
+			return array(
+				'embed' => $embed,
+				'item'  => $item,
+			);
 		},
 
 		'F-cjk' => function () {
