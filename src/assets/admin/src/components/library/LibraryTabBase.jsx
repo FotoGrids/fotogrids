@@ -698,6 +698,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 		editingDraft,
 		entityType.type,
 		entityType.slug,
+		entityType.label_singular,
 		restBase,
 		cancelEdit,
 		flashNotice,

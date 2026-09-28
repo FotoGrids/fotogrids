@@ -195,6 +195,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 				}
 			})
 			.catch(() => {});
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the selected gallery; item is read only to skip reloading it.
 	}, [galleryId, restUrl, restNonce]);
 
 	const onSelectFromPicker = (picked) => {
