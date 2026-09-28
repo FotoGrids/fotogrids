@@ -8,7 +8,7 @@ import { Button } from './Button';
  * @param {string}          props.badge       Badge label.
  * @param {React.ReactNode} props.children    Notice text.
  * @param {string}          props.actionLabel Label for the link button.
- * @param {Function}        props.onAction    Handler for the link button.
+ * @param {() => void}      props.onAction    Handler for the link button.
  * @param {boolean}         props.center      Align the text with the button
  *                                            instead of the top of the row.
  *                                            Suits a single line of copy.

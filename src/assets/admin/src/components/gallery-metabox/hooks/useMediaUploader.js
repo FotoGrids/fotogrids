@@ -8,10 +8,10 @@ import { useCallback } from 'react';
  * Returns a function that opens the WordPress media frame and reports the
  * chosen attachments as grid items.
  *
- * @param {Object}   options
- * @param {Object}   options.strings  Localised strings.
- * @param {Function} options.onSelect Called with the selected attachments mapped to items.
- * @return {Function} Opens the frame; takes the router tab to land on.
+ * @param {Object}                    options
+ * @param {Object}                    options.strings  Localised strings.
+ * @param {(items: Object[]) => void} options.onSelect Called with the selected attachments mapped to items.
+ * @return {(contentMode?: string) => void} Opens the frame; takes the router tab to land on.
  */
 const useMediaUploader = ({ strings, onSelect }) =>
 	useCallback(
