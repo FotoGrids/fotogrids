@@ -11,6 +11,9 @@
  *
  *   View:  subscribes to FotoGrids.onCollection and fires one ping per
  *          gallery or album on the first init.
+ *   Item:  listens for `fotogrids:lightbox:open` and
+ *          `fotogrids:lightbox:navigate` and fires one item view ping
+ *          for every slide the lightbox shows.
  *   Share: listens for the document-level `fotogrids:share` event
  *          (dispatched by the Sharing module when a user shares an
  *          item) and fires the share ping. Sharing itself never calls
@@ -95,6 +98,29 @@
     }
 
     /**
+     * Handle a fotogrids:lightbox:open or :navigate event by sending an
+     * item view ping. The lightbox's gallery element supplies the stats
+     * config, so a gallery with statistics disabled records nothing.
+     *
+     * @param {CustomEvent} e
+     */
+    function trackItemView( e ) {
+        const detail = e && e.detail;
+        if ( ! detail || ! detail.galleryEl || ! detail.item ) return;
+
+        const cfg = readConfig( detail.galleryEl );
+        if ( ! cfg ) return;
+
+        const itemId = parseInt( detail.item.id, 10 );
+        if ( ! itemId ) return;
+
+        ping( cfg.restUrl + 'stats/view', cfg.nonce, {
+            object_type: 'item',
+            object_id:   itemId,
+        } );
+    }
+
+    /**
      * Handle a fotogrids:share event by sending a share ping. The event
      * fires from the Sharing module when the user clicks a share button.
      *
@@ -127,6 +153,8 @@
         if ( window.FotoGrids && typeof window.FotoGrids.onCollection === 'function' ) {
             window.FotoGrids.onCollection( trackView, 50 );
         }
+        document.addEventListener( 'fotogrids:lightbox:open', trackItemView );
+        document.addEventListener( 'fotogrids:lightbox:navigate', trackItemView );
         document.addEventListener( 'fotogrids:share', trackShare );
     }
 
