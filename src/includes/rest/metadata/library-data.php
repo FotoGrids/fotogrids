@@ -104,42 +104,22 @@ class Library_Data {
 	}
 
 	/**
-	 * Decode the per-row meta JSON into structured data.
+	 * Counts across every entry of a type, for the Library header cards.
 	 *
-	 * For locations this exposes latitude / longitude as floats; for other
-	 * types it returns whatever was stored.
-	 *
-	 * @since 1.0.0
-	 * @param object $row Row from fotogrids_tags.
-	 * @return array
+	 * @since  1.1.5
+	 * @param  string $type Metadata type.
+	 * @return array<string, int>
 	 */
-	private static function serialize_row( $row ) {
-		$meta = null;
-		if ( ! empty( $row->meta ) ) {
-			$decoded = json_decode( $row->meta, true );
-			if ( is_array( $decoded ) ) {
-				$meta = $decoded;
-			}
-		}
-
-		$out = array(
-			'id'          => (int) $row->id,
-			'type'        => $row->type,
-			'name'        => $row->name,
-			'slug'        => $row->slug,
-			'usage_count' => (int) $row->usage_count,
-			'created_at'  => $row->created_at,
-			'meta'        => $meta,
+	private static function summarize( $type ) {
+		$summary = array(
+			'unused' => \FotoGrids\Metadata_Manager::count_metadata( $type, '', true ),
 		);
 
-		if ( 'location' === $row->type ) {
-			$out['latitude']  = isset( $meta['latitude'] ) ? (float) $meta['latitude'] : null;
-			$out['longitude'] = isset( $meta['longitude'] ) ? (float) $meta['longitude'] : null;
-		} elseif ( 'person' === $row->type ) {
-			$out['details'] = isset( $meta['details'] ) ? (string) $meta['details'] : '';
+		if ( 'location' === $type ) {
+			$summary['with_coordinates'] = \FotoGrids\Metadata_Manager::count_locations_with_coordinates();
 		}
 
-		return $out;
+		return $summary;
 	}
 
 	// ─── Endpoint callbacks ─────────────────────────────────────────────────
@@ -172,7 +152,7 @@ class Library_Data {
 		$rows  = \FotoGrids\Metadata_Manager::get_metadata_paginated( $type, $args );
 		$total = \FotoGrids\Metadata_Manager::count_metadata( $type, $args['search'], $args['unused_only'] );
 
-		$items = array_map( array( __CLASS__, 'serialize_row' ), $rows );
+		$items = array_map( array( '\FotoGrids\Metadata_Manager', 'format_for_response' ), $rows );
 
 		$response = rest_ensure_response(
 			array(
@@ -180,6 +160,7 @@ class Library_Data {
 				'total'    => $total,
 				'page'     => max( 1, $args['page'] ? $args['page'] : 1 ),
 				'per_page' => $args['per_page'] ? $args['per_page'] : 50,
+				'summary'  => self::summarize( $type ),
 			)
 		);
 
@@ -202,16 +183,27 @@ class Library_Data {
 			return new \WP_Error( 'fotogrids_library_empty_name', __( 'Name is required.', 'fotogrids' ), array( 'status' => 400 ) );
 		}
 
+		$existing = \FotoGrids\Metadata_Manager::find_metadata( $type, $name );
+		if ( $existing ) {
+			return new \WP_Error(
+				'fotogrids_library_exists',
+				/* translators: %s: name of the existing tag, person or location. */
+				sprintf( __( '"%s" already exists.', 'fotogrids' ), $existing->name ),
+				array(
+					'status'      => 409,
+					'conflict_id' => (int) $existing->id,
+				)
+			);
+		}
+
 		$meta = null;
 		if ( 'location' === $type ) {
-			$lat = $request->get_param( 'latitude' );
-			$lng = $request->get_param( 'longitude' );
-			if ( null !== $lat || null !== $lng ) {
-				$meta = array();
-				if ( null !== $lat && '' !== $lat ) {
-					$meta['latitude'] = (float) $lat; }
-				if ( null !== $lng && '' !== $lng ) {
-					$meta['longitude'] = (float) $lng; }
+			$meta = \FotoGrids\Metadata_Manager::normalize_coordinates(
+				$request->get_param( 'latitude' ),
+				$request->get_param( 'longitude' )
+			);
+			if ( is_wp_error( $meta ) ) {
+				return $meta;
 			}
 		} elseif ( 'person' === $type ) {
 			$details = (string) $request->get_param( 'details' );
@@ -227,7 +219,7 @@ class Library_Data {
 
 		do_action( Actions_Library::CREATED, $type, (int) $row->id );
 
-		return rest_ensure_response( self::serialize_row( $row ) );
+		return rest_ensure_response( \FotoGrids\Metadata_Manager::format_for_response( $row ) );
 	}
 
 	/**
@@ -256,22 +248,19 @@ class Library_Data {
 		}
 
 		if ( 'location' === $type ) {
-			$lat = $request->get_param( 'latitude' );
-			$lng = $request->get_param( 'longitude' );
-
 			$next = $existing_meta;
-			if ( $request->has_param( 'latitude' ) ) {
-				if ( null === $lat || '' === $lat ) {
-					unset( $next['latitude'] );
-				} else {
-					$next['latitude'] = (float) $lat;
+			if ( $request->has_param( 'latitude' ) || $request->has_param( 'longitude' ) ) {
+				$current     = \FotoGrids\Metadata_Manager::coordinates_from_meta( $existing_meta );
+				$coordinates = \FotoGrids\Metadata_Manager::normalize_coordinates(
+					$request->has_param( 'latitude' ) ? $request->get_param( 'latitude' ) : $current['latitude'],
+					$request->has_param( 'longitude' ) ? $request->get_param( 'longitude' ) : $current['longitude']
+				);
+				if ( is_wp_error( $coordinates ) ) {
+					return $coordinates;
 				}
-			}
-			if ( $request->has_param( 'longitude' ) ) {
-				if ( null === $lng || '' === $lng ) {
-					unset( $next['longitude'] );
-				} else {
-					$next['longitude'] = (float) $lng;
+				unset( $next['latitude'], $next['longitude'] );
+				if ( null !== $coordinates ) {
+					$next = array_merge( $next, $coordinates );
 				}
 			}
 			$meta = empty( $next ) ? array() : $next;
@@ -293,7 +282,7 @@ class Library_Data {
 			return $result;
 		}
 
-		return rest_ensure_response( self::serialize_row( $result ) );
+		return rest_ensure_response( \FotoGrids\Metadata_Manager::format_for_response( $result ) );
 	}
 
 	/**
@@ -367,7 +356,7 @@ class Library_Data {
 			return $result;
 		}
 
-		$result['target'] = self::serialize_row( $result['target'] );
+		$result['target'] = \FotoGrids\Metadata_Manager::format_for_response( $result['target'] );
 		return rest_ensure_response( $result );
 	}
 

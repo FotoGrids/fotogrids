@@ -4,14 +4,17 @@ const apiFetch = wp.apiFetch;
 
 /**
  * Fetches top-N library entries sorted by usage_count descending, plus the
- * total entry count. Used by the per-tab header charts.
+ * total entry count and the counts in the response's `summary`. Used by the
+ * per-tab header charts.
  *
- * Returns { topItems, total, loading }.
+ * Returns { topItems, total, summary, loading }.
  * topItems: array of { id, name, usage_count, ... }
+ * summary:  counts across every entry, e.g. { unused, with_coordinates }
  */
 const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 	const [topItems, setTopItems] = useState([]);
 	const [total, setTotal] = useState(0);
+	const [summary, setSummary] = useState({});
 	const [loading, setLoading] = useState(true);
 	const mountedRef = useRef(true);
 
@@ -47,6 +50,7 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 				}
 				setTopItems(Array.isArray(res.items) ? res.items : []);
 				setTotal(Number(res.total) || 0);
+				setSummary(res.summary || {});
 				setLoading(false);
 			})
 			.catch(() => {
@@ -57,7 +61,7 @@ const useLibraryStats = ({ entitySlug, limit = 7 }) => {
 			});
 	}, [entitySlug, limit]);
 
-	return { topItems, total, loading };
+	return { topItems, total, summary, loading };
 };
 
 export default useLibraryStats;

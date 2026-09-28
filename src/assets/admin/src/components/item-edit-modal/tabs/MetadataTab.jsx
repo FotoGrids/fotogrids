@@ -181,12 +181,13 @@ const MetadataTab = ({
 										>
 											{item.name}
 										</span>
-										{item.latitude && item.longitude && (
-											<span className="fotogrids-metadata-item__coordinates">
-												({item.latitude.toFixed(4)},{' '}
-												{item.longitude.toFixed(4)})
-											</span>
-										)}
+										{item.latitude != null &&
+											item.longitude != null && (
+												<span className="fotogrids-metadata-item__coordinates">
+													({item.latitude.toFixed(4)},{' '}
+													{item.longitude.toFixed(4)})
+												</span>
+											)}
 									</>
 								)}
 								<button

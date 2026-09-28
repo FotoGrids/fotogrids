@@ -25,6 +25,7 @@ const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
 	const {
 		topItems,
 		total: fetchedTotal,
+		summary,
 		loading,
 	} = useLibraryStats({
 		entitySlug: entityType?.slug || 'locations',
@@ -106,10 +107,8 @@ const LibraryLocationsHeader = ({ entityType, total: externalTotal }) => {
 		};
 	}, [loading, topItems]);
 
-	const withCoords = topItems.filter(
-		(i) => i.latitude != null && i.longitude != null
-	).length;
-	const unusedCount = topItems.filter((i) => i.usage_count === 0).length;
+	const withCoords = Number(summary.with_coordinates) || 0;
+	const unusedCount = Number(summary.unused) || 0;
 
 	// Build SVG dots from lat/lng using a simple equirectangular projection
 	// onto a 300 × 150 viewBox (roughly 2:1 like a world map).
