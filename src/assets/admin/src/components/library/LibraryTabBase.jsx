@@ -45,7 +45,7 @@ const LibraryTableRow = memo(
 						isSelected ? 'fotogrids-library-row-selected' : ''
 					}
 				>
-					<td scope="row" className="check-column">
+					<td className="check-column">
 						<Checkbox
 							checked={isSelected}
 							onChange={() => onToggleSelected(item.id)}
@@ -73,6 +73,7 @@ const LibraryTableRow = memo(
 										onCancelEdit();
 									}
 								}}
+								// eslint-disable-next-line jsx-a11y/no-autofocus -- the user just asked to rename this row.
 								autoFocus
 								__nextHasNoMarginBottom
 							/>
@@ -1134,8 +1135,8 @@ const LibraryTabBase = ({ entityType, config }) => {
 				title={__('Delete selected entries?', 'fotogrids')}
 				message={sprintf(
 					_n(
-						'You are about to delete %d entry. Linked items will lose this %s.',
-						'You are about to delete %d entries. Linked items will lose these %s.',
+						'You are about to delete %1$d entry. Linked items will lose this %2$s.',
+						'You are about to delete %1$d entries. Linked items will lose these %2$s.',
 						selectedIds.size,
 						'fotogrids'
 					),
@@ -1176,6 +1177,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 									name: e.target.value,
 								})
 							}
+							// eslint-disable-next-line jsx-a11y/no-autofocus -- first field of the dialog the user just opened.
 							autoFocus
 						/>
 					</FormField>

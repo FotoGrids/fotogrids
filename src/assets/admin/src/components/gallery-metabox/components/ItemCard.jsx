@@ -32,6 +32,7 @@ const ItemCard = ({ item, strings, onOpen, onToggleFeatured, onRemove }) => {
 			draggable="true"
 		>
 			{item.thumbnail ? (
+				// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- mouse shortcut; the Edit button in the tile's controls is the keyboard path.
 				<img
 					src={item.thumbnail}
 					alt={item.alt}
@@ -39,6 +40,7 @@ const ItemCard = ({ item, strings, onOpen, onToggleFeatured, onRemove }) => {
 					style={{ cursor: 'pointer' }}
 				/>
 			) : (
+				// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- mouse shortcut; the Edit button in the tile's controls is the keyboard path.
 				<div
 					className="fotogrids-item-thumb-placeholder"
 					onClick={() => onOpen(item.id)}

@@ -57,8 +57,14 @@ const TabVideo = ({
 		<div className="fotogrids-tab-panel fg-is-active">
 			<div className="fotogrids-item-edit-video">
 				<div className="fotogrids-item-edit-field-group">
-					<label>{strings.posterImage || 'Poster Image'}</label>
-					<div className="fotogrids-item-edit-video-poster-row">
+					<span id="fotogrids-video-poster-label">
+						{strings.posterImage || 'Poster Image'}
+					</span>
+					<div
+						className="fotogrids-item-edit-video-poster-row"
+						role="group"
+						aria-labelledby="fotogrids-video-poster-label"
+					>
 						<div className="fotogrids-item-edit-video-poster-preview">
 							{posterUrl ? (
 								<img

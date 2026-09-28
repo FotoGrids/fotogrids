@@ -126,7 +126,8 @@ const MetadataTab = ({
 				{!isHardFull && currentInput && hasSuggestions && (
 					<div className="fotogrids-item-edit-autocomplete">
 						{filteredSuggestions.map((item) => (
-							<div
+							<button
+								type="button"
 								key={item.id}
 								className="fotogrids-item-edit-autocomplete-item"
 								onClick={() =>
@@ -134,7 +135,7 @@ const MetadataTab = ({
 								}
 							>
 								{item.name}
-							</div>
+							</button>
 						))}
 					</div>
 				)}

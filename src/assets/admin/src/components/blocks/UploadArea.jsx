@@ -27,6 +27,7 @@
  */
 import React from 'react';
 import Icon from '../shared/Icon';
+import { activateOnKey } from '../../utils/activate-on-key';
 
 const { __ } = wp.i18n;
 
@@ -97,6 +98,10 @@ const UploadArea = ({
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
 				onClick={handleClick}
+				onKeyDown={activateOnKey(handleClick)}
+				role="button"
+				tabIndex={isUploading ? -1 : 0}
+				aria-disabled={isUploading || undefined}
 				style={{ cursor: isUploading ? 'not-allowed' : 'pointer' }}
 			>
 				<input

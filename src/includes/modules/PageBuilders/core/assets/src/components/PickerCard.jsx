@@ -78,7 +78,7 @@ const PickerCard = ({
 	})();
 
 	const cardInner = (
-		<article
+		<div
 			className={className}
 			role="button"
 			tabIndex={0}
@@ -164,7 +164,7 @@ const PickerCard = ({
 					)}
 				</div>
 			</div>
-		</article>
+		</div>
 	);
 
 	return cardInner;

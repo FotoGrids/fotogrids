@@ -292,23 +292,16 @@ const ToolsPage = () => {
 						? { '--fg-tool-card-color': tool.image_bg_color }
 						: undefined;
 
-					return !isLocked ? (
+					return !isLocked && !isUnavailable ? (
 						<a
 							key={tool.id}
-							href={
-								isUnavailable ? undefined : getTabHref(tool.id)
-							}
+							href={getTabHref(tool.id)}
 							className={cardClasses}
 							style={cardStyle}
-							onClick={
-								isUnavailable
-									? undefined
-									: (e) => {
-											e.preventDefault();
-											handleToolChange(tool.id);
-										}
-							}
-							aria-disabled={isUnavailable || undefined}
+							onClick={(e) => {
+								e.preventDefault();
+								handleToolChange(tool.id);
+							}}
 						>
 							{cardInner}
 						</a>

@@ -274,6 +274,7 @@ const PickerModal = ({
 				 * card. Toolbar (search + sort) lives in Modal.SubHeader
 				 * above and stays pinned while the body scrolls.
 				 */}
+				{/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- delegates arrow keys from the focusable cards inside. */}
 				<div
 					className="fg-pb-picker__list"
 					ref={listRef}

@@ -152,8 +152,11 @@ const MergeDialog = ({
 						)}
 						{results.map((r) => (
 							<li key={r.id}>
-								<label>
+								<label
+									htmlFor={`fotogrids-merge-target-${r.id}`}
+								>
 									<input
+										id={`fotogrids-merge-target-${r.id}`}
 										type="radio"
 										name="fotogrids-merge-target"
 										value={r.id}

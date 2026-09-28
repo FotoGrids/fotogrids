@@ -197,12 +197,14 @@ const MediaTab = () => {
 					{thumbCrop && (
 						<div style={{ marginTop: 16, maxWidth: 220 }}>
 							<label
+								htmlFor="fotogrids-thumbnail-alignment"
 								className="fotogrids-dimensions-field__label"
 								style={{ display: 'block', marginBottom: 6 }}
 							>
 								{__('Crop alignment', 'fotogrids')}
 							</label>
 							<Select
+								id="fotogrids-thumbnail-alignment"
 								value={
 									settings?.thumbnail_alignment ?? 'center'
 								}

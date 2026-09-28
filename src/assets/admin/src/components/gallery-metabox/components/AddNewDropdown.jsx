@@ -38,21 +38,23 @@ const AddNewDropdown = ({ isOpen, onToggle, onSelect, strings }) => (
 		{isOpen && (
 			<div className="fotogrids-add-new-menu fotogrids-dropdown-open">
 				{ADD_OPTIONS.map(({ action, labelKey }) => (
-					<div
+					<button
+						type="button"
 						key={action}
 						className="fotogrids-add-option"
 						onClick={() => onSelect(action)}
 					>
 						{strings[labelKey]}
-					</div>
+					</button>
 				))}
-				<div
+				<button
+					type="button"
 					className="fotogrids-add-option fotogrids-add-option--pro"
 					onClick={() => onSelect('instagram')}
 				>
 					{strings.instagram}
 					<span className="fotogrids-pro-badge">Pro</span>
-				</div>
+				</button>
 			</div>
 		)}
 	</div>

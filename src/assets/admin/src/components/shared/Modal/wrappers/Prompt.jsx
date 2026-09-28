@@ -118,6 +118,7 @@ const Prompt = ({
 								handleSubmit();
 							}
 						}}
+						// eslint-disable-next-line jsx-a11y/no-autofocus -- the prompt's only field, in a dialog the user just opened.
 						autoFocus
 					/>
 				</FormField>

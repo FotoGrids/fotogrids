@@ -11,6 +11,7 @@ import Icon from '../shared/Icon';
 import { Button } from '../shared/Button';
 import Checkbox from '../shared/Checkbox';
 import LoadingIcon from '../shared/LoadingIcon';
+import { activateOnKey } from '../../utils/activate-on-key';
 
 const { __ } = wp.i18n;
 
@@ -55,6 +56,7 @@ const TemplateCard = ({
 				</span>
 			)}
 
+			{/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- mouse shortcut; the card's Preview button is the keyboard path. */}
 			<div
 				className="fotogrids-template-card__preview"
 				onClick={() => onPreview(template)}
@@ -339,6 +341,18 @@ const TemplatesPage = () => {
 		},
 	];
 
+	const launchTemplatesUpgrade = () => {
+		const upgrade = window.FotoGridsUpgrade;
+		if (!upgrade) {
+			return;
+		}
+		if (upgrade.launchForFeature && upgrade.launchForFeature.templates) {
+			upgrade.launchForFeature.templates();
+		} else if (upgrade.launch) {
+			upgrade.launch('templates');
+		}
+	};
+
 	const renderInfoColumn = () => {
 		if (isProActive) {
 			return null;
@@ -361,41 +375,47 @@ const TemplatesPage = () => {
 				</p>
 
 				<ul className="fotogrids-templates-page__info-list">
-					{infoItems.map((item) => (
-						<li
-							key={item.key}
-							className={`fotogrids-templates-page__info-item ${item.pro ? 'fotogrids-templates-page__info-item--pro' : ''}`}
-							onClick={() => {
-								if (item.pro && window.FotoGridsUpgrade) {
-									if (
-										window.FotoGridsUpgrade
-											.launchForFeature &&
-										window.FotoGridsUpgrade.launchForFeature
-											.templates
-									) {
-										window.FotoGridsUpgrade.launchForFeature.templates();
-									} else if (window.FotoGridsUpgrade.launch) {
-										window.FotoGridsUpgrade.launch(
-											'templates'
-										);
-									}
-								}
-							}}
-						>
-							<div className="fotogrids-templates-page__info-item__heading">
-								<Icon name="check_circle" />
-								<h5>
-									{item.title}
-									{item.pro && (
-										<span className="fotogrids-pro-badge">
-											{__('Pro', 'fotogrids')}
-										</span>
-									)}
-								</h5>
-							</div>
-							<p>{item.description}</p>
-						</li>
-					))}
+					{infoItems.map((item) => {
+						const content = (
+							<>
+								<div className="fotogrids-templates-page__info-item__heading">
+									<Icon name="check_circle" />
+									<h5>
+										{item.title}
+										{item.pro && (
+											<span className="fotogrids-pro-badge">
+												{__('Pro', 'fotogrids')}
+											</span>
+										)}
+									</h5>
+								</div>
+								<p>{item.description}</p>
+							</>
+						);
+
+						return (
+							<li
+								key={item.key}
+								className={`fotogrids-templates-page__info-item ${item.pro ? 'fotogrids-templates-page__info-item--pro' : ''}`}
+							>
+								{item.pro ? (
+									<div
+										className="fotogrids-templates-page__info-item__trigger"
+										role="button"
+										tabIndex={0}
+										onClick={launchTemplatesUpgrade}
+										onKeyDown={activateOnKey(
+											launchTemplatesUpgrade
+										)}
+									>
+										{content}
+									</div>
+								) : (
+									content
+								)}
+							</li>
+						);
+					})}
 				</ul>
 			</aside>
 		);

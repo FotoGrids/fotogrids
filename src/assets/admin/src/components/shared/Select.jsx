@@ -21,6 +21,8 @@ const Select = ({
 	// applied to both the dropdown option and the selected trigger value.
 	// Used e.g. to render each label in its own font family.
 	optionStyle = null,
+	// Optional id for the trigger button, so a <label htmlFor> can name it.
+	id,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOption, setSelectedOption] = useState(null);
@@ -175,6 +177,7 @@ const Select = ({
 		>
 			<button
 				type="button"
+				id={id}
 				className="fotogrids-select__trigger"
 				onClick={handleToggle}
 				disabled={disabled}

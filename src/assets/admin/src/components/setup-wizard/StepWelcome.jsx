@@ -282,6 +282,7 @@ const StepWelcome = ({ onStart, onSkip }) => {
 						)}
 					</p>
 
+					{/* eslint-disable-next-line jsx-a11y/no-redundant-roles -- Safari drops list semantics under list-style: none. */}
 					<ul
 						className="fotogrids-setup-telemetry-modal__list"
 						role="list"
