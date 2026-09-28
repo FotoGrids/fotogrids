@@ -7,7 +7,7 @@
  * Calls onFileReady({ name, size, text }) when the file has been read
  * successfully. Calls onFileError(message) on read failure.
  *
- * @param {Function} props.onFileReady          Called with { name, size, text }.
+ * @param {(file: {name: string, size: number, text: string}) => void} props.onFileReady          Called with { name, size, text }.
  * @param {string}   [props.accept]             File input accept attr, e.g. ".json,.xml".
  * @param {string}   [props.title]              Upload zone title text.
  * @param {string}   [props.subtitle]           Upload zone subtitle text.

@@ -11,8 +11,8 @@ import Icon from './Icon';
  *
  * @param {Object}   props
  * @param {Array}    props.options    [{ value, label, icon? }] - icon is a FotoGridsIcons name.
- * @param {*}        props.value      Currently selected value.
- * @param {Function} props.onChange   Called with the chosen value.
+ * @param {string|number}        props.value      Currently selected value.
+ * @param {(value: string|number) => void} props.onChange   Called with the chosen value.
  * @param {string}   [props.ariaLabel]
  * @param {boolean}  [props.disabled]
  * @param {string}   [props.className]

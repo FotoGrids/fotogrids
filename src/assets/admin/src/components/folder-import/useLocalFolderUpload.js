@@ -6,8 +6,8 @@
  *
  * @param {Object}   options
  * @param {boolean}  options.isOpen              Clears the picked folder when this turns false.
- * @param {Function} options.onUploadComplete    Called with the new attachment IDs.
- * @param {Function} options.onFinished          Called once the batch settles.
+ * @param {(ids: number[]) => void} options.onUploadComplete    Called with the new attachment IDs.
+ * @param {() => void} options.onFinished          Called once the batch settles.
  * @param {string}   [options.noImagesMessage]   Shown when the folder held no images.
  * @param {string}   [options.failedMessage]     Fallback when the upload carries none.
  * @return {Object} files, folderName, uploading, counts, percent, error, pickFiles, startUpload.

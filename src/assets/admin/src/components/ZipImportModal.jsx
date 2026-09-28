@@ -6,8 +6,8 @@
  *
  * @param {Object}   props
  * @param {boolean}  props.isOpen       Modal visibility.
- * @param {Function} props.onClose      Called when the modal should close.
- * @param {Function} props.onAddItems   Called with an array of gallery item objects.
+ * @param {() => void} props.onClose      Called when the modal should close.
+ * @param {(items: Object[]) => void} props.onAddItems   Called with an array of gallery item objects.
  * @param {Object}   [props.strings]    Localized labels.
  */
 
@@ -28,7 +28,7 @@ const isZip = (file) => Boolean(file) && /\.zip$/i.test(file.name || '');
  *
  * @param {File}     file
  * @param {number}   galleryId  The gallery the import belongs to.
- * @param {Function} onProgress Called with a 0-100 percentage.
+ * @param {(percent: number) => void} onProgress Called with a 0-100 percentage.
  * @return {Promise<Object>}
  */
 const uploadArchive = (file, galleryId, onProgress) =>

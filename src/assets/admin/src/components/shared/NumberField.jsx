@@ -10,7 +10,7 @@ import React from 'react';
  * @param {Object}                 props
  * @param {string}                 [props.id]
  * @param {number}                 props.value
- * @param {Function}               props.onChange   Called with the parsed integer (NaN-safe → min or 0).
+ * @param {(value: number) => void}               props.onChange   Called with the parsed integer (NaN-safe → min or 0).
  * @param {number}                 [props.min]
  * @param {number}                 [props.max]
  * @param {number}                 [props.step]

@@ -12,11 +12,11 @@ import AddNewDropdown from './AddNewDropdown.jsx';
  * @param {Object}   props
  * @param {string}   props.activeTab          Currently selected tab id.
  * @param {Object}   props.strings            Localised strings.
- * @param {Function} props.onTabSwitch        Switches tab.
+ * @param {(tab: string) => void} props.onTabSwitch        Switches tab.
  * @param {boolean}  props.addDropdownOpen    Whether the Add New menu is showing.
- * @param {Function} props.onAddDropdownToggle Toggles the Add New menu.
- * @param {Function} props.onAddOption        Receives the chosen Add New action.
- * @param {Function} props.onClearAll         Opens the remove-all confirmation.
+ * @param {() => void} props.onAddDropdownToggle Toggles the Add New menu.
+ * @param {(action: string) => void} props.onAddOption        Receives the chosen Add New action.
+ * @param {() => void} props.onClearAll         Opens the remove-all confirmation.
  * @return {JSX.Element}
  */
 const MetaboxHeader = ({

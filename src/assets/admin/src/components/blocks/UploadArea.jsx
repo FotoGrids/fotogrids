@@ -20,8 +20,8 @@
  * @param {string}       [props.hint]             Small muted line, e.g. "Supported: .json, .xml".
  * @param {string}       [props.accept]           Passed to <input accept>.
  * @param {boolean}      [props.multiple]         Allow multiple files.
- * @param {Function}     props.onFiles            Called with FileList on drop or input change.
- * @param {Function}     [props.onDragChange]     Called with true/false as drag state changes.
+ * @param {(files: FileList) => void}     props.onFiles            Called with FileList on drop or input change.
+ * @param {(dragging: boolean) => void}     [props.onDragChange]     Called with true/false as drag state changes.
  * @param {Object}       props.inputRef           React ref for the hidden file input.
  * @param {string}       [props.inputId]          HTML id for the hidden input.
  */

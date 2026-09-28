@@ -9,8 +9,8 @@ const { __ } = wp.i18n;
  * @param {Object}   props
  * @param {number}   props.width
  * @param {number}   props.height
- * @param {Function} props.onWidthChange
- * @param {Function} props.onHeightChange
+ * @param {(value: number) => void} props.onWidthChange
+ * @param {(value: number) => void} props.onHeightChange
  * @param {string}   [props.unit]            Defaults to "px".
  * @param {string}   [props.widthLabel]
  * @param {string}   [props.heightLabel]

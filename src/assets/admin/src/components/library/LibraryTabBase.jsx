@@ -50,6 +50,7 @@ const LibraryTableRow = memo(
 							checked={isSelected}
 							onChange={() => onToggleSelected(item.id)}
 							ariaLabel={sprintf(
+								/* translators: %s: entry name. */
 								__('Select %s', 'fotogrids'),
 								item.name
 							)}
@@ -167,6 +168,7 @@ const LibraryTableRow = memo(
 								disabled={!canManage}
 								onClick={() => onRequestDelete(item)}
 								ariaLabel={sprintf(
+									/* translators: %s: entry name. */
 									__('Delete %s', 'fotogrids'),
 									item.name
 								)}
@@ -184,6 +186,7 @@ const LibraryTableRow = memo(
 									<p>
 										{item.usage_count > 0
 											? sprintf(
+													/* translators: 1: entry name, 2: number of items using it. */
 													_n(
 														'Delete "%1$s"? This will remove it from %2$d item.',
 														'Delete "%1$s"? This will remove it from %2$d items.',
@@ -194,6 +197,7 @@ const LibraryTableRow = memo(
 													item.usage_count
 												)
 											: sprintf(
+													/* translators: %s: entry name. */
 													__(
 														'Delete "%s"? It is not used by any items.',
 														'fotogrids'
@@ -270,6 +274,7 @@ const LibraryTableToolbar = memo(
 						placeholder={
 							entityType.label_plural
 								? sprintf(
+										/* translators: %s: plural entry type, e.g. "tags". */
 										__('Search %s…', 'fotogrids'),
 										entityType.label_plural.toLowerCase()
 									)
@@ -298,6 +303,7 @@ const LibraryTableToolbar = memo(
 							onClick={onOpenCreate}
 						>
 							{sprintf(
+								/* translators: %s: singular entry type, e.g. "tag". */
 								__('Add %s', 'fotogrids'),
 								entityType.label_singular ||
 									__('entry', 'fotogrids')
@@ -330,6 +336,7 @@ const LibraryTableBulkBar = memo(
 			<div className="fotogrids-library-bulkbar">
 				<span>
 					{sprintf(
+						/* translators: %d: number of selected entries. */
 						_n(
 							'%d selected',
 							'%d selected',
@@ -1095,6 +1102,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				<div className="fotogrids-library-pagination tablenav-pages">
 					<span className="displaying-num">
 						{sprintf(
+							/* translators: %d: number of entries. */
 							_n('%d entry', '%d entries', total, 'fotogrids'),
 							total
 						)}
@@ -1109,6 +1117,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 						</Button>
 						<span className="paging-input">
 							{sprintf(
+								/* translators: 1: current page, 2: total pages. */
 								__('%1$d of %2$d', 'fotogrids'),
 								page,
 								totalPages
@@ -1134,6 +1143,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				variant="danger"
 				title={__('Delete selected entries?', 'fotogrids')}
 				message={sprintf(
+					/* translators: 1: number of entries, 2: plural entry type, e.g. "tags". */
 					_n(
 						'You are about to delete %1$d entry. Linked items will lose this %2$s.',
 						'You are about to delete %1$d entries. Linked items will lose these %2$s.',
@@ -1154,6 +1164,7 @@ const LibraryTabBase = ({ entityType, config }) => {
 				<Modal.Header>
 					<Modal.HeaderTitle>
 						{sprintf(
+							/* translators: %s: singular entry type, e.g. "tag". */
 							__('Add %s', 'fotogrids'),
 							entityType.label_singular ||
 								__('entry', 'fotogrids')

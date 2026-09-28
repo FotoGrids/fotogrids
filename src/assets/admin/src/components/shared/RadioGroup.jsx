@@ -6,7 +6,7 @@
  * component: pass `selected` and an `onChange(value)` handler.
  *
  * The options/selected/onChange shape intentionally mirrors the
- * @wordpress/components RadioControl it replaces, so existing call sites
+ * `@wordpress/components` RadioControl it replaces, so existing call sites
  * migrate with minimal change. Each option may also carry a `description`
  * and `disabled` flag.
  *

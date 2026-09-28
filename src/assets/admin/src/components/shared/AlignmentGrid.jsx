@@ -64,7 +64,7 @@ const POSITIONS = [
  *
  * @param {Object}   props
  * @param {string}   props.value      One of the nine position values.
- * @param {Function} props.onChange   Called with the chosen position value.
+ * @param {(position: string) => void} props.onChange   Called with the chosen position value.
  * @param {string}   [props.ariaLabel] Accessible name for the radiogroup.
  * @param {boolean}  [props.disabled]
  * @param {string}   [props.className]

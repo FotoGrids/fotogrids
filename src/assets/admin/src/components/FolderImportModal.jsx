@@ -9,9 +9,9 @@
  *
  * @param {Object}   props
  * @param {boolean}  props.isOpen             Modal visibility.
- * @param {Function} props.onClose            Called when the modal should close.
- * @param {Function} props.onAddItems         Called with an array of gallery item objects.
- * @param {Function} props.onUploadComplete   Called with an array of new attachment IDs.
+ * @param {() => void} props.onClose            Called when the modal should close.
+ * @param {(items: Object[]) => void} props.onAddItems         Called with an array of gallery item objects.
+ * @param {(ids: number[]) => void} props.onUploadComplete   Called with an array of new attachment IDs.
  * @param {number}   props.galleryId          Gallery the import is for.
  * @param {Object}   [props.strings]          Localized labels.
  */

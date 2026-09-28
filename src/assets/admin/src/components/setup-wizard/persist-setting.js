@@ -17,7 +17,7 @@
  *
  * @param {string} setting  Allowlisted option name (e.g. `fotogrids_user_persona`).
  * @param {string|boolean} value
- * @returns {Promise<{ ok: boolean, value?: any }>}
+ * @returns {Promise<{ ok: boolean, value?: unknown }>}
  */
 export async function persistSetting(setting, value) {
 	const admin = window.fotogridsAdmin || {};

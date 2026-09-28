@@ -21,8 +21,8 @@ import Icon from '../Icon';
  * @param {Array}    props.tabs        Tab descriptors: { id, label, icon?, group? }.
  * @param {Array}    [props.groups]    Group descriptors: { id, label, icon?, onClick? }. Omit for a flat list.
  * @param {string}   props.activeTab   Currently active tab id.
- * @param {Function} props.onTabChange Called with the tab id when a tab is chosen.
- * @param {Function} [props.getTabHref] Optional (id) => href, used so tabs are
+ * @param {(id: string) => void} props.onTabChange Called with the tab id when a tab is chosen.
+ * @param {(id: string) => string} [props.getTabHref] Optional (id) => href, used so tabs are
  *                                       real links (right-click / open-in-new-tab).
  * @param {string}   [props.ariaLabel] Accessible label for the <nav>.
  */

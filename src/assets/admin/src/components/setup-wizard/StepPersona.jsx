@@ -13,7 +13,7 @@ const { __ } = wp.i18n;
  *
  * @param {Object}            props
  * @param {string|null}       props.picked    Currently selected persona id, or null.
- * @param {Function}          props.onPick    Called with the persona id when a card is clicked.
+ * @param {(id: string) => void}          props.onPick    Called with the persona id when a card is clicked.
  */
 const PERSONAS = [
 	{

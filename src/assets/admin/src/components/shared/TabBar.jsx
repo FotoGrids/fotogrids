@@ -12,7 +12,7 @@ import Icon from './Icon.jsx';
  * @param {Array}    props.tabs           [{ id: string, label: string, icon?: string }]
  *                                        `icon` is a FotoGridsIcons name - renders left of the label.
  * @param {string}   props.activeTab      The `id` of the currently active tab.
- * @param {Function} props.onTabChange    Called with the tab `id` when a tab is clicked.
+ * @param {(id: string) => void} props.onTabChange    Called with the tab `id` when a tab is clicked.
  * @param {string}   [props.className]    Extra class(es) on the wrapper element.
  */
 const TabBar = ({ tabs = [], activeTab, onTabChange, className = '' }) => {

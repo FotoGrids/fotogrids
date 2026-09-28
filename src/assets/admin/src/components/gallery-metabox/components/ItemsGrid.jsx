@@ -11,9 +11,9 @@ import ItemCard from './ItemCard.jsx';
  * @param {Object}   props
  * @param {Array}    props.items             Items in grid order.
  * @param {Object}   props.strings           Localised strings.
- * @param {Function} props.onOpenItem        Opens the item editor.
- * @param {Function} props.onToggleFeatured  Sets or clears the featured item.
- * @param {Function} props.onRemoveItem      Removes an item from the gallery.
+ * @param {(id: number) => void} props.onOpenItem        Opens the item editor.
+ * @param {(id: number) => void} props.onToggleFeatured  Sets or clears the featured item.
+ * @param {(id: number) => void} props.onRemoveItem      Removes an item from the gallery.
  * @return {JSX.Element}
  */
 const ItemsGrid = ({

@@ -11,9 +11,9 @@ import MediaUpload from '../../blocks/MediaUpload.jsx';
  *
  * @param {Object}   props
  * @param {Object}   props.strings          Localised strings.
- * @param {Function} props.onUploadComplete Receives attachment ids after a direct upload.
- * @param {Function} props.onFromLibrary    Opens the media library.
- * @param {Function} props.onVideoEmbed     Opens the video embed modal.
+ * @param {(ids: number[]) => void} props.onUploadComplete Receives attachment ids after a direct upload.
+ * @param {() => void} props.onFromLibrary    Opens the media library.
+ * @param {() => void} props.onVideoEmbed     Opens the video embed modal.
  * @return {JSX.Element}
  */
 const ItemsEmptyState = ({

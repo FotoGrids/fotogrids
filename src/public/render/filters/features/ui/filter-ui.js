@@ -690,7 +690,7 @@
 			 * a `fotogrids:filters_changed` event with the same payload.
 			 *
 			 * @param {Element}  galleryEl
-			 * @param {Function} cb
+			 * @param {(active: Object) => void} cb
 			 */
 			onChange(galleryEl, cb) {
 				if (!changeListeners.has(galleryEl)) {

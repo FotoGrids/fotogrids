@@ -7,7 +7,7 @@
  * @param {Array}    props.crumbs       `{ label, path }` entries, root first.
  * @param {string}   props.currentPath  Path of the folder on screen.
  * @param {boolean}  [props.disabled]   Block navigation while work is in flight.
- * @param {Function} props.onNavigate   Called with the path of the crumb clicked.
+ * @param {(path: string) => void} props.onNavigate   Called with the path of the crumb clicked.
  * @param {string}   [props.label]      Accessible name for the nav landmark.
  */
 

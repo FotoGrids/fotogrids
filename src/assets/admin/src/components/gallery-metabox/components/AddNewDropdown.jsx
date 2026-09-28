@@ -18,8 +18,8 @@ const ADD_OPTIONS = [
  *
  * @param {Object}   props
  * @param {boolean}  props.isOpen   Whether the menu is showing.
- * @param {Function} props.onToggle Toggles the menu.
- * @param {Function} props.onSelect Receives the chosen action key.
+ * @param {() => void} props.onToggle Toggles the menu.
+ * @param {(action: string) => void} props.onSelect Receives the chosen action key.
  * @param {Object}   props.strings  Localised strings.
  * @return {JSX.Element}
  */

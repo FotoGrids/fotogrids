@@ -27,8 +27,8 @@ const EMPTY = {
  *
  * @param {Object}   props
  * @param {number}   [props.galleryId]   Scope to one gallery when set.
- * @param {Function} [props.onChange]    Called with the latest status after any refresh.
- * @param {*}        [props.refreshKey]  Change this to force a status re-fetch (e.g. after a save).
+ * @param {(status: Object) => void} [props.onChange]    Called with the latest status after any refresh.
+ * @param {unknown}        [props.refreshKey]  Change this to force a status re-fetch (e.g. after a save).
  */
 const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 	const [status, setStatus] = useState(EMPTY);

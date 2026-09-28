@@ -14,7 +14,7 @@ import { useEffect, useRef } from 'react';
  * @param {Object}   options
  * @param {Array}    options.items     Current items in grid order.
  * @param {Object}   options.strings   Localised strings; supplies the placeholder drop text.
- * @param {Function} options.onReorder Called with the new array of item ids after a drop.
+ * @param {(ids: number[]) => void} options.onReorder Called with the new array of item ids after a drop.
  * @return {void}
  */
 const useItemDragSort = ({ items, strings, onReorder }) => {

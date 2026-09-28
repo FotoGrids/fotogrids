@@ -14,9 +14,9 @@ import { isEmbedItem } from '../api/embed-api';
  * @param {Object}   props
  * @param {Object}   props.item              The item to render.
  * @param {Object}   props.strings           Localised strings.
- * @param {Function} props.onOpen            Opens the item editor.
- * @param {Function} props.onToggleFeatured  Sets or clears the featured item.
- * @param {Function} props.onRemove          Removes the item from the gallery.
+ * @param {(id: number) => void} props.onOpen            Opens the item editor.
+ * @param {(id: number) => void} props.onToggleFeatured  Sets or clears the featured item.
+ * @param {(id: number) => void} props.onRemove          Removes the item from the gallery.
  * @return {JSX.Element}
  */
 const ItemCard = ({ item, strings, onOpen, onToggleFeatured, onRemove }) => {

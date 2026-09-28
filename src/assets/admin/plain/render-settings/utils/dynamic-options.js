@@ -11,7 +11,7 @@ window.FotoGridsDynamicOptions = window.FotoGridsDynamicOptions || {};
  *
  * @param {Object}   setting          The catalog setting definition.
  * @param {Object}   [context]        Optional context.
- * @param {Function} [context.decorate] Maps each fetched option before use.
+ * @param {(option: Object) => Object} [context.decorate] Maps each fetched option before use.
  * @return {{options: Array, loading: boolean}} Resolved options and load state.
  */
 const useDynamicOptions = (setting, context = {}) => {

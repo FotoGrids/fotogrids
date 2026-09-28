@@ -139,7 +139,7 @@
 	 * next sync).
 	 *
 	 * `siblings` is read off the computed --fg-pagination-siblings CSS
-	 * variable, so the per-breakpoint @media block emitted by PHP
+	 * variable, so the per-breakpoint `@media` block emitted by PHP
 	 * (Responsive_Var → Style_Var_Builder) automatically downgrades it to
 	 * 1 on mobile and 2 on desktop/tablet without any JS breakpoint plumbing.
 	 *

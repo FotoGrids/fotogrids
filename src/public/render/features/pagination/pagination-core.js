@@ -796,7 +796,7 @@
 	 * Subscribe to page-change notifications for a specific gallery.
 	 *
 	 * @param {Element}  galleryEl
-	 * @param {Function} cb
+	 * @param {(detail: Object) => void} cb
 	 */
 	function onChange(galleryEl, cb) {
 		if (!listeners.has(galleryEl)) {

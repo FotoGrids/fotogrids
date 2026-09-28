@@ -8,7 +8,7 @@
  * @param {?string}  props.parent       Parent path, or null at the uploads root.
  * @param {string}   props.currentPath  Path of the folder on screen.
  * @param {boolean}  [props.disabled]   Block navigation while work is in flight.
- * @param {Function} props.onNavigate   Called with the path to open.
+ * @param {(path: string) => void} props.onNavigate   Called with the path to open.
  */
 
 import React from 'react';

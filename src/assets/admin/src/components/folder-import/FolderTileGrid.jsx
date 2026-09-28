@@ -7,7 +7,7 @@
  * @param {Array}    props.files            `{ name, path, thumbnail, size, attachment_id }`.
  * @param {string[]} props.selected         Paths currently selected.
  * @param {boolean}  [props.disabled]       Block selection while work is in flight.
- * @param {Function} props.onToggle         Called with the path of the tile clicked.
+ * @param {(path: string) => void} props.onToggle         Called with the path of the tile clicked.
  * @param {string}   [props.newBadgeLabel]  Badge shown on files not yet in the library.
  */
 

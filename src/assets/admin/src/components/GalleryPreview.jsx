@@ -39,7 +39,7 @@ import { buildRestUrl } from '../utils/rest-url';
  * @param {Object}   props
  * @param {number}   props.galleryId  Gallery post id.
  * @param {boolean}  props.hasItems   Whether the gallery has at least one item.
- * @param {Function} props.onAddItems Called by the empty state's Add items button.
+ * @param {() => void} props.onAddItems Called by the empty state's Add items button.
  * @return {JSX.Element}
  */
 const GalleryPreview = ({

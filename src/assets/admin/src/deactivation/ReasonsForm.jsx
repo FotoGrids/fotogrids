@@ -15,10 +15,10 @@ const MAX_DETAIL_LENGTH = 128;
 /**
  * @param {Object}   props
  * @param {Object}   props.settings  Localised fotogridsDeactivation data.
- * @param {Function} props.onSubmit  Called with the selected reason + details.
- * @param {Function} props.onSkip    Called when the user skips feedback.
- * @param {Function} props.onCancel  Called when the user cancels.
- * @param {Function} props.onClose   Called when the user dismisses via the header close button.
+ * @param {(reason: {id: string, details: string, snooze: boolean}) => Promise<void>} props.onSubmit  Called with the selected reason + details.
+ * @param {() => void} props.onSkip    Called when the user skips feedback.
+ * @param {() => void} props.onCancel  Called when the user cancels.
+ * @param {() => void} props.onClose   Called when the user dismisses via the header close button.
  * @return {JSX.Element} The composed modal content.
  */
 export default function ReasonsForm({

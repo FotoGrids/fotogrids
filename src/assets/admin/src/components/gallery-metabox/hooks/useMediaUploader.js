@@ -10,8 +10,8 @@ import { useCallback } from 'react';
  *
  * @param {Object}   options
  * @param {Object}   options.strings  Localised strings.
- * @param {Function} options.onSelect Called with the selected attachments mapped to items.
- * @return {Function} Opens the frame; takes the router tab to land on.
+ * @param {(items: Object[]) => void} options.onSelect Called with the selected attachments mapped to items.
+ * @return {(contentMode?: string) => void} Opens the frame; takes the router tab to land on.
  */
 const useMediaUploader = ({ strings, onSelect }) =>
 	useCallback(

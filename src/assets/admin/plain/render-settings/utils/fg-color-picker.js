@@ -215,9 +215,9 @@ function el(tag, attrs, ...children) {
  *
  * @param {object} options
  * @param {string}   options.value      Initial CSS color string.
- * @param {Function} options.onChange   Called with CSS string on every change.
+ * @param {(color: string) => void} options.onChange   Called with CSS string on every change.
  * @param {boolean}  [options.disabled] If true, all controls are inert.
- * @returns {{ element: HTMLElement, setValue: Function, destroy: Function }}
+ * @returns {{ element: HTMLElement, setValue: (color: string) => void, destroy: () => void }}
  */
 window.FGColorPicker.create = function (options) {
 	const {
