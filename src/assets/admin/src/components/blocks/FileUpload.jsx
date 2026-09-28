@@ -20,63 +20,67 @@ import UploadArea from './UploadArea';
 const { __ } = wp.i18n;
 
 const FileUpload = ({
-    onFileReady,
-    accept,
-    title    = __('Select file to import', 'fotogrids'),
-    subtitle = __('or drag and drop your file here', 'fotogrids'),
-    hint,
-    inputId  = 'fotogrids-file-upload-input',
+	onFileReady,
+	accept,
+	title = __('Select file to import', 'fotogrids'),
+	subtitle = __('or drag and drop your file here', 'fotogrids'),
+	hint,
+	inputId = 'fotogrids-file-upload-input',
 }) => {
-    const [isDragging, setIsDragging]   = useState(false);
-    const [isReading, setIsReading]     = useState(false);
-    const [error, setError]             = useState(null);
-    const inputRef = useRef(null);
+	const [isDragging, setIsDragging] = useState(false);
+	const [isReading, setIsReading] = useState(false);
+	const [error, setError] = useState(null);
+	const inputRef = useRef(null);
 
-    const handleFiles = (fileList) => {
-        const file = fileList[0];
-        if (!file) return;
+	const handleFiles = (fileList) => {
+		const file = fileList[0];
+		if (!file) {
+			return;
+		}
 
-        setIsReading(true);
-        setError(null);
+		setIsReading(true);
+		setError(null);
 
-        const reader = new FileReader();
+		const reader = new FileReader();
 
-        reader.onload = (e) => {
-            setIsReading(false);
-            if (onFileReady) {
-                onFileReady({
-                    name: file.name,
-                    size: file.size,
-                    text: e.target.result,
-                });
-            }
-        };
+		reader.onload = (e) => {
+			setIsReading(false);
+			if (onFileReady) {
+				onFileReady({
+					name: file.name,
+					size: file.size,
+					text: e.target.result,
+				});
+			}
+		};
 
-        reader.onerror = () => {
-            setIsReading(false);
-            setError(__('Could not read the file. Please try again.', 'fotogrids'));
-        };
+		reader.onerror = () => {
+			setIsReading(false);
+			setError(
+				__('Could not read the file. Please try again.', 'fotogrids')
+			);
+		};
 
-        reader.readAsText(file);
-    };
+		reader.readAsText(file);
+	};
 
-    return (
-        <UploadArea
-            isDragging={isDragging}
-            isUploading={isReading}
-            uploadProgress={isReading ? 50 : 0}
-            error={error}
-            title={title}
-            subtitle={subtitle}
-            hint={hint}
-            accept={accept}
-            multiple={false}
-            onFiles={handleFiles}
-            onDragChange={setIsDragging}
-            inputRef={inputRef}
-            inputId={inputId}
-        />
-    );
+	return (
+		<UploadArea
+			isDragging={isDragging}
+			isUploading={isReading}
+			uploadProgress={isReading ? 50 : 0}
+			error={error}
+			title={title}
+			subtitle={subtitle}
+			hint={hint}
+			accept={accept}
+			multiple={false}
+			onFiles={handleFiles}
+			onDragChange={setIsDragging}
+			inputRef={inputRef}
+			inputId={inputId}
+		/>
+	);
 };
 
 export default FileUpload;

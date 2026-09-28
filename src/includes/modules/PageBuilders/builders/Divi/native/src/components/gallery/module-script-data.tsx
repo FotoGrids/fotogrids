@@ -3,9 +3,7 @@ import { ModuleScriptDataProps } from '@divi/module';
 import { FotoGridsGalleryAttrs } from './types';
 
 export const ModuleScriptData = ({
-  elements,
+	elements,
 }: ModuleScriptDataProps<FotoGridsGalleryAttrs>): ReactElement => (
-  <Fragment>
-    {elements.scriptData({ attrName: 'module' })}
-  </Fragment>
+	<Fragment>{elements.scriptData({ attrName: 'module' })}</Fragment>
 );

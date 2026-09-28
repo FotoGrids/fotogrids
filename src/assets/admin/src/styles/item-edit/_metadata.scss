@@ -15,16 +15,24 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	width: 100%;
+	margin: 0;
 	padding: 10px 12px;
 	cursor: pointer;
+	border: 0;
 	border-bottom: 1px solid #f0f0f0;
+	background: none;
+	font: inherit;
+	color: inherit;
+	text-align: start;
 	transition: background-color 0.2s ease;
 
 	&:last-child {
 		border-bottom: none;
 	}
 
-	&:hover {
+	&:hover,
+	&:focus-visible {
 		background-color: #f6f7f7;
 	}
 }

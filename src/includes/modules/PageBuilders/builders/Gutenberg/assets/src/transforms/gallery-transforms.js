@@ -17,37 +17,38 @@
 import { createBlock } from '@wordpress/blocks';
 
 const fromShortcode = {
-    type: 'shortcode',
-    tag: 'fotogrids_gallery',
-    attributes: {
-        galleryId: {
-            type: 'number',
-            shortcode: ({ named: { id } }) => parseInt(id, 10) || 0,
-        },
-    },
+	type: 'shortcode',
+	tag: 'fotogrids_gallery',
+	attributes: {
+		galleryId: {
+			type: 'number',
+			shortcode: ({ named: { id } }) => parseInt(id, 10) || 0,
+		},
+	},
 };
 
 const fromCoreGallery = {
-    type: 'block',
-    blocks: ['core/gallery'],
-    transform: (attributes, innerBlocks) => {
-        const ids = collectCoreGalleryAttachmentIds(attributes, innerBlocks);
+	type: 'block',
+	blocks: ['core/gallery'],
+	transform: (attributes, innerBlocks) => {
+		const ids = collectCoreGalleryAttachmentIds(attributes, innerBlocks);
 
-        return createBlock('fotogrids/gallery', {
-            galleryId: 0,
-            _pendingImportAttachmentIds: ids,
-            _pendingImportTitle: '',
-        });
-    },
+		return createBlock('fotogrids/gallery', {
+			galleryId: 0,
+			_pendingImportAttachmentIds: ids,
+			_pendingImportTitle: '',
+		});
+	},
 };
 
 const toShortcode = {
-    type: 'block',
-    blocks: ['core/shortcode'],
-    transform: ({ galleryId }) => createBlock('core/shortcode', {
-        text: `[fotogrids_gallery id="${parseInt(galleryId, 10) || 0}"]`,
-    }),
-    isMatch: ({ galleryId }) => Number(galleryId) > 0,
+	type: 'block',
+	blocks: ['core/shortcode'],
+	transform: ({ galleryId }) =>
+		createBlock('core/shortcode', {
+			text: `[fotogrids_gallery id="${parseInt(galleryId, 10) || 0}"]`,
+		}),
+	isMatch: ({ galleryId }) => Number(galleryId) > 0,
 };
 
 /**
@@ -62,33 +63,39 @@ const toShortcode = {
  * @return {number[]}
  */
 const collectCoreGalleryAttachmentIds = (attributes, innerBlocks) => {
-    const ids = [];
+	const ids = [];
 
-    if (Array.isArray(attributes?.ids)) {
-        attributes.ids.forEach((id) => {
-            const n = parseInt(id, 10);
-            if (n > 0 && !ids.includes(n)) ids.push(n);
-        });
-    }
-    if (Array.isArray(attributes?.images)) {
-        attributes.images.forEach((image) => {
-            const n = parseInt(image?.id, 10);
-            if (n > 0 && !ids.includes(n)) ids.push(n);
-        });
-    }
-    if (Array.isArray(innerBlocks)) {
-        innerBlocks.forEach((block) => {
-            if (block?.name === 'core/image') {
-                const n = parseInt(block?.attributes?.id, 10);
-                if (n > 0 && !ids.includes(n)) ids.push(n);
-            }
-        });
-    }
+	if (Array.isArray(attributes?.ids)) {
+		attributes.ids.forEach((id) => {
+			const n = parseInt(id, 10);
+			if (n > 0 && !ids.includes(n)) {
+				ids.push(n);
+			}
+		});
+	}
+	if (Array.isArray(attributes?.images)) {
+		attributes.images.forEach((image) => {
+			const n = parseInt(image?.id, 10);
+			if (n > 0 && !ids.includes(n)) {
+				ids.push(n);
+			}
+		});
+	}
+	if (Array.isArray(innerBlocks)) {
+		innerBlocks.forEach((block) => {
+			if (block?.name === 'core/image') {
+				const n = parseInt(block?.attributes?.id, 10);
+				if (n > 0 && !ids.includes(n)) {
+					ids.push(n);
+				}
+			}
+		});
+	}
 
-    return ids;
+	return ids;
 };
 
 export default {
-    from: [ fromShortcode, fromCoreGallery ],
-    to: [ toShortcode ],
+	from: [fromShortcode, fromCoreGallery],
+	to: [toShortcode],
 };

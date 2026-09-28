@@ -518,7 +518,9 @@ function readActiveFilters(galleryEl) {
 		window.FotoGrids &&
 		window.FotoGrids.modules &&
 		window.FotoGrids.modules.filters;
-	if (!fmod || typeof fmod.getActive !== 'function') return {};
+	if (!fmod || typeof fmod.getActive !== 'function') {
+		return {};
+	}
 	return fmod.getActive(galleryEl);
 }
 
@@ -930,30 +932,44 @@ class FotoGridsLightbox {
 	 * @param {string}      [opts.dir]  Force tooltip direction ('above'|'below'|'left'|'right').
 	 */
 	_bindTooltip(el, opts) {
-		if (!window.FgTooltip) return;
+		if (!window.FgTooltip) {
+			return;
+		}
 
 		// Store forced direction so FgTooltip's position() honours it.
-		if (opts?.dir) el.dataset.fgTooltipDir = opts.dir;
+		if (opts?.dir) {
+			el.dataset.fgTooltipDir = opts.dir;
+		}
 
 		// Wire aria-describedby once so screen readers announce the tooltip on focus.
 		const ttEl = document.getElementById('fg-tooltip');
-		if (ttEl) el.setAttribute('aria-describedby', ttEl.id);
+		if (ttEl) {
+			el.setAttribute('aria-describedby', ttEl.id);
+		}
 
 		const getLabel = () =>
 			el.getAttribute('aria-label') || el.getAttribute('title') || '';
 
 		el.addEventListener('mouseenter', () => {
-			if (this.settings?.noTooltips) return;
+			if (this.settings?.noTooltips) {
+				return;
+			}
 			const l = getLabel();
-			if (l) window.FgTooltip.showImmediately(el, l);
+			if (l) {
+				window.FgTooltip.showImmediately(el, l);
+			}
 		});
 		el.addEventListener('mouseleave', () =>
 			window.FgTooltip.hideImmediately()
 		);
 		el.addEventListener('focus', () => {
-			if (this.settings?.noTooltips) return;
+			if (this.settings?.noTooltips) {
+				return;
+			}
 			const l = getLabel();
-			if (l) window.FgTooltip.showImmediately(el, l);
+			if (l) {
+				window.FgTooltip.showImmediately(el, l);
+			}
 		});
 		el.addEventListener('blur', () => window.FgTooltip.hideImmediately());
 	}
@@ -1048,12 +1064,16 @@ class FotoGridsLightbox {
 
 		dlg.querySelector('.fg-lb-dots').addEventListener('click', (e) => {
 			const btn = e.target.closest('[data-lb-index]');
-			if (btn) this.goTo(parseInt(btn.dataset.lbIndex, 10));
+			if (btn) {
+				this.goTo(parseInt(btn.dataset.lbIndex, 10));
+			}
 		});
 
 		dlg.querySelector('.fg-lb-thumbs').addEventListener('click', (e) => {
 			const btn = e.target.closest('[data-lb-index]');
-			if (btn) this.goTo(parseInt(btn.dataset.lbIndex, 10));
+			if (btn) {
+				this.goTo(parseInt(btn.dataset.lbIndex, 10));
+			}
 		});
 
 		dlg.addEventListener('pointerdown', this._onPointerDown);
@@ -1079,7 +1099,9 @@ class FotoGridsLightbox {
 		// Escape closes a modal <dialog> natively without calling close(), so the
 		// fotogrids:lightbox:close event is routed from the dialog's own 'close'.
 		dlg.addEventListener('close', () => {
-			if (this._closeInProgress) return;
+			if (this._closeInProgress) {
+				return;
+			}
 			this.close();
 		});
 
@@ -1094,7 +1116,9 @@ class FotoGridsLightbox {
 	 * @param {number}      index
 	 */
 	open(galleryEl, index) {
-		if (!this.dialog) this._createDialog();
+		if (!this.dialog) {
+			this._createDialog();
+		}
 
 		this.galleryEl = galleryEl;
 		this.settings = readSettings(galleryEl);
@@ -1142,7 +1166,9 @@ class FotoGridsLightbox {
 			);
 		}
 
-		if (this._total === 0) return;
+		if (this._total === 0) {
+			return;
+		}
 
 		this._applySettings();
 		this._renderNav();
@@ -1194,8 +1220,12 @@ class FotoGridsLightbox {
 	 * @param {number} index          Start index into slides.
 	 */
 	openSlides(galleryEl, slides, index) {
-		if (!Array.isArray(slides) || slides.length === 0) return;
-		if (!this.dialog) this._createDialog();
+		if (!Array.isArray(slides) || slides.length === 0) {
+			return;
+		}
+		if (!this.dialog) {
+			this._createDialog();
+		}
 
 		this.galleryEl = galleryEl;
 		this.settings = readSettings(galleryEl);
@@ -1234,8 +1264,9 @@ class FotoGridsLightbox {
 	}
 
 	close() {
-		if (!this.dialog) return;
-		if (this._closeInProgress) return;
+		if (!this.dialog || this._closeInProgress) {
+			return;
+		}
 		this._closeInProgress = true;
 
 		// Stop any playing video before the dialog closes.
@@ -1273,7 +1304,9 @@ class FotoGridsLightbox {
 			candidates.forEach((el) => {
 				const figure = el.closest('.fg-item');
 				const seqStr = figure ? figure.dataset.fgSequenceIndex : null;
-				if (seqStr === null || seqStr === '') return;
+				if (seqStr === null || seqStr === '') {
+					return;
+				}
 				const seq = parseInt(seqStr, 10);
 				const d = Math.abs(seq - target);
 				if (d < bestDelta) {
@@ -1281,7 +1314,9 @@ class FotoGridsLightbox {
 					best = el;
 				}
 			});
-			if (best) best.focus({ preventScroll: true });
+			if (best) {
+				best.focus({ preventScroll: true });
+			}
 		}
 
 		this._itemDataCache.clear();
@@ -1320,8 +1355,9 @@ class FotoGridsLightbox {
 	 * @returns {{offset:number, limit:number}|null}
 	 */
 	_findGap(from, maxLen) {
-		if (from < 0 || from >= this._total) return null;
-		if (this.items[from] != null) return null;
+		if (from < 0 || from >= this._total || this.items[from] != null) {
+			return null;
+		}
 		let end = from;
 		while (
 			end < this._total &&
@@ -1346,7 +1382,9 @@ class FotoGridsLightbox {
 	 * @returns {Promise<void>}
 	 */
 	_ensureSlides(centerIndex, lookahead) {
-		if (!isGalleryPaginated(this.galleryEl)) return Promise.resolve();
+		if (!isGalleryPaginated(this.galleryEl)) {
+			return Promise.resolve();
+		}
 
 		const start = Math.max(0, centerIndex - lookahead);
 		const end = Math.min(this._total - 1, centerIndex + lookahead);
@@ -1380,10 +1418,14 @@ class FotoGridsLightbox {
 	 */
 	_fetchSlideRange(offset, limit) {
 		const gEl = this.galleryEl;
-		if (!gEl) return Promise.resolve();
+		if (!gEl) {
+			return Promise.resolve();
+		}
 
 		const key = `${offset}:${limit}`;
-		if (!this._inFlightFetches) this._inFlightFetches = new Map();
+		if (!this._inFlightFetches) {
+			this._inFlightFetches = new Map();
+		}
 		if (this._inFlightFetches.has(key)) {
 			return this._inFlightFetches.get(key);
 		}
@@ -1407,10 +1449,10 @@ class FotoGridsLightbox {
 			credentials: 'same-origin',
 			body: JSON.stringify({
 				gallery_id: galleryId,
-				offset: offset,
-				limit: limit,
+				offset,
+				limit,
 				random_seed: randomSeed,
-				filters: filters,
+				filters,
 			}),
 		})
 			.then((response) => {
@@ -1420,7 +1462,9 @@ class FotoGridsLightbox {
 				return response.json();
 			})
 			.then((data) => {
-				if (!data || !Array.isArray(data.slides)) return;
+				if (!data || !Array.isArray(data.slides)) {
+					return;
+				}
 
 				// The server's total is authoritative; resize the sparse array to match.
 				if (
@@ -1437,7 +1481,9 @@ class FotoGridsLightbox {
 
 				data.slides.forEach((apiSlide, i) => {
 					const slot = offset + i;
-					if (slot < 0 || slot >= this._total) return;
+					if (slot < 0 || slot >= this._total) {
+						return;
+					}
 					if (this.items[slot] == null) {
 						this.items[slot] = buildSlideFromApi(apiSlide);
 					}
@@ -1468,7 +1514,9 @@ class FotoGridsLightbox {
 	 * Called after a fetch resolves so newly-arrived data shows up.
 	 */
 	_refreshChrome() {
-		if (!this.dialog) return;
+		if (!this.dialog) {
+			return;
+		}
 		try {
 			this._renderDots();
 			this._renderThumbs();
@@ -1485,7 +1533,9 @@ class FotoGridsLightbox {
 	 * @param {number} delta
 	 */
 	navigate(delta) {
-		if (this._transitioning) return;
+		if (this._transitioning) {
+			return;
+		}
 
 		const len = this._total;
 		let next;
@@ -1494,7 +1544,9 @@ class FotoGridsLightbox {
 			next = (((this.index + delta) % len) + len) % len;
 		} else {
 			next = Math.max(0, Math.min(this.index + delta, len - 1));
-			if (next === this.index) return;
+			if (next === this.index) {
+				return;
+			}
 		}
 
 		// Start fetching around the new index before rendering it.
@@ -1528,7 +1580,9 @@ class FotoGridsLightbox {
 	 * @param {number} index
 	 */
 	goTo(index) {
-		if (index === this.index || this._transitioning) return;
+		if (index === this.index || this._transitioning) {
+			return;
+		}
 		const delta = index > this.index ? 1 : -1;
 		this._ensureSlides(index, this._lookahead());
 		this._showItem(index, true);
@@ -1567,7 +1621,9 @@ class FotoGridsLightbox {
 	 */
 	_clampZoomOffset() {
 		const imgEl = this.dialog?.querySelector('.fg-lb-img');
-		if (!imgEl) return;
+		if (!imgEl) {
+			return;
+		}
 
 		const wrap = imgEl.parentElement;
 		const wW = wrap.clientWidth;
@@ -1598,7 +1654,9 @@ class FotoGridsLightbox {
 	 *                                   Stops auto-progress when progressStop is on.
 	 */
 	_applyZoom(byUser = false) {
-		if (!this.dialog) return;
+		if (!this.dialog) {
+			return;
+		}
 
 		// If this zoom was triggered by the user and progressStop is enabled, stop auto.
 		if (
@@ -1645,7 +1703,9 @@ class FotoGridsLightbox {
 	 * hasn't loaded yet or its natural size is unknown.
 	 */
 	_effectiveZoomMax() {
-		if (this.settings?.zoomBeyond) return FGLB_ZOOM_MAX;
+		if (this.settings?.zoomBeyond) {
+			return FGLB_ZOOM_MAX;
+		}
 
 		const imgEl = this.dialog?.querySelector('.fg-lb-img');
 		if (imgEl && imgEl.naturalWidth && imgEl.offsetWidth) {
@@ -1735,8 +1795,12 @@ class FotoGridsLightbox {
 		if (s.zoom) {
 			dlg.setAttribute('data-fg-lb-zoom', '');
 			dlg.setAttribute('data-fg-lb-zoom-trigger', s.zoomTrigger);
-			if (s.zoomIcons) dlg.setAttribute('data-fg-lb-zoom-icons', '');
-			if (s.zoomBeyond) dlg.setAttribute('data-fg-lb-zoom-beyond', '');
+			if (s.zoomIcons) {
+				dlg.setAttribute('data-fg-lb-zoom-icons', '');
+			}
+			if (s.zoomBeyond) {
+				dlg.setAttribute('data-fg-lb-zoom-beyond', '');
+			}
 		}
 
 		// Auto-progress indicator style + bar location.
@@ -1768,7 +1832,9 @@ class FotoGridsLightbox {
 		const toolbarStart = dlg.querySelector('.fg-lb-toolbar-start');
 		const toolbarEnd = dlg.querySelector('.fg-lb-toolbar-end');
 		const content = dlg.querySelector('.fg-lb-content');
-		if (!toolbar || !toolbarStart || !toolbarEnd || !content) return;
+		if (!toolbar || !toolbarStart || !toolbarEnd || !content) {
+			return;
+		}
 
 		const labels = s.labels;
 		toolbar.setAttribute('aria-label', labels.toolbar);
@@ -1961,9 +2027,11 @@ class FotoGridsLightbox {
 						FGLB_ZOOM_MIN,
 						this._zoomScale - FGLB_ZOOM_STEP
 					);
-					if (this._zoomScale === FGLB_ZOOM_MIN)
+					if (this._zoomScale === FGLB_ZOOM_MIN) {
 						this._zoomOffset = { x: 0, y: 0 };
-					else this._clampZoomOffset();
+					} else {
+						this._clampZoomOffset();
+					}
 					this._applyZoom(true);
 				});
 				// Insert before zoom-in so order is: … | − | + | close
@@ -2060,7 +2128,9 @@ class FotoGridsLightbox {
 	 */
 	_syncPlayPauseBtn(paused) {
 		const btn = this.dialog?.querySelector('.fg-lb-play-pause');
-		if (!btn) return;
+		if (!btn) {
+			return;
+		}
 
 		if (paused) {
 			// Currently paused → show play triangle so user can resume
@@ -2087,7 +2157,9 @@ class FotoGridsLightbox {
 		dlg.querySelector('.fg-lb-prev').hidden = !show;
 		dlg.querySelector('.fg-lb-next').hidden = !show;
 
-		if (show) this._updateNavEnds();
+		if (show) {
+			this._updateNavEnds();
+		}
 	}
 
 	/**
@@ -2096,7 +2168,9 @@ class FotoGridsLightbox {
 	 */
 	_updateNavEnds() {
 		const s = this.settings;
-		if (!s.showArrows || this.items.length <= 1) return;
+		if (!s.showArrows || this.items.length <= 1) {
+			return;
+		}
 
 		const dlg = this.dialog;
 		const prevBtn = dlg.querySelector('.fg-lb-prev');
@@ -2142,7 +2216,9 @@ class FotoGridsLightbox {
 	}
 
 	_updateDots() {
-		if (!this.settings.showDots) return;
+		if (!this.settings.showDots) {
+			return;
+		}
 		this.dialog.querySelectorAll('.fg-lb-dot').forEach((btn, i) => {
 			const active = i === this.index;
 			btn.classList.toggle('fg-lb-dot--active', active);
@@ -2152,7 +2228,9 @@ class FotoGridsLightbox {
 
 	_updateCounter() {
 		const el = this.dialog?.querySelector('.fg-lb-counter');
-		if (!el) return;
+		if (!el) {
+			return;
+		}
 		el.textContent = `${this.index + 1} / ${this.items.length}`;
 	}
 
@@ -2238,7 +2316,9 @@ class FotoGridsLightbox {
 	}
 
 	_updateThumbs() {
-		if (this.settings.thumbLocation === 'none') return;
+		if (this.settings.thumbLocation === 'none') {
+			return;
+		}
 		this.dialog.querySelectorAll('.fg-lb-thumb').forEach((btn, i) => {
 			btn.classList.toggle('fg-lb-thumb--active', i === this.index);
 			btn.setAttribute(
@@ -2264,7 +2344,9 @@ class FotoGridsLightbox {
 		const s = this.settings;
 
 		// Reset zoom on every slide change so the new image starts at 1×.
-		if (s.zoom) this._resetZoom();
+		if (s.zoom) {
+			this._resetZoom();
+		}
 
 		dlg.setAttribute(
 			'aria-label',
@@ -2390,9 +2472,13 @@ class FotoGridsLightbox {
 		const imgEl = dlg.querySelector('.fg-lb-img');
 		const spinner = dlg.querySelector('.fg-lb-spinner');
 
-		if (!wrap) return;
+		if (!wrap) {
+			return;
+		}
 
-		if (spinner) spinner.hidden = true;
+		if (spinner) {
+			spinner.hidden = true;
+		}
 		if (imgEl) {
 			imgEl.classList.remove('fg-lb-img--loading');
 			imgEl.classList.add('fg-lb-img--hidden');
@@ -2442,7 +2528,9 @@ class FotoGridsLightbox {
 		const settings = item.embedSettings || {};
 
 		if (item.itemType === 'video_file') {
-			if (!item.videoSrc) return null;
+			if (!item.videoSrc) {
+				return null;
+			}
 			const video = document.createElement('video');
 			video.className = 'fg-lb-video-player';
 			video.src = item.videoSrc;
@@ -2457,12 +2545,16 @@ class FotoGridsLightbox {
 			return video;
 		}
 
-		if (!item.embedId) return null;
+		if (!item.embedId) {
+			return null;
+		}
 		const src =
 			item.itemType === 'video_vimeo'
 				? buildVimeoEmbedSrc(item.embedId, settings)
 				: buildYouTubeEmbedSrc(item.embedId, settings);
-		if (!src) return null;
+		if (!src) {
+			return null;
+		}
 
 		const iframe = document.createElement('iframe');
 		iframe.className = 'fg-lb-video-player';
@@ -2482,7 +2574,9 @@ class FotoGridsLightbox {
 
 	_preloadAdjacentSlides(index) {
 		const count = this.settings.preloadSlides;
-		if (!count || this.items.length <= 1) return;
+		if (!count || this.items.length <= 1) {
+			return;
+		}
 
 		const len = this.items.length;
 		const loop = this.settings.loop;
@@ -2494,11 +2588,15 @@ class FotoGridsLightbox {
 			];
 
 			candidates.forEach((i) => {
-				if (i < 0 || i >= len) return;
+				if (i < 0 || i >= len) {
+					return;
+				}
 				const src = this.items[i]
 					? fullSrcForViewport(this.items[i], this.settings.mobileMax)
 					: '';
-				if (!src || this._preloadCache.has(src)) return;
+				if (!src || this._preloadCache.has(src)) {
+					return;
+				}
 				this._preloadCache.add(src);
 				new Image().src = src;
 			});
@@ -2628,10 +2726,14 @@ class FotoGridsLightbox {
 	 * @returns {Object|null}
 	 */
 	_sharingConfig() {
-		if (!this.galleryEl || !window.FotoGridsSharing) return null;
+		if (!this.galleryEl || !window.FotoGridsSharing) {
+			return null;
+		}
 
 		const raw = this.galleryEl.dataset.fgSharing;
-		if (!raw) return null;
+		if (!raw) {
+			return null;
+		}
 
 		let config;
 		try {
@@ -2663,7 +2765,9 @@ class FotoGridsLightbox {
 	 */
 	_buildLightboxShareBar(item, overrides) {
 		const config = this._sharingConfig();
-		if (!config) return null;
+		if (!config) {
+			return null;
+		}
 
 		// Apply overrides without mutating the resolved config the rest of the
 		// sharing pipeline reads.
@@ -2714,7 +2818,9 @@ class FotoGridsLightbox {
 			button_size: 'small',
 			button_style: 'icons_only',
 		});
-		if (!bar) return;
+		if (!bar) {
+			return;
+		}
 
 		bar.classList.add('fotogrids-share-bar--lightbox-popover');
 
@@ -2735,13 +2841,19 @@ class FotoGridsLightbox {
 	 */
 	_renderInfoBlocks(item) {
 		const infoEl = this.dialog?.querySelector('.fg-lb-info');
-		if (!infoEl) return;
+		if (!infoEl) {
+			return;
+		}
 
 		const s = this.settings;
-		if (!s.infoPanelEnabled) return;
+		if (!s.infoPanelEnabled) {
+			return;
+		}
 
 		// Explicit empty selection - the panel renders nothing.
-		if (Array.isArray(s.infoBlocks) && s.infoBlocks.length === 0) return;
+		if (Array.isArray(s.infoBlocks) && s.infoBlocks.length === 0) {
+			return;
+		}
 
 		// Slide still loading: clear the panel; it re-renders when the slide arrives.
 		if (!item) {
@@ -2831,7 +2943,9 @@ class FotoGridsLightbox {
 			}
 		}
 
-		if (!needsRest) return;
+		if (!needsRest) {
+			return;
+		}
 
 		const itemId = item.id ? String(item.id) : '';
 		if (!itemId) {
@@ -2938,7 +3052,9 @@ class FotoGridsLightbox {
 					const idx = blocks.findIndex((b) => textBlocks.includes(b));
 					let insertedBefore = null;
 					for (let k = idx + 1; k < blocks.length; k++) {
-						if (textBlocks.includes(blocks[k])) continue;
+						if (textBlocks.includes(blocks[k])) {
+							continue;
+						}
 						const nextEl = infoEl.querySelector(
 							'[data-fg-lb-block="' + blocks[k] + '"]'
 						);
@@ -2959,7 +3075,9 @@ class FotoGridsLightbox {
 			const blockEl = infoEl.querySelector(
 				`[data-fg-lb-block="${blockId}"]`
 			);
-			if (!blockEl) return;
+			if (!blockEl) {
+				return;
+			}
 
 			blockEl.classList.remove('fg-lb-info-block--loading');
 
@@ -2985,14 +3103,21 @@ class FotoGridsLightbox {
 				}
 				const rows = [];
 				const labels = this.settings.labels;
-				if (fi.filename) rows.push([labels.file, fi.filename]);
-				if (fi.filesize) rows.push([labels.size, fi.filesize]);
-				if (fi.width && fi.height)
+				if (fi.filename) {
+					rows.push([labels.file, fi.filename]);
+				}
+				if (fi.filesize) {
+					rows.push([labels.size, fi.filesize]);
+				}
+				if (fi.width && fi.height) {
 					rows.push([
 						labels.dimensions,
 						`${fi.width} × ${fi.height}`,
 					]);
-				if (fi.mime_type) rows.push([labels.type, fi.mime_type]);
+				}
+				if (fi.mime_type) {
+					rows.push([labels.type, fi.mime_type]);
+				}
 				if (rows.length === 0) {
 					blockEl.remove();
 					return;
@@ -3025,7 +3150,9 @@ class FotoGridsLightbox {
 				let hasAny = false;
 				fields.forEach((key) => {
 					const val = exif[key];
-					if (val === undefined || val === null || val === '') return;
+					if (val === undefined || val === null || val === '') {
+						return;
+					}
 					hasAny = true;
 					const dt = document.createElement('dt');
 					dt.textContent = labels[key] || key;
@@ -3110,7 +3237,6 @@ class FotoGridsLightbox {
 					)
 				);
 				blockEl.appendChild(locText);
-				return;
 			}
 		});
 	}
@@ -3132,7 +3258,9 @@ class FotoGridsLightbox {
 			'location',
 		];
 		blocks.forEach((blockId) => {
-			if (!REST_BLOCKS.includes(blockId)) return;
+			if (!REST_BLOCKS.includes(blockId)) {
+				return;
+			}
 
 			// Description lives inside the combined text block - drop its
 			// reserved slot; remove the whole block if nothing else remains.
@@ -3233,7 +3361,9 @@ class FotoGridsLightbox {
 	 * and freezes the progress indicator.
 	 */
 	_pauseAuto() {
-		if (this._autoPaused) return;
+		if (this._autoPaused) {
+			return;
+		}
 		this._autoPaused = true;
 
 		if (this._autoTimer !== null) {
@@ -3257,8 +3387,9 @@ class FotoGridsLightbox {
 		// Hover-out and other automatic triggers are blocked when the user has
 		// manually navigated with progressStop on. The play button calls
 		// _playBtnResume() instead, which bypasses this guard.
-		if (this._autoStoppedByUser) return;
-		if (!this._autoPaused) return;
+		if (this._autoStoppedByUser || !this._autoPaused) {
+			return;
+		}
 		this._autoPaused = false;
 
 		const remaining =
@@ -3405,10 +3536,14 @@ class FotoGridsLightbox {
 
 	_restartProgressIndicator() {
 		const s = this.settings;
-		if (!s.autoProgress || s.progressStyle === 'none') return;
+		if (!s.autoProgress || s.progressStyle === 'none') {
+			return;
+		}
 
 		const el = this._progressAnimEl();
-		if (!el) return;
+		if (!el) {
+			return;
+		}
 
 		// Clearing both classes and forcing a reflow before re-adding --running
 		// restarts the animation from 0.
@@ -3419,7 +3554,7 @@ class FotoGridsLightbox {
 
 		// offsetWidth returns 0 for SVG children, so use getBoundingClientRect()
 		// which forces a full geometry recalculation on both HTML and SVG elements.
-		// eslint-disable-next-line no-unused-expressions
+
 		el.getBoundingClientRect();
 
 		el.classList.add('fg-lb-progress--running');
@@ -3427,7 +3562,9 @@ class FotoGridsLightbox {
 
 	_pauseProgressIndicator() {
 		const el = this._progressAnimEl();
-		if (!el) return;
+		if (!el) {
+			return;
+		}
 		// Swap --running for --paused: animation-name stays, play-state becomes paused.
 		el.classList.remove('fg-lb-progress--running');
 		el.classList.add('fg-lb-progress--paused');
@@ -3435,7 +3572,9 @@ class FotoGridsLightbox {
 
 	_resumeProgressIndicator() {
 		const el = this._progressAnimEl();
-		if (!el) return;
+		if (!el) {
+			return;
+		}
 		// Swap --paused for --running: same animation-name, play-state becomes running.
 		el.classList.remove('fg-lb-progress--paused');
 		el.classList.add('fg-lb-progress--running');
@@ -3443,7 +3582,9 @@ class FotoGridsLightbox {
 
 	_resetProgressIndicator() {
 		const el = this._progressAnimEl();
-		if (!el) return;
+		if (!el) {
+			return;
+		}
 		// Strip all state classes - no animation-name → element snaps to its
 		// CSS default (bar width: 0; ring stroke-dashoffset: 81.68 = empty).
 		el.classList.remove(
@@ -3460,7 +3601,9 @@ class FotoGridsLightbox {
 	 * @returns {Element|null}
 	 */
 	_progressAnimEl() {
-		if (!this.dialog || !this.settings) return null;
+		if (!this.dialog || !this.settings) {
+			return null;
+		}
 		if (this.settings.progressStyle === 'bar') {
 			return this.dialog.querySelector('.fg-lb-progress-bar');
 		}
@@ -3471,13 +3614,17 @@ class FotoGridsLightbox {
 	}
 
 	_onKeydown(e) {
-		if (!this.dialog || !this.dialog.open) return;
+		if (!this.dialog || !this.dialog.open) {
+			return;
+		}
 
 		switch (e.key) {
 			case 'Escape':
 				// <dialog> handles Escape natively via showModal(); this fallback
 				// covers polyfilled environments only.
-				if (typeof this.dialog.showModal !== 'function') this.close();
+				if (typeof this.dialog.showModal !== 'function') {
+					this.close();
+				}
 				break;
 			case 'ArrowLeft':
 				if (this.settings.showArrows) {
@@ -3503,8 +3650,9 @@ class FotoGridsLightbox {
 	}
 
 	_onPointerDown(e) {
-		if (e.button !== 0) return;
-		if (e.target.closest('button, a')) return;
+		if (e.button !== 0 || e.target.closest('button, a')) {
+			return;
+		}
 
 		// When zoomed in, initiate a pan drag instead of a swipe.
 		// Reset click-moved flag on every new pointer-down.
@@ -3548,7 +3696,9 @@ class FotoGridsLightbox {
 			return;
 		}
 
-		if (!this._swipe.active) return;
+		if (!this._swipe.active) {
+			return;
+		}
 		const sdx = e.clientX - this._swipe.startX;
 		const sdy = e.clientY - this._swipe.startY;
 		if (!this._zoomClickMoved && Math.hypot(sdx, sdy) > 5) {
@@ -3564,7 +3714,9 @@ class FotoGridsLightbox {
 			return;
 		}
 
-		if (!this._swipe.active) return;
+		if (!this._swipe.active) {
+			return;
+		}
 		this._swipe.active = false;
 
 		const dx = this._swipe.dx;
@@ -3577,14 +3729,20 @@ class FotoGridsLightbox {
 	}
 
 	_onWheel(e) {
-		if (!this.settings?.zoom) return;
+		if (!this.settings?.zoom) {
+			return;
+		}
 
 		e.preventDefault();
 
 		// Normalise delta: some devices report deltaMode LINE (1) or PAGE (2).
 		let delta = e.deltaY;
-		if (e.deltaMode === 1) delta *= 20;
-		if (e.deltaMode === 2) delta *= 400;
+		if (e.deltaMode === 1) {
+			delta *= 20;
+		}
+		if (e.deltaMode === 2) {
+			delta *= 400;
+		}
 
 		// Convert to a scale multiplier: 100px scroll ≈ one FGLB_ZOOM_STEP.
 		const factor = 1 - (delta / 400) * FGLB_ZOOM_STEP * 4;
@@ -3592,7 +3750,9 @@ class FotoGridsLightbox {
 		const prev = this._zoomScale;
 		const next = Math.max(FGLB_ZOOM_MIN, Math.min(max, prev * factor));
 
-		if (next === prev) return;
+		if (next === prev) {
+			return;
+		}
 
 		// Zoom toward the cursor position (relative to media-wrap centre).
 		const wrap = e.currentTarget;
@@ -3615,8 +3775,9 @@ class FotoGridsLightbox {
 	}
 
 	_onTouchStart(e) {
-		if (!this.settings?.zoom) return;
-		if (e.touches.length !== 2) return;
+		if (!this.settings?.zoom || e.touches.length !== 2) {
+			return;
+		}
 
 		const t0 = e.touches[0];
 		const t1 = e.touches[1];
@@ -3628,8 +3789,9 @@ class FotoGridsLightbox {
 	}
 
 	_onTouchMove(e) {
-		if (!this.settings?.zoom) return;
-		if (e.touches.length !== 2) return;
+		if (!this.settings?.zoom || e.touches.length !== 2) {
+			return;
+		}
 
 		e.preventDefault();
 
@@ -3639,7 +3801,9 @@ class FotoGridsLightbox {
 			t1.clientX - t0.clientX,
 			t1.clientY - t0.clientY
 		);
-		if (this._pinchStartDist === 0) return;
+		if (this._pinchStartDist === 0) {
+			return;
+		}
 
 		const max = this._effectiveZoomMax();
 		const next = Math.max(
@@ -3684,17 +3848,26 @@ class FotoGridsLightbox {
 	 */
 	_onZoomClick(e, isDbl) {
 		const s = this.settings;
-		if (!s?.zoom) return;
-		if (e.target.closest('button, a')) return;
+		if (!s?.zoom || e.target.closest('button, a')) {
+			return;
+		}
 
 		const trigger = s.zoomTrigger;
 
-		if (trigger === 'wheel_pinch') return;
-		if (trigger === 'double_click' && !isDbl) return;
-		if (trigger === 'click' && isDbl) return; // dblclick also fires click - ignore the click half
+		if (
+			trigger === 'wheel_pinch' ||
+			(trigger === 'double_click' && !isDbl)
+		) {
+			return;
+		}
+		if (trigger === 'click' && isDbl) {
+			return;
+		} // dblclick also fires click - ignore the click half
 
 		// In click mode, suppress if the pointer moved (it was a pan drag, not a tap).
-		if (trigger === 'click' && this._zoomClickMoved) return;
+		if (trigger === 'click' && this._zoomClickMoved) {
+			return;
+		}
 
 		if (this._zoomScale > FGLB_ZOOM_MIN) {
 			// Already zoomed - reset.
@@ -3722,7 +3895,9 @@ class FotoGridsLightbox {
 	}
 
 	_fire(name, detail) {
-		if (!this.galleryEl) return;
+		if (!this.galleryEl) {
+			return;
+		}
 		this.galleryEl.dispatchEvent(
 			new CustomEvent(`fotogrids:lightbox:${name}`, {
 				bubbles: true,
@@ -3768,9 +3943,9 @@ class FotoGridsLightboxInit {
 		// but the classic overlay only owns the click when the variant is full.
 		// Mini and grid galleries have their own modules claim the click.
 		const variant = galleryEl.dataset.fgLightboxVariant;
-		if (variant && variant !== 'full') return;
-
-		if (this._wired.has(galleryEl)) return;
+		if ((variant && variant !== 'full') || this._wired.has(galleryEl)) {
+			return;
+		}
 		this._wired.add(galleryEl);
 
 		const lb = this._lightbox;
@@ -3779,10 +3954,14 @@ class FotoGridsLightboxInit {
 			// The trigger <a> only wraps the media, but the whole .fg-item
 			// (including the caption) should open the lightbox.
 			const figure = e.target.closest('.fg-item');
-			if (!figure) return;
+			if (!figure) {
+				return;
+			}
 
 			const trigger = figure.querySelector('[data-fg-lightbox-trigger]');
-			if (!trigger) return;
+			if (!trigger) {
+				return;
+			}
 
 			e.preventDefault();
 
@@ -3792,12 +3971,18 @@ class FotoGridsLightboxInit {
 		});
 
 		galleryEl.addEventListener('keydown', (e) => {
-			if (e.key !== 'Enter' && e.key !== ' ') return;
+			if (e.key !== 'Enter' && e.key !== ' ') {
+				return;
+			}
 			const figure = e.target.closest('.fg-item');
-			if (!figure) return;
+			if (!figure) {
+				return;
+			}
 
 			const trigger = figure.querySelector('[data-fg-lightbox-trigger]');
-			if (!trigger) return;
+			if (!trigger) {
+				return;
+			}
 
 			e.preventDefault();
 			const items = collectItems(galleryEl);
@@ -3816,7 +4001,9 @@ class FotoGridsLightboxInit {
 let _manager;
 
 function initFotoGridsLightbox() {
-	if (_manager) return;
+	if (_manager) {
+		return;
+	}
 	_manager = new FotoGridsLightboxInit();
 	// Expose the manager's shared lightbox so deep-linking and other
 	// integrations reuse the same instance instead of constructing a new one.

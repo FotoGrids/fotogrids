@@ -10,9 +10,11 @@ const { __ } = wp.i18n;
  * never locked by accident.
  */
 const userHasCap = (cap) => {
-    const bag = window.fotogridsAdmin?.capabilities;
-    if (!bag) return true;
-    return bag[cap] === true;
+	const bag = window.fotogridsAdmin?.capabilities;
+	if (!bag) {
+		return true;
+	}
+	return bag[cap] === true;
 };
 
 /**
@@ -39,31 +41,37 @@ const userHasCap = (cap) => {
  * @param {string}          [props.className] Extra class on the root.
  */
 const SettingsLock = ({ cap, children, title, message, className = '' }) => {
-    if (!cap || userHasCap(cap)) {
-        return <>{children}</>;
-    }
+	if (!cap || userHasCap(cap)) {
+		return <>{children}</>;
+	}
 
-    return (
-        <div className={`fg-settings-lock ${className}`.trim()}>
-            <div className="fg-settings-lock__badge" role="note">
-                <Icon name="lock" className="fg-settings-lock__icon" />
-                <div className="fg-settings-lock__text">
-                    <strong>
-                        {title || __('Locked - administrator only', 'fotogrids')}
-                    </strong>
-                    <span>
-                        {message || __(
-                            'Your role can view these settings but cannot change them. Ask an administrator if you need to make changes here.',
-                            'fotogrids'
-                        )}
-                    </span>
-                </div>
-            </div>
-            <fieldset className="fg-settings-lock__fieldset" disabled aria-disabled="true">
-                {children}
-            </fieldset>
-        </div>
-    );
+	return (
+		<div className={`fg-settings-lock ${className}`.trim()}>
+			<div className="fg-settings-lock__badge" role="note">
+				<Icon name="lock" className="fg-settings-lock__icon" />
+				<div className="fg-settings-lock__text">
+					<strong>
+						{title ||
+							__('Locked - administrator only', 'fotogrids')}
+					</strong>
+					<span>
+						{message ||
+							__(
+								'Your role can view these settings but cannot change them. Ask an administrator if you need to make changes here.',
+								'fotogrids'
+							)}
+					</span>
+				</div>
+			</div>
+			<fieldset
+				className="fg-settings-lock__fieldset"
+				disabled
+				aria-disabled="true"
+			>
+				{children}
+			</fieldset>
+		</div>
+	);
 };
 
 export default SettingsLock;
@@ -77,8 +85,9 @@ export default SettingsLock;
  * @returns {boolean}
  */
 export const canModifyCollectionSettings = (postType) => {
-    const cap = postType === 'fotogrids_album'
-        ? 'modify_fotogrids_album_settings'
-        : 'modify_fotogrids_gallery_settings';
-    return userHasCap(cap);
+	const cap =
+		postType === 'fotogrids_album'
+			? 'modify_fotogrids_album_settings'
+			: 'modify_fotogrids_gallery_settings';
+	return userHasCap(cap);
 };

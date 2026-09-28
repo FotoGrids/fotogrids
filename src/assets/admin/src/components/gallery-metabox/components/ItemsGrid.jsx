@@ -16,19 +16,25 @@ import ItemCard from './ItemCard.jsx';
  * @param {Function} props.onRemoveItem      Removes an item from the gallery.
  * @return {JSX.Element}
  */
-const ItemsGrid = ({ items, strings, onOpenItem, onToggleFeatured, onRemoveItem }) => (
-    <div id="fotogrids-items-grid" className="fotogrids-sortable">
-        {items.map((item) => (
-            <ItemCard
-                key={item.id}
-                item={item}
-                strings={strings}
-                onOpen={onOpenItem}
-                onToggleFeatured={onToggleFeatured}
-                onRemove={onRemoveItem}
-            />
-        ))}
-    </div>
+const ItemsGrid = ({
+	items,
+	strings,
+	onOpenItem,
+	onToggleFeatured,
+	onRemoveItem,
+}) => (
+	<div id="fotogrids-items-grid" className="fotogrids-sortable">
+		{items.map((item) => (
+			<ItemCard
+				key={item.id}
+				item={item}
+				strings={strings}
+				onOpen={onOpenItem}
+				onToggleFeatured={onToggleFeatured}
+				onRemove={onRemoveItem}
+			/>
+		))}
+	</div>
 );
 
 export default ItemsGrid;

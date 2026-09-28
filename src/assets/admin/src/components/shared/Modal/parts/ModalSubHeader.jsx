@@ -26,22 +26,24 @@ import React from 'react';
  * @since 1.0.0
  */
 const ModalSubHeader = ({
-    divider = true,
-    className = '',
-    children,
-    ...rest
+	divider = true,
+	className = '',
+	children,
+	...rest
 }) => {
-    const classes = [
-        'fg-modal__sub-header',
-        !divider && 'fg-modal__sub-header--no-divider',
-        className,
-    ].filter(Boolean).join(' ');
+	const classes = [
+		'fg-modal__sub-header',
+		!divider && 'fg-modal__sub-header--no-divider',
+		className,
+	]
+		.filter(Boolean)
+		.join(' ');
 
-    return (
-        <div className={ classes } { ...rest }>
-            { children }
-        </div>
-    );
+	return (
+		<div className={classes} {...rest}>
+			{children}
+		</div>
+	);
 };
 
 export default ModalSubHeader;

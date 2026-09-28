@@ -20,66 +20,66 @@ import AddNewDropdown from './AddNewDropdown.jsx';
  * @return {JSX.Element}
  */
 const MetaboxHeader = ({
-    activeTab,
-    strings,
-    onTabSwitch,
-    addDropdownOpen,
-    onAddDropdownToggle,
-    onAddOption,
-    onClearAll,
+	activeTab,
+	strings,
+	onTabSwitch,
+	addDropdownOpen,
+	onAddDropdownToggle,
+	onAddOption,
+	onClearAll,
 }) => (
-    <div className="fotogrids-gallery-header">
-        <div className="fotogrids-gallery-tabs">
-            <button
-                type="button"
-                className={`fotogrids-gallery-tab ${activeTab === 'manage' ? 'fotogrids-gallery-tab--active' : ''}`}
-                onClick={() => onTabSwitch('manage')}
-            >
-                <span className="fotogrids-icon" data-icon="edit"></span>
-                {strings.manageItems}
-            </button>
-            <button
-                type="button"
-                className={`fotogrids-gallery-tab ${activeTab === 'preview' ? 'fotogrids-gallery-tab--active' : ''}`}
-                onClick={() => onTabSwitch('preview')}
-            >
-                <span className="fotogrids-icon" data-icon="preview"></span>
-                {strings.previewGallery}
-            </button>
-        </div>
+	<div className="fotogrids-gallery-header">
+		<div className="fotogrids-gallery-tabs">
+			<button
+				type="button"
+				className={`fotogrids-gallery-tab ${activeTab === 'manage' ? 'fotogrids-gallery-tab--active' : ''}`}
+				onClick={() => onTabSwitch('manage')}
+			>
+				<span className="fotogrids-icon" data-icon="edit"></span>
+				{strings.manageItems}
+			</button>
+			<button
+				type="button"
+				className={`fotogrids-gallery-tab ${activeTab === 'preview' ? 'fotogrids-gallery-tab--active' : ''}`}
+				onClick={() => onTabSwitch('preview')}
+			>
+				<span className="fotogrids-icon" data-icon="preview"></span>
+				{strings.previewGallery}
+			</button>
+		</div>
 
-        {activeTab === 'manage' && (
-            <div className="fotogrids-gallery-actions">
-                <AddNewDropdown
-                    isOpen={addDropdownOpen}
-                    onToggle={onAddDropdownToggle}
-                    onSelect={onAddOption}
-                    strings={strings}
-                />
-                <Button
-                    variant="secondary"
-                    size="sm"
-                    className="fotogrids-items-remove-all"
-                    onClick={onClearAll}
-                >
-                    {strings.removeAll}
-                </Button>
-                <Button
-                    variant="secondary"
-                    size="sm"
-                    className="fotogrids-items-bulk-editor"
-                    onClick={() => {
-                        if (window.FotoGridsUpgrade) {
-                            window.FotoGridsUpgrade.launchForFeature.bulkOperations();
-                        }
-                    }}
-                >
-                    {strings.bulkEditor}
-                    <span className="fotogrids-pro-badge">Pro</span>
-                </Button>
-            </div>
-        )}
-    </div>
+		{activeTab === 'manage' && (
+			<div className="fotogrids-gallery-actions">
+				<AddNewDropdown
+					isOpen={addDropdownOpen}
+					onToggle={onAddDropdownToggle}
+					onSelect={onAddOption}
+					strings={strings}
+				/>
+				<Button
+					variant="secondary"
+					size="sm"
+					className="fotogrids-items-remove-all"
+					onClick={onClearAll}
+				>
+					{strings.removeAll}
+				</Button>
+				<Button
+					variant="secondary"
+					size="sm"
+					className="fotogrids-items-bulk-editor"
+					onClick={() => {
+						if (window.FotoGridsUpgrade) {
+							window.FotoGridsUpgrade.launchForFeature.bulkOperations();
+						}
+					}}
+				>
+					{strings.bulkEditor}
+					<span className="fotogrids-pro-badge">Pro</span>
+				</Button>
+			</div>
+		)}
+	</div>
 );
 
 export default MetaboxHeader;

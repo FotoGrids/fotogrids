@@ -8,4 +8,4 @@
 import MigrationTool from './MigrationTool.jsx';
 import './migration.scss';
 
-window.FotoGridsToolsComponents.register( 'migration', MigrationTool );
+window.FotoGridsToolsComponents.register('migration', MigrationTool);

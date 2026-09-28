@@ -38,43 +38,68 @@ import React from 'react';
  */
 
 const COLORS = {
-    top:         '#3c46f0', // primary blue
-    midLeft:     '#f01e32', // red
-    bottomLeft:  '#ffb914', // yellow
-    bottomMid:   '#323232', // dark
-    midRight:    '#323232', // dark
+	top: '#3c46f0', // primary blue
+	midLeft: '#f01e32', // red
+	bottomLeft: '#ffb914', // yellow
+	bottomMid: '#323232', // dark
+	midRight: '#323232', // dark
 };
 
-const FotoGridsIcon = ({
-    size = 20,
-    variant = 'full',
-    className,
-    ...rest
-}) => {
-    const dim = typeof size === 'number' ? `${ size }` : size;
-    const fill = variant === 'mono' ? 'currentColor' : null;
+const FotoGridsIcon = ({ size = 20, variant = 'full', className, ...rest }) => {
+	const dim = typeof size === 'number' ? `${size}` : size;
+	const fill = variant === 'mono' ? 'currentColor' : null;
 
-    const f = (key) => (fill !== null ? fill : COLORS[ key ]);
+	const f = (key) => (fill !== null ? fill : COLORS[key]);
 
-    return (
-        <svg
-            width={ dim }
-            height={ dim }
-            viewBox="0 0 60 60"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            focusable="false"
-            className={ className }
-            { ...rest }
-        >
-            <rect x="1.42"  y="1.42"  width="56.69" height="14.17" fill={ f('top') } />
-            <rect x="1.42"  y="22.68" width="35.43" height="14.17" fill={ f('midLeft') } />
-            <rect x="1.42"  y="43.94" width="14.17" height="14.17" fill={ f('bottomLeft') } />
-            <rect x="22.68" y="43.94" width="14.17" height="14.17" fill={ f('bottomMid') } />
-            <rect x="43.94" y="22.68" width="14.17" height="35.43" fill={ f('midRight') } />
-        </svg>
-    );
+	return (
+		<svg
+			width={dim}
+			height={dim}
+			viewBox="0 0 60 60"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			aria-hidden="true"
+			focusable="false"
+			className={className}
+			{...rest}
+		>
+			<rect
+				x="1.42"
+				y="1.42"
+				width="56.69"
+				height="14.17"
+				fill={f('top')}
+			/>
+			<rect
+				x="1.42"
+				y="22.68"
+				width="35.43"
+				height="14.17"
+				fill={f('midLeft')}
+			/>
+			<rect
+				x="1.42"
+				y="43.94"
+				width="14.17"
+				height="14.17"
+				fill={f('bottomLeft')}
+			/>
+			<rect
+				x="22.68"
+				y="43.94"
+				width="14.17"
+				height="14.17"
+				fill={f('bottomMid')}
+			/>
+			<rect
+				x="43.94"
+				y="22.68"
+				width="14.17"
+				height="35.43"
+				fill={f('midRight')}
+			/>
+		</svg>
+	);
 };
 
 export default FotoGridsIcon;

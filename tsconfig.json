@@ -22,7 +22,8 @@
     "jsx": "react-jsx",
   "baseUrl": ".",
   "paths": {
-    "@/*": ["src/assets/*"]
+    "@/*": ["src/assets/*"],
+    "@modules/*": ["src/includes/modules/*"]
   },
     "declaration": true,
     "declarationMap": true,
