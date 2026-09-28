@@ -31,86 +31,97 @@ const DELTA_GLYPHS = { up: '↑', down: '↓', flat: '–' };
  * @returns {React.ReactElement} Inline SVG spinner.
  */
 const CardSpinner = () => (
-    <svg
-        className="fg-stat-card__spinner"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        focusable="false"
-    >
-        <circle cx="12" cy="12" r="9" />
-    </svg>
+	<svg
+		className="fg-stat-card__spinner"
+		viewBox="0 0 24 24"
+		aria-hidden="true"
+		focusable="false"
+	>
+		<circle cx="12" cy="12" r="9" />
+	</svg>
 );
 
-const StatCard = ( {
-    icon,
-    iconName,
-    value,
-    label,
-    accent = 'blue',
-    invert = false,
-    loading = false,
-    href,
-    delta = null,
-    deltaTitle = '',
-    footnote = '',
-} ) => {
-    const baseClass = 'fg-stat-card';
-    const wrapperClass = [
-        baseClass,
-        `${baseClass}--${accent}`,
-        invert && `${baseClass}--invert`,
-    ].filter( Boolean ).join( ' ' );
+const StatCard = ({
+	icon,
+	iconName,
+	value,
+	label,
+	accent = 'blue',
+	invert = false,
+	loading = false,
+	href,
+	delta = null,
+	deltaTitle = '',
+	footnote = '',
+}) => {
+	const baseClass = 'fg-stat-card';
+	const wrapperClass = [
+		baseClass,
+		`${baseClass}--${accent}`,
+		invert && `${baseClass}--invert`,
+	]
+		.filter(Boolean)
+		.join(' ');
 
-    const isLink = !! href && ! loading;
-    const Tag = isLink ? 'a' : 'div';
-    const wrapperProps = isLink ? { href } : {};
+	const isLink = !!href && !loading;
+	const Tag = isLink ? 'a' : 'div';
+	const wrapperProps = isLink ? { href } : {};
 
-    const hasDelta  = ! loading && typeof delta === 'number' && isFinite( delta );
-    const direction = hasDelta && delta !== 0 ? ( delta > 0 ? 'up' : 'down' ) : 'flat';
+	const hasDelta = !loading && typeof delta === 'number' && isFinite(delta);
+	const direction =
+		hasDelta && delta !== 0 ? (delta > 0 ? 'up' : 'down') : 'flat';
 
-    const valueNode = loading ? (
-        <span className={`${baseClass}__value-row`}>
-            <CardSpinner />
-        </span>
-    ) : (
-        <span className={`${baseClass}__value-row`}>
-            <span className={`${baseClass}__value`}>{ value }</span>
-        </span>
-    );
+	const valueNode = loading ? (
+		<span className={`${baseClass}__value-row`}>
+			<CardSpinner />
+		</span>
+	) : (
+		<span className={`${baseClass}__value-row`}>
+			<span className={`${baseClass}__value`}>{value}</span>
+		</span>
+	);
 
-    return (
-        <Tag className={ wrapperClass } { ...wrapperProps } aria-busy={ loading || undefined }>
-            { iconName && (
-                <Icon name={ iconName } className={`${baseClass}__icon`} />
-            ) }
-            { ! iconName && icon && (
-                <div
-                    className={`${baseClass}__icon`}
-                    dangerouslySetInnerHTML={ { __html: icon } }
-                    aria-hidden="true"
-                />
-            ) }
-            <div className={`${baseClass}__body`}>
-                { valueNode }
-                <div className={`${baseClass}__label`}>{ label }</div>
-            </div>
-            { ! loading && ( footnote || hasDelta ) && (
-                <span className={`${baseClass}__meta`}>
-                    { hasDelta && (
-                        <Tooltip content={ deltaTitle } position="bottom">
-                            <span className={`${baseClass}__delta ${baseClass}__delta--${ direction }`}>
-                                { DELTA_GLYPHS[ direction ] }
-                                { `${ Math.abs( delta ) }%` }
-                            </span>
-                        </Tooltip>
-                    ) }
-                    { footnote && (
-                        <span className={`${baseClass}__footnote`}>{ footnote }</span>
-                    ) }
-                </span>
-            ) }
-        </Tag>
-    );
+	return (
+		<Tag
+			className={wrapperClass}
+			{...wrapperProps}
+			aria-busy={loading || undefined}
+		>
+			{iconName && (
+				<Icon name={iconName} className={`${baseClass}__icon`} />
+			)}
+			{!iconName && icon && (
+				<div
+					className={`${baseClass}__icon`}
+					dangerouslySetInnerHTML={{ __html: icon }}
+					aria-hidden="true"
+				/>
+			)}
+			<div className={`${baseClass}__body`}>
+				{valueNode}
+				<div className={`${baseClass}__label`}>{label}</div>
+			</div>
+			{!loading && (footnote || hasDelta) && (
+				<span className={`${baseClass}__meta`}>
+					{hasDelta && (
+						<Tooltip content={deltaTitle} position="bottom">
+							<span
+								className={`${baseClass}__delta ${baseClass}__delta--${direction}`}
+							>
+								{DELTA_GLYPHS[direction]}
+								{`${Math.abs(delta)}%`}
+							</span>
+						</Tooltip>
+					)}
+					{footnote && (
+						<span className={`${baseClass}__footnote`}>
+							{footnote}
+						</span>
+					)}
+				</span>
+			)}
+		</Tag>
+	);
 };
 
 export default StatCard;

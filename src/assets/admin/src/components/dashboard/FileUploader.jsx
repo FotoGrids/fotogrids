@@ -9,77 +9,96 @@ import Icon from '../shared/Icon';
 const { __ } = wp.i18n;
 
 const FileUploader = ({ onUploadComplete }) => {
-    const handleUploadComplete = (attachmentIds) => {
-        if (!attachmentIds || attachmentIds.length === 0 || !onUploadComplete) {
-            return;
-        }
+	const handleUploadComplete = (attachmentIds) => {
+		if (!attachmentIds || attachmentIds.length === 0 || !onUploadComplete) {
+			return;
+		}
 
-        Promise.resolve(onUploadComplete(attachmentIds)).catch((error) => {
-            console.error('Error creating gallery from upload:', error);
-        });
-    };
+		Promise.resolve(onUploadComplete(attachmentIds)).catch((error) => {
+			console.error('Error creating gallery from upload:', error);
+		});
+	};
 
-    const openMediaLibrary = () => {
-        if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-            alert(__('WordPress media library is not available. Please refresh the page.', 'fotogrids'));
-            return;
-        }
+	const openMediaLibrary = () => {
+		if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+			alert(
+				__(
+					'WordPress media library is not available. Please refresh the page.',
+					'fotogrids'
+				)
+			);
+			return;
+		}
 
-        const mediaUploader = wp.media({
-            title: __('Select Images for Gallery', 'fotogrids'),
-            button: {
-                text: __('Create Gallery', 'fotogrids')
-            },
-            multiple: true,
-            library: {
-                type: 'image'
-            }
-        });
+		const mediaUploader = wp.media({
+			title: __('Select Images for Gallery', 'fotogrids'),
+			button: {
+				text: __('Create Gallery', 'fotogrids'),
+			},
+			multiple: true,
+			library: {
+				type: 'image',
+			},
+		});
 
-        mediaUploader.on('select', () => {
-            const attachments = mediaUploader.state().get('selection').toJSON();
-            const attachmentIds = attachments.map(att => att.id);
+		mediaUploader.on('select', () => {
+			const attachments = mediaUploader.state().get('selection').toJSON();
+			const attachmentIds = attachments.map((att) => att.id);
 
-            if (attachmentIds.length > 0 && onUploadComplete) {
-                onUploadComplete(attachmentIds).catch(error => {
-                    console.error('Error creating gallery from library:', error);
-                    alert(error.message || __('Failed to create gallery.', 'fotogrids'));
-                });
-            }
-        });
+			if (attachmentIds.length > 0 && onUploadComplete) {
+				onUploadComplete(attachmentIds).catch((error) => {
+					console.error(
+						'Error creating gallery from library:',
+						error
+					);
+					alert(
+						error.message ||
+							__('Failed to create gallery.', 'fotogrids')
+					);
+				});
+			}
+		});
 
-        mediaUploader.open();
-    };
+		mediaUploader.open();
+	};
 
-    return (
-        <div className="fotogrids-admin-block-card fg-abc-uploader">
-            <div className="fotogrids-admin-block-card-header">
-                <Icon name="upload" className="fotogrids-admin-block-card-header-icon" />
-                <h3>{__('Quick Upload', 'fotogrids')}</h3>
-                <p>{__('Click or drag files here to create a gallery automatically.', 'fotogrids')}</p>
-            </div>
-            <div className="fotogrids-admin-block-card-content">
-                <MediaUpload
-                    onUploadComplete={handleUploadComplete}
-                    inputId="fotogrids-dashboard-upload-input"
-                />
-                <p className="fotogrids-upload-or">
-                    {__('or ', 'fotogrids')}
-                    <a
-                        href="#"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            openMediaLibrary();
-                        }}
-                        className="fotogrids-upload-or__link"
-                    >
-                        {__('choose existing files', 'fotogrids')}
-                    </a>
-                    {__(' from media library', 'fotogrids')}
-                </p>
-            </div>
-        </div>
-    );
+	return (
+		<div className="fotogrids-admin-block-card fg-abc-uploader">
+			<div className="fotogrids-admin-block-card-header">
+				<Icon
+					name="upload"
+					className="fotogrids-admin-block-card-header-icon"
+				/>
+				<h3>{__('Quick Upload', 'fotogrids')}</h3>
+				<p>
+					{__(
+						'Click or drag files here to create a gallery automatically.',
+						'fotogrids'
+					)}
+				</p>
+			</div>
+			<div className="fotogrids-admin-block-card-content">
+				<MediaUpload
+					onUploadComplete={handleUploadComplete}
+					inputId="fotogrids-dashboard-upload-input"
+				/>
+				<p className="fotogrids-upload-or">
+					{__('or ', 'fotogrids')}
+					<a
+						href="#"
+						onClick={(e) => {
+							e.preventDefault();
+							openMediaLibrary();
+						}}
+						className="fotogrids-upload-or__link"
+					>
+						{__('choose existing files', 'fotogrids')}
+					</a>
+					{__(' from media library', 'fotogrids')}
+				</p>
+			</div>
+		</div>
+	);
 };
 
 export default FileUploader;

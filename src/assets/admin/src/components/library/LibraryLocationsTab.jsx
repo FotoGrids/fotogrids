@@ -9,10 +9,10 @@ import LibraryLocationsHeader from './LibraryLocationsHeader';
  * show the Lat/Lng column and inline editor.
  */
 const LibraryLocationsTab = ({ entityType }) => (
-    <>
-        <LibraryLocationsHeader entityType={entityType} />
-        <LibraryTabBase entityType={entityType} />
-    </>
+	<>
+		<LibraryLocationsHeader entityType={entityType} />
+		<LibraryTabBase entityType={entityType} />
+	</>
 );
 
 export default LibraryLocationsTab;

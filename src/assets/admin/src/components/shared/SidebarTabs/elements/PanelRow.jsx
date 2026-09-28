@@ -19,64 +19,65 @@ import React from 'react';
  * @param {React.ReactNode}        props.children        The control(s).
  */
 const PanelRow = ({
-    title,
-    description,
-    htmlFor,
-    fullWidth = false,
-    splitColumns = false,
-    largerLabels = false,
-    className = '',
-    children,
+	title,
+	description,
+	htmlFor,
+	fullWidth = false,
+	splitColumns = false,
+	largerLabels = false,
+	className = '',
+	children,
 }) => {
-    const LabelTag = htmlFor ? 'label' : 'span';
-    const renderDescription = (value) => {
-        if (typeof value !== 'string') return value;
+	const LabelTag = htmlFor ? 'label' : 'span';
+	const renderDescription = (value) => {
+		if (typeof value !== 'string') return value;
 
-        const parts = value.split(/`([^`]+)`/g);
-        if (parts.length === 1) return value;
+		const parts = value.split(/`([^`]+)`/g);
+		if (parts.length === 1) return value;
 
-        return parts.map((part, index) => (
-            index % 2 === 1
-                ? <code key={`code-${index}`}>{part}</code>
-                : <React.Fragment key={`text-${index}`}>{part}</React.Fragment>
-        ));
-    };
+		return parts.map((part, index) =>
+			index % 2 === 1 ? (
+				<code key={`code-${index}`}>{part}</code>
+			) : (
+				<React.Fragment key={`text-${index}`}>{part}</React.Fragment>
+			)
+		);
+	};
 
-    const baseClass = 'fotogrids-sidebar-layout__panel__row';
+	const baseClass = 'fotogrids-sidebar-layout__panel__row';
 
-    const modifierClass = fullWidth    ? ` ${baseClass}--full`
-                        : splitColumns ? ` ${baseClass}--split`
-                        : largerLabels ? ` ${baseClass}--larger-labels`
-                        : '';
+	const modifierClass = fullWidth
+		? ` ${baseClass}--full`
+		: splitColumns
+			? ` ${baseClass}--split`
+			: largerLabels
+				? ` ${baseClass}--larger-labels`
+				: '';
 
-    return (
-        <div
-            className={
-                baseClass +
-                modifierClass +
-                (className ? ` ${className}` : '')
-            }
-        >
-            <div className={`${baseClass}__label-col`}>
-                {title && (
-                    <LabelTag
-                        className={`${baseClass}__title`}
-                        htmlFor={htmlFor || undefined}
-                    >
-                        {title}
-                    </LabelTag>
-                )}
-                {description && (
-                    <div className={`${baseClass}__description`}>
-                        {renderDescription(description)}
-                    </div>
-                )}
-            </div>
-            <div className={`${baseClass}__control-col`}>
-                {children}
-            </div>
-        </div>
-    );
+	return (
+		<div
+			className={
+				baseClass + modifierClass + (className ? ` ${className}` : '')
+			}
+		>
+			<div className={`${baseClass}__label-col`}>
+				{title && (
+					<LabelTag
+						className={`${baseClass}__title`}
+						htmlFor={htmlFor || undefined}
+					>
+						{title}
+					</LabelTag>
+				)}
+				{description && (
+					<div className={`${baseClass}__description`}>
+						{renderDescription(description)}
+					</div>
+				)}
+			</div>
+			<div className={`${baseClass}__control-col`}>{children}</div>
+		</div>
+	);
 };
 
 export default PanelRow;

@@ -14,20 +14,28 @@ import { Button } from './Button';
  *                                            Suits a single line of copy.
  * @return {React.ReactElement} The notice.
  */
-const ProFeatureNotice = ({ badge, children, actionLabel, onAction, center = false }) => (
-    <div
-        className={`fotogrids-pro-feature-notice${
-            center ? ' fotogrids-pro-feature-notice--center' : ''
-        }`}
-    >
-        <div className="fotogrids-pro-feature-notice__content">
-            <span className="fotogrids-pro-badge">{badge}</span>
-            <span className="fotogrids-pro-feature-notice__text">{children}</span>
-        </div>
-        <Button variant="link" onClick={onAction}>
-            {actionLabel}
-        </Button>
-    </div>
+const ProFeatureNotice = ({
+	badge,
+	children,
+	actionLabel,
+	onAction,
+	center = false,
+}) => (
+	<div
+		className={`fotogrids-pro-feature-notice${
+			center ? ' fotogrids-pro-feature-notice--center' : ''
+		}`}
+	>
+		<div className="fotogrids-pro-feature-notice__content">
+			<span className="fotogrids-pro-badge">{badge}</span>
+			<span className="fotogrids-pro-feature-notice__text">
+				{children}
+			</span>
+		</div>
+		<Button variant="link" onClick={onAction}>
+			{actionLabel}
+		</Button>
+	</div>
 );
 
 export default ProFeatureNotice;

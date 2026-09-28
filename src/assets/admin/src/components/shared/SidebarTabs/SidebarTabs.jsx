@@ -24,33 +24,31 @@ import SidebarTabsNav from './SidebarTabsNav';
  * @param {React.ReactNode} props.children Content for the active tab.
  */
 const SidebarTabs = ({
-    tabs = [],
-    groups,
-    activeTab,
-    onTabChange,
-    getTabHref,
-    ariaLabel,
-    className = '',
-    children,
+	tabs = [],
+	groups,
+	activeTab,
+	onTabChange,
+	getTabHref,
+	ariaLabel,
+	className = '',
+	children,
 }) => {
-    return (
-        <div className={`fotogrids-sidebar-tabs ${className}`.trim()}>
-            <aside className="fotogrids-sidebar-tabs__rail">
-                <SidebarTabsNav
-                    tabs={tabs}
-                    groups={groups}
-                    activeTab={activeTab}
-                    onTabChange={onTabChange}
-                    getTabHref={getTabHref}
-                    ariaLabel={ariaLabel}
-                />
-            </aside>
+	return (
+		<div className={`fotogrids-sidebar-tabs ${className}`.trim()}>
+			<aside className="fotogrids-sidebar-tabs__rail">
+				<SidebarTabsNav
+					tabs={tabs}
+					groups={groups}
+					activeTab={activeTab}
+					onTabChange={onTabChange}
+					getTabHref={getTabHref}
+					ariaLabel={ariaLabel}
+				/>
+			</aside>
 
-            <div className="fotogrids-sidebar-tabs__content">
-                {children}
-            </div>
-        </div>
-    );
+			<div className="fotogrids-sidebar-tabs__content">{children}</div>
+		</div>
+	);
 };
 
 export default SidebarTabs;

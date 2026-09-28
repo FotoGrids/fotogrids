@@ -11,19 +11,19 @@ import FotoGridsIcon from '../../FotoGridsIcon';
  * @since 1.0.0
  */
 const ModalHeaderLogo = ({
-    className = '',
-    children,
-    logoSize = 20,
-    logoVariant = 'full',
-    ...rest
+	className = '',
+	children,
+	logoSize = 20,
+	logoVariant = 'full',
+	...rest
 }) => (
-    <span
-        className={ `fg-modal__header__logo ${ className }`.trim() }
-        aria-hidden="true"
-        { ...rest }
-    >
-        { children ?? <FotoGridsIcon size={ logoSize } variant={ logoVariant } /> }
-    </span>
+	<span
+		className={`fg-modal__header__logo ${className}`.trim()}
+		aria-hidden="true"
+		{...rest}
+	>
+		{children ?? <FotoGridsIcon size={logoSize} variant={logoVariant} />}
+	</span>
 );
 
 export default ModalHeaderLogo;

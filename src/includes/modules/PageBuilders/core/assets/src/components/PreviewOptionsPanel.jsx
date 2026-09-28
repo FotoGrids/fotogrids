@@ -24,29 +24,32 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const PreviewOptionsPanel = ({
-    clickBehavior,
-    pagination,
-    onChangeClickBehavior,
-    onChangePagination,
-    initialOpen = false,
+	clickBehavior,
+	pagination,
+	onChangeClickBehavior,
+	onChangePagination,
+	initialOpen = false,
 }) => (
-    <PanelBody
-        title={__('Preview', 'fotogrids')}
-        initialOpen={initialOpen}
-    >
-        <ToggleControl
-            label={__('Make items clickable', 'fotogrids')}
-            help={__('When disabled, item clicks select the block in the editor instead of opening the gallery action. Published pages are not affected.', 'fotogrids')}
-            checked={!!clickBehavior}
-            onChange={onChangeClickBehavior}
-        />
-        <ToggleControl
-            label={__('Enable pagination controls', 'fotogrids')}
-            help={__('When disabled, pagination controls stay visible but inactive in the editor. Published pages are not affected.', 'fotogrids')}
-            checked={!!pagination}
-            onChange={onChangePagination}
-        />
-    </PanelBody>
+	<PanelBody title={__('Preview', 'fotogrids')} initialOpen={initialOpen}>
+		<ToggleControl
+			label={__('Make items clickable', 'fotogrids')}
+			help={__(
+				'When disabled, item clicks select the block in the editor instead of opening the gallery action. Published pages are not affected.',
+				'fotogrids'
+			)}
+			checked={!!clickBehavior}
+			onChange={onChangeClickBehavior}
+		/>
+		<ToggleControl
+			label={__('Enable pagination controls', 'fotogrids')}
+			help={__(
+				'When disabled, pagination controls stay visible but inactive in the editor. Published pages are not affected.',
+				'fotogrids'
+			)}
+			checked={!!pagination}
+			onChange={onChangePagination}
+		/>
+	</PanelBody>
 );
 
 export default PreviewOptionsPanel;

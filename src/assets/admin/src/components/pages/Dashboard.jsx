@@ -18,101 +18,105 @@ import LoadingIcon from '../shared/LoadingIcon';
 const { __ } = wp.i18n;
 
 const Dashboard = () => {
-    const [stats, setStats] = useState({
-        galleries: 0,
-        galleries_total: 0,
-        galleries_published: 0,
-        settings_configured: false,
-        albums: 0,
-        albums_total: 0,
-        items: 0,
-        views: 0,
-        shares: 0
-    });
-    const [loading, setLoading] = useState(true);
+	const [stats, setStats] = useState({
+		galleries: 0,
+		galleries_total: 0,
+		galleries_published: 0,
+		settings_configured: false,
+		albums: 0,
+		albums_total: 0,
+		items: 0,
+		views: 0,
+		shares: 0,
+	});
+	const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadStats();
-    }, []);
+	useEffect(() => {
+		loadStats();
+	}, []);
 
-    const loadStats = () => {
-        setLoading(true);
-        fetchDashboardStats()
-            .then(data => {
-                setStats({
-                    galleries: data.galleries || 0,
-                    galleries_total: data.galleries_total || 0,
-                    galleries_published: data.galleries_published || 0,
-                    settings_configured: data.settings_configured || false,
-                    albums: data.albums || 0,
-                    albums_total: data.albums_total || 0,
-                    items: data.items || 0,
-                    views: data.views || 0,
-                    shares: data.shares || 0
-                });
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error loading dashboard stats:', error);
-                setLoading(false);
-            });
-    };
+	const loadStats = () => {
+		setLoading(true);
+		fetchDashboardStats()
+			.then((data) => {
+				setStats({
+					galleries: data.galleries || 0,
+					galleries_total: data.galleries_total || 0,
+					galleries_published: data.galleries_published || 0,
+					settings_configured: data.settings_configured || false,
+					albums: data.albums || 0,
+					albums_total: data.albums_total || 0,
+					items: data.items || 0,
+					views: data.views || 0,
+					shares: data.shares || 0,
+				});
+				setLoading(false);
+			})
+			.catch((error) => {
+				console.error('Error loading dashboard stats:', error);
+				setLoading(false);
+			});
+	};
 
-    const handleUploadComplete = async (imageIds) => {
-        try {
-            await createGalleryFromImages(imageIds);
-            loadStats();
-            alert(__('Gallery created successfully!', 'fotogrids'));
-        } catch (error) {
-            console.error('Error creating gallery from upload:', error);
-            alert(error.message || __('Failed to create gallery.', 'fotogrids'));
-        }
-    };
+	const handleUploadComplete = async (imageIds) => {
+		try {
+			await createGalleryFromImages(imageIds);
+			loadStats();
+			alert(__('Gallery created successfully!', 'fotogrids'));
+		} catch (error) {
+			console.error('Error creating gallery from upload:', error);
+			alert(
+				error.message || __('Failed to create gallery.', 'fotogrids')
+			);
+		}
+	};
 
-    const setupProgress = {
-        galleriesTotal: stats.galleries_total,
-        galleriesPublished: stats.galleries_published,
-        settingsConfigured: stats.settings_configured
-    };
+	const setupProgress = {
+		galleriesTotal: stats.galleries_total,
+		galleriesPublished: stats.galleries_published,
+		settingsConfigured: stats.settings_configured,
+	};
 
-    const renderSetupSlot = () => {
-        if (loading) {
-            return (
-                <div className="fotogrids-admin-block-card fg-abc-setup-loading">
-                    <LoadingIcon label={__('Loading setup progress', 'fotogrids')} />
-                </div>
-            );
-        }
+	const renderSetupSlot = () => {
+		if (loading) {
+			return (
+				<div className="fotogrids-admin-block-card fg-abc-setup-loading">
+					<LoadingIcon
+						label={__('Loading setup progress', 'fotogrids')}
+					/>
+				</div>
+			);
+		}
 
-        if (isSetupComplete(setupProgress)) {
-            return <RecentlyEdited hasAlbums={stats.albums_total > 0} />;
-        }
+		if (isSetupComplete(setupProgress)) {
+			return <RecentlyEdited hasAlbums={stats.albums_total > 0} />;
+		}
 
-        return <Checklist {...setupProgress} />;
-    };
+		return <Checklist {...setupProgress} />;
+	};
 
-    return (
-        <div className="fotogrids-dashboard">
-            <div className="fotogrids-admin-blocks-grid">
-                <MainCTA
-                    galleriesCount={stats.galleries}
-                    itemsCount={stats.items}
-                />
+	return (
+		<div className="fotogrids-dashboard">
+			<div className="fotogrids-admin-blocks-grid">
+				<MainCTA
+					galleriesCount={stats.galleries}
+					itemsCount={stats.items}
+				/>
 
-                {renderSetupSlot()}
+				{renderSetupSlot()}
 
-                <FileUploader onUploadComplete={handleUploadComplete} />
+				<FileUploader onUploadComplete={handleUploadComplete} />
 
-                <CreateOptions />
+				<CreateOptions />
 
-                <LearnSection />
+				<LearnSection />
 
-                <ProFeatures />
-            </div>
+				<ProFeatures />
+			</div>
 
-            <OverviewStats stats={stats} loading={loading} />
-        </div>
-    );
+			<OverviewStats stats={stats} loading={loading} />
+		</div>
+	);
 };
 
 export default Dashboard;

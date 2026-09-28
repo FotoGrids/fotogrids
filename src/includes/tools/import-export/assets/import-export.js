@@ -8,4 +8,4 @@
 import ImportExportTool from './ImportExportTool.jsx';
 import './import-export.scss';
 
-window.FotoGridsToolsComponents.register( 'import-export', ImportExportTool );
+window.FotoGridsToolsComponents.register('import-export', ImportExportTool);

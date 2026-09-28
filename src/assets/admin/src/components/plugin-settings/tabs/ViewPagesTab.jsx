@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import apiFetch from '@wordpress/api-fetch';
 import {
-    SettingsPanel,
-    PanelRow,
-    Segmented,
-    NumberField,
-    SaveBar,
+	SettingsPanel,
+	PanelRow,
+	Segmented,
+	NumberField,
+	SaveBar,
 } from '../../shared/settings';
 import Toggle from '../../shared/Toggle';
 import InfoBlock from '../../shared/InfoBlock';
@@ -40,379 +40,505 @@ const normalize = (raw) => ({ ...DEFAULTS, ...(raw || {}) });
  * group's settings are still persisted and surfaced when the mode flips.
  */
 const ViewPagesTab = () => {
-    const [settings, setSettings] = useState(normalize(window.fotogridsAdmin?.viewSettings));
-    const [saved, setSaved] = useState(normalize(window.fotogridsAdmin?.viewSettings));
-    const [saving, setSaving] = useState(false);
-    const [status, setStatus] = useState(null);
-    const [errorMessage, setErrorMessage] = useState(null);
+	const [settings, setSettings] = useState(
+		normalize(window.fotogridsAdmin?.viewSettings)
+	);
+	const [saved, setSaved] = useState(
+		normalize(window.fotogridsAdmin?.viewSettings)
+	);
+	const [saving, setSaving] = useState(false);
+	const [status, setStatus] = useState(null);
+	const [errorMessage, setErrorMessage] = useState(null);
 
-    useEffect(() => {
-        let active = true;
-        apiFetch({ path: '/fotogrids/v1/admin/view-settings' })
-            .then((data) => {
-                if (!active || !data?.settings) return;
-                const s = normalize(data.settings);
-                setSettings(s);
-                setSaved(s);
-            })
-            .catch(() => {});
-        return () => { active = false; };
-    }, []);
+	useEffect(() => {
+		let active = true;
+		apiFetch({ path: '/fotogrids/v1/admin/view-settings' })
+			.then((data) => {
+				if (!active || !data?.settings) return;
+				const s = normalize(data.settings);
+				setSettings(s);
+				setSaved(s);
+			})
+			.catch(() => {});
+		return () => {
+			active = false;
+		};
+	}, []);
 
-    const dirty = useMemo(
-        () => JSON.stringify(settings) !== JSON.stringify(saved),
-        [settings, saved]
-    );
+	const dirty = useMemo(
+		() => JSON.stringify(settings) !== JSON.stringify(saved),
+		[settings, saved]
+	);
 
-    const update = (key, value) => {
-        setSettings(prev => ({ ...prev, [key]: value }));
-        setStatus(null);
-        setErrorMessage(null);
-    };
+	const update = (key, value) => {
+		setSettings((prev) => ({ ...prev, [key]: value }));
+		setStatus(null);
+		setErrorMessage(null);
+	};
 
-    const handleSave = async () => {
-        setSaving(true);
-        setStatus(null);
-        setErrorMessage(null);
-        try {
-            const result = await apiFetch({
-                path: '/fotogrids/v1/admin/view-settings',
-                method: 'POST',
-                data: settings,
-            });
-            const next = result?.settings ? normalize(result.settings) : settings;
-            setSettings(next);
-            setSaved(next);
-            setStatus('saved');
-            setTimeout(() => setStatus(null), 3000);
-        } catch (err) {
-            setStatus('error');
-            setErrorMessage(err?.message || null);
-        } finally {
-            setSaving(false);
-        }
-    };
+	const handleSave = async () => {
+		setSaving(true);
+		setStatus(null);
+		setErrorMessage(null);
+		try {
+			const result = await apiFetch({
+				path: '/fotogrids/v1/admin/view-settings',
+				method: 'POST',
+				data: settings,
+			});
+			const next = result?.settings
+				? normalize(result.settings)
+				: settings;
+			setSettings(next);
+			setSaved(next);
+			setStatus('saved');
+			setTimeout(() => setStatus(null), 3000);
+		} catch (err) {
+			setStatus('error');
+			setErrorMessage(err?.message || null);
+		} finally {
+			setSaving(false);
+		}
+	};
 
-    const handleDiscard = () => {
-        setSettings(saved);
-        setStatus(null);
-        setErrorMessage(null);
-    };
+	const handleDiscard = () => {
+		setSettings(saved);
+		setStatus(null);
+		setErrorMessage(null);
+	};
 
-    // Reuse the plugin's existing color picker widget (plain global) by passing
-    // a synthetic setting descriptor.
-    const renderAccentPicker = () => {
-        const renderer = window.FotoGridsRenderSettings?.renderColorPicker;
-        if (!renderer) {
-            return (
-                <input
-                    type="color"
-                    value={settings.accent_color}
-                    onChange={(e) => update('accent_color', e.target.value)}
-                />
-            );
-        }
-        return renderer(
-            { key: 'accent_color', default: DEFAULTS.accent_color },
-            settings.accent_color,
-            false,
-            {
-                updateSetting: (key, value) => update('accent_color', value),
-                getFieldState: () => 'editable',
-                __,
-            }
-        );
-    };
+	// Reuse the plugin's existing color picker widget (plain global) by passing
+	// a synthetic setting descriptor.
+	const renderAccentPicker = () => {
+		const renderer = window.FotoGridsRenderSettings?.renderColorPicker;
+		if (!renderer) {
+			return (
+				<input
+					type="color"
+					value={settings.accent_color}
+					onChange={(e) => update('accent_color', e.target.value)}
+				/>
+			);
+		}
+		return renderer(
+			{ key: 'accent_color', default: DEFAULTS.accent_color },
+			settings.accent_color,
+			false,
+			{
+				updateSetting: (key, value) => update('accent_color', value),
+				getFieldState: () => 'editable',
+				__,
+			}
+		);
+	};
 
-    const isIntegrated = settings.layout_mode === 'integrated';
+	const isIntegrated = settings.layout_mode === 'integrated';
 
-    const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
-    const permalinksUrl = window.fotogridsAdmin?.permalinksUrl || '';
-    // wp_localize_script casts every scalar to a string, so the structure is
-    // compared against the empty string rather than read as a boolean. An
-    // absent key means an older bundle and is treated as pretty permalinks.
-    const prettyPermalinks = window.fotogridsAdmin?.permalinkStructure !== '';
+	const homeUrl = (window.fotogridsAdmin?.homeUrl || '').replace(/\/$/, '');
+	const permalinksUrl = window.fotogridsAdmin?.permalinksUrl || '';
+	// wp_localize_script casts every scalar to a string, so the structure is
+	// compared against the empty string rather than read as a boolean. An
+	// absent key means an older bundle and is treated as pretty permalinks.
+	const prettyPermalinks = window.fotogridsAdmin?.permalinkStructure !== '';
 
-    // Without a permalink structure WordPress ignores the rewrite base and
-    // serves view pages from the post type's query var instead.
-    // Prefix and segment are each optional; an empty result is the site root.
-    const basePath = (segment) =>
-        [settings.base_prefix, segment]
-            .map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
-            .filter(Boolean)
-            .join('/');
+	// Without a permalink structure WordPress ignores the rewrite base and
+	// serves view pages from the post type's query var instead.
+	// Prefix and segment are each optional; an empty result is the site root.
+	const basePath = (segment) =>
+		[settings.base_prefix, segment]
+			.map((part) => String(part || '').replace(/^\/+|\/+$/g, ''))
+			.filter(Boolean)
+			.join('/');
 
-    const galleryBase = basePath(settings.base_gallery_segment);
-    const albumBase = basePath(settings.base_album_segment);
+	const galleryBase = basePath(settings.base_gallery_segment);
+	const albumBase = basePath(settings.base_album_segment);
 
-    // Allowed: FotoGrids serves both types from one rule and resolves the slug.
-    const basesShared = galleryBase === albumBase;
-    const atSiteRoot = '' === galleryBase || '' === albumBase;
+	// Allowed: FotoGrids serves both types from one rule and resolves the slug.
+	const basesShared = galleryBase === albumBase;
+	const atSiteRoot = '' === galleryBase || '' === albumBase;
 
-    const previewUrl = (segment, sample, queryVar) => {
-        if (!prettyPermalinks) {
-            return `${homeUrl}/?${queryVar}=${sample}`;
-        }
+	const previewUrl = (segment, sample, queryVar) => {
+		if (!prettyPermalinks) {
+			return `${homeUrl}/?${queryVar}=${sample}`;
+		}
 
-        const base = basePath(segment);
-        return `${homeUrl}/${base ? `${base}/` : ''}${sample}/`;
-    };
+		const base = basePath(segment);
+		return `${homeUrl}/${base ? `${base}/` : ''}${sample}/`;
+	};
 
-    const urlPreview = (segment, sample, queryVar) => (
-        <p className="fotogrids-field-help">{previewUrl(segment, sample, queryVar)}</p>
-    );
+	const urlPreview = (segment, sample, queryVar) => (
+		<p className="fotogrids-field-help">
+			{previewUrl(segment, sample, queryVar)}
+		</p>
+	);
 
-    return (
-        <div className="fotogrids-sidebar-tabs__content__inner" key="view-pages-content">
-            <SettingsPanel
-                title={__('Address', 'fotogrids')}
-                description={__('Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root.', 'fotogrids')}
-            >
-                {!prettyPermalinks && (
-                    <InfoBlock
-                        variant="warning"
-                        title={__('Plain permalinks are on', 'fotogrids')}
-                        description={__('View pages are served from a query address, so the settings below have no effect yet. They apply as soon as you choose any other permalink structure.', 'fotogrids')}
-                    >
-                        {permalinksUrl && (
-                            <Button variant="secondary" size="sm" href={permalinksUrl}>
-                                {__('Permalink settings', 'fotogrids')}
-                            </Button>
-                        )}
-                    </InfoBlock>
-                )}
+	return (
+		<div
+			className="fotogrids-sidebar-tabs__content__inner"
+			key="view-pages-content"
+		>
+			<SettingsPanel
+				title={__('Address', 'fotogrids')}
+				description={__(
+					'Where view pages live on your site. Leave the prefix empty to put galleries and albums directly at the site root.',
+					'fotogrids'
+				)}
+			>
+				{!prettyPermalinks && (
+					<InfoBlock
+						variant="warning"
+						title={__('Plain permalinks are on', 'fotogrids')}
+						description={__(
+							'View pages are served from a query address, so the settings below have no effect yet. They apply as soon as you choose any other permalink structure.',
+							'fotogrids'
+						)}
+					>
+						{permalinksUrl && (
+							<Button
+								variant="secondary"
+								size="sm"
+								href={permalinksUrl}
+							>
+								{__('Permalink settings', 'fotogrids')}
+							</Button>
+						)}
+					</InfoBlock>
+				)}
 
-                {prettyPermalinks && basesShared && (
-                    <InfoBlock
-                        variant="error"
-                        title={__('Galleries and albums share one address', 'fotogrids')}
-                        description={__('Both open from the same path, so a gallery and an album that carry the same slug cannot both be reached — the gallery wins and the album stays available through its own segment. Keeping their slugs distinct is up to you. Use with caution.', 'fotogrids')}
-                    />
-                )}
+				{prettyPermalinks && basesShared && (
+					<InfoBlock
+						variant="error"
+						title={__(
+							'Galleries and albums share one address',
+							'fotogrids'
+						)}
+						description={__(
+							'Both open from the same path, so a gallery and an album that carry the same slug cannot both be reached — the gallery wins and the album stays available through its own segment. Keeping their slugs distinct is up to you. Use with caution.',
+							'fotogrids'
+						)}
+					/>
+				)}
 
-                {prettyPermalinks && atSiteRoot && (
-                    <InfoBlock
-                        variant="warning"
-                        title={__('These pages sit at the top level of your site', 'fotogrids')}
-                        description={__('An address directly after your domain can resolve to a gallery or album, so a page or post you add later at the same path may stop opening.', 'fotogrids')}
-                    />
-                )}
+				{prettyPermalinks && atSiteRoot && (
+					<InfoBlock
+						variant="warning"
+						title={__(
+							'These pages sit at the top level of your site',
+							'fotogrids'
+						)}
+						description={__(
+							'An address directly after your domain can resolve to a gallery or album, so a page or post you add later at the same path may stop opening.',
+							'fotogrids'
+						)}
+					/>
+				)}
 
-                <PanelRow
-                    title={__('Prefix', 'fotogrids')}
-                    description={__('The part both addresses below share. Clear it and they start straight after your domain.', 'fotogrids')}
-                    htmlFor="fg-view-base-prefix"
-                >
-                    <input
-                        id="fg-view-base-prefix"
-                        type="text"
-                        className="fotogrids-text-input"
-                        value={settings.base_prefix}
-                        placeholder={__('fotogrids', 'fotogrids')}
-                        onChange={(e) => update('base_prefix', e.target.value)}
-                    />
-                </PanelRow>
+				<PanelRow
+					title={__('Prefix', 'fotogrids')}
+					description={__(
+						'The part both addresses below share. Clear it and they start straight after your domain.',
+						'fotogrids'
+					)}
+					htmlFor="fg-view-base-prefix"
+				>
+					<input
+						id="fg-view-base-prefix"
+						type="text"
+						className="fotogrids-text-input"
+						value={settings.base_prefix}
+						placeholder={__('fotogrids', 'fotogrids')}
+						onChange={(e) => update('base_prefix', e.target.value)}
+					/>
+				</PanelRow>
 
-                <PanelRow
-                    title={__('Gallery segment', 'fotogrids')}
-                    description={__('The word that marks a gallery in the address.', 'fotogrids')}
-                    htmlFor="fg-view-base-gallery"
-                >
-                    <input
-                        id="fg-view-base-gallery"
-                        type="text"
-                        className="fotogrids-text-input"
-                        value={settings.base_gallery_segment}
-                        placeholder={__('gallery', 'fotogrids')}
-                        onChange={(e) => update('base_gallery_segment', e.target.value)}
-                    />
-                    {urlPreview(settings.base_gallery_segment, 'gallery-name', 'fotogrids_gallery')}
-                </PanelRow>
+				<PanelRow
+					title={__('Gallery segment', 'fotogrids')}
+					description={__(
+						'The word that marks a gallery in the address.',
+						'fotogrids'
+					)}
+					htmlFor="fg-view-base-gallery"
+				>
+					<input
+						id="fg-view-base-gallery"
+						type="text"
+						className="fotogrids-text-input"
+						value={settings.base_gallery_segment}
+						placeholder={__('gallery', 'fotogrids')}
+						onChange={(e) =>
+							update('base_gallery_segment', e.target.value)
+						}
+					/>
+					{urlPreview(
+						settings.base_gallery_segment,
+						'gallery-name',
+						'fotogrids_gallery'
+					)}
+				</PanelRow>
 
-                <PanelRow
-                    title={__('Album segment', 'fotogrids')}
-                    description={__('The word that marks an album in the address.', 'fotogrids')}
-                    htmlFor="fg-view-base-album"
-                >
-                    <input
-                        id="fg-view-base-album"
-                        type="text"
-                        className="fotogrids-text-input"
-                        value={settings.base_album_segment}
-                        placeholder={__('album', 'fotogrids')}
-                        onChange={(e) => update('base_album_segment', e.target.value)}
-                    />
-                    {urlPreview(settings.base_album_segment, 'album-name', 'fotogrids_album')}
-                </PanelRow>
+				<PanelRow
+					title={__('Album segment', 'fotogrids')}
+					description={__(
+						'The word that marks an album in the address.',
+						'fotogrids'
+					)}
+					htmlFor="fg-view-base-album"
+				>
+					<input
+						id="fg-view-base-album"
+						type="text"
+						className="fotogrids-text-input"
+						value={settings.base_album_segment}
+						placeholder={__('album', 'fotogrids')}
+						onChange={(e) =>
+							update('base_album_segment', e.target.value)
+						}
+					/>
+					{urlPreview(
+						settings.base_album_segment,
+						'album-name',
+						'fotogrids_album'
+					)}
+				</PanelRow>
 
-                <PanelRow
-                    fullWidth
-                    title={__('Before you change this', 'fotogrids')}
-                    description={__('Addresses on the default `fotogrids/gallery` and `fotogrids/album` base keep working and forward to the new one. Links you shared under a custom base you set earlier will stop resolving.', 'fotogrids')}
-                />
-            </SettingsPanel>
+				<PanelRow
+					fullWidth
+					title={__('Before you change this', 'fotogrids')}
+					description={__(
+						'Addresses on the default `fotogrids/gallery` and `fotogrids/album` base keep working and forward to the new one. Links you shared under a custom base you set earlier will stop resolving.',
+						'fotogrids'
+					)}
+				/>
+			</SettingsPanel>
 
-            <SettingsPanel
-                title={__('Page layout', 'fotogrids')}
-                description={__('Choose how view pages render. Integrated treats each gallery or album as a normal post in your theme. Standalone renders a theme-less shell that owns the whole page.', 'fotogrids')}
-            >
-                <PanelRow
-                    title={__('Layout mode', 'fotogrids')}
-                    description={__('Integrated uses your theme’s header, footer and navigation. Standalone overrides the theme entirely.', 'fotogrids')}
-                >
-                    <Segmented
-                        ariaLabel={__('Layout mode', 'fotogrids')}
-                        value={settings.layout_mode}
-                        onChange={(v) => update('layout_mode', v)}
-                        options={[
-                            { value: 'integrated', label: __('Integrated', 'fotogrids') },
-                            { value: 'standalone', label: __('Standalone', 'fotogrids') },
-                        ]}
-                    />
-                </PanelRow>
-            </SettingsPanel>
+			<SettingsPanel
+				title={__('Page layout', 'fotogrids')}
+				description={__(
+					'Choose how view pages render. Integrated treats each gallery or album as a normal post in your theme. Standalone renders a theme-less shell that owns the whole page.',
+					'fotogrids'
+				)}
+			>
+				<PanelRow
+					title={__('Layout mode', 'fotogrids')}
+					description={__(
+						'Integrated uses your theme’s header, footer and navigation. Standalone overrides the theme entirely.',
+						'fotogrids'
+					)}
+				>
+					<Segmented
+						ariaLabel={__('Layout mode', 'fotogrids')}
+						value={settings.layout_mode}
+						onChange={(v) => update('layout_mode', v)}
+						options={[
+							{
+								value: 'integrated',
+								label: __('Integrated', 'fotogrids'),
+							},
+							{
+								value: 'standalone',
+								label: __('Standalone', 'fotogrids'),
+							},
+						]}
+					/>
+				</PanelRow>
+			</SettingsPanel>
 
-            {isIntegrated && (
-                <SettingsPanel
-                    title={__('Integrated view pages', 'fotogrids')}
-                    description={__('Behaviour for view pages rendered inside your theme. These settings control how the gallery acts as a normal post on your site.', 'fotogrids')}
-                >
-                    <PanelRow
-                        title={__('Show title block above gallery', 'fotogrids')}
-                        description={__('Display the FotoGrids title and item count above the gallery. Most themes already render the post title, so this is off by default.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.integrated_show_title_block}
-                            onChange={(v) => update('integrated_show_title_block', v)}
-                        />
-                    </PanelRow>
+			{isIntegrated && (
+				<SettingsPanel
+					title={__('Integrated view pages', 'fotogrids')}
+					description={__(
+						'Behaviour for view pages rendered inside your theme. These settings control how the gallery acts as a normal post on your site.',
+						'fotogrids'
+					)}
+				>
+					<PanelRow
+						title={__(
+							'Show title block above gallery',
+							'fotogrids'
+						)}
+						description={__(
+							'Display the FotoGrids title and item count above the gallery. Most themes already render the post title, so this is off by default.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.integrated_show_title_block}
+							onChange={(v) =>
+								update('integrated_show_title_block', v)
+							}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Hide featured image', 'fotogrids')}
-                        description={__('Suppress your theme’s featured-image render on view pages. The gallery is the visual content, so an extra featured image above it is usually redundant.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.integrated_hide_featured_image}
-                            onChange={(v) => update('integrated_hide_featured_image', v)}
-                        />
-                    </PanelRow>
+					<PanelRow
+						title={__('Hide featured image', 'fotogrids')}
+						description={__(
+							'Suppress your theme’s featured-image render on view pages. The gallery is the visual content, so an extra featured image above it is usually redundant.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.integrated_hide_featured_image}
+							onChange={(v) =>
+								update('integrated_hide_featured_image', v)
+							}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Allow comments', 'fotogrids')}
-                        description={__('Let visitors leave comments on view pages if your theme renders them.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.integrated_allow_comments}
-                            onChange={(v) => update('integrated_allow_comments', v)}
-                        />
-                    </PanelRow>
+					<PanelRow
+						title={__('Allow comments', 'fotogrids')}
+						description={__(
+							'Let visitors leave comments on view pages if your theme renders them.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.integrated_allow_comments}
+							onChange={(v) =>
+								update('integrated_allow_comments', v)
+							}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Include in author and date archives', 'fotogrids')}
-                        description={__('When on, view pages appear in your theme’s author and date archives alongside blog posts.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.integrated_include_in_archives}
-                            onChange={(v) => update('integrated_include_in_archives', v)}
-                        />
-                    </PanelRow>
+					<PanelRow
+						title={__(
+							'Include in author and date archives',
+							'fotogrids'
+						)}
+						description={__(
+							'When on, view pages appear in your theme’s author and date archives alongside blog posts.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.integrated_include_in_archives}
+							onChange={(v) =>
+								update('integrated_include_in_archives', v)
+							}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Previous / next navigation', 'fotogrids')}
-                        description={__('When on, previous/next post links on view pages stay within galleries or within albums. When off, navigation is suppressed.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.integrated_post_navigation}
-                            onChange={(v) => update('integrated_post_navigation', v)}
-                        />
-                    </PanelRow>
-                </SettingsPanel>
-            )}
+					<PanelRow
+						title={__('Previous / next navigation', 'fotogrids')}
+						description={__(
+							'When on, previous/next post links on view pages stay within galleries or within albums. When off, navigation is suppressed.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.integrated_post_navigation}
+							onChange={(v) =>
+								update('integrated_post_navigation', v)
+							}
+						/>
+					</PanelRow>
+				</SettingsPanel>
+			)}
 
-            {!isIntegrated && (
-                <SettingsPanel
-                    title={__('Standalone appearance', 'fotogrids')}
-                    description={__('Look and feel of the theme-less shell. These settings apply to every Standalone view page.', 'fotogrids')}
-                >
-                    <PanelRow
-                        title={__('Accent color', 'fotogrids')}
-                        description={__('Used for buttons, links and highlights.', 'fotogrids')}
-                    >
-                        {renderAccentPicker()}
-                    </PanelRow>
+			{!isIntegrated && (
+				<SettingsPanel
+					title={__('Standalone appearance', 'fotogrids')}
+					description={__(
+						'Look and feel of the theme-less shell. These settings apply to every Standalone view page.',
+						'fotogrids'
+					)}
+				>
+					<PanelRow
+						title={__('Accent color', 'fotogrids')}
+						description={__(
+							'Used for buttons, links and highlights.',
+							'fotogrids'
+						)}
+					>
+						{renderAccentPicker()}
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Theme', 'fotogrids')}
-                        description={__('The base colour scheme.', 'fotogrids')}
-                    >
-                        <Segmented
-                            ariaLabel={__('Theme', 'fotogrids')}
-                            value={settings.theme}
-                            onChange={(v) => update('theme', v)}
-                            options={[
-                                { value: 'light', label: __('Light', 'fotogrids') },
-                                { value: 'dark', label: __('Dark', 'fotogrids') },
-                            ]}
-                        />
-                    </PanelRow>
+					<PanelRow
+						title={__('Theme', 'fotogrids')}
+						description={__('The base colour scheme.', 'fotogrids')}
+					>
+						<Segmented
+							ariaLabel={__('Theme', 'fotogrids')}
+							value={settings.theme}
+							onChange={(v) => update('theme', v)}
+							options={[
+								{
+									value: 'light',
+									label: __('Light', 'fotogrids'),
+								},
+								{
+									value: 'dark',
+									label: __('Dark', 'fotogrids'),
+								},
+							]}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Maximum width', 'fotogrids')}
-                        description={__('How wide the gallery content can grow on large screens.', 'fotogrids')}
-                        htmlFor="fg-view-max-width"
-                    >
-                        <NumberField
-                            id="fg-view-max-width"
-                            value={settings.max_width}
-                            onChange={(v) => update('max_width', v)}
-                            unit="px"
-                            min={320}
-                            max={3000}
-                            step={10}
-                        />
-                    </PanelRow>
+					<PanelRow
+						title={__('Maximum width', 'fotogrids')}
+						description={__(
+							'How wide the gallery content can grow on large screens.',
+							'fotogrids'
+						)}
+						htmlFor="fg-view-max-width"
+					>
+						<NumberField
+							id="fg-view-max-width"
+							value={settings.max_width}
+							onChange={(v) => update('max_width', v)}
+							unit="px"
+							min={320}
+							max={3000}
+							step={10}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Show page header', 'fotogrids')}
-                        description={__('Display the title and item count at the top of the view page.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.show_header}
-                            onChange={(v) => update('show_header', v)}
-                        />
-                    </PanelRow>
+					<PanelRow
+						title={__('Show page header', 'fotogrids')}
+						description={__(
+							'Display the title and item count at the top of the view page.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.show_header}
+							onChange={(v) => update('show_header', v)}
+						/>
+					</PanelRow>
 
-                    <PanelRow
-                        title={__('Show page footer', 'fotogrids')}
-                        description={__('Display the sharing controls and footer credit at the bottom of the view page.', 'fotogrids')}
-                    >
-                        <Toggle
-                            checked={settings.show_footer}
-                            onChange={(v) => update('show_footer', v)}
-                        />
-                    </PanelRow>
-                </SettingsPanel>
-            )}
+					<PanelRow
+						title={__('Show page footer', 'fotogrids')}
+						description={__(
+							'Display the sharing controls and footer credit at the bottom of the view page.',
+							'fotogrids'
+						)}
+					>
+						<Toggle
+							checked={settings.show_footer}
+							onChange={(v) => update('show_footer', v)}
+						/>
+					</PanelRow>
+				</SettingsPanel>
+			)}
 
-            {errorMessage && (
-                <InfoBlock
-                    variant="error"
-                    role="alert"
-                    title={__('That address could not be saved', 'fotogrids')}
-                    description={errorMessage}
-                />
-            )}
+			{errorMessage && (
+				<InfoBlock
+					variant="error"
+					role="alert"
+					title={__('That address could not be saved', 'fotogrids')}
+					description={errorMessage}
+				/>
+			)}
 
-            <SaveBar
-                dirty={dirty}
-                saving={saving}
-                status={status}
-                onSave={handleSave}
-                onDiscard={handleDiscard}
-                watch={settings}
-            />
-        </div>
-    );
+			<SaveBar
+				dirty={dirty}
+				saving={saving}
+				status={status}
+				onSave={handleSave}
+				onDiscard={handleDiscard}
+				watch={settings}
+			/>
+		</div>
+	);
 };
 
 export default ViewPagesTab;

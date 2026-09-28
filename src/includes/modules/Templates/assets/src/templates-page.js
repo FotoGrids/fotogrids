@@ -13,28 +13,30 @@ import TemplatesPage from '@/admin/src/components/pages/TemplatesPage';
 import './templates-page.scss';
 
 function initializeTemplatesPage() {
-    const container = document.getElementById('fotogrids-templates-page');
-    if (!container) {
-        return;
-    }
+	const container = document.getElementById('fotogrids-templates-page');
+	if (!container) {
+		return;
+	}
 
-    if (container._reactRootContainer) {
-        container._reactRootContainer.render(React.createElement(TemplatesPage));
-        return;
-    }
+	if (container._reactRootContainer) {
+		container._reactRootContainer.render(
+			React.createElement(TemplatesPage)
+		);
+		return;
+	}
 
-    try {
-        const root = createRoot(container);
-        container._reactRootContainer = root;
-        root.render(React.createElement(TemplatesPage));
-    } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('FotoGrids: Error rendering Templates page:', error);
-    }
+	try {
+		const root = createRoot(container);
+		container._reactRootContainer = root;
+		root.render(React.createElement(TemplatesPage));
+	} catch (error) {
+		// eslint-disable-next-line no-console
+		console.error('FotoGrids: Error rendering Templates page:', error);
+	}
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeTemplatesPage);
+	document.addEventListener('DOMContentLoaded', initializeTemplatesPage);
 } else {
-    setTimeout(initializeTemplatesPage, 0);
+	setTimeout(initializeTemplatesPage, 0);
 }

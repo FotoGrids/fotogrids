@@ -18,34 +18,34 @@ import Icon from './Icon';
  * @param {React.ReactNode}        props.children    The control (right slot).
  */
 const InfoBlock = ({
-    title,
-    description,
-    icon,
-    variant = 'info',
-    role,
-    children,
+	title,
+	description,
+	icon,
+	variant = 'info',
+	role,
+	children,
 }) => {
-    const baseClass = 'fotogrids-info-block';
-    const variantIcons = {
-        warning: 'alert_circle',
-        error: 'x_circle',
-    };
-    const resolvedIcon = icon || variantIcons[variant] || 'info_square';
+	const baseClass = 'fotogrids-info-block';
+	const variantIcons = {
+		warning: 'alert_circle',
+		error: 'x_circle',
+	};
+	const resolvedIcon = icon || variantIcons[variant] || 'info_square';
 
-    return (
-        <div className={`${baseClass} ${baseClass}--${variant}`} role={role}>
-            <div className={`${baseClass}__icon`}>
-                <Icon name={resolvedIcon} />
-            </div>
-            <div className={`${baseClass}__text`}>
-                {title && <h4 className={`${baseClass}__title`}>{title}</h4>}
-                {description && (
-                    <p className={`${baseClass}__description`}>{description}</p>
-                )}
-            </div>
-            <div className={`${baseClass}__control`}>{children}</div>
-        </div>
-    );
+	return (
+		<div className={`${baseClass} ${baseClass}--${variant}`} role={role}>
+			<div className={`${baseClass}__icon`}>
+				<Icon name={resolvedIcon} />
+			</div>
+			<div className={`${baseClass}__text`}>
+				{title && <h4 className={`${baseClass}__title`}>{title}</h4>}
+				{description && (
+					<p className={`${baseClass}__description`}>{description}</p>
+				)}
+			</div>
+			<div className={`${baseClass}__control`}>{children}</div>
+		</div>
+	);
 };
 
 export default InfoBlock;

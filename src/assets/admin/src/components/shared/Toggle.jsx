@@ -19,56 +19,58 @@
 
 import React from 'react';
 
-const Toggle = ( {
-    checked   = false,
-    onChange,
-    label,
-    labelLight = false,
-    description,
-    id,
-    disabled  = false,
-    size      = 'default',
-    color     = 'default',
-} ) => {
-    const buttonClass = [
-        'fotogrids-toggle',
-        checked              ? 'fgt-is-checked'         : '',
-        size  === 'small'    ? 'fotogrids-toggle--small' : '',
-        color === 'green'    ? 'fotogrids-toggle--green' : '',
-    ].filter( Boolean ).join( ' ' );
+const Toggle = ({
+	checked = false,
+	onChange,
+	label,
+	labelLight = false,
+	description,
+	id,
+	disabled = false,
+	size = 'default',
+	color = 'default',
+}) => {
+	const buttonClass = [
+		'fotogrids-toggle',
+		checked ? 'fgt-is-checked' : '',
+		size === 'small' ? 'fotogrids-toggle--small' : '',
+		color === 'green' ? 'fotogrids-toggle--green' : '',
+	]
+		.filter(Boolean)
+		.join(' ');
 
-    return (
-        <div className="fotogrids-toggle-control">
-            <div className="fotogrids-toggle-wrapper">
-                <button
-                    type="button"
-                    id={ id }
-                    role="switch"
-                    aria-checked={ checked }
-                    className={ buttonClass }
-                    onClick={ () => ! disabled && onChange( ! checked ) }
-                    disabled={ disabled }
-                >
-                    <span className="fotogrids-toggle__track" />
-                    <span className="fotogrids-toggle__thumb" />
-                </button>
-            </div>
-            { label && (
-                <label
-                    className={ `fotogrids-setting__label ${labelLight ? 'fotogrids-setting__label--light' : ''}` }
-                    htmlFor={ id }
-                    style={ id ? undefined : { cursor: 'default' } }
-                >
-                    { label }
-                </label>
-            ) }
-            { description && (
-                <div className="fotogrids-setting__description">
-                    { description }
-                </div>
-            ) }
-        </div>
-    );
+	return (
+		<div className="fotogrids-toggle-control">
+			<div className="fotogrids-toggle-wrapper">
+				<button
+					type="button"
+					id={id}
+					role="switch"
+					aria-checked={checked}
+					className={buttonClass}
+					onClick={() => !disabled && onChange(!checked)}
+					disabled={disabled}
+				>
+					<span className="fotogrids-toggle__track" />
+					<span className="fotogrids-toggle__thumb" />
+				</button>
+			</div>
+			{label && (
+				<label
+					className={`fotogrids-setting__label ${labelLight ? 'fotogrids-setting__label--light' : ''}`}
+					htmlFor={id}
+					style={id ? undefined : { cursor: 'default' }}
+				>
+					{label}
+				</label>
+			)}
+			{description && (
+				<div className="fotogrids-setting__description">
+					{description}
+				</div>
+			)}
+		</div>
+	);
 };
 
 export default Toggle;

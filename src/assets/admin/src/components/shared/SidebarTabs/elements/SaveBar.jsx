@@ -39,139 +39,145 @@ const AUTOSAVE_DELAY = 2000;
 // every scalar - and a real boolean once a toggle has written the AJAX response
 // back. Anything else is ambiguous, and off is the safe answer.
 const autosaveIsOn = () => {
-    const raw = window.fotogridsAdmin?.autosave;
-    return true === raw || '1' === raw;
+	const raw = window.fotogridsAdmin?.autosave;
+	return true === raw || '1' === raw;
 };
 const SaveBar = ({
-    dirty,
-    saving = false,
-    status = null,
-    onSave,
-    disabled = false,
-    onDiscard,
-    savedHint,
-    saveLabel,
-    extraAction,
-    watch,
+	dirty,
+	saving = false,
+	status = null,
+	onSave,
+	disabled = false,
+	onDiscard,
+	savedHint,
+	saveLabel,
+	extraAction,
+	watch,
 }) => {
-    const [autosave, setAutosave] = useState(autosaveIsOn);
+	const [autosave, setAutosave] = useState(autosaveIsOn);
 
-    // The Advanced tab announces the option changing, so the other tabs pick it
-    // up without a reload.
-    useEffect(() => {
-        const handleAutosaveChanged = (e) =>
-            setAutosave(
-                typeof e.detail?.enabled === 'boolean'
-                    ? e.detail.enabled
-                    : autosaveIsOn()
-            );
+	// The Advanced tab announces the option changing, so the other tabs pick it
+	// up without a reload.
+	useEffect(() => {
+		const handleAutosaveChanged = (e) =>
+			setAutosave(
+				typeof e.detail?.enabled === 'boolean'
+					? e.detail.enabled
+					: autosaveIsOn()
+			);
 
-        document.addEventListener(
-            'fotogrids:autosave_changed',
-            handleAutosaveChanged
-        );
-        return () =>
-            document.removeEventListener(
-                'fotogrids:autosave_changed',
-                handleAutosaveChanged
-            );
-    }, []);
+		document.addEventListener(
+			'fotogrids:autosave_changed',
+			handleAutosaveChanged
+		);
+		return () =>
+			document.removeEventListener(
+				'fotogrids:autosave_changed',
+				handleAutosaveChanged
+			);
+	}, []);
 
-    // Held in a ref so a new onSave identity on each render does not restart
-    // the debounce.
-    const onSaveRef = useRef(onSave);
-    onSaveRef.current = onSave;
+	// Held in a ref so a new onSave identity on each render does not restart
+	// the debounce.
+	const onSaveRef = useRef(onSave);
+	onSaveRef.current = onSave;
 
-    const watchToken = watch === undefined ? null : JSON.stringify(watch);
+	const watchToken = watch === undefined ? null : JSON.stringify(watch);
 
-    useEffect(() => {
-        // `status === 'error'` stops a failed save retrying on a loop. Editing
-        // again clears the status, which re-arms this.
-        if (!autosave || !dirty || saving || disabled || 'error' === status) {
-            return undefined;
-        }
+	useEffect(() => {
+		// `status === 'error'` stops a failed save retrying on a loop. Editing
+		// again clears the status, which re-arms this.
+		if (!autosave || !dirty || saving || disabled || 'error' === status) {
+			return undefined;
+		}
 
-        const timer = setTimeout(() => onSaveRef.current?.(), AUTOSAVE_DELAY);
-        return () => clearTimeout(timer);
-    }, [autosave, dirty, saving, disabled, status, watchToken]);
+		const timer = setTimeout(() => onSaveRef.current?.(), AUTOSAVE_DELAY);
+		return () => clearTimeout(timer);
+	}, [autosave, dirty, saving, disabled, status, watchToken]);
 
-    // A sentinel sits directly after the bar. While the bar is pinned to the
-    // bottom of the viewport the sentinel is scrolled out of view (not
-    // intersecting); once the user reaches the end of the content the sentinel
-    // comes into view and the bar settles into its natural position; that
-    // state is mirrored into an `fg-is-sticky` class on the bar.
-    const sentinelRef = useRef(null);
-    const [isStuck, setIsStuck] = useState(false);
+	// A sentinel sits directly after the bar. While the bar is pinned to the
+	// bottom of the viewport the sentinel is scrolled out of view (not
+	// intersecting); once the user reaches the end of the content the sentinel
+	// comes into view and the bar settles into its natural position; that
+	// state is mirrored into an `fg-is-sticky` class on the bar.
+	const sentinelRef = useRef(null);
+	const [isStuck, setIsStuck] = useState(false);
 
-    useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel || typeof IntersectionObserver === 'undefined') {
-            return undefined;
-        }
+	useEffect(() => {
+		const sentinel = sentinelRef.current;
+		if (!sentinel || typeof IntersectionObserver === 'undefined') {
+			return undefined;
+		}
 
-        const observer = new IntersectionObserver(
-            ([entry]) => setIsStuck(!entry.isIntersecting),
-            { threshold: 0 }
-        );
+		const observer = new IntersectionObserver(
+			([entry]) => setIsStuck(!entry.isIntersecting),
+			{ threshold: 0 }
+		);
 
-        observer.observe(sentinel);
-        return () => observer.disconnect();
-    }, []);
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	}, []);
 
-    let dotClass = 'fotogrids-save-bar__dot';
-    let message;
+	let dotClass = 'fotogrids-save-bar__dot';
+	let message;
 
-    if (status === 'error') {
-        dotClass += ' fotogrids-save-bar__dot--error';
-        message = __('Save failed', 'fotogrids');
-    } else if (dirty) {
-        dotClass += ' fotogrids-save-bar__dot--dirty';
-        message = __('Unsaved changes', 'fotogrids');
-    } else {
-        dotClass += ' fotogrids-save-bar__dot--clean';
-        message = __('All changes saved', 'fotogrids');
-    }
+	if (status === 'error') {
+		dotClass += ' fotogrids-save-bar__dot--error';
+		message = __('Save failed', 'fotogrids');
+	} else if (dirty) {
+		dotClass += ' fotogrids-save-bar__dot--dirty';
+		message = __('Unsaved changes', 'fotogrids');
+	} else {
+		dotClass += ' fotogrids-save-bar__dot--clean';
+		message = __('All changes saved', 'fotogrids');
+	}
 
-    return (
-        <>
-        <div className={`fotogrids-save-bar${isStuck ? ' fg-is-sticky' : ''}`}>
-            <span className={dotClass} aria-hidden="true" />
-            <span className="fotogrids-save-bar__message">
-                {message}
-                {!dirty && status !== 'error' && savedHint && (
-                    <span className="fotogrids-save-bar__hint">{` - ${savedHint}`}</span>
-                )}
-            </span>
+	return (
+		<>
+			<div
+				className={`fotogrids-save-bar${isStuck ? ' fg-is-sticky' : ''}`}
+			>
+				<span className={dotClass} aria-hidden="true" />
+				<span className="fotogrids-save-bar__message">
+					{message}
+					{!dirty && status !== 'error' && savedHint && (
+						<span className="fotogrids-save-bar__hint">{` - ${savedHint}`}</span>
+					)}
+				</span>
 
-            {dirty && onDiscard && !autosave && (
-                <Button
-                    variant="secondary"
-                    style="ghost"
-                    size="xs"
-                    onClick={onDiscard}
-                    disabled={saving}
-                >
-                    {__('Discard', 'fotogrids')}
-                </Button>
-            )}
+				{dirty && onDiscard && !autosave && (
+					<Button
+						variant="secondary"
+						style="ghost"
+						size="xs"
+						onClick={onDiscard}
+						disabled={saving}
+					>
+						{__('Discard', 'fotogrids')}
+					</Button>
+				)}
 
-            {extraAction}
+				{extraAction}
 
-            <Button
-                variant="primary"
-                size="xs"
-                onClick={onSave}
-                disabled={saving || !dirty || disabled}
-                busy={saving}
-            >
-                {saving
-                    ? __('Saving…', 'fotogrids')
-                    : (saveLabel || __('Save changes', 'fotogrids'))}
-            </Button>
-        </div>
-        <div ref={sentinelRef} className="fotogrids-save-bar__sentinel" aria-hidden="true" />
-        </>
-    );
+				<Button
+					variant="primary"
+					size="xs"
+					onClick={onSave}
+					disabled={saving || !dirty || disabled}
+					busy={saving}
+				>
+					{saving
+						? __('Saving…', 'fotogrids')
+						: saveLabel || __('Save changes', 'fotogrids')}
+				</Button>
+			</div>
+			<div
+				ref={sentinelRef}
+				className="fotogrids-save-bar__sentinel"
+				aria-hidden="true"
+			/>
+		</>
+	);
 };
 
 export default SaveBar;

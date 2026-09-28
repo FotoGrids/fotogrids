@@ -12,13 +12,13 @@ import React from 'react';
  * @param {string} [props.state]      "on" | "off" | "muted". Defaults to "muted".
  */
 const StatusLight = ({ label, stateLabel, state = 'muted' }) => (
-    <span className={`fotogrids-status-light fotogrids-status-light--${state}`}>
-        <span className="fotogrids-status-light__label">{label}</span>
-        <span className="fotogrids-status-light__state">
-            <span className="fotogrids-status-light__dot" aria-hidden="true" />
-            {stateLabel}
-        </span>
-    </span>
+	<span className={`fotogrids-status-light fotogrids-status-light--${state}`}>
+		<span className="fotogrids-status-light__label">{label}</span>
+		<span className="fotogrids-status-light__state">
+			<span className="fotogrids-status-light__dot" aria-hidden="true" />
+			{stateLabel}
+		</span>
+	</span>
 );
 
 export default StatusLight;

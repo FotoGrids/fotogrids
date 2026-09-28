@@ -23,66 +23,89 @@ import React from 'react';
  * @param {React.ReactNode}        props.children        Panel body.
  */
 const Panel = ({
-    title,
-    titleTag = 'h2',
-    description,
-    action,
-    noBody = false,
-    noBodyPadding = false,
-    equalBodyPadding = false,
-    longDescription = false,
-    bare = false,
-    className = '',
-    children,
+	title,
+	titleTag = 'h2',
+	description,
+	action,
+	noBody = false,
+	noBodyPadding = false,
+	equalBodyPadding = false,
+	longDescription = false,
+	bare = false,
+	className = '',
+	children,
 }) => {
-    const hasHeader = title || description || action;
-    const allowedTitleTags = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'span']);
-    const safeTitleTag = typeof titleTag === 'string' && allowedTitleTags.has(titleTag) ? titleTag : 'h2';
-    const TitleTag = safeTitleTag;
+	const hasHeader = title || description || action;
+	const allowedTitleTags = new Set([
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6',
+		'p',
+		'div',
+		'span',
+	]);
+	const safeTitleTag =
+		typeof titleTag === 'string' && allowedTitleTags.has(titleTag)
+			? titleTag
+			: 'h2';
+	const TitleTag = safeTitleTag;
 
-    const baseClass = 'fotogrids-sidebar-layout__panel';
+	const baseClass = 'fotogrids-sidebar-layout__panel';
 
-    const rootClass = [
-        baseClass,
-        bare ? `${baseClass}--bare` : '',
-        className,
-    ].filter(Boolean).join(' ');
+	const rootClass = [baseClass, bare ? `${baseClass}--bare` : '', className]
+		.filter(Boolean)
+		.join(' ');
 
-    return (
-        <section className={rootClass}>
-            {hasHeader && (
-                <header
-                    className={[
-                        `${baseClass}__head`,
-                        noBody ? `${baseClass}__head--no-body` : '',
-                    ].filter(Boolean).join(' ')}
-                >
-                    <div className={`${baseClass}__heading`}>
-                        {title && (
-                            <TitleTag className={`${baseClass}__title ${baseClass}__title--${safeTitleTag}`}>{title}</TitleTag>
-                        )}
-                        {description && (
-                            <p className={`${baseClass}__description ${longDescription ? `${baseClass}__description--long` : ''}`}>{description}</p>
-                        )}
-                    </div>
-                    {action && (
-                        <div className={`${baseClass}__action`}>{action}</div>
-                    )}
-                </header>
-            )}
-            {!noBody && (
-                <div
-                    className={[
-                        `${baseClass}__body`,
-                        noBodyPadding ? `${baseClass}__body--flush` : '',
-                        equalBodyPadding ? `${baseClass}__body--equal` : '',
-                    ].filter(Boolean).join(' ')}
-                >
-                    {children}
-                </div>
-            )}
-        </section>
-    );
+	return (
+		<section className={rootClass}>
+			{hasHeader && (
+				<header
+					className={[
+						`${baseClass}__head`,
+						noBody ? `${baseClass}__head--no-body` : '',
+					]
+						.filter(Boolean)
+						.join(' ')}
+				>
+					<div className={`${baseClass}__heading`}>
+						{title && (
+							<TitleTag
+								className={`${baseClass}__title ${baseClass}__title--${safeTitleTag}`}
+							>
+								{title}
+							</TitleTag>
+						)}
+						{description && (
+							<p
+								className={`${baseClass}__description ${longDescription ? `${baseClass}__description--long` : ''}`}
+							>
+								{description}
+							</p>
+						)}
+					</div>
+					{action && (
+						<div className={`${baseClass}__action`}>{action}</div>
+					)}
+				</header>
+			)}
+			{!noBody && (
+				<div
+					className={[
+						`${baseClass}__body`,
+						noBodyPadding ? `${baseClass}__body--flush` : '',
+						equalBodyPadding ? `${baseClass}__body--equal` : '',
+					]
+						.filter(Boolean)
+						.join(' ')}
+				>
+					{children}
+				</div>
+			)}
+		</section>
+	);
 };
 
 export default Panel;

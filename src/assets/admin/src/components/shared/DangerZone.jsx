@@ -16,27 +16,27 @@ import Icon from './Icon';
  * @param {React.ReactNode}        props.children    The control (right slot).
  */
 const DangerZone = ({
-    title,
-    description,
-    icon = 'alert_bubble',
-    children,
+	title,
+	description,
+	icon = 'alert_bubble',
+	children,
 }) => {
-    const baseClass = 'fotogrids-danger-zone';
+	const baseClass = 'fotogrids-danger-zone';
 
-    return (
-        <div className={baseClass}>
-            <div className={`${baseClass}__icon`}>
-                <Icon name={icon} />
-            </div>
-            <div className={`${baseClass}__text`}>
-                {title && <h4 className={`${baseClass}__title`}>{title}</h4>}
-                {description && (
-                    <p className={`${baseClass}__description`}>{description}</p>
-                )}
-            </div>
-            <div className={`${baseClass}__control`}>{children}</div>
-        </div>
-    );
+	return (
+		<div className={baseClass}>
+			<div className={`${baseClass}__icon`}>
+				<Icon name={icon} />
+			</div>
+			<div className={`${baseClass}__text`}>
+				{title && <h4 className={`${baseClass}__title`}>{title}</h4>}
+				{description && (
+					<p className={`${baseClass}__description`}>{description}</p>
+				)}
+			</div>
+			<div className={`${baseClass}__control`}>{children}</div>
+		</div>
+	);
 };
 
 export default DangerZone;

@@ -8,4 +8,7 @@
 import RegenerateThumbnailsTool from './RegenerateThumbnailsTool.jsx';
 import './regenerate-thumbnails.scss';
 
-window.FotoGridsToolsComponents.register( 'regenerate-thumbnails', RegenerateThumbnailsTool );
+window.FotoGridsToolsComponents.register(
+	'regenerate-thumbnails',
+	RegenerateThumbnailsTool
+);
