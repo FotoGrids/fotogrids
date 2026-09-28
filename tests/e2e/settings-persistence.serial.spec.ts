@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { loginAsAdmin } from './helpers';
+import { storageStateFor } from './support/roles';
+
+test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 /**
  * Saving one settings tab must not disturb another, and a setting turned off
@@ -76,10 +78,6 @@ async function setAutosave(page: Page, on: boolean) {
 }
 
 test.describe('settings persistence', () => {
-	test.beforeEach(async ({ page }) => {
-		await loginAsAdmin(page);
-	});
-
 	test('autosave defaults to on', async ({ page }) => {
 		await openAdvanced(page);
 		expect(await toggleState(page, 'fotogrids_autosave')).toBe('true');
