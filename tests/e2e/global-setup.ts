@@ -2,6 +2,7 @@ import { execFileSync } from 'child_process';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { request } from '@playwright/test';
+import { purgeScoped } from './support/collections';
 import {
 	ROLES,
 	authDir,
@@ -141,6 +142,10 @@ async function globalSetup(): Promise< void > {
 
 	wpCli();
 	seed();
+
+	// Collections a scoped spec created on an earlier run. Left behind they
+	// accumulate, and a spec counting galleries would see them.
+	purgeScoped();
 
 	mkdirSync( authDir(), { recursive: true } );
 

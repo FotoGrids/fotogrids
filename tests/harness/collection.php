@@ -1,0 +1,179 @@
+<?php
+/**
+ * Build throwaway collections for a spec that needs one of its own.
+ *
+ * Run through WP-CLI, one operation per invocation:
+ *
+ *   wp eval-file collection.php op=render items=4,5,6 settings='{"layout":"masonry"}'
+ *   wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
+ *   wp eval-file collection.php op=purge
+ *
+ * Every post it creates carries FG_COLLECTION_MARKER, so `op=purge` can remove
+ * the lot. tests/e2e/support/collections.ts is the interface specs use.
+ *
+ * @package FotoGrids
+ */
+
+use FotoGrids\Collection_Defaults;
+use FotoGrids\FotoGrids_Cache;
+use FotoGrids\Galleries\Gallery_Repository;
+use FotoGrids\Settings\Setting_Value_Codec;
+
+/** Marks a post as this script's to delete. Distinct from the seeder's. */
+const FG_COLLECTION_MARKER = '_fg_scoped';
+
+/**
+ * Read `name=value` arguments, whatever order WP-CLI passes them in.
+ *
+ * @param array  $args    Positional arguments from WP-CLI.
+ * @param string $name    Argument name.
+ * @param string $default Returned when the argument is absent.
+ * @return string
+ */
+function fg_col_arg( array $args, string $name, string $default = '' ): string {
+	foreach ( $args as $arg ) {
+		if ( 0 === strpos( $arg, $name . '=' ) ) {
+			return substr( $arg, strlen( $name ) + 1 );
+		}
+	}
+
+	return $default;
+}
+
+/**
+ * Write settings to a collection and drop its render cache.
+ *
+ * Each setting is one post-meta row, so this persists key by key through the
+ * same codec the save pipeline uses - which is what makes a value written here
+ * read back identically to one saved through the UI.
+ *
+ * The cache flush is not optional: the render cache is keyed on the gallery,
+ * not on its settings, so without it the next render replays the HTML built
+ * before the change and a render assertion reads a stale layout.
+ *
+ * @param int   $gallery_id Gallery to write to.
+ * @param array $settings   Catalog key to value.
+ * @return void
+ * @throws Exception When a key is not in the catalog.
+ */
+function fg_col_settings( int $gallery_id, array $settings ): void {
+	$defaults = Collection_Defaults::resolve_gallery();
+
+	foreach ( $settings as $key => $value ) {
+		if ( ! array_key_exists( $key, $defaults ) ) {
+			throw new Exception( "Unknown setting key '{$key}'" );
+		}
+
+		Setting_Value_Codec::persist(
+			$gallery_id,
+			'fotogrids_' . $key,
+			Setting_Value_Codec::normalize_incoming(
+				$value,
+				$defaults[ $key ],
+				Setting_Value_Codec::catalog_field_type( $key )
+			),
+			$defaults[ $key ],
+			Setting_Value_Codec::catalog_field_type( $key )
+		);
+	}
+
+	FotoGrids_Cache::flush_for_gallery( $gallery_id );
+}
+
+/**
+ * A post whose content renders one gallery through the shortcode.
+ *
+ * @param int $gallery_id Gallery to embed.
+ * @return int
+ */
+function fg_col_render_page( int $gallery_id ): int {
+	$page_id = wp_insert_post(
+		array(
+			'post_type'    => 'post',
+			'post_title'   => 'Renders gallery ' . $gallery_id,
+			'post_status'  => 'publish',
+			'post_content' => '[fotogrids_gallery id="' . $gallery_id . '"]',
+		),
+		true
+	);
+
+	if ( is_wp_error( $page_id ) ) {
+		WP_CLI::error( $page_id->get_error_message() );
+	}
+
+	update_post_meta( $page_id, FG_COLLECTION_MARKER, 1 );
+
+	return $page_id;
+}
+
+$op = fg_col_arg( $args, 'op' );
+
+if ( 'render' === $op ) {
+	$gallery_id = wp_insert_post(
+		array(
+			'post_type'   => 'fotogrids_gallery',
+			'post_title'  => fg_col_arg( $args, 'title', 'Scoped gallery' ),
+			'post_status' => 'publish',
+		),
+		true
+	);
+
+	if ( is_wp_error( $gallery_id ) ) {
+		WP_CLI::error( $gallery_id->get_error_message() );
+	}
+
+	update_post_meta( $gallery_id, FG_COLLECTION_MARKER, 1 );
+
+	$items = array_filter( array_map( 'intval', explode( ',', fg_col_arg( $args, 'items' ) ) ) );
+	if ( $items ) {
+		Gallery_Repository::set_item_ids( $gallery_id, $items );
+	}
+
+	$settings = json_decode( fg_col_arg( $args, 'settings', '{}' ), true );
+	if ( is_array( $settings ) && $settings ) {
+		fg_col_settings( $gallery_id, $settings );
+	}
+
+	WP_CLI::log(
+		(string) wp_json_encode(
+			array(
+				'id'  => $gallery_id,
+				'url' => get_permalink( fg_col_render_page( $gallery_id ) ),
+			)
+		)
+	);
+	return;
+}
+
+if ( 'settings' === $op ) {
+	$settings = json_decode( fg_col_arg( $args, 'settings', '{}' ), true );
+	fg_col_settings( (int) fg_col_arg( $args, 'id' ), is_array( $settings ) ? $settings : array() );
+	return;
+}
+
+if ( 'purge' === $op ) {
+	$owned = get_posts(
+		array(
+			'post_type'        => array( 'post', 'fotogrids_gallery', 'fotogrids_album' ),
+			'post_status'      => 'any',
+			'posts_per_page'   => -1,
+			'fields'           => 'ids',
+			'suppress_filters' => true,
+			'meta_query'       => array(
+				array(
+					'key'     => FG_COLLECTION_MARKER,
+					'compare' => 'EXISTS',
+				),
+			),
+		)
+	);
+
+	foreach ( $owned as $post_id ) {
+		wp_delete_post( $post_id, true );
+	}
+
+	WP_CLI::log( (string) count( $owned ) );
+	return;
+}
+
+WP_CLI::error( "Unknown op '{$op}'. Expected render, settings or purge." );
