@@ -903,7 +903,7 @@ class Import_Export_Data {
 					'object_id'   => $object_id,
 					'views'       => (int) ( $row['views'] ?? 0 ),
 					'shares'      => (int) ( $row['shares'] ?? 0 ),
-					'last_viewed' => sanitize_text_field( $row['last_viewed'] ?? current_time( 'mysql' ) ),
+					'last_viewed' => sanitize_text_field( $row['last_viewed'] ?? current_time( 'mysql', true ) ),
 				)
 			);
 			++$imported;
