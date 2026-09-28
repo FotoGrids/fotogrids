@@ -27,7 +27,7 @@ import {
 	BlockAlignmentToolbar,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 import metadata from '../../blocks/gallery/block.json';
 import transforms from './transforms/gallery-transforms';
@@ -326,10 +326,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 					onClose={() => setPickerOpen(false)}
 					selectedId={galleryId}
 					createNewUrl={createNewUrl}
-					title={sprintf(
-						/* translators: page-builder picker heading */
-						__('Select a FotoGrids gallery', 'fotogrids')
-					)}
+					title={__('Select a FotoGrids gallery', 'fotogrids')}
 				/>
 			)}
 		</div>

@@ -16,6 +16,8 @@ import Icon from './Icon';
  * @param {string}   [props.ariaLabel]
  * @param {boolean}  [props.disabled]
  * @param {string}   [props.className]
+ * @param {string}   [props.size]      'default' or 'small' (tighter padding, smaller text).
+ * @param {string}   [props.variant]   'default' or 'rounded' (pill-shaped track and options).
  */
 const Segmented = ({
 	options = [],

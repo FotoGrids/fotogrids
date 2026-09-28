@@ -15,6 +15,8 @@ import React from 'react';
  * @param {React.ReactNode}        [props.action]        Right-aligned header action (e.g. a button).
  * @param {boolean}                [props.noBody]        Omit the body wrapper; header-only panel.
  * @param {boolean}                [props.noBodyPadding] Drop the body padding (for tables/grids that pad themselves).
+ * @param {boolean}                [props.equalBodyPadding] Pad the body evenly on all sides (32px).
+ * @param {boolean}                [props.longDescription]  Let the description span the full width instead of 64ch.
  * @param {boolean}                [props.bare]          Remove background, border, border-radius, and padding
  *                                                       entirely. Use when the parent already provides a surface
  *                                                       (e.g. inside a SidebarTabs content pane) and you just

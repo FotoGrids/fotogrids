@@ -211,9 +211,12 @@
 		// execCommand('copy') reads the selection, so focus and selection are restored
 		// afterwards; otherwise the share button's blur handler hides its tooltip.
 		const previouslyFocused = document.activeElement;
+		const selection = document.getSelection
+			? document.getSelection()
+			: null;
 		const previousSelection =
-			document.getSelection && document.getSelection().rangeCount > 0
-				? document.getSelection().getRangeAt(0)
+			selection && selection.rangeCount > 0
+				? selection.getRangeAt(0)
 				: null;
 
 		ta.focus({ preventScroll: true });

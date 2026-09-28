@@ -11,15 +11,15 @@
 (function () {
 	'use strict';
 
-	var config = window.fotogridsErrorCapture;
+	const config = window.fotogridsErrorCapture;
 
 	if (!config || !config.endpoint || !config.paths || !config.paths.length) {
 		return;
 	}
 
-	var MAX_REPORTS_PER_PAGE = 10;
-	var sent = 0;
-	var seen = {};
+	const MAX_REPORTS_PER_PAGE = 10;
+	let sent = 0;
+	const seen = {};
 
 	/**
 	 * Whether a piece of text points at a FotoGrids asset.
@@ -32,7 +32,7 @@
 			return false;
 		}
 
-		for (var i = 0; i < config.paths.length; i++) {
+		for (let i = 0; i < config.paths.length; i++) {
 			if (text.indexOf(config.paths[i]) !== -1) {
 				return true;
 			}
@@ -52,7 +52,7 @@
 			return;
 		}
 
-		var key = payload.message + '|' + payload.file + '|' + payload.line;
+		const key = payload.message + '|' + payload.file + '|' + payload.line;
 
 		if (seen[key]) {
 			return;
@@ -77,8 +77,8 @@
 	}
 
 	window.addEventListener('error', function (event) {
-		var file = event.filename || '';
-		var stack = (event.error && event.error.stack) || '';
+		const file = event.filename || '';
+		const stack = (event.error && event.error.stack) || '';
 
 		// A cross-origin script reports "Script error." with no stack, which
 		// cannot be attributed to anyone; those are left alone.
@@ -96,8 +96,8 @@
 	});
 
 	window.addEventListener('unhandledrejection', function (event) {
-		var reason = event.reason;
-		var stack = (reason && reason.stack) || '';
+		const reason = event.reason;
+		const stack = (reason && reason.stack) || '';
 
 		if (!isOurs(stack)) {
 			return;

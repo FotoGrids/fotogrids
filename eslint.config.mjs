@@ -80,10 +80,10 @@ export default [
             // private mode) so it is not flagged.
             'no-empty': ['warn', { allowEmptyCatch: true }],
 
-            // The automatic JSX runtime makes React-in-scope unnecessary; prop
-            // types are carried by TypeScript.
+            // Webpack compiles JSX with the classic runtime, so JSX counts as a
+            // use of the React import; prop types are carried by TypeScript.
             'react/react-in-jsx-scope': 'off',
-            'react/jsx-uses-react': 'off',
+            'react/jsx-uses-react': 'error',
             'react/prop-types': 'off',
             'react-hooks/rules-of-hooks': 'error',
             'react-hooks/exhaustive-deps': 'warn',
@@ -131,6 +131,21 @@ export default [
             // Formatting is owned entirely by Prettier (prettier/prettier via the
             // WordPress preset); ESLint stylistic rules are intentionally not set
             // here so the two never conflict.
+        },
+    },
+    {
+        // Externals the Divi Visual Builder provides on its vendor globals.
+        files: ['src/includes/modules/PageBuilders/builders/Divi/native/**'],
+        settings: {
+            'import/core-modules': ['lodash', '@wordpress/hooks'],
+        },
+    },
+    {
+        // Visitor-facing scripts run in the page's own document, never inside
+        // the block editor's canvas iframe.
+        files: ['src/public/render/**'],
+        rules: {
+            '@wordpress/no-global-active-element': 'off',
         },
     },
     {

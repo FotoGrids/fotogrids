@@ -27,11 +27,6 @@ const GalleryMetabox = ({
 	nonce = '',
 	strings = {},
 }) => {
-	if (!React || !useState || !useEffect || !useCallback) {
-		console.error('React hooks not available');
-		return React.createElement('div', {}, 'React hooks not available');
-	}
-
 	const uiState = window.FotoGridsUiState?.createNamespace({
 		area: 'gallery-items',
 		postId: window.fotogridsMetaBoxes?.postId || 0,

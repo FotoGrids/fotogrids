@@ -6,6 +6,7 @@ import LoadingIcon from '../shared/LoadingIcon';
 import { collectionTitle } from '../../utils/collection-title';
 
 const { __ } = wp.i18n;
+const { createInterpolateElement } = wp.element;
 
 const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 	const targetType = template?.category === 'album' ? 'album' : 'gallery';
@@ -85,7 +86,8 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 					cancelLabel: __('Cancel', 'fotogrids'),
 					headerIcon: false,
 				})
-			: window.confirm(confirmMessage);
+			: // eslint-disable-next-line no-alert -- fallback when the admin modal API has not loaded.
+				window.confirm(confirmMessage);
 
 		if (!confirmed) {
 			return;
@@ -199,14 +201,16 @@ const ApplyTemplateModal = ({ template, isOpen, onClose, onSuccess }) => {
 				{targetId && selectedTarget && (
 					<div className="fotogrids-notice fotogrids-notice--warning">
 						<p>
-							{__(
-								'Warning: Applying this template will overwrite all existing settings for',
-								'fotogrids'
-							)}
-							<strong> {selectedTarget.title}</strong>.
-							{__(
-								' Are you sure you want to proceed?',
-								'fotogrids'
+							{createInterpolateElement(
+								__(
+									'Warning: Applying this template will overwrite all existing settings for <target />. Are you sure you want to proceed?',
+									'fotogrids'
+								),
+								{
+									target: (
+										<strong>{selectedTarget.title}</strong>
+									),
+								}
 							)}
 						</p>
 					</div>

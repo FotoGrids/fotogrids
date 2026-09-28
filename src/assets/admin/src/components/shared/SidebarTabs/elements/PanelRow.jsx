@@ -15,6 +15,7 @@ import React from 'react';
  * @param {boolean}                [props.splitColumns]  Two equal columns, each min 220px. Use when the
  *                                                       label and control deserve the same visual weight
  *                                                       (e.g. a description-heavy row with a large control).
+ * @param {boolean}                [props.largerLabels]  Widen the label column to 240px (two-column rows only).
  * @param {string}                 [props.className]     Extra class on the root.
  * @param {React.ReactNode}        props.children        The control(s).
  */

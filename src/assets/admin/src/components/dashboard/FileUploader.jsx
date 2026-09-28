@@ -7,6 +7,7 @@ import MediaUpload from '../blocks/MediaUpload';
 import Icon from '../shared/Icon';
 
 const { __ } = wp.i18n;
+const { createInterpolateElement } = wp.element;
 
 const FileUploader = ({ onUploadComplete }) => {
 	const handleUploadComplete = (attachmentIds) => {
@@ -21,12 +22,14 @@ const FileUploader = ({ onUploadComplete }) => {
 
 	const openMediaLibrary = () => {
 		if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-			alert(
-				__(
-					'WordPress media library is not available. Please refresh the page.',
-					'fotogrids'
-				)
-			);
+			if (window.fotogridsToast) {
+				window.fotogridsToast.error(
+					__(
+						'WordPress media library is not available. Please refresh the page.',
+						'fotogrids'
+					)
+				);
+			}
 			return;
 		}
 
@@ -51,10 +54,12 @@ const FileUploader = ({ onUploadComplete }) => {
 						'Error creating gallery from library:',
 						error
 					);
-					alert(
-						error.message ||
-							__('Failed to create gallery.', 'fotogrids')
-					);
+					if (window.fotogridsToast) {
+						window.fotogridsToast.error(
+							error.message ||
+								__('Failed to create gallery.', 'fotogrids')
+						);
+					}
 				});
 			}
 		});
@@ -83,18 +88,21 @@ const FileUploader = ({ onUploadComplete }) => {
 					inputId="fotogrids-dashboard-upload-input"
 				/>
 				<p className="fotogrids-upload-or">
-					{__('or ', 'fotogrids')}
-					<a
-						href="#"
-						onClick={(e) => {
-							e.preventDefault();
-							openMediaLibrary();
-						}}
-						className="fotogrids-upload-or__link"
-					>
-						{__('choose existing files', 'fotogrids')}
-					</a>
-					{__(' from media library', 'fotogrids')}
+					{createInterpolateElement(
+						__(
+							'or <link>choose existing files</link> from media library',
+							'fotogrids'
+						),
+						{
+							link: (
+								<button
+									type="button"
+									onClick={openMediaLibrary}
+									className="fotogrids-upload-or__link"
+								/>
+							),
+						}
+					)}
 				</p>
 			</div>
 		</div>

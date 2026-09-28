@@ -62,12 +62,19 @@ const Dashboard = () => {
 		try {
 			await createGalleryFromImages(imageIds);
 			loadStats();
-			alert(__('Gallery created successfully!', 'fotogrids'));
+			if (window.fotogridsToast) {
+				window.fotogridsToast.success(
+					__('Gallery created successfully!', 'fotogrids')
+				);
+			}
 		} catch (error) {
 			console.error('Error creating gallery from upload:', error);
-			alert(
-				error.message || __('Failed to create gallery.', 'fotogrids')
-			);
+			if (window.fotogridsToast) {
+				window.fotogridsToast.error(
+					error.message ||
+						__('Failed to create gallery.', 'fotogrids')
+				);
+			}
 		}
 	};
 

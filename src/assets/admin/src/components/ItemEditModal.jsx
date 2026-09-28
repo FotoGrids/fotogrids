@@ -373,6 +373,7 @@ const ItemEditModal = ({
 				if (window.fotogridsToast) {
 					window.fotogridsToast.error(errorMessage);
 				} else {
+					// eslint-disable-next-line no-alert -- fallback when the toast script has not loaded.
 					alert(errorMessage);
 				}
 			}
@@ -382,6 +383,7 @@ const ItemEditModal = ({
 			if (window.fotogridsToast) {
 				window.fotogridsToast.error(strings.errorSaving);
 			} else {
+				// eslint-disable-next-line no-alert -- fallback when the toast script has not loaded.
 				alert(strings.errorSaving);
 			}
 		}

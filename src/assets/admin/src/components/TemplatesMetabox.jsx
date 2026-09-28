@@ -124,6 +124,7 @@ const TemplatesMetabox = () => {
 		const modal = window.FotoGridsAdmin?.modal;
 
 		if (!modal?.confirm) {
+			// eslint-disable-next-line no-alert -- fallback when the admin modal API has not loaded.
 			return window.confirm(strings.confirmApply);
 		}
 

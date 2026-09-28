@@ -156,7 +156,10 @@ const WatermarkRegenerate = ({ galleryId = 0, onChange, refreshKey }) => {
 				done,
 				total
 			)
-		: reasonParts.join(__(' · ', 'fotogrids'));
+		: reasonParts.join(
+				// eslint-disable-next-line @wordpress/i18n-no-flanking-whitespace -- list separator; locales may change the spacing.
+				__(' · ', 'fotogrids')
+			);
 
 	return (
 		<InfoBlock icon="security" title={title} description={description}>

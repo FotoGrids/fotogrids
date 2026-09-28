@@ -332,15 +332,13 @@
 								self.state.delete(sourceId);
 							}
 						}
-					} else {
+					} else if (cb.checked) {
 						// Single-select: checking a box replaces the set for
 						// this source; unchecking clears the source entirely.
 						// Sibling checkboxes are updated by _syncUi().
-						if (cb.checked) {
-							self.state.set(sourceId, new Set([cb.value]));
-						} else {
-							self.state.delete(sourceId);
-						}
+						self.state.set(sourceId, new Set([cb.value]));
+					} else {
+						self.state.delete(sourceId);
 					}
 
 					self._apply();
@@ -692,7 +690,7 @@
 			 * a `fotogrids:filters_changed` event with the same payload.
 			 *
 			 * @param {Element}  galleryEl
-			 * @param {function} cb
+			 * @param {Function} cb
 			 */
 			onChange(galleryEl, cb) {
 				if (!changeListeners.has(galleryEl)) {
