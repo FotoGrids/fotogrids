@@ -1,4 +1,5 @@
-import { test, expect, APIRequestContext } from '@playwright/test';
+import { test, expect } from './support/test';
+import type { APIRequestContext } from '@playwright/test';
 import { fixture, firstItem } from './support/fixtures';
 import { apiAnonymous, apiAs, roles } from './support/roles';
 

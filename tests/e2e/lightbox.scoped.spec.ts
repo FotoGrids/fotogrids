@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
 import { galleryPage } from './support/collections';
 import { firstItem } from './support/fixtures';
 import { GalleryRender } from './support/gallery-render';
