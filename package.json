@@ -9,7 +9,7 @@
     "build:dev": "cross-env NODE_ENV=development webpack && npm run clean:dsstore",
     "clean": "rm -rf dist",
     "clean:dsstore": "find dist -name .DS_Store -delete 2>/dev/null || true",
-    "lint": "eslint src",
+    "lint": "eslint src --max-warnings=0",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write 'src/{assets,includes,public}/**/*.{js,jsx,ts,tsx}' 'src/assets/**/*.{scss,css}' '**/*.md'",
     "type-check": "tsc --noEmit",

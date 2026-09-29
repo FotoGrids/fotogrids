@@ -19,7 +19,7 @@ const { __ } = wp.i18n;
  * Uses SidebarTabs for the left-rail layout consistent with Settings and Tools.
  */
 const LibraryPage = () => {
-	const library = window.fotogridsLibrary || {};
+	const library = useMemo(() => window.fotogridsLibrary || {}, []);
 	const entityTypes = useMemo(
 		() => (Array.isArray(library.entityTypes) ? library.entityTypes : []),
 		[library]

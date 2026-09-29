@@ -689,8 +689,8 @@
 			 * receives the active map. Also: gallery wrappers dispatch
 			 * a `fotogrids:filters_changed` event with the same payload.
 			 *
-			 * @param {Element}  galleryEl
-			 * @param {Function} cb
+			 * @param {Element}                  galleryEl
+			 * @param {(active: Object) => void} cb
 			 */
 			onChange(galleryEl, cb) {
 				if (!changeListeners.has(galleryEl)) {

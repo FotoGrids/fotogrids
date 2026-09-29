@@ -98,12 +98,12 @@ declare global {
 			};
 		};
 		wp: {
-			element: any;
-			components: any;
-			data: any;
-			apiFetch: any;
-			i18n: any;
-			mediaUtils: any;
+			element: typeof import('@wordpress/element');
+			components: typeof import('@wordpress/components');
+			data: typeof import('@wordpress/data');
+			apiFetch: typeof import('@wordpress/api-fetch').default;
+			i18n: typeof import('@wordpress/i18n');
+			mediaUtils: Record<string, unknown>;
 		};
 	}
 }

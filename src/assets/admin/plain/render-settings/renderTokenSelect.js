@@ -83,6 +83,8 @@ const TokenSelectComponent = ({
 		setSelectedValues(parseValue(currentValue));
 	}, [currentValue]);
 
+	const optionValuesKey = allOptions.map((o) => o.value).join('|');
+
 	// When a per-option condition turns an option off, drop any stale selected
 	// value referencing it. Without this, the user would still see (and could
 	// not remove without re-enabling the gating setting) a chip whose option
@@ -100,7 +102,8 @@ const TokenSelectComponent = ({
 			setSelectedValues(pruned);
 			updateSetting(setting.key, serializeValue(pruned));
 		}
-	}, [allOptions.map((o) => o.value).join('|'), optionsLoading]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- prunes only when the option list itself changes.
+	}, [optionValuesKey, optionsLoading]);
 
 	const settingState =
 		typeof getFieldState === 'function'

@@ -23,7 +23,7 @@
 	 * Each queue is kept sorted by (priority asc, seq asc) so registration
 	 * order is preserved within a priority bucket.
 	 *
-	 * @type {Object<string, Array<{ cb: Function, priority: number, seq: number }>>}
+	 * @type {Object<string, Array<{ cb: (element: Element) => void, priority: number, seq: number }>>}
 	 */
 	const queues = {
 		gallery: [],
@@ -143,7 +143,7 @@
 
 	/**
 	 * Classifies the window, using the same max-width conditions as the
-	 * server-emitted @media blocks.
+	 * server-emitted `@media` blocks.
 	 *
 	 * @param {{ mobile: number, tablet: number }} config
 	 * @return {string}
@@ -275,9 +275,9 @@
 	/**
 	 * Inserts a callback into the named queue, kept sorted by (priority, seq).
 	 *
-	 * @param {string}   queueName One of 'gallery', 'album', 'collection'.
-	 * @param {Function} cb
-	 * @param {number}   priority
+	 * @param {string}                     queueName One of 'gallery', 'album', 'collection'.
+	 * @param {(element: Element) => void} cb
+	 * @param {number}                     priority
 	 */
 	function insertCallback(queueName, cb, priority) {
 		const q = queues[queueName];
@@ -452,7 +452,7 @@
 	 * subscribers never miss a collection.
 	 *
 	 * @param {string} queueName 'gallery' | 'album' | 'collection'
-	 * @return {Function}
+	 * @return {(cb: (element: Element) => void, priority?: number) => void}
 	 */
 	function makeSubscriber(queueName) {
 		return function (cb, priority) {
@@ -507,8 +507,8 @@
 		 * Lower priority runs first. Same priority preserves registration
 		 * order.
 		 *
-		 * @param {Function} cb       Receives (galleryElement).
-		 * @param {number} [priority] Default 10.
+		 * @param {(element: Element) => void} cb         Receives (galleryElement).
+		 * @param {number}                     [priority] Default 10.
 		 */
 		onGallery: makeSubscriber('gallery'),
 
@@ -518,8 +518,8 @@
 		 *
 		 * Same replay-on-late-subscribe semantics as onGallery.
 		 *
-		 * @param {Function} cb       Receives (albumElement).
-		 * @param {number} [priority] Default 10.
+		 * @param {(element: Element) => void} cb         Receives (albumElement).
+		 * @param {number}                     [priority] Default 10.
 		 */
 		onAlbum: makeSubscriber('album'),
 
@@ -530,8 +530,8 @@
 		 * needs to run against both kinds; most modules want onGallery or
 		 * onAlbum instead.
 		 *
-		 * @param {Function} cb       Receives (collectionElement).
-		 * @param {number} [priority] Default 10.
+		 * @param {(element: Element) => void} cb         Receives (collectionElement).
+		 * @param {number}                     [priority] Default 10.
 		 */
 		onCollection: makeSubscriber('collection'),
 
@@ -578,7 +578,7 @@
 		 * Populated by modules; the runtime itself never reads or writes
 		 * properties on this object.
 		 *
-		 * @type {Object<string, *>}
+		 * @type {Object<string, unknown>}
 		 */
 		modules: {},
 	};

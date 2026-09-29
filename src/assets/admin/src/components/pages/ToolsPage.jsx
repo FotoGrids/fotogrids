@@ -76,6 +76,7 @@ const ToolsPage = () => {
 			}
 		};
 		load();
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- loads the tool manifest once on mount.
 	}, []);
 
 	useEffect(() => {

@@ -9,8 +9,8 @@
  * onUploadComplete() is called once with every attachment ID that landed, after
  * the batch settles - including when part of it failed.
  *
- * @param {Function} props.onUploadComplete  Called with array of WP attachment IDs.
- * @param {string}   [props.inputId]         HTML id for the hidden file input.
+ * @param {(ids: number[]) => void} props.onUploadComplete  Called with array of WP attachment IDs.
+ * @param {string}                  [props.inputId]         HTML id for the hidden file input.
  */
 import React, { useCallback, useRef, useState } from 'react';
 import { uploadMedia } from '@wordpress/media-utils';

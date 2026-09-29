@@ -66,6 +66,7 @@ const WatermarkStatusComponent = ({
 		if (postId) {
 			fetchStatus();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- fetches once per post; fetchStatus is recreated every render.
 	}, [postId]);
 
 	const regenerate = async (ids) => {

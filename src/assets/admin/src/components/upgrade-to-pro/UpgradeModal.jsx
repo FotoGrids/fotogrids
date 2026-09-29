@@ -147,6 +147,7 @@ const UpgradeModal = () => {
 				clearInterval(autoAdvanceRef.current);
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- restarts auto-advance only when the modal opens or the benefit count changes.
 	}, [isOpen, benefits.length]);
 
 	const handleBenefitChange = (index, resetTimer = false) => {

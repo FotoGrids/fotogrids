@@ -14,10 +14,27 @@ declare global {
 		fotogridsPbDivi?: {
 			galleryOptions?: Record<string, { label: string }>;
 			albumOptions?: Record<string, { label: string }>;
-			[k: string]: any;
+			[k: string]: unknown;
 		};
 	}
 }
+
+type ModuleDefinition = {
+	metadata?: {
+		attributes?: Record<
+			string,
+			{
+				settings?: {
+					innerContent?: {
+						item?: {
+							component?: { props?: Record<string, unknown> };
+						};
+					};
+				};
+			}
+		>;
+	};
+};
 
 /**
  * Inject live select options (passed from PHP via window.fotogridsPbDivi)
@@ -25,11 +42,11 @@ declare global {
  * reads options from this metadata, and the static module.json ships them
  * empty, so we patch them in here.
  */
-const withOptions = (
-	moduleDef: any,
+const withOptions = <T extends ModuleDefinition>(
+	moduleDef: T,
 	attrKey: 'gallery' | 'album',
 	options?: Record<string, { label: string }>
-): any => {
+): T => {
 	if (!options) {
 		return moduleDef;
 	}

@@ -24,7 +24,7 @@ declare global {
 		fotogridsPbDivi?: {
 			restUrl: string;
 			restNonce: string;
-			[k: string]: any;
+			[k: string]: unknown;
 		};
 	}
 }
@@ -66,7 +66,7 @@ const FotoGridsAlbumEdit = (props: FotoGridsAlbumEditProps): ReactElement => {
 			emptyRef.current.style.display = '';
 		}
 
-		const cfg = window.fotogridsPbDivi || ({} as any);
+		const cfg = window.fotogridsPbDivi || { restUrl: '', restNonce: '' };
 		const restUrl = cfg.restUrl || '';
 		const nonce = cfg.restNonce || '';
 		const url = `${restUrl}preview/album/${encodeURIComponent(albumId)}`;
@@ -91,7 +91,7 @@ const FotoGridsAlbumEdit = (props: FotoGridsAlbumEditProps): ReactElement => {
 			.then((r) =>
 				r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))
 			)
-			.then(async (data: any) => {
+			.then(async (data: { html?: unknown }) => {
 				const html = typeof data?.html === 'string' ? data.html : '';
 				if (!html) {
 					container.innerHTML = '';
@@ -113,7 +113,7 @@ const FotoGridsAlbumEdit = (props: FotoGridsAlbumEditProps): ReactElement => {
 					ownerWindow: container.ownerDocument?.defaultView || window,
 				});
 			})
-			.catch((error: any) => {
+			.catch((error: Error) => {
 				if (error?.name !== 'AbortError') {
 					container.innerHTML = '';
 					if (emptyRef.current) {

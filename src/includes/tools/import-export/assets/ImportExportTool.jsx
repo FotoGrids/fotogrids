@@ -279,7 +279,11 @@ const ExportPanel = ({ onOperationStart, onOperationEnd }) => {
 	const toggleType = (key) => {
 		setInclude((prev) => {
 			const next = new Set(prev);
-			next.has(key) ? next.delete(key) : next.add(key);
+			if (next.has(key)) {
+				next.delete(key);
+			} else {
+				next.add(key);
+			}
 			return next;
 		});
 	};
@@ -511,7 +515,11 @@ const ImportPanel = ({ onOperationStart, onOperationEnd }) => {
 	const toggleInclude = (key) => {
 		setInclude((prev) => {
 			const next = new Set(prev);
-			next.has(key) ? next.delete(key) : next.add(key);
+			if (next.has(key)) {
+				next.delete(key);
+			} else {
+				next.add(key);
+			}
 			return next;
 		});
 	};

@@ -197,6 +197,7 @@ const PasswordInputComponent = ({
 				}
 			}
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- a new toggleLabel gives the ref a new identity, so React re-runs it and the tooltip refreshes.
 		[toggleLabel]
 	);
 

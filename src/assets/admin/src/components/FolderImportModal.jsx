@@ -7,13 +7,13 @@
  * Browsing and local uploading each live in their own hook; this component owns
  * the selection, the import request, and the footer that drives both tabs.
  *
- * @param {Object}   props
- * @param {boolean}  props.isOpen             Modal visibility.
- * @param {Function} props.onClose            Called when the modal should close.
- * @param {Function} props.onAddItems         Called with an array of gallery item objects.
- * @param {Function} props.onUploadComplete   Called with an array of new attachment IDs.
- * @param {number}   props.galleryId          Gallery the import is for.
- * @param {Object}   [props.strings]          Localized labels.
+ * @param {Object}                    props
+ * @param {boolean}                   props.isOpen             Modal visibility.
+ * @param {() => void}                props.onClose            Called when the modal should close.
+ * @param {(items: Object[]) => void} props.onAddItems         Called with an array of gallery item objects.
+ * @param {(ids: number[]) => void}   props.onUploadComplete   Called with an array of new attachment IDs.
+ * @param {number}                    props.galleryId          Gallery the import is for.
+ * @param {Object}                    [props.strings]          Localized labels.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';

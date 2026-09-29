@@ -341,12 +341,15 @@ const FontFamilyComponent = ({
 	}, [googleFontsStatus]);
 
 	const normalizedSearchTerm = searchTerm.trim().toLowerCase();
-	const defaultOption = {
-		label: __('Default', 'fotogrids'),
-		value: defaultOptionValue,
-		fontFamily: '',
-		source: 'default',
-	};
+	const defaultOption = useMemo(
+		() => ({
+			label: __('Default', 'fotogrids'),
+			value: defaultOptionValue,
+			fontFamily: '',
+			source: 'default',
+		}),
+		[defaultOptionValue, __]
+	);
 
 	const filteredSystemOptions = useMemo(() => {
 		if (!normalizedSearchTerm) {

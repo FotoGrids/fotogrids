@@ -34,8 +34,8 @@ class ToastManager {
 
 	/**
 	 * Subscribe to toast changes
-	 * @param {Function} callback - Function to call when toasts change
-	 * @returns {Function} Unsubscribe function
+	 * @param {(toasts: Object[]) => void} callback - Function to call when toasts change
+	 * @returns {() => void} Unsubscribe function
 	 */
 	subscribe(callback) {
 		this.listeners.push(callback);
