@@ -6,6 +6,8 @@
  *
  *   wp eval-file collection.php op=render items=4,5,6 settings='{"layout":"masonry"}'
  *   wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
+ *   wp eval-file collection.php op=album galleries=41 title='Scoped album'
+ *   wp eval-file collection.php op=page gallery=13
  *   wp eval-file collection.php op=purge
  *
  * Every post it creates carries FG_COLLECTION_MARKER, so `op=purge` can remove
@@ -133,6 +135,52 @@ if ( 'render' === $op ) {
 	if ( is_array( $settings ) && $settings ) {
 		fg_col_settings( $gallery_id, $settings );
 	}
+
+	WP_CLI::log(
+		(string) wp_json_encode(
+			array(
+				'id'  => $gallery_id,
+				'url' => get_permalink( fg_col_render_page( $gallery_id ) ),
+			)
+		)
+	);
+	return;
+}
+
+if ( 'album' === $op ) {
+	$album_id = wp_insert_post(
+		array(
+			'post_type'   => 'fotogrids_album',
+			'post_title'  => fg_col_arg( $args, 'title', 'Scoped album' ),
+			'post_status' => 'publish',
+		),
+		true
+	);
+
+	if ( is_wp_error( $album_id ) ) {
+		WP_CLI::error( $album_id->get_error_message() );
+	}
+
+	update_post_meta( $album_id, FG_COLLECTION_MARKER, 1 );
+
+	$galleries = array_filter( array_map( 'intval', explode( ',', fg_col_arg( $args, 'galleries' ) ) ) );
+	foreach ( $galleries as $position => $gallery_id ) {
+		\FotoGrids\Gallery_Album_Relations::add_gallery_to_album( $gallery_id, (int) $album_id, (int) $position );
+	}
+
+	$settings = json_decode( fg_col_arg( $args, 'settings', '{}' ), true );
+	if ( is_array( $settings ) && $settings ) {
+		fg_col_settings( (int) $album_id, $settings );
+	}
+
+	WP_CLI::log( (string) wp_json_encode( array( 'id' => (int) $album_id ) ) );
+	return;
+}
+
+if ( 'page' === $op ) {
+	// A rendering page for a gallery the spec did not create - a seeded
+	// fixture it only reads. The page is scoped; the gallery is untouched.
+	$gallery_id = (int) fg_col_arg( $args, 'gallery' );
 
 	WP_CLI::log(
 		(string) wp_json_encode(
