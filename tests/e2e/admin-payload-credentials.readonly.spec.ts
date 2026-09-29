@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
 import { storageStateFor } from './support/roles';
 
 test.use( { storageState: storageStateFor( 'administrator' ) } );

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
 import { galleryPage, setSettings } from './support/collections';
 import { GalleryRender } from './support/gallery-render';
 
