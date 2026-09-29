@@ -1,0 +1,256 @@
+import { test, expect } from './support/test';
+import type { APIRequestContext } from '@playwright/test';
+import { fixture, firstItem } from './support/fixtures';
+import { apiAnonymous, apiAs } from './support/roles';
+
+/**
+ * SEC-13. Every write route refuses a request that carries no REST nonce.
+ *
+ * The routes come from the namespace index, so one registered tomorrow is
+ * covered the day it appears. Each must land in exactly one of three lists:
+ * public on purpose, proven to refuse, or named here as unexercisable. A new
+ * route lands in none of them and fails, which is the point.
+ *
+ * Serial: a route that fails this is, by definition, performing the write.
+ */
+
+/** Routes that answer without a nonce on purpose, with the reason each one is. */
+const PUBLIC_ON_PURPOSE: Record< string, string > = {
+	'/fotogrids/v1/stats/view': 'view counting is unauthenticated by design',
+	'/fotogrids/v1/stats/share': 'share counting is unauthenticated by design',
+	'/fotogrids/v1/gallery/(?P<id>\\d+)/unlock':
+		'a visitor submits the gallery password before they have any session',
+	'/fotogrids/v1/gallery/render': 'a read that uses POST for its argument size',
+	'/fotogrids/v1/gallery/lightbox/slides':
+		'a read, gated per gallery rather than by capability',
+};
+
+/**
+ * Routes whose arguments this test cannot synthesise, so the request is
+ * rejected for its body before the permission callback runs. Their auth is
+ * unproven here and is covered by the row named against each one.
+ */
+const UNPROVEN: Record< string, string > = {
+	'/fotogrids/v1/admin/tools/migration/import': 'refs describe another install',
+	'/fotogrids/v1/media/import/folder': 'files must name real paths on disk',
+	'/fotogrids/v1/import/core-gallery': 'attachment_ids must be core gallery attachments',
+	'/fotogrids/v1/admin/albums/(?P<id>\\d+)/galleries': 'gallery_ids is validated against the album',
+	'/fotogrids/v1/admin/albums/(?P<id>\\d+)/galleries/reorder': 'gallery_ids must be the album’s own',
+	'/fotogrids/v1/admin/galleries/(?P<id>\\d+)/albums': 'album_ids is validated against the gallery',
+	'/fotogrids/v1/admin/galleries/(?P<id>\\d+)/items': 'item_ids is validated against the gallery',
+};
+
+/** Stand-ins for the route parameters, by the segment that owns them. */
+function fillParams( route: string ): string {
+	return route
+		.replace( /\(\?P<gallery_id>[^)]*\)/g, String( fixture< number >( 'F-small', 'gallery' ) ) )
+		.replace( /\(\?P<album_id>[^)]*\)/g, String( fixture< number >( 'F-album', 'album' ) ) )
+		.replace( /\(\?P<type>[^)]*\)/g, 'tags' )
+		.replace( /\(\?P<id>\[a-zA-Z0-9_-\]\+\)/g, 'clean-grid' )
+		.replace( /\(\?P<id>[^)]*\)/g, () => {
+			if ( route.includes( '/items/embed/' ) ) {
+				// An embed id, or the route answers 404 before it checks anything.
+				return String( fixture< number >( 'F-orphan', 'embed' ) );
+			}
+			if ( route.includes( '/album' ) ) {
+				return String( fixture< number >( 'F-album', 'album' ) );
+			}
+			if ( route.includes( '/items/' ) || route.includes( '/metadata/item/' ) ) {
+				return String( firstItem( 'F-small' ) );
+			}
+			return String( fixture< number >( 'F-small', 'gallery' ) );
+		} );
+}
+
+type ArgSchema = {
+	required?: boolean;
+	type?: string | string[];
+	enum?: unknown[];
+	default?: unknown;
+};
+
+/**
+ * A value the route will accept for one argument. Arguments are validated
+ * before the permission callback, so a request with a rejected body never
+ * reaches the check this test is about.
+ */
+function sampleArg( name: string, schema: ArgSchema ): unknown {
+	if ( Array.isArray( schema.enum ) && schema.enum.length ) {
+		return schema.enum[ 0 ];
+	}
+	if ( undefined !== schema.default ) {
+		return schema.default;
+	}
+
+	const id = /album/.test( name )
+		? fixture< number >( 'F-album', 'album' )
+		: /item/.test( name )
+		? firstItem( 'F-small' )
+		: fixture< number >( 'F-small', 'gallery' );
+
+	switch ( Array.isArray( schema.type ) ? schema.type[ 0 ] : schema.type ) {
+		case 'integer':
+		case 'number':
+			return id;
+		case 'boolean':
+			return false;
+		case 'array':
+			return [ id ];
+		case 'object':
+			return {};
+		default:
+			return 'probe';
+	}
+}
+
+type Endpoint = { route: string; method: string; data: Record< string, unknown > };
+
+/** Every write endpoint in the namespace, with a body it should accept. */
+async function writeEndpoints( request: APIRequestContext ): Promise< Endpoint[] > {
+	const index = ( await ( await request.get( '/?rest_route=/fotogrids/v1' ) ).json() ) as {
+		routes: Record<
+			string,
+			{ endpoints?: { methods?: string[]; args?: Record< string, ArgSchema > }[] }
+		>;
+	};
+
+	const endpoints: Endpoint[] = [];
+
+	for ( const [ route, info ] of Object.entries( index.routes ) ) {
+		// Path parameters come from the URL, not the body.
+		const inPath = [ ...route.matchAll( /\(\?P<(\w+)>/g ) ].map( ( m ) => m[ 1 ] );
+
+		for ( const endpoint of info.endpoints ?? [] ) {
+			const methods = ( endpoint.methods ?? [] ).filter( ( m ) =>
+				[ 'POST', 'PUT', 'PATCH', 'DELETE' ].includes( m )
+			);
+			if ( ! methods.length ) {
+				continue;
+			}
+
+			const data: Record< string, unknown > = {};
+			for ( const [ name, schema ] of Object.entries( endpoint.args ?? {} ) ) {
+				if ( schema.required && ! inPath.includes( name ) ) {
+					data[ name ] = sampleArg( name, schema );
+				}
+			}
+
+			for ( const method of methods ) {
+				endpoints.push( { route, method, data } );
+			}
+		}
+	}
+
+	return endpoints;
+}
+
+test( 'SEC-13: every write route refuses a request with no nonce', async ( {
+	playwright,
+} ) => {
+	const anon = await apiAnonymous( playwright );
+	const endpoints = await writeEndpoints( anon );
+	await anon.dispose();
+
+	expect( endpoints.length, 'the namespace index listed no write routes' ).toBeGreaterThan( 20 );
+
+	// An administrator's cookies, deliberately without X-WP-Nonce. WordPress
+	// treats a cookie request with no nonce as anonymous, so anything that
+	// answers here is reachable by a cross-site form post.
+	const { context } = await apiAs( playwright, 'administrator' );
+
+	const accepted: string[] = [];
+	const errored: string[] = [];
+	const unreached: string[] = [];
+	const refused = new Set< string >();
+
+	for ( const { route, method, data } of endpoints ) {
+		if ( PUBLIC_ON_PURPOSE[ route ] ) {
+			continue;
+		}
+
+		const response = await context.fetch(
+			`/?rest_route=${ encodeURIComponent( fillParams( route ) ) }`,
+			{ method, data, failOnStatusCode: false }
+		);
+		const status = response.status();
+		const where = `${ method } ${ route } → ${ status }`;
+
+		if ( status < 400 ) {
+			accepted.push( where );
+		} else if ( status >= 500 ) {
+			errored.push( where );
+		} else if ( 401 === status || 403 === status ) {
+			refused.add( route );
+		} else {
+			unreached.push( where );
+		}
+	}
+
+	await context.dispose();
+
+	expect( accepted, 'write routes that answered without a nonce' ).toEqual( [] );
+	expect( errored, 'write routes that raised a server error' ).toEqual( [] );
+
+	// A route that never reached its permission callback proves nothing, so it
+	// has to be named above. This is what keeps a green run meaningful.
+	expect(
+		unreached.filter( ( entry ) => ! Object.keys( UNPROVEN ).some( ( r ) => entry.includes( r ) ) ),
+		'write routes this test could not exercise, and UNPROVEN does not name'
+	).toEqual( [] );
+
+	// And a named route that has become exercisable belongs in the proven set.
+	expect(
+		Object.keys( UNPROVEN ).filter( ( route ) => refused.has( route ) ),
+		'UNPROVEN names routes that now refuse properly; remove them'
+	).toEqual( [] );
+} );
+
+test( 'the routes that are public on purpose still are', async ( { playwright } ) => {
+	const anon = await apiAnonymous( playwright );
+
+	const response = await anon.post(
+		`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/stats/view' ) }`,
+		{
+			data: {
+				object_type: 'gallery',
+				object_id: fixture< number >( 'F-small', 'gallery' ),
+			},
+		}
+	);
+	await anon.dispose();
+
+	expect( response.status() ).toBe( 200 );
+} );
+
+test( 'a view is not recorded for an object that does not exist', async ( {
+	playwright,
+} ) => {
+	test.fail( true, 'no existence check on /stats/view — FotoGrids/backstage#380' );
+
+	const anon = await apiAnonymous( playwright );
+	const response = await anon.post(
+		`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/stats/view' ) }`,
+		{ data: { object_type: 'gallery', object_id: 99999999 } }
+	);
+	await anon.dispose();
+
+	expect( response.status() ).toBeGreaterThanOrEqual( 400 );
+} );
+
+test( 'an author cannot rewrite metadata on an item they do not own', async ( {
+	playwright,
+} ) => {
+	test.fail( true, '/metadata/item/{id} checks only edit_posts — FotoGrids/backstage#379' );
+
+	const { context, nonce } = await apiAs( playwright, 'author' );
+
+	const response = await context.post(
+		`/?rest_route=${ encodeURIComponent(
+			`/fotogrids/v1/metadata/item/${ firstItem( 'F-small' ) }`
+		) }`,
+		{ headers: { 'X-WP-Nonce': nonce }, data: { tags: [] } }
+	);
+	await context.dispose();
+
+	expect( response.status() ).toBe( 403 );
+} );
