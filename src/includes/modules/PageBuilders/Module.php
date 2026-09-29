@@ -146,6 +146,9 @@ class Module extends Abstract_Module {
 		// `et_builder_ready` once Divi's framework is up.
 		require_once __DIR__ . '/builders/Divi/Module.php';
 		Builders\Divi\Module::init();
+
+		require_once __DIR__ . '/builders/Bricks/Module.php';
+		Builders\Bricks\Module::init();
 	}
 
 	/**
