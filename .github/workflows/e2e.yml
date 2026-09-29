@@ -76,7 +76,7 @@ jobs:
           # embed handling - so they keep being built. Not the whole catalogue:
           # F-huge writes 40MB for nothing any spec asks about yet. Playwright's
           # global setup runs the seeder itself, so there is no separate step.
-          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
         run: |
           set -a; . ./tests/harness/.env; set +a
           npm run test:e2e
