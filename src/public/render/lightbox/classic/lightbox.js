@@ -2407,14 +2407,7 @@ class FotoGridsLightbox {
 				imgEl.classList.remove('fg-lb-img--loading');
 				if (animated && s.transition !== 'none') {
 					imgEl.classList.add('fg-lb-img--in');
-					imgEl.addEventListener(
-						'transitionend',
-						() => {
-							imgEl.classList.remove('fg-lb-img--in');
-							this._transitioning = false;
-						},
-						{ once: true }
-					);
+					this._settleSlide(imgEl, s.duration);
 				} else {
 					this._transitioning = false;
 				}
@@ -2446,6 +2439,34 @@ class FotoGridsLightbox {
 		}
 
 		this._preloadAdjacentSlides(index);
+	}
+
+	/**
+	 * Release the navigation lock once the incoming slide has settled.
+	 *
+	 * transitionend never fires when no transition runs, so the timer is what
+	 * stops the lock being held for good. It is set past the transition so it
+	 * cannot cut a running one short.
+	 *
+	 * @param {HTMLImageElement} imgEl
+	 * @param {number}           duration Transition duration in ms.
+	 */
+	_settleSlide(imgEl, duration) {
+		let settled = false;
+
+		const finish = () => {
+			if (settled) {
+				return;
+			}
+			settled = true;
+			clearTimeout(timer);
+			imgEl.removeEventListener('transitionend', finish);
+			imgEl.classList.remove('fg-lb-img--in');
+			this._transitioning = false;
+		};
+
+		const timer = setTimeout(finish, duration + 250);
+		imgEl.addEventListener('transitionend', finish);
 	}
 
 	/**

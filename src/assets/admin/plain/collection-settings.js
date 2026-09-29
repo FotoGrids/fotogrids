@@ -1986,6 +1986,7 @@ function CollectionSettings() {
 			'div',
 			{
 				key: setting.key,
+				'data-fg-setting': setting.key,
 				className: `fotogrids-setting ${isDisabled ? 'fotogrids-setting--disabled' : ''}`,
 			},
 			[

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
 
 /**
  * Smoke E2E: proves the WordPress site is up and the plugin loaded without a

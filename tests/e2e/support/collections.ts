@@ -28,10 +28,12 @@ function collection( args: string[] ): string {
  *
  * @param settings Catalog key to value; validated against the catalog.
  * @param items    Attachment ids. Defaults to F-small's five.
+ * @param title    Gallery title.
  */
 export function galleryPage(
 	settings: Settings = {},
-	items?: number[]
+	items?: number[],
+	title?: string
 ): { id: number; url: string } {
 	const ids = items ?? fixture< number[] >( 'F-small', 'items' );
 
@@ -42,8 +44,30 @@ export function galleryPage(
 			'op=render',
 			`items=${ ids.join( ',' ) }`,
 			`settings=${ JSON.stringify( settings ) }`,
+			...( undefined === title ? [] : [ `title=${ title }` ] ),
 		] )
 	);
+}
+
+/** An album holding galleries this spec created. */
+export function album(
+	galleries: number[],
+	settings: Settings = {},
+	title?: string
+): { id: number } {
+	return JSON.parse(
+		collection( [
+			'op=album',
+			`galleries=${ galleries.join( ',' ) }`,
+			`settings=${ JSON.stringify( settings ) }`,
+			...( undefined === title ? [] : [ `title=${ title }` ] ),
+		] )
+	);
+}
+
+/** A page rendering a gallery the spec did not create, such as a fixture. */
+export function pageFor( galleryId: number ): { id: number; url: string } {
+	return JSON.parse( collection( [ 'op=page', `gallery=${ galleryId }` ] ) );
 }
 
 /** Change settings on a collection this spec created, and drop its cache. */
