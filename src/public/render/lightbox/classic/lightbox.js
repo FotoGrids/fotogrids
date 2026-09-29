@@ -2444,11 +2444,9 @@ class FotoGridsLightbox {
 	/**
 	 * Release the navigation lock once the incoming slide has settled.
 	 *
-	 * transitionend is not guaranteed to fire: a cached image can have the class
-	 * change painted in the same frame as the source swap, in which case no
-	 * transition runs and no event arrives. The timer is what stops the lock
-	 * being held for good, which would drop every later navigation. It is set
-	 * well past the transition so it never cuts a running one short.
+	 * transitionend never fires when no transition runs, so the timer is what
+	 * stops the lock being held for good. It is set past the transition so it
+	 * cannot cut a running one short.
 	 *
 	 * @param {HTMLImageElement} imgEl
 	 * @param {number}           duration Transition duration in ms.
