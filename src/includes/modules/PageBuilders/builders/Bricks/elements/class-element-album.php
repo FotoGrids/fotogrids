@@ -45,6 +45,29 @@ class Element_Album extends Element_Base {
 	}
 
 	/**
+	 * Collection kind rendered by the element.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_kind(): string {
+		return 'album';
+	}
+
+	/**
+	 * Number of galleries in the album.
+	 *
+	 * @since 1.2.0
+	 * @param int $collection_id Album post ID.
+	 * @return int
+	 */
+	protected function get_item_count( int $collection_id ): int {
+		return class_exists( '\FotoGrids\Gallery_Album_Relations' )
+			? count( (array) \FotoGrids\Gallery_Album_Relations::get_galleries_for_album( $collection_id ) )
+			: 0;
+	}
+
+	/**
 	 * Label of the collection ID control.
 	 *
 	 * @since 1.2.0
