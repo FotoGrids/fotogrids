@@ -264,8 +264,10 @@ abstract class Element_Base extends \Bricks\Element {
 	 * @since 1.2.0
 	 * @return string
 	 */
-	protected function get_click_preview_description(): string {
-		return esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' );
+	private function get_click_preview_description(): string {
+		return 'album' === $this->get_kind()
+			? esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the album action. Published pages are not affected.', 'fotogrids' )
+			: esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' );
 	}
 
 	/**
