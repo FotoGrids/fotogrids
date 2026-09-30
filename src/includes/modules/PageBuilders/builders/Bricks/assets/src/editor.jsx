@@ -155,6 +155,27 @@ const countLabel = (kind, count) =>
 				count
 			);
 
+const CreateButton = ({ kind }) => {
+	const isAlbum = kind === 'album';
+	const url = isAlbum ? config.albumCreateUrl : config.galleryCreateUrl;
+	if (!url) {
+		return null;
+	}
+	return (
+		<Button
+			variant="secondary"
+			size="sm"
+			icon="plus"
+			fullWidth
+			onClick={() => openTab(url)}
+		>
+			{isAlbum
+				? __('Create new album', 'fotogrids')
+				: __('Create new gallery', 'fotogrids')}
+		</Button>
+	);
+};
+
 const BricksPicker = ({ kind }) => {
 	const isAlbum = kind === 'album';
 	const [id, setId] = useState(readId);
@@ -189,7 +210,6 @@ const BricksPicker = ({ kind }) => {
 	}, [id, kind]);
 
 	const choose = useCallback(() => openPicker(kind, id), [kind, id]);
-	const createUrl = isAlbum ? config.albumCreateUrl : config.galleryCreateUrl;
 	const editBase = isAlbum ? config.albumEditBase : config.galleryEditBase;
 
 	return (
@@ -243,19 +263,7 @@ const BricksPicker = ({ kind }) => {
 					</Button>
 				)}
 			</div>
-			{createUrl && (
-				<Button
-					variant="secondary"
-					size="sm"
-					icon="plus"
-					fullWidth
-					onClick={() => openTab(createUrl)}
-				>
-					{isAlbum
-						? __('Create new album', 'fotogrids')
-						: __('Create new gallery', 'fotogrids')}
-				</Button>
-			)}
+			<CreateButton kind={kind} />
 		</div>
 	);
 };
@@ -276,7 +284,14 @@ const reconcile = () => {
 			return;
 		}
 		const root = createRoot(node);
-		root.render(<BricksPicker kind={node.dataset.fgPickerKind} />);
+		const kind = node.dataset.fgPickerKind;
+		root.render(
+			node.dataset.fgPickerMode === 'create' ? (
+				<CreateButton kind={kind} />
+			) : (
+				<BricksPicker kind={kind} />
+			)
+		);
 		roots.set(node, root);
 		document.body.classList.add(READY_CLASS);
 	});

@@ -41,6 +41,34 @@ abstract class Element_Base extends \Bricks\Element {
 	public const PICKER_CONTROL = 'fgPicker';
 
 	/**
+	 * Setting key of the collection source (picker or dynamic).
+	 *
+	 * @var string
+	 */
+	public const SOURCE_SETTING = 'fgCollectionSource';
+
+	/**
+	 * Setting key of the dynamic collection ID.
+	 *
+	 * @var string
+	 */
+	public const DYNAMIC_SETTING = 'fgCollectionIdDynamic';
+
+	/**
+	 * Control key of the standalone create button shown in dynamic mode.
+	 *
+	 * @var string
+	 */
+	public const CREATE_CONTROL = 'fgCreateNew';
+
+	/**
+	 * Control group of the builder-only preview toggles.
+	 *
+	 * @var string
+	 */
+	public const PREVIEW_GROUP = 'fgPreview';
+
+	/**
 	 * Builder panel category.
 	 *
 	 * @var string
@@ -106,6 +134,26 @@ abstract class Element_Base extends \Bricks\Element {
 	abstract protected function render_collection( int $collection_id ): string;
 
 	/**
+	 * Whether the collection ID can come from dynamic data.
+	 *
+	 * @since 1.2.0
+	 * @return bool
+	 */
+	protected function has_dynamic_source(): bool {
+		return false;
+	}
+
+	/**
+	 * Label of the source option that uses the picker.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_picker_source_label(): string {
+		return '';
+	}
+
+	/**
 	 * Search keywords for the builder panel.
 	 *
 	 * @since 1.2.0
@@ -116,24 +164,147 @@ abstract class Element_Base extends \Bricks\Element {
 	}
 
 	/**
+	 * Register the element control groups.
+	 *
+	 * @since 1.2.0
+	 * @return void
+	 */
+	public function set_control_groups() {
+		$this->control_groups[ self::PREVIEW_GROUP ] = array(
+			'title' => esc_html__( 'Preview', 'fotogrids' ),
+			'tab'   => 'content',
+		);
+	}
+
+	/**
 	 * Register the element controls.
+	 *
+	 * Keys are prefixed or use the canonical preview keys: Bricks scans the
+	 * page settings JSON for generic quoted keys such as `"lightbox"`.
 	 *
 	 * @since 1.2.0
 	 * @return void
 	 */
 	public function set_controls() {
+		$picker_only = array();
+
+		if ( $this->has_dynamic_source() ) {
+			$this->controls[ self::SOURCE_SETTING ] = array(
+				'tab'       => 'content',
+				'type'      => 'select',
+				'label'     => esc_html__( 'Source', 'fotogrids' ),
+				'options'   => array(
+					'picker'  => $this->get_picker_source_label(),
+					'dynamic' => esc_html__( 'Dynamic', 'fotogrids' ),
+				),
+				'default'   => 'picker',
+				'inline'    => true,
+				'clearable' => false,
+				'rerender'  => true,
+			);
+
+			$picker_only = array( 'required' => array( self::SOURCE_SETTING, '!=', 'dynamic' ) );
+		}
+
 		$this->controls[ self::PICKER_CONTROL ] = array(
 			'tab'     => 'content',
 			'type'    => 'info',
-			'content' => sprintf( '<div class="fg-pb-bricks-picker" data-fg-picker-kind="%s"></div>', esc_attr( $this->get_kind() ) ),
-		);
+			'content' => $this->picker_placeholder( 'picker' ),
+		) + $picker_only;
 
 		$this->controls[ self::SETTING_ID ] = array(
-			'tab'      => 'content',
-			'type'     => 'text',
-			'label'    => $this->get_id_label(),
-			'rerender' => true,
+			'tab'            => 'content',
+			'type'           => 'text',
+			'label'          => $this->get_id_label(),
+			'hasDynamicData' => false,
+			'rerender'       => true,
+		) + $picker_only;
+
+		if ( $this->has_dynamic_source() ) {
+			$dynamic_only = array( 'required' => array( self::SOURCE_SETTING, '=', 'dynamic' ) );
+
+			$this->controls[ self::DYNAMIC_SETTING ] = array(
+				'tab'            => 'content',
+				'type'           => 'text',
+				'label'          => $this->get_dynamic_id_label(),
+				'description'    => $this->get_dynamic_id_description(),
+				'hasDynamicData' => 'text',
+				'rerender'       => true,
+			) + $dynamic_only;
+
+			$this->controls[ self::CREATE_CONTROL ] = array(
+				'tab'     => 'content',
+				'type'    => 'info',
+				'content' => $this->picker_placeholder( 'create' ),
+			) + $dynamic_only;
+		}
+
+		$this->controls[ Preview_Options::ATTR_CLICK_BEHAVIOR ] = array(
+			'tab'         => 'content',
+			'group'       => self::PREVIEW_GROUP,
+			'type'        => 'checkbox',
+			'label'       => esc_html__( 'Make items clickable', 'fotogrids' ),
+			'description' => esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' ),
+			'rerender'    => true,
 		);
+
+		$this->controls[ Preview_Options::ATTR_PAGINATION ] = array(
+			'tab'         => 'content',
+			'group'       => self::PREVIEW_GROUP,
+			'type'        => 'checkbox',
+			'label'       => esc_html__( 'Enable pagination controls', 'fotogrids' ),
+			'description' => esc_html__( 'When disabled, pagination controls stay visible but inactive in the builder. Published pages are not affected.', 'fotogrids' ),
+			'rerender'    => true,
+		);
+	}
+
+	/**
+	 * Label of the dynamic collection ID control.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_dynamic_id_label(): string {
+		return '';
+	}
+
+	/**
+	 * Description of the dynamic collection ID control.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_dynamic_id_description(): string {
+		return '';
+	}
+
+	/**
+	 * Placeholder the panel bundle mounts the picker card into.
+	 *
+	 * @since 1.2.0
+	 * @param string $mode 'picker' for the full card, 'create' for the create button only.
+	 * @return string
+	 */
+	private function picker_placeholder( string $mode ): string {
+		return sprintf(
+			'<div class="fg-pb-bricks-picker" data-fg-picker-kind="%1$s" data-fg-picker-mode="%2$s"></div>',
+			esc_attr( $this->get_kind() ),
+			esc_attr( $mode )
+		);
+	}
+
+	/**
+	 * Collection ID from the picker or, in dynamic mode, from resolved dynamic data.
+	 *
+	 * @since 1.2.0
+	 * @return int
+	 */
+	private function get_collection_id(): int {
+		if ( $this->has_dynamic_source() && 'dynamic' === ( $this->settings[ self::SOURCE_SETTING ] ?? '' ) ) {
+			return absint( $this->render_dynamic_data( (string) ( $this->settings[ self::DYNAMIC_SETTING ] ?? '' ) ) );
+		}
+
+		return absint( $this->settings[ self::SETTING_ID ] ?? 0 );
 	}
 
 	/**
@@ -155,7 +326,7 @@ abstract class Element_Base extends \Bricks\Element {
 	 * @return void
 	 */
 	public function render() {
-		$collection_id = absint( $this->settings[ self::SETTING_ID ] ?? 0 );
+		$collection_id = $this->get_collection_id();
 
 		if ( ! $this->is_frontend ) {
 			$this->render_canvas_markup( $collection_id );
