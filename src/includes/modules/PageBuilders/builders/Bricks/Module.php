@@ -64,6 +64,13 @@ final class Module {
 	public const CANVAS_SCRIPT_HANDLE = 'fotogrids-pb-bricks-canvas';
 
 	/**
+	 * Script and style handle of the builder panel bundle.
+	 *
+	 * @var string
+	 */
+	public const EDITOR_HANDLE = 'fotogrids-pb-bricks-editor';
+
+	/**
 	 * Whether the Bricks theme is loaded.
 	 *
 	 * @since 1.2.0
@@ -90,6 +97,7 @@ final class Module {
 		add_action( 'init', array( self::class, 'register_elements' ), 11 );
 		add_filter( 'bricks/builder/i18n', array( self::class, 'add_category_label' ) );
 		add_filter( Filters_Page_Builders::HAS_CONTENT, array( self::class, 'detect_in_bricks' ), 10, 2 );
+		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_editor_assets' ) );
 	}
 
 	/**
@@ -121,6 +129,50 @@ final class Module {
 		$i18n[ self::CATEGORY ] = esc_html__( 'FotoGrids', 'fotogrids' );
 
 		return $i18n;
+	}
+
+	/**
+	 * Enqueue the collection picker in the builder's main window.
+	 *
+	 * @since 1.2.0
+	 * @return void
+	 */
+	public static function enqueue_editor_assets(): void {
+		if ( ! function_exists( 'bricks_is_builder_main' ) || ! bricks_is_builder_main() || ! class_exists( Elements\Element_Base::class, false ) ) {
+			return;
+		}
+
+		$base_url = FOTOGRIDS_PLUGIN_URL . 'includes/modules/PageBuilders/builders/Bricks/assets/';
+
+		wp_enqueue_script(
+			self::EDITOR_HANDLE,
+			$base_url . 'editor.js',
+			array( 'wp-element', 'wp-components', 'wp-i18n', \FotoGrids\Modules\PageBuilders\Module::FG_ICONS_SCRIPT_HANDLE ),
+			FOTOGRIDS_VERSION,
+			true
+		);
+		wp_set_script_translations( self::EDITOR_HANDLE, 'fotogrids', FOTOGRIDS_PLUGIN_DIR . 'languages' );
+
+		wp_enqueue_style(
+			self::EDITOR_HANDLE,
+			$base_url . 'editor.css',
+			array( 'wp-components', \FotoGrids\Modules\PageBuilders\Module::FG_SHARED_STYLE_HANDLE ),
+			FOTOGRIDS_VERSION
+		);
+
+		wp_localize_script(
+			self::EDITOR_HANDLE,
+			'fotogridsPbBricks',
+			array(
+				'restUrl'          => esc_url_raw( rest_url( 'fotogrids/v1/' ) ),
+				'restNonce'        => wp_create_nonce( 'wp_rest' ),
+				'settingKey'       => Elements\Element_Base::SETTING_ID,
+				'galleryCreateUrl' => admin_url( 'post-new.php?post_type=fotogrids_gallery' ),
+				'albumCreateUrl'   => admin_url( 'post-new.php?post_type=fotogrids_album' ),
+				'galleryEditBase'  => admin_url( 'post.php?action=edit&post=' ),
+				'albumEditBase'    => admin_url( 'post.php?action=edit&post=' ),
+			)
+		);
 	}
 
 	/**

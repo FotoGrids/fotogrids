@@ -84,7 +84,7 @@ class Element_Album extends Element_Base {
 	 * @return string
 	 */
 	protected function get_empty_title(): string {
-		return esc_html__( 'Enter an album ID in the element settings.', 'fotogrids' );
+		return esc_html__( 'Choose an album in the element settings.', 'fotogrids' );
 	}
 
 	/**

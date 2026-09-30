@@ -34,6 +34,13 @@ abstract class Element_Base extends \Bricks\Element {
 	public const SETTING_ID = 'fgCollectionId';
 
 	/**
+	 * Control key of the picker placeholder.
+	 *
+	 * @var string
+	 */
+	public const PICKER_CONTROL = 'fgPicker';
+
+	/**
 	 * Builder panel category.
 	 *
 	 * @var string
@@ -115,6 +122,12 @@ abstract class Element_Base extends \Bricks\Element {
 	 * @return void
 	 */
 	public function set_controls() {
+		$this->controls[ self::PICKER_CONTROL ] = array(
+			'tab'     => 'content',
+			'type'    => 'info',
+			'content' => sprintf( '<div class="fg-pb-bricks-picker" data-fg-picker-kind="%s"></div>', esc_attr( $this->get_kind() ) ),
+		);
+
 		$this->controls[ self::SETTING_ID ] = array(
 			'tab'      => 'content',
 			'type'     => 'text',
