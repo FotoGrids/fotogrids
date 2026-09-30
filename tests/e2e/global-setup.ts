@@ -132,6 +132,29 @@ async function captureSession(
 	);
 }
 
+/**
+ * Put every role's plugin capabilities back to what activation grants.
+ *
+ * `Core_Permissions` owns the ladder, so this asks it rather than restating it.
+ */
+function resetRoleCapabilities(): void {
+	wpEval(
+		`$defaults = \\FotoGrids\\Permissions\\Core_Permissions::cpt_cap_defaults();
+		$ladder = array( 'author' => array( 'author', 'editor', 'administrator' ), 'editor' => array( 'editor', 'administrator' ) );
+		foreach ( $defaults as $cap => $lowest ) {
+			foreach ( array( 'author', 'editor', 'administrator' ) as $name ) {
+				$role = get_role( $name );
+				if ( ! $role ) { continue; }
+				if ( in_array( $name, $ladder[ $lowest ] ?? array( 'editor', 'administrator' ), true ) ) {
+					$role->add_cap( $cap );
+				} else {
+					$role->remove_cap( $cap );
+				}
+			}
+		}`
+	);
+}
+
 async function globalSetup(): Promise< void > {
 	const baseURL = process.env.WP_BASE_URL;
 	if ( ! baseURL ) {
@@ -146,6 +169,12 @@ async function globalSetup(): Promise< void > {
 	// Collections a scoped spec created on an earlier run. Left behind they
 	// accumulate, and a spec counting galleries would see them.
 	purgeScoped();
+
+	// Role capabilities are site-wide, and a spec that drives the Permissions
+	// Manager can leave them changed. A run that started from someone else's
+	// leftovers would measure those instead of the plugin's own defaults, so
+	// every run begins from the documented ladder.
+	resetRoleCapabilities();
 
 	mkdirSync( authDir(), { recursive: true } );
 
