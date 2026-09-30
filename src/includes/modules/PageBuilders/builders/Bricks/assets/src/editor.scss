@@ -4,7 +4,8 @@
 
 @use "sass:meta";
 
-[data-controlkey="fgPicker"] [data-control="info"] {
+[data-controlkey="fgPicker"] [data-control="info"],
+[data-controlkey="fgCreateNew"] [data-control="info"] {
     padding: 0;
     background: none;
     color: inherit;
