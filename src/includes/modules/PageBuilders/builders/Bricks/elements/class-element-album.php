@@ -78,6 +78,16 @@ class Element_Album extends Element_Base {
 	}
 
 	/**
+	 * Description of the "Make items clickable" preview toggle.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_click_preview_description(): string {
+		return esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the album action. Published pages are not affected.', 'fotogrids' );
+	}
+
+	/**
 	 * Builder placeholder title shown before an album is chosen.
 	 *
 	 * @since 1.2.0
