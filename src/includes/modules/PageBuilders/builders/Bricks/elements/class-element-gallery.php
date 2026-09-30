@@ -80,6 +80,46 @@ class Element_Gallery extends Element_Base {
 	}
 
 	/**
+	 * Galleries can take their ID from dynamic data.
+	 *
+	 * @since 1.2.0
+	 * @return bool
+	 */
+	protected function has_dynamic_source(): bool {
+		return true;
+	}
+
+	/**
+	 * Label of the source option that uses the picker.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_picker_source_label(): string {
+		return esc_html__( 'Gallery Picker', 'fotogrids' );
+	}
+
+	/**
+	 * Label of the dynamic gallery ID control.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_dynamic_id_label(): string {
+		return esc_html__( 'Dynamic Gallery ID', 'fotogrids' );
+	}
+
+	/**
+	 * Description of the dynamic gallery ID control.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_dynamic_id_description(): string {
+		return esc_html__( 'Bind a dynamic source that outputs a gallery ID.', 'fotogrids' );
+	}
+
+	/**
 	 * Builder placeholder title shown before a gallery is chosen.
 	 *
 	 * @since 1.2.0
