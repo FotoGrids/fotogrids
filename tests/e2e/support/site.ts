@@ -28,3 +28,30 @@ export function restoreRoles( snapshot: string ): void {
 		input: snapshot,
 	} );
 }
+
+/** A site option's value, or null when the row does not exist. */
+export function getOption( name: string ): string | null {
+	try {
+		// An absent option is an expected answer here, not a failure to report.
+		return execFileSync( wpCli(), [ 'option', 'get', name ], {
+			encoding: 'utf8',
+			stdio: [ 'ignore', 'pipe', 'ignore' ],
+		} ).trim();
+	} catch {
+		return null;
+	}
+}
+
+/** Set a site option, or delete it when `value` is null, as `getOption` found it. */
+export function setOption( name: string, value: string | null ): void {
+	if ( null === value ) {
+		try {
+			wp( [ 'option', 'delete', name ] );
+		} catch {
+			// Already absent, which is the state asked for.
+		}
+		return;
+	}
+
+	wp( [ 'option', 'update', name, value ] );
+}
