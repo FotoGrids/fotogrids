@@ -5,15 +5,13 @@ import { test as base, expect } from '@playwright/test';
 /**
  * The `test` every spec imports, instead of `@playwright/test`.
  *
- * Two guards run around every test and fail it on output no assertion looks
- * at: browser console errors, and PHP notices in the site's debug log. A spec
- * that expects either opts out by naming a reason.
+ * Two guards fail a test on output no assertion looks at: console errors and PHP
+ * notices. Opt out by naming a reason:
  *
  *     test.use( { allowConsoleErrors: 'asserts the 401 path' } );
  *
- * One site serves every worker, so the log is shared and a notice is attributed
- * to whichever test was running. That only matters once a notice exists, which
- * is the thing this is here to prevent.
+ * The log is shared across workers, so a notice is attributed to whichever test
+ * was running.
  */
 
 export type GuardOptions = {
@@ -24,11 +22,11 @@ export type GuardOptions = {
 };
 
 type Guards = {
-	/** Auto fixture; nothing reads it, it exists to bracket the test. */
+	/** Auto fixture; exists only to bracket the test. */
 	phpLog: void;
 };
 
-/** Where WordPress writes its log, when the harness enabled one. */
+/** Where WordPress writes its log, if the harness enabled one. */
 function debugLog(): string | null {
 	const wpPath = process.env.WP_PATH;
 	if ( ! wpPath ) {

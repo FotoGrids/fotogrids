@@ -13,11 +13,10 @@ import { fixture, firstItem } from './support/fixtures';
 import { apiAs, wpCli } from './support/roles';
 
 /**
- * SEC-17 and SEC-18. Neither import route can be talked into reading or writing
- * outside the uploads folder.
+ * SEC-17 and SEC-18. Neither import route reads or writes outside uploads.
  *
- * Both tests plant a real image where the escape would land, so a refusal means
- * the guard stopped it rather than the file simply not being there.
+ * A real image is planted where each escape would land, so a refusal means the
+ * guard stopped it rather than the file being absent.
  *
  * Serial: these write to the filesystem and import attachments.
  */
@@ -35,7 +34,7 @@ const SYMLINK_NAME = 'fg-escape-link';
 /** The name the traversing archive entry tries to land under. */
 const SLIP_NAME = 'fg-slipped.jpg';
 
-/** The bytes of a seeded attachment, so the planted file is a real image. */
+/** Bytes of a seeded attachment, so the plant is a real image. */
 function seededImageBytes(): Buffer {
 	const file = execFileSync(
 		wpCli(),
@@ -46,7 +45,7 @@ function seededImageBytes(): Buffer {
 	return readFileSync( path.join( uploadsDir(), file ) );
 }
 
-/** Attachments whose file is the planted one, however they were registered. */
+/** How many attachments point at the planted file. */
 function attachmentsPointingOutside(): string {
 	return execFileSync(
 		wpCli(),
@@ -64,8 +63,7 @@ test.beforeAll( () => {
 	mkdirSync( outsideDir(), { recursive: true } );
 	writeFileSync( path.join( outsideDir(), OUTSIDE_NAME ), seededImageBytes() );
 
-	// A symlink inside uploads pointing out of it. Stripping `..` segments does
-	// nothing here; only resolving the real path does.
+	// A symlink out of uploads: only realpath() catches this, not segment stripping.
 	const link = path.join( uploadsDir(), SYMLINK_NAME );
 	if ( ! existsSync( link ) ) {
 		symlinkSync( outsideDir(), link );
@@ -163,8 +161,7 @@ test( 'SEC-17: the same request imports a file that is genuinely inside uploads'
 	const body = ( await response.json() ) as { items?: unknown[] };
 	await context.dispose();
 
-	// Without this the refusals above would pass on a route that rejects
-	// everything, which would say nothing about the traversal guard.
+	// Otherwise the refusals above would pass on a route that rejects everything.
 	expect( body.items ?? [], 'a path inside uploads was refused too' ).not.toEqual( [] );
 } );
 
@@ -180,9 +177,8 @@ test( 'SEC-18: a zip-slip entry is never written outside the extraction folder',
 	const source = path.join( staged, 'ordinary.jpg' );
 	writeFileSync( source, image );
 
-	// One ordinary entry, and one whose stored name climbs out of wherever it
-	// is extracted. Written directly, because no archiver will produce the
-	// second name for you.
+	// One ordinary entry and one climbing out; written directly, as no archiver
+	// produces the second name.
 	execFileSync( 'python3', [
 		'-c',
 		'import sys,zipfile\n' +
@@ -219,13 +215,11 @@ test( 'SEC-18: a zip-slip entry is never written outside the extraction folder',
 
 	expect( response.status() ).toBe( 200 );
 
-	// The ordinary entry imported, so the archive really was processed and the
-	// assertions below are about the traversing entry rather than a no-op.
+	// The ordinary entry imported, so the archive was processed at all.
 	const items = body.items ?? [];
 	expect( items, 'the archive imported nothing, so nothing was proven' ).not.toEqual( [] );
 
-	// Dropped before extraction: it is neither imported under a flattened name
-	// nor written above the folder it was extracted into.
+	// Dropped before extraction: no flattened import, nothing written above dest.
 	expect(
 		items.filter( ( item ) => ( item.url ?? '' ).includes( 'fg-slipped' ) ),
 		'the traversing entry was extracted and imported'

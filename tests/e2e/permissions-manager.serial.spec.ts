@@ -5,11 +5,10 @@ import { getOption, restoreRoles, setOption, snapshotRoles } from './support/sit
 import { SettingsPage } from './support/settings-page';
 
 /**
- * ROLE-10 to ROLE-12. What the Permissions Manager writes, and what activation
- * grants a role it has never heard of.
+ * ROLE-10 to ROLE-12. What the Permissions Manager writes, and what the
+ * capability resync grants a role it has never heard of.
  *
- * Serial: role capabilities are site-wide. Every test here snapshots them and
- * puts them back, so nothing downstream reads what these left behind.
+ * Serial: role capabilities are site-wide, so each test puts them back.
  */
 
 test.describe.configure( { mode: 'serial' } );
@@ -59,8 +58,7 @@ test( 'ROLE-10: the lowest-role write moves the capability down the ladder and b
 		expect( response.status(), `setting ${ STATS_KEY } to ${ lowestRole }` ).toBe( 200 );
 	};
 
-	// Editor is the shipped default, so the author not holding it is the
-	// starting point the rest of this test moves away from.
+	// The shipped default, which the rest of this test moves away from.
 	expect( roleHas( 'editor', STATS_CAP ) ).toBe( true );
 	expect( roleHas( 'author', STATS_CAP ) ).toBe( false );
 
@@ -82,11 +80,8 @@ test( 'ROLE-10: the lowest-role write moves the capability down the ladder and b
 test.describe( 'the matrix screen', () => {
 	test.use( { storageState: storageStateFor( 'administrator' ) } );
 
-	/**
-	 * ROLE-11. The ladder cannot describe a grant that skips a role, so the
-	 * dropdown grows a synthetic option rather than showing a role that would
-	 * be wrong if saved.
-	 */
+	// ROLE-11. No floor describes a grant that skips a role, so the dropdown
+	// grows a synthetic option rather than showing one that would be wrong.
 	test( 'ROLE-11: a grant that skips a role shows as custom', async ( { page } ) => {
 		const settings = new SettingsPage( page );
 
@@ -105,8 +100,7 @@ test.describe( 'the matrix screen', () => {
 		).toHaveCount( 1 );
 		expect( await row.inputValue() ).toBe( '__custom__' );
 
-		// A laddered row alongside it does not grow the option, so this is the
-		// non-laddered grant being described rather than every row gaining it.
+		// A laddered row does not, so the option tracks the grant.
 		const laddered = page.locator( '#fg-perm-fg_manage_library' );
 		await expect( laddered.locator( 'option[value="__custom__"]' ) ).toHaveCount( 0 );
 	} );
@@ -119,9 +113,8 @@ test( 'ROLE-12: a role the plugin has never heard of is granted nothing', async 
 	wp( [ 'role', 'create', 'fg-photographer', 'FG Photographer' ] );
 
 	try {
-		// The resync returns early once the stored version is current, so
-		// without this the call below would do nothing and the assertion would
-		// hold for the wrong reason.
+		// The resync returns early once the version is current; without this the
+		// call does nothing and the row passes for the wrong reason.
 		setOption( CAPS_VERSION, '0' );
 
 		wp( [ 'eval', '\\FotoGrids\\Activator::maybe_resync_capabilities();' ] );
@@ -140,7 +133,7 @@ test( 'ROLE-12: a role the plugin has never heard of is granted nothing', async 
 
 		expect( granted, 'a custom role picked up plugin capabilities' ).toBe( '' );
 
-		// The roles it does know about were granted theirs by the same run.
+		// Known roles were granted theirs by the same run.
 		expect( roleHas( 'editor', STATS_CAP ) ).toBe( true );
 	} finally {
 		wp( [ 'role', 'delete', 'fg-photographer' ] );

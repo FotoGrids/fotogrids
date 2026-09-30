@@ -8,15 +8,14 @@ import { GalleryEditor } from './support/gallery-editor';
 /**
  * SEC-19. A gallery's password never reaches the browser.
  *
- * The plaintext is encrypted at rest, and `Gallery_Repository::get_settings()`
- * carries the ciphertext under a synthetic `_password_encrypted` key while
- * blanking the public `password` one. The editor is where those settings are
- * handed to the browser wholesale, so that is the payload it exists for.
+ * Settings carry the ciphertext under `_password_encrypted` and blank the public
+ * `password` key. The editor ships those settings wholesale, so it is the
+ * payload the blanking exists for.
  *
- * Scoped: the page is this spec's; the fixture gallery it renders is only read.
+ * Scoped: the page is this spec's; the fixture gallery is only read.
  */
 
-/** The stored ciphertext, read the way nothing in the browser can. */
+/** The stored ciphertext, read where the browser cannot. */
 function storedCiphertext( galleryId: number ): string {
 	return execFileSync(
 		wpCli(),
@@ -39,10 +38,6 @@ function expectNoSecrets(
 test.describe( 'the editor screen', () => {
 	test.use( { storageState: storageStateFor( 'administrator' ) } );
 
-	/**
-	 * The editor is where a gallery's settings are handed to the browser
-	 * wholesale, so it is the payload the blanking exists for.
-	 */
 	test( 'the settings payload carries neither the password nor its ciphertext', async ( {
 		page,
 	} ) => {
@@ -59,8 +54,7 @@ test.describe( 'the editor screen', () => {
 			JSON.stringify( window.fotogridsSettings ?? null )
 		);
 
-		// The payload really is this gallery's settings, or the assertions
-		// below would hold just as well on an empty object.
+		// Otherwise the assertions below would hold on an empty object.
 		expect( payload, 'the editor handed the browser no settings' ).toContain( 'layout' );
 
 		expectNoSecrets( payload, { password, ciphertext }, 'the editor settings payload' );
@@ -79,8 +73,7 @@ test( 'the lock screen carries neither, and the unlock cookie is not the ciphert
 	await page.goto( url );
 	expectNoSecrets( await page.content(), { password, ciphertext }, 'the lock screen' );
 
-	// page.request shares the page's cookie jar, so this unlocks the gallery
-	// for the reload below exactly as the lock screen's own form would.
+	// page.request shares the cookie jar, so this unlocks it for the reload.
 	const unlock = await page.request.post(
 		`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/gallery/${ galleryId }/unlock` ) }`,
 		{ data: { password } }

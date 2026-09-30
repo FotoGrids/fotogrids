@@ -4,17 +4,15 @@ import { fixture, firstItem } from './support/fixtures';
 import { apiAnonymous, apiAs } from './support/roles';
 
 /**
- * SEC-13. Every write route refuses a request that carries no REST nonce.
+ * SEC-13. Every write route refuses a request carrying no REST nonce.
  *
- * The routes come from the namespace index, so one registered tomorrow is
- * covered the day it appears. Each must land in exactly one of three lists:
- * public on purpose, proven to refuse, or named here as unexercisable. A new
- * route lands in none of them and fails, which is the point.
+ * Routes come from the namespace index. Each must be listed as public on
+ * purpose, proven to refuse, or unexercisable; one in none of them fails.
  *
- * Serial: a route that fails this is, by definition, performing the write.
+ * Serial: a route that fails this is performing the write.
  */
 
-/** Routes that answer without a nonce on purpose, with the reason each one is. */
+/** Routes that answer without a nonce on purpose, and why. */
 const PUBLIC_ON_PURPOSE: Record< string, string > = {
 	'/fotogrids/v1/stats/view': 'view counting is unauthenticated by design',
 	'/fotogrids/v1/stats/share': 'share counting is unauthenticated by design',
@@ -25,11 +23,7 @@ const PUBLIC_ON_PURPOSE: Record< string, string > = {
 		'a read, gated per gallery rather than by capability',
 };
 
-/**
- * Routes whose arguments this test cannot synthesise, so the request is
- * rejected for its body before the permission callback runs. Their auth is
- * unproven here and is covered by the row named against each one.
- */
+/** Routes rejected for their body before the permission callback runs. */
 const UNPROVEN: Record< string, string > = {
 	'/fotogrids/v1/admin/tools/migration/import': 'refs describe another install',
 	'/fotogrids/v1/media/import/folder': 'files must name real paths on disk',
@@ -49,7 +43,7 @@ function fillParams( route: string ): string {
 		.replace( /\(\?P<id>\[a-zA-Z0-9_-\]\+\)/g, 'clean-grid' )
 		.replace( /\(\?P<id>[^)]*\)/g, () => {
 			if ( route.includes( '/items/embed/' ) ) {
-				// An embed id, or the route answers 404 before it checks anything.
+				// An embed id, or the route 404s before checking anything.
 				return String( fixture< number >( 'F-orphan', 'embed' ) );
 			}
 			if ( route.includes( '/album' ) ) {
@@ -69,11 +63,7 @@ type ArgSchema = {
 	default?: unknown;
 };
 
-/**
- * A value the route will accept for one argument. Arguments are validated
- * before the permission callback, so a request with a rejected body never
- * reaches the check this test is about.
- */
+/** A value the route will accept, so the request reaches its permission callback. */
 function sampleArg( name: string, schema: ArgSchema ): unknown {
 	if ( Array.isArray( schema.enum ) && schema.enum.length ) {
 		return schema.enum[ 0 ];
@@ -153,9 +143,7 @@ test( 'SEC-13: every write route refuses a request with no nonce', async ( {
 
 	expect( endpoints.length, 'the namespace index listed no write routes' ).toBeGreaterThan( 20 );
 
-	// An administrator's cookies, deliberately without X-WP-Nonce. WordPress
-	// treats a cookie request with no nonce as anonymous, so anything that
-	// answers here is reachable by a cross-site form post.
+	// Cookies without X-WP-Nonce: WordPress treats this as anonymous.
 	const { context } = await apiAs( playwright, 'administrator' );
 
 	const accepted: string[] = [];
@@ -191,14 +179,13 @@ test( 'SEC-13: every write route refuses a request with no nonce', async ( {
 	expect( accepted, 'write routes that answered without a nonce' ).toEqual( [] );
 	expect( errored, 'write routes that raised a server error' ).toEqual( [] );
 
-	// A route that never reached its permission callback proves nothing, so it
-	// has to be named above. This is what keeps a green run meaningful.
+	// A route that never reached its permission callback has to be named above.
 	expect(
 		unreached.filter( ( entry ) => ! Object.keys( UNPROVEN ).some( ( r ) => entry.includes( r ) ) ),
 		'write routes this test could not exercise, and UNPROVEN does not name'
 	).toEqual( [] );
 
-	// And a named route that has become exercisable belongs in the proven set.
+	// A named route that now refuses belongs in the proven set.
 	expect(
 		Object.keys( UNPROVEN ).filter( ( route ) => refused.has( route ) ),
 		'UNPROVEN names routes that now refuse properly; remove them'

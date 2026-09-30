@@ -24,11 +24,8 @@ test( 'a script payload in a settings string is inert in the button it renders',
 	await expectInert( page, 'load_more_button_text' );
 } );
 
-/**
- * The breadcrumb schema is JSON inside a `<script>` block, so a title holding
- * `</script>` would close the tag early and everything after it would be
- * markup. The emitter rewrites the sequence; this is what says so.
- */
+// The schema is JSON inside a script block, so a title holding `</script>`
+// would close the tag early. The emitter rewrites the sequence.
 test( 'a title holding a closing script tag cannot break out of the JSON-LD', async ( {
 	page,
 } ) => {

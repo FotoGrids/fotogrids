@@ -4,15 +4,12 @@ import { fixture, firstItem } from './support/fixtures';
 import { apiAnonymous, apiAs } from './support/roles';
 
 /**
- * Who may read gallery data over REST, and what the routes hand back when they
- * should refuse.
+ * Who may read gallery data over REST, and what a refusal hands back.
  *
- * `readonly`: every request here either reads or is rejected, so nothing on the
- * site changes.
+ * readonly: every request reads or is rejected.
  *
- * Rows marked `test.fail` assert what the route should do. They fail today and
- * are expected to; the day the linked fix lands, Playwright reports the
- * unexpected pass and the marker comes off.
+ * `test.fail` rows assert what the route should do; they fail until the linked
+ * fix lands, then report an unexpected pass.
  */
 
 function route( path: string, query: Record< string, string | number > = {} ) {
@@ -121,11 +118,7 @@ test.describe( 'the unlock route gives nothing away', () => {
 		await anon.dispose();
 	} );
 
-	/**
-	 * SEC-10. A gallery with no password must answer a guess exactly as a
-	 * password gallery answers a wrong one, or the response tells an attacker
-	 * which galleries are worth attacking.
-	 */
+	// SEC-10. Answering differently would say which galleries are worth attacking.
 	test( 'SEC-10: a wrong password and an unprotected gallery answer alike', async () => {
 		const wrong = await unlock( fixture< number >( 'F-pw', 'gallery' ), 'nope' );
 		const none = await unlock( fixture< number >( 'F-small', 'gallery' ), 'nope' );
@@ -161,11 +154,9 @@ test.describe( 'capabilities on admin and preview routes', () => {
 		expect( response.status() ).toBe( 403 );
 	} );
 
-	/**
-	 * SEC-12. Media settings are the one settings route on `manage_fotogrids`;
-	 * every sibling uses `manage_fotogrids_settings`. Both default to
-	 * administrator, so this pins the asymmetry rather than a privilege gap.
-	 */
+	// SEC-12. Media settings use manage_fotogrids where siblings use
+	// manage_fotogrids_settings. Both default to administrator, so this pins the
+	// asymmetry, not a gap.
 	test( 'SEC-12: media settings and general settings agree for an editor', async ( {
 		playwright,
 	} ) => {

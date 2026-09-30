@@ -6,9 +6,8 @@ import { fixture } from './fixtures';
 /**
  * Throwaway collections, for a spec that needs to write.
  *
- * A seeded fixture is shared, so a spec that changes one changes the answer for
- * every other spec reading it. These build a collection the spec owns, which is
- * what the `scoped` project's contract allows.
+ * Seeded fixtures are shared, so changing one changes the answer for every spec
+ * reading it. These build a collection the spec owns, as `scoped` requires.
  */
 
 export type Settings = Record< string, unknown >;
@@ -21,10 +20,9 @@ function collection( args: string[] ): string {
 }
 
 /**
- * A published gallery, and a post that renders it through the shortcode.
+ * A gallery, and a post that renders it through the shortcode.
  *
- * Items default to a seeded set, so this uploads nothing: attachments are read
- * by every spec and written by none.
+ * Items default to a seeded set, so this uploads nothing.
  *
  * @param settings Catalog key to value; validated against the catalog.
  * @param items    Attachment ids. Defaults to F-small's five.
@@ -41,8 +39,7 @@ export function galleryPage(
 ): { id: number; url: string } {
 	const ids = items ?? fixture< number[] >( 'F-small', 'items' );
 
-	// One invocation, not two: every `wp eval-file` bootstraps WordPress, which
-	// costs more than the work it is asked to do.
+	// One invocation: each `wp eval-file` bootstraps WordPress.
 	return JSON.parse(
 		collection( [
 			'op=render',
@@ -71,7 +68,7 @@ export function album(
 	);
 }
 
-/** A page rendering a gallery the spec did not create, such as a fixture. */
+/** A page rendering a gallery the spec did not create. */
 export function pageFor( galleryId: number ): { id: number; url: string } {
 	return JSON.parse( collection( [ 'op=page', `gallery=${ galleryId }` ] ) );
 }
