@@ -6,6 +6,7 @@
  *
  *   wp eval-file collection.php op=render items=4,5,6 settings='{"layout":"masonry"}'
  *   wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
+ *   wp eval-file collection.php op=render items=4 author=fg-author
  *   wp eval-file collection.php op=album galleries=41 title='Scoped album'
  *   wp eval-file collection.php op=page gallery=13
  *   wp eval-file collection.php op=purge
@@ -83,6 +84,26 @@ function fg_col_settings( int $gallery_id, array $settings ): void {
 }
 
 /**
+ * Resolve an author login to its user id; 0 leaves the post unowned.
+ *
+ * @param string $login User login, or '' for none.
+ * @return int
+ */
+function fg_col_author( string $login ): int {
+	if ( '' === $login ) {
+		return 0;
+	}
+
+	$user = get_user_by( 'login', $login );
+
+	if ( ! $user ) {
+		WP_CLI::error( 'no such user: ' . $login );
+	}
+
+	return (int) $user->ID;
+}
+
+/**
  * A post whose content renders one gallery through the shortcode.
  *
  * @param int $gallery_id Gallery to embed.
@@ -115,7 +136,8 @@ if ( 'render' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_gallery',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped gallery' ),
-			'post_status' => 'publish',
+			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
+			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
 		true
 	);

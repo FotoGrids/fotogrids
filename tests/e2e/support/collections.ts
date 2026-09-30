@@ -29,11 +29,15 @@ function collection( args: string[] ): string {
  * @param settings Catalog key to value; validated against the catalog.
  * @param items    Attachment ids. Defaults to F-small's five.
  * @param title    Gallery title.
+ * @param author   Login of the user who should own it.
+ * @param status   Post status; defaults to publish.
  */
 export function galleryPage(
 	settings: Settings = {},
 	items?: number[],
-	title?: string
+	title?: string,
+	author?: string,
+	status?: string
 ): { id: number; url: string } {
 	const ids = items ?? fixture< number[] >( 'F-small', 'items' );
 
@@ -45,6 +49,8 @@ export function galleryPage(
 			`items=${ ids.join( ',' ) }`,
 			`settings=${ JSON.stringify( settings ) }`,
 			...( undefined === title ? [] : [ `title=${ title }` ] ),
+			...( undefined === author ? [] : [ `author=${ author }` ] ),
+			...( undefined === status ? [] : [ `status=${ status }` ] ),
 		] )
 	);
 }
