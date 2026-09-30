@@ -2,6 +2,7 @@ import { test, expect } from './support/test';
 import { storageStateFor } from './support/roles';
 import { CollectionSettings } from './support/collection-settings';
 import { GalleryEditor } from './support/gallery-editor';
+import { restoreRoles, snapshotRoles } from './support/site';
 import { SettingsPage } from './support/settings-page';
 
 test.use( { storageState: storageStateFor( 'administrator' ) } );
@@ -171,6 +172,18 @@ test.describe( 'settings persistence', () => {
 		expect( defaults ).toBe( advanced );
 	} );
 
+	// These drive the screen that rewrites role capabilities, and one site
+	// serves every worker, so the roles go back exactly as they were found.
+	let roles: string;
+
+	test.beforeAll( () => {
+		roles = snapshotRoles();
+	} );
+
+	test.afterAll( () => {
+		restoreRoles( roles );
+	} );
+
 	test( 'permissions manager shows a save bar', async ( { page } ) => {
 		await new SettingsPage( page ).open( 'permissions_manager' );
 	} );
@@ -216,6 +229,7 @@ test.describe( 'settings persistence', () => {
 		expect( writes.length ).toBeGreaterThan( 0 );
 		// The panel was never swapped out for the loading state.
 		await expect( select ).toBeVisible();
+
 	} );
 
 	test( 'saving gallery defaults leaves the advanced settings alone', async ( {
