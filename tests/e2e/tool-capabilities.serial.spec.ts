@@ -6,11 +6,9 @@ import { restoreRoles, snapshotRoles } from './support/site';
 /**
  * ROLE-13. Which tools a role is offered.
  *
- * Every tool carries its own capability, and `Tools_Registry::get_all_for_user`
- * falls back to `manage_fotogrids` for any tool whose own capability the user
- * lacks — so an administrator keeps seeing a tool nobody has been granted yet.
- * That fallback is the reason a per-tool capability alone has to be checked
- * against a role that does not hold `manage_fotogrids`.
+ * The registry falls back to `manage_fotogrids` for any tool whose own capability
+ * the user lacks, so a per-tool capability can only be tested against a role
+ * without it.
  *
  * Serial: roles and users are site-wide, and both are put back.
  */
@@ -26,7 +24,7 @@ function wp( args: string[] ): string {
 	return execFileSync( wpCli(), args, { encoding: 'utf8' } ).trim();
 }
 
-/** The tool ids `get_all_for_user` offers, as some login sees them. */
+/** The tool ids offered to a login. */
 function toolsFor( login: string ): string[] {
 	const ids = wp( [
 		'eval',
@@ -81,11 +79,8 @@ test( 'ROLE-13: the registry holds more tools than that, so the filter did the w
 	expect( all ).toContain( TOOL );
 } );
 
-/**
- * The fallback, stated as its own row: an administrator sees a tool whose own
- * capability no role has been granted. Removing it from every role is what makes
- * the fallback the only thing that could be offering it.
- */
+// With the capability granted nowhere, the fallback is the only thing that
+// could be offering the tool.
 test( 'ROLE-13: manage_fotogrids still offers a tool nobody has been granted', () => {
 	const admin = process.env.WP_ADMIN_USER ?? 'admin';
 
