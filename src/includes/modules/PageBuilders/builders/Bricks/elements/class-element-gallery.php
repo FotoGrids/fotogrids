@@ -47,6 +47,29 @@ class Element_Gallery extends Element_Base {
 	}
 
 	/**
+	 * Collection kind rendered by the element.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	protected function get_kind(): string {
+		return 'gallery';
+	}
+
+	/**
+	 * Number of items in the gallery.
+	 *
+	 * @since 1.2.0
+	 * @param int $collection_id Gallery post ID.
+	 * @return int
+	 */
+	protected function get_item_count( int $collection_id ): int {
+		return class_exists( '\FotoGrids\Galleries\Gallery_Repository' )
+			? count( (array) \FotoGrids\Galleries\Gallery_Repository::get_item_ids( $collection_id ) )
+			: 0;
+	}
+
+	/**
 	 * Label of the collection ID control.
 	 *
 	 * @since 1.2.0
