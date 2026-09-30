@@ -26,7 +26,7 @@ test( 'a script payload in a settings string is inert in the button it renders',
 
 // The schema is JSON inside a script block, so a title holding `</script>`
 // would close the tag early. The emitter rewrites the sequence.
-test( 'a title holding a closing script tag cannot break out of the JSON-LD', async ( {
+test( 'a title holding a closing script tag cannot break out of the JSON-LD', { tag: '@critical' }, async ( {
 	page,
 } ) => {
 	const { id, url } = galleryPage( {}, undefined, PAYLOAD );

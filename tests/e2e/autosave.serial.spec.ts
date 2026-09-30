@@ -25,7 +25,7 @@ test( 'opening Add New and waiting creates nothing', async ( { page } ) => {
 	expect( await editor.listTitles() ).toEqual( before );
 } );
 
-test( 'a settings change on Add New creates nothing', async ( { page } ) => {
+test( 'a settings change on Add New creates nothing', { tag: '@critical' }, async ( { page } ) => {
 	const editor = new GalleryEditor( page );
 	const before = await editor.listTitles();
 
