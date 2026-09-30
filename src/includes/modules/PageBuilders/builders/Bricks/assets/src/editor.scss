@@ -1,0 +1,32 @@
+/**
+ * Bricks builder panel: gallery and album picker.
+ */
+
+.fg-pb-bricks-picker__card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .fg-pb-inspector-summary {
+        margin-bottom: 0;
+    }
+}
+
+.fg-pb-bricks-picker__empty {
+    margin: 0;
+}
+
+.fg-pb-bricks-picker__actions {
+    display: flex;
+    gap: 4px;
+
+    > .fg-button {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+// The raw ID field stays usable until the picker has mounted.
+body.fg-pb-bricks-picker-ready [data-controlkey="fgCollectionId"] {
+    display: none;
+}

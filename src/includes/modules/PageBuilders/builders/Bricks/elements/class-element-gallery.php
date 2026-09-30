@@ -86,7 +86,7 @@ class Element_Gallery extends Element_Base {
 	 * @return string
 	 */
 	protected function get_empty_title(): string {
-		return esc_html__( 'Enter a gallery ID in the element settings.', 'fotogrids' );
+		return esc_html__( 'Choose a gallery in the element settings.', 'fotogrids' );
 	}
 
 	/**
