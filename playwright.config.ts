@@ -18,6 +18,16 @@ import { defineConfig, devices } from '@playwright/test';
  */
 const baseURL = process.env.WP_BASE_URL ?? 'http://127.0.0.1:8899';
 
+/**
+ * Tiers, selected from CI rather than configured here:
+ *
+ *   Tier 1 (gate, every PR)  --project=readonly, plus --grep @critical
+ *   Tier 2 (full, main)      everything
+ *
+ * `readonly` is the whole API layer, so Tier 1 is that plus the browser rows
+ * tagged `@critical`: the paths whose breakage would ship a broken plugin.
+ */
+
 /** Shared by all three; only the write contract differs. */
 const chromium = { ...devices[ 'Desktop Chrome' ] };
 
@@ -26,7 +36,9 @@ export default defineConfig( {
 	globalSetup: './tests/e2e/global-setup.ts',
 	fullyParallel: true,
 	forbidOnly: !! process.env.CI,
-	retries: process.env.CI ? 2 : 0,
+	// One retry, never more: a test needing two is not a signal, it burns 3x its
+	// runtime and still reports green.
+	retries: process.env.CI ? 1 : 0,
 	// One WordPress serves every project, so this is bounded by PHP-FPM.
 	workers: Number( process.env.FG_WORKERS ) || 4,
 	reporter: process.env.CI

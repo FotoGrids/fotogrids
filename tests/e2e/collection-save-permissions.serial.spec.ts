@@ -83,7 +83,7 @@ test( 'ROLE-07: an author changes their own gallery’s content', async ( { page
 	expect( storedTitle( id ) ).toBe( 'After' );
 } );
 
-test( 'ROLE-06: the same save drops every settings key and says which', async ( {
+test( 'ROLE-06: the same save drops every settings key and says which', { tag: '@critical' }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage(

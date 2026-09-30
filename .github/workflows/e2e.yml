@@ -2,6 +2,7 @@ name: E2E
 
 on:
   pull_request:
+    types: [ opened, synchronize, reopened, labeled ]
   push:
     branches: [ main ]
 
@@ -10,6 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The branch ruleset on main requires a check named exactly "Playwright".
+  # Renaming this job de-references it and the gate silently stops applying.
   playwright:
     name: Playwright
     runs-on: ubuntu-latest
@@ -69,7 +72,100 @@ jobs:
       - name: Boot WordPress
         run: ./tests/harness/boot.sh --mode=ci
 
-      - name: Run Playwright tests
+      - name: Run the gate tier
+        env:
+          # The sets the suite reads, plus the three that exercise the seeder's
+          # own harder paths - the EXIF writer, the album relations and the
+          # embed handling - so they keep being built. Not the whole catalogue:
+          # F-huge writes 40MB for nothing any spec asks about yet. Playwright's
+          # global setup runs the seeder itself, so there is no separate step.
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+        run: |
+          set -a; . ./tests/harness/.env; set +a
+          npm run test:e2e:gate
+
+      - name: Harness diagnostics
+        if: failure()
+        run: |
+          echo '--- boot.sh --doctor ---'
+          ./tests/harness/boot.sh --doctor || true
+          echo '--- php server log ---'
+          tail -50 tests/harness/.state/server.log || true
+          echo '--- wordpress debug.log ---'
+          tail -50 tests/harness/.state/wp/wp-content/debug.log || true
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  # Not required by the branch ruleset, so it cannot block a PR.
+  full:
+    name: E2E full
+    if: >-
+      github.event_name == 'push'
+      || contains( github.event.pull_request.labels.*.name, 'ci:full' )
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: fotogrids_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+
+    env:
+      FG_DB_HOST: 127.0.0.1
+      FG_DB_PORT: 3306
+      FG_DB_USER: root
+      FG_DB_NAME: fotogrids_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mysqli, gd, exif, zip, mbstring
+          coverage: none
+
+      - name: Build plugin
+        run: npm run build:dev
+
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('./node_modules/@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Playwright browsers
+        # No --with-deps: ubuntu-latest already carries every shared library
+        # Chromium needs, and installing them costs ~12s per run.
+        run: npx playwright install chromium
+
+      - name: Boot WordPress
+        run: ./tests/harness/boot.sh --mode=ci
+
+      - name: Run every functional row
         env:
           # The sets the suite reads, plus the three that exercise the seeder's
           # own harder paths - the EXIF writer, the album relations and the
@@ -95,6 +191,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: playwright-report
+          name: playwright-report-full
           path: playwright-report/
           retention-days: 14

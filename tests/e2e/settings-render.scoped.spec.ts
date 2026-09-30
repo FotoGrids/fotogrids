@@ -10,7 +10,7 @@ import { GalleryRender } from './support/gallery-render';
  * parallelism alongside the readonly specs.
  */
 
-test( 'a gallery renders with the layout its settings ask for', async ( {
+test( 'a gallery renders with the layout its settings ask for', { tag: '@critical' }, async ( {
 	page,
 } ) => {
 	const { id, url } = galleryPage( { layout: 'masonry' } );
@@ -38,7 +38,7 @@ test( 'a column count reaches the wrapper as a CSS variable', async ( {
 	expect( await gallery.cssVar( 'cols' ) ).toBe( '5' );
 } );
 
-test( 'changing a setting changes the next render', async ( { page } ) => {
+test( 'changing a setting changes the next render', { tag: '@critical' }, async ( { page } ) => {
 	const { id, url } = galleryPage( { layout: 'grid' } );
 	const gallery = new GalleryRender( page, id );
 

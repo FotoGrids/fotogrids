@@ -43,7 +43,7 @@ async function reach(
 test.describe( 'an administrator', () => {
 	test.use( { storageState: storageStateFor( 'administrator' ) } );
 
-	test( 'ROLE-01: sees the plugin menu and reaches every page behind it', async ( {
+	test( 'ROLE-01: sees the plugin menu and reaches every page behind it', { tag: '@critical' }, async ( {
 		page,
 	} ) => {
 		await page.goto( '/wp-admin/' );
