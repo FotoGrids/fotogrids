@@ -139,6 +139,9 @@ const openPicker = (kind, currentId) => {
 	);
 };
 
+// Buttons rather than links: Bricks forces the colour of links in info controls.
+const openTab = (url) => window.open(url, '_blank', 'noopener,noreferrer');
+
 const countLabel = (kind, count) =>
 	kind === 'album'
 		? sprintf(
@@ -232,9 +235,7 @@ const BricksPicker = ({ kind }) => {
 					<Button
 						variant="secondary"
 						size="sm"
-						href={`${editBase}${id}`}
-						target="_blank"
-						rel="noopener noreferrer"
+						onClick={() => openTab(`${editBase}${id}`)}
 					>
 						{isAlbum
 							? __('Edit album', 'fotogrids')
@@ -248,9 +249,7 @@ const BricksPicker = ({ kind }) => {
 					size="sm"
 					icon="plus"
 					fullWidth
-					href={createUrl}
-					target="_blank"
-					rel="noopener noreferrer"
+					onClick={() => openTab(createUrl)}
 				>
 					{isAlbum
 						? __('Create new album', 'fotogrids')

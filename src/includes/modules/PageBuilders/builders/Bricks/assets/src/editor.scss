@@ -2,6 +2,25 @@
  * Bricks builder panel: gallery and album picker.
  */
 
+@use "sass:meta";
+
+[data-controlkey="fgPicker"] [data-control="info"] {
+    padding: 0;
+    background: none;
+    color: inherit;
+}
+
+// Bricks styles every panel button; scoping the shared button rules
+// under the picker restores them.
+.bricks-panel .fg-pb-bricks-picker {
+    @include meta.load-css("../../../../../../../assets/admin/src/styles/fg-button/fg-button");
+
+    .fg-button {
+        height: auto;
+        text-transform: none;
+    }
+}
+
 .fg-pb-bricks-picker__card {
     display: flex;
     flex-direction: column;
