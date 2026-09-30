@@ -5,6 +5,10 @@ on:
     types: [ opened, synchronize, reopened, labeled ]
   push:
     branches: [ main ]
+  schedule:
+    # Nightly, so quarantined tests keep being measured while nobody waits.
+    - cron: '40 2 * * *'
+  workflow_dispatch:
 
 concurrency:
   group: e2e-${{ github.workflow }}-${{ github.ref }}
@@ -15,6 +19,7 @@ jobs:
   # Renaming this job de-references it and the gate silently stops applying.
   playwright:
     name: Playwright
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     services:
@@ -192,5 +197,91 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: playwright-report-full
+          path: playwright-report/
+          retention-days: 14
+
+  # Measures the quarantine. Never required, never run on a PR.
+  quarantine:
+    name: E2E quarantine
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    continue-on-error: true
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: fotogrids_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+
+    env:
+      FG_DB_HOST: 127.0.0.1
+      FG_DB_PORT: 3306
+      FG_DB_USER: root
+      FG_DB_NAME: fotogrids_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mysqli, gd, exif, zip, mbstring
+          coverage: none
+
+      - name: Build plugin
+        run: npm run build:dev
+
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('./node_modules/@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Playwright browsers
+        # No --with-deps: ubuntu-latest already carries every shared library
+        # Chromium needs, and installing them costs ~12s per run.
+        run: npx playwright install chromium
+
+      - name: Boot WordPress
+        run: ./tests/harness/boot.sh --mode=ci
+
+      - name: Run the quarantined tests
+        env:
+          # The sets the suite reads, plus the three that exercise the seeder's
+          # own harder paths - the EXIF writer, the album relations and the
+          # embed handling - so they keep being built. Not the whole catalogue:
+          # F-huge writes 40MB for nothing any spec asks about yet. Playwright's
+          # global setup runs the seeder itself, so there is no separate step.
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+        run: |
+          set -a; . ./tests/harness/.env; set +a
+          npm run test:e2e:quarantine -- --reporter=json || true
+
+      - name: Flake report
+        if: always()
+        run: node tests/ci/flake-report.js playwright-report.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report-quarantine
           path: playwright-report/
           retention-days: 14
