@@ -4,13 +4,12 @@ import { storageStateFor } from './support/roles';
 import type { Role } from './support/roles';
 
 /**
- * ROLE-01 to ROLE-05. Which admin screens each role can see and reach.
+ * ROLE-01 to ROLE-05. Which admin screens each role sees and can reach.
  *
- * The menu is one question and the URL is another: a submenu whose parent the
- * user cannot see still has a page behind it, so every role is checked both
- * ways round.
+ * Menu and URL are separate questions: a submenu whose parent is hidden still
+ * has a page behind it, so each role is checked both ways.
  *
- * Serial: these sign in as five different users against one site.
+ * Serial: five users against one site.
  */
 
 test.describe.configure( { mode: 'serial' } );
@@ -31,12 +30,7 @@ function menuItems( page: import( '@playwright/test' ).Page ) {
 	return page.locator( `${ MENU } a[href*="fotogrids"]` );
 }
 
-/**
- * Whether WordPress served the screen or refused it.
- *
- * A refused admin page answers 403 with the notice as its body, so the status
- * is the check; the notice's wording is not part of the contract.
- */
+/** Whether the screen was served. A refusal is 403; its wording is not a contract. */
 async function reach(
 	page: import( '@playwright/test' ).Page,
 	slug: string
@@ -71,11 +65,7 @@ test.describe( 'an editor', () => {
 		allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
 	} );
 
-	/**
-	 * Library and Statistics are registered under caps an editor holds, but
-	 * their parent menu is registered under one they do not — so the pages
-	 * exist with no menu entry pointing at them.
-	 */
+	// Library and Statistics sit under caps an editor holds; their parent does not.
 	test( 'ROLE-02: reaches Library and Statistics without the parent menu', async ( {
 		page,
 	} ) => {
@@ -101,10 +91,8 @@ test.describe( 'an author', () => {
 		allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
 	} );
 
-	/**
-	 * The parent page needs a capability an author lacks, so WordPress promotes
-	 * the first submenu they can reach. That entry keeps the plugin's name.
-	 */
+	// The parent needs a cap an author lacks, so WordPress promotes the first
+	// submenu they can reach, under the plugin's name.
 	test( 'ROLE-03: the promoted menu entry points at Galleries', async ( { page } ) => {
 		await page.goto( '/wp-admin/' );
 

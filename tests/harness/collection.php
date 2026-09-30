@@ -11,8 +11,8 @@
  *   wp eval-file collection.php op=page gallery=13
  *   wp eval-file collection.php op=purge
  *
- * Every post it creates carries FG_COLLECTION_MARKER, so `op=purge` can remove
- * the lot. tests/e2e/support/collections.ts is the interface specs use.
+ * Every post carries FG_COLLECTION_MARKER, so `op=purge` removes the lot.
+ * tests/e2e/support/collections.ts is the interface specs use.
  *
  * @package FotoGrids
  */
@@ -22,7 +22,7 @@ use FotoGrids\FotoGrids_Cache;
 use FotoGrids\Galleries\Gallery_Repository;
 use FotoGrids\Settings\Setting_Value_Codec;
 
-/** Marks a post as this script's to delete. Distinct from the seeder's. */
+/** Marks a post as this script's to delete; distinct from the seeder's. */
 const FG_COLLECTION_MARKER = '_fg_scoped';
 
 /**

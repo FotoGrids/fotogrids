@@ -6,14 +6,12 @@ import { execFileSync } from 'child_process';
 /**
  * ROLE-06 and ROLE-07. What an author's save is allowed to change.
  *
- * `Permission_Gate` classifies every Collection Settings key as settings, and
- * an author holds `edit_fotogrids_galleries` but not
- * `modify_fotogrids_gallery_settings`. So a save from an author keeps its
- * content and drops its settings, reporting which keys it dropped rather than
- * failing the whole request.
+ * Every Collection Settings key is classified as settings, and an author lacks
+ * `modify_fotogrids_gallery_settings`, so a save keeps its content and drops its
+ * settings, naming the dropped keys.
  *
- * The galleries here are drafts: an author cannot open one of their own once it
- * is published (FotoGrids/backstage#383), and the gate is what these are about.
+ * Drafts, because an author cannot open their own published gallery
+ * (FotoGrids/backstage#383).
  *
  * Serial: these save real galleries.
  */
@@ -48,10 +46,7 @@ type SaveResponse = {
 	data?: { skipped_for_permissions?: string[] };
 };
 
-/**
- * Save through the same admin-ajax action the editor uses, with the nonce the
- * editor screen was served.
- */
+/** Save through the admin-ajax action the editor uses, with its own nonce. */
 async function saveAs(
 	page: import( '@playwright/test' ).Page,
 	galleryId: number,
@@ -59,7 +54,7 @@ async function saveAs(
 ): Promise< SaveResponse > {
 	await page.goto( `/wp-admin/post.php?post=${ galleryId }&action=edit` );
 
-	// The screen renders the field once per metabox; they carry the same nonce.
+	// One field per metabox, same nonce in each.
 	const nonce = await page
 		.locator( '#fotogrids_meta_box_nonce' )
 		.first()
@@ -110,8 +105,8 @@ test( 'ROLE-06: the same save drops every settings key and says which', async ( 
 
 	expect( body.success ).toBe( true );
 
-	// The content half went through, so the request was accepted and it is the
-	// settings key specifically that was refused.
+	// The content went through, so the request was accepted and the settings key
+	// specifically refused.
 	expect( storedTitle( id ) ).toBe( 'Settings probe saved' );
 	expect( storedSetting( id, 'layout' ), 'an author rewrote a setting' ).toBe( 'grid' );
 	expect( body.data?.skipped_for_permissions ?? [] ).toContain( 'layout' );

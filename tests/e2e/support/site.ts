@@ -4,10 +4,9 @@ import { wpCli } from './roles';
 /**
  * Site-wide state a spec has to put back.
  *
- * One WordPress serves every worker, so a spec that drives a screen which
- * rewrites roles changes the answer for every spec that runs after it. Reading
- * the option back is exact and does not depend on the UI having finished a
- * debounced save.
+ * One WordPress serves every worker, so a screen that rewrites roles changes the
+ * answer for every later spec. Reading the option is exact, and does not depend
+ * on the UI finishing a debounced save.
  */
 
 const ROLES_OPTION = 'wp_user_roles';
@@ -21,7 +20,7 @@ export function snapshotRoles(): string {
 	return wp( [ 'option', 'get', ROLES_OPTION, '--format=json' ] );
 }
 
-/** Put the roles back exactly as `snapshotRoles` found them. */
+/** Put the roles back as `snapshotRoles` found them. */
 export function restoreRoles( snapshot: string ): void {
 	execFileSync( wpCli(), [ 'option', 'update', ROLES_OPTION, '--format=json' ], {
 		encoding: 'utf8',
@@ -32,7 +31,7 @@ export function restoreRoles( snapshot: string ): void {
 /** A site option's value, or null when the row does not exist. */
 export function getOption( name: string ): string | null {
 	try {
-		// An absent option is an expected answer here, not a failure to report.
+		// An absent option is an answer, not a failure.
 		return execFileSync( wpCli(), [ 'option', 'get', name ], {
 			encoding: 'utf8',
 			stdio: [ 'ignore', 'pipe', 'ignore' ],
@@ -42,13 +41,13 @@ export function getOption( name: string ): string | null {
 	}
 }
 
-/** Set a site option, or delete it when `value` is null, as `getOption` found it. */
+/** Set a site option, or delete it when `value` is null. */
 export function setOption( name: string, value: string | null ): void {
 	if ( null === value ) {
 		try {
 			wp( [ 'option', 'delete', name ] );
 		} catch {
-			// Already absent, which is the state asked for.
+			// Already absent.
 		}
 		return;
 	}
