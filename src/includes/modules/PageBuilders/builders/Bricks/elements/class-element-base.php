@@ -244,7 +244,7 @@ abstract class Element_Base extends \Bricks\Element {
 			'group'       => self::PREVIEW_GROUP,
 			'type'        => 'checkbox',
 			'label'       => esc_html__( 'Make items clickable', 'fotogrids' ),
-			'description' => esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' ),
+			'description' => $this->get_click_preview_description(),
 			'rerender'    => true,
 		);
 
@@ -256,6 +256,18 @@ abstract class Element_Base extends \Bricks\Element {
 			'description' => esc_html__( 'When disabled, pagination controls stay visible but inactive in the builder. Published pages are not affected.', 'fotogrids' ),
 			'rerender'    => true,
 		);
+	}
+
+	/**
+	 * Description of the "Make items clickable" preview toggle.
+	 *
+	 * @since 1.2.0
+	 * @return string
+	 */
+	private function get_click_preview_description(): string {
+		return 'album' === $this->get_kind()
+			? esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the album action. Published pages are not affected.', 'fotogrids' )
+			: esc_html__( 'When disabled, item clicks select the element in the builder instead of opening the gallery action. Published pages are not affected.', 'fotogrids' );
 	}
 
 	/**
