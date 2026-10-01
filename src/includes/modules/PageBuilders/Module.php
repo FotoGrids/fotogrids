@@ -87,7 +87,7 @@ class Module extends Abstract_Module {
 	}
 
 	public function get_description(): string {
-		return __( 'Insert FotoGrids galleries and albums from Gutenberg, Elementor and Divi.', 'fotogrids' );
+		return __( 'Insert FotoGrids galleries and albums from Gutenberg, Elementor, Divi and Bricks.', 'fotogrids' );
 	}
 
 	/**
