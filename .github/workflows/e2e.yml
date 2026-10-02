@@ -182,6 +182,13 @@ jobs:
           set -a; . ./tests/harness/.env; set +a
           npm run test:e2e
 
+      - name: Run the lifecycle scenarios
+        env:
+          FG_DB_HOST: 127.0.0.1
+          FG_DB_PORT: 3306
+          FG_DB_USER: root
+        run: npm run test:lifecycle
+
       - name: Harness diagnostics
         if: failure()
         run: |
