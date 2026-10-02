@@ -41,6 +41,16 @@ class Metadata_Permissions {
 	 * @return bool
 	 */
 	public static function check_manage_library( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter -- Signature mandated by WordPress callback/hook contract; param intentionally unused here.
+		return self::can_manage_library();
+	}
+
+	/**
+	 * Whether the current user may create or change library entries.
+	 *
+	 * @since 1.1.5
+	 * @return bool
+	 */
+	public static function can_manage_library() {
 		return current_user_can( 'manage_fotogrids_library' )
 			|| current_user_can( 'manage_fotogrids' );
 	}

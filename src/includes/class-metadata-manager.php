@@ -133,6 +133,39 @@ class Metadata_Manager {
 	}
 
 	/**
+	 * Find an existing metadata entry by name, without creating or changing it.
+	 *
+	 * Matches case-insensitively on the name, or on the slug derived from it.
+	 *
+	 * @since 1.1.5
+	 * @param string $type Metadata type.
+	 * @param string $name Metadata name.
+	 * @return object|null Metadata row, or null when there is no match.
+	 */
+	public static function find_metadata( $type, $name ) {
+		if ( ! self::validate_type( $type ) ) {
+			return null;
+		}
+
+		$name = trim( (string) $name );
+		if ( '' === $name ) {
+			return null;
+		}
+
+		global $wpdb;
+
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s)',
+				$wpdb->prefix . 'fotogrids_tags',
+				$type,
+				$name,
+				sanitize_title( $name )
+			)
+		);
+	}
+
+	/**
 	 * Add or get existing metadata entry
 	 *
 	 * @param string $type Metadata type
@@ -152,18 +185,9 @@ class Metadata_Manager {
 			return false;
 		}
 
-		$slug  = sanitize_title( $name );
-		$table = $wpdb->prefix . 'fotogrids_tags';
-
-		$existing = $wpdb->get_row(
-			$wpdb->prepare(
-				'SELECT * FROM %i WHERE type = %s AND (LOWER(name) = LOWER(%s) OR slug = %s)',
-				$table,
-				$type,
-				$name,
-				$slug
-			)
-		);
+		$slug     = sanitize_title( $name );
+		$table    = $wpdb->prefix . 'fotogrids_tags';
+		$existing = self::find_metadata( $type, $name );
 
 		if ( $existing ) {
 			if ( null !== $meta ) {

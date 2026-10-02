@@ -88,7 +88,17 @@ class Metadata_Data {
 			return new \WP_Error( 'missing_name', __( 'Tag name is required', 'fotogrids' ), array( 'status' => 400 ) );
 		}
 
-		$tag = \FotoGrids\Metadata_Manager::add_or_get_tag( $name );
+		$tag = self::resolve_entry(
+			'tag',
+			$name,
+			function () use ( $name ) {
+				return \FotoGrids\Metadata_Manager::add_or_get_tag( $name );
+			}
+		);
+
+		if ( is_wp_error( $tag ) ) {
+			return $tag;
+		}
 
 		if ( ! $tag ) {
 			return new \WP_Error( 'creation_failed', __( 'Failed to create tag', 'fotogrids' ), array( 'status' => 500 ) );
@@ -114,7 +124,17 @@ class Metadata_Data {
 			return new \WP_Error( 'missing_name', __( 'Person name is required', 'fotogrids' ), array( 'status' => 400 ) );
 		}
 
-		$person = \FotoGrids\Metadata_Manager::add_or_get_person( $name );
+		$person = self::resolve_entry(
+			'person',
+			$name,
+			function () use ( $name ) {
+				return \FotoGrids\Metadata_Manager::add_or_get_person( $name );
+			}
+		);
+
+		if ( is_wp_error( $person ) ) {
+			return $person;
+		}
 
 		if ( ! $person ) {
 			return new \WP_Error( 'creation_failed', __( 'Failed to create person', 'fotogrids' ), array( 'status' => 500 ) );
@@ -142,7 +162,17 @@ class Metadata_Data {
 			return new \WP_Error( 'missing_name', __( 'Location name is required', 'fotogrids' ), array( 'status' => 400 ) );
 		}
 
-		$location = \FotoGrids\Metadata_Manager::add_or_get_location( $name, $latitude, $longitude );
+		$location = self::resolve_entry(
+			'location',
+			$name,
+			function () use ( $name, $latitude, $longitude ) {
+				return \FotoGrids\Metadata_Manager::add_or_get_location( $name, $latitude, $longitude );
+			}
+		);
+
+		if ( is_wp_error( $location ) ) {
+			return $location;
+		}
 
 		if ( ! $location ) {
 			return new \WP_Error( 'creation_failed', __( 'Failed to create location', 'fotogrids' ), array( 'status' => 500 ) );
@@ -170,123 +200,36 @@ class Metadata_Data {
 	}
 
 	/**
-	 * Save item metadata
+	 * Resolve a library entry by name, creating it only for users who manage the library.
 	 *
-	 * Saves metadata for a specific item including tags, people, and locations.
-	 * Clears existing metadata before saving new data to ensure accuracy.
+	 * Users without the library capability can use an existing entry but cannot
+	 * add one or change its stored details.
 	 *
-	 * @since 1.0.0
-	 * @param \WP_REST_Request $request The REST API request containing item ID and metadata
-	 * @return \WP_REST_Response Results of metadata save operation including any errors
+	 * @since 1.1.5
+	 * @param string   $type   Metadata type: tag, person or location.
+	 * @param string   $name   Entry name.
+	 * @param callable $create Creates or fetches the entry; called only for library managers.
+	 * @return object|false|\WP_Error Entry row, false when creation failed, or a 403 error.
 	 */
-	public static function save_item_metadata( $request ) {
-		$item_id   = $request->get_param( 'id' );
-		$tags      = $request->get_param( 'tags' ) ?: array();
-		$people    = $request->get_param( 'people' ) ?: array();
-		$locations = $request->get_param( 'locations' ) ?: array();
+	public static function resolve_entry( $type, $name, callable $create ) {
+		if ( Metadata_Permissions::can_manage_library() ) {
+			return $create();
+		}
 
-		\FotoGrids\Metadata_Manager::clear_item_metadata( $item_id );
+		$entry = \FotoGrids\Metadata_Manager::find_metadata( $type, $name );
 
-		$results = array(
-			'tags'      => array(),
-			'people'    => array(),
-			'locations' => array(),
-			'errors'    => array(),
+		if ( $entry ) {
+			return $entry;
+		}
+
+		return new \WP_Error(
+			'fotogrids_library_forbidden',
+			sprintf(
+				/* translators: %s: tag, person or location name. */
+				__( '"%s" is not in the library, and you do not have permission to add it.', 'fotogrids' ),
+				$name
+			),
+			array( 'status' => 403 )
 		);
-
-		// ── Tags ─────────────────────────────────────────────────────────────
-		// The FE sends an array of integer IDs. Link each directly without a
-		// name lookup. Fall back to name-based lookup only for non-integer values
-		// (e.g. external API callers that still send names).
-		foreach ( $tags as $tag_data ) {
-			if ( is_int( $tag_data ) || ( is_numeric( $tag_data ) && (float) intval( $tag_data ) === (float) $tag_data ) ) {
-				$tag_id = (int) $tag_data;
-				$result = \FotoGrids\Metadata_Manager::link_tag_to_item( $item_id, $tag_id );
-				if ( $result ) {
-					$results['tags'][] = array( 'id' => $tag_id );
-				} else {
-					/* translators: 1: tag ID, 2: item ID. */
-					$results['errors'][] = sprintf( __( 'Failed to link tag ID %1$d to item %2$d', 'fotogrids' ), $tag_id, $item_id );
-				}
-			} else {
-				// Fallback: name string (backwards compat for external callers).
-				$tag_name = is_string( $tag_data ) ? trim( $tag_data ) : ( isset( $tag_data['name'] ) ? trim( $tag_data['name'] ) : '' );
-				if ( empty( $tag_name ) ) {
-					continue;
-				}
-				$result = \FotoGrids\Metadata_Manager::add_tag_to_item( $item_id, $tag_name );
-				if ( $result ) {
-					$results['tags'][] = array( 'name' => $tag_name );
-				} else {
-					/* translators: 1: tag name, 2: item ID. */
-					$results['errors'][] = sprintf( __( 'Failed to add tag: %1$s to item %2$d', 'fotogrids' ), $tag_name, $item_id );
-				}
-			}
-		}
-
-		// ── People ───────────────────────────────────────────────────────────
-		// The FE sends { id, name, details }. When an ID is present, link
-		// directly. Fall back to name-based lookup when ID is absent.
-		foreach ( $people as $person ) {
-			$person_id = isset( $person['id'] ) ? (int) $person['id'] : 0;
-			$name      = isset( $person['name'] ) ? trim( $person['name'] ) : '';
-			$details   = isset( $person['details'] ) ? trim( $person['details'] ) : '';
-
-			if ( $person_id > 0 ) {
-				$result = \FotoGrids\Metadata_Manager::link_person_to_item( $item_id, $person_id );
-				if ( $result ) {
-					$results['people'][] = array(
-						'id'   => $person_id,
-						'name' => $name,
-					);
-				} else {
-					/* translators: 1: person ID, 2: item ID. */
-					$results['errors'][] = sprintf( __( 'Failed to link person ID %1$d to item %2$d', 'fotogrids' ), $person_id, $item_id );
-				}
-			} elseif ( ! empty( $name ) ) {
-				// Fallback: no ID supplied - find or create by name.
-				$result = \FotoGrids\Metadata_Manager::add_person_to_item( $item_id, $name, $details );
-				if ( $result ) {
-					$results['people'][] = array( 'name' => $name );
-				} else {
-					/* translators: %s: person name. */
-					$results['errors'][] = sprintf( __( 'Failed to add person: %s', 'fotogrids' ), $name );
-				}
-			}
-		}
-
-		// ── Locations ────────────────────────────────────────────────────────
-		// The FE sends { id, name, latitude, longitude }. When an ID is present,
-		// link directly. Fall back to name-based lookup when ID is absent.
-		foreach ( $locations as $location ) {
-			$location_id = isset( $location['id'] ) ? (int) $location['id'] : 0;
-			$name        = isset( $location['name'] ) ? trim( $location['name'] ) : '';
-			$latitude    = isset( $location['latitude'] ) ? $location['latitude'] : null;
-			$longitude   = isset( $location['longitude'] ) ? $location['longitude'] : null;
-
-			if ( $location_id > 0 ) {
-				$result = \FotoGrids\Metadata_Manager::link_location_to_item( $item_id, $location_id );
-				if ( $result ) {
-					$results['locations'][] = array(
-						'id'   => $location_id,
-						'name' => $name,
-					);
-				} else {
-					/* translators: 1: location ID, 2: item ID. */
-					$results['errors'][] = sprintf( __( 'Failed to link location ID %1$d to item %2$d', 'fotogrids' ), $location_id, $item_id );
-				}
-			} elseif ( ! empty( $name ) ) {
-				// Fallback: no ID supplied - find or create by name.
-				$result = \FotoGrids\Metadata_Manager::add_location_to_item( $item_id, $name, $latitude, $longitude );
-				if ( $result ) {
-					$results['locations'][] = array( 'name' => $name );
-				} else {
-					/* translators: %s: location name. */
-					$results['errors'][] = sprintf( __( 'Failed to add location: %s', 'fotogrids' ), $name );
-				}
-			}
-		}
-
-		return rest_ensure_response( $results );
 	}
 }
