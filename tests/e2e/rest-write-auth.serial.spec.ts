@@ -266,18 +266,34 @@ test( 'an author cannot add a tag to the library', async ( { playwright } ) => {
 test( 'an author can pick a tag that is already in the library', async ( {
 	playwright,
 } ) => {
-	// F-tagged seeds the "Sunset" tag.
-	fixture< number >( 'F-tagged', 'gallery' );
+	const name = `Shared tag ${ Date.now() }`;
+	const tagsRoute = `/?rest_route=${ encodeURIComponent( '/fotogrids/v1/metadata/tags' ) }`;
+	const admin = await apiAs( playwright, 'administrator' );
 
-	const { context, nonce } = await apiAs( playwright, 'author' );
+	const created = await admin.context.post( tagsRoute, {
+		headers: { 'X-WP-Nonce': admin.nonce },
+		data: { name },
+	} );
+	const tag = ( await created.json() ) as { id: number; name: string };
+	expect( created.status() ).toBe( 200 );
 
-	const response = await context.post(
-		`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/metadata/tags' ) }`,
-		{ headers: { 'X-WP-Nonce': nonce }, data: { name: 'sunset' } }
+	const author = await apiAs( playwright, 'author' );
+	const picked = await author.context.post( tagsRoute, {
+		headers: { 'X-WP-Nonce': author.nonce },
+		data: { name: name.toLowerCase() },
+	} );
+	const body = ( await picked.json() ) as { id: number; name: string };
+	await author.context.dispose();
+
+	await admin.context.delete(
+		`/?rest_route=${ encodeURIComponent(
+			`/fotogrids/v1/library/tags/${ tag.id }`
+		) }`,
+		{ headers: { 'X-WP-Nonce': admin.nonce } }
 	);
-	const body = ( await response.json() ) as { name: string };
-	await context.dispose();
+	await admin.context.dispose();
 
-	expect( response.status() ).toBe( 200 );
-	expect( body.name ).toBe( 'Sunset' );
+	expect( picked.status() ).toBe( 200 );
+	expect( Number( body.id ) ).toBe( Number( tag.id ) );
+	expect( body.name ).toBe( name );
 } );
