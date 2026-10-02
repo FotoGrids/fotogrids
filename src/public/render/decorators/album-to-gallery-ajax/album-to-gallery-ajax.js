@@ -79,21 +79,56 @@
 	}
 
 	/**
+	 * Order script handles so each one follows the handles it depends on.
+	 *
+	 * Injected scripts run in insertion order, so a module appended before
+	 * its dependency would run without it. Dependencies absent from the map
+	 * are already on the page and are skipped.
+	 *
+	 * @param {Record<string, {deps?: string[]}>} jsData
+	 * @return {string[]} Handles, dependencies first.
+	 */
+	function orderByDependencies(jsData) {
+		const ordered = [];
+		const visited = {};
+
+		function visit(handle) {
+			if (visited[handle]) {
+				return;
+			}
+			visited[handle] = true;
+
+			const entry = jsData[handle];
+			const deps = entry && Array.isArray(entry.deps) ? entry.deps : [];
+			deps.forEach(function (dep) {
+				if (Object.prototype.hasOwnProperty.call(jsData, dep)) {
+					visit(dep);
+				}
+			});
+
+			ordered.push(handle);
+		}
+
+		Object.keys(jsData).forEach(visit);
+		return ordered;
+	}
+
+	/**
 	 * Inject <script> tags for any JS handles the render pipeline declared
 	 * that aren't already in the document. The album page only enqueued the
 	 * modules its own render needed; a swapped-in gallery can need more.
 	 * Late-loaded modules scan the DOM on init, so they still wire it.
 	 *
-	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
-	 *     handle → {src, in_footer} map. in_footer is ignored; scripts are
-	 *     appended to <head> and execute in order.
+	 * @param {Record<string, {src: string, in_footer: boolean, deps: string[]}>} jsData
+	 *     handle → {src, in_footer, deps} map. in_footer is ignored; scripts are
+	 *     appended to <head> in dependency order and execute in that order.
 	 */
 	function injectMissingScripts(jsData) {
 		if (!jsData || typeof jsData !== 'object') {
 			return;
 		}
 
-		Object.keys(jsData).forEach(function (handle) {
+		orderByDependencies(jsData).forEach(function (handle) {
 			const entry = jsData[handle];
 			const url = entry && entry.src ? entry.src : '';
 			if (!handle || !url) {

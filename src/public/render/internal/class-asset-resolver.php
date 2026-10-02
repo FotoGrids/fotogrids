@@ -58,10 +58,11 @@ final class Asset_Resolver {
 	/**
 	 * JS handles enqueued in any flush this request.
 	 *
-	 * Stored as handle => ['src' => string, 'in_footer' => bool] so the cache
-	 * replay path can re-register and re-enqueue them with correct metadata.
+	 * Stored as handle => ['src' => string, 'in_footer' => bool, 'deps' => string[]]
+	 * so the cache replay path and client-side loaders can re-register them with
+	 * correct metadata and in dependency order.
 	 *
-	 * @var array<string, array{src: string, in_footer: bool}>
+	 * @var array<string, array{src: string, in_footer: bool, deps: array<int, string>}>
 	 */
 	private array $enqueued_js_handles = array();
 
@@ -177,6 +178,7 @@ final class Asset_Resolver {
 			$this->enqueued_js_handles[ $handle ] = array(
 				'src'       => $js_asset['src'],
 				'in_footer' => $js_asset['in_footer'],
+				'deps'      => array_values( $js_asset['deps'] ),
 			);
 			$new_js_handles[]                     = $handle;
 		}
@@ -221,12 +223,13 @@ final class Asset_Resolver {
 	/**
 	 * Returns JS asset metadata keyed by handle for all assets enqueued this request.
 	 *
-	 * Each entry is an array with 'src' (string) and 'in_footer' (bool). Reads
-	 * from $enqueued_js_handles so the data is available after flush() has cleared
-	 * the per-render queue - the same pattern as get_css_asset_urls().
+	 * Each entry is an array with 'src' (string), 'in_footer' (bool) and 'deps'
+	 * (the handles the script depends on). Reads from $enqueued_js_handles so the
+	 * data is available after flush() has cleared the per-render queue - the same
+	 * pattern as get_css_asset_urls().
 	 *
 	 * @since   1.0.0
-	 * @return  array<string, array{src: string, in_footer: bool}>
+	 * @return  array<string, array{src: string, in_footer: bool, deps: array<int, string>}>
 	 */
 	public function get_js_asset_data(): array {
 		return $this->enqueued_js_handles;

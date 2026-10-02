@@ -25,6 +25,7 @@ tests=(
     "${plugin_root}/tests/integration/PublicRenderParityTest.php"
     "${plugin_root}/tests/integration/RenderCacheExpiryTest.php"
     "${plugin_root}/tests/integration/RenderCacheInlineAssetsTest.php"
+    "${plugin_root}/tests/integration/RenderCacheScriptDepsTest.php"
     "${plugin_root}/tests/integration/RandomSortModeTest.php"
     "${plugin_root}/tests/integration/TemplateConfigValidityTest.php"
 )

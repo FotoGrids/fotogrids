@@ -119,7 +119,7 @@ class Public_Render {
 	 *
 	 * @since  1.0.0
 	 * @param  array<string, string>                             $css Handle → URL map.
-	 * @param  array<string, array{src: string, in_footer: bool}> $js  Handle → metadata map.
+	 * @param  array<string, array{src: string, in_footer: bool, deps: array<int, string>}> $js  Handle → metadata map.
 	 * @return void
 	 */
 	private static function replay_cached_assets( array $css, array $js ): void {
@@ -145,7 +145,7 @@ class Public_Render {
 			if ( isset( $already_js[ $handle ] ) ) {
 				continue;
 			}
-			wp_register_script( $handle, $meta['src'], array(), FOTOGRIDS_VERSION, $meta['in_footer'] );
+			wp_register_script( $handle, $meta['src'], $meta['deps'], FOTOGRIDS_VERSION, $meta['in_footer'] );
 			wp_enqueue_script( $handle );
 		}
 	}

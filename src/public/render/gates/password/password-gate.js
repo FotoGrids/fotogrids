@@ -56,18 +56,53 @@
 	}
 
 	/**
+	 * Order script handles so each one follows the handles it depends on.
+	 *
+	 * Injected scripts run in insertion order, so a module appended before
+	 * its dependency would run without it. Dependencies absent from the map
+	 * are already on the page and are skipped.
+	 *
+	 * @param {Record<string, {deps?: string[]}>} jsData
+	 * @return {string[]} Handles, dependencies first.
+	 */
+	function orderByDependencies(jsData) {
+		const ordered = [];
+		const visited = {};
+
+		function visit(handle) {
+			if (visited[handle]) {
+				return;
+			}
+			visited[handle] = true;
+
+			const entry = jsData[handle];
+			const deps = entry && Array.isArray(entry.deps) ? entry.deps : [];
+			deps.forEach(function (dep) {
+				if (Object.prototype.hasOwnProperty.call(jsData, dep)) {
+					visit(dep);
+				}
+			});
+
+			ordered.push(handle);
+		}
+
+		Object.keys(jsData).forEach(visit);
+		return ordered;
+	}
+
+	/**
 	 * Inject any JS handles the render pipeline declared for the unlocked
 	 * gallery that aren't already in the document. Mirrors the
 	 * Album_To_Gallery_Ajax injectMissingScripts helper.
 	 *
-	 * @param {Record<string, {src: string, in_footer: boolean}>} jsData
+	 * @param {Record<string, {src: string, in_footer: boolean, deps: string[]}>} jsData
 	 */
 	function injectMissingScripts(jsData) {
 		if (!jsData || typeof jsData !== 'object') {
 			return;
 		}
 
-		Object.keys(jsData).forEach(function (handle) {
+		orderByDependencies(jsData).forEach(function (handle) {
 			const entry = jsData[handle];
 			const url = entry && entry.src ? entry.src : '';
 			if (!handle || !url) {
