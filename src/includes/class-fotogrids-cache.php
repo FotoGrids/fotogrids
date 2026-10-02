@@ -468,11 +468,9 @@ class FotoGrids_Cache {
 	/**
 	 * Build the cache key for a gallery render.
 	 *
-	 * The visitor bucket is included so that gates producing user-context-variant
-	 * output (e.g. who_can_view = registered_users) naturally produce separate
-	 * cache entries without the cache needing to know about gate logic.
-	 * The bucket itself is filterable so any gate or module can append its own
-	 * dimension via the fotogrids/cache/bucket filter.
+	 * The bucket partitions the cache on any dimension a module adds through
+	 * the fotogrids/cache/bucket filter. Gated renders never reach the cache;
+	 * they are excluded through the fotogrids/cache/should_cache filter.
 	 *
 	 * @since  1.0.0
 	 * @param  int   $gallery_id
