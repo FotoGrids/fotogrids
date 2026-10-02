@@ -8,6 +8,17 @@ set -uo pipefail
 
 FG_LIFECYCLE_FAILURES=0
 
+# The tables the plugin owns, without the `wp_fotogrids_` prefix. Named rather
+# than discovered, so adding or dropping one is a deliberate edit here. Exported
+# so `wp eval` can read the list instead of having it interpolated into PHP.
+export FG_TABLES="item_meta statistics statistics_daily gallery_albums tags item_metadata render_cache"
+FG_TABLE_COUNT=$( set -- $FG_TABLES; echo $# )
+
+# The subset that holds site data. `render_cache` is derived and expires on its
+# own, so a row that asserts nothing was lost must not count it.
+export FG_DATA_TABLES="item_meta statistics statistics_daily gallery_albums tags item_metadata"
+FG_DATA_TABLE_COUNT=$( set -- $FG_DATA_TABLES; echo $# )
+
 # --- assertions -------------------------------------------------------------
 
 fail() {
@@ -26,6 +37,18 @@ assert_eq() {
 		pass "$what"
 	else
 		fail "$what — expected '$expected', got '$actual'"
+	fi
+}
+
+# Current behaviour that is wrong but not this change's to fix. Passes while the
+# defect stands and fails once it is fixed, so the fix cannot land silently.
+assert_defect() {
+	local expected="$1" actual="$2" what="$3" issue="$4"
+
+	if [ "$expected" = "$actual" ]; then
+		pass "$what (known defect, $issue)"
+	else
+		fail "$what changed — $issue may be fixed; update this row"
 	fi
 }
 
@@ -54,6 +77,16 @@ scratch_install() {
 	cp -a "$source_wp"/. "$SCRATCH_DIR"/
 	rm -f "$SCRATCH_DIR/wp-config.php"
 
+	# The harness installs the plugin as a symlink into the shared build. Copied
+	# through here, so a scenario that moves or edits a plugin file wrecks its
+	# own install and not the build every other test runs against.
+	if [ -L "$SCRATCH_DIR/wp-content/plugins/fotogrids" ]; then
+		local linked
+		linked="$( readlink -f "$SCRATCH_DIR/wp-content/plugins/fotogrids" )"
+		rm -f "$SCRATCH_DIR/wp-content/plugins/fotogrids"
+		cp -rL "$linked" "$SCRATCH_DIR/wp-content/plugins/fotogrids"
+	fi
+
 	mysql $FG_MYSQL_ARGS -e \
 		"DROP DATABASE IF EXISTS \`$SCRATCH_DB\`; CREATE DATABASE \`$SCRATCH_DB\`;"
 
@@ -69,6 +102,17 @@ scratch_install() {
 # Separate from the install, so a scenario can assert on the before state.
 scratch_activate() {
 	$WP plugin activate fotogrids --quiet
+}
+
+# Deactivate and delete the way a site owner does, as the admin.
+#
+# The SDK registers its uninstall hook from inside the deactivation hook, and
+# that hook returns early without a current user, so a deactivation with nobody
+# logged in leaves nothing to run on delete. `--skip-delete` keeps the files, so
+# the install can still be inspected afterwards.
+uninstall_as_admin() {
+	$WP --user=admin plugin deactivate fotogrids --quiet
+	$WP --user=admin plugin uninstall fotogrids --skip-delete --quiet
 }
 
 scratch_teardown() {
