@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-01T00:14:46+00:00\n"
+"POT-Creation-Date: 2026-10-02T11:42:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -4148,30 +4148,30 @@ msgstr ""
 msgid "Gallery and album rendering, including error context."
 msgstr ""
 
-#: includes/class-metadata-manager.php:794
-#: includes/class-metadata-manager.php:858
+#: includes/class-metadata-manager.php:818
+#: includes/class-metadata-manager.php:882
 #: includes/rest/metadata/library-data.php:245
 #: includes/rest/metadata/library-data.php:311
 msgid "Entry not found."
 msgstr ""
 
-#: includes/class-metadata-manager.php:799
+#: includes/class-metadata-manager.php:823
 msgid "Name cannot be empty."
 msgstr ""
 
-#: includes/class-metadata-manager.php:817
+#: includes/class-metadata-manager.php:841
 msgid "Another entry with this name already exists. Use Merge if you want to combine them."
 msgstr ""
 
-#: includes/class-metadata-manager.php:883
+#: includes/class-metadata-manager.php:907
 msgid "Failed to delete entry."
 msgstr ""
 
-#: includes/class-metadata-manager.php:946
+#: includes/class-metadata-manager.php:970
 msgid "Invalid metadata type."
 msgstr ""
 
-#: includes/class-metadata-manager.php:951
+#: includes/class-metadata-manager.php:975
 msgid "Target entry not found."
 msgstr ""
 
@@ -6187,7 +6187,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:722
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:248
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:54
 msgid "FotoGrids Album"
@@ -6259,7 +6259,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:46
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:534
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:291
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:55
 msgid "FotoGrids Gallery"
@@ -6296,8 +6296,7 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:204
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:427
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:615
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:180
 msgid "Loading preview…"
 msgstr ""
@@ -6381,8 +6380,7 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:609
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:704
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select an album to display."
 msgstr ""
 
@@ -6402,8 +6400,7 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:421
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:516
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -7142,54 +7139,48 @@ msgstr ""
 msgid "The embed item_meta row ID to delete."
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:51
+#: includes/rest/items/save-item-data.php:52
 #: includes/rest/lightbox/lightbox-data.php:54
 msgid "Item not found."
 msgstr ""
 
 #. translators: 1: tag ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:142
-#: includes/rest/metadata/metadata-data.php:209
+#: includes/rest/items/save-item-data.php:143
 #, php-format
 msgid "Failed to link tag ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: 1: tag name, 2: item ID.
-#: includes/rest/items/save-item-data.php:159
-#: includes/rest/metadata/metadata-data.php:222
+#: includes/rest/items/save-item-data.php:168
 #, php-format
 msgid "Failed to add tag: %1$s to item %2$d"
 msgstr ""
 
 #. translators: 1: person ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:183
-#: includes/rest/metadata/metadata-data.php:244
+#: includes/rest/items/save-item-data.php:192
 #, php-format
 msgid "Failed to link person ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: person name.
-#: includes/rest/items/save-item-data.php:194
-#: includes/rest/metadata/metadata-data.php:253
+#: includes/rest/items/save-item-data.php:211
 #, php-format
 msgid "Failed to add person: %s"
 msgstr ""
 
 #. translators: 1: location ID, 2: item ID.
-#: includes/rest/items/save-item-data.php:216
-#: includes/rest/metadata/metadata-data.php:276
+#: includes/rest/items/save-item-data.php:233
 #, php-format
 msgid "Failed to link location ID %1$d to item %2$d"
 msgstr ""
 
 #. translators: %s: location name.
-#: includes/rest/items/save-item-data.php:227
-#: includes/rest/metadata/metadata-data.php:285
+#: includes/rest/items/save-item-data.php:252
 #, php-format
 msgid "Failed to add location: %s"
 msgstr ""
 
-#: includes/rest/items/save-item-data.php:248
+#: includes/rest/items/save-item-data.php:273
 msgid "Item saved successfully."
 msgstr ""
 
@@ -7405,24 +7396,30 @@ msgstr ""
 msgid "Tag name is required"
 msgstr ""
 
-#: includes/rest/metadata/metadata-data.php:94
+#: includes/rest/metadata/metadata-data.php:104
 msgid "Failed to create tag"
 msgstr ""
 
-#: includes/rest/metadata/metadata-data.php:114
+#: includes/rest/metadata/metadata-data.php:124
 msgid "Person name is required"
 msgstr ""
 
-#: includes/rest/metadata/metadata-data.php:120
+#: includes/rest/metadata/metadata-data.php:140
 msgid "Failed to create person"
 msgstr ""
 
-#: includes/rest/metadata/metadata-data.php:142
+#: includes/rest/metadata/metadata-data.php:162
 msgid "Location name is required"
 msgstr ""
 
-#: includes/rest/metadata/metadata-data.php:148
+#: includes/rest/metadata/metadata-data.php:178
 msgid "Failed to create location"
+msgstr ""
+
+#. translators: %s: tag, person or location name.
+#: includes/rest/metadata/metadata-data.php:229
+#, php-format
+msgid "\"%s\" is not in the library, and you do not have permission to add it."
 msgstr ""
 
 #: includes/rest/permissions/permissions-data.php:112
@@ -11146,13 +11143,11 @@ msgstr ""
 msgid "Choose gallery"
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:457
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:475
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "This gallery has nothing to preview yet."
 msgstr ""
 
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:645
-#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:663
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:1
 msgid "This album has nothing to preview yet."
 msgstr ""
 

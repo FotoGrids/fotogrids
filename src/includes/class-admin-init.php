@@ -339,8 +339,7 @@ class Admin_Init {
 					'initialTab'  => $initial_tab,
 					'entityTypes' => array_values( $entity_types ),
 					'perPage'     => 50,
-					'canManage'   => current_user_can( 'manage_fotogrids_library' )
-						|| current_user_can( 'manage_fotogrids' ),
+					'canManage'   => Permissions\Permission_Check::can( 'manage_fotogrids_library' ),
 				)
 			);
 		}

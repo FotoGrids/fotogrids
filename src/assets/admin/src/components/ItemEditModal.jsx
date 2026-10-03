@@ -245,6 +245,13 @@ const ItemEditModal = ({
 
 			const newItem = await response.json();
 
+			if (!response.ok) {
+				window.fotogridsToast?.error(
+					newItem?.message || strings.errorSaving
+				);
+				return;
+			}
+
 			// For replace-type keys (maxItems === 1, e.g. locations), replace
 			// the existing entry rather than appending.
 			const REPLACE_TYPES = ['locations'];
