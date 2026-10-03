@@ -115,6 +115,72 @@ jobs:
           path: playwright-report/
           retention-days: 14
 
+  # Visual baselines are rasterised with the runner's fonts, so they are
+  # produced here and committed from the artifact, never from a workstation.
+  # Dispatch this job, download `visual-baselines`, commit it, and the full
+  # tier then verifies what it wrote.
+  visual-baselines:
+    name: Visual baselines
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: fotogrids_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+
+    env:
+      FG_DB_HOST: 127.0.0.1
+      FG_DB_PORT: 3306
+      FG_DB_USER: root
+      FG_DB_NAME: fotogrids_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node and dependencies
+        uses: ./.github/actions/setup-node-deps
+
+      - name: Set up PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mysqli, gd, exif, zip, mbstring
+          coverage: none
+
+      - name: Build plugin
+        run: npm run build:dev
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Boot WordPress
+        run: ./tests/harness/boot.sh --mode=ci
+
+      - name: Write the baselines
+        env:
+          FG_SEED_SETS: F-single,F-reg,F-pw,F-orphan,F-small,F-exif,F-album,F-mixed,F-draft
+        run: |
+          set -a; . ./tests/harness/.env; set +a
+          npx playwright test --project=serial --no-deps --grep @visual --update-snapshots
+
+      - name: Upload the baselines
+        uses: actions/upload-artifact@v6
+        with:
+          name: visual-baselines
+          path: tests/e2e/__screenshots__/
+          retention-days: 7
+
   # Not required by the branch ruleset, so it cannot block a PR.
   full:
     name: E2E full
