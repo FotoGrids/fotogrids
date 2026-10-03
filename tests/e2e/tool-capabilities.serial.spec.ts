@@ -59,7 +59,7 @@ test.afterAll( () => {
 	restoreRoles( roles );
 } );
 
-test( 'ROLE-13: a role with one tool capability is offered exactly that tool', () => {
+test( 'ROLE-13: a role with one tool capability is offered exactly that tool', { tag: '@permissions' }, () => {
 	const offered = toolsFor( USER );
 
 	expect( offered, 'the role was offered a tool it holds no capability for' ).toEqual( [
@@ -67,7 +67,7 @@ test( 'ROLE-13: a role with one tool capability is offered exactly that tool', (
 	] );
 } );
 
-test( 'ROLE-13: the registry holds more tools than that, so the filter did the work', () => {
+test( 'ROLE-13: the registry holds more tools than that, so the filter did the work', { tag: '@permissions' }, () => {
 	const all = wp( [
 		'eval',
 		"echo implode( ',', array_keys( \\FotoGrids\\Tools\\Tools_Registry::get_all() ) );",
@@ -81,7 +81,7 @@ test( 'ROLE-13: the registry holds more tools than that, so the filter did the w
 
 // With the capability granted nowhere, the fallback is the only thing that
 // could be offering the tool.
-test( 'ROLE-13: manage_fotogrids still offers a tool nobody has been granted', () => {
+test( 'ROLE-13: manage_fotogrids still offers a tool nobody has been granted', { tag: '@permissions' }, () => {
 	const admin = process.env.WP_ADMIN_USER ?? 'admin';
 
 	wp( [

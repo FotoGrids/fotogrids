@@ -37,7 +37,7 @@ function ownDraft( title: string ) {
 	return galleryPage( { layout: 'grid' }, undefined, title, 'fg-author', 'draft' );
 }
 
-test( 'ROLE-08: readonly ships the settings tree with the notice and no write', async ( {
+test( 'ROLE-08: readonly ships the settings tree with the notice and no write', { tag: [ '@settings', '@permissions' ] }, async ( {
 	page,
 } ) => {
 	setOption( OPTION, 'readonly' );
@@ -66,7 +66,7 @@ test( 'ROLE-08: readonly ships the settings tree with the notice and no write', 
 	expect( shipped.unauthorisedNotice ?? '' ).toContain( 'read-only mode' );
 } );
 
-test( 'ROLE-09: hidden does not register the metabox at all', async ( { page } ) => {
+test( 'ROLE-09: hidden does not register the metabox at all', { tag: [ '@settings', '@permissions' ] }, async ( { page } ) => {
 	setOption( OPTION, 'hidden' );
 	const { id } = ownDraft( 'Hidden probe' );
 

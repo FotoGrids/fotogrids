@@ -44,14 +44,14 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		await anon.dispose();
 	} );
 
-	test( 'SEC-01: an anonymous lightbox item request with no gallery is refused', async () => {
+	test( 'SEC-01: an anonymous lightbox item request with no gallery is refused', { tag: [ '@api', '@permissions' ] }, async () => {
 		const response = await anon.get(
 			route( `/fotogrids/v1/lightbox/item/${ orphan() }` )
 		);
 		expect( response.status() ).toBe( 401 );
 	} );
 
-	test( 'SEC-01: naming a public gallery does not unlock an item outside it', async () => {
+	test( 'SEC-01: naming a public gallery does not unlock an item outside it', { tag: [ '@api', '@permissions' ] }, async () => {
 		const response = await anon.get(
 			route( `/fotogrids/v1/lightbox/item/${ orphan() }`, {
 				gallery_id: publicGallery(),
@@ -60,7 +60,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		expect( response.status() ).toBe( 401 );
 	} );
 
-	test( 'an item in a public gallery stays readable anonymously', async () => {
+	test( 'an item in a public gallery stays readable anonymously', { tag: [ '@api', '@permissions' ] }, async () => {
 		const response = await anon.get(
 			route( `/fotogrids/v1/lightbox/item/${ publicItem() }`, {
 				gallery_id: publicGallery(),
@@ -70,7 +70,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		expect( ( await response.json() ).id ).toBe( publicItem() );
 	} );
 
-	test( 'SEC-02: a lightbox item in a password gallery is refused until unlocked', async ( {
+	test( 'SEC-02: a lightbox item in a password gallery is refused until unlocked', { tag: [ '@api', '@permissions' ] }, async ( {
 		playwright,
 	} ) => {
 		const itemRoute = route( `/fotogrids/v1/lightbox/item/${ pwItem() }`, {
@@ -88,7 +88,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		await visitor.dispose();
 	} );
 
-	test( 'SEC-02: a lightbox item in a registered-users gallery needs a signed-in visitor', async ( {
+	test( 'SEC-02: a lightbox item in a registered-users gallery needs a signed-in visitor', { tag: [ '@api', '@permissions' ] }, async ( {
 		playwright,
 	} ) => {
 		const itemRoute = route( `/fotogrids/v1/lightbox/item/${ regItem() }`, {
@@ -104,7 +104,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		await context.dispose();
 	} );
 
-	test( 'SEC-03: lightbox slides for a registered-users gallery need a signed-in visitor', async ( {
+	test( 'SEC-03: lightbox slides for a registered-users gallery need a signed-in visitor', { tag: [ '@api', '@permissions' ] }, async ( {
 		playwright,
 	} ) => {
 		const slidesRoute = route( '/fotogrids/v1/gallery/lightbox/slides' );
@@ -122,7 +122,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		await context.dispose();
 	} );
 
-	test( 'SEC-04: lightbox slides for a password gallery are refused until unlocked', async ( {
+	test( 'SEC-04: lightbox slides for a password gallery are refused until unlocked', { tag: [ '@api', '@permissions' ] }, async ( {
 		playwright,
 	} ) => {
 		const slidesRoute = route( '/fotogrids/v1/gallery/lightbox/slides' );
@@ -144,7 +144,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		await visitor.dispose();
 	} );
 
-	test( 'lightbox slides for a public gallery stay readable anonymously', async () => {
+	test( 'lightbox slides for a public gallery stay readable anonymously', { tag: [ '@api', '@permissions' ] }, async () => {
 		const response = await anon.post(
 			route( '/fotogrids/v1/gallery/lightbox/slides' ),
 			slides( publicGallery() )
@@ -153,7 +153,7 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		expect( ( await response.json() ).total ).toBe( 1 );
 	} );
 
-	test( 'SEC-05: the template preview needs an editor, whatever nonce is sent', async ( {
+	test( 'SEC-05: the template preview needs an editor, whatever nonce is sent', { tag: [ '@api', '@permissions' ] }, async ( {
 		playwright,
 	} ) => {
 		const preview = ( nonce?: string ) =>
