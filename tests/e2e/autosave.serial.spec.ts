@@ -15,7 +15,7 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
 
 test.describe.configure( { mode: 'serial' } );
 
-test( 'opening Add New and waiting creates nothing', async ( { page } ) => {
+test( 'opening Add New and waiting creates nothing', { tag: [ '@admin', '@settings' ] }, async ( { page } ) => {
 	const editor = new GalleryEditor( page );
 	const before = await editor.listTitles();
 
@@ -25,7 +25,7 @@ test( 'opening Add New and waiting creates nothing', async ( { page } ) => {
 	expect( await editor.listTitles() ).toEqual( before );
 } );
 
-test( 'a settings change on Add New creates nothing', { tag: '@critical' }, async ( { page } ) => {
+test( 'a settings change on Add New creates nothing', { tag: [ '@critical', '@admin', '@settings' ] }, async ( { page } ) => {
 	const editor = new GalleryEditor( page );
 	const before = await editor.listTitles();
 
@@ -36,7 +36,7 @@ test( 'a settings change on Add New creates nothing', { tag: '@critical' }, asyn
 	expect( await editor.listTitles() ).toEqual( before );
 } );
 
-test( 'an unsaved gallery still warns about unsaved changes', async ( {
+test( 'an unsaved gallery still warns about unsaved changes', { tag: [ '@admin', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const editor = new GalleryEditor( page );

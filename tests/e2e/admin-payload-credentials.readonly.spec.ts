@@ -25,7 +25,7 @@ const CREDENTIAL_FIELDS = [
 
 test.describe('FotoGrids admin payload', () => {
 	for (const path of ADMIN_PAGES) {
-		test(`carries no credential fields on ${path}`, async ({ page }) => {
+		test(`carries no credential fields on ${path}`, { tag: [ '@admin', '@api' ] }, async ({ page }) => {
 			await page.goto(path);
 
 			const payload = await page.evaluate(() => {

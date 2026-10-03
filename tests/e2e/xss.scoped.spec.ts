@@ -9,7 +9,7 @@ import { PAYLOAD, expectInert } from './support/xss';
  * Scoped: every gallery and album here is created by the test that reads it.
  */
 
-test( 'a script payload in a settings string is inert in the button it renders', async ( {
+test( 'a script payload in a settings string is inert in the button it renders', { tag: [ '@layout', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const { id, url } = galleryPage( {
@@ -26,7 +26,7 @@ test( 'a script payload in a settings string is inert in the button it renders',
 
 // The schema is JSON inside a script block, so a title holding `</script>`
 // would close the tag early. The emitter rewrites the sequence.
-test( 'a title holding a closing script tag cannot break out of the JSON-LD', { tag: '@critical' }, async ( {
+test( 'a title holding a closing script tag cannot break out of the JSON-LD', { tag: [ '@critical', '@layout', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const { id, url } = galleryPage( {}, undefined, PAYLOAD );

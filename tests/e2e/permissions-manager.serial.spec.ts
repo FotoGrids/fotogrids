@@ -41,7 +41,7 @@ test.afterEach( () => {
 	restoreRoles( roles );
 } );
 
-test( 'ROLE-10: the lowest-role write moves the capability down the ladder and back', async ( {
+test( 'ROLE-10: the lowest-role write moves the capability down the ladder and back', { tag: [ '@permissions', '@settings' ] }, async ( {
 	playwright,
 } ) => {
 	const { context, nonce } = await apiAs( playwright, 'administrator' );
@@ -82,7 +82,7 @@ test.describe( 'the matrix screen', () => {
 
 	// ROLE-11. No floor describes a grant that skips a role, so the dropdown
 	// grows a synthetic option rather than showing one that would be wrong.
-	test( 'ROLE-11: a grant that skips a role shows as custom', async ( { page } ) => {
+	test( 'ROLE-11: a grant that skips a role shows as custom', { tag: [ '@permissions', '@settings' ] }, async ( { page } ) => {
 		const settings = new SettingsPage( page );
 
 		// Author holds it, editor does not: no single floor describes that.
@@ -106,7 +106,7 @@ test.describe( 'the matrix screen', () => {
 	} );
 } );
 
-test( 'ROLE-12: a role the plugin has never heard of is granted nothing', async () => {
+test( 'ROLE-12: a role the plugin has never heard of is granted nothing', { tag: [ '@permissions', '@settings' ] }, async () => {
 	const CAPS_VERSION = 'fotogrids_caps_version';
 	const version = getOption( CAPS_VERSION );
 

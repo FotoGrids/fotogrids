@@ -134,7 +134,7 @@ async function writeEndpoints( request: APIRequestContext ): Promise< Endpoint[]
 	return endpoints;
 }
 
-test( 'SEC-13: every write route refuses a request with no nonce', async ( {
+test( 'SEC-13: every write route refuses a request with no nonce', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
 	const anon = await apiAnonymous( playwright );
@@ -192,7 +192,7 @@ test( 'SEC-13: every write route refuses a request with no nonce', async ( {
 	).toEqual( [] );
 } );
 
-test( 'the routes that are public on purpose still are', async ( { playwright } ) => {
+test( 'the routes that are public on purpose still are', { tag: [ '@api', '@permissions' ] }, async ( { playwright } ) => {
 	const anon = await apiAnonymous( playwright );
 
 	const response = await anon.post(
@@ -209,7 +209,7 @@ test( 'the routes that are public on purpose still are', async ( { playwright } 
 	expect( response.status() ).toBe( 200 );
 } );
 
-test( 'a view is not recorded for an object that does not exist', async ( {
+test( 'a view is not recorded for an object that does not exist', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
 	test.fail( true, 'no existence check on /stats/view — FotoGrids/backstage#380' );
@@ -224,7 +224,7 @@ test( 'a view is not recorded for an object that does not exist', async ( {
 	expect( response.status() ).toBeGreaterThanOrEqual( 400 );
 } );
 
-test( 'an author cannot rewrite metadata on an item they do not own', async ( {
+test( 'an author cannot rewrite metadata on an item they do not own', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
 	test.fail( true, '/metadata/item/{id} checks only edit_posts — FotoGrids/backstage#379' );

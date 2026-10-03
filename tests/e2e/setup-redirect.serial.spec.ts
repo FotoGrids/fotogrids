@@ -50,7 +50,7 @@ test.afterAll( () => {
 	wp( [ 'transient', 'delete', TRANSIENT ] );
 } );
 
-test( 'LIFE-05: reactivating an existing install does not flag the wizard', () => {
+test( 'LIFE-05: reactivating an existing install does not flag the wizard', { tag: [ '@lifecycle', '@admin' ] }, () => {
 	expect( version, 'the site has no stored version, so it is not an existing install' )
 		.not.toBeNull();
 
@@ -62,7 +62,7 @@ test( 'LIFE-05: reactivating an existing install does not flag the wizard', () =
 } );
 
 test( 'LIFE-04: a fresh activation flags it, and one admin load spends it', {
-	tag: '@critical',
+	tag: [ '@critical', '@lifecycle', '@admin' ],
 }, async ( { page } ) => {
 	setOption( 'fotogrids_version', null );
 	reactivate();

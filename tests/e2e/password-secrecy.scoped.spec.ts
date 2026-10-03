@@ -38,7 +38,7 @@ function expectNoSecrets(
 test.describe( 'the editor screen', () => {
 	test.use( { storageState: storageStateFor( 'administrator' ) } );
 
-	test( 'the settings payload carries neither the password nor its ciphertext', async ( {
+	test( 'the settings payload carries neither the password nor its ciphertext', { tag: [ '@gate', '@settings' ] }, async ( {
 		page,
 	} ) => {
 		const galleryId = fixture< number >( 'F-pw', 'gallery' );
@@ -62,7 +62,7 @@ test.describe( 'the editor screen', () => {
 	} );
 } );
 
-test( 'the lock screen carries neither, and the unlock cookie is not the ciphertext', async ( {
+test( 'the lock screen carries neither, and the unlock cookie is not the ciphertext', { tag: [ '@gate', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const galleryId = fixture< number >( 'F-pw', 'gallery' );

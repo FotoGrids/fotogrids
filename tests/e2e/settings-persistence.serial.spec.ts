@@ -22,7 +22,7 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
 test.describe.configure( { mode: 'serial' } );
 
 test.describe( 'settings persistence', () => {
-	test( 'autosave defaults to on', async ( { page } ) => {
+	test( 'autosave defaults to on', { tag: [ '@settings', '@admin' ] }, async ( { page } ) => {
 		const settings = new SettingsPage( page );
 
 		await settings.openAdvanced();
@@ -36,7 +36,7 @@ test.describe( 'settings persistence', () => {
 	 * as "unset, therefore on" leaves the editor's switch stuck on while the
 	 * setting is off. That is what this pins down.
 	 */
-	test( 'turning autosave off is reflected in the editor', async ( {
+	test( 'turning autosave off is reflected in the editor', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -64,7 +64,7 @@ test.describe( 'settings persistence', () => {
 	 * The point of the setting: a change on a settings screen writes itself,
 	 * with no Save click.
 	 */
-	test( 'a settings change saves itself when autosave is on', async ( {
+	test( 'a settings change saves itself when autosave is on', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -87,7 +87,7 @@ test.describe( 'settings persistence', () => {
 		await restore;
 	} );
 
-	test( 'a settings change waits for Save when autosave is off', async ( {
+	test( 'a settings change waits for Save when autosave is off', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -107,7 +107,7 @@ test.describe( 'settings persistence', () => {
 		await settings.setAutosave( true );
 	} );
 
-	test( 'the defaults tab saves over REST, not through options.php', async ( {
+	test( 'the defaults tab saves over REST, not through options.php', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -122,7 +122,7 @@ test.describe( 'settings persistence', () => {
 	 * The REST write runs outside is_admin(), so a class the endpoint reaches
 	 * for has to exist there - which is the shape of failure this catches.
 	 */
-	test( 'a defaults change round-trips through the endpoint', async ( {
+	test( 'a defaults change round-trips through the endpoint', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -157,7 +157,7 @@ test.describe( 'settings persistence', () => {
 		expect( stored.defaults.featured_show_all_radius ).toBe( value );
 	} );
 
-	test( 'the defaults save bar sits where the other tabs put it', async ( {
+	test( 'the defaults save bar sits where the other tabs put it', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -184,7 +184,7 @@ test.describe( 'settings persistence', () => {
 		restoreRoles( roles );
 	} );
 
-	test( 'permissions manager shows a save bar', async ( { page } ) => {
+	test( 'permissions manager shows a save bar', { tag: [ '@settings', '@admin' ] }, async ( { page } ) => {
 		await new SettingsPage( page ).open( 'permissions_manager' );
 	} );
 
@@ -193,7 +193,7 @@ test.describe( 'settings persistence', () => {
 	 * nothing like the other tabs. A change must now go dirty, wait out the
 	 * debounce, then commit - and the panel must stay mounted throughout.
 	 */
-	test( 'permissions manager debounces like the other tabs', async ( {
+	test( 'permissions manager debounces like the other tabs', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );
@@ -232,7 +232,7 @@ test.describe( 'settings persistence', () => {
 
 	} );
 
-	test( 'saving gallery defaults leaves the advanced settings alone', async ( {
+	test( 'saving gallery defaults leaves the advanced settings alone', { tag: [ '@settings', '@admin' ] }, async ( {
 		page,
 	} ) => {
 		const settings = new SettingsPage( page );

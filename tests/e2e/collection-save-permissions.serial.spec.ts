@@ -74,7 +74,7 @@ async function saveAs(
 	return ( await response.json() ) as SaveResponse;
 }
 
-test( 'ROLE-07: an author changes their own gallery’s content', async ( { page } ) => {
+test( 'ROLE-07: an author changes their own gallery’s content', { tag: [ '@permissions', '@settings' ] }, async ( { page } ) => {
 	const { id } = galleryPage( { layout: 'grid' }, undefined, 'Before', AUTHOR, 'draft' );
 
 	const body = await saveAs( page, id, { post_title: 'After' } );
@@ -83,7 +83,7 @@ test( 'ROLE-07: an author changes their own gallery’s content', async ( { page
 	expect( storedTitle( id ) ).toBe( 'After' );
 } );
 
-test( 'ROLE-06: the same save drops every settings key and says which', { tag: '@critical' }, async ( {
+test( 'ROLE-06: the same save drops every settings key and says which', { tag: [ '@critical', '@permissions', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage(

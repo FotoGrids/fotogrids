@@ -43,7 +43,7 @@ async function reach(
 test.describe( 'an administrator', () => {
 	test.use( { storageState: storageStateFor( 'administrator' ) } );
 
-	test( 'ROLE-01: sees the plugin menu and reaches every page behind it', { tag: '@critical' }, async ( {
+	test( 'ROLE-01: sees the plugin menu and reaches every page behind it', { tag: [ '@critical', '@admin', '@permissions' ] }, async ( {
 		page,
 	} ) => {
 		await page.goto( '/wp-admin/' );
@@ -66,7 +66,7 @@ test.describe( 'an editor', () => {
 	} );
 
 	// Library and Statistics sit under caps an editor holds; their parent does not.
-	test( 'ROLE-02: reaches Library and Statistics without the parent menu', async ( {
+	test( 'ROLE-02: reaches Library and Statistics without the parent menu', { tag: [ '@admin', '@permissions' ] }, async ( {
 		page,
 	} ) => {
 		await page.goto( '/wp-admin/' );
@@ -93,7 +93,7 @@ test.describe( 'an author', () => {
 
 	// The parent needs a cap an author lacks, so WordPress promotes the first
 	// submenu they can reach, under the plugin's name.
-	test( 'ROLE-03: the promoted menu entry points at Galleries', async ( { page } ) => {
+	test( 'ROLE-03: the promoted menu entry points at Galleries', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 		await page.goto( '/wp-admin/' );
 
 		await expect(
@@ -101,7 +101,7 @@ test.describe( 'an author', () => {
 		).toHaveAttribute( 'href', /post_type=fotogrids_gallery/ );
 	} );
 
-	test( 'ROLE-03: reaches the gallery list that entry links to', async ( { page } ) => {
+	test( 'ROLE-03: reaches the gallery list that entry links to', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 		test.fail(
 			true,
 			'the screen an author is offered answers 403 — FotoGrids/backstage#382'
@@ -112,7 +112,7 @@ test.describe( 'an author', () => {
 		expect( response?.status() ).toBe( 200 );
 	} );
 
-	test( 'ROLE-04: cannot open a gallery someone else owns', async ( { page } ) => {
+	test( 'ROLE-04: cannot open a gallery someone else owns', { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 		const id = fixture< number >( 'F-small', 'gallery' );
 
 		const response = await page.goto( `/wp-admin/post.php?post=${ id }&action=edit` );
@@ -130,7 +130,7 @@ for ( const role of [ 'contributor', 'subscriber' ] as const satisfies readonly 
 			allowConsoleErrors: 'a refused screen answers 403, which the browser logs',
 		} );
 
-		test( `ROLE-05: is refused every plugin page`, async ( { page } ) => {
+		test( `ROLE-05: is refused every plugin page`, { tag: [ '@admin', '@permissions' ] }, async ( { page } ) => {
 			for ( const slug of Object.keys( PAGES ) ) {
 				expect( await reach( page, slug ), `${ role } reached ${ slug }` ).toBe(
 					'refused'

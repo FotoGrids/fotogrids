@@ -75,7 +75,7 @@ async function unlock( context: BrowserContext, galleryId: number ): Promise< vo
 	expect( response.status() ).toBe( 200 );
 }
 
-test( 'an ungated gallery is cached, so the cache is on for the rows below', { tag: '@critical' }, async ( {
+test( 'an ungated gallery is cached, so the cache is on for the rows below', { tag: [ '@critical', '@cache', '@gate' ] }, async ( {
 	browser,
 } ) => {
 	const { id, url } = galleryPage( { enable_cache: true } );
@@ -88,7 +88,7 @@ test( 'an ungated gallery is cached, so the cache is on for the rows below', { t
 } );
 
 test.describe( 'a registered-users gallery', () => {
-	test( "GATE-10: a subscriber's render does not reach a guest", { tag: '@critical' }, async ( { browser } ) => {
+	test( "GATE-10: a subscriber's render does not reach a guest", { tag: [ '@critical', '@cache', '@gate' ] }, async ( { browser } ) => {
 		const { id, url } = galleryPage( {
 			enable_cache: true,
 			who_can_view: 'registered_users',
@@ -110,7 +110,7 @@ test.describe( 'a registered-users gallery', () => {
 		await guest.close();
 	} );
 
-	test( "GATE-10: a guest's login screen does not reach a subscriber", { tag: '@critical' }, async ( { browser } ) => {
+	test( "GATE-10: a guest's login screen does not reach a subscriber", { tag: [ '@critical', '@cache', '@gate' ] }, async ( { browser } ) => {
 		const { id, url } = galleryPage( {
 			enable_cache: true,
 			who_can_view: 'registered_users',
@@ -130,7 +130,7 @@ test.describe( 'a registered-users gallery', () => {
 } );
 
 test.describe( 'a password-protected gallery', () => {
-	test( 'GATE-10: an unlocked render does not reach a visitor without the cookie', { tag: '@critical' }, async ( {
+	test( 'GATE-10: an unlocked render does not reach a visitor without the cookie', { tag: [ '@critical', '@cache', '@gate' ] }, async ( {
 		browser,
 	} ) => {
 		const { id, url } = passwordGallery();
@@ -152,7 +152,7 @@ test.describe( 'a password-protected gallery', () => {
 		await stranger.close();
 	} );
 
-	test( 'GATE-10: a cached lock screen does not outlive an unlock', { tag: '@critical' }, async ( { browser } ) => {
+	test( 'GATE-10: a cached lock screen does not outlive an unlock', { tag: [ '@critical', '@cache', '@gate' ] }, async ( { browser } ) => {
 		const { id, url } = passwordGallery();
 		const visitor = await anonymous( browser );
 

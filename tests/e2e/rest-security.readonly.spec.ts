@@ -31,14 +31,14 @@ test.describe( 'gallery gates over REST', () => {
 		await anon.dispose();
 	} );
 
-	test( 'SEC-06: an anonymous unscoped item query returns nothing', async () => {
+	test( 'SEC-06: an anonymous unscoped item query returns nothing', { tag: '@api' }, async () => {
 		const response = await anon.get( route( '/fotogrids/v1/items' ) );
 
 		expect( response.status() ).toBe( 200 );
 		expect( ( await response.json() ).items ).toEqual( [] );
 	} );
 
-	test( 'SEC-07: a draft gallery yields no items anonymously', async () => {
+	test( 'SEC-07: a draft gallery yields no items anonymously', { tag: '@api' }, async () => {
 		for ( const key of [ 'draft', 'private', 'trashed' ] ) {
 			const response = await anon.get(
 				route( '/fotogrids/v1/items', {
@@ -51,7 +51,7 @@ test.describe( 'gallery gates over REST', () => {
 		}
 	} );
 
-	test( 'a password gallery yields no items to an anonymous caller', async () => {
+	test( 'a password gallery yields no items to an anonymous caller', { tag: '@api' }, async () => {
 		test.fail( true, 'gates are not evaluated on /items — FotoGrids/backstage#378' );
 
 		const response = await anon.get(
@@ -63,7 +63,7 @@ test.describe( 'gallery gates over REST', () => {
 		expect( ( await response.json() ).items ).toEqual( [] );
 	} );
 
-	test( 'a registered-users gallery yields no items to an anonymous caller', async () => {
+	test( 'a registered-users gallery yields no items to an anonymous caller', { tag: '@api' }, async () => {
 		test.fail( true, 'gates are not evaluated on /items — FotoGrids/backstage#378' );
 
 		const response = await anon.get(
@@ -75,7 +75,7 @@ test.describe( 'gallery gates over REST', () => {
 		expect( ( await response.json() ).items ).toEqual( [] );
 	} );
 
-	test( 'a password gallery is not readable through /gallery/{id}', async () => {
+	test( 'a password gallery is not readable through /gallery/{id}', { tag: '@api' }, async () => {
 		test.fail( true, 'gates are not evaluated on /gallery/{id} — FotoGrids/backstage#378' );
 
 		const response = await anon.get(
@@ -85,7 +85,7 @@ test.describe( 'gallery gates over REST', () => {
 		expect( response.status() ).toBe( 401 );
 	} );
 
-	test( 'a contributor sees no unpublished galleries they do not own', async ( {
+	test( 'a contributor sees no unpublished galleries they do not own', { tag: '@api' }, async ( {
 		playwright,
 	} ) => {
 		test.fail( true, 'unscoped /items ignores authorship — FotoGrids/backstage#381' );
@@ -119,7 +119,7 @@ test.describe( 'the unlock route gives nothing away', () => {
 	} );
 
 	// SEC-10. Answering differently would say which galleries are worth attacking.
-	test( 'SEC-10: a wrong password and an unprotected gallery answer alike', async () => {
+	test( 'SEC-10: a wrong password and an unprotected gallery answer alike', { tag: '@api' }, async () => {
 		const wrong = await unlock( fixture< number >( 'F-pw', 'gallery' ), 'nope' );
 		const none = await unlock( fixture< number >( 'F-small', 'gallery' ), 'nope' );
 
@@ -128,7 +128,7 @@ test.describe( 'the unlock route gives nothing away', () => {
 		expect( ( await none.json() ).code ).toBe( ( await wrong.json() ).code );
 	} );
 
-	test( 'SEC-10: the right password unlocks', async () => {
+	test( 'SEC-10: the right password unlocks', { tag: '@api' }, async () => {
 		const response = await unlock(
 			fixture< number >( 'F-pw', 'gallery' ),
 			fixture< string >( 'F-pw', 'password' )
@@ -140,7 +140,7 @@ test.describe( 'the unlock route gives nothing away', () => {
 
 test.describe( 'capabilities on admin and preview routes', () => {
 	/** SEC-20. Preview skips every gate, so it must require the manage cap. */
-	test( 'SEC-20: preview refuses an editor', async ( { playwright } ) => {
+	test( 'SEC-20: preview refuses an editor', { tag: '@api' }, async ( { playwright } ) => {
 		const { context, nonce } = await apiAs( playwright, 'editor' );
 
 		const response = await context.post(
@@ -157,7 +157,7 @@ test.describe( 'capabilities on admin and preview routes', () => {
 	// SEC-12. Media settings use manage_fotogrids where siblings use
 	// manage_fotogrids_settings. Both default to administrator, so this pins the
 	// asymmetry, not a gap.
-	test( 'SEC-12: media settings and general settings agree for an editor', async ( {
+	test( 'SEC-12: media settings and general settings agree for an editor', { tag: '@api' }, async ( {
 		playwright,
 	} ) => {
 		const { context, nonce } = await apiAs( playwright, 'editor' );
@@ -193,7 +193,7 @@ test.describe( 'query arguments reach SQL safely', () => {
 	 * SEC-16. A probe that reached SQL unprepared would surface as a 500 or a
 	 * database error in the body; a prepared one is simply an unmatched search.
 	 */
-	test( 'SEC-16: injection probes return a normal empty result', async () => {
+	test( 'SEC-16: injection probes return a normal empty result', { tag: '@api' }, async () => {
 		const probes = [
 			"' OR 1=1 --",
 			'"; DROP TABLE wp_posts; --',
@@ -215,7 +215,7 @@ test.describe( 'query arguments reach SQL safely', () => {
 		}
 	} );
 
-	test( 'SEC-16: a public item request still works alongside the probes', async () => {
+	test( 'SEC-16: a public item request still works alongside the probes', { tag: '@api' }, async () => {
 		const response = await anon.get(
 			route( `/fotogrids/v1/lightbox/item/${ firstItem( 'F-small' ) }`, {
 				gallery_id: fixture< number >( 'F-small', 'gallery' ),
