@@ -137,7 +137,7 @@ class Metadata_Manager {
 	 *
 	 * Matches case-insensitively on the name, or on the slug derived from it.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param string $type Metadata type.
 	 * @param string $name Metadata name.
 	 * @return object|null Metadata row, or null when there is no match.

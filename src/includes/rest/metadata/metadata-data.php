@@ -205,7 +205,7 @@ class Metadata_Data {
 	 * Users without the library capability can use an existing entry but cannot
 	 * add one or change its stored details.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @param string   $type   Metadata type: tag, person or location.
 	 * @param string   $name   Entry name.
 	 * @param callable $create Creates or fetches the entry; called only for library managers.

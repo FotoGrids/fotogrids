@@ -47,7 +47,7 @@ class Metadata_Permissions {
 	/**
 	 * Whether the current user may create or change library entries.
 	 *
-	 * @since 1.1.5
+	 * @since 1.2.0
 	 * @return bool
 	 */
 	public static function can_manage_library() {
