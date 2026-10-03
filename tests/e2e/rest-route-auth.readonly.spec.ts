@@ -153,6 +153,84 @@ test.describe( 'REST routes that return item data outside the render pipeline', 
 		expect( ( await response.json() ).total ).toBe( 1 );
 	} );
 
+	test( 'gallery item routes open to a visitor who unlocked the password gallery', { tag: [ '@api', '@permissions' ] }, async ( {
+		playwright,
+	} ) => {
+		const visitor = await apiAnonymous( playwright );
+		await visitor.post(
+			route( `/fotogrids/v1/gallery/${ pwGallery() }/unlock` ),
+			{ data: { password: fixture< string >( 'F-pw', 'password' ) } }
+		);
+
+		const items = await visitor.get(
+			route( '/fotogrids/v1/items', { gallery: pwGallery() } )
+		);
+		expect( ( await items.json() ).items ).toHaveLength( 1 );
+
+		const gallery = await visitor.get(
+			route( `/fotogrids/v1/gallery/${ pwGallery() }`, { preview: 1 } )
+		);
+		expect( gallery.status() ).toBe( 200 );
+
+		const galleryItems = await visitor.get(
+			route( `/fotogrids/v1/galleries/${ pwGallery() }/items` )
+		);
+		expect( galleryItems.status() ).toBe( 200 );
+		await visitor.dispose();
+	} );
+
+	test( 'gallery item routes open to a signed-in visitor on a registered-users gallery', { tag: [ '@api', '@permissions' ] }, async ( {
+		playwright,
+	} ) => {
+		const { context, nonce } = await apiAs( playwright, 'subscriber' );
+		const headers = { 'X-WP-Nonce': nonce };
+
+		const items = await context.get(
+			route( '/fotogrids/v1/items', { gallery: regGallery() } ),
+			{ headers }
+		);
+		expect( ( await items.json() ).items ).toHaveLength( 1 );
+
+		const galleryItems = await context.get(
+			route( `/fotogrids/v1/galleries/${ regGallery() }/items` ),
+			{ headers }
+		);
+		expect( galleryItems.status() ).toBe( 200 );
+		await context.dispose();
+	} );
+
+	test( 'gallery item routes for a public gallery stay readable anonymously', { tag: [ '@api', '@permissions' ] }, async () => {
+		const items = await anon.get(
+			route( '/fotogrids/v1/items', { gallery: publicGallery() } )
+		);
+		expect( ( await items.json() ).items ).toHaveLength( 1 );
+
+		const galleryItems = await anon.get(
+			route( `/fotogrids/v1/galleries/${ publicGallery() }/items` )
+		);
+		expect( galleryItems.status() ).toBe( 200 );
+	} );
+
+	test( 'an editor of a password gallery reads it without unlocking', { tag: [ '@api', '@permissions' ] }, async ( {
+		playwright,
+	} ) => {
+		const { context, nonce } = await apiAs( playwright, 'administrator' );
+		const headers = { 'X-WP-Nonce': nonce };
+
+		const slidesResponse = await context.post(
+			route( '/fotogrids/v1/gallery/lightbox/slides' ),
+			{ ...slides( pwGallery() ), headers }
+		);
+		expect( slidesResponse.status() ).toBe( 200 );
+
+		const galleryItems = await context.get(
+			route( `/fotogrids/v1/galleries/${ pwGallery() }/items` ),
+			{ headers }
+		);
+		expect( galleryItems.status() ).toBe( 200 );
+		await context.dispose();
+	} );
+
 	test( 'SEC-05: the template preview needs an editor, whatever nonce is sent', { tag: [ '@api', '@permissions' ] }, async ( {
 		playwright,
 	} ) => {
