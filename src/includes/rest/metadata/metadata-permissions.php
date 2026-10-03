@@ -51,8 +51,7 @@ class Metadata_Permissions {
 	 * @return bool
 	 */
 	public static function can_manage_library() {
-		return current_user_can( 'manage_fotogrids_library' )
-			|| current_user_can( 'manage_fotogrids' );
+		return \FotoGrids\Permissions\Permission_Check::can( 'manage_fotogrids_library' );
 	}
 
 	/**
