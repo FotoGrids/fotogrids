@@ -1,0 +1,41 @@
+{
+	"paths": {
+		"src/fotogrids.php": "*",
+		"src/includes/class-activator.php": "*",
+		"src/includes/class-deactivator.php": "*",
+		"src/includes/hooks/**": "*",
+		"src/includes/modules/class-module-registry.php": "*",
+		"src/includes/modules/class-abstract-module.php": "*",
+		"src/includes/class-post-types.php": "*",
+		"src/includes/class-kses.php": "*",
+		"src/public/render/boot.php": "*",
+
+		"src/public/render/**": "@layout",
+		"src/public/render/layouts/**": "@layout",
+		"src/public/render/decorators/**": "@layout",
+		"src/public/render/sorters/**": "@layout",
+		"src/public/render/lightbox/**": "@lightbox",
+		"src/public/render/gates/**": "@gate",
+		"src/public/render/filters/**": "*",
+
+		"src/includes/rest/**": "@api",
+		"src/includes/class-rest.php": "@api",
+		"src/includes/permissions/**": "@permissions",
+		"src/includes/settings/**": "@settings",
+		"src/includes/catalog/**": "@settings",
+		"src/includes/cache/**": "@cache",
+		"src/includes/class-fotogrids-cache.php": "@cache",
+		"src/includes/class-uninstaller.php": "@lifecycle",
+		"src/includes/admin/**": "@admin",
+		"src/includes/metaboxes/**": "@admin",
+		"src/includes/modules/Metaboxes/**": "@admin",
+		"src/includes/class-admin-init.php": "@admin",
+		"src/assets/admin/**": "@admin",
+		"src/includes/watermark/**": "*",
+
+		"tests/**": "*",
+		"playwright.config.ts": "*",
+		"package.json": "*",
+		".github/workflows/**": "*"
+	}
+}

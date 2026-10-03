@@ -95,7 +95,7 @@ test.afterAll( () => {
 	rmSync( path.join( wpPath(), 'wp-content', SLIP_NAME ), { force: true } );
 } );
 
-test( 'SEC-17: the folder import refuses every path that leaves the uploads folder', async ( {
+test( 'SEC-17: the folder import refuses every path that leaves the uploads folder', { tag: '@api' }, async ( {
 	playwright,
 } ) => {
 	const planted = path.join( outsideDir(), OUTSIDE_NAME );
@@ -137,7 +137,7 @@ test( 'SEC-17: the folder import refuses every path that leaves the uploads fold
 	expect( attachmentsPointingOutside(), 'an attachment now points outside uploads' ).toBe( '0' );
 } );
 
-test( 'SEC-17: the same request imports a file that is genuinely inside uploads', async ( {
+test( 'SEC-17: the same request imports a file that is genuinely inside uploads', { tag: '@api' }, async ( {
 	playwright,
 } ) => {
 	const inside = execFileSync(
@@ -165,7 +165,7 @@ test( 'SEC-17: the same request imports a file that is genuinely inside uploads'
 	expect( body.items ?? [], 'a path inside uploads was refused too' ).not.toEqual( [] );
 } );
 
-test( 'SEC-18: a zip-slip entry is never written outside the extraction folder', async ( {
+test( 'SEC-18: a zip-slip entry is never written outside the extraction folder', { tag: '@api' }, async ( {
 	playwright,
 } ) => {
 	const image = seededImageBytes();

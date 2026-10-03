@@ -12,7 +12,7 @@ test.use( { storageState: storageStateFor( 'administrator' ) } );
  * Scoped: each test edits a gallery it created, and none of these saves.
  */
 
-test( 'a field is found by its catalog key and shows the stored value', async ( {
+test( 'a field is found by its catalog key and shows the stored value', { tag: [ '@admin', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage( { layout: 'masonry' } );
@@ -26,7 +26,7 @@ test( 'a field is found by its catalog key and shows the stored value', async ( 
 	await expect( panel.field( 'item_spacing' ) ).toBeVisible();
 } );
 
-test( 'switching tabs brings that tab’s fields into the panel', async ( {
+test( 'switching tabs brings that tab’s fields into the panel', { tag: [ '@admin', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage();
@@ -42,7 +42,7 @@ test( 'switching tabs brings that tab’s fields into the panel', async ( {
 	await expect( panel.field( 'layout' ) ).toBeHidden();
 } );
 
-test( 'a gallery created with items shows them in the editor', async ( {
+test( 'a gallery created with items shows them in the editor', { tag: [ '@admin', '@settings' ] }, async ( {
 	page,
 } ) => {
 	const { id } = galleryPage();

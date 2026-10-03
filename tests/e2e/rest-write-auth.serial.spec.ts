@@ -134,7 +134,7 @@ async function writeEndpoints( request: APIRequestContext ): Promise< Endpoint[]
 	return endpoints;
 }
 
-test( 'SEC-13: every write route refuses a request with no nonce', async ( {
+test( 'SEC-13: every write route refuses a request with no nonce', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
 	const anon = await apiAnonymous( playwright );
@@ -192,7 +192,7 @@ test( 'SEC-13: every write route refuses a request with no nonce', async ( {
 	).toEqual( [] );
 } );
 
-test( 'the routes that are public on purpose still are', async ( { playwright } ) => {
+test( 'the routes that are public on purpose still are', { tag: [ '@api', '@permissions' ] }, async ( { playwright } ) => {
 	const anon = await apiAnonymous( playwright );
 
 	const response = await anon.post(
@@ -209,7 +209,7 @@ test( 'the routes that are public on purpose still are', async ( { playwright } 
 	expect( response.status() ).toBe( 200 );
 } );
 
-test( 'a view is not recorded for an object that does not exist', async ( {
+test( 'a view is not recorded for an object that does not exist', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
 	test.fail( true, 'no existence check on /stats/view — FotoGrids/backstage#380' );
@@ -224,7 +224,7 @@ test( 'a view is not recorded for an object that does not exist', async ( {
 	expect( response.status() ).toBeGreaterThanOrEqual( 400 );
 } );
 
-test( 'item metadata has no write route of its own', async ( { playwright } ) => {
+test( 'item metadata has no write route of its own', { tag: [ '@api', '@permissions' ] }, async ( { playwright } ) => {
 	const { context, nonce } = await apiAs( playwright, 'administrator' );
 
 	const response = await context.post(
@@ -238,7 +238,7 @@ test( 'item metadata has no write route of its own', async ( { playwright } ) =>
 	expect( response.status() ).toBe( 404 );
 } );
 
-test( 'an author cannot add a tag to the library', async ( { playwright } ) => {
+test( 'an author cannot add a tag to the library', { tag: [ '@api', '@permissions' ] }, async ( { playwright } ) => {
 	const name = `Author tag ${ Date.now() }`;
 	const author = await apiAs( playwright, 'author' );
 
@@ -263,7 +263,7 @@ test( 'an author cannot add a tag to the library', async ( { playwright } ) => {
 	expect( found.map( ( tag ) => tag.name ) ).not.toContain( name );
 } );
 
-test( 'an author can pick a tag that is already in the library', async ( {
+test( 'an author can pick a tag that is already in the library', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
 	const name = `Shared tag ${ Date.now() }`;

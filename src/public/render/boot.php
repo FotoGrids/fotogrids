@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use FotoGrids\Hooks\Actions_Render;
+use FotoGrids\Hooks\Filters_Cache;
 use FotoGrids\Render\Internal\Asset_Resolver;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -189,6 +190,21 @@ add_action(
 		\FotoGrids\Render\Internal\Module_Registry::register( 'features', \FotoGrids\Render\Features\Pagination\Page_Buttons\Page_Buttons::class );
 	},
 	10
+);
+
+add_filter(
+	Filters_Cache::SHOULD_CACHE,
+	static function ( $should_cache, $settings, $gallery_id ): bool {
+		if ( ! $should_cache ) {
+			return false;
+		}
+
+		$context = \FotoGrids\Render\Internal\Gallery_Item_Sequence::stub_context( (int) $gallery_id, (array) $settings );
+
+		return ! \FotoGrids\Render\Internal\Render_Controller::has_active_gates( $context );
+	},
+	10,
+	3
 );
 
 add_action(

@@ -11,7 +11,7 @@ import { Lightbox } from './support/lightbox';
  * change what another spec reads.
  */
 
-test( 'the lightbox opens from an item and closes again', { tag: '@critical' }, async ( { page } ) => {
+test( 'the lightbox opens from an item and closes again', { tag: [ '@critical', '@lightbox' ] }, async ( { page } ) => {
 	const { id, url } = galleryPage( { layout: 'grid' } );
 	const gallery = new GalleryRender( page, id );
 	const lightbox = new Lightbox( page );
@@ -23,7 +23,7 @@ test( 'the lightbox opens from an item and closes again', { tag: '@critical' }, 
 	await lightbox.close();
 } );
 
-test( 'the lightbox moves to the next item', { tag: '@critical' }, async ( { page } ) => {
+test( 'the lightbox moves to the next item', { tag: [ '@critical', '@lightbox' ] }, async ( { page } ) => {
 	const { id, url } = galleryPage( {
 		layout: 'grid',
 		lightbox_show_dots: true,
@@ -40,7 +40,7 @@ test( 'the lightbox moves to the next item', { tag: '@critical' }, async ( { pag
 	expect( await lightbox.index() ).toBe( 1 );
 } );
 
-test( 'a single-item gallery offers nothing to navigate to', async ( {
+test( 'a single-item gallery offers nothing to navigate to', { tag: '@lightbox' }, async ( {
 	page,
 } ) => {
 	const { id, url } = galleryPage( { layout: 'grid' }, [
