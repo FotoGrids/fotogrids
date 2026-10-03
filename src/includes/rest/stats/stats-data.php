@@ -1,6 +1,7 @@
 <?php
 namespace FotoGrids\REST\Stats;
 
+use FotoGrids\Galleries\Embed_Store;
 use FotoGrids\Hooks\Actions_Gallery;
 
 if ( ! defined( 'WPINC' ) ) {
@@ -89,14 +90,14 @@ class Stats_Data {
 	 *
 	 * @since  1.2.0
 	 * @param  string $object_type gallery, album or item.
-	 * @param  int    $object_id   Post ID of the gallery or album, attachment ID of the item.
+	 * @param  int    $object_id   Post ID of the gallery, album, attachment or video embed.
 	 * @return bool
 	 */
 	private static function object_exists( $object_type, $object_id ) {
 		$post_types = array(
-			'gallery' => 'fotogrids_gallery',
-			'album'   => 'fotogrids_album',
-			'item'    => 'attachment',
+			'gallery' => array( 'fotogrids_gallery' ),
+			'album'   => array( 'fotogrids_album' ),
+			'item'    => array( 'attachment', Embed_Store::POST_TYPE ),
 		);
 
 		if ( ! isset( $post_types[ $object_type ] ) ) {
@@ -106,7 +107,7 @@ class Stats_Data {
 		$post = get_post( $object_id );
 
 		return $post instanceof \WP_Post
-			&& $post_types[ $object_type ] === $post->post_type
+			&& in_array( $post->post_type, $post_types[ $object_type ], true )
 			&& 'trash' !== $post->post_status;
 	}
 
