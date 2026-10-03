@@ -34,7 +34,7 @@ function loadMap() {
 
 	return Object.entries( paths ).map( ( [ glob, tag ] ) => ( {
 		glob,
-		tag,
+		tags: Array.isArray( tag ) ? tag : [ tag ],
 		re: toRegExp( glob ),
 	} ) );
 }
@@ -47,7 +47,7 @@ function tagsFor( file, rules ) {
 		return [ EVERYTHING ];
 	}
 
-	return hit.map( ( rule ) => rule.tag );
+	return hit.flatMap( ( rule ) => rule.tags );
 }
 
 /** The changed paths, or null when the base cannot be resolved. */
