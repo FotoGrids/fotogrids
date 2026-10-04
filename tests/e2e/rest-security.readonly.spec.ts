@@ -102,8 +102,6 @@ test.describe( 'gallery gates over REST', () => {
 	test( 'a contributor sees no unpublished galleries they do not own', { tag: '@api' }, async ( {
 		playwright,
 	} ) => {
-		test.fail( true, 'unscoped /items ignores authorship — FotoGrids/backstage#381' );
-
 		const { context, nonce } = await apiAs( playwright, 'contributor' );
 
 		const response = await context.get( route( '/fotogrids/v1/items' ), {
