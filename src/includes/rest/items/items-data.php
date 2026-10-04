@@ -35,7 +35,7 @@ class Items_Data {
 		if ( $gallery_id ) {
 			$gallery_id = (int) $gallery_id;
 
-			if ( 'publish' !== get_post_status( $gallery_id ) && ! current_user_can( 'edit_post', $gallery_id ) ) {
+			if ( true !== \FotoGrids\REST\Gallery\Gallery_Permissions::authorize_gallery_view( $gallery_id ) ) {
 				return self::empty_items_response( $limit, $offset );
 			}
 

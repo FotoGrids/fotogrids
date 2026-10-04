@@ -52,8 +52,6 @@ test.describe( 'gallery gates over REST', () => {
 	} );
 
 	test( 'a password gallery yields no items to an anonymous caller', { tag: '@api' }, async () => {
-		test.fail( true, 'gates are not evaluated on /items — FotoGrids/backstage#378' );
-
 		const response = await anon.get(
 			route( '/fotogrids/v1/items', {
 				gallery: fixture< number >( 'F-pw', 'gallery' ),
@@ -64,8 +62,6 @@ test.describe( 'gallery gates over REST', () => {
 	} );
 
 	test( 'a registered-users gallery yields no items to an anonymous caller', { tag: '@api' }, async () => {
-		test.fail( true, 'gates are not evaluated on /items — FotoGrids/backstage#378' );
-
 		const response = await anon.get(
 			route( '/fotogrids/v1/items', {
 				gallery: fixture< number >( 'F-reg', 'gallery' ),
@@ -76,13 +72,31 @@ test.describe( 'gallery gates over REST', () => {
 	} );
 
 	test( 'a password gallery is not readable through /gallery/{id}', { tag: '@api' }, async () => {
-		test.fail( true, 'gates are not evaluated on /gallery/{id} — FotoGrids/backstage#378' );
-
 		const response = await anon.get(
 			route( `/fotogrids/v1/gallery/${ fixture< number >( 'F-pw', 'gallery' ) }` )
 		);
 
 		expect( response.status() ).toBe( 401 );
+	} );
+
+	test( 'a registered-users gallery is not readable through /gallery/{id}', { tag: '@api' }, async () => {
+		const response = await anon.get(
+			route( `/fotogrids/v1/gallery/${ fixture< number >( 'F-reg', 'gallery' ) }` )
+		);
+
+		expect( response.status() ).toBe( 401 );
+	} );
+
+	test( 'gated galleries are not readable through /galleries/{id}/items', { tag: '@api' }, async () => {
+		for ( const key of [ 'F-pw', 'F-reg' ] ) {
+			const response = await anon.get(
+				route(
+					`/fotogrids/v1/galleries/${ fixture< number >( key, 'gallery' ) }/items`
+				)
+			);
+
+			expect( response.status(), key ).toBe( 401 );
+		}
 	} );
 
 	test( 'a contributor sees no unpublished galleries they do not own', { tag: '@api' }, async ( {

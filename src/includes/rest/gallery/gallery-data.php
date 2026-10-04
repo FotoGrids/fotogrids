@@ -115,16 +115,9 @@ class Gallery_Data {
 			);
 		}
 
-		// Non-published galleries (draft, private, trashed, etc.) are only
-		// readable by users who can edit them; the public lightbox only ever
-		// requests published galleries. The `preview` flag does NOT relax this
-		// - it must never expose unpublished content to anonymous callers.
-		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'edit_post', $gallery_id ) ) {
-			return new \WP_Error(
-				'gallery_not_published',
-				__( 'Gallery is not published', 'fotogrids' ),
-				array( 'status' => 403 )
-			);
+		$access = Gallery_Permissions::authorize_gallery_view( $gallery_id );
+		if ( true !== $access ) {
+			return $access;
 		}
 
 		$meta = array(
@@ -543,12 +536,9 @@ class Gallery_Data {
 			return new \WP_Error( 'gallery_not_found', __( 'Gallery not found.', 'fotogrids' ), array( 'status' => 404 ) );
 		}
 
-		// This endpoint is public so the front-end lightbox can read items
-		// without a nonce, but only for published galleries. Items from
-		// unpublished galleries (draft, private, trashed) are restricted to
-		// users who can edit the gallery.
-		if ( 'publish' !== $gallery->post_status && ! current_user_can( 'edit_post', $gallery_id ) ) {
-			return new \WP_Error( 'gallery_not_available', __( 'Gallery is not available.', 'fotogrids' ), array( 'status' => 403 ) );
+		$access = Gallery_Permissions::authorize_gallery_view( $gallery_id );
+		if ( true !== $access ) {
+			return $access;
 		}
 
 		$rows = \FotoGrids\Galleries\Gallery_Repository::get_items( $gallery_id );
