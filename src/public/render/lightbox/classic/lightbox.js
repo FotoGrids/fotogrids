@@ -4021,12 +4021,6 @@ class FotoGridsLightboxInit {
 			const index = items.findIndex((item) => item.triggerEl === trigger);
 			lb.open(galleryEl, index >= 0 ? index : 0);
 		});
-
-		galleryEl.querySelectorAll('.fg-item').forEach((figure) => {
-			if (!figure.hasAttribute('tabindex')) {
-				figure.setAttribute('tabindex', '0');
-			}
-		});
 	}
 }
 

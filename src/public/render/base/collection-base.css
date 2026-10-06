@@ -27,15 +27,6 @@
     cursor: var(--fg-hover-cursor, default);
 }
 
-.fotogrids-collection .fg-item:focus {
-    outline: none;
-}
-
-.fotogrids-collection .fg-item:focus-visible {
-    outline: 2px solid var(--fg-colors-blue);
-    outline-offset: 2px;
-}
-
 /* When a decorator wraps the entire item contents (media + caption) in an
    anchor, the <a> becomes the flex child of fg-item. These rules ensure it
    inherits the same flex layout so gap and direction still apply correctly. */
@@ -53,12 +44,17 @@
 /* Suppress the default :focus outline on every focusable control in a
    collection (anchors, buttons, custom tabindex elements such as slider
    arrows/dots, pagination, and lightbox toolbar buttons). Keyboard focus is
-   still made visible via the :focus-visible ring on .fg-item and on each
+   still made visible via the :focus-visible ring on item links and on each
    control's own :focus-visible rule. */
 .fotogrids-collection a:focus,
 .fotogrids-collection button:focus,
 .fotogrids-collection [tabindex]:focus {
     outline: none;
+}
+
+.fotogrids-collection .fg-item a:focus-visible {
+    outline: 2px solid var(--fg-colors-blue);
+    outline-offset: 2px;
 }
 
 .fotogrids-collection .fg-item-media {
