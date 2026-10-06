@@ -10,9 +10,6 @@ import { execFileSync } from 'child_process';
  * `modify_fotogrids_gallery_settings`, so a save keeps its content and drops its
  * settings, naming the dropped keys.
  *
- * Drafts, because an author cannot open their own published gallery
- * (FotoGrids/backstage#383).
- *
  * Serial: these save real galleries.
  */
 
