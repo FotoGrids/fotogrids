@@ -86,7 +86,8 @@ class Stats_Data {
 	}
 
 	/**
-	 * Checks that the tracked object exists and matches its declared type.
+	 * Checks that the tracked object exists, matches its declared type and is
+	 * published, private or an attachment.
 	 *
 	 * @since  1.2.0
 	 * @param  string $object_type gallery, album or item.
@@ -108,7 +109,7 @@ class Stats_Data {
 
 		return $post instanceof \WP_Post
 			&& in_array( $post->post_type, $post_types[ $object_type ], true )
-			&& 'trash' !== $post->post_status;
+			&& in_array( $post->post_status, array( 'publish', 'private', 'inherit' ), true );
 	}
 
 	/**

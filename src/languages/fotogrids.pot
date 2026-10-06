@@ -7443,7 +7443,7 @@ msgstr ""
 msgid "Failed to update statistics"
 msgstr ""
 
-#: includes/rest/stats/stats-data.php:123
+#: includes/rest/stats/stats-data.php:124
 msgid "The object being tracked does not exist."
 msgstr ""
 
