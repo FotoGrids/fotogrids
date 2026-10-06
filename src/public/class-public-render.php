@@ -520,11 +520,11 @@ class Public_Render {
 		}
 
 		$album = \FotoGrids\Albums\Album_Repository::get( $album_id );
-		if ( ! $album || 'publish' !== $album->post_status ) {
+		if ( ! $album || ( 'publish' !== $album->post_status && ! current_user_can( 'read_post', $album_id ) ) ) {
 			return '';
 		}
 
-		$child_galleries = Gallery_Album_Relations::get_galleries_for_album(
+		$child_galleries = Gallery_Album_Relations::get_visible_galleries_for_album(
 			$album_id,
 			array(
 				'orderby' => 'position',
