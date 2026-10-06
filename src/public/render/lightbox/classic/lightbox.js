@@ -1440,12 +1440,17 @@ class FotoGridsLightbox {
 		const randomSeed = parseInt(gEl.dataset.fgRandomSeed || '0', 10);
 		const filters = readActiveFilters(gEl);
 
+		const headers = {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': nonce,
+		};
+		if (gEl.dataset.fgUnlockToken) {
+			headers['X-FotoGrids-Unlock'] = gEl.dataset.fgUnlockToken;
+		}
+
 		const promise = fetch(url, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': nonce,
-			},
+			headers,
 			credentials: 'same-origin',
 			body: JSON.stringify({
 				gallery_id: galleryId,
@@ -3006,6 +3011,10 @@ class FotoGridsLightbox {
 			'';
 		if (nonce) {
 			headers['X-WP-Nonce'] = nonce;
+		}
+		const unlockToken = this.galleryEl?.dataset.fgUnlockToken;
+		if (unlockToken) {
+			headers['X-FotoGrids-Unlock'] = unlockToken;
 		}
 
 		fetch(url, {

@@ -273,13 +273,18 @@
 
 		const timer = window.setTimeout(release, HOLD_TIMEOUT_MS);
 
+		const headers = {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': collectionEl.dataset.fgRenderNonce || '',
+		};
+		if (collectionEl.dataset.fgUnlockToken) {
+			headers['X-FotoGrids-Unlock'] = collectionEl.dataset.fgUnlockToken;
+		}
+
 		window
 			.fetch(url, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-WP-Nonce': collectionEl.dataset.fgRenderNonce || '',
-				},
+				headers,
 				credentials: 'same-origin',
 				body: JSON.stringify({
 					gallery_id: galleryId,

@@ -323,12 +323,17 @@
 			10
 		);
 
+		const headers = {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': nonce,
+		};
+		if (galleryEl.dataset.fgUnlockToken) {
+			headers['X-FotoGrids-Unlock'] = galleryEl.dataset.fgUnlockToken;
+		}
+
 		return fetch(url, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-WP-Nonce': nonce,
-			},
+			headers,
 			credentials: 'same-origin',
 			body: JSON.stringify({
 				gallery_id: galleryId,
