@@ -212,8 +212,6 @@ test( 'the routes that are public on purpose still are', { tag: [ '@api', '@perm
 test( 'a view is not recorded for an object that does not exist', { tag: [ '@api', '@permissions' ] }, async ( {
 	playwright,
 } ) => {
-	test.fail( true, 'no existence check on /stats/view — FotoGrids/backstage#380' );
-
 	const anon = await apiAnonymous( playwright );
 	const response = await anon.post(
 		`/?rest_route=${ encodeURIComponent( '/fotogrids/v1/stats/view' ) }`,
@@ -221,7 +219,54 @@ test( 'a view is not recorded for an object that does not exist', { tag: [ '@api
 	);
 	await anon.dispose();
 
-	expect( response.status() ).toBeGreaterThanOrEqual( 400 );
+	expect( response.status() ).toBe( 404 );
+} );
+
+test( 'views and shares count only for published or private objects of the declared type', {
+	tag: [ '@api', '@permissions' ],
+}, async ( { playwright } ) => {
+	const gallery = fixture< number >( 'F-small', 'gallery' );
+	const album = fixture< number >( 'F-album', 'album' );
+	const image = firstItem( 'F-small' );
+
+	const cases: Array< [ string, string, number, number ] > = [
+		[ 'view', 'gallery', gallery, 200 ],
+		[ 'view', 'album', album, 200 ],
+		[ 'view', 'item', image, 200 ],
+		[ 'view', 'item', fixture< number >( 'F-mixed', 'video' ), 200 ],
+		[ 'view', 'item', fixture< number >( 'F-mixed', 'youtube' ), 200 ],
+		[ 'view', 'item', fixture< number >( 'F-mixed', 'vimeo' ), 200 ],
+		[ 'share', 'item', fixture< number >( 'F-mixed', 'youtube' ), 200 ],
+		[ 'view', 'gallery', fixture< number >( 'F-draft', 'private' ), 200 ],
+		[ 'view', 'gallery', fixture< number >( 'F-draft', 'draft' ), 404 ],
+		[ 'view', 'gallery', fixture< number >( 'F-draft', 'trashed' ), 404 ],
+		[ 'view', 'gallery', album, 404 ],
+		[ 'view', 'album', gallery, 404 ],
+		[ 'view', 'item', gallery, 404 ],
+		[ 'view', 'gallery', image, 404 ],
+		[ 'share', 'item', 99999999, 404 ],
+	];
+
+	const anon = await apiAnonymous( playwright );
+	const results: string[] = [];
+	for ( const [ action, objectType, objectId ] of cases ) {
+		const response = await anon.post(
+			`/?rest_route=${ encodeURIComponent( `/fotogrids/v1/stats/${ action }` ) }`,
+			{
+				data: {
+					object_type: objectType,
+					object_id: objectId,
+					...( 'share' === action ? { network: 'copy' } : {} ),
+				},
+			}
+		);
+		results.push( `${ action } ${ objectType } ${ objectId } -> ${ response.status() }` );
+	}
+	await anon.dispose();
+
+	expect( results ).toEqual(
+		cases.map( ( [ action, objectType, objectId, status ] ) => `${ action } ${ objectType } ${ objectId } -> ${ status }` )
+	);
 } );
 
 test( 'item metadata has no write route of its own', { tag: [ '@api', '@permissions' ] }, async ( { playwright } ) => {
