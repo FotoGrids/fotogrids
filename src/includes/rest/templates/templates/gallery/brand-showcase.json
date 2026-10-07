@@ -21,7 +21,6 @@
       "mobile": 6
     },
     "hover_effect": "zoom",
-    "captions": true,
     "item_click_behavior": "lightbox",
     "caption_placement": "overlay",
     "caption_title_source": "title",
