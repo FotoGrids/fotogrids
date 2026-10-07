@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-06T12:45:38+00:00\n"
+"POT-Creation-Date: 2026-10-07T08:32:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: fotogrids\n"
@@ -18,8 +18,8 @@ msgstr ""
 #. Author of the plugin
 #: fotogrids.php
 #: includes/catalog/catalog-strings.php:357
-#: includes/class-admin-init.php:69
-#: includes/class-admin-init.php:70
+#: includes/class-admin-init.php:97
+#: includes/class-admin-init.php:98
 #: includes/diagnostics/class-system-report.php:50
 #: includes/diagnostics/class-system-report.php:181
 #: includes/metaboxes/class-metabox-strings.php:382
@@ -44,32 +44,32 @@ msgstr ""
 msgid "https://www.fotogrids.com/about/"
 msgstr ""
 
-#: fotogrids.php:253
+#: fotogrids.php:250
 msgid "FotoGrids requires WordPress version 6.3 or higher."
 msgstr ""
 
-#: fotogrids.php:254
-#: fotogrids.php:263
+#: fotogrids.php:251
+#: fotogrids.php:260
 msgid "Plugin Activation Error"
 msgstr ""
 
-#: fotogrids.php:262
+#: fotogrids.php:259
 msgid "FotoGrids requires PHP version 7.4 or higher."
 msgstr ""
 
-#: fotogrids.php:278
-#: includes/class-admin-init.php:134
-#: includes/class-admin-init.php:135
+#: fotogrids.php:275
+#: includes/class-admin-init.php:163
+#: includes/class-admin-init.php:164
 #: includes/tools/import-export/assets/ImportExportTool.jsx:54
 #: includes/tools/import-export/assets/ImportExportTool.jsx:137
 msgid "Settings"
 msgstr ""
 
-#: fotogrids.php:296
+#: fotogrids.php:293
 msgid "Get FotoGrids Pro"
 msgstr ""
 
-#: fotogrids.php:321
+#: fotogrids.php:318
 #: assets/admin/src/components/dashboard/LearnSection.jsx:86
 msgid "Help Center"
 msgstr ""
@@ -152,8 +152,8 @@ msgstr ""
 
 #: includes/admin/class-admin-columns.php:214
 #: includes/admin/class-dashboard-widget.php:126
-#: includes/class-admin-init.php:89
-#: includes/class-admin-init.php:90
+#: includes/class-admin-init.php:118
+#: includes/class-admin-init.php:119
 #: includes/class-post-types.php:328
 #: includes/diagnostics/class-system-report.php:160
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:15
@@ -221,8 +221,8 @@ msgid "New"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:134
-#: includes/class-admin-init.php:98
-#: includes/class-admin-init.php:99
+#: includes/class-admin-init.php:127
+#: includes/class-admin-init.php:128
 #: includes/diagnostics/class-system-report.php:161
 #: assets/admin/src/components/dashboard/OverviewStats.jsx:21
 #: assets/admin/src/components/pages/StatsPage.jsx:235
@@ -237,8 +237,8 @@ msgid "Engagement"
 msgstr ""
 
 #: includes/admin/class-dashboard-widget.php:167
-#: includes/class-admin-init.php:80
-#: includes/class-admin-init.php:81
+#: includes/class-admin-init.php:109
+#: includes/class-admin-init.php:110
 msgid "Dashboard"
 msgstr ""
 
@@ -3948,8 +3948,12 @@ msgstr ""
 msgid "{postType} Password"
 msgstr ""
 
-#: includes/class-admin-init.php:107
-#: includes/class-admin-init.php:108
+#: includes/class-admin-init.php:88
+msgid "Sorry, you are not allowed to access this page."
+msgstr ""
+
+#: includes/class-admin-init.php:136
+#: includes/class-admin-init.php:137
 #: includes/class-upgrade-modal.php:97
 #: includes/modules/Templates/Module.php:43
 #: includes/modules/Templates/Module.php:118
@@ -3958,34 +3962,34 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
-#: includes/class-admin-init.php:116
-#: includes/class-admin-init.php:117
+#: includes/class-admin-init.php:145
+#: includes/class-admin-init.php:146
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:33
 msgid "Library"
 msgstr ""
 
-#: includes/class-admin-init.php:125
-#: includes/class-admin-init.php:126
+#: includes/class-admin-init.php:154
+#: includes/class-admin-init.php:155
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:34
 #: includes/tools/import-export/assets/ImportExportTool.jsx:62
 msgid "Statistics"
 msgstr ""
 
-#: includes/class-admin-init.php:143
-#: includes/class-admin-init.php:144
+#: includes/class-admin-init.php:172
+#: includes/class-admin-init.php:173
 #: assets/admin/src/components/plugin-settings/tabs/PermissionsManagerTab.jsx:35
 msgid "Tools"
 msgstr ""
 
-#: includes/class-admin-init.php:153
-#: includes/class-admin-init.php:154
+#: includes/class-admin-init.php:182
+#: includes/class-admin-init.php:183
 #: includes/metaboxes/class-metabox-strings.php:290
 #: includes/modules/Templates/Module.php:322
 #: assets/admin/plain/collection-settings.js:2546
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/class-admin-init.php:601
+#: includes/class-admin-init.php:630
 #: includes/metaboxes/class-collection-save-pipeline.php:97
 #: includes/metaboxes/class-item-ajax-endpoints.php:467
 #: includes/rest/admin/admin-data.php:219
@@ -4002,37 +4006,37 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/class-admin-init.php:630
+#: includes/class-admin-init.php:659
 msgid "Invalid setting"
 msgstr ""
 
-#: includes/class-admin-init.php:640
+#: includes/class-admin-init.php:669
 msgid "Invalid value"
 msgstr ""
 
-#: includes/class-admin-init.php:650
-#: includes/class-admin-init.php:708
+#: includes/class-admin-init.php:679
+#: includes/class-admin-init.php:737
 msgid "Failed to save setting"
 msgstr ""
 
-#: includes/class-admin-init.php:713
+#: includes/class-admin-init.php:742
 msgid "Failed to update setting"
 msgstr ""
 
-#: includes/class-admin-init.php:956
+#: includes/class-admin-init.php:985
 msgid "Assign to Album"
 msgstr ""
 
-#: includes/class-admin-init.php:957
+#: includes/class-admin-init.php:986
 msgid "Remove from All Albums"
 msgstr ""
 
-#: includes/class-admin-init.php:1088
+#: includes/class-admin-init.php:1117
 msgid "Unknown Album"
 msgstr ""
 
 #. translators: 1: number of galleries assigned, 2: album name.
-#: includes/class-admin-init.php:1094
+#: includes/class-admin-init.php:1123
 #, php-format
 msgid "%1$d gallery assigned to \"%2$s\"."
 msgid_plural "%1$d galleries assigned to \"%2$s\"."
@@ -4040,8 +4044,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be assigned.
-#: includes/class-admin-init.php:1107
-#: includes/class-admin-init.php:1121
+#: includes/class-admin-init.php:1136
+#: includes/class-admin-init.php:1150
 #, php-format
 msgid "%d gallery could not be assigned."
 msgid_plural "%d galleries could not be assigned."
@@ -4049,7 +4053,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries removed from all albums.
-#: includes/class-admin-init.php:1140
+#: includes/class-admin-init.php:1169
 #, php-format
 msgid "%d gallery removed from all albums."
 msgid_plural "%d galleries removed from all albums."
@@ -4057,32 +4061,32 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of galleries that could not be processed.
-#: includes/class-admin-init.php:1152
-#: includes/class-admin-init.php:1166
+#: includes/class-admin-init.php:1181
+#: includes/class-admin-init.php:1195
 #, php-format
 msgid "%d gallery could not be processed."
 msgid_plural "%d galleries could not be processed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-admin-init.php:1184
-#: includes/class-admin-init.php:1375
+#: includes/class-admin-init.php:1213
+#: includes/class-admin-init.php:1404
 msgid "Please select an album to assign galleries to."
 msgstr ""
 
-#: includes/class-admin-init.php:1187
+#: includes/class-admin-init.php:1216
 msgid "The selected album is invalid or no longer exists."
 msgstr ""
 
-#: includes/class-admin-init.php:1190
+#: includes/class-admin-init.php:1219
 msgid "An error occurred during bulk operation."
 msgstr ""
 
-#: includes/class-admin-init.php:1235
+#: includes/class-admin-init.php:1264
 msgid "Select Album:"
 msgstr ""
 
-#: includes/class-admin-init.php:1238
+#: includes/class-admin-init.php:1267
 msgid "Choose an album..."
 msgstr ""
 
@@ -6179,6 +6183,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-album.php:44
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:61
 #: includes/modules/ViewCollections/class-router.php:163
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:587
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/album.jsx:248
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:54
 msgid "FotoGrids Album"
@@ -6250,6 +6255,7 @@ msgstr ""
 #: includes/modules/PageBuilders/builders/Bricks/elements/class-element-gallery.php:46
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:72
 #: includes/modules/ViewCollections/class-router.php:164
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:871
 #: includes/modules/PageBuilders/builders/Gutenberg/assets/src/gallery.jsx:291
 #: includes/modules/PageBuilders/core/assets/src/components/BlockPlaceholder.jsx:55
 msgid "FotoGrids Gallery"
@@ -6286,6 +6292,8 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/Module.php:204
 #: assets/admin/plain/render-settings/renderImagePicker.js:136
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:392
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:676
 #: includes/modules/PageBuilders/core/assets/src/components/LivePreview.jsx:180
 msgid "Loading preview…"
 msgstr ""
@@ -6369,6 +6377,8 @@ msgid "When disabled, pagination controls stay visible but inactive in the edito
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-album.php:178
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:386
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:481
 msgid "Select an album to display."
 msgstr ""
 
@@ -6388,6 +6398,8 @@ msgid "When disabled, item clicks select the widget in the editor instead of ope
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/widgets/class-widget-gallery.php:243
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:670
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:765
 msgid "Select a gallery to display."
 msgstr ""
 
@@ -11127,6 +11139,16 @@ msgstr ""
 
 #: includes/modules/PageBuilders/builders/Bricks/assets/src/editor.jsx:252
 msgid "Choose gallery"
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:422
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:440
+msgid "This album has nothing to preview yet."
+msgstr ""
+
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:706
+#: includes/modules/PageBuilders/builders/Divi/native/build/bundle.js:724
+msgid "This gallery has nothing to preview yet."
 msgstr ""
 
 #: includes/modules/PageBuilders/builders/Elementor/assets/src/editor.jsx:336

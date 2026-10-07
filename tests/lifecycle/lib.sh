@@ -106,10 +106,8 @@ scratch_activate() {
 
 # Deactivate and delete the way a site owner does, as the admin.
 #
-# The SDK registers its uninstall hook from inside the deactivation hook, and
-# that hook returns early without a current user, so a deactivation with nobody
-# logged in leaves nothing to run on delete. `--skip-delete` keeps the files, so
-# the install can still be inspected afterwards.
+# `--skip-delete` keeps the files, so the install can still be inspected
+# afterwards.
 uninstall_as_admin() {
 	$WP --user=admin plugin deactivate fotogrids --quiet
 	$WP --user=admin plugin uninstall fotogrids --skip-delete --quiet
