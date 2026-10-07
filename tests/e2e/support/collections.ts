@@ -52,11 +52,21 @@ export function galleryPage(
 	);
 }
 
-/** An album holding galleries this spec created. */
+/**
+ * An album holding galleries this spec created.
+ *
+ * @param galleries Gallery ids, in album order.
+ * @param settings  Catalog key to value.
+ * @param title     Album title.
+ * @param author    Login of the user who should own it.
+ * @param status    Post status; defaults to publish.
+ */
 export function album(
 	galleries: number[],
 	settings: Settings = {},
-	title?: string
+	title?: string,
+	author?: string,
+	status?: string
 ): { id: number } {
 	return JSON.parse(
 		collection( [
@@ -64,8 +74,15 @@ export function album(
 			`galleries=${ galleries.join( ',' ) }`,
 			`settings=${ JSON.stringify( settings ) }`,
 			...( undefined === title ? [] : [ `title=${ title }` ] ),
+			...( undefined === author ? [] : [ `author=${ author }` ] ),
+			...( undefined === status ? [] : [ `status=${ status }` ] ),
 		] )
 	);
+}
+
+/** Mark a collection made through the UI so the purge removes it too. */
+export function adopt( id: number ): void {
+	collection( [ 'op=adopt', `id=${ id }` ] );
 }
 
 /** A page rendering a gallery the spec did not create. */

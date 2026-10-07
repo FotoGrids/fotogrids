@@ -8,9 +8,11 @@
  *   wp eval-file collection.php op=settings id=41 settings='{"layout":"grid"}'
  *   wp eval-file collection.php op=render items=4 author=fg-author
  *   wp eval-file collection.php op=album galleries=41 title='Scoped album'
+ *   wp eval-file collection.php op=album author=fg-author status=draft
  *   wp eval-file collection.php op=page gallery=13
  *   wp eval-file collection.php op=page gallery=41 atts='template="masonry"'
  *   wp eval-file collection.php op=page album=42 atts='template="grid"'
+ *   wp eval-file collection.php op=adopt id=57
  *   wp eval-file collection.php op=purge
  *
  * Every post carries FG_COLLECTION_MARKER, so `op=purge` removes the lot.
@@ -180,7 +182,8 @@ if ( 'album' === $op ) {
 		array(
 			'post_type'   => 'fotogrids_album',
 			'post_title'  => fg_col_arg( $args, 'title', 'Scoped album' ),
-			'post_status' => 'publish',
+			'post_status' => fg_col_arg( $args, 'status', 'publish' ),
+			'post_author' => fg_col_author( fg_col_arg( $args, 'author' ) ),
 		),
 		true
 	);
@@ -226,6 +229,12 @@ if ( 'page' === $op ) {
 if ( 'settings' === $op ) {
 	$settings = json_decode( fg_col_arg( $args, 'settings', '{}' ), true );
 	fg_col_settings( (int) fg_col_arg( $args, 'id' ), is_array( $settings ) ? $settings : array() );
+	return;
+}
+
+if ( 'adopt' === $op ) {
+	// A collection the spec made through the UI, claimed so the purge finds it.
+	update_post_meta( (int) fg_col_arg( $args, 'id' ), FG_COLLECTION_MARKER, 1 );
 	return;
 }
 
