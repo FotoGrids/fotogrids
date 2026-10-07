@@ -289,6 +289,17 @@ const GalleryMetabox = ({
 		[setItems, strings]
 	);
 
+	const handleItemSaved = useCallback(
+		(itemId, fields) => {
+			setItems((prevItems) =>
+				prevItems.map((it) =>
+					it.id === itemId ? { ...it, ...fields } : it
+				)
+			);
+		},
+		[setItems]
+	);
+
 	useEffect(() => {
 		const handleClickOutside = (event) => {
 			if (
@@ -364,6 +375,7 @@ const GalleryMetabox = ({
 					items={items}
 					onClose={() => setShowModal(false)}
 					onNavigate={navigateItem}
+					onSaved={handleItemSaved}
 					strings={strings}
 				/>
 			)}
