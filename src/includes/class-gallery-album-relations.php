@@ -203,6 +203,26 @@ class Gallery_Album_Relations {
 	}
 
 	/**
+	 * Get the galleries of an album that the current user may view.
+	 *
+	 * Published galleries are always included; draft and private galleries
+	 * only when the current user can read them.
+	 *
+	 * @since 1.2.0
+	 * @param int   $album_id Album post ID.
+	 * @param array $args     Query arguments, as for get_galleries_for_album().
+	 * @return array Gallery objects with relationship data.
+	 */
+	public static function get_visible_galleries_for_album( $album_id, $args = array() ) {
+		return array_values(
+			array_filter(
+				self::get_galleries_for_album( $album_id, $args ),
+				static fn ( $gallery ) => 'publish' === $gallery->post_status || current_user_can( 'read_post', (int) $gallery->ID )
+			)
+		);
+	}
+
+	/**
 	 * Get albums for gallery
 	 *
 	 * @param int $gallery_id Gallery post ID
