@@ -145,11 +145,6 @@ class Freemius_Bootstrap {
 		// renders instead of the Freemius opt-in screen.
 		self::$instance->add_filter( 'redirect_on_activation', '__return_false' );
 
-		// Run data cleanup through the SDK's uninstall action instead of
-		// register_uninstall_hook()/uninstall.php so Freemius can report the
-		// uninstall event before the data is dropped.
-		self::$instance->add_action( 'after_uninstall', array( self::class, 'run_uninstall_cleanup' ) );
-
 		// The SDK adds its own opt-in/opt-out link to the plugins row. FotoGrids
 		// owns that consent in Settings > Advanced, which also mirrors the choice
 		// into Freemius; the SDK link resets anonymous mode without updating the
@@ -190,19 +185,23 @@ class Freemius_Bootstrap {
 	}
 
 	/**
-	 * Runs plugin data cleanup after Freemius reports the uninstall event.
+	 * Passes the uninstall to the Freemius SDK so it can report the event.
 	 *
-	 * Hooked to the SDK's `after_uninstall` action. Loads the uninstaller
-	 * explicitly because the uninstall request may not have required it yet.
+	 * WordPress runs uninstall.php instead of the uninstall callback the SDK
+	 * registers, so that callback is fired here on the per-plugin action
+	 * WordPress would have used. Does nothing when the SDK is not loaded.
 	 *
-	 * @since  1.0.0
+	 * @since  1.2.0
 	 * @return void
 	 */
-	public static function run_uninstall_cleanup(): void {
-		if ( ! class_exists( '\FotoGrids\Uninstaller' ) ) {
-			require_once FOTOGRIDS_PLUGIN_DIR . 'includes/class-uninstaller.php';
+	public static function report_uninstall(): void {
+		if ( null === self::$instance ) {
+			return;
 		}
 
-		\FotoGrids\Uninstaller::uninstall();
+		$action = 'uninstall_' . FOTOGRIDS_PLUGIN_BASENAME;
+
+		add_action( $action, array( 'Freemius', '_uninstall_plugin_hook' ) );
+		do_action( $action ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Core's per-plugin uninstall action.
 	}
 }

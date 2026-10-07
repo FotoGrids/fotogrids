@@ -14,7 +14,9 @@
 // docroot is the WordPress install `php -S -t` was pointed at.
 $docroot = rtrim( $_SERVER['DOCUMENT_ROOT'], '/' );
 $path    = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
-$file    = $docroot . $path;
+// The URI arrives percent-encoded; a file with a non-ASCII name is only found
+// on disk once it is decoded.
+$file = $docroot . rawurldecode( $path );
 
 // wp-admin/ and similar directory requests resolve to their index.php.
 if ( is_dir( $file ) && file_exists( rtrim( $file, '/' ) . '/index.php' ) ) {

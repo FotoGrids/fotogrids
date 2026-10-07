@@ -589,12 +589,16 @@ final class Core_Permissions {
 			'edit_fotogrids_galleries',
 			'publish_fotogrids_galleries',
 			'delete_fotogrids_galleries',
+			'edit_published_fotogrids_galleries',
+			'delete_published_fotogrids_galleries',
 			'edit_fotogrids_album',
 			'read_fotogrids_album',
 			'delete_fotogrids_album',
 			'edit_fotogrids_albums',
 			'publish_fotogrids_albums',
 			'delete_fotogrids_albums',
+			'edit_published_fotogrids_albums',
+			'delete_published_fotogrids_albums',
 		);
 
 		$defaults = array();
