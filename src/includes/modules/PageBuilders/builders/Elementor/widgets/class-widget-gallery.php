@@ -268,7 +268,7 @@ class Widget_Gallery extends Widget_Base {
 			}
 
 			$preview_options = Preview_Options::normalise( $settings );
-			$html            = Preview_Renderer::render_gallery_html( $gallery_id, $preview_options );
+			$html            = Preview_Renderer::render_gallery_html( $gallery_id, $preview_options, (string) $this->get_id() );
 
 			// Wrap so the editor.js capture-phase pagination guard has a
 			// stable hook to bind to; the class signals "this output

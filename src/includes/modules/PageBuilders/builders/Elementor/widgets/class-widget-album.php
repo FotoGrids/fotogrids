@@ -206,7 +206,7 @@ class Widget_Album extends Widget_Base {
 			}
 
 			$preview_options = Preview_Options::normalise( $settings );
-			$html            = Preview_Renderer::render_album_html( $album_id, $preview_options );
+			$html            = Preview_Renderer::render_album_html( $album_id, $preview_options, (string) $this->get_id() );
 
 			$pagination_off = ( ! $preview_options['pagination'] ) ? ' is-fg-pb-pagination-frozen' : '';
 			$fg_markup      = '<div class="fg-pb-elementor-preview' . $pagination_off . '">'

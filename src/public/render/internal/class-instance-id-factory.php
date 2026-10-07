@@ -43,6 +43,28 @@ final class Instance_Id_Factory {
 	}
 
 	/**
+	 * Generates the instance identifier for one builder placement of a collection.
+	 *
+	 * Returns `fg-{id}-p{key}`, so placements rendered in separate requests stay
+	 * distinct and keep the same ID across re-renders. Falls back to generate()
+	 * when the key holds no usable characters.
+	 *
+	 * @since   1.2.0
+	 * @param   int    $collection_id Gallery or album identifier.
+	 * @param   string $placement_key Builder element identifier.
+	 * @return  string
+	 */
+	public function generate_for_placement( int $collection_id, string $placement_key ): string {
+		$key = substr( (string) preg_replace( '/[^a-z0-9]/', '', strtolower( $placement_key ) ), 0, 32 );
+
+		if ( '' === $key ) {
+			return $this->generate( $collection_id );
+		}
+
+		return sprintf( 'fg-%d-p%s', $collection_id, $key );
+	}
+
+	/**
 	 * Resets instance state for tests.
 	 *
 	 * @since   1.0.0
