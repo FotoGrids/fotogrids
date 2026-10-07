@@ -420,7 +420,7 @@ class Gallery_Album_Relations {
 			)
 		);
 
-		return $max_position ? $max_position + 1 : 0;
+		return null === $max_position ? 0 : (int) $max_position + 1;
 	}
 
 	/**

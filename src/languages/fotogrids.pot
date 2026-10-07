@@ -7442,9 +7442,13 @@ msgstr ""
 msgid "Unknown logical permission."
 msgstr ""
 
-#: includes/rest/stats/stats-data.php:38
-#: includes/rest/stats/stats-data.php:67
+#: includes/rest/stats/stats-data.php:43
+#: includes/rest/stats/stats-data.php:76
 msgid "Failed to update statistics"
+msgstr ""
+
+#: includes/rest/stats/stats-data.php:124
+msgid "The object being tracked does not exist."
 msgstr ""
 
 #: includes/rest/templates/templates-data.php:253
