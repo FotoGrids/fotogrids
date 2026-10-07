@@ -53,13 +53,15 @@ export function galleryPage(
 }
 
 /**
- * An album holding galleries this spec created.
+ * An album holding galleries this spec created, and a post that renders it
+ * through the shortcode.
  *
  * @param galleries Gallery ids, in album order.
  * @param settings  Catalog key to value.
  * @param title     Album title.
  * @param author    Login of the user who should own it.
  * @param status    Post status; defaults to publish.
+ * @return The album id, the rendering post's URL and the album's view page URL.
  */
 export function album(
 	galleries: number[],
@@ -67,7 +69,7 @@ export function album(
 	title?: string,
 	author?: string,
 	status?: string
-): { id: number } {
+): { id: number; url: string; view: string } {
 	return JSON.parse(
 		collection( [
 			'op=album',

@@ -291,6 +291,18 @@
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = html;
 
+				// Without a remember cookie, the token is what authorises
+				// this gallery's later requests until the page is left.
+				if (data.unlockToken) {
+					tempDiv
+						.querySelectorAll(
+							'[data-fg-gallery-id="' + galleryId + '"]'
+						)
+						.forEach(function (el) {
+							el.dataset.fgUnlockToken = data.unlockToken;
+						});
+				}
+
 				const newNodes = Array.prototype.slice.call(tempDiv.childNodes);
 				if (newNodes.length === 0) {
 					window.location.reload();

@@ -63,3 +63,12 @@ export function firstItem( set: string, key = 'items' ): number {
 	}
 	return items[ 0 ];
 }
+
+/** Twelve distinct items, enough for two pages of six, from sets CI seeds. */
+export function twelveItems(): number[] {
+	return [
+		...fixture< number[] >( 'F-small', 'items' ),
+		...fixture< number[] >( 'F-tagged', 'items' ),
+		...fixture< number[] >( 'F-single', 'items' ),
+	];
+}

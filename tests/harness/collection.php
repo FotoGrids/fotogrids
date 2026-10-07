@@ -204,7 +204,31 @@ if ( 'album' === $op ) {
 		fg_col_settings( (int) $album_id, $settings );
 	}
 
-	WP_CLI::log( (string) wp_json_encode( array( 'id' => (int) $album_id ) ) );
+	$page_id = wp_insert_post(
+		array(
+			'post_type'    => 'post',
+			'post_title'   => 'Renders album ' . $album_id,
+			'post_status'  => 'publish',
+			'post_content' => '[fotogrids_album id="' . $album_id . '"]',
+		),
+		true
+	);
+
+	if ( is_wp_error( $page_id ) ) {
+		WP_CLI::error( $page_id->get_error_message() );
+	}
+
+	update_post_meta( $page_id, FG_COLLECTION_MARKER, 1 );
+
+	WP_CLI::log(
+		(string) wp_json_encode(
+			array(
+				'id'   => (int) $album_id,
+				'url'  => get_permalink( $page_id ),
+				'view' => get_permalink( $album_id ),
+			)
+		)
+	);
 	return;
 }
 
