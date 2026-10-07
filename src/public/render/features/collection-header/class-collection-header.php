@@ -10,6 +10,7 @@ use FotoGrids\Render\Api\Feature;
 use FotoGrids\Render\Api\Inline_Assets;
 use FotoGrids\Render\Api\Module_Assets;
 use FotoGrids\Render\Api\Render_Context;
+use FotoGrids\Render\Internal\Context_Builder;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -53,6 +54,30 @@ final class Collection_Header implements Feature, Inline_Assets {
 	 * @since 1.0.0
 	 */
 	private const DEFAULT_SEPARATOR_SVG = '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 4l4 4-4 4"/></svg>';
+
+	/**
+	 * Partitions the render cache by the visit-context album.
+	 *
+	 * Hooked to fotogrids/cache/bucket. A render reached through `fg_via`
+	 * is keyed by the parent album Breadcrumb_Resolver picks for it, or 0
+	 * when it picks none; a render without `fg_via` keeps the bucket as is.
+	 *
+	 * @since  1.2.0
+	 * @param  string $bucket     Cache bucket.
+	 * @param  array  $settings   Collection settings.
+	 * @param  int    $gallery_id Gallery ID.
+	 * @return string
+	 */
+	public static function cache_bucket( $bucket, $settings, $gallery_id ): string {
+		$via_album_id = Context_Builder::via_album_from_request();
+		if ( null === $via_album_id ) {
+			return (string) $bucket;
+		}
+
+		$album_id = Breadcrumb_Resolver::resolve_parent_album( (int) $gallery_id, $via_album_id );
+
+		return $bucket . '|via:' . (int) $album_id;
+	}
 
 	public function id(): string {
 		return 'fotogrids/collection-header';
