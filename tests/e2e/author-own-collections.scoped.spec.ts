@@ -140,11 +140,7 @@ test.describe( 'an author', () => {
 } );
 
 test.describe( 'an author, trashing', () => {
-	test.use( {
-		storageState: storageStateFor( 'author' ),
-		allowConsoleErrors:
-			'trashing redirects to the list screen, which answers 403 for an author — FotoGrids/backstage#382',
-	} );
+	test.use( { storageState: storageStateFor( 'author' ) } );
 
 	for ( const { kind } of KINDS ) {
 		test( `ROLE-03: moves an own published ${ kind } to the trash`, { tag: [ '@permissions', '@admin' ] }, async ( {
