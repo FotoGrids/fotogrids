@@ -95,6 +95,7 @@ const loadPreview = async (container) => {
 					click_behavior: container.dataset.fgBricksClick === '1',
 					pagination: container.dataset.fgBricksPagination === '1',
 				},
+				placement_key: container.dataset.fgBricksPlacement || '',
 			}),
 		});
 

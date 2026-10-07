@@ -46,7 +46,7 @@ import PreviewOptionsToolbar from '@modules/PageBuilders/core/assets/src/compone
 
 const readPbConfig = () => window?.fotogridsPageBuilders || {};
 
-const Edit = ({ attributes, setAttributes, isSelected }) => {
+const Edit = ({ attributes, setAttributes, isSelected, clientId }) => {
 	const {
 		galleryId,
 		align,
@@ -293,6 +293,7 @@ const Edit = ({ attributes, setAttributes, isSelected }) => {
 					)}
 					<LivePreview
 						kind="gallery"
+						placementKey={clientId}
 						id={galleryId}
 						restUrl={restUrl}
 						restNonce={restNonce}
